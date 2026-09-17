@@ -32,13 +32,21 @@ provenance, fail-closed defaults). This package creates no new registry,
 state machine, or provenance system (operator constraints 39-41): its records
 are intended to be ingested by the canonical gate machinery at the PRIOR-ART /
 STATE-OF-THE-ART COLLISION stage of the canonical loop (Art. LV) and by the
-external-audit #7 Novelty dimension. The patent side declares PATENT_BLIND
-per run unless a scoped Lens (or equivalent patent) transport is configured:
-the operator's stated alternative, "configure Lens or declare
-patent-blindness per run", measured live in R495_TRANSPORT_PROBE.json.
+external-audit #7 Novelty dimension. The patent side is SELF-MEASURING per
+run across every registered provider (Lens, PatSnap, PatentBear): it
+declares PATENT_BLIND unless at least one provider measures LIVE, and it
+issues a PATENT_COVERAGE_LIVE_THIS_RUN coverage statement when one does.
+Measured history: Lens out-of-scope (R495); PatSnap recognized-but-
+unopenable (R496); PatentBear LIVE (R497 -- MCP JSON-RPC tools/call,
+real-vs-garbage key boundary measured HTTP 401 at the tool layer on BOTH
+search_patents and get_patent_record, cross-path byte verification of
+search-hit title AND abstract inside the independently fetched record
+text, and provider-documented quota metering: free plan 20 external
+calls/month, usage object ledgered per call in R497_PATENTBEAR_PROBE3.json).
 
 Credentials arrive via environment injection only (ELSEVIER_API_KEY,
-LENS_API_KEY); values are never printed, logged, or persisted.
+LENS_API_KEY, PATSNAP_API_KEY, PATENTBEAR_API_KEY); values are never
+printed, logged, or persisted.
 """
 
 import hashlib
@@ -52,6 +60,11 @@ import urllib.request
 SCOPUS_SEARCH_URL = "https://api.elsevier.com/content/search/scopus"
 SCOPUS_ABSTRACT_URL = "https://api.elsevier.com/content/abstract/scopus_id/"
 LENS_PATENTS_URL = "https://api.lens.org/patents/search"
+# PatentBear MCP surface (measured live at R497; see R497_PATENTBEAR_PROBE*.json)
+PATENTBEAR_MCP_URL = "https://www.patentbear.com/mcp"
+PATENTBEAR_PROTOCOL_VERSION = "2025-06-18"
+PATENTBEAR_PACE_S = 1.1
+PATENTBEAR_MEASURE_QUERY = "shunt valve"   # anchor query family, fixed (Art. VIII)
 TIMEOUT_S = 45
 RATE_LIMIT_HTTP = 429          # measured live at R495: burst calls hit 429
 RATE_LIMIT_RETRIES = 2         # bounded; 429-only; transport robustness, never
@@ -75,6 +88,11 @@ V_NO_COLLISION = "NO_COLLISION_FOUND"     # verified coverage, zero relevant hit
 V_INDETERMINATE = "INDETERMINATE"         # relevance not establishable by the deterministic instrument
 V_INCOMPLETE = "RETRIEVAL_INCOMPLETE"     # transport failed -- unknown, NOT absence
 V_BLIND = "PATENT_BLIND"                  # no scoped patent transport: declared per run
+# Per-run patent COVERAGE statement (R497). NOT a novelty verdict and not a
+# relevance verdict (Art. XLVI/XXVIII): it states only that >= 1 patent
+# provider measured LIVE this run, so record-level byte binding is available
+# on the patent leg. Blindness and coverage are mutually exclusive.
+T_COVERED = "PATENT_COVERAGE_LIVE_THIS_RUN"
 
 
 def _now():
@@ -210,6 +228,126 @@ class ScopusTransport:
         return T_LIVE, title + "\n" + abstract, meta
 
 
+class PatentBearTransport:
+    """PatentBear MCP transport -- measured LIVE at R497.
+
+    Surface (all measured, R497_PATENTBEAR_PROBE{,2,3}.json):
+      - MCP JSON-RPC over POST at PATENTBEAR_MCP_URL; stateless (no
+        Mcp-Session-Id observed); Bearer pb_live_ key.
+      - initialize/tools/list are unauthenticated by design (33 tools were
+        listed to a garbage key too) -- the credential boundary lives at
+        tools/call: measured HTTP 401 for a garbage key on BOTH
+        search_patents and get_patent_record, while the real key measures
+        HTTP 200 with per-call usage accounting (the garbage-key attempts
+        did not debit the real key's counter -- accounting is per key).
+      - Every SUCCESSFUL call debits the account's monthly external-call
+        quota (provider-documented: free 20 / Plus 500 / Pro & Team 5000);
+        the usage object rides every response and is ledgered by the
+        caller. Quota is a first-class custody field, not a side note.
+      - search hits carry verbatim title+abstract; the R497 cross-path
+        measurement verified BOTH byte-exact inside the independently
+        fetched get_patent_record text (Art. II/III machinery on the
+        patent leg).
+
+    A LIVE search yields typed LIVE_200 with hits; num_hits is a COUNT
+    SIGNAL ONLY (Art. XXI.1) -- relevance and collision verdicts are made
+    only downstream, on record-level byte evidence.
+    """
+
+    name = "patentbear"
+
+    def __init__(self, api_key=None):
+        self.api_key = api_key if api_key is not None else \
+            os.environ.get("PATENTBEAR_API_KEY", "")
+
+    def configured(self):
+        return bool(self.api_key)
+
+    def _tools_call(self, tool, arguments):
+        """One JSON-RPC tools/call. Returns (state, text, usage, http).
+        401/403 -> AUTH_FAILED (the measured credential boundary); any other
+        non-200 or unparseable payload -> SEARCH_FAILED (typed, never
+        absence); an in-band isError -> SEARCH_FAILED with the error text
+        preserved. The usage object is surfaced whenever present."""
+        body = json.dumps({
+            "jsonrpc": "2.0", "id": 1, "method": "tools/call",
+            "params": {"name": tool, "arguments": arguments},
+        }).encode()
+        headers = {"Content-Type": "application/json",
+                   "Accept": "application/json, text/event-stream",
+                   "User-Agent": "toscanini-rbg/1.0",
+                   "Authorization": "Bearer " + self.api_key}
+        time.sleep(PATENTBEAR_PACE_S)
+        code, raw = _http_post(PATENTBEAR_MCP_URL, body, headers)
+        usage = None
+        if code in (401, 403):
+            return T_AUTH_FAILED, "", usage, code
+        if code is None or code != 200:
+            return T_SEARCH_FAILED, "", usage, code
+        try:
+            payload = json.loads(raw.decode("utf-8", "replace"))
+            items = (payload.get("result") or {}).get("content") or []
+            text = "\n".join(c.get("text", "") for c in items
+                             if isinstance(c, dict) and c.get("type") == "text")
+            if (payload.get("result") or {}).get("isError"):
+                return T_SEARCH_FAILED, text or "", usage, code
+        except Exception:  # noqa: BLE001 -- typed failure, never absence
+            return T_SEARCH_FAILED, "", usage, code
+        try:
+            usage = (json.loads(text) or {}).get("usage")
+        except Exception:  # noqa: BLE001
+            usage = None
+        return T_LIVE, text or "", usage, code
+
+    def search(self, query):
+        """Returns (state, hits, usage). hits carry the provider's verbatim
+        id/title/abstract fields -- no normalization (Art. II)."""
+        if not self.configured():
+            return T_UNCONFIGURED, [], None
+        state, text, usage, http = self._tools_call("search_patents",
+                                                    {"query": query})
+        if state != T_LIVE:
+            return state, [], usage
+        try:
+            payload = json.loads(text)
+        except Exception:  # noqa: BLE001
+            return T_SEARCH_FAILED, [], usage
+        hits = payload.get("hits") or []
+        if payload.get("num_hits", 0) == 0 and not hits:
+            return T_NO_RESULTS, [], usage
+        if not hits:
+            return T_SEARCH_FAILED, [], usage
+        clean = []
+        for h in hits:
+            if isinstance(h, dict) and h.get("id"):
+                clean.append({"id": str(h["id"]),
+                              "title": h.get("title") or "",
+                              "abstract": h.get("abstract") or ""})
+        if not clean:
+            return T_SEARCH_FAILED, [], usage
+        return T_LIVE, clean, usage
+
+    def fetch_record_text(self, patentbear_id):
+        """Independent record resolution (Art. III): the gate fetches the
+        record itself by ID. Returns (state, text, meta)."""
+        if not self.configured():
+            return T_UNCONFIGURED, "", {}
+        state, text, usage, http = self._tools_call(
+            "get_patent_record", {"id": patentbear_id, "format": "text"})
+        meta = {"record_id": patentbear_id, "fetch_http": http,
+                "usage": usage,
+                "fetched_text_sha256": sha256(text) if text else None,
+                "fetched_text_len": len(text or "")}
+        if state != T_LIVE:
+            meta["state"] = state
+            return state, "", meta
+        if not text:
+            return T_SEARCH_FAILED, "", meta
+        # provider-side truncation markers are surfaced, never silently eaten
+        meta["text_omitted_marker_present"] = ("text_omitted" in text)
+        return T_LIVE, text, meta
+
+
 PATSNAP_COUNT_URL = "https://connect.patsnap.com/search/patent/query-search-count"
 LENS_PATENT_SEARCH_URL = "https://api.lens.org/patents/search"
 
@@ -232,6 +370,11 @@ class PatentTransportLayer:
         registers no companion app_id. KEY PRESENCE IS NOT TRANSPORT
         LIVENESS -- a present-but-unopenable credential must NOT unblind
         the run.
+      PatentBear (R497): LIVE. The operator's pb_live_ key opens the MCP
+        tools/call layer (search_patents, get_patent_record measured 200
+        with usage accounting; a garbage key measures 401 on the same
+        surface -- the boundary is measured, not assumed). The patent leg
+        now carries record-level byte binding end to end.
 
     The operator's directive branch is 'configure Lens OR declare
     patent-blindness per run'; the layer declares PATENT_BLIND unless a
@@ -243,19 +386,47 @@ class PatentTransportLayer:
     name = "patent_layer"
     PATSNAP_RECOGNIZED = "KEY_RECOGNIZED_AUTH_NOT_OPENED"
 
-    def __init__(self, lens_key=None, patsnap_key=None, measure=True):
+    def __init__(self, lens_key=None, patsnap_key=None, patentbear_key=None,
+                 measure=True):
         self.lens_key = lens_key if lens_key is not None else os.environ.get("LENS_API_KEY", "")
         self.patsnap_key = patsnap_key if patsnap_key is not None else os.environ.get("PATSNAP_API_KEY", "")
+        self.patentbear_key = patentbear_key if patentbear_key is not None else \
+            os.environ.get("PATENTBEAR_API_KEY", "")
         self.measured = {}
         if measure:
             self.measure()
 
-    # ---- runtime measurement (cheap: <=2 calls, paced) ----
+    # ---- runtime measurement (re-measured every repetition; the
+    #      PatentBear leg costs 1 quota debit by provider design) ----
     def measure(self):
         self.measured = {}
         self.measured["lens"] = self._measure_lens()
         self.measured["patsnap"] = self._measure_patsnap()
+        self.measured["patentbear"] = self._measure_patentbear()
         return self.measured
+
+    def _measure_patentbear(self):
+        """Self-measurement of the PatentBear transport: ONE search_patents
+        call (1 quota debit by provider design). The search payload is
+        KEPT in the measurement entry so the battery's patent-side fixtures
+        reuse it instead of spending additional quota (Art. LXXIII budget
+        discipline; measured provider quota: free plan 20 calls/month)."""
+        if not self.patentbear_key:
+            return {"status": T_UNCONFIGURED, "evidence": "PATENTBEAR_API_KEY absent"}
+        transport = PatentBearTransport(api_key=self.patentbear_key)
+        state, hits, usage = transport.search(PATENTBEAR_MEASURE_QUERY)
+        entry = {"status": state,
+                 "evidence": "patentbear tools/call search_patents -> %s" % state,
+                 "usage": usage}
+        if state == T_LIVE:
+            # verbatim provider fields; the count stays a COUNT SIGNAL (Art. XXI.1)
+            entry["search_hits"] = hits
+            entry["count_signal_only_note"] = \
+                "num_hits is a count signal only; no verdict derives from it"
+        elif state == T_AUTH_FAILED:
+            entry["evidence"] = ("patentbear tools/call search_patents HTTP 401 -- "
+                                 "key rejected at the measured tool-layer boundary")
+        return entry
 
     def _measure_lens(self):
         if not self.lens_key:
@@ -324,9 +495,13 @@ class PatentTransportLayer:
         return [k for k, v in self.measured.items() if v["status"] == T_LIVE]
 
     def blind_declaration(self):
-        """The per-run patent-blindness declaration (Art. XXV/XXVIII/XLVI).
-        FIRES whenever no provider measures LIVE -- including the adversarial
-        case where credentials are present but no transport opens."""
+        """The per-run patent-blindness/coverage declaration (Art. XXV/
+        XXVIII/XLVI). FIRES whenever no provider measures LIVE -- including
+        the adversarial case where credentials are present but no transport
+        opens. When a provider DOES measure LIVE, the declaration is None
+        and a PATENT_COVERAGE_LIVE_THIS_RUN coverage statement is issued in
+        its place: the two states are mutually exclusive and neither is a
+        novelty or relevance verdict."""
         live = self.live_providers()
         return {
             "transport": self.name,
@@ -334,18 +509,21 @@ class PatentTransportLayer:
             "live_providers": live,
             "provider_measurements": dict(self.measured),
             "declaration": "PATENT_BLIND_FOR_THIS_RUN" if not live else None,
+            "coverage_statement": T_COVERED if live else None,
             "consequence": (None if live else
                             "patent-side collision coverage for this run is UNKNOWN; "
                             "no novelty or collision verdict may rely on patent coverage"),
             "measured_evidence": ("R495_TRANSPORT_PROBE.json lens 500 'No product in "
                                   "scope'/scholarly 401; R496_PATSNAP_PROBE.json patsnap "
                                   "67200202 recognized-but-unopenable, /auth 67200101, "
-                                  "/oauth/token 67200015, Space secret surface names-only []"),
-            "missing_for_unblinding": "a PatSnap companion app_id/client_id (or a "
-                                      "bearer-capable token) paired with the registered "
-                                      "app_key -- the single registered key completes no "
-                                      "documented exchange (Art. LXXIII escalation names "
-                                      "exactly this gap)",
+                                  "/oauth/token 67200015, Space secret surface names-only []; "
+                                  "R497_PATENTBEAR_PROBE{,2,3}.json patentbear LIVE at "
+                                  "tools/call, garbage key 401, cross-path byte check "
+                                  "title+abstract verified, quota metered free 20/month"),
+            "missing_for_unblinding": (None if live else
+                                       "a scoped patent transport (Lens product scope, "
+                                       "PatSnap companion app_id, or an openable "
+                                       "PatentBear/patent credential)"),
             "probed_at_utc": _now(),
         }
 

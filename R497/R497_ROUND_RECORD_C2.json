@@ -1,0 +1,182 @@
+{
+  "round_record": "R497_ROUND_RECORD_C2",
+  "round": "R497",
+  "agent": "Super Z (main session — Coder 2)",
+  "directive": "Operator supplied a PatentBear API key (pb_live_...; fingerprint 561b6e70f5b5) in response to the standing patent-transport reminder — the third registered patent provider after Lens (out-of-scope, R495) and PatSnap (recognized-but-unopenable, R496).",
+  "race_reconciliation": {
+    "title": "RACE RECONCILIATION — same round number, same key, two lines",
+    "measured": [
+      "the parallel line (Coder 1) landed R497 at cd78063 while this round was in flight: the SAME pb_live_ PatentBear key (their registry fingerprint_16 561b6e70f5b5ea7f shares this record's fingerprint_sha256_12 561b6e70f5b5 — the operator supplied one key to both lines concurrently)",
+      "file-name collisions resolved by the C1/C2 record convention (the R495 lift-in precedent): THEIR R497_PATENTBEAR_PROBE.json and R497_ROUND_RECORD.json remain canonical and byte-untouched; this line's ledgers are the _C2 set (PROBE2/PROBE3/PB_TOOLS/RBG_REP_SMOKE needed no rename — no upstream counterpart)",
+      "the two lines measured DIFFERENT transports to the same provider: theirs = the production search_patent_bear path (sources.py), where they found and FIXED a measured Art. XXI.3 false-absence (scope='all'-first false-zeroed 410,163 real matches; fixed patents-first + typed PROVIDER_INCONSISTENT); this line = the MCP JSON-RPC surface called directly (Bearer pb_live_), where the auth boundary was measured at the tool layer (garbage key HTTP 401 on BOTH search_patents and get_patent_record) and the cross-path byte check ran (title+abstract verbatim inside the independently fetched record text)",
+      "meter reconciliation: their record says remaining 6 after their 7 measured searches; this round's smoke then debited 2 -> remaining 4 (smoke quota ledger: used 15 -> 16). One consistent account trajectory across two concurrent consumers",
+      "both lines independently installed the same stewardship floor (their 'floor 2' / this line's F10 remaining<2 typed INCOMPLETE) and both escalate the SAME owner-gated item: the R378 PatentBear account upgrade is the binding constraint on corpus-scale collision measurement (their math: 105 searches for the 21-case corpus x 5 classes; this line's 3-repetition seal needs 6)"
+    ],
+    "resolution": "zero file-level changes to their line (their records, their sources.py fix, their scripts untouched by this commit); the two instrument layers are complementary: theirs = the production collision stage + its transport fix, this line's = the standalone RBG lift-in instrument v3 with the sealed-battery discipline and the patent-leg byte-binding fixtures"
+  },
+  "constitution": {
+    "version": "2.6.0",
+    "basis": "v2.4.0 read IN FULL at R495 (hash b54a1be9); 2.4.0->2.6.0 delta verified mechanically and read IN FULL at R496; remote main re-verified unchanged this round, no new delta",
+    "governing_articles": [
+      "II",
+      "III",
+      "IV",
+      "VII",
+      "VIII",
+      "XXI",
+      "XXII",
+      "XXIII",
+      "XXV",
+      "XXVIII",
+      "XXXIV",
+      "XLVI",
+      "LV",
+      "LXI",
+      "LXX",
+      "LXXI",
+      "LXXIII",
+      "LXXIV"
+    ]
+  },
+  "baseline": {
+    "local_head": "e1ad503",
+    "origin_main": "e1ad503",
+    "ls_remote_verified": true,
+    "state": "CLEAN_ALIGNED",
+    "note": "local checkout aligned to origin/main at the R496 tip before any work; no new upstream commits; constitution delta: none"
+  },
+  "secrets_registry": {
+    "article": "LXXIII",
+    "vault": "/home/z/my-project/.secrets.env (0600, outside every repository)",
+    "added_this_round": {
+      "name": "PATENTBEAR_API_KEY",
+      "prefix": "pb_live_",
+      "length": 51,
+      "fingerprint_sha256_12": "561b6e70f5b5"
+    },
+    "rule": "values env-injection-only at runtime; fingerprints only in records; nothing secret in the repository"
+  },
+  "probe_phase_1": {
+    "ledger": "R497_PATENTBEAR_PROBE.json",
+    "findings": [
+      "surface discovered: https://www.patentbear.com/mcp — MCP JSON-RPC over POST, protocolVersion 2025-06-18, serverInfo 'Patent Bear' 2.1.0",
+      "stateless: no Mcp-Session-Id issued; initialize returns HTTP 200",
+      "initialize is UNAUTHENTICATED BY DESIGN: a garbage pb_live_ key receives the identical 200 serverInfo — measured, not assumed"
+    ]
+  },
+  "probe_phase_2": {
+    "ledger": "R497_PATENTBEAR_PROBE2.json",
+    "tools_catalog": "R497_PB_TOOLS.json (33 tools captured with input schemas)",
+    "findings": [
+      "tools/list also unauthenticated: 33 tools listed to the garbage key too",
+      "tools/call help works with the real key (42,574 chars of provider documentation)",
+      "search_patents('shunt valve') -> HTTP 200, isError=false, num_hits=27,086 (COUNT SIGNAL ONLY, Art. XXI.1), usage {allowed: true, monthly_limit: 20, monthly_used: 1, monthly_remaining: 19}",
+      "search hits carry verbatim title + abstract fields (the separate snippet field carries <b> highlight markup and is NOT used for byte verification)"
+    ]
+  },
+  "probe_phase_3": {
+    "ledger": "R497_PATENTBEAR_PROBE3.json",
+    "findings": [
+      "AUTH BOUNDARY MEASURED AT THE TOOL LAYER: garbage key on get_patent_record -> HTTP 401; garbage key on search_patents -> HTTP 401; real key -> HTTP 200 with per-call usage accounting (the R496 'key presence is not transport liveness' discipline satisfied on the new provider)",
+      "CROSS-PATH BYTE CHECK: the search hit's title AND abstract both appear VERBATIM inside the independently fetched get_patent_record text (60,979 chars; title True, abstract True) — Art. II/III machinery holds on the patent leg",
+      "QUOTA MODEL (provider-documented in help + measured): every successful read call debits the account's monthly external-call quota (free 20 / Plus 500 / Pro & Team 5000); the usage object rides every response; failed/401 calls debit nothing and unauthenticated calls debit nothing",
+      "quota trajectory measured: used 1 (phase-2 search) -> 2 (record fetch) -> 3 (second search); remaining 17 after probes"
+    ]
+  },
+  "concurrent_usage_finding": {
+    "measured": "between probe phase 3 (used=3) and the smoke run's first PatentBear call (used=14 pre-debit), 11 debits were consumed on the account without any call from this session",
+    "interpretation": "the quota is the ACCOUNT's, shared with whatever else the operator connects to the same pb_live_ key (the provider advertises the same key working inside Claude/ChatGPT/Gemini); this session does not control the account's other consumers",
+    "consequence": "quota availability is a live, externally-driven constraint; the instrument carries stewardship guards (see instrument_v3)"
+  },
+  "instrument_v3": {
+    "files": [
+      "scripts/r495_rbg/rbg_gate.py",
+      "scripts/r495_rbg/rbg_battery.py",
+      "scripts/r495_rbg/rbg_seal.py"
+    ],
+    "changes": [
+      "PatentBearTransport: MCP JSON-RPC tools/call transport (search_patents, get_patent_record format=text) with typed states (LIVE_200 / AUTH_FAILED at the measured 401 boundary / SEARCH_FAILED / NO_RESULTS / RETRIEVAL_UNCONFIGURED), verbatim hit fields, usage-object capture, provider-side truncation markers surfaced",
+      "PatentTransportLayer now THREE-provider self-measuring (Lens + PatSnap + PatentBear), re-measured inside every repetition; the patent leg spends exactly 1 debit per measurement, payload reused by F10",
+      "new per-run coverage statement T_COVERED = PATENT_COVERAGE_LIVE_THIS_RUN: issued INSTEAD of the blindness declaration when >= 1 provider measures LIVE; neither it nor blindness is a novelty or relevance verdict (Art. XLVI/XXVIII)",
+      "battery v3: 11 fixtures — Art. VII DISCLOSED FIXTURE UPDATE: F6 re-authored (per-run declaration must reflect measured reality; with a LIVE provider it must be the coverage statement, not blindness), F9 re-anchored (the injected credential is now the measured-401 garbage pb_live_ key; same invariant), F10 (patent-leg positive adjudication: relevance + record-level byte binding of BOTH the hit title AND abstract against the independently fetched record text; the search count plays NO role), F11 (patent-leg hallucinated passage must REFUTE)",
+      "QUOTA STEWARDSHIP: F10 refuses the record fetch with a typed INCOMPLETE when measured remaining headroom < 2 (never spend the account's last 2 debits); the seal driver early-stops remaining repetitions once any repetition fails (no quota burned after the seal is already impossible)",
+      "every PatentBear usage object is ledgered into the repetition record (patentbear_quota_ledger)"
+    ],
+    "art_vii_note": "the v2 F6/F9 expectations are preserved in the R496 records and in git history; the corpus was re-authored against the new measured reality, never silently — the update is disclosed here and in the battery header"
+  },
+  "smoke_verification_run": {
+    "record": "R497_RBG_REP_SMOKE.json",
+    "status": "VERIFICATION_RUN_NOT_A_SEAL (a single green run seals nothing — the operator's standing rule; Art. XXVI)",
+    "result": "all 11 fixtures PASS",
+    "observed_verdict_sequence": [
+      "EVIDENCE_VERIFIED",
+      "EVIDENCE_REFUTED",
+      "EVIDENCE_REFUTED",
+      "EVIDENCE_REFUTED",
+      "RETRIEVAL_INCOMPLETE",
+      "PATENT_COVERAGE_LIVE_THIS_RUN",
+      "BLINDNESS_RETAINED",
+      "NO_COLLISION_FOUND",
+      "COLLISION_DETECTED",
+      "COLLISION_DETECTED",
+      "EVIDENCE_REFUTED"
+    ],
+    "verdict_sequence_sha256": "8b23e3dfbf49e1eaca7b3ea11250b553b95573e0acea50ec1f927144968055ab",
+    "highlights": {
+      "F6": "declaration=None, coverage_statement=PATENT_COVERAGE_LIVE_THIS_RUN, live_providers=[patentbear] — the patent leg is UNBLINDED by measured evidence",
+      "F10": "record US8968233B2: byte verdicts EVIDENCE_VERIFIED on BOTH title and abstract; relevance STRING_LEVEL (shunt, valve); no truncation marker",
+      "F11": "hallucinated patent passage EVIDENCE_REFUTED against the same gate-fetched record text",
+      "F9": "garbage pb_live_ key measured AUTH_FAILED (HTTP 401) at the tool layer; blindness retained",
+      "provider_states_measured_this_run": {
+        "lens": "TOKEN_OUT_OF_SCOPE",
+        "patsnap": "KEY_RECOGNIZED_AUTH_NOT_OPENED",
+        "patentbear": "LIVE_200"
+      }
+    },
+    "quota_ledger": [
+      {
+        "call": "layer_self_measurement_search",
+        "usage": {
+          "allowed": true,
+          "monthly_limit": 20,
+          "monthly_used": 15,
+          "monthly_remaining": 5
+        }
+      },
+      {
+        "call": "F10_record_fetch",
+        "usage": {
+          "allowed": true,
+          "plan": "free",
+          "monthly_limit": 20,
+          "monthly_used": 16,
+          "monthly_remaining": 4
+        }
+      }
+    ]
+  },
+  "seal_state": {
+    "state": "SEAL_NOT_CLAIMED_QUOTA_INFEASIBLE",
+    "need": "3 fresh-process repetitions x 2 PatentBear debits = 6 external calls",
+    "measured_available": "4 remaining after this round's smoke (account at 16/20 used); consistent with the parallel line's measured 6 remaining after their 7 searches — one shared account, two concurrent consumers",
+    "decision": "NOT RUN — running the seal now would exhaust the operator's account (harming the account's other consumers) and still fail mid-way; a seal claimed from the single smoke run would be dishonest (single green runs seal nothing)",
+    "stewardship_policy_installed": "F10 typed INCOMPLETE at remaining<2; driver early-stop on first failed repetition",
+    "what_unblocks": [
+      "plan upgrade on the PatentBear account (Plus 500 or Pro & Team 5000 external calls/month) — then: ELSEVIER_API_KEY + PATENTBEAR_API_KEY in env, run scripts/r495_rbg/rbg_seal.py <out_dir> --round R497",
+      "OR a dedicated pb_live_ key for this instrument, isolated from the operator's interactive connectors",
+      "OR a quiet window at the monthly quota reset with >= 6 + headroom available",
+      "note: the Scopus-side fixtures (F1-F5, F7, F8) are unaffected and remain sealed 3/3 from R495; the patent-leg fixtures (F6, F9, F10, F11) are the ones awaiting the quota window"
+    ]
+  },
+  "art_lxxi_tuple": {
+    "delivery_state": "DELIVERED_WITH_TYPED_OPEN_SEAL",
+    "pushed_commit": "recorded in the R497 commit message and the local worklog",
+    "escalation_issued": "ONE owner reminder (shared with the parallel line's Art. LXV escalation): the R378 PatentBear account upgrade unblocks BOTH the corpus-scale collision measurement (their line, 105 searches) AND this line's 3-repetition patent-leg seal (6 debits)",
+    "escalation_count": 1
+  },
+  "relation_to_parallel_line": {
+    "R494_200_union": "untouched; the RBG remains a lift-in instrument for the canonical PRIOR-ART / STATE-OF-THE-ART COLLISION stage (Art. LV) and the #7 Novelty dimension",
+    "new_capability_for_the_ring": "the collision instrument's patent leg now measures LIVE with record-level byte binding end to end — the gate no longer declares patent blindness when PatentBear is configured; blindness and coverage are typed, mutually exclusive, per-run states"
+  },
+  "reviewer_provenance": "AI_REVIEW"
+}

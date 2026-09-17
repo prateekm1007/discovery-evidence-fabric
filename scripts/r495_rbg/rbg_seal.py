@@ -28,12 +28,27 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 BATTERY = os.path.join(HERE, "rbg_battery.py")
 
 
-def run_repetitions(out_dir, n_reps):
+def run_repetitions(out_dir, n_reps, round_label="R495"):
     os.makedirs(out_dir, exist_ok=True)
     reps = []
     for i in range(1, n_reps + 1):
+        # QUOTA STEWARDSHIP (R497): once any completed repetition has a
+        # failing fixture, unanimity is already impossible -- running further
+        # repetitions would only burn metered provider quota for nothing.
+        # Early-stop is recorded as a typed state; the seal then fails
+        # honestly with the reason. (A fresh full seal remains the path when
+        # the blocker is transient, e.g. provider quota.)
+        prior_failure = any(
+            (not r.get("process_failed") and r.get("all_fixtures_pass") is False)
+            or r.get("process_failed") for r in reps)
+        if prior_failure:
+            reps.append({"repetition_id": "R%d" % i, "not_run_early_stop": True,
+                         "reason": "seal already impossible after an earlier "
+                                   "repetition failure; remaining repetitions not "
+                                   "run -- metered provider quota preserved"})
+            continue
         rep_id = "R%d" % i
-        out_json = os.path.join(out_dir, "R495_RBG_REP_%s.json" % rep_id)
+        out_json = os.path.join(out_dir, "%s_RBG_REP_%s.json" % (round_label, rep_id))
         # fresh process per repetition (loop step 11 discipline)
         proc = subprocess.run(
             [sys.executable, BATTERY, rep_id, out_json],
@@ -55,7 +70,12 @@ def run_repetitions(out_dir, n_reps):
 
 
 def compute_seal(reps, n_reps, round_label="R495"):
-    complete = [r for r in reps if not r.get("process_failed")]
+    # a repetition counts as COMPLETE only if its process ran, produced a
+    # verdict sequence, and passed all fixtures; early-stopped slots are
+    # neither complete nor failures-to-agree -- they are recorded as such
+    complete = [r for r in reps if not r.get("process_failed")
+                and not r.get("not_run_early_stop")
+                and r.get("verdict_sequence_sha256")]
     seal = {
         "seal_id": "%s_RBG_SEAL" % round_label,
         "seal_path": "repetition_based_measurement",
@@ -63,9 +83,11 @@ def compute_seal(reps, n_reps, round_label="R495"):
                           "verdict sequences across every repetition",
         "repetitions_requested": n_reps,
         "repetitions_completed": len(complete),
+        "early_stopped_slots": [r["repetition_id"] for r in reps
+                                if r.get("not_run_early_stop")],
     }
     seq_hashes = sorted({r["verdict_sequence_sha256"] for r in complete})
-    all_pass = all(r["all_fixtures_pass"] for r in complete)
+    all_pass = bool(complete) and all(r["all_fixtures_pass"] for r in complete)
     unanimous = len(complete) == n_reps and len(seq_hashes) == 1
     seal["per_repetition_hashes"] = [r["verdict_sequence_sha256"] for r in complete]
     seal["all_fixtures_pass_everywhere"] = all_pass
@@ -89,12 +111,15 @@ if __name__ == "__main__":
     round_label = "R495"
     if "--round" in sys.argv:
         round_label = sys.argv[sys.argv.index("--round") + 1]
-    reps = run_repetitions(out_dir, n_reps)
+    reps = run_repetitions(out_dir, n_reps, round_label)
     seal = compute_seal(reps, n_reps, round_label)
     record = {"seal_record": seal, "repetitions": reps,
               "battery_version_note": "battery_version recorded per repetition (v1 = R495 "
                                       "8-fixture corpus; v2 = R496 9-fixture corpus with the "
-                                      "multi-provider patent layer + F9)",
+                                      "multi-provider patent layer + F9; v3 = R497 11-fixture "
+                                      "corpus with PatentBear LIVE: F6 coverage statement, F9 "
+                                      "measured-401 garbage key, F10/F11 patent-leg byte "
+                                      "binding; Art. VII disclosed fixture update)",
               "seal_statement": (
                   "Sealed by repetition-based measurement: %d independent fresh-process "
                   "repetitions of the live-retrieval battery, unanimous verdict sequences, "

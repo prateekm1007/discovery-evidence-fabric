@@ -1,0 +1,2094 @@
+{
+  "tools": [
+    {
+      "name": "help",
+      "title": "Patent Bear guide",
+      "description": "Human-readable guide to everything Patent Bear can do through this connector \u2014 each tool, what it's for, and example prompts a user can say. Call it when the user asks what Patent Bear can do, how to phrase a request, or when you're unsure which tool fits. Pass topic to get one section: search, records, citing, citations, family, legal, file_history, definitions, similar, office_actions, labs, reading_results, corpora, library, plans, or version.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "topic": {
+            "type": "string",
+            "enum": [
+              "all",
+              "search",
+              "records",
+              "citing",
+              "citations",
+              "family",
+              "legal",
+              "file_history",
+              "definitions",
+              "similar",
+              "office_actions",
+              "labs",
+              "reading_results",
+              "corpora",
+              "library",
+              "plans",
+              "version"
+            ],
+            "description": "One section of the guide, or 'all' (default)."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        }
+      ],
+      "annotations": {
+        "title": "Patent Bear guide",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "search_patents",
+      "title": "Search patents",
+      "description": "Search Patent Bear patents, published applications, and technical literature. For exact US records, query can be a full identifier like US12574394B2 or US20030000656A1; the service also accepts numeric patent/publication numbers. Use source_type:'patent' or version:'B2' for issued grants, and source_type:'publication' or version:'A1' for published applications when the query is numeric only. Use publication_date, publication_date_from/publication_date_to, or date_from/date_to for publication-date windows. Returned source_url values point to Patent Bear records. Each hit includes title and abstract (verbatim text suitable for quoting) plus metadata; articles also include journal and authors. Snippet fragments from the claims and specification are included when they match. For full claim and description text, call get_patent_record with the hit id.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "query"
+        ],
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Keyword, natural-language query, or exact identifier. Full US identifiers such as US12574394B2 and US20030000656A1 are normalized automatically. Numeric-only lookups such as 12574394 or 20030000656 are also supported."
+          },
+          "q": {
+            "type": "string",
+            "description": "Alias for query."
+          },
+          "source_type": {
+            "type": "string",
+            "enum": [
+              "patent",
+              "publication",
+              "article"
+            ],
+            "description": "Restrict result source. Use patent for issued grants, publication for published applications, and article for technical literature. Recommended for numeric-only exact lookups."
+          },
+          "version": {
+            "type": "string",
+            "description": "US kind code such as B2 for issued grants or A1 for published applications. This also selects the correct grant/publication index."
+          },
+          "publication_date": {
+            "type": "string",
+            "description": "Exact publication date in YYYY-MM-DD. For US grants in Patent Bear, this matches the issue date when indexed."
+          },
+          "publication_date_from": {
+            "type": "string",
+            "description": "Inclusive publication-date start in YYYY-MM-DD."
+          },
+          "publication_date_to": {
+            "type": "string",
+            "description": "Inclusive publication-date end in YYYY-MM-DD."
+          },
+          "date_from": {
+            "type": "string",
+            "description": "Alias for publication_date_from."
+          },
+          "date_to": {
+            "type": "string",
+            "description": "Alias for publication_date_to."
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "patents",
+              "npl",
+              "all"
+            ],
+            "description": "Search patents/publications, technical literature, or both."
+          },
+          "search_fields": {
+            "type": "string",
+            "description": "Comma-separated fields such as title,abstract,claimsText,descriptionText,patentNumber,assigneeNameSearchable,applicantNames,inventorNames,cpcClassifications."
+          },
+          "max_hits": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 25,
+            "description": "Maximum results to return."
+          },
+          "limit": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 25,
+            "description": "Alias for max_hits."
+          },
+          "offset": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 500,
+            "description": "Result offset for paging."
+          },
+          "sort": {
+            "type": "string",
+            "enum": [
+              "relevance",
+              "newest",
+              "oldest"
+            ],
+            "description": "Result sort order."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Search patents",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_patent_record",
+      "title": "Patent record",
+      "description": "Fetch the full text of a US grant or publication by id (e.g. US12574394B2; a bare grant number like US11470243 or 11470243 resolves too), pulled from the Patent Bear record store. Returns title, biblio (issue date, application number and filing date, earliest priority date, pre-grant publication, assignee, inventors, examiner and art unit, CPC, continuity chain), term (patent term adjustment with the A/B/C breakdown, an expiration estimate, terminal-disclaimer status from our file-wrapper mirror and the front page, any disclaimer documents on file, and double-patenting rejections given or received from our office-action corpus \u2014 grants only), abstract, full claims (with numbers), and description sections \u2014 verbatim text suitable for quoting. Read dates from biblio; never infer an issue date from a file-history event. For issued grants every description paragraph carries its column:line range (col_lines, parallel to paragraphs; format:'text' prints it inline as [\u00b612 \u00b7 4:12-19]) \u2014 the same cites the Patent Bear reader shows, so you can read the whole specification and cite as you go. Claims are the OPERATIVE version: after any reexamination / AIA-trial certificate, cancelled claims stay in place with status 'cancelled', amended claims show the certified text with the as-issued wording in original_text (status 'amended'), and substitute claims are appended (status 'added'); claim_version says which certificates applied. A statutory disclaimer under 35 U.S.C. \u00a7 253 marks its claims 'disclaimed'. claims_status lists the numbers, the disclaimer documents and any certificate of correction on file. Never chart, construe, or assert a claim marked cancelled or disclaimed, and quote amended claims from the certified text. Use format:'json' for structured fields, 'text' for a single flat document with inline cites, or 'both'. Use fields to limit to abstract, claims, and/or description. Articles are not available here; use the abstract returned by search_patents instead. For the exact lines of ONE sentence (rather than its paragraph's range), call find_in_patent with quote = that sentence.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "US grant or publication id, e.g. US12574394B2 or US20030000656A1. Use the id returned by search_patents. Articles (NPL) are not supported."
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "json",
+              "text",
+              "both"
+            ],
+            "description": "json returns structured fields (default); text returns a single flat document; both returns each."
+          },
+          "fields": {
+            "type": "string",
+            "description": "Comma-separated subset of biblio,term,abstract,claims,description to return. Title is always included. Defaults to all (term = PTA + expiration estimate, grants only)."
+          },
+          "from_paragraph": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Continue a long description from this paragraph index \u2014 the next_paragraph of a truncated response. Pair with fields=description."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Patent record",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "find_in_patent",
+      "title": "Find in patent \u00b7 col:line cites",
+      "description": "Locate text inside ONE patent and return the verbatim passages with column:line cites (e.g. \"4:12-19\" = col. 4, ll. 12-19) \u2014 quote-ready for invalidity contentions, claim charts, and office-action responses. Cites are resolved inside the passage's own paragraph (the reader's highlight-to-cite), so they are stable across calls. Two modes. text = search terms/phrases \u2192 matching passages (snippet windows by default; context:'sentence' returns complete sentences cited to their exact lines \u2014 the right setting for charts and quote tables; context:'paragraph' returns whole paragraphs). quote = an EXACT sentence you already have (from get_patent_record or an earlier result) \u2192 its precise col:line and the complete sentence, exactly like highlighting it in the reader. Every passage carries a cite object: cite.formatted (the only string to put in a citation), cite.granularity (sentence / paragraph / snippet \u2014 what the range actually bounds) and cite.approximate (true = bracketed from neighbouring paragraphs; flag it for confirmation, never narrow it yourself), plus paragraph (\u00b6 index) and paragraph_col_line. Grants with a column-line artifact get colLine refs; publications cite by claim number and paragraph. Up to 25 passages per call; for the whole specification with a cite on every paragraph, call get_patent_record. Column-line artifacts are built from the issued PDF on first request \u2014 if cite_note says generation was queued, call again with wait:true (holds up to ~50s) or retry after 2-5 minutes and real col:line cites will be there. A passage whose cite fell back to its paragraph's range carries cite_warning \u2014 never file that range as a sentence cite. Never construct a col:line number yourself. Line numbers follow the printed gutter numerals; offsets_verified means the text was matched at those OCR positions, and line_note says when a number can be one off a hand count (a numeral printed midway between two lines) \u2014 say that once, in your own words, whenever you present col:line cites for filing. Claim passages carry claim_status when the claim was cancelled or disclaimed. Many sentences at once: pass quotes (an array, up to 50) and get every cite in ONE call \u2014 always do this for a quote table, a chart's Support column, or a set of highlights, instead of one call per sentence. Use this whenever the user asks WHERE a patent says something, or needs a proper col.-line citation for a quote.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "patent"
+        ],
+        "properties": {
+          "patent": {
+            "type": "string",
+            "description": "US patent or publication, e.g. US10861617B2, 10861617, or US20030000656A1."
+          },
+          "text": {
+            "type": "string",
+            "description": "Search terms or a phrase to locate supporting passages (e.g. \"rubberband scrolled region\"). Required unless quote is given. At least ~3 words for a reliable column:line match."
+          },
+          "quote": {
+            "type": "string",
+            "description": "An EXACT sentence or passage from the patent to pin down \u2014 returns its precise column:line and the complete sentence, like highlighting it in the reader. Copy it verbatim from get_patent_record or an earlier find_in_patent result. Takes precedence over text."
+          },
+          "quotes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "description": "Up to 50 EXACT sentences or passages to cite in ONE call \u2014 use this, not one call per sentence, for a quote table, a claim chart's Support column, or a set of highlights. Each comes back with its own passages and cite object (results[], in order; not_found flags a quote that is not in the record verbatim). Counts as one call. Takes precedence over quote and text."
+          },
+          "wait": {
+            "type": "boolean",
+            "description": "When cite_note says the column-line build was queued, pass true to hold the call (up to ~50s) until the build lands, so the passages come back with col:line cites in one call instead of a retry."
+          },
+          "context": {
+            "type": "string",
+            "enum": [
+              "snippet",
+              "sentence",
+              "paragraph"
+            ],
+            "description": "What each passage bounds. snippet (default): a ~300-character window around the match. sentence: the complete sentence(s) around the match, cited to their exact lines \u2014 use this for claim charts and quote tables. paragraph: the whole paragraph verbatim, never cut mid-sentence."
+          },
+          "max": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 25,
+            "description": "Maximum passages to return (default 5, up to 25)."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Find in patent \u00b7 col:line cites",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_citations",
+      "title": "Citations",
+      "description": "Citation lookups for a US grant. scope:'cited' (default) = the front-page References Cited: the art placed on the record during prosecution \u2014 the applicant's information disclosure statements and the examiner's own citations (patents, publications, NPL) \u2014 available on every plan. It is NOT what the specification text discusses: a reference the applicant disclosed to the examiner may never be mentioned in the body, so say \"the applicant disclosed X to the examiner\" or \"the examiner cited X\", never \"the specification cites X\". For references discussed IN the specification, use find_in_patent on the author or title. scope:'forward' = later US GRANTS citing this one (US only \u2014 WO, EP and other offices' citing publications are not included, so say so when counting who cites a patent, and supplement from the EP or Asia corpora if the user needs the global picture); scope:'family' = consolidated backward + forward citations across the family. Forward and family are a paid feature (free-plan callers get a 403 with an upgrade link \u2014 relay it, don't retry). Every citing entry carries assignee with owner_source (assignee = the front-page (73) assignee; applicant = the (71) applicant when no assignee is printed \u2014 still the owner of record at grant). Forward lists come newest first, up to 500 per call with the true total; cited lists are paged the same way (patents_total, npl_total). If more_note says there are more, call again with the offset it gives so nothing is left out.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "patent"
+        ],
+        "properties": {
+          "patent": {
+            "type": "string",
+            "description": "US patent or publication, e.g. US10861617B2, 10861617, or US20030000656A1."
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "cited",
+              "forward",
+              "family"
+            ],
+            "description": "cited (default) = art this patent cites (every plan). forward = later US grants citing it (US only); family = both directions across the family (paid plans)."
+          },
+          "limit": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 500,
+            "description": "forward/family only: citing patents per call, newest first (default 500)."
+          },
+          "offset": {
+            "type": "number",
+            "minimum": 0,
+            "description": "forward/family only: skip this many citing patents \u2014 use the next_offset from the previous call to page through a long list."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Citations",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_family",
+      "title": "Patent family",
+      "description": "Patent family. scope:'us' (default) = the US continuation/divisional tree \u2014 parents, children, siblings with application numbers, from the grant index. scope:'global' = the worldwide family from USPTO Global Dossier (the application page's Family Tree): every member application by office (US, EP, JP, CN, KR, WO...), its kind, its publications, its own filing_date at that office (publications[].date is the publication date \u2014 never read it as a filing date, and never assume a counterpart shares the priority filing date), and the priority claims linking them, plus a link to the interactive tree. Use for continuity questions, foreign counterparts, and double-patenting or priority-chain context.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "patent"
+        ],
+        "properties": {
+          "patent": {
+            "type": "string",
+            "description": "US patent or publication, e.g. US10861617B2, 10861617, or US20030000656A1."
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "us",
+              "global"
+            ],
+            "description": "'us' (default) = US continuation/divisional tree. 'global' = worldwide family from USPTO Global Dossier (foreign counterparts, PCT, priority claims)."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Patent family",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_legal_activity",
+      "title": "Litigation & PTAB history",
+      "description": "Has this US patent been litigated or challenged? One call returns district-court cases (1963\u2192present complaint-level dockets: filing date, parties, PACER cause code \u2014 no docket events, so stays, motions, counterclaims and current status need PACER), FJC outcome buckets for terminated cases (settled / verdict / dismissed / ongoing; no_outcome_record = no outcome row matched, the case may be open), PTAB proceedings (IPR/PGR/CBM) with status, dates and petitioner, and the written decisions in the opinion corpus \u2014 those listing the patent in suit and appeals that name one of its PTAB trials (matched_by says which). Also returns certificates: reexamination (ex parte / inter partes) and AIA-trial certificates from Patent Bear's certificate corpus \u2014 which claims were cancelled, confirmed, amended, or added, and when. Reexamination proceedings themselves are not indexed, only their certificates. Public litigation data.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "patent"
+        ],
+        "properties": {
+          "patent": {
+            "type": "string",
+            "description": "US patent or publication, e.g. US10861617B2, 10861617, or US20030000656A1."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Litigation & PTAB history",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_file_history",
+      "title": "Prosecution file history",
+      "description": "Each document carries document_id and text_available; read a document's text with get_file_history_document. Reexamination papers live in their own wrapper: pass application = the certificate's source_number (from term_summary.certificates or get_legal_activity) to read a reexamination file. Reissue patents are cited as USRE050016E1 (six digits). Prosecution timeline for a US grant or publication: the file wrapper grouped into dated events (office actions, amendments, notices of allowance), each marked applicant/USPTO and flagged when it's a rejection or allowance decision. Use for prosecution-history questions, estoppel context, and \"what happened during examination\". Document PDFs are viewable at the returned source_url. Also returns term_summary: issue date, PTA days, expiration estimate, terminal-disclaimer status, double-patenting rejections, and any reexamination / AIA-trial certificates (the post-grant claim outcome) \u2014 read those from here rather than reconstructing them from wrapper dates. The response carries as_of, when this wrapper was last read; when the answer depends on whether something newer has been filed, give the user that date and ask whether they want it refreshed (then call again with refresh:true) rather than assuming the timeline is current.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "anyOf": [
+          {
+            "required": [
+              "patent"
+            ]
+          },
+          {
+            "required": [
+              "application"
+            ]
+          }
+        ],
+        "properties": {
+          "patent": {
+            "type": "string",
+            "description": "US patent or publication, e.g. US10861617B2, 10861617, or US20030000656A1."
+          },
+          "refresh": {
+            "type": "boolean",
+            "description": "Re-read the file wrapper instead of returning the last read (see as_of). Ask the user before setting this: it takes longer and is only needed when the question turns on very recent filings."
+          },
+          "discover_proceedings": {
+            "type": "boolean",
+            "description": "One USPTO lookup listing the patent's reexamination (90/95) and supplemental-examination (96) control numbers, for when a reexamination is mentioned but no certificate is on record. Then read the proceeding with application = that number."
+          },
+          "full": {
+            "type": "boolean",
+            "description": "Include every document. By default a wrapper with more than 100 documents omits bookkeeping entries (fee sheets, receipts, IDS forms, litigation notices) and says so in compact_note."
+          },
+          "application": {
+            "type": "string",
+            "description": "Read this application's wrapper instead of the patent's own: a reexamination control number (the certificate's source_number, e.g. 90019422 \u2014 series 90 ex parte, 95 inter partes, 96 supplemental examination) or any US application number. Keep patent set to the related patent."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Prosecution file history",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_term_definitions",
+      "title": "Patent dictionary",
+      "description": "The patent dictionary: 94.8 million explicit definitions mined from US patents and published applications, 1976 to today \u2014 the sentences where a specification actually defines a term (\"as used herein\", \"refers to\", \"means\"), plus every abbreviation a patent spells out. Three questions. patent = how THIS patent defines its terms (add term to ask about one). term = how the whole corpus has defined that term, newest first, with filters: assignee (substring; exact for one entity), cpc (the field), from / to (issue date), kind (grant | pub), definition_kind, limit (max 200). assignee + top_terms = which terms that applicant defines. Use it when drafting a definitions section, checking whether a term already has an accepted meaning in the art, showing how an assignee or an era used a word, or testing a construction against how others defined it. Discovery: assignee + top_terms lists the terms that applicant defines most often (count, distinct forms, patents, first/last seen) \u2014 the first call of a definitions draft, because it finds the 40\u201360 terms an application carries rather than the few someone typed. Batch: pass terms (a list, up to 40) and/or patents (up to 20) to look up a whole claim set's terms \u2014 and the definitions already inside related patents \u2014 in ONE call, each term searched in singular and plural and merged. Use batch when drafting a definitions section for an application: the definitions_workflow prompt carries the full recipe, and the finished draft belongs in the matter notebook (write_note). Single-term matching is on the normalized term, so singular and plural are different entries \u2014 search both, or use terms for the merge. The rows carry the definition sentence but NOT its location: never cite a column or line from this tool; run the sentence through find_in_patent for a verified cite. Every plan.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "term": {
+            "type": "string",
+            "description": "The term to look up, e.g. \"packet-filtering rule\". Pass it as written; matching is on a normalized form, and plurals are separate entries."
+          },
+          "patent": {
+            "type": "string",
+            "description": "A US grant or publication \u2014 returns that patent's own definitions. Combine with term to ask how this patent defines that one term."
+          },
+          "top_terms": {
+            "type": "boolean",
+            "description": "Discovery: with assignee (and no term/terms/patents), list the terms that applicant defines most often \u2014 definitions count, distinct forms, patents, first/last seen. The first call of a definitions draft."
+          },
+          "terms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Batch: up to 40 terms looked up in one call (each in singular and plural, merged, newest first). Filters below apply to every term. Use this for a claim set's worth of terms."
+          },
+          "patents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Batch: up to 20 US grants or publications whose own definitions to return in the same call \u2014 e.g. the assignee's parent or sibling filings."
+          },
+          "assignee": {
+            "type": "string",
+            "description": "Only definitions from patents whose assignee contains this text, e.g. Cisco. Case-insensitive substring; add exact: true to match one normalized entity (\"Cisco Technology\" but not \"Cisco Systems\")."
+          },
+          "exact": {
+            "type": "boolean",
+            "description": "Match the assignee exactly after normalization (case, punctuation and corporate suffixes folded) instead of as a substring."
+          },
+          "cpc": {
+            "type": "string",
+            "description": "Only definitions from patents classified under this CPC/IPC prefix, e.g. A61K or H04L 63 \u2014 how the FIELD defines a term."
+          },
+          "definition_kind": {
+            "type": "string",
+            "enum": [
+              "explicit",
+              "abbreviation",
+              "degree"
+            ],
+            "description": "Restrict to explicit definitions (\"refers to\"), spelled-out abbreviations, or terms of degree. Defaults to explicit in top_terms mode."
+          },
+          "from": {
+            "type": "string",
+            "description": "Earliest issue date, YYYY-MM-DD."
+          },
+          "to": {
+            "type": "string",
+            "description": "Latest issue date, YYYY-MM-DD."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "grant",
+              "pub"
+            ],
+            "description": "Restrict to issued grants or published applications."
+          },
+          "limit": {
+            "type": "number",
+            "description": "Definitions to return, up to 200 (default 50)."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Patent dictionary",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "run_research",
+      "title": "Run a Patent Bear analysis",
+      "description": "Start a Patent Bear analysis, exactly as if run from the Patent Bear site \u2014 the run appears in the account's Library and completes on Patent Bear's servers. Prior Art, Disclosure, Charting, Clearance and Invention are billed to the account's credits (1 credit = $25); Sequence, Chemistry and Citations are structured searches, included on Pro and Team and 1 credit on Plus. Prior Art, Disclosure, Citations and Charting take a patent; Sequence and Chemistry take a patent or a sequence / structure; Clearance takes a product description and Invention an invention disclosure. \u26a0\ufe0f Runs SPEND REAL CREDITS, so every run is TWO calls. The first call, without intake_confirmed, returns the intake and starts nothing: for Prior Art, the operative claim set (after any reexamination or AIA-trial certificate: cancelled claims excluded, amended and substitute claims carrying the certificate's text), each claim's status and text, what a selection costs, and the constructions already saved on the patent; for the other analyses, what will run (patent, claims, references, family members, the extracted elements for clearance and invention, the sequence or structure) and its cost. Put the intake to the user, then call again with intake_confirmed:true and their choices; when the intake carries confirm_with (clearance, invention), echo those fields on the second call. The server does not choose the claims; a failed run is not retried without the user. If the account was recently working in a matter (e.g. after save_patent), the run inherits that matter automatically. Returns the run id, the credits held, and a Patent Bear link where the results appear. TIMING: Prior Art and Invention runs take 15-20 minutes (thorough mode longer); Charting and Clearance several minutes; Sequence, Chemistry, Citations and Disclosure a few minutes. After starting, give the user the link immediately \u2014 progress and results render there live \u2014 and check get_research_run only when the user asks or after ~10 minutes. Do not busy-poll. A 'concurrency' error means that analysis already has 3 runs in flight for this account \u2014 wait for one to finish, don't retry in a loop. Prior Art follow-ups: when a finished run left limitations unmapped, get_research_run's next_steps carries a gap_menu. Put that menu to the user, and once they pick, start the follow-up here with search_mode 'gap', parent_run_id, and gap_limitations (their picks, by label) \u2014 or search_mode 'broad' with parent_run_id to widen the same search. Either can also carry search_queries: your own 2-6 word search strings for vocabulary the claim does not use \u2014 the follow-up searches everything the parent did plus those. 1 credit each, same two calls: the first returns the targeting and cost, the second with intake_confirmed:true starts it. Available analyses \u2014 prior_art: invalidity prior-art search with element-by-element claim mapping. Args: patent; optional claims (\"independent\" default = 1 credit, \"all\" or claim numbers cost more), thorough (deeper, slower search), run_name. disclosure: \u00a7112 written-description/enablement support analysis. Args: patent (issued grants only); optional claims (\"independent\" default, \"all\", or claim numbers \u2014 flat 1 credit either way), run_name. sequence: finds patent DNA, RNA and protein sequences by homology. Args: patent (searches that patent's own sequence listing; optional seq_ids = SEQ ID NOs to limit it) OR sequence (a raw or FASTA sequence; optional seq_type prot|nuc, cutoff_date YYYY-MM-DD); optional max_hits (default 50). Included on Pro and Team, 1 credit on Plus. chemistry: finds patents by chemical structure. Args: patent (searches that patent's own structures; optional structure_ids like C001) OR smiles (a SMILES string); optional search_type substructure|similarity (default substructure), tanimoto 0.3-1 for similarity, max_hits (default 50, up to 100). Included on Pro and Team, 1 credit on Plus. citations: forward and backward citation analysis of a patent's whole granted family (US continuity, EP and CN/JP/TW counterparts). Args: patent; optional include_ep (default true), include_asia (default true). Included on Pro and Team, 1 credit on Plus. charting: charts named references against a patent's claims element by element, with verbatim evidence and column:line cites. Args: patent; references = 1-25 patent or publication numbers; optional claims (claim numbers like \"1,3,5\", up to 10; default = independent claims). 1 credit. clearance: screens a product or feature description against active US patents for potentially blocking granted claims (a watch list, not an FTO opinion). Args: product_description (40+ characters; it is processed by Patent Bear's model provider like on the site); optional title. The first call extracts the product's searchable elements and returns them in the intake; the second call echoes confirm_with (result_id, target_id, title, elements \u2014 edited if the user wishes). 1 credit. invention: prior-art search from a plain-text invention disclosure, before any claims exist. Args: disclosure (40+ characters; it is processed by Patent Bear's model provider like on the site); optional cutoff_date YYYY-MM-DD (art published before it; default today), title. The first call extracts the invention's elements and returns them in the intake; the second call echoes confirm_with (result_id, target_id, title, elements, cpc). 1 credit. First run on an account: the account holder must have accepted the Research terms once (authorizing this connector does that; older connections get a one-click link on the site) \u2014 relay the accept_link if the run is refused for that reason.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "analysis"
+        ],
+        "properties": {
+          "analysis": {
+            "type": "string",
+            "enum": [
+              "prior_art",
+              "disclosure",
+              "sequence",
+              "chemistry",
+              "citations",
+              "charting",
+              "clearance",
+              "invention"
+            ],
+            "description": "Which analysis to run. See the tool description for each analysis's arguments and cost."
+          },
+          "patent": {
+            "type": "string",
+            "description": "US patent to analyze, e.g. US10861617B2 or 10861617. Required for prior_art, disclosure, citations and charting; sequence and chemistry take it or a sequence / smiles; clearance and invention take text instead."
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "charting: 1-25 patent or publication numbers to chart against the patent's claims."
+          },
+          "sequence": {
+            "type": "string",
+            "description": "sequence: a raw or FASTA nucleotide or protein sequence to search (instead of a patent)."
+          },
+          "seq_ids": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "sequence (patent mode): SEQ ID NOs to search; default = every sequence in the listing."
+          },
+          "seq_type": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "prot",
+              "nuc"
+            ],
+            "description": "sequence: force protein or nucleotide; default auto."
+          },
+          "smiles": {
+            "type": "string",
+            "description": "chemistry: a SMILES structure to search (instead of a patent)."
+          },
+          "structure_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "chemistry (patent mode): structure markers like C001 to search; default = every structure in the patent."
+          },
+          "search_type": {
+            "type": "string",
+            "enum": [
+              "substructure",
+              "similarity"
+            ],
+            "description": "chemistry: default substructure."
+          },
+          "tanimoto": {
+            "type": "number",
+            "minimum": 0.3,
+            "maximum": 1,
+            "description": "chemistry similarity threshold; default 0.7."
+          },
+          "max_hits": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 500,
+            "description": "sequence / chemistry: hits to return; default 50."
+          },
+          "cutoff_date": {
+            "type": "string",
+            "description": "sequence (direct) and invention: only art published before this date, YYYY-MM-DD. invention defaults to today."
+          },
+          "include_ep": {
+            "type": "boolean",
+            "description": "citations: include EP counterparts; default true."
+          },
+          "include_asia": {
+            "type": "boolean",
+            "description": "citations: include CN/JP/TW search-report citations; default true."
+          },
+          "product_description": {
+            "type": "string",
+            "description": "clearance: the product or feature to screen, 40+ characters. It is processed by Patent Bear's model provider, exactly as on the site."
+          },
+          "disclosure": {
+            "type": "string",
+            "description": "invention: the invention disclosure in plain text, 40+ characters. It is processed by Patent Bear's model provider, exactly as on the site."
+          },
+          "elements": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "clearance / invention, second call: the element list from the intake's confirm_with, edited if the user wished."
+          },
+          "result_id": {
+            "type": "string",
+            "description": "clearance / invention, second call: confirm_with.result_id from the intake."
+          },
+          "target_id": {
+            "type": "string",
+            "description": "clearance / invention, second call: confirm_with.target_id from the intake."
+          },
+          "title": {
+            "type": "string",
+            "description": "clearance / invention: display title; the intake proposes one."
+          },
+          "cpc": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "invention, second call: confirm_with.cpc from the intake (1-3 CPC subclasses)."
+          },
+          "claims": {
+            "type": "string",
+            "description": "prior_art / disclosure: \"independent\" (default), \"all\", or comma-separated claim numbers like \"1,3,5\" (on prior_art, dependent claims increase the credit cost). charting: claim numbers like \"1,3,5\", up to 10; default = independent claims."
+          },
+          "terms": {
+            "type": "array",
+            "description": "claim_construction only (required there): terms to construe, each { term: string, claim_numbers?: number[] }."
+          },
+          "intake_confirmed": {
+            "type": "boolean",
+            "description": "Every run is two calls. Without this flag the call returns the intake \u2014 for prior_art the operative claims after any certificate, cost and saved constructions; for the other analyses what will run and its cost \u2014 and starts NOTHING. With it, the run starts with exactly the arguments given. Set it only after the user has chosen."
+          },
+          "claim_version": {
+            "type": "string",
+            "enum": [
+              "certified",
+              "original"
+            ],
+            "description": "prior_art: which claim set to analyze when a reexamination / AIA-trial certificate exists. certified (default) = the claims as they stand after the certificate; original = the issued claims."
+          },
+          "constructions": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "prior_art: claim constructions to apply. [{id}] applies a saved construction from the intake's saved_constructions; [{term, construction, type?, status?, claims?}] writes one for this run. Or the string \"saved\" to apply every saved construction. Constructions shape how the claim is read against the art."
+          },
+          "claim_edits": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "prior_art: analyze edited claim text \u2014 [{number, text}] with the FULL replacement text of that claim (a proposed amendment, a narrowed reading). The patent itself is never changed; the run records the edit."
+          },
+          "search_mode": {
+            "type": "string",
+            "enum": [
+              "gap",
+              "broad"
+            ],
+            "description": "prior_art follow-ups on a FINISHED run (1 credit each, and the user must choose first). gap = re-search only the limitations in gap_limitations; broad = widen retrieval over the same claims. Both need parent_run_id. Omit for a fresh search."
+          },
+          "parent_run_id": {
+            "type": "string",
+            "description": "The finished run this follows, from get_research_run. Required with search_mode."
+          },
+          "search_queries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Follow-ups only (with search_mode and parent_run_id): up to 12 search strings of 2-6 words to add to what the parent run searched, e.g. [\"tls version block\", \"sslv2 refuse handshake\"]. Use when the unmapped limitation is described in the art with vocabulary the claim does not use. Show the user the list before starting; 1 credit like any follow-up."
+          },
+          "gap_limitations": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Which limitations a gap search targets: [{claim: 1, label: \"1c\"}, ...] using labels from that run's gap_menu. The element text comes from the parent run, so never invent one \u2014 an unknown label is rejected."
+          },
+          "thorough": {
+            "type": "boolean",
+            "description": "prior_art only: broader, deeper, substantially slower search. Defaults to false."
+          },
+          "run_name": {
+            "type": "string",
+            "description": "Optional display name for the run in the Library."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Run a Patent Bear analysis",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_research_run",
+      "title": "Analysis run status and results",
+      "description": "Check a Patent Bear analysis run started with run_research (or from the site) and, once it is done, read its results. Returns lifecycle status (running / done / failed / cancelled), the current step and elapsed minutes while running, the Patent Bear link where the full results render, and for finished Prior Art runs a results summary: per claim, the best reference (with coverage, prior-art basis, and the verbatim evidence quote per element), the gap-filler, the proposed combination and its remaining gaps, other charted candidates, and the search funnel \u2014 enough to write the invalidity discussion here; link to the run for the full charts. A running Prior Art run is normal for 15-20 minutes. Two ways to handle the wait, and no third: give the user the link and stop, or \u2014 if they asked you to watch it \u2014 call again with wait:true, which holds for about a minute and returns as soon as the run finishes. Repeated instant calls without wait are the wrong answer: each burns a request and tells you nothing new. Read legal_status and next_steps BEFORE you characterize the outcome. If next_steps.verdict is claims_cancelled, the recommendation is to STOP: say the claims were cancelled and by what, treat the chart as history, and do not offer a gap or broader search on them. Otherwise a run that leaves elements unmapped is a SEARCH result, never a validity opinion: say which element went unmapped, then RECOMMEND the gap search \u2014 built for exactly this, re-running retrieval aimed only at that limitation \u2014 put the gap_menu choice to the user, and on their yes start it yourself with run_research (search_mode gap, parent_run_id, gap_limitations). Mention the credit once as a fact, never as the headline. Ending on \"no art found\" with a list of options is a wrong answer; ending with a recommendation \u2014 including \"stop, and here is where to look instead\" \u2014 is the right one. run_journal is the run's own story for a reader who was not in the room: what was chosen at intake (claim version, excluded claims, constructions, edits, gap targets), which corpora were searched and which were not, what the funnel considered, and lineage \u2014 the root run and every follow-up with the gaps it already searched. Read it before recommending anything: never propose a gap search on a limitation lineage.gaps_already_searched lists, and always name the ROOT run as parent_run_id. HOW TO READ THE RESULTS: (1) coverage_pct is triage, never a conclusion \u2014 an element counts as found when ANY of its clauses is taught, so read every quote against the element's full text and say which clause it reaches; each element now carries support (strong / thin / generic_context / not_found) and, when the evaluator checked clauses, sub_limitations.not_shown naming the clause the citations do not reach. (2) search_funnel ratios are the funnel's design (evaluated is a fixed ~50 budget); never say the search ran dry, was not comprehensive, or exhausted its candidates on the strength of those numbers. (3) A reference whose only found elements are boilerplate (a processor, a memory, receiving data) matched the claim's scaffolding, not its invention \u2014 say so and move on. (4) elapsed_minutes is time since start while running; finished runs report duration_minutes. Call help with topic reading_results for the full guide.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "run_id"
+        ],
+        "properties": {
+          "wait": {
+            "type": "boolean",
+            "description": "Hold for up to a minute and return the moment the run finishes. Use this whenever the user asked you to watch a run, and call again while it is still going \u2014 never poll without it."
+          },
+          "run_id": {
+            "type": "string",
+            "description": "The run id returned by run_research."
+          },
+          "analysis": {
+            "type": "string",
+            "enum": [
+              "prior_art",
+              "disclosure",
+              "sequence",
+              "chemistry",
+              "citations",
+              "charting",
+              "clearance",
+              "invention"
+            ],
+            "description": "Which analysis the run belongs to. Optional \u2014 omitting it searches every analysis."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Analysis run status and results",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_research_runs",
+      "title": "My analysis runs",
+      "description": "List the account's analysis runs across every analysis (Prior Art, Charting, Citations, Disclosure, Priority, Claim Construction, and more) \u2014 including runs started in the browser. Newest first. Filter with analysis and/or patent. Each row carries status and a deep link to the results. Answers \"show me my last prior art run\".",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "analysis": {
+            "type": "string",
+            "description": "Filter to one analysis, e.g. prior_art, charting, citations, disclosure, priority, claim_construction, clearance, invention, sequence, chemistry, portfolio_signals."
+          },
+          "patent": {
+            "type": "string",
+            "description": "Filter to runs on one patent, e.g. US10861617B2."
+          },
+          "limit": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 50,
+            "description": "Maximum runs to return (default 20)."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "My analysis runs",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_matters",
+      "title": "My matters",
+      "description": "List the account's Library matters (client-matter folders) with ids, names, and item counts. Call before save_patent when the user names a matter, to resolve or confirm it.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {}
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "My matters",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "create_matter",
+      "title": "New matter",
+      "description": "Create a Library matter (client-matter folder) by name. Idempotent \u2014 if a matter with the same name exists, returns it instead of duplicating. Paid feature (Plus and up); free-plan callers get a 403 with an upgrade link \u2014 relay it.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Matter name, e.g. \"Acme v. Widgets \u2014 invalidity\" or a matter number."
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "New matter",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "save_patent",
+      "title": "Save to Library",
+      "description": "Save a patent to the account's Patent Bear Library, optionally filing it into a matter (by matter name or matter_id) and attaching a note. Answers \"save US10998418B2 to matter Z\". If the matter doesn't exist, the save still succeeds and the response says so \u2014 offer create_matter, don't silently create one. Paid feature (Plus and up); free-plan callers get a 403 with an upgrade link \u2014 relay it, don't retry.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "patent"
+        ],
+        "properties": {
+          "patent": {
+            "type": "string",
+            "description": "US patent or publication, e.g. US10861617B2, 10861617, or US20030000656A1."
+          },
+          "matter": {
+            "type": "string",
+            "description": "Optional matter to file it into \u2014 a matter name or matter_id from list_matters."
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional note stored with the save."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Save to Library",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_saved_patents",
+      "title": "Saved patents",
+      "description": "List the account's saved patents, newest first \u2014 optionally only those filed in one matter (by name or matter_id). Each row has the patent id, cached title/assignee, note, and a Patent Bear link.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "matter": {
+            "type": "string",
+            "description": "Only patents filed in this matter (name or matter_id)."
+          },
+          "limit": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Maximum rows (default 50)."
+          },
+          "offset": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Paging offset."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Saved patents",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "save_patent_analysis",
+      "title": "Write analysis to Library",
+      "description": "Write a structured Overview or Claim Summary for a patent into the account's Patent Bear Library \u2014 it renders on the patent's library page exactly like a Patent Bear-generated analysis, attributed to the connector. AUTHOR the content yourself from the patent's real record (get_patent_record / find_in_patent) \u2014 verbatim grounding only, never memory. content must be a JSON object matching the kind's schema (see the kind property). Overwrites any existing analysis of that kind \u2014 call get_patent_analysis first if unsure. Paid feature (Plus and up).",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "patent",
+          "kind",
+          "content"
+        ],
+        "properties": {
+          "patent": {
+            "type": "string",
+            "description": "US patent or publication, e.g. US10861617B2, 10861617, or US20030000656A1."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "overview",
+              "claim_summary"
+            ],
+            "description": "overview content schema: { lede: string (one plain-English sentence: what the invention is), problem: {text, cite}, advance: {text, cite}, steps: [{title (2-4 words), text (one sentence), cite}] (3-5 mechanism steps in operating order), claims: [{number, category: method|system|apparatus|crm|other, text}] (ONE per INDEPENDENT claim), terms: [{term, definition}] (2-4 claim terms). claim_summary content schema: { totals: {total: int, independent: [claim numbers]}, claims: [{number, type: independent|dependent, dependsOn: int|null, scope: string|null (independents), adds: string|null (dependents), limitations: [{label, specPara (paragraph number like \"0036\"), specQuote (verbatim contiguous sentence from the spec), note}] (independents; [] for dependents), support: same-shape object or null (dependents)}}. Every cite is null or {source: spec|claim|abstract, ref: paragraph/claim number or null, quote: verbatim contiguous phrase or null}. Quotes MUST be verbatim from the record \u2014 never from memory."
+          },
+          "content": {
+            "type": "object",
+            "description": "The analysis as a JSON object matching the kind's schema exactly."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Write analysis to Library",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_patent_analysis",
+      "title": "Library analyses",
+      "description": "Read the stored Overview / Claim Summary analyses for a patent from the account's Library (whoever authored them), with model provenance and timestamps.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "patent"
+        ],
+        "properties": {
+          "patent": {
+            "type": "string",
+            "description": "US patent or publication, e.g. US10861617B2, 10861617, or US20030000656A1."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Library analyses",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_claim_charts",
+      "title": "My claim charts",
+      "description": "List the claim charts in the user's Patent Bear Library \u2014 name, target patent, matter, origin (Prior Art analysis, Charting analysis, Disclosure analysis, hand-built), last edit, and a link that opens each chart. Filter with patent and/or matter (id or name). Then call get_claim_chart for the full element-by-element content. Paid plans only (free-plan callers get a 403 with an upgrade link \u2014 relay it, don't retry).",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "patent": {
+            "type": "string",
+            "description": "Only charts whose target is this patent (e.g. US10861617B2)."
+          },
+          "matter": {
+            "type": "string",
+            "description": "Only charts filed in this matter (id or exact name)."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum charts to return (default 50, max 100)."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "My claim charts",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_claim_chart",
+      "title": "Claim chart",
+      "description": "Read one claim chart from the user's Library: every charted claim broken into elements [pre], [a], [b]..., and for each element the evidence written under every reference column (quotes, col:line cites, figure callouts) as plain text, plus a text rendering of the whole chart. Pass chart = the chart id (from list_claim_charts) or its unique name. Use it to summarize a chart, compare references, draft contentions from it, or check which elements still lack evidence. The link opens the chart in the Library, editable and exportable to Word.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "chart"
+        ],
+        "properties": {
+          "chart": {
+            "type": "string",
+            "description": "Chart id from list_claim_charts, or the chart's unique name."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Claim chart",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "save_highlights",
+      "title": "Highlight in the reader",
+      "description": "Highlight text in the user's Patent Bear reader \u2014 exactly what the user gets by selecting a passage and clicking Highlight \u2014 optionally with a note, and save claim terms (a term from one claim, tracked across the patent). Saved as the user's own annotations: they appear in the reader immediately and in the Library's Annotations page. highlights: [{ quote, color?, note?, paragraph?, claim? }] \u2014 quote must be the record's exact words (from get_patent_record or find_in_patent); paragraph (\u00b6 index) or claim narrows where to look. claim_terms: [{ term, claim, color?, note? }] \u2014 term must appear verbatim in that claim. Up to 50 per call; duplicates are returned as existed:true, never doubled. document_notes: [\"\u2026\"] \u2014 notes about the PATENT AS A WHOLE (posture, family, what to watch), not tied to a passage; they show at the top of the user's Notes panel. NOTES ARE VERSIONED: pass set_name (required whenever any item carries a note) \u2014 the name of the work product these notes belong to (\"Eligibility Brief\", \"Claim Construction\", \"Invalidity chart v2\"). Notes are appended into that named set; a note already on the passage from another set or another author is never overwritten. Use one set name for one piece of work, and reuse it across calls. The links returned open the reader on that set. Use it to save a cite table's passages so the user can confirm them in the reader, to mark claim elements, or to leave notes on passages. Paid plans only (free-plan callers get a 403 with an upgrade link \u2014 relay it). CHECK WHAT WAS SAVED: compare each created[].text to the quote you sent. A shorter text with partial:true means only that prefix was found and highlighted (the record's text differs from your quote by an ellipsis, an entity, or a snippet boundary) \u2014 re-send the sentence exactly as find_in_patent (context: sentence) returns it, or pass exact:true on the item to refuse partial saves. Never tell the user a passage is highlighted when text is shorter than what you sent.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "patent"
+        ],
+        "properties": {
+          "patent": {
+            "type": "string",
+            "description": "US patent or publication, e.g. US10861617B2, 10861617, or US20030000656A1."
+          },
+          "set_name": {
+            "type": "string",
+            "maxLength": 80,
+            "description": "Name of the note set these notes belong to \u2014 the work product: \"Eligibility Brief\", \"Claim Construction\", \"Invalidity chart v2\". REQUIRED whenever any item carries a note. Reuse it across calls for the same piece of work."
+          },
+          "document_notes": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "string"
+            },
+            "description": "Notes about the patent as a whole (not a passage): posture, family, what to watch. Each goes into set_name."
+          },
+          "highlights": {
+            "type": "array",
+            "maxItems": 50,
+            "description": "Passages to highlight in the reader.",
+            "items": {
+              "type": "object",
+              "required": [
+                "quote"
+              ],
+              "properties": {
+                "quote": {
+                  "type": "string",
+                  "description": "The exact words to highlight, copied from the record (a sentence or phrase; at least 3 characters)."
+                },
+                "color": {
+                  "type": "string",
+                  "enum": [
+                    "yellow",
+                    "green",
+                    "blue",
+                    "rose",
+                    "purple",
+                    "orange",
+                    "teal",
+                    "cyan",
+                    "slate",
+                    "pink",
+                    "red"
+                  ],
+                  "description": "Highlight color (default yellow)."
+                },
+                "note": {
+                  "type": "string",
+                  "description": "Optional note attached to the highlight \u2014 e.g. the cite, or why it matters."
+                },
+                "paragraph": {
+                  "type": "number",
+                  "description": "Optional \u00b6 index (from find_in_patent / get_patent_record) to pin which description paragraph to search."
+                },
+                "claim": {
+                  "type": "number",
+                  "description": "Optional claim number when the quote is claim language."
+                },
+                "exact": {
+                  "type": "boolean",
+                  "description": "Refuse a partial (prefix-only) match instead of saving it."
+                }
+              }
+            }
+          },
+          "claim_terms": {
+            "type": "array",
+            "maxItems": 50,
+            "description": "Claim terms to save (tracked per claim, highlighted wherever they appear).",
+            "items": {
+              "type": "object",
+              "required": [
+                "term",
+                "claim"
+              ],
+              "properties": {
+                "term": {
+                  "type": "string",
+                  "description": "The term exactly as it appears in the claim, e.g. \"event object\"."
+                },
+                "claim": {
+                  "type": "number",
+                  "description": "Claim number the term is taken from."
+                },
+                "color": {
+                  "type": "string",
+                  "enum": [
+                    "yellow",
+                    "green",
+                    "blue",
+                    "rose",
+                    "purple",
+                    "orange",
+                    "teal",
+                    "cyan",
+                    "slate",
+                    "pink",
+                    "red"
+                  ]
+                },
+                "note": {
+                  "type": "string",
+                  "description": "Optional note on the term."
+                }
+              }
+            }
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Highlight in the reader",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "save_claim_construction",
+      "title": "Save claim construction",
+      "description": "Save a claim-term construction to the user's Constructions tracker (term \u2192 what it means), scoped to a patent and optionally a matter \u2014 the same record the reader's \"Add construction\" creates, listed at /library/constructions and importable into Research analyses. Fields: term (required), construction (required \u2014 the proposed meaning), claims (numbers), basis (intrinsic/extrinsic support, quote it with col:line cites), type (e.g. plain meaning, means-plus-function), status (proposed default / agreed / court / disputed), matter (name or id). Paid plans only. Never invent a construction: ground it in the specification, claims, and file history the tools return.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "patent",
+          "term",
+          "construction"
+        ],
+        "properties": {
+          "patent": {
+            "type": "string",
+            "description": "US patent or publication, e.g. US10861617B2, 10861617, or US20030000656A1."
+          },
+          "term": {
+            "type": "string",
+            "description": "The claim term being construed, e.g. \"scroll or gesture call\"."
+          },
+          "construction": {
+            "type": "string",
+            "description": "The proposed construction \u2014 what the term means."
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "Claim numbers the term appears in."
+          },
+          "basis": {
+            "type": "string",
+            "description": "Support for the construction: quoted specification, claims, or file-history passages with their cites."
+          },
+          "type": {
+            "type": "string",
+            "description": "Construction type, e.g. plain and ordinary meaning, lexicography, means-plus-function."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "proposed",
+              "agreed",
+              "court",
+              "disputed"
+            ],
+            "description": "Default proposed."
+          },
+          "matter": {
+            "type": "string",
+            "description": "Optional matter to file it under \u2014 name or matter_id from list_matters."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Save claim construction",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_annotations",
+      "title": "My highlights & constructions",
+      "description": "List the user's highlights (with notes), claim terms, and claim constructions for one patent \u2014 or, with decision_id, the highlights on one court decision \u2014 each with a link that opens the reader on that passage. Notes come grouped by named set (note_sets, with counts and who created each: the user or an AI agent by app name); pass set_name to read one set. A set spans documents: set_name ALONE lists every patent and decision it has notes on, each with a link, plus a library_link that opens them all \u2014 the one link to hand back for a brief. Use it before saving to avoid duplicates, or when the user asks what they have marked up.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "patent": {
+            "type": "string",
+            "description": "US patent or publication, e.g. US10861617B2, 10861617, or US20030000656A1."
+          },
+          "decision_id": {
+            "type": "string",
+            "description": "A court decision id (from search_litigation) instead of a patent \u2014 lists the highlights on that decision."
+          },
+          "set_name": {
+            "type": "string",
+            "description": "Only notes in this named set (see note_sets in the response). Alone, without patent or decision_id: lists every patent and decision the set has notes on, with links \u2014 a set spans documents."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "My highlights & constructions",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_notes",
+      "title": "Matter notebook",
+      "description": "List the notes in a matter's notebook \u2014 the long-form workspace on the matter, shared with everyone who can see it. Returns each note's title, when it changed, note_id, and a link that opens it. Pass include_content to read the notes themselves, or note_id for one note. Call it before writing so you revise the right note instead of starting a second one on the same subject.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "matter"
+        ],
+        "properties": {
+          "matter": {
+            "type": "string",
+            "description": "Matter id from list_matters or create_matter."
+          },
+          "include_content": {
+            "type": "boolean",
+            "description": "Return each note's html, not just its title."
+          },
+          "note_id": {
+            "type": "string",
+            "description": "Read one note in full."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Matter notebook",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "write_note",
+      "title": "Write to the matter notebook",
+      "description": "Write a note into a matter's notebook \u2014 a case summary, a per-patent prosecution and litigation history, a research memo, a call note. This is where long-form work belongs: highlights live on the patent, a note lives on the matter, and the user opens it at /library/notebook. Pass matter (from list_matters or create_matter), a title, and content in markdown: headings, bullet and numbered lists, bold, links. To revise a note, pass its note_id from list_notes \u2014 with append:true to add a section, without it to replace the note. Write real prose with the cites the other tools returned, not a bare outline. Paid plans only.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "matter": {
+            "type": "string",
+            "description": "Matter id from list_matters or create_matter. Required unless note_id is given."
+          },
+          "title": {
+            "type": "string",
+            "description": "The note's title, e.g. \"US 9,203,806 \u2014 prosecution and litigation history\". Inferred from the first line when omitted."
+          },
+          "content": {
+            "type": "string",
+            "description": "The note itself, in markdown: ## headings, - bullets, 1. numbered lists, **bold**, [links](https://...). Quote passages with the cites the other tools returned."
+          },
+          "note_id": {
+            "type": "string",
+            "description": "Revise this existing note (from list_notes) instead of creating a new one."
+          },
+          "append": {
+            "type": "boolean",
+            "description": "With note_id: add this content to the end of the note instead of replacing it."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Write to the matter notebook",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "save_definitions",
+      "title": "Save a definitions section",
+      "description": "Save a drafted definitions section into a matter's notebook as a structured note, and get a Word file where every definition paragraph carries a comment bubble with its provenance: the verbatim source sentences, the patents (linked), how many of the applicant's definitions took that form, and any divergence flag. This is the deliverable of the definitions_workflow prompt \u2014 use it instead of write_note for a definitions section. Pass matter (id or exact name), title, optional application / assignee / preamble, and entries: one per term with term, definition (the proposed text), sources [{ patent, sentence (verbatim from get_term_definitions), count, of, date }], and optionally divergence, original: true (no prior definition existed), note. Every entry needs sources or original: true. Returns link (the note) and docx_link (the Word download, opened signed-in) \u2014 give the user both. Paid plans only.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "entries"
+        ],
+        "properties": {
+          "matter": {
+            "type": "string",
+            "description": "Matter id or its exact name (list_matters / create_matter). Required unless note_id is given."
+          },
+          "title": {
+            "type": "string",
+            "description": "Note title, e.g. \"Definitions draft \u2014 US20240123456A1\"."
+          },
+          "application": {
+            "type": "string",
+            "description": "The application or patent the section is drafted for."
+          },
+          "assignee": {
+            "type": "string",
+            "description": "The applicant whose definitions anchor the draft, e.g. City of Hope."
+          },
+          "preamble": {
+            "type": "string",
+            "description": "Opening boilerplate paragraph, if drafted (\"Unless defined otherwise, all technical and scientific terms...\")."
+          },
+          "entries": {
+            "type": "array",
+            "description": "One per term, in the order they should appear.",
+            "items": {
+              "type": "object",
+              "required": [
+                "term",
+                "definition"
+              ],
+              "properties": {
+                "term": {
+                  "type": "string"
+                },
+                "definition": {
+                  "type": "string",
+                  "description": "The proposed definition as it will read in the application, e.g. \"As used herein, the term \u201cantibody\u201d refers to ...\"."
+                },
+                "sources": {
+                  "type": "array",
+                  "description": "Verbatim source sentences this text was built from (from get_term_definitions). Up to 12.",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "patent",
+                      "sentence"
+                    ],
+                    "properties": {
+                      "patent": {
+                        "type": "string",
+                        "description": "e.g. US10414814B2"
+                      },
+                      "sentence": {
+                        "type": "string",
+                        "description": "The definition sentence exactly as printed."
+                      },
+                      "count": {
+                        "type": "number",
+                        "description": "How many of the applicant's definitions took this form."
+                      },
+                      "of": {
+                        "type": "number",
+                        "description": "Out of how many definitions were examined."
+                      },
+                      "date": {
+                        "type": "string",
+                        "description": "Issue or publication date, YYYY-MM-DD."
+                      }
+                    }
+                  }
+                },
+                "divergence": {
+                  "type": "string",
+                  "description": "Where the applicant or the art has defined the term differently, and which form was chosen and why."
+                },
+                "original": {
+                  "type": "boolean",
+                  "description": "True when no prior definition was found and the text is the drafter's own."
+                },
+                "note": {
+                  "type": "string",
+                  "description": "Anything the reviewer must check: a term of degree needing an objective anchor, a conflict inside one patent, a truncated source."
+                }
+              }
+            }
+          },
+          "caveats": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Method and scope notes (sample sizes, filters used, truncated sources). Shown after the entries and in the Word file's first comment."
+          },
+          "note_id": {
+            "type": "string",
+            "description": "Replace a previously saved section (from list_notes) instead of creating a new note."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Save a definitions section",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "search_litigation",
+      "title": "Court decisions",
+      "description": "Search Patent Bear's corpus of US patent court decisions (about 58,000 opinions and orders from district courts, the Federal Circuit, and the PTAB era, 1965 onward, parsed from govinfo) by party, judge, court, patent-in-suit, law firm, cited authority (e.g. \"Alice\", \"Phillips\"), case number, doctrine, disposition, outcome, year range, or words in the opinion text. Sentences are phrase-searched: a q of six or more words runs as an exact phrase, and if nothing matches it is retried as terms with query_mode saying so \u2014 read query_mode before treating a result as \"no decision says this\". Returns decision cards: case, court, judge, date, document type, disposition, doctrines, patents in suit, notable cites, a one-line holding, the reporter citation when the decision was published (e.g. 921 F.3d 1084; companion appeals under one caption come back as citation_candidates \u2014 never pick one), how often our corpus cites it, a link to the reader, and the court's PDF. Then call get_opinion to read one in full. Public records \u2014 every plan.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "q": {
+            "type": "string",
+            "description": "Words or a phrase that must appear in the opinion text, e.g. \"rubberbanding\" or \"means-plus-function\". A sentence of six or more words is searched as an EXACT PHRASE automatically; if nothing matches, the same words are retried as terms and query_mode says so."
+          },
+          "phrase": {
+            "type": "boolean",
+            "description": "Force q to be searched as an exact phrase (true) or as separate terms (false). Default: automatic by length."
+          },
+          "party": {
+            "type": "string",
+            "description": "A party name, e.g. Apple."
+          },
+          "judge": {
+            "type": "string",
+            "description": "Judge's name, e.g. Albright."
+          },
+          "court": {
+            "type": "string",
+            "description": "Court facet, e.g. txwd, ded, ca13 = Federal Circuit (cafc is accepted too); comma-separated for several."
+          },
+          "patent": {
+            "type": "string",
+            "description": "Patent-in-suit, e.g. US7844915B2 or 7,844,915."
+          },
+          "firm": {
+            "type": "string",
+            "description": "Law firm name appearing in the decision."
+          },
+          "cited": {
+            "type": "string",
+            "description": "A cited authority by case name (Alice, Mayo, Phillips, Markman, KSR, Nautilus, Williamson, Wands, Amgen, Ariad, Festo, Halo, eBay, Octane\u2026) or a reporter cite (858 F.2d 731). Unmapped names fall back to a phrase search of the opinion text."
+          },
+          "caseNo": {
+            "type": "string",
+            "description": "Docket number, e.g. 1:23-cv-00548."
+          },
+          "caseName": {
+            "type": "string",
+            "description": "Case caption words."
+          },
+          "doctrine": {
+            "type": "string",
+            "description": "Doctrine facet \u2014 one or more of (comma-separated): section_101 (eligibility), section_102 (anticipation), section_103 (obviousness), section_112 (enablement, written description, indefiniteness), claim_construction, infringement, damages, willfulness, injunction, doctrine_of_equivalents, inequitable_conduct, standing, venue, daubert, discovery, sanctions, summary_judgment_standard. Common aliases (eligibility_101, obviousness, indefiniteness, alice, markman) are mapped; anything else is a 400 listing the valid values."
+          },
+          "disposition": {
+            "type": "string",
+            "description": "Disposition facet: granted, granted_in_part, denied, mixed, adopted (R&R adopted), rejected (R&R rejected), unknown. A derived label \u2014 quote the ordering paragraph from get_opinion for what the court did."
+          },
+          "entity": {
+            "type": "string",
+            "description": "Party-type facet: operating_company, licensing_or_npe, individual, government, university, unknown."
+          },
+          "outcome": {
+            "type": "string",
+            "description": "Deprecated: not a filter on the current index (ignored with a facet_note). Use doctrine: section_101 with disposition or q instead."
+          },
+          "from": {
+            "type": "string",
+            "description": "Earliest decision date, YYYY-MM-DD (finer than yearFrom)."
+          },
+          "to": {
+            "type": "string",
+            "description": "Latest decision date, YYYY-MM-DD."
+          },
+          "within": {
+            "type": "string",
+            "description": "Limit to decisions in the same case as this docket number (a within-case search)."
+          },
+          "notCaseNo": {
+            "type": "string",
+            "description": "Exclude decisions with this docket number."
+          },
+          "yearFrom": {
+            "type": "string",
+            "description": "Earliest decision year, e.g. 2018."
+          },
+          "yearTo": {
+            "type": "string",
+            "description": "Latest decision year."
+          },
+          "page": {
+            "type": "number",
+            "description": "Results page (10 per page)."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Court decisions",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_opinion",
+      "title": "Read a court decision",
+      "description": "Read one court decision in full by decision_id (from search_litigation or get_legal_activity): the opinion text page by page as parsed from the court's PDF, the reporter citation when published (cite as \"<citation>, slip op. at <page>\"), footnotes, the parties, judge, patents in suit, disposition, and links: the Patent Bear reader, pdf_link (the court's own PDF), and the govinfo record. Pass include_pdf: true to receive the PDF itself alongside the text, so you can read the original and confirm every quote against it before it goes into a filing; keep it off for routine reading (long opinions are large). Long opinions page: follow next_page with from_page. Before you cite a pinpoint, pass quote (and the page you think it is on): quote_location returns the page the words are actually on, corrects an off-by-one, and warns when the stored text dropped a line-break hyphen (\"patenteligible\") so you print the quote as the PDF has it.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "decision_id"
+        ],
+        "properties": {
+          "decision_id": {
+            "type": "string",
+            "description": "The decision id from search_litigation or get_legal_activity, e.g. USCOURTS-txwd-1_23-cv-00548-2."
+          },
+          "from_page": {
+            "type": "number",
+            "description": "Start at this PDF page (for long opinions; follow next_page)."
+          },
+          "to_page": {
+            "type": "number",
+            "description": "Last page to return. Without it a read returns up to 8 pages from from_page and gives next_page."
+          },
+          "quote": {
+            "type": "string",
+            "description": "A passage to locate first: quote_location gives the page it is actually on (with page_note if you guessed a different page) and pages[] starts there. Use it before citing a pinpoint."
+          },
+          "page": {
+            "type": "number",
+            "description": "With quote: the page you believe the passage is on; the response confirms or corrects it."
+          },
+          "include_pdf": {
+            "type": "boolean",
+            "description": "Also return the court's PDF as an attached document so you can read the original. Default false."
+          },
+          "footnotes": {
+            "type": "boolean",
+            "description": "Include footnotes (default true)."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Read a court decision",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "save_opinion",
+      "title": "Save a court decision to Library",
+      "description": "Save a court decision to the user's Patent Bear Library \u2014 the reader's Save button, so the decision is in their Library under Opinions with its caption cached, optionally with a note. Idempotent: saving again refreshes it (existed:true). Use it as part of any hand-back: every decision you relied on for a brief, chart or memo should be saved (save_opinion) AND its quoted passages highlighted (save_opinion_highlights). Pass decision_id from search_litigation or get_legal_activity. Paid plans only.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "decision_id"
+        ],
+        "properties": {
+          "decision_id": {
+            "type": "string",
+            "description": "The decision id from search_litigation or get_legal_activity, e.g. USCOURTS-ca13-17-01437-0."
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional note on the saved decision, e.g. why it matters to this matter."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Save a court decision to Library",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "save_opinion_highlights",
+      "title": "Highlight a court decision",
+      "description": "Highlight passages in a court decision in the user's Patent Bear reader, each optionally with a note \u2014 the opinion twin of save_highlights. Saved as the user's own annotations: they appear on the decision's reader page and in the Library's Annotations page. highlights: [{ page, quote, color?, note?, exact? }] \u2014 page is the slip-opinion page from get_opinion's pages[], quote the exact words on that page. Up to 50 per call; duplicates come back as existed:true. set_name is required whenever any item carries a note: the work product these notes belong to (\"Eligibility Brief\"). Notes are appended into that named set \u2014 never overwriting another set's or the user's notes. Reuse the same set name for the patent's highlights (save_highlights) so the whole hand-back opens on one set. document_notes: [\"\u2026\"] are notes about the DECISION AS A WHOLE (holding, posture, why it matters), not tied to a page. Every quotation you hand back for a brief, chart, or memo should be saved this way, and hyperlinked with the link returned (it opens the decision on that page with the passage marked). CHECK WHAT WAS SAVED: a shorter text with partial:true means only that prefix was found \u2014 re-send the passage exactly as pages[] has it, or pass exact:true. Paid plans only.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "decision_id"
+        ],
+        "properties": {
+          "decision_id": {
+            "type": "string",
+            "description": "The decision id from search_litigation or get_legal_activity, e.g. USCOURTS-txwd-1_23-cv-00548-2."
+          },
+          "set_name": {
+            "type": "string",
+            "maxLength": 80,
+            "description": "Name of the note set these notes belong to \u2014 the work product: \"Eligibility Brief\". REQUIRED whenever any item carries a note. Use the same name as the patent's highlights for one hand-back."
+          },
+          "document_notes": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "string"
+            },
+            "description": "Notes about the decision as a whole (holding, posture, why it matters). Each goes into set_name."
+          },
+          "highlights": {
+            "type": "array",
+            "maxItems": 50,
+            "description": "Passages to highlight on the decision.",
+            "items": {
+              "type": "object",
+              "required": [
+                "page",
+                "quote"
+              ],
+              "properties": {
+                "page": {
+                  "type": "integer",
+                  "description": "Slip-opinion page the quote is on, from get_opinion's pages[].page."
+                },
+                "quote": {
+                  "type": "string",
+                  "description": "The exact words to highlight, copied from that page's text (at least 3 characters)."
+                },
+                "color": {
+                  "type": "string",
+                  "enum": [
+                    "yellow",
+                    "green",
+                    "blue",
+                    "rose",
+                    "purple",
+                    "orange",
+                    "teal",
+                    "cyan",
+                    "slate",
+                    "pink",
+                    "red"
+                  ],
+                  "description": "Highlight color (default yellow)."
+                },
+                "note": {
+                  "type": "string",
+                  "description": "Optional note \u2014 which proposition of the brief this passage supports, the pin cite, why it matters."
+                },
+                "exact": {
+                  "type": "boolean",
+                  "description": "Refuse a partial (prefix-only) match instead of saving it."
+                }
+              }
+            }
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Highlight a court decision",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_file_history_document",
+      "title": "Read a file-history document",
+      "description": "The TEXT of one file-wrapper document \u2014 an office action, an amendment, the applicant's remarks, a claims listing, an examiner's reference list \u2014 sectioned. Take document_id from get_file_history (documents with text_available:true). Text comes from the Office's rendition when Patent Bear holds it, otherwise from OCR of the PDF: a first read of a scanned document returns status:processing \u2014 tell the user, then call again with wait:true. Retry at most twice; a document the servers could not read returns an error with retry_after_seconds \u2014 stop, give the user pdf_link, and answer from the metadata (for a terminal disclaimer, get_file_history's term_summary.terminal_disclaimer has the filed/approved events without the text). Use it before characterizing prosecution: which statute a rejection rests on and over what art, what the applicant amended and what it argued to distinguish the art, what the examiner said in allowing. Long documents page by section (follow next_section). No page numbers in the text \u2014 use pdf_link for a page cite.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "document_id"
+        ],
+        "anyOf": [
+          {
+            "required": [
+              "patent"
+            ]
+          },
+          {
+            "required": [
+              "application"
+            ]
+          }
+        ],
+        "properties": {
+          "patent": {
+            "type": "string",
+            "description": "US patent or publication, e.g. US10861617B2, 10861617, or US20030000656A1."
+          },
+          "document_id": {
+            "type": "string",
+            "description": "The document_id from get_file_history's documents[] (e.g. INT00KPVRXEAPX1)."
+          },
+          "from_section": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Continue a long document from this section index (the next_section of the previous call)."
+          },
+          "max_chars": {
+            "type": "number",
+            "minimum": 5000,
+            "maximum": 60000,
+            "description": "Cap the text returned per call (default 60000 characters); use a smaller value with from_section to page a very long document (a full PTAB decision) in pieces your result window can hold."
+          },
+          "wait": {
+            "type": "boolean",
+            "description": "When the previous call said status:processing, hold up to 45 seconds for the text to arrive."
+          },
+          "application": {
+            "type": "string",
+            "description": "The application (or reexamination control) number the document belongs to, when get_file_history was called with an application argument."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Read a file-history document",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "find_similar_patents",
+      "title": "Similar patents \u00b7 by claim",
+      "description": "Find the patents whose claims read closest to a patent's independent claims, or to any text \u2014 a claim, one element, a sentence describing the idea. Nearest-neighbour search over 47.6 million claim embeddings (bge-small-en-v1.5), collapsed to the patent whose best claim matches, with title, assignee, date and a link for each hit. Pass patent (US grant or publication; its own claims are excluded) or text (text wins if both). record = grant | pub narrows to one kind; limit up to 50 (default 20). No date cutoff and no CPC filter \u2014 it finds neighbours to read, not prior art: for art against a claim with a priority date and element-by-element evaluation, run the Prior Art analysis (run_research prior_art). Every plan.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "patent": {
+            "type": "string",
+            "description": "A US grant or publication, e.g. US7844915B2 \u2014 neighbours of ITS independent claims (the patent itself is excluded)."
+          },
+          "text": {
+            "type": "string",
+            "description": "Free text to match against claims: a claim, one element, or a sentence describing the idea. Wins over patent if both are given."
+          },
+          "record": {
+            "type": "string",
+            "enum": [
+              "grant",
+              "pub"
+            ],
+            "description": "Only issued grants, or only published applications."
+          },
+          "limit": {
+            "type": "number",
+            "description": "Neighbours to return, up to 50 (default 20)."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Similar patents \u00b7 by claim",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "search_office_actions",
+      "title": "Search examiner office actions",
+      "description": "Search 13 million examiner office actions (non-final and final rejections, July 2007 to the current week) by the examiner's own words and by the USPTO's rejection tags. Answers: how has this examiner or art unit applied \u00a7 101 to claims like these; what does a final rejection in tech center 3600 citing \"prima facie\" obviousness look like; every action on this application or patent; how often 112 rejections appear in an art unit, by year. query = words (all must appear) or a \"quoted phrase\" from the action's text; filters: rejection_type (101 | 102 | 103 | 112 | DoublePatent | Other), tech_center, art_unit, examiner_id, document_code (CTNF non-final | CTFR final), year, application, patent. Hits carry an excerpt around the match, the tagged rejections, examiner / art unit / tech center, and facets by rejection type, tech center and year; include_text: true returns the full action. Newest first, limit up to 50, offset to page. Examiner side only: the applicant's response is in the file wrapper \u2014 get_file_history on the application pairs them. Quote the examiner verbatim. Every plan.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Words that must all appear in the examiner's text, and/or a \"quoted phrase\" for an exact match, e.g. \"abstract idea\" mental process."
+          },
+          "rejection_type": {
+            "type": "string",
+            "enum": [
+              "101",
+              "102",
+              "103",
+              "112",
+              "DoublePatent",
+              "Other"
+            ],
+            "description": "Only actions carrying this rejection type (USPTO tagging)."
+          },
+          "tech_center": {
+            "type": "string",
+            "description": "Tech center, e.g. 3600 or 2100."
+          },
+          "art_unit": {
+            "type": "string",
+            "description": "Group art unit, e.g. 3692."
+          },
+          "examiner_id": {
+            "type": "string",
+            "description": "Examiner employee number, as the file wrapper and other hits report it."
+          },
+          "document_code": {
+            "type": "string",
+            "enum": [
+              "CTNF",
+              "CTFR"
+            ],
+            "description": "CTNF = non-final rejection, CTFR = final rejection."
+          },
+          "year": {
+            "type": "number",
+            "description": "Year the action was mailed, 2007 to today."
+          },
+          "application": {
+            "type": "string",
+            "description": "Application number, e.g. 16123456 \u2014 every action on that application."
+          },
+          "patent": {
+            "type": "string",
+            "description": "Granted patent number, e.g. 9203806 \u2014 the actions in its prosecution."
+          },
+          "include_text": {
+            "type": "boolean",
+            "description": "Return each action's full text instead of an excerpt (up to max_chars per action; the page stops attaching text after 200,000 characters and marks the rest text_omitted). Pair with limit \u2264 5."
+          },
+          "max_chars": {
+            "type": "number",
+            "description": "With include_text: characters per action, 1,000 to 40,000 (default 40,000). Use 8000 when you only need the rejection statements."
+          },
+          "limit": {
+            "type": "number",
+            "description": "Actions per page, up to 50 (default 10; keep to 5 or fewer with include_text)."
+          },
+          "offset": {
+            "type": "number",
+            "description": "Paging offset, from the previous page's next_offset."
+          }
+        }
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp"
+          ]
+        }
+      ],
+      "annotations": {
+        "title": "Search examiner office actions",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    }
+  ],
+  "captured_utc": "2026-09-17T18:37:27Z"
+}

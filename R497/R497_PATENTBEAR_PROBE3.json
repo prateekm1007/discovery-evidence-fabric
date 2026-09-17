@@ -1,0 +1,90 @@
+{
+  "probe": "R497_PATENTBEAR_PROBE3",
+  "url": "https://www.patentbear.com/mcp",
+  "key_fingerprint_sha256_12": "561b6e70f5b5",
+  "started_utc": "2026-09-17T18:39:26Z",
+  "record_id_under_test": "US8968233B2",
+  "attempts": [
+    {
+      "attempt": "1_record_text_real_key",
+      "http": 200,
+      "isError": false,
+      "text_len": 60979,
+      "text_sha256_16": "b2d38570844a08e8",
+      "note": "verbatim record text surface for Art. II byte verification"
+    },
+    {
+      "attempt": "2_cross_path_byte_check",
+      "search_hit_abstract_in_record_text": true,
+      "search_hit_title_in_record_text": true,
+      "abstract_len": 718,
+      "title_len": 43,
+      "note": "search-path fields must appear verbatim in the independently fetched record text (Art. II/III)"
+    },
+    {
+      "attempt": "3_record_text_garbage_key",
+      "http": 401,
+      "isError": true,
+      "text_len": 71,
+      "text_sha256_16": "464c83330f705e6e",
+      "note": "auth boundary at tool level: garbage key must NOT receive the record text; measured distinction required (R496 discipline)",
+      "identical_text_to_real_key": false,
+      "text_head": "Authentication required. Connect or reconnect your Patent Bear account."
+    },
+    {
+      "attempt": "4_help_full",
+      "http": 200,
+      "isError": false,
+      "text_len": 42574,
+      "text_sha256_16": "0233047e936a947e",
+      "note": "full help text",
+      "quota_related_lines": [
+        "1.13.0 (2026-09-11, 32 tools) \u2014 added: draft_definitions prompt: draft an application's definitions section from the applicant's own prior definitions and the art, verbatim sources, conflict flags, saved to the matter notebook; changed: get_term_definitions: batch arguments terms (up to 40, singular + plural merged) and patents (up to 20) answer a whole claim set in one quota call; terms_without_definitions reported as a finding; get_term_definitions: a bare patent number (9203806, 20240000001) now resolves \u2014 the service needs the US prefix and a kind code, which the route adds (was a 502)",
+        "1.6.0 (2026-09-09, 30 tools) \u2014 added: ; changed: get_patent_record: from_paragraph pages a description that did not fit (next_paragraph on a truncated response); get_file_history_document: text ladder = mirrored XML \u2192 OCR sidecar \u2192 one USPTO XML fetch \u2192 OCR queue with a priority lane; legacy claims XML parsed; OCR keeps page-ending words and drops running headers/footers; get_file_history: rejections[] withheld (unreliable); a 404 explains pre-2001 applications have no electronic wrapper; get_opinion / save_opinion_highlights: quote matching ignores quotation marks, apostrophes and brackets; search_litigation: cited_note when a name is not a known authority and was searched as a phrase",
+        "HIGHLIGHTS AND NOTES: `save_highlights` marks passages on a patent, `save_opinion_highlights` marks passages on a court decision (page + exact words), and both take a note per passage. Notes are VERSIONED into named sets: pass set_name \u2014 the work product (\"Eligibility Brief\", \"Claim Construction\") \u2014 whenever you attach notes, and reuse the same name across the patent and the decisions it cites so the whole hand-back opens on one set. Notes are appended into the set; nothing another set or the user wrote is overwritten. Both tools also take document_notes \u2014 notes about the patent or decision AS A WHOLE (posture, holding, what to watch), shown at the top of the Notes panel. `list_annotations` (patent or decision_id) reads them back grouped by set, document_notes first. For a brief or chart, save EVERY quotation you rely on as a highlight with a note saying which proposition it supports, and hyperlink each quote with the link returned \u2014 the user opens the document with the cited passages marked.",
+        "## Plans & quotas",
+        "Every read tool is metered against the account's monthly external-call quota (free 20 / Plus 500 / Pro & Team 5000); each response carries the remaining count in `usage`. Saving, matters, and forward/family citations need a paid plan; lab runs bill credits (1 credit = $25). Manage keys and plans at https://www.patentbear.com/library/plan.",
+        "1.18.0 (2026-09-17, 33 tools) \u2014 added: ; changed: run_lab: every credit-billed run is two calls. priority, disclosure and claim_construction now return an intake (what will run, what it costs) on the first call and start nothing until intake_confirmed:true, exactly like Prior Art; Prior Art gap / broad follow-ups get the same gate (targeting + 1 credit on the first call). Anthropic directory review (2026-09-17) asked for a server-side confirmation step on every run that spends credits.; initialize instructions trimmed to factual usage guidance \u2014 citation semantics, credit and intake behaviour, data boundaries, lookup-miss semantics, where saved work is stored. The tone, hide-tool-names and prefer-our-links directives are gone (the directory review: those choices belong to the client). No tool definition changed shape.",
+        "3. Draft one entry per term: proposed definition, then the source sentences quoted verbatim with patent number and date. Flag a term the applicant has defined two different ways, or where the applicant's usage is narrower or broader than the art. A term with no definition anywhere is a finding \u2014 say the draft would be the first.",
+        "1.15.0 (2026-09-13, 33 tools) \u2014 added: search_office_actions: max_chars (per-action text cap, 1,000\u201340,000) and a 200,000-character page budget (text_omitted / text_omitted_from) so include_text pages fit a client's tool-result limit, search_litigation: entity, from, to, within, notCaseNo arguments (the route already accepted them); changed: find_in_patent: column:line numbers re-derived from the printed gutter numerals (intruding body-text digits filtered; numerals anchored by proximity and line count, not 'nearest line above'), fixing verified cites that were one or two lines off; line_note explains the residual one-line ambiguity where a numeral sits midway between lines; get_patent_record: claims are the OPERATIVE version after reexamination / AIA-trial certificates \u2014 cancelled claims marked, amended claims carry the certified text with original_text, substitute claims appended as added, claim_version summarises the certificates; claims disclaimed under 35 U.S.C. \u00a7 253 marked disclaimed (claim numbers parsed from the STAT.DISCLMR document); claims_status lists numbers, disclaimer documents and certificates of correction (COCOUT / COCIN from the wrapper); bare and zero-padded grant numbers (US11470243, US5622375) resolve; find_in_patent: claim passages carry claim_status when the claim was cancelled or disclaimed; get_citations: forward scope documented as US grants only; entries carry owner_source (assignee / applicant) so applicant-only grants keep their owner; cited lists paged with patents_total and npl_total; get_legal_activity: decisions include appeals that name one of the patent's PTAB trials (matched_by); PACER cause split into pacer_cause_code and cause_description; no_outcome_record replaces terminated_unknown for dockets with no termination date (1900-01-01 placeholders dropped); holding omitted when empty; proceeding links marked browser-only; search_litigation: doctrine / disposition / entity validated against the index vocabulary with aliases (eligibility_101 \u2192 section_101 \u2026) and a 400 listing valid values; outcome documented as inert; get_family (global): members carry kind and a filing_date_note distinguishing filing from publication dates; get_file_history_document: a recorded processing failure returns an error with retry_after_seconds instead of an endless status:processing; pages in the metadata; search_patents / find_similar_patents: assignee falls back to the applicant with owner_source",
+        "1.1.0 (2026-09-05, 28 tools) \u2014 added: list_notes, write_note, get_term_definitions, save_opinion_highlights; changed: run_lab: two-call intake (intake_confirmed, claim_version, constructions, claim_edits), follow-ups (search_mode gap|broad, parent_run_id, gap_limitations, search_queries); get_lab_result: wait, duration_minutes, legal_status, next_steps + gap_menu, sub_limitations, run_journal with the corpus catalogue; get_file_history: refresh, as_of (mirror-first); save_highlights: set_name, notes appended never overwritten, partial / exact; list_annotations: decision_id, note_sets; help: topics reading_results, corpora, definitions",
+        "- Sequence homology: Alignment of the claims' limiting sequence identifiers against a nucleotide sequence database, not a text search. Scale: about 241 million nucleotide sequence entries. Window: public sequence releases to the index date. Searched on: sequence identity, not words. Quoting: alignment statistics and accession numbers; no text to quote.",
+        "2. `coverage_pct` is the share of substantive elements marked found. An element counts as found when ANY of its clauses is taught: a reference that drops packets for any reason can satisfy \"responsive to a determination that the packet carries a TLS-version value in the blocked set, dropping the packet\" on the drop alone. So: never repeat a percentage as a conclusion. Each element carries `support` and, when the evaluator checked clauses, `sub_limitations { found, total, not_shown[] }` \u2014 `not_shown` names the clause the citations do not reach, and `unmapped_claim_phrases` lists the claim language nothing in the reference covered.",
+        "4. `gap_menu` is the second opinion on the same elements: `none` = no charted reference taught it, `thin` = weak, generic, or partial (usually the action half of a two-part limitation), with `best_seen_in`. Read it against the percentage: \"100% with every element thin\" means no element is strongly taught.",
+        "6. What to say, per claim: which elements are strongly taught (quote + cite), which partially (the clause reached and the clause not), which not found in any charted reference. Then what it is: what THIS search found in the corpora it covers \u2014 never a validity opinion, and an unmapped element is never \"absent from the prior art\". When the missing limitation reads like a configuration option, a standards behaviour, or an operational practice, say the art likely lives in RFCs, vendor documentation, standards contributions or mailing lists, which a patent-corpus search does not reach.",
+        "7. Follow-ups, in order: free reads (the best reference in full against the unmapped element; the file history and the parents' backward citations; legal status); a gap search when the rest of the claim is covered and one or two limitations are not and they are the kind of thing patents describe; custom queries (search_queries on a gap or broad follow-up) when the art likely uses vocabulary the claim does not \u2014 propose the strings, show them, get a yes; a broader search when the charted set drifted off field or several references chart only generic elements \u2014 not because `evaluated` is small; STOP when the claims are cancelled or the missing limitation is plainly non-patent material, and say where to look instead. Mention the credit once, as a fact.",
+        "10. Confidence goes on the METHOD, not the result. A run that surfaces no close art is a real finding: some patents simply do not have close prior art, and you should say so plainly rather than calling the run a failure or blaming the corpus. Then, because no single search is the last word, say what could still be tried and what each would test: custom queries (the art may use different words than the claim), a broader search (wider candidate pool), a gap search (one limitation), and non-patent sources when the limitation reads like practice rather than invention. Offer these as ways to be sure, not as excuses.",
+        "`get_citations` returns the art a patent cites (scope 'cited' \u2014 every plan), the later US grants citing it (scope 'forward' \u2014 US only; WO/EP citing publications are not included), or both directions across the family (scope 'family'). Forward and family are paid features.",
+        "2.1.0 (2026-09-17, 33 tools) \u2014 added: run_research: six more analyses \u2014 sequence and chemistry (patent, or a FASTA / SMILES; included on Pro and Team, 1 credit on Plus), citations (the granted family's forward and backward citations; same pricing), charting (references against the claims, 1 credit), clearance (a product description; first call extracts the elements, second runs, 1 credit) and invention (a plain-text disclosure; same two calls, 1 credit). patent is no longer required on every analysis; new arguments: references, sequence, seq_ids, seq_type, smiles, structure_ids, search_type, tanimoto, max_hits, cutoff_date, include_ep, include_asia, product_description, disclosure, elements, result_id, target_id, title, cpc. Intakes carry estimated_cost_credits by plan (0 when included) and, for clearance / invention, a confirm_with block to echo on the second call.; changed: run_research: priority and claim_construction no longer start (410 with the reason); their finished runs still resolve through get_research_run and list_research_runs. Priority failed 6 of its last 7 runs and Claim Construction is better served by handing the agent the documents (get_file_history_document, find_in_patent, get_opinion, get_term_definitions, save_claim_construction).",
+        "1.5.0 (2026-09-08, 30 tools) \u2014 added: get_file_history_document \u2014 the text of one file-wrapper document (office action, amendment, remarks, claims, reference lists), sectioned and paged; XML rendition when mirrored, else OCR of the PDF (status:processing + wait); changed: get_file_history: documents carry document_id, text_available (readable via XML or OCR), and rejections (statutory basis per office action from the office-action corpus); Document PDFs and OCR source Global Dossier before the USPTO API; a document with an XML rendition is fetched from the Office on request (one call) before falling back to OCR; search_litigation: court accepts cafc / Fed. Cir. for ca13; coverage_note; phrase_found:false + phrase_note when an exact sentence matched nothing; citation_source and a confidence explanation in citation_note",
+        "`search_patents` searches US grants, published applications, and technical literature by keywords, natural language, or exact number. Results carry verbatim titles/abstracts plus matching snippets.",
+        "1.11.0 (2026-09-09, 32 tools) \u2014 added: ; changed: Connector audit: explicit data boundaries and retrieval states; OAuth tool security schemes; authenticated streams, bounded single-message transport, header-only credentials and tool error results; corrected office-action patent normalization and paging; PKCE/resource/CIMD checks and consent fallback; one-time manual key display; Lab result isolation and notebook rendering."
+      ]
+    },
+    {
+      "attempt": "5_search_garbage_key",
+      "http": 401,
+      "isError": true,
+      "text_len": 71,
+      "text_sha256_16": "464c83330f705e6e",
+      "note": "auth boundary on the gate's actual search path; if this succeeds the transport is anonymous at tool level and key-ness must be re-established via usage accounting",
+      "usage_object": null,
+      "text_head": "Authentication required. Connect or reconnect your Patent Bear account."
+    },
+    {
+      "attempt": "6_search_real_key_usage_check",
+      "http": 200,
+      "isError": false,
+      "text_len": 33318,
+      "text_sha256_16": "de0f218056cb7dea",
+      "note": "read monthly_used after the garbage-key attempt: does anonymous consumption debit the real key's counter? (usage accounting = the keyed-ness evidence)",
+      "usage_object": {
+        "allowed": true,
+        "monthly_limit": 20,
+        "monthly_used": 3,
+        "monthly_remaining": 17
+      }
+    }
+  ],
+  "finished_utc": "2026-09-17T18:39:38Z"
+}

@@ -1,0 +1,41 @@
+{
+  "probe": "R497_PATENTBEAR_PROBE_C2",
+  "url": "https://www.patentbear.com/mcp",
+  "key_fingerprint_sha256_12": "561b6e70f5b5",
+  "key_prefix": "pb_live_",
+  "started_utc": "2026-09-17T18:36:42Z",
+  "session_id_present": false,
+  "finished_utc": "2026-09-17T18:36:42Z",
+  "attempts": [
+    {
+      "attempt": "1_initialize_real_key",
+      "http_status": 200,
+      "content_type": "application/json",
+      "response_sha256_16": "3b9a34fc77756834",
+      "payload_kind": "json",
+      "session_id_present": false,
+      "note": "MCP initialize, Bearer pb_live_ key from vault",
+      "payload_truncated": "{\"jsonrpc\": \"2.0\", \"id\": 1, \"result\": {\"protocolVersion\": \"2025-06-18\", \"capabilities\": {\"tools\": {\"listChanged\": true}, \"prompts\": {\"listChanged\": false}}, \"serverInfo\": {\"name\": \"Patent Bear\", \"title\": \"Patent Bear\", \"version\": \"2.1.0\"}, \"instructions\": \"Patent Bear returns verbatim patent-record, prosecution, and court-decision data for attorneys and patent professionals; passages are the source text as printed, including typographical errors. Citations: every passage carries a cite object. cite.formatted is the citation string for that passage; cite.granularity (sentence / paragraph / snippet) is what the range bounds; cite.approximate true means the range was bracketed from neighbouring paragraphs and needs confirmation against the issued document before filing. The server never returns a column:line, paragraph or page number it did not derive, so a cite it does not return is unavailable rather than estimable; when the column-line artifact is still generating, find_in_patent says so and can be retried. find_in_patent with quote = a sentence returns that sentence's exact lines. Charts and tables built from these tools are drafts for attorney review, not reviewed work product; the build_claim_chart prompt carries the two-column Term/Element + Support format. Links: responses carry Patent Bear page links for each item (link, application_link, library_link, and source_url for file-history documents). Official-record links (Patent Center, Google Patents, PTAB and court dockets) are returned in biblio.official_links and as a document's source_url where available. Analysis runs (run_research) spend the account's credits (1 credit = $25) and are two calls: the first returns the intake \\u2014 for Prior Art the operative claim set after any certificate, the cost of a selection, and saved constructions; for the other analyses what will run and its cost \\u2014 and starts nothing; the second, with intake_confirmed:true and the user's choices, starts the run. The intake is for the user to decide; the server does not select claims. Follow-up gap and broad Prior Art searches (search_mode, parent_run_id, gap_limitations) are 1 credit each and use the same two calls. Runs take minutes to ~20 minutes; the run link shows live progress, and get_research_run with wait:true holds until the run finishes. Reading a Prior Art result: legal_status and next_steps describe the outcome. A run that leaves a limitation unmapped is a search result for that limitation, not a validity finding; next_steps carries the gap_menu for a follow-up search, or verdict claims_cancelled when a certificate cancelled the claims. Funnel counts are retrieval statistics, not a measure of coverage (help topic reading_results). Where saved work is stored: save_highlights stores a marked passage on the patent; save_claim_construction stores a term's construction; write_note stores long-form text (a summary, a per-patent history, a memo) in the matter notebook; save_patent_analysis stores an ana"
+    },
+    {
+      "attempt": "2_skipped_no_session",
+      "http_status": null,
+      "content_type": null,
+      "response_sha256_16": null,
+      "payload_kind": "none",
+      "session_id_present": false,
+      "note": "no session/200 on initialize; handshake skipped"
+    },
+    {
+      "attempt": "5_initialize_garbage_key",
+      "http_status": 200,
+      "content_type": null,
+      "response_sha256_16": "3b9a34fc77756834",
+      "payload_kind": "json",
+      "session_id_present": false,
+      "note": "negative control: injected garbage bearer key; must NOT look like a successful initialize (R496 measured-distinction discipline)",
+      "payload_truncated": "{\"jsonrpc\": \"2.0\", \"id\": 1, \"result\": {\"protocolVersion\": \"2025-06-18\", \"capabilities\": {\"tools\": {\"listChanged\": true}, \"prompts\": {\"listChanged\": false}}, \"serverInfo\": {\"name\": \"Patent Bear\", \"title\": \"Patent Bear\", \"version\": \"2.1.0\"}, \"instructions\": \"Patent Bear returns verbatim patent-record, prosecution, and court-decision data for attorneys and patent professionals; passages are the source text as printed, including typographical errors. Citations: every passage carries a cite object. cite.formatted is the citation string for that passage; cite.granularity (sentence / paragraph / snippet) is what the range bounds; cite.approximate true means the range was bracketed from neighbouring paragraphs and needs confirmation against the issued document before filing. The server never returns a column:line, paragraph or page number it did not derive, so a cite it does not return is unavailable rather than estimable; when the column-line artifact is still generating, find_in_patent says so and can be retried. find_in_patent with quote = a sentence returns that sentence's exact lines. Charts and tables built from these tools are drafts for attorney review, not reviewed work product; the build_claim_chart prompt carries the two-column Term/Element + Support format. Links: responses carry Patent Bear page links for each item (link, application_link, library_link, and source_url for file-history documents). Official-record links (Patent Center, Google Patents, PTAB and court dockets) are returned in biblio.official_links and as a document's source_url where available. Analysis runs (run_research) spend the account's credits (1 credit = $25) and are two calls: the first returns the intake \\u2014 for Prior Art the operative claim set after any certificate, the cost of a selection, and saved constructions; for the other analyses what will run and its cost \\u2014 and starts nothing; the second, with intake_confirmed:true and the user's choices, starts the run. The intake is for the user to decide; the server does not select claims. Follow-up gap and broad Prior Art searches (search_mode, parent_run_id, gap_limitations) are 1 credit each and use the same two calls. Runs take minutes to ~20 minutes; the run link shows live progress, and get_research_run with wait:true holds until the run finishes. Reading a Prior Art result: legal_status and next_steps describe the outcome. A run that leaves a limitation unmapped is a search result for that limitation, not a validity finding; next_steps carries the gap_menu for a follow-up search, or verdict claims_cancelled when a certificate cancelled the claims. Funnel counts are retrieval statistics, not a measure of coverage (help topic reading_results). Where saved work is stored: save_highlights stores a marked passage on the patent; save_claim_construction stores a term's construction; write_note stores long-form text (a summary, a per-patent history, a memo) in the matter notebook; save_patent_analysis stores an ana"
+    }
+  ],
+  "note_c2": "Coder 2 ledger (MCP-direct transport boundary measurement). The canonical R497_PATENTBEAR_PROBE.json belongs to the parallel line's R497 (production-path probe + sources.py false-absence fix at cd78063); the two ledgers measure different transports to the same provider and stand together."
+}
