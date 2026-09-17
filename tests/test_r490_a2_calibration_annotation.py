@@ -42,12 +42,17 @@ CANDIDATE = {
                         "rolling-contact band",
     "testable_prediction": "strain-gauge coupon test over one 20-hour "
                            "shift shows the reduction",
+    "evidence_items": [
+        {"id": "ev:cam-pad-doc",
+         "title": "USPTO 4,444,444: bolt-on hydrostatic pad ring for "
+                  "cam-follower interfaces, claimed as the standard "
+                  "retrofit for point-contact followers"}],
 }
 
 KILL_RESPONSE = """
 UNSUPPORTED_MECHANISM: PASS
 WEAK_TRANSFER: PASS
-OBVIOUS_COMBINATION: KILLED - the bolt-on ring converting point contact into a hydrostatic pad is the standard cam-follower retrofit (R493 v4: grounding per the kill standard)
+OBVIOUS_COMBINATION: KILLED - ev:cam-pad-doc discloses the bolt-on ring converting point contact into a hydrostatic pad as the standard cam-follower retrofit (R493 v4: packet-anchored per the kill standard)
 PRIOR_ART: PASS
 CONTRADICTION: PASS
 BOUNDARY_FAILURE: PASS

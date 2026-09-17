@@ -95,7 +95,7 @@ THE KILL STANDARD (applies to every dimension): a KILLED verdict must NAME its s
 Dimensions:
 1. UNSUPPORTED_MECHANISM: the causal chain is physically/chemically invalid — name the specific claimed effect and the specific physical reason it cannot hold.
 2. WEAK_TRANSFER: the source-to-application transfer is superficial — name the specific mechanism element that fails to transfer and why.
-3. OBVIOUS_COMBINATION: this is an obvious combination of known techniques — NAME the specific known techniques and show the combination is obvious FROM THEM (a novel integration with a new design variable is not obvious).
+3. OBVIOUS_COMBINATION: this is an obvious combination of known techniques — NAME the specific known techniques and show the combination is obvious FROM THEM (a novel integration with a new design variable is not obvious). The known techniques must come from the PROVIDED record (the evidence_items): a combination you know from memory, literature, or commercial systems you cannot cite from the packet is an OBJECTION, not a kill — record PASS and name it in your reason.
 4. PRIOR_ART: this is already known — name the specific prior disclosure you have in view (without one, PASS).
 5. CONTRADICTION: the PROVIDED evidence contradicts the claim — cite the evidence's specific conflicting value(s). If no evidence items are provided, or the evidence does not actually conflict with a claimed number, this dimension is PASS (absence of evidence is not a contradiction).
 6. BOUNDARY_FAILURE: a boundary condition is missing or violated — name the specific boundary/operating point and the specific violation.
@@ -105,7 +105,7 @@ Dimensions:
 Candidate (arm hidden; any evidence_items provided are part of the record):
 {candidate_json}
 
-Respond (each on ONE line, KILLED lines must carry their specific grounding):
+Respond (each on ONE line, KILLED lines must carry their specific grounding). You MUST respond with ALL NINE lines — every dimension line, then OVERALL, then REASON; a dimension you cannot object to is PASS:
 UNSUPPORTED_MECHANISM: PASS | KILLED - <specific grounding>
 WEAK_TRANSFER: PASS | KILLED - <specific grounding>
 OBVIOUS_COMBINATION: PASS | KILLED - <named techniques>
@@ -138,11 +138,13 @@ def _packet_evidence(candidate: dict) -> list:
 
 def _kill_grounded(kill_text: str, candidate: dict) -> bool:
     """True when the kill line names a specific: a number, a named
-    regime/standard, or a >=4-word verbatim overlap with the
-    candidate's own claims (the grounding must come FROM the record,
-    not from generic reviewer boilerplate)."""
+    regime/standard, a >=4-word verbatim overlap with the candidate's
+    own claims, or a packet-evidence citation (the grounding must
+    come FROM the record, not from generic reviewer boilerplate)."""
     text = str(kill_text or "")
     if _DIGIT_RE.search(text) or _STANDARD_RE.search(text):
+        return True
+    if _packet_anchored(text, candidate):
         return True
     # 4-gram overlap against the candidate's own claim text
     claim_text = " ".join(str(candidate.get(k) or "") for k in (
@@ -158,6 +160,30 @@ def _kill_grounded(kill_text: str, candidate: dict) -> bool:
     for i in range(len(kill_words) - 3):
         if " ".join(kill_words[i:i + 4]) in grams:
             return True
+    return False
+
+
+def _packet_anchored(kill_text: str, candidate: dict) -> bool:
+    """True when the kill's citation is IN the provided packet: it
+    names an evidence-item id (ev:...) or echoes >=4 consecutive words
+    of an evidence item's text. Memory/literature citations that the
+    instrument cannot verify from the packet do not anchor."""
+    text = str(kill_text or "").lower()
+    if "ev:" in text:
+        return True
+    evs = _packet_evidence(candidate)
+    for e in evs:
+        ev_text = " ".join(str(e.get(k) or "") for k in
+                           ("id", "title", "text", "content")).lower()
+        words = _WORD_RE.findall(ev_text)
+        if len(words) < 4:
+            continue
+        grams = {" ".join(words[i:i + 4])
+                 for i in range(len(words) - 3)}
+        kill_words = _WORD_RE.findall(text)
+        for i in range(len(kill_words) - 3):
+            if " ".join(kill_words[i:i + 4]) in grams:
+                return True
     return False
 
 
@@ -428,8 +454,11 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
         # Both floors are WARRANTED by measured DEV-corpus baseline
         # failures (R493/A2_BASELINE) and demote the kill to a
         # preserved objection — they NEVER create a kill and never
-        # touch the deterministic gates (Art. VII discipline).
-        if is_killed:
+        # touch the deterministic gates (Art. VII discipline). A
+        # dimension already typed ADVERSARIAL_INVALID keeps its own
+        # disposition (EVALUATION_FAILED) — the floors never
+        # re-process it.
+        if is_killed and "ADVERSARIAL_INVALID" not in raw_verdict.upper():
             # FLOOR 1 (contradiction-absence): a CONTRADICTION kill
             # with NO evidence items in the instrument's packet is the
             # typed false-kill class ABSENCE_AS_CONTRADICTION (Art.
@@ -460,6 +489,27 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
                                f"{_objection_text(raw_verdict)[:120]})")
                 v4_corrections_applied.append(
                     "a2_v4_floors:ungrounded_kill")
+            # FLOOR 3 (R493 v4.1, memory-claim): an OBVIOUS_COMBINATION
+            # kill whose known-techniques citation is NOT in the packet
+            # is a remembered-claim — the instrument has no retrieval,
+            # so literature/commercial-system memory is unverifiable
+            # and can never execute as a kill (the engine v4's measured
+            # direction — burden-of-proof: a kill requires a record in
+            # view — applied to the A2; measured on a2dev-04/12/14:
+            # three memory-cited obviousness kills, two on clean
+            # controls). The kill survives only when it cites the
+            # packet's evidence (an ev: id or a >=4-word verbatim echo
+            # of an evidence item).
+            elif dim_name == "obvious_combination" and \
+                    not _packet_anchored(raw_verdict, candidate):
+                is_killed = False
+                raw_verdict = ("SURVIVE (objection preserved - "
+                               "memory-claim floor: the known techniques "
+                               "are not in the provided record; objection "
+                               "was: "
+                               f"{_objection_text(raw_verdict)[:120]})")
+                v4_corrections_applied.append(
+                    "a2_v4_floors:memory_claim")
 
         corrected_attacks[dim_name] = raw_verdict
 

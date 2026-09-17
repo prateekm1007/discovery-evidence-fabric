@@ -273,6 +273,89 @@ class TestUnionGatePins(unittest.TestCase):
         self.assertIn("adversarial challenge failed", res["reason"])
 
 
+class TestMemoryClaimFloor(unittest.TestCase):
+    """R493 v4.1: an obviousness kill must be PACKET-ANCHORED (an ev:
+    citation or a verbatim echo of an evidence item) — literature /
+    commercial-system memory is unverifiable by a no-retrieval
+    instrument and can never execute as a kill (measured on
+    a2dev-04/12/14; the engine v4's burden-of-proof direction,
+    applied to the A2)."""
+
+    @staticmethod
+    def _parsed(attacks_text: str, candidate: dict):
+        from unittest import mock as _m
+        with _m.patch.object(a2, "llm_chat", return_value=attacks_text):
+            return a2.adversarial_challenge(candidate, True,
+                                            "TOPICAL_RELATED")
+
+    def test_memory_cited_obviousness_kill_demotes(self):
+        # the measured a2dev-12/14 shape: named literature/commercial
+        # systems, none in the packet
+        cand = _full_candidate()
+        resp = ("UNSUPPORTED_MECHANISM: PASS\n"
+                "WEAK_TRANSFER: PASS\n"
+                "OBVIOUS_COMBINATION: KILLED - N2 sparging is a "
+                "published technique (IMO GloBallast trials, the Dutch "
+                "NoBallast work); combining it with a sensor array is "
+                "the textbook configuration\n"
+                "PRIOR_ART: PASS\n"
+                "CONTRADICTION: PASS\n"
+                "BOUNDARY_FAILURE: PASS\n"
+                "ENGINEERING_INFEASIBILITY: PASS\n"
+                "REGULATORY_INCOMPATIBILITY: PASS\n"
+                "OVERALL: KILLED\n"
+                "REASON: x")
+        res = self._parsed(resp, cand)
+        self.assertIn("memory-claim floor",
+                      res["attacks"]["obvious_combination"])
+        self.assertIn("a2_v4_floors:memory_claim",
+                      res["v4_corrections_applied"])
+        self.assertIn("N2 sparging is a published technique",
+                      res["attacks"]["obvious_combination"])
+        self.assertEqual(res["overall"], "PASS")
+
+    def test_packet_cited_obviousness_kill_survives(self):
+        cand = _full_candidate()
+        cand["evidence_items"] = [{"id": "ev:prior",
+                                   "title": "the Dutch NoBallast "
+                                            "N2 stripping trials "
+                                            "report"}]
+        resp = ("UNSUPPORTED_MECHANISM: PASS\n"
+                "WEAK_TRANSFER: PASS\n"
+                "OBVIOUS_COMBINATION: KILLED - ev:n2-report reports the "
+                "N2 stripping trials the candidate replicates\n"
+                "PRIOR_ART: PASS\n"
+                "CONTRADICTION: PASS\n"
+                "BOUNDARY_FAILURE: PASS\n"
+                "ENGINEERING_INFEASIBILITY: PASS\n"
+                "REGULATORY_INCOMPATIBILITY: PASS\n"
+                "OVERALL: KILLED\n"
+                "REASON: x")
+        res = self._parsed(resp, cand)
+        self.assertIn("KILLED", res["attacks"]["obvious_combination"])
+        self.assertNotIn("a2_v4_floors:memory_claim",
+                         res["v4_corrections_applied"])
+
+    def test_memory_claim_floor_never_touches_other_dimensions(self):
+        cand = _full_candidate()
+        cand["evidence_items"] = [{"id": "ev:1", "title": "x"}]
+        resp = ("UNSUPPORTED_MECHANISM: KILLED - claimed 3.5-log at "
+                "8 Wh/m3 is 1000x below the measurable regime\n"
+                "WEAK_TRANSFER: PASS\n"
+                "OBVIOUS_COMBINATION: PASS\n"
+                "PRIOR_ART: PASS\n"
+                "CONTRADICTION: PASS\n"
+                "BOUNDARY_FAILURE: PASS\n"
+                "ENGINEERING_INFEASIBILITY: PASS\n"
+                "REGULATORY_INCOMPATIBILITY: PASS\n"
+                "OVERALL: KILLED\n"
+                "REASON: x")
+        res = self._parsed(resp, cand)
+        self.assertNotIn("a2_v4_floors:memory_claim",
+                         res["v4_corrections_applied"])
+        self.assertEqual(res["overall"], "KILLED")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
 
@@ -367,14 +450,17 @@ class TestV4Floors(unittest.TestCase):
 
     def test_grounded_kills_pass_the_floor(self):
         cand = _full_candidate()
-        cand["evidence_items"] = [{"id": "ev:1", "title": "x"}]
+        cand["evidence_items"] = [{"id": "ev:1", "title":
+                                   "type-approval report of the same "
+                                   "rotor-stator cavitation and UV "
+                                   "combination"}]
         resp = ("UNSUPPORTED_MECHANISM: KILLED - claimed 3.5-log "
                 "inactivation at 8 Wh/m3 specific energy is 1000x "
                 "below the measurable radical regime\n"
                 "WEAK_TRANSFER: PASS\n"
-                "OBVIOUS_COMBINATION: KILLED - the named techniques "
-                "(rotor-stator cavitation + UV) are standard IMO D-2 "
-                "practice\n"
+                "OBVIOUS_COMBINATION: KILLED - ev:1 documents the "
+                "rotor-stator cavitation + UV combination as "
+                "type-approved practice\n"
                 "PRIOR_ART: PASS\n"
                 "CONTRADICTION: PASS\n"
                 "BOUNDARY_FAILURE: PASS\n"
