@@ -146,11 +146,15 @@ def _promotion_attack():
 check("guard: AI-mesh promotion to engineering blocked", _promotion_attack, EG.EpistemicViolation)
 
 # ----------------------------------------------------------------------------
-print(f"passed: {len(passed)}  failed: {len(failed)}")
-for name, detail in failed:
-    print(f"  FAILED {name}: {detail}")
-if failed:
-    print("R449 BATTERY: RED")
-    sys.exit(1)
-print("R449 BATTERY: ALL GREEN")
-sys.exit(0)
+# Direct-run exit-code contract preserved; import-safe for pytest collection
+# (R510-C13: module-level sys.exit killed full collection — guarded behind
+# __main__, battery still executes on direct run with identical exit codes).
+if __name__ == "__main__":
+    print(f"passed: {len(passed)}  failed: {len(failed)}")
+    for name, detail in failed:
+        print(f"  FAILED {name}: {detail}")
+    if failed:
+        print("R449 BATTERY: RED")
+        sys.exit(1)
+    print("R449 BATTERY: ALL GREEN")
+    sys.exit(0)

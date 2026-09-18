@@ -54,6 +54,12 @@ def to_mechanism(entry, constraint):
 
 
 def main() -> int:
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", default="DIVERSITY_DRYRUN.json",
+                    help="R510/ output name (version each measurement run; "
+                         "never overwrite another run's record in place)")
+    args = ap.parse_args()
     corpus = json.loads((REPO / "R458" / "BENCHMARK_CORPUS.json").read_text())
     rows = []
     for pid in PROBLEMS:
@@ -81,7 +87,7 @@ def main() -> int:
                "grid_pin": os.environ.get("ENGINE_GRID_PROVIDERS", "default") +
                " (ENGINE_GRID_PROVIDERS; evidence [] by design)",
                "reviewer_provenance": "AI_REVIEW"}
-    (REPO / "R510" / "DIVERSITY_DRYRUN.json").write_text(
+    (REPO / "R510" / args.out).write_text(
         json.dumps(verdict, indent=1), encoding="utf-8", newline="\n")
     print(json.dumps(verdict, indent=1))
     return 0 if verdict["acceptance_median_ge_3"] else 1

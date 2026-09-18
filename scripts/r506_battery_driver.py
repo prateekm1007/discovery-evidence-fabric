@@ -34,9 +34,15 @@ import urllib.request
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-MANIFEST = REPO / "R506" / "BATTERY_PROBLEMS.json"
-SESSIONS = REPO / "R506" / "BATTERY_SESSIONS.json"
-MEASUREMENT = REPO / "R506" / "YIELD_MEASUREMENT.json"
+# Battery-2 generalization (R510-C13): every battery identity resolves from
+# env with the R506 frozen defaults — default behavior byte-identical.
+MANIFEST = REPO / os.environ.get("R506_MANIFEST", "R506/BATTERY_PROBLEMS.json")
+SESSIONS = REPO / os.environ.get("R506_SESSIONS", "R506/BATTERY_SESSIONS.json")
+MEASUREMENT = REPO / os.environ.get("R506_MEASUREMENT",
+                                    "R506/YIELD_MEASUREMENT.json")
+BATTERY_NAME = os.environ.get("R506_BATTERY_NAME", "R506-discovery-yield")
+BATTERY_TAG = os.environ.get("R506_BATTERY_TAG", "R506-BATTERY")
+YIELD_ROW_PREFIX = os.environ.get("R506_YIELD_ROW_PREFIX", "YIELD_ROW_")
 INSTRUMENT = REPO / "scripts" / "r506_discovery_yield.py"
 WORKTREE = Path(os.environ.get("R506_DURABLE_WORKTREE",
                                "/home/z/my-project/r506_durable"))
@@ -122,7 +128,7 @@ def submit():
         return 2
     grams = _corpus_grams()
     sessions = json.load(open(SESSIONS)) if SESSIONS.exists() else {
-        "battery": "R506-discovery-yield", "manifest_sha256":
+        "battery": BATTERY_NAME, "manifest_sha256":
             hashlib.sha256(open(MANIFEST, "rb").read()).hexdigest(),
         "submissions": []}
     subs = {s.get("problem_index") for s in sessions["submissions"]}
@@ -140,8 +146,8 @@ def submit():
         if shared:
             print(f"#{idx} CORPUS COLLISION at submit-time: {sorted(shared)[:2]} — refusing")
             return 2
-        prefix = (f"[R506-BATTERY declared_family={p['declared_family']} "
-                  f"source={p['source_id']} battery=R506-discovery-yield]\n\n")
+        prefix = (f"[{BATTERY_TAG} declared_family={p['declared_family']} "
+                  f"source={p['source_id']} battery={BATTERY_NAME}]\n\n")
         text = prefix + verbatim
         try:
             st, resp = _req("POST", "/api/run", {"text": text})
@@ -187,16 +193,16 @@ def _push_custody():
                                      "session_id": s.get("session_id"),
                                      "submitted_at_utc": s.get("submitted_at_utc")}
                                     for s in sessions.get("submissions", [])]}
-        dst = WORKTREE / "battery" / "R506_BATTERY_SESSIONS_REDACTED.json"
+        dst = WORKTREE / "battery" / (BATTERY_NAME + "_SESSIONS_REDACTED.json")
         dst.parent.mkdir(parents=True, exist_ok=True)
         with open(dst, "w") as f:
             json.dump(redacted, f, indent=1)
         subprocess.run(["git", "-C", str(WORKTREE), "add", "battery/"],
                        check=True, timeout=60)
         subprocess.run(["git", "-C", str(WORKTREE), "commit", "-m",
-                        "R506 battery custody (REDACTED): session ids only; "
-                        "owner capabilities deliberately non-durable per "
-                        "BS-021/R489"],
+                        BATTERY_NAME + " battery custody (REDACTED): session "
+                        "ids only; owner capabilities deliberately "
+                        "non-durable per BS-021/R489"],
                        capture_output=True, timeout=120)
         r = subprocess.run(["git", "-C", str(WORKTREE), "push", "origin",
                             "HEAD:runtime-state-hf"], capture_output=True,
@@ -293,7 +299,8 @@ def harvest():
                          "session_id": sid,
                          "harvest": "NOT_YET_ON_DURABLE_BRANCH_OR_UNKNOWN"})
             continue
-        out = REPO / "R506" / f"YIELD_ROW_{s['problem_index']}_{slug}.json"
+        out = REPO / os.environ.get("R506_YIELD_DIR", "R506") / \
+            f"{YIELD_ROW_PREFIX}{s['problem_index']}_{slug}.json"
         r = subprocess.run(
             [sys.executable, str(INSTRUMENT), "--run-dir",
              str(WORKTREE / "runs" / slug), "--out", str(out)],
@@ -311,7 +318,7 @@ def harvest():
                      "row": row})
     measurement = {
         "artifact_type": "R506_YIELD_MEASUREMENT",
-        "battery": "R506-discovery-yield",
+        "battery": BATTERY_NAME,
         "instrument": "r506_discovery_yield/1.0.0",
         "instrument_sha256": hashlib.sha256(
             open(INSTRUMENT, "rb").read()).hexdigest(),

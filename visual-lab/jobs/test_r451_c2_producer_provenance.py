@@ -348,11 +348,14 @@ check("G: source pin -- the numpy import (the latent NameError in the "
 
 
 # ---------------------------------------------------------------------------
-console("")
-if failed:
-    console(f"FAILED ({len(failed)}):")
-    for name, detail in failed:
-        console(f"  - {name}: {detail}")
-    sys.exit(1)
-console(f"producer-provenance battery: ALL PASS ({len(passed)} checks)")
-sys.exit(0)
+# R510-C13: import-safe for pytest collection (module-level sys.exit killed
+# full collection) — direct-run exit contract unchanged under __main__.
+if __name__ == "__main__":
+    console("")
+    if failed:
+        console(f"FAILED ({len(failed)}):")
+        for name, detail in failed:
+            console(f"  - {name}: {detail}")
+        sys.exit(1)
+    console(f"producer-provenance battery: ALL PASS ({len(passed)} checks)")
+    sys.exit(0)

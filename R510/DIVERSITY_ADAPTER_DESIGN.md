@@ -43,3 +43,11 @@ signatures; then evidence-ground the grid so distinct papers supply disjoint
 
 Adapter code executes iff the funnel names candidate starvation (Part 1.4).
 Until then this design + the honest zero-record are the deliverable.
+
+## LXIV disposition (R510-C13)
+
+SUPERSEDED IN THIS CHANGE: the no-graph adapter mapping (dry-run `to_mechanism`
+without `mechanism_graph`, C9 and earlier) — replaced by the graph mapping in
+the same C12 change that ships the replacement (no parallel live paths).
+KEPT: the adjudicator (`compare_candidates`, thresholds 0.45/0.8) and the
+INDETERMINATE-never-counted rule — unchanged, still the authority.
