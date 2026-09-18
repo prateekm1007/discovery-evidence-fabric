@@ -35,6 +35,10 @@ PROBLEMS = ("B1", "E1", "F1")
 def to_mechanism(entry, constraint):
     f = entry.get("fields") or {}
     modes = [f["failure_mode"]] if f.get("failure_mode") else []
+    graph_fields = {"mechanism": f.get("mechanism", ""),
+                    "intervention": f.get("intervention", ""),
+                    "expected_effect": f.get("expected_effect",
+                                             f.get("effect", ""))}
     return {
         "candidate_id": entry.get("candidate_id"),
         "candidate_hash": entry.get("prompt_hash", "") + (
@@ -45,6 +49,7 @@ def to_mechanism(entry, constraint):
         "novel_design_variable": f.get("design_variable", f.get("variable", "")),
         "known_failure_modes": modes,
         "constraint_set": {"boundary_conditions": constraint},
+        "mechanism_graph": ms.mechanism_graph_from_fields(graph_fields),
     }
 
 
@@ -73,7 +78,8 @@ def main() -> int:
                "median_distinct": median(dist),
                "acceptance_median_ge_3": median(dist) >= 3,
                "evidence": "[] by design (breadth dry-run, disclosed)",
-               "grid_pin": "xkiro (ENGINE_GRID_PROVIDERS)",
+               "grid_pin": os.environ.get("ENGINE_GRID_PROVIDERS", "default") +
+               " (ENGINE_GRID_PROVIDERS; evidence [] by design)",
                "reviewer_provenance": "AI_REVIEW"}
     (REPO / "R510" / "DIVERSITY_DRYRUN.json").write_text(
         json.dumps(verdict, indent=1), encoding="utf-8", newline="\n")

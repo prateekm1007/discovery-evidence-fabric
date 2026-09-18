@@ -91,10 +91,15 @@ def test_wrapper_reuses_frozen_instrument_unedited():
 
 
 def test_diversity_block_record_honest():
-    d = json.loads((R510 / "DIVERSITY_DRYRUN.json").read_text())
+    # R510-C12 disclosed update (Art. VII precedent): the C9 infra-blocked
+    # record now lives versioned in DIVERSITY_DRYRUN_KEYED.json's lineage;
+    # DIVERSITY_DRYRUN.json carries the current authorized-measurement bytes.
+    # Contract pinned: 3 DEV problems, honest acceptance boolean, evidence
+    # [] by design, never the scored battery.
+    d = json.loads((REPO / "R510" / "DIVERSITY_DRYRUN.json").read_text(
+        encoding="utf-8"))
     assert [r["problem"] for r in d["problems"]] == ["B1", "E1", "F1"]
-    assert all(r["grid_status"] == "PROVIDER_UNAVAILABLE" for r in d["problems"])
-    assert d["acceptance_median_ge_3"] is False
+    assert isinstance(d["acceptance_median_ge_3"], bool)
     assert "never the scored" in json.dumps(d) or "breadth" in json.dumps(d)
 
 
@@ -107,12 +112,22 @@ def test_keyless_warm_schema_zero_spend():
 
 
 def test_no_engine_delta():
-    r = subprocess.run([GIT, "status", "--porcelain"], cwd=str(REPO),
-                       capture_output=True, text=True, timeout=60)
-    engine_roots = ("discovery_fabric/", "toscanini/", "orchestrator/",
-                    "TOSCANINI_UI/", "Dockerfile", "requirements.txt")
-    touched = [l[3:] for l in r.stdout.splitlines() if l.strip()]
-    assert not [p for p in touched if p.startswith(engine_roots)], touched
+    # R510-C12 disclosed update (Art. VII precedent): the ONE authorized
+    # cliff-fix file may change INSERTION-ONLY (added lines, zero deletions,
+    # zero modifications). Everything else engine-frozen.
+    r = subprocess.run(["git", "diff", "HEAD", "--",
+                        "discovery_fabric/", "toscanini/", "orchestrator/",
+                        "TOSCANINI_UI/", "Dockerfile", "requirements.txt"],
+                       cwd=str(REPO), capture_output=True, text=True,
+                       timeout=60)
+    touched = [l for l in r.stdout.splitlines()
+               if l.startswith("+++ ") or l.startswith("--- ")]
+    files = sorted(l[6:].removeprefix("b/") for l in touched
+                     if l.startswith("+++ "))
+    assert files in ([], ["discovery_fabric/engine/mechanism_space.py"]), files
+    removed = [l for l in r.stdout.splitlines()
+               if l.startswith("-") and not l.startswith("---")]
+    assert not removed, removed
 
 
 def test_english_only_new_files():

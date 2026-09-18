@@ -1345,6 +1345,31 @@ NEAR_DUPLICATE_JACCARD = 0.8            # causal-core merge bar (v1 name kept)
 CAUSAL_CORE_MERGE_JACCARD = 0.8         # same value, v2 name (see above)
 CAUSAL_CORE_DISTINCT_FLOOR = 0.45       # below = materially different core
 
+# Adapter graph roles (R510 cliff-fix, authorized build): the ONLY fields the
+# diversity adapter maps into the causal core. Relations are deliberately NOT
+# extracted — an edge label would assert causality the term instrument cannot
+# prove (Art. VI); nodes carry per-role term sets, edges stay empty.
+GRAPH_SOURCE_ROLES = ("mechanism", "intervention", "expected_effect")
+
+
+def mechanism_graph_from_fields(fields: Dict[str, Any]
+                                ) -> Dict[str, Any]:
+    """Derive a mechanism_graph from grid field text (R510 adapter mapping).
+
+    Deterministic, zero invented content: node terms are the canonical
+    tokenizer output over each role's own text; empty roles stay empty
+    (thin pairs still type INDETERMINATE — Art. XXV). No thresholds here;
+    compare_candidates() adjudicates unchanged.
+    """
+    nodes: Dict[str, Any] = {}
+    for role in GRAPH_SOURCE_ROLES:
+        terms = sorted(_terms((fields or {}).get(role, "")))
+        if terms:
+            nodes[role] = {"terms": terms}
+    return {"nodes": nodes, "edges": [],
+            "derivation": ("term-sets per field role from grid text "
+                           "(R510 adapter); no relations extracted")}
+
 
 def _dimension_terms(candidate: Dict[str, Any], dim: str) -> set:
     if dim == "mechanism_graph":
