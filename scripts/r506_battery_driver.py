@@ -179,7 +179,9 @@ def _push_custody():
     Owner capabilities are deliberately non-durable (BS-021 by design — the
     R489 record); the durable-branch harvest needs session ids only."""
     if not (GITHUB_TOKEN and WORKTREE.exists() and SESSIONS.exists()):
-        return
+        print("FATAL: durable worktree not found; cannot push battery custody; "
+              "Art. XV: the silent skip is the defect, not the missing path")
+        sys.exit(2)
     try:
         sessions = json.load(open(SESSIONS))
         redacted = {"battery": sessions.get("battery"),
