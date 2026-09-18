@@ -159,6 +159,12 @@ def main() -> int:
             print("[r510-deploy] README frontmatter PREPENDED")
         else:
             print("[r510-deploy] README frontmatter already present")
+        # hub-client upload prep reads README.md as strict UTF-8 (measured
+        # R510: 0x97 byte trips 1.32.0); sanitize the STAGED copy only.
+        readme_path.write_text(
+            readme_path.read_text(errors="replace"), encoding="utf-8")
+        print("[r510-deploy] staged README normalized to UTF-8 (repo bytes "
+              "untouched)")
 
         df_path = stage / "Dockerfile"
         df_text = df_path.read_text()
