@@ -18,8 +18,14 @@ Pinned facts (repo bytes only — CI-safe, the durable worktree is NOT required)
      honesty calls (blocking_count=None -> STAGE_INCOMPLETE,
      grid-advanced exclusion) stay pinned.
   5. THE BATTERY MANIFEST CHAIN: sha256(BATTERY_PROBLEMS.json) ==
-     BATTERY_SESSIONS.manifest_sha256; 6 problems / 3 declared families;
-     the disjointness rule is present.
+     BATTERY_SESSIONS_REDACTED.manifest_sha256; 6 problems / 3 declared
+     families; the disjointness rule is present. The pin reads the COMMITTED
+     REDACTED custody mirror (byte-identical to the durable-branch record:
+     runtime-state-hf battery/R506_BATTERY_SESSIONS_REDACTED.json — session
+     ids + manifest sha + timestamps only, zero keys per BS-021/R489), so
+     the chain re-derives on every clean clone; the mirror's own shape
+     (exact redacted field set, no owner_key, no response payloads) is
+     pinned too — the redaction cannot silently rot.
   6. THE HARVEST RULES PRE-REGISTRATION: R506/HARVEST_RULES.json
      self-attests the rules script sha; the 6 seed record ids
      (nhtsa_odi:{odi}) match the manifest; verdict vocabularies and the
@@ -197,7 +203,10 @@ def test_hermetic_cases_declared_reproduced_in_spec():
 
 def test_battery_manifest_chain_and_families():
     manifest = _load(R506 / "BATTERY_PROBLEMS.json")
-    sessions = _load(R506 / "BATTERY_SESSIONS.json")
+    # The REDACTED custody mirror, committed to main (session ids, manifest
+    # sha, timestamps; zero keys — BS-021/R489 custody pattern). The chain
+    # pin points at the committed mirror so it holds on every clean clone.
+    sessions = _load(R506 / "BATTERY_SESSIONS_REDACTED.json")
     assert sessions["manifest_sha256"] == _sha(R506 / "BATTERY_PROBLEMS.json")
     assert manifest["n_problems"] == 6
     assert manifest["n_families"] == 3
@@ -205,6 +214,28 @@ def test_battery_manifest_chain_and_families():
                                                   "electrical"}
     assert manifest["disjointness_rule"]
     assert manifest["verbatim_policy"]
+    # the mirror itself is pinned (loud, never skip-on-absent): exact
+    # redacted field set per submission, full 6-session chain, per-problem
+    # identity against the tracked manifest bytes.
+    assert set(sessions) == {"battery", "manifest_sha256", "note",
+                             "submissions"}
+    redacted_fields = {"problem_index", "source_id", "declared_family",
+                       "session_id", "submitted_at_utc",
+                       "clarification_answered_with"}
+    subs = sessions["submissions"]
+    assert len(subs) == 6
+    by_idx = {s["problem_index"]: s for s in subs}
+    assert sorted(by_idx) == [1, 2, 3, 4, 5, 6]
+    assert len({s["session_id"] for s in subs}) == 6
+    man_src = {p["source_id"] for p in manifest["problems"]}
+    assert {s["source_id"] for s in subs} == man_src
+    for s in subs:
+        assert set(s) == redacted_fields
+        assert s["session_id"] and s["submitted_at_utc"]
+        assert s["clarification_answered_with"]
+        assert s["declared_family"] in manifest["declared_families"]
+    blob = json.dumps(sessions)
+    assert "owner_key" not in blob and "response" not in blob
 
 
 def test_battery_problems_are_verbatim_sha_pinned():
