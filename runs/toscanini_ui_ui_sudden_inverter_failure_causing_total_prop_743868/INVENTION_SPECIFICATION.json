@@ -1,0 +1,1555 @@
+{
+ "invention_id": {
+  "value": "inv:ui_sudden_inverter_failure_causing_total_prop_743868:87ec7c2ad924",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_sudden_inverter_failure_causing_total_prop_743868",
+   "device": "rear motor power inverter",
+   "failure": "Documented problem 'sudden inverter failure causing total propulsion power loss while driving' concerning rear motor power inverter. User-submitted engineering problem (session input): \"[R506-BATTERY declared_family=mechanical source=odi:11460084 battery=R506-discovery-yield]\n\nWhile driving, a small warning appeared on the screen, directing us to pull over. Roughly 10-15 seconds later, the car died in the middle of the road.   The car was towed to a Tesla service center. The rear m\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "sudden inverter failure causing total propulsion power loss while driving",
+   "constraint": "warnings must let the driver reach a safe pullover spot within the 10-15 seconds before the vehicle dies"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:5060ac77"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of rear motor power inverter",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Real-time estimation of electromagnetic torque and d-q axis stator reactance via a moving-average-filtered third-order generalized integrator flux observer, feeding an adaptive predictive model that is updated each sampling instant and enforces current constraints, so operating-point-dependent nonlinearities (inductance variation, flux weakening) are tracked rather than mis-modeled.",
+   "intervention": "Embed the filtered third-order generalized integrator flux observer in the rear motor inverter's control software to continuously estimate torque and stator reactance; use the adaptive linear MPC's current-constraint enforcement and per-sample model update to detect inverter/motor operating-point drift early, then command a controlled torque derate plus a \"pull over safely\" warning instead of allowing a hard shutdown.",
+   "expected_effect": "Incipient inverter failure signatures (reactance/inductance variation, flux weakening, current imbalance) are detected while propulsion is still available, so the warning is issued with residual torque authority maintained, giving the driver the 10-15 seconds needed to reach a safe pullover spot before total power loss.",
+   "mechanism_source_span": "a moving-average-filtered third-order generalized integrator flux observer provides real-time estimation of electromagnetic torque and d-q axis stator reactance, enabling the predictive model to adapt to operating-point-dependent PMSM nonlinearities",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-026-39158-3"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Adaptive linear MPC for a PMSM-driven autonomous EV with a filtered third-order generalized integrator observer.",
+   "mechanism": "Real-time estimation of electromagnetic torque and d-q axis stator reactance via a moving-average-filtered third-order generalized integrator flux observer, feeding an adaptive predictive model that is updated each sampling instant and enforces current constraints, so operating-point-dependent nonlinearities (inductance variation, flux weakening) are tracked rather than mis-modeled.",
+   "intervention_site": "rear motor power inverter",
+   "expected_effect": "Incipient inverter failure signatures (reactance/inductance variation, flux weakening, current imbalance) are detected while propulsion is still available, so the warning is issued with residual torque authority maintained, giving the driver the 10-15 seconds needed to reach a safe pullover spot before total power loss.",
+   "falsification_test": "On a vehicle or HIL bench, inject a representative rear inverter fault (phase open/short, gate-driver loss, capacitor degradation) and log (a) time from fault onset to driver warning and (b) time from warning to total propulsion loss; the mechanism is falsified if warning-to-loss is under 10-15 s or if the observer's torque/reactance estimates show no detectable deviation before catastrophic shutdown."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-026-39158-3"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "multi_source_directions": {
+    "discovery": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "destruction": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "transfer": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "reality": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    }
+   }
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "legacy_status": "LIKELY_PRIOR_ART_EXISTS",
+   "differentiation_resolution": {
+    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "NO_FAMILIES",
+    "per_family": [],
+    "n_families": 0,
+    "n_search_errors": 10,
+    "search_errors": [
+     {
+      "query": "current inverter power model rear motor",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "current inverter power model rear motor",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"85beaf75-d076-4dc0-9e2b-e622b024e461\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "current reactance model inductance variation weakening",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "current reactance model inductance variation weakening",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"2ceb54d0-4f10-45ba-b7a6-380d66f15ad9\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "current inverter reactance model filtered generalized integrator flux",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "current inverter reactance model filtered generalized integrator flux",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"fbfa2f0a-1144-4646-ae27-33185c8000ab\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "current detection estimation reactance inductance variation",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "current detection estimation reactance inductance variation",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"609fff17-064a-4ead-8546-d91db5e9c0e4\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "current inverter power inductance variation weakening",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "current inverter power inductance variation weakening",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"c95b0984-e3ce-4384-b2c1-aa0e9a01d648\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     }
+    ],
+    "search_execution": {
+     "mandatory_complete": false,
+     "n_errors": 10,
+     "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+    },
+    "relevance_model_version": "collision_resolution/2.0.0",
+    "determinism_contract": {
+     "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+     "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+    },
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    }
+   },
+   "nearest": [],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "current inverter power model rear motor"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "current reactance model inductance variation weakening"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "current inverter reactance model filtered generalized integrator flux"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "current detection estimation reactance inductance variation"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "current inverter power inductance variation weakening"
+    }
+   ],
+   "scientific": [
+    {
+     "title": "PlatROB: An open-source, modular, and low-cost hardware platform for mobile robotics and AI education.",
+     "id": "41704540",
+     "query": "rear motor power inverter Documented problem"
+    },
+    {
+     "title": "Predictive temperature control of electric two wheeler hub motor using gradient aware neural regulation with degradation tracking and fault tolerant multi condition torque adaptation.",
+     "id": "41826393",
+     "query": "rear motor power inverter Documented problem"
+    },
+    {
+     "title": "Investigation of magnetic orientation effects on interior rotor BLDC motor performance for EVs: a response surface methodology approach.",
+     "id": "41629520",
+     "query": "rear motor power inverter Documented problem"
+    },
+    {
+     "title": "Full‑speed sensorless control of HEAFSPMM using nonlinear adaptive flux observer, improved MRAS, and ADRC speed controller.",
+     "id": "42706296",
+     "query": "Real-time estimation electromagnetic torque d-q axis"
+    },
+    {
+     "title": "Sliding Mode Observer with Exponential Reaching Law for Speed Estimation of a Six-Phase Induction Machine.",
+     "id": "42515397",
+     "query": "Real-time estimation electromagnetic torque d-q axis"
+    }
+   ]
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Embed the filtered third-order generalized integrator flux observer in the rear motor inverter's control software to continuously estimate torque and stator reactance; use the adaptive linear MPC's current-constraint enforcement and per-sample model update to detect inverter/motor operating-point drift early, then command a controlled torque derate plus a \"pull over safely\" warning instead of allowing a hard shutdown.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-026-39158-3"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "warnings must let the driver reach a safe pullover spot within the 10-15 seconds before the vehicle dies",
+   "failure_mode_of_device": "sudden inverter failure causing total propulsion power loss while driving"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:5060ac77"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [
+   {
+    "dimension": "unsupported_mechanism",
+    "attack_verdict": "KILLED - the record's own source (doi:10.1038/s41598-026-39158-3) frames the TOGI observer as a tool for tracking PMSM operating-point nonlinearities (inductance variation, flux weakening) to improve control tracking, not as a fault/diagnostic observer; the claimed diagnostic use (\"detect inverter/motor operating-point drift early\" as a precursor to \"catastrophic shutdown\" from phase open/short, gate-driver loss, or capacitor degradation) is not supported by the cited paper, which validates yaw MAE / lateral error / voltage ripple reductions under nominal operation, not fault-mode detection — the mechanism's load-bearing claim (the observer distinguishes pre-failure drift from normal nonlinearity) is ungrounded in the record.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "weak_transfer",
+    "attack_verdict": "KILLED - the source evidence is validated on a TI C2000 HIL at 9.65 ms/cycle for trajectory-tracking improvement in an autonomous EV simulator; the target problem is a hard-fault diagnostic on a production rear inverter where the failure mode is a sudden 10-15 s collapse from warning to total prop loss, and the record carries no bridge from a tracking-accuracy observer to a fault-onset detector with explicit detection latency, threshold, or false-positive rate against the named faults (phase open/short, gate-driver loss, capacitor degradation).",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "obvious_combination",
+    "attack_verdict": "PASS - the record does not cite the constituent pieces (MAF, TOGI, adaptive MPC) in a way that lets me name them as an obvious combination from the record itself.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "prior_art",
+    "attack_verdict": "PASS - no specific prior disclosure is named in the record.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "contradiction",
+    "attack_verdict": "PASS - no evidence item contradicts a specific claimed value; the source confirms the observer/MPC architecture exists, and the record's own problem-existence basis is UNVERIFIED but that is not a numerical contradiction.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "boundary_failure",
+    "attack_verdict": "INSUFFICIENT_EVIDENCE (INSUFFICIENT_EVIDENCE)",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "engineering_infeasibility",
+    "attack_verdict": "",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "regulatory_incompatibility",
+    "attack_verdict": "",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Incipient inverter failure signatures (reactance/inductance variation, flux weakening, current imbalance) are detected while propulsion is still available, so the warning is issued with residual torqu",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-18T15:12:22.038422+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-18T15:12:22.038422+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1109/epepemc.2010.5606664",
+    "title": "Evaluation of total loss for an inverter and motor by applying modulation strategies",
+    "source_uri": "https://doi.org/10.1109/epepemc.2010.5606664",
+    "doi": "10.1109/epepemc.2010.5606664",
+    "content_hash": "0f8c2640a9024ca1bc39e648f3059b63af4fa2a03eccf83b59474c3009cac0bc",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1038/s41598-026-39158-3",
+    "title": "Adaptive linear MPC for a PMSM-driven autonomous EV with a filtered third-order generalized integrator observer.",
+    "source_uri": "https://doi.org/10.1038/s41598-026-39158-3",
+    "doi": "10.1038/s41598-026-39158-3",
+    "content_hash": "bb627628d17f424eb93c3ce9178d72df080a661828ea72b5962fa8002a06d5fe",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/tpel.2006.872366",
+    "title": "A five-leg inverter for driving a traction motor and a compressor motor",
+    "source_uri": "https://doi.org/10.1109/tpel.2006.872366",
+    "doi": "10.1109/tpel.2006.872366",
+    "content_hash": "bb45f329e95ed989622d356f67d48e32f61f8b2c16bd6e95320accf485250d48",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1038/s41598-025-13791-w",
+    "title": "Investigation of a staggered dual-rotor wound field synchronous motor for offshore wind turbine full-scale testing platforms.",
+    "source_uri": "https://doi.org/10.1038/s41598-025-13791-w",
+    "doi": "10.1038/s41598-025-13791-w",
+    "content_hash": "c6177f4fad051e73318a61b38634e49a588a7bec0abba22037495673492b63b9",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1097/md.0000000000046567",
+    "title": "How does stretching exercise of the ankle joint affect balance and gait function in healthy older adults aged 65 to 75 years?: A randomized clinical trial.",
+    "source_uri": "https://doi.org/10.1097/md.0000000000046567",
+    "doi": "10.1097/md.0000000000046567",
+    "content_hash": "9ca55ecf4b0e1a4d090ce45da61df0a336ec3c6fdb4caee40505d767afac8f44",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1038/s41598-026-37505-y",
+    "title": "Predictive temperature control of electric two wheeler hub motor using gradient aware neural regulation with degradation tracking and fault tolerant multi condition torque adaptation.",
+    "source_uri": "https://doi.org/10.1038/s41598-026-37505-y",
+    "doi": "10.1038/s41598-026-37505-y",
+    "content_hash": "97fc98039fd6441eda7c2bd147f50197526da968fff539f8656f411e9ec23450",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5821/dissertation-2117-182141",
+    "title": "Active power sharing and frequency regulation in inverter-based islanded microgrids subject to clock drifts, damage in power links and loss of communications",
+    "source_uri": "https://doi.org/10.5821/dissertation-2117-182141",
+    "doi": "10.5821/dissertation-2117-182141",
+    "content_hash": "bb7981bb8101f54bae4e1abec275e2d60817139c753d41170785987afddb16d3",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.14264/300424",
+    "title": "A high power inverter for remote applications",
+    "source_uri": "https://doi.org/10.14264/300424",
+    "doi": "10.14264/300424",
+    "content_hash": "cbe6dd807110289b0c5f97fe9ebf48da967d9e03bb6a74c64999b5362ba0f857",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.58837/chula.the.2018.179",
+    "title": "Reactive Power Management In A Distribution System By Photovoltaic Inverter",
+    "source_uri": "https://doi.org/10.58837/chula.the.2018.179",
+    "doi": "10.58837/chula.the.2018.179",
+    "content_hash": "80b882bb28d674088ee157aae9ab5d72306046df24332c8e7a3be93e338c46dc",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2212.05246",
+    "title": "Power Loss Modelling of GaN HEMT based 3L ANPC Three Phase Inverter for different PWM Techniques",
+    "source_uri": "https://doi.org/10.48550/arxiv.2212.05246",
+    "doi": "10.48550/arxiv.2212.05246",
+    "content_hash": "31e3a7b8ec4d4a713356b8091c43797e81d2aed29659ea2ad72c18be4407a09f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1903.08471",
+    "title": "A State-Failure--Network Method to Identify Critical Components in Power Systems",
+    "source_uri": "https://doi.org/10.48550/arxiv.1903.08471",
+    "doi": "10.48550/arxiv.1903.08471",
+    "content_hash": "a5d17c15649b2d2a986a002e51ac36505e47540fc71bccbf9083359dbe1c55e8",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1902.08594",
+    "title": "Regression-based Inverter Control for Decentralized Optimal Power Flow and Voltage Regulation",
+    "source_uri": "https://doi.org/10.48550/arxiv.1902.08594",
+    "doi": "10.48550/arxiv.1902.08594",
+    "content_hash": "cc39a299507276bcfe6efeea2b14eb31742b1e5b9ed7e5fccbbd1db086159cec",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.2514/6.2009-1132",
+    "title": "Turboelectric Distributed Propulsion Engine Cycle Analysis for Hybrid-Wing-Body Aircraft",
+    "source_uri": "https://doi.org/10.2514/6.2009-1132",
+    "doi": "10.2514/6.2009-1132",
+    "content_hash": "f65154d4507613572ce5f7e36fac31119f341567d66cca4f43c0633b9427d1ee",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/en16062925",
+    "title": "Comprehensive Review of Recent Advancements in Battery Technology, Propulsion, Power Interfaces, and Vehicle Network Systems for Intelligent Autonomous and Connected Electric Vehicles",
+    "source_uri": "https://doi.org/10.3390/en16062925",
+    "doi": "10.3390/en16062925",
+    "content_hash": "04d1ebba2e64c8d37c4d604f61bb55c82a1404e72c57d51a79f1cc0a537ead95",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3389/fneur.2019.00999",
+    "title": "The Motion of Body Center of Mass During Walking: A Review Oriented to Clinical Applications",
+    "source_uri": "https://doi.org/10.3389/fneur.2019.00999",
+    "doi": "10.3389/fneur.2019.00999",
+    "content_hash": "6173792b9004055bb8c3c755fff06dd939ad04857ecb481373108021847dacb1",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/energycon.2012.6347755",
+    "title": "Self-Commissioning of Inverter Nonlinear Effects in AC Drives",
+    "source_uri": "https://doi.org/10.1109/energycon.2012.6347755",
+    "doi": "10.1109/energycon.2012.6347755",
+    "content_hash": "303effa4b0c4dccbc8062bba1eee9571f6eb8e832ca45e2aa71d6b6cc1dd9624",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-025-13791-w",
+   "doi:10.1038/s41598-026-37505-y",
+   "doi:10.1038/s41598-026-39158-3",
+   "doi:10.1097/md.0000000000046567",
+   "doi:10.1109/energycon.2012.6347755",
+   "doi:10.1109/epepemc.2010.5606664",
+   "doi:10.1109/tpel.2006.872366",
+   "doi:10.14264/300424",
+   "doi:10.2514/6.2009-1132",
+   "doi:10.3389/fneur.2019.00999",
+   "doi:10.3390/en16062925",
+   "doi:10.48550/arxiv.1902.08594",
+   "doi:10.48550/arxiv.1903.08471",
+   "doi:10.48550/arxiv.2212.05246",
+   "doi:10.5821/dissertation-2117-182141",
+   "doi:10.58837/chula.the.2018.179"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "unresolved_source": "current inverter power model rear motor",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "current inverter power model rear motor",
+    "error": "HTTP 401: {\"reference\":\"85beaf75-d076-4dc0-9e2b-e622b024e461\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "current reactance model inductance variation weakening",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "current reactance model inductance variation weakening",
+    "error": "HTTP 401: {\"reference\":\"2ceb54d0-4f10-45ba-b7a6-380d66f15ad9\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "current inverter reactance model filtered generalized integrator flux",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "current inverter reactance model filtered generalized integrator flux",
+    "error": "HTTP 401: {\"reference\":\"fbfa2f0a-1144-4646-ae27-33185c8000ab\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "current detection estimation reactance inductance variation",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "current detection estimation reactance inductance variation",
+    "error": "HTTP 401: {\"reference\":\"609fff17-064a-4ead-8546-d91db5e9c0e4\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "current inverter power inductance variation weakening",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "current inverter power inductance variation weakening",
+    "error": "HTTP 401: {\"reference\":\"c95b0984-e3ce-4384-b2c1-aa0e9a01d648\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "On a vehicle or HIL bench, inject a representative rear inverter fault (phase open/short, gate-driver loss, capacitor degradation) and log (a) time from fault onset to driver warning and (b) time from warning to total propulsion loss; the mechanism is falsified if warning-to-loss is under 10-15 s or if the observer's torque/reactance estimates show no detectable deviation before catastrophic shutdown."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_sudden_inverter_failure_causing_total_prop_743868:2026-09-18T15:04:28",
+   "final_envelope_hash": "87ec7c2ad924098a05ec62ac34f50c4aedcdd4b98b6506137ae68d677a480141",
+   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-18T15:12:22+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": true,
+    "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+    "verdict": "CONTESTED"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-18T15:12:22+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1109/epepemc.2010.5606664": {
+   "id": "doi:10.1109/epepemc.2010.5606664",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/epepemc.2010.5606664",
+   "source_uri": "https://doi.org/10.1109/epepemc.2010.5606664",
+   "title": "Evaluation of total loss for an inverter and motor by applying modulation strategies",
+   "abstract": "",
+   "doi": "10.1109/epepemc.2010.5606664",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2010",
+   "retrieval_timestamp": "2026-09-18T15:05:29.633265+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0f8c2640a9024ca1bc39e648f3059b63af4fa2a03eccf83b59474c3009cac0bc",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/epepemc.2010.5606664"
+    },
+    "queries_by_source": {
+     "crossref": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/epepemc.2010.5606664",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1038/s41598-026-39158-3": {
+   "id": "doi:10.1038/s41598-026-39158-3",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41698989",
+   "source_uri": "https://doi.org/10.1038/s41598-026-39158-3",
+   "title": "Adaptive linear MPC for a PMSM-driven autonomous EV with a filtered third-order generalized integrator observer.",
+   "abstract": "Autonomous electric vehicles require precise coordination between motor torque control and vehicle trajectory tracking. However, permanent magnet synchronous motors (PMSMs) exhibit nonlinear behavior-particularly inductance variation and flux weakening-that conventional model predictive control (MPC) methods with fixed parameters cannot adequately capture, leading to degraded tracking performance during dynamic transitions. To address these challenges, this paper proposes an adaptive linear MPC (AL-MPC) strategy that integrates three key components. First, a moving-average-filtered third-order generalized integrator flux observer provides real-time estimation of electromagnetic torque and d-q axis stator reactance, enabling the predictive model to adapt to operating-point-dependent PMSM nonlinearities. Second, a Taylor-series-based linearization formulates a unified nine-state predictive model coupling motor currents, wheel velocity, yaw angle, and lateral position, which is updated at each sampling instant to reflect current operating conditions. Third, an active-set quadratic programming optimizer efficiently computes optimal d-q voltages and steering angle while enforcing current, voltage, and state constraints. The AL-MPC is validated through MATLAB/Simulink simulations and hardware-in-the-loop (HIL) testing on a TI C2000 embedded controller. Compared with classical seven-dimensional linear MPC, the proposed method achieves 99.9% reduction in yaw mean absolute error (MAE), 65% reduction in lateral position root mean square error, and 93% reduction in steering signal variation under varying velocity conditions. Against adaptive nonlinear MPC, it attains 77.7% lower yaw MAE, 94.6% lower lateral MAE, 95.4% reduction in velocity ripple, and 67% lower voltage ripple during rapid acceleration with torque disturbances, while requiring 3.7% less computation time. The HIL results confirm real-time feasibility with a total execution time of 9.65 ms per control cycle.",
+   "doi": "10.1038/s41598-026-39158-3",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-02-16",
+   "retrieval_timestamp": "2026-09-18T15:05:29.633364+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bb627628d17f424eb93c3ce9178d72df080a661828ea72b5962fa8002a06d5fe",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41698989"
+    },
+    "queries_by_source": {
+     "europepmc": "rear motor power inverter sudden inverter experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-18T15:05:29.589429+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-026-39158-3",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": "https://doi.org/10.1038/s41598-026-39158-3",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1109/tpel.2006.872366": {
+   "id": "doi:10.1109/tpel.2006.872366",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/tpel.2006.872366",
+   "source_uri": "https://doi.org/10.1109/tpel.2006.872366",
+   "title": "A five-leg inverter for driving a traction motor and a compressor motor",
+   "abstract": "",
+   "doi": "10.1109/tpel.2006.872366",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2006",
+   "retrieval_timestamp": "2026-09-18T15:05:29.633394+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bb45f329e95ed989622d356f67d48e32f61f8b2c16bd6e95320accf485250d48",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/tpel.2006.872366"
+    },
+    "queries_by_source": {
+     "crossref": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article",
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/tpel.2006.872366",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1038/s41598-025-13791-w": {
+   "id": "doi:10.1038/s41598-025-13791-w",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:40835656",
+   "source_uri": "https://doi.org/10.1038/s41598-025-13791-w",
+   "title": "Investigation of a staggered dual-rotor wound field synchronous motor for offshore wind turbine full-scale testing platforms.",
+   "abstract": "The development of high-fidelity testing platforms for offshore wind turbines necessitates drag motors capable of emulating complex marine operating conditions while maintaining ultralow torque ripple. This paper proposes a staggered dual-rotor wound field synchronous drag motor (WFSDM) system for 25 MW full-scale land-based testing platforms targeting large-capacity offshore wind turbines. The research follows a structured approach: firstly, the theoretical model of the WFSDM is introduced, and its dimensions and structural parameters are determined according to design requirements using the D 2 L method. To enhance average torque and minimize torque ripple, the rotor structure undergoes further optimization through a multi-objective genetic algorithm. Following this, an analysis of the electromagnetic performance of the optimized WFSDM is conducted. To meet the testing requirements of 25 MW wind turbines, a staggered salient poles assembly of dual-rotor is proposed, which reduces torque ripple to 1.31% while maintaining an average torque output of 34.82 MNm. Finally, the mechanical analysis results are verified to ensure that both the stator and rotor structures comply with safety requirements and possess sufficient safety factors. The staggered dual-rotor WFSDM addresses critical challenges in offshore turbine testing and provides a scalable solution for next-generation offshore wind technology validation, bridging the gap between laboratory testing and real-world marine deployment.",
+   "doi": "10.1038/s41598-025-13791-w",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-08-20",
+   "retrieval_timestamp": "2026-09-18T15:05:29.633414+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c6177f4fad051e73318a61b38634e49a588a7bec0abba22037495673492b63b9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:40835656"
+    },
+    "queries_by_source": {
+     "europepmc": "rear motor power inverter sudden inverter experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-025-13791-w",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1097/md.0000000000046567": {
+   "id": "doi:10.1097/md.0000000000046567",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41398840",
+   "source_uri": "https://doi.org/10.1097/md.0000000000046567",
+   "title": "How does stretching exercise of the ankle joint affect balance and gait function in healthy older adults aged 65 to 75 years?: A randomized clinical trial.",
+   "abstract": "Background This study aimed to examine the effects of ankle joint stretching exercises on gait function in older adults and to clarify their relationship with balance control. Specifically, the study compared the outcomes of simultaneous stretching of the plantar flexors and ankle inverters with those of stretching the plantar flexors alone. Methods In this single-blind randomized controlled trial, 40 healthy older adults aged 65 to 75 years (36 women and 4 men; overall mean age, 69.0 ± 2.9 years) were randomized (1:1) to either the experimental group (simultaneous stretching of the plantar flexors and invertors) or the control group (stretching of the plantar flexors only). Each group performed stretching exercises for 30 minutes/day, 5 days/week, for a total of 15 sessions over 3 weeks. The primary outcome was the Ankle dorsiflexion and eversion range of motion (ROM), Berg Balance Scale (BBS) score, Timed Up and Go test (TUG), gait parameter, center of pressure (COP) parameter. Results Both groups showed significant improvements in ankle dorsiflexion ROM, BBS, step cadence, and double support time in gait after the intervention. However, only the experimental group showed significant improvements in ankle eversion ROM, mediolateral COP range, step velocity on both sides, and TUG performance. Between-group comparisons revealed that changes in eversion ROM, mediolateral COP range, and TUG performance were significantly greater in the experimental group than in the control group. No significant between-group differences were observed in dorsiflexion ROM, BBS scores, step length, step duration, mean COP velocity, or cadence. Conclusion Ankle stretching exercises improved balance and gait function in healthy older adults, with greater effects observed from combined stretching of the plantar flexors and invertors. These benefits are likely due to enhanced postural control and increased ankle flexibility.",
+   "doi": "10.1097/md.0000000000046567",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-12-01",
+   "retrieval_timestamp": "2026-09-18T15:05:29.633433+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9ca55ecf4b0e1a4d090ce45da61df0a336ec3c6fdb4caee40505d767afac8f44",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41398840"
+    },
+    "queries_by_source": {
+     "europepmc": "rear motor power inverter sudden inverter experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1097/md.0000000000046567",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter experimental comparison",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1038/s41598-026-37505-y": {
+   "id": "doi:10.1038/s41598-026-37505-y",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41826393",
+   "source_uri": "https://doi.org/10.1038/s41598-026-37505-y",
+   "title": "Predictive temperature control of electric two wheeler hub motor using gradient aware neural regulation with degradation tracking and fault tolerant multi condition torque adaptation.",
+   "abstract": "Thermal stress in electric two-wheeler hub motors is a major bottleneck affecting drivetrain reliability, safety, and efficiency-especially under varied terrain, aggressive riding profiles, and sensor reliability degradation. This paper presents a novel Hybrid Gradient-Aware Neural Regulation (GANR) framework designed to enable predictive motor temperature control, real-time thermal degradation monitoring, and fault-tolerant torque shaping. The system integrates three distinct yet interlinked control layers: (i) gradient-sensitive neural temperature estimation, (ii) cumulative thermal damage indexing through a Motor Health Index (MHI), and (iii) multi-condition torque derating logic that adapts to ambient temperature, health state, and usage intensity. The controller combines a physics-based thermal model with a lightweight neural network estimator capable of learning under sensor drift, latency, or complete failure. A fallback and safety-mode flowchart ensure robust operation by switching to boundary-scaled torque caps and enabling a real-time decision layer that balances energy consumption, performance demand, and thermal safety. The system's intelligence also extends to an ambient-aware derating boundary and a thermal margin estimator to prevent runaway heating events. A detailed simulation framework is developed using real vehicle specifications, encompassing city, aggressive, and worst-case thermal cycles. Results reveal that the proposed control system can delay torque derating by up to 14%, improve energy efficiency by ~ 7.4%, and achieve prediction RMSE below 2.1 °C even under multiple sensor fault scenarios. In addition, a full real-time deployment analysis is presented using a mid-tier embedded platform with CPU-cycle, memory, and scheduling footprint assessments. This study offers an original, fault-resilient, and hardware-feasible solution to a largely unaddressed domain-intelligent thermal-aware torque control in electric two-wheelers, creating a new pathway toward smarter, safer, and more robust electric mobility systems.",
+   "doi": "10.1038/s41598-026-37505-y",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-03-13",
+   "retrieval_timestamp": "2026-09-18T15:05:29.633451+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "97fc98039fd6441eda7c2bd147f50197526da968fff539f8656f411e9ec23450",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41826393"
+    },
+    "queries_by_source": {
+     "europepmc": "rear motor power inverter sudden inverter experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-18T15:05:29.547064+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-026-37505-y",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter experimental comparison",
+   "source_rank": 5,
+   "fulltext_url": "https://www.nature.com/articles/s41598-026-37505-y_reference.pdf",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.5821/dissertation-2117-182141": {
+   "id": "doi:10.5821/dissertation-2117-182141",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5821/dissertation-2117-182141",
+   "source_uri": "https://doi.org/10.5821/dissertation-2117-182141",
+   "title": "Active power sharing and frequency regulation in inverter-based islanded microgrids subject to clock drifts, damage in power links and loss of communications",
+   "abstract": "",
+   "doi": "10.5821/dissertation-2117-182141",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T15:05:29.633471+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bb7981bb8101f54bae4e1abec275e2d60817139c753d41170785987afddb16d3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5821/dissertation-2117-182141"
+    },
+    "queries_by_source": {
+     "crossref": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5821/dissertation-2117-182141",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.14264/300424": {
+   "id": "doi:10.14264/300424",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.14264/300424",
+   "source_uri": "https://doi.org/10.14264/300424",
+   "title": "A high power inverter for remote applications",
+   "abstract": "",
+   "doi": "10.14264/300424",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T15:05:29.633488+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "cbe6dd807110289b0c5f97fe9ebf48da967d9e03bb6a74c64999b5362ba0f857",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.14264/300424"
+    },
+    "queries_by_source": {
+     "crossref": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.14264/300424",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.58837/chula.the.2018.179": {
+   "id": "doi:10.58837/chula.the.2018.179",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.58837/chula.the.2018.179",
+   "source_uri": "https://doi.org/10.58837/chula.the.2018.179",
+   "title": "Reactive Power Management In A Distribution System By Photovoltaic Inverter",
+   "abstract": "",
+   "doi": "10.58837/chula.the.2018.179",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T15:05:29.633504+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "80b882bb28d674088ee157aae9ab5d72306046df24332c8e7a3be93e338c46dc",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.58837/chula.the.2018.179"
+    },
+    "queries_by_source": {
+     "crossref": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.58837/chula.the.2018.179",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2212.05246": {
+   "id": "doi:10.48550/arxiv.2212.05246",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2212.05246v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2212.05246",
+   "title": "Power Loss Modelling of GaN HEMT based 3L ANPC Three Phase Inverter for different PWM Techniques",
+   "abstract": "The paper presents a straightforward modelling approach to compute the power loss distribution in GaN HEMT based three phase and three level (3L) active neutral point clamped (ANPC) inverters, for different pulse width modulated techniques. Conduction and switching losses averaged over each PWM switching period are analytically computed by starting from the operating conditions of the AC load and data of GaN power devices. The accuracy of the proposed analytical approach is evaluated through a circuit based power electronics simulation tool, applied to different carrier-based PWM strategies.",
+   "doi": "10.48550/arxiv.2212.05246",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T15:05:29.633520+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "31e3a7b8ec4d4a713356b8091c43797e81d2aed29659ea2ad72c18be4407a09f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2212.05246v1"
+    },
+    "queries_by_source": {
+     "arxiv": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2212.05246",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2212.05246v1",
+   "authors": [
+    "M. Cacciato",
+    "G. Aiello",
+    "F. Gennaro",
+    "S. Mita",
+    "D. Patti",
+    "G. Scelba",
+    "A. Sujeeth"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.1903.08471": {
+   "id": "doi:10.48550/arxiv.1903.08471",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1903.08471v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1903.08471",
+   "title": "A State-Failure--Network Method to Identify Critical Components in Power Systems",
+   "abstract": "In order to mitigate cascading failure blackout risks in power systems, the critical components whose failures lead to high blackout risks should be identified. In this paper, such critical components are identified by the state-failure network (SF-network) formed by cascading failure chain and loss data, which can be gathered from either utilities or simulations. The failures along the chains are recombined in the SF-network, where each failure is allocated a value that can reveal the blackout risks after their occurrences. Thus, critical failures can be identified in the SF-network where the failures raise up blackout risks, and thus the critical components can be found based on their critical failure risks. The simulation results validate the effectiveness of the proposed method.",
+   "doi": "10.48550/arxiv.1903.08471",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T15:05:29.633539+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a5d17c15649b2d2a986a002e51ac36505e47540fc71bccbf9083359dbe1c55e8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1903.08471v1"
+    },
+    "queries_by_source": {
+     "arxiv": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1903.08471",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/1903.08471v1",
+   "authors": [
+    "Linzhi Li",
+    "Hao Wu",
+    "Yonghua Song",
+    "Yi Liu"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.1902.08594": {
+   "id": "doi:10.48550/arxiv.1902.08594",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1902.08594v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1902.08594",
+   "title": "Regression-based Inverter Control for Decentralized Optimal Power Flow and Voltage Regulation",
+   "abstract": "Electronic power inverters are capable of quickly delivering reactive power to maintain customer voltages within operating tolerances and to reduce system losses in distribution grids. This paper proposes a systematic and data-driven approach to determine reactive power inverter output as a function of local measurements in a manner that obtains near optimal results. First, we use a network model and historic load and generation data and do optimal power flow to compute globally optimal reactive power injections for all controllable inverters in the network. Subsequently, we use regression to find a function for each inverter that maps its local historical data to an approximation of its optimal reactive power injection. The resulting functions then serve as decentralized controllers in the participating inverters to predict the optimal injection based on a new local measurements. The method achieves near-optimal results when performing voltage- and capacity-constrained loss minimization and voltage flattening, and allows for an efficient volt-VAR optimization (VVO) scheme in which legacy control equipment collaborates with existing inverters to facilitate safe operation of distribution networks with higher levels of distributed generation.",
+   "doi": "10.48550/arxiv.1902.08594",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T15:05:29.633555+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "cc39a299507276bcfe6efeea2b14eb31742b1e5b9ed7e5fccbbd1db086159cec",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1902.08594v1"
+    },
+    "queries_by_source": {
+     "arxiv": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1902.08594",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter failure causing total propulsion power loss while driving",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/1902.08594v1",
+   "authors": [
+    "Oscar Sondermeijer",
+    "Roel Dobbe",
+    "Daniel Arnold",
+    "Claire Tomlin",
+    "Tamás Keviczky"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.2514/6.2009-1132": {
+   "id": "doi:10.2514/6.2009-1132",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W2020614826",
+   "source_uri": "https://doi.org/10.2514/6.2009-1132",
+   "title": "Turboelectric Distributed Propulsion Engine Cycle Analysis for Hybrid-Wing-Body Aircraft",
+   "abstract": "Meeting NASA's N+3 goals requires a fundamental shift in approach to aircraft and engine design. Material and design improvements allow higher pressure and higher temperature core engines which improve the thermal efficiency. Propulsive efficiency, the other half of the overall efficiency equation, however, is largely determined by the fan pressure ratio (FPR). Lower FPR increases propulsive efficiency, but also dramatically reduces fan shaft speed through the combination of larger diameter fans and reduced fan tip speed limits. The result is that below an FPR of 1.5 the maximum fan shaft speed makes direct drive turbines problematic. However, it is the low pressure ratio fans that allow the improvement in propulsive efficiency which, along with improvements in thermal efficiency in the core, contributes strongly to meeting the N+3 goals for fuel burn reduction. The lower fan exhaust velocities resulting from lower FPRs are also key to meeting the aircraft noise goals. Adding a gear box to the standard turbofan engine allows acceptable turbine speeds to be maintained. However, development of a 50,000+ hp gearbox required by fans in a large twin engine transport aircraft presents an extreme technical challenge, therefore another approach is needed. This paper presents a propulsion system which transmits power from the turbine to the fan electrically rather than mechanically. Recent and anticipated advances in high temperature superconducting generators, motors, and power lines offer the possibility that such devices can be used to transmit turbine power in aircraft without an excessive weight penalty. Moving to such a power transmission system does more than provide better matching between fan and turbine shaft speeds. The relative ease with which electrical power can be distributed throughout the aircraft opens up numerous other possibilities for new aircraft and propulsion configurations and modes of operation. This paper discusses a number of these new possibilities. The Boeing N2 hybrid-wing-body (HWB) is used as a baseline aircraft for this study. The two pylon mounted conventional turbofans are replaced by two wing-tip mounted turboshaft engines, each driving a superconducting generator. Both generators feed a common electrical bus which distributes power to an array of superconducting motor-driven fans in a continuous nacelle centered along the trailin",
+   "doi": "10.2514/6.2009-1132",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T15:05:29.633573+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f65154d4507613572ce5f7e36fac31119f341567d66cca4f43c0633b9427d1ee",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W2020614826"
+    },
+    "queries_by_source": {
+     "openalex": "rear motor power inverter sudden inverter failure causing total propulsion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-18T15:05:29.436018+00:00",
+     "is_oa": true,
+     "oa_status": "green",
+     "host_type": "repository",
+     "repository_institution": "National Aeronautics and Space Administration"
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.2514/6.2009-1132",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter failure causing total propulsion",
+   "source_rank": 0,
+   "fulltext_url": "https://ntrs.nasa.gov/api/citations/20130010780/downloads/20130010780.pdf",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "doi:10.3390/en16062925": {
+   "id": "doi:10.3390/en16062925",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W4360616589",
+   "source_uri": "https://doi.org/10.3390/en16062925",
+   "title": "Comprehensive Review of Recent Advancements in Battery Technology, Propulsion, Power Interfaces, and Vehicle Network Systems for Intelligent Autonomous and Connected Electric Vehicles",
+   "abstract": "Numerous recent innovations have been achieved with the goal of enhancing electric vehicles and the parts that go into them, particularly in the areas of managing energy, battery design and optimization, and autonomous driving. This promotes a more effective and sustainable eco-system and helps to build the next generation of electric car technology. This study offers insights into the most recent research and advancements in electric vehicles (EVs), as well as new, innovative, and promising technologies based on scientific data and facts associated with e-mobility from a technological standpoint, which may be achievable by 2030. Appropriate modeling and design strategies, including digital twins with connected Internet of Things (IoT), are discussed in this study. Vehicles with autonomous features have the potential to increase safety on roads, increase driving economy, and provide drivers more time to focus on other duties thanks to the Internet of Things idea. The enabling technology that entails a car moving out of a parking spot, traveling along a long highway, and then parking at the destination is also covered in this article. The development of autonomous vehicles depends on the data obtained for deployment in actual road conditions. There are also research gaps and proposals for autonomous, intelligent vehicles. One of the many social concerns that are described is the cause of an accident with an autonomous car. A smart device that can spot strange driving behavior and prevent accidents is briefly discussed. In addition, all EV-related fields are covered, including the likely technical challenges and knowledge gaps in each one, from in-depth battery material sciences through power electronics and powertrain engineering to market assessments and environmental assessments.",
+   "doi": "10.3390/en16062925",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T15:05:29.633588+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "04d1ebba2e64c8d37c4d604f61bb55c82a1404e72c57d51a79f1cc0a537ead95",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W4360616589"
+    },
+    "queries_by_source": {
+     "openalex": "rear motor power inverter sudden inverter failure causing total propulsion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.3390/en16062925",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter failure causing total propulsion",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "doi:10.3389/fneur.2019.00999": {
+   "id": "doi:10.3389/fneur.2019.00999",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W2972008015",
+   "source_uri": "https://doi.org/10.3389/fneur.2019.00999",
+   "title": "The Motion of Body Center of Mass During Walking: A Review Oriented to Clinical Applications",
+   "abstract": "Human walking is usually conceived as the cyclic rotation of the limbs. The goal of lower-limb movements, however, is the forward translation of the body system, which can be mechanically represented by its center of mass (CoM). Lower limbs act as struts of an inverted pendulum, allowing minimization of muscle work, from infancy to old age. The plantar flexors of the trailing limbs have been identified as the main engines of CoM propulsion. Motion of the CoM can be investigated through refined techniques, but research has been focused on the fields of human and animal physiology rather than clinical medicine. Alterations in CoM motion could reveal motor impairments that are not detectable by clinical observation. The study of the three-dimensional trajectory of the CoM motion represents a clinical frontier. After adjusting for displacement due to the average forward speed, the trajectory assumes a figure-eight shape (dubbed the \"bow-tie\") with a perimeter about 18 cm long. Its lateral size decreases with walking velocity, thus ensuring dynamic stability. Lateral redirection appears as a critical phase of the step, requiring precise muscle sequencing. The shape and size of the \"bow-tie\" as functions of dynamically equivalent velocities do not change from child to adulthood, despite anatomical growth. The trajectory of the CoM thus appears to be a promising summary index of both balance and the neural maturation of walking. In asymmetric gaits, the affected lower limb avoids muscle work by pivoting almost passively, but extra work is required from the unaffected side during the next step, in order to keep the body system in motion. Generally, the average work to transport the CoM across a stride remains normal. In more demanding conditions, such as walking faster or uphill, the affected limb can actually provide more work; however, the unaffected limb also provides more work and asymmetry between the steps persists. This learned or acquired asymmetry is a formerly unsuspected challenge to rehabilitation attempts to restore symmetry. Techniques of selective loading of the affected side, which include constraining the motion of the unaffected limb or forcing the use of the affected limb on split-belt treadmills which impose a different velocity and power to either limb, are now under scrutiny.",
+   "doi": "10.3389/fneur.2019.00999",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T15:05:29.633604+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6173792b9004055bb8c3c755fff06dd939ad04857ecb481373108021847dacb1",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W2972008015"
+    },
+    "queries_by_source": {
+     "openalex": "rear motor power inverter sudden inverter failure causing total propulsion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-18T15:05:29.477907+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.3389/fneur.2019.00999",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter failure causing total propulsion",
+   "source_rank": 2,
+   "fulltext_url": "https://www.frontiersin.org/articles/10.3389/fneur.2019.00999/pdf",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "doi:10.1109/energycon.2012.6347755": {
+   "id": "doi:10.1109/energycon.2012.6347755",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:4836256",
+   "source_uri": "https://doi.org/10.1109/energycon.2012.6347755",
+   "title": "Self-Commissioning of Inverter Nonlinear Effects in AC Drives",
+   "abstract": "The paper presents a novel technique for an accurate identification of the inverter nonlinear effects, such as the dead-time and on-state voltage drops. The proposed technique is very simple and it is based only on a current control scheme. If the inverter load is an AC motor, the inverter effects can be identified at drive startup using as measured quantities the motor currents and the inverter DC link voltage. The identified inverter error is stored in a Look-Up Table (LUT) that can be subsequently used by the vector control algorithm. The proposed method has been tested on a 1 kVA inverter prototype and the obtained results demonstrate the feasibility of the proposed solutio",
+   "doi": "10.1109/energycon.2012.6347755",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T15:05:29.633618+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "303effa4b0c4dccbc8062bba1eee9571f6eb8e832ca45e2aa71d6b6cc1dd9624",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:4836256"
+    },
+    "queries_by_source": {
+     "core": "rear motor power inverter sudden inverter failure causing total propulsion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1109/energycon.2012.6347755",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rear motor power inverter sudden inverter failure causing total propulsion",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Rosu, S.G.",
+    "S.G. Rosu",
+    "I.R. Bojoi",
+    "E. Armando",
+    "BOJOI, IUSTIN RADU",
+    "Bojoi, R.",
+    "Pellegrino, Gian-Mario Luigi",
+    "S. G. Rosu",
+    "Armando, Eric Giacomo",
+    "PELLEGRINO, GIAN - MARIO LUIGI",
+    "G. Pellegrino"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:5060ac77": {
+   "id": "problem:5060ac77",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "5060ac7721d2967bd94dd2fdbda16fc75d0b81ff1d6b0344cd2255055379d8e3",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": true,
+  "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+  "verdict": "CONTESTED"
+ },
+ "_spec_hash": "cf33c749e76a3d4b80a8be99f0d21a8950278f318be4e91172107de6a55a37a9",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-18T15:12:22+00:00Z"
+ }
+}
