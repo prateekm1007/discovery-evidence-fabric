@@ -1,0 +1,711 @@
+{
+  "stage": "BRIDGE_GATE",
+  "bridge_gate_version": "1.3.0",
+  "outcome": "COMPLETED",
+  "at": "2026-09-18T16:40:47Z",
+  "reviewer_provenance": "AI_REVIEW",
+  "case": "B",
+  "visualizability_class": "CONCEPTUAL_3D",
+  "conceptual": true,
+  "visualizability": {
+    "visualizability_class": "CONCEPTUAL_3D",
+    "classification_basis": {
+      "geometry_parameters_sourced": 0,
+      "subsystems_recorded": 0,
+      "physical_site_detected": true,
+      "physical_site_vocabulary": {
+        "n_words": 53,
+        "authority": "discovery_fabric/engine/domains.py (ENGINEERING_DOMAIN_REGISTRY, one authority)",
+        "registry_domains_excluded": [
+          "ml_data"
+        ],
+        "layers_used": [
+          "architecture_blocks",
+          "architecture_blocks_medical",
+          "manufacturing_candidates",
+          "materials_candidates",
+          "disciplines",
+          "domain label",
+          "failure_modes (mode + physical_mechanism)",
+          "manufacturing_routes"
+        ]
+      },
+      "process_signal": false,
+      "algorithmic_signal": false,
+      "intervention_site": "Nissan Leaf high voltage battery system",
+      "engineering_min_params": 3,
+      "reason": "single device-form invention (site 'Nissan Leaf high voltage battery system'), 0 sourced geometry parameters \u2014 conceptual device visualization",
+      "measured_from": [
+        "engineering_specification.parameters",
+        "engineering_specification.engineering_core.critical_parameters",
+        "engineering_specification.system_architecture.subsystems",
+        "final_state.causal_chain"
+      ]
+    },
+    "subsystems": [],
+    "geometry_parameters": [],
+    "intervention_site": "Nissan Leaf high voltage battery system"
+  },
+  "geometry": {
+    "model_glbs": [
+      "model-001.glb"
+    ],
+    "glb_sha256": "389c14e6df15c7f45e708fdc73aa7e5702d42ff33058e1217a19819b780f5f10",
+    "components": [
+      {
+        "name": "pack_enclosure",
+        "label": "pack enclosure",
+        "type": "structural",
+        "material_class": "body_metal",
+        "role": "pack enclosure (structural presentation element)",
+        "mapped_from": null
+      },
+      {
+        "name": "cell_stack",
+        "label": "cell stack",
+        "type": "structural",
+        "material_class": "battery",
+        "role": "cell stack (structural presentation element)",
+        "mapped_from": null
+      },
+      {
+        "name": "bus_bars",
+        "label": "bus bars",
+        "type": "structural",
+        "material_class": "machined_metal",
+        "role": "series interconnect bus bars (family-definitional presentation element of the energy-storage acceptance case; mapped subsystem recorded as alias)",
+        "mapped_from": null
+      },
+      {
+        "name": "link_cell_stack__bus_bars",
+        "label": "electrical link: cell_stack -> bus_bars",
+        "type": "interface",
+        "material_class": "conduit_power",
+        "role": "electrical coupling (topology only)",
+        "interface_id": "es_cells_bus"
+      }
+    ],
+    "key_dimensions": {
+      "measurement_basis": "TOPOLOGY_ONLY",
+      "note": "domain conceptual artifact \u2014 component identity, count and adjacency only; sizes are abstract presentation units, not engineering dimensions",
+      "component_count": 4,
+      "structural_form_components": 3,
+      "mapped_subsystem_components": 0,
+      "interface_count": 1,
+      "adjacency": [
+        {
+          "from": "cell_stack",
+          "to": "bus_bars",
+          "kind": "electrical"
+        }
+      ],
+      "domain_family": "energy",
+      "technology_class": "ENERGY_STORAGE"
+    },
+    "generation_models": [
+      {
+        "generation": 1,
+        "glb": "MODEL/model-001.glb",
+        "current": true
+      }
+    ],
+    "domain_family": "energy",
+    "quality_gates": {
+      "artifact": "R432_QUALITY_GATES",
+      "version": "1.0.0",
+      "geometry_gate": {
+        "artifact": "GEOMETRY_QUALITY_GATE",
+        "version": "1.0.0",
+        "domain_family": "energy",
+        "technology_class": "ENERGY_STORAGE",
+        "technology_class_role": "bridge geometry archetype (presentation routing, R445)",
+        "checks": [
+          {
+            "check": "valid_glb",
+            "passed": true
+          },
+          {
+            "check": "non_empty_scene",
+            "passed": true,
+            "measured": {
+              "node_count": 4,
+              "mesh_count": 4
+            }
+          },
+          {
+            "check": "component_ids_match_spec",
+            "passed": true,
+            "measured": {
+              "spec_components": 3,
+              "scene_nodes": 4,
+              "missing": [],
+              "unexpected": [],
+              "link_nodes_drawn": [
+                "link_cell_stack__bus_bars"
+              ]
+            }
+          },
+          {
+            "check": "named_components",
+            "passed": true,
+            "measured": {
+              "sample": [
+                "bus_bars",
+                "cell_stack",
+                "link_cell_stack__bus_bars",
+                "pack_enclosure"
+              ]
+            }
+          },
+          {
+            "check": "bounding_box_sane",
+            "passed": true,
+            "measured": {
+              "extent": [
+                6.4,
+                2.5,
+                4.4
+              ]
+            }
+          },
+          {
+            "check": "no_nan_inf_coordinates",
+            "passed": true
+          },
+          {
+            "check": "no_microscopic_geometry",
+            "passed": true,
+            "measured": {
+              "min_component_extent": 0.129956
+            }
+          },
+          {
+            "check": "no_duplicate_model",
+            "passed": true,
+            "measured": {
+              "duplicates": []
+            }
+          },
+          {
+            "check": "normals_valid",
+            "passed": true
+          },
+          {
+            "check": "component_interference",
+            "passed": true,
+            "measured": {
+              "pairs_checked": 3,
+              "same_cell_unmated": [],
+              "nested_disclosed": [
+                {
+                  "pair": "bus_bars==pack_enclosure",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.028,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                },
+                {
+                  "pair": "cell_stack==pack_enclosure",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.501,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                }
+              ],
+              "rule": "two distinct parts at the same cell (mutual overlap > 0.9 of the smaller and > 0.6 of the larger bbox) without a declared mating interface is an engineering-realization failure; nested parts are disclosed for the engineering boundary"
+            }
+          },
+          {
+            "check": "no_isolated_outlier_geometry",
+            "passed": true,
+            "measured": {
+              "islands": [],
+              "note": "components beyond 1.6x the assembly radius"
+            }
+          },
+          {
+            "check": "no_single_blob_domination",
+            "passed": true,
+            "measured": {
+              "largest_component_volume_fraction": 0.5452
+            }
+          },
+          {
+            "check": "interfaces_resolve",
+            "passed": true,
+            "measured": {
+              "unresolved": []
+            }
+          },
+          {
+            "check": "canonical_topology_preserved",
+            "passed": true,
+            "measured": {
+              "component_count": 3,
+              "interface_count": 1
+            }
+          }
+        ],
+        "failures": [],
+        "passed": true
+      },
+      "visual_gate": {
+        "artifact": "VISUAL_QUALITY_GATE",
+        "version": "1.0.0",
+        "domain_family": "energy",
+        "technology_class": "ENERGY_STORAGE",
+        "technology_class_role": "bridge geometry archetype (presentation routing, R445)",
+        "checks": [
+          {
+            "check": "not_flat_slab",
+            "passed": true,
+            "measured": {
+              "height_over_length": 0.3906,
+              "component_count": 4
+            }
+          },
+          {
+            "check": "not_generic_box_pile",
+            "passed": true,
+            "measured": {
+              "component_count": 4,
+              "pure_box_components": 0,
+              "box_ratio": 0.0
+            }
+          },
+          {
+            "check": "family_component_count",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE",
+              "components": 4,
+              "required": 4
+            }
+          },
+          {
+            "check": "family_feature_cell_stack",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE",
+              "found": 1,
+              "required": 1
+            }
+          },
+          {
+            "check": "family_feature_pack_enclosure",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE",
+              "found": 1,
+              "required": 1
+            }
+          }
+        ],
+        "failures": [],
+        "passed": true,
+        "note": "presentation audit \u2014 structural metrics only; NOT scientific validation and NOT a vision model (R432 section 17 disclosure)"
+      },
+      "engineering_gate": null,
+      "passed": true,
+      "failures": []
+    },
+    "artifact_identity": {
+      "artifact": "ARTIFACT_IDENTITY",
+      "blender_scene_hash": null,
+      "cad_source": null,
+      "derivation": "assembled from persisted run artifacts only \u2014 every hash from a real file at build time (Art. VI); blender_scene_hash fills when the render stage records its scene",
+      "derived_at": "2026-09-18T16:40:47Z",
+      "domain_family": "energy",
+      "generation_id": "gen-1",
+      "geometry_hash": "389c14e6df15c7f45e708fdc73aa7e5702d42ff33058e1217a19819b780f5f10",
+      "glb_disk_sha256": "389c14e6df15c7f45e708fdc73aa7e5702d42ff33058e1217a19819b780f5f10",
+      "glb_matches_geometry_hash": true,
+      "glb_path": "/app/ENGINE_RUNS/toscanini_ui_ui_thermal_runaway_fire_749211/MODEL/model-001.glb",
+      "identity_version": "1.0.0",
+      "run_id": "ts_817e73be0620",
+      "source_geometry_hash": "5856f8ab8cd1826372b8f489f6853c831511890a5b9e3b866fc387ca925e0657",
+      "technology_id": "ui_thermal_runaway_fire_749211",
+      "visualizability_class": "CONCEPTUAL_3D"
+    },
+    "fallback_basis": null,
+    "scores": {
+      "artifact": "R433_MODEL_SCORES",
+      "version": "1.0.0",
+      "semantic_identity": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "not_visualized": [],
+        "checks": [
+          {
+            "check": "model_loads",
+            "passed": true,
+            "measured": {
+              "node_count": 4
+            }
+          },
+          {
+            "check": "family_selected",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE"
+            }
+          },
+          {
+            "check": "spec_components_visualized",
+            "passed": true,
+            "measured": {
+              "spec_components": 3,
+              "not_visualized": []
+            }
+          },
+          {
+            "check": "domain_architecture_present",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE",
+              "required": 3,
+              "not_visualized": []
+            }
+          },
+          {
+            "check": "major_interfaces_represented",
+            "passed": true,
+            "measured": {
+              "interfaces": 1,
+              "resolvable_in_scene": 1,
+              "note": "conduit links may run inside the body by design"
+            }
+          }
+        ]
+      },
+      "engineering_coherence": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "checks": [
+          {
+            "check": "valid_glb",
+            "passed": true
+          },
+          {
+            "check": "non_empty_scene",
+            "passed": true,
+            "measured": {
+              "node_count": 4,
+              "mesh_count": 4
+            }
+          },
+          {
+            "check": "component_ids_match_spec",
+            "passed": true,
+            "measured": {
+              "spec_components": 3,
+              "scene_nodes": 4,
+              "missing": [],
+              "unexpected": [],
+              "link_nodes_drawn": [
+                "link_cell_stack__bus_bars"
+              ]
+            }
+          },
+          {
+            "check": "named_components",
+            "passed": true,
+            "measured": {
+              "sample": [
+                "bus_bars",
+                "cell_stack",
+                "link_cell_stack__bus_bars",
+                "pack_enclosure"
+              ]
+            }
+          },
+          {
+            "check": "bounding_box_sane",
+            "passed": true,
+            "measured": {
+              "extent": [
+                6.4,
+                2.5,
+                4.4
+              ]
+            }
+          },
+          {
+            "check": "no_nan_inf_coordinates",
+            "passed": true
+          },
+          {
+            "check": "no_microscopic_geometry",
+            "passed": true,
+            "measured": {
+              "min_component_extent": 0.129956
+            }
+          },
+          {
+            "check": "no_duplicate_model",
+            "passed": true,
+            "measured": {
+              "duplicates": []
+            }
+          },
+          {
+            "check": "normals_valid",
+            "passed": true
+          },
+          {
+            "check": "component_interference",
+            "passed": true,
+            "measured": {
+              "pairs_checked": 3,
+              "same_cell_unmated": [],
+              "nested_disclosed": [
+                {
+                  "pair": "bus_bars==pack_enclosure",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.028,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                },
+                {
+                  "pair": "cell_stack==pack_enclosure",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.501,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                }
+              ],
+              "rule": "two distinct parts at the same cell (mutual overlap > 0.9 of the smaller and > 0.6 of the larger bbox) without a declared mating interface is an engineering-realization failure; nested parts are disclosed for the engineering boundary"
+            }
+          },
+          {
+            "check": "no_isolated_outlier_geometry",
+            "passed": true,
+            "measured": {
+              "islands": [],
+              "note": "components beyond 1.6x the assembly radius"
+            }
+          },
+          {
+            "check": "no_single_blob_domination",
+            "passed": true,
+            "measured": {
+              "largest_component_volume_fraction": 0.5452
+            }
+          },
+          {
+            "check": "interfaces_resolve",
+            "passed": true,
+            "measured": {
+              "unresolved": []
+            }
+          },
+          {
+            "check": "canonical_topology_preserved",
+            "passed": true,
+            "measured": {
+              "component_count": 3,
+              "interface_count": 1
+            }
+          },
+          {
+            "check": "artifact_identity_chain",
+            "passed": true,
+            "measured": {
+              "generation_id": "gen-1",
+              "geometry_hash": "389c14e6df15c7f4"
+            }
+          }
+        ]
+      },
+      "presentation_quality": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "checks": [
+          {
+            "check": "not_flat_slab",
+            "passed": true,
+            "measured": {
+              "height_over_length": 0.3906,
+              "component_count": 4
+            }
+          },
+          {
+            "check": "not_generic_box_pile",
+            "passed": true,
+            "measured": {
+              "component_count": 4,
+              "pure_box_components": 0,
+              "box_ratio": 0.0
+            }
+          },
+          {
+            "check": "family_component_count",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE",
+              "components": 4,
+              "required": 4
+            }
+          },
+          {
+            "check": "family_feature_cell_stack",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE",
+              "found": 1,
+              "required": 1
+            }
+          },
+          {
+            "check": "family_feature_pack_enclosure",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE",
+              "found": 1,
+              "required": 1
+            }
+          }
+        ]
+      },
+      "note": "three separated dimensions \u2014 never combined into one score (R433 section 13); presentation PASS with semantic FAIL is a disclosed failure, never a pass"
+    },
+    "evolution": [
+      {
+        "generation": 1,
+        "invention_id": "inv:429b1825ec:gen1",
+        "status": "CURRENT",
+        "status_basis": "state INVENTION_SURVIVED \u00b7 maturity EVIDENCE_SUPPORTED",
+        "why": "the latest recorded architecture generation",
+        "domain_family": "energy",
+        "component_count": 4,
+        "glb": "/api/run/ts_817e73be0620/model?gen=1",
+        "glb_sha256": "389c14e6df15c7f45e708fdc73aa7e5702d42ff33058e1217a19819b780f5f10",
+        "current": true
+      }
+    ],
+    "generation_id": "gen-1",
+    "generation_count": 1
+  },
+  "renders": {
+    "stage": "RENDER",
+    "status": "RENDER_REQUESTED",
+    "job": {
+      "status": "RUNNING",
+      "enqueued_at": "2026-09-18T16:40:47Z",
+      "worker_pid": 14752,
+      "readback": null
+    },
+    "execution": "async artifact job (waits for the run worker to exit, then renders through the quality ladder; poll the CIO visualization.renders)",
+    "note": "DISCOVERY COMPLETE does not mean PRESENTATION RENDER COMPLETE \u2014 the render runs asynchronously after the run's terminal state"
+  },
+  "package_out": {
+    "zip_name": "",
+    "zip_sha256": null,
+    "zip_bytes": null,
+    "package_maturity": null,
+    "visualizability_class": null,
+    "manifest_files": null,
+    "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE (bridge) \u2014 the ONE canonical technology-transfer artifact for this run, honestly maturity-labeled; distinct from the buyer release chain (Art. IV: no weakened gates)"
+  },
+  "report": {
+    "bridge_version": "2.0.0",
+    "steps": [
+      {
+        "step": "CLASSIFY",
+        "status": "OK",
+        "detail": {
+          "visualizability_class": "CONCEPTUAL_3D",
+          "basis": {
+            "geometry_parameters_sourced": 0,
+            "subsystems_recorded": 0,
+            "physical_site_detected": true,
+            "physical_site_vocabulary": {
+              "n_words": 53,
+              "authority": "discovery_fabric/engine/domains.py (ENGINEERING_DOMAIN_REGISTRY, one authority)",
+              "registry_domains_excluded": [
+                "ml_data"
+              ],
+              "layers_used": [
+                "architecture_blocks",
+                "architecture_blocks_medical",
+                "manufacturing_candidates",
+                "materials_candidates",
+                "disciplines",
+                "domain label",
+                "failure_modes (mode + physical_mechanism)",
+                "manufacturing_routes"
+              ]
+            },
+            "process_signal": false,
+            "algorithmic_signal": false,
+            "intervention_site": "Nissan Leaf high voltage battery system",
+            "engineering_min_params": 3,
+            "reason": "single device-form invention (site 'Nissan Leaf high voltage battery system'), 0 sourced geometry parameters \u2014 conceptual device visualization",
+            "measured_from": [
+              "engineering_specification.parameters",
+              "engineering_specification.engineering_core.critical_parameters",
+              "engineering_specification.system_architecture.subsystems",
+              "final_state.causal_chain"
+            ]
+          }
+        },
+        "at": "2026-09-18T16:40:45Z"
+      },
+      {
+        "step": "GEOMETRY",
+        "status": "OK",
+        "detail": {
+          "visualizability_class": "CONCEPTUAL_3D",
+          "domain_family": "energy",
+          "glb_sha256": "389c14e6df15c7f45e708fdc73aa7e5702d42ff33058e1217a19819b780f5f10",
+          "components": 4,
+          "quality_gates": true,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "OK",
+              "domain_family": "energy"
+            }
+          ]
+        },
+        "at": "2026-09-18T16:40:47Z"
+      },
+      {
+        "step": "GENERATION_MODELS",
+        "status": "OK",
+        "detail": {
+          "count": 1,
+          "domain_family": "energy"
+        },
+        "at": "2026-09-18T16:40:47Z"
+      },
+      {
+        "step": "PACKAGE",
+        "status": "PACKAGE_BUILD_BLOCKED",
+        "detail": {
+          "stage": "MODEL_VALIDATION_FAILED",
+          "run_id": "ts_817e73be0620",
+          "record": "PACKAGE_BUILD_BLOCKED.json"
+        },
+        "at": "2026-09-18T16:40:47Z"
+      },
+      {
+        "step": "CIO_UPDATE",
+        "status": "OK_GEOMETRY_ONLY",
+        "detail": {
+          "geometry_present": true,
+          "package_blocked": true,
+          "note": "geometry projected; downloads honestly absent \u2014 the package compiler blocked this build"
+        },
+        "at": "2026-09-18T16:40:47Z"
+      }
+    ],
+    "outcome": "PACKAGE_BUILD_BLOCKED",
+    "visualizability_class": "CONCEPTUAL_3D",
+    "package_blocked": true,
+    "package_blocked_reason": "MODEL_VALIDATION_FAILED"
+  }
+}
