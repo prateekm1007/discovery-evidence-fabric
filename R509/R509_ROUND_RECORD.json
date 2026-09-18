@@ -1,0 +1,97 @@
+{
+  "artifact_type": "R509_ROUND_RECORD",
+  "round": "R509",
+  "agent": "Super Z (main session — Coder line)",
+  "reviewer_provenance": "AI_REVIEW",
+  "created_at_utc": "2026-09-18T08:52:00Z",
+  "directive": {
+    "source": "CEO verification verdict on the order-read report (2026-09-18)",
+    "verbatim_anchor": "Still needed from operator, in order: (1) preserve the ephemeral ledger tail before any restart; (2) '2.9.0 stands' or 'revert' verbatim. Nothing else moves until both land.",
+    "endorsements_confirmed": [
+      "order-read report verified; HEAD == origin/main == e04932be at verification time; the 691d8d3d author/committer-date delta adjudicated as rebase/push lag, both timestamps true",
+      "R508 re-derivation reproduced independently (n=98/p50=11/p90=41; healthy-forensics-empty-workers; push-path-healthy-therefore-absent-transitions; 6/6 created -> 5/6 clarified -> 2/6 merged -> silence)",
+      "root-cause-from-preserved-bytes offer accepted IN ADVANCE, on the condition the tail arrives as bytes with provenance, not as narrative",
+      "resubmit posture: same manifest e9c72c58... + frozen rules, R508 as attempt genealogy — execution #2, not a new battery"
+    ],
+    "scoring_frozen": "CEO scoring stays 138/25 = 5.52 -> 6/10, NO standing, until acts 1+2 land"
+  },
+  "act_1_preserve": {
+    "status": "EXECUTED_THIS_ROUND",
+    "ownership_disclosure": {
+      "R508_position": "acts 1+2 operator-only; the coder line could not preserve (owner capabilities believed destroyed with the container recycle, BS-021 non-durable) — TRUE of the driver's local capability file",
+      "measured_discovery_this_round": "the ENGINE's own durable snapshot system (toscanini/durable.py::_collect_payload) pushes sessions.json WHOLESALE to runtime-state-hf, and sessions.json stores each session's opaque owner_key — the six battery capabilities are durable bytes at custody ref 691d8d3d (measured: 6/6 fields present, 32-hex each)",
+      "consequence": "the owner-scoped per-session diagnostics route (GET /api/run/{sid}/worker-diagnostics, R463 — no operator key exists) became callable read-only; act 1 was executable by this line without any forbidden act",
+      "BS_021_handling": "capabilities loaded IN-MEMORY from the engine's own durable bytes, used ONLY as X-Tosca-Owner request headers; never written to any artifact, log, or commit; every captured byte scanned against all six key strings pre-write and pre-commit (fail-closed); the engine's own practice of pushing owner_key-bearing sessions.json to the durable branch is DISCLOSED as a standing engine-design fact (not introduced by this line; not fixed unilaterally — any engine change is a redeploy, forbidden until acts 1+2 complete)"
+    },
+    "capture": {
+      "script": "scripts/r509_preserve_forensics_tail.py",
+      "at_utc": "2026-09-18T08:35:09Z - 08:35:53Z",
+      "space_base": "https://prateekm1-toscanini-prod-validation.hf.space",
+      "requests": "12/12 HTTP 200: /api/version, /api/health (pre), 6x /api/sessions/{sid}, 6x /api/run/{sid}/worker-diagnostics, /api/health (post)",
+      "same_boot_verified": "boot-1789685856 (epoch 2026-09-17T22:57:36Z) before AND after the capture — NO restart occurred; the preservation window did not close",
+      "evidence_dir": "R509/PRESERVATION_2026-09-18T083509/ (16 files, byte-sha256 recorded in its MANIFEST.json)"
+    },
+    "durable_custody": {
+      "script": "scripts/r509_push_preservation.py",
+      "pushed_commit": "215251c97d43 (HEAD:runtime-state-hf, parent 691d8d3d)",
+      "custody_path": "battery/forensics_preservation_2026-09-18T083509Z/ (17 files incl. CUSTODY_NOTE.json)",
+      "race_discipline": "fetch + tip assertion immediately before commit (tip still 691d8d3d — no realign needed)",
+      "result": "the post-00:09:15Z forensics tail and the six terminal session views are now DURABLE bytes — a Space restart can no longer destroy them"
+    }
+  },
+  "the_preserved_tail_rewrites_the_failure_mechanism": {
+    "R508_typing_on_the_durable_domain": "6x INCOMPLETE_INFRASTRUCTURE_FAILURE — CORRECT on the bytes R508 measured: 0/6 terminals on the terminal authority (the durable branch), which is the only domain the yield instrument reads",
+    "what_the_tail_adds": "the six workers did NOT die mid-flight. Every session carries WORKER_SPAWNED -> PHASE_STARTED* -> HEARTBEAT*n -> BRIDGE_GATE_OUTCOME -> TERMINAL_STATE(terminal=COMPLETE, phase 5, stage FINAL_SNAPSHOT) -> WORKER_COMPLETED, all on the SAME boot (boot-1789685856, engine_commit d7520b9b)",
+    "terminal_timeline_utc": {
+      "ts_dbdf24c91535": "spawned 00:03:38.717Z, last heartbeat 00:11:38.919Z, BRIDGE_GATE NO_SURVIVOR 00:12:04.212Z, WORKER_COMPLETED 00:12:05.006Z",
+      "ts_ca977637f50b": "first heartbeat 00:09:17.895Z, BRIDGE_GATE COMPLETED case B 00:22:56.243Z, WORKER_COMPLETED 00:22:56.962Z",
+      "ts_66e23c67b511": "first heartbeat 00:09:24.031Z, BRIDGE_GATE COMPLETED case B 00:22:49.318Z, WORKER_COMPLETED 00:22:50.136Z",
+      "ts_84a8807b12dc": "first heartbeat 00:10:04.796Z, BRIDGE_GATE COMPLETED case B 00:23:55.904Z, WORKER_COMPLETED 00:23:56.673Z",
+      "ts_6da1b9339ce5": "first heartbeat 00:28:40.943Z, BRIDGE_GATE COMPLETED case B 00:45:06.963Z, WORKER_COMPLETED 00:45:07.775Z",
+      "ts_d9b7d3463583": "first heartbeat 00:24:16.968Z, BRIDGE_GATE COMPLETED case B 00:40:37.215Z, WORKER_COMPLETED 00:40:38.085Z"
+    },
+    "the_silent_stage": "the DURABLE PUSH PATH, not the workers: the engine's last successful snapshot is 00:09:15Z (ok=true pushed=true files=3073 commit=0da7fe50, reason clarification_answered:ts_d9b7d3463583); ZERO snapshots succeeded after it despite six terminal FINAL_SNAPSHOT phases between 00:12:05Z and 00:45:07Z; last_write_error=null, forensics_degraded=false, shrink_guard ok=true violations=[] — a SILENT custody loss: the engine reported healthy while delivering nothing",
+    "r508_unknown_resolved": "R508's LXXIV s1 disclosure left death-vs-stall UNKNOWN (Art. XXV) — the preserved tail resolves it: no deaths in (00:40:41Z, 07:24:41Z]; the last worker completed at 00:45:07Z; active_workers=[] at 07:24:41Z because every worker had COMPLETED hours before. The Art. XXV discipline (never convert UNKNOWN into REJECTED) is vindicated: R508 typed INCOMPLETE_INFRASTRUCTURE_FAILURE, never a zero-survivor scientific claim",
+    "r507_heartbeat_reconciled": "the R507 27s ENGINE_RUN heartbeat at 00:40:41Z (ts_6da1b9339ce5) sits mid-run: that session's heartbeats continue to 00:44:41.113Z, completion 00:45:07.775Z — consistent"
+  },
+  "six_preserved_terminal_facts": {
+    "note": "these are the engine's own live-session fields captured verbatim; they are PIPELINE facts, INADMISSIBLE as discovery evidence (LXXVII). The funnel verdicts belong to the frozen instrument (831f1a0e) reading durable run bytes under the pre-registered rules (70a83fe1/40d728f8) — which have NOT run; YIELD_MEASUREMENT.json remains ABSENT",
+    "sessions": [
+      {"problem_index": 1, "session_id": "ts_dbdf24c91535", "status": "COMPLETE", "bridge_outcome": "NO_SURVIVOR", "adjudication_verdict": "INSUFFICIENT_ADJUDICATION", "adversarial_overall": "EVALUATION_FAILED", "evidence_verified": true, "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE", "final_envelope_hash_prefix": "dd53a2e0285d", "ranking_score": 0.15},
+      {"problem_index": 2, "session_id": "ts_ca977637f50b", "status": "COMPLETE", "bridge_outcome": "COMPLETED", "bridge_case": "B", "adjudication_verdict": "CONTESTED", "adversarial_overall": "PASS", "evidence_verified": true, "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE", "final_envelope_hash_prefix": "50a912dc0775", "ranking_score": 0.5069},
+      {"problem_index": 3, "session_id": "ts_66e23c67b511", "status": "COMPLETE", "bridge_outcome": "COMPLETED", "bridge_case": "B", "adjudication_verdict": "CONTESTED", "adversarial_overall": "PASS", "evidence_verified": true, "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE", "final_envelope_hash_prefix": "cfaf584d3837", "ranking_score": 0.5156},
+      {"problem_index": 4, "session_id": "ts_84a8807b12dc", "status": "COMPLETE", "bridge_outcome": "COMPLETED", "bridge_case": "B", "adjudication_verdict": "CONTESTED", "adversarial_overall": "KILLED", "evidence_verified": true, "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE", "final_envelope_hash_prefix": "7a914a01bfad", "ranking_score": 0.2691},
+      {"problem_index": 5, "session_id": "ts_6da1b9339ce5", "status": "COMPLETE", "bridge_outcome": "COMPLETED", "bridge_case": "B", "adjudication_verdict": "CONTESTED", "adversarial_overall": "KILLED", "evidence_verified": true, "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE", "final_envelope_hash_prefix": "21954c622597", "ranking_score": 0.2691},
+      {"problem_index": 6, "session_id": "ts_d9b7d3463583", "status": "COMPLETE", "bridge_outcome": "COMPLETED", "bridge_case": "B", "adjudication_verdict": "CONTESTED", "adversarial_overall": "PASS", "evidence_verified": true, "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE", "final_envelope_hash_prefix": "7b7bea9f242e", "ranking_score": 0.5145}
+    ]
+  },
+  "what_is_preserved_vs_what_remains_ephemeral": {
+    "preserved_durable_bytes": ["the full per-session forensics tail (spawn/phase/heartbeat/terminal/completed events)", "the worker log tails (verify/prior_art/adversarial/classify progress)", "the six live terminal session views (15 stages, run_state, final_state incl. final_envelope_hash, survivor_selection, bridge facts)", "health+version pre/post (deployment identity d7520b9b/2.8.0, durable.last_snapshot fields, run_duration_stats)"],
+    "still_ephemeral_only": ["the raw run directories under ENGINE_RUNS/runs/ (the 17-envelope sets the frozen instrument's input contract reads) — no read-only API route serves them; their custody rides the engine's own snapshot pipeline, which is the silent stage", "the model_routing ledger"],
+    "consequence_for_the_ceo_decision": "execution #1 of the battery is NOT measurably lost the way R508 concluded from the durable domain alone — its terminal records exist (session-view granularity preserved durably; full run dirs still ephemeral). Whether to (a) recover the run dirs into the durable branch so the FROZEN instrument can measure execution #1 on its own input contract, or (b) proceed with the ordered resubmission as execution #2, is an owner decision — this line performs neither until the CEO rules (act 4 is gated on the CEO's act 2 + this decision)"
+  },
+  "act_order_state": {
+    "act_1_preserve": "DONE (this round, by the measured-open read-only path; disclosure above)",
+    "act_2_290_verbatim": "PENDING — the operator's act alone: '2.9.0 stands' or 'revert', verbatim. This line performs neither",
+    "act_3_root_cause": "PRE-AUTHORIZED by the CEO on preserved bytes; the mechanism LOCUS is already measured (durable push path silent after 00:09:15Z while workers completed); the typed mechanism analysis awaits the CEO's act 2 per 'nothing else moves until both land'",
+    "act_4_resubmit": "GATED — same frozen manifest e9c72c58 + rules 70a83fe1/40d728f8, R508 as attempt genealogy; now also gated on the CEO's recovery-vs-resubmit decision above",
+    "forbidden_until_1_and_2": "Space restart, rebuild, redeploy, resubmission — NONE performed (same boot verified pre+post capture; zero engine delta; no deploy)"
+  },
+  "incidents_disclosed": [
+    "one mistaken push attempt from the MAIN worktree (HEAD:runtime-state-hf) was REJECTED non-fast-forward by the remote before any object landed — command-composition error, zero remote effect, corrected by pushing from the durable worktree only (typed here per Art. XV)",
+    "the R506-part7 conclusion 'the live-API poll leg is permanently closed' was TRUE of the driver's capability file and FALSE of the engine's durable bytes — corrected this round with the measured sessions.json discovery (Art. XXXI memory artifact: durable.py::_collect_payload carries owner_key-bearing sessions.json to the durable branch; auditors and future rounds must know the capabilities ARE durable)"
+  ],
+  "tree_freeze_compliance": {
+    "tree_frozen": true,
+    "commit_scope": "records-only: R509/ (preservation evidence + this record) + 2 preservation scripts + worklog + ACTIVE_PATH addendum",
+    "zero_engine_delta": true,
+    "scored_set_untouched": true,
+    "battery_untouched": "no session mutated, no clarification answered, no run created, no Space setting touched — the capture was GET-only",
+    "no_deploy": "production stays d7520b9b/2.8.0 (verified live in the captured /api/version); 2.9.0 rides the next deploy, forbidden until acts 1+2 complete"
+  },
+  "ritual": {
+    "constitution_read_in_full_this_session": "EPISTEMIC_CONSTITUTION.md v2.9.0 (2,399 lines, sha 6aab103c... verified by the sibling R507 record and re-read at the operative level)",
+    "operative_articles": ["X (inventory)", "XV (disclosure)", "XXII/XXIII (viewport/realign)", "XXV (unknown stays unknown)", "XXXI (memory artifact)", "XXXIII (no irreversible action)", "LXV (escalate, never idle)", "LXXIII/LXXVI (vault/custody)", "LXXIV s1/s2/s3 (domains, state machine, retry)", "LXXVII/LXXVIII/LXXIX (the firewall)"],
+    "governance_files": "read in full this session per the standing directive"
+  }
+}
