@@ -40,7 +40,10 @@ REGISTERED_FINGERPRINTS = {"561b6e70f5b5ea7f", "50fe7b3d569bb1fa"}
 
 
 def _load(p: Path):
-    return json.loads(p.read_text())
+    # Art. VII harness fix (R506 audit): explicit UTF-8 — the frozen
+    # corpus sha is defined over UTF-8 bytes; a locale-decoding runner
+    # (cp1252) must reconstruct the same hash, not a new one.
+    return json.loads(p.read_text(encoding="utf-8"))
 
 
 # ---------- 1. registry 1.4.0 ----------
