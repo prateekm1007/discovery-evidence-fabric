@@ -1,0 +1,60 @@
+{
+  "acceptance": "R509 watchdog replay acceptance \u2014 directive Phase 2 item 5",
+  "generated_at_utc": "2026-09-18T11:47:59.070278Z",
+  "bounds": {
+    "stalled_over_2x_p90_min": 82,
+    "derivation": "2 x p90; p90=41 min measured (n=98, p50=11), R508/EVIDENCE_HEALTH_2026-09-18T0724Z.json; directive-authorized derived bound; no other threshold invented (Art. XXVII)",
+    "durable_tip_stale_min": 82,
+    "bound_reuse_disclosure": "same measured distribution applied to the branch surface; no second number invented",
+    "heartbeat_fresh_s": 120,
+    "hysteresis": {
+      "confirm_polls": 3,
+      "clear_polls": 3
+    }
+  },
+  "corpora_source": "durable branch runtime-state-hf snapshot_log.jsonl bytes + R508/EVIDENCE_HEALTH_2026-09-18T0724Z.json (main); worker presence in the healthy-closure corpora is REPLAY_DERIVED and labeled",
+  "corpora": {
+    "r508_death_signature": {
+      "description": "execution #1 durable window (18 real snapshots) + measured silence + the real 07:24:41Z health observation",
+      "expected": {
+        "alert_types": [
+          "STALLED_OVER_2X_P90",
+          "DURABLE_TIP_STALE",
+          "HEARTLESS_WORKERS"
+        ],
+        "min_order": [
+          "STALLED_OVER_2X_P90",
+          "DURABLE_TIP_STALE",
+          "HEARTLESS_WORKERS"
+        ],
+        "note": "STALLED fires per tracked session (6 records, one type); tip-stale rides the same measured bound"
+      },
+      "pass": true,
+      "alert_types_in_fire_order": [
+        "STALLED_OVER_2X_P90",
+        "DURABLE_TIP_STALE",
+        "HEARTLESS_WORKERS"
+      ],
+      "n_alert_records": 8
+    },
+    "r484_r487_healthy_closures": {
+      "description": "2026-09-17 healthy closure windows for the six sessions that progressed that day (R484/R487 era); max measured per-session gap 37.3 min < 82",
+      "expected": {
+        "alert_types": [],
+        "note": "zero false fires required"
+      },
+      "pass": true,
+      "alert_types_in_fire_order": [],
+      "n_alert_records": 0
+    }
+  },
+  "r484_r487_max_measured_gap_min": 37.3,
+  "r484_r487_gap_source": "per-session snapshot_log progression gaps, 2026-09-17 (measured this session)",
+  "disclosed_limitation": "a 293.1-min healthy per-session gap exists on 2026-09-13->14 (ts_a2a7952d1de9, outside the directive's R484/R487 acceptance corpus): the 82-min durable-progression bound WOULD have fired there. Disclosed per Art. XV; the bound stays as directed; a heartbeat-aware suppression variant is an owner decision, not unilaterally adopted.",
+  "live_dry_run": {
+    "status": "ARMED",
+    "note": "48h live dry-run starts with --live; alerts append-only to R509/WATCHDOG_ALERTS.jsonl"
+  },
+  "bs021_scan": "CLEAN",
+  "verdict": "PASS"
+}

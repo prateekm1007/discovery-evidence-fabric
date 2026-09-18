@@ -1,0 +1,57 @@
+{
+  "artifact_type": "KEY_BUDGET_COORDINATION_LEDGER",
+  "round": "R509",
+  "reviewer_provenance": "AI_REVIEW",
+  "directive_anchor": "CEO 'all bottlenecks, one ordered campaign' parallel track 11: per-line debit accounting against the shared 19/20 bucket + reserve floor, so seals stop consuming each other's headroom blind. Records-only: fingerprints/budgets, ZERO values (BS-021/LXXVI).",
+  "status": "ACTIVE — seeded from recorded history; every future debit-consuming round appends RESERVATION rows before spend and OUTCOME rows after (append-only; no row is ever rewritten)",
+  "shared_buckets": [
+    {
+      "bucket_id": "PATENTBEAR_ACTIVE_KEY",
+      "property": "per-key monthly bucket, capacity 20 debits, stewardship reserve floor 2 (R497/R498 measured)",
+      "active_fingerprint": "50fe7b3d569bb1fa",
+      "prior_fingerprint": "561b6e70f5b5ea7f",
+      "values_held": "NEVER here — vault/.env.keys per LXXVI Section 3; this ledger carries fingerprints only",
+      "state_as_measured": {
+        "used": 19,
+        "capacity": 20,
+        "remaining": 1,
+        "below_reserve_floor": true,
+        "floor": 2,
+        "spend_allowed": false,
+        "typed": "POOL_EXHAUSTED_MEASURED (R505); spend that would cross the floor requires a fresh operator-supplied key",
+        "citations": ["R505/R505_REAUDIT_INTAKE.json:bucket_state='19/20 untouched, last debit preserved'", "R505/R505_ROUND_RECORD.json:POOL STATE MEASURED", "R498/R498_ROUND_RECORD.json:meter trajectory used 8->14, remaining 12->6"]
+      },
+      "seal_scale_costs_measured": {
+        "probe_debit": 1,
+        "seal_scale_spend": 6,
+        "full_battery_rerun_need": 8,
+        "citation": "R498/R498_ROUND_RECORD.json quota_ledger (2 per repetition x 3); R505/R505_ROUND_RECORD.json (6 debits + floor 2)"
+      }
+    }
+  ],
+  "history_rows": [
+    {"round": "R497", "event": "KEY_SUPPLY", "fingerprint": "561b6e70f5b5ea7f", "note": "operator supplied rotated key #1 after the prior key's meter hit the reserve floor (2/20 remaining) on 2026-08-31; usable_before_reserve_floor=4 measured", "citations": ["R497/R497_ROUND_RECORD.json:the_operator_answer, usable_before_reserve_floor"]},
+    {"round": "R498", "line": "Coder line A", "event": "DEBIT_OUTCOME", "debits": 7, "purpose": "probe 1 + full-battery seal 6", "meter_after": "used=7/remaining=13", "citations": ["R498/R498_ROUND_RECORD.json:meter reconciliation"]},
+    {"round": "R498", "line": "Coder line B", "event": "DEBIT_OUTCOME", "debits": 7, "purpose": "probe 1 + patent-leg seal 6", "meter_after": "used=14/remaining=6", "disclosed_incident": "line B initially typed the 7 pre-probe debits as 'account is SHARED'; CORRECTED by line A's earlier-in-time record — the two lines were the consumers; the bucket is PER KEY", "lesson": "THIS is the blind-consumption failure track 11 exists to prevent", "citations": ["R498/R498_ROUND_RECORD.json:account_finding + Art. XV correction"]},
+    {"round": "R502", "line": "unattributed in surviving bytes", "event": "DEBIT_OUTCOME", "debits": 5, "purpose": "full-battery R502 spend (reconstructed delta 14->19/20; R502 round record not present in this tree — cited from R505's 'last debit preserved' state; typed RECONSTRUCTED_FROM_TERMINAL_STATE, not per-call measured)", "meter_after": "used=19/remaining=1", "citations": ["R505/R505_REAUDIT_INTAKE.json:121"]},
+    {"round": "R504", "event": "CUSTODY_GAP_TYPED", "note": "PATENTBEAR_API_KEY value not held anywhere machine-readable; fingerprint registered; decision: active key NOT probed, 1 remaining below floor 2 preserved", "citations": ["R504/R504_ROUND_RECORD.json:82", "R505/R505_ROUND_RECORD.json:the R504 decision stands"]},
+    {"round": "R505", "event": "ZERO_DEBIT_VERIFY", "note": "probe of the OLD fingerprint 561b6e70f5b5ea7f debited nothing (401 transport-class); active key preserved untouched below floor", "citations": ["R505/PATENTBEAR_VALUE_RECOVERY.json", "R505/R505_ROUND_RECORD.json:note"]}
+  ],
+  "coordination_protocol": {
+    "purpose": "process fix for bottleneck 7 — two coder lines share one operator key pool; without a shared reservation surface each seal consumes the other's headroom blind (the R498 incident, twice-recorded)",
+    "rules": [
+      "1. RESERVE-BEFORE-SPEND: any round intending metered debits appends a RESERVATION row {round, line, purpose, max_debits, bucket_id} to this ledger BEFORE its first metered call; the reservation is a budget intent, not a measured spend",
+      "2. MEASURE-METER-FIRST: the standing R498 stewardship guard — re-measure the provider meter before the first call of every spend; a meter below (max_debits + floor) types POOL_EXHAUSTED_MEASURED and the spend does not start",
+      "3. RECONCILE-AFTER-SPEND: append an OUTCOME row {debits, meter_before, meter_after, purpose} — unexplained deltas type CROSS_LINE_UNEXPECTED_DEBIT and freeze further spend on that bucket pending owner input (never re-rolled, never absorbed silently)",
+      "4. FLOOR-IS-LAW: no spend may cross reserve floor 2; seal-scale work (6 debits) on a key below floor+6 requires the next rotated operator key",
+      "5. RESERVATIONS EXPIRE: a reservation row not reconciled by an OUTCOME row within the same round is marked EXPIRED_UNSPENT by the next round's intake (anti-entropy: the ledger never accumulates phantom headroom)"
+    ],
+    "enforcement": "records-level (this ledger is the coordination surface); CI/pin-level enforcement is post-harvest work, not unilaterally built now (scope law: observer-side records only until harvest)"
+  },
+  "bs021_note": "fingerprints only; zero key values; every emitted byte fail-closed scanned (same pattern set as the R506/R509 instruments)",
+  "what_is_NOT_claimed": [
+    "the R502 delta (5 debits) is RECONSTRUCTED from terminal-state citations, not per-call measured — the R502 round record is not in this tree",
+    "no new spend is authorized by this ledger; the active bucket stays FROZEN below floor",
+    "Tier-1 registrations (EPO OPS / PatentsView) are not budgeted here until they exist (owner-gated, standing)"
+  ]
+}
