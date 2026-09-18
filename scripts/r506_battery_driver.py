@@ -38,7 +38,8 @@ MANIFEST = REPO / "R506" / "BATTERY_PROBLEMS.json"
 SESSIONS = REPO / "R506" / "BATTERY_SESSIONS.json"
 MEASUREMENT = REPO / "R506" / "YIELD_MEASUREMENT.json"
 INSTRUMENT = REPO / "scripts" / "r506_discovery_yield.py"
-WORKTREE = Path("/home/z/my-project/r506_durable")
+WORKTREE = Path(os.environ.get("R506_DURABLE_WORKTREE",
+                               "/home/z/my-project/r506_durable"))
 
 BASE = "https://prateekm1-toscanini-prod-validation.hf.space"
 HF_TOKEN = os.environ.get("HF_TOKEN", "")
@@ -294,7 +295,7 @@ def harvest():
             continue
         out = REPO / "R506" / f"YIELD_ROW_{s['problem_index']}_{slug}.json"
         r = subprocess.run(
-            ["python3", str(INSTRUMENT), "--run-dir",
+            [sys.executable, str(INSTRUMENT), "--run-dir",
              str(WORKTREE / "runs" / slug), "--out", str(out)],
             capture_output=True, text=True)
         if r.returncode != 0:

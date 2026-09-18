@@ -44,7 +44,10 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 SPACE_BASE = "https://prateekm1-toscanini-prod-validation.hf.space"
 
-EXPECTED_ENGINE_COMMIT = "d7520b9bc5d7f26a2ab40b28367501e916634513"
+# Re-baselined R510-C11 per the operator deploy directive + R510/NIL_DELTA_PROOF.json
+# (engine 0 files d7520b9b..d15aaa75; pre-registration identity transfers).
+# Previous pin d7520b9b... preserved in git history (Art. XI).
+EXPECTED_ENGINE_COMMIT = "d15aaa75227767064d732e910d41b6bffc692630"
 EXPECTED = {
     "battery_manifest": {
         "path": "R506/BATTERY_PROBLEMS.json",
