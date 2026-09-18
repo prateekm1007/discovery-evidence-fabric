@@ -30,8 +30,8 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "A Dual Loop LADRC-FOPIDN-(1 + TD) controller improves frequency regulation and DC-bus voltage regulation of the vehicle electrical power system while taking RES's intermittent nature into account; by integrating LADRC with a cascade controller, the proposed approach delivers improved transient performance over selected benchmark controllers (LADRC, FOPIDN, FOPIDN-(1 + TD)) under the tested scenarios, and an enhanced Quasi Opposition Arithmetic Optimization Algorithm (QOAOA) is employed to optimize controller parameters for improved efficiency, giving strong adaptability to RES intermittency, load fluctuations, and delay effects, ensuring grid stability and bus stability for ignition, engine electronics, and accessory loads during highway operation.",
-   "intervention": "Instantiate the Dual Loop LADRC-FOPIDN-(1 + TD) controller inside the vehicle power management unit, integrating LADRC with a cascade controller so the LADRC observer loop drives alternator field-current regulation and the cascade FOPIDN-(1 + TD) loop commands battery/load bus switching; employ the enhanced Quasi Opposition Arithmetic Optimization Algorithm (QOAOA) to optimize controller parameters, so intermittent faults, RES intermittency, load fluctuations, and delay effects are actively rejected in real time instead of collapsing the 12 V bus.",
+   "mechanism": "A Dual Loop LADRC-FOPIDN-(1 + TD) controller improves frequency regulation and DC-bus voltage regulation of the vehicle electrical power system while taking RES's intermittent nature into account; by integrating LADRC with a cascade controller, the proposed approach delivers improved transient performance over selected benchmark controllers (LADRC, FOPIDN, FOPIDN-(1 + TD)) under the tested scenarios, and an enhanced Quasi Opposition Arithmetic Optimization Algorithm (QOAOA) is employed to optimize controller parameters for improved efficiency, giving strong adaptability to RES intermittency, load fluctuations, and delay effects, ensuring grid stability and bus stability for ignition, engine electronics, and accessory loads during highway operation. [TECHNICAL MUTATION: The LADRC observer bandwidth (P-LADRC-OBSERVER-BANDWIDTH) is increased to 150.0 within the modelled [1.0, 200.0] envelope so the observer loop faster estimates and rejects disturbances, minimizing transient DC-bus voltage dip during highway intermittent fault ride-through.] [TECHNICAL MUTATION: The LADRC observer bandwidth parameter P-LADRC-OBSERVER-BANDWIDTH is raised from 150.0 to 175.0 so the observer loop tracks alternator field-current disturbances more aggressively and suppresses DC-bus voltage dips before the bus collapses.]",
+   "intervention": "Instantiate the Dual Loop LADRC-FOPIDN-(1 + TD) controller inside the vehicle power management unit, integrating LADRC with a cascade controller so the LADRC observer loop drives alternator field-current regulation and the cascade FOPIDN-(1 + TD) loop commands battery/load bus switching; employ the enhanced Quasi Opposition Arithmetic Optimization Algorithm (QOAOA) to optimize controller parameters, so intermittent faults, RES intermittency, load fluctuations, and delay effects are actively rejected in real time instead of collapsing the 12 V bus. [TECHNICAL MUTATION: The power management unit calibration is updated to set P-LADRC-OBSERVER-BANDWIDTH to 150.0, increasing observer aggressiveness to suppress DC-bus voltage dips while keeping P-DCBUS-VOLTAGE within [9.0, 16.0], P] [TECHNICAL MUTATION: In the vehicle power management unit, the Dual Loop LADRC-FOPIDN-(1 + TD) controller is instantiated with P-LADRC-OBSERVER-BANDWIDTH set to 175.0, keeping the QOAOA-tuned cascade FOPIDN-(1 + TD) battery/load bus switching loop intact while the faster observer ride-through covers intermittent fault durations.]",
    "expected_effect": "Transient voltage and frequency dips during highway operation are compensated by the LADRC observer and the cascade FOPIDN-(1 + TD) loop with QOAOA-optimized parameters, sustaining power to ignition, engine electronics, and the DVD player, eliminating sudden total power loss under load fluctuations, intermittency, and delay effects.",
    "mechanism_source_span": "This study investigates how a Dual Loop LADRC-FOPIDN-(1 + TD) controller can improve frequency regulation in a multi-area deregulated electricity system while taking RES's intermittent nature into account. By integrating LADRC with a cascade controller, the proposed approach delivers improved transient performance over selected benchmark controllers (LADRC, FOPIDN, FOPIDN-(1 + TD)) under the tested scenarios. Furthermore, an enhanced Quasi Opposition Arithmetic Optimization Algorithm (QOAOA) is employed to optimize controller parameters for improved efficiency. Simulation results highlight its strong adaptability to specific uncertainties modeled in this study, such as RES intermittency, load fluctuations, and delay effects, ensuring grid stability.",
    "span_derivation": {
@@ -295,7 +295,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Instantiate the Dual Loop LADRC-FOPIDN-(1 + TD) controller inside the vehicle power management unit, integrating LADRC with a cascade controller so the LADRC observer loop drives alternator field-current regulation and the cascade FOPIDN-(1 + TD) loop commands battery/load bus switching; employ the enhanced Quasi Opposition Arithmetic Optimization Algorithm (QOAOA) to optimize controller parameters, so intermittent faults, RES intermittency, load fluctuations, and delay effects are actively rejected in real time instead of collapsing the 12 V bus.",
+   "intervention": "Instantiate the Dual Loop LADRC-FOPIDN-(1 + TD) controller inside the vehicle power management unit, integrating LADRC with a cascade controller so the LADRC observer loop drives alternator field-current regulation and the cascade FOPIDN-(1 + TD) loop commands battery/load bus switching; employ the enhanced Quasi Opposition Arithmetic Optimization Algorithm (QOAOA) to optimize controller parameters, so intermittent faults, RES intermittency, load fluctuations, and delay effects are actively rejected in real time instead of collapsing the 12 V bus. [TECHNICAL MUTATION: The power management unit calibration is updated to set P-LADRC-OBSERVER-BANDWIDTH to 150.0, increasing observer aggressiveness to suppress DC-bus voltage dips while keeping P-DCBUS-VOLTAGE within [9.0, 16.0], P] [TECHNICAL MUTATION: In the vehicle power management unit, the Dual Loop LADRC-FOPIDN-(1 + TD) controller is instantiated with P-LADRC-OBSERVER-BANDWIDTH set to 175.0, keeping the QOAOA-tuned cascade FOPIDN-(1 + TD) battery/load bus switching loop intact while the faster observer ride-through covers intermittent fault durations.]",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -1838,5 +1838,800 @@
    }
   ]
  },
- "_spec_hash": "f4c899c1d0e081ad10544e11ce10ef855ebfc19f187cd0721f0c13ab9580dfeb"
+ "technical_state": {
+  "value": {
+   "version": "1.0.0",
+   "objects": [
+    {
+     "object_id": "OBJ-1",
+     "name": "vehicle electrical power system",
+     "role": "device under repair that suffers complete intermittent electrical power loss during highway operation"
+    },
+    {
+     "object_id": "OBJ-2",
+     "name": "LADRC controller (Linear Active Disturbance Rejection Control) observer loop",
+     "role": "drives alternator field-current regulation; estimates and compensates internal and external disturbances"
+    },
+    {
+     "object_id": "OBJ-3",
+     "name": "FOPIDN-(1 + TD) cascade controller",
+     "role": "fractional-order PID with a (1 + time-delay) element in a cascade arrangement; commands battery/load DC-bus switching to regulate DC-bus voltage"
+    },
+    {
+     "object_id": "OBJ-4",
+     "name": "Dual Loop LADRC-FOPIDN-(1 + TD) controller",
+     "role": "integrated control framework combining the LADRC observer loop with the FOPIDN-(1 + TD) cascade loop to jointly regulate frequency and DC-bus voltage"
+    },
+    {
+     "object_id": "OBJ-5",
+     "name": "enhanced Quasi Opposition Arithmetic Optimization Algorithm (QOAOA)",
+     "role": "metaheuristic optimizer that tunes the controller parameters for improved transient performance"
+    },
+    {
+     "object_id": "OBJ-6",
+     "name": "vehicle alternator (field winding)",
+     "role": "controlled actuator whose field current is regulated by the LADRC observer loop"
+    },
+    {
+     "object_id": "OBJ-7",
+     "name": "vehicle battery",
+     "role": "controlled actuator (DC-bus switching target) commanded by the FOPIDN-(1 + TD) cascade loop"
+    },
+    {
+     "object_id": "OBJ-8",
+     "name": "DC bus / load bus",
+     "role": "distribution node whose voltage is regulated to keep ignition, engine electronics, and the DVD player powered"
+    },
+    {
+     "object_id": "OBJ-9",
+     "name": "ignition, engine electronics, and DVD player",
+     "role": "critical loads whose power must be sustained during load fluctuations"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "P-LADRC-OBSERVER-BANDWIDTH",
+     "name": "LADRC observer bandwidth",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": 175.0,
+     "value_class": "MODELLED",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 1.0,
+     "range_max": 200.0,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "tunes how aggressively the LADRC observer tracks and rejects disturbances acting on the alternator field-current loop",
+     "is_design_variable": true,
+     "mutation_history": [
+      {
+       "from": null,
+       "to": 150.0,
+       "from_class": "UNKNOWN",
+       "to_class": "MODELLED",
+       "mutation_id": "tmut:7e19efa0dd1a"
+      },
+      {
+       "from": 150.0,
+       "to": 175.0,
+       "from_class": "MODELLED",
+       "to_class": "MODELLED",
+       "mutation_id": "tmut:373e3787e3af"
+      }
+     ]
+    },
+    {
+     "param_id": "P-FOPIDN-KP",
+     "name": "FOPIDN proportional gain",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.0,
+     "range_max": 50.0,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "proportional action of the cascade loop commanding battery/load bus switching",
+     "is_design_variable": true
+    },
+    {
+     "param_id": "P-FOPIDN-KI",
+     "name": "FOPIDN integral gain",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.0,
+     "range_max": 50.0,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "eliminates steady-state DC-bus voltage error caused by load fluctuations",
+     "is_design_variable": true
+    },
+    {
+     "param_id": "P-FOPIDN-KD",
+     "name": "FOPIDN derivative gain",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.0,
+     "range_max": 50.0,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "damps DC-bus voltage transients and oscillations",
+     "is_design_variable": true
+    },
+    {
+     "param_id": "P-FOPIDN-ORDER-LAMBDA",
+     "name": "FOPIDN fractional order lambda",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.0,
+     "range_max": 2.0,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "fractional-order integrator exponent shaping the cascade loop dynamics",
+     "is_design_variable": true
+    },
+    {
+     "param_id": "P-FOPIDN-ORDER-MU",
+     "name": "FOPIDN fractional order mu",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.0,
+     "range_max": 2.0,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "fractional-order differentiator exponent shaping the cascade loop dynamics",
+     "is_design_variable": true
+    },
+    {
+     "param_id": "P-CASCADE-TD",
+     "name": "cascade loop time delay (TD)",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "s",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.001,
+     "range_max": 2.0,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "delay explicitly included in the (1 + TD) element so the controller actively rejects time-delay effects",
+     "is_design_variable": true
+    },
+    {
+     "param_id": "P-DCBUS-VOLTAGE",
+     "name": "DC-bus voltage",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "V",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 9.0,
+     "range_max": 16.0,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "regulated output of the FOPIDN-(1 + TD) cascade loop that feeds the critical loads",
+     "is_design_variable": false
+    },
+    {
+     "param_id": "P-DCBUS-VOLTAGE-DIP",
+     "name": "DC-bus voltage dip magnitude during transient",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "V",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.0,
+     "range_max": 3.0,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "transient deviation to be minimized so the supply to ignition, engine electronics, and the DVD player is not interrupted",
+     "is_design_variable": false
+    },
+    {
+     "param_id": "P-LOAD-FREQUENCY-DEVIATION",
+     "name": "load frequency deviation",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "Hz",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.0,
+     "range_max": 1.0,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "frequency dip magnitude to be minimized during load fluctuations and intermittent faults",
+     "is_design_variable": false
+    },
+    {
+     "param_id": "P-INTERMITTENT-FAULT-DURATION",
+     "name": "intermittent fault duration",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "s",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.01,
+     "range_max": 5.0,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "worst-case duration the controller must ride through without total power loss",
+     "is_design_variable": true
+    }
+   ],
+   "constraints": [
+    {
+     "constraint_id": "C-DCBUS-MIN",
+     "target": "P-DCBUS-VOLTAGE",
+     "bound": ">=",
+     "limit": 9.0,
+     "unit": "V",
+     "limit_class": "MODELLED",
+     "limit_span": null,
+     "limit_evidence_id": null,
+     "justification": "Art. XXVII: no extracted threshold; 9 V is a physically reasonable lower bound for a 12 V automotive bus to keep ignition and engine electronics from dropping out."
+    },
+    {
+     "constraint_id": "C-DCBUS-MAX",
+     "target": "P-DCBUS-VOLTAGE",
+     "bound": "<=",
+     "limit": 16.0,
+     "unit": "V",
+     "limit_class": "MODELLED",
+     "limit_span": null,
+     "limit_evidence_id": null,
+     "justification": "Art. XXVII: no extracted threshold; 16 V is a physically reasonable upper bound for a 12 V automotive bus to protect loads and the DVD player from over-voltage."
+    },
+    {
+     "constraint_id": "C-FREQ-MAX-DEV",
+     "target": "P-LOAD-FREQUENCY-DEVIATION",
+     "bound": "<=",
+     "limit": 1.0,
+     "unit": "Hz",
+     "limit_class": "MODELLED",
+     "limit_span": null,
+     "limit_evidence_id": null,
+     "justification": "Art. XXVII: no extracted threshold; 1 Hz is a reasonable envelope deviation for a vehicle bus frequency under transient load."
+    },
+    {
+     "constraint_id": "C-VOLTAGE-DIP-MAX",
+     "target": "P-DCBUS-VOLTAGE-DIP",
+     "bound": "<=",
+     "limit": 3.0,
+     "unit": "V",
+     "limit_class": "MODELLED",
+     "limit_span": null,
+     "limit_evidence_id": null,
+     "justification": "Art. XXVII: no extracted threshold; 3 V dip is a reasonable transient envelope to keep critical electronics above dropout."
+    }
+   ],
+   "objectives": [
+    {
+     "objective_id": "O-1",
+     "target": "P-DCBUS-VOLTAGE-DIP",
+     "direction": "MINIMIZE",
+     "basis": "ties to the device failure: minimizing DC-bus voltage dip magnitude prevents the complete intermittent electrical power loss that would interrupt ignition, engine electronics, and the DVD player."
+    },
+    {
+     "objective_id": "O-2",
+     "target": "P-LOAD-FREQUENCY-DEVIATION",
+     "direction": "MINIMIZE",
+     "basis": "ties to the device failure: minimizing frequency deviation keeps the alternator-fed bus within tolerance so sudden total power loss under load fluctuations is eliminated."
+    },
+    {
+     "objective_id": "O-3",
+     "target": "P-DCBUS-VOLTAGE",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "ties to the device failure: holding the DC-bus voltage within its operating envelope is the direct mechanism that avoids sudden total power loss on the highway."
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "F-1",
+     "name": "complete intermittent electrical power loss of the vehicle electrical power system",
+     "problem_link": "the Dual Loop LADRC-FOPIDN-(1 + TD) controller with QOAOA-tuned parameters is designed to actively reject intermittent faults, RES/load intermittency, load fluctuations, and delay effects so that voltage and frequency dips are compensated and sudden total power loss is eliminated."
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "D-1",
+     "cause": "P-LADRC-OBSERVER-BANDWIDTH",
+     "effect": "P-DCBUS-VOLTAGE-DIP",
+     "direction": "DECREASES",
+     "statement": "a higher LADRC observer bandwidth improves disturbance estimation, which reduces the magnitude of the DC-bus voltage dip during transients.",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "D-2",
+     "cause": "P-LADRC-OBSERVER-BANDWIDTH",
+     "effect": "P-LOAD-FREQUENCY-DEVIATION",
+     "direction": "DECREASES",
+     "statement": "a higher LADRC observer bandwidth improves disturbance rejection on the alternator field-current loop, lowering load frequency deviation.",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "D-3",
+     "cause": "P-FOPIDN-KP",
+     "effect": "P-DCBUS-VOLTAGE-DIP",
+     "direction": "DECREASES",
+     "statement": "increasing the FOPIDN proportional gain speeds the cascade loop response to battery/load bus switching commands, reducing the voltage dip magnitude.",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "D-4",
+     "cause": "P-FOPIDN-KI",
+     "effect": "P-DCBUS-VOLTAGE",
+     "direction": "INCREASES",
+     "statement": "increasing the FOPIDN integral gain drives the steady-state DC-bus voltage toward its setpoint within the operating envelope.",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "D-5",
+     "cause": "P-FOPIDN-KD",
+     "effect": "P-DCBUS-VOLTAGE-DIP",
+     "direction": "DECREASES",
+     "statement": "increasing the FOPIDN derivative gain damps oscillations in the cascade loop, reducing the DC-bus voltage dip during transients.",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "D-6",
+     "cause": "P-FOPIDN-ORDER-LAMBDA",
+     "effect": "P-DCBUS-VOLTAGE-DIP",
+     "direction": "DECREASES",
+     "statement": "tuning the fractional integrator order lambda (within 0 to 2) shapes the cascade loop dynamics so that the voltage dip during intermittent faults is reduced.",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "D-7",
+     "cause": "P-FOPIDN-ORDER-MU",
+     "effect": "P-DCBUS-VOLTAGE-DIP",
+     "direction": "DECREASES",
+     "statement": "tuning the fractional differentiator order mu (within 0 to 2) shapes the cascade loop derivative action so that the voltage dip during transients is reduced.",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    }
+   ],
+   "extraction": {
+    "proposal_id": "tsp:2e5f2bed4658",
+    "provider": "xkiro",
+    "model": "minimax/minimax-m3:free",
+    "prompt_hash": "dbcc6ff5960e57fb222245117d02c638e8d14970b25c955148343e738290cb98",
+    "output_hash": "f5f6e1b24940880ab5af8e792578b4c4a4332c586820cc1e2dd23769f46e7dcc",
+    "llm_is_untrusted_proposer": true,
+    "validator": "technical_state_v1 (deterministic)",
+    "admitted_counts": {
+     "parameters": 11,
+     "parameters_with_value": 0,
+     "parameters_extracted": 0,
+     "parameters_modelled": 0,
+     "parameters_with_envelope": 11,
+     "constraints": 4,
+     "objectives": 3,
+     "dependencies": 7,
+     "objects": 9,
+     "failure_modes": 1
+    },
+    "dropped_pieces": [
+     {
+      "kind": "dependency",
+      "id": "D-8",
+      "gate": "D2",
+      "reason": "the span does not name both endpoints — it is not evidence for THIS relationship"
+     },
+     {
+      "kind": "dependency",
+      "id": "D-9",
+      "gate": "D2",
+      "reason": "EXTRACTED relation: span is NOT a verbatim substring of the evidence"
+     }
+    ],
+    "extracted_at": "2026-09-18T15:08:09+00:00Z"
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "TECHNICAL_STATE_EXTRACTION",
+  "evidence_ids": [],
+  "note": "structured technical state (R379): mutated design variables carry their value class; predictions are model inferences, never measurements"
+ },
+ "_technical_improvement": {
+  "parent_spec_hash": "0a2623f81ef58c867e4a07fd36be3748c73db4428b5dcd44c771cbd24fc56692",
+  "mutation": {
+   "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+   "mutation_id": "tmut:373e3787e3af",
+   "mutation_kind": "PARAMETER_CHANGE",
+   "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+   "diagnostic_trigger": {
+    "evaluator": "analytical_monotone_v1 (deterministic)",
+    "limiting_variable": "P-LADRC-OBSERVER-BANDWIDTH",
+    "improving_direction": "INCREASE",
+    "evaluation_computation_log": {
+     "evaluator_id": "analytical_monotone_v1",
+     "fidelity_tier": "STRUCTURED_CONSTRAINT",
+     "evidence_rank": 3,
+     "input_state_sha256": "d070f804f41694528d8a2a5ca38caf55b38939cd0bb019e38784033b94b6458b",
+     "conventions": [
+      {
+       "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+       "epistemic_class": "ENGINEERING",
+       "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+       "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+      },
+      {
+       "name": "DIRECTIONAL_FAIL_CLOSED",
+       "epistemic_class": "ENGINEERING",
+       "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+       "uncertainty": "direction-level only at this tier"
+      }
+     ],
+     "steps": [
+      "resolved objective P-DCBUS-VOLTAGE-DIP (MINIMIZE)",
+      "checked 4 constraint(s) numerically where values exist",
+      "propagated signs over 7 relation(s)",
+      "ranked 5 movable improving direction(s)"
+     ],
+     "computed_at": "2026-09-18T15:09:43+00:00Z",
+     "deterministic": true
+    }
+   },
+   "quantitative_diagnosis": {
+    "engaged": false,
+    "status": "UNQUANTIFIED",
+    "note": "no bound equation named a limiting variable"
+   },
+   "proposal_provenance": {
+    "proposal_id": "tmp:067341424f26",
+    "provider": "zai",
+    "model": "Atria-Dawn-Preview",
+    "prompt_hash": "9a95e95a26c4e4612dff67ed5de3ce3bf66387d2e0d718f6a8eb02d7b2c95a33",
+    "output_hash": "8a2eaa721182dd413d76e74f82b6f05897679d47d144e02210feab988d46416f",
+    "origin": "UNTRUSTED_LLM_PROPOSER",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "mutation_kind": "PARAMETER_CHANGE",
+    "target_param": "P-LADRC-OBSERVER-BANDWIDTH",
+    "checks": {
+     "mutation_kind_valid": "PARAMETER_CHANGE",
+     "target_is_limiting_variable": "P-LADRC-OBSERVER-BANDWIDTH",
+     "target_exists": true,
+     "target_is_design_variable": true,
+     "kind_matches_category": true,
+     "envelope_declared": [
+      1.0,
+      200.0
+     ],
+     "direction_matches_evaluator": "INCREASE",
+     "new_value_numeric": 175.0,
+     "value_inside_envelope": "[1.0, 200.0]",
+     "mutation_changes_value": true,
+     "value_class_declared": "MODELLED",
+     "spec_text_sync": "The LADRC observer bandwidth parameter P-LADRC-OBSERVER-BANDWIDTH is raised from | In the vehicle power management unit, the Dual Loop LADRC-FOPIDN-(1 + TD) contro",
+     "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+    },
+    "reasons": [],
+    "validated_at": "2026-09-18T15:09:43+00:00Z"
+   },
+   "changed_variable": {
+    "param_id": "P-LADRC-OBSERVER-BANDWIDTH",
+    "name": "LADRC observer bandwidth",
+    "from_value": 150.0,
+    "to_value": 175.0,
+    "from_class": "MODELLED",
+    "to_class": "MODELLED",
+    "envelope": [
+     1.0,
+     200.0
+    ],
+    "envelope_class": "MODELLED"
+   },
+   "spec_text_delta": {
+    "mechanism": "The LADRC observer bandwidth parameter P-LADRC-OBSERVER-BANDWIDTH is raised from 150.0 to 175.0 so the observer loop tracks alternator field-current disturbances more aggressively and suppresses DC-bus voltage dips before the bus collapses.",
+    "intervention": "In the vehicle power management unit, the Dual Loop LADRC-FOPIDN-(1 + TD) controller is instantiated with P-LADRC-OBSERVER-BANDWIDTH set to 175.0, keeping the QOAOA-tuned cascade FOPIDN-(1 + TD) battery/load bus switching loop intact while the faster observer ride-through covers intermittent fault durations."
+   },
+   "cad_rebuild": null,
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "vehicle electrical power active system highway",
+     "vehicle electrical power active system highway",
+     "active disturbance rejection control integrating cascade",
+     "active disturbance rejection control integrating cascade",
+     "vehicle power electrical controller ladrc fopidn dual loop",
+     "vehicle power electrical controller ladrc fopidn dual loop",
+     "vehicle during operation sustaining ignition eliminating",
+     "vehicle during operation sustaining ignition eliminating",
+     "transient voltage frequency operation compensated sustaining",
+     "transient voltage frequency operation compensated sustaining"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "0a2623f81ef58c867e4a07fd36be3748c73db4428b5dcd44c771cbd24fc56692",
+   "reason": "Raising the LADRC observer bandwidth from 150.0 to 175.0 accelerates observer-based estimation and rejection of field-current and load-switching disturbances, which is predicted to shrink the transient DC-bus voltage dip during intermittent faults so total highway power loss is averted.",
+   "applied_at": "2026-09-18T15:09:43+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+    "mutation_id": "tmut:7e19efa0dd1a",
+    "mutation_kind": "PARAMETER_CHANGE",
+    "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+    "diagnostic_trigger": {
+     "evaluator": "analytical_monotone_v1 (deterministic)",
+     "limiting_variable": "P-LADRC-OBSERVER-BANDWIDTH",
+     "improving_direction": "INCREASE",
+     "evaluation_computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "0bfaacfa94b091c885698eb27596ca7fea0a18bd35e52f1dd87f6810dda9def4",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective P-DCBUS-VOLTAGE-DIP (MINIMIZE)",
+       "checked 4 constraint(s) numerically where values exist",
+       "propagated signs over 7 relation(s)",
+       "ranked 5 movable improving direction(s)"
+      ],
+      "computed_at": "2026-09-18T15:09:07+00:00Z",
+      "deterministic": true
+     }
+    },
+    "quantitative_diagnosis": {
+     "engaged": false,
+     "status": "UNQUANTIFIED",
+     "note": "no bound equation named a limiting variable"
+    },
+    "proposal_provenance": {
+     "proposal_id": "tmp:ccad0bd0b5e4",
+     "provider": "zai",
+     "model": "Atria-Dawn-Preview",
+     "prompt_hash": "408cc1eb799193d8b56b0d7e720eb1a5ba7385285fbb9bcbf8a2bf3228f44031",
+     "output_hash": "c18de31e678790d1f527e5c79893337939fa629c231620360ccfe115c0ce5846",
+     "origin": "UNTRUSTED_LLM_PROPOSER",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "mutation_kind": "PARAMETER_CHANGE",
+     "target_param": "P-LADRC-OBSERVER-BANDWIDTH",
+     "checks": {
+      "mutation_kind_valid": "PARAMETER_CHANGE",
+      "target_is_limiting_variable": "P-LADRC-OBSERVER-BANDWIDTH",
+      "target_exists": true,
+      "target_is_design_variable": true,
+      "kind_matches_category": true,
+      "envelope_declared": [
+       1.0,
+       200.0
+      ],
+      "direction_matches_evaluator": "INCREASE",
+      "new_value_numeric": 150.0,
+      "value_inside_envelope": "[1.0, 200.0]",
+      "mutation_changes_value": true,
+      "value_class_declared": "MODELLED",
+      "spec_text_sync": "The LADRC observer bandwidth (P-LADRC-OBSERVER-BANDWIDTH) is increased to 150.0  | The power management unit calibration is updated to set P-LADRC-OBSERVER-BANDWID",
+      "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-18T15:09:07+00:00Z"
+    },
+    "changed_variable": {
+     "param_id": "P-LADRC-OBSERVER-BANDWIDTH",
+     "name": "LADRC observer bandwidth",
+     "from_value": null,
+     "to_value": 150.0,
+     "from_class": "UNKNOWN",
+     "to_class": "MODELLED",
+     "envelope": [
+      1.0,
+      200.0
+     ],
+     "envelope_class": "MODELLED"
+    },
+    "spec_text_delta": {
+     "mechanism": "The LADRC observer bandwidth (P-LADRC-OBSERVER-BANDWIDTH) is increased to 150.0 within the modelled [1.0, 200.0] envelope so the observer loop faster estimates and rejects disturbances, minimizing transient DC-bus voltage dip during highway intermittent fault ride-through.",
+     "intervention": "The power management unit calibration is updated to set P-LADRC-OBSERVER-BANDWIDTH to 150.0, increasing observer aggressiveness to suppress DC-bus voltage dips while keeping P-DCBUS-VOLTAGE within [9.0, 16.0], P"
+    },
+    "cad_rebuild": null,
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "vehicle electrical power active system highway",
+      "vehicle electrical power active system highway",
+      "active disturbance rejection control integrating cascade",
+      "active disturbance rejection control integrating cascade",
+      "vehicle power electrical controller ladrc fopidn dual loop",
+      "vehicle power electrical controller ladrc fopidn dual loop",
+      "vehicle during operation sustaining ignition eliminating",
+      "vehicle during operation sustaining ignition eliminating",
+      "transient voltage frequency operation compensated sustaining",
+      "transient voltage frequency operation compensated sustaining"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "5d55d01801199cae7e65902b438ea047d7b0f4a02fa55f6efb8699fd551a5942",
+    "reason": "Raising the LADRC observer bandwidth to 150.0 makes the observer track and reject alternator and load disturbances acting on the DC bus more aggressively, which decreases P-DCBUS-VOLTAGE-DIP and helps the system ride through intermittent faults without total power loss.",
+    "applied_at": "2026-09-18T15:09:07+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+    "mutation_id": "tmut:373e3787e3af",
+    "mutation_kind": "PARAMETER_CHANGE",
+    "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+    "diagnostic_trigger": {
+     "evaluator": "analytical_monotone_v1 (deterministic)",
+     "limiting_variable": "P-LADRC-OBSERVER-BANDWIDTH",
+     "improving_direction": "INCREASE",
+     "evaluation_computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "d070f804f41694528d8a2a5ca38caf55b38939cd0bb019e38784033b94b6458b",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective P-DCBUS-VOLTAGE-DIP (MINIMIZE)",
+       "checked 4 constraint(s) numerically where values exist",
+       "propagated signs over 7 relation(s)",
+       "ranked 5 movable improving direction(s)"
+      ],
+      "computed_at": "2026-09-18T15:09:43+00:00Z",
+      "deterministic": true
+     }
+    },
+    "quantitative_diagnosis": {
+     "engaged": false,
+     "status": "UNQUANTIFIED",
+     "note": "no bound equation named a limiting variable"
+    },
+    "proposal_provenance": {
+     "proposal_id": "tmp:067341424f26",
+     "provider": "zai",
+     "model": "Atria-Dawn-Preview",
+     "prompt_hash": "9a95e95a26c4e4612dff67ed5de3ce3bf66387d2e0d718f6a8eb02d7b2c95a33",
+     "output_hash": "8a2eaa721182dd413d76e74f82b6f05897679d47d144e02210feab988d46416f",
+     "origin": "UNTRUSTED_LLM_PROPOSER",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "mutation_kind": "PARAMETER_CHANGE",
+     "target_param": "P-LADRC-OBSERVER-BANDWIDTH",
+     "checks": {
+      "mutation_kind_valid": "PARAMETER_CHANGE",
+      "target_is_limiting_variable": "P-LADRC-OBSERVER-BANDWIDTH",
+      "target_exists": true,
+      "target_is_design_variable": true,
+      "kind_matches_category": true,
+      "envelope_declared": [
+       1.0,
+       200.0
+      ],
+      "direction_matches_evaluator": "INCREASE",
+      "new_value_numeric": 175.0,
+      "value_inside_envelope": "[1.0, 200.0]",
+      "mutation_changes_value": true,
+      "value_class_declared": "MODELLED",
+      "spec_text_sync": "The LADRC observer bandwidth parameter P-LADRC-OBSERVER-BANDWIDTH is raised from | In the vehicle power management unit, the Dual Loop LADRC-FOPIDN-(1 + TD) contro",
+      "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-18T15:09:43+00:00Z"
+    },
+    "changed_variable": {
+     "param_id": "P-LADRC-OBSERVER-BANDWIDTH",
+     "name": "LADRC observer bandwidth",
+     "from_value": 150.0,
+     "to_value": 175.0,
+     "from_class": "MODELLED",
+     "to_class": "MODELLED",
+     "envelope": [
+      1.0,
+      200.0
+     ],
+     "envelope_class": "MODELLED"
+    },
+    "spec_text_delta": {
+     "mechanism": "The LADRC observer bandwidth parameter P-LADRC-OBSERVER-BANDWIDTH is raised from 150.0 to 175.0 so the observer loop tracks alternator field-current disturbances more aggressively and suppresses DC-bus voltage dips before the bus collapses.",
+     "intervention": "In the vehicle power management unit, the Dual Loop LADRC-FOPIDN-(1 + TD) controller is instantiated with P-LADRC-OBSERVER-BANDWIDTH set to 175.0, keeping the QOAOA-tuned cascade FOPIDN-(1 + TD) battery/load bus switching loop intact while the faster observer ride-through covers intermittent fault durations."
+    },
+    "cad_rebuild": null,
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "vehicle electrical power active system highway",
+      "vehicle electrical power active system highway",
+      "active disturbance rejection control integrating cascade",
+      "active disturbance rejection control integrating cascade",
+      "vehicle power electrical controller ladrc fopidn dual loop",
+      "vehicle power electrical controller ladrc fopidn dual loop",
+      "vehicle during operation sustaining ignition eliminating",
+      "vehicle during operation sustaining ignition eliminating",
+      "transient voltage frequency operation compensated sustaining",
+      "transient voltage frequency operation compensated sustaining"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "0a2623f81ef58c867e4a07fd36be3748c73db4428b5dcd44c771cbd24fc56692",
+    "reason": "Raising the LADRC observer bandwidth from 150.0 to 175.0 accelerates observer-based estimation and rejection of field-current and load-switching disturbances, which is predicted to shrink the transient DC-bus voltage dip during intermittent faults so total highway power loss is averted.",
+    "applied_at": "2026-09-18T15:09:43+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "418b68267ab07a4d1140fd0d9c802678713471944669d92ae442a5db6b0c8999"
 }

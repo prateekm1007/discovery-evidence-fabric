@@ -30,11 +30,47 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Breaking an infrared beam of light sensed by a photodiode, with the photodiodes connected to comparators, yields a discrete direction-resolved electrical signal that a controller uses to govern automated door actuation.",
-   "intervention": "Add an infrared emitter/photodiode pair with comparator across the Odyssey sliding door latch and feed its beam-break output into the powertrain control module as a verified latch-state interlock: above a motion threshold the unlatch signal inhibits the engine-shutdown command and issues a driver alert instead of stalling, while permitting normal door actuation when stationary.",
-   "expected_effect": "An unintended sliding-door unlatch at 65 mph is detected and converted into a hold/warning action, so the engine continues running during vehicle motion while sliding door operation is preserved when parked.",
-   "mechanism_source_span": "This system works on the principle of breaking an infrared beam of light, sensed by a photodiode.",
-   "span_derivation": null
+   "mechanism": "The mechanism is breaking an infrared beam of light, sensed by a photodiode; two transmitting infrared diodes and two receiving photo-diodes are connected to comparators, which give a lower output when the beam is broken and high output when transmitting normally, and a controller uses that verified beam-break state to govern automated sliding-door actuation.",
+   "intervention": "Mount two transmitting infrared diodes and two receiving photo-diodes with their comparators across the Odyssey sliding-door latch, then feed the comparator output into the powertrain control module as a verified latch-state interlock: above a motion threshold, a lower output from the broken beam inhibits the engine-shutdown command and issues a driver alert instead of stalling, while a high output permits normal door actuation when stationary.",
+   "expected_effect": "An unintended sliding-door unlatch at 65 mph is detected as a lower output from the broken infrared beam and converted into a hold/warning action, so the engine continues running during vehicle motion while sliding-door operation is preserved when parked.",
+   "mechanism_source_span": "This system works on the principle of breaking an infrared beam of light, sensed by a photodiode. It consists of two transmitting infrared diodes and two receiving photo-diodes. The first one is for someone coming in and the second one is for someone going out of the room. The photodiodes are connected to comparators, which give a lower output when the beam is broken and high output when transmitting normally.",
+   "span_derivation": {
+    "n_shared": 21,
+    "shared_terms": [
+     "beam",
+     "breaking",
+     "broken",
+     "comparator",
+     "connected",
+     "diode",
+     "give",
+     "high",
+     "infrared",
+     "light",
+     "lower",
+     "normally",
+     "output",
+     "photo",
+     "photodiode",
+     "receiving",
+     "sensed",
+     "transmitting",
+     "two",
+     "when"
+    ],
+    "span_terms_n": 34,
+    "ratio": 0.618,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "Induce a sliding-door unlatch at 65 mph with the interlock active; if the engine stalls, or if the door fails to actuate normally when stationary, the candidate is falsified.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.48550/arxiv.1303.1728",
+     "source_span": "This system works on the principle of breaking an infrared beam of light, sensed by a photodiode. It consists of two transmitting infrared diodes and two receiving photo-diodes. The first one is for someone coming in and the second one is for someone going out of the room. The photodiodes are connected to comparators, which give a lower output when the beam is broken and high output when transmitting normally."
+    }
+   }
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
@@ -249,7 +285,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Add an infrared emitter/photodiode pair with comparator across the Odyssey sliding door latch and feed its beam-break output into the powertrain control module as a verified latch-state interlock: above a motion threshold the unlatch signal inhibits the engine-shutdown command and issues a driver alert instead of stalling, while permitting normal door actuation when stationary.",
+   "intervention": "Mount two transmitting infrared diodes and two receiving photo-diodes with their comparators across the Odyssey sliding-door latch, then feed the comparator output into the powertrain control module as a verified latch-state interlock: above a motion threshold, a lower output from the broken beam inhibits the engine-shutdown command and issues a driver alert instead of stalling, while a high output permits normal door actuation when stationary.",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -264,7 +300,19 @@
  "constraints": {
   "value": {
    "stated_constraint": "any solution must prevent unintended engine shutdown during vehicle motion while preserving sliding door operation",
-   "failure_mode_of_device": "unintended engine stall from sliding door unlatch"
+   "failure_mode_of_device": "unintended engine stall from sliding door unlatch",
+   "evidence_derived": [
+    {
+     "constraint": "Because the comparators give a lower output when the beam is broken and high output when transmitting normally, the interlock must treat a low comparator output as the verified unlatch state and inhibit the engine-shutdown command above the motion threshold while leaving door actuation unaffected when stationary.",
+     "evidence_id": "doi:10.48550/arxiv.1303.1728",
+     "span": "This system works on the principle of breaking an infrared beam of light, sensed by a photodiode. It consists of two transmitting infrared diodes and two receiving photo-diodes. The first one is for someone coming in and the second one is for someone going out of the room. The photodiodes are connec"
+    },
+    {
+     "constraint": "The latch-state interlock shall interpret a lower comparator output as a verified broken infrared beam and a high comparator output as normal transmission, and only the verified broken-beam state may inhibit engine shutdown above the motion threshold.",
+     "evidence_id": "doi:10.48550/arxiv.1303.1728",
+     "span": "This system works on the principle of breaking an infrared beam of light, sensed by a photodiode. It consists of two transmitting infrared diodes and two receiving photo-diodes. The first one is for someone coming in and the second one is for someone going out of the room. The photodiodes are connec"
+    }
+   ]
   },
   "epistemic_class": "SOURCE_FACT",
   "origin_stage": "PROBLEM",
@@ -1065,10 +1113,219 @@
   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
   "verdict": "CONTESTED"
  },
- "_spec_hash": "735b6048dfcb41339c8de676c66d55340787e4c90c3d7fe13e3263f9e511620c",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
   "checked_at": "2026-09-18T15:04:03+00:00Z"
- }
+ },
+ "_improvement": {
+  "parent_spec_hash": "d866b9744948127dd8d26849f73480061fa5a89ec8bf37e9f61779ee75c82a84",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:b5c0171d015c",
+   "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.362,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:4f96c180b37f",
+    "provider": "zai",
+    "model": "Atria-Dawn-Preview",
+    "prompt_hash": "a4ccd86420613ac2a9047787404fd3a0e9163fce9ece423d19013be756df11ba",
+    "output_hash": "4f96c180b37fc6b2b61269ed3f0f5fc420e5342900aa42dfb24b349cf8a951c4",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.48550/arxiv.1303.1728",
+     "span_verbatim_in_evidence": true,
+     "evidence_support": 0.418,
+     "evidence_support_cleared": 0.418,
+     "constraint_traceable_to_evidence": "The latch-state interlock shall interpret a lower comparator output as a verified broken infrared beam and a high compar"
+    },
+    "reasons": [],
+    "validated_at": "2026-09-18T15:09:12+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "An infrared beam of light is broken and sensed by a photodiode; two transmitting infrared diodes and two receiving photo-diodes feed comparators, which give a lower output when the beam is broken and high output when transmitting normally, and a controller uses that discrete direction-resolved elect",
+     "after": "The mechanism is breaking an infrared beam of light, sensed by a photodiode; two transmitting infrared diodes and two receiving photo-diodes are connected to comparators, which give a lower output when the beam is broken and high output when transmitting normally, and a controller uses that verified"
+    },
+    "intervention": {
+     "before": "Mount two transmitting infrared diodes and two receiving photo-diodes with their comparators across the Odyssey sliding door latch, and because the comparators give a lower output when the beam is broken and high output when transmitting normally, feed that beam-break output into the powertrain cont",
+     "after": "Mount two transmitting infrared diodes and two receiving photo-diodes with their comparators across the Odyssey sliding-door latch, then feed the comparator output into the powertrain control module as a verified latch-state interlock: above a motion threshold, a lower output from the broken beam in"
+    },
+    "mechanism_source_span": {
+     "before": "This system works on the principle of breaking an infrared beam of light, sensed by a photodiode. It consists of two transmitting infrared diodes and two receiving photo-diodes. The first one is for someone coming in and the second one is for someone going out of the room. The photodiodes are connec",
+     "after": "This system works on the principle of breaking an infrared beam of light, sensed by a photodiode. It consists of two transmitting infrared diodes and two receiving photo-diodes. The first one is for someone coming in and the second one is for someone going out of the room. The photodiodes are connec"
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "door sliding odyssey powertrain interlock yield",
+     "door sliding odyssey powertrain interlock yield",
+     "door yields uses breaking infrared photodiode",
+     "door yields uses breaking infrared photodiode",
+     "door sliding odyssey powertrain interlock infrared photodiode comparator",
+     "door sliding odyssey powertrain interlock infrared photodiode comparator",
+     "door detection sliding warning action running",
+     "door detection sliding warning action running",
+     "detected converted warning continues running operation",
+     "detected converted warning continues running operation"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "d866b9744948127dd8d26849f73480061fa5a89ec8bf37e9f61779ee75c82a84",
+   "child_spec_hash": null,
+   "reason": "This repairs the measured evidence-derivation weakness by anchoring the mechanism and intervention in the cited evidence's verbatim infrared-beam, photodiode, and comparator vocabulary and by deriving the interlock constraint from that quoted span.",
+   "applied_at": "2026-09-18T15:09:12+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:44f7880df466",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.082,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:f04e29941545",
+     "provider": "zai",
+     "model": "Atria-Dawn-Preview",
+     "prompt_hash": "65cef48db785aa15ca94715b6b7c29925fc057c77c0c1427c73d400783e6f5e7",
+     "output_hash": "f04e29941545c7f4ce4dd03e163c15b8ce8e53f0001e9e601faa38ae4ae86621",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.48550/arxiv.1303.1728",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.379,
+      "evidence_support_cleared": 0.379,
+      "constraint_traceable_to_evidence": "Because the comparators give a lower output when the beam is broken and high output when transmitting normally, the inte"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-18T15:06:24+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Breaking an infrared beam of light sensed by a photodiode, with the photodiodes connected to comparators, yields a discrete direction-resolved electrical signal that a controller uses to govern automated door actuation.",
+      "after": "An infrared beam of light is broken and sensed by a photodiode; two transmitting infrared diodes and two receiving photo-diodes feed comparators, which give a lower output when the beam is broken and high output when transmitting normally, and a controller uses that discrete direction-resolved elect"
+     },
+     "intervention": {
+      "before": "Add an infrared emitter/photodiode pair with comparator across the Odyssey sliding door latch and feed its beam-break output into the powertrain control module as a verified latch-state interlock: above a motion threshold the unlatch signal inhibits the engine-shutdown command and issues a driver al",
+      "after": "Mount two transmitting infrared diodes and two receiving photo-diodes with their comparators across the Odyssey sliding door latch, and because the comparators give a lower output when the beam is broken and high output when transmitting normally, feed that beam-break output into the powertrain cont"
+     },
+     "mechanism_source_span": {
+      "before": "This system works on the principle of breaking an infrared beam of light, sensed by a photodiode.",
+      "after": "This system works on the principle of breaking an infrared beam of light, sensed by a photodiode. It consists of two transmitting infrared diodes and two receiving photo-diodes. The first one is for someone coming in and the second one is for someone going out of the room. The photodiodes are connec"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "door sliding odyssey powertrain interlock yield",
+      "door sliding odyssey powertrain interlock yield",
+      "door yields uses breaking infrared photodiode",
+      "door yields uses breaking infrared photodiode",
+      "door sliding odyssey powertrain interlock infrared photodiode comparator",
+      "door sliding odyssey powertrain interlock infrared photodiode comparator",
+      "door detection sliding warning action running",
+      "door detection sliding warning action running",
+      "detected converted warning continues running operation",
+      "detected converted warning continues running operation"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "735b6048dfcb41339c8de676c66d55340787e4c90c3d7fe13e3263f9e511620c",
+    "child_spec_hash": null,
+    "reason": "The measured I1_MECHANISM_EVIDENCE_DERIVATION defect (0.082, underived vocabulary) is repaired by re-anchoring the mechanism and intervention in a verbatim span whose own terms — infrared beam of light, photodiode, transmitting infrared diodes, receiving photo-diodes, comparators, lower output when the beam is broken — now carry the mechanism, with the derived constraint taken from that same span.",
+    "applied_at": "2026-09-18T15:06:24+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:b5c0171d015c",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.362,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:4f96c180b37f",
+     "provider": "zai",
+     "model": "Atria-Dawn-Preview",
+     "prompt_hash": "a4ccd86420613ac2a9047787404fd3a0e9163fce9ece423d19013be756df11ba",
+     "output_hash": "4f96c180b37fc6b2b61269ed3f0f5fc420e5342900aa42dfb24b349cf8a951c4",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.48550/arxiv.1303.1728",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.418,
+      "evidence_support_cleared": 0.418,
+      "constraint_traceable_to_evidence": "The latch-state interlock shall interpret a lower comparator output as a verified broken infrared beam and a high compar"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-18T15:09:12+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "An infrared beam of light is broken and sensed by a photodiode; two transmitting infrared diodes and two receiving photo-diodes feed comparators, which give a lower output when the beam is broken and high output when transmitting normally, and a controller uses that discrete direction-resolved elect",
+      "after": "The mechanism is breaking an infrared beam of light, sensed by a photodiode; two transmitting infrared diodes and two receiving photo-diodes are connected to comparators, which give a lower output when the beam is broken and high output when transmitting normally, and a controller uses that verified"
+     },
+     "intervention": {
+      "before": "Mount two transmitting infrared diodes and two receiving photo-diodes with their comparators across the Odyssey sliding door latch, and because the comparators give a lower output when the beam is broken and high output when transmitting normally, feed that beam-break output into the powertrain cont",
+      "after": "Mount two transmitting infrared diodes and two receiving photo-diodes with their comparators across the Odyssey sliding-door latch, then feed the comparator output into the powertrain control module as a verified latch-state interlock: above a motion threshold, a lower output from the broken beam in"
+     },
+     "mechanism_source_span": {
+      "before": "This system works on the principle of breaking an infrared beam of light, sensed by a photodiode. It consists of two transmitting infrared diodes and two receiving photo-diodes. The first one is for someone coming in and the second one is for someone going out of the room. The photodiodes are connec",
+      "after": "This system works on the principle of breaking an infrared beam of light, sensed by a photodiode. It consists of two transmitting infrared diodes and two receiving photo-diodes. The first one is for someone coming in and the second one is for someone going out of the room. The photodiodes are connec"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "door sliding odyssey powertrain interlock yield",
+      "door sliding odyssey powertrain interlock yield",
+      "door yields uses breaking infrared photodiode",
+      "door yields uses breaking infrared photodiode",
+      "door sliding odyssey powertrain interlock infrared photodiode comparator",
+      "door sliding odyssey powertrain interlock infrared photodiode comparator",
+      "door detection sliding warning action running",
+      "door detection sliding warning action running",
+      "detected converted warning continues running operation",
+      "detected converted warning continues running operation"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "d866b9744948127dd8d26849f73480061fa5a89ec8bf37e9f61779ee75c82a84",
+    "child_spec_hash": null,
+    "reason": "This repairs the measured evidence-derivation weakness by anchoring the mechanism and intervention in the cited evidence's verbatim infrared-beam, photodiode, and comparator vocabulary and by deriving the interlock constraint from that quoted span.",
+    "applied_at": "2026-09-18T15:09:12+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "1630daac3960ac6a48d1198aa7450cbf169297230d7b95675091aaaf324d63a6"
 }
