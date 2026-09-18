@@ -1,0 +1,86 @@
+{
+  "artifact_type": "R509_KEY_BUDGET_LEDGER",
+  "track": "11 — key-budget coordination ledger (records-only, fingerprints, zero values)",
+  "directive_anchor": "Coder directive: all bottlenecks, one ordered campaign — parallel track 11",
+  "purpose": "per-line debit accounting against the shared metered bucket + reserve floor, so seal-scale spends stop consuming each other's headroom blind (bottleneck 7 process fix)",
+  "custody_rule": "Art. LXXVI: values live ONLY in the HF Space secret surface (the custody vault of record) or an operator-supplied channel; this ledger records NAMES + FINGERPRINTS + typed states, never values (BS-021). A value not held in a session is REGISTERED_ABSENT_VALUE_NOT_HELD and is never fabricated.",
+  "keys": [
+    {
+      "name": "PATENTBEAR_OLD",
+      "fingerprint_sha256_12": "561b6e70f5b5",
+      "provider": "patentbear",
+      "status": "RETIRED_BY_PROVIDER",
+      "measured_basis": "401 isError 'Authentication required' through the production-mirroring transport (R505); the 401 debits nothing",
+      "budget": "n/a (credential retired)"
+    },
+    {
+      "name": "PATENTBEAR_ACTIVE",
+      "fingerprint_sha256_12": "50fe7b3d569bb1",
+      "provider": "patentbear",
+      "status": "POOL_EXHAUSTED_MEASURED",
+      "budget_state": {
+        "bucket_size": 20,
+        "used": 19,
+        "remaining": 1,
+        "reserve_floor": 2,
+        "remaining_below_floor": true,
+        "full_battery_requirement_on_one_key": 8,
+        "measured_at_round": "R505",
+        "note": "the last debit is PRESERVED (not probed) per the R504 floor decision; the sole unblock is a fresh operator key supply"
+      }
+    },
+    {
+      "name": "HF_TOKEN",
+      "fingerprint_form": "len 37, prefix hf_MrZ… suffix …NkNM (R505 recorded form)",
+      "provider": "huggingface",
+      "status": "REGISTERED_ABSENT_VALUE_NOT_HELD_THIS_CONTAINER",
+      "measured_basis": "held in the R505 session vault; this session's local vault was lost to the environment rollback (the R509-C2 recovery disclosure); the HF Space secret surface remains the custody vault of record",
+      "budget_state": {"note": "HF credits decision for the funded ring: owner-gated, unchanged"}
+    },
+    {
+      "name": "GITHUB_TOKEN",
+      "fingerprint_sha256_12": "f1ebca5f9b62",
+      "provider": "github",
+      "status": "HELD_THIS_SESSION_VIA_GITCREDS",
+      "measured_basis": "sha256(12) of the .gitcreds token matches the registered f1ebca5f9b622f3e (R497/R503/R505 lineage); push credential only",
+      "budget_state": {"metered": false}
+    },
+    {
+      "name": "UNOROUTER_KEY",
+      "fingerprint": "not registered here (the Space's own secret)",
+      "provider": "unorouter",
+      "status": "AUTH_FAILURE_MEASURED_R505",
+      "measured_basis": "the Space's key refused (glm-5.3:free unreachable) — owner-gated re-supply escalated (LXV)",
+      "budget_state": {"note": "the flagship free ring rung (glm-5.3:free) is gated on this"}
+    },
+    {
+      "name": "ELSEVIER_VALUE",
+      "fingerprint": "not held outside a sealing session (standing)",
+      "provider": "elsevier",
+      "status": "SEALING_SESSION_ONLY",
+      "measured_basis": "the standing typing (R502/R505): the value exists only in a sealing session when supplied"
+    }
+  ],
+  "debit_log": [
+    {
+      "round": "R509-C2 (this round)",
+      "line": "Coder 1 (the R508/R509-C1 lineage)",
+      "metered_debits": 0,
+      "note": "observer-side round: no metered provider touched (the autopsy/watchdog/rehearsal run on durable bytes + public GETs only)"
+    },
+    {
+      "round": "R509 (sibling line)",
+      "line": "main session — Coder line",
+      "metered_debits": 0,
+      "note": "the preservation capture was 12 GETs against the Space's own API; zero PatentBear/Elsevier debits"
+    },
+    {
+      "round": "R505",
+      "line": "Coder 1",
+      "metered_debits": 0,
+      "note": "the 401 debits nothing; the active key's last debit preserved; the A2 gauntlet constructs no metered provider"
+    }
+  ],
+  "coordination_rule": "any line planning a metered spend MUST record the intended debit here FIRST (key name + count) and reconcile the bucket state after; a spend that would take remaining below the floor is refused by discipline (the R504 floor decision) and escalated (LXV)",
+  "reviewer_provenance": "AI_REVIEW"
+}

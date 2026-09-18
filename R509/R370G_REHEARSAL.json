@@ -1,0 +1,123 @@
+{
+ "artifact_type": "R509_R370G_DOOR_REHEARSAL",
+ "track": "10 \u2014 R370G door rehearsal (rehearsal-only, never promoting)",
+ "door": "validate -> ingest -> ledger -> decide -> learn",
+ "stages": {
+  "validate": {
+   "accept_case": {
+    "violations": [],
+    "valid": true
+   },
+   "kill_case": {
+    "violations": [],
+    "valid": true
+   },
+   "reject_case": {
+    "violations": [
+     "missing mandatory field: attestation"
+    ],
+    "rejected": true,
+    "note": "a missing provenance field is rejected \u2014 no observation enters without provenance"
+   }
+  },
+  "ingest_ledger": {
+   "ingest_keep": {
+    "ingested": true,
+    "entry_sha256": "837e945587d78a8147ecc86a037d6dabf75294eb055f744e18a3dea290957488",
+    "ledger_entry_count": 1,
+    "real_event_count": 0
+   },
+   "ingest_kill": {
+    "ingested": true,
+    "entry_sha256": "f80adc0965b8223bcd2d4d8c57e3122556aca9028abecd810ef1af5c1661c3c5",
+    "ledger_entry_count": 2,
+    "real_event_count": 0
+   },
+   "double_entry_rejected": true,
+   "broken_event_rejected": true,
+   "ledger_verify": {
+    "valid": true,
+    "entries": 2
+   },
+   "entry_count": 2,
+   "real_event_count": 0,
+   "reality_classes": [
+    "CONTROLLED_REHEARSAL",
+    "CONTROLLED_REHEARSAL"
+   ],
+   "note": "rehearsal ledger at R509/r370g_rehearsal_ledger.json \u2014 NOT the real ledger; real_event_count must be 0",
+   "tamper_detected": true
+  },
+  "decide": {
+   "keep_case": {
+    "verdict": "KEEP",
+    "rule_id": "P04-KEEP-ACCEPT",
+    "expected": "KEEP (fixture derived from the frozen ACCEPT constants)",
+    "match": true
+   },
+   "kill_case": {
+    "verdict": "KILL",
+    "rule_id": "P04-KILL-A-COMMONCAUSE",
+    "expected": "KILL (occlusion at the frozen channel-a constant)",
+    "match": true
+   },
+   "thresholds_imported_not_retyped": {
+    "P04_Q_MIN_PASS": 0.4,
+    "P04_Q_MIN_KILL": 0.2,
+    "P04_COMMON_CAUSE_KILL_PCT": 90.0,
+    "P04_G_RATIO_MODELLED": 0.0885
+   }
+  },
+  "learn_adjudicate": {
+   "adjudication": {
+    "prediction_before": 1.0,
+    "actual_measurement": 1.1,
+    "prediction_after": 1.05,
+    "unit": "mL/min",
+    "error_before": 0.10000000000000009,
+    "error_after": 0.050000000000000044,
+    "held_out": {
+     "actual": 1.2,
+     "prediction_before": 1.0,
+     "prediction_after": 1.15
+    },
+    "held_out_error_before": 0.19999999999999996,
+    "held_out_error_after": 0.050000000000000044,
+    "reality_event_id": "rehearsal-event-keep-001",
+    "reality_source_type": "CONTROLLED_REHEARSAL",
+    "counts_as_learning": false,
+    "rehearsal": true,
+    "improvement_basis": "held_out",
+    "verdict": "MODEL_IMPROVED",
+    "reason": "CONTROLLED_REHEARSAL \u2014 machinery demonstration only; never a learning event (Art. XXXVIII). error_after < error_before on the held_out; the prediction moved \u2014 the reality event changed future model behavior (Art. LI)"
+   },
+   "counts_as_learning": false,
+   "note": "CONTROLLED_REHEARSAL inputs demonstrate the machinery but carry counts_as_learning=false \u2014 never the real count",
+   "summary": {
+    "counts_by_verdict": {
+     "MODEL_IMPROVED": 1,
+     "LEARNING_FAILED": 0,
+     "INSUFFICIENT_DATA": 0
+    },
+    "real_learning_events": 0,
+    "learning_loop_operational": false,
+    "rule": "a rehearsal verdict may demonstrate the machinery but never counts as learning (Art. XXXVIII); a reality event that does not change future behavior is not a learning loop (R407-D)"
+   }
+  },
+  "learn_causal_loop": {
+   "loop_id": "cl-b31fce0072a31b82",
+   "stages": [
+    "CANDIDATE",
+    "MECHANISTIC_MODEL",
+    "VIRTUAL_EXPERIMENT"
+   ],
+   "verification_state": null,
+   "note": "bounded rehearsal loop \u2014 the learn leg of the door"
+  }
+ },
+ "door_verdict": {
+  "DOOR_PROVEN": true,
+  "basis": "validate accepts/rejects correctly; ingest double-entry + broken-event guards hold; the hash-chained ledger verifies and detects tampering; the frozen decision rule computes both KEEP and KILL channels from imported constants; the adjudicator demonstrates learning machinery with counts_as_learning=false for rehearsal inputs",
+  "never_promotes": "every fixture event is CONTROLLED_REHEARSAL; real_event_count=0; REAL_LOOP_VERIFIED stays 0 until a REAL packet flows (a survivor must exist first)"
+ }
+}

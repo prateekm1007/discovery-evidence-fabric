@@ -1,0 +1,116 @@
+{
+  "artifact_type": "R509_C2_ROUND_RECORD",
+  "round": "R509-C2",
+  "agent": "Super Z (principal session) — the R508/R508-C1 lineage, Coder 1",
+  "reviewer_provenance": "AI_REVIEW",
+  "measured_at_utc": "2026-09-18T12:10:00Z",
+  "directive": {
+    "verbatim_anchor": "Coder directive: all bottlenecks, one ordered campaign",
+    "scope_law_held": "manifest e9c72c58..., harvest rules 70a83fe1.../40d728f8..., instrument 831f1a0e... FROZEN (re-verified from bytes this round); zero engine delta; zero deploy; zero resubmit (phase-3 submission remains gated on the operator acts)",
+    "report_form": "phase order, bytes cited at each gate"
+  },
+  "environment_rollback_recovery": {
+    "the_event": "between the R508-C1 round and this directive, the local container was rolled back to a ~Sep-11/16-era snapshot: the local multi-agent worklog (through R508-C1), the harvest-tree worktree, r506_durable/, the vault .secrets.env, and the recent local scripts were lost locally",
+    "the_authorities_held": "origin/main == ed296772 (the R508-C1 push, verified) and origin/runtime-state-hf == 691d8d3d -> 215251c9; everything durable survived by design (Art. XXII/XXIII/LXXIV — the discipline's payoff, demonstrated)",
+    "recovery": "fresh clone from origin (harvest-tree re-established); durable worktree re-created at r506_durable; .gitcreds SURVIVED the rollback and its token fingerprint sha256:12 == f1ebca5f9b62 matches the registered GITHUB_TOKEN (f1ebca5f9b622f3e, the R497/R503/R505 lineage) — push capability intact",
+    "custody_typing": "the vault .secrets.env (GITHUB_TOKEN + HF_TOKEN values) is LOST to this container — the HF_TOKEN value is now REGISTERED_ABSENT_VALUE_NOT_HELD_HERE (Art. LXXVI §3: never fabricated, re-supplied by the operator or a session that holds it; the HF Space secret surface remains the custody vault of record); no deploy is planned this round regardless (forbidden until operator acts complete)",
+    "worklog_note": "the LOCAL multi-agent worklog was rolled back with the container; this round appends a recovery entry to the rolled-back file (append-only, nothing overwritten); the authoritative round history lives in the repo's ACTIVE_PATH.md + round records, which survived on origin"
+  },
+  "phase_1_mine_the_durable_residue": {
+    "status": "DONE",
+    "premise_correction": "the directive's premise (autopsy the deaths) was rewritten by the sibling line's R509 act-1 PRESERVE (origin/main 759891bf, durable 215251c9): the preserved tail proves NO deaths — all six workers COMPLETED 00:12:05-00:45:07Z; the silent stage is the DURABLE PUSH PATH. This round's autopsy integrates that (the directive's own order: extract facts BEFORE theorizing).",
+    "deliverables": {
+      "script": "scripts/r509_residue_autopsy.py (read-only, git-show-of-pinned-commit discipline, fail-closed, BS-021 leak-scan)",
+      "output": "R509/RESIDUE_AUTOPSY.json (six rows + battery row + discriminator + derived bounds)",
+      "one_line_verdict_table": [
+        "1 ts_dbdf24c91535: COMPLETED-EPHEMERAL / PUSH-FAILURE-suspect",
+        "2 ts_ca977637f50b: COMPLETED-EPHEMERAL / PUSH-FAILURE-suspect",
+        "3 ts_66e23c67b511: COMPLETED-EPHEMERAL / PUSH-FAILURE-suspect",
+        "4 ts_84a8807b12dc: COMPLETED-EPHEMERAL / PUSH-FAILURE-suspect",
+        "5 ts_6da1b9339ce5: COMPLETED-EPHEMERAL / PUSH-FAILURE-suspect",
+        "6 ts_d9b7d3463583: COMPLETED-EPHEMERAL / PUSH-FAILURE-suspect"
+      ]
+    },
+    "bytes_cited_highlights": {
+      "per_session": "durable journal last row + last snapshot reason + frozen sessions.json status (5x RUNNING, 1x BUILDING_PROBLEM at 00:09:15Z) + preserved spawn_forensics timeline (spawn -> heartbeats -> BRIDGE_GATE_OUTCOME -> TERMINAL_STATE FINAL_SNAPSHOT -> WORKER_COMPLETED) + final_state (final_status, envelope hash, adjudication, adversarial, ranking)",
+      "exclusions_byte_cited": "OOM excluded by WORKER_COMPLETED; TRANSPORT-HANG excluded by TERMINAL_STATE; PROVIDER-STALL excluded by completion + the 30/30 ok=True routing window (00:00:46-00:09:12Z, xkiro+atria, latencies 1.4-48s)",
+      "battery_level": "last snapshot 00:09:15Z ok=true files=3073; ZERO snapshots after; ZERO error rows in the ENTIRE 760-row snapshot_log history; ZERO battery run dirs on the durable branch (100 runs/ entries, none battery); 6/6 terminal phases exist ephemeral",
+      "the_sharpest_new_fact": "the engine_checkpoint cadence is a measured 10.0-MINUTE PERIODIC TIMER (n=17 inter-arrival gaps across 6 historical sessions, all 10.0-10.1 min; R487 alone shows 11 checkpoints at 10.0-10.2-min spacing) — the battery's six RUNNING sessions received ZERO checkpoints after 00:09:15Z: the checkpoint pusher went silent between 00:09:15Z and ~00:19Z while the health surface kept reporting last_write_error=null"
+    },
+    "hang_vs_death_discriminator": {
+      "directive_question": "shared hang vs six independent OOMs",
+      "measured_answer": "NEITHER — DISSOLVED: all six workers reached WORKER_COMPLETED (preserved bytes); the xkiro RATE_LIMITED clusters (23:05-23:59Z, 69 events incl. the directive's 23:37Z — verified in the durable routing ledger) ENDED before the battery was submitted (00:03:38-00:04:32Z; first post-congestion ok xkiro call 00:00:46Z); the 00:40:41Z heartbeat sits mid-run for ts_6da1b9339ce5 (heartbeats to 00:44:41.113Z, completed 00:45:07.775Z)",
+      "per_session_routing_attribution": "PARTIAL (1/6): only ts_dbdf24c91535 has a session-attributed routing row (00:09:06Z atria Atria-Dawn-Preview ok=True 41168ms synthesis); the other battery-window rows carry session_id null — post-00:09:15Z per-session attribution is NOT_MEASURABLE from durable bytes (Art. XXV)"
+    },
+    "corrections_disclosed": [
+      "the sibling R509 record listed 'the model_routing ledger' as still-ephemeral-only: PRECISION — the durable branch DOES carry model_routing/ledger.jsonl (1,176 rows, 2026-09-15T22:59:46Z -> 2026-09-18T00:09:12Z, sha-pinned at 215251c9); what is ephemeral is its post-snapshot TAIL (Art. XV/XXIV, the artifact wins)",
+      "the directive's '1,107 routing-ledger lines' was not re-derived exactly (measured 1,176 at the pinned commit; no obvious subset matches 1,107) — the autopsy cites the measured count with the pinned-commit provenance"
+    ],
+    "no_inference_beyond_labels": "each row's evidence fits exactly one suspect (push-path); every exclusion is byte-cited; the pusher's INTERNAL cause stays typed UNKNOWN (execution-domain, owner-scoped — the act-3 root-cause input)"
+  },
+  "phase_2_observer_side_watchdog": {
+    "status": "DONE — ACCEPTANCE MET",
+    "deliverable": "scripts/r509_battery_watchdog.py (three typed alerts, hysteresis = 2 consecutive polls, OBSERVATION_GAP never fires, self-test 5/5)",
+    "thresholds_all_derived_nothing_invented": {
+      "STALLED_OVER_2X_P90": "82 min = 2 x p90(41), the n=98 /api/health run_duration_stats distribution (the directive's own bound)",
+      "DURABLE_TIP_STALE": "30 min = 3x the measured 10.0-min engine_checkpoint cadence (three consecutive missed checkpoints) — a NEW bound this round's autopsy measured from snapshot_log bytes",
+      "HEARTLESS_WORKERS": "active_workers==[] (the engine's own 120s heartbeat-freshness semantics) while >=1 tracked session non-terminal-durable"
+    },
+    "acceptance_evidence": {
+      "self_test": "5/5 (healthy-timeline zero-fire; TIP_STALE at +40min and STALLED at +90min on a frozen tip; terminal sessions never fire; observation gaps reset hysteresis; all-terminal stops alerts)",
+      "signature_replay_R509": "R509/REPLAY_R509_SIGNATURE.json — 25 polls, 3 alerts IN ORDER: DURABLE_TIP_STALE 00:50Z -> HEARTLESS_WORKERS 00:55Z -> STALLED_OVER_2X_P90 01:40Z (all within 91 min of the last durable event 00:09:51Z, vs the 7-hour silent loss actually suffered)",
+      "false_fire_controls": "R509/REPLAY_R484_CONTROL.json (13 polls, 0 alerts — ts_b7673571279e's window: transitions + 10-min checkpoints + terminal landed 00:15:26Z); R509/REPLAY_R487_CONTROL.json (27 polls, 0 alerts — ts_f0880e025e60: 11 checkpoints at 10.0-10.2-min spacing, terminal landed 11:05:59Z)",
+      "the_48h_dry_run": "R509/REPLAY_48H_DRYRUN.json — 577 polls over 2026-09-16T08:35Z -> 2026-09-18T08:35Z tracking all eight sessions (six battery + both controls): EXACTLY 3 alerts (the signature, in order), ZERO elsewhere"
+    },
+    "replay_method_disclosure": "the replay reconstructs each 5-min poll from durable bytes (branch commit history as tip events; sessions.json versions per commit as session statuses; ledger + preserved-tail heartbeats as active_workers; push-path health = measured healthy across all 760 ok rows) — honest to the observation surface a live watchdog would have polled",
+    "known_borderline_class_disclosed": "a long-running session whose terminal lands >30 min after its last checkpoint can transiently trip DURABLE_TIP_STALE before the terminal lands (observed shape: ts_cd6c2a619ed2's 40-min gap) — the alert is TRUE as stated when it fires (the tip IS stale); it is a warning tier, and the STALLED tier (82 min) never false-fires on this class"
+  },
+  "phase_3_resubmit_execution_2": {
+    "status": "ARMED — NOT EXECUTED (gated exactly as the directive orders)",
+    "preflight_gate": {
+      "script": "scripts/r509_preflight_gate.py (fail-closed; exit 0 GO / 3 IDENTITY_MOVED_REBASELINE / 4 GATE_REFUSED / 5 FREEZE_BROKEN / 6 WATCHDOG_UNARMED)",
+      "tested_paths_this_round": "freeze GREEN (manifest/rules/instrument shas re-verified from bytes); default -> GATE_REFUSED (operator act 2 pending); act-2 given + ruling pending -> GATE_REFUSED; 'revert' -> GATE_REFUSED (constitution adjudication first); offline rehearsal all-green -> GO",
+      "identity_check": "GET /api/version must serve d7520b9b... — if the Space moved: STOP + re-baseline, never silently measure a new build (the directive's own rule)"
+    },
+    "kill_switch": {
+      "script": "scripts/r509_kill_switch.py (per-session STALLED at >82 min without durable progression; declares, PRESERVES fresh evidence immediately via the R509 act-1 read-only owner-key GET path with BS-021 fail-closed scans, and records; NEVER touches workers)",
+      "self_test": "3/3 (declare-once, terminal-never, BS-021 abort)",
+      "live_path_note": "the live GET path stays unexercised until a real stall — by design (no Space touch this round beyond read-only public endpoints)"
+    },
+    "the_gates_that_still_block_submission": [
+      "operator act 2 verbatim: '2.9.0 stands' (or 'revert' -> adjudication first) — PENDING",
+      "the CEO's execution ruling the sibling R509 framed: (a) recover the ephemeral run dirs so the frozen instrument measures execution #1, or (b) resubmit as execution #2 — PENDING (the directive orders (b); the preflight enforces the ruling be recorded explicitly, defaulting to refuse)",
+      "the directive's own gate: 'zero resubmit before the operator's preserve act' — act 1 (PRESERVE) is DONE (the sibling's measured-open path, durable at 215251c9)"
+    ]
+  },
+  "phase_4_harvest_then_build_exactly_one_thing": {
+    "status": "PENDING ON PHASE 3 (and the (a)-vs-(b) ruling — under (a) the funnel runs on execution #1's recovered bytes; under (b) on execution #2's terminals)",
+    "armed_state": "instrument 831f1a0e frozen-verified; harvest rules 70a83fe1/40d728f8 frozen-verified and armed (contamination + clarification audits populate per-run verdicts); YIELD_MEASUREMENT.json correctly ABSENT; the build-one-thing cliff menu (diversity adapter / collision scale-out / attacker v4.3 / ring-failover) awaits the measured funnel — the directive's stop-list forbids all other builds"
+  },
+  "parallel_tracks": {
+    "track_10_r370g_rehearsal": "DONE — R509/R370G_REHEARSAL.json: DOOR_PROVEN=true end-to-end (validate accept+reject paths; ingest double-entry + broken-event guards; hash-chained ledger verifies AND detects tampering; the frozen P04 rule computes KEEP and KILL from IMPORTED constants; adjudicate_learning runs with counts_as_learning=false; the bounded causal-learning loop executes the learn leg) — every fixture event is CONTROLLED_REHEARSAL, real_event_count=0, REAL_LOOP_VERIFIED stays 0, nothing promotes",
+    "track_11_key_budget_ledger": "DONE — R509/KEY_BUDGET_LEDGER.json (records-only, fingerprints, zero values): PatentBear old RETIRED (401, R505), active POOL_EXHAUSTED (19/20, floor 2, battery needs 8), HF_TOKEN REGISTERED_ABSENT_VALUE_NOT_HELD_THIS_CONTAINER (the rollback disclosure), GITHUB_TOKEN held via .gitcreds (fp-verified), unorouter AUTH_FAILURE owner-gated, Elsevier sealing-session-only; debit log: this round ZERO metered debits (observer-side); coordination rule: intended debits recorded here FIRST",
+    "track_12_respawn_design": "DONE — R509/RESPAWN_DESIGN.md (DESIGN ONLY, no code, lands post-harvest as its own measured change): four mechanisms — M1 push-acknowledgment verification (DURABLE_CUSTODY_SILENCE engine state, health surface stops lying by omission), M2 periodic terminal reconciliation (would have recovered all six R509 sessions; fixes the boot-only gap and the completed-then-orphan-marked oddity), M3 heartbeat-age reaping (last, deliberately — the R509 lesson: the workers were alive), M4 idempotent resume per LXXIV s3/R401; regression gate: the R509 signature + R484/R487 no-op fixtures as tests before any deploy"
+  },
+  "stop_list_compliance": {
+    "no_attacker_tuning": true,
+    "no_new_providers_sources_ui_pruning_package_work": true,
+    "no_physics_changes": true,
+    "no_deploy": "production stays d7520b9b/2.8.0 (no Space touch this round beyond read-only public GETs)",
+    "no_resubmit_outside_phase_3": true,
+    "no_touching_the_six_sessions_durable_history": "all durable-branch access read-only (git show of the pinned commit)",
+    "tree_freeze": "records + observer-side scripts only; zero engine delta (inventory --check GREEN); scored set untouched; battery untouched"
+  },
+  "tests_at_this_tip": "39 passed + 1 skipped across the R505/R506/R507 pin suites; watchdog self-test 5/5; kill-switch self-test 3/3; preflight freeze check GREEN; inventory --check GREEN",
+  "incidents_disclosed": [
+    "the environment rollback (above) — recovered from the remote authorities; the local worklog append-only entry notes it",
+    "intermittent read instability on the durable worktree (the R507 ENOENT quirk class: same code, different results across minutes) + a raw Unicode line-separator inside a JSON string field that fragments rows under str.splitlines() — FIXED by the git-show + b'\\n'-split + sha-pin + fail-closed discipline now encoded in the autopsy script",
+    "the watchdog's first draft counted absent (not-yet-created) sessions as non-terminal (would false-fire on pre-creation windows) — caught by inspection during the control-replay design, fixed, self-test extended",
+    "the kill-switch's first draft parsed --self-test but never dispatched it (argparse-only bug) — caught on first run, fixed, self-test 3/3"
+  ],
+  "next_actions": [
+    "operator: act 2 verbatim ('2.9.0 stands' or 'revert') — the single remaining gate on the ordered campaign's phase 3",
+    "operator: the (a)-recover vs (b)-resubmit ruling (the sibling R509's framing; the directive orders (b); the preflight records whichever is ruled)",
+    "then: preflight --live GO -> submit the identical six problems as execution #2 with the kill-switch + watchdog armed; six terminals or six typed infra failures with death evidence preserved by the watchdog this time; then harvest and build exactly one thing"
+  ]
+}

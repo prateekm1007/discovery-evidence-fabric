@@ -1,0 +1,688 @@
+{
+ "artifact_type": "R509_RESIDUE_AUTOPSY",
+ "phase": "1 \u2014 mine the durable residue (observer-side, no Space touch)",
+ "directive_anchor": "Coder directive: all bottlenecks, one ordered campaign",
+ "durable_commit_pinned": "215251c97d43a478122ddb7fad364be6777a7000",
+ "sources_sha256": {
+  "snapshot_log.jsonl": "0238754b116b7ea55709876b8b33b089d1c35190d626746f29871f0865f19d9e",
+  "worker_forensics/ledger.jsonl": "09246a620262a49b12e97761bf6434164edb083e0646b68906d8a89db32dbbc4",
+  "model_routing/ledger.jsonl": "5d084d542c8f9e7aa7b6af397d8523730d2758a23cdd43f3924410dc1b68284f",
+  "sessions.json": "cdf917908c334e0158281a68309b9194486b9d297f4342e5edec9c879816687f"
+ },
+ "read_discipline": "git-show of the pinned commit; b'\\n'-split JSONL; fail-closed; sha256 per source (the overlay read-instability lesson)",
+ "per_session_rows": [
+  {
+   "problem_index": 1,
+   "session_id": "ts_dbdf24c91535",
+   "durable_side": {
+    "sessions_json_status_frozen_at_last_snapshot": "RUNNING",
+    "last_durable_journal_row": {
+     "ts_utc": "2026-09-18T00:09:08.897Z",
+     "event": "HEARTBEAT",
+     "stage": "ENGINE_RUN"
+    },
+    "last_durable_snapshot_reason": {
+     "at": "2026-09-18T00:04:02Z",
+     "reason": "problem_understanding_merged:ts_dbdf24c91535",
+     "ok": true
+    },
+    "durable_run_dir": false
+   },
+   "preserved_side": {
+    "status_live": "COMPLETE",
+    "last_envelope_stage": {
+     "stage": "RANK",
+     "status": "OK",
+     "finished_at": "2026-09-18T00:12:03+00:00Z"
+    },
+    "final_state": {
+     "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+     "final_envelope_hash": "dd53a2e0285d55e813cdbe1984157e1d63337bbbbb35cb60212447f8c2fc1a39",
+     "adjudication_verdict": "INSUFFICIENT_ADJUDICATION",
+     "adversarial_overall": "EVALUATION_FAILED",
+     "evidence_verified": true,
+     "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+     "ranking_score": 0.15
+    },
+    "timeline": {
+     "spawned": "2026-09-18T00:03:38.717Z",
+     "first_heartbeat": "2026-09-18T00:04:08.728Z",
+     "last_heartbeat": "2026-09-18T00:11:38.919Z",
+     "bridge_gate": {
+      "ts": "2026-09-18T00:12:04.212Z",
+      "outcome": "NO_SURVIVOR"
+     },
+     "terminal_state": {
+      "ts": "2026-09-18T00:12:05.000Z",
+      "stage": "FINAL_SNAPSHOT",
+      "field": null
+     },
+     "worker_completed": "2026-09-18T00:12:05.006Z",
+     "n_events": 34
+    }
+   },
+   "last_routing_attempt": {
+    "session_attributed": true,
+    "recorded_at": "2026-09-18T00:09:06Z",
+    "provider": "atria",
+    "model": "Atria-Dawn-Preview",
+    "ok": true,
+    "failure_class": null,
+    "latency_ms": 41168,
+    "note": "the only session-attributed routing row in the durable ledger"
+   },
+   "typed_suspects": [
+    "PUSH-FAILURE-suspect"
+   ],
+   "suspect_basis": {
+    "PUSH-FAILURE-suspect": "terminal reached in the ephemeral store (TERMINAL_STATE FINAL_SNAPSHOT at 2026-09-18T00:12:05.000Z, WORKER_COMPLETED at 2026-09-18T00:12:05.006Z) but ZERO durable snapshots for this session after the 00:09:15Z last-overall snapshot; the measured engine_checkpoint cadence (10.0 min) delivered 0 checkpoints to this session vs the cadence every historical RUNNING session received"
+   },
+   "exclusions_byte_cited": {
+    "OOM_suspect_EXCLUDED_by": {
+     "event": "WORKER_COMPLETED",
+     "ts_utc": "2026-09-18T00:12:05.006Z",
+     "basis": "the worker reached WORKER_COMPLETED \u2014 a process that OOMs does not emit a completion event"
+    },
+    "TRANSPORT_HANG_suspect_EXCLUDED_by": {
+     "event": "TERMINAL_STATE",
+     "ts_utc": "2026-09-18T00:12:05.000Z",
+     "stage": "FINAL_SNAPSHOT",
+     "basis": "the run reached TERMINAL_STATE (phase 5, FINAL_SNAPSHOT) \u2014 a hung worker freezes before terminal"
+    },
+    "PROVIDER_STALL_suspect_EXCLUDED_by": {
+     "basis": "terminal completion requires every LLM stage to have returned; the durable-visible battery routing window is failure-free",
+     "routing_window_rows": 30,
+     "routing_window_ok_true": 30,
+     "xkiro_rate_limited_window": [
+      "2026-09-15T23:05:36Z",
+      "2026-09-17T23:59:32Z"
+     ],
+     "xkiro_congestion_predates_battery": true
+    }
+   },
+   "residual_UNKNOWN": "the snapshot pusher's internal cause of silence (execution-domain, owner-scoped) \u2014 the autopsy types the LOCUS (durable push path), never the internal cause (Art. XXV/LXXIV s1)"
+  },
+  {
+   "problem_index": 2,
+   "session_id": "ts_ca977637f50b",
+   "durable_side": {
+    "sessions_json_status_frozen_at_last_snapshot": "RUNNING",
+    "last_durable_journal_row": {
+     "ts_utc": "2026-09-18T00:09:12.284Z",
+     "event": "PHASE_STARTED",
+     "stage": "ENGINE_RUN"
+    },
+    "last_durable_snapshot_reason": {
+     "at": "2026-09-18T00:08:45Z",
+     "reason": "clarification_answered:ts_ca977637f50b",
+     "ok": true
+    },
+    "durable_run_dir": false
+   },
+   "preserved_side": {
+    "status_live": "COMPLETE",
+    "last_envelope_stage": {
+     "stage": "RANK",
+     "status": "OK",
+     "finished_at": "2026-09-18T00:16:34+00:00Z"
+    },
+    "final_state": {
+     "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+     "final_envelope_hash": "50a912dc077556587c85a967c2079540809a38321ade9abd1b2cb6bebf822394",
+     "adjudication_verdict": "CONTESTED",
+     "adversarial_overall": "PASS",
+     "evidence_verified": true,
+     "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+     "ranking_score": 0.5069
+    },
+    "timeline": {
+     "spawned": null,
+     "first_heartbeat": "2026-09-18T00:09:17.895Z",
+     "last_heartbeat": "2026-09-18T00:22:47.995Z",
+     "bridge_gate": {
+      "ts": "2026-09-18T00:22:56.243Z",
+      "outcome": "COMPLETED"
+     },
+     "terminal_state": {
+      "ts": "2026-09-18T00:22:56.958Z",
+      "stage": "FINAL_SNAPSHOT",
+      "field": null
+     },
+     "worker_completed": "2026-09-18T00:22:56.962Z",
+     "n_events": 40
+    }
+   },
+   "last_routing_attempt": {
+    "session_attributed": false,
+    "recorded_at": null,
+    "provider": null,
+    "model": null,
+    "ok": null,
+    "failure_class": null,
+    "latency_ms": null,
+    "note": "only 1/6 battery routing rows carries a session_id in the durable bytes; the rest are NOT_SESSION_ATTRIBUTED (session_id null) \u2014 per-session attribution post-00:09:15Z is NOT_MEASURABLE from durable bytes (Art. XXV)"
+   },
+   "typed_suspects": [
+    "PUSH-FAILURE-suspect"
+   ],
+   "suspect_basis": {
+    "PUSH-FAILURE-suspect": "terminal reached in the ephemeral store (TERMINAL_STATE FINAL_SNAPSHOT at 2026-09-18T00:22:56.958Z, WORKER_COMPLETED at 2026-09-18T00:22:56.962Z) but ZERO durable snapshots for this session after the 00:09:15Z last-overall snapshot; the measured engine_checkpoint cadence (10.0 min) delivered 0 checkpoints to this session vs the cadence every historical RUNNING session received"
+   },
+   "exclusions_byte_cited": {
+    "OOM_suspect_EXCLUDED_by": {
+     "event": "WORKER_COMPLETED",
+     "ts_utc": "2026-09-18T00:22:56.962Z",
+     "basis": "the worker reached WORKER_COMPLETED \u2014 a process that OOMs does not emit a completion event"
+    },
+    "TRANSPORT_HANG_suspect_EXCLUDED_by": {
+     "event": "TERMINAL_STATE",
+     "ts_utc": "2026-09-18T00:22:56.958Z",
+     "stage": "FINAL_SNAPSHOT",
+     "basis": "the run reached TERMINAL_STATE (phase 5, FINAL_SNAPSHOT) \u2014 a hung worker freezes before terminal"
+    },
+    "PROVIDER_STALL_suspect_EXCLUDED_by": {
+     "basis": "terminal completion requires every LLM stage to have returned; the durable-visible battery routing window is failure-free",
+     "routing_window_rows": 30,
+     "routing_window_ok_true": 30,
+     "xkiro_rate_limited_window": [
+      "2026-09-15T23:05:36Z",
+      "2026-09-17T23:59:32Z"
+     ],
+     "xkiro_congestion_predates_battery": true
+    }
+   },
+   "residual_UNKNOWN": "the snapshot pusher's internal cause of silence (execution-domain, owner-scoped) \u2014 the autopsy types the LOCUS (durable push path), never the internal cause (Art. XXV/LXXIV s1)"
+  },
+  {
+   "problem_index": 3,
+   "session_id": "ts_66e23c67b511",
+   "durable_side": {
+    "sessions_json_status_frozen_at_last_snapshot": "RUNNING",
+    "last_durable_journal_row": {
+     "ts_utc": "2026-09-18T00:09:10.080Z",
+     "event": "PHASE_STARTED",
+     "stage": "ENGINE_RUN"
+    },
+    "last_durable_snapshot_reason": {
+     "at": "2026-09-18T00:08:58Z",
+     "reason": "problem_understanding_merged:ts_66e23c67b511",
+     "ok": true
+    },
+    "durable_run_dir": false
+   },
+   "preserved_side": {
+    "status_live": "COMPLETE",
+    "last_envelope_stage": {
+     "stage": "RANK",
+     "status": "OK",
+     "finished_at": "2026-09-18T00:15:28+00:00Z"
+    },
+    "final_state": {
+     "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+     "final_envelope_hash": "cfaf584d38375cb0d8722c3864f2528c63221ffe0634bf9f511af8fd5337daf2",
+     "adjudication_verdict": "CONTESTED",
+     "adversarial_overall": "PASS",
+     "evidence_verified": true,
+     "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+     "ranking_score": 0.5156
+    },
+    "timeline": {
+     "spawned": null,
+     "first_heartbeat": "2026-09-18T00:09:24.031Z",
+     "last_heartbeat": "2026-09-18T00:22:24.131Z",
+     "bridge_gate": {
+      "ts": "2026-09-18T00:22:49.318Z",
+      "outcome": "COMPLETED"
+     },
+     "terminal_state": {
+      "ts": "2026-09-18T00:22:50.133Z",
+      "stage": "FINAL_SNAPSHOT",
+      "field": null
+     },
+     "worker_completed": "2026-09-18T00:22:50.136Z",
+     "n_events": 40
+    }
+   },
+   "last_routing_attempt": {
+    "session_attributed": false,
+    "recorded_at": null,
+    "provider": null,
+    "model": null,
+    "ok": null,
+    "failure_class": null,
+    "latency_ms": null,
+    "note": "only 1/6 battery routing rows carries a session_id in the durable bytes; the rest are NOT_SESSION_ATTRIBUTED (session_id null) \u2014 per-session attribution post-00:09:15Z is NOT_MEASURABLE from durable bytes (Art. XXV)"
+   },
+   "typed_suspects": [
+    "PUSH-FAILURE-suspect"
+   ],
+   "suspect_basis": {
+    "PUSH-FAILURE-suspect": "terminal reached in the ephemeral store (TERMINAL_STATE FINAL_SNAPSHOT at 2026-09-18T00:22:50.133Z, WORKER_COMPLETED at 2026-09-18T00:22:50.136Z) but ZERO durable snapshots for this session after the 00:09:15Z last-overall snapshot; the measured engine_checkpoint cadence (10.0 min) delivered 0 checkpoints to this session vs the cadence every historical RUNNING session received"
+   },
+   "exclusions_byte_cited": {
+    "OOM_suspect_EXCLUDED_by": {
+     "event": "WORKER_COMPLETED",
+     "ts_utc": "2026-09-18T00:22:50.136Z",
+     "basis": "the worker reached WORKER_COMPLETED \u2014 a process that OOMs does not emit a completion event"
+    },
+    "TRANSPORT_HANG_suspect_EXCLUDED_by": {
+     "event": "TERMINAL_STATE",
+     "ts_utc": "2026-09-18T00:22:50.133Z",
+     "stage": "FINAL_SNAPSHOT",
+     "basis": "the run reached TERMINAL_STATE (phase 5, FINAL_SNAPSHOT) \u2014 a hung worker freezes before terminal"
+    },
+    "PROVIDER_STALL_suspect_EXCLUDED_by": {
+     "basis": "terminal completion requires every LLM stage to have returned; the durable-visible battery routing window is failure-free",
+     "routing_window_rows": 30,
+     "routing_window_ok_true": 30,
+     "xkiro_rate_limited_window": [
+      "2026-09-15T23:05:36Z",
+      "2026-09-17T23:59:32Z"
+     ],
+     "xkiro_congestion_predates_battery": true
+    }
+   },
+   "residual_UNKNOWN": "the snapshot pusher's internal cause of silence (execution-domain, owner-scoped) \u2014 the autopsy types the LOCUS (durable push path), never the internal cause (Art. XXV/LXXIV s1)"
+  },
+  {
+   "problem_index": 4,
+   "session_id": "ts_84a8807b12dc",
+   "durable_side": {
+    "sessions_json_status_frozen_at_last_snapshot": "RUNNING",
+    "last_durable_journal_row": {
+     "ts_utc": "2026-09-18T00:09:04.823Z",
+     "event": "PHASE_STARTED",
+     "stage": "ACQUIRING_RUN_LOCK"
+    },
+    "last_durable_snapshot_reason": {
+     "at": "2026-09-18T00:08:58Z",
+     "reason": "clarification_answered:ts_84a8807b12dc",
+     "ok": true
+    },
+    "durable_run_dir": false
+   },
+   "preserved_side": {
+    "status_live": "COMPLETE",
+    "last_envelope_stage": {
+     "stage": "RANK",
+     "status": "OK",
+     "finished_at": "2026-09-18T00:19:04+00:00Z"
+    },
+    "final_state": {
+     "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+     "final_envelope_hash": "7a914a01bfad23ca75d458b0f1d5d5fe062805e4125f2d54bec7601105e8b43a",
+     "adjudication_verdict": "CONTESTED",
+     "adversarial_overall": "KILLED",
+     "evidence_verified": true,
+     "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+     "ranking_score": 0.2691
+    },
+    "timeline": {
+     "spawned": null,
+     "first_heartbeat": "2026-09-18T00:10:04.796Z",
+     "last_heartbeat": "2026-09-18T00:23:34.921Z",
+     "bridge_gate": {
+      "ts": "2026-09-18T00:23:55.904Z",
+      "outcome": "COMPLETED"
+     },
+     "terminal_state": {
+      "ts": "2026-09-18T00:23:56.670Z",
+      "stage": "FINAL_SNAPSHOT",
+      "field": null
+     },
+     "worker_completed": "2026-09-18T00:23:56.673Z",
+     "n_events": 40
+    }
+   },
+   "last_routing_attempt": {
+    "session_attributed": false,
+    "recorded_at": null,
+    "provider": null,
+    "model": null,
+    "ok": null,
+    "failure_class": null,
+    "latency_ms": null,
+    "note": "only 1/6 battery routing rows carries a session_id in the durable bytes; the rest are NOT_SESSION_ATTRIBUTED (session_id null) \u2014 per-session attribution post-00:09:15Z is NOT_MEASURABLE from durable bytes (Art. XXV)"
+   },
+   "typed_suspects": [
+    "PUSH-FAILURE-suspect"
+   ],
+   "suspect_basis": {
+    "PUSH-FAILURE-suspect": "terminal reached in the ephemeral store (TERMINAL_STATE FINAL_SNAPSHOT at 2026-09-18T00:23:56.670Z, WORKER_COMPLETED at 2026-09-18T00:23:56.673Z) but ZERO durable snapshots for this session after the 00:09:15Z last-overall snapshot; the measured engine_checkpoint cadence (10.0 min) delivered 0 checkpoints to this session vs the cadence every historical RUNNING session received"
+   },
+   "exclusions_byte_cited": {
+    "OOM_suspect_EXCLUDED_by": {
+     "event": "WORKER_COMPLETED",
+     "ts_utc": "2026-09-18T00:23:56.673Z",
+     "basis": "the worker reached WORKER_COMPLETED \u2014 a process that OOMs does not emit a completion event"
+    },
+    "TRANSPORT_HANG_suspect_EXCLUDED_by": {
+     "event": "TERMINAL_STATE",
+     "ts_utc": "2026-09-18T00:23:56.670Z",
+     "stage": "FINAL_SNAPSHOT",
+     "basis": "the run reached TERMINAL_STATE (phase 5, FINAL_SNAPSHOT) \u2014 a hung worker freezes before terminal"
+    },
+    "PROVIDER_STALL_suspect_EXCLUDED_by": {
+     "basis": "terminal completion requires every LLM stage to have returned; the durable-visible battery routing window is failure-free",
+     "routing_window_rows": 30,
+     "routing_window_ok_true": 30,
+     "xkiro_rate_limited_window": [
+      "2026-09-15T23:05:36Z",
+      "2026-09-17T23:59:32Z"
+     ],
+     "xkiro_congestion_predates_battery": true
+    }
+   },
+   "residual_UNKNOWN": "the snapshot pusher's internal cause of silence (execution-domain, owner-scoped) \u2014 the autopsy types the LOCUS (durable push path), never the internal cause (Art. XXV/LXXIV s1)"
+  },
+  {
+   "problem_index": 5,
+   "session_id": "ts_6da1b9339ce5",
+   "durable_side": {
+    "sessions_json_status_frozen_at_last_snapshot": "RUNNING",
+    "last_durable_journal_row": {
+     "ts_utc": "2026-09-18T00:09:10.840Z",
+     "event": "PHASE_STARTED",
+     "stage": "ACQUIRING_RUN_LOCK"
+    },
+    "last_durable_snapshot_reason": {
+     "at": "2026-09-18T00:09:09Z",
+     "reason": "clarification_answered:ts_6da1b9339ce5",
+     "ok": true
+    },
+    "durable_run_dir": false
+   },
+   "preserved_side": {
+    "status_live": "COMPLETE",
+    "last_envelope_stage": {
+     "stage": "RANK",
+     "status": "OK",
+     "finished_at": "2026-09-18T00:34:28+00:00Z"
+    },
+    "final_state": {
+     "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+     "final_envelope_hash": "21954c622597532d86ba7014a28167d7ac2362a495770fd71addd48bb8bbc4ce",
+     "adjudication_verdict": "CONTESTED",
+     "adversarial_overall": "KILLED",
+     "evidence_verified": true,
+     "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+     "ranking_score": 0.2691
+    },
+    "timeline": {
+     "spawned": null,
+     "first_heartbeat": "2026-09-18T00:28:40.943Z",
+     "last_heartbeat": "2026-09-18T00:44:41.113Z",
+     "bridge_gate": {
+      "ts": "2026-09-18T00:45:06.963Z",
+      "outcome": "COMPLETED"
+     },
+     "terminal_state": {
+      "ts": "2026-09-18T00:45:07.771Z",
+      "stage": "FINAL_SNAPSHOT",
+      "field": null
+     },
+     "worker_completed": "2026-09-18T00:45:07.775Z",
+     "n_events": 40
+    }
+   },
+   "last_routing_attempt": {
+    "session_attributed": false,
+    "recorded_at": null,
+    "provider": null,
+    "model": null,
+    "ok": null,
+    "failure_class": null,
+    "latency_ms": null,
+    "note": "only 1/6 battery routing rows carries a session_id in the durable bytes; the rest are NOT_SESSION_ATTRIBUTED (session_id null) \u2014 per-session attribution post-00:09:15Z is NOT_MEASURABLE from durable bytes (Art. XXV)"
+   },
+   "typed_suspects": [
+    "PUSH-FAILURE-suspect"
+   ],
+   "suspect_basis": {
+    "PUSH-FAILURE-suspect": "terminal reached in the ephemeral store (TERMINAL_STATE FINAL_SNAPSHOT at 2026-09-18T00:45:07.771Z, WORKER_COMPLETED at 2026-09-18T00:45:07.775Z) but ZERO durable snapshots for this session after the 00:09:15Z last-overall snapshot; the measured engine_checkpoint cadence (10.0 min) delivered 0 checkpoints to this session vs the cadence every historical RUNNING session received"
+   },
+   "exclusions_byte_cited": {
+    "OOM_suspect_EXCLUDED_by": {
+     "event": "WORKER_COMPLETED",
+     "ts_utc": "2026-09-18T00:45:07.775Z",
+     "basis": "the worker reached WORKER_COMPLETED \u2014 a process that OOMs does not emit a completion event"
+    },
+    "TRANSPORT_HANG_suspect_EXCLUDED_by": {
+     "event": "TERMINAL_STATE",
+     "ts_utc": "2026-09-18T00:45:07.771Z",
+     "stage": "FINAL_SNAPSHOT",
+     "basis": "the run reached TERMINAL_STATE (phase 5, FINAL_SNAPSHOT) \u2014 a hung worker freezes before terminal"
+    },
+    "PROVIDER_STALL_suspect_EXCLUDED_by": {
+     "basis": "terminal completion requires every LLM stage to have returned; the durable-visible battery routing window is failure-free",
+     "routing_window_rows": 30,
+     "routing_window_ok_true": 30,
+     "xkiro_rate_limited_window": [
+      "2026-09-15T23:05:36Z",
+      "2026-09-17T23:59:32Z"
+     ],
+     "xkiro_congestion_predates_battery": true
+    }
+   },
+   "residual_UNKNOWN": "the snapshot pusher's internal cause of silence (execution-domain, owner-scoped) \u2014 the autopsy types the LOCUS (durable push path), never the internal cause (Art. XXV/LXXIV s1)"
+  },
+  {
+   "problem_index": 6,
+   "session_id": "ts_d9b7d3463583",
+   "durable_side": {
+    "sessions_json_status_frozen_at_last_snapshot": "BUILDING_PROBLEM",
+    "last_durable_journal_row": {
+     "ts_utc": "2026-09-18T00:09:15.107Z",
+     "event": "CLARIFICATION_ANSWERED",
+     "stage": null
+    },
+    "last_durable_snapshot_reason": {
+     "at": "2026-09-18T00:09:15Z",
+     "reason": "clarification_answered:ts_d9b7d3463583",
+     "ok": true
+    },
+    "durable_run_dir": false
+   },
+   "preserved_side": {
+    "status_live": "COMPLETE",
+    "last_envelope_stage": {
+     "stage": "RANK",
+     "status": "OK",
+     "finished_at": "2026-09-18T00:30:01+00:00Z"
+    },
+    "final_state": {
+     "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+     "final_envelope_hash": "7b7bea9f242ebf746a4ed4b3751dcec4361be941b04f658ee4d98d381421a1c0",
+     "adjudication_verdict": "CONTESTED",
+     "adversarial_overall": "PASS",
+     "evidence_verified": true,
+     "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+     "ranking_score": 0.5145
+    },
+    "timeline": {
+     "spawned": null,
+     "first_heartbeat": "2026-09-18T00:24:16.968Z",
+     "last_heartbeat": "2026-09-18T00:40:17.132Z",
+     "bridge_gate": {
+      "ts": "2026-09-18T00:40:37.215Z",
+      "outcome": "COMPLETED"
+     },
+     "terminal_state": {
+      "ts": "2026-09-18T00:40:38.079Z",
+      "stage": "FINAL_SNAPSHOT",
+      "field": null
+     },
+     "worker_completed": "2026-09-18T00:40:38.085Z",
+     "n_events": 40
+    }
+   },
+   "last_routing_attempt": {
+    "session_attributed": false,
+    "recorded_at": null,
+    "provider": null,
+    "model": null,
+    "ok": null,
+    "failure_class": null,
+    "latency_ms": null,
+    "note": "only 1/6 battery routing rows carries a session_id in the durable bytes; the rest are NOT_SESSION_ATTRIBUTED (session_id null) \u2014 per-session attribution post-00:09:15Z is NOT_MEASURABLE from durable bytes (Art. XXV)"
+   },
+   "typed_suspects": [
+    "PUSH-FAILURE-suspect"
+   ],
+   "suspect_basis": {
+    "PUSH-FAILURE-suspect": "terminal reached in the ephemeral store (TERMINAL_STATE FINAL_SNAPSHOT at 2026-09-18T00:40:38.079Z, WORKER_COMPLETED at 2026-09-18T00:40:38.085Z) but ZERO durable snapshots for this session after the 00:09:15Z last-overall snapshot; the measured engine_checkpoint cadence (10.0 min) delivered 0 checkpoints to this session vs the cadence every historical RUNNING session received"
+   },
+   "exclusions_byte_cited": {
+    "OOM_suspect_EXCLUDED_by": {
+     "event": "WORKER_COMPLETED",
+     "ts_utc": "2026-09-18T00:40:38.085Z",
+     "basis": "the worker reached WORKER_COMPLETED \u2014 a process that OOMs does not emit a completion event"
+    },
+    "TRANSPORT_HANG_suspect_EXCLUDED_by": {
+     "event": "TERMINAL_STATE",
+     "ts_utc": "2026-09-18T00:40:38.079Z",
+     "stage": "FINAL_SNAPSHOT",
+     "basis": "the run reached TERMINAL_STATE (phase 5, FINAL_SNAPSHOT) \u2014 a hung worker freezes before terminal"
+    },
+    "PROVIDER_STALL_suspect_EXCLUDED_by": {
+     "basis": "terminal completion requires every LLM stage to have returned; the durable-visible battery routing window is failure-free",
+     "routing_window_rows": 30,
+     "routing_window_ok_true": 30,
+     "xkiro_rate_limited_window": [
+      "2026-09-15T23:05:36Z",
+      "2026-09-17T23:59:32Z"
+     ],
+     "xkiro_congestion_predates_battery": true
+    }
+   },
+   "residual_UNKNOWN": "the snapshot pusher's internal cause of silence (execution-domain, owner-scoped) \u2014 the autopsy types the LOCUS (durable push path), never the internal cause (Art. XXV/LXXIV s1)"
+  }
+ ],
+ "battery_level": {
+  "battery": "R506-discovery-yield execution #1",
+  "typed_suspects": [
+   "PUSH-FAILURE-suspect"
+  ],
+  "basis": {
+   "last_successful_snapshot": {
+    "at": "2026-09-18T00:09:15Z",
+    "reason": "clarification_answered:ts_d9b7d3463583",
+    "ok": true,
+    "pushed": null,
+    "files": 3073,
+    "error": null
+   },
+   "snapshots_after_last": 0,
+   "snapshot_log_history_error_rows": 0,
+   "terminal_phases_exist_ephemeral": "6/6, 2026-09-18T00:12:05.006Z .. 2026-09-18T00:45:07.775Z",
+   "engine_checkpoint_cadence_measured": {
+    "n_gaps": 17,
+    "n_sessions_with_checkpoints": 6,
+    "min": 10.016666666666667,
+    "p50": 10.033333333333333,
+    "max": 10.05,
+    "battery_sessions_with_checkpoints": 0
+   },
+   "battery_sessions_receiving_checkpoints": 0,
+   "expected_checkpoints_missed_per_session_at_least": 3,
+   "push_path_reported_healthy_while_silent": true,
+   "durable_run_dirs": 0
+  },
+  "what_r508_typed_on_the_durable_domain": "6x INCOMPLETE_INFRASTRUCTURE_FAILURE \u2014 CORRECT on the bytes R508 could read (0/6 terminals on the terminal authority); the preserved tail resolves its LXXIV s1 death-vs-stall UNKNOWN: no deaths",
+  "residual_UNKNOWN": "the pusher's internal cause \u2014 owner-scoped (act 3 root-cause input: the preserved tail + any owner-side pusher logs)"
+ },
+ "hang_vs_death_discriminator": {
+  "directive_question": "shared hang (missing timeout) vs six independent OOMs",
+  "measured_answer": "NEITHER \u2014 DISSOLVED by preserved bytes: all six workers reached WORKER_COMPLETED; there were no deaths to discriminate",
+  "xkiro_rate_limited_event": {
+   "directive_cited": "23:37Z",
+   "measured_in_durable_bytes": {
+    "n_events_total": 69,
+    "first": "2026-09-15T23:05:36Z",
+    "last": "2026-09-17T23:59:32Z",
+    "events_at_23:37Z": 1,
+    "clusters_minutes": {
+     "23:05": 3,
+     "23:21": 3,
+     "23:22": 3,
+     "23:23": 3,
+     "23:28": 6,
+     "23:34": 3,
+     "23:35": 2,
+     "23:39": 7,
+     "23:42": 5,
+     "23:46": 3,
+     "23:47": 3,
+     "23:48": 3,
+     "23:37": 1,
+     "23:38": 2,
+     "23:40": 2,
+     "23:41": 4,
+     "23:43": 2,
+     "23:44": 4,
+     "23:49": 2,
+     "23:56": 2,
+     "23:57": 2,
+     "23:58": 2,
+     "23:59": 2
+    }
+   },
+   "relation_to_battery": "the congestion ENDED 23:59:32Z; the battery was submitted 00:03:38-00:04:32Z; the first post-congestion ok xkiro call is 00:00:46Z \u2014 the battery ran AFTER the incident window closed"
+  },
+  "heartbeat_004041Z": "sits mid-run for ts_6da1b9339ce5 (heartbeats continue to 00:44:41.113Z; WORKER_COMPLETED 00:45:07.775Z) \u2014 consistent with the preserved timeline, never a death signal",
+  "routing_battery_window": {
+   "rows_0000_0009": 30,
+   "ok_true": 30,
+   "failure_class_rows": 0
+  }
+ },
+ "derived_watchdog_bounds": {
+  "engine_checkpoint_cadence_min": {
+   "n_gaps": 17,
+   "n_sessions_with_checkpoints": 6,
+   "min": 10.016666666666667,
+   "p50": 10.033333333333333,
+   "max": 10.05,
+   "battery_sessions_with_checkpoints": 0
+  },
+  "tip_stale_threshold_min": 30,
+  "tip_stale_basis": "3x the measured 10.0-min engine_checkpoint cadence \u2014 three consecutive missed checkpoints while any session is non-terminal-durable",
+  "stalled_threshold_min": 82,
+  "stalled_basis": "the directive's 2x p90 bound; p90=41 from the /api/health run_duration_stats n=98 measured distribution",
+  "heartbeat_freshness_s": 120,
+  "heartbeat_basis": "the engine's own active_workers derivation semantics (a worker is active only with a heartbeat fresher than 120s)"
+ },
+ "one_line_verdict_table": [
+  {
+   "idx": 1,
+   "sid": "ts_dbdf24c91535",
+   "verdict": "COMPLETED-EPHEMERAL / PUSH-FAILURE-suspect (not OOM, not transport-hang, not provider-stall \u2014 exclusions byte-cited)"
+  },
+  {
+   "idx": 2,
+   "sid": "ts_ca977637f50b",
+   "verdict": "COMPLETED-EPHEMERAL / PUSH-FAILURE-suspect (not OOM, not transport-hang, not provider-stall \u2014 exclusions byte-cited)"
+  },
+  {
+   "idx": 3,
+   "sid": "ts_66e23c67b511",
+   "verdict": "COMPLETED-EPHEMERAL / PUSH-FAILURE-suspect (not OOM, not transport-hang, not provider-stall \u2014 exclusions byte-cited)"
+  },
+  {
+   "idx": 4,
+   "sid": "ts_84a8807b12dc",
+   "verdict": "COMPLETED-EPHEMERAL / PUSH-FAILURE-suspect (not OOM, not transport-hang, not provider-stall \u2014 exclusions byte-cited)"
+  },
+  {
+   "idx": 5,
+   "sid": "ts_6da1b9339ce5",
+   "verdict": "COMPLETED-EPHEMERAL / PUSH-FAILURE-suspect (not OOM, not transport-hang, not provider-stall \u2014 exclusions byte-cited)"
+  },
+  {
+   "idx": 6,
+   "sid": "ts_d9b7d3463583",
+   "verdict": "COMPLETED-EPHEMERAL / PUSH-FAILURE-suspect (not OOM, not transport-hang, not provider-stall \u2014 exclusions byte-cited)"
+  }
+ ],
+ "reviewer_provenance": "AI_REVIEW"
+}
