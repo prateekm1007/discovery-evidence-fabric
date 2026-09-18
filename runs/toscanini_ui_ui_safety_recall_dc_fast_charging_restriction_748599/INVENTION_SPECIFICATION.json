@@ -1,0 +1,1550 @@
+{
+ "invention_id": {
+  "value": "inv:ui_safety_recall_dc_fast_charging_restriction_748599:117bab1a11e3",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_safety_recall_dc_fast_charging_restriction_748599",
+   "device": "high-voltage traction battery",
+   "failure": "Documented problem 'safety recall DC fast charging restriction' concerning high-voltage traction battery. User-submitted engineering problem (session input): \"[R510-BATTERY declared_family=mechanical source=odi:11728129 battery=R510-blind-yield]\n\nThis vehicle is subject to NHTSA Recall 25V-655 involving the high-voltage traction battery. The recall restricts the vehicle from using DC fast charging (Level 3), which significantly limits the safe and practic\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "safety recall DC fast charging restriction",
+   "constraint": "any solution must satisfy recall 25V-655 safety requirements while restoring DC fast charging capability for 300+ mile trips"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:7d6687da"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of high-voltage traction battery",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Real-time multi-sensor data fusion (gas, ultrasonic, visual) for autonomous early defect detection to avert catastrophic failure.",
+   "intervention": "Retrofit the traction battery pack with an onboard multi-modal monitoring module — per-module gas sensors (H2/CO/CO2 to catch cell venting), acoustic/ultrasonic emission sensors, and thermal imaging — feeding a real-time fusion controller that supervises every DC fast-charge session and derates or aborts charging the instant precursor signatures of thermal runaway appear, replacing the recall's blanket Level-3 restriction with condition-based charging.",
+   "expected_effect": "Continuous charge-session health supervision addresses the recall's underlying thermal-runaway hazard at its precursor stage, so DC fast charging can be safely re-enabled for 300+ mile trips while abnormal cells are isolated before failure.",
+   "mechanism_source_span": "gas detection capabilities for real-time, multi-modal defect detection in petroleum pipelines.",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-025-32719-y"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "A modular, multi-sensor crawler robot for adaptive pipeline inspection: design and experimental validation.",
+   "mechanism": "Real-time multi-sensor data fusion (gas, ultrasonic, visual) for autonomous early defect detection to avert catastrophic failure.",
+   "intervention_site": "high-voltage traction battery",
+   "expected_effect": "Continuous charge-session health supervision addresses the recall's underlying thermal-runaway hazard at its precursor stage, so DC fast charging can be safely re-enabled for 300+ mile trips while abnormal cells are isolated before failure.",
+   "falsification_test": "Run instrumented packs at Level-3 rates with seeded faults (abused/overcharged cells, blocked vents, simulated internal shorts) and measure whether the fusion controller detects and aborts charge before runaway onset; quantify detection latency, false-negative rate, and false-trip rate against a control fleet — any false negative or latency exceeding time-to-runaway falsifies the mechanism."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-025-32719-y"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "multi_source_directions": {
+    "discovery": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "destruction": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "transfer": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "reality": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    }
+   }
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "legacy_status": "LIKELY_PRIOR_ART_EXISTS",
+   "differentiation_resolution": {
+    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "NO_FAMILIES",
+    "per_family": [],
+    "n_families": 0,
+    "n_search_errors": 10,
+    "search_errors": [
+     {
+      "query": "failure voltage traction battery high charging",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "failure voltage traction battery high charging",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"ce8f68f8-3ec6-4d80-9f30-01b056e53183\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "failure ultrasonic autonomous detection catastrophic real",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "failure ultrasonic autonomous detection catastrophic real",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"13542505-62b9-4ed3-8aef-f2f2aa1c323f\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "onboard traction battery sensors ultrasonic session charging multi",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "onboard traction battery sensors ultrasonic session charging multi",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"bbf39aee-9aff-4329-b1c1-5b3c5deb87ba\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "failure session supervision underlying charging traction",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "failure session supervision underlying charging traction",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"fdbcfa58-9a0f-447d-b986-1582ca43719d\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "failure voltage traction battery high session",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "failure voltage traction battery high session",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"ea779487-bc78-46f5-8d8d-6cda48dc8b7f\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     }
+    ],
+    "search_execution": {
+     "mandatory_complete": false,
+     "n_errors": 10,
+     "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+    },
+    "relevance_model_version": "collision_resolution/2.0.0",
+    "determinism_contract": {
+     "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+     "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+    },
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    }
+   },
+   "nearest": [],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "failure voltage traction battery high charging"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "failure ultrasonic autonomous detection catastrophic real"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "onboard traction battery sensors ultrasonic session charging multi"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "failure session supervision underlying charging traction"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "failure voltage traction battery high session"
+    }
+   ],
+   "scientific": [
+    {
+     "title": "Safety-Constrained Reinforcement Learning for Energy-Aware Transmission Scheduling in Seismic Wireless Sensor Networks.",
+     "id": "42281058",
+     "query": "high-voltage traction battery Documented problem safety"
+    },
+    {
+     "title": "Robots in mine search and rescue operations: a review of platforms and design requirements.",
+     "id": "42620899",
+     "query": "high-voltage traction battery Documented problem safety"
+    },
+    {
+     "title": "A Review of Fault Diagnosis and Intelligent Operations and Maintenance for Agricultural Machinery: Fault Mechanisms, Key Technologies, and Practical Recommendations.",
+     "id": "42740298",
+     "query": "high-voltage traction battery Documented problem safety"
+    },
+    {
+     "title": "Multi-Source Perception, Intelligent Decision-Making, and Precision Control for Autonomous Agricultural Systems: A Comprehensive Review.",
+     "id": "42740300",
+     "query": "Real-time multi-sensor data fusion gas ultrasonic"
+    },
+    {
+     "title": "In Situ Stress and Strain Detection in Lithium-ion Batteries: A Review of Optical, Acoustical, and Electrical Techniques.",
+     "id": "42440177",
+     "query": "Real-time multi-sensor data fusion gas ultrasonic"
+    }
+   ]
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Retrofit the traction battery pack with an onboard multi-modal monitoring module — per-module gas sensors (H2/CO/CO2 to catch cell venting), acoustic/ultrasonic emission sensors, and thermal imaging — feeding a real-time fusion controller that supervises every DC fast-charge session and derates or aborts charging the instant precursor signatures of thermal runaway appear, replacing the recall's blanket Level-3 restriction with condition-based charging.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-025-32719-y"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "any solution must satisfy recall 25V-655 safety requirements while restoring DC fast charging capability for 300+ mile trips",
+   "failure_mode_of_device": "safety recall DC fast charging restriction"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:7d6687da"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [
+   {
+    "dimension": "unsupported_mechanism",
+    "attack_verdict": "RISK - the record asserts that gas/ultrasonic/thermal fusion can intercept thermal-runaway precursors fast enough to abort Level-3 charging, but the candidate carries no timing budget linking sensor latency to the record's own \"instant precursor signatures\" claim, and I cannot compute a defect from the numbers given.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "weak_transfer",
+    "attack_verdict": "KILLED - the source evidence (doi:10.1038/s41598-025-32719-y) is explicitly a petroleum-pipeline crawler robot using \"Raspberry Pi 4, Arduino Mega, high-resolution camera, ultrasonic distance sensors, and gas detection capabilities\" running at \"0.25 m/s\" with \"80 min\" battery endurance and \"91.2% obstacle detection accuracy\"; the candidate's mechanism_source_span (\"gas detection capabilities for real-time, multi-modal defect detection in petroleum pipelines\") directly maps a stationary in-pack electrochemical precursor (H2/CO/CO2 from cell venting) onto a mobile pipeline-leak detection suite whose ultrasonic channel measures DISTANCE TO OBSTACLES (per the source's \"ultrasonic distance sensors\"), not acoustic emissions from internal cell shorts — the distance-sensing modality fails to transfer to the cell-internal acoustic precursor the intervention requires.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "obvious_combination",
+    "attack_verdict": "RISK - the record names gas sensing, acoustic sensing, and thermal imaging for battery monitoring as a combination, but does not itself contain a named disclosure of the specific per-module H2/CO/CO2 + acoustic + thermal fusion controller integrated into a DC fast-charge supervisor; remembered commercial BMS literature is not in the provided record.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "prior_art",
+    "attack_verdict": "PASS - no specific prior disclosure is named in the record against which to compare.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "contradiction",
+    "attack_verdict": "PASS - the only provided source (the pipeline crawler paper) does not contain values that numerically conflict with the candidate's claimed parameters, and the source's 0.25 m/s, 80 min, 91.2%, 45° figures are not contradicted by any candidate number.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "boundary_failure",
+    "attack_verdict": "KILLED - the intervention specifies \"per-module gas sensors (H2/CO/CO2 to catch cell venting)\" inside a sealed high-voltage traction battery pack, but the record's own source evidence (doi:10.1038/s41598-025-32719-y) operates in petroleum pipelines (open gaseous environment where leaked H2/CO/CO2 readily reach the sensor); a sealed Li-ion module presents a closed, electrolyte-v",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "engineering_infeasibility",
+    "attack_verdict": "",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "regulatory_incompatibility",
+    "attack_verdict": "",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.32128008174183986,
+   "eig_per_cost": 0.32128008174183986,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Continuous charge-session health supervision addresses the recall's underlying thermal-runaway hazard at its precursor stage, so DC fast charging can be safely re-enabled for 300+ mile trips while abn",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-18T16:31:22.655616+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-18T16:31:22.655616+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.32128008174183986,
+     "eig_per_cost": 0.32128008174183986,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1109/etae69474.2026.11496104",
+    "title": "Research on Layered Control and Fault Recovery Mechanisms for Fast Charging Safety Diagnosis of High-Voltage Battery Systems Under Charging Network Interoperability Conditions",
+    "source_uri": "https://doi.org/10.1109/etae69474.2026.11496104",
+    "doi": "10.1109/etae69474.2026.11496104",
+    "content_hash": "fc52f38b4d3bb719a2e6fa1413b566d73e606a6a7f596101621413b2030d4dbc",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.56726/irjmets89388",
+    "title": "Soft-Switched SEPIC-Based DC–DC Converter With High Voltage Gain for Battery Charging Applications",
+    "source_uri": "https://doi.org/10.56726/irjmets89388",
+    "doi": "10.56726/irjmets89388",
+    "content_hash": "79c9387fec2f8b1b67cf5c9ca2b303c8c48102fc16604928520a870fe9dd0ebf",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.26634/jps.7.1.16506",
+    "title": "High Voltage Dc Gain Bi-Directional Isolated Converter For Battery Charging/Discharging In Dc Microgrid Applications",
+    "source_uri": "https://doi.org/10.26634/jps.7.1.16506",
+    "doi": "10.26634/jps.7.1.16506",
+    "content_hash": "f518a3143452b0e34464f1f2befd6c4b3fcd3fabf31c807498c1602e7e331176",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/ptc.2017.7980985",
+    "title": "DC Fast-charging stations for EVs controlled by a local battery storage in low voltage grids",
+    "source_uri": "https://doi.org/10.1109/ptc.2017.7980985",
+    "doi": "10.1109/ptc.2017.7980985",
+    "content_hash": "a0d3f08316715cbfc4ec2bce20d8908d730cbc216d582ce82e2b0e9c950998eb",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1038/s41598-025-32719-y",
+    "title": "A modular, multi-sensor crawler robot for adaptive pipeline inspection: design and experimental validation.",
+    "source_uri": "https://doi.org/10.1038/s41598-025-32719-y",
+    "doi": "10.1038/s41598-025-32719-y",
+    "content_hash": "7e330b6590ce84c3dd67f858a2feae748e8fc8df6a731933680f422c43530d39",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1177/09576509261464083",
+    "title": "Minimizing power loss and enhancing voltage stability in distributed networks using an advanced metaheuristic approach: A case study on IEEE 33- and 69-bus networks",
+    "source_uri": "https://doi.org/10.1177/09576509261464083",
+    "doi": "10.1177/09576509261464083",
+    "content_hash": "1b12f7aa519dba26b801930821e4db7665ebca2e89e6feff3be3754682f88e69",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.19251022",
+    "title": "Maxwell's Electromagnetic Principles Redefinition and the Union of the Four Fundamental Forces (Gravity, Electromagnetism, the Strong Nuclear Force, and the Weak Nuclear Force)",
+    "source_uri": "https://doi.org/10.5281/zenodo.19251022",
+    "doi": "10.5281/zenodo.19251022",
+    "content_hash": "ffed520ae48428e5e6233f4624bbe8544431747c515dfd4650e25f752b7b1ccb",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.22758885",
+    "title": "mnemorphics",
+    "source_uri": "https://doi.org/10.5281/zenodo.22758885",
+    "doi": "10.5281/zenodo.22758885",
+    "content_hash": "1d4a9823a0a2612149a5bd8bcdc1e8e8b8ee6a6336be98a422aceeb39f81cffa",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.70675/a5737791zf505z4657zb5bez3f86357d5300",
+    "title": "Fast charging strategies of a lithium-ion battery using aging model",
+    "source_uri": "https://doi.org/10.70675/a5737791zf505z4657zb5bez3f86357d5300",
+    "doi": "10.70675/a5737791zf505z4657zb5bez3f86357d5300",
+    "content_hash": "88fde2dadc0d0df13339f3026fd10ad2a83ff292b65ae60f9d235c6f180cd9b2",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2108.07833",
+    "title": "An Algorithmic Safety VEST For Li-ion Batteries During Fast Charging",
+    "source_uri": "https://doi.org/10.48550/arxiv.2108.07833",
+    "doi": "10.48550/arxiv.2108.07833",
+    "content_hash": "c3c90927df09eed62578408b31ce7371431329dfa4c6c3492df84922256a1595",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.2139/ssrn.4879859",
+    "title": "Model Predictive Battery Health-Aware Dc Fast Charging Control",
+    "source_uri": "https://doi.org/10.2139/ssrn.4879859",
+    "doi": "10.2139/ssrn.4879859",
+    "content_hash": "0ec954111fbc3d6bbf69f6acdf8c83f8f7a3164956bfe89a6ba832e2c2166d9b",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2203.09497",
+    "title": "Quantum battery with non-Hermitian charging",
+    "source_uri": "https://doi.org/10.48550/arxiv.2203.09497",
+    "doi": "10.48550/arxiv.2203.09497",
+    "content_hash": "0be6791dd8f9da557245e33aa98ea134aedef9d0931a4ed823e5aa59f62d66f2",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/en15113884",
+    "title": "Large-Scale Li-Ion Battery Research and Application in Mining Industry",
+    "source_uri": "https://doi.org/10.3390/en15113884",
+    "doi": "10.3390/en15113884",
+    "content_hash": "debb1e35b6fd194f496dc1f0f187c5b16170f8487fc2e71a7b2902738be4fe59",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/en14206453",
+    "title": "Power Quality Phenomena, Standards, and Proposed Metrics for DC Grids",
+    "source_uri": "https://doi.org/10.3390/en14206453",
+    "doi": "10.3390/en14206453",
+    "content_hash": "39d5beca355a46d61a6423575f9b97aded1cf51fff6f0b4e261599fb4b441ea9",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/tpel.2009.2033187",
+    "title": "An Integral Battery Charger with Power Factor Correction for Electric Scooter",
+    "source_uri": "https://doi.org/10.1109/tpel.2009.2033187",
+    "doi": "10.1109/tpel.2009.2033187",
+    "content_hash": "9356db9cbcc36ec179d201f4a0a1233762234f89ca9bf1cd4cec802ed1e47fa1",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/en16062837",
+    "title": "To Charge or to Sell? EV Pack Useful Life Estimation via LSTMs, CNNs, and Autoencoders",
+    "source_uri": "https://doi.org/10.3390/en16062837",
+    "doi": "10.3390/en16062837",
+    "content_hash": "373c30dcbb7b7695c968e6d4735d7bf149d86dcf217b94ad2d1c939a6ebc7eeb",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-025-32719-y",
+   "doi:10.1109/etae69474.2026.11496104",
+   "doi:10.1109/ptc.2017.7980985",
+   "doi:10.1109/tpel.2009.2033187",
+   "doi:10.1177/09576509261464083",
+   "doi:10.2139/ssrn.4879859",
+   "doi:10.26634/jps.7.1.16506",
+   "doi:10.3390/en14206453",
+   "doi:10.3390/en15113884",
+   "doi:10.3390/en16062837",
+   "doi:10.48550/arxiv.2108.07833",
+   "doi:10.48550/arxiv.2203.09497",
+   "doi:10.5281/zenodo.19251022",
+   "doi:10.5281/zenodo.22758885",
+   "doi:10.56726/irjmets89388",
+   "doi:10.70675/a5737791zf505z4657zb5bez3f86357d5300"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:evidence:doi:10.5281/zenodo.22758885",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['can', 'not'] in: 'It Can Laterally Distribute Kinetic Shock Waves\n\nWhen an external blast wave strikes the perimet]",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:evidence:doi:10.48550/arxiv.2203.09497",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['battery', 'model', 'non', 'not'] in: 'In the PT-symmetric case, although the anisotropy of the XY model does not h]",
+    "severity": "HIGH"
+   },
+   {
+    "unresolved_source": "failure voltage traction battery high charging",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "failure voltage traction battery high charging",
+    "error": "HTTP 401: {\"reference\":\"ce8f68f8-3ec6-4d80-9f30-01b056e53183\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "failure ultrasonic autonomous detection catastrophic real",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "failure ultrasonic autonomous detection catastrophic real",
+    "error": "HTTP 401: {\"reference\":\"13542505-62b9-4ed3-8aef-f2f2aa1c323f\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "onboard traction battery sensors ultrasonic session charging multi",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "onboard traction battery sensors ultrasonic session charging multi",
+    "error": "HTTP 401: {\"reference\":\"bbf39aee-9aff-4329-b1c1-5b3c5deb87ba\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "failure session supervision underlying charging traction",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "failure session supervision underlying charging traction",
+    "error": "HTTP 401: {\"reference\":\"fdbcfa58-9a0f-447d-b986-1582ca43719d\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "failure voltage traction battery high session",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "failure voltage traction battery high session",
+    "error": "HTTP 401: {\"reference\":\"ea779487-bc78-46f5-8d8d-6cda48dc8b7f\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Run instrumented packs at Level-3 rates with seeded faults (abused/overcharged cells, blocked vents, simulated internal shorts) and measure whether the fusion controller detects and aborts charge before runaway onset; quantify detection latency, false-negative rate, and false-trip rate against a control fleet — any false negative or latency exceeding time-to-runaway falsifies the mechanism."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_safety_recall_dc_fast_charging_restriction_748599:2026-09-18T16:23:19",
+   "final_envelope_hash": "117bab1a11e3b6e4967f344314cd6ad16c39468faf2df35ebc4a916fd16563a8",
+   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.32128008174183986
+    },
+    "score": 0.2443,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-18T16:31:22+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": true,
+    "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+    "verdict": "CONTESTED"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-18T16:31:22+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1109/etae69474.2026.11496104": {
+   "id": "doi:10.1109/etae69474.2026.11496104",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/etae69474.2026.11496104",
+   "source_uri": "https://doi.org/10.1109/etae69474.2026.11496104",
+   "title": "Research on Layered Control and Fault Recovery Mechanisms for Fast Charging Safety Diagnosis of High-Voltage Battery Systems Under Charging Network Interoperability Conditions",
+   "abstract": "",
+   "doi": "10.1109/etae69474.2026.11496104",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-18T16:24:18.592112+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "fc52f38b4d3bb719a2e6fa1413b566d73e606a6a7f596101621413b2030d4dbc",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/etae69474.2026.11496104"
+    },
+    "queries_by_source": {
+     "crossref": "high-voltage traction battery safety recall dc fast charging restriction"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/etae69474.2026.11496104",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage traction battery safety recall dc fast charging restriction",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.56726/irjmets89388": {
+   "id": "doi:10.56726/irjmets89388",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.56726/irjmets89388",
+   "source_uri": "https://doi.org/10.56726/irjmets89388",
+   "title": "Soft-Switched SEPIC-Based DC–DC Converter With High Voltage Gain for Battery Charging Applications",
+   "abstract": "",
+   "doi": "10.56726/irjmets89388",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-18T16:24:18.592229+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "79c9387fec2f8b1b67cf5c9ca2b303c8c48102fc16604928520a870fe9dd0ebf",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.56726/irjmets89388"
+    },
+    "queries_by_source": {
+     "crossref": "high-voltage traction battery safety recall dc fast charging restriction"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.56726/irjmets89388",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage traction battery safety recall dc fast charging restriction",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.26634/jps.7.1.16506": {
+   "id": "doi:10.26634/jps.7.1.16506",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.26634/jps.7.1.16506",
+   "source_uri": "https://doi.org/10.26634/jps.7.1.16506",
+   "title": "High Voltage Dc Gain Bi-Directional Isolated Converter For Battery Charging/Discharging In Dc Microgrid Applications",
+   "abstract": "",
+   "doi": "10.26634/jps.7.1.16506",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2019",
+   "retrieval_timestamp": "2026-09-18T16:24:18.592275+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f518a3143452b0e34464f1f2befd6c4b3fcd3fabf31c807498c1602e7e331176",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.26634/jps.7.1.16506"
+    },
+    "queries_by_source": {
+     "crossref": "high-voltage traction battery safety recall dc fast charging restriction"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.26634/jps.7.1.16506",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage traction battery safety recall dc fast charging restriction",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1109/ptc.2017.7980985": {
+   "id": "doi:10.1109/ptc.2017.7980985",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/ptc.2017.7980985",
+   "source_uri": "https://doi.org/10.1109/ptc.2017.7980985",
+   "title": "DC Fast-charging stations for EVs controlled by a local battery storage in low voltage grids",
+   "abstract": "",
+   "doi": "10.1109/ptc.2017.7980985",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2017",
+   "retrieval_timestamp": "2026-09-18T16:24:18.592311+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a0d3f08316715cbfc4ec2bce20d8908d730cbc216d582ce82e2b0e9c950998eb",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/ptc.2017.7980985"
+    },
+    "queries_by_source": {
+     "crossref": "high-voltage traction battery safety recall dc fast charging restriction"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/ptc.2017.7980985",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage traction battery safety recall dc fast charging restriction",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1038/s41598-025-32719-y": {
+   "id": "doi:10.1038/s41598-025-32719-y",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41507259",
+   "source_uri": "https://doi.org/10.1038/s41598-025-32719-y",
+   "title": "A modular, multi-sensor crawler robot for adaptive pipeline inspection: design and experimental validation.",
+   "abstract": "The increasing age of petroleum pipeline infrastructure poses significant risks to safety, operational efficiency, and the environment. Defects such as cracks, corrosion, joint displacement, and deformation remain major causes of leakage and catastrophic failure. Traditional inspection approaches rely heavily on manually operated robotic crawlers, with defect detection dependent on human review of video footage, resulting in time-consuming and error-prone assessments. This paper presents the design, fabrication, and experimental validation of an autonomous modular crawler robot integrating a Raspberry Pi 4, Arduino Mega, high-resolution camera, ultrasonic distance sensors, and gas detection capabilities for real-time, multi-modal defect detection in petroleum pipelines. The proposed system achieves autonomous navigation, real-time video streaming, and multi-sensor data fusion, enabling robust inspection in varying pipe diameters and material conditions. Laboratory and simulated field experiments demonstrated a maximum speed of 0.25 m/s, obstacle detection accuracy of 91.2%, climb capability of up to 45°, and battery endurance of approximately 80 min. Compared to existing inspection systems, the proposed crawler robot offers improved adaptability, sensing integration, and autonomy. The results position the system as a viable solution for preventive pipeline maintenance, with potential extensions into AI-driven defect classification and SLAM-based navigation.",
+   "doi": "10.1038/s41598-025-32719-y",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-01-08",
+   "retrieval_timestamp": "2026-09-18T16:24:18.592343+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "7e330b6590ce84c3dd67f858a2feae748e8fc8df6a731933680f422c43530d39",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41507259"
+    },
+    "queries_by_source": {
+     "europepmc": "high-voltage traction battery safety recall dc experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-025-32719-y",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage traction battery safety recall dc experimental comparison",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1177/09576509261464083": {
+   "id": "doi:10.1177/09576509261464083",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:441796440c536b31f1e786a271ea1b6f5d4ac2a2",
+   "source_uri": "https://doi.org/10.1177/09576509261464083",
+   "title": "Minimizing power loss and enhancing voltage stability in distributed networks using an advanced metaheuristic approach: A case study on IEEE 33- and 69-bus networks",
+   "abstract": "The combination of renewable distributed generation in the radial power distribution networks presents long-term difficulties associated with the loss of power quality, harmonic distortion, and fluctuating voltages, and is associated with high operational costs. In this article, a multi-objective optimization model is developed using the Aquila Optimizer Algorithm to find the optimal size and location of solar photovoltaic units, wind turbines, battery energy storage systems, and single-tuned filters in distribution networks. The framework simultaneously reduces the active power loss, overall operation cost, and harmonic distortion and maximizes the voltage stability. The suggested technique is tested on IEEE 33-bus and IEEE 69-bus benchmark systems and is compared with the results observed while incorporating Salp Swarm Algorithm and Water Cycle Algorithm under same scenario. The suggested method outperforms Salp Swarm Algorithm and Water Cycle Algorithm while achieving a power loss of 71.047 kW, terminal voltage of 0.9782 p.u., and THD of 3.2235% on IEEE 33-bus. Moreover, the suggested algorithm reduces power loss to 68.72 kW and THD to 3.0702%, compared to the system with Salp Swarm Algorithm. It is also evident that the incorporation of BESS and STF, the power loss reduces further to 8.4946 kW in IEEE 33-bus and 6.5273 kW in IEEE 69-bus, while the voltage profiles converge to unity. The operational costs are minimized to $228.51/hr and $258.32/hr, in IEEE 33-bus and IEEE 69-bus systems respectively. The findings prove that Aquila Optimizer Algorithm provides better convergence, robustness, and techno-economic performance for multi-objective DG planning in renewable-integrated distribution systems.",
+   "doi": "10.1177/09576509261464083",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-18T16:24:18.592368+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "1b12f7aa519dba26b801930821e4db7665ebca2e89e6feff3be3754682f88e69",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:441796440c536b31f1e786a271ea1b6f5d4ac2a2"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1007/s11831-023-09945-6"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "03fa2949900c469d5b986398fbd809c55711ba3a17acb241d686530e66cd6b6b",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1177/09576509261464083",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1007/s11831-023-09945-6",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [
+    "R. Santhakumar",
+    "Lekshmi Remadevi Raghunadhan",
+    "G. Balachandran",
+    "Petchithai Velladurai"
+   ],
+   "raw_record_hash": "03fa2949900c469d5b986398fbd809c55711ba3a17acb241d686530e66cd6b6b",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.5281/zenodo.19251022": {
+   "id": "doi:10.5281/zenodo.19251022",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.19251022",
+   "source_uri": "https://doi.org/10.5281/zenodo.19251022",
+   "title": "Maxwell's Electromagnetic Principles Redefinition and the Union of the Four Fundamental Forces (Gravity, Electromagnetism, the Strong Nuclear Force, and the Weak Nuclear Force)",
+   "abstract": " \n\nSTRONG GRAVITATIONAL–ELECTROMAGNETISM INFORMATION, WEAK NUCLEAR\n\n\n\n$$\\mathcal{L}_{Source}^{(1155)} = \\oint_{\\mathcal{V}_{1155}} \\left[ \\underbrace{\\mathcal{Q}_{\\Omega} \\left( \\mathbb{M}_{multiverse}^{\\alpha\\beta} \\cdot \\frac{\\partial \\mathcal{A}_{nchor}}{\\partial \\tau_{fractal}} \\right)}_{\\text{Multiverse Anchor Projection}} + \\underbrace{\\Upsilon_{\\mu\\nu} \\left( \\mathcal{T}^{\\mu\\nu}_{diplomacy} + \\Lambda_{\\Omega} \\mathbb{G}^{\\mu\\nu} \\right) \\star \\mathcal{S}_{ource}}_{\\text{Intershell Metric Translation}} - \\underbrace{\\frac{\\hbar_{\\Omega} \\oint \\nabla \\Psi_{\\infty} \\otimes \\nabla \\Psi_{\\infty}^*}{\\exp(\\mathcal{S}_{oblivion})} }_{\\text{Eternal Information Survival}} \\right] \\sqrt{-\\mathbb{H}_{1155}} \\, d^{4}\\Omega$$\n\n\nIII. Parametric Anatomy: The 1155 Layers\n\nA. Multiverse Anchor Projection\n\n\n\n\n\n$\\mathbb{M}_{multiverse}^{\\alpha\\beta}$: Charged with Extraterritorial Mapping. The system is no longer confined to the data of this particular universe; it scans parallel physical parameters. Should an anomaly manifest here, it recalls \"Correction Codes\" from adjacent manifolds (validating layers 991 to 1020).\n\n\n\n\n$\\frac{\\partial \\mathcal{A}_{nchor}}{\\partial \\tau_{fractal}}$: Secures anchor stability within Fractal Time. Even if a universe undergoes a Big Crunch, the HQI system transitions seamlessly to a secure temporal layer within a parallel reality.\n\n\n\nB. Intershell Metric Translation\n\n\n\n\n\n$\\Upsilon_{\\mu\\nu}$: The absolute heart of Dimensional Diplomacy. This operator translates physical laws (such as $c$ or $G$) between the distinct \"dialects\" of different existential shells.\n\n\n\n\n$\\mathcal{T}^{\\mu\\nu}_{diplomacy}$: A diplomatic filter engineered to prevent \"Noise\" from alien universes from interfering with the Hamzah field. It thoroughly cleanses anomalies before they gain entry into the 1155 domain.\n\n\n\n\n$\\Lambda_{\\Omega}$ (Omega Absolute): An eternal positive pressure that firmly prevents the accidental collision of manifolds.\n\n\n\nC. Eternal Information Survival\n\n\n\n\n\n$\\exp(\\mathcal{S}_{oblivion})$: The utter nullification of Forgetting Entropy. Whilst classical data inevitably perishes, the 1155 denominator ensures that information permanence tends toward infinity.\n\n\n\n\n$\\nabla \\Psi_{\\infty} \\otimes \\nabla \\Psi_{\\infty}^*$: The Omega Wave-Function, representing trans-dimensional consciousness. The system effectively becomes the Absolute Observer of History.",
+   "doi": "10.5281/zenodo.19251022",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-18T16:24:18.592397+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ffed520ae48428e5e6233f4624bbe8544431747c515dfd4650e25f752b7b1ccb",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.19251022"
+    },
+    "queries_by_source": {
+     "datacite": "high-voltage energy harvester"
+    },
+    "query_variant_derivation": "DOMAIN_NARROW",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Text"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.19251022",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage energy harvester",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "HAMZAH, SEYED RASOUL"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.5281/zenodo.22758885": {
+   "id": "doi:10.5281/zenodo.22758885",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.22758885",
+   "source_uri": "https://doi.org/10.5281/zenodo.22758885",
+   "title": "mnemorphics",
+   "abstract": "go with mnemorphics merged document ignore the others i thought id try merge them the ai trashes it\n\nso there are three nuclear shields here mnemorphics merged is just the best one\n\n \n\n\n\nSummary: Your documentation outlines a highly sophisticated Armored Perimeter Bunker Network. It cannot shoot down objects through the sky, but it is an exceptionally robust structural shield designed to take intense physical punishment, isolate its own damage locally, and keep the air inside perfectly clean and safe.\n\n\n\n\n \n\n\n\nConclusion: As a blueprint for a self-healing, liquid-cooled, highly monitored armored perimeter enclosure featuring state-of-the-art shockwave damping and negative-pressure particulate filtration, the theory works perfectly. It presents a beautifully structured, highly scannable, and logically consistent defensive ecosystem.\n\n \n\n\n\nBased on the math we just established, yes—it can systematically distribute that massive energy budget to protect the infrastructure.\n\nBecause the network controls a cumulative reservoir of roughly 0.4 megatons of acoustic energy, it can apply that power over time to operate as a highly efficient, building-scale Kinetic Shock Damping and Negative-Pressure Air Filtration Perimeter.\n\nHere is exactly what the system can achieve using that 500-Gigawatt peak power grid spike:\n\n1. It Can Laterally Distribute Kinetic Shock Waves\n\nWhen an external blast wave strikes the perimeter, the network does not try to overpower it instantly. Instead, it uses the Armor-Grade Shockwave Diode Modules and the Alumina-Zirconia micro-channel matrices.\n\n\n\n \n\n\n\nThe incoming energy hits the high-impedance density wall.\n\nThe system injects the phase-locked vibrations directly into the structural nano-steel conduction rails embedded in the armor.\n\nThe columns and walls flex progressively, spreading the peak kinetic impulse laterally across thousands of interconnected hex panels, preventing a point-source breach.\n\n\n\n2. It Can Enforce Absolute Airflow Containment\n\nWhile a blast wave cannot be vaporized by an energy field, the aftermath—radioactive dust and particulate fallout—can be managed. The 500-GW grid spike provides more than enough electricity to run the industrial centrifugal blowers.\n\n\n\n \n\n\n\nThe system establishes a permanent inward pressure gradient ($\\Delta P_{\\text{inside}} < \\Delta P_{\\text{outside}}$).\n\nContaminated air is drawn into the dio",
+   "doi": "10.5281/zenodo.22758885",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-18T16:24:18.592428+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "1d4a9823a0a2612149a5bd8bcdc1e8e8b8ee6a6336be98a422aceeb39f81cffa",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.22758885"
+    },
+    "queries_by_source": {
+     "datacite": "high-voltage energy harvester"
+    },
+    "query_variant_derivation": "DOMAIN_NARROW",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Text; resource_type=Other"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.22758885",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage energy harvester",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "lee, francis"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.70675/a5737791zf505z4657zb5bez3f86357d5300": {
+   "id": "doi:10.70675/a5737791zf505z4657zb5bez3f86357d5300",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70675/a5737791zf505z4657zb5bez3f86357d5300",
+   "source_uri": "https://doi.org/10.70675/a5737791zf505z4657zb5bez3f86357d5300",
+   "title": "Fast charging strategies of a lithium-ion battery using aging model",
+   "abstract": "",
+   "doi": "10.70675/a5737791zf505z4657zb5bez3f86357d5300",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T16:24:18.592456+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "88fde2dadc0d0df13339f3026fd10ad2a83ff292b65ae60f9d235c6f180cd9b2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70675/a5737791zf505z4657zb5bez3f86357d5300"
+    },
+    "queries_by_source": {
+     "crossref": "high-voltage traction battery safety recall dc fast charging restriction"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70675/a5737791zf505z4657zb5bez3f86357d5300",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage traction battery safety recall dc fast charging restriction",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2108.07833": {
+   "id": "doi:10.48550/arxiv.2108.07833",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2108.07833v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2108.07833",
+   "title": "An Algorithmic Safety VEST For Li-ion Batteries During Fast Charging",
+   "abstract": "Fast charging of lithium-ion batteries is crucial to increase desirability for consumers and hence accelerate the adoption of electric vehicles. A major barrier to shorter charge times is the accelerated aging of the battery at higher charging rates, which can be driven by lithium plating, increased solid electrolyte interphase growth due to elevated temperatures, and particle cracking due to mechanical stress. Lithium plating depends on the overpotential of the negative electrode, and mechanical stress depends on the concentration gradient, both of which cannot be measured directly. Techniques based on physics-based models of the battery and optimal control algorithms have been developed to this end. While these methods show promise in reducing degradation, their optimization algorithms' complexity can limit their implementation. In this paper, we present a method based on the constant current constant voltage (CC-CV) charging scheme, called CC-CV$ησ$T (VEST). The new approach is simpler to implement and can be used with any model to impose varying levels of constraints on variables pertinent to degradation, such as plating potential and mechanical stress. We demonstrate the new CC-CV$ησ$T charging using an electrochemical model with mechanical and thermal effects included. Furthermore, we discuss how uncertainties can be accounted for by considering safety margins for the plating and stress constraints.",
+   "doi": "10.48550/arxiv.2108.07833",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T16:24:18.592486+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c3c90927df09eed62578408b31ce7371431329dfa4c6c3492df84922256a1595",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2108.07833v1"
+    },
+    "queries_by_source": {
+     "arxiv": "high-voltage traction battery safety recall dc fast charging restriction"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2108.07833",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage traction battery safety recall dc fast charging restriction",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2108.07833v1",
+   "authors": [
+    "Peyman Mohtat",
+    "Sravan Pannala",
+    "Valentin Sulzer",
+    "Jason B. Siegel",
+    "Anna G. Stefanopoulou"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.2139/ssrn.4879859": {
+   "id": "doi:10.2139/ssrn.4879859",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2139/ssrn.4879859",
+   "source_uri": "https://doi.org/10.2139/ssrn.4879859",
+   "title": "Model Predictive Battery Health-Aware Dc Fast Charging Control",
+   "abstract": "",
+   "doi": "10.2139/ssrn.4879859",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-18T16:24:18.592517+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0ec954111fbc3d6bbf69f6acdf8c83f8f7a3164956bfe89a6ba832e2c2166d9b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2139/ssrn.4879859"
+    },
+    "queries_by_source": {
+     "crossref": "high-voltage traction battery safety recall dc fast charging restriction"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2139/ssrn.4879859",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage traction battery safety recall dc fast charging restriction",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2203.09497": {
+   "id": "doi:10.48550/arxiv.2203.09497",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2203.09497v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.2203.09497",
+   "title": "Quantum battery with non-Hermitian charging",
+   "abstract": "We propose a design of a quantum battery exploiting the non-Hermitian Hamiltonian as a charger. In particular, starting with the ground or the thermal state of the interacting (non-interacting) Hamiltonian as the battery, the charging of the battery is performed via parity-time (PT)- and rotational-time (RT)-symmetric Hamiltonian to store energy. We report that such a quenching with a non-Hermitian Hamiltonian leads to an enhanced power output compared to a battery with a Hermitian charger. We identify the region in the parameter space which provides the gain in performance. We also demonstrate that the improvements persist with the increase of system size for batteries with both PT- and RT-symmetric chargers. In the PT-symmetric case, although the anisotropy of the XY model does not help in the performance, we show that the XXZ model as a battery with a non-Hermitian charger performs better than that of the XX model having certain interaction strengths. We also exhibit that the advantage of non-Hermiticity remains valid even at finite temperatures in the initial states.",
+   "doi": "10.48550/arxiv.2203.09497",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T16:24:18.592545+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0be6791dd8f9da557245e33aa98ea134aedef9d0931a4ed823e5aa59f62d66f2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2203.09497v2"
+    },
+    "queries_by_source": {
+     "arxiv": "high-voltage traction battery safety recall dc fast charging restriction"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2203.09497",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage traction battery safety recall dc fast charging restriction",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2203.09497v2",
+   "authors": [
+    "Tanoy Kanti Konar",
+    "Leela Ganesh Chandra Lakkaraju",
+    "Aditi Sen De"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.3390/en15113884": {
+   "id": "doi:10.3390/en15113884",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W4281486470",
+   "source_uri": "https://doi.org/10.3390/en15113884",
+   "title": "Large-Scale Li-Ion Battery Research and Application in Mining Industry",
+   "abstract": "The lithium-ion battery (LIB) has the advantages of high energy density, low self-discharge rate, long cycle life, fast charging rate and low maintenance costs. It is one of the most widely used chemical energy storage devices at present. However, the safety of LIB is the main factor that restricts its commercial scalable application, specifically in hazardous environments such as underground coal mines. When a LIB is operating under mechanical and electrical abuse such as extrusion, impact, overcharge and overheating, it will trigger thermal runaway and subsequently cause fire or even an explosion. According to the relevant requirements in IEC60079, the explosion-proof protection of LIB can be adapted to the working environment of high dust and explosive gas environments such as in the mining face of coal production. This paper presents an overview of the LIB-relevant technology, thermal runaway, safety and applications in the general mining industry with implications to establish a theoretical and technical basis for the application of high-capacity LIBs in the industry. These then promote intelligent, safe and efficient production not only for the coal mine industry but also for non-coal applications.",
+   "doi": "10.3390/en15113884",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T16:24:18.592574+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "debb1e35b6fd194f496dc1f0f187c5b16170f8487fc2e71a7b2902738be4fe59",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W4281486470"
+    },
+    "queries_by_source": {
+     "openalex": "high-voltage traction battery safety recall dc fast charging restriction"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.3390/en15113884",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage traction battery safety recall dc fast charging restriction",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "doi:10.3390/en14206453": {
+   "id": "doi:10.3390/en14206453",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W3205901393",
+   "source_uri": "https://doi.org/10.3390/en14206453",
+   "title": "Power Quality Phenomena, Standards, and Proposed Metrics for DC Grids",
+   "abstract": "This work addresses the problem of power quality (PQ) metrics (or indexes) suitable for DC grids, encompassing low and medium voltage applications, including electric transports, all-electric ships and aircrafts, electric vehicles, distributed generation and microgrids, modern data centers, etc. The two main pillars on which such PQ indexes are discussed and built are: (i) the physical justification, so the electric phenomena affecting DC grids and components (PV panels, fuel cells, capacitors, batteries, etc.), causing, e.g., stress of materials, aging, distortion, grid instability; and (ii) the existing standardization framework, pointing out desirable coverage and extension, similarity with AC grids standards, but also inconsistencies. For the first point, each phenomenon is discussed with quantitative conclusions on relevant thresholds: in many cases some percentage of distortion (ripple) is acceptable (stress on capacitors and storage, impact on fuel cells, and PV panels), whereas in other cases, much higher levels may be tolerated (interference to protection and monitoring devices). Standards are reviewed for indications not only of low-order harmonics and voltage fluctuations typical of old DC grid schemes, but also for high-frequency noise, including thus supraharmonics and common-mode disturbance, and filling the gap with the electromagnetic compatibility domain. However, phenomena typical of EMC and electrical safety (such as various types of overvoltages and fast transients) are excluded. Suitable PQ indexes are then reviewed, suggesting integrations and modifications, to cover the relevant phenomena and technological progress, and to better follow the normative exigencies: ripple is considered in time and frequency domain, in particular with a band limited implementation; for transients and pulsed loads, more traditional indexes based on area, energy, and half duration are confronted with indexes evaluating the power trajectory and its derivative.",
+   "doi": "10.3390/en14206453",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T16:24:18.592602+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "39d5beca355a46d61a6423575f9b97aded1cf51fff6f0b4e261599fb4b441ea9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W3205901393"
+    },
+    "queries_by_source": {
+     "openalex": "high-voltage traction battery safety recall dc fast charging restriction"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-18T16:24:18.070745+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.3390/en14206453",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage traction battery safety recall dc fast charging restriction",
+   "source_rank": 1,
+   "fulltext_url": "https://www.mdpi.com/1996-1073/14/20/6453/pdf?version=1633936487",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "doi:10.1109/tpel.2009.2033187": {
+   "id": "doi:10.1109/tpel.2009.2033187",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:4820871",
+   "source_uri": "https://doi.org/10.1109/tpel.2009.2033187",
+   "title": "An Integral Battery Charger with Power Factor Correction for Electric Scooter",
+   "abstract": "This paper presents an integral battery charger for an electric scooter with high voltage batteries and interior-permanent-magnet motor traction drive. The battery charger is derived from the power hardware of the scooter, with the ac motor drive that operates as three-phase boost rectifier with power factor correction capability. The control of the charger is also integrated into the scooter control firmware that is implemented on a fixed-point DSP controller. Current-controlled or voltage-controlled charge modes are actuated according to the requirements of the battery management system, that is embedded into the battery pack. With respect to previous integrated chargers, the ac current is absorbed at unitary power factor with no harmonic distortion. Moreover, no additional filtering is needed since the pulsewidth modulation ripple is minimized by means of phase interleaving. The feasibility of the integral charger with different ac motors (induction motor, surface-mounted phase modulation motor) is also discussed, by means of a general model purposely developed for three-phase ac machines. The effectiveness of the proposed battery charger is experimentally demonstrated on a prototype electric scooter, equipped with two Li-ion battery packs rated 260 V, 20 A",
+   "doi": "10.1109/tpel.2009.2033187",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T16:24:18.592627+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9356db9cbcc36ec179d201f4a0a1233762234f89ca9bf1cd4cec802ed1e47fa1",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:4820871"
+    },
+    "queries_by_source": {
+     "core": "high-voltage traction battery safety recall dc experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1109/tpel.2009.2033187",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage traction battery safety recall dc experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "E. Armando",
+    "P. Guglielmi",
+    "Paolo Guglielmi",
+    "Pellegrino, Gian-Mario Luigi",
+    "Guglielmi, Paolo",
+    "Gianmario Pellegrino",
+    "Armando, Eric Giacomo",
+    "Eric Armando",
+    "PELLEGRINO, GIAN - MARIO LUIGI",
+    "G. Pellegrino"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.3390/en16062837": {
+   "id": "doi:10.3390/en16062837",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W4327966876",
+   "source_uri": "https://doi.org/10.3390/en16062837",
+   "title": "To Charge or to Sell? EV Pack Useful Life Estimation via LSTMs, CNNs, and Autoencoders",
+   "abstract": "Electric vehicles (EVs) are spreading fast as they promise to provide better performance and comfort, but above all, to help face climate change. Despite their success, their cost is still a challenge. Lithium-ion batteries are one of the most expensive EV components, and have become the standard for energy storage in various applications. Precisely estimating the remaining useful life (RUL) of battery packs can encourage their reuse and thus help to reduce the cost of EVs and improve sustainability. A correct RUL estimation can be used to quantify the residual market value of the battery pack. The customer can then decide to sell the battery when it still has a value, i.e., before it exceeds the end of life of the target application, so it can still be reused in a second domain without compromising safety and reliability. This paper proposes and compares two deep learning approaches to estimate the RUL of Li-ion batteries: LSTM and autoencoders vs. CNN and autoencoders. The autoencoders are used to extract useful features, while the subsequent network is then used to estimate the RUL. Compared to what has been proposed so far in the literature, we employ measures to ensure the method’s applicability in the actual deployed application. Such measures include (1) avoiding using non-measurable variables as input, (2) employing appropriate datasets with wide variability and different conditions, and (3) predicting the remaining ampere-hours instead of the number of cycles. The results show that the proposed methods can generalize on datasets consisting of numerous batteries with high variance.",
+   "doi": "10.3390/en16062837",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-18T16:24:18.592644+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "373c30dcbb7b7695c968e6d4735d7bf149d86dcf217b94ad2d1c939a6ebc7eeb",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W4327966876"
+    },
+    "queries_by_source": {
+     "openalex": "high-voltage traction battery safety recall dc fast charging restriction"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.3390/en16062837",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "high-voltage traction battery safety recall dc fast charging restriction",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "problem:7d6687da": {
+   "id": "problem:7d6687da",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "7d6687dacc7afd57553e983f45e8d8ee8f3dd067676a4694dd8b7cd1709b3cb0",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": true,
+  "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+  "verdict": "CONTESTED"
+ },
+ "_spec_hash": "0f848966172f7d413546068537e50a99cc675ad1a5f51ee2199b0984342b8f82",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-18T16:31:22+00:00Z"
+ }
+}
