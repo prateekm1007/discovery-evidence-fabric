@@ -1,0 +1,33 @@
+{
+ "gen": 1,
+ "invention_id": "inv:1ba0fef3fa:gen1",
+ "parent_id": null,
+ "lineage": [
+  "inv:1ba0fef3fa:gen1"
+ ],
+ "origin": "BASELINE_SYNTHESIS",
+ "architecture": {
+  "mechanism": "Real-time estimation of electromagnetic torque and d-q axis stator reactance via a moving-average-filtered third-order generalized integrator flux observer, feeding an adaptive predictive model that is updated each sampling instant and enforces current constraints, so operating-point-dependent nonlinearities (inductance variation, flux weakening) are tracked rather than mis-modeled.",
+  "intervention": "Embed the filtered third-order generalized integrator flux observer in the rear motor inverter's control software to continuously estimate torque and stator reactance; use the adaptive linear MPC's current-constraint enforcement and per-sample model update to detect inverter/motor operating-point drift early, then command a controlled torque derate plus a \"pull over safely\" warning instead of allowing a hard shutdown.",
+  "expected_effect": "Incipient inverter failure signatures (reactance/inductance variation, flux weakening, current imbalance) are detected while propulsion is still available, so the warning is issued with residual torque authority maintained, giving the driver the 10-15 seconds needed to reach a safe pullover spot before total power loss.",
+  "falsification_test": "On a vehicle or HIL bench, inject a representative rear inverter fault (phase open/short, gate-driver loss, capacitor degradation) and log (a) time from fault onset to driver warning and (b) time from warning to total propulsion loss; the mechanism is falsified if warning-to-loss is under 10-15 s or if the observer's torque/reactance estimates show no detectable deviation before catastrophic shutdown."
+ },
+ "state": "INVENTION_SURVIVED",
+ "maturity": "GENERATED",
+ "challenge": {
+  "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+  "attack_overall": "KILLED",
+  "evidence_verified": true,
+  "killed": false,
+  "failure_class": null,
+  "kill_reason": "all deterministic checks passed; the adversarial gauntlet's objections are ESCALATED (uncalibrated attacker, Art. L) and ride the record for adjudication",
+  "final_status": "AUTOMATED_INVENTION_CANDIDATE"
+ },
+ "causal_delta": null,
+ "change_delta": null,
+ "reason_for_change": null,
+ "fresh_evidence": null,
+ "model": null,
+ "artifacts": {},
+ "evidence_verified": true
+}
