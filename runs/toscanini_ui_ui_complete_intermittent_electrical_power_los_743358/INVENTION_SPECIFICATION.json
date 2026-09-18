@@ -30,11 +30,47 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Dual-loop disturbance-rejection control — integrating LADRC (Linear Active Disturbance Rejection Control) with a cascade FOPIDN controller estimates and compensates load fluctuations, intermittency, and delay effects to maintain bus stability.",
-   "intervention": "Add an LADRC-FOPIDN dual-loop controller to the vehicle power management unit (alternator field current regulation plus battery/load bus switching) so intermittent faults and load dumps are actively rejected in real time instead of collapsing the electrical bus.",
-   "expected_effect": "Transient voltage/frequency dips during highway operation are compensated, sustaining power to ignition, engine electronics, and DVD player, eliminating sudden total power loss.",
-   "mechanism_source_span": "By integrating LADRC with a cascade controller, the proposed approach delivers improved transient performance over selected benchmark controllers",
-   "span_derivation": null
+   "mechanism": "A Dual Loop LADRC-FOPIDN-(1 + TD) controller improves frequency regulation and DC-bus voltage regulation of the vehicle electrical power system while taking RES's intermittent nature into account; by integrating LADRC with a cascade controller, the proposed approach delivers improved transient performance over selected benchmark controllers (LADRC, FOPIDN, FOPIDN-(1 + TD)) under the tested scenarios, and an enhanced Quasi Opposition Arithmetic Optimization Algorithm (QOAOA) is employed to optimize controller parameters for improved efficiency, giving strong adaptability to RES intermittency, load fluctuations, and delay effects, ensuring grid stability and bus stability for ignition, engine electronics, and accessory loads during highway operation.",
+   "intervention": "Instantiate the Dual Loop LADRC-FOPIDN-(1 + TD) controller inside the vehicle power management unit, integrating LADRC with a cascade controller so the LADRC observer loop drives alternator field-current regulation and the cascade FOPIDN-(1 + TD) loop commands battery/load bus switching; employ the enhanced Quasi Opposition Arithmetic Optimization Algorithm (QOAOA) to optimize controller parameters, so intermittent faults, RES intermittency, load fluctuations, and delay effects are actively rejected in real time instead of collapsing the 12 V bus.",
+   "expected_effect": "Transient voltage and frequency dips during highway operation are compensated by the LADRC observer and the cascade FOPIDN-(1 + TD) loop with QOAOA-optimized parameters, sustaining power to ignition, engine electronics, and the DVD player, eliminating sudden total power loss under load fluctuations, intermittency, and delay effects.",
+   "mechanism_source_span": "This study investigates how a Dual Loop LADRC-FOPIDN-(1 + TD) controller can improve frequency regulation in a multi-area deregulated electricity system while taking RES's intermittent nature into account. By integrating LADRC with a cascade controller, the proposed approach delivers improved transient performance over selected benchmark controllers (LADRC, FOPIDN, FOPIDN-(1 + TD)) under the tested scenarios. Furthermore, an enhanced Quasi Opposition Arithmetic Optimization Algorithm (QOAOA) is employed to optimize controller parameters for improved efficiency. Simulation results highlight its strong adaptability to specific uncertainties modeled in this study, such as RES intermittency, load fluctuations, and delay effects, ensuring grid stability.",
+   "span_derivation": {
+    "n_shared": 51,
+    "shared_terms": [
+     "account",
+     "adaptability",
+     "algorithm",
+     "approach",
+     "arithmetic",
+     "benchmark",
+     "cascade",
+     "controller",
+     "delay",
+     "deliver",
+     "dual",
+     "effect",
+     "efficiency",
+     "employed",
+     "enhanced",
+     "ensuring",
+     "fluctuation",
+     "fopidn",
+     "frequency",
+     "grid"
+    ],
+    "span_terms_n": 69,
+    "ratio": 0.739,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "Highway-profile bench replay in which intermittent alternator dropouts and pulsed load dumps are injected; the test fails if any monitored bus voltage sag below the ignition/ECU keep-alive threshold coincides with engine or DVD shutdown, or if transient performance does not exceed the selected benchmark controllers (LADRC, FOPIDN, FOPIDN-(1 + TD)).",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.1038/s41598-026-53160-9",
+     "source_span": "This study investigates how a Dual Loop LADRC-FOPIDN-(1 + TD) controller can improve frequency regulation in a multi-area deregulated electricity system while taking RES's intermittent nature into account. By integrating LADRC with a cascade controller, the proposed approach delivers improved transient performance over selected benchmark controllers (LADRC, FOPIDN, FOPIDN-(1 + TD)) under the tested scenarios. Furthermore, an enhanced Quasi Opposition Arithmetic Optimization Algorithm (QOAOA) is employed to optimize controller parameters for improved efficiency. Simulation results highlight its strong adaptability to specific uncertainties modeled in this study, such as RES intermittency, load fluctuations, and delay effects, ensuring grid stability."
+    }
+   }
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
@@ -259,7 +295,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Add an LADRC-FOPIDN dual-loop controller to the vehicle power management unit (alternator field current regulation plus battery/load bus switching) so intermittent faults and load dumps are actively rejected in real time instead of collapsing the electrical bus.",
+   "intervention": "Instantiate the Dual Loop LADRC-FOPIDN-(1 + TD) controller inside the vehicle power management unit, integrating LADRC with a cascade controller so the LADRC observer loop drives alternator field-current regulation and the cascade FOPIDN-(1 + TD) loop commands battery/load bus switching; employ the enhanced Quasi Opposition Arithmetic Optimization Algorithm (QOAOA) to optimize controller parameters, so intermittent faults, RES intermittency, load fluctuations, and delay effects are actively rejected in real time instead of collapsing the 12 V bus.",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -274,7 +310,14 @@
  "constraints": {
   "value": {
    "stated_constraint": "The repair must eliminate sudden total power loss during highway operation.",
-   "failure_mode_of_device": "complete intermittent electrical power loss"
+   "failure_mode_of_device": "complete intermittent electrical power loss",
+   "evidence_derived": [
+    {
+     "constraint": "The Dual Loop LADRC-FOPIDN-(1 + TD) controller parameters must be optimized with the enhanced Quasi Opposition Arithmetic Optimization Algorithm (QOAOA), and its design must explicitly address the three uncertainties (RES intermittency, load fluctuations, and delay effects",
+     "evidence_id": "doi:10.1038/s41598-026-53160-9",
+     "span": "This study investigates how a Dual Loop LADRC-FOPIDN-(1 + TD) controller can improve frequency regulation in a multi-area deregulated electricity system while taking RES's intermittent nature into account. By integrating LADRC with a cascade controller, the proposed approach delivers improved transi"
+    }
+   ]
   },
   "epistemic_class": "SOURCE_FACT",
   "origin_stage": "PROBLEM",
@@ -1523,10 +1566,277 @@
   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
   "verdict": "CONTESTED"
  },
- "_spec_hash": "e82a8d6d086e5169bab5d331b5327fc379bd990a5f7d927d16db128c0f716d3d",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
   "checked_at": "2026-09-18T15:03:29+00:00Z"
- }
+ },
+ "_improvement": {
+  "parent_spec_hash": "ccdd830677b091207494842193c0126737adc743b820e32f9496affbf7ffef41",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:447c7e131740",
+   "mutation_type": "MECHANISM_STRENGTHENING",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.333,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:d8c29c4a2675",
+    "provider": "zai",
+    "model": "Atria-Dawn-Preview",
+    "prompt_hash": "200e1b1a9acbc4e0c44d3bca2de93f42ff8b8bbe657033592ea5547b441dd54e",
+    "output_hash": "d8c29c4a26753bd9390843b5ed470ef419be02bf8e2dc98d4cb616a78ca27225",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.1038/s41598-026-53160-9",
+     "span_verbatim_in_evidence": true,
+     "mutation_changes_candidate": true,
+     "span_derivation": {
+      "n_shared": 51,
+      "shared_terms": [
+       "account",
+       "adaptability",
+       "algorithm",
+       "approach",
+       "arithmetic",
+       "benchmark",
+       "cascade",
+       "controller",
+       "delay",
+       "deliver",
+       "dual",
+       "effect",
+       "efficiency",
+       "employed",
+       "enhanced",
+       "ensuring",
+       "fluctuation",
+       "fopidn",
+       "frequency",
+       "grid"
+      ],
+      "span_terms_n": 69,
+      "ratio": 0.739,
+      "underived": false,
+      "state": "MEASURED",
+      "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+     },
+     "span_derivation_cleared": 0.739
+    },
+    "reasons": [],
+    "validated_at": "2026-09-18T15:05:41+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "Dual Loop LADRC-FOPIDN-(1 + TD) disturbance-rejection control, in which a Linear Active Disturbance Rejection Control (LADRC) observer estimates total disturbance on the vehicle DC bus and a cascade Fractional-Order PID plus filter (FOPIDN) controller with a (1 + TD) tracking-differentiator stage co",
+     "after": "A Dual Loop LADRC-FOPIDN-(1 + TD) controller improves frequency regulation and DC-bus voltage regulation of the vehicle electrical power system while taking RES's intermittent nature into account; by integrating LADRC with a cascade controller, the proposed approach delivers improved transient perfo"
+    },
+    "intervention": {
+     "before": "Instantiate a Dual Loop LADRC-FOPIDN-(1 + TD) controller inside the vehicle power management unit, where the LADRC loop drives alternator field-current regulation and the cascade FOPIDN-(1 + TD) loop commands the battery/load bus switching so that intermittent faults, RES-like intermittency, and loa",
+     "after": "Instantiate the Dual Loop LADRC-FOPIDN-(1 + TD) controller inside the vehicle power management unit, integrating LADRC with a cascade controller so the LADRC observer loop drives alternator field-current regulation and the cascade FOPIDN-(1 + TD) loop commands battery/load bus switching; employ the "
+    },
+    "mechanism_source_span": {
+     "before": "This study investigates how a Dual Loop LADRC-FOPIDN-(1 + TD) controller can improve frequency regulation in a multi-area deregulated electricity system while taking RES's intermittent nature into account. By integrating LADRC with a cascade controller, the proposed approach delivers improved transi",
+     "after": "This study investigates how a Dual Loop LADRC-FOPIDN-(1 + TD) controller can improve frequency regulation in a multi-area deregulated electricity system while taking RES's intermittent nature into account. By integrating LADRC with a cascade controller, the proposed approach delivers improved transi"
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "vehicle electrical power active system highway",
+     "vehicle electrical power active system highway",
+     "active disturbance rejection control integrating cascade",
+     "active disturbance rejection control integrating cascade",
+     "vehicle power electrical controller ladrc fopidn dual loop",
+     "vehicle power electrical controller ladrc fopidn dual loop",
+     "vehicle during operation sustaining ignition eliminating",
+     "vehicle during operation sustaining ignition eliminating",
+     "transient voltage frequency operation compensated sustaining",
+     "transient voltage frequency operation compensated sustaining"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "ccdd830677b091207494842193c0126737adc743b820e32f9496affbf7ffef41",
+   "child_spec_hash": null,
+   "reason": "",
+   "applied_at": "2026-09-18T15:05:41+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:5b9525543157",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.206,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:9939e8fe6241",
+     "provider": "xkiro",
+     "model": "minimax/minimax-m3:free",
+     "prompt_hash": "f9e350acb93bea1648f6f37e0f7f8c689c59fe5c61a98bc45ed36cc84d5eb02e",
+     "output_hash": "9939e8fe6241259794e4bb076243d602f2381494743b0c4717e7066369f91510",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1038/s41598-026-53160-9",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.348,
+      "evidence_support_cleared": 0.348,
+      "constraint_traceable_to_evidence": "The Dual Loop LADRC-FOPIDN-(1 + TD) controller parameters must be optimized with the enhanced Quasi Opposition Arithmeti"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-18T15:04:52+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Dual-loop disturbance-rejection control — integrating LADRC (Linear Active Disturbance Rejection Control) with a cascade FOPIDN controller estimates and compensates load fluctuations, intermittency, and delay effects to maintain bus stability.",
+      "after": "Dual Loop LADRC-FOPIDN-(1 + TD) disturbance-rejection control, in which a Linear Active Disturbance Rejection Control (LADRC) observer estimates total disturbance on the vehicle DC bus and a cascade Fractional-Order PID plus filter (FOPIDN) controller with a (1 + TD) tracking-differentiator stage co"
+     },
+     "intervention": {
+      "before": "Add an LADRC-FOPIDN dual-loop controller to the vehicle power management unit (alternator field current regulation plus battery/load bus switching) so intermittent faults and load dumps are actively rejected in real time instead of collapsing the electrical bus.",
+      "after": "Instantiate a Dual Loop LADRC-FOPIDN-(1 + TD) controller inside the vehicle power management unit, where the LADRC loop drives alternator field-current regulation and the cascade FOPIDN-(1 + TD) loop commands the battery/load bus switching so that intermittent faults, RES-like intermittency, and loa"
+     },
+     "mechanism_source_span": {
+      "before": "By integrating LADRC with a cascade controller, the proposed approach delivers improved transient performance over selected benchmark controllers",
+      "after": "This study investigates how a Dual Loop LADRC-FOPIDN-(1 + TD) controller can improve frequency regulation in a multi-area deregulated electricity system while taking RES's intermittent nature into account. By integrating LADRC with a cascade controller, the proposed approach delivers improved transi"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "vehicle electrical power active system highway",
+      "vehicle electrical power active system highway",
+      "active disturbance rejection control integrating cascade",
+      "active disturbance rejection control integrating cascade",
+      "vehicle power electrical controller ladrc fopidn dual loop",
+      "vehicle power electrical controller ladrc fopidn dual loop",
+      "vehicle during operation sustaining ignition eliminating",
+      "vehicle during operation sustaining ignition eliminating",
+      "transient voltage frequency operation compensated sustaining",
+      "transient voltage frequency operation compensated sustaining"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "e82a8d6d086e5169bab5d331b5327fc379bd990a5f7d927d16db128c0f716d3d",
+    "child_spec_hash": null,
+    "reason": "",
+    "applied_at": "2026-09-18T15:04:52+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:447c7e131740",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.333,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:d8c29c4a2675",
+     "provider": "zai",
+     "model": "Atria-Dawn-Preview",
+     "prompt_hash": "200e1b1a9acbc4e0c44d3bca2de93f42ff8b8bbe657033592ea5547b441dd54e",
+     "output_hash": "d8c29c4a26753bd9390843b5ed470ef419be02bf8e2dc98d4cb616a78ca27225",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1038/s41598-026-53160-9",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 51,
+       "shared_terms": [
+        "account",
+        "adaptability",
+        "algorithm",
+        "approach",
+        "arithmetic",
+        "benchmark",
+        "cascade",
+        "controller",
+        "delay",
+        "deliver",
+        "dual",
+        "effect",
+        "efficiency",
+        "employed",
+        "enhanced",
+        "ensuring",
+        "fluctuation",
+        "fopidn",
+        "frequency",
+        "grid"
+       ],
+       "span_terms_n": 69,
+       "ratio": 0.739,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 0.739
+     },
+     "reasons": [],
+     "validated_at": "2026-09-18T15:05:41+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Dual Loop LADRC-FOPIDN-(1 + TD) disturbance-rejection control, in which a Linear Active Disturbance Rejection Control (LADRC) observer estimates total disturbance on the vehicle DC bus and a cascade Fractional-Order PID plus filter (FOPIDN) controller with a (1 + TD) tracking-differentiator stage co",
+      "after": "A Dual Loop LADRC-FOPIDN-(1 + TD) controller improves frequency regulation and DC-bus voltage regulation of the vehicle electrical power system while taking RES's intermittent nature into account; by integrating LADRC with a cascade controller, the proposed approach delivers improved transient perfo"
+     },
+     "intervention": {
+      "before": "Instantiate a Dual Loop LADRC-FOPIDN-(1 + TD) controller inside the vehicle power management unit, where the LADRC loop drives alternator field-current regulation and the cascade FOPIDN-(1 + TD) loop commands the battery/load bus switching so that intermittent faults, RES-like intermittency, and loa",
+      "after": "Instantiate the Dual Loop LADRC-FOPIDN-(1 + TD) controller inside the vehicle power management unit, integrating LADRC with a cascade controller so the LADRC observer loop drives alternator field-current regulation and the cascade FOPIDN-(1 + TD) loop commands battery/load bus switching; employ the "
+     },
+     "mechanism_source_span": {
+      "before": "This study investigates how a Dual Loop LADRC-FOPIDN-(1 + TD) controller can improve frequency regulation in a multi-area deregulated electricity system while taking RES's intermittent nature into account. By integrating LADRC with a cascade controller, the proposed approach delivers improved transi",
+      "after": "This study investigates how a Dual Loop LADRC-FOPIDN-(1 + TD) controller can improve frequency regulation in a multi-area deregulated electricity system while taking RES's intermittent nature into account. By integrating LADRC with a cascade controller, the proposed approach delivers improved transi"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "vehicle electrical power active system highway",
+      "vehicle electrical power active system highway",
+      "active disturbance rejection control integrating cascade",
+      "active disturbance rejection control integrating cascade",
+      "vehicle power electrical controller ladrc fopidn dual loop",
+      "vehicle power electrical controller ladrc fopidn dual loop",
+      "vehicle during operation sustaining ignition eliminating",
+      "vehicle during operation sustaining ignition eliminating",
+      "transient voltage frequency operation compensated sustaining",
+      "transient voltage frequency operation compensated sustaining"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "ccdd830677b091207494842193c0126737adc743b820e32f9496affbf7ffef41",
+    "child_spec_hash": null,
+    "reason": "",
+    "applied_at": "2026-09-18T15:05:41+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "f4c899c1d0e081ad10544e11ce10ef855ebfc19f187cd0721f0c13ab9580dfeb"
 }
