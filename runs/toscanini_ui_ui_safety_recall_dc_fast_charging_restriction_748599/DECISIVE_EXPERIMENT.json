@@ -1,0 +1,123 @@
+{
+ "shortlist": [
+  {
+   "experiment": "run killer experiment: falsification_test_from_candidate",
+   "source_stage": "NEXT_BEST_ACTION",
+   "action_id": "action:killer_experiment",
+   "expected_information_gain": 0.32128008174183986,
+   "score": 0.36,
+   "decision_impact": 0.9,
+   "probability_of_decision_change": 0.8,
+   "kill_probability": "UNKNOWN (no sourced base rate exists)",
+   "cost": 0.6425601634836797,
+   "time": "UNKNOWN",
+   "dependency": "physical_lab",
+   "basis": "COMPUTED (NBA score formula engine-v1)"
+  },
+  {
+   "experiment": "falsification_test_from_candidate",
+   "source_stage": "KILLER_EXPERIMENT",
+   "expected_information_gain": 0.32128008174183986,
+   "eig_per_cost": 0.32128008174183986,
+   "decision_impact": 0.9,
+   "kill_probability": "UNKNOWN (no sourced base rate exists)",
+   "cost": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+   "time": "UNKNOWN",
+   "dependency": "design article must exist first (see build plan)",
+   "is_selected_killer": true,
+   "basis": "COMPUTED (Bayesian EIG over MODEL_DERIVED priors)",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Continuous charge-session health supervision addresses the recall's underlying thermal-runaway hazard at its precursor stage, so DC fast charging can be safely re-enabled for 300+ mile trips while abn",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-18T16:31:22.655616+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-18T16:31:22.655616+00:00"
+     }
+    }
+   ]
+  },
+  {
+   "experiment": "contradiction_attacking_experiment",
+   "source_stage": "KILLER_EXPERIMENT",
+   "expected_information_gain": 0.34249274537077934,
+   "eig_per_cost": 0.1712463726853897,
+   "decision_impact": 0.6,
+   "kill_probability": "UNKNOWN (no sourced base rate exists)",
+   "cost": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+   "time": "UNKNOWN",
+   "dependency": "design article must exist first (see build plan)",
+   "is_selected_killer": false,
+   "basis": "COMPUTED (Bayesian EIG over MODEL_DERIVED priors)"
+  }
+ ],
+ "administrative_actions_excluded": [
+  {
+   "action_id": "con:evidence:doi:10.5281/zenodo.22758885",
+   "description": "attack contradiction: user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/",
+   "provider": "internal_attack",
+   "exclusion_reason": "administrative/research action, not a falsification experiment (R377: the decisive experiment must be an experiment; recorded here — a valid next-best-action but not a decisive experiment)"
+  },
+  {
+   "action_id": "con:evidence:doi:10.48550/arxiv.2203.09497",
+   "description": "attack contradiction: user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/",
+   "provider": "internal_attack",
+   "exclusion_reason": "administrative/research action, not a falsification experiment (R377: the decisive experiment must be an experiment; recorded here — a valid next-best-action but not a decisive experiment)"
+  }
+ ],
+ "exclusion_note": "R377: administrative actions from next_best_action are excluded from the decisive-experiment shortlist (measured defect: all six R376 survivors selected 'fetch and audit claims of nearest collision patents' as the decisive experiment — a literature task cannot distinguish the candidate from existing approaches)",
+ "selected": {
+  "experiment": "run killer experiment: falsification_test_from_candidate",
+  "source_stage": "NEXT_BEST_ACTION",
+  "action_id": "action:killer_experiment",
+  "expected_information_gain": 0.32128008174183986,
+  "score": 0.36,
+  "decision_impact": 0.9,
+  "probability_of_decision_change": 0.8,
+  "kill_probability": "UNKNOWN (no sourced base rate exists)",
+  "cost": 0.6425601634836797,
+  "time": "UNKNOWN",
+  "dependency": "physical_lab",
+  "basis": "COMPUTED (NBA score formula engine-v1)"
+ },
+ "explanation": "This is the next experiment because it has the greatest expected ability to change the candidate decision (NEXT_BEST_ACTION ranking; score 0.36)",
+ "no_invented_values_note": "cost/time/kill_probability remain UNKNOWN where no stage recorded them (Art. XXV)",
+ "falsification_contract": {
+  "HYPOTHESIS": "expected effect holds: Continuous charge-session health supervision addresses the recall's underlying thermal-runaway hazard at its precursor stage, so DC fast charging can be safely re-enabled for 300+ mile trips while abn (recorded prior 0.6, epistemic class MODEL_DERIVED per the killer-experiment provenance)",
+  "TREATMENT": "Retrofit the traction battery pack with an onboard multi-modal monitoring module — per-module gas sensors (H2/CO/CO2 to catch cell venting), acoustic/ultrasonic emission sensors, and thermal imaging — feeding a real-time fusion controller that supervises every DC fast-charge session and derates or aborts charging the instant precursor signatures of thermal runaway appear, replacing the recall's blanket Level-3 restriction with condition-based charging.",
+  "CONTROL_BLOCKER": "no executed baseline comparison on record (physics chain executed: ['PRE_REQUIREMENTS']; lifecycle MECHANISM_NOT_SIMULATABLE) — the control arm is not invented from the problem statement",
+  "MEASUREMENT": "Run instrumented packs at Level-3 rates with seeded faults (abused/overcharged cells, blocked vents, simulated internal shorts) and measure whether the fusion controller detects and aborts charge before runaway onset; quantify detection latency, false-negative rate, and false-trip rate against a control fleet — any false negative or latency exceeding time-to-runaway falsifies the mechanism.",
+  "APPARATUS_BLOCKER": "no separate apparatus record exists; the falsification test does not state a quantified instrumented procedure",
+  "SAMPLE_BLOCKER": "no sample-size / n= record exists in any engine stage (honest UNKNOWN — Art. XXV)",
+  "ACCEPTANCE_THRESHOLD": "Continuous charge-session health supervision addresses the recall's underlying thermal-runaway hazard at its precursor stage, so DC fast charging can be safely re-enabled for 300+ mile trips while abnormal cells are isolated before failure.",
+  "FALSIFICATION_THRESHOLD": "the recorded falsification test ('Run instrumented packs at Level-3 rates with seeded faults (abused/overcharged cells, blocked vents, simulated internal shorts) and measure whether the fusion controller detects and aborts charge befo') fails to show the recorded expected effect ('Continuous charge-session health supervision addresses the recall's underlying thermal-runaway hazard at its precursor stage, so DC fast charging can be safely re-enabled for 300+ mile trips while abn') — the mechanism is killed by its own test's negative outcome; the recorded failing hypothesis is 'expected effect does not reproduce outside source context'",
+  "FALSIFICATION_BANDS": {
+   "expected_effect_numbers": [
+    "300"
+   ],
+   "falsification_test_numbers": [
+    "3"
+   ],
+   "basis": "verbatim numbers extracted from the candidate's own records (never computed, never inferred — Art. VI)"
+  },
+  "UNCERTAINTY": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)",
+  "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+  "TIME": "UNKNOWN (no stage recorded a time estimate)",
+  "SAFETY_BLOCKER": "no safety-analysis stage output exists in the engine (honest UNKNOWN — Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+ },
+ "timestamp": "2026-09-18T16:33:01+00:00Z"
+}
