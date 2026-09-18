@@ -2165,3 +2165,19 @@ Work Log:
 Stage Summary:
 - Both lines' campaign executions now coexist in the tree; their findings are complementary, not contradictory (convergent: PUSH-FAILURE ×6, shared-hang dead, 1,176 ledger rows; divergent-by-design: watchdog threshold derivations + hysteresis — both recorded for the owner). The directive's '1,107 lines' figure was not re-derived exactly by either line (disclosed, non-consequential). Phase 3/4 gates unchanged: operator act 2 verbatim + the (a)-vs-(b) ruling. True number unchanged: 138/25 = 5.52 -> 6/10, NO.
 - reviewer_provenance=AI_REVIEW
+
+---
+Task ID: R510-INTAKE (handoff custody)
+Agent: Super Z (main session — the R509-C2-ZLINE line, outgoing)
+Task: the operator's handoff directive — a deep, detailed master handoff to the next chat, so no old files ever need repasting: everything done, what is left, what must be read before coding, the file-structure map against entropy, credential/vault custody, and every machine action as autocommands.
+
+Work Log:
+- Re-verified the entire operative state from live bytes before writing: HEAD==origin/main==3c17b602, clean; durable tip 215251c9; frozen chain sha256sum re-checked (manifest e9c72c58 / rules script 40d728f8 / instrument 831f1a0e; rules internal sha 70a83fe1 read from the preflight gate); live Space identity GET -> d7520b9b/2.8.0; vault fingerprints recomputed (GH f1ebca5f9b622f3e len 40, HF 33bc7af22c628bc1 len 37 — match registered, nothing rotated).
+- Wrote HANDOFF_NEXT_CHAT_R510_MASTER.md (766 lines, repo root, the R419 precedent): bootstrap ritual (vault consult order + authenticated fetch + frozen-chain verify + live identity), the MUST-READ list (13 entries, ordered, with why), authority order + mission, the twelve iron laws, the verified current state (six-session verdict table + the measured push-path mechanism + the armed instruments), the DONE ledger with commits, the GATE TREE of what is left (operator word-acts A/B -> gates C-G), credential custody + key-budget law, the file-structure map (anti-entropy naming/placement law), ten known traps, nine autocommand playbooks (baseline/watchdog/kill-switch/gated preflight+submit/harvest/records-push/tests/vault-rebuild/cold-start), the scorecard, a verification log, and the next chat's first ten actions.
+- OPERATING MODE honored: every machine action is a copy-paste autocommand; the operator's only acts are the two word-acts (act 2 verbatim; the recover-vs-resubmit ruling) and supplies (fresh PatentBear key, ring funding, Tier-1 registrations) — nothing manual anywhere.
+- BS-021: the handoff carries fingerprints and paths only; the vault values were never written into it or into this worklog; fail-closed leak scan run against the file (CLEAN) and against the commit set pre-push.
+- Tree freeze HELD: this is a records-only commit (handoff + worklog entry); zero engine delta; no deploy; no resubmission; the six sessions' durable history untouched; watchdog instruments left as armed.
+
+Stage Summary:
+- The next chat can now reach full operative context from exactly two pointer-hops: this worklog entry -> HANDOFF_NEXT_CHAT_R510_MASTER.md -> the 13 must-read files. All gates, bytes, shas, endpoints, and credentials-custody it needs are in the handoff with autocommands. True number unchanged: 138/25 = 5.52 -> OVERALL 6/10, NO. Phase 3/4 gates unchanged: operator act 2 verbatim + the (a)-vs-(b) ruling.
+- reviewer_provenance=AI_REVIEW
