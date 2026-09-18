@@ -206,6 +206,45 @@ def _push_custody():
         print(f"custody push typed failure (local copy remains): {e}")
 
 
+def answer_clarifications():
+    """Mechanically answer AWAITING_CLARIFICATION runs with the problem's OWN
+    verbatim summary (the R484 precedent: 'the clarification answered with
+    the EXACT predecessor text') — zero NEW bytes authored. Disclosed in the
+    measurement record."""
+    if not SESSIONS.exists():
+        print("no sessions file")
+        return 2
+    sessions = json.load(open(SESSIONS))
+    m = json.load(open(MANIFEST))
+    by_idx = {p["selection_index"]: p for p in m["problems"]}
+    for s in sessions["submissions"]:
+        sid = s.get("session_id")
+        p = by_idx[s["problem_index"]]
+        verbatim = p["summary_verbatim"]
+        try:
+            st, res = _req("GET", f"/api/run/{sid}/result",
+                           headers={"X-Tosca-Owner": s.get("owner_key") or ""})
+            status = res.get("status") or res.get("state")
+            if status != "AWAITING_CLARIFICATION":
+                print(f"#{s['problem_index']} {sid}: status {status} — no answer needed")
+                continue
+            q = res.get("clarification") or {}
+            field = q.get("field") or ""
+            answer = verbatim[:2000]  # the run's own submitted bytes, verbatim
+            st2, resp2 = _req("POST", f"/api/run/{sid}/answer",
+                              {"answer": answer, "field": field},
+                              headers={"X-Tosca-Owner": s.get("owner_key") or ""})
+            print(f"#{s['problem_index']} {sid}: clarification '{field}' "
+                  f"answered with the problem's own verbatim text (HTTP {st2})")
+        except urllib.error.HTTPError as e:
+            print(f"#{s['problem_index']} {sid}: HTTP {e.code} "
+                  f"(typed; run continues server-side)")
+        except Exception as e:
+            print(f"#{s['problem_index']} {sid}: OBSERVER {type(e).__name__}")
+        time.sleep(3)
+    return 0
+
+
 def poll(budget_min=DEFAULT_BUDGET_MIN):
     if not SESSIONS.exists():
         print("no sessions file")
@@ -361,11 +400,13 @@ if __name__ == "__main__":
         sys.exit(preflight())
     elif mode == "submit":
         sys.exit(submit())
+    elif mode == "answer":
+        sys.exit(answer_clarifications())
     elif mode == "poll":
         sys.exit(poll(int(sys.argv[2]) if len(sys.argv) > 2
                       else DEFAULT_BUDGET_MIN))
     elif mode == "harvest":
         sys.exit(harvest())
     else:
-        print("modes: preflight | submit | poll [budget_min] | harvest")
+        print("modes: preflight | submit | answer | poll [budget_min] | harvest")
         sys.exit(1)
