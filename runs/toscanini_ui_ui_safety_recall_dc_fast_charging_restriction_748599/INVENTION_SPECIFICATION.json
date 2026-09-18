@@ -30,11 +30,45 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Real-time multi-sensor data fusion (gas, ultrasonic, visual) for autonomous early defect detection to avert catastrophic failure.",
-   "intervention": "Retrofit the traction battery pack with an onboard multi-modal monitoring module — per-module gas sensors (H2/CO/CO2 to catch cell venting), acoustic/ultrasonic emission sensors, and thermal imaging — feeding a real-time fusion controller that supervises every DC fast-charge session and derates or aborts charging the instant precursor signatures of thermal runaway appear, replacing the recall's blanket Level-3 restriction with condition-based charging.",
-   "expected_effect": "Continuous charge-session health supervision addresses the recall's underlying thermal-runaway hazard at its precursor stage, so DC fast charging can be safely re-enabled for 300+ mile trips while abnormal cells are isolated before failure.",
-   "mechanism_source_span": "gas detection capabilities for real-time, multi-modal defect detection in petroleum pipelines.",
-   "span_derivation": null
+   "mechanism": "Layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperability conditions, employing per-module gas, acoustic/ultrasonic, and thermal signatures fused across layers so that abnormal cells are detected and isolated before thermal runaway becomes unrecoverable, as reported in the research on layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperability conditions.",
+   "intervention": "Retrofit the high-voltage battery with per-module gas, acoustic/ultrasonic, and thermal sensors feeding a real-time fusion controller that implements layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperability conditions, supervising every DC fast-charge session and derating or aborting charging when precursor thermal-runaway signatures appear.",
+   "expected_effect": "Because layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperability conditions act at the precursor stage, abnormal cells are isolated before failure, satisfying recall 25V-655 safety requirements while restoring DC fast charging for 300+ mile trips.",
+   "mechanism_source_span": "Research on Layered Control and Fault Recovery Mechanisms for Fast Charging Safety Diagnosis of High-Voltage Battery Systems Under Charging Network Interoperability Conditions",
+   "span_derivation": {
+    "n_shared": 18,
+    "shared_terms": [
+     "battery",
+     "charging",
+     "condition",
+     "control",
+     "diagnosi",
+     "fast",
+     "fault",
+     "high",
+     "interoperability",
+     "layered",
+     "mechanism",
+     "network",
+     "recovery",
+     "research",
+     "safety",
+     "system",
+     "under",
+     "voltage"
+    ],
+    "span_terms_n": 18,
+    "ratio": 1.0,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "Run repeated DC fast-charge sessions over a 300+ mile trip profile with cells seeded for incipient venting and thermal runaway; the candidate is falsified if any unsafe session completes without derating or aborting, or if healthy sessions are blocked unnecessarily.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.1109/etae69474.2026.11496104",
+     "source_span": "Research on Layered Control and Fault Recovery Mechanisms for Fast Charging Safety Diagnosis of High-Voltage Battery Systems Under Charging Network Interoperability Conditions"
+    }
+   }
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
@@ -259,7 +293,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Retrofit the traction battery pack with an onboard multi-modal monitoring module — per-module gas sensors (H2/CO/CO2 to catch cell venting), acoustic/ultrasonic emission sensors, and thermal imaging — feeding a real-time fusion controller that supervises every DC fast-charge session and derates or aborts charging the instant precursor signatures of thermal runaway appear, replacing the recall's blanket Level-3 restriction with condition-based charging.",
+   "intervention": "Retrofit the high-voltage battery with per-module gas, acoustic/ultrasonic, and thermal sensors feeding a real-time fusion controller that implements layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperability conditions, supervising every DC fast-charge session and derating or aborting charging when precursor thermal-runaway signatures appear.",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -274,7 +308,19 @@
  "constraints": {
   "value": {
    "stated_constraint": "any solution must satisfy recall 25V-655 safety requirements while restoring DC fast charging capability for 300+ mile trips",
-   "failure_mode_of_device": "safety recall DC fast charging restriction"
+   "failure_mode_of_device": "safety recall DC fast charging restriction",
+   "evidence_derived": [
+    {
+     "constraint": "DC fast charging may be re-enabled only when layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperability conditions continuously supervise each session and can derate or abort it before thermal runaway.",
+     "evidence_id": "doi:10.1109/etae69474.2026.11496104",
+     "span": "Research on Layered Control and Fault Recovery Mechanisms for Fast Charging Safety Diagnosis of High-Voltage Battery Systems Under Charging Network Interoperability Conditions"
+    },
+    {
+     "constraint": "The precursor-stage detection-and-isolation logic must be expressed using the exact vocabulary \"layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperability conditions\" as the organizing construct for the fusion controller supervising DC fast-charge sessions.",
+     "evidence_id": "doi:10.1109/etae69474.2026.11496104",
+     "span": "Research on Layered Control and Fault Recovery Mechanisms for Fast Charging Safety Diagnosis of High-Voltage Battery Systems Under Charging Network Interoperability Conditions"
+    }
+   ]
   },
   "epistemic_class": "SOURCE_FACT",
   "origin_stage": "PROBLEM",
@@ -1541,10 +1587,225 @@
   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
   "verdict": "CONTESTED"
  },
- "_spec_hash": "0f848966172f7d413546068537e50a99cc675ad1a5f51ee2199b0984342b8f82",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
   "checked_at": "2026-09-18T16:31:22+00:00Z"
- }
+ },
+ "_improvement": {
+  "parent_spec_hash": "4cfb9557281aae90850a6b6ea1fd5b6cb832ff7e93a5ceaca9d96ab3df90d4e4",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:4029709ba842",
+   "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.405,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:345eaf08685e",
+    "provider": "xkiro",
+    "model": "minimax/minimax-m3:free",
+    "prompt_hash": "224372ec162843a3e4001b2dc932616e98715543a22ee4157b794ef4274bd412",
+    "output_hash": "345eaf08685e23ded1ec5c3c474bc8f4324eb11012eafb25d2b0bfbb575660d0",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.1109/etae69474.2026.11496104",
+     "span_verbatim_in_evidence": true,
+     "evidence_support": 0.364,
+     "evidence_support_cleared": 0.364,
+     "constraint_traceable_to_evidence": "The precursor-stage detection-and-isolation logic must be expressed using the exact vocabulary \"layered control and faul"
+    },
+    "reasons": [],
+    "validated_at": "2026-09-18T16:41:23+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "Layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperability conditions: per-module gas, acoustic/ultrasonic, and thermal signatures are fused across layers, allowing abnormal cells to be detected and isolate",
+     "after": "Layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperability conditions, employing per-module gas, acoustic/ultrasonic, and thermal signatures fused across layers so that abnormal cells are detected and isola"
+    },
+    "intervention": {
+     "before": "Retrofit the high-voltage battery with per-module gas, acoustic/ultrasonic, and thermal sensors feeding a real-time fusion controller that implements layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperabili",
+     "after": "Retrofit the high-voltage battery with per-module gas, acoustic/ultrasonic, and thermal sensors feeding a real-time fusion controller that implements layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperabili"
+    },
+    "mechanism_source_span": {
+     "before": "Research on Layered Control and Fault Recovery Mechanisms for Fast Charging Safety Diagnosis of High-Voltage Battery Systems Under Charging Network Interoperability Conditions",
+     "after": "Research on Layered Control and Fault Recovery Mechanisms for Fast Charging Safety Diagnosis of High-Voltage Battery Systems Under Charging Network Interoperability Conditions"
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "con:evidence:doi:10.5281/zenodo.22758885",
+     "con:evidence:doi:10.48550/arxiv.2203.09497",
+     "failure voltage traction battery high charging",
+     "failure voltage traction battery high charging",
+     "failure ultrasonic autonomous detection catastrophic real",
+     "failure ultrasonic autonomous detection catastrophic real",
+     "onboard traction battery sensors ultrasonic session charging multi",
+     "onboard traction battery sensors ultrasonic session charging multi",
+     "failure session supervision underlying charging traction",
+     "failure session supervision underlying charging traction",
+     "failure voltage traction battery high session",
+     "failure voltage traction battery high session"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "4cfb9557281aae90850a6b6ea1fd5b6cb832ff7e93a5ceaca9d96ab3df90d4e4",
+   "child_spec_hash": null,
+   "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness (0.405 < 0.7) by re-anchoring the mechanism and intervention vocabulary to a verbatim span from the custodied evidence.",
+   "applied_at": "2026-09-18T16:41:23+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:d57b5a6271df",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.175,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:e7ee31206550",
+     "provider": "zai",
+     "model": "Atria-Dawn-Preview",
+     "prompt_hash": "b52032bce7be71a9692b45061f5cfb68e6d9bfda2f14502e5346d50f9e491e2b",
+     "output_hash": "e7ee31206550c002031b9cd1eabdeea878d9a55e6c98a2437c53b3cccfb0c5c1",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1109/etae69474.2026.11496104",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.357,
+      "evidence_support_cleared": 0.357,
+      "constraint_traceable_to_evidence": "DC fast charging may be re-enabled only when layered control and fault recovery mechanisms for fast charging safety diag"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-18T16:38:41+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Real-time multi-sensor data fusion (gas, ultrasonic, visual) for autonomous early defect detection to avert catastrophic failure.",
+      "after": "Layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperability conditions: per-module gas, acoustic/ultrasonic, and thermal signatures are fused across layers, allowing abnormal cells to be detected and isolate"
+     },
+     "intervention": {
+      "before": "Retrofit the traction battery pack with an onboard multi-modal monitoring module — per-module gas sensors (H2/CO/CO2 to catch cell venting), acoustic/ultrasonic emission sensors, and thermal imaging — feeding a real-time fusion controller that supervises every DC fast-charge session and derates or a",
+      "after": "Retrofit the high-voltage battery with per-module gas, acoustic/ultrasonic, and thermal sensors feeding a real-time fusion controller that implements layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperabili"
+     },
+     "mechanism_source_span": {
+      "before": "gas detection capabilities for real-time, multi-modal defect detection in petroleum pipelines.",
+      "after": "Research on Layered Control and Fault Recovery Mechanisms for Fast Charging Safety Diagnosis of High-Voltage Battery Systems Under Charging Network Interoperability Conditions"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.5281/zenodo.22758885",
+      "con:evidence:doi:10.48550/arxiv.2203.09497",
+      "failure voltage traction battery high charging",
+      "failure voltage traction battery high charging",
+      "failure ultrasonic autonomous detection catastrophic real",
+      "failure ultrasonic autonomous detection catastrophic real",
+      "onboard traction battery sensors ultrasonic session charging multi",
+      "onboard traction battery sensors ultrasonic session charging multi",
+      "failure session supervision underlying charging traction",
+      "failure session supervision underlying charging traction",
+      "failure voltage traction battery high session",
+      "failure voltage traction battery high session"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "0f848966172f7d413546068537e50a99cc675ad1a5f51ee2199b0984342b8f82",
+    "child_spec_hash": null,
+    "reason": "This repairs the measured I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring the mechanism, intervention, and derived safety constraint in the verbatim technical vocabulary of the cited evidence.",
+    "applied_at": "2026-09-18T16:38:41+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:4029709ba842",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.405,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:345eaf08685e",
+     "provider": "xkiro",
+     "model": "minimax/minimax-m3:free",
+     "prompt_hash": "224372ec162843a3e4001b2dc932616e98715543a22ee4157b794ef4274bd412",
+     "output_hash": "345eaf08685e23ded1ec5c3c474bc8f4324eb11012eafb25d2b0bfbb575660d0",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1109/etae69474.2026.11496104",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.364,
+      "evidence_support_cleared": 0.364,
+      "constraint_traceable_to_evidence": "The precursor-stage detection-and-isolation logic must be expressed using the exact vocabulary \"layered control and faul"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-18T16:41:23+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperability conditions: per-module gas, acoustic/ultrasonic, and thermal signatures are fused across layers, allowing abnormal cells to be detected and isolate",
+      "after": "Layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperability conditions, employing per-module gas, acoustic/ultrasonic, and thermal signatures fused across layers so that abnormal cells are detected and isola"
+     },
+     "intervention": {
+      "before": "Retrofit the high-voltage battery with per-module gas, acoustic/ultrasonic, and thermal sensors feeding a real-time fusion controller that implements layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperabili",
+      "after": "Retrofit the high-voltage battery with per-module gas, acoustic/ultrasonic, and thermal sensors feeding a real-time fusion controller that implements layered control and fault recovery mechanisms for fast charging safety diagnosis of high-voltage battery systems under charging network interoperabili"
+     },
+     "mechanism_source_span": {
+      "before": "Research on Layered Control and Fault Recovery Mechanisms for Fast Charging Safety Diagnosis of High-Voltage Battery Systems Under Charging Network Interoperability Conditions",
+      "after": "Research on Layered Control and Fault Recovery Mechanisms for Fast Charging Safety Diagnosis of High-Voltage Battery Systems Under Charging Network Interoperability Conditions"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.5281/zenodo.22758885",
+      "con:evidence:doi:10.48550/arxiv.2203.09497",
+      "failure voltage traction battery high charging",
+      "failure voltage traction battery high charging",
+      "failure ultrasonic autonomous detection catastrophic real",
+      "failure ultrasonic autonomous detection catastrophic real",
+      "onboard traction battery sensors ultrasonic session charging multi",
+      "onboard traction battery sensors ultrasonic session charging multi",
+      "failure session supervision underlying charging traction",
+      "failure session supervision underlying charging traction",
+      "failure voltage traction battery high session",
+      "failure voltage traction battery high session"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "4cfb9557281aae90850a6b6ea1fd5b6cb832ff7e93a5ceaca9d96ab3df90d4e4",
+    "child_spec_hash": null,
+    "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness (0.405 < 0.7) by re-anchoring the mechanism and intervention vocabulary to a verbatim span from the custodied evidence.",
+    "applied_at": "2026-09-18T16:41:23+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "ea789f1dcf4f7dd31d917cc099433b9dd36c181e695aba426ee8cf43b5f763de"
 }
