@@ -1,0 +1,37 @@
+{
+  "artifact_type": "R509_POST_RESTART_OBSERVATION",
+  "record_id": "R509_C2_POST_RESTART_ADDENDUM",
+  "round": "R509-C2 (follow-up, same session)",
+  "reviewer_provenance": "AI_REVIEW",
+  "measured_at_utc": "2026-09-18T12:25:00Z",
+  "the_event": {
+    "fact": "the production Space RESTARTED between 08:25:28Z (this line's last pre-round observation, boot-1789685856) and 12:15Z: /api/health now reports boot-1789731375 = epoch 2026-09-18T11:36:15Z",
+    "cause_typing": "NOT this line — its only Space interactions this round were read-only GETs (public health/version + one owner-key session-view poll after the restart was discovered); typed HF_PLATFORM_RECYCLE_OR_OWNER_SIDE per the R508 framing ('a Space restart/rebuild (HF recycle)'); the exact trigger is owner/platform-scoped UNKNOWN (Art. XXV)",
+    "when_relative_to_this_round": "mid-round (this line's environment rollback completed ~11:01Z; the autopsy/watchdog work ran 11:15-12:10Z; the restart landed 11:36:15Z inside that span; discovered at the round's final observation)"
+  },
+  "measured_post_restart_state": {
+    "production_tuple": "d7520b9b / 2.8.0 — unchanged (version endpoint)",
+    "session_store_PERSISTED": {
+      "evidence": "GET /api/sessions/ts_ca977637f50b with the durable owner_key (the R509 act-1 read-only path, in-memory key, BS-021 scan clean): HTTP 200, status COMPLETE, updated_at 2026-09-18T00:22:56Z, final_state present (final_status INVENTION_REQUIRES_EXPERIMENT, final_envelope_hash 50a912dc0775...), 15 stages, last stage RANK",
+      "interpretation": "the LIVE truth (COMPLETE) — NOT the durable branch's frozen state (RUNNING at 00:09:15Z) — so the live session store SURVIVED the restart (persistent storage or process-restart-in-container), it was not re-materialized from the durable branch",
+      "byte_consistency": "envelope hash 50a912dc0775 == the R509 08:35Z preserved capture's value for this session (the sibling's round record) — the store is byte-consistent across the restart"
+    },
+    "run_dirs": "UNKNOWN_FROM_OBSERVER_DOMAIN — no read-only API route serves them (the R509 measurement); IF the same persistent storage holds them they are INTACT; owner-verifiable in one look; this is THE open input to the (a)-recover option",
+    "durable_push_path_STILL_SILENT": {
+      "evidence": "durable.last_snapshot STILL 00:09:15Z (commit 0da7fe50) after a full boot cycle; ZERO new commits on runtime-state-hf since the preservation push 215251c9 (08:39:43Z)",
+      "the_stronger_measurement": "historically boots PUSH — the snapshot_log carries 120 boot/after_restore reason rows across 760 snapshots — THIS boot pushed NOTHING: the push-path defect is RESTART-INSENSITIVE (it survived a full container restart), a stronger fact than R509's in-boot silence",
+      "implication": "any future execution (recovered or resubmitted) rides a push path measured silent across boots — the M1/M2 respawn-design mechanisms are the named fix, but engine work stays forbidden until harvest (the directive's scope law)"
+    },
+    "orphans_reconciled_this_boot": 0,
+    "active_workers": "[] (expected: the six battery workers completed 00:12-00:45Z; nothing is running)",
+    "run_duration_stats": "n=98 p50=11 p90=41 — unchanged (no new completed runs)"
+  },
+  "consequences_for_the_ordered_campaign": {
+    "the_a_vs_b_decision": "STILL OPEN, and (a) is NOT dead: the session store persisted; the run dirs' survival is the one unknown (owner-verifiable); IF the run dirs persist, the frozen instrument can still measure execution #1 on its own input contract after an owner-side recovery push",
+    "phase_3_gates_unchanged": "operator act 2 verbatim + the CEO's (a)-vs-(b) ruling; the preflight gate already encodes both",
+    "phase_2_watchdog_validation_bonus": "the restart itself demonstrates why the watchdog's durable-tip tracking is boot-aware: a boot WITHOUT a boot-snapshot is now a MEASURED failure signature (DURABLE_TIP_STALE would hold through it)",
+    "the_r508_warning_vindicated": "the R508 escalation said a restart 'DESTROYS the root-cause bytes' — the sibling's act-1 PRESERVE (08:35Z) beat the restart (11:36Z) by 3 hours; every preserved byte is durable; the run dirs were the only class left exposed, and their survival is now the measured open question"
+  },
+  "this_line_acts_this_follow_up": "records-only: this observation + the ACTIVE_PATH/worklog addenda + push; NO Space interaction beyond the two read-only GETs described; no engine delta; no deploy; the tree freeze and the stop-list hold",
+  "tree_freeze_compliance": {"tree_frozen": true, "commit_scope": "records-only follow-up", "zero_engine_delta": true, "no_deploy": true, "battery_untouched": true}
+}

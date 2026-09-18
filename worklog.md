@@ -2134,3 +2134,17 @@ Stage Summary:
 - The campaign's observer-side halves are DONE and accepted: the autopsy names the measured mechanism (durable push path silent while healthy-reported — NOT worker deaths), and the watchdog would have caught the loss at 00:50Z, 6.4 hours before discovery, with zero false fires across 48h of history.
 - Phase 3 is fully armed and double-gated on the operator: act 2 verbatim + the (a)-recover vs (b)-resubmit ruling. Phase 4 awaits.
 - reviewer_provenance=AI_REVIEW
+
+---
+Task ID: R509-C2-POST (Coder 1, follow-up)
+Agent: Super Z (principal session)
+Task: the mid-round Space restart (11:36:15Z, boot-1789731375) — measured, disclosed, and its consequences for the ordered campaign recorded.
+
+Work Log:
+- Discovered at the round's final observation; NOT this line's act (read-only GETs only; typed HF_PLATFORM_RECYCLE_OR_OWNER_SIDE, trigger owner/platform-scoped UNKNOWN).
+- Measured: the live session store PERSISTED (owner-key GET of ts_ca977637f50b: COMPLETE, envelope 50a912dc0775 == the preserved capture — live truth, not a durable restore); run dirs UNKNOWN from the observer domain (the (a)-recover option's one open input, owner-verifiable); the durable push path stayed SILENT through the restart (no boot/after_restore snapshot; historically boots push — 120 rows in 760; zero new durable commits since 215251c9) — RESTART-INSENSITIVE silence, a stronger measurement than R509's; orphans_reconciled_this_boot=0 (all six workers completed pre-restart); production tuple unchanged.
+- Recorded R509/POST_RESTART_OBSERVATION.json + this addendum; records-only; no Space interaction beyond the two GETs; freeze + stop-list hold.
+
+Stage Summary:
+- The (a)-vs-(b) decision remains open with (a) NOT dead (session store persisted; run dirs owner-verifiable); phase-3 gates unchanged (act 2 verbatim + the ruling); the push-path defect is now measured restart-insensitive — the respawn design's M1/M2 are the named fix, post-harvest only.
+- reviewer_provenance=AI_REVIEW
