@@ -64,7 +64,7 @@ def main() -> int:
             row["result"] = "OBSERVATION_GAP"
             row["error"] = type(e).__name__ + ": " + str(e)[:200]
     os.makedirs(os.path.dirname(TICK_LOG), exist_ok=True)
-    with open(TICK_LOG, "a", encoding="utf-8") as f:
+    with open(TICK_LOG, "a", encoding="utf-8", newline="") as f:
         f.write(json.dumps(row) + "\n")
     print(json.dumps(row, indent=1)[:1200])
     return 0

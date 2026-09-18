@@ -50,7 +50,8 @@ def main() -> int:
     m.RAW_DIR.mkdir(parents=True, exist_ok=True)
     corpus = json.loads(m.CORPUS_PATH.read_text())
     cases = corpus["cases"][:a.limit] if a.limit else corpus["cases"]
-    (m.OUT_DIR / "IDENTITY.json").write_text(json.dumps(identity, indent=1))
+    (m.OUT_DIR / "IDENTITY.json").write_text(
+        json.dumps(identity, indent=1), encoding="utf-8", newline="\n")
     consecutive_failures = 0
     for i, case in enumerate(cases, 1):
         cid = case["case_id"]
@@ -63,7 +64,8 @@ def main() -> int:
         else:
             m._log(f"  TRANSPORT FAILURE http={rec.get('http')} "
                    f"error={json.dumps(rec.get('error'))[:160]}")
-        (m.RAW_DIR / f"{cid}.json").write_text(json.dumps(rec, indent=1))
+        (m.RAW_DIR / f"{cid}.json").write_text(
+            json.dumps(rec, indent=1), encoding="utf-8", newline="\n")
         got_verdict = (rec.get("http") == 200 and attack.get("overall") in
                        ("KILLED", "PASS", "ADVERSARIAL_INVALID"))
         consecutive_failures = 0 if got_verdict else consecutive_failures + 1
@@ -79,6 +81,15 @@ def main() -> int:
         raise SystemExit("FATAL: corpus bytes changed DURING the run")
     m._log("freeze re-verified post-run")
     r = m.score()
+    # r505's own RESULTS write uses platform text mode (CRLF on Windows);
+    # that file is frozen-instrument output, so normalize the emitted bytes
+    # to LF here instead of editing the instrument (placement/freeze law).
+    for _p in (m.RESULTS_PATH, m.OUT_DIR / "IDENTITY.json"):
+        _p.write_text(_p.read_text(encoding="utf-8"), encoding="utf-8",
+                      newline="\n")
+    for _p in m.RAW_DIR.glob("*.json"):
+        _p.write_text(_p.read_text(encoding="utf-8"), encoding="utf-8",
+                      newline="\n")
     h = r["headline"]
     m._log(f"HEADLINE: TPR={h['tpr_defect_cohorts']} FPR={h['fpr_known_good']} "
            f"coverage={h['coverage_all_9_fields']} parse={h['parse_completeness']} "

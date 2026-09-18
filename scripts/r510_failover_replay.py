@@ -75,7 +75,7 @@ def main() -> int:
                            "zero suppressions"),
                "reviewer_provenance": "AI_REVIEW"}
     (REPO / "R510" / "FAILOVER_REPLAY.json").write_text(
-        json.dumps(verdict, indent=1))
+        json.dumps(verdict, indent=1), encoding="utf-8", newline="\n")
     print(json.dumps(verdict, indent=1))
     return 0 if verdict["acceptance"] else 1
 

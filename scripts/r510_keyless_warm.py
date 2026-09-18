@@ -55,7 +55,8 @@ def main() -> int:
     rows = [probe_get(), probe_post()]
     verdict = {"artifact_type": "R510_KEYLESS_WARM", "probes": rows,
                "metered_debits": 0, "reviewer_provenance": "AI_REVIEW"}
-    (REPO / "R510" / "KEYLESS_WARM.json").write_text(json.dumps(verdict, indent=1))
+    (REPO / "R510" / "KEYLESS_WARM.json").write_text(
+        json.dumps(verdict, indent=1), encoding="utf-8", newline="\n")
     print(json.dumps(verdict, indent=1))
     return 0
 

@@ -131,3 +131,32 @@ def test_english_only_new_files():
                 bad.append((rel, hex(o)))
                 break
     assert not bad, bad
+
+
+def test_emission_lf_only():
+    import subprocess
+    out = subprocess.run(
+        ["git", "ls-files", "R510/", "scripts/r510_a2_dev_rerun.py",
+         "scripts/r510_observe_tick.py", "scripts/r510_failover_replay.py",
+         "scripts/r510_diversity_dryrun.py", "scripts/r510_keyless_warm.py",
+         "scripts/r510_space_deploy.py", "tests/test_r510_support_pins.py",
+         "worklog.md"],
+        capture_output=True, text=True, cwd=str(REPO)).stdout.splitlines()
+    bad = [f for f in out if b"\r\n" in (REPO / f).read_bytes()]
+    assert not bad, bad
+
+
+def test_writers_force_lf():
+    writers = ["scripts/r510_a2_dev_rerun.py", "scripts/r510_observe_tick.py",
+               "scripts/r510_failover_replay.py",
+               "scripts/r510_diversity_dryrun.py",
+               "scripts/r510_keyless_warm.py", "scripts/r510_space_deploy.py"]
+    missing = [w for w in writers
+               if "newline=" not in (REPO / w).read_text(encoding="utf-8")]
+    assert not missing, missing
+
+
+def test_gitattributes_covers_text_types():
+    attrs = (REPO / ".gitattributes").read_text(encoding="utf-8")
+    for ext in ("*.json", "*.py", "*.md", "*.jsonl", "*.txt"):
+        assert ext in attrs and "eol=lf" in attrs, ext

@@ -242,7 +242,7 @@ def main() -> int:
         "created_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(rec, indent=1))
+    OUT.write_text(json.dumps(rec, indent=1), encoding="utf-8", newline="\n")
     print(f"[r510-deploy] record -> {OUT}")
     return 0
 

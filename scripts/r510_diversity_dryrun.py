@@ -76,7 +76,7 @@ def main() -> int:
                "grid_pin": "xkiro (ENGINE_GRID_PROVIDERS)",
                "reviewer_provenance": "AI_REVIEW"}
     (REPO / "R510" / "DIVERSITY_DRYRUN.json").write_text(
-        json.dumps(verdict, indent=1))
+        json.dumps(verdict, indent=1), encoding="utf-8", newline="\n")
     print(json.dumps(verdict, indent=1))
     return 0 if verdict["acceptance_median_ge_3"] else 1
 
