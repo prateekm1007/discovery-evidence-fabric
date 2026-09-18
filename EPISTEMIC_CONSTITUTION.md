@@ -1,6 +1,6 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 2.8.0
+**Version:** 2.9.0
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
@@ -16,6 +16,7 @@
 **Amended:** 2026-09-17 (Article LXXIV — Observer-Independent Durable Execution, the SANDBOX / EXECUTION DURABILITY PRINCIPLES: execution is not observation, remote work is durable, observation failure is not execution failure, UNKNOWN stays distinct from FAILED, polling observes but never keeps computation alive, reconnection is normal, timeout semantics are typed, retry is idempotent, FAIL CLOSED PROGRESS OPEN — per the operator's 2026-09-17 directive after the measured attempt-5 lifecycle proof; see `R484/constitution/ARTICLE_LXXIV_OBSERVER_INDEPENDENT_DURABLE_EXECUTION.md`)
 **Amended:** 2026-09-18 (Article LXXV — Patent Evidence Is Not Patent Truth: a patent match is evidence, never truth; patent records are evidence objects with five custody fields (provenance, publication identity, family relationship, temporal status, source); coverage is measured, never inferred from counts; secondary indexes discover, primary patent-office records verify consequential assertions; six tracked source properties (FREE / ACCESSIBLE / AUTOMATABLE / LICENSE-COMPATIBLE / RATE-LIMITED / AUTHENTICATED) never collapsed — per the operator's 2026-09-18 directive after the free-patent-source research sweep; see `R498/constitution/ARTICLE_LXXV_PATENT_EVIDENCE_IS_NOT_PATENT_TRUTH.md`)
 **Amended:** 2026-09-18 (Article LXXVI — Credential Custody: the Hugging Face Space secret surface is the custody vault of record — every credential the machine holds anywhere must be present there by name; rotation is a CEO act, never a machine judgment — resolving the standing R451-family rotation escalations as owner-accepted risk; values never custody-free, custody audits output names + fingerprints + typed statuses only — per the operator's 2026-09-18 directive "keep all keys safe in huggingface secrets. do not rotate them unless i the CEO says so. update that in the constitution. all keys, API's should be there."; see `R503/constitution/ARTICLE_LXXVI_CREDENTIAL_CUSTODY.md`)
+**Amended:** 2026-09-18 (Articles LXXVII–LXXIX — the Discovery Yield Firewall: discovery performance is distinct from pipeline completion (the metric firewall); survivor quality with mechanically recorded gate verdicts; fresh-problem generalization with test-enforced blindness — per the operator's 2026-09-18 directive "Ratify the firewall first"; drafts `R506/constitution/` (PENDING package), enacted R507 with the two-line reading disclosed in `R507/constitution/AMENDMENT_RECORD.json`; see `R506/constitution/ARTICLE_LXXVII_DISCOVERY_PERFORMANCE_IS_NOT_PIPELINE_COMPLETION.md`, `ARTICLE_LXXVIII_SURVIVOR_QUALITY.md`, `ARTICLE_LXXIX_FRESH_PROBLEM_GENERALIZATION.md`)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself, AND — from v2.0.0 — what the machine may call a discovery or an invention
 
@@ -2251,6 +2252,92 @@ Secret VALUES never enter the repository, any artifact, log, or commit (BS-021) 
 
 ---
 
+## Article LXXVII — Discovery Performance Is Distinct From Pipeline Completion
+
+**Ratified:** 2026-09-18 (Round R507; drafted R506)
+**Amends:** Constitution v2.8.0 → v2.9.0
+**Full text:** `R506/constitution/ARTICLE_LXXVII_DISCOVERY_PERFORMANCE_IS_NOT_PIPELINE_COMPLETION.md`
+**Sponsor:** Operator (CEO) directive, 2026-09-18, "Review of the external feedback + directive to coder", section 1, verbatim: "**LXXVII — DISCOVERY PERFORMANCE IS DISTINCT FROM PIPELINE COMPLETION.** Completed execution, stage-completion rate, package emission, test passage, search/model-call counts, orchestration success are inadmissible as discovery evidence. Discovery claims require the yield instrument on fresh problems. Promotion on pipeline signals alone is a constitutional violation (cite XLVIII/LIX as basis, extend to metrics)."
+
+### The rule
+
+> **A COMPLETED EXECUTION IS NOT A DISCOVERY. PIPELINE COMPLETION SIGNALS ARE INADMISSIBLE AS DISCOVERY EVIDENCE, WHATEVER NUMBER THEY ARE CARRIED IN.**
+
+The following are **inadmissible** as evidence that the machine discovered anything:
+
+```text
+completed execution / all-stages-green
+stage-completion rate
+package emission (ZIP/PDF/3D artifact existence)
+test passage / battery green counts
+search-call, model-call, or token counts
+orchestration success / transport health
+candidate counts at any stage (already Art. XLVIII)
+```
+
+Discovery claims require **the yield instrument** — the frozen DISCOVERY YIELD funnel (`R506/YIELD_INSTRUMENT.json`, pre-registered instrument sha) — run on **fresh problems** satisfying Article LXXIX. The funnel's `candidates_generated_distinct → attack_survivors → contradiction_survivors → experimentally_discriminated → mutated_survivors → buyer_ready` transitions are the admissible chain; its per-transition drop attribution (stage + typed reason, bytes cited) is the admissible bottleneck evidence.
+
+**Promotion on pipeline signals alone is a constitutional violation.** A candidate, capability, or round may not be promoted, classified upward (Art. LX ladder), or described as discovering/inventing on the strength of pipeline signals alone. This extends the Discovery Imperative and Articles XLVIII/LIX from counts and benchmark tuning to the metric level: a pipeline signal dressed up as a different number remains inadmissible.
+
+---
+
+## Article LXXVIII — Survivor Quality: What Counts as a Surviving Invention
+
+**Ratified:** 2026-09-18 (Round R507; drafted R506)
+**Amends:** Constitution v2.8.0 → v2.9.0
+**Full text:** `R506/constitution/ARTICLE_LXXVIII_SURVIVOR_QUALITY.md`
+**Sponsor:** Operator (CEO) directive, 2026-09-18, same section, verbatim: "**LXXVIII — SURVIVOR QUALITY.** Discovery credit accrues only to candidates surviving the domain-appropriate adversarial + evidence + contradiction + technical gates, each mechanically recorded (attack record, verification verdict, `blocking_count==0`, physics/technical evaluation). Candidate count, survivor-at-synthesis, and grid-advanced counts are never invention counts."
+
+### The rule
+
+> **DISCOVERY CREDIT ACCRUES ONLY TO A CANDIDATE THAT HAS SURVIVED — WITH MECHANICALLY RECORDED EVIDENCE FOR EACH — THE DOMAIN-APPROPRIATE:**
+
+```text
+1. adversarial gate       (attack record with per-dimension verdicts)
+2. evidence gate          (verification verdict; Art. I-III discipline)
+3. contradiction gate     (blocking_count == 0, the engine's own check)
+4. technical gate         (physics/technical evaluation on record)
+```
+
+**Each gate's verdict must exist as a machine-checkable record attached to that candidate.** A gate that did not run is not a gate passed: its absence types the candidate `INCOMPLETE_*` (Art. LXI), never surviving.
+
+### Never counted as inventions
+
+```text
+candidate count at any stage
+survivor-at-synthesis counts
+grid-advanced counts        (grid advancement is transport to the
+                             engineering gauntlet, not survival of the
+                             discovery gauntlet)
+package-emitted counts      (emission is a pipeline signal — Art. LXXVII)
+```
+
+This article defines **what counts**, not **how many must survive**: bars stay where the R412 seal put them; quotas stay search budgets (Art. LXVIII). Nothing existing is weakened. Extends Art. XLVIII (defining the survivor before diversity can be measured over survivors), Art. LX (the concrete gate-verdict checklist), and Art. LXI in the inverse direction (a skipped gate is also never a scientific pass). The yield instrument is the standing mechanical implementation: `grid_advanced_not_counted` is recorded but never counted; `mutated_survivors` requires `delta_real` + re-evaluation with nothing inherited.
+
+---
+
+## Article LXXIX — Fresh-Problem Generalization
+
+**Ratified:** 2026-09-18 (Round R507; drafted R506)
+**Amends:** Constitution v2.8.0 → v2.9.0
+**Full text:** `R506/constitution/ARTICLE_LXXIX_FRESH_PROBLEM_GENERALIZATION.md`
+**Sponsor:** Operator (CEO) directive, 2026-09-18, same section, verbatim: "**LXXIX — FRESH-PROBLEM GENERALIZATION.** Capability claims require blind problems: not authored, tuned, or selected to match the pipeline; corpus-disjointness test-enforced against R446/R412/R458/R492-DEV/sealed corpora; family-declared at submission; single-shot or fixed-budget with *all* attempts recorded (zeros are data). Tuning between scored problems voids the battery."
+
+### The rule
+
+> **A DISCOVERY-CAPABILITY CLAIM REQUIRES BLIND FRESH PROBLEMS.**
+
+**Blind** means all of:
+
+1. **Not authored, tuned, or selected to match the pipeline.** Problems come from sources outside the machine's own generation, and the selection rule is pre-registered (hash-frozen) before any problem is submitted. A problem whose wording, structure, or evidence surface was adjusted after seeing pipeline behavior is void.
+2. **Corpus-disjointness is test-enforced** against every standing corpus: `R446`, `R412`, `R458` (incl. its DEV split), `R492-DEV`, and the sealed corpora. The disjointness check runs mechanically before submission and fails closed.
+3. **Family-declared at submission.** The problem payload carries its domain family so the run's own bytes can prove the family claim (closing the R489 submission-path gap by construction).
+4. **Single-shot or fixed-budget, all attempts recorded.** Zeros are data. An attempt that produced nothing is published with the same fidelity as an attempt that produced a survivor. Selective publication of attempts is benchmark gaming (Art. LIX) at the attempt level.
+
+**Tuning between scored problems voids the battery.** All tuning touches DEV/frozen corpora only, never the scored set. A battery in which any gate, prompt, threshold, retrieval form, or model selection changed between scored problems is VOID — the measurements stand only as un-scored history. A battery whose disjointness cannot be re-run by a second container is void (Art. LXII). Extends Art. XLIX (the blind-source requirement it presupposes) and Art. LIX (from parameters to problems).
+
+---
+
 # THE FOUR CONSTITUTIONAL LAYERS
 
 ```text
@@ -2300,6 +2387,9 @@ One immutable constitutional gate. It cannot become GREEN merely because code co
 ✓ tracked review independence                (Article LXVII)
 ✓ honest portfolio size                      (Article LXVIII)
 ✓ genuine cross-domain reach                 (Articles XLIII, LXIX)
+✓ discovery evidence via the yield funnel, never pipeline signals (Article LXXVII)
+✓ survivor credit only via mechanically recorded gate survivals (Article LXXVIII)
+✓ blind fresh-problem generalization for capability claims (Article LXXIX)
 ```
 
 And the final question remains:

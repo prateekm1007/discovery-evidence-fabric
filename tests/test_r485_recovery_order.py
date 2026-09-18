@@ -148,6 +148,12 @@ class TestTheUnionRecord:
         # (retired per Art. LXIV; preserved in R485/constitution/) —
         # pinned by the retired proposal's TITLES, so later ratified
         # amendments reusing a number with a different title stay law
+        # (Art. VII disclosed update, R507: the ratified LXXVII-LXXIX
+        # Yield Firewall articles carry DIFFERENT titles than the retired
+        # proposal's same-numbered articles and ARE law — the LXXIX entry
+        # is narrowed from the bare-number prefix to the retired
+        # proposal's full title "Fail Closed, Progress Open", the same
+        # title-based form R504 applied to LXXV/LXXVI)
         for retired_title in (
                 "## Article LXXV — Remote Work Must Be Durable",
                 "## Article LXXVI — The Durable State Machine and Typed "
@@ -155,7 +161,7 @@ class TestTheUnionRecord:
                 "## Article LXXVII — Provider Execution and Sandbox "
                 "Execution Are Separate Boundaries",
                 "## Article LXXVIII — Retry Must Be Idempotent",
-                "## Article LXXIX —",
+                "## Article LXXIX — Fail Closed, Progress Open",
         ):
             assert retired_title not in body, (
                 f"retired proposal article in the body: {retired_title!r} "

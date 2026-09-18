@@ -1,6 +1,6 @@
 # Article LXXVIII — Survivor Quality: What Counts as a Surviving Invention
 
-**Status:** DRAFT FOR OPERATOR RATIFICATION (R506) — not yet law
+**Status:** RATIFIED 2026-09-18 (Round R507) — enacted into constitution v2.9.0 per the operator's 2026-09-18 directive "Ratify the firewall first"; see R507/constitution/AMENDMENT_RECORD.json
 **Proposed amendment:** Constitution v2.8.0 → v2.9.0
 **Sponsor:** Operator (CEO) directive, 2026-09-18, "Review of the external feedback + directive to coder", section 1, verbatim:
 

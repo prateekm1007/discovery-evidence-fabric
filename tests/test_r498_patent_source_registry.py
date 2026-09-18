@@ -103,7 +103,17 @@ def test_amendment_hashes_bind(amendment):
                            encoding="utf-8"))
     assert chain["old"]["version"] == "2.7.0"
     assert chain["old"]["sha256"] == amendment["new"]["sha256"]
-    assert chain["new"]["sha256"] == actual
+    # Art. VII disclosed update (R507, same precedent): the chain extends
+    # through the LXXVI link to the LXXVII-LXXIX Yield Firewall link —
+    # each ratified record binds its parent's exact bytes; the LATEST
+    # ratified record binds the current file
+    link507 = json.load(open(os.path.join(REPO, "R507", "constitution",
+                                          "AMENDMENT_RECORD.json"),
+                             encoding="utf-8"))
+    assert link507["old"]["version"] == "2.8.0"
+    assert link507["old"]["sha256"] == chain["new"]["sha256"]
+    assert link507["new"]["version"] == "2.9.0"
+    assert link507["new"]["sha256"] == actual
 
 
 def test_constitution_carries_lxxv_once_with_clauses():
