@@ -19,17 +19,25 @@
   mean distance ≥0.6, rewrites < n//2. Dry-run acceptance: median DISTINCT ≥3
   over 3 R458-DEV problems (B1/E1/F1; never the scored battery).
 
-## Dry-run result (measured, infra-blocked — Art. LXI)
+## Dry-run result, keyed run R510-C10 (measured — acceptance false, honestly)
 
-`R510/DIVERSITY_DRYRUN.json`: all three problems `PROVIDER_UNAVAILABLE`,
-usable 0, DISTINCT 0, acceptance false. Cause, typed: this container holds no
-`XKIRO_API_KEY` (the grid's local transport needs a ring key in env), and the
-only held model credential (`HF_TOKEN`) is 402-blocked by standing measurement
-(R463/R495). No production diversity endpoint exists (server.py carries only
-`/api/ops/calibration-attack` and `/api/ops/a2-attack`), so server-side keys
-cannot serve the grid either. This is a measurement gap, not an adapter defect:
-the mapping + adjudicator path is code-complete and import-clean; the generator
-leg needs a holding container with a credited ring key (owner ask stands, Part 3).
+`R510/DIVERSITY_DRYRUN.json` (overwrites the C9 infra-blocked record above, which
+stands as history): grid GRID_RUN, usable 10/10/9 via operator-supplied ring
+values (session-env only, cleared post-run; first-2-available xkiro,atria; no
+exhaustion, no rung switch needed). n_distinct 1/1/1, rest INDETERMINATE, median
+1 < 3 → acceptance FALSE.
+
+Root cause (subagent-analyzed from code, falsifier named in
+`R510/R510_C10_WORKLOG_ENTRY.md`): the adapter mapping omits `mechanism_graph`
+(grid emits a MECHANISM field; mapping never converts it), so every pair takes
+the `core_j None → INDETERMINATE` first branch; the first-kept baseline yields
+exactly one DISTINCT deterministically. Verdict correct per XLII/XXV; adapter
+defective for its purpose — it cannot pass its own bar without graph mapping.
+
+Gated fix spec (code post-harvest/funnel only): parse grid MECHANISM text into
+`mechanism_graph` nodes (causal variables + physics vocab as terms) and edge
+signatures; then evidence-ground the grid so distinct papers supply disjoint
+ vocab (richness in envelope fields alone has zero leverage on `core_j`).
 
 ## Gating
 
