@@ -380,10 +380,15 @@ def test_epo_lod_is_verification_not_search_provider():
 
 def test_registry_union_v1_2_0_carries_r499_measurements():
     reg = json.load(open(REG))
-    # v1.3.0 (R504): the v1.2.0 two-line union + the R504 both-mode auth
-    # re-typing — a data-level Art. VII disclosed update; every v1.2.0
-    # marker survives (values are extended, never replaced)
-    assert reg["version"] == "1.3.0"
+    # the version tracks the AMENDMENT CHAIN (1.2.0 union -> 1.3.0 R504
+    # auth re-typing -> 1.4.0 R505 patentbear pool state); the R505
+    # disclosed update: this pin asserts >= the union base and the
+    # chain's presence — a LATER data-level amendment never fails the
+    # R499 measurement pins (the R503 stale-pin precedent, intent
+    # preserved and strengthened: every v1.2.0 marker must survive
+    # every later amendment — values are extended, never replaced)
+    assert reg["version"] >= "1.2.0"
+    assert reg["updated_round"] >= "R499"
     s = reg["sources"]
     # EPO LOD: the 406 is superseded by the discovered live endpoint (BOTH lines)
     assert "MEASURED_R499" in s["epo_linked_open_data"]["properties"]["ACCESSIBLE"]

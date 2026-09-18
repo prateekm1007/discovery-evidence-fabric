@@ -1,0 +1,90 @@
+{
+ "artifact_type": "PATENTBEAR_VALUE_RECOVERY",
+ "round": "R505",
+ "reviewer_provenance": "AI_REVIEW",
+ "measured_at": "2026-09-17T23:33:27.499889+00:00",
+ "directive_anchor": "the re-audit's leverage order: 'PatentBear value recovery -> full-battery R502 -> v4.2 vs strong ring -> REAL packet -> fresh ZIP'",
+ "probe": {
+  "key_fingerprint": "561b6e70f5b5ea7f",
+  "key_role": "operator key #1 (R497-era, the R503-registered custody-gap fingerprint)",
+  "calls_made": 1,
+  "call_shape": "MCP tools/call search_patents, scope=patents, query='shunt valve' (the battery's fixed anchor query), max_hits=5 \u2014 mirrors sources.py::search_patent_bear",
+  "first_attempt_disclosure": "attempt 1 used urllib's default User-Agent and drew Cloudflare Error 1010 (403) at the CDN edge \u2014 BEFORE the provider's auth layer, ZERO debits spent, and the key's state was NOT measured by it. The typed state PROBE_KEY_AUTH_REFUSED from that attempt was WRONG (a transport failure is never a verdict about the key, Art. XXI.3) \u2014 corrected in-round: the Chrome UA that the production transport sends (sources.py _UA) is now mirrored. Lesson recorded per Art. XXXI: a probe that does not mirror the production transport's FULL header set measures the CDN, not the credential.",
+  "result": {
+   "http_status": 401,
+   "latency_s": 0.36,
+   "state": "AUTH_FAILED_401",
+   "error_body_head": "{\"jsonrpc\":\"2.0\",\"id\":7141,\"result\":{\"isError\":true,\"content\":[{\"type\":\"text\",\"text\":\"Authentication required. Connect or reconnect your Patent Bear account.\"}],\"_meta\":{\"mcp/www_authenticate\":[\"Beare"
+  },
+  "state_typed": "AUTH_FAILED_401"
+ },
+ "active_key_not_probed": {
+  "fingerprint": "50fe7b3d569bb1fa",
+  "measured_state": "19/20 used = 1 remaining (R499 reconciliation; R501/R503/R504 unchanged)",
+  "reason": "below the reserve floor 2 \u2014 the R504 'last debit preserved' stewardship decision stands; probing it would spend the last debit"
+ },
+ "custody_state_correction": {
+  "r503_r504_typing": "PATENTBEAR_API_KEY value not held anywhere the machine can read (typed custody gap)",
+  "this_session": "BOTH operator-supplied values are held here: the active key (fp 50fe7b3d...) in the session vault AND repo .env.keys; the first-supplied key (fp 561b6e70...) in the operator's standing instruction this session carries \u2014 the LXXVI Section 3 'holding session' unblock path is executable for both",
+  "correction_class": "session-scoped truth superseded for this line (Art. XV disclosure \u2014 the R503/R504 typing was correct for THOSE sessions' environments)",
+  "stores_inspected": {
+   "session_vault_.secrets.env": {
+    "name": "PATENTBEAR_API_KEY",
+    "fingerprint": "50fe7b3d569bb1fa"
+   },
+   "repo_.env.keys": {
+    "name": "PATENT_BEAR_API_KEY",
+    "fingerprint": "50fe7b3d569bb1fa"
+   }
+  }
+ },
+ "tracked_meter_file_state": {
+  "value": {
+   "monthly_remaining": 6,
+   "updated_at": "2026-09-17T18:46:54.904713+00:00",
+   "reserve_floor": 2
+  },
+  "disclosure": "the persisted meter is key-agnostic (updated by whichever key last answered); its 6-remaining figure is the R497-era report from the probe key (2026-09-17T18:46Z) \u2014 NOT the active key's state (19/20 used, 1 remaining, R499 reconciliation). The file is left untouched by this probe; both keys' states are carried per-key in this record."
+ },
+ "full_battery_arithmetic": {
+  "needed_debits": "6 (3 repetitions x 2 PatentBear debits: F6 layer self-measurement search + F10 record fetch) + reserve floor 2 = 8 remaining at start",
+  "probe_key_after_probe": "UNKNOWN (no numeric monthly_remaining in the probe response)",
+  "active_key": "1 remaining (below floor \u2014 not spendable)",
+  "verdict": "PROBE_KEY_AUTH_REFUSED_AUTH_FAILED_401 \u2014 the pool's spendable quota is the active key's 1-preserved-debit only; the operator path (fresh key supply) is the sole unblock"
+ },
+ "pool_state_measured": {
+  "conclusion": "POOL_EXHAUSTED_MEASURED: the first-supplied key (fp 561b6e70...) draws 401 isError 'Authentication required' \u2014 the provider retired it (the R498 rotation was a TRUE rotation: old credential deauthorized, its R497-era 6-remaining bucket is UNREACHABLE). The 401 debits nothing (the R497 garbage-key control class). The operator's committed path \u2014 'more keys will be supplied when you run out' \u2014 is now the MEASURED state: the pool has run out. A fresh key with a full bucket (20) unblocks the full-battery patent leg (8 needed) with 12 to spare; the Scopus leg additionally needs the Elsevier value in the sealing session.",
+  "note": "the operator's PatentBear pool as measured THIS round: two key values held, ONE opens the transport, and that key's bucket holds a single preserved debit below the reserve floor"
+ },
+ "scopus_leg_state": {
+  "elsevier_key_in_this_session": false,
+  "where_the_value_lives": "the Space secret surface (write-only from outside; standing per R503/R504) and the sibling line's session vault (R501-C2 disclosure)",
+  "consequence": "even with PatentBear quota, a full-battery seal cannot run from THIS session \u2014 the Scopus leg would type SKIPPED_UNCONFIGURED and a skip is never a pass (the R498 discipline)"
+ },
+ "operator_decision_menu": {
+  "opened_at": "R505",
+  "escalation_count": 1,
+  "options": [
+   {
+    "option": "supply a fresh PatentBear key (the committed path: 'more keys will be supplied when you run out')",
+    "unblocks": "the full-battery R502 re-run's patent leg (needs 8 remaining on one key)",
+    "cost_of_inaction": "the full battery stays leg-sealed (3x per-leg seals) but never battery-sealed on the v4.1 instrument"
+   },
+   {
+    "option": "re-supply ELSEVIER_API_KEY to a sealing session (or task the line that holds it)",
+    "unblocks": "the Scopus leg from that session \u2014 the full battery additionally needs the PatentBear quota above",
+    "cost_of_inaction": "same as above \u2014 the battery cannot run from any session lacking either leg"
+   },
+   {
+    "option": "wait for the monthly quota window to roll (if the provider window is calendar-month, both buckets reset 2026-10-01)",
+    "unblocks": "possibly both keys' buckets (UNMEASURED \u2014 the window semantics are the provider's; 2026-08-31 floor-hit + 2026-09-01-reset evidence in the R498 record suggests calendar-month)",
+    "cost_of_inaction": "13 days without a battery-scale seal path"
+   },
+   {
+    "option": "the R378 account upgrade (investors fund unlimited usage \u2014 CEO statement 2026-08-31)",
+    "unblocks": "quota entirely; corpus-scale collision measurement (105 searches for the 21-case corpus, R497 arithmetic)",
+    "cost_of_inaction": "the machine stays probe-scale on PatentBear"
+   }
+  ]
+ }
+}
