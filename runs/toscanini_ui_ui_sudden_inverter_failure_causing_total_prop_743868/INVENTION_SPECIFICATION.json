@@ -1,6 +1,6 @@
 {
  "invention_id": {
-  "value": "inv:ui_sudden_inverter_failure_causing_total_prop_743868:87ec7c2ad924",
+  "value": "inv:ui_sudden_inverter_failure_causing_total_prop_743868:06f6df69bab2",
   "epistemic_class": "COMPUTED",
   "origin_stage": "INVENTION_SPEC",
   "evidence_ids": [],
@@ -30,31 +30,31 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Real-time estimation of electromagnetic torque and d-q axis stator reactance via a moving-average-filtered third-order generalized integrator flux observer, feeding an adaptive predictive model that is updated each sampling instant and enforces current constraints, so operating-point-dependent nonlinearities (inductance variation, flux weakening) are tracked rather than mis-modeled.",
-   "intervention": "Embed the filtered third-order generalized integrator flux observer in the rear motor inverter's control software to continuously estimate torque and stator reactance; use the adaptive linear MPC's current-constraint enforcement and per-sample model update to detect inverter/motor operating-point drift early, then command a controlled torque derate plus a \"pull over safely\" warning instead of allowing a hard shutdown.",
-   "expected_effect": "Incipient inverter failure signatures (reactance/inductance variation, flux weakening, current imbalance) are detected while propulsion is still available, so the warning is issued with residual torque authority maintained, giving the driver the 10-15 seconds needed to reach a safe pullover spot before total power loss.",
+   "mechanism": "Fault-mode-explicit detection and post-fault remaining-time estimation on the rear motor inverter, using only signatures that are diagnostic by construction rather than control-tracking residuals: (1) gate-driver desaturation/short-circuit events on each phase (hardware-level, microsecond-scale fault evidence), (2) cross-checked phase current sensors and DC-link voltage dynamics to detect phase open/short and asymmetric conduction, and (3) online DC-link capacitor health from switching-frequency ripple current/voltage, giving ESR rise and capacitance fade — the established precursor signature for electrolytic DC-link failure. Once a fault is confirmed, remaining propulsion time is estimated from measured margin in the surviving power path: junction-temperature rise rate of the remaining devices and DC-link stored energy, extrapolated to the thermal/electrical shutdown threshold, producing an explicit countdown rather than a binary warning.",
+   "intervention": "Add a fault-detection layer to the rear inverter control software that consumes existing signals (desat pins, phase currents, DC-link voltage, switching duty, module temperature) and runs three detectors in parallel: desat-event latching, phase-current/DC-link consistency checks, and ripple-based ESR/capacitance tracking. On confirmed detection, command a graded torque derate to preserve the healthy path, and drive a two-stage driver alert: (a) immediate dramatic alert (loud tone, instrument-cluster + center-screen banner, hazard-lamp flash) with a displayed \"propulsion shutdown in ~N s\" countdown updated from the thermal/DC-link margin estimate, and (b) a final imminent-shutdown alert at the measured depletion threshold. The derate and countdown are coupled so the displayed time matches the actual derate trajectory.",
+   "expected_effect": "",
    "mechanism_source_span": "a moving-average-filtered third-order generalized integrator flux observer provides real-time estimation of electromagnetic torque and d-q axis stator reactance, enabling the predictive model to adapt to operating-point-dependent PMSM nonlinearities",
    "span_derivation": null
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
   "evidence_ids": [
-   "doi:10.1038/s41598-026-39158-3"
+   "doi:10.1038/s41598-025-13791-w"
   ],
   "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
  },
  "causal_chain": {
   "value": {
-   "source_observation": "Adaptive linear MPC for a PMSM-driven autonomous EV with a filtered third-order generalized integrator observer.",
-   "mechanism": "Real-time estimation of electromagnetic torque and d-q axis stator reactance via a moving-average-filtered third-order generalized integrator flux observer, feeding an adaptive predictive model that is updated each sampling instant and enforces current constraints, so operating-point-dependent nonlinearities (inductance variation, flux weakening) are tracked rather than mis-modeled.",
+   "source_observation": "UNKNOWN",
+   "mechanism": "Fault-mode-explicit detection and post-fault remaining-time estimation on the rear motor inverter, using only signatures that are diagnostic by construction rather than control-tracking residuals: (1) gate-driver desaturation/short-circuit events on each phase (hardware-level, microsecond-scale fault evidence), (2) cross-checked phase current sensors and DC-link voltage dynamics to detect phase open/short and asymmetric conduction, and (3) online DC-link capacitor health from switching-frequency ripple current/voltage, giving ESR rise and capacitance fade — the established precursor signature for electrolytic DC-link failure. Once a fault is confirmed, remaining propulsion time is estimated from measured margin in the surviving power path: junction-temperature rise rate of the remaining devices and DC-link stored energy, extrapolated to the thermal/electrical shutdown threshold, producing an explicit countdown rather than a binary warning.",
    "intervention_site": "rear motor power inverter",
-   "expected_effect": "Incipient inverter failure signatures (reactance/inductance variation, flux weakening, current imbalance) are detected while propulsion is still available, so the warning is issued with residual torque authority maintained, giving the driver the 10-15 seconds needed to reach a safe pullover spot before total power loss.",
-   "falsification_test": "On a vehicle or HIL bench, inject a representative rear inverter fault (phase open/short, gate-driver loss, capacitor degradation) and log (a) time from fault onset to driver warning and (b) time from warning to total propulsion loss; the mechanism is falsified if warning-to-loss is under 10-15 s or if the observer's torque/reactance estimates show no detectable deviation before catastrophic shutdown."
+   "expected_effect": "",
+   "falsification_test": ""
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
   "evidence_ids": [
-   "doi:10.1038/s41598-026-39158-3"
+   "doi:10.1038/s41598-025-13791-w"
   ],
   "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
  },
@@ -89,7 +89,7 @@
  "prior_art": {
   "value": {
    "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
-   "legacy_status": "LIKELY_PRIOR_ART_EXISTS",
+   "legacy_status": "",
    "differentiation_resolution": {
     "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
     "epistemic_class": "SEARCH_RESULT",
@@ -97,72 +97,60 @@
     "evidence_tier_summary": "NO_FAMILIES",
     "per_family": [],
     "n_families": 0,
-    "n_search_errors": 10,
+    "n_search_errors": 8,
     "search_errors": [
      {
-      "query": "current inverter power model rear motor",
+      "query": "inverter rear motor power failure propulsion",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "current inverter power model rear motor",
+      "query": "inverter rear motor power failure propulsion",
       "source": "lens_patent",
-      "error": "HTTP 401: {\"reference\":\"85beaf75-d076-4dc0-9e2b-e622b024e461\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "error": "HTTP 401: {\"reference\":\"e79d38bf-6884-4c99-bf2c-ebda44a271d4\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "current reactance model inductance variation weakening",
+      "query": "inverter rear motor power evidence current",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "current reactance model inductance variation weakening",
+      "query": "inverter rear motor power evidence current",
       "source": "lens_patent",
-      "error": "HTTP 401: {\"reference\":\"2ceb54d0-4f10-45ba-b7a6-380d66f15ad9\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "error": "HTTP 401: {\"reference\":\"3ad7eb55-f6b3-4897-9b22-6ef4eeacbabf\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "current inverter reactance model filtered generalized integrator flux",
+      "query": "voltage switching temperature inverter rear currents current propulsion",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "current inverter reactance model filtered generalized integrator flux",
+      "query": "voltage switching temperature inverter rear currents current propulsion",
       "source": "lens_patent",
-      "error": "HTTP 401: {\"reference\":\"fbfa2f0a-1144-4646-ae27-33185c8000ab\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "error": "HTTP 401: {\"reference\":\"5f9c1471-72a5-414f-b147-e94785f30ae6\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "current detection estimation reactance inductance variation",
+      "query": "inverter estimation detection existing switching latching",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "current detection estimation reactance inductance variation",
+      "query": "inverter estimation detection existing switching latching",
       "source": "lens_patent",
-      "error": "HTTP 401: {\"reference\":\"609fff17-064a-4ead-8546-d91db5e9c0e4\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
-      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
-     },
-     {
-      "query": "current inverter power inductance variation weakening",
-      "source": "google_patents",
-      "error": "HTTP 503",
-      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
-     },
-     {
-      "query": "current inverter power inductance variation weakening",
-      "source": "lens_patent",
-      "error": "HTTP 401: {\"reference\":\"c95b0984-e3ce-4384-b2c1-aa0e9a01d648\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "error": "HTTP 401: {\"reference\":\"ad6d5810-3790-4f8f-97f6-027071b13322\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      }
     ],
     "search_execution": {
      "mandatory_complete": false,
-     "n_errors": 10,
+     "n_errors": 8,
      "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
     },
     "relevance_model_version": "collision_resolution/2.0.0",
@@ -205,52 +193,22 @@
    "queries": [
     {
      "query_class": "ENTITY",
-     "query": "current inverter power model rear motor"
+     "query": "inverter rear motor power failure propulsion"
     },
     {
      "query_class": "MECHANISM",
-     "query": "current reactance model inductance variation weakening"
+     "query": "inverter rear motor power evidence current"
     },
     {
      "query_class": "DISTINGUISHING",
-     "query": "current inverter reactance model filtered generalized integrator flux"
+     "query": "voltage switching temperature inverter rear currents current propulsion"
     },
     {
      "query_class": "FUNCTION",
-     "query": "current detection estimation reactance inductance variation"
-    },
-    {
-     "query_class": "ADJACENT",
-     "query": "current inverter power inductance variation weakening"
+     "query": "inverter estimation detection existing switching latching"
     }
    ],
-   "scientific": [
-    {
-     "title": "PlatROB: An open-source, modular, and low-cost hardware platform for mobile robotics and AI education.",
-     "id": "41704540",
-     "query": "rear motor power inverter Documented problem"
-    },
-    {
-     "title": "Predictive temperature control of electric two wheeler hub motor using gradient aware neural regulation with degradation tracking and fault tolerant multi condition torque adaptation.",
-     "id": "41826393",
-     "query": "rear motor power inverter Documented problem"
-    },
-    {
-     "title": "Investigation of magnetic orientation effects on interior rotor BLDC motor performance for EVs: a response surface methodology approach.",
-     "id": "41629520",
-     "query": "rear motor power inverter Documented problem"
-    },
-    {
-     "title": "Full‑speed sensorless control of HEAFSPMM using nonlinear adaptive flux observer, improved MRAS, and ADRC speed controller.",
-     "id": "42706296",
-     "query": "Real-time estimation electromagnetic torque d-q axis"
-    },
-    {
-     "title": "Sliding Mode Observer with Exponential Reaching Law for Speed Estimation of a Six-Phase Induction Machine.",
-     "id": "42515397",
-     "query": "Real-time estimation electromagnetic torque d-q axis"
-    }
-   ]
+   "scientific": []
   },
   "epistemic_class": "COMPUTED",
   "origin_stage": "COLLISION",
@@ -259,7 +217,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Embed the filtered third-order generalized integrator flux observer in the rear motor inverter's control software to continuously estimate torque and stator reactance; use the adaptive linear MPC's current-constraint enforcement and per-sample model update to detect inverter/motor operating-point drift early, then command a controlled torque derate plus a \"pull over safely\" warning instead of allowing a hard shutdown.",
+   "intervention": "Add a fault-detection layer to the rear inverter control software that consumes existing signals (desat pins, phase currents, DC-link voltage, switching duty, module temperature) and runs three detectors in parallel: desat-event latching, phase-current/DC-link consistency checks, and ripple-based ESR/capacitance tracking. On confirmed detection, command a graded torque derate to preserve the healthy path, and drive a two-stage driver alert: (a) immediate dramatic alert (loud tone, instrument-cluster + center-screen banner, hazard-lamp flash) with a displayed \"propulsion shutdown in ~N s\" countdown updated from the thermal/DC-link margin estimate, and (b) a final imminent-shutdown alert at the measured depletion threshold. The derate and countdown are coupled so the displayed time matches the actual derate trajectory.",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -267,7 +225,7 @@
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
   "evidence_ids": [
-   "doi:10.1038/s41598-026-39158-3"
+   "doi:10.1038/s41598-025-13791-w"
   ],
   "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
  },
@@ -548,44 +506,36 @@
  "uncertainties": {
   "value": [
    {
-    "unresolved_source": "current inverter power model rear motor",
+    "unresolved_source": "inverter rear motor power failure propulsion",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "current inverter power model rear motor",
-    "error": "HTTP 401: {\"reference\":\"85beaf75-d076-4dc0-9e2b-e622b024e461\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+    "unresolved_source": "inverter rear motor power failure propulsion",
+    "error": "HTTP 401: {\"reference\":\"e79d38bf-6884-4c99-bf2c-ebda44a271d4\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
    },
    {
-    "unresolved_source": "current reactance model inductance variation weakening",
+    "unresolved_source": "inverter rear motor power evidence current",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "current reactance model inductance variation weakening",
-    "error": "HTTP 401: {\"reference\":\"2ceb54d0-4f10-45ba-b7a6-380d66f15ad9\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+    "unresolved_source": "inverter rear motor power evidence current",
+    "error": "HTTP 401: {\"reference\":\"3ad7eb55-f6b3-4897-9b22-6ef4eeacbabf\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
    },
    {
-    "unresolved_source": "current inverter reactance model filtered generalized integrator flux",
+    "unresolved_source": "voltage switching temperature inverter rear currents current propulsion",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "current inverter reactance model filtered generalized integrator flux",
-    "error": "HTTP 401: {\"reference\":\"fbfa2f0a-1144-4646-ae27-33185c8000ab\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+    "unresolved_source": "voltage switching temperature inverter rear currents current propulsion",
+    "error": "HTTP 401: {\"reference\":\"5f9c1471-72a5-414f-b147-e94785f30ae6\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
    },
    {
-    "unresolved_source": "current detection estimation reactance inductance variation",
+    "unresolved_source": "inverter estimation detection existing switching latching",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "current detection estimation reactance inductance variation",
-    "error": "HTTP 401: {\"reference\":\"609fff17-064a-4ead-8546-d91db5e9c0e4\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
-   },
-   {
-    "unresolved_source": "current inverter power inductance variation weakening",
-    "error": "HTTP 503"
-   },
-   {
-    "unresolved_source": "current inverter power inductance variation weakening",
-    "error": "HTTP 401: {\"reference\":\"c95b0984-e3ce-4384-b2c1-aa0e9a01d648\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+    "unresolved_source": "inverter estimation detection existing switching latching",
+    "error": "HTTP 401: {\"reference\":\"ad6d5810-3790-4f8f-97f6-027071b13322\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
    }
   ],
   "epistemic_class": "COMPUTED",
@@ -598,7 +548,7 @@
    {
     "assumption": "mechanism transfers across domain context",
     "basis": "MODELLED",
-    "test": "On a vehicle or HIL bench, inject a representative rear inverter fault (phase open/short, gate-driver loss, capacitor degradation) and log (a) time from fault onset to driver warning and (b) time from warning to total propulsion loss; the mechanism is falsified if warning-to-loss is under 10-15 s or if the observer's torque/reactance estimates show no detectable deviation before catastrophic shutdown."
+    "test": ""
    },
    {
     "assumption": "searched sources approximate the prior-art universe",
@@ -614,7 +564,7 @@
  "provenance": {
   "value": {
    "run_id": "engrun:ui_sudden_inverter_failure_causing_total_prop_743868:2026-09-18T15:04:28",
-   "final_envelope_hash": "87ec7c2ad924098a05ec62ac34f50c4aedcdd4b98b6506137ae68d677a480141",
+   "final_envelope_hash": "06f6df69bab233c00790680ee9f4a73a935d27a742261347751d8b091062f62d",
    "final_status": "AUTOMATED_INVENTION_CANDIDATE",
    "adjudication_verdict": "CONTESTED",
    "ranking": {
@@ -641,7 +591,7 @@
     "verdict": "CONTESTED"
    },
    "code_commit": null,
-   "built_at": "2026-09-18T15:12:22+00:00Z"
+   "built_at": "2026-09-18T15:13:09+00:00Z"
   },
   "epistemic_class": "COMPUTED",
   "origin_stage": "INVENTION_SPEC",
@@ -1546,10 +1496,28 @@
   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
   "verdict": "CONTESTED"
  },
- "_spec_hash": "cf33c749e76a3d4b80a8be99f0d21a8950278f318be4e91172107de6a55a37a9",
+ "_spec_hash": "f17e5c98393af7814ab2c7505fbffab09d577fc68d75af894447988c7a28c5c4",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
-  "checked_at": "2026-09-18T15:12:22+00:00Z"
+  "checked_at": "2026-09-18T15:13:09+00:00Z"
+ },
+ "_mechanism_space_candidate": {
+  "marker": "MECHANISM_SPACE_CANDIDATE",
+  "transformation_operator": "IMPROVE_G1",
+  "mechanism_support_state": null,
+  "support_counts": null,
+  "contradictions_visible": null,
+  "consequence": "IMPROVE child: the mutated mechanism has no mechanism-space adjudication; the E16-H release gate holds it for human review (R401 Phase 4)"
+ },
+ "_improve_child": {
+  "marker": "IMPROVE_STAGE_CHILD",
+  "stage_version": "improve_stage/1.0.0 (R481 P0-1)",
+  "lineage": {
+   "parent_id": "cand:A2:ui_sudden_inverter_failure_causing_total_prop_743868:d909d6e112001c81",
+   "generation": 1,
+   "kill_basis_hash": "57fd3a80abd89b9fc8b821eeb71879935ae2bec588906f127131176520b48bdf",
+   "created_at": "2026-09-18T15:13:03+00:00Z"
+  }
  }
 }
