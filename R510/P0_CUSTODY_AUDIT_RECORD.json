@@ -80,12 +80,13 @@
  "reproduced_test_evidence": {
   "artifact_hashes": "commit SHAs as above; battery file tests/test_r510_reality_loop.py (32 tests)",
   "commands": [
-   "python -m pytest tests/test_r510_reality_loop.py -q (clean checkout @ a3206b22)",
-   "python -m pytest <9-file regression set> -q (working tree)"
+   "python -m pytest tests/test_r510_reality_loop.py -q (clean checkout @ a3206b22: 28/28)",
+   "python -m pytest tests/test_r510_reality_loop.py -q (working tree with P0 hardening: 32/32)",
+   "python -m pytest <9-file regression set> -q (working tree: 207 passed, 6 pre-existing failures)"
   ],
   "counts": {
-   "battery": "32 passed, 0 failed",
-   "regression": "207 passed, 6 failed (all 6 proven pre-existing via stash: 5 TestIndependentAttack fake-signature drift + cost_policy pin)"
+   "battery_clean_checkout_a3206b22": "28 passed, 0 failed",
+   "battery_working_tree_with_hardening": "32 passed, 0 failed (28 + 4 new corruption/forgery/abandonment attack tests)"
   },
   "environment": "Windows win32, CPython 3.12, keyless/hermetic (conftest strips provider keys; no network except loopback-excluded probes)",
   "exact_tested_sha": "a3206b22c05d993e11a7ab0fe65758acb4f57a53 (detached clean worktree, tree clean)",
@@ -107,5 +108,12 @@
   "remote-execution disconnect survival on the server (design + precedent only)",
   "multi-process flock correctness on POSIX (typed fallback proven here)",
   "fresh REAL observation end-to-end (needs keyed ring + allowed observation + deploy)"
+ ],
+ "corrections": [
+  {
+   "what": "battery counts first recorded as 32-from-clean-checkout",
+   "correction": "clean checkout yielded 28/28; 32/32 came from the working tree after 4 attack tests were added for corrupt-ledger/registry, forged completion, and abandoned-claim attacks",
+   "reason": "precision (Art XV); the clean-checkout run predated the attack tests"
+  }
  ]
 }

@@ -608,3 +608,74 @@ def test_impact_expanded_shape_kill(tmp_path):
     assert after["entry_count"] == 1, after
     assert after["head_sha256"]
     assert impact["query_policy_before"] == "UNKNOWN_NO_QUERY_REGISTRY"
+
+
+# corruption + forgery attacks (§7) ----------------------------------------------
+def test_corrupted_ledger_typed_not_traceback(tmp_path):
+    (tmp_path / "ledger").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "ledger" / "REALITY_EVENT_LEDGER.json").write_text(
+        "{corrupt", encoding="utf-8")
+    rec = _exec(_event("EV-COR-1"), str(tmp_path / "ledger"),
+                parent_problem=dict(PARENT_PROBLEM),
+                parent_run_id=PARENT_RUN,
+                cemetery_path=_kill_cemetery(tmp_path))
+    assert rec["executed"] is False
+    assert rec["execution_state"] == "EXECUTION_BLOCKED"
+    assert any("CORRUPT" in p for p in rec["problems"]), rec
+
+
+def test_corrupted_registry_refuses_without_fork(tmp_path):
+    with _cemetery(tmp_path):
+        _exec(_event("EV-RGC-1"), str(tmp_path / "ledger"),
+              parent_problem=dict(PARENT_PROBLEM),
+              parent_run_id=PARENT_RUN,
+              cemetery_path=_kill_cemetery(tmp_path))
+    (tmp_path / "ledger" / "REALITY_STATE.json").write_text(
+        "{corrupt", encoding="utf-8")
+    with _cemetery(tmp_path):
+        rec = _exec(_event("EV-RGC-2"), str(tmp_path / "ledger"),
+                    parent_problem=dict(PARENT_PROBLEM),
+                    parent_run_id=PARENT_RUN,
+                    cemetery_path=_kill_cemetery(tmp_path))
+    assert rec["executed"] is False
+    assert rec["execution_state"] == "EXECUTION_BLOCKED"
+    assert any("CORRUPT" in p for p in rec["problems"]), rec
+
+
+def test_forged_finalized_without_ledger_is_unknown(tmp_path):
+    forged = {"executed": True, "event_id": "EV-FG-1",
+              "execution_state": "EXECUTED_REAL", "branch": "KEEP",
+              "phase": "FINALIZED"}
+    (tmp_path / "ledger" / "executions").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "ledger" / "executions" / "EV-FG-1.json").write_text(
+        json.dumps(forged), encoding="utf-8")
+    rec = ri.resume_execution(
+        str(tmp_path / "ledger"), "EV-FG-1",
+        auth=dict(AUTH_OK), session_store=STORE_OK)
+    assert rec["executed"] is False
+    assert rec["execution_state"] == "UNKNOWN"
+
+
+def test_claimed_abandoned_recovers_single_launch(tmp_path):
+    with _cemetery(tmp_path):
+        _exec(_event("EV-AB-1", verdict="KILL"),
+              str(tmp_path / "ledger"), run_launcher=None,
+              parent_problem=dict(PARENT_PROBLEM),
+              parent_run_id=PARENT_RUN,
+              cemetery_path=_kill_cemetery(tmp_path))
+    req_path = tmp_path / "ledger" / "child_requests" / "EV-AB-1.json"
+    req = json.loads(req_path.read_text())
+    req["status"] = "CLAIMED"
+    req["claim"] = {"claimed_at": "2026-01-01T00:00:00Z",
+                    "note": "simulated crash between claim and launch"}
+    req_path.write_text(json.dumps(req), encoding="utf-8")
+    calls = []
+    with _cemetery(tmp_path):
+        out = ri.resume_pending_children(
+            str(tmp_path / "ledger"), _fake_launcher(calls))
+    assert calls == ["EV-AB-1"], calls
+    assert [l["trigger"] for l in out["launched"]] == ["EV-AB-1"]
+    out2 = ri.resume_pending_children(
+        str(tmp_path / "ledger"), _fake_launcher(calls))
+    assert out2["launched"] == []
+    assert calls == ["EV-AB-1"], calls

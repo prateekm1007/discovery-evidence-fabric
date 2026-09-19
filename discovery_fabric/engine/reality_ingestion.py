@@ -805,8 +805,22 @@ def ingest_reality_event_durable(event: Dict[str, Any],
         ledger: Dict[str, Any] = {"artifact_type": "REALITY_EVENT_LEDGER",
                                    "entries": []}
         if os.path.exists(ledger_path):
-            with open(ledger_path, encoding="utf-8") as f:
-                ledger = json.load(f)
+            try:
+                with open(ledger_path, encoding="utf-8") as f:
+                    ledger = json.load(f)
+            except Exception as exc:
+                return {"ingested": False,
+                        "problems": ["ledger CORRUPT_UNREADABLE: %s "
+                                     "(typed; never parsed partially, "
+                                     "never repaired silently)" %
+                                     (type(exc).__name__,)],
+                        "ledger_state": "CORRUPT_UNREADABLE"}
+            if not isinstance(ledger, dict) or not isinstance(
+                    ledger.get("entries", []), list):
+                return {"ingested": False,
+                        "problems": ["ledger MALFORMED: entries is not "
+                                     "a list (typed)"],
+                        "ledger_state": "MALFORMED"}
         if any(e.get("event_id") == event["event_id"]
                for e in ledger.get("entries", [])):
             return {"ingested": False,
@@ -1125,8 +1139,16 @@ def _continue_execution(event, ledger_dir, ing, cemetery_path,
     if rehearsal:
         _reg_before = _reg_after = "REHEARSAL_NO_REGISTRY_WRITE"
     else:
-        _reg_before, _reg_after = _apply_event_to_state(
-            ledger_dir, event, branch, out)
+        try:
+            _reg_before, _reg_after = _apply_event_to_state(
+                ledger_dir, event, branch, out)
+        except _RealityStateCorrupt as exc:
+            return {"executed": False, "event_id": event["event_id"],
+                    "execution_state": "EXECUTION_BLOCKED",
+                    "problems": [str(exc)],
+                    "note": "canonical registry unreadable; refusing to "
+                            "fork canonical state (typed, never a "
+                            "scientific verdict)"}
     _cem_after = _cemetery_head(_cem_target)
     fin = _finalize_execution(
         event, ledger_dir, branch, out, run_launcher, parent_problem,
@@ -1614,6 +1636,12 @@ def _read_reality_state(ledger_dir: str) -> Dict:
     return {"artifact_type": "REALITY_STATE/1.0.0", "packages": {}}
 
 
+class _RealityStateCorrupt(Exception):
+    """The canonical reality-state registry exists but is unparseable.
+    Never reset silently (that would lose package reality status);
+    never proceed (that would fork canonical state). Typed refusal."""
+
+
 def _apply_event_to_state(ledger_dir: str, event, branch: str,
                           out: Dict) -> tuple:
     """Apply one executed event to the canonical registry. Returns
@@ -1622,6 +1650,15 @@ def _apply_event_to_state(ledger_dir: str, event, branch: str,
     NEVER advanced here (no buyer/commercial gates move on reality
     reception alone, §6); package reality status is recorded."""
     with _LedgerLocked(_reality_state_path(ledger_dir)):
+        _reg_path = _reality_state_path(ledger_dir)
+        if os.path.exists(_reg_path):
+            try:
+                json.load(open(_reg_path, encoding="utf-8"))
+            except Exception as exc:
+                raise _RealityStateCorrupt(
+                    "REALITY_STATE.json CORRUPT_UNREADABLE: %s "
+                    "(refusing to overwrite canonical state)"
+                    % (type(exc).__name__,))
         state = _read_reality_state(ledger_dir)
         before = _loop_sha(state)
         pkg = state["packages"].setdefault(event["package_id"], {})
