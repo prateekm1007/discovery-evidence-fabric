@@ -85,13 +85,39 @@ def check(problem_id, root):
     # Attack-state classifications must match exactly across A/B
     # (Art. LXXXIII/LXI: measured, never assumed; transport /
     # independence / drop identical; ATTACK_INCOMPLETE stays distinct
-    # from KILLED and SURVIVED).
+    # from KILLED and SURVIVED). The MS candidate's timestamp-derived
+    # engine id is normalized (proven permitted) before comparison.
+    _ms_ids_a = {c["candidate_id"] for c in pa["candidates"]
+                 if (c.get("origin") or "").startswith("MECHANISM_SPACE")}
+    _ms_ids_b = {c["candidate_id"] for c in pb["candidates"]
+                 if (c.get("origin") or "").startswith("MECHANISM_SPACE")}
+
+    def _norm_attack_state(s):
+        out = s
+        for _msid in (_ms_ids_a | _ms_ids_b):
+            if _msid:
+                out = out.replace(_msid, "MS_ID")
+                out = out.replace(_msid[-12:], "MS_SUF")
+        return out
+
+    def _norm_attack_meas(m):
+        out = {}
+        for cid, v in (m or {}).items():
+            k = "MS_ID" if cid in _ms_ids_a or cid in _ms_ids_b else cid
+            out[k] = v
+        return out
+
     for k in ("attack_reached", "attack_naive_overall",
               "attack_candidates_reached", "attack_survived",
-              "attack_state_aggregate", "attack_measurement",
-              "attack_state"):
+              "attack_state_aggregate"):
         _ok(fa.get(k) == fb.get(k),
             "funnel.attack.%s differs" % k)
+    _ok(_norm_attack_meas(fa.get("attack_measurement")) ==
+        _norm_attack_meas(fb.get("attack_measurement")),
+        "funnel.attack.attack_measurement differs")
+    _ok(_norm_attack_state(fa.get("attack_state") or "") ==
+        _norm_attack_state(fb.get("attack_state") or ""),
+        "funnel.attack.attack_state differs")
     for k in ("ranking_stable_hash", "deterministic_input_identity",
               "bundle_identity", "grid_state",
               "mechanism_space_state"):
