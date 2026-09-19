@@ -26,6 +26,33 @@ def _git(*args):
         return ""
 
 
+def _commit() -> str:
+    """HEAD commit for reproducibility — best-effort and honest: the
+    git binary first, then a direct .git/HEAD read (no PATH
+    dependence); UNKNOWN_GIT_UNAVAILABLE when neither answers, never
+    fabricated (Art. VI)."""
+    sha = _git("rev-parse", "HEAD")
+    if len(sha) == 40:
+        return sha
+    repo = REPO
+    try:
+        for _ in range(6):
+            if os.path.isdir(os.path.join(repo, ".git")):
+                break
+            repo = os.path.dirname(repo)
+        head = os.path.join(repo, ".git", "HEAD")
+        with open(head, encoding="utf-8") as fh:
+            ref = (fh.read() or "").strip()
+        if ref and not ref.startswith("ref:"):
+            return ref if len(ref) == 40 else "UNKNOWN_GIT_UNAVAILABLE"
+        with open(os.path.join(repo, ".git", ref.split(":", 1)[1].strip()),
+                  encoding="utf-8") as fh:
+            ref = (fh.read() or "").strip()
+        return ref if len(ref) == 40 else "UNKNOWN_GIT_UNAVAILABLE"
+    except Exception:
+        return "UNKNOWN_GIT_UNAVAILABLE"
+
+
 def main() -> int:
     root = sys.argv[1]
     entries = {}
@@ -110,7 +137,7 @@ def main() -> int:
     record = {
         "artifact": "R510_DRYRUN_PROOF_RECORD/1.0.0",
         "constitution": "2.10.1",
-        "code_commit": _git("rev-parse", "HEAD"),
+        "code_commit": _commit(),
         "epistemic_status": (
             "CONTROLLED TEST MATERIAL ONLY. These problems are "
             "machine-authored for funnel-measurement (Art. LXXXIII "
