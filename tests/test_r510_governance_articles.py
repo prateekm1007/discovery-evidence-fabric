@@ -44,9 +44,31 @@ def _live_sha():
 
 
 # ---------- 1. version + chain + acknowledgment ----------
+# R510 LXXXV disclosed update: live moved 2.10.0 -> 2.10.1. The 2.10.0
+# chain below is now HISTORICAL; the live chain is pinned after it.
 
-def test_constitution_version_2_10_0():
-    assert "**Version:** 2.10.0" in _body()
+def test_constitution_version_2_10_1():
+    assert "**Version:** 2.10.1" in _body()
+    assert "2.10.0 → v2.10.1" in _body() or "2.10.0 → 2.10.1" in _body()
+
+
+def test_lxxxv_present_with_push_rule():
+    body = _body()
+    assert len(re.findall(r"^## Article LXXXV ", body, re.M)) == 1
+    assert "LOCAL_UNVERIFIED" in body
+    assert "coder-drafted, operator review requested" in body
+
+
+def test_lxxxv_chain_binds_and_links():
+    rec = json.loads((R510C / "AMENDMENT_RECORD_LXXXV.json")
+                     .read_text(encoding="utf-8"))
+    assert rec["old"]["version"] == "2.10.0"
+    assert rec["new"]["version"] == "2.10.1"
+    assert rec["new"]["sha256"] == _live_sha()
+    assert rec["reviewer_provenance"] == "AI_REVIEW"
+
+
+def test_amendment_trail_preserves_2_10_0_line():
     assert "2.9.0 → v2.10.0" in _body() or "2.9.0 → 2.10.0" in _body()
 
 
@@ -59,16 +81,24 @@ def test_r510_record_chain_binds_and_links():
     assert rec["old"] == rec507["new"], \
         "chain break: R510.old must equal R507.new (Art. XI)"
     assert rec["new"]["version"] == "2.10.0"
-    assert rec["new"]["sha256"] == _live_sha()
+    assert rec["new"]["sha256"] == \
+        "20bfee4aaacfeaf0351f99923a3cb349228e923d24e40583209de108e12543d1"
+    # R510 LXXXV disclosed update: this record is now historical; the
+    # live link is AMENDMENT_RECORD_LXXXV, chained below.
+    rec85 = json.loads((R510C / "AMENDMENT_RECORD_LXXXV.json")
+                       .read_text(encoding="utf-8"))
+    assert rec85["old"]["version"] == "2.10.0"
+    assert rec85["new"]["version"] == "2.10.1"
+    assert rec85["new"]["sha256"] == _live_sha()
     assert rec["checks"]["operator_directive_verbatim_in_body"] is True
     assert rec["checks"]["no_existing_article_weakened"] is True
     assert rec["checks"]["compliance_check"] is True
     assert rec["reviewer_provenance"] == "AI_REVIEW"
 
 
-def test_acknowledgment_rebound_to_2_10_0():
+def test_acknowledgment_rebound_to_2_10_1():
     ack = json.loads(ACK.read_text(encoding="utf-8"))
-    assert ack["constitution_version"] == "2.10.0"
+    assert ack["constitution_version"] == "2.10.1"
     assert ack["constitution_hash"] == _live_sha()
     assert ack["session"] == "R510"
 

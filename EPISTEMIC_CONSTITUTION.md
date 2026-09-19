@@ -1,6 +1,6 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 2.10.0
+**Version:** 2.10.1
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
@@ -18,6 +18,7 @@
 **Amended:** 2026-09-18 (Article LXXVI — Credential Custody: the Hugging Face Space secret surface is the custody vault of record — every credential the machine holds anywhere must be present there by name; rotation is a CEO act, never a machine judgment — resolving the standing R451-family rotation escalations as owner-accepted risk; values never custody-free, custody audits output names + fingerprints + typed statuses only — per the operator's 2026-09-18 directive "keep all keys safe in huggingface secrets. do not rotate them unless i the CEO says so. update that in the constitution. all keys, API's should be there."; see `R503/constitution/ARTICLE_LXXVI_CREDENTIAL_CUSTODY.md`)
 **Amended:** 2026-09-18 (Articles LXXVII–LXXIX — the Discovery Yield Firewall: discovery performance is distinct from pipeline completion (the metric firewall); survivor quality with mechanically recorded gate verdicts; fresh-problem generalization with test-enforced blindness — per the operator's 2026-09-18 directive "Ratify the firewall first"; drafts `R506/constitution/` (PENDING package), enacted R507 with the two-line reading disclosed in `R507/constitution/AMENDMENT_RECORD.json`; see `R506/constitution/ARTICLE_LXXVII_DISCOVERY_PERFORMANCE_IS_NOT_PIPELINE_COMPLETION.md`, `ARTICLE_LXXVIII_SURVIVOR_QUALITY.md`, `ARTICLE_LXXIX_FRESH_PROBLEM_GENERALIZATION.md`)
 **Amended:** 2026-09-19 (Articles LXXX–LXXXIV — evidence-synthesis binding, attacker deployment gate, UNKNOWN dwell time, funnel as instrument, minimum diversity — plus amendments to Arts. L (ring-quality floor), XXI.3 (bounded inference), LXI (persistence gate), X (sidecar definition), and the narrowed scope law + funnel-anchored cliff-fix rule — per the operator's 2026-09-19 governance directive; see `R510/constitution/AMENDMENT_RECORD.json` and `R510/constitution/` article files)
+**Amended:** 2026-09-19 (Article LXXXV — Push for Auditability: completed work is pushed so auditors verify reachable bytes; unpushed commits are LOCAL_UNVERIFIED and cannot evidence completion — per the operator's 2026-09-19 directive "push the stack ... amend the constitution, so you push automatically in order to be audited"; article text coder-drafted, operator review requested; see `R510/constitution/ARTICLE_LXXXV_PUSH_FOR_AUDITABILITY.md` and `R510/constitution/AMENDMENT_RECORD_LXXXV.json`)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself, AND — from v2.0.0 — what the machine may call a discovery or an invention
 
@@ -2452,6 +2453,27 @@ Runs with zero distinct mechanisms have reached the attack stage and reported re
 > **A discovery run that produces fewer than 2 materially distinct candidate mechanisms (per the Art. XLII distinctness definition) must be classified MECHANISM_STARVED before advancing.**
 
 A `MECHANISM_STARVED` run may not report attack, contradiction, or experiment results as discovery evidence. The run terminal state is `MECHANISM_STARVED`, not `INVENTION_REQUIRES_EXPERIMENT`: the former means the system did not generate anything worth attacking; the latter means it invented something but couldn't test it.
+
+---
+
+## Article LXXXV — Push for Auditability
+
+**Ratified:** 2026-09-19 (Round R510)
+**Amends:** Constitution v2.10.0 → v2.10.1
+**Full text:** `R510/constitution/ARTICLE_LXXXV_PUSH_FOR_AUDITABILITY.md`
+**Sponsor:** Operator directive, 2026-09-19 ("push the stack ... amend the constitution, so you push automatically in order to be audited"); article text coder-drafted, operator review requested
+
+### The rule
+
+> **Work that is not pushed cannot be audited. Work that cannot be audited cannot be called done.**
+
+After completing a coherent change set, the coder pushes `origin/main` promptly so that auditors verify reachable bytes (merge-base/branch-containing proof against the remote). Until pushed, a commit is `LOCAL_UNVERIFIED`: it may not be cited as evidence of completion, verification, or deployment readiness. The auditor verifies only commits reachable from the remote; a coder report about unpushed bytes is a hypothesis, never evidence.
+
+Push at minimum before any audit verdict is requested and before any round is reported complete. Classified or secret-bearing material is never pushed to satisfy this article (BS-021 outranks speed: sanitize first, then push).
+
+### What this supersedes
+
+The prior working convention ("finish never implies push; pushes require the literal word") is retired for audit-driven work: the push is now part of completing the work, not a separate authorization. Destructive operations (force-push, history rewrites of published commits, branch deletion) remain forbidden without explicit operator words.
 
 ---
 

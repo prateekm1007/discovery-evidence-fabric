@@ -124,7 +124,12 @@ def test_amendment_hashes_bind(amendment):
                              encoding="utf-8"))
     assert link510["old"] == link507["new"]
     assert link510["new"]["version"] == "2.10.0"
-    assert link510["new"]["sha256"] == actual
+    link85 = json.load(open(os.path.join(REPO, "R510", "constitution",
+                                         "AMENDMENT_RECORD_LXXXV.json"),
+                            encoding="utf-8"))
+    assert link85["old"]["version"] == "2.10.0"
+    assert link85["new"]["version"] == "2.10.1"
+    assert link85["new"]["sha256"] == actual
 
 
 def test_constitution_carries_lxxv_once_with_clauses():
