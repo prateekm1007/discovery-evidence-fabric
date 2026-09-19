@@ -1,766 +1,2287 @@
-# TOSCANINI / DISCOVERY-EVIDENCE-FABRIC — MASTER HANDOFF TO NEXT CHAT (R510 era)
+# TOSCANINI / DISCOVERY-EVIDENCE-FABRIC — MASTER HANDOFF TO NEXT CHAT
 
-**Date of handoff:** 2026-09-18 (UTC)
-**Author:** Super Z coder line (the R509-C2-ZLINE line), at main `3c17b602`
-**Verified:** every sha, endpoint, and path in this document was re-verified from live bytes at handoff time (see §10 verification log)
-**Precedent:** this file follows the `HANDOFF_TO_NEXT_CHAT_R419_MASTER.md` convention. The R419 handoff's mission and authority-order sections remain valid; its STATE sections are superseded by this document.
+**Handoff purpose:** cold-start a new auditor/coder chat without requiring the operator to paste old files, logs, code, or history into the chat window.
 
-**Purpose:** give the next coder/auditor chat the complete operative state so the operator never has to repaste old files. Everything the new chat needs is either (a) in this file, or (b) in a file this file points to, with the exact autocommand to read/verify it.
+**Canonical handoff path:** `HANDOFF_NEXT_CHAT_R510_MASTER.md`
 
-**OPERATING MODE — AUTOCOMMANDS ONLY:** the operator (CEO) does not run manual steps. Every machine action in this document is a copy-paste-ready shell command for the new chat to execute itself. The operator's only acts are WORDS in chat (ratifications, rulings, verbatim acts) and SUPPLIES (keys, funding, registrations). If you (new chat) find a step that seems to need a human at a keyboard — it doesn't; either it is an autocommand here, or it is one of the operator's word-acts, or it is forbidden until an operator act lands.
+**Canonical handoff policy:** update this file in place when continuity materially changes. Do not create `HANDOFF_NEXT_CHAT_R510_MASTER_v2.md`, `FINAL_HANDOFF.md`, `NEXT_HANDOFF2.md`, or parallel continuity files. Parallel handoffs create entropy.
+
+**Current repository:** `prateekm1007/discovery-evidence-fabric`
+
+**Current default branch:** `main`
+
+**Current remote HEAD:** `bfbb5bfdd345037f0af84ad5823ec1c2d4d7eec4`
+
+**Accepted support-cliff baseline:** `13e0a3b21364395df2a6ad540622dfface19a69e`
+
+**Measured support-fix engine commit:** `d4e87d1c6bc71692e7e0e648b22307381600942a`
+
+**Measured attack-instrumentation engine commit:** `f6a990a37a9d6cfbedf7fad6d75d0db43e625201`
+
+**Current proof-publication commit:** `bfbb5bfdd345037f0af84ad5823ec1c2d4d7eec4`
+
+**Important provenance distinction:** the six current dry-run proof executions were executed under `f6a990a3...`; the current `R510/DRYRUN_PROOF_RECORD.json` was later regenerated/published at `bfbb5bf...`. The proof record deliberately reports the measured execution commit, not the generation-time HEAD. The publication commit is therefore NOT the execution commit.
+
+**Current Constitution:** v2.10.1; blob SHA `ac128b1c83ee01035deda2ba7592db77b84182ce`.
+
+**Current auditor governance files:**
+- `GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md` — SHA `ab2b10b76308a1ebea57ce8fff92fa3dcca9b8f0`
+- `GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md` — SHA `1c7c108eee2b37aecd8289ed035ea6858be94a92`
+- `GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md` — SHA `ad6f6561ad1b6dc9c13254d35fabd27f889a5e89`
+- `GOVERNANCE/AUDITOR_REMEMBERED_STATE.md` — SHA `775c2b1897eceafe1d5cd2b3d5940a729a9fc051`
+
+**Frozen discovery-yield instrument:** `R506/YIELD_INSTRUMENT.json`, v1.0.0, script SHA `831f1a0e075cb9dd370c18325bf2b19fac9f7fa69d1218b980d8c4b22946a2ac`.
+
+**Current tests reported by the latest coder round:** `47 passed, 0 failed`.
+
+**Current dry-run live/paid calls:** `0 / 0`.
+
+**Current world-class claim:** explicitly false / not established.
 
 ---
 
-## 0. FIRST INSTRUCTION — THE BOOTSTRAP RITUAL (run these before ANY other action)
+# 0. NON-NEGOTIABLE OPERATING MODE
 
-Do not start by coding. Do not start by planning. Establish the live baseline first. Run this block verbatim:
+The operator does not perform terminal work manually. The operator does not open files, edit files, copy repository contents into chat, manually run tests, manually push commits, or manually reconstruct context for a new chat.
+
+The new chat must reconstruct state itself from the authoritative repository using autocommands/tool calls.
+
+## 0.1 Autocommands only
+
+Every machine action must be executable by the coding/auditor agent:
+
+- repository inspection;
+- file reads;
+- hashes;
+- tests;
+- benchmark/dry-run execution;
+- record generation;
+- file modifications;
+- commit;
+- push;
+- remote verification;
+- deployment verification where required;
+- artifact inspection;
+- provenance validation.
+
+Do not issue the operator instructions such as:
+
+```text
+open this file
+copy this section
+run this command
+edit this JSON
+push these changes
+send me the output
+```
+
+Instead, the coder must execute those actions itself through its available shell/connectors.
+
+## 0.2 No chat-window file pasting
+
+A new chat MUST NOT require the operator to paste old files.
+
+The correct bootstrap is:
+
+```text
+new chat
+→ discover repository
+→ fetch current main
+→ read canonical handoff
+→ read governance
+→ read Constitution
+→ inspect current code/artifacts
+→ verify live state
+→ continue from authoritative bytes
+```
+
+This handoff is a continuity aid, not the source of truth. When this file conflicts with live repository bytes, live bytes win and the discrepancy must be recorded.
+
+## 0.3 No speculative feature expansion
+
+The current objective is controlled optimization, not broad product development.
+
+Do not add:
+- new invention concepts merely to create volume;
+- new model providers without a measured need;
+- new ranking formulas without a measured portfolio problem;
+- new mechanism operators without a measured mechanism-space deficit;
+- new UI features during this optimization loop;
+- duplicate frameworks;
+- replacement architectures;
+- unrelated refactors;
+- new governance documents when an existing canonical document can be updated.
+
+## 0.4 One-cliff optimization law
+
+The current optimization process is governed by `R510/constitution/ONE_CLIFF_FIX_RULE.md` and Constitution Article LXXXIII.
+
+The operational sequence is:
+
+```text
+FRESH CONTROLLED BATTERY
+        ↓
+DURABLE FUNNEL MEASUREMENT
+        ↓
+NAME LARGEST VALID DROPOUT
+        ↓
+ONE FIX ONLY
+        ↓
+IDENTICAL BATTERY
+        ↓
+COMPARE BEFORE / AFTER
+        ↓
+NEXT MEASURED CLIFF
+```
+
+A transport failure is not a scientific cliff.
+
+A measurement gap is not a scientific kill.
+
+A package count is not discovery evidence.
+
+A green unit test is not proof of production behavior.
+
+---
+
+# 1. AUTHORITY ORDER — NEVER VIOLATE THIS HIERARCHY
+
+When documents conflict, authority flows downward only after the higher level is satisfied.
+
+```text
+1. EPISTEMIC_CONSTITUTION.md
+2. GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md
+3. GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md
+4. GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md
+5. ACTIVE_PATH.md
+6. CANONICAL_MODEL_FLOW.md
+7. CANONICAL_STATE/ and other explicitly canonical registries
+8. Frozen benchmark/instrument definitions
+9. Current round artifacts and proof records
+10. Implementation code
+11. Tests
+12. Worklogs / handoffs / narrative reports
+13. Chat claims
+```
+
+Tests are evidence about implementation. Tests do not override the Constitution.
+
+A handoff is memory/navigation. It does not override repository truth.
+
+A report can state a result. Only the underlying artifact can prove it.
+
+---
+
+# 2. PROJECT MISSION AND PRODUCT CONTRACT
+
+The project is Toscanini: an AI discovery and invention machine intended to take a difficult user problem through an evidence-constrained, mechanistic, adversarial, experimental, engineering, reality, learning, and buyer-transfer loop.
+
+The target conceptual loop is:
+
+```text
+PROBLEM
+→ EVIDENCE
+→ MECHANISM
+→ CANDIDATES
+→ ATTACK
+→ DIAGNOSIS
+→ IMPROVEMENT / MUTATION
+→ TECHNICAL EVALUATION
+→ 3D / SYSTEM DESIGN
+→ DECISIVE EXPERIMENT
+→ REALITY
+→ OUTCOME
+→ CAUSAL UPDATE
+→ NEXT EXPERIMENT / NEXT DESIGN
+→ ENGINEERING DOSSIER
+→ BUYER PACKAGE
+```
+
+The runtime D6 stage order is:
+
+```text
+RETRIEVE
+→ FREEZE
+→ PREMISE_GATE
+→ SYNTHESIZE
+→ VERIFY
+→ MECHANISM_SPACE
+→ MULTI_SOURCE_DISCOVERY
+→ COLLISION
+→ PHYSICS
+→ ATTACK
+→ CONTRADICTION
+→ KILLER_EXPERIMENT
+→ IMPROVE
+→ ADJUDICATION
+→ CLASSIFY
+→ NEXT_BEST_ACTION
+→ RANK
+```
+
+## 2.1 User-facing candidate contract
+
+The website is deliberately Claude-like / conversational.
+
+The critical product requirement established by the operator is:
+
+> whenever a valid user request reaches successful candidate generation, the system should return a candidate rather than erase the candidate because a downstream stage is unavailable.
+
+Therefore:
+
+```text
+CANDIDATE GENERATION SUCCESS
+    ↓
+candidate remains visible
+    ↓
+EVIDENCE / ATTACK / EXPERIMENT / REALITY state attaches honestly
+```
+
+A downstream transport failure must not retroactively pretend that no candidate existed.
+
+Conversely, a candidate that has not survived a required scientific gate must not be presented as a discovery/invention merely because it was generated.
+
+---
+
+# 3. CURRENT GOVERNING CONSTITUTION — KEY ARTICLES FOR THE NEXT CHAT
+
+The full Constitution MUST be reread before coding. The following are the most relevant invariants for the current optimization:
+
+## Evidence and verifier discipline
+
+- **I** — evidence precedes assertion.
+- **II** — exact evidence beats semantic plausibility.
+- **III** — verifier never trusts claimant.
+- **IV** — no fallback epistemology.
+- **V** — fail closed but allow valid evidenced claims; use positive/negative/metamorphic/E2E tests.
+- **VI** — never manufacture provenance; UNKNOWN is legitimate.
+- **VII** — never weaken verifier to rescue a claim.
+- **VIII** — certification attacks itself.
+- **IX** — certification is observational.
+- **X** — one canonical state authority.
+- **XII** — provenance custody chain.
+- **XIII** — research and infrastructure are separate authorities.
+- **XIV** — RED gate means STOP.
+- **XV** — coder discloses inconvenient results.
+- **XVI** — implementation is hypothesis; tests are evidence.
+- **XVII** — P0 controls require attempted bypasses.
+- **XVIII** — LLM is untrusted.
+- **XIX** — optimize truth, not gate color.
+- **XXI** — search count is not evidence; absence/provider failure is not absence; relevance must be adjudicated; triangulation independence and provenance matter.
+- **XXIV** — summary is not artifact.
+- **XXV** — UNKNOWN stays UNKNOWN; infrastructure failure does not become scientific rejection.
+- **XXIX** — implementation failure and mechanism failure are distinct.
+- **XXX** — evaluator must be adversarially optimized/tested.
+- **XXXI** — corrections must create memory; learned knowledge must actually affect future behavior.
+
+## Discovery / mechanism discipline
+
+- **XLI** — canonical mechanism:
+  `PROBLEM → FAILURE/UNMET NEED → CAUSAL MECHANISM → INTERVENTION → PHYSICAL/CHEMICAL/COMPUTATIONAL EFFECT → BOUNDARY CONDITIONS → DESIGN VARIABLES → PREDICTED EFFECT → FAILURE MODES → TESTABLE PREDICTION`.
+- **XLII** — distinctness verdicts are `DISTINCT / EQUIVALENT / INDETERMINATE`; INDETERMINATE never counts as DISTINCT.
+- **XLIII** — search-space neutral.
+- **XLIV** — evidence boundary/freeze.
+- **XLV** — generator/verifier separation.
+- **XLVI** — retrieval absence is not novelty.
+- **XLVII** — baseline supremacy.
+- **XLVIII** — diversity via MMD / materially distinct mechanisms.
+- **XLIX** — multi-domain discovery benchmark.
+- **L** — attacker calibration.
+- **LI** — learning must change future search; archive-only does not count.
+- **LII** — killer experiment is a falsification contract.
+- **LIII** — reality ladder:
+  `MODEL_DERIVED → COMPUTATIONAL_RESULT → EXTERNAL_REFERENCE_DATA → PHYSICAL_OBSERVATION → REAL_LOOP_VERIFIED → REPEATED_REALITY_VERIFIED`.
+- **LIV** — every invention needs a kill condition.
+- **LV** — autonomous discovery loop has typed stages/failures/provenance.
+- **LVI** — information gain matters.
+- **LVII** — search different mechanism-space regions.
+- **LIX** — frozen benchmark, no tuning between scored problems.
+- **LX** — classification ladder.
+- **LXI** — infrastructure failure != scientific rejection.
+- **LXII** — reproducibility.
+- **LXIII** — buyer reality.
+
+## Current R510 firewall additions
+
+- **LXXI** — production URL / deployment identity is delivery standard.
+- **LXXII** — no 3D artifact without passing visual compiler.
+- **LXXIII** — operator secrets registry / lookup order.
+- **LXXIV** — observer-independent durable execution.
+- **LXXV** — patent evidence != patent truth.
+- **LXXVI** — credential custody; rotation is CEO-only.
+- **LXXVII** — discovery performance is distinct from pipeline completion.
+- **LXXVIII** — only candidates surviving adversarial + evidence + contradiction + technical gates earn discovery credit.
+- **LXXIX** — capability claims require blind fresh problems and corpus-disjointness.
+- **LXXX** — every mechanism needs a >=8 contiguous-word verbatim span from frozen evidence; otherwise `UNGROUNDED_SYNTHESIS`, UNKNOWN, no advance.
+- **LXXXI** — attacker with FPR > 0.30 cannot issue terminal KILL; may issue `ESCALATED_OBJECTION`.
+- **LXXXII** — UNKNOWN with same typed reason for 5 consecutive rounds becomes `CHRONIC_UNKNOWN`.
+- **LXXXIII** — discovery funnel is authoritative measurement instrument.
+- **LXXXIV** — fewer than 2 materially distinct candidates => `MECHANISM_STARVED` and no attack/contradiction/experiment discovery evidence.
+- **LXXXV** — unpushed work is `LOCAL_UNVERIFIED`; push promptly and verify remote reachability.
+
+---
+
+# 4. GOVERNANCE FILES — THEIR JOBS AND HOW NOT TO CORRUPT THEM
+
+## `GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md`
+
+Governs auditor behavior. Important rules:
+- live-state beats narrative;
+- built is not wired;
+- local proof is not production proof;
+- API success is not semantic success;
+- infrastructure failure is not scientific absence;
+- audit the joins between stages;
+- maintain remembered project state;
+- no silent reconciliation;
+- benchmark gaming guard;
+- reproduce before escalating;
+- separate code defects from environment defects;
+- stop only for information gain.
+
+Do not move project-specific scientific rules into this file. It is auditor-governance, not engine law.
+
+## `GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md`
+
+Known auditor failure modes. Current particularly relevant entries include:
+- **BS-034** — self-reported completion bias.
+- **BS-035** — audit tunnel vision.
+- **BS-036** — recursive governance drift.
+- **BS-037** — auditor forgetting project state and direction.
+
+New blind spots must be added only when a real observed miss demonstrates a new recurring failure class. Do not grow the register speculatively.
+
+## `GOVERNANCE/AUDITOR_REMEMBERED_STATE.md`
+
+Continuity aid. It is allowed to remember:
+- mission;
+- authoritative repositories;
+- settled architecture;
+- current blockers;
+- rejected paths;
+- latest accepted directive;
+- last verified behavior;
+- next decisive verification.
+
+It is NOT evidence. Refresh it against live state.
+
+## `GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md`
+
+Operational coordination between auditor and coder. It reinforces:
+- auditor reads governance;
+- coder reads Constitution;
+- independent audit first;
+- minimal coherent fixes;
+- tests + fresh end-to-end proof;
+- blind-spot update if new failure class appears;
+- release/deployment verification.
+
+---
+
+# 5. THE THREE MOST IMPORTANT CANONICAL MAPS
+
+## 5.1 `EPISTEMIC_CONSTITUTION.md`
+
+Supreme authority. No implementation may silently redefine its scientific meaning.
+
+## 5.2 `ACTIVE_PATH.md`
+
+The primary documented production-path map. It should be treated as the authoritative description of what production is intended to execute. Its historical addenda are useful evidence, but the next chat must verify the actual code path rather than trusting narrative.
+
+## 5.3 `CANONICAL_MODEL_FLOW.md`
+
+Binds invention state to engineering/3D/browser rendering. Test-enforced one-canonical-model architecture:
+
+```text
+canonical invention state
+→ domain/engineering geometry specification
+→ deterministic geometry
+→ geometry quality gate
+→ Blender presentation layer
+→ canonical GLB / identity
+→ one browser viewer
+```
+
+CadQuery/OCP/OCCT is engineering geometry authority. Blender is presentation-only. Three.js/browser viewer is presentation layer.
+
+Do not create a second invention→geometry mapping.
+
+---
+
+# 6. CURRENT ARCHITECTURE — ROLE MAP
+
+The live `discovery_fabric/` package has many historical and active modules. The next chat must avoid recreating existing responsibilities under new filenames.
+
+## Top-level `discovery_fabric/`
+
+Current high-level subpackages:
+
+```text
+discovery_fabric/
+├── a2/                    # run-level adversarial/gauntlet path
+├── benchmark/             # benchmark helpers
+├── connectors/             # external connector surfaces
+├── directional/            # directional hypothesis / challenge evolution
+├── discovery_modes/        # discovery-mode orchestration/selection
+├── engine/                 # canonical D6 engine implementation
+├── evidence_fabric/        # evidence retrieval/fabric support
+├── knowledge_graph/        # graph/state representations
+├── physics_stack/          # physics subsystem support
+├── prior_art_v2/           # prior-art subsystem
+├── quarantine/             # quarantine / retired or isolated material
+├── retrieval_fabric/       # retrieval source logic
+├── source_registry/        # source registry
+├── prior_art_v2_bridge.py  # bridge compatibility surface
+├── portable_flock.py       # portability/locking utility
+└── v4_corrections.py       # authoritative adversarial corrections
+```
+
+The package is not a blank-slate framework. Before adding a subsystem, search for an existing canonical implementation.
+
+## `discovery_fabric/engine/`
+
+This is the core active orchestration layer. Important current files and roles:
+
+```text
+run.py                     # canonical EngineRun conductor; actual D6 lifecycle
+adapters.py                # stage adapters / orchestration seam
+stage_entry.py             # stage entry contract/support
+call_context.py            # request/run execution context; fixture binding
+llm_registry.py            # provider selection / model calls / availability
+model_routing.py           # model/provider routing policies
+provider_health.py         # observed provider health
+transport_capability.py    # transport capability surface
+
+mechanism_space.py         # candidate generation, dedupe, support verification, cemetery consultation
+candidate.py               # candidate/state object definitions
+candidate_diversity.py     # exploration grid and distinctness paths
+transition_trace.py        # R510 candidate transition measurement
+
+dry_run.py                # controlled dry-run transport, portfolio/funnel measurement
+independent_attack.py     # per-candidate independent adversarial attack
+engineering_attack.py     # engineering-level attack/repair/selection
+attacker_calibration.py   # attacker calibration gate/consumption logic
+
+premise_gate.py            # premise gate
+cheap_screen.py            # cheap candidate screening
+evidence_classification.py# evidence classification
+
+domain_reasoning.py        # domain reasoning
+quantitiy_reasoning.py     # quantity reasoning (existing module)
+technical_evaluator.py     # technical evaluation
+physics_stage.py           # physics lifecycle
+physics_gate.py            # physics gate
+technical_equations.py     # technical equation subsystem
+equations.py               # equation subsystem
+
+contradiction handling via orchestrator/contradiction_queue.py
+
+improve_stage.py           # IMPROVE stage
+improvement_engine.py      # causal improvement engine
+technical_improvement_engine.py # technical improvement path
+design_learning.py         # design learning
+causal_learning.py         # causal learning
+
+decisive_experiment.py     # decisive experiment selection
+experiment_selector.py     # experiment selection logic
+evolution.py               # evolution chain
+
+engineering_spec.py        # engineering specification
+invention_spec.py           # invention specification
+package_compiler.py        # canonical package compilation
+package_registry.py        # package identity/registry
+package_quality_gate/      # package quality controls
+
+invention_bridge/           # invention-to-geometry bridge subsystem
+visual_compiler/            # 3D visual compiler
+cad_pipeline.py             # CAD pipeline
+
+state_integrity.py          # canonical state integrity
+release.py                  # release logic
+runtime_admission.py        # runtime admission
+```
+
+### Critical anti-entropy rule
+
+When changing attack behavior, the canonical per-candidate module is:
+
+```text
+discovery_fabric/engine/independent_attack.py
+```
+
+not `a2/adversarial.py`.
+
+When changing run-level A2 behavior, the canonical module is:
+
+```text
+discovery_fabric/a2/adversarial.py
+```
+
+These are different attack systems with different contracts.
+
+When changing the conductor, modify `run.py`; do not build a second runner.
+
+When changing the dry-run transport/measurement instrument, modify `engine/dry_run.py` and its R510 test/fixture surface; do not build a new dry-run engine.
+
+---
+
+# 7. CRITICAL ATTACK ARCHITECTURE — TWO ATTACKS, NOT ONE
+
+This is the single most important context discovery for the next chat.
+
+## 7.1 Attack path A — run-level A2 adversarial gauntlet
+
+Canonical file:
+
+```text
+discovery_fabric/a2/adversarial.py
+```
+
+Canonical function:
+
+```text
+adversarial_challenge(candidate, evidence_verified, prior_art_state)
+```
+
+Its LLM call path includes:
+
+```text
+llm_chat()
+→ llm_registry.generate(... purpose="attack" ...)
+```
+
+Current controlled fixtures DO contain a matching:
+
+```json
+{"purpose_exact":"attack", ...}
+```
+
+Existing direct test:
+
+```text
+tests/test_r510_dryrun.py::test_attack_fixtures_kill_through_real_instrument
+```
+
+proves that the A2 attack text can travel through `adversarial_challenge()` and produce a `KILLED` result in the direct fixture test.
+
+That is valid evidence for path A only.
+
+## 7.2 Attack path B — per-candidate independent attack
+
+Canonical file:
+
+```text
+discovery_fabric/engine/independent_attack.py
+```
+
+Canonical function:
+
+```text
+independent_attack(...)
+```
+
+Actual LLM call:
+
+```text
+from .mechanism_space import llm_generate
+
+llm_generate(
+    prompt,
+    system=..., 
+    purpose="independent_attack",
+    exclude_providers=[generator_provider] if generator_provider else None,
+    max_tokens=1600,
+    hard_pin_provider=require_provider,
+)
+```
+
+This is what the real `EngineRun._post_rank_pipeline` invokes for each `mech-*` or `grid-*` candidate.
+
+Each result is persisted as:
+
+```text
+INDEPENDENT_ATTACK_{key}.json
+```
+
+Then consumption applies:
+
+```text
+attacker_calibration.apply_at_consumption(...)
+```
+
+and only then do KILL/escalation semantics affect downstream selection.
+
+## 7.3 Why the current 34 attack failures happen
+
+The current controlled fixture bundle in:
+
+```text
+tests/fixtures/dryrun/problems.py
+```
+
+contains:
+
+```text
+purpose_prefix = synthesis
+purpose_prefix = operator_
+purpose_exact = attack
+purpose_prefix = diversity_exploration
+```
+
+It does NOT contain:
+
+```text
+purpose_exact = independent_attack
+```
+
+Therefore the real per-candidate independent attacker sends a request for:
+
+```text
+purpose="independent_attack"
+```
+
+The deterministic fixture matcher finds no matching specification and correctly returns:
+
+```text
+PROVIDER_UNAVAILABLE
+```
+
+The resulting per-candidate attack state becomes:
+
+```text
+ATTACK_INCOMPLETE
+transport=TRANSPORT_UNAVAILABLE
+```
+
+This is the root cause of the current 34 transport-unavailable candidate states.
+
+This is an implementation/fixture-coverage defect in the dry-run path, not evidence that 34 candidates are scientifically killed.
+
+## 7.4 Why simply reusing the A2 fixture is unsafe
+
+The A2 fixture text uses a different response contract:
+
+```text
+UNSUPPORTED_MECHANISM: ...
+WEAK_TRANSFER: ...
+OBVIOUS_COMBINATION: ...
+...
+OVERALL: KILLED
+```
+
+The independent attacker parser expects:
+
+```text
+MECHANISM_FAILURE: <KILL|RISK|SURVIVE> — ... GROUNDED_IN: ...
+BOUNDARY_CONDITION_FAILURE: ...
+EVIDENCE_CONTRADICTION: ...
+BASELINE_EQUIVALENCE: ...
+IMPLEMENTATION_IMPOSSIBILITY: ...
+MEASUREMENT_AMBIGUITY: ...
+```
+
+Therefore the correct dry-run fix is a dedicated deterministic `independent_attack` fixture response matching the actual independent attacker contract.
+
+Do not merge the contracts merely because both are “attack.”
+
+---
+
+# 8. CURRENT ATTACK-INSTRUMENT FINDINGS THAT MUST BE PRESERVED
+
+## 8.1 What has already been improved
+
+R510 attack measurement instrumentation now persists, per candidate:
+
+```text
+attack_reached
+independent_attack_attempted
+independent_attack_status
+engineering_attack_status
+attack_transport_state
+attack_independence_state
+attack_drop_transition
+```
+
+and aggregates:
+
+```text
+NOT_REACHED
+ATTEMPTED
+COMPLETED
+INCOMPLETE
+KILLED
+SURVIVED
+UNKNOWN
+```
+
+This is a measurement improvement, not a scientific discovery result.
+
+## 8.2 Current semantic concern — `independent_attack_attempted`
+
+The current helper treats a persisted record whose `overall != NOT_RUN` as attempted.
+
+That means a transport-refused request can currently result in:
+
+```text
+independent_attack_attempted=true
+```
+
+while also having:
+
+```text
+llm_status=PROVIDER_UNAVAILABLE
+attack_transport_state=TRANSPORT_UNAVAILABLE
+```
+
+This is potentially overbroad naming.
+
+The next chat should audit whether the state machine needs separate mechanical distinctions:
+
+```text
+attack_requested
+attack_execution_started
+attack_execution_completed
+independent_attack_attempted
+```
+
+Do not automatically refactor this. First inspect all consumers and prove whether the ambiguity affects authoritative classification or is merely a label.
+
+## 8.3 Current semantic concern — top-level `attack_naive_overall`
+
+The funnel currently reads `naive_attack_overall` from:
+
+```text
+envelope_ATTACK.json
+```
+
+The current proof sample can show:
+
+```text
+attack_naive_overall = KILLED
+```
+
+while the per-candidate independent attack pool simultaneously reports:
+
+```text
+ATTACK_INCOMPLETE
+TRANSPORT_UNAVAILABLE
+```
+
+This is not automatically a bug because the two are different attack paths.
+
+It IS a dangerous semantic surface because a reader or downstream consumer can interpret the top-level `KILLED` as if it represented the 34 candidate-level independent attacks.
+
+The next chat must trace every consumer of `attack_naive_overall` before deciding whether to rename, scope, or remove it from authoritative interpretation.
+
+Do not casually delete it if historical or current A2 semantics require it. Make the distinction explicit and mechanically impossible to confuse.
+
+---
+
+# 9. CURRENT DRY-RUN SYSTEM
+
+## `discovery_fabric/engine/dry_run.py`
+
+Responsibilities:
+
+- deterministic `FixtureTransport`;
+- specificity-aware matching;
+- honest `PROVIDER_UNAVAILABLE` refusal;
+- zero live/paid call telemetry;
+- deterministic candidate identity;
+- deterministic ranking;
+- durable portfolio reconstruction;
+- per-candidate attack measurement;
+- funnel construction.
+
+Fixture matching precedence is explicitly:
+
+```text
+exact purpose
+→ exact route
+→ narrower prompt
+→ purpose prefix
+→ stable tie-break
+```
+
+No-match must remain a typed transport refusal.
+
+## Ranking
+
+Current deterministic selection-aid weights:
+
+```text
+mechanism_support = 3
+span_bound = 2
+distinctness_distinct = 2
+evidence_refs = 1
+attack_survived = 2
+testability = 1
+```
+
+Tie-break:
+
+```text
+candidate_id ascending
+```
+
+The ranking is NOT an epistemic quality score. It is a deterministic portfolio selection aid.
+
+Do not reinterpret score or rank as evidence of discovery.
+
+---
+
+# 10. FROZEN DISCOVERY-YIELD INSTRUMENT
+
+Canonical file:
+
+```text
+R506/YIELD_INSTRUMENT.json
+```
+
+Version:
+
+```text
+1.0.0
+```
+
+Script SHA:
+
+```text
+831f1a0e075cb9dd370c18325bf2b19fac9f7fa69d1218b980d8c4b22946a2ac
+```
+
+Authoritative funnel order:
+
+```text
+1. fresh_submitted
+2. premise_coherent
+3. evidence_verified
+4. mechanisms_found
+5. candidates_generated_distinct
+6. attack_survivors
+7. contradiction_survivors
+8. experimentally_discriminated
+9. mutated_survivors
+10. buyer_ready
+```
+
+Rules:
+
+- counts derive from durable bytes;
+- candidate count uses distinctness authority;
+- `INDETERMINATE` does not count as DISTINCT;
+- grid-advanced is not automatically survivor credit;
+- no novelty claim from missing search coverage;
+- no cost inference where unmetered;
+- no pipeline-completion signal can be promoted into discovery evidence.
+
+Do not edit this instrument during a scored battery.
+
+If the instrument itself must change, it becomes a new instrument/version and old measurements stand unchanged.
+
+---
+
+# 11. CURRENT R510 DRY-RUN MEASUREMENTS
+
+Current post-support-fix A/B baseline:
+
+```text
+P1 A/B:
+  support_not_enough_evidence = 0
+  support_partial = 1
+  pipeline_retained = 1
+  survivor_eligible = true
+
+P2 A/B:
+  cemetery_block = 1
+  drop = CEMETERY_BLOCK
+  invariant unchanged
+
+P3 A/B:
+  support_not_enough_evidence = 0
+  support_partial = 1
+  pipeline_retained = 1
+  survivor_eligible = true
+```
+
+Previous support cliff:
+
+```text
+BEFORE:
+  support_nee = 1/run
+  survivor_eligible = false
+  drop = SUPPORT_VERIFICATION
+
+AFTER:
+  support_nee = 0
+  support_partial = 1
+  survivor_eligible = true
+```
+
+Regression status:
+
+```text
+false
+```
+
+Current candidate transition aggregate:
+
+```text
+generated = 36
+structural_loss = 0
+cemetery_loss = 2
+ distinctness_loss = 0
+support_loss = 0
+attack_incomplete = 34
+attack_killed = 0
+other_loss = 0
+```
+
+Candidate pool count by run is effectively:
+
+```text
+P1 = 6
+P2 = 5
+P3 = 6
+```
+
+Across A/B:
+
+```text
+6 + 5 + 6 = 17 candidates/run
+17 × 2 = 34 independent-attack pool candidates
+```
+
+All 34 current independent-attack pool states are classified as transport-unavailable/incomplete.
+
+Therefore:
+
+> The current measurement does NOT establish that the candidate portfolio loses 34 scientific candidates to attack.
+
+It establishes that the current dry-run transport fixture does not serve the real independent-attack purpose.
+
+---
+
+# 12. CURRENT R510 PROOF RECORD
+
+Canonical artifact:
+
+```text
+R510/DRYRUN_PROOF_RECORD.json
+```
+
+Current proof record contains:
+
+- Constitution version;
+- measured run summaries;
+- repeatability state;
+- candidate-transition measurement;
+- attack measurement;
+- attack aggregate;
+- sample funnel;
+- stage timings;
+- ranked portfolio sample;
+- deterministic fixture-matching declaration;
+- reviewer provenance.
+
+Current proof record must remain clearly classified as:
+
+```text
+CONTROLLED TEST MATERIAL ONLY
+```
+
+The problems are machine-authored dry-run fixtures.
+
+They are NOT blind fresh problems under Article LXXIX.
+
+They are NOT discovery evidence under Article LXXVII.
+
+`r506_eligible=False` is required.
+
+---
+
+# 13. CURRENT CONTROLLED DRY-RUN FIXTURES
+
+Canonical file:
+
+```text
+tests/fixtures/dryrun/problems.py
+```
+
+Contains three machine-authored controlled problems:
+
+```text
+dry-p1
+  family = thermal-management
+  device = engine cooling system
+  failure = coolant vapor leak under driving conditions
+  constraint = no engine removal
+
+dry-p2
+  family = fluid-power
+  device = hydraulic lift actuator
+  failure = pressure decay during sustained hold
+  constraint = no system drain-down
+
+dry-p3
+  family = structural-dynamics
+  device = cable/damper system
+  failure = crosswind lock-in
+  constraint = no cable replacement
+```
+
+These are dry-run fixtures only.
+
+They must never be presented as blind capability evidence.
+
+Each pack contains deterministic evidence and generated candidate bodies.
+
+The A2 attack fixture exists and uses `purpose_exact="attack"`.
+
+The missing coverage is the real per-candidate independent-attack purpose.
+
+---
+
+# 14. CURRENT TEST ARCHITECTURE
+
+## Primary R510 dry-run tests
+
+```text
+tests/test_r510_dryrun.py
+```
+
+Current coverage includes:
+
+- fixture precedence;
+- exact-purpose precedence;
+- route precedence;
+- prompt specificity;
+- honest refusal;
+- deterministic ranking;
+- support state reads;
+- distinctness governance;
+- attack-drop semantics;
+- attack-transport classification;
+- attack-independence classification;
+- dry-run constructor isolation;
+- cemetery sandboxing;
+- direct A2 attack fixture;
+- proof counts;
+- repeatability.
+
+Important gap:
+
+> `test_attack_fixtures_kill_through_real_instrument` directly exercises `a2.adversarial.adversarial_challenge`; it does not prove the complete `EngineRun → independent_attack()` per-candidate path executes under dry-run fixtures.
+
+A new end-to-end dry-run test must cover the latter.
+
+## Transition tests
+
+```text
+tests/test_r510_transitions.py
+```
+
+Controls A-D:
+
+```text
+A = cemetery block
+B = no cemetery block
+C = distinctness drop
+D = support loss
+```
+
+The tests enforce the transition taxonomy and candidate retention logic.
+
+## Diversity tests
+
+```text
+tests/test_r510_diversity_adapter.py
+```
+
+Covers:
+
+- canonical mapping;
+- empty field preservation;
+- true distinctness;
+- identical equivalence;
+- knob-only equivalence;
+- metamorphic rewording;
+- fixture refusal;
+- deterministic grid wiring.
+
+---
+
+# 15. CURRENT EXECUTION / PROOF AUTOMATION
+
+## `scripts/r510_dryrun_proof.py`
+
+Runs one controlled problem/round through the real `EngineRun` with deterministic fixture transport.
+
+Required behavior:
+
+- fresh output directory;
+- no live credentials required;
+- no live calls;
+- no paid calls;
+- persisted per-run proof summary;
+- cemetery before/after comparison;
+- durable funnel/portfolio outputs.
+
+## `scripts/r510_dryrun_repeat.py`
+
+Compares A/B repeatability using deterministic identities and normalized permitted runtime metadata.
+
+The permitted timestamp-derived MS candidate-id variation is normalized because it is runtime metadata, not scientific identity.
+
+## `scripts/r510_dryrun_record.py`
+
+Consumes the six per-run proof outputs and writes:
+
+```text
+R510/DRYRUN_PROOF_RECORD.json
+```
+
+The current implementation derives the reported `code_commit` from the proof runs' own summaries via `_run_commit` and fails closed if run commits disagree.
+
+## `scripts/r510_dryrun_record.py` provenance rule
+
+Current ordering is:
+
+```text
+commit engine
+→ execute proof runs
+→ generate proof record
+→ publish proof record
+```
+
+This closes the prior Article XXXI stale-commit defect.
+
+---
+
+# 16. FILE STRUCTURE — AUTHORITATIVE ROLE CLASSIFICATION
+
+The repository is intentionally large because it contains years of research rounds, historical proofs, product experiments, and active infrastructure. The presence of a file does not mean it is the current authority.
+
+The next chat should use the following role model.
+
+## A. GOVERNANCE / CONSTITUTION — highest human/process authority
+
+```text
+EPISTEMIC_CONSTITUTION.md
+GOVERNANCE/
+  AUDITOR_SELF_GOVERNANCE_v1.md
+  AUDIT_LOOP_PROTOCOL_v1.md
+  AUDITOR_BLINDSPOT_REGISTER.md
+  AUDITOR_REMEMBERED_STATE.md
+R510/constitution/
+  AMENDMENT_RECORD.json
+  AMENDMENT_RECORD_LXXXV.json
+  ARTICLE_LXXX_*.md
+  ARTICLE_LXXXI_*.md
+  ARTICLE_LXXXII_*.md
+  ARTICLE_LXXXIII_*.md
+  ARTICLE_LXXXIV_*.md
+  ARTICLE_LXXXV_*.md
+  ONE_CLIFF_FIX_RULE.md
+  SCOPE_LAW.md
+```
+
+Policy: do not create parallel governance documents when an existing article or governance file is the correct home.
+
+## B. PRODUCTION PATH / ARCHITECTURE DOCUMENTATION
+
+```text
+ACTIVE_PATH.md
+CANONICAL_MODEL_FLOW.md
+ENGINE_BLUEPRINT.md
+ADR_*.md
+PRODUCTION_ADVERSARIAL_CALL_GRAPH.md
+```
+
+Policy: these documents describe/bind implementation. They are not allowed to silently override Constitution semantics.
+
+## C. CANONICAL DURABLE STATE
+
+```text
+CANONICAL_STATE/
+```
+
+This is the designated canonical-state area. Historical objects may be retained, but only explicit canonical files should be treated as current authority.
+
+Important root registries include:
+
+```text
+MODULE_INVENTORY.json
+ENGINE_RELEASE_REGISTRY.json
+ENGINEERING_DOMAIN_REGISTRY.json
+RUNTIME_CAPABILITY_REGISTRY.json
+PACKAGE_ID_REGISTRY.json
+PATENT_SOURCE_REGISTRY.json
+PORTFOLIO_COMMERCIAL_STATE.json
+```
+
+Do not hand-edit a generated registry if a generator/authority script exists.
+
+## D. ACTIVE ENGINE IMPLEMENTATION
+
+```text
+discovery_fabric/engine/
+discovery_fabric/a2/
+engine-related orchestrator/ modules
+```
+
+Treat existing canonical functions as owners of their responsibilities. Search before creating a new module.
+
+## E. CONTROLLED TEST INPUTS
+
+```text
+tests/fixtures/dryrun/
+```
+
+These are controlled test fixtures, not discovery evidence.
+
+## F. CURRENT R510 OPTIMIZATION ARTIFACTS
+
+```text
+R510/
+  DRYRUN_PROOF_RECORD.json
+  DIVERSITY_DRYRUN*.json
+  GRID_MECHANISM_FIXTURE.json
+  MECHANISM_STARVATION_BASELINE.json
+  MEMORY_PROOF_COMMIT_DEFECT.json
+  ...
+```
+
+R510 contains both the current dry-run line and unrelated/live R510 campaign artifacts. Do not treat every R510 file as equally authoritative.
+
+## G. FROZEN R506 DISCOVERY MEASUREMENT
+
+```text
+R506/
+  YIELD_INSTRUMENT.json
+  BATTERY_PROBLEMS.json
+  BATTERY_RAW/
+  YIELD_MEASUREMENT.json
+  HARVEST_RULES.json
+  hermetic acceptance artifacts
+```
+
+These are frozen/measurement artifacts. Do not modify scored inputs or instrument bytes while relying on their existing measurement identity.
+
+## H. RUNTIME STATE — NOT SOURCE CODE AUTHORITY
+
+```text
+ENGINE_RUNS/
+ENGINE_RUNTIME/
+TOSCANINI_UI/runslots/
+TOSCANINI_UI/runqueue/
+```
+
+These are runtime/ephemeral or runtime-derived surfaces. Do not turn them into a second canonical state representation.
+
+The private durable runtime-state branch has historically carried durable copies of runtime records; use the branch-specific authority when the current task actually depends on runtime-state evidence.
+
+## I. PRODUCT SURFACES
+
+```text
+TOSCANINI/
+TOSCANINI_UI/
+toscanini/
+```
+
+These are product/UI/backend surfaces. UI must derive truth from canonical backend state and must not invent scientific status.
+
+## J. ENGINEERING / 3D / PACKAGE PATH
+
+```text
+premium_package_factory/
+discovery_fabric/engine/invention_bridge/
+discovery_fabric/engine/visual_compiler/
+visual-lab/
+BENCHMARK_ENGINEERING_DOSSIERS/
+artifacts/
+```
+
+Use `CANONICAL_MODEL_FLOW.md` to preserve the single mapping.
+
+## K. HISTORICAL ROUND DIRECTORIES
+
+The repository contains many:
+
+```text
+R309 ... R510
+```
+
+These are historical round evidence and implementation lineage.
+
+Rule:
+
+> Historical round content is evidence of what happened at that round, not automatically current architecture.
+
+Do not revive retired implementations merely because they appear in an old round.
+
+## L. HISTORICAL PORTFOLIO / INVENTION DIRECTORIES
+
+Examples include:
+
+```text
+CEREVASC_*
+LEAD_PORTFOLIO_4
+other named invention/territory trees
+```
+
+These are portfolio/history material unless current canonical state explicitly points at them.
+
+Do not use them as current engine authority merely because the content is polished.
+
+## M. SCRIPTS
+
+`scripts/` is historically very large and contains many round-specific automation files.
+
+Current R510 dry-run authority is specifically:
+
+```text
+scripts/r510_dryrun_proof.py
+scripts/r510_dryrun_record.py
+scripts/r510_dryrun_repeat.py
+```
+
+Other `r510_*.py` scripts may be relevant to adjacent campaign/deployment tasks but must not be pulled into this optimization loop without evidence.
+
+## N. TESTS
+
+`tests/` is intentionally extensive. Historical tests remain valuable regression evidence but are not all the current control surface.
+
+Current R510 optimization core:
+
+```text
+tests/test_r510_dryrun.py
+tests/test_r510_transitions.py
+tests/test_r510_diversity_adapter.py
+```
+
+Relevant attacker/calibration regression families include:
+
+```text
+test_r412_attacker_measurement.py
+test_r417_attacker_calibration.py
+test_r446_attacker_calibration.py
+test_r487_attacker_v3.py
+test_r495_v42_attacker_computes.py
+```
+
+Use them when changing shared attacker semantics. Do not run unrelated huge suites merely to create noise unless needed for regression confidence.
+
+---
+
+# 17. FILE ENTROPY RULES — THE ANTI-DUPLICATION CONTRACT
+
+The repository's biggest structural risk is no longer lack of functionality; it is accumulated historical surface area plus repeated round-specific implementations.
+
+The next chat must enforce these rules:
+
+## 17.1 One canonical implementation per responsibility
+
+Before creating a file:
+
+```text
+search repository
+→ identify existing owner
+→ inspect call graph/tests
+→ only add if no existing authority can own the responsibility
+```
+
+Do not create:
+
+```text
+attack_v2.py
+attack_final.py
+attack_new.py
+attack_fixed.py
+r510_attack_v2.py
+```
+
+when `independent_attack.py` or `a2/adversarial.py` already owns the behavior.
+
+## 17.2 One canonical continuity file
+
+Use:
+
+```text
+HANDOFF_NEXT_CHAT_R510_MASTER.md
+```
+
+Do not create another master handoff.
+
+## 17.3 One canonical instrument
+
+Use:
+
+```text
+R506/YIELD_INSTRUMENT.json
+```
+
+Do not create a second funnel instrument to make the current result look better.
+
+## 17.4 One canonical dry-run implementation
+
+Use:
+
+```text
+discovery_fabric/engine/dry_run.py
+```
+
+Do not build a parallel fixture framework.
+
+## 17.5 One canonical proof record
+
+Use:
+
+```text
+R510/DRYRUN_PROOF_RECORD.json
+```
+
+Regenerate it from the measured run records; do not manually edit it.
+
+## 17.6 Do not overwrite historical records
+
+Historical measurements must remain historical.
+
+If an old artifact is wrong, create a new corrective artifact if the Constitution requires a correction trail. Do not rewrite the underlying history to make a new result appear old.
+
+## 17.7 Do not hand-edit generated registries
+
+Find the generating authority and use it.
+
+## 17.8 No naming by optimism
+
+Avoid filenames such as:
+
+```text
+FINAL
+WORLD_CLASS
+COMPLETE
+CERTIFIED
+PROVEN
+BEST
+```
+
+unless those labels are required by an existing authoritative schema.
+
+---
+
+# 18. CURRENT COMMIT / CHANGE HISTORY — MINIMUM CONTINUITY
+
+The immediately relevant line is:
+
+```text
+4612801f  R510 transition instrumentation
+↓
+d4e87d1c  support-verification cliff fix
+↓
+13e0a3b2  regenerated proof record / transition measurement
+↓
+f6a990a3  attack measurement instrumentation
+↓
+13411bf4  A/B attack-state repeatability normalization
+↓
+bfbb5bf  proof record regenerated with attack measurement and run-commit provenance
+```
+
+## 18.1 `4612801f`
+
+Observation-only transition instrumentation.
+
+Added transition ledger and controls without changing core support/dedup/verifier semantics.
+
+## 18.2 `d4e87d1c`
+
+Single measured-cliff fix at `SUPPORT_VERIFICATION`.
+
+Root problem:
+
+```text
+R453-LEAN evidence = only {system, abstract}
+→ verifier item_mech_terms empty
+→ overlap zero
+→ clear/distinct candidates receive NOT_ENOUGH_EVIDENCE
+```
+
+Fix:
+
+```text
+lean evidence exposes frozen record mechanism/effect vocabulary deterministically
+```
+
+No threshold, verifier, or prompt weakening.
+
+Result:
+
+```text
+P1/P3
+NOT_ENOUGH_EVIDENCE → PARTIALLY_SUPPORTED
+survivor_eligible = true
+```
+
+## 18.3 `13e0a3b2`
+
+Regenerated proof record after the support fix and repaired top-level `_commit()` robustness.
+
+## 18.4 `f6a990a3`
+
+Added attack measurement instrumentation.
+
+Scientific attack semantics were intentionally not changed.
+
+## 18.5 `13411bf4`
+
+Repeatability checker normalization for permitted timestamp-derived mechanism-space IDs.
+
+## 18.6 `bfbb5bf`
+
+Regenerated proof record and derived top-level `code_commit` from the runs' own recorded execution commits.
+
+---
+
+# 19. CURRENT UNRESOLVED PROBLEM — EXACTLY WHERE THE NEXT CHAT STARTS
+
+The next chat should begin here:
+
+```text
+SUPPORT_VERIFICATION cliff
+       ↓ FIXED
+POST-FIX candidate pool
+       ↓
+34 candidates reach independent-attack path
+       ↓
+34 transport refusals
+       ↓
+ATTACK_INCOMPLETE
+TRANSPORT_UNAVAILABLE
+```
+
+The immediate question is:
+
+> Why does the real per-candidate independent attacker receive no dry-run fixture response even though the run-level A2 `attack` fixture exists?
+
+Live code inspection has already established the answer:
+
+```text
+independent_attack.py
+  purpose="independent_attack"
+```
+
+vs.
+
+```text
+tests/fixtures/dryrun/problems.py
+  purpose_exact="attack"
+```
+
+Therefore the next coding change should be confined to the deterministic dry-run fixture coverage and/or narrowly associated attack-state measurement, after first tracing consumers.
+
+---
+
+# 20. NEXT CHAT — EXACT AUTOCOMMAND BOOTSTRAP
+
+A new chat must run these checks itself. Do not ask the operator to run them.
+
+## 20.1 Locate/verify repository
+
+POSIX-compatible form:
 
 ```bash
-# ---------- 0.1 locale (the R507 UTF-8 lesson; run in EVERY new shell) ----------
 export LANG=C.UTF-8 LC_ALL=C.UTF-8
-
-# ---------- 0.2 LXXIII vault consult order (Art. LXXIII / R509-C2 recovery precedent) ----------
-# Order: (1) canonical path, (2) /tmp survivor copy, (3) rebuild canonical from survivor.
-for p in /home/z/my-project/.secrets.env /tmp/my-project/.secrets.env; do
-  [ -f "$p" ] && echo "VAULT FOUND: $p"
-done
-if [ ! -f /home/z/my-project/.secrets.env ] && [ -f /tmp/my-project/.secrets.env ]; then
-  cp /tmp/my-project/.secrets.env /home/z/my-project/.secrets.env && chmod 600 /home/z/my-project/.secrets.env
-  echo "canonical vault rebuilt from /tmp survivor"
+REPO="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "$REPO" ] || [ ! -d "$REPO/.git" ]; then
+  REPO="/home/z/my-project/hf_space"
 fi
-# Load into session env (values NEVER go into files, logs, or commits — BS-021):
-set -a; . /home/z/my-project/.secrets.env; set +a
-# Verify fingerprints (expected: GITHUB_TOKEN sha256[:16]=f1ebca5f9b622f3e len 40; HF_TOKEN sha256[:16]=33bc7af22c628bc1 len 37):
-python3 - <<'PY'
-import hashlib, os
-for n in ("GITHUB_TOKEN", "HF_TOKEN"):
-    v = os.environ.get(n, "")
-    print(n, "fp:", hashlib.sha256(v.encode()).hexdigest()[:16], "len:", len(v))
-PY
-# Expected output:
-# GITHUB_TOKEN fp: f1ebca5f9b622f3e len: 40
-# HF_TOKEN fp: 33bc7af22c628bc1 len: 37
-# If fingerprints DIFFER: STOP. Do not rotate (LXXVI: rotation is a CEO act).
-# Register the delta, ask the operator, and treat all push/Space acts as blocked.
-
-# ---------- 0.3 repo baseline (fresh container? clone; existing? verify) ----------
-cd /home/z/my-project/hf_space 2>/dev/null || {
-  git clone https://github.com/prateekm1007/discovery-evidence-fabric.git /home/z/my-project/hf_space
-  cd /home/z/my-project/hf_space
-}
-# Authenticated fetch via the standing credential-helper injection
-# (token via env, NEVER in a URL, NEVER on disk — the R503/R506 push pattern):
-git -c credential.helper='!f() { echo username=x; echo password='"$GITHUB_TOKEN"'; }; f' fetch origin
-echo "local HEAD : $(git rev-parse HEAD)"
-echo "origin/main: $(git rev-parse origin/main)"
-# These two MUST be equal. If not: realign (git status first; never destroy local records):
-#   git status --short   # records-only work is additive; stash/rebuild cleanly if dirty
-
-# ---------- 0.4 durable branch tip ----------
-git -c credential.helper='!f() { echo username=x; echo password='"$GITHUB_TOKEN"'; }; f' \
-  ls-remote origin refs/heads/runtime-state-hf refs/heads/main
-# Expected at handoff time: main=3c17b602..., runtime-state-hf=215251c9...
-
-# ---------- 0.5 frozen chain verify (the R506 battery freeze; Art. XXVII: these bytes are law) ----------
-sha256sum R506/BATTERY_PROBLEMS.json scripts/r506_harvest_rules.py scripts/r506_discovery_yield.py
-# Expected (first 8 hex):
-#   e9c72c58  R506/BATTERY_PROBLEMS.json        (the six-problem manifest)
-#   40d728f8  scripts/r506_harvest_rules.py     (the frozen rules script)
-#   831f1a0e  scripts/r506_discovery_yield.py   (the frozen yield instrument)
-
-# ---------- 0.6 live production identity (read-only public GET; no token needed) ----------
-curl -sS -m 20 "https://prateekm1-toscanini-prod-validation.hf.space/api/version"
-# Expected: {"engine_commit": "d7520b9bc5d7f26a2ab40b28367501e916634513", ...,
-#            "constitution_version": "2.8.0"}
-# If engine_commit != d7520b9b...: STOP AND RE-BASELINE (Art. XXVII discipline:
-# never silently measure a different build than the frozen battery measured).
-
-# ---------- 0.7 in-flight check (did the sibling line move while you read?) ----------
-git log --oneline -8
+if [ ! -d "$REPO/.git" ]; then
+  git clone https://github.com/prateekm1007/discovery-evidence-fabric.git "$REPO"
+fi
+cd "$REPO"
+git fetch origin
+git checkout main
+git reset --hard origin/main
+git status --short
+git rev-parse HEAD
+git rev-parse origin/main
 ```
 
-If every step returned the expected values, your baseline is green and you may proceed to §1.
+Do not execute a hard reset if the environment contains uncommitted operator work that has not been classified. First capture status and preserve it according to the governance rules. The new chat must perform this classification itself.
 
-If the vault is missing entirely (fresh container, /tmp wiped): the recovery order is
-(1) session env → (2) `/tmp/my-project/.secrets.env` → (3) `/home/z/my-project/.secrets.env` →
-(4) the HF Space secrets surface (32 names; needs the HF token — chicken-and-egg, so only
-usable if the HF token came from 1–3) → (5) the operator re-supplies in one chat message
-(the R503 precedent; zero shame, it is a typed custody event, not a failure).
+Preferred safe baseline check:
+
+```bash
+git status --short
+git diff --stat
+git rev-parse HEAD
+git rev-parse origin/main
+```
+
+If `HEAD != origin/main`, classify drift before touching files.
+
+## 20.2 Read continuity sources automatically
+
+```bash
+cd "$REPO"
+printf '%s\n' \
+  EPISTEMIC_CONSTITUTION.md \
+  GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md \
+  GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md \
+  GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md \
+  GOVERNANCE/AUDITOR_REMEMBERED_STATE.md \
+  ACTIVE_PATH.md \
+  CANONICAL_MODEL_FLOW.md \
+  HANDOFF_NEXT_CHAT_R510_MASTER.md
+```
+
+Then read the files programmatically using the agent's repository/file tool rather than asking the operator to paste them.
+
+## 20.3 Verify current hashes
+
+```bash
+sha256sum \
+  EPISTEMIC_CONSTITUTION.md \
+  GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md \
+  GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md \
+  GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md \
+  GOVERNANCE/AUDITOR_REMEMBERED_STATE.md \
+  R506/YIELD_INSTRUMENT.json
+```
+
+Do not assume the hash in this handoff is still current if the repository has moved. The live bytes are authoritative.
+
+## 20.4 Verify current commit lineage
+
+```bash
+git log --oneline --decorate -12
+git show --stat --oneline bfbb5bfdd345037f0af84ad5823ec1c2d4d7eec4
+git diff --stat 13e0a3b21364395df2a6ad540622dfface19a69e..bfbb5bfdd345037f0af84ad5823ec1c2d4d7eec4
+```
+
+## 20.5 Verify the critical attack purpose mismatch
+
+```bash
+grep -RIn --exclude-dir=.git --exclude='HANDOFF_NEXT_CHAT_R510_MASTER.md' \
+  'purpose="independent_attack"' discovery_fabric tests scripts || true
+
+grep -RIn --exclude-dir=.git \
+  'purpose_exact.*independent_attack' tests/fixtures/dryrun scripts discovery_fabric || true
+
+grep -RIn --exclude-dir=.git \
+  'purpose_exact.*attack' tests/fixtures/dryrun/problems.py || true
+```
+
+The expected inspection result is that `independent_attack.py` requests `independent_attack`, while the dry-run pack presently defines `attack` but not `independent_attack`.
+
+## 20.6 Trace all consumers of the dangerous attack fields
+
+```bash
+grep -RIn --exclude-dir=.git \
+  'attack_naive_overall\|attack_state_aggregate\|attack_survived\|independent_attack_attempted\|attack_drop_transition' \
+  discovery_fabric orchestrator scripts tests R510 | head -n 500
+```
+
+Do this BEFORE renaming/removing fields.
 
 ---
 
-## 1. MUST-READ BEFORE CODING (the no-break list, in this order)
+# 21. NEXT OPTIMIZATION WORK — ORDERED AND AUTOCOMMAND-ONLY
 
-The system has been broken before by chats that skipped this list. The ritual is not
-ceremonial — it is the audit loop protocol (`GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md`) and
-it is enforced by the governance files. Read in this order, fully, before any code,
-plan, or verdict:
+## Step 1 — Freeze the current baseline
 
-| # | File | Size | Why it must be read |
-|---|------|------|---------------------|
-| 1 | `EPISTEMIC_CONSTITUTION.md` | 2,399 lines (v2.9.0, sha `6aab103c`…, IN TREE — production still serves 2.8.0) | The supreme authority. Especially: Art. XXI.3 (absence ≠ absence), XXV (silence-is-not-death; never convert UNKNOWN into REJECTED), XXVII (no invented thresholds), XXVIII (no silent semantic promotion), XXXI (memory artifacts), XXXVII/XXXVIII (reality boundary), XXXIX (release chain), XLIII (blind problems), LXI (typed failures), LXXIII (vault), LXXIV (durable checkpoints / mid-flight rule), LXXVI (credential custody; rotation is a CEO act), LXXVII (discovery performance ≠ pipeline completion), LXXVIII (survivor four-gates incl. `blocking_count==0`), LXXIX (fresh-problem generalization), the Four Layers, and the WORLD_CLASS_DISCOVERY_GATE checklist |
-| 2 | `GOVERNANCE/README.md` then the other four | short | How auditing itself is governed; the blindspot register is where BS-021 (owner keys never land in durable bytes) lives |
-| 3 | `ACTIVE_PATH.md` | 1,305 lines | The single authority for what the production path IS; read through the R509 addenda at the end |
-| 4 | `worklog.md` (repo root) | 2,167 lines — AT MINIMUM read every entry from `R506` to the end | The canonical, append-only work record; the last five entries (R506, R509 act-1, R509-C2, R509-C2-POST, R509-C2-ZLINE) are the live campaign |
-| 5 | `R506/R506_ROUND_RECORD.json` | json | The battery: what the six problems are, how the freeze works, why the manifest was pushed before terminals existed |
-| 6 | `R508/R508_ROUND_RECORD.json` + commit `ed296772` message (R508-C1) | json | The typed infrastructure failure (6× `INCOMPLETE_INFRASTRUCTURE_FAILURE`) and the verification intake |
-| 7 | `R509/R509_ROUND_RECORD.json` | json | Act 1 PRESERVE: the discovery that the six capabilities are durable bytes; the tail that rewrote the mechanism (no deaths — the push path went silent) |
-| 8 | `R509/R509_C2_ROUND_RECORD.json` + `R509/POST_RESTART_OBSERVATION.json` | json | The sibling line's execution: the 10-min engine_checkpoint cadence fact, the 48h dry-run, the 11:36:15Z Space restart |
-| 9 | `R509/R509_C2_ROUND_RECORD_ZLINE.json` | json | THIS line's execution: the race reconciliation block (§ `race_reconciliation`) tells you exactly what both lines measured and where they differ by design |
-| 10 | `R509/RESPAWN_DESIGN.md` + `R509/SUPPORT_TRACKS_DESIGN_NOTES.md` | md | The post-harvest engine fixes (M1–M4) and the parallel support tracks — design only, code forbidden until harvest |
-| 11 | `scripts/r509_preflight_gate.py` (docstring), `scripts/r509_kill_switch.py`, `scripts/r509_battery_watchdog.py` + `_zline.py` | py | The armed phase-3 instrumentation you will inherit; read before running |
-| 12 | `HANDOFF_TO_NEXT_CHAT_R419_MASTER.md` | 1,474 lines | Background: mission, authority order, history of failure classes. Its state sections are superseded by this file |
-| 13 | `R509/KEY_BUDGET_LEDGER_ZLINE.json` + `R509/KEY_BUDGET_LEDGER.json` | json | The key-budget law: the shared PatentBear bucket, the five-rule protocol, why you must not spend |
+Treat:
 
-Reading discipline that has worked: read with the question "what would I have to
-NEVER do to avoid breaking this?" after each file. If you finish the list without
-three new "never do" entries, you skimmed; go back.
+```text
+bfbb5bfdd345037f0af84ad5823ec1c2d4d7eec4
+```
+
+as the current dry-run baseline unless remote state has moved.
+
+Do not change:
+
+- R506 yield instrument;
+- scored problem manifests;
+- Constitution thresholds;
+- verifier semantics;
+- ranking weights;
+- mechanism operators;
+- support fix;
+- live R510 Battery2 artifacts.
+
+## Step 2 — Audit the actual independent attack call path
+
+Trace:
+
+```text
+EngineRun._post_rank_pipeline
+→ independent_attack.independent_attack
+→ mechanism_space.llm_generate
+→ FixtureTransport.match
+→ LLMCallResult
+→ persisted INDEPENDENT_ATTACK_{key}.json
+→ attacker_calibration.apply_at_consumption
+→ candidate selection / downstream state
+```
+
+The purpose string must be recorded and verified.
+
+## Step 3 — Verify whether only fixture coverage is missing
+
+Do NOT immediately patch code.
+
+First demonstrate that:
+
+```text
+matched `independent_attack` fixture
+```
+
+would be accepted by the current production parser without code changes.
+
+If the parser/engine path itself has a defect, classify it separately.
+
+## Step 4 — Add the minimal independent-attack fixture
+
+Only after the trace confirms fixture coverage is the single defect:
+
+- add `purpose_exact="independent_attack"` to the existing controlled fixture pack;
+- provide response text matching `independent_attack.py`'s exact parser contract;
+- preserve existing A/B deterministic identity rules;
+- do not reuse incompatible A2 format blindly;
+- do not change the actual attack algorithm.
+
+The fixture should include deterministic cases representing real independent-attack outcomes.
+
+At minimum, the fixture design should cover:
+
+```text
+transport success
+valid SURVIVE/RISK path
+valid KILL path through existing grounding rules
+```
+
+The test fixture must remain explicitly controlled test material.
+
+## Step 5 — Add true end-to-end dry-run coverage
+
+Add a test that executes an actual `EngineRun(... dry_run=True, fixture_transport=...)` and proves:
+
+```text
+purpose=independent_attack
+→ fixture matched
+→ independent_attack executed
+→ parser returned structured items
+→ existing attack evaluator determined result
+→ result persisted
+→ run did not call live/paid transport
+```
+
+This must be different from the existing direct A2 test.
+
+## Step 6 — Preserve failure behavior
+
+Also test:
+
+```text
+no independent_attack fixture
+→ PROVIDER_UNAVAILABLE
+→ TRANSPORT_UNAVAILABLE
+→ ATTACK_INCOMPLETE
+→ never KILLED
+→ never SURVIVED
+```
+
+This protects the infrastructure/science boundary.
+
+## Step 7 — Audit attack-state naming
+
+Only if consumer tracing demonstrates a real semantic ambiguity, introduce:
+
+```text
+attack_requested
+attack_execution_started
+attack_execution_completed
+```
+
+or an equivalently minimal state distinction.
+
+Do not create a large state-machine rewrite.
+
+## Step 8 — Audit the two-path attack nomenclature
+
+Ensure the proof record can tell readers whether a result refers to:
+
+```text
+run-level A2 attack
+```
+
+or:
+
+```text
+per-candidate independent attack
+```
+
+A field like `attack_naive_overall` must never be silently interpreted as the per-candidate independent pool result.
+
+## Step 9 — Run the identical 3 × A/B battery
+
+Fresh output directories only.
+
+No tuning between A/B.
+
+No problem changes.
+
+No instrument changes.
+
+No live calls.
+
+## Step 10 — Compute the post-fix funnel from durable bytes
+
+Recompute:
+
+```text
+fresh_submitted
+premise_coherent
+evidence_verified
+mechanisms_found
+candidates_generated_distinct
+attack_survivors
+contradiction_survivors
+experimentally_discriminated
+mutated_survivors
+buyer_ready
+```
+
+## Step 11 — Classify the attack transition
+
+Separate:
+
+```text
+not reached
+requested but not executed
+transport unavailable
+execution incomplete
+scientifically killed
+scientifically survived
+unknown
+```
+
+Do not collapse infrastructure states into scientific states.
+
+## Step 12 — Identify the next real cliff
+
+Only after the independent attack actually executes should the next scientific bottleneck be named from measurement.
+
+Do not assume:
+
+```text
+ATTACK = next scientific cliff
+```
+
+until the attack is truly measurable.
+
+## Step 13 — Apply exactly one scientific/engineering cliff fix
+
+The fix must target the largest measured dropout named by the frozen funnel measurement.
+
+No unrelated cleanup in the same optimization change.
+
+## Step 14 — Re-run identical measurement
+
+Compare:
+
+```text
+before
+vs
+same battery after fix
+```
+
+The improvement must be evidenced by durable bytes, not narrative.
+
+## Step 15 — Rebuild proof record
+
+Derive publication record from actual measured run outputs.
+
+Preserve execution commit vs publication commit distinction.
+
+## Step 16 — Run test suite
+
+At minimum:
+
+```bash
+python3 -m pytest tests/test_r510_dryrun.py tests/test_r510_transitions.py tests/test_r510_diversity_adapter.py -q
+```
+
+Run relevant attacker/calibration regressions if shared modules were changed.
+
+## Step 17 — Push automatically
+
+After a coherent change set:
+
+```bash
+git add ...
+git commit -m "R510 — <honest measured change>"
+git push origin main
+git fetch origin
+git rev-parse HEAD
+git rev-parse origin/main
+```
+
+No operator push step.
+
+## Step 18 — Final acceptance
+
+A round may be reported complete only when:
+
+```text
+code tested
++ fresh E2E proof
++ durable funnel
++ largest cliff identified
++ one fix applied
++ identical rerun
++ repeatability established
++ provenance exact
++ remote push verified
+```
+
+Otherwise report the actual incomplete state.
 
 ---
 
-## 2. AUTHORITY ORDER AND MISSION (unchanged from R419, restated because it never bends)
+# 22. DO NOT REPEAT THESE ALREADY-COMPLETED ITEMS
 
-Authority order when artifacts conflict:
-1. `EPISTEMIC_CONSTITUTION.md` (v2.9.0 in tree; production serves 2.8.0 — see the act-2 gate in §6)
-2. `GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md`
-3. `GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md` (BS-021: owner keys never land in durable bytes)
-4. `GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md`
-5. `ACTIVE_PATH.md`
-6. Current repository / deployment state (verified, not assumed)
-7. Current worklog / directives
-8. Screenshots, reports, handoffs (INCLUDING THIS ONE — this file is a continuity aid, never authority)
-9. Remembered conversational context
+A new chat MUST NOT waste time redoing already-settled work unless a new regression is found.
 
-Mission (settled, do not re-litigate): a **world-class AI discovery and invention
-machine** that turns difficult user problems into credible technology packages a real
-company can evaluate, license, and build. The current cycle goal (CEO, R506): **stop
-proving the machine works; start measuring whether it discovers.** One instrument, one
-battery, one survivor. Success for the current campaign is, verbatim from the CEO
-directive: *"not activity — it is six terminals, then one bottleneck named by
-measurement."*
+Do not redo solely for continuity:
 
-Who is who:
-- **The operator / CEO** = the human user. Speaks in directives. Owns all keys.
-  Ratifies constitution amendments. Rules on (a)-vs-(b) decisions. Never runs commands.
-- **Coder lines** = AI sessions (you). Execute phases, produce records, push records.
-  Two lines may run the SAME directive in parallel — the race protocol in §11.6 handles it.
-- **The sibling line** = the other AI session that executed R509-C2 before this line;
-  its records are canonical (`R509/` without suffix), this line's landed additively
-  (`_ZLINE` suffixes). Both seals stand (R498 precedent).
+- support-verification root cause discovery;
+- support fix implementation;
+- support cliff measurement;
+- proof-record stale commit bug fix;
+- current R510 transition ledger instrumentation;
+- dry-run fixture precedence design;
+- deterministic ranking design;
+- direct A2 fixture test;
+- basic cemetery sandbox control;
+- A/B candidate-id normalization.
+
+These are established current history.
+
+The new task is to make the real independent-attack path measurable, then continue the measured one-cliff loop.
 
 ---
 
-## 3. THE IRON LAWS — violate any of these and you break the system
+# 23. UNRELATED / SEPARATE CURRENT WORK THAT MUST NOT BE COLLAPSED INTO THIS DRY-RUN TASK
 
-1. **Repetition-only seal.** No new problem text, no gate/threshold/prompt tuning, no
-   engine change touches the scored set while a battery is in flight or frozen. Tuning
-   voids the battery (draft Art. LXXIX).
-2. **Every measurement is typed.** A number without a type, a provenance, and a byte
-   citation is not a measurement. Absence of evidence is typed (e.g.
-   `ABSENT_FROM_DURABLE_LEDGER`, `UNOBSERVABLE_*`, `REGISTERED_ABSENT_VALUE_NOT_HELD`),
-   never silently treated as zero or as failure.
-3. **Never research-type a live artifact.** Read-only paths for observers; the
-   durable worktree is read-only; `sessions.json` on the durable branch carries
-   `owner_key` values — load in memory only, never write them anywhere, BS-021
-   fail-closed scan before ANY write/commit.
-4. **Art. XXVII — invent no threshold.** The only derived bound ever authorized is
-   82 min = 2 × p90 (p90=41, n=98, measured). Everything else cites its source bytes.
-5. **Art. XXV — silence is not death.** UNKNOWN stays UNKNOWN with a typed reason
-   until bytes resolve it. R508 held this line and was vindicated by the preserved tail.
-6. **Art. XV — disclose immediately.** Every mistake, every environment rollback,
-   every rejected push, every correction of a sibling's imprecision. Disclosure has
-   never once been punished; concealment has.
-7. **Scope law (the CEO campaign directive, binding):** until harvest, the tree accepts
-   ONLY observer-side scripts + records. Zero engine delta in
-   `discovery_fabric/`, `toscanini/`, `orchestrator/`, `TOSCANINI_UI/`. Zero deploy.
-   Zero resubmission outside phase 3. Touching the six sessions' durable history is
-   forbidden entirely.
-8. **Stop-list (binding, from the same directive):** no attacker tuning, no new
-   providers/sources/UI/pruning/package work, no physics changes, no deploy, no
-   resubmission outside phase 3, no touching the six sessions' durable history.
-9. **BS-021 + LXXIII + LXXVI (credentials):** owner key VALUES never land in durable
-   bytes (no repo file, no commit, no record, no log, no download). The vault file
-   (`/home/z/my-project/.secrets.env`, 0600) and the HF Space secrets surface (32
-   names, the custody vault of record) are the only resting places. **Rotation is a
-   CEO act — never machine-judged, never machine-executed.**
-10. **Art. X — `MODULE_INVENTORY.json`** is regenerated only by its own authority
-    script and must be `--check` GREEN whenever engine files changed (they shouldn't
-    have, per the scope law).
-11. **Measure-before-integration / LXXIV durable checkpoints:** execution states live
-    on the durable branch (`runtime-state-hf`), not in chat memory. A missing manifest
-    means MID_FLIGHT, never terminal.
-12. **The funnel is the boss (phase 4 law):** the harvest rules + instrument decide
-    the bottleneck; exactly ONE cliff-fix gets built per cycle; everything else on the
-    wish-list waits.
+## R510 live battery2
+
+`R510/BATTERY2_STATUS.json` currently describes a separate live blind-yield battery with six submitted problems and owner/custody dependencies.
+
+That line must remain separate from the dry-run fixture optimization.
+
+Do not mutate:
+
+```text
+R510/BATTERY2_PROBLEMS.json
+R510/BATTERY2_SESSIONS.json
+R510/YIELD2_* live battery state
+```
+
+unless the operator explicitly changes the active task.
+
+## Production deployment line
+
+Production deployment records and runtime-state branches are separate from the controlled dry-run measurement unless the user explicitly asks to audit deployment/product behavior.
+
+## Historical R-cycles
+
+Do not reopen R400/R401/R412/R450/etc. simply because the code references them. Their records are provenance/history. Use current canonical implementations and current tests unless the current task explicitly requires historical reconstruction.
 
 ---
 
-## 4. CURRENT STATE — verified facts with bytes (the situation you inherit)
+# 24. SECRETS / CREDENTIAL CUSTODY
 
-### 4.1 The one-paragraph state
+Constitution Articles LXXIII and LXXVI govern credential custody.
 
-The R506 discovery-yield battery (six blind NHTSA problems, frozen manifest
-`e9c72c58`) was submitted 2026-09-18 00:03–00:04Z to production (`d7520b9b` / 2.8.0).
-All six workers reached terminal COMPLETE on the live Space between 00:12:05Z and
-00:45:07Z — **no deaths** — but the engine's durable push path went silently silent
-after the last snapshot 00:09:15Z (`0da7fe50`), so the durable terminal authority has
-0/6 terminals and the round typed 6× `INCOMPLETE_INFRASTRUCTURE_FAILURE` (LXI). The
-ephemeral forensics tail + six live terminal session views were PRESERVED read-only at
-08:35Z (durable commit `215251c9`), three hours before a Space restart (11:36:15Z)
-that would have destroyed them — the preservation also proved the live session store
-SURVIVED the restart (the store persists; only the run dirs' survival is unknown, and
-only the owner can check). The durable push path is now measured RESTART-INSENSITIVE
-silent (this boot pushed nothing vs 120 historical boot-reason rows). Scorecard:
-138/25 = 5.52 → OVERALL 6/10, NO — eighth consecutive NO, frozen until terminals
-exist on the durable authority. Phase 3 (resubmit or recover) and phase 4 (harvest)
-are fully armed and gated on the operator's two word-acts.
+The rule is:
 
-### 4.2 The six sessions (the campaign's subject matter)
+```text
+secret values
+→ vault / HF Space secret surface
+→ fingerprints only in records
+```
 
-| # | session_id | durable last row | last snapshot | live terminal (preserved) | bridge | verdict (both lines) |
-|---|-----------|------------------|---------------|---------------------------|--------|----------------------|
-| P1 | `ts_dbdf24c91535` | HEARTBEAT @ 00:09:08.897Z | problem_understanding_merged @ 00:04:02Z | COMPLETE / INVENTION_REQUIRES_EXPERIMENT @ 00:12:04Z | NO_SURVIVOR | PUSH-FAILURE-suspect |
-| P2 | `ts_ca977637f50b` | PHASE_STARTED @ 00:09:12.284Z | clarification_answered @ 00:08:45Z | COMPLETE / INVENTION_REQUIRES_EXPERIMENT @ 00:22:56Z | COMPLETED | PUSH-FAILURE-suspect |
-| P3 | `ts_66e23c67b511` | PHASE_STARTED @ 00:09:10.080Z | problem_understanding_merged @ 00:08:58Z | COMPLETE / INVENTION_REQUIRES_EXPERIMENT @ 00:22:49Z | COMPLETED | PUSH-FAILURE-suspect |
-| P4 | `ts_84a8807b12dc` | PHASE_STARTED @ 00:09:04.823Z | clarification_answered @ 00:08:58Z | COMPLETE / INVENTION_REQUIRES_EXPERIMENT @ 00:23:55Z | COMPLETED | PUSH-FAILURE-suspect |
-| P5 | `ts_6da1b9339ce5` | PHASE_STARTED @ 00:09:10.840Z | clarification_answered @ 00:09:09Z | COMPLETE / INVENTION_REQUIRES_EXPERIMENT @ 00:45:07Z | COMPLETED | PUSH-FAILURE-suspect |
-| P6 | `ts_d9b7d3463583` | CLARIFICATION_ANSWERED @ 00:09:15.107Z | clarification_answered @ 00:09:15Z | COMPLETE / INVENTION_REQUIRES_EXPERIMENT @ 00:40:37Z | COMPLETED | PUSH-FAILURE-suspect |
+Never put secret values in:
 
-Preserved terminal facts (pipeline facts only — LXXVII-inadmissible as discovery
-evidence): #1 INSUFFICIENT_ADJUDICATION / EVALUATION_FAILED / rank 0.15; #2 #3 #6
-CONTESTED / adv PASS / rank 0.5069–0.5145; #4 #5 CONTESTED / adv KILLED / rank
-0.2691; all six evidence_verified=true, prior_art UNRESOLVED_INSUFFICIENT_EVIDENCE.
+- repository;
+- worklog;
+- proof record;
+- test output;
+- chat response;
+- commit message.
 
-### 4.3 The measured mechanism (both lines converged)
+Rotation is a CEO-only action.
 
-- The silent stage is the **durable push path**: last successful snapshot 00:09:15Z
-  (`0da7fe50`), then ZERO snapshots despite six terminal FINAL_SNAPSHOT phases — with
-  `last_write_error=null`, `forensics_degraded=false`, shrink_guard ok. **Silent
-  custody loss.**
-- The sibling's narrowing fact: `engine_checkpoint` is a measured **10.0-min periodic
-  timer** (n=17 gaps / 6 sessions; R487: 11 checkpoints at 10.0–10.2-min spacing) —
-  the six RUNNING battery sessions received **zero** ticks. The checkpoint/push
-  subsystem below the health surface dropped both the periodic ticks AND the six
-  terminal pushes. WHICH internal stage: still UNKNOWN (owner-side bytes needed).
-- Shared-hang hypothesis: **NOT supported** (xkiro `RATE_LIMITED` = exactly ONE row at
-  23:37:47Z followed by 16 ok-rows; terminal spread 33.0 min = independent
-  completions; heartbeat 00:40:41Z mid-run).
-- Push-path silence is **RESTART-INSENSITIVE**: the 11:36:15Z boot pushed nothing
-  (vs 120 historical boot/after_restore rows) — the defect survived a full restart.
-- The routing ledger carries **1,176** durable rows (the directive's "1,107" was not
-  re-derived exactly by either line — disclosed, non-consequential).
-- Owner-side forensics of the push-path internals remains THE typed root-cause path.
+Do not rotate a credential merely because the auditor sees a stale or exposed fingerprint.
 
-### 4.4 What is armed and waiting (phase 3 instrumentation, all observer-side)
+If a required credential value is absent from the current environment, type the state honestly and use the operator's allowed word/supply mechanism when necessary.
 
-| Instrument | Script | State | Autocommand |
-|-----------|--------|-------|-------------|
-| Pre-flight gate (fail-closed; 6 checks: freeze shas / live identity / durable / watchdog / act-2 verbatim / CEO ruling) | `scripts/r509_preflight_gate.py` | ARMED, never executed against live; GO only in offline rehearsal so far | `python3 scripts/r509_preflight_gate.py --skip-live --operator-act2-verbatim "2.9.0 stands" --ceo-execution-ruling resubmit` (rehearsal) |
-| Kill-switch (per-session STALLED > 82 min → typed declare + PRESERVE via the read-only owner-key path; never touches workers) | `scripts/r509_kill_switch.py` | ARMED, self-test 3/3 | `python3 scripts/r509_kill_switch.py --self-test` then `--loop 10` when a run is live |
-| Watchdog (canonical: STALLED_OVER_2X_P90 82min / DURABLE_TIP_STALE 30min=3× cadence / HEARTLESS_WORKERS; 2-poll hysteresis) | `scripts/r509_battery_watchdog.py` | ACCEPTED: 48h dry-run 577 polls, exactly 3 alerts (the R508 signature), zero false fires on R484/R487 | `python3 scripts/r509_battery_watchdog.py --self-test`; live: `--live` or cron `--once` |
-| Watchdog ZLINE variant (DURABLE_TIP_STALE rides 2×p90 = the only authorized derived bound; 3/3 hysteresis) | `scripts/r509_battery_watchdog_zline.py` | ACCEPTED: replay PASS vs REAL R508 evidence bytes, zero false fires | `python3 scripts/r509_battery_watchdog_zline.py --self-test` |
-| Battery driver (preflight / submit / poll / harvest modes) | `scripts/r506_battery_driver.py` | FROZEN-adjacent: this is the submission + harvest path | `python3 scripts/r506_battery_driver.py preflight` |
-| Yield instrument | `scripts/r506_discovery_yield.py` (`831f1a0e`) | FROZEN — never edit; divergence = broken freeze | (called by the driver's harvest mode) |
-
-One live watchdog tick was recorded 11:48:03Z (container-lifetime limited, disclosed).
-The 48h accumulation runs via `--live` — start it if no process is running (§10.3).
-
-### 4.5 The two watchdog variants are BOTH valid — an owner decision is queued
-
-Canonical (sibling): `DURABLE_TIP_STALE` fires at 30 min = 3 × the measured 10-min
-checkpoint cadence, 2-poll hysteresis. ZLINE (this line): `DURABLE_TIP_STALE` rides
-82 min = 2 × p90 (the directive's only authorized derived bound), 3/3 hysteresis.
-Both are recorded for the owner to pick or merge. Until the owner picks, run the
-canonical one and leave the variant in the tree. Disclosed limitation (do NOT fix
-unilaterally): a 293.1-min healthy progression gap exists 2026-09-13→14 (outside the
-R484/R487 acceptance corpus) — the 82-min bound would have fired there; a
-heartbeat-aware suppression variant is an owner decision, recorded not adopted.
+Current dry-run optimization requires no paid credential because `FixtureTransport` must remain isolated from live provider credentials.
 
 ---
 
-## 5. WHAT IS DONE (the compressed ledger — read with `git log` beside you)
+# 25. REALITY / DISCOVERY STATUS — DO NOT OVERCLAIM
 
-Every entry below is a pushed commit on `origin/main` unless stated otherwise.
-The worklog entries in `worklog.md` carry the full detail; this table is the map.
+The current dry-run evidence proves useful engineering observations about orchestration and measurement.
 
-| Commit | Round | What landed (records-only unless noted) |
-|--------|-------|------------------------------------------|
-| `2b42e8b4` → `9d126769` | R506 | The yield instrument built + frozen (`831f1a0e`); LXXVII/LXXVIII/LXXIX drafted (pending operator); the six-problem battery selected mechanically from NHTSA ODI narratives, disjointness fail-closed, manifest `e9c72c58` PUSHED BEFORE any terminal existed; all 6 submitted through the real user path; 5 clarified mechanically with each run's own verbatim text; redacted custody pushed to `runtime-state-hf` (`691d8d3d`) |
-| (R506 → R508 span) | R507 | Constitution 2.8.0 → **2.9.0** ratified in tree (LXXVII/LXXVIII/LXXIX enacted; tree sha `6aab103c`); production still serves 2.8.0 — the verbatim act-2 gate exists because of this gap |
-| `ed296772` | R508 + R508-C1 | The infra loss typed honestly: 6× `INCOMPLETE_INFRASTRUCTURE_FAILURE` (LXI); score 138/25 = 5.52 → OVERALL 6/10, **NO** (eighth consecutive); every checkable claim re-derived; forbidden-until-acts list (restart/rebuild/redeploy/resubmit) established |
-| `759891bf` | R509 (act 1) | **PRESERVE EXECUTED** — the measured discovery that `durable.py::_collect_payload` pushes `sessions.json` (with owner_keys) WHOLESALE to the durable branch made act 1 executable read-only; 12/12 HTTP 200 GETs, same-boot verified both sides, 16 evidence files + six terminal views pushed as `battery/forensics_preservation_2026-09-18T083509Z/` → durable commit **`215251c9`** (parent `691d8d3d`); BS-021 scans clean; capabilities in-memory only |
-| `666b8228` | R509-C2 (sibling line) | Phase 1 autopsy (`RESIDUE_AUTOPSY.json`: 6× PUSH-FAILURE-suspect, checkpoint-cadence fact); phase 2 watchdog (`r509_battery_watchdog.py` + 4 replay artifacts + 48h dry-run 577 polls); phase 3 ARMED (`r509_preflight_gate.py`, `r509_kill_switch.py`); tracks 10 (R370G door rehearsal DOOR_PROVEN, real_event_count=0), 11 (KEY_BUDGET_LEDGER), 12 (RESPAWN_DESIGN.md M1–M4); environment-rollback recovery disclosed |
-| `1b23f584` | R509-C2-POST (sibling) | The 11:36:15Z Space restart measured: session store PERSISTED (owner-key GET `ts_ca977637f50b` → COMPLETE, envelope `50a912dc0775` byte-consistent); run dirs UNKNOWN from observer domain (owner-verifiable in one look); push path RESTART-INSENSITIVE silent; production tuple unchanged |
-| `3c17b602` | R509-C2-ZLINE (this line) | The independent parallel execution landed additively: `RESIDUE_AUTOPSY_ZLINE.json` (per-session routing attribution typed; the 23:37:47Z row is EXACTLY ONE; 33.0-min spread kills shared-hang), `r509_battery_watchdog_zline.py` + replay acceptance PASS vs REAL R508 evidence bytes, `KEY_BUDGET_LEDGER_ZLINE.json` (5-rule protocol), `SUPPORT_TRACKS_DESIGN_NOTES.md`, the full race_reconciliation block; four pre-rebase local commits preserved in reflog, zero remote objects overwritten |
+It does NOT establish:
 
-Support tracks (directive tracks 10–12, all isolated, none deployed):
-- **Track 10 — R370G door rehearsal:** DOOR_PROVEN end-to-end on a labeled rehearsal
-  fixture; real_event_count=0, counts_as_learning=false, nothing promotes,
-  REAL_LOOP_VERIFIED stays 0.
-- **Track 11 — key-budget coordination ledger:** committed; the shared PatentBear
-  bucket 19/20 FROZEN below floor 2; the R498 two-line blind-consumption incident is
-  the named lesson; five rules (reserve-before-spend / measure-meter-first /
-  reconcile-after-spend / floor-is-law / reservations-expire).
-- **Track 12 — respawn design (post-harvest only, no code yet):** M1 durable-push
-  custody acknowledgment (the piece execution #1 actually exposed), M2 periodic
-  terminal reconciliation (would have recovered all six), M3 idempotent resume =
-  push-not-rerun, M4 reaping last; regression gate = the R509 signature + closure
-  no-ops.
+- world-class discovery;
+- repeated discovery capability;
+- blind fresh-problem generalization;
+- real physical validation;
+- repeated reality validation;
+- buyer acceptance;
+- commercial validation;
+- patentability;
+- freedom to operate.
+
+The current controlled dry-run problems are explicitly machine-authored and therefore are not admissible as Article LXXIX blind capability evidence.
+
+The current 34 attack transport failures do not prove that candidates are scientifically bad.
+
+The current support-fix success does not prove the candidates are inventions.
+
+The current ranked portfolio does not prove candidate quality.
 
 ---
 
-## 6. WHAT IS LEFT — the gate tree (who owns each gate, in order)
+# 26. CURRENT USER STATUS — DONE / ACTIVE / LEFT
 
-```
-GATE A (operator, WORD-ACT):   act 2 verbatim — the operator types exactly
-                               "2.9.0 stands" (opens phase 3) or "revert"
-                               (constitution adjudication first, phase 3 stays shut).
-GATE B (operator, RULING):     (a) recover-first — owner recovers the ephemeral run
-                               dirs into the durable branch (the ONE open input: do
-                               the run dirs still exist owner-side? owner-verifiable
-                               in one look; the session store survived the restart, so
-                               (a) is NOT dead) → the frozen instrument then measures
-                               execution #1 on its own input contract;
-                            or (b) resubmit — execution #2, identical six problems,
-                               same bytes/prefixes, R508 as attempt genealogy.
-GATE C (autocommand):          pre-flight gate GO (fail-closed; it refuses by design
-                               until A+B land) + kill-switch armed in parallel.
-GATE D (autocommand):          the run itself — six terminals, or six typed failures
-                               WITH death evidence (watchdog durable tail + alert log).
-                               Only terminals enter the funnel.
-GATE E (autocommand):          phase 4 harvest under the frozen rules → YIELD_MEASUREMENT
-                               + funnel + bottleneck rank published.
-GATE F (build, ONE only):      the single cliff-fix the funnel names:
-                               diversity adapter (candidates starve) /
-                               collision scale-out (mandatory_complete=false dominates) /
-                               attacker v4.3 (over/under-kill dominates) /
-                               ring-failover routing (substitution dominates).
-                               Everything else on the wish-list is FORBIDDEN this cycle.
-GATE G (post-harvest):         engine-side respawn design (M1–M4) lands as its own
-                               measured change with regression proof (test cases = the
-                               R508/R509 deaths + closure no-ops). Until then: forbidden.
-PARALLEL (operator supplies):  fund-or-assign the strong ring (HF router);
-                               fresh PatentBear key (bucket 19/20 FROZEN below floor 2);
-                               Tier-1 registrations (EPO OPS / PatentsView).
-```
+## Done
 
-Notes on the gates:
-- **Do not execute GATE C/D until both word-acts (A + B) are in the chat transcript.**
-  The pre-flight gate script encodes both and refuses otherwise — trust it, but also
-  honor it even if you could bypass it.
-- If the operator answers "2.9.0 stands" + "resubmit": the exact execution order is
-  §10.4. If "recover-first": the owner pushes the run dirs; you then run the harvest
-  path on execution #1's own input contract — read `R509/R509_ROUND_RECORD.json`
-  "Owner decision now framed" again before acting.
-- The kill-switch runs DURING any live execution (GATE D), not instead of it. It is
-  observe-and-type only. If it fires `STALLED` per-session: preserve + root-cause from
-  the NEW evidence; that is the pre-registered response, not a judgment call.
-- **The operator's word-acts are the only manual things in this system, and they are
-  words, not commands.** Everything under GATES C–G is autocommands in §10.
+- [x] Constitution v2.10.1 is current and reread for this audit.
+- [x] Auditor governance is current and reviewed.
+- [x] Remote main is the current repository authority.
+- [x] Support-verification cliff was reproduced, fixed, and rerun.
+- [x] P1/P3 moved from `NOT_ENOUGH_EVIDENCE` to `PARTIALLY_SUPPORTED` without weakening verification.
+- [x] P2 cemetery control remains intact.
+- [x] Transition instrumentation exists.
+- [x] Attack measurement instrumentation exists.
+- [x] Attack transport failure is typed rather than silently turned into a scientific kill.
+- [x] Six A/B dry-run runs were executed at `f6a990a3...`.
+- [x] Repeatability was repaired and is PASS for P1/P2/P3.
+- [x] Proof record was regenerated from run-owned commit provenance.
+- [x] Current remote head is `bfbb5bf...`.
+- [x] Latest reported test result is `47 passed, 0 failed`.
+- [x] No live/paid calls in the dry-run proof.
+- [x] No world-class claim.
+
+## Active / immediately next
+
+- [ ] Audit exact `independent_attack` transport fixture mismatch.
+- [ ] Trace all consumers of `attack_naive_overall` and `independent_attack_attempted`.
+- [ ] Add the minimal dedicated `independent_attack` deterministic fixture if confirmed necessary.
+- [ ] Add true EngineRun-level independent-attack E2E tests.
+- [ ] Re-run the identical 3 × A/B dry-run battery.
+- [ ] Compute actual attack outcomes from durable bytes.
+- [ ] Identify the next real measured scientific cliff.
+- [ ] Apply one and only one cliff-targeted fix.
+- [ ] Rerun the same battery and measure improvement.
+- [ ] Regenerate proof record.
+- [ ] Push and verify remote identity.
+
+## Remaining broader dependencies
+
+- [ ] Independent attack must become actually measurable before an attack-related scientific bottleneck can be called.
+- [ ] Blind fresh-problem measurement remains required for genuine capability claims.
+- [ ] Reality-loop evidence remains incomplete.
+- [ ] Buyer evaluation remains incomplete.
+- [ ] Production/deployment behavior remains a separate acceptance layer.
 
 ---
 
-## 7. CREDENTIALS, VAULT, AND KEY BUDGET (read twice before touching any API)
+# 27. ACCEPTANCE CRITERIA FOR THE NEXT ROUND
 
-### 7.1 The vault (Art. LXXIII + LXXVI)
+The next round is GREEN only when all of these are machine-verifiable:
 
-- Canonical local vault: `/home/z/my-project/.secrets.env` (mode 0600).
-  Current living copy: `/tmp/my-project/.secrets.env` (survivor of the last container
-  recycle; 287 bytes; `GITHUB_TOKEN` + `HF_TOKEN`; fingerprints match the registered
-  records — NOTHING rotated).
-- The HF Space secrets surface is the **custody vault of record** (Art. LXXVI):
-  32 names measured live at R503 (incl. `HF_TOKEN`, `GITHUB_TOKEN`, NVIDIA_API_KEY,
-  OPENROUTER_API_KEY, ENGINE_OPERATOR_KEY; PATENTBEAR_API_KEY status = custody gap,
-  value not held — §7.3).
-- **Values live in exactly two places**: the local vault file and the HF secrets
-  surface. Never in a repo file, a commit, a record JSON, a log, a chat paste-back,
-  or `/home/z/my-project/download/`. Every emitted byte with potential key material
-  gets the BS-021 fail-closed scan (grep the emitted files for value substrings
-  BEFORE commit — see `scripts/r509_push_preservation.py` for the pattern).
-- **Rotation is a CEO act.** If a key fails (401/403), you type the failure, register
-  the fingerprint delta, and ask. You never rotate, never regenerate, never "helpfully"
-  update a standing secret (the R503 disclosed incident is the cautionary tale — the
-  write happened to be byte-identical, which is the ONLY reason it was survivable).
-
-### 7.2 Registered fingerprints (verify, never assume)
-
-| Credential | Fingerprint (sha256[:16]) | len | Registered at | Status at handoff |
-|-----------|---------------------------|-----|---------------|-------------------|
-| `GITHUB_TOKEN` (PAT, push/fetch) | `f1ebca5f9b622f3e` | 40 | R497 lift-in / R503 vault audit / R509-C2 recovery | HELD in vault; push intact |
-| `HF_TOKEN` (HF API, prateekm1, fine-grained) | `33bc7af22c628bc1` | 37 | R463 probe / R468 set event / R503 whoami verify | HELD in vault; Space secrets surface readable with it |
-| PATENTBEAR active key | `50fe7b3d569bb1fa` (prior `561b6e70f5b5ea7f`) | — | R505 / R509 ZLINE ledger | **VALUE NOT HELD anywhere machine-readable** (R504 custody gap); bucket 19/20 → spend FROZEN |
-
-HF token autocommands (after §0.2 vault load):
-```bash
-# whoami verify (expect: name prateekm1, type fine-grained):
-curl -sS -m 20 -H "Authorization: Bearer $HF_TOKEN" https://huggingface.co/api/whoami-v2 | head -c 300
-# Space secrets surface LIST (names only in logs — never echo values):
-curl -sS -m 30 -H "Authorization: Bearer $HF_TOKEN" \
-  "https://huggingface.co/api/spaces/prateekm1/toscanini-prod-validation/secrets" \
-  | head -c 2000   # endpoint shape may have changed — if so, read scripts/r503_vault_custody.py first
+```text
+1. current baseline hash is known
+2. Constitution hash/version is known
+3. current governance hashes are known
+4. independent_attack purpose is exercised through the real EngineRun path
+5. fixture transport is deterministic
+6. unmatched fixture still fails closed
+7. no live/paid calls occur in the dry-run
+8. independent attack is parsed by the real production parser
+9. attack result is determined by the existing evaluator
+10. transport failure cannot become KILLED
+11. attack execution is distinguishable from attack request if ambiguity is material
+12. A/B repeatability passes
+13. full funnel is regenerated from durable bytes
+14. scientific cliff is chosen from measurement, not assumption
+15. exactly one cliff fix is applied
+16. identical battery reruns
+17. before/after change is measured
+18. tests pass
+19. proof record carries the actual execution commit
+20. publication is pushed to origin/main
+21. HEAD == origin/main
+22. worktree clean
+23. no world-class claim unless the Constitution's full evidence standard is actually met
 ```
-If you must fetch a VALUE from the secrets surface (LXXVI Section 3 allows
-measure-before-write custody work): do it in-process (`python3` + requests, value
-straight into the vault file write), never echo it, never put it in a command line,
-never in a tool result you paste anywhere.
-
-### 7.3 The key budget is LAW (track 11)
-
-- The shared PatentBear bucket is **19/20 used, remaining 1, below the stewardship
-  reserve floor of 2 → `POOL_EXHAUSTED_MEASURED`; spend_allowed=false. FROZEN.**
-- Measured costs: probe=1 debit, seal-scale spend=6, full battery rerun=8. Nothing
-  seal-scale is possible until the operator supplies a fresh rotated key.
-- Before ANY metered spend: append a RESERVATION row to
-  `R509/KEY_BUDGET_LEDGER_ZLINE.json` (append-only), re-measure the provider meter
-  FIRST, and append the OUTCOME row after. Unexplained deltas type
-  `CROSS_LINE_UNEXPECTED_DEBIT` and freeze the bucket.
-- The R498 lesson (twice-recorded): two coder lines sharing one key pool consume each
-  other's headroom blind unless the ledger is checked first. CHECK THE LEDGER FIRST.
-
-### 7.4 The push pattern (autocommand; token never in URL or on disk)
-
-```bash
-git -c credential.helper='!f() { echo username=x; echo password='"$GITHUB_TOKEN"'; }; f' push origin main
-# durable branch (records custody) — same pattern:
-git -c credential.helper='!f() { echo username=x; echo password='"$GITHUB_TOKEN"'; }; f' push origin runtime-state-hf
-# verify after every push:
-git -c credential.helper='!f() { echo username=x; echo password='"$GITHUB_TOKEN"'; }; f' ls-remote origin refs/heads/main refs/heads/runtime-state-hf
-```
-Scripted equivalent: `scripts/r509_push_preservation.py::cred_env()` (the standing
-R503/R506/R509 pattern — GIT_CONFIG_COUNT injection, GIT_ASKPASS=/bin/true). Copy that
-function; do not invent a new mechanism.
-
-
-## 8. FILE STRUCTURE MAP (anti-entropy — where things live, where new things go)
-
-### 8.1 The workspace root (`/home/z/my-project/`)
-
-```
-/home/z/my-project/
-├── .env                       # container tooling (DATABASE_URL) — NOT the vault, ignore
-├── .secrets.env               # THE LXXIII VAULT (canonical, 0600) — rebuild from /tmp
-│                              #   copy per §0.2; values never leave it
-├── hf_space/                  # ★ THE CANONICAL REPO (main branch) — everything happens here
-├── r509_durable/              # detached worktree of origin/runtime-state-hf @ 215251c9
-│                              #   (runs/, sessions.json ← owner_keys INSIDE, BS-021,
-│                              #   snapshot_log.jsonl, battery/, evidence/, model_routing/)
-│                              #   READ-ONLY for observers. Never commit here directly.
-├── hf_space.stale_09b44c5/    # stale R451-era checkout — quarantine reference ONLY.
-│                              #   Named "stale" on purpose. Never work in it, never delete
-│                              #   it mid-round (it is disclosed custody of the stale era).
-├── r445_work/, r446_work/     # historical round work dirs (frozen, with node_modules gaps)
-├── r446hf_negtest_409.json    # R446 negative-test artifact (frozen)
-├── download/                  # user-facing deliverables only — NEVER put keys/records here
-├── upload/, skills/, scripts/, tool-results/   # container scaffolding, not project state
-└── worklog.md                 # STALE container-local legacy worklog (R441-era). The
-                               #   canonical worklog is hf_space/worklog.md. Do not confuse them.
-```
-
-### 8.2 Inside the canonical repo (`/home/z/my-project/hf_space/`)
-
-```
-hf_space/
-├── EPISTEMIC_CONSTITUTION.md      # v2.9.0 IN TREE (2,399 lines) — production serves 2.8.0
-├── GOVERNANCE/                    # 5 auditor files (README, SELF_GOVERNANCE, BLINDSPOT_REGISTER,
-│                                  #   REMEMBERED_STATE, LOOP_PROTOCOL) — read 5, live by them
-├── ACTIVE_PATH.md                 # the single authority for the production path + addenda
-├── worklog.md                     # ★ CANONICAL append-only worklog (2,167 lines; R441→R509-C2-ZLINE)
-├── HANDOFF_TO_NEXT_CHAT_R419_MASTER.md   # prior handoff (background valid, state superseded)
-├── HANDOFF_NEXT_CHAT_R510_MASTER.md      # THIS file
-├── MODULE_INVENTORY.json          # Art. X authority — regen ONLY by its script, keep --check GREEN
-├── CANONICAL_MODEL_FLOW.md, ENGINE_BLUEPRINT.md, PRODUCTION_ADVERSARIAL_CALL_GRAPH.md
-├── R309/ … R509/                  # round records: ONE directory per round, records-only.
-│   │                              #   Next round = R510/ (never reuse, never rename another
-│   │                              #   line's files — race protocol §9.6)
-│   ├── R506/                      # BATTERY_PROBLEMS.json (manifest, e9c72c58) ·
-│   │                              #   HARVEST_RULES.json (bytes 8cec1cd3 / attest 70a83fe1) ·
-│   │                              #   YIELD_INSTRUMENT.json (831f1a0e pre-registration) ·
-│   │                              #   DURABLE_POPULATION_BASELINE.json (97-run pre-battery) ·
-│   │                              #   BATTERY_RAW/ (verbatim NHTSA fetches) ·
-│   │                              #   BATTERY_SESSIONS_REDACTED.json · 3 hermetic case files
-│   └── R509/                      # THE LIVE CAMPAIGN EVIDENCE:
-│       ├── RESIDUE_AUTOPSY.json / RESIDUE_AUTOPSY_ZLINE.json
-│       ├── R509_ROUND_RECORD.json / R509_C2_ROUND_RECORD.json / R509_C2_ROUND_RECORD_ZLINE.json
-│       ├── POST_RESTART_OBSERVATION.json
-│       ├── PRESERVATION_2026-09-18T083509/   (the 08:35Z capture, byte shas)
-│       ├── WATCHDOG_REPLAY_ACCEPTANCE.json / REPLAY_48H_DRYRUN.json /
-│       │   REPLAY_R484_CONTROL.json / REPLAY_R487_CONTROL.json / REPLAY_R509_SIGNATURE.json
-│       ├── WATCHDOG_LIVE_LOG.jsonl
-│       ├── KEY_BUDGET_LEDGER.json / KEY_BUDGET_LEDGER_ZLINE.json
-│       ├── R370G_REHEARSAL.json / r370g_rehearsal_ledger.json
-│       ├── RESPAWN_DESIGN.md / SUPPORT_TRACKS_DESIGN_NOTES.md
-│       └── (new alerts/watches append here: WATCHDOG_ALERTS.jsonl, KILL_SWITCH_*.jsonl)
-├── scripts/                       # 478 round scripts, naming law: scripts/rNNN_<purpose>.py
-│   │                              #   r506_* battery/instrument (FROZEN ones marked in §4.4)
-│   │                              #   r507_* ratification/pins · r509_* campaign instruments
-│   │                              #   Your new scripts: scripts/r510_*
-├── discovery_fabric/              # ★ ENGINE — FROZEN under the scope law (zero delta until
-├── toscanini/                     # ★ ENGINE (server.py = the job API) — same freeze
-├── orchestrator/                  # ★ ENGINE — same freeze
-├── TOSCANINI_UI/webapp/           # ★ frontend — same freeze
-├── archive/, MECHANISM_CEMETERY/  # retired code — never delete, never import, never "clean up"
-├── tests/                         # pin suites (R506 17+1s, R507+R505 22 passed) — run, don't touch
-└── Dockerfile, requirements.txt   # deploy surfaces — deploy is forbidden outside its phase
-```
-
-### 8.3 Naming and placement law (this is how entropy was kept out for 200 rounds)
-
-1. **One round = one directory**: new records go to `R510/` (then R511, …). Never write
-   into another round's directory except APPEND-ONLY ledgers that declare it
-   (KEY_BUDGET ledger rows, WATCHDOG alert logs).
-2. **One script per instrument, name = round + purpose**: `scripts/r510_<thing>.py`.
-   Frozen instruments (`831f1a0e` etc.) are never edited — a divergence is a broken
-   freeze, the loudest possible failure, by design.
-3. **Race protocol**: if two lines run the same directive, the second pusher lands
-   ADDITIVELY with a suffix (`_ZLINE`, `_C1`, `_C2`) and a race_reconciliation block in
-   its round record. Push rejections (non-fast-forward) are handled by fetch + realign +
-   rename — NEVER force-push, NEVER overwrite remote objects (the R498/R509 precedents).
-4. **The durable branch** (`runtime-state-hf`) is engine state + custody evidence. Its
-   worktree is read-only for observers; writes happen through dedicated scripts that
-   assert the tip before committing (see `r509_push_preservation.py`).
-5. **`worklog.md` is append-only** — new entries at the end, format: `--- Task ID: …`,
-   `Agent: …`, `Task: …`, `Work Log: …`, `Stage Summary: …`, `reviewer_provenance=AI_REVIEW`.
-6. **Every round record JSON** carries: artifact_type, round, directive anchor,
-   reviewer_provenance=AI_REVIEW, a `what_is_NOT_claimed` list, and byte citations for
-   every claim. Copy the shape from `R509/R509_C2_ROUND_RECORD_ZLINE.json`.
-7. **Active path changes** = an ACTIVE_PATH.md addendum at the end + worklog entry, never
-   a rewrite of earlier sections.
-8. Nothing project-related ever goes to `/home/z/my-project/download/` (that is for
-   user deliverables) — records live in the repo and get PUSHED (durable beats local;
-   the container has recycled twice and origin is what survived).
 
 ---
 
-## 9. KNOWN TRAPS (each one already cost a round once — do not pay again)
+# 28. STOP CONDITIONS — WHEN THE CODER MUST NOT “IMPROVE” FURTHER
 
-1. **Container recycle / rollback** (happened ~Sep-11/16 and again before 11:01Z today):
-   local worktrees, vaults, and worklogs vanish. Only origin survives. Therefore:
-   commit + push records IMMEDIATELY when a gate closes; never leave the only copy of
-   evidence local overnight; the vault consult order (§0.2) is the recovery path.
-2. **Stale checkout**: the R451-era incident (`hf_space.stale_09b44c5`). Always
-   `ls-remote` + compare HEAD == origin/main before acting (§0.3–0.4). Never assume a
-   clone is fresh because it exists.
-3. **Locale**: the sole Windows cp1252 failure class became a UTF-8 requirement
-   (Correction 1, R507 era). `export LANG=C.UTF-8 LC_ALL=C.UTF-8` in every shell (§0.1).
-4. **Unicode line-separator fragmentation** when reading JSONL ledgers (measured in the
-   ZLINE autopsy): use the read discipline in `scripts/r509_residue_autopsy_zline.py`
-   (b-`\n`-split, sha-pinned, fail-closed) instead of naive line iteration.
-5. **Push command composition**: one mistaken `git push origin HEAD:runtime-state-hf`
-   from the main worktree was rejected non-fast-forward (zero remote effect) and had to
-   be disclosed (Art. XV). Compose push refspecs deliberately; verify with ls-remote.
-6. **The race pattern**: R506/R507 and R509-C2 both had two lines converge on one
-   directive. Expect it; land additively; reconcile in your round record (§8.3.3).
-7. **Absence is not absence** (Art. XXI.3): `session_id=null` rows typed
-   `ABSENT_FROM_DURABLE_LEDGER`, empty surfaces typed `REGISTERED_ABSENT_…`,
-   unobservable inputs typed `UNOBSERVABLE_*`. A zero you did not measure is a lie.
-8. **Secrets hygiene incidents** are one keystroke away: the R503 mis-parse rewrote a
-   standing secret (survived only because byte-identical). Measure-before-write,
-   fail-closed, values in two places only (§7.1).
-9. **The 1,107-vs-1,176 class of imprecision**: when a directive states a figure, you
-   still measure it from bytes and disclose the delta. Directives are orders, not
-   measurements.
-10. **The restart hazard**: a Space restart destroys ephemeral run dirs (the R508
-    warning, vindicated by 3 hours on 2026-09-18). If a run is live and evidence is
-    ephemeral-only, PRESERVE FIRST — preservation always outranks analysis.
+Stop coding and report the blocker when:
 
+- the remaining problem is owner-only supply/registration;
+- the issue is a provider outage that cannot be repaired in code without changing scientific scope;
+- the next change would alter a frozen scored instrument;
+- a battery has entered a prohibited tuning state;
+- evidence for the requested fix is missing;
+- a required reality experiment needs physical-world access not available to the system;
+- a deployment identity is mismatched and measuring another build would invalidate the result;
+- the next proposed change is not tied to a measured funnel dropout.
 
-## 10. AUTOCOMMAND PLAYBOOKS (every machine action you will need)
+Do not convert a blocker into a speculative feature request.
 
-### 10.1 Baseline re-verify (run at session start, and any time you feel unsure)
-= §0 verbatim. Fast form when the vault is already loaded:
-```bash
-export LANG=C.UTF-8 LC_ALL=C.UTF-8; cd /home/z/my-project/hf_space
-set -a; . /home/z/my-project/.secrets.env; set +a
-git -c credential.helper='!f() { echo username=x; echo password='"$GITHUB_TOKEN"'; }; f' fetch origin
-git rev-parse HEAD origin/main
-curl -sS -m 20 https://prateekm1-toscanini-prod-validation.hf.space/api/version
-sha256sum R506/BATTERY_PROBLEMS.json scripts/r506_harvest_rules.py scripts/r506_discovery_yield.py
-```
-
-### 10.2 Watchdog operations (observer-only, always legal)
-```bash
-cd /home/z/my-project/hf_space
-python3 scripts/r509_battery_watchdog.py --self-test          # canonical variant
-python3 scripts/r509_battery_watchdog_zline.py --self-test    # ZLINE variant
-# single poll right now (cron-friendly):
-python3 scripts/r509_battery_watchdog.py --once --alert-log R509/WATCHDOG_ALERTS.jsonl
-# continuous live leg (48h accumulation; run under nohup so the container survives you):
-nohup python3 scripts/r509_battery_watchdog.py --live \
-      --alert-log R509/WATCHDOG_ALERTS.jsonl >> R509/WATCHDOG_LIVE_LOG.jsonl 2>&1 &
-# replay a historical window (acceptance re-run):
-python3 scripts/r509_battery_watchdog.py --replay "2026-09-18T00:00Z" "2026-09-18T02:00Z" \
-      --out R509/REPLAY_R509_SIGNATURE.json
-```
-Check if a watchdog is already running before starting another:
-`ps aux | grep -E "r509_(battery_watchdog|kill_switch)" | grep -v grep`
-
-### 10.3 Kill-switch (armed; runs only while a battery is live)
-```bash
-python3 scripts/r509_kill_switch.py --self-test                # 3/3 expected
-# during GATE D only:
-nohup python3 scripts/r509_kill_switch.py --loop 10 \
-      --alert-log R509/KILL_SWITCH_ALERTS.jsonl >> R509/KILL_SWITCH_LIVE.log 2>&1 &
-```
-It declares per-session STALLED at >82 min without durable progression, PRESERVEs the
-session tail via the read-only owner-key path, and never touches workers. Its firing
-is the pre-registered response, not a decision point.
-
-### 10.4 GATES C+D — pre-flight then execution #2 (ONLY after operator act 2 + ruling)
-```bash
-cd /home/z/my-project/hf_space
-# (1) offline rehearsal of the gate (always safe, does not touch the Space):
-python3 scripts/r509_preflight_gate.py --skip-live \
-  --operator-act2-verbatim "2.9.0 stands" --ceo-execution-ruling resubmit
-# (2) the real gate (live identity check against the Space):
-python3 scripts/r509_preflight_gate.py \
-  --operator-act2-verbatim "2.9.0 stands" --ceo-execution-ruling resubmit
-# Exit codes: 0 GO | 3 IDENTITY_MOVED_REBASELINE | 4 GATE_REFUSED | 5 FREEZE_BROKEN | 6 WATCHDOG_UNARMED
-# (3) ON GO: start the observers, then submit:
-python3 scripts/r506_battery_driver.py preflight
-python3 scripts/r506_battery_driver.py submit        # identical six problems, same bytes/prefixes
-# (4) then §10.2 live watchdog + §10.3 kill-switch, and poll:
-python3 scripts/r506_battery_driver.py poll
-```
-Read `scripts/r506_battery_driver.py` docstring + `r509_preflight_gate.py` docstring
-BEFORE the first real invocation. If the gate exits 3 (identity moved): STOP and
-re-baseline — never silently measure a new build; that refusal is the system working.
-
-### 10.5 GATE E — harvest (only after terminals exist on the durable authority)
-```bash
-python3 scripts/r506_harvest_rules_validation.py     # frozen rules self-check
-python3 scripts/r506_harvest_rules_rehearsal.py      # hermetic rehearsal first — always
-python3 scripts/r506_battery_driver.py harvest       # → R506/YIELD_MEASUREMENT.json + funnel
-```
-Then publish the funnel + bottleneck rank in the round record. Build exactly ONE
-cliff-fix (GATE F) — the funnel names it, not you.
-
-### 10.6 Records commit + push (the routine every round ends with)
-```bash
-cd /home/z/my-project/hf_space
-export LANG=C.UTF-8 LC_ALL=C.UTF-8
-set -a; . /home/z/my-project/.secrets.env; set +a
-# (a) BS-021 leak scan on EVERY file you are about to commit:
-for f in $(git status --short | awk '{print $2}'); do
-  python3 - "$f" <<'PY'
-import sys, re
-p = sys.argv[1]
-b = open(p, 'rb').read()
-import os
-toks = []
-vault = '/home/z/my-project/.secrets.env'
-if os.path.exists(vault):
-    for line in open(vault):
-        if '=' in line and not line.strip().startswith('#'):
-            v = line.split('=',1)[1].strip()
-            if len(v) >= 12: toks.append(v)
-hit = [t[:6] for t in toks if t.encode() in b]
-print(p, 'LEAK' if hit else 'clean', hit or '')
-PY
-done
-# If ANY file prints LEAK: do not commit; fix the file, not the scan.
-# (b) commit records only (scope law) and push:
-git add R510/ scripts/r510_*.py worklog.md ACTIVE_PATH.md HANDOFF_NEXT_CHAT_R510_MASTER.md 2>/dev/null || true
-git commit -m "R510 — <one honest sentence>. Records-only; zero engine delta; no deploy. reviewer_provenance=AI_REVIEW"
-git -c credential.helper='!f() { echo username=x; echo password='"$GITHUB_TOKEN"'; }; f' push origin main
-git -c credential.helper='!f() { echo username=x; echo password='"$GITHUB_TOKEN"'; }; f' ls-remote origin refs/heads/main
-# (c) append the worklog entry (append-only) and push again if the entry came after the commit.
-```
-
-### 10.7 Tests you must be able to pass at any moment
-```bash
-python3 -m pytest tests/ -k "r506 or r507 or r505" -q    # the pin suites: 39 passed + 1 skipped expected
-python3 scripts/module_inventory.py --check 2>/dev/null || python3 - <<'PY'
-# Art. X inventory check — locate the authority script first if this fails:
-import subprocess; print(subprocess.run(['grep','-rl','MODULE_INVENTORY','scripts/'],capture_output=True,text=True).stdout)
-PY
-```
-(The inventory regen authority is the Art. X script — find it via the grep if the
-name differs at your tip; never hand-edit MODULE_INVENTORY.json.)
-
-### 10.8 Vault rebuild after a container recycle
-```bash
-for p in /tmp/my-project/.secrets.env /home/z/my-project/.secrets.env; do [ -f "$p" ] && echo "survivor: $p"; done
-cp /tmp/my-project/.secrets.env /home/z/my-project/.secrets.env 2>/dev/null && chmod 600 /home/z/my-project/.secrets.env
-# verify fingerprints against §7.2 — if they differ: STOP, register the delta, ask the operator.
-# If BOTH are gone: the HF token must be re-supplied by the operator in one chat message
-# (the R503 precedent) — typed CUSTODY_GAP_VALUE_NOT_HELD, then rebuilt 0600, never rotated.
-```
-
-### 10.9 Rebuild everything on a brand-new container (the full cold start)
-```bash
-export LANG=C.UTF-8 LC_ALL=C.UTF-8
-# vault (§10.8) → clone → baseline (§0.3–0.6) → read §1 list → worklog tail → git log -8
-# durable worktree rebuild (read-only):
-cd /home/z/my-project/hf_space
-git -c credential.helper='!f() { echo username=x; echo password='"$GITHUB_TOKEN"'; }; f' fetch origin
-git worktree add --detach /home/z/my-project/r509_durable 215251c9 || \
-git -C /home/z/my-project/r509_durable checkout --detach 215251c9
-```
-Everything else (r445_work, stale checkout) is history — ignore it.
+Do not manufacture certainty to keep the loop moving.
 
 ---
 
-## 11. SCORECARD AND TRUE NUMBER (so you do not have to re-derive the standing verdict)
+# 29. NEW CHAT FIRST TEN ACTIONS
 
-- **Standing score: 138/25 = 5.52 → OVERALL 6/10, NO — the eighth consecutive NO.**
-  Frozen until terminals exist on the durable authority (recovery or execution #2).
-  The infra loss measures nothing about capability (LXI + the LXXVII symmetry).
-- Pre-battery durable baseline (97 runs): buyer_ready 0/86; experimentally_
-  discriminated 0/86; mutated_survivors 2/86; drops 43× EVIDENCE_UNVERIFIED,
-  27× NO_CANDIDATES, 11× ATTACK_KILLED. This is what "the machine does not yet
-  discover" looks like in bytes.
-- Decisive verifications still owed (the re-audit union): the R500 pure seal re-run
-  (needs 6+ quiet debits — key-blocked); v4.2 attacker-computes deployed measurement
-  (rides next deploy — deploy-gated); the funded strong ring (owner-gated); one REAL
-  instrument packet → REAL_LOOP_VERIFIED; a fresh-problem survivor reaching a buyer
-  ZIP; the Tier-1 registrations.
-- What would move the number: terminals → harvest → a funnel with a named bottleneck
-  → the ONE cliff-fix → a survivor through the four LXXVIII gates
-  (`blocking_count==0` included). Nothing else moves it.
+The new chat's first actions are deterministic:
 
----
+```text
+1. Locate repository and verify main/origin.
+2. Read this handoff from the live remote bytes.
+3. Read Constitution in full.
+4. Read auditor self-governance + blindspot + remembered state + audit protocol.
+5. Read ACTIVE_PATH and CANONICAL_MODEL_FLOW.
+6. Verify current commits and recent history.
+7. Read current R510 proof record and dry-run tests/fixtures.
+8. Trace `independent_attack` purpose through EngineRun → fixture transport.
+9. Trace `attack_naive_overall` / `independent_attack_attempted` consumers.
+10. Only then execute the next measured dry-run optimization directive.
+```
 
-## 12. VERIFICATION LOG (what this handoff itself verified, at handoff time)
+No operator file paste is required.
 
-Run at 2026-09-18 by the outgoing line, all GREEN:
-- local HEAD == origin/main == `3c17b602` (R509-C2-ZLINE); worktree clean.
-- Vault present at `/tmp/my-project/.secrets.env`; GH fp `f1ebca5f9b622f3e` (len 40),
-  HF fp `33bc7af22c628bc1` (len 37) — match registered records.
-- Space live: `GET /api/version` → `d7520b9bc5d7f26a2ab40b28367501e916634513` / 2.8.0,
-  web_build c0c934b4…, 102 files; space page HTTP 200.
-- Frozen chain byte-verified: `R506/BATTERY_PROBLEMS.json` → `e9c72c58`;
-  `scripts/r506_harvest_rules.py` → `40d728f8`; `scripts/r506_discovery_yield.py` →
-  `831f1a0e`; rules internal sha `70a83fe1` embedded in the preflight gate;
-  manifest/rules/instrument/production identities all as §4 states.
-- Durable tip: `origin/runtime-state-hf` = `215251c9` (remote-tracking ref, pushed);
-  durable worktree at `/home/z/my-project/r509_durable` detached at `215251c9`.
-- Watchdog/kill-switch `--help` interfaces verified; one live watchdog tick on record
-  (11:48:03Z); no watchdog process running at handoff (start one per §10.2 if you
-  want the 48h leg accumulating).
-
-If your re-run of §0 diverges from any expected value above, the divergence is the
-news — measure it, type it, disclose it. This handoff is then stale and the bytes win.
+No manual terminal work is required from the operator.
 
 ---
 
-## 13. YOUR FIRST TEN ACTIONS (the new chat, in order)
+# 30. FINAL OPERATING PRINCIPLE
 
-1. Run §0 (the bootstrap ritual) — every step, no skipping.
-2. Read §1 files 1–5 (constitution in full, governance, ACTIVE_PATH, worklog R506→end).
-3. Read §1 files 6–13 (the campaign records + instruments).
-4. `git log --oneline -8` — check whether the sibling line moved while you read.
-5. Start the watchdog live leg if none is running (§10.2) — the 48h accumulation should
-   be growing, not waiting.
-6. Verify the pin suites pass at tip (§10.7).
-7. Rehearse the pre-flight gate offline (§10.4 step 1) so you have seen its GO and its
-   refusals before the operator's acts arrive.
-8. Append an intake entry to `worklog.md` (who you are, what you verified) —
-   append-only, with reviewer_provenance=AI_REVIEW.
-9. Commit + push the intake (§10.6). Your existence is now durable.
-10. Then WAIT for the operator's word-acts (GATE A: "2.9.0 stands" / "revert";
-    GATE B: recover-first / resubmit). While waiting, legal work is: observer watches,
-    reading, rehearsal — nothing else. When the acts land, §10.4 is the path.
+The project is no longer blocked by lack of instrumentation at the current layer. The immediate job is to make the **real independent attack path executable and measurable**, without weakening scientific standards.
 
-**The single sentence that matters:** six terminals, then one bottleneck named by
-measurement — everything else is noise, and the constitution is how you tell the
-difference.
+The correct sequence is:
+
+```text
+CURRENT STATE
+
+36 generated
+2 cemetery-control losses
+0 support losses
+34 independent-attack transport refusals
+
+        ↓
+
+FIX ONLY THE CONFIRMED DRY-RUN INDEPENDENT-ATTACK COVERAGE GAP
+
+        ↓
+
+RUN THE SAME 3 × A/B BATTERY
+
+        ↓
+
+MEASURE ACTUAL ATTACK OUTCOMES
+
+        ↓
+
+ONLY THEN IDENTIFY THE NEXT SCIENTIFIC DROP
+
+        ↓
+
+ONE CLIFF FIX
+
+        ↓
+
+SAME BATTERY
+
+        ↓
+
+COMPARE
+```
+
+Do not skip directly from “34 transport failures” to “attack algorithm is bad.”
+
+Do not skip from “47 tests pass” to “world-class.”
+
+Do not skip from “ranked portfolio exists” to “discovery.”
+
+Do not create parallel architecture to solve a problem already owned by an existing module.
+
+Do not create another handoff file.
+
+Do not ask the operator to reconstruct context by copy/pasting old files.
+
+**The new chat should be able to begin entirely from the remote repository, this handoff, the Constitution, and the existing canonical artifacts.**
+
+---
+
+# 31. VERIFIED FILE / AUTHORITY TABLE AT HANDOFF
+
+| Area | Canonical file / directory | Current role | Mutation policy |
+|---|---|---|---|
+| Constitution | `EPISTEMIC_CONSTITUTION.md` | supreme project law | only constitutional amendment process |
+| Auditor governance | `GOVERNANCE/` | auditor behavior / continuity | only governance-purpose changes |
+| Production path | `ACTIVE_PATH.md` | production-path documentation authority | update only when path changes |
+| Invention → 3D | `CANONICAL_MODEL_FLOW.md` | canonical model-flow binding | update when code-bound mapping changes |
+| Canonical state | `CANONICAL_STATE/` | durable canonical state | authority-specific only |
+| Yield instrument | `R506/YIELD_INSTRUMENT.json` | frozen discovery-capability measurement | immutable for frozen measurement |
+| R510 dry-run proof | `R510/DRYRUN_PROOF_RECORD.json` | current controlled dry-run proof record | regenerate from durable proof runs |
+| Dry-run engine | `discovery_fabric/engine/dry_run.py` | deterministic fixture + funnel/portfolio measurement | minimal current-round changes only |
+| Run conductor | `discovery_fabric/engine/run.py` | real D6 EngineRun path | do not duplicate |
+| A2 attacker | `discovery_fabric/a2/adversarial.py` | run-level A2 gauntlet | preserve separate contract |
+| Independent attacker | `discovery_fabric/engine/independent_attack.py` | per-candidate independent attack | immediate next attack-path authority |
+| Engineering attack | `discovery_fabric/engine/engineering_attack.py` | engineering attack / repair / selection | downstream technical authority |
+| Attack calibration | `discovery_fabric/engine/attacker_calibration.py` | calibration consumption gate | do not bypass |
+| Mechanism generation | `discovery_fabric/engine/mechanism_space.py` | candidate generation/support/dedupe | canonical mechanism-space authority |
+| Transition measurement | `discovery_fabric/engine/transition_trace.py` | R510 transition ledger | measurement only unless evidence says otherwise |
+| Dry-run fixtures | `tests/fixtures/dryrun/problems.py` | machine-authored controlled inputs | not discovery evidence |
+| Dry-run proof runner | `scripts/r510_dryrun_proof.py` | real EngineRun proof execution | current R510 runner |
+| Proof record generator | `scripts/r510_dryrun_record.py` | proof-record assembly | generated, do not hand-edit output |
+| Repeatability | `scripts/r510_dryrun_repeat.py` | A/B comparison | deterministic comparison authority |
+| R510 dry-run tests | `tests/test_r510_dryrun.py` | current dry-run controls | extend for independent_attack E2E |
+| R510 transition tests | `tests/test_r510_transitions.py` | candidate transition controls | preserve taxonomy |
+| R510 diversity tests | `tests/test_r510_diversity_adapter.py` | diversity/mapping controls | preserve distinctness semantics |
+| Runtime output | `ENGINE_RUNS/` | ephemeral run state | do not treat as canonical code |
+| Live R510 battery | `R510/BATTERY2_*` | separate live blind-yield campaign | do not perturb for dry-run task |
+| Historical rounds | `R*/` | lineage/evidence | historical; do not revive as current authority |
+
+---
+
+# 32. HANDOFF INTEGRITY NOTE
+
+This handoff intentionally contains enough architectural, governance, provenance, and current-bottleneck information that a new chat can reconstruct the active task without the operator copying old files into the chat window.
+
+The handoff itself is a continuity aid, not a substitute for live verification.
+
+When a new chat starts:
+
+```text
+READ HANDOFF
+→ RE-READ AUTHORITIES
+→ VERIFY REMOTE BYTES
+→ RECONSTRUCT ACTIVE STATE
+→ CONTINUE FROM CURRENT BOTTLENECK
+```
+
+The remote repository remains the ultimate evidence surface for the code and committed artifacts.
