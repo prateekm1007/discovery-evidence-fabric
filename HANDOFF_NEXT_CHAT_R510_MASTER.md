@@ -10,11 +10,9 @@
 
 **Current default branch:** `main`
 
-**Current engine/proof remote HEAD before this handoff publication:** `bfbb5bfdd345037f0af84ad5823ec1c2d4d7eec4`
+**Remote HEAD policy:** the exact current remote HEAD MUST be fetched and verified by every new chat. This handoff intentionally does not treat a hard-coded HEAD as authority; the latest measured engine/proof publication baseline is `bfbb5bfdd345037f0af84ad5823ec1c2d4d7eec4`, followed by docs-only handoff publication commits.
 
-**Handoff publication commit (docs-only):** `587ea8be503a552b1c94172f864bfa91b18163a1`
-
-**Current remote HEAD after handoff publication:** `587ea8be503a552b1c94172f864bfa91b18163a1`
+**Known handoff publication lineage:** `587ea8be503a552b1c94172f864bfa91b18163a1` and subsequent docs-only state-refresh commits. These commits do not replace the measured engine/proof commit identities.
 
 **Accepted support-cliff baseline:** `13e0a3b21364395df2a6ad540622dfface19a69e`
 
