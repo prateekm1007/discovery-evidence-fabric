@@ -1,6 +1,6 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 2.9.0
+**Version:** 2.10.0
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
@@ -17,6 +17,7 @@
 **Amended:** 2026-09-18 (Article LXXV — Patent Evidence Is Not Patent Truth: a patent match is evidence, never truth; patent records are evidence objects with five custody fields (provenance, publication identity, family relationship, temporal status, source); coverage is measured, never inferred from counts; secondary indexes discover, primary patent-office records verify consequential assertions; six tracked source properties (FREE / ACCESSIBLE / AUTOMATABLE / LICENSE-COMPATIBLE / RATE-LIMITED / AUTHENTICATED) never collapsed — per the operator's 2026-09-18 directive after the free-patent-source research sweep; see `R498/constitution/ARTICLE_LXXV_PATENT_EVIDENCE_IS_NOT_PATENT_TRUTH.md`)
 **Amended:** 2026-09-18 (Article LXXVI — Credential Custody: the Hugging Face Space secret surface is the custody vault of record — every credential the machine holds anywhere must be present there by name; rotation is a CEO act, never a machine judgment — resolving the standing R451-family rotation escalations as owner-accepted risk; values never custody-free, custody audits output names + fingerprints + typed statuses only — per the operator's 2026-09-18 directive "keep all keys safe in huggingface secrets. do not rotate them unless i the CEO says so. update that in the constitution. all keys, API's should be there."; see `R503/constitution/ARTICLE_LXXVI_CREDENTIAL_CUSTODY.md`)
 **Amended:** 2026-09-18 (Articles LXXVII–LXXIX — the Discovery Yield Firewall: discovery performance is distinct from pipeline completion (the metric firewall); survivor quality with mechanically recorded gate verdicts; fresh-problem generalization with test-enforced blindness — per the operator's 2026-09-18 directive "Ratify the firewall first"; drafts `R506/constitution/` (PENDING package), enacted R507 with the two-line reading disclosed in `R507/constitution/AMENDMENT_RECORD.json`; see `R506/constitution/ARTICLE_LXXVII_DISCOVERY_PERFORMANCE_IS_NOT_PIPELINE_COMPLETION.md`, `ARTICLE_LXXVIII_SURVIVOR_QUALITY.md`, `ARTICLE_LXXIX_FRESH_PROBLEM_GENERALIZATION.md`)
+**Amended:** 2026-09-19 (Articles LXXX–LXXXIV — evidence-synthesis binding, attacker deployment gate, UNKNOWN dwell time, funnel as instrument, minimum diversity — plus amendments to Arts. L (ring-quality floor), XXI.3 (bounded inference), LXI (persistence gate), X (sidecar definition), and the narrowed scope law + funnel-anchored cliff-fix rule — per the operator's 2026-09-19 governance directive; see `R510/constitution/AMENDMENT_RECORD.json` and `R510/constitution/` article files)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself, AND — from v2.0.0 — what the machine may call a discovery or an invention
 
@@ -288,6 +289,10 @@ Everything else is:
 - or non-authoritative.
 
 No coder may quietly use an old scoreboard, worklog, cached report or convenient JSON as current truth.
+
+### Amendment (R510, 2026-09-19 — sidecar definition; see `R510/constitution/AMEND_ART_X_SIDECAR_DEFINITION.md`):
+
+A sidecar is a record derived from a canonical state change that carries audit provenance. A sidecar is not canonical state. It does not constitute a learning event. It does not update the next EngineRun's search parameters. A sidecar is promoted to canonical state when and only when: (a) it is explicitly consumed as an input to a subsequent EngineRun's input manifest, AND (b) the consumption is recorded with the sidecar's hash in the child run record. Promotion not recorded is promotion not achieved.
 
 ---
 
@@ -595,6 +600,10 @@ Zero search results for a query means no records matched that specific query str
 ### 3. Provider failure is not absence.
 
 When a search provider times out, returns an error, or has authentication issues, the result is `SEARCH_FAILED`, `TIMEOUT`, or `AUTH_FAILED` — NOT `EMPTY` or `NO_RESULTS`. Only a successful query that returns zero matching records constitutes `NO_RESULTS`. Provider failures must never masquerade as evidence of absence.
+
+### Amendment (R510, 2026-09-19 — bounded inference; see `R510/constitution/AMEND_ART_XXI_3_BOUNDED_INFERENCE.md`):
+
+Absence may not be inferred from a single search failure. However, a systematic pattern across N ≥ 5 independent runs where a capability measure is zero is not UNKNOWN — it is a measured systematic zero. The Art. XXI.3 protection applies to individual measurements, not to aggregates across independently-run problems. A zero that is consistent across 16 problems and 2 batteries is a finding, not an unknown.
 
 ### 4. Relevance must be independently established.
 
@@ -1574,6 +1583,10 @@ attack coverage
 
 This makes the attacker a scientific instrument rather than a second LLM opinion.
 
+### Amendment (R510, 2026-09-19 — ring-quality floor; see `R510/constitution/AMEND_ART_L_RING_QUALITY_FLOOR.md`):
+
+A ring used for calibration measurement must satisfy a pre-calibration probe: response length ≥ 200 tokens, latency ≥ 5 seconds, on a calibration-class prompt. A ring that fails this probe is classified `INSUFFICIENT_QUALITY_RING`. Its calibration outputs are classified `RING_QUALITY_INVALID`, not as a measurement of the instrument. `RING_QUALITY_INVALID` is not `NOT_CALIBRATED` — the instrument's calibration state remains `UNMEASURED_ON_CAPABLE_RING`, which is distinct from the cases where calibration was attempted and failed.
+
 ---
 
 ## Article LI — Learning Must Change Future Search
@@ -1862,6 +1875,10 @@ INCOMPLETE_INFERENCE_FAILURE
 ```
 
 A missing LLM transport, a skipped stage, a provider outage, or an unevaluated gate is an `INCOMPLETE_*` or `UNKNOWN` state. Converting it into `REJECTED` manufactures negative knowledge from infrastructure and contaminates scientific statistics (extends Articles XXI.3 and XXV to the terminal decision field).
+
+### Amendment (R510, 2026-09-19 — persistence gate; see `R510/constitution/AMEND_ART_LXI_PERSISTENCE_GATE.md`):
+
+An `INCOMPLETE_INFRASTRUCTURE_FAILURE` that recurs across 2 consecutive executions of the same problem set is a P0 `INFRASTRUCTURE_BLOCKER`. It may not be addressed by re-typing or re-submitting without a diagnosed root cause and a tested fix committed to the durable record. The diagnosis must explain the mechanism of failure, not merely re-describe the symptom.
 
 ---
 
@@ -2335,6 +2352,106 @@ This article defines **what counts**, not **how many must survive**: bars stay w
 4. **Single-shot or fixed-budget, all attempts recorded.** Zeros are data. An attempt that produced nothing is published with the same fidelity as an attempt that produced a survivor. Selective publication of attempts is benchmark gaming (Art. LIX) at the attempt level.
 
 **Tuning between scored problems voids the battery.** All tuning touches DEV/frozen corpora only, never the scored set. A battery in which any gate, prompt, threshold, retrieval form, or model selection changed between scored problems is VOID — the measurements stand only as un-scored history. A battery whose disjointness cannot be re-run by a second container is void (Art. LXII). Extends Art. XLIX (the blind-source requirement it presupposes) and Art. LIX (from parameters to problems).
+
+---
+
+## Article LXXX — The Evidence-Synthesis Binding Contract
+
+**Ratified:** 2026-09-19 (Round R510)
+**Amends:** Constitution v2.9.0 → v2.10.0
+**Full text:** `R510/constitution/ARTICLE_LXXX_EVIDENCE_SYNTHESIS_BINDING.md`
+**Sponsor:** Operator governance directive, 2026-09-19, section WHAT I WOULD ADD
+
+### The correction this article makes
+
+The system retrieves evidence correctly (custody chain, freeze, content hashes) but has had no constitutional requirement that synthesis actually cite it — mechanisms generated as LLM opinion rather than evidence-constrained discovery. Art. II ("exact evidence beats semantic plausibility") is hereby operationalized at the synthesis stage.
+
+### The rule
+
+> **Every mechanism output must contain at least one verbatim span (≥ 8 contiguous words) from a frozen evidence record in the run's custody chain.**
+
+A mechanism without a verbatim span is classified `UNGROUNDED_SYNTHESIS`. `UNGROUNDED_SYNTHESIS` is `UNKNOWN`, not `REJECTED` (Art. XXV applies). It may not advance to `CANDIDATES`. The `span_verbatim_rate` must be recorded in every stage envelope. No stage summary may report a mechanism count without reporting `span_verbatim_rate` alongside it.
+
+---
+
+## Article LXXXI — The Attacker Deployment Gate
+
+**Ratified:** 2026-09-19 (Round R510)
+**Amends:** Constitution v2.9.0 → v2.10.0
+**Full text:** `R510/constitution/ARTICLE_LXXXI_ATTACKER_DEPLOYMENT_GATE.md`
+**Sponsor:** Operator governance directive, 2026-09-19, section WHAT I WOULD ADD
+
+### The correction this article makes
+
+Art. L requires calibration but has not said an uncalibrated instrument cannot deploy. This article makes that a hard gate rather than an inferred behavior.
+
+### The rule
+
+> **An attacker instrument with FPR > 0.30 on its sealed calibration corpus may not issue terminal KILL verdicts.**
+
+It may issue `ESCALATED_OBJECTION`. This is a hard gate, not advisory. The gate applies to every attacker instrument separately. A new instrument version resets calibration status to `UNCALIBRATED` and must earn deployment authority independently. An instrument's deployment authority is revoked automatically if its calibration corpus is superseded and the instrument has not been re-measured against the new corpus within 5 rounds.
+
+---
+
+## Article LXXXII — UNKNOWN Maximum Dwell Time
+
+**Ratified:** 2026-09-19 (Round R510)
+**Amends:** Constitution v2.9.0 → v2.10.0
+**Full text:** `R510/constitution/ARTICLE_LXXXII_UNKNOWN_DWELL_TIME.md`
+**Sponsor:** Operator governance directive, 2026-09-19, section WHAT I WOULD ADD
+
+### The correction this article makes
+
+The discipline of UNKNOWN staying UNKNOWN is right, but stale UNKNOWNs have persisted 50+ rounds with no pressure for resolution. This article converts stale UNKNOWNs into P0 escalations without weakening Art. XXV.
+
+### The rule
+
+> **An UNKNOWN state with a typed reason that appears in 5 consecutive round records without a recorded unblocking event becomes a P0 CHRONIC_UNKNOWN.**
+
+A `CHRONIC_UNKNOWN` must be classified as either:
+(a) `CODER_BLOCKED`: the coder can act but has not — a P0 coder directive for the next round.
+(b) `OWNER_BLOCKED`: requires owner action — the owner must be explicitly notified with the exact unblocking condition stated.
+(c) `PERMANENTLY_UNKNOWN`: no path to resolution exists — record the reason and remove from active tracking.
+
+A state cannot remain in unclassified UNKNOWN past 5 consecutive rounds.
+
+---
+
+## Article LXXXIII — The Discovery Funnel as Constitutional Instrument
+
+**Ratified:** 2026-09-19 (Round R510)
+**Amends:** Constitution v2.9.0 → v2.10.0
+**Full text:** `R510/constitution/ARTICLE_LXXXIII_DISCOVERY_FUNNEL_INSTRUMENT.md`
+**Sponsor:** Operator governance directive, 2026-09-19, section WHAT I WOULD ADD
+
+### The correction this article makes
+
+The funnel (submitted → premise → evidence → mechanisms → distinct → attack → contradiction → experimental → mutated → buyer_ready) has been the project's primary measurement instrument while living as an implementation detail. It is hereby constitutionalized.
+
+### The rule
+
+> **The discovery funnel is the authoritative capability measurement instrument.**
+
+Its stage sequence is fixed. Stage definitions may not change between battery runs. After each successful battery, the stage with the largest dropout is the authorized bottleneck target for the next cliff-fix. A cliff-fix that does not address the named bottleneck requires explicit auditor acceptance with recorded justification. The funnel must be published in full in every execution record. A run with no funnel record is `INCOMPLETE` regardless of terminal state.
+
+---
+
+## Article LXXXIV — Minimum Candidate Diversity Before Attack
+
+**Ratified:** 2026-09-19 (Round R510)
+**Amends:** Constitution v2.9.0 → v2.10.0
+**Full text:** `R510/constitution/ARTICLE_LXXXIV_MINIMUM_DIVERSITY_BEFORE_ATTACK.md`
+**Sponsor:** Operator governance directive, 2026-09-19, section WHAT I WOULD ADD
+
+### The correction this article makes
+
+Runs with zero distinct mechanisms have reached the attack stage and reported results as if the pipeline functioned — conflating pipeline completion with a discovery event (the Art. LXXVII violation at the run level).
+
+### The rule
+
+> **A discovery run that produces fewer than 2 materially distinct candidate mechanisms (per the Art. XLII distinctness definition) must be classified MECHANISM_STARVED before advancing.**
+
+A `MECHANISM_STARVED` run may not report attack, contradiction, or experiment results as discovery evidence. The run terminal state is `MECHANISM_STARVED`, not `INVENTION_REQUIRES_EXPERIMENT`: the former means the system did not generate anything worth attacking; the latter means it invented something but couldn't test it.
 
 ---
 

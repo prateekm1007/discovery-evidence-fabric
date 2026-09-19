@@ -3,11 +3,13 @@
 Articles LXXVII-LXXIX ratification (constitution 2.8.0 -> 2.9.0, Round
 R507; the operator's 2026-09-18 directive 'Ratify the firewall first').
 
-Pinned facts:
-  1. THE VERSION + HASH CHAIN: the live constitution is 2.9.0; the
-     R507 amendment record binds old 2.8.0 (a9e2543d...) -> new 2.9.0
-     (6aab103c...); the acknowledgment capsule is rebound to the same
-     hash + version; compliance GREEN.
+Pinned facts (R510 update: the live constitution is now 2.10.0; the
+  R507 chain below is verified as HISTORY with the live chain pinned
+  in tests/test_r510_governance_articles.py):
+  1. THE VERSION + HASH CHAIN: the R507 record binds old 2.8.0
+     (a9e2543d...) -> new 2.9.0 (6aab103c...); the R510 record links
+     old 2.9.0 -> new 2.10.0 (live sha); the acknowledgment capsule
+     is rebound to 2.10.0 (session R510); compliance GREEN.
   2. THE THREE ARTICLES PRESENT, ONCE EACH, WITH THE RULES: the
      inadmissible-signal list (LXXVII), the four-gate checklist +
      never-counted list (LXXVIII), the four blind clauses + the
@@ -41,34 +43,48 @@ def _body():
 
 
 # ---------- 1. version + chain + acknowledgment ----------
+# R510 disclosed update: the live constitution moved 2.9.0 -> 2.10.0
+# (Articles LXXX-LXXXIV + amendments). The R507 chain below is now
+# HISTORICAL (verified against its record, not the live file); the
+# live chain is pinned in tests/test_r510_governance_articles.py.
 
-def test_constitution_version_2_9_0():
-    assert "**Version:** 2.9.0" in _body()
-    assert "2.8.0 → v2.9.0" in _body() or "2.8.0 → 2.9.0" in _body()
+def test_constitution_version_2_10_0():
+    assert "**Version:** 2.10.0" in _body()
+    assert "2.9.0 → v2.10.0" in _body() or "2.9.0 → 2.10.0" in _body()
 
 
 def test_amendment_record_chain_binds():
     rec = json.loads(AMEND.read_text(encoding="utf-8"))
-    import hashlib
-    actual = hashlib.sha256(CONST.read_bytes()).hexdigest()
     assert rec["old"] == {"version": "2.8.0",
                           "sha256": "a9e2543d8c97bd812106463ac43179b21c767"
                                     "0c25d540bafc05d04295964acec"}
     assert rec["new"]["version"] == "2.9.0"
-    assert rec["new"]["sha256"] == actual
+    assert rec["new"]["sha256"] == \
+        "6aab103cb4f00cc5d4b10b82f63587d78f5b4269ca7bdf2633b5807448d2922d"
+    # R510 disclosed update: the R507 new-sha no longer equals the live
+    # file (2.10.0 now live). Chain continuity is verified instead: the
+    # R510 record's old link must equal this record's new link (Art. XI).
+    rec510 = json.loads((REPO / "R510" / "constitution" /
+                         "AMENDMENT_RECORD.json").read_text(
+                             encoding="utf-8"))
+    assert rec510["old"] == rec["new"]
+    assert rec510["new"]["version"] == "2.10.0"
+    import hashlib
+    assert rec510["new"]["sha256"] == \
+        hashlib.sha256(CONST.read_bytes()).hexdigest()
     assert rec["checks"]["operator_directive_verbatim_in_body"] is True
     assert rec["checks"]["no_existing_article_weakened"] is True
     assert rec["checks"]["acknowledgment_rebound"] is True
     assert rec["checks"]["compliance_check"] is True
 
 
-def test_acknowledgment_rebound_to_2_9_0():
+def test_acknowledgment_rebound_to_2_10_0():
     ack = json.loads(ACK.read_text(encoding="utf-8"))
     import hashlib
     actual = hashlib.sha256(CONST.read_bytes()).hexdigest()
-    assert ack["constitution_version"] == "2.9.0"
+    assert ack["constitution_version"] == "2.10.0"
     assert ack["constitution_hash"] == actual
-    assert ack["session"] == "R507"
+    assert ack["session"] == "R510"
 
 
 # ---------- 2. the three articles present with the rules ----------
@@ -124,9 +140,14 @@ def test_world_class_gate_checklist_extended():
 
 def test_no_numeric_threshold_in_the_new_articles():
     body = _body()
-    # isolate the three article sections
+    # isolate the three article sections. R510 disclosed update: end
+    # the slice at Article LXXX so the operator-specified bars in the
+    # new LXXXI/L amendments (0.30, 200 tokens, ...) cannot trip this
+    # LXXVII-LXXIX check — its intent (no invented bars in the firewall
+    # trio) is preserved exactly; the new numbers are pinned with
+    # operator provenance in tests/test_r510_governance_articles.py.
     start = body.index("## Article LXXVII ")
-    end = body.index("# THE FOUR CONSTITUTIONAL LAYERS")
+    end = body.index("## Article LXXX ")
     section = body[start:end]
     # the R412 bars referenced but never stated as new numbers
     assert "R412" in section
