@@ -712,12 +712,26 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
         title = str(rec.get("title") or "")
         abstract = str(rec.get("abstract") or "")
         record_text = f"{title}. {abstract}".strip()
+        # The mechanism-level verifier reads the item's own
+        # mechanism/effect vocabulary from the fields it custodies.
+        # On the lean path the record's abstract IS the mechanism
+        # statement (R453-LEAN: deterministic reuse of the frozen
+        # FREEZE record — zero LLM calls, no extraction fan-out). We
+        # surface it so the support instrument sees the record's real
+        # mechanism vocabulary instead of an empty mechanism field
+        # (which forced every lean verdict to NOT_ENOUGH_EVIDENCE —
+        # phenomenon-only overlap was never mechanism support). The
+        # instrument's thresholds/relations are untouched; an
+        # unbound/unextracted mechanism still caps at
+        # PARTIALLY_SUPPORTS (never direct SUPPORTS).
         items.append({
             "item_id": f"lean_{rec.get('id')}",
             "structured_hash": _h.sha256(
                 record_text.encode("utf-8", "replace")).hexdigest(),
             "fields": {"system": {"value": title},
-                       "abstract": {"value": abstract}},
+                       "abstract": {"value": abstract},
+                       "mechanism": {"value": record_text},
+                       "observed_effect": {"value": abstract}},
             "source": rec.get("source") or rec.get("id"),
             "provenance": {
                 "content_hash": rec.get("content_hash"),
