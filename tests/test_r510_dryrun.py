@@ -391,6 +391,114 @@ def test_independent_attack_unmatched_fails_closed():
             rec.get("overall"), True) == "ATTACK_INCOMPLETE", pid
 
 
+def _independent_attack_candidate(pid):
+    """A minimal candidate mirroring the pool-candidate shape passed by
+    EngineRun._post_rank_pipeline (run.py:1693-1717)."""
+    return {
+        "candidate_id": "cand:ia:%s" % pid,
+        "mechanism": "Centrifugal vapor separation transfers aerospace "
+                     "bleed-air moisture separator physics into engine "
+                     "coolant circuits",
+        "intervention": "Install a clamp-on centrifugal vapor separator "
+                        "in the upper coolant hose",
+        "predicted_effect": "Vapor diverts to the vent before reaching "
+                            "the radiator; leak alarms trigger 10 times "
+                            "earlier",
+        "testable_prediction": "Separator cuts undetected vapor leak "
+                               "duration from 40 hours to under 4 hours "
+                               "at 90 Celsius coolant temperature",
+        "novel_design_variable": "",
+        "known_failure_modes": [],
+        "constraint_set": {},
+    }
+
+
+def test_independent_attack_grounded_kill_yields_killed():
+    """A GROUNDED KILL (basis bound to a concrete evidence record id in
+    the bundle, non-absence) passes the real grounding/anchor checks and
+    yields overall=KILLED. This exercises path B's kill semantics through
+    the real instrument — transport available, parser runs, KILL stands.
+    """
+    from discovery_fabric.engine import independent_attack as _ia
+    for pid, pack in PACKS.items():
+        eid = pack["evidence"][0]["id"]
+        kill_content = "\n".join([
+            "MECHANISM_FAILURE: KILL \u2014 the separator cannot detect "
+            "coolant vapor nucleation because evidence %s records bubble "
+            "collapse frequencies the mechanism does not transduce "
+            "GROUNDED_IN: EVIDENCE %s" % (eid, eid),
+            "BOUNDARY_CONDITION_FAILURE: SURVIVE \u2014 boundary failure "
+            "not demonstrated GROUNDED_IN: EVIDENCE %s" % eid,
+            "EVIDENCE_CONTRADICTION: SURVIVE \u2014 no contradiction "
+            "observed GROUNDED_IN: EVIDENCE %s" % eid,
+            "BASELINE_EQUIVALENCE: SURVIVE \u2014 baseline not exceeded "
+            "GROUNDED_IN: EVIDENCE %s" % eid,
+            "IMPLEMENTATION_IMPOSSIBILITY: SURVIVE \u2014 implementation "
+            "feasible GROUNDED_IN: EVIDENCE %s" % eid,
+            "MEASUREMENT_AMBIGUITY: SURVIVE \u2014 ambiguity resolved "
+            "GROUNDED_IN: EVIDENCE %s" % eid,
+        ]) + "\n"
+        fx = dr.FixtureTransport(
+            [{"purpose_exact": "independent_attack",
+              "content": kill_content}], bundle_id="t/1")
+        tok = cctx.bind_fixture(fx)
+        try:
+            rec = _ia.independent_attack(
+                _independent_attack_candidate(pid),
+                dict(pack["problem"]), list(pack["evidence"]), None)
+        finally:
+            cctx.unbind_fixture(tok)
+        assert rec.get("overall") == "KILLED", (pid, rec)
+        assert rec.get("state") == "ATTACK_RUN", pid
+        mech = next((i for i in rec.get("items", [])
+                     if i.get("attack_class") == "MECHANISM_FAILURE"), {})
+        assert mech.get("verdict") == "KILL", pid
+        assert mech.get("demoted_from") is None, pid
+
+
+def test_independent_attack_ungrounded_kill_demotes_escalated():
+    """An UNGROUNDED KILL (basis asserts an ABSENCE — no binding) fails
+    the grounding check and is DEMOTED to ABSTAIN, preserved and
+    escalated: overall=ESCALATED_OBJECTION, NEVER KILLED (fail-closed).
+    """
+    from discovery_fabric.engine import independent_attack as _ia
+    for pid, pack in PACKS.items():
+        eid = pack["evidence"][0]["id"]
+        ungrounded_content = "\n".join([
+            "MECHANISM_FAILURE: KILL \u2014 the candidate provides no "
+            "evidence the separator works and no data is shown to support "
+            "the predicted effect GROUNDED_IN: EVIDENCE %s" % eid,
+            "BOUNDARY_CONDITION_FAILURE: SURVIVE \u2014 boundary failure "
+            "not demonstrated GROUNDED_IN: EVIDENCE %s" % eid,
+            "EVIDENCE_CONTRADICTION: SURVIVE \u2014 no contradiction "
+            "observed GROUNDED_IN: EVIDENCE %s" % eid,
+            "BASELINE_EQUIVALENCE: SURVIVE \u2014 baseline not exceeded "
+            "GROUNDED_IN: EVIDENCE %s" % eid,
+            "IMPLEMENTATION_IMPOSSIBILITY: SURVIVE \u2014 implementation "
+            "feasible GROUNDED_IN: EVIDENCE %s" % eid,
+            "MEASUREMENT_AMBIGUITY: SURVIVE \u2014 ambiguity resolved "
+            "GROUNDED_IN: EVIDENCE %s" % eid,
+        ]) + "\n"
+        fx = dr.FixtureTransport(
+            [{"purpose_exact": "independent_attack",
+              "content": ungrounded_content}], bundle_id="t/1")
+        tok = cctx.bind_fixture(fx)
+        try:
+            rec = _ia.independent_attack(
+                _independent_attack_candidate(pid),
+                dict(pack["problem"]), list(pack["evidence"]), None)
+        finally:
+            cctx.unbind_fixture(tok)
+        # the ungrounded kill is demoted, preserved, escalated — never KILLED
+        assert rec.get("overall") == "ESCALATED_OBJECTION", (pid, rec)
+        assert rec.get("overall") != "KILLED", pid
+        mech = next((i for i in rec.get("items", [])
+                     if i.get("attack_class") == "MECHANISM_FAILURE"), {})
+        assert mech.get("verdict") == "ABSTAIN", pid
+        assert mech.get("demoted_from") == "KILL", pid
+        assert mech.get("demotion_layer") == "v2_grounding", pid
+
+
 # --------------------------------------- isolation/construction fast
 def test_constructor_refuses_fixture_without_dryrun(tmp_path):
     fx = dr.FixtureTransport([], bundle_id="t/1")
