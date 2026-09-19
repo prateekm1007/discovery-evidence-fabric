@@ -261,6 +261,7 @@ class EngineRun:
         finally:
             _cctx.unbind(_ctx_token)
         self._write_reality_consumption()
+        self._write_search_consumption()
         return result
 
     def _write_reality_consumption(self):
@@ -292,6 +293,47 @@ class EngineRun:
                     {"error": "%s: %s" % (type(exc).__name__,
                                           str(exc)[:200]),
                      "trigger_event_id": block.get("trigger_event_id")})
+            except Exception:
+                pass
+
+    def _write_search_consumption(self):
+        """SEARCH_CONSUMPTION record (§4): a run whose problem carries
+        a reality_constraints block AND whose MECHANISM_SPACE stage
+        executed writes SEARCH_CONSUMPTION.json from the stage's OWN
+        persisted envelope (envelope_MECHANISM_SPACE.json as written
+        by this run — never re-derived, never synthesized). Binds
+        child_run_id, parent event, knowledge id + artifact hash,
+        consumed-constraint hash, stage name, operator/configuration
+        used, timestamp, and the canonical search-state hash. Gated
+        on block presence AND non-rehearsal AND an executed
+        mechanism space (SKIPPED/DISABLED/absent stages write
+        nothing — UNPROVEN, never forged). A record failure never
+        fails the run: SEARCH_CONSUMPTION_ERROR.json, typed."""
+        block = (self.problem or {}).get("reality_constraints")
+        if not isinstance(block, dict) or self.rehearsal:
+            return
+        try:
+            ms_path = self.out / "envelope_MECHANISM_SPACE.json"
+            if not ms_path.exists():
+                return
+            env = json.loads(ms_path.read_text(encoding="utf-8"))
+            space = (env.get("mechanism_space") or {})
+            if not isinstance(space, dict) or not space.get("state"):
+                return
+            try:
+                from .reality_ingestion import (
+                    record_search_consumption as _rsc)
+            except Exception:
+                from discovery_fabric.engine.reality_ingestion import (
+                    record_search_consumption as _rsc)
+            _rsc(str(self.out), dict(block), dict(space))
+        except Exception as exc:  # noqa: BLE001 — visible, never fatal
+            try:
+                self._persist(
+                    "SEARCH_CONSUMPTION_ERROR.json",
+                    {"error": "%s: %s" % (type(exc).__name__,
+                                          str(exc)[:200]),
+                      "trigger_event_id": block.get("trigger_event_id")})
             except Exception:
                 pass
 

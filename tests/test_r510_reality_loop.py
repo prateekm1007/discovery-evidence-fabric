@@ -1195,7 +1195,7 @@ def test_cemetery_change_not_consumed_nonsubstantive(tmp_path):
     assert "knowledge_bound" not in delta["changed_fields"]
 
 
-def test_real_constraint_substantive(tmp_path):
+def test_real_constraint_text_alone_nonsubstantive(tmp_path):
     import hashlib as _hl
     art = dict(_VART)
     art_sha = _hl.sha256(json.dumps(
@@ -1218,9 +1218,11 @@ def test_real_constraint_substantive(tmp_path):
     s0 = ri.extract_search_state(str(plaindir))
     s1 = ri.extract_search_state(str(kbdir))
     delta = ri.measure_search_delta(s0, s1)
-    assert delta["substantive"] is True
-    assert "constraint_applied" in delta["changed_fields"]
+    assert delta["substantive"] is False
     assert "knowledge_bound" in delta["changed_fields"]
+    assert "clause_text_present_informational_only" in \
+        delta["changed_fields"]
+    assert "constraint_applied" not in delta["changed_fields"]
 
 
 def test_replay_same_contract_no_duplicate_effect(tmp_path):
@@ -1351,78 +1353,6 @@ def test_consumption_lineage_mismatch_rejected(tmp_path):
 
 
 # full §15 chain on the real launcher (disabled stages, offline) --------
-def test_e2e_verified_consumption_measured_delta(tmp_path):
-    import os as _os
-    if _os.name == "nt":
-        pytest = __import__("pytest")
-        pytest.skip("production child_run_id values contain colons "
-                    "(canonical engrun:...:... lineage format); Windows "
-                    "filesystems reject them. Production runs Linux.")
-    from discovery_fabric.engine.adapters import STAGE_ORDER
-    dis = list(STAGE_ORDER)
-    cem_file = _kill_cemetery(tmp_path)
-    (tmp_path / "cemetery").mkdir(parents=True, exist_ok=True)
-    Path(cem_file).write_text(json.dumps({"entries": []}),
-                              encoding="utf-8")
-    parent_dir = tmp_path / "runs" / "engrun_parent_e2e15"
-    parent_dir.mkdir(parents=True, exist_ok=True)
-    (parent_dir / "problem.json").write_text(
-        json.dumps(dict(PARENT_PROBLEM, problem_id="pp0_e2e_parent")),
-        encoding="utf-8")
-    (parent_dir / "run_manifest.json").write_text(
-        json.dumps({"run_id": "engrun_parent_e2e"}), encoding="utf-8")
-    s0 = ri.extract_search_state(str(parent_dir),
-                                 cemetery_path=cem_file)
-    assert s0["cemetery"]["entry_count"] == 0
-
-    def _resolver(kid):
-        data = json.loads(Path(cem_file).read_text())
-        for e in data.get("entries", []):
-            if e.get("entry_id") == kid:
-                return e
-        return None
-
-    def _real(req):
-        return ri.default_run_launcher(
-            req, str(tmp_path / "runs"), disabled_stages=dis,
-            knowledge_resolver=_resolver)
-
-    with _cemetery(tmp_path):
-        rec = _exec(_event("EV-E2E-2", verdict="KILL"),
-                    str(tmp_path / "ledger"), run_launcher=_real,
-                    parent_problem=dict(PARENT_PROBLEM),
-                    parent_run_id=PARENT_RUN,
-                    cemetery_path=cem_file)
-    assert rec["executed"] is True
-    assert rec["child"]["request_status"] == "LAUNCHED"
-    kid = rec["branch_record"]["cemetery_entry_id"]
-    child_id = rec["child"]["child_run_id"]
-    child_dir = tmp_path / "runs" / child_id
-    exp = {"trigger_event_id": "EV-E2E-2", "parent_run_id": PARENT_RUN,
-           "knowledge_record_id": kid, "launch_id": "lid-x"}
-    verified = ri.verify_consumption(str(child_dir), exp, _resolver)
-    assert verified["verified"] is True, verified["reason"]
-    assert verified["contract"]["knowledge_record_id"] == kid
-    s1 = ri.extract_search_state(str(child_dir),
-                                 cemetery_path=cem_file)
-    delta = ri.measure_search_delta(s0, s1)
-    assert delta["substantive"] is True, delta
-    assert "knowledge_bound" in delta["changed_fields"]
-    assert "cemetery_flip" in delta["changed_fields"]
-    impact = json.loads((tmp_path / "ledger" / "search_impact" /
-                         "EV-E2E-2.json").read_text())
-    assert impact["behavioral_change_observed"] == \
-        "CHILD_CONSUMED_VERIFIED", impact["behavioral_change_observed"]
-    assert impact["child_consumed_delta"]["artifact_verification"] == \
-        "RESOLVED"
-    assert impact["operator_region_after"] is not None
-    with _cemetery(tmp_path):
-        out = ri.reconcile_unknown_launch(
-            str(tmp_path / "ledger"), "EV-E2E-2", _real,
-            ri.default_execution_checker(str(tmp_path / "runs")))
-    assert out["state"] == "LAUNCHED"
-
-
 def _craft_child(tmp_path, name, problem, manifest_extra=None,
                  receipt=None):
     child = tmp_path / "runs" / name
@@ -1661,48 +1591,6 @@ def test_delta_falsifier_problem_only(tmp_path):
     assert delta["all_fields"]["problem_only"] is True
 
 
-def test_delta_substantive_kill_path(tmp_path):
-    import hashlib as _hl
-    art = dict(_ART)
-    art_sha = _hl.sha256(json.dumps(
-        art, sort_keys=True,
-        separators=(",", ":")).encode()).hexdigest()
-    runs = tmp_path / "runs"
-    plain = runs / "engrun_dneg"
-    plain.mkdir(parents=True, exist_ok=True)
-    (plain / "problem.json").write_text(
-        json.dumps(dict(PARENT_PROBLEM, problem_id="pp0_neg")),
-        encoding="utf-8")
-    (plain / "run_manifest.json").write_text(
-        json.dumps({"run_id": "engrun_dneg"}), encoding="utf-8")
-    kbdir = runs / "engrun_dpos"
-    kbdir.mkdir(parents=True, exist_ok=True)
-    (kbdir / "problem.json").write_text(
-        json.dumps(_kb_problem("EV-DP-2", "KX", art_sha)),
-        encoding="utf-8")
-    (kbdir / "run_manifest.json").write_text(
-        json.dumps(dict(_kb_manifest("EV-DP-2", "KX", art_sha,
-                                     "engrun_dpos"),
-                        run_id="engrun_dpos")), encoding="utf-8")
-    s0 = ri.extract_search_state(str(plain), cemetery_path=None)
-    s1 = ri.extract_search_state(str(kbdir), cemetery_path=None)
-    cem0 = {"state": "READ", "entry_count": 0, "head_sha256": "EMPTY"}
-    cem1 = {"state": "READ", "entry_count": 1, "head_sha256": "h1"}
-    s0["cemetery"], s1["cemetery"] = cem0, cem1
-    v0 = ri.verify_consumption(
-        str(plain), _kb_expected("EV-DP-2", "KX", art_sha),
-        _resolver_for({"KX": art}))
-    v1 = ri.verify_consumption(
-        str(kbdir), _kb_expected("EV-DP-2", "KX", art_sha),
-        _resolver_for({"KX": art}))
-    assert v0["verified"] is False
-    assert v1["verified"] is True
-    delta = ri.measure_search_delta(s0, s1)
-    assert delta["substantive"] is True
-    assert "cemetery_flip" in delta["changed_fields"]
-    assert "knowledge_bound" in delta["changed_fields"]
-
-
 def test_negative_control_no_delta(tmp_path):
     runs = tmp_path / "runs"
     for name in ("engrun_nc1", "engrun_nc2"):
@@ -1723,72 +1611,6 @@ def test_negative_control_no_delta(tmp_path):
         _kb_expected("EV-NC-1", "KX", "kh" * 32),
         _resolver_for({"KX": dict(_ART)}))
     assert out["verified"] is False
-
-
-def test_e2e_verified_consumption_measured_delta(tmp_path):
-    import os as _os
-    if _os.name == "nt":
-        pytest = __import__("pytest")
-        pytest.skip("production child_run_id values contain colons "
-                    "(canonical engrun:...:... lineage); Windows "
-                    "filesystems reject them. Production runs Linux.")
-    from discovery_fabric.engine.adapters import STAGE_ORDER
-    dis = list(STAGE_ORDER)
-    cem_file = _kill_cemetery(tmp_path)
-
-    def _resolver(kid):
-        data = json.loads(Path(cem_file).read_text())
-        for e in data.get("entries", []):
-            if e.get("entry_id") == kid:
-                return e
-        return None
-
-    def _real(req):
-        return ri.default_run_launcher(
-            req, str(tmp_path / "runs"), disabled_stages=dis)
-
-    with _cemetery(tmp_path):
-        rec = _exec(_event("EV-E2E-2", verdict="KILL"),
-                    str(tmp_path / "ledger"), run_launcher=_real,
-                    parent_problem=dict(PARENT_PROBLEM),
-                    parent_run_id=PARENT_RUN,
-                    cemetery_path=cem_file)
-    assert rec["executed"] is True
-    assert rec["child"]["request_status"] == "LAUNCHED"
-    kid = rec["branch_record"]["cemetery_entry_id"]
-    child_id = rec["child"]["child_run_id"]
-    child_dir = tmp_path / "runs" / child_id
-    exp = {"trigger_event_id": "EV-E2E-2", "parent_run_id": PARENT_RUN,
-           "knowledge_record_id": kid, "launch_id": "lid-x"}
-    verified = ri.verify_consumption(str(child_dir), exp, _resolver)
-    assert verified["verified"] is True, verified["reason"]
-    assert verified["contract"]["knowledge_record_id"] == kid
-    parent_dir = tmp_path / "runs" / "engrun_parent_e2e"
-    parent_dir.mkdir(parents=True, exist_ok=True)
-    (parent_dir / "problem.json").write_text(
-        json.dumps(dict(PARENT_PROBLEM, problem_id="pp0_e2e_parent")),
-        encoding="utf-8")
-    (parent_dir / "run_manifest.json").write_text(
-        json.dumps({"run_id": "engrun_parent_e2e"}), encoding="utf-8")
-    s0 = ri.extract_search_state(str(parent_dir),
-                                 cemetery_path=cem_file)
-    s1 = ri.extract_search_state(str(child_dir),
-                                 cemetery_path=cem_file)
-    delta = ri.measure_search_delta(s0, s1)
-    assert delta["substantive"] is True, delta
-    assert "knowledge_bound" in delta["changed_fields"]
-    impact = json.loads((tmp_path / "ledger" / "search_impact" /
-                         "EV-E2E-2.json").read_text())
-    assert impact["behavioral_change_observed"] == \
-        "CHILD_CONSUMED_VERIFIED", impact["behavioral_change_observed"]
-    assert impact["child_consumed_delta"]["artifact_verification"] == \
-        "RESOLVED"
-    assert impact["operator_region_after"] is not None
-    with _cemetery(tmp_path):
-        out = ri.reconcile_unknown_launch(
-            str(tmp_path / "ledger"), "EV-E2E-2", _real,
-            ri.default_execution_checker(str(tmp_path / "runs")))
-    assert out["state"] == "LAUNCHED"
 
 
 def _vrun_dir(tmp_path, name, problem, manifest_extra=None,
@@ -2131,14 +1953,23 @@ def test_e2e_verified_consumption_measured_delta(tmp_path):
         json.dumps(dict(PARENT_PROBLEM, problem_id="pp0_e2e_parent")),
         encoding="utf-8")
     (parent_dir / "run_manifest.json").write_text(
-        json.dumps({"run_id": "engrun_parent_e2e"}), encoding="utf-8")
+        json.dumps({"run_id": "engrun_parent_e2e",
+                    "disabled_stages": sorted(dis),
+                    "stage_order": []}), encoding="utf-8")
     s0 = ri.extract_search_state(str(parent_dir),
                                  cemetery_path=cem_file)
     s1 = ri.extract_search_state(str(child_dir),
                                  cemetery_path=cem_file)
     delta = ri.measure_search_delta(s0, s1)
-    assert delta["substantive"] is True, delta
+    assert delta["substantive"] is False, delta
     assert "knowledge_bound" in delta["changed_fields"]
+    assert "constraint_applied" not in delta["changed_fields"]
+    search = ri.verify_search_consumption(
+        str(child_dir), dict(exp, cemetery_entry_id=kid), _resolver)
+    assert search["state"] == "SEARCH_CONSUMPTION_UNPROVEN", search
+    assert search["knowledge_state"] == "KNOWLEDGE_BOUND", search
+    adj = ri.adjudicate_search_learning(delta)
+    assert adj["verdict"] == "NO_LEARNING", adj
     impact = json.loads((tmp_path / "ledger" / "search_impact" /
                          "EV-E2E-2.json").read_text())
     assert impact["behavioral_change_observed"] == \
@@ -2151,3 +1982,318 @@ def test_e2e_verified_consumption_measured_delta(tmp_path):
             str(tmp_path / "ledger"), "EV-E2E-2", _real,
             ri.default_execution_checker(str(tmp_path / "runs")))
     assert out["state"] == "LAUNCHED"
+
+
+_KENTRY = {
+    "entry_id": "CE-TEST-K1",
+    "territory_id": "CV-TEST",
+    "mechanism_name": "cryogenic microvalve stiction lock",
+    "proposed_version": "V1",
+    "killed_at_version": "V2",
+    "kill_reason": "PHYSICS_CEILING",
+    "what_was_proposed": "tungsten carbide microvalve for cryogenic soak",
+    "why_it_failed": "cryogenic soak raises microvalve stiction torque "
+                     "beyond the tungsten carbide actuation budget",
+    "reusable_lesson": "cryogenic soak raises microvalve stiction torque "
+                       "beyond tungsten carbide actuation limits",
+    "what_to_avoid": "tungsten carbide microvalve under cryogenic soak",
+    "physical_constraint": "tungsten carbide microvalve stiction torque "
+                           "exceeds actuation budget under cryogenic soak",
+    "evidence_sources": [],
+    "epistemic_class": "PROVEN_INVARIANT",
+}
+
+_CAND_TEXT = ("tungsten carbide microvalve with cryogenic soak stiction "
+              "torque compensation")
+
+
+def _sc_candidates():
+    return [{"candidate_id": "cand-001", "candidate_state": "CANDIDATE",
+             "intervention": _CAND_TEXT, "mechanism": _CAND_TEXT,
+             "predicted_effect": _CAND_TEXT,
+             "novel_design_variable": _CAND_TEXT}]
+
+
+def _sc_space(cemetery_record, candidates):
+    return {"mechanism_space_version": "mechanism_space/1.0.0",
+            "state": "BUILT",
+            "problem_id": "pp0_sc",
+            "operator_ids": ["DIRECT_TRANSFER"],
+            "operator_results": [
+                {"operator": "DIRECT_TRANSFER",
+                 "operator_version": "v1",
+                 "transformation_rule": "transfer",
+                 "search_constraint": "direct",
+                 "n_items_examined": 1,
+                 "n_items_selected": 1,
+                 "selected_item_ids": ["lean_1"],
+                 "state": "OPERATED",
+                 "operator_selection": {
+                     "selected_operator": "DIRECT_TRANSFER",
+                     "contracts_evaluated": [
+                         {"satisfied": True}],
+                     "selection_basis": "test"}}],
+            "cemetery_consumption": cemetery_record,
+            "candidates": candidates}
+
+
+def _sc_dir(tmp_path, name, eid, art_sha, run_id, space):
+    import copy as _copy
+    problem = _vprob(eid, "KX", art_sha)
+    d = _vrun_dir(tmp_path, name, problem,
+                  dict(_vman(eid, "KX", art_sha, run_id),
+                       run_id=run_id))
+    if space is not None:
+        ri.record_search_consumption(str(d), dict(problem[
+            "reality_constraints"]), _copy.deepcopy(space))
+    return d
+
+
+def _sc_exp(eid, art_sha, run_id, entry_id=None):
+    exp = _vexp(eid, "KX", art_sha, run_id=run_id)
+    if entry_id is not None:
+        exp = dict(exp, cemetery_entry_id=entry_id)
+    return exp
+
+
+def _sc_art():
+    import hashlib as _hl
+    art = dict(_VART)
+    art_sha = _hl.sha256(json.dumps(
+        art, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    return art, art_sha
+
+
+def test_forged_search_consumption_rejected(tmp_path):
+    art, art_sha = _sc_art()
+    from discovery_fabric.engine import mechanism_space as _ms
+    with _cemetery(tmp_path):
+        Path(tmp_path / "cemetery").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "cemetery" / "CEMETERY.json").write_text(
+            json.dumps({"entries": []}), encoding="utf-8")
+        rec = _ms._consult_cemetery(_sc_candidates())
+    d = _sc_dir(tmp_path, "engrun_sf01", "EV-SF-1", art_sha,
+                "engrun_sf01", _sc_space(rec, _sc_candidates()))
+    p = d / "SEARCH_CONSUMPTION.json"
+    forged = json.loads(p.read_text(encoding="utf-8"))
+    forged["search_snapshot"]["cemetery_consultation"]["n_blocked"] = 99
+    p.write_text(json.dumps(forged), encoding="utf-8")
+    out = ri.verify_search_consumption(
+        str(d), _sc_exp("EV-SF-1", art_sha, "engrun_sf01",
+                        entry_id="CE-TEST-K1"),
+        _vresolver({"KX": art}))
+    assert out["state"] == "SEARCH_CONSUMPTION_REJECTED", out
+    assert out["knowledge_state"] == "KNOWLEDGE_BOUND", out
+
+
+def test_bound_without_search_consumption_unproven(tmp_path):
+    art, art_sha = _sc_art()
+    problem = _vprob("EV-SU-1", "KX", art_sha)
+    d = _vrun_dir(tmp_path, "engrun_su01", problem,
+                  dict(_vman("EV-SU-1", "KX", art_sha, "engrun_su01"),
+                       run_id="engrun_su01"))
+    out = ri.verify_search_consumption(
+        str(d), _sc_exp("EV-SU-1", art_sha, "engrun_su01",
+                        entry_id="CE-TEST-K1"),
+        _vresolver({"KX": art}))
+    assert out["state"] == "SEARCH_CONSUMPTION_UNPROVEN", out
+    assert out["knowledge_state"] == "KNOWLEDGE_BOUND", out
+    kb = ri.verify_consumption(
+        str(d), _sc_exp("EV-SU-1", art_sha, "engrun_su01"),
+        _vresolver({"KX": art}))
+    assert kb["verified"] is True
+
+
+def test_mentioned_unused_search_rejected(tmp_path):
+    problem = dict(PARENT_PROBLEM, problem_id="pp0_smu")
+    problem["constraint"] = "base mentioning KX knowledge in free text"
+    d = _vrun_dir(tmp_path, "engrun_smu01", problem,
+                  {"run_id": "engrun_smu01"})
+    out = ri.verify_search_consumption(
+        str(d), _sc_exp("EV-SM-1", "kh" * 32, "engrun_smu01"),
+        _vresolver({"KX": dict(_VART)}))
+    assert out["state"] == "SEARCH_CONSUMPTION_REJECTED", out
+    assert out["knowledge_state"] == "KNOWLEDGE_UNBOUND", out
+
+
+def test_control_treatment_no_search_difference_nonsubstantive(tmp_path):
+    art, art_sha = _sc_art()
+    from discovery_fabric.engine import mechanism_space as _ms
+    with _cemetery(tmp_path):
+        Path(tmp_path / "cemetery").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "cemetery" / "CEMETERY.json").write_text(
+            json.dumps({"entries": []}), encoding="utf-8")
+        rec0 = _ms._consult_cemetery(_sc_candidates())
+        rec1 = _ms._consult_cemetery(_sc_candidates())
+    assert rec0["n_blocked"] == 0 and rec1["n_blocked"] == 0
+    runs = tmp_path / "runs"
+    plain = runs / "engrun_snc0"
+    plain.mkdir(parents=True, exist_ok=True)
+    (plain / "problem.json").write_text(
+        json.dumps(dict(PARENT_PROBLEM, problem_id="pp0_snc0")),
+        encoding="utf-8")
+    (plain / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_snc0"}), encoding="utf-8")
+    treat = _sc_dir(tmp_path, "engrun_snc1", "EV-SN-1", art_sha,
+                    "engrun_snc1", _sc_space(rec1, _sc_candidates()))
+    s0 = ri.extract_search_state(str(plain))
+    s1 = ri.extract_search_state(str(treat))
+    s1["knowledge_binding"]["cemetery_entry_id"] = "CE-TEST-K1"
+    delta = ri.measure_search_delta(s0, s1)
+    assert delta["substantive"] is False, delta
+    assert "kill_decision_bound" not in delta["changed_fields"]
+    assert ri.adjudicate_search_learning(delta)["verdict"] == "NO_LEARNING"
+
+
+def test_treatment_verified_search_change_substantive(tmp_path):
+    art, art_sha = _sc_art()
+    from discovery_fabric.engine import mechanism_space as _ms
+    with _cemetery(tmp_path):
+        Path(tmp_path / "cemetery").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "cemetery" / "CEMETERY.json").write_text(
+            json.dumps({"entries": []}), encoding="utf-8")
+        rec0 = _ms._consult_cemetery(_sc_candidates())
+        assert rec0["n_blocked"] == 0
+        (tmp_path / "cemetery" / "CEMETERY.json").write_text(
+            json.dumps({"entries": [dict(_KENTRY)]}), encoding="utf-8")
+        cands = _sc_candidates()
+        rec1 = _ms._consult_cemetery(cands)
+        assert rec1["n_blocked"] == 1, rec1
+        assert rec1["blocked"][0]["entries"] == ["CE-TEST-K1"], rec1
+    runs = tmp_path / "runs"
+    plain = runs / "engrun_svs0"
+    plain.mkdir(parents=True, exist_ok=True)
+    (plain / "problem.json").write_text(
+        json.dumps(dict(PARENT_PROBLEM, problem_id="pp0_svs0")),
+        encoding="utf-8")
+    (plain / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_svs0"}), encoding="utf-8")
+    treat = _sc_dir(tmp_path, "engrun_svs1", "EV-SS-1", art_sha,
+                    "engrun_svs1", _sc_space(rec1, cands))
+    exp = _sc_exp("EV-SS-1", art_sha, "engrun_svs1",
+                  entry_id="CE-TEST-K1")
+    out = ri.verify_search_consumption(str(treat), exp,
+                                       _vresolver({"KX": art}))
+    assert out["state"] == "SEARCH_CONSUMPTION_VERIFIED", out
+    assert out["knowledge_state"] == "KNOWLEDGE_BOUND", out
+    s0 = ri.extract_search_state(str(plain))
+    s1 = ri.extract_search_state(str(treat))
+    s1["knowledge_binding"]["cemetery_entry_id"] = "CE-TEST-K1"
+    delta = ri.measure_search_delta(s0, s1)
+    assert delta["substantive"] is True, delta
+    assert "kill_decision_bound" in delta["changed_fields"]
+    assert "constraint_applied" in delta["changed_fields"]
+    assert ri.adjudicate_search_learning(delta)["verdict"] == \
+        "LEARNING_CANDIDATE"
+
+
+def test_search_verify_replay_no_second_effect(tmp_path):
+    art, art_sha = _sc_art()
+    from discovery_fabric.engine import mechanism_space as _ms
+    with _cemetery(tmp_path):
+        Path(tmp_path / "cemetery").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "cemetery" / "CEMETERY.json").write_text(
+            json.dumps({"entries": [dict(_KENTRY)]}), encoding="utf-8")
+        cands = _sc_candidates()
+        rec1 = _ms._consult_cemetery(cands)
+    treat = _sc_dir(tmp_path, "engrun_srp1", "EV-SR-1", art_sha,
+                    "engrun_srp1", _sc_space(rec1, cands))
+    exp = _sc_exp("EV-SR-1", art_sha, "engrun_srp1",
+                  entry_id="CE-TEST-K1")
+    p = treat / "SEARCH_CONSUMPTION.json"
+    import hashlib as _hl
+    before = _hl.sha256(p.read_bytes()).hexdigest()
+    r1 = ri.verify_search_consumption(str(treat), exp,
+                                      _vresolver({"KX": art}))
+    r2 = ri.verify_search_consumption(str(treat), exp,
+                                      _vresolver({"KX": art}))
+    after = _hl.sha256(p.read_bytes()).hexdigest()
+    assert r1["state"] == r2["state"] == "SEARCH_CONSUMPTION_VERIFIED"
+    assert before == after
+
+
+def test_true_e2e_search_consumption(tmp_path):
+    from discovery_fabric.engine.adapters import STAGE_ORDER
+    from discovery_fabric.engine.run import EngineRun
+    keep = {"RETRIEVE", "FREEZE", "PREMISE_GATE", "VERIFY",
+            "MECHANISM_SPACE", "ADJUDICATION", "CLASSIFY"}
+    dis = sorted(s for s in STAGE_ORDER if s not in keep)
+    cem_file = _kill_cemetery(tmp_path)
+    (tmp_path / "cemetery").mkdir(parents=True, exist_ok=True)
+    Path(cem_file).write_text(json.dumps({"entries": []}),
+                              encoding="utf-8")
+
+    def _resolver(kid):
+        data = json.loads(Path(cem_file).read_text())
+        for e in data.get("entries", []):
+            if e.get("entry_id") == kid:
+                return e
+        return None
+
+    with _cemetery(tmp_path):
+        rec = _exec(_event("EV-TRUE-1", verdict="KILL"),
+                    str(tmp_path / "ledger"),
+                    parent_problem=dict(PARENT_PROBLEM),
+                    parent_run_id=PARENT_RUN,
+                    cemetery_path=cem_file)
+    assert rec["executed"] is True, rec
+    assert rec["branch"] == "KILL", rec
+    kid = rec["branch_record"]["cemetery_entry_id"]
+    req = rec["branch_record"]["child_request"]
+    assert req["status"] == "REQUESTED", req
+    base_constraint = str(PARENT_PROBLEM["constraint"])
+    assert str(req["child_problem"]["constraint"]).startswith(
+        base_constraint)
+    runs = tmp_path / "runs"
+    control = EngineRun(problem=dict(PARENT_PROBLEM,
+                                     problem_id="pp0_true_ctrl"),
+                        out_dir=str(runs / "engrun_true_ctrl"),
+                        run_id="engrun_true_ctrl",
+                        disabled_stages=list(dis)).run()
+    assert control.get("run_id") == "engrun_true_ctrl"
+    treatment = EngineRun(problem=dict(req["child_problem"]),
+                          out_dir=str(runs / "engrun_true_trt"),
+                          run_id="engrun_true_trt",
+                          disabled_stages=list(dis)).run()
+    assert treatment.get("run_id") == "engrun_true_trt"
+    man_c = json.loads((runs / "engrun_true_ctrl" / "run_manifest.json"
+                        ).read_text())
+    man_t = json.loads((runs / "engrun_true_trt" / "run_manifest.json"
+                        ).read_text())
+    assert sorted(man_c.get("disabled_stages", [])) == \
+        sorted(man_t.get("disabled_stages", []))
+    assert man_c.get("stage_order") == man_t.get("stage_order")
+    exp = {"trigger_event_id": "EV-TRUE-1", "parent_run_id": PARENT_RUN,
+           "knowledge_record_id": kid, "launch_id": "lid-true",
+           "knowledge_artifact_sha256": req["knowledge_artifact_sha256"],
+           "child_run_id": "engrun_true_trt",
+           "parent_problem_sha256": req["parent_problem_sha256"],
+           "branch": "KILL", "cemetery_entry_id": kid}
+    kb = ri.verify_consumption(str(runs / "engrun_true_trt"), exp,
+                               _resolver)
+    assert kb["verified"] is True, kb["reason"]
+    sc = ri.verify_search_consumption(str(runs / "engrun_true_trt"),
+                                      exp, _resolver)
+    assert sc["knowledge_state"] == "KNOWLEDGE_BOUND", sc
+    snap_dir = tmp_path / "ledger" / "search_snapshots"
+    snap_dir.mkdir(parents=True, exist_ok=True)
+    s0 = ri.extract_search_state(str(runs / "engrun_true_ctrl"),
+                                 cemetery_path=cem_file)
+    s1 = ri.extract_search_state(str(runs / "engrun_true_trt"),
+                                 cemetery_path=cem_file)
+    s1["knowledge_binding"]["cemetery_entry_id"] = kid
+    (snap_dir / "S0.json").write_text(json.dumps(s0), encoding="utf-8")
+    (snap_dir / "S1.json").write_text(json.dumps(s1), encoding="utf-8")
+    assert s0["canonical_state_hash"] == json.loads(
+        (snap_dir / "S0.json").read_text())["canonical_state_hash"]
+    delta = ri.measure_search_delta(s0, s1)
+    adj = ri.adjudicate_search_learning(delta)
+    if sc["state"] == "SEARCH_CONSUMPTION_VERIFIED":
+        assert delta["substantive"] is True, delta
+        assert "constraint_applied" in delta["changed_fields"]
+        assert adj["verdict"] == "LEARNING_CANDIDATE", adj
+    else:
+        assert sc["state"] == "SEARCH_CONSUMPTION_UNPROVEN", sc
+        assert delta["substantive"] is False, delta
+        assert "constraint_applied" not in delta["changed_fields"]
+        assert adj["verdict"] == "NO_LEARNING", adj

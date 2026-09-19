@@ -2597,6 +2597,163 @@ def record_child_consumption(child_run_dir: str, parent_event_id: str,
     return {"consumed": True, "receipt": receipt}
 
 
+def canonical_search_snapshot(space: Dict, constraint_text: str,
+                              manifest: Dict) -> Dict:
+    """Deterministic search-state snapshot from an EXECUTED
+    mechanism-space record. §8-clean by construction: no candidate
+    text, no LLM wording, no timestamps, no run/problem ids, no
+    serialized-order dependence (all lists sorted). Carries WHAT the
+    search decided (operator selection, examined states, cemetery
+    kill decisions with entry ids, candidate decision multiset,
+    consumed-constraint hash, selection policy) — never the wording
+    that produced it."""
+    import hashlib as _hl
+    space = space or {}
+    op_results = space.get("operator_results") or []
+    examined = sorted(
+        [{"operator": o.get("operator"), "state": o.get("state")}
+         for o in op_results if isinstance(o, dict)],
+        key=lambda d: str(d.get("operator")))
+    sel = (space.get("operator_results") or [{}])
+    evaluated = 0
+    satisfied = 0
+    selected_operator = None
+    for o in op_results:
+        if not isinstance(o, dict):
+            continue
+        _osel = o.get("operator_selection") or {}
+        if isinstance(_osel, dict):
+            if selected_operator is None and _osel.get(
+                    "selected_operator"):
+                selected_operator = _osel.get("selected_operator")
+            _ev = _osel.get("contracts_evaluated") or []
+            evaluated += len(_ev)
+            satisfied += sum(1 for e in _ev if isinstance(e, dict)
+                             and e.get("satisfied"))
+    if selected_operator is None:
+        _oids = sorted(space.get("operator_ids") or [])
+        selected_operator = _oids[0] if _oids else None
+    ccons = space.get("cemetery_consumption") or {}
+    _blocked_ids = set()
+    for b in (ccons.get("blocked") or []):
+        for e in (b.get("entries") or []):
+            if e:
+                _blocked_ids.add(str(e))
+    cands = space.get("candidates") or []
+
+    def _cand_block_ids(c):
+        ids = []
+        for b in (c.get("cemetery_block") or []):
+            if isinstance(b, dict) and b.get("cemetery_entry"):
+                ids.append(str(b.get("cemetery_entry")))
+        return sorted(ids)
+
+    decisions = sorted(
+        [{"state": c.get("candidate_state"),
+          "blocked": _cand_block_ids(c)}
+         for c in cands if isinstance(c, dict)],
+        key=lambda d: (str(d.get("state")), ",".join(d.get("blocked"))))
+    evaluated = 0
+    satisfied = 0
+    _op_sel = space.get("operator_selection") or {}
+    if isinstance(_op_sel, dict):
+        _ev = _op_sel.get("contracts_evaluated") or []
+        evaluated = len(_ev)
+        satisfied = sum(1 for e in _ev if isinstance(e, dict)
+                        and e.get("satisfied"))
+    else:
+        for o in op_results:
+            if isinstance(o, dict) and isinstance(
+                    o.get("operator_selection"), dict):
+                _ev = o["operator_selection"].get(
+                    "contracts_evaluated") or []
+                evaluated += len(_ev)
+                satisfied += sum(
+                    1 for e in _ev if isinstance(e, dict)
+                    and e.get("satisfied"))
+    snapshot = {
+        "stage": "MECHANISM_SPACE",
+        "space_state": space.get("state"),
+        "space_version": space.get("mechanism_space_version"),
+        "operator_ids": sorted(space.get("operator_ids") or []),
+        "selected_operator": selected_operator,
+        "contracts_evaluated": evaluated,
+        "contracts_satisfied": satisfied,
+        "operators_examined": examined,
+        "cemetery_consultation": {
+            "state": ccons.get("state"),
+            "n_consulted": ccons.get("n_candidates_consulted", 0),
+            "n_blocked": ccons.get("n_blocked", 0),
+            "n_warned": ccons.get("n_warned", 0),
+            "blocked_entry_ids": sorted(_blocked_ids),
+        },
+        "candidates": {
+            "n_retained": len(cands),
+            "decisions": decisions,
+        },
+        "consumed_constraint_sha256": _hl.sha256(
+            str(constraint_text or "").encode("utf-8",
+                                              "replace")).hexdigest(),
+        "candidate_selection_policy": {
+            "disabled_stages": sorted(
+                (manifest or {}).get("disabled_stages", [])),
+            "stage_order": (manifest or {}).get("stage_order"),
+        },
+    }
+    snapshot["snapshot_hash"] = _loop_sha(snapshot)
+    return snapshot
+
+
+def record_search_consumption(child_run_dir: str, block: Dict,
+                              space: Dict) -> Dict:
+    """Durable SEARCH_CONSUMPTION record (§4), emitted from the
+    MECHANISM_SPACE stage's OWN persisted envelope (never
+    re-derived, never synthesized). Binds child_run_id, parent
+    reality event, knowledge id + artifact hash, consumed-constraint
+    hash, stage name, operator/configuration used, timestamp, and
+    the canonical search-state hash. Returns the record (and writes
+    SEARCH_CONSUMPTION.json). Callers gate on block presence,
+    non-rehearsal, and an executed stage."""
+    child_run_dir = str(child_run_dir)
+    try:
+        manifest = json.load(open(os.path.join(
+            child_run_dir, "run_manifest.json"), encoding="utf-8"))
+    except Exception:
+        manifest = {}
+    try:
+        problem = json.load(open(os.path.join(
+            child_run_dir, "problem.json"), encoding="utf-8"))
+    except Exception:
+        problem = {}
+    constraint_text = str(problem.get("constraint") or "")
+    snapshot = canonical_search_snapshot(space, constraint_text,
+                                         manifest)
+    record = {
+        "artifact_type": "SEARCH_CONSUMPTION/1.0.0",
+        "stage": "MECHANISM_SPACE",
+        "child_run_id": manifest.get("run_id"),
+        "trigger_event_id": block.get("trigger_event_id"),
+        "parent_run_id": block.get("parent_run_id"),
+        "knowledge_record_id": block.get("knowledge_record_id"),
+        "knowledge_artifact_sha256": block.get(
+            "knowledge_artifact_sha256"),
+        "consumed_constraint_sha256": snapshot[
+            "consumed_constraint_sha256"],
+        "operator_configuration": {
+            "operator_ids": snapshot["operator_ids"],
+            "selected_operator": snapshot["selected_operator"],
+            "space_version": snapshot["space_version"],
+            "space_state": snapshot["space_state"],
+        },
+        "search_snapshot": snapshot,
+        "search_state_hash": snapshot["snapshot_hash"],
+        "executed_at": _loop_now(),
+    }
+    _atomic_write_json(os.path.join(child_run_dir,
+                                    "SEARCH_CONSUMPTION.json"), record)
+    return record
+
+
 def verify_consumption(child_run_dir: str, expected: Dict,
                        knowledge_resolver=None) -> Dict:
     """Independent consumption verifier (§2-§4): reconstructs consumption
@@ -2739,6 +2896,131 @@ def verify_consumption(child_run_dir: str, expected: Dict,
                       "artifacts"}
 
 
+def verify_search_consumption(child_run_dir: str, expected: Dict,
+                              knowledge_resolver=None) -> Dict:
+    """Independent search-consumption verifier (§5): proves manifest
+    binding AND actual search-stage consumption. KNOWLEDGE_BOUND
+    (verify_consumption) NEVER implies SEARCH_CONSUMPTION_VERIFIED.
+
+    States:
+      SEARCH_CONSUMPTION_VERIFIED — binding proven, record integrity
+        proven, and an executed search decision is bound to THIS
+        knowledge (cemetery kill citing the expected cemetery entry).
+      SEARCH_CONSUMPTION_UNPROVEN — bound, but no (valid) record or
+        no knowledge-bound decision (the honest cliff state: a
+        correct manifest with no actual search consumption).
+      SEARCH_CONSUMPTION_REJECTED — binding failed, or the record is
+        forged/tampered (integrity mismatch), or rehearsal.
+
+    A child receipt (CONSUMPTION.json) alone remains insufficient —
+    it is never consulted here."""
+    child_run_dir = str(child_run_dir)
+    expected = expected or {}
+    if expected.get("rehearsal"):
+        return {"state": "SEARCH_CONSUMPTION_REJECTED",
+                "knowledge_state": "KNOWLEDGE_UNBOUND",
+                "reason": "CONTROLLED_REHEARSAL is permanently excluded "
+                          "from consumption proof",
+                "checks": {"rehearsal_excluded": True}}
+    bound = verify_consumption(child_run_dir, expected,
+                               knowledge_resolver)
+    knowledge_state = ("KNOWLEDGE_BOUND" if bound.get("verified")
+                       else "KNOWLEDGE_UNBOUND")
+    checks: Dict[str, Any] = {"knowledge_binding": bound}
+    if not bound.get("verified"):
+        return {"state": "SEARCH_CONSUMPTION_REJECTED",
+                "knowledge_state": knowledge_state,
+                "reason": "knowledge not bound: %s" % (
+                    bound.get("reason"),),
+                "checks": checks}
+    rec_path = os.path.join(child_run_dir, "SEARCH_CONSUMPTION.json")
+    try:
+        record = json.load(open(rec_path, encoding="utf-8"))
+        checks["record_readable"] = True
+    except Exception as exc:
+        checks["record_readable"] = False
+        return {"state": "SEARCH_CONSUMPTION_UNPROVEN",
+                "knowledge_state": knowledge_state,
+                "reason": "no search-consumption record: %s "
+                          "(bound input, unproven search)" % (
+                              type(exc).__name__,),
+                "checks": checks}
+    try:
+        manifest = json.load(open(os.path.join(
+            child_run_dir, "run_manifest.json"), encoding="utf-8"))
+        problem = json.load(open(os.path.join(
+            child_run_dir, "problem.json"), encoding="utf-8"))
+    except Exception as exc:
+        return {"state": "SEARCH_CONSUMPTION_REJECTED",
+                "knowledge_state": knowledge_state,
+                "reason": "run artifacts unreadable: %s" % (
+                    type(exc).__name__,),
+                "checks": checks}
+    import hashlib as _hl
+    constraint_hash = _hl.sha256(
+        str(problem.get("constraint") or "").encode(
+            "utf-8", "replace")).hexdigest()
+    snapshot = record.get("search_snapshot") or {}
+    checks["record_child_run_match"] = (
+        record.get("child_run_id") == manifest.get("run_id")
+        == expected.get("child_run_id"))
+    checks["record_trigger_match"] = (
+        record.get("trigger_event_id")
+        == expected.get("trigger_event_id"))
+    checks["record_knowledge_match"] = (
+        record.get("knowledge_record_id")
+        == expected.get("knowledge_record_id"))
+    checks["record_artifact_match"] = (
+        record.get("knowledge_artifact_sha256")
+        == expected.get("knowledge_artifact_sha256"))
+    checks["record_stage_match"] = (
+        record.get("stage") == "MECHANISM_SPACE")
+    checks["record_constraint_match"] = (
+        record.get("consumed_constraint_sha256") == constraint_hash
+        == snapshot.get("consumed_constraint_sha256"))
+    checks["record_snapshot_integrity"] = (
+        record.get("search_state_hash") == snapshot.get("snapshot_hash")
+        == _loop_sha({k: v for k, v in snapshot.items()
+                      if k != "snapshot_hash"}))
+    integrity = bool(
+        checks["record_child_run_match"]
+        and checks["record_trigger_match"]
+        and checks["record_knowledge_match"]
+        and checks["record_artifact_match"]
+        and checks["record_stage_match"]
+        and checks["record_constraint_match"]
+        and checks["record_snapshot_integrity"])
+    checks["record_integrity"] = integrity
+    if not integrity:
+        bad = sorted(k for k, v in checks.items()
+                     if k.startswith("record_") and not v)
+        return {"state": "SEARCH_CONSUMPTION_REJECTED",
+                "knowledge_state": knowledge_state,
+                "reason": "search-consumption record forged or tampered "
+                          "(%s)" % (", ".join(bad),),
+                "checks": checks}
+    ccons = (snapshot.get("cemetery_consultation") or {})
+    blocked_ids = set(ccons.get("blocked_entry_ids") or [])
+    entry_id = expected.get("cemetery_entry_id")
+    checks["decision_cemetery_kill_bound"] = bool(
+        entry_id and entry_id in blocked_ids)
+    checks["decision_n_blocked"] = int(ccons.get("n_blocked") or 0)
+    if checks["decision_cemetery_kill_bound"]:
+        return {"state": "SEARCH_CONSUMPTION_VERIFIED",
+                "knowledge_state": knowledge_state,
+                "reason": "manifest binding plus an executed "
+                          "search-stage kill decision bound to this "
+                          "knowledge (cemetery entry %s)" % (entry_id,),
+                "checks": checks, "record": record}
+    return {"state": "SEARCH_CONSUMPTION_UNPROVEN",
+            "knowledge_state": knowledge_state,
+            "reason": "record integrity holds but no executed search "
+                      "decision is bound to this knowledge "
+                      "(n_blocked=%d; KNOWLEDGE_BOUND does not imply "
+                      "consumption)" % (checks["decision_n_blocked"],),
+            "checks": checks, "record": record}
+
+
 def extract_search_state(run_dir: str, cemetery_path=None) -> Dict:
     """Machine-readable SEARCH_STATE (§6) extracted deterministically
     from a run dir (works on ANY run dir, parent or child). Fields
@@ -2788,6 +3070,39 @@ def extract_search_state(run_dir: str, cemetery_path=None) -> Dict:
         cemetery = {"state": "UNKNOWN_NO_CEMETERY_PATH"}
     block = (problem.get("reality_constraints") or {}) \
         if prob_ok else {}
+    sc_path = os.path.join(run_dir, "SEARCH_CONSUMPTION.json")
+    if os.path.exists(sc_path):
+        try:
+            _sc = json.load(open(sc_path, encoding="utf-8"))
+            search_snapshot = _sc.get("search_snapshot")
+            search_consumption = {
+                "state": "RECORDED",
+                "search_state_hash": _sc.get("search_state_hash"),
+                "integrity": bool(
+                    search_snapshot
+                    and _sc.get("search_state_hash")
+                    == search_snapshot.get("snapshot_hash")),
+            }
+        except Exception as exc:
+            search_snapshot, search_consumption = None, {
+                "state": "UNKNOWN_UNREADABLE",
+                "error": type(exc).__name__}
+    elif os.path.exists(ms_path):
+        try:
+            _ms2 = json.load(open(ms_path, encoding="utf-8"))
+            _space2 = _ms2.get("mechanism_space", _ms2)
+            search_snapshot = canonical_search_snapshot(
+                _space2 if isinstance(_space2, dict) else {},
+                str(problem.get("constraint") or "")
+                if prob_ok else "", manifest)
+            search_consumption = {"state": "UNRECORDED_STAGE_EXECUTED"}
+        except Exception as exc:
+            search_snapshot, search_consumption = None, {
+                "state": "UNKNOWN_UNREADABLE",
+                "error": type(exc).__name__}
+    else:
+        search_snapshot, search_consumption = None, {
+            "state": "UNKNOWN_NO_SEARCH_EXECUTION"}
     state = {
         "artifact_type": "SEARCH_STATE/1.0.0",
         "run_id": manifest.get("run_id"),
@@ -2807,6 +3122,8 @@ def extract_search_state(run_dir: str, cemetery_path=None) -> Dict:
         } if manifest else "UNKNOWN_NO_MANIFEST",
         "query_policy": "UNKNOWN_NO_QUERY_REGISTRY",
         "cemetery": cemetery,
+        "search_snapshot": search_snapshot,
+        "search_consumption": search_consumption,
         "active_hypotheses_constraints": [
             str(problem.get("constraint") or "")] if prob_ok else [],
     }
@@ -2816,16 +3133,16 @@ def extract_search_state(run_dir: str, cemetery_path=None) -> Dict:
 
 
 def measure_search_delta(s0: Dict, s1: Dict) -> Dict:
-    """MEASURED_DELTA = DIFF(S0, S1) with substantive-field rules (§7).
-    A different problem_id or serialized constraint ALONE is NOT
-    substantive (the §7 falsifier is built in, not bolted on).
-    Substantive requires knowledge binding PLUS at least one
-    GROUNDED signal: cemetery flip, operator-region change,
-    candidate-selection-policy change, or a BOUND active constraint
-    (clause present in S1, absent in S0, with verified knowledge
-    binding — unbound text diffs never qualify). hypothesis_new is
-    reported as INFORMATIONAL ONLY, never sufficient (constraint text
-    without binding is wording, not learning)."""
+    """MEASURED_DELTA = DIFF(S0, S1) with substantive-field rules.
+    A different problem_id, serialized constraint, or clause TEXT
+    alone is NEVER substantive (§6/§8: wording is not learning).
+    constraint_applied is substantive ONLY when the search-stage
+    artifact proves the constraint changed an EXECUTED search
+    decision: a knowledge-bound cemetery kill in S1's search
+    snapshot, or a causal operator/candidate/policy decision
+    difference S0->S1 with S1 knowledge-bound. hypothesis text and
+    clause presence without decision evidence are INFORMATIONAL
+    ONLY."""
     def _norm_constraint(text):
         import re as _re
         return _re.sub(r"\[REALITY [^\]]*\]", "", str(text or "")
@@ -2858,8 +3175,28 @@ def measure_search_delta(s0: Dict, s1: Dict) -> Dict:
                                          str(t or "")))
     _s0raw = (s0.get("active_hypotheses_constraints") or [""])[0]
     _s1raw = (s1.get("active_hypotheses_constraints") or [""])[0]
-    constraint_applied = bool(
-        knowledge_bound and _clause(_s1raw) and not _clause(_s0raw))
+    clause_text_present = bool(_clause(_s1raw) and not _clause(_s0raw))
+    sn0 = (s0.get("search_snapshot") or {})
+    sn1 = (s1.get("search_snapshot") or {})
+    _s1blocked = set(((sn1.get("cemetery_consultation") or {})
+                      .get("blocked_entry_ids")) or [])
+    _s0blocked = set(((sn0.get("cemetery_consultation") or {})
+                      .get("blocked_entry_ids")) or [])
+    _new_blocks = _s1blocked - _s0blocked
+    _entry_id = kb1.get("cemetery_entry_id")
+    kill_decision_bound = bool(
+        knowledge_bound and _entry_id and _entry_id in _new_blocks)
+    kill_decision_unlinked = bool(
+        knowledge_bound and _new_blocks and not _entry_id)
+    _op_sel = (sn0.get("selected_operator") != sn1.get(
+        "selected_operator") and sn1.get("selected_operator")
+        is not None)
+    _cand_dec = ((sn0.get("candidates") or {}).get("decisions")
+                 != (sn1.get("candidates") or {}).get("decisions"))
+    decision_diff = bool(
+        knowledge_bound and sn0 and sn1
+        and (_op_sel or _cand_dec or policy_change))
+    constraint_applied = bool(kill_decision_bound or decision_diff)
     hypothesis_new = bool(s1c and s1c != s0c)
     changed = {
         "knowledge_bound": knowledge_bound,
@@ -2867,6 +3204,11 @@ def measure_search_delta(s0: Dict, s1: Dict) -> Dict:
         "operator_change": operator_change,
         "policy_change": policy_change,
         "constraint_applied": constraint_applied,
+        "kill_decision_bound": kill_decision_bound,
+        "kill_decision_unlinked_informational_only":
+            kill_decision_unlinked,
+        "decision_diff": decision_diff,
+        "clause_text_present_informational_only": clause_text_present,
         "hypothesis_new_informational_only": hypothesis_new,
         "problem_only": (
             s0.get("problem_sha256") != s1.get("problem_sha256")
@@ -2883,6 +3225,28 @@ def measure_search_delta(s0: Dict, s1: Dict) -> Dict:
             "falsifier": "problem_id/constraint-only differences are "
                          "excluded by construction; hypothesis text "
                          "without binding is informational only"}
+
+
+def adjudicate_search_learning(delta: Dict) -> Dict:
+    """LEARNING ADJUDICATION over a MEASURED_DELTA (distinct from the
+    candidate adjudicator adjudicate_learning() at line 397 — that
+    name is kept untouched). Pure verdict: LEARNING_CANDIDATE iff
+    the delta is substantive (an executed search decision changed
+    under bound knowledge); else NO_LEARNING (bound input without
+    consumed search is archival, not learning). Deterministic, no
+    I/O, no LLM."""
+    delta = delta or {}
+    changed = list(delta.get("changed_fields") or [])
+    if delta.get("substantive") is True:
+        return {"verdict": "LEARNING_CANDIDATE",
+                "reason": "measured substantive search delta: %s" % (
+                    ", ".join(changed),),
+                "changed_fields": changed}
+    return {"verdict": "NO_LEARNING",
+            "reason": "no substantive search delta (changed: %s; "
+                      "KNOWLEDGE_BOUND alone is not learning)" % (
+                          ", ".join(changed) or "none",),
+            "changed_fields": changed}
 
 
 def default_run_launcher(child_request: Dict, runs_root: str,
