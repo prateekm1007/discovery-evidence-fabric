@@ -2395,3 +2395,19 @@ Work Log:
 Stage Summary:
 - The ONE authorized build is complete: adapter code + battery + DEV measurement (median 2, bar unmet, honestly) + sealed intact. Decision on the bar (accept 2 / evidence-grounded re-validation / revise with justification) belongs to auditor+operator — the falsifier and bytes are on record either way. Survivor campaign/REAL/ZIP/XLIX still wait on post-fix survivors per verdict.
 - reviewer_provenance=AI_REVIEW
+
+- R510-BRIDGE BUILD (production evidence bridge repair, auditor NEXT-BUILD directive):
+- S0 CONSTITUTION READ: v2.9.0 reread in full before implementation (lines 1-2399, this session); sha256 6aab103cb4f00cc5d4b10b82f63587d78f5b4269ca7bdf2633b5807448d2922d; main 33b87fc7 == origin/main at start (plus local-only 88815a7e baseline + 87889cde plan ahead of origin, records-only); deployed d15aaa75/2.9.0 live (probed); tree clean.
+- WHAT WAS FALSE: (1) lean admission saw title-only terms while abstracts held the mechanism vocabulary (#2 rejected with shared_terms=[] despite 6 verified items); (2) operator hardcoded DIRECT_TRANSFER (cross-domain evidence could only die accidentally); (3) C12 graph term engine had zero production callers; (4) refusal text tokenized into graph nodes (demoed live).
+- WHAT CHANGED (2 engine files, thresholds/instruments untouched): adapters.py lean items carry abstract + verbatim relevance; _lean_select_operator routes DIRECT_TRANSFER on verifier relevance (domain+mechanism, VERIFY's own thresholds) with legacy title-view fallback, CROSS_DOMAIN_ANALOGY on foreign-domain+mechanism relevance, other operators legacy, canonical order, one call, all verdicts recorded; operator-parameterized template/purpose/semantic-check. mechanism_space.py: absence vocabulary v1 + _guarded_role_terms shared by mechanism_graph_from_fields and build_mechanism_graph (byte-identical on non-absence text); R453 allowlist amended with disclosed reason.
+- WHY: restores the evidence-to-candidate causal boundary per directive §2-§7; cemetery matcher untouched (banked Cycle A); no threshold moved (0.45/0.8/2/1 pinned numerically in bridge battery).
+- PRODUCTION CONSUMER: MechanismSpaceAdapter.execute -> _lean_mechanism_space (same entrypoint, 17-stage chain unchanged).
+- ATTACK THAT DEFEATED OLD: title-foreign/abstract-rich evidence (admission refusal despite verified mechanism relevance); refusal-shaped fields becoming graph terms.
+- TESTS: new tests/test_r510_production_bridge.py 11/11 (10 §8 cases + threshold pins); r453 lean 22/22 incl. amended allowlist; C12 falsifier corrected (refusal->empty, genuine->measurable); support pins incl. re-pinned engine-delta; r401 suite: only pre-existing failures (5 TestIndependentAttack fake-signature drift + cost_policy pin, identical stashed).
+- COLLECTION: 3554 collected, 60 errors, zero in touched files (pre-existing env gaps).
+- UNKNOWN: whether abstract-routed admission yields newly retained candidates on live runs (before/after replay + fresh-input validation pending); whether unblocked #3/#6-class candidates survive downstream (untested by design here).
+- DEPLOYMENT: not deployed (d15aaa75 live; this build local-only pending auditor acceptance + operator push word).
+- FRESH RUN: pending (§11-§13 after acceptance).
+- NEXT BOTTLENECK: cemetery false-positive matcher (banked Cycle A) + contradiction blocks (#1/#4-class).
+- BS-021: zero values (this entry carries shas/ids only). Scope: 2 engine files + 3 test files + worklog. No deploy/resubmit/secret/rotation. STOP on scored sets observed throughout.
+- reviewer_provenance=AI_REVIEW

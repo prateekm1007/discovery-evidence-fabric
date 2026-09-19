@@ -573,6 +573,111 @@ class EvidenceVerifyAdapter(BaseAdapter):
             verified=res.get("verified"))
 
 
+def _lean_rel_band(relevance):
+    """Read the verifier's relevance measurement, if present.
+
+    Returns {"domain": bool|None, "mechanism": bool|None} — None means
+    the dimension was not measured (legacy envelopes), never False.
+    """
+    if not isinstance(relevance, dict):
+        return None
+
+    def _flag(dim):
+        v = relevance.get(dim) or {}
+        r = v.get("relevant")
+        return r if isinstance(r, bool) else None
+
+    return {"domain": _flag("domain"), "mechanism": _flag("mechanism")}
+
+
+def _lean_select_operator(items, problem):
+    """R510 production bridge: deterministic operator selection over the
+    verified items using canonical evidence (no invented content).
+
+    Routing (first satisfied wins, canonical OPERATOR_IDS order, so
+    DIRECT_TRANSFER keeps priority wherever its conditions hold):
+      - DIRECT_TRANSFER: the verifier's relevance measurement when
+        present (domain AND mechanism relevant on the FULL record text
+        under VERIFY's own rule table — strictly stronger than the
+        title proxy, same bar family); legacy title-view contract when
+        relevance is absent (preserved behavior, recorded as fallback).
+      - CROSS_DOMAIN_ANALOGY: verifier relevance with foreign domain
+        (domain False) AND mechanism overlap (the classifier's ANALOGY
+        shape) — explicit analogy routing, never accidental failure;
+        else the legacy contract.
+      - GEOMETRIC/Boundary/FAILURE_PATH: the existing input contracts
+        unchanged (no relevance equivalent exists; honestly recorded).
+    One instantiation call downstream regardless of how many
+    (item, operator) pairs are examined — contracts are pure
+    deterministic predicates (zero LLM fan-out). Everything examined
+    is recorded in evaluated; the selection basis is recorded.
+    """
+    from discovery_fabric.engine import mechanism_space as _ms
+    evaluated = []
+    selected = None
+    for it in items:
+        band = _lean_rel_band(it.get("relevance"))
+        for o in _ms.TRANSFORMATION_OPERATORS:
+            oid = o["operator_id"]
+            contract = None
+            satisfied = False
+            basis = ""
+            if oid == "DIRECT_TRANSFER" and band is not None \
+                    and band["domain"] is not None \
+                    and band["mechanism"] is not None:
+                if band["domain"] and band["mechanism"]:
+                    satisfied = True
+                    basis = ("verifier relevance: domain+failure+mechanism "
+                             "relevant on full record text (VERIFY rule "
+                             "table; VERIFY's thresholds, unchanged here)")
+                else:
+                    basis = ("verifier relevance: domain=%s mechanism=%s "
+                             "— not same-domain demonstrated; explicit "
+                             "routing, not accidental failure"
+                             % (band["domain"], band["mechanism"]))
+                contract = {"operator": oid, "satisfied": satisfied,
+                            "basis": basis, "route": "verifier-relevance"}
+            elif oid == "CROSS_DOMAIN_ANALOGY" and band is not None \
+                    and band["domain"] is False \
+                    and band["mechanism"] is not None:
+                if band["mechanism"]:
+                    satisfied = True
+                    basis = ("verifier relevance: foreign domain + "
+                             "mechanism overlap (classifier ANALOGY "
+                             "shape); explicit analogy routing")
+                else:
+                    basis = ("verifier relevance: no mechanism overlap "
+                             "— analogy inapplicable")
+                contract = {"operator": oid, "satisfied": satisfied,
+                            "basis": basis, "route": "verifier-relevance"}
+            else:
+                c = o["input_contract"](it, problem)
+                contract = c
+                satisfied = bool(c.get("satisfied"))
+                basis = ("legacy title-view contract: "
+                         + str(c.get("basis", ""))[:200])
+            evaluated.append({"item_id": it.get("item_id"),
+                              "operator": oid, "satisfied": satisfied,
+                              "basis": basis,
+                              "route": (contract or {}).get("route",
+                                                            "legacy-view")})
+            if satisfied and selected is None:
+                selected = (it, o, contract)
+    if selected is None:
+        return {"operator": None, "item": None, "contract": {
+            "satisfied": False,
+            "basis": "no (item, operator) pair satisfied any admission "
+                     "contract — honest refusal (Art. XXV)"},
+            "evaluated": evaluated,
+            "selection_basis": "none-satisfied"}
+    it, o, contract = selected
+    return {"operator": o, "item": it, "contract": contract,
+            "evaluated": evaluated,
+            "selection_basis": ("first satisfied in canonical operator "
+                                "order over verified items (deterministic; "
+                                "one instantiation call downstream)")}
+
+
 def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     """R453-LEAN-CORE: the lean mechanism-space construction (the
     external auditor mandate — no extraction fan-out; reuse the
@@ -581,13 +686,15 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
 
     The structured items are built DETERMINISTICALLY from the frozen
     evidence records the FREEZE stage custodied, joined to their
-    VERIFY-stage claim-level classification (the item's title is its
-    system descriptor for the operator's input contract; the record
-    text IS the evidence). ZERO LLM calls here. Then ONE
-    DIRECT_TRANSFER instantiation call on the top verified item, and
-    the deterministic validation/distinctness/verification tail reuses
-    the mechanism_space module's own instruments (same gates, no
-    second evaluator — Art. IV)."""
+    VERIFY-stage claim-level classification AND relevance measurement
+    (the item's title is its system descriptor; the abstract rides
+    as its own slot; the record text IS the evidence). ZERO LLM calls
+    here. Then ONE instantiation call with the deterministically
+    selected operator (canonical order, verifier-relevance routing
+    with legacy title-view fallback — see _lean_select_operator),
+    and the deterministic validation/distinctness/verification tail
+    reuses the mechanism_space module's own instruments (same gates,
+    no second evaluator — Art. IV)."""
     import hashlib as _h
     from . import stage_entry
     from discovery_fabric.engine import mechanism_space as _ms
@@ -609,7 +716,8 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             "item_id": f"lean_{rec.get('id')}",
             "structured_hash": _h.sha256(
                 record_text.encode("utf-8", "replace")).hexdigest(),
-            "fields": {"system": {"value": title}},
+            "fields": {"system": {"value": title},
+                       "abstract": {"value": abstract}},
             "source": rec.get("source") or rec.get("id"),
             "provenance": {
                 "content_hash": rec.get("content_hash"),
@@ -617,6 +725,12 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                 "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
                 "claim_classification": cls_item.get("classification"),
             },
+            # the verifier's relevance measurement, verbatim when the
+            # classifier emitted it (None on legacy envelopes): the
+            # canonical full-text overlap basis the operator selection
+            # consults instead of the title-only proxy (§6). Verbatim
+            # custody, never re-derived here.
+            "relevance": cls_item.get("relevance"),
             "_record_text": record_text,
         })
     space: Dict[str, Any] = {
@@ -626,7 +740,7 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                         "reused; at most one operator call)",
         "built_at": utc_now(),
         "problem_id": problem.get("problem_id", ""),
-        "operator_ids": ["DIRECT_TRANSFER"],
+        "operator_ids": [],
         "n_structured_items": len(items),
     }
     if not items:
@@ -646,17 +760,20 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
         "items": [{k: v for k, v in it.items()
                    if not k.startswith("_")} for it in items],
     }
-    # ---- the ONE operator generation call (DIRECT_TRANSFER, the top
-    #      verified item — deterministic selection; no corrective retry
-    #      on the lean path: one call is one call, the span/semantic
-    #      gates themselves are unchanged) --------------------------------
-    op = next((o for o in _ms.TRANSFORMATION_OPERATORS
-               if o["operator_id"] == "DIRECT_TRANSFER"), None)
-    item = items[0]
-    contract = op["input_contract"](item, problem) if op else {
-        "satisfied": False, "basis": "operator unavailable"}
+    # ---- the ONE operator generation call (deterministic selection
+    #      over verified items via _lean_select_operator: canonical
+    #      operator order, verifier-relevance routing with legacy title-
+    #      view fallback; no corrective retry on the lean path: one call
+    #      is one call, the span/semantic gates themselves are
+    #      unchanged) ---------------------------------------------------
+    sel = _lean_select_operator(items, problem)
+    op = sel["operator"]
+    item = sel["item"] if sel["item"] is not None else items[0]
+    contract = sel["contract"]
+    sel_id = op["operator_id"] if op else "NONE"
+    space["operator_ids"] = [sel_id] if op else []
     operator_result: Dict[str, Any] = {
-        "operator": "DIRECT_TRANSFER",
+        "operator": sel_id,
         "operator_version": op["version"] if op else "unknown",
         "transformation_rule": op["transformation_rule"] if op else "",
         "search_constraint": op["search_constraint"] if op else "",
@@ -665,22 +782,30 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
         "selected_item_ids": [item.get("item_id")]
         if contract.get("satisfied") else [],
         "input_contract": contract,
+        "operator_selection": {
+            "selected_operator": sel_id,
+            "selected_item_id": item.get("item_id")
+            if contract.get("satisfied") else None,
+            "selection_basis": sel["selection_basis"],
+            "contracts_evaluated": sel["evaluated"],
+        },
         "lean_path": ("one instantiation call, no corrective retry "
-                      "(R453-LEAN; the span/semantic gates unchanged)"),
+                      "(R453-LEAN; deterministic operator selection; "
+                      "the span/semantic gates unchanged)"),
         "candidates": [],
     }
     if not (op and contract.get("satisfied")):
         operator_result.update({
             "state": op["failure_state"] if op else "NO_APPLICABLE_EVIDENCE",
-            "note": ("the DIRECT_TRANSFER input contract was not "
-                     "satisfied by the top verified item — honest "
-                     "refusal, nothing fabricated (Art. XXV)"),
+            "note": ("no (item, operator) pair satisfied any admission "
+                     "contract — honest refusal, nothing fabricated "
+                     "(Art. XXV)"),
         })
     else:
-        item["_selection"] = {"selected_by": "DIRECT_TRANSFER",
+        item["_selection"] = {"selected_by": sel_id,
                               "contract": contract}
         prompt = _ms._OPERATOR_INSTANTIATION_PROMPTS[
-            "DIRECT_TRANSFER"].format(
+            sel_id].format(
             system=item["fields"].get("system") or "(unextracted)",
             mechanism=_ms._field_val(item, "mechanism") or "(unextracted)",
             observed_effect=_ms._field_val(item, "observed_effect")
@@ -701,7 +826,7 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             prompt,
             system="You are a rigorous mechanism engineer. Every "
                    "claim must derive from the given evidence.",
-            purpose="operator_DIRECT_TRANSFER")
+            purpose=f"operator_{sel_id}")
         if not meta.get("ok"):
             operator_result.update({
                 "state": "OPERATOR_INSTANTIATION_FAILED",
@@ -712,7 +837,7 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             fields = _ms._parse_candidate_fields(meta["content"] or "")
             cand = _ms.assemble_candidate(op, item, fields, problem, meta)
             sem = _ms.operator_semantic_check(
-                "DIRECT_TRANSFER", item, cand, problem)
+                sel_id, item, cand, problem)
             cand["operator_semantic_check"] = sem
             operator_result["candidates"] = [cand]
             operator_result["state"] = (
@@ -772,8 +897,9 @@ class MechanismSpaceAdapter(BaseAdapter):
     production path); the structured items are the FREEZE/VERIFY facts
     (the frozen evidence records + their claim-level classification —
     deterministic, zero LLM calls), and AT MOST ONE operator
-    instantiation call (DIRECT_TRANSFER on the top verified item),
-    only after admission passed. The module's own
+    instantiation call with the deterministically selected operator
+    (canonical order over verified items; R510 bridge), only after
+    admission passed. The module's own
     build_mechanism_space() remains the hermetic instrument its test
     battery exercises; the production role moved here (Art. LXIV:
     KEPT_BECAUSE test-covered instrument — the superseding production

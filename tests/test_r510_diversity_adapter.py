@@ -3,9 +3,11 @@
 Covers the new mechanism_graph_from_fields() mapping + its wiring into the
 dry-run adapter. Positive/negative/metamorphic cases are hand-built term sets
 (unit-testing the mapping/adjudicator contract, never discovery claims);
-the falsifier pair uses R510/GRID_MECHANISM_FIXTURE.json (live grid bytes).
-Frozen adjudicator thresholds untouched (0.45/0.8); existing mechanism_space
-suites must stay green (no behavior change to existing paths).
+the fixture pair uses R510/GRID_MECHANISM_FIXTURE.json (live grid refusal
+bytes — corrected per auditor §4: refusal stays absence) plus genuine-text
+positive controls. Frozen adjudicator thresholds untouched (0.45/0.8);
+existing mechanism_space suites must stay green (guard is behavior-identical
+on non-absence text).
 """
 
 import json
@@ -83,18 +85,58 @@ def test_metamorphic_rewording_never_creates_distinct():
     assert cmp["verdict"] != "DISTINCT"
 
 
-def test_falsifier_fixture_pair_has_measurable_core():
-    # Banked falsifier: non-empty graph nodes on real grid bytes, core_j != None.
+def test_falsifier_fixture_refusal_stays_absence():
+    # CORRECTED (auditor §4 order; was asserting non-empty nodes on
+    # refusal bytes): the R510/GRID_MECHANISM_FIXTURE.json entries are
+    # explicit refusal text ("No mechanism can be extracted...",
+    # "source text is missing", ...). Absence must remain absence —
+    # refusal-shaped fields yield EMPTY node sets, never graph
+    # vocabulary. The fixture file itself is frozen evidence and is
+    # NOT modified; only this test's assertions change, for the
+    # recorded reason.
     fx = json.loads((REPO / "R510" / "GRID_MECHANISM_FIXTURE.json").read_text(
         encoding="utf-8"))["entries"]
     assert len(fx) >= 2
     graphs = [ms.mechanism_graph_from_fields(e["fields"]) for e in fx[:2]]
-    assert all(g["nodes"] for g in graphs), "empty core on live bytes"
-    a = _cand("f0", graphs[0])
-    b = _cand("f1", graphs[1])
+    assert all(g["nodes"] == {} for g in graphs), (
+        "refusal text became graph terms: %s"
+        % [g["nodes"] for g in graphs])
+    assert all(g["edges"] == [] for g in graphs)
+
+
+def test_falsifier_genuine_content_stays_measurable():
+    # Positive control kept: genuine mechanism-bearing text still
+    # produces a non-empty, comparable core (the helper's purpose).
+    a = ms.mechanism_graph_from_fields(
+        {"mechanism": "pump cavitation erosion pits the inducer",
+         "intervention": "inducer leading-edge redesign",
+         "expected_effect": "erosion rate falls"})
+    b = ms.mechanism_graph_from_fields(
+        {"mechanism": "heparin coating elutes anticoagulant",
+         "intervention": "graft surface coating",
+         "expected_effect": "thrombosis rate falls"})
+    assert a["nodes"] and b["nodes"]
     import re
-    basis = ms.compare_candidates(a, b)["basis"]
+    basis = ms.compare_candidates(_cand("f0", a),
+                                  _cand("f1", b))["basis"]
     assert re.search(r"Jaccard (None|0\.\d+)", basis), basis
+
+
+def test_absence_guard_cases():
+    # The ordered absence vocabulary (data v1): refusal shapes stay
+    # empty; a legitimate negative RESULT still tokenizes (it is
+    # evidence content, not extraction failure).
+    assert ms.mechanism_graph_from_fields(
+        {"mechanism": "No mechanism can be extracted because the "
+                      "source text is empty."})["nodes"] == {}
+    assert ms.mechanism_graph_from_fields(
+        {"mechanism": "UNEXTRACTED"})["nodes"] == {}
+    assert ms.mechanism_graph_from_fields(
+        {"intervention": "None derivable — no design change present "
+                         "in the source."})["nodes"] == {}
+    legit = ms.mechanism_graph_from_fields(
+        {"expected_effect": "no effect was observed at low doses"})
+    assert legit["nodes"], "legitimate negative results must tokenize"
 
 
 def test_dryrun_wiring_includes_graph():

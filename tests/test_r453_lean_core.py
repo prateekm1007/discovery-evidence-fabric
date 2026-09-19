@@ -531,6 +531,14 @@ class TestDeletionAccounting(unittest.TestCase):
                     # exercised through its own battery, not this
                     # mandate's accounting)
                     "discovery_fabric/engine/cheap_screen.py",
+                    # R510-BRIDGE AMENDMENT (disclosed): the production
+                    # evidence-bridge repair adds the epistemic-absence
+                    # guard + the shared guarded term engine to
+                    # mechanism_space.py (thresholds, instruments, and
+                    # adjudicator untouched); adapters.py carries the
+                    # lean-side selection. Same mandate accounting
+                    # otherwise.
+                    "discovery_fabric/engine/mechanism_space.py",
                     # R495 AMENDMENT (disclosed): the A2 burden-of-
                     # proof instrument is the R490-owned calibration
                     # surface — v4.2 (the attacker-computes standard)

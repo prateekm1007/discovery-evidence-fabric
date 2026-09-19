@@ -578,18 +578,20 @@ def build_mechanism_graph(structured_item: Dict[str, Any],
     nodes = {
         "intervention_site": {
             "label": "INTERVENTION",
-            "terms": sorted(_terms(intervention))[:20]},
+            "terms": _guarded_role_terms(intervention)[:20]},
         "causal_agent": {
             "label": "MECHANISM",
-            "terms": sorted(_terms(mechanism) | _terms(
-                f.get("mechanism", "")))[:20]},
+            "terms": sorted(set(_guarded_role_terms(mechanism))
+                            | set(_guarded_role_terms(
+                                f.get("mechanism", ""))))[:20]},
         "physical_effect": {
             "label": "PREDICTED_EFFECT",
-            "terms": sorted(_terms(
-                candidate_fields.get("predicted_effect", "")))[:20]},
+            "terms": _guarded_role_terms(
+                candidate_fields.get("predicted_effect", ""))[:20]},
         "observed_outcome": {
             "label": "OBSERVED_EFFECT",
-            "terms": sorted(_terms(f.get("observed_effect", "")))[:20]},
+            "terms": _guarded_role_terms(
+                f.get("observed_effect", ""))[:20]},
     }
     edges = [
         {"from": "intervention_site", "to": "causal_agent",
@@ -1351,6 +1353,50 @@ CAUSAL_CORE_DISTINCT_FLOOR = 0.45       # below = materially different core
 # prove (Art. VI); nodes carry per-role term sets, edges stay empty.
 GRAPH_SOURCE_ROLES = ("mechanism", "intervention", "expected_effect")
 
+# Epistemic-absence vocabulary (R510 production bridge, authorized build):
+# role text matching any of these patterns is a REFUSAL/ABSENCE statement
+# about the source, never mechanism content — it contributes ZERO terms
+# (Art. VI/XXV: unknown stays unknown; auditor §4 order). Patterns anchor
+# on EXTRACTION-FAILURE vocabulary (extract/derive/state/provide/source/
+# abstract/data), never on bare negations: a legitimate negative RESULT
+# ("no effect was observed at low doses") matches nothing here and
+# tokenizes normally. Recorded as data v1, disclosed.
+_ABSENCE_PATTERNS = (
+    r"\bunextracted\b",
+    r"\bnone\s+derivable\b",
+    r"\bcannot\s+(extract|derive|predict|determine)\b",
+    r"\bcan\s+not\s+be\s+(extracted|derived|predicted)\b",
+    r"can't\s+(extract|derive|predict)\b",
+    r"\bunable\s+to\s+(extract|derive|predict|determine)\b",
+    r"\bsource\s+(text\s+is\s+)?missing\b",
+    r"\babstract\s+(is\s+)?empty\b",
+    r"\bsource\s+text\s+is\s+empty\b",
+    r"\bmissing\s+data\b",
+    r"\binsufficient\s+data\b",
+    r"\bnot\s+(stated|provided|specified|available)\b",
+    r"\bno\s+mechanism\s+can\b",
+    r"\bno\s+intervention\s+can\b",
+    r"\bno\s+effect\s+can\b",
+)
+_ABSENCE_RES = tuple(re.compile(p, re.IGNORECASE)
+                     for p in _ABSENCE_PATTERNS)
+
+
+def _is_absence_text(text: str) -> bool:
+    """True iff the role text is an explicit absence/refusal statement."""
+    t = str(text or "")
+    return bool(t) and any(p.search(t) for p in _ABSENCE_RES)
+
+
+def _guarded_role_terms(text: str) -> list:
+    """Shared term engine (R510 production bridge): canonical tokenizer
+    output, except absence/refusal text yields [] (never graph content).
+    Consumed by mechanism_graph_from_fields AND build_mechanism_graph —
+    one guarded engine, one authority (§9)."""
+    if _is_absence_text(text):
+        return []
+    return sorted(_terms(text))
+
 
 def mechanism_graph_from_fields(fields: Dict[str, Any]
                                 ) -> Dict[str, Any]:
@@ -1363,7 +1409,7 @@ def mechanism_graph_from_fields(fields: Dict[str, Any]
     """
     nodes: Dict[str, Any] = {}
     for role in GRAPH_SOURCE_ROLES:
-        terms = sorted(_terms((fields or {}).get(role, "")))
+        terms = _guarded_role_terms((fields or {}).get(role, ""))
         if terms:
             nodes[role] = {"terms": terms}
     return {"nodes": nodes, "edges": [],
