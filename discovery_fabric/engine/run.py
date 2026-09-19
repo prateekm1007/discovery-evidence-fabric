@@ -66,6 +66,23 @@ DOWNSTREAM_BLOCKERS = {
 }
 
 
+def _cemetery_sandbox_path(out_dir: Any) -> Path:
+    """Dry-run cemetery sandbox path (fail-closed): the sandbox file
+    must resolve INSIDE the run out-dir. A path escaping the run
+    directory raises ValueError (the run is refused — never writes
+    outside). Resolved (symlinks/.. eliminated) before the
+    containment check, so traversal cannot sneak past it."""
+    base = Path(out_dir).resolve()
+    box = base / "cemetery" / "CEMETERY.json"
+    try:
+        box.relative_to(base)
+    except ValueError:
+        raise ValueError(
+            "dry-run cemetery sandbox escapes the run directory "
+            f"(out={out_dir}) — run refused (fail closed)")
+    return box
+
+
 class EngineRun:
     def __init__(self, problem: Dict[str, Any], out_dir: str,
                  credentials_path: Optional[str] = None,
@@ -77,7 +94,10 @@ class EngineRun:
                  resume: bool = False,
                  event_callback: Optional[Callable] = None,
                  session_id: Optional[str] = None,
-                 stage_gate: Optional[Callable] = None):
+                 stage_gate: Optional[Callable] = None,
+                 dry_run: bool = False,
+                 fixture_transport: Optional[Any] = None,
+                 fixture_evidence: Optional[List[Dict[str, Any]]] = None):
         # R431: optional journal callback — called (stage, envelope)
         # each time a stage envelope is persisted (the moment the
         # operation occurs). No engine-side journal dependency.
@@ -131,6 +151,31 @@ class EngineRun:
         # resume fact is recorded in the run manifest for honesty.
         self.resume = resume
         self.resumed_from_stage: Optional[str] = None
+        # Dry-run fixture mode (final-stretch directive, ONE cliff):
+        # explicit opt-in ONLY. Fixture args without dry_run=True are
+        # refused at construction (a fixture transport can never
+        # activate on the LIVE path). dry_run=True is recorded in the
+        # manifest and every dry-run artifact carries DRY_RUN_FIXTURE
+        # provenance with r506_eligible=False.
+        if (fixture_transport is not None or fixture_evidence
+                is not None) and not dry_run:
+            raise ValueError(
+                "fixture_transport/fixture_evidence require "
+                "dry_run=True (fixture transport cannot activate in "
+                "LIVE)")
+        if dry_run and fixture_transport is None:
+            raise ValueError(
+                "dry_run=True requires fixture_transport (a dry run "
+                "without fixtures is not a dry run — stages would "
+                "call live providers)")
+        self.dry_run = bool(dry_run)
+        self.fixture_transport = fixture_transport
+        if self.dry_run and fixture_evidence:
+            self.env.evidence = [dict(e) for e in fixture_evidence]
+        # Monotonic tail timing (post-rank pipeline + evolution):
+        # additive performance measurement for the dry-run funnel
+        # (provenance timestamps untouched).
+        self._tail_durations: Dict[str, float] = {}
         # CEO Directive 1: the survivor -> package pipeline is AUTOMATIC in
         # production mode. A normal successful survivor ALWAYS produces
         # INVENTION_SPECIFICATION -> ENGINEERING_SPECIFICATION ->
@@ -200,7 +245,8 @@ class EngineRun:
         p = self.out / name
         tmp = p.parent / (p.name + ".tmp")
         tmp.write_text(json.dumps(obj, indent=1, ensure_ascii=False,
-                                  default=str))
+                                  default=str),
+                       encoding="utf-8")
         os.replace(tmp, p)
 
     def _persist_envelope(self, stage: str):
@@ -233,6 +279,12 @@ class EngineRun:
             "credentials_loaded": self.credentials_loaded,
             "resumed": bool(self.resume),
             "started_at": utc_now(),
+            "dry_run": self.dry_run,
+            "dry_run_provenance": ("DRY_RUN_FIXTURE" if self.dry_run
+                                   else None),
+            "fixture_bundle": (getattr(self.fixture_transport,
+                                       "bundle_id", None)
+                               if self.dry_run else None),
         }
         # R510 consumption contract (§3): a problem carrying a reality
         # block binds its knowledge references into the run's own input
@@ -256,12 +308,43 @@ class EngineRun:
         from . import call_context as _cctx
         _ctx_token = _cctx.bind_run(self.run_id,
                                     session_id=self.session_id)
+        _fx_token = None
+        if self.dry_run and self.fixture_transport is not None:
+            _fx_token = _cctx.bind_fixture(self.fixture_transport)
+        _cem_restored = None
+        if self.dry_run:
+            # Cemetery sandbox (fail-closed): dry-run cemetery writes
+            # are isolated to the run directory (see
+            # _cemetery_sandbox_path — escape refuses the run, a
+            # sandbox that cannot be established refuses the run
+            # rather than letting cemetery writes reach production
+            # state (Art. IX)).
+            _cem_box = _cemetery_sandbox_path(self.out)
+            try:
+                from orchestrator import mechanism_cemetery as _mc
+            except Exception as _cem_exc:
+                raise ValueError(
+                    "dry-run cemetery sandbox unavailable "
+                    f"({_cem_exc}) — run refused rather than "
+                    "writing cemetery state to production "
+                    "(fail closed)")
+            _cem_restored = _mc.CEMETERY_PATH
+            _mc.CEMETERY_PATH = _cem_box
         try:
             result = self._run_inner(manifest)
         finally:
+            if _fx_token is not None:
+                _cctx.unbind_fixture(_fx_token)
+            if _cem_restored is not None:
+                # Restore LOUDLY: a sandbox redirect leaking into
+                # subsequent LIVE execution would corrupt production
+                # cemetery state — silence here is forbidden (Art. IX).
+                from orchestrator import mechanism_cemetery as _mc2
+                _mc2.CEMETERY_PATH = _cem_restored
             _cctx.unbind(_ctx_token)
         self._write_reality_consumption()
         self._write_search_consumption()
+        self._write_dry_run_records()
         return result
 
     def _write_reality_consumption(self):
@@ -334,6 +417,52 @@ class EngineRun:
                     {"error": "%s: %s" % (type(exc).__name__,
                                           str(exc)[:200]),
                       "trigger_event_id": block.get("trigger_event_id")})
+            except Exception:
+                pass
+
+    def _write_dry_run_records(self):
+        """Dry-run portfolio + funnel (ONE cliff): gated on dry_run.
+        Built from this run's OWN persisted artifacts (never
+        re-derived inputs, never live evidence). Failures recorded
+        as DRY_RUN_RECORDS_ERROR.json, never fatal, never touching
+        live records."""
+        if not self.dry_run:
+            return
+        try:
+            from . import dry_run as _dr
+            _bundle = getattr(self.fixture_transport, "bundle_id",
+                              "dry-run-bundle/1")
+            _bundle_ident = ""
+            try:
+                _bundle_ident = (
+                    self.fixture_transport.input_identity()
+                    if self.fixture_transport is not None else "")
+            except Exception:
+                _bundle_ident = ""
+            portfolio = _dr.build_portfolio(
+                str(self.out), dict(self.problem or {}), self.run_id,
+                _bundle, _bundle_ident)
+            self._persist("CANDIDATE_PORTFOLIO.json", portfolio)
+            funnel = _dr.build_funnel(
+                str(self.out), list(self.env.stage_log),
+                self.fixture_transport.telemetry()
+                if self.fixture_transport is not None else {},
+                portfolio, self.run_id, _bundle,
+                problem=dict(self.problem or {}),
+                bundle_identity=_bundle_ident,
+                final_status=str((self.env.epistemic_state or {}).get(
+                    "final_status", "")
+                    if isinstance(self.env.epistemic_state, dict)
+                    else self.env.epistemic_state or ""),
+                tail=dict(self._tail_durations))
+            self._persist("DRY_RUN_FUNNEL.json", funnel)
+        except Exception as exc:  # noqa: BLE001 — visible, never fatal
+            try:
+                self._persist(
+                    "DRY_RUN_RECORDS_ERROR.json",
+                    {"error": "%s: %s" % (type(exc).__name__,
+                                          str(exc)[:200]),
+                     "run_id": self.run_id})
             except Exception:
                 pass
 
@@ -678,7 +807,11 @@ class EngineRun:
                                     "state comes from the standard "
                                     "classifiers (ADJUDICATION/CLASSIFY)")})
             else:
+                import time as _time
+                _tail_t0 = _time.perf_counter()
                 self._post_rank_pipeline(run_ctx={"run_id": self.run_id})
+                self._tail_durations["post_rank_pipeline_s"] = (
+                    _time.perf_counter() - _tail_t0)
 
         # ------------- R416: the causal evolution pipeline -----------------
         # Product contract (honest-causes-evolution-v1): every valid
@@ -767,8 +900,12 @@ class EngineRun:
                     })
                 else:
                     try:
+                        import time as _time2
+                        _evo_t0 = _time2.perf_counter()
                         evolution_summary = self._evolution_pipeline(
                             {"run_id": self.run_id}, final)
+                        self._tail_durations["evolution_s"] = (
+                            _time2.perf_counter() - _evo_t0)
                         if evolution_summary and \
                                 evolution_summary.get("final_state"):
                             final = dict(evolution_summary["final_state"])
@@ -1230,6 +1367,15 @@ class EngineRun:
                     continue
                 op = c.get("transformation_operator", "OP")
                 _ms_seq[op] = _ms_seq.get(op, 0) + 1
+                # primary_source is a dict on the structured path but a
+                # plain source-name string on the lean path (adapters
+                # R453: rec source/id) — a string carries no
+                # content_hash; unknown stays unknown (Art. XXV).
+                _ms_primary_source = (
+                    (c.get("evidence_bundle") or {}).get("primary_source"))
+                _ms_source_hash = (
+                    _ms_primary_source.get("content_hash", "")
+                    if isinstance(_ms_primary_source, dict) else "")
                 mech_cand = {
                     "candidate_id": c["candidate_id"],
                     "mechanism": c.get("mechanism", ""),
@@ -1243,9 +1389,7 @@ class EngineRun:
                     "source_evidence": {
                         "source_id": (c.get("evidence_bundle") or {})
                         .get("primary_item_id", ""),
-                        "source_hash": ((c.get("evidence_bundle") or {})
-                                        .get("primary_source") or {})
-                        .get("content_hash", "")},
+                        "source_hash": _ms_source_hash},
                     "mechanism_support": c.get("mechanism_support"),
                     "mechanism_space_candidate": c,
                     "derivation_trace": c.get("derivation_trace"),
@@ -2143,10 +2287,12 @@ class EngineRun:
                 "recorded_at": utc_now(),
             })
         except Exception as exc:  # noqa: BLE001 — explicit, never fabricated
+            import traceback as _tb
             self.package_failure = f"{type(exc).__name__}: {exc}"
             self._persist("PACKAGE_FAILED.json", {
                 "stage": "POST_RANK_PIPELINE",
                 "error": self.package_failure,
+                "traceback": _tb.format_exc()[-3000:],
                 "timestamp": utc_now()})
 
     # ------------------------------------------------------------------

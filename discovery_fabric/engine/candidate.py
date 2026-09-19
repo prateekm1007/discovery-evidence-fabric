@@ -14,6 +14,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
@@ -120,6 +121,10 @@ class Candidate:
         never silent skips (Art. IV) and never fabricated success (Art. VI).
         """
         before = self.envelope_hash()
+        # Monotonic high-resolution stage timing (dry-run performance
+        # measurement; Art. LXXXIII funnel durations). ADDITIVE ONLY:
+        # started_at/finished_at provenance timestamps are unchanged.
+        _mono_start = time.perf_counter()
         entry: Dict[str, Any] = {
             "stage": stage_name,
             "capability_id": capability_id,
@@ -135,6 +140,7 @@ class Candidate:
                 "status": "FAILED_EXPLICIT",
                 "error": f"{type(exc).__name__}: {exc}",
                 "finished_at": utc_now(),
+                "duration_monotonic_s": time.perf_counter() - _mono_start,
                 "after_envelope_hash": before,
                 "candidate_delta": [],
                 "delta_real": False,
@@ -160,6 +166,7 @@ class Candidate:
         entry.update({
             "status": "OK",
             "finished_at": utc_now(),
+            "duration_monotonic_s": time.perf_counter() - _mono_start,
             "after_envelope_hash": after,
             "candidate_delta": delta_keys,
             "delta_real": after != before,

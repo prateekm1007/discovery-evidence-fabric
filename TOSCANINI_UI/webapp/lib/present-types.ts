@@ -104,6 +104,14 @@ export interface CandidateView {
   maturity: string | null;
   current: boolean;
   killed: boolean;
+  // R510 dry-run cliff: canonical portfolio fields, passed through
+  // VERBATIM from the backend's portfolio projection (never derived
+  // in React — no client-side rank, distinctness, or ordering).
+  // Null when the backend served no portfolio record.
+  candidateId: string | null;
+  rank: number | null;
+  distinctness: string | null;
+  rankingBasis: string | null;
 }
 
 export interface NextAction {

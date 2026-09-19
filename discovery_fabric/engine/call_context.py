@@ -42,6 +42,9 @@ _ACTIVE: ContextVar[Optional[Dict[str, Any]]] = ContextVar(
     "engine_call_context", default=None)
 _LOCK = threading.Lock()
 
+_FIXTURE: ContextVar[Optional[Any]] = ContextVar(
+    "engine_fixture_transport", default=None)
+
 RUN_OWNED = "RUN_OWNED"
 STANDALONE = "STANDALONE"
 CAPABILITY_PROBE = "CAPABILITY_PROBE"
@@ -75,6 +78,22 @@ def set_stage(stage: str) -> None:
 def current() -> Optional[Dict[str, Any]]:
     ctx = _ACTIVE.get()
     return dict(ctx) if ctx else None
+
+
+def bind_fixture(fixture: Any) -> Any:
+    """Bind a dry-run fixture transport for this context (EngineRun
+    binds it for the whole run lifetime in dry-run mode ONLY).
+    Default None: LIVE behavior never consults a fixture."""
+    return _FIXTURE.set(fixture)
+
+
+def unbind_fixture(token: Any) -> None:
+    _FIXTURE.reset(token)
+
+
+def fixture() -> Optional[Any]:
+    """The bound dry-run fixture transport, or None on the LIVE path."""
+    return _FIXTURE.get()
 
 
 def effective(run_id: Optional[str] = None) -> Dict[str, Any]:

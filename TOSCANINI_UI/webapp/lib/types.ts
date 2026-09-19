@@ -560,6 +560,10 @@ export interface RunStateObject {
   // THIS, never client-side inference.
   generations?: GenerationsProjection | null;
   evolution_state?: EvolutionLivePhase | null;
+  // R510 dry-run cliff: canonical ranked portfolio projection (see
+  // CanonicalPortfolioProjection). Served by the backend when the
+  // run persisted CANDIDATE_PORTFOLIO.json; absent otherwise.
+  portfolio?: CanonicalPortfolioProjection | null;
   schema_version?: string;
 }
 
@@ -644,6 +648,34 @@ export interface EvolutionLivePhase {
   label: string;
   subline: string;
   note?: string;
+}
+
+// R510 dry-run cliff: the canonical ranked candidate portfolio as the
+// backend serves it (projected verbatim from the run's
+// CANDIDATE_PORTFOLIO.json — the UI reads rank, identity,
+// distinctness and ranking basis from THESE fields and derives
+// nothing: no client-side sort, no client-side scoring, no order
+// inference. Null/absent when the backend has no portfolio record.)
+export interface CanonicalPortfolioItem {
+  candidate_id?: string | null;
+  rank?: number | null;
+  mechanism?: string | null;
+  intervention?: string | null;
+  predicted_effect?: string | null;
+  falsification_test?: string | null;
+  distinctness?: string | null;
+  ranking_basis?: Record<string, number> | null;
+  ranking_rule?: string | null;
+  state?: string | null;
+  origin?: string | null;
+  provenance?: string | null;
+}
+
+export interface CanonicalPortfolioProjection {
+  candidates: CanonicalPortfolioItem[];
+  candidate_count_ranked?: number | null;
+  mode?: string | null;
+  r506_eligible?: boolean | null;
 }
 
 export interface CIOMaturity {

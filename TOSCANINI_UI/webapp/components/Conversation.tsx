@@ -141,10 +141,30 @@ function Candidates({
         >
           <div className="conv-cand-head">
             <span className="conv-cand-label">{c.label}</span>
+            {c.rank !== null && c.rank !== undefined && (
+              <span className="conv-rank" data-conv-rank>
+                Rank {c.rank}
+              </span>
+            )}
             <span className={`conv-attack atk-${c.attack.toLowerCase()}`}>
               {ATTACK_LABEL[c.attack] ?? c.attack}
             </span>
           </div>
+          {c.candidateId && (
+            <div className="conv-cand-id faint" data-conv-candidate-id>
+              {c.candidateId}
+            </div>
+          )}
+          {c.distinctness && (
+            <div className="conv-cand-distinct" data-conv-distinctness>
+              Distinctness: {c.distinctness}
+            </div>
+          )}
+          {c.rankingBasis && (
+            <div className="conv-cand-basis faint" data-conv-ranking-basis>
+              Ranking basis: {c.rankingBasis}
+            </div>
+          )}
           {c.maturity && (
             // R461 (independent audit P1-10): the maturity boundary is
             // FIRST-LINE — a human sentence that can never read as

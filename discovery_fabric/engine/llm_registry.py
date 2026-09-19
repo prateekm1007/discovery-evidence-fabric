@@ -1154,6 +1154,33 @@ def availability_matrix() -> List[Dict[str, Any]]:
     call-model — credential presence is a configuration fact, never
     capability evidence (the C1.3-1 rule). Read-only derivation: this
     function performs NO probes."""
+    from . import call_context as _cctx2
+    if _cctx2.fixture() is not None:
+        return [{
+            "provider_id": "DRY_RUN_FIXTURE",
+            "env_var": "DRY_RUN_FIXTURE_MODE",
+            "available": True,
+            "key_ring_env_vars": [],
+            "key_slots_present": [],
+            "key_slot_active": None,
+            "model": "fixture-text/1",
+            "quality_tier": "FIXTURE",
+            "cost_tier": "none",
+            "latency_tier": "instant",
+            "context_capacity_tokens": 0,
+            "cost_basis": "no-charge-fixture",
+            "locality": "in-process-fixture",
+            "license": "n/a-fixture",
+            "model_revision": "fixture/1",
+            "account_domain": "none",
+            "cost_policy": None,
+            "cost_policy_eligible": True,
+            "cost_policy_note": "fixture transport: no charge, no "
+                                "credential (dry-run only)",
+            "capability_state": "FIXTURE",
+            "policy_note": "dry-run fixture provider (test transport; "
+                           "never epistemic evidence)",
+        }]
     from . import runtime_admission as _ra
     reconcile_runtime_classifications()  # R483: the re-point class authority
     policy = _cost_policy.active_policy()
@@ -1567,6 +1594,23 @@ def generate(prompt: str, system: str = "",
     cascade under load served the free-tier ring and the same rules
     measured FPR 1.0 live vs 0.25 on the strong ring's outputs).
     Production paths never set it (Art. V stands for them)."""
+    from . import call_context as _cctx
+    _fixture = _cctx.fixture()
+    if _fixture is not None:
+        _purpose = ""
+        _route = ""
+        try:
+            _purpose = str((policy.purpose if policy is not None
+                            else "") or "")
+            _pref = (policy.preferred_providers
+                     if policy is not None else None) or []
+            _route = str(_pref[0]) if _pref else ""
+        except Exception:
+            _purpose = ""
+            _route = ""
+        return _fixture.serve(prompt=prompt, system=system,
+                              purpose=_purpose, run_id=run_id,
+                              timeout=timeout, route=_route)
     from .provider_health import (ROLE_SYNTHESIS, HEALTH, classify_failure,
                                   order_for_role, role_for_purpose)
     from . import model_routing as mr

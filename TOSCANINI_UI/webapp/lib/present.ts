@@ -384,6 +384,29 @@ function strongestChallengeSentence(detail: SessionDetail): string | null {
 // ---------------------------------------------------------------------------
 
 export function deriveCandidates(detail: SessionDetail): CandidateView[] {
+  // R510 dry-run cliff: when the backend serves the canonical ranked
+  // portfolio projection, it is rendered VERBATIM in canonical order
+  // (no client-side sort, no derived rank/distinctness — React reads).
+  const portfolio = detail.run_state?.portfolio?.candidates ?? null;
+  if (portfolio !== null) {
+    return portfolio.map((p) => ({
+      label: p.candidate_id ?? "candidate",
+      intervention: p.intervention ?? null,
+      mechanism: p.mechanism ?? null,
+      why: p.predicted_effect ?? null,
+      whatChanged: null,
+      risk: p.falsification_test ?? null,
+      attack: "NOT_RUN" as AttackState,
+      maturity: p.state ?? null,
+      current: false,
+      killed: false,
+      candidateId: p.candidate_id ?? null,
+      rank: typeof p.rank === "number" ? p.rank : null,
+      distinctness: p.distinctness ?? null,
+      rankingBasis:
+        p.ranking_basis != null ? JSON.stringify(p.ranking_basis) : null,
+    }));
+  }
   const gens = detail.run_state?.generations?.generations ?? [];
   return gens.map((g) => {
     const ch = g.challenge ?? {};
@@ -403,6 +426,10 @@ export function deriveCandidates(detail: SessionDetail): CandidateView[] {
       current:
         detail.run_state?.generations?.current_invention?.gen === g.gen,
       killed: ch.killed === true,
+      candidateId: null,
+      rank: null,
+      distinctness: null,
+      rankingBasis: null,
     };
   });
 }
