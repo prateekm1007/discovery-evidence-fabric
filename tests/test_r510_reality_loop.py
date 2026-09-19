@@ -656,6 +656,38 @@ def test_forged_finalized_without_ledger_is_unknown(tmp_path):
     assert rec["execution_state"] == "UNKNOWN"
 
 
+class _EffectLauncher:
+    """Identity-preserving test double (§11): models idempotent remote
+    execution as an effect registry keyed by launch_id. Retries with
+    the same launch id converge on ONE effect; receipts converge on
+    the same child. fail modes: None | "timeout-after-effect"
+    (records the effect, then raises like a lost response) |
+    "reject" (raises LauncherRejected with no effect)."""
+
+    def __init__(self, fail=None):
+        self.effects = {}
+        self.calls = []
+        self.fail = fail
+
+    def __call__(self, req):
+        lid = req["launch_id"]
+        self.calls.append(lid)
+        if lid in self.effects:
+            return dict(self.effects[lid], duplicate=True)
+        if self.fail == "reject":
+            raise ri.LauncherRejected("admission refused (test)")
+        ex = {"launch_id": lid,
+              "child_run_id": req["child_run_id"], "state": "RUNNING"}
+        self.effects[lid] = ex
+        if self.fail == "timeout-after-effect":
+            self.fail = None
+            raise TimeoutError("response lost after effect (test)")
+        return dict(ex, receipt=True)
+
+    def check(self, launch_id, hint=None):
+        return self.effects.get(launch_id)
+
+
 def test_claimed_abandoned_recovers_single_launch(tmp_path):
     with _cemetery(tmp_path):
         _exec(_event("EV-AB-1", verdict="KILL"),
@@ -669,13 +701,204 @@ def test_claimed_abandoned_recovers_single_launch(tmp_path):
     req["claim"] = {"claimed_at": "2026-01-01T00:00:00Z",
                     "note": "simulated crash between claim and launch"}
     req_path.write_text(json.dumps(req), encoding="utf-8")
-    calls = []
+    fx = _EffectLauncher()
     with _cemetery(tmp_path):
         out = ri.resume_pending_children(
-            str(tmp_path / "ledger"), _fake_launcher(calls))
-    assert calls == ["EV-AB-1"], calls
+            str(tmp_path / "ledger"), fx, fx.check)
     assert [l["trigger"] for l in out["launched"]] == ["EV-AB-1"]
+    assert len(fx.effects) == 1
     out2 = ri.resume_pending_children(
-        str(tmp_path / "ledger"), _fake_launcher(calls))
+        str(tmp_path / "ledger"), fx, fx.check)
     assert out2["launched"] == []
-    assert calls == ["EV-AB-1"], calls
+    assert len(fx.effects) == 1
+    req2 = json.loads(req_path.read_text())
+    assert req2["status"] == "LAUNCHED"
+    assert req2["launch_id"] == req["launch_id"]
+
+
+def _kill_request(tmp_path, eid="EV-ADV-1"):
+    with _cemetery(tmp_path):
+        _exec(_event(eid, verdict="KILL"),
+              str(tmp_path / "ledger"), run_launcher=None,
+              parent_problem=dict(PARENT_PROBLEM),
+              parent_run_id=PARENT_RUN,
+              cemetery_path=_kill_cemetery(tmp_path))
+    return json.loads((tmp_path / "ledger" / "child_requests" /
+                       (eid + ".json")).read_text())
+
+
+# A. stale claim cannot fork a second child -------------------------------
+def test_a_stale_claim_cannot_fork(tmp_path):
+    req = _kill_request(tmp_path, "EV-ADV-A")
+    lid = req["launch_id"]
+    claimed, _ = ri._claim_child(str(tmp_path / "ledger"), "EV-ADV-A")
+    assert claimed is True
+    fx = _EffectLauncher()
+    with _cemetery(tmp_path):
+        out = ri.resume_pending_children(
+            str(tmp_path / "ledger"), fx, fx.check)
+    assert [l["trigger"] for l in out["launched"]] == ["EV-ADV-A"]
+    assert list(fx.effects) == [lid]
+    cur = json.loads((tmp_path / "ledger" / "child_requests" /
+                      "EV-ADV-A.json").read_text())
+    assert cur["status"] == "LAUNCHED"
+
+
+# B. death before receipt recovers the same launch id -----------------------
+def test_b_death_before_receipt_same_id(tmp_path):
+    req = _kill_request(tmp_path, "EV-ADV-B")
+    lid = req["launch_id"]
+    claimed, _ = ri._claim_child(str(tmp_path / "ledger"), "EV-ADV-B")
+    assert claimed is True
+    fx = _EffectLauncher()
+    with _cemetery(tmp_path):
+        out = ri.reconcile_unknown_launch(
+            str(tmp_path / "ledger"), "EV-ADV-B", fx, fx.check)
+    assert out["state"] == "LAUNCHED", out
+    assert out["child_run_id"] == req["child_run_id"]
+    assert len(fx.effects) == 1
+    assert list(fx.effects) == [lid]
+    cur = json.loads((tmp_path / "ledger" / "child_requests" /
+                      "EV-ADV-B.json").read_text())
+    assert cur["status"] == "LAUNCHED"
+    assert cur["launch_id"] == lid
+
+
+# C. lost response adopts the existing effect ---------------------------------
+def test_c_lost_response_adopts_no_second_effect(tmp_path):
+    _kill_request(tmp_path, "EV-ADV-C")
+    fx = _EffectLauncher(fail="timeout-after-effect")
+    with _cemetery(tmp_path):
+        out = ri.resume_pending_children(
+            str(tmp_path / "ledger"), fx, fx.check)
+    assert out["launched"] == [], out
+    assert any("UNKNOWN" in str(f.get("error", "")) or
+               "ambiguous" in str(f.get("error", ""))
+               for f in out["failed"]), out
+    assert len(fx.effects) == 1
+    assert len(fx.calls) == 1
+    cur = json.loads((tmp_path / "ledger" / "child_requests" /
+                      "EV-ADV-C.json").read_text())
+    assert cur["status"] == "UNKNOWN_LAUNCH", cur["status"]
+    with _cemetery(tmp_path):
+        out2 = ri.resume_pending_children(
+            str(tmp_path / "ledger"), fx, fx.check)
+    assert [l["trigger"] for l in out2["launched"]] == ["EV-ADV-C"]
+    assert out2["launched"][0]["reconciled"] is True
+    assert len(fx.calls) == 1, "reconcile must adopt, never relaunch"
+    assert len(fx.effects) == 1
+    cur = json.loads((tmp_path / "ledger" / "child_requests" /
+                      "EV-ADV-C.json").read_text())
+    assert cur["status"] == "LAUNCHED"
+
+
+# D. two concurrent resumers, one effective child ------------------------------
+def test_d_concurrent_resume_single_effect(tmp_path):
+    _kill_request(tmp_path, "EV-ADV-D")
+    fx = _EffectLauncher()
+    outs = []
+
+    def _resume():
+        with _cemetery(tmp_path):
+            outs.append(ri.resume_pending_children(
+                str(tmp_path / "ledger"), fx, fx.check))
+
+    threads = [threading.Thread(target=_resume) for _i in range(4)]
+    [t.start() for t in threads]
+    [t.join() for t in threads]
+    assert len(fx.effects) == 1, fx.effects
+    launched = [l for o in outs for l in o["launched"]]
+    assert len(launched) == 1, launched
+
+
+# E. duplicate resume after LAUNCHED: zero additional ------------------------------
+def test_e_duplicate_resume_after_launched(tmp_path):
+    _kill_request(tmp_path, "EV-ADV-E")
+    fx = _EffectLauncher()
+    with _cemetery(tmp_path):
+        ri.resume_pending_children(str(tmp_path / "ledger"), fx, fx.check)
+    n_calls, n_effects = len(fx.calls), len(fx.effects)
+    with _cemetery(tmp_path):
+        out = ri.resume_pending_children(
+            str(tmp_path / "ledger"), fx, fx.check)
+    assert out["launched"] == []
+    assert len(fx.calls) == n_calls
+    assert len(fx.effects) == n_effects == 1
+
+
+# F. malformed/corrupted request state ----------------------------------------------
+def test_f_malformed_request_never_executes(tmp_path):
+    (tmp_path / "ledger" / "child_requests").mkdir(parents=True,
+                                                   exist_ok=True)
+    (tmp_path / "ledger" / "child_requests" / "EV-ADV-F.json").write_text(
+        "{broken", encoding="utf-8")
+    fx = _EffectLauncher()
+    out = ri.resume_pending_children(str(tmp_path / "ledger"), fx,
+                                     fx.check)
+    assert fx.calls == [] and not fx.effects
+    assert out["failed"] and out["launched"] == []
+    (tmp_path / "ledger" / "child_requests" / "EV-ADV-F.json").write_text(
+        json.dumps({"status": "REQUESTED"}), encoding="utf-8")
+    out2 = ri.resume_pending_children(str(tmp_path / "ledger"), fx,
+                                      fx.check)
+    assert fx.calls == [] and not fx.effects
+    assert out2["launched"] == []
+
+
+# G. tampered record fail-closed ----------------------------------------------
+def test_g_tampered_launch_id_fail_closed(tmp_path):
+    req = _kill_request(tmp_path, "EV-ADV-G")
+    p = tmp_path / "ledger" / "child_requests" / "EV-ADV-G.json"
+    tampered = json.loads(p.read_text())
+    tampered["launch_id"] = "deadbeef" * 4
+    p.write_text(json.dumps(tampered), encoding="utf-8")
+    fx = _EffectLauncher()
+    with _cemetery(tmp_path):
+        out = ri.resume_pending_children(
+            str(tmp_path / "ledger"), fx, fx.check)
+    assert fx.calls == [] and not fx.effects
+    cur = json.loads(p.read_text())
+    assert cur["status"] == "UNKNOWN_TAMPERED", cur["status"]
+    assert out["launched"] == []
+    assert req["launch_id"] != "deadbeef" * 4
+
+
+# launch-id determinism + rejection path ----------------------------------------------
+def test_launch_id_deterministic_and_recomputed(tmp_path):
+    req = _kill_request(tmp_path, "EV-ADV-H")
+    assert req["launch_id"] == ri._launch_id_for(
+        req["trigger_event_id"], req["child_run_id"],
+        req["knowledge_record_id"])
+    ok, _ = ri._verify_request(req)
+    assert ok is True
+
+
+def test_rejected_becomes_failed_and_retries_same_id(tmp_path):
+    _kill_request(tmp_path, "EV-ADV-I")
+    fx = _EffectLauncher(fail="reject")
+    with _cemetery(tmp_path):
+        out = ri.resume_pending_children(
+            str(tmp_path / "ledger"), fx, fx.check)
+    assert out["failed"] and out["launched"] == []
+    assert not fx.effects
+    cur = json.loads((tmp_path / "ledger" / "child_requests" /
+                      "EV-ADV-I.json").read_text())
+    assert cur["status"] == "LAUNCH_FAILED"
+    fx2 = _EffectLauncher()
+    with _cemetery(tmp_path):
+        out2 = ri.resume_pending_children(
+            str(tmp_path / "ledger"), fx2, fx2.check)
+    assert [l["trigger"] for l in out2["launched"]] == ["EV-ADV-I"]
+    assert len(fx2.effects) == 1
+
+
+def test_default_execution_checker_filesystem(tmp_path):
+    runs = tmp_path / "runs"
+    (runs / "engrun_pp0_x").mkdir(parents=True, exist_ok=True)
+    (runs / "engrun_pp0_x" / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_pp0_x"}), encoding="utf-8")
+    check = ri.default_execution_checker(str(runs))
+    found = check("any-launch-id", {"child_run_id": "engrun_pp0_x"})
+    assert found and found["child_run_id"] == "engrun_pp0_x"
+    assert check("any-launch-id",
+                 {"child_run_id": "engrun_pp0_absent"}) is None
