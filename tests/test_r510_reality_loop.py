@@ -1101,7 +1101,7 @@ def test_full_cycle_real_launcher_reconcile(tmp_path):
     child_id = rec["child"]["child_run_id"]
     with _cemetery(tmp_path):
         out = ri.reconcile_unknown_launch(
-            str(tmp_path / "ledger"), "EV-E2E-2", _real,
+            str(tmp_path / "ledger"), "EV-FC-1", _real,
             ri.default_execution_checker(str(tmp_path / "runs")))
     assert out["state"] == "LAUNCHED"
 
@@ -1946,8 +1946,13 @@ def test_e2e_verified_consumption_measured_delta(tmp_path):
     kid = rec["branch_record"]["cemetery_entry_id"]
     child_id = rec["child"]["child_run_id"]
     child_dir = tmp_path / "runs" / child_id
+    _creq = rec["branch_record"]["child_request"]
     exp = {"trigger_event_id": "EV-E2E-2", "parent_run_id": PARENT_RUN,
-           "knowledge_record_id": kid, "launch_id": "lid-x"}
+           "knowledge_record_id": kid, "launch_id": "lid-x",
+           "knowledge_artifact_sha256": _creq["knowledge_artifact_sha256"],
+           "child_run_id": child_id,
+           "parent_problem_sha256": _creq["parent_problem_sha256"],
+           "branch": "KILL", "cemetery_entry_id": kid}
     verified = ri.verify_consumption(str(child_dir), exp, _resolver)
     assert verified["verified"] is True, verified["reason"]
     assert verified["contract"]["knowledge_record_id"] == kid

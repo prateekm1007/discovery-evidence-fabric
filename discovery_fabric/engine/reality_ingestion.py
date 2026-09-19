@@ -2001,6 +2001,8 @@ def _refresh_impact(ledger_dir: str, event_id: str) -> bool:
             "artifact_verification",
             _cons.get("artifact_verification",
                       _crec.get("artifact_verification")))
+        if isinstance(_ver, dict):
+            _ver = _ver.get("artifact_verification")
         if status == "LAUNCHED" and _cons.get("consumed") is True:
             impact["behavioral_change_observed"] = \
                 "CHILD_CONSUMED_VERIFIED" if _ver in (
@@ -3479,8 +3481,8 @@ def default_run_launcher(child_request: Dict, runs_root: str,
                             "reason": "knowledge artifact not resolvable; "
                                       "never synthesized (fail-closed)"}
         elif isinstance(artifact, dict):
-            if _loop_sha(artifact) == child_request.get(
-                    "knowledge_artifact_sha256"):
+            if _loop_sha(_knowledge_canonical(artifact)) == \
+                    child_request.get("knowledge_artifact_sha256"):
                 verification = {"artifact_verification": "RESOLVED"}
             else:
                 verification = {"artifact_verification": "TAMPERED",
