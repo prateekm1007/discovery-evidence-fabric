@@ -10,7 +10,11 @@
 
 **Current default branch:** `main`
 
-**Current remote HEAD:** `bfbb5bfdd345037f0af84ad5823ec1c2d4d7eec4`
+**Current engine/proof remote HEAD before this handoff publication:** `bfbb5bfdd345037f0af84ad5823ec1c2d4d7eec4`
+
+**Handoff publication commit (docs-only):** `587ea8be503a552b1c94172f864bfa91b18163a1`
+
+**Current remote HEAD after handoff publication:** `587ea8be503a552b1c94172f864bfa91b18163a1`
 
 **Accepted support-cliff baseline:** `13e0a3b21364395df2a6ad540622dfface19a69e`
 
