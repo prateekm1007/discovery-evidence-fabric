@@ -166,6 +166,37 @@ def check(problem_id, root):
                 [k for k in rest_a
                  if rest_a.get(k) != rest_b.get(k)]))
 
+    # Transition-ledger repeatability: operator counts identical,
+    # drop-transition identities identical (id-free comparison —
+    # drop classes + cemetery entries, never engine ids).
+    def _ledger(run_dir):
+        env = _load(os.path.join(
+            run_dir, "envelope_MECHANISM_SPACE.json"))
+        m = env.get("mechanism_space", env) or {}
+        return m.get("candidate_transitions") or {}
+    la, lb = (_ledger(os.path.join(da, ra)),
+              _ledger(os.path.join(db, rb)))
+    _ok((la.get("operator_counts") or {}) == (
+        lb.get("operator_counts") or {}),
+        "operator_transition_counts differ: %s vs %s" % (
+            la.get("operator_counts"), lb.get("operator_counts")))
+    da_drops = sorted(str(t.get("drop_transition")) for t in (
+        la.get("candidate_traces") or []))
+    db_drops = sorted(str(t.get("drop_transition")) for t in (
+        lb.get("candidate_traces") or []))
+    _ok(da_drops == db_drops,
+        "drop-transition identities differ: %s vs %s" % (
+            da_drops, db_drops))
+    da_blocks = sorted(str(e) for t in (
+        la.get("candidate_traces") or [])
+        for e in (t.get("cemetery_entry_ids") or []))
+    db_blocks = sorted(str(e) for t in (
+        lb.get("candidate_traces") or [])
+        for e in (t.get("cemetery_entry_ids") or []))
+    _ok(da_blocks == db_blocks,
+        "cemetery block entries differ: %s vs %s" % (
+            da_blocks, db_blocks))
+
     result = {"problem_id": problem_id, "passed": not failures,
               "failures": failures, "permitted_diffs": permitted}
     print(json.dumps(result, indent=1))

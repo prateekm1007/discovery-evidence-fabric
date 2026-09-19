@@ -1,0 +1,15 @@
+{
+  "artifact": "R510_MEMORY_PROOF_COMMIT_DEFECT/1.0.0",
+  "article": "XXXI",
+  "lesson": "A proof record generated from one commit cannot certify runs executed from another commit. The R510 DRYRUN_PROOF_RECORD.json recorded code_commit=a52caadc (read from .git/HEAD at generation time) while the six measured runs had executed from the uncommitted working tree that became d32d0da8. The record's commit field described the parent of the executed bytes, not the executed bytes.",
+  "failed_assumption": "The final report commit was assumed to be equivalent to the execution commit. Equivalence of intent ('the tree will be committed as-is') was treated as equivalence of bytes. Only a committed-then-executed ordering (or a tree-hash comparison) establishes it.",
+  "affected_artifacts": [
+    "R510/DRYRUN_PROOF_RECORD.json (code_commit field on all six run entries; superseded by regeneration)"
+  ],
+  "tests_added": [
+    "Proof-record generation (scripts/r510_dryrun_record.py) now runs only after the six proof runs execute at the audited commit; scripts/r510_dryrun_proof.py refuses occupied out-dirs so no run can mix bytes across commits.",
+    "Repeatability checker (scripts/r510_dryrun_repeat.py) compares deterministic_input_identity + bundle_identity + ranking_stable_hash across rounds, which change if any byte of problem, fixture, or scoring-relevant input changes."
+  ],
+  "prevention": "Proof-record generation must verify measured run commit == audited code commit before publication. Operational rule: commit code first, execute proof runs second, generate the record third. If the record's commit cannot be established from the runs' own manifests, record PROVENANCE_INCOMPLETE and do not claim the run is fully proven.",
+  "reviewer_provenance": "AI_REVIEW"
+}

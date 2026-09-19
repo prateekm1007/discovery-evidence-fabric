@@ -753,6 +753,13 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                      "classification item — nothing was fabricated "
                      "(Art. XXV)"),
         })
+        # R510 transition ledger: no operator call was attempted —
+        # the empty ledger records the NOT_ATTEMPTED shape.
+        from . import transition_trace as _tt0
+        space["candidate_transitions"] = _tt0.build_transition_ledger(
+            [], "NONE", "NO_EVIDENCE", {}, {"state": "NOT_CONSULTED",
+                                            "blocked": []}, {}, [], {},
+            {})
         return space
     space["structured_evidence"] = {
         "state": "BUILT", "n_items": len(items),
@@ -848,17 +855,38 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
          if k != "candidates"}]
     space["operator_candidates_full"] = [operator_result]
     # ---- the deterministic tail: the module's own instruments -------
+    # R510 transition ledger (OBSERVATION ONLY): assembly states are
+    # snapshotted before the instruments mutate them; every later read
+    # comes from the instruments' own outputs. No semantic change —
+    # the ledger watches, never steers.
+    _assembled = [c for c in operator_result.get("candidates", [])
+                  if isinstance(c, dict)]
+    _pre_cem_states = {str(c.get("candidate_id")): str(
+        c.get("candidate_state") or "") for c in _assembled}
+    _sem_by_id = {str(c.get("candidate_id")): (
+        c.get("operator_semantic_check") or {}) for c in _assembled}
     all_candidates = [c for c in operator_result.get("candidates", [])
                       if isinstance(c, dict)
                       and c.get("candidate_state") == "CANDIDATE"]
     space["cemetery_consumption"] = _ms._consult_cemetery(all_candidates)
     dedup = _ms.deduplicate_candidates(all_candidates)
     space["distinctness"] = dedup
+    _dd_by_id = {str(c.get("candidate_id")): {
+        "verdict": c.get("distinctness_verdict"),
+        "basis": c.get("distinctness_basis")} for c in all_candidates}
     retained = _ms._retained_candidates(all_candidates, dedup)
     verifications = [_ms.verify_mechanism_support(c, items, problem)
                      for c in retained]
     for c, v in zip(retained, verifications):
         c["mechanism_support"] = v
+    from . import transition_trace as _tt
+    space["candidate_transitions"] = _tt.build_transition_ledger(
+        _assembled, sel_id, str(operator_result.get("state") or ""),
+        _pre_cem_states, space["cemetery_consumption"], _dd_by_id,
+        [str(c.get("candidate_id")) for c in retained],
+        {str(c.get("candidate_id")): (c.get("mechanism_support") or {})
+         for c in retained},
+        _sem_by_id)
     space["candidates"] = [_ms._public_candidate(c) for c in retained]
     space["state"] = ("BUILT" if dedup.get("n_kept")
                       else "NO_CANDIDATES")

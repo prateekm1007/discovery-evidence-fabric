@@ -44,6 +44,52 @@ def main() -> int:
     spec.loader.exec_module(mod)
     repeats = {pid: mod.check(pid, root)
                for pid in ("dry-p1", "dry-p2", "dry-p3")}
+    # candidate_transition_measurement (all MEASURED — read from the
+    # runs' own persisted MS envelopes; nothing inferred, no UNKNOWN
+    # fields in this section).
+    transitions = {}
+    for pid in ("dry-p1", "dry-p2", "dry-p3"):
+        for rnd in ("A", "B"):
+            key = "%s_%s" % (pid, rnd)
+            ms_path = os.path.join(
+                root, key, "engrun_%s_%s" % (
+                    pid.replace("-", "_"), rnd),
+                "envelope_MECHANISM_SPACE.json")
+            with open(ms_path, encoding="utf-8") as fh:
+                ms_env = json.load(fh)
+            ms = ms_env.get("mechanism_space", ms_env) or {}
+            ledger = ms.get("candidate_transitions") or {}
+            traces = ledger.get("candidate_traces") or []
+            transitions[key] = {
+                "status": "MEASURED",
+                "operator_transition_counts": (
+                    ledger.get("operator_counts") or {}),
+                "candidate_drop_transitions": [
+                    {"candidate_id": t.get("candidate_id"),
+                     "drop_transition": t.get("drop_transition"),
+                     "pipeline_retained": t.get("pipeline_retained"),
+                     "survivor_eligible": t.get(
+                         "survivor_eligible")}
+                    for t in traces],
+                "cemetery_block_records": [
+                    {"candidate_id": t.get("candidate_id"),
+                     "cemetery_entry_ids": t.get(
+                         "cemetery_entry_ids"),
+                     "cemetery_block_reason": t.get(
+                         "cemetery_block_reason")}
+                    for t in traces
+                    if t.get("cemetery_state") == "BLOCKED"],
+                "distinctness_records": [
+                    {"candidate_id": t.get("candidate_id"),
+                     "distinctness_verdict": t.get(
+                         "distinctness_verdict")}
+                    for t in traces],
+                "support_verification_records": [
+                    {"candidate_id": t.get("candidate_id"),
+                     "support_state": t.get("support_state"),
+                     "support_counts": t.get("support_counts")}
+                    for t in traces],
+            }
     # ranked portfolio sample: P1-A rank 1-2, trimmed to the
     # presentation fields (full records live in the run dirs).
     _pfx = {"dry-p1_A": "dry-p1_A/engrun_dry_p1_A"}
@@ -75,6 +121,7 @@ def main() -> int:
             "r506_eligible=False."),
         "runs": entries,
         "repeatability": repeats,
+        "candidate_transition_measurement": transitions,
         "funnel_sample_p1a": {
             k: fun[k] for k in (
                 "submitted", "premise", "evidence", "mechanisms",

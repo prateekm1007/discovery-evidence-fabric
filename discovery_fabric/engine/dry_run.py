@@ -503,6 +503,15 @@ def build_portfolio(run_dir: str, problem: Dict[str, Any],
                     "intervention"):
                 grid_usable.append(c)
     frozen_ids = _frozen_evidence_ids(run_dir)
+    # R510 transition ledger (adapter-observed, read verbatim from
+    # the run's own MS envelope): MS-origin entries carry their
+    # transition record; grid candidates never traverse the MS path
+    # (null — never inferred).
+    _trans_by_id: Dict[str, Dict[str, Any]] = {}
+    _ms_trans = ms.get("candidate_transitions") or {}
+    for _t in (_ms_trans.get("candidate_traces") or []):
+        if isinstance(_t, dict) and _t.get("candidate_id"):
+            _trans_by_id[str(_t["candidate_id"])] = _t
     mechs: List[Dict] = []
     for c in grid_usable:
         mechs.append(_grid_to_mechanism(c, constraint, frozen_ids))
@@ -535,6 +544,8 @@ def build_portfolio(run_dir: str, problem: Dict[str, Any],
             "exploration_angle": "",
             "transformation_operator": c.get(
                 "transformation_operator", ""),
+            "transition_trace": _trans_by_id.get(
+                str(c.get("candidate_id"))),
             "origin": "MECHANISM_SPACE",
             "fixture_provenance": DRY_RUN_PROVENANCE,
         })
@@ -657,6 +668,25 @@ def build_portfolio(run_dir: str, problem: Dict[str, Any],
             "exploration_angle": c.get("exploration_angle", ""),
             "transformation_operator": c.get(
                 "transformation_operator", ""),
+            "transitions": (
+                None if (c.get("origin") or "").startswith(
+                    "EXPLORATION_GRID") else {
+                        "drop_transition": (
+                            c.get("transition_trace") or {}).get(
+                                "drop_transition"),
+                        "cemetery_state": (
+                            c.get("transition_trace") or {}).get(
+                                "cemetery_state"),
+                        "support_state": (
+                            c.get("transition_trace") or {}).get(
+                                "support_state"),
+                        "pipeline_retained": (
+                            c.get("transition_trace") or {}).get(
+                                "pipeline_retained"),
+                        "survivor_eligible": (
+                            c.get("transition_trace") or {}).get(
+                                "survivor_eligible"),
+                    }),
             "provenance": DRY_RUN_PROVENANCE,
         })
     candidates.sort(key=lambda c: (c.get("rank") or 10 ** 9))
