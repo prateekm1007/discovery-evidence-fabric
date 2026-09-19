@@ -1428,7 +1428,7 @@ def _execute_modify(event, ledger_dir, parent_problem, parent_run_id,
     child = _request_child(event, ledger_dir, parent_problem,
                            parent_run_id, hyp["hypothesis_id"],
                            "MODIFY", rehearsal,
-                           knowledge_artifact=hyp)
+                           knowledge_artifact=_knowledge_canonical(hyp))
     return {"path": "MODIFY", "scope": scope, "hypothesis": hyp,
             "adjudication": adj, "child_request": child}
 
@@ -1479,6 +1479,19 @@ def _cemetery_entry_by_id(cemetery_path: str,
     return None
 
 
+def _knowledge_canonical(artifact) -> Dict:
+    """Canonical knowledge bytes for binding: the artifact dict minus
+    chain-bookkeeping keys (prev_entry_sha256 and friends) that
+    append-time chaining adds AFTER the request binds its hash. Both
+    the binder (_request_child inputs) and the verifier strip the
+    same keys, so file-round-tripped entries still match (Art. X:
+    one canonical byte form)."""
+    if not isinstance(artifact, dict):
+        return artifact
+    return {k: v for k, v in artifact.items()
+            if k != "prev_entry_sha256"}
+
+
 def _execute_kill(event, ledger_dir, parent_problem, parent_run_id,
                   rehearsal: bool, cemetery_path=None) -> Dict:
     """KILL executor: cemetery append (REAL only — rehearsal NEVER
@@ -1513,10 +1526,11 @@ def _execute_kill(event, ledger_dir, parent_problem, parent_run_id,
         knowledge_artifact = _cemetery_entry_by_id(target, entry_id)
     else:
         payload = kill_path_entry(event.get("decision") or {}, event)
-        entry = mc.CemeteryEntry(**{
+        artifact_view = {
             k: v for k, v in payload.items()
             if k in mc.CemeteryEntry.__dataclass_fields__
-            and k != "epistemic_class_justification"})
+            and k != "epistemic_class_justification"}
+        entry = mc.CemeteryEntry(**artifact_view)
         _append_cemetery_entries([entry], target)
         _record_cemetery_link(ledger_dir, event["event_id"],
                               payload.get("entry_id"))
@@ -1524,7 +1538,7 @@ def _execute_kill(event, ledger_dir, parent_problem, parent_run_id,
             payload["what_to_avoid"] + " " + payload["reusable_lesson"])
         entry_id, appended = payload.get("entry_id"), True
         check_verdict = check.get("verdict")
-        knowledge_artifact = payload
+        knowledge_artifact = artifact_view
     constraint = {
         "excluded_cemetery_entry": entry_id,
         "trigger_event_id": event["event_id"],
@@ -1533,7 +1547,8 @@ def _execute_kill(event, ledger_dir, parent_problem, parent_run_id,
     }
     child = _request_child(event, ledger_dir, parent_problem,
                            parent_run_id, entry_id, "KILL", False,
-                           knowledge_artifact=knowledge_artifact)
+                           knowledge_artifact=_knowledge_canonical(
+                               knowledge_artifact))
     adj = _adjudicate_if_numbered(event)
     return {"path": "KILL", "scope": scope, "cemetery_entry_id": entry_id,
             "cemetery_appended": appended, "search_constraint": constraint,
@@ -1613,7 +1628,8 @@ def _request_child(event, ledger_dir, parent_problem, parent_run_id,
         parent_problem, event, knowledge_id, branch,
         parent_run_id=parent_run_id,
         parent_problem_sha256=_loop_sha(parent_problem),
-        knowledge_artifact_sha256=_loop_sha(knowledge_artifact)
+        knowledge_artifact_sha256=_loop_sha(
+            _knowledge_canonical(knowledge_artifact))
         if isinstance(knowledge_artifact, dict) else "NOT_SUPPLIED")
     child_run_id = "engrun:%s:%s" % (
         child_problem.get("problem_id"),
@@ -1627,7 +1643,8 @@ def _request_child(event, ledger_dir, parent_problem, parent_run_id,
             "child_run_id": child_run_id,
             "launch_id": _launch_id_for(event["event_id"], child_run_id,
                                         knowledge_id),
-            "knowledge_artifact_sha256": _loop_sha(knowledge_artifact)
+            "knowledge_artifact_sha256": _loop_sha(
+                _knowledge_canonical(knowledge_artifact))
             if isinstance(knowledge_artifact, dict) else "NOT_SUPPLIED",
             "launch_attempts": 0,
            "reconciliation_history": [],
@@ -1980,8 +1997,10 @@ def _refresh_impact(ledger_dir: str, event_id: str) -> bool:
                  or {})
         _crec = (_cons.get("receipt")
                  if isinstance(_cons, dict) else None) or {}
-        _ver = _cons.get("artifact_verification",
-                         _crec.get("artifact_verification"))
+        _ver = (req.get("launch_receipt") or {}).get(
+            "artifact_verification",
+            _cons.get("artifact_verification",
+                      _crec.get("artifact_verification")))
         if status == "LAUNCHED" and _cons.get("consumed") is True:
             impact["behavioral_change_observed"] = \
                 "CHILD_CONSUMED_VERIFIED" if _ver in (
@@ -2576,6 +2595,241 @@ def record_child_consumption(child_run_dir: str, parent_event_id: str,
     _atomic_write_json(os.path.join(child_run_dir, "CONSUMPTION.json"),
                        receipt)
     return {"consumed": True, "receipt": receipt}
+
+
+def verify_consumption(child_run_dir: str, expected: Dict,
+                       knowledge_resolver=None) -> Dict:
+    """Independent consumption verifier (§2-§4): reconstructs consumption
+    from INDEPENDENT durable artifacts, never from CONSUMPTION.json
+    (a self-authored receipt MUST NEVER upgrade an unverified run).
+    Reads, in order: run_manifest.json (run executed? knowledge refs
+    bound by the run itself?), problem.json (lineage block + clause +
+    bytes), artifact resolution (resolver or manifest-carried hash —
+    absent means UNRESOLVED, never synthesized). Returns
+    {"verified": bool, "contract": {...}, "checks": {...}, "reason"}.
+    Every check records its own evidence; the first failing check
+    decides, but all checks still run (no short-circuit hiding)."""
+    child_run_dir = str(child_run_dir)
+    expected = expected or {}
+    checks: Dict[str, Any] = {}
+    if expected.get("rehearsal"):
+        return {"verified": False,
+                "reason": "CONTROLLED_REHEARSAL is permanently excluded "
+                          "from consumption proof (never a learning "
+                          "claim)",
+                "checks": {"rehearsal_excluded": True}}
+    manifest_path = os.path.join(child_run_dir, "run_manifest.json")
+    try:
+        manifest = json.load(open(manifest_path, encoding="utf-8"))
+        checks["manifest_readable"] = True
+    except Exception as exc:
+        return {"verified": False,
+                "reason": "run manifest unreadable: %s (no manifest, "
+                          "no verified run)" % (type(exc).__name__,),
+                "checks": {"manifest_readable": False}}
+    checks["run_executed"] = bool(manifest.get("run_id"))
+    man_knowledge = manifest.get("knowledge_consumed") or {}
+    checks["manifest_binds_knowledge"] = bool(
+        man_knowledge.get("trigger_event_id")
+        == expected.get("trigger_event_id")
+        and man_knowledge.get("knowledge_record_id")
+        == expected.get("knowledge_record_id"))
+    problem_path = os.path.join(child_run_dir, "problem.json")
+    try:
+        problem = json.load(open(problem_path, encoding="utf-8"))
+        checks["problem_readable"] = True
+    except Exception as exc:
+        return {"verified": False,
+                "reason": "child problem.json unreadable: %s" %
+                          (type(exc).__name__,),
+                "checks": checks}
+    block = problem.get("reality_constraints") or {}
+    checks["block_trigger_match"] = \
+        block.get("trigger_event_id") == expected.get("trigger_event_id")
+    checks["block_knowledge_match"] = \
+        block.get("knowledge_record_id") == expected.get(
+            "knowledge_record_id")
+    checks["clause_present"] = ("[REALITY %s:" %
+                                (expected.get("trigger_event_id"),)
+                                in str(problem.get("constraint") or ""))
+    artifact_hash = block.get("knowledge_artifact_sha256",
+                              "NOT_SUPPLIED")
+    resolved, resolved_bytes = None, None
+    if knowledge_resolver is not None:
+        try:
+            resolved = knowledge_resolver(
+                block.get("knowledge_record_id"))
+        except Exception as exc:
+            resolved = None
+            checks["resolver_error"] = "%s: %s" % (
+                type(exc).__name__, str(exc)[:200])
+    if isinstance(resolved, dict):
+        if _loop_sha(_knowledge_canonical(resolved)) == artifact_hash:
+            checks["artifact"] = "RESOLVED"
+        else:
+            checks["artifact"] = "TAMPERED"
+    else:
+        checks["artifact"] = "UNRESOLVED_ABSENT"
+    failures = []
+    if not checks["run_executed"]:
+        failures.append("no run identity in manifest")
+    if not checks["manifest_binds_knowledge"]:
+        failures.append("manifest does not bind the expected knowledge")
+    if not checks["block_trigger_match"]:
+        failures.append("problem lineage trigger mismatch")
+    if not checks["block_knowledge_match"]:
+        failures.append("problem lineage knowledge mismatch")
+    if not checks["clause_present"]:
+        failures.append("constraint clause absent from problem")
+    if checks["artifact"] != "RESOLVED":
+        failures.append("artifact %s" % (checks["artifact"],))
+    contract = {
+        "parent_event_id": expected.get("trigger_event_id"),
+        "parent_run_id": expected.get("parent_run_id"),
+        "child_run_id": manifest.get("run_id"),
+        "knowledge_record_id": expected.get("knowledge_record_id"),
+        "knowledge_artifact_sha256": artifact_hash,
+        "child_problem_sha256": _loop_sha(problem),
+        "child_input_manifest_hash": _loop_sha({
+            "problem": problem,
+            "manifest_run_id": manifest.get("run_id")}),
+        "trigger_event_id": expected.get("trigger_event_id"),
+        "launch_id": expected.get("launch_id"),
+        "verified_at": _loop_now(),
+        "verifier_provenance": "reality_ingestion.verify_consumption",
+    }
+    if failures:
+        return {"verified": False,
+                "reason": "consumption unproven: %s" % ("; ".join(
+                    failures),),
+                "checks": checks, "contract": contract}
+    return {"verified": True, "checks": checks, "contract": contract,
+            "reason": "all consumption checks green from independent "
+                      "artifacts"}
+
+
+def extract_search_state(run_dir: str, cemetery_path=None) -> Dict:
+    """Machine-readable SEARCH_STATE (§6) extracted deterministically
+    from a run dir (works on ANY run dir, parent or child). Fields
+    that have no canonical source stay typed UNKNOWN (never prose,
+    never invented)."""
+    run_dir = str(run_dir)
+    try:
+        problem = json.load(open(os.path.join(
+            run_dir, "problem.json"), encoding="utf-8"))
+        prob_ok = True
+    except Exception:
+        problem, prob_ok = {}, False
+    try:
+        manifest = json.load(open(os.path.join(
+            run_dir, "run_manifest.json"), encoding="utf-8"))
+    except Exception:
+        manifest = {}
+    ms_path = os.path.join(run_dir, "envelope_MECHANISM_SPACE.json")
+    if os.path.exists(ms_path):
+        try:
+            _ms = json.load(open(ms_path, encoding="utf-8"))
+            _space = _ms.get("mechanism_space", _ms)
+            regions: Dict[str, Any] = {
+                "state": "READ",
+                "operator_ids": _space.get("operator_ids"),
+                "operators_examined": [
+                    {"operator": o.get("operator"),
+                     "state": o.get("state")}
+                    for o in (_space.get("operator_results") or [])]}
+        except Exception as exc:
+            regions = {"state": "UNKNOWN_UNREADABLE",
+                       "error": type(exc).__name__}
+    else:
+        regions = {"state": "UNKNOWN_NO_MECHANISM_SPACE"}
+    if cemetery_path is not None and os.path.exists(str(cemetery_path)):
+        try:
+            _cem = json.load(open(str(cemetery_path), encoding="utf-8"))
+            _entries = _cem.get("entries", [])
+            cemetery = {"state": "READ",
+                        "entry_count": len(_entries),
+                        "head_sha256": _loop_sha(_entries[-1])
+                        if _entries else "EMPTY"}
+        except Exception as exc:
+            cemetery = {"state": "UNKNOWN_UNREADABLE",
+                        "error": type(exc).__name__}
+    else:
+        cemetery = {"state": "UNKNOWN_NO_CEMETERY_PATH"}
+    block = (problem.get("reality_constraints") or {}) \
+        if prob_ok else {}
+    state = {
+        "artifact_type": "SEARCH_STATE/1.0.0",
+        "run_id": manifest.get("run_id"),
+        "problem_sha256": _loop_sha(problem) if prob_ok else "UNREADABLE",
+        "constraint_text": str(problem.get("constraint") or "")
+        if prob_ok else "",
+        "knowledge_binding": {
+            "trigger_event_id": block.get("trigger_event_id"),
+            "knowledge_record_id": block.get("knowledge_record_id"),
+            "knowledge_artifact_sha256":
+                block.get("knowledge_artifact_sha256"),
+        } if block else None,
+        "operator_regions": regions,
+        "candidate_selection_policy": {
+            "disabled_stages": sorted(manifest.get("disabled_stages", [])),
+            "stage_order": manifest.get("stage_order"),
+        } if manifest else "UNKNOWN_NO_MANIFEST",
+        "cemetery": cemetery,
+        "active_hypotheses_constraints": [
+            str(problem.get("constraint") or "")] if prob_ok else [],
+    }
+    state["canonical_state_hash"] = _loop_sha(
+        {k: v for k, v in state.items() if k != "artifact_type"})
+    return state
+
+
+def measure_search_delta(s0: Dict, s1: Dict) -> Dict:
+    """MEASURED_DELTA = DIFF(S0, S1) with substantive-field rules (§7).
+    A different problem_id or serialized constraint ALONE is NOT
+    substantive (the §7 falsifier is built in, not bolted on).
+    Substantive requires knowledge binding PLUS at least one of:
+    cemetery flip, operator-region change, or newly admitted
+    hypothesis/constraint content beyond the reality clause itself."""
+    def _norm_constraint(text):
+        import re as _re
+        return _re.sub(r"\[REALITY [^\]]*\]", "", str(text or "")
+                       ).strip()
+    s0c = _norm_constraint((s0.get("active_hypotheses_constraints") or
+                            [""])[0])
+    s1c = _norm_constraint((s1.get("active_hypotheses_constraints") or
+                            [""])[0])
+    kb0 = (s0.get("knowledge_binding") or {})
+    kb1 = (s1.get("knowledge_binding") or {})
+    knowledge_bound = bool(
+        kb1.get("trigger_event_id") and kb1.get("knowledge_record_id")
+        and not kb0.get("trigger_event_id"))
+    cem0, cem1 = s0.get("cemetery") or {}, s1.get("cemetery") or {}
+    cemetery_flip = bool(
+        cem0.get("state") == "READ" and cem1.get("state") == "READ"
+        and cem0.get("head_sha256") != cem1.get("head_sha256"))
+    op0 = ((s0.get("operator_regions") or {}).get("operator_ids"))
+    op1 = ((s1.get("operator_regions") or {}).get("operator_ids"))
+    operator_change = bool(
+        op0 is not None and op1 is not None and op0 != op1)
+    hypothesis_new = bool(s1c and s1c != s0c)
+    changed = {
+        "knowledge_bound": knowledge_bound,
+        "cemetery_flip": cemetery_flip,
+        "operator_change": operator_change,
+        "hypothesis_new": hypothesis_new,
+        "problem_only": (
+            s0.get("problem_sha256") != s1.get("problem_sha256")
+            and not (knowledge_bound or cemetery_flip
+                     or operator_change or hypothesis_new)),
+    }
+    substantive = bool(
+        knowledge_bound and (cemetery_flip or operator_change
+                             or hypothesis_new))
+    return {"substantive": substantive,
+            "changed_fields": sorted(k for k, v in changed.items() if v),
+            "all_fields": changed,
+            "falsifier": "problem_id/constraint-only differences are "
+                         "excluded by construction"}
 
 
 def default_run_launcher(child_request: Dict, runs_root: str,

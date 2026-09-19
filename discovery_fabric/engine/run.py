@@ -234,6 +234,18 @@ class EngineRun:
             "resumed": bool(self.resume),
             "started_at": utc_now(),
         }
+        # R510 consumption contract (§3): a problem carrying a reality
+        # block binds its knowledge references into the run's own input
+        # manifest (verbatim custody, never re-derived). Runs without
+        # the block carry no knowledge keys at all.
+        _rc_block = (self.problem or {}).get("reality_constraints") \
+            if isinstance(self.problem, dict) else None
+        if isinstance(_rc_block, dict):
+            manifest["knowledge_consumed"] = {
+                k: _rc_block.get(k) for k in
+                ("trigger_event_id", "knowledge_record_id",
+                 "knowledge_artifact_sha256", "parent_run_id",
+                 "parent_problem_sha256", "branch")}
         # R451-C1.3-3: bind the run-level call context for the WHOLE
         # run — every LLM call made by any stage (mechanism_space,
         # evolution, adversarial, bridge) inherits the run identity

@@ -1222,21 +1222,32 @@ def test_consumption_lineage_mismatch_rejected(tmp_path):
 
 
 # full §15 chain on the real launcher (disabled stages, offline) --------
-def test_e2e_real_launcher_consumption_closed(tmp_path):
+def test_e2e_verified_consumption_measured_delta(tmp_path):
     import os as _os
     if _os.name == "nt":
         pytest = __import__("pytest")
         pytest.skip("production child_run_id values contain colons "
                     "(canonical engrun:...:... lineage format); Windows "
-                    "filesystems reject them. Production runs Linux. "
-                    "Covered on Windows by the colon-free launcher test "
-                    "above; full-shape proof requires a POSIX host.")
+                    "filesystems reject them. Production runs Linux.")
     from discovery_fabric.engine.adapters import STAGE_ORDER
     dis = list(STAGE_ORDER)
+    cem_file = _kill_cemetery(tmp_path)
+    (tmp_path / "cemetery").mkdir(parents=True, exist_ok=True)
+    Path(cem_file).write_text(json.dumps({"entries": []}),
+                              encoding="utf-8")
+    parent_dir = tmp_path / "runs" / "engrun_parent_e2e15"
+    parent_dir.mkdir(parents=True, exist_ok=True)
+    (parent_dir / "problem.json").write_text(
+        json.dumps(dict(PARENT_PROBLEM, problem_id="pp0_e2e_parent")),
+        encoding="utf-8")
+    (parent_dir / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_parent_e2e"}), encoding="utf-8")
+    s0 = ri.extract_search_state(str(parent_dir),
+                                 cemetery_path=cem_file)
+    assert s0["cemetery"]["entry_count"] == 0
 
     def _resolver(kid):
-        data = json.loads((tmp_path / "cemetery" / "CEMETERY.json")
-                          .read_text())
+        data = json.loads(Path(cem_file).read_text())
         for e in data.get("entries", []):
             if e.get("entry_id") == kid:
                 return e
@@ -1248,29 +1259,763 @@ def test_e2e_real_launcher_consumption_closed(tmp_path):
             knowledge_resolver=_resolver)
 
     with _cemetery(tmp_path):
-        rec = _exec(_event("EV-E2E-1", verdict="KILL"),
+        rec = _exec(_event("EV-E2E-2", verdict="KILL"),
                     str(tmp_path / "ledger"), run_launcher=_real,
                     parent_problem=dict(PARENT_PROBLEM),
                     parent_run_id=PARENT_RUN,
-                    cemetery_path=_kill_cemetery(tmp_path))
+                    cemetery_path=cem_file)
     assert rec["executed"] is True
     assert rec["child"]["request_status"] == "LAUNCHED"
+    kid = rec["branch_record"]["cemetery_entry_id"]
     child_id = rec["child"]["child_run_id"]
-    child_dir = tmp_path / "runs" / child_id.replace(":", "_")
-    assert (child_dir / "CONSUMPTION.json").exists()
-    cons = json.loads((child_dir / "CONSUMPTION.json").read_text())
-    assert cons["parent_event_id"] == "EV-E2E-1"
-    assert cons["knowledge_record_id"] == \
-        rec["branch_record"]["cemetery_entry_id"]
-    assert cons["constraint_clause_present"] is True
+    child_dir = tmp_path / "runs" / child_id
+    exp = {"trigger_event_id": "EV-E2E-2", "parent_run_id": PARENT_RUN,
+           "knowledge_record_id": kid, "launch_id": "lid-x"}
+    verified = ri.verify_consumption(str(child_dir), exp, _resolver)
+    assert verified["verified"] is True, verified["reason"]
+    assert verified["contract"]["knowledge_record_id"] == kid
+    s1 = ri.extract_search_state(str(child_dir),
+                                 cemetery_path=cem_file)
+    delta = ri.measure_search_delta(s0, s1)
+    assert delta["substantive"] is True, delta
+    assert "knowledge_bound" in delta["changed_fields"]
+    assert "cemetery_flip" in delta["changed_fields"]
     impact = json.loads((tmp_path / "ledger" / "search_impact" /
-                         "EV-E2E-1.json").read_text())
+                         "EV-E2E-2.json").read_text())
     assert impact["behavioral_change_observed"] == \
         "CHILD_CONSUMED_VERIFIED", impact["behavioral_change_observed"]
     assert impact["child_consumed_delta"]["artifact_verification"] == \
         "RESOLVED"
+    assert impact["operator_region_after"] is not None
     with _cemetery(tmp_path):
         out = ri.reconcile_unknown_launch(
-            str(tmp_path / "ledger"), "EV-E2E-1", _real,
+            str(tmp_path / "ledger"), "EV-E2E-2", _real,
+            ri.default_execution_checker(str(tmp_path / "runs")))
+    assert out["state"] == "LAUNCHED"
+
+
+def _craft_child(tmp_path, name, problem, manifest_extra=None,
+                 receipt=None):
+    child = tmp_path / "runs" / name
+    child.mkdir(parents=True, exist_ok=True)
+    (child / "problem.json").write_text(json.dumps(problem),
+                                        encoding="utf-8")
+    manifest = {"run_id": name}
+    manifest.update(manifest_extra or {})
+    (child / "run_manifest.json").write_text(json.dumps(manifest),
+                                             encoding="utf-8")
+    if receipt is not None:
+        (child / "CONSUMPTION.json").write_text(
+            json.dumps(receipt), encoding="utf-8")
+    return child
+
+
+def _kb_problem(eid, kid, artifact_sha):
+    problem = dict(PARENT_PROBLEM)
+    problem["constraint"] = "base [REALITY %s: KILL knowledge %s " \
+        "constrains this search]" % (eid, kid)
+    problem["reality_constraints"] = {
+        "trigger_event_id": eid, "knowledge_record_id": kid,
+        "knowledge_artifact_sha256": artifact_sha,
+        "parent_run_id": PARENT_RUN,
+        "parent_problem_sha256": "ph" * 32,
+        "branch": "KILL", "constraint_clause": "c"}
+    problem["problem_id"] = "pp0_kb_" + eid.lower()
+    return problem
+
+
+def _kb_manifest(eid, kid, artifact_sha, run_id):
+    return {"run_id": run_id,
+            "knowledge_consumed": {
+                "trigger_event_id": eid,
+                "knowledge_record_id": kid,
+                "knowledge_artifact_sha256": artifact_sha,
+                "parent_run_id": PARENT_RUN,
+                "parent_problem_sha256": "ph" * 32,
+                "branch": "KILL"}}
+
+
+def _kb_expected(eid, kid, artifact_sha):
+    return {"trigger_event_id": eid, "parent_run_id": PARENT_RUN,
+            "knowledge_record_id": kid, "launch_id": "lid-" + eid}
+
+
+_ART = {"mechanism": "linear regulator holds bus voltage",
+        "entry_id": "KA-TEST-001"}
+
+
+def _resolver_for(artifact_by_kid):
+    def _resolve(kid):
+        return artifact_by_kid.get(kid)
+    return _resolve
+
+
+# §5 forgery battery: receipt never upgrades ------------------------------
+def test_forged_receipt_without_binding_fails(tmp_path):
+    problem = dict(PARENT_PROBLEM, problem_id="pp0_forge01")
+    child = _craft_child(tmp_path, "engrun_forge01", problem,
+                         {"run_id": "engrun_forge01"},
+                         receipt={"consumed": True,
+                                  "knowledge_record_id": "KX",
+                                  "artifact_verification": "RESOLVED"})
+    out = ri.verify_consumption(
+        str(child), _kb_expected("EV-F", "KX", "kh" * 32),
+        _resolver_for({"KX": dict(_ART)}))
+    assert out["verified"] is False
+    assert "manifest does not bind" in out["reason"]
+
+
+def test_hash_mismatch_fails(tmp_path):
+    problem = _kb_problem("EV-HM-1", "KX", "kh" * 32)
+    child = _craft_child(tmp_path, "engrun_hm01", problem,
+                         dict(_kb_manifest("EV-HM-1", "KX", "kh" * 32,
+                                           "engrun_hm01"),
+                              run_id="engrun_hm01"))
+    out = ri.verify_consumption(
+        str(child), _kb_expected("EV-HM-1", "KX", "kh" * 32),
+        _resolver_for({"KX": {"mechanism": "something else entirely"}}))
+    assert out["verified"] is False
+    assert out["checks"]["artifact"] == "TAMPERED"
+
+
+def test_different_artifact_same_id_fails(tmp_path):
+    problem = _kb_problem("EV-DA-1", "KX", "kh" * 32)
+    child = _craft_child(tmp_path, "engrun_da01", problem,
+                         dict(_kb_manifest("EV-DA-1", "KX", "kh" * 32,
+                                           "engrun_da01"),
+                              run_id="engrun_da01"))
+    out = ri.verify_consumption(
+        str(child), _kb_expected("EV-DA-1", "KX", "kh" * 32),
+        _resolver_for({"KX": {"mechanism": "unrelated other device"}}))
+    assert out["verified"] is False
+
+
+def test_problem_without_manifest_binding_fails(tmp_path):
+    problem = _kb_problem("EV-PM-1", "KX", "kh" * 32)
+    child = _craft_child(tmp_path, "engrun_pm01", problem,
+                         {"run_id": "engrun_pm01"})
+    out = ri.verify_consumption(
+        str(child), _kb_expected("EV-PM-1", "KX", "kh" * 32),
+        _resolver_for({"KX": dict(_ART)}))
+    assert out["verified"] is False
+    assert "manifest does not bind" in out["reason"]
+
+
+def test_absent_knowledge_unresolved(tmp_path):
+    problem = _kb_problem("EV-AB2-1", "KX", "kh" * 32)
+    child = _craft_child(tmp_path, "engrun_ab201", problem,
+                         dict(_kb_manifest("EV-AB2-1", "KX", "kh" * 32,
+                                           "engrun_ab201"),
+                              run_id="engrun_ab201"))
+    out = ri.verify_consumption(
+        str(child), _kb_expected("EV-AB2-1", "KX", "kh" * 32),
+        _resolver_for({}))
+    assert out["verified"] is False
+    assert out["checks"]["artifact"] == "UNRESOLVED_ABSENT"
+
+
+def test_unused_knowledge_fails(tmp_path):
+    problem = dict(PARENT_PROBLEM, problem_id="pp0_plain02")
+    child = _craft_child(tmp_path, "engrun_plain02", problem,
+                         {"run_id": "engrun_plain02"})
+    out = ri.verify_consumption(
+        str(child), _kb_expected("EV-UN-1", "KX", "kh" * 32),
+        _resolver_for({"KX": dict(_ART)}))
+    assert out["verified"] is False
+
+
+def test_rehearsal_refused_by_verifier(tmp_path):
+    problem = _kb_problem("EV-RH-V", "KX", "kh" * 32)
+    child = _craft_child(tmp_path, "engrun_rhv01", problem,
+                         dict(_kb_manifest("EV-RH-V", "KX", "kh" * 32,
+                                           "engrun_rhv01"),
+                              run_id="engrun_rhv01"))
+    exp = _kb_expected("EV-RH-V", "KX", "kh" * 32)
+    exp["rehearsal"] = True
+    out = ri.verify_consumption(str(child), exp,
+                                _resolver_for({"KX": dict(_ART)}))
+    assert out["verified"] is False
+    assert "REHEARSAL" in out["reason"]
+
+
+def test_verifier_replay_stable(tmp_path):
+    import hashlib as _hl
+    art = dict(_ART)
+    art_sha = _hl.sha256(json.dumps(
+        art, sort_keys=True,
+        separators=(",", ":")).encode()).hexdigest()
+    problem = _kb_problem("EV-RP-1", "KX", art_sha)
+    child = _craft_child(tmp_path, "engrun_rp01", problem,
+                         dict(_kb_manifest("EV-RP-1", "KX", art_sha,
+                                           "engrun_rp01"),
+                              run_id="engrun_rp01"))
+    exp = _kb_expected("EV-RP-1", "KX", art_sha)
+    r1 = ri.verify_consumption(str(child), exp,
+                               _resolver_for({"KX": art}))
+    r2 = ri.verify_consumption(str(child), exp,
+                               _resolver_for({"KX": art}))
+    assert r1["verified"] is True and r2["verified"] is True
+    assert r1["contract"] == r2["contract"]
+
+
+def test_duplicate_receipt_no_upgrade(tmp_path):
+    import hashlib as _hl
+    art = dict(_ART)
+    art_sha = _hl.sha256(json.dumps(
+        art, sort_keys=True,
+        separators=(",", ":")).encode()).hexdigest()
+    problem = _kb_problem("EV-DP-1", "KX", art_sha)
+    foreign = dict(PARENT_PROBLEM, problem_id="pp0_foreign")
+    child = _craft_child(tmp_path, "engrun_dp01", foreign,
+                         {"run_id": "engrun_dp01"},
+                         receipt={"consumed": True,
+                                  "knowledge_record_id": "KX",
+                                  "artifact_verification": "RESOLVED"})
+    out = ri.verify_consumption(
+        str(child), _kb_expected("EV-DP-1", "KX", art_sha),
+        _resolver_for({"KX": art}))
+    assert out["verified"] is False
+
+
+def test_precreated_receipt_ignored_when_supported(tmp_path):
+    import hashlib as _hl
+    art = dict(_ART)
+    art_sha = _hl.sha256(json.dumps(
+        art, sort_keys=True,
+        separators=(",", ":")).encode()).hexdigest()
+    problem = _kb_problem("EV-PR-1", "KX", art_sha)
+    child = _craft_child(tmp_path, "engrun_pr01", problem,
+                         dict(_kb_manifest("EV-PR-1", "KX", art_sha,
+                                           "engrun_pr01"),
+                              run_id="engrun_pr01"),
+                         receipt={"consumed": False,
+                                  "reason": "planted lie"})
+    out = ri.verify_consumption(
+        str(child), _kb_expected("EV-PR-1", "KX", art_sha),
+        _resolver_for({"KX": art}))
+    assert out["verified"] is True
+
+
+# SEARCH_STATE + delta (§6/§7) ----------------------------------------------
+def test_search_state_stable_hash(tmp_path):
+    runs = tmp_path / "runs"
+    child = runs / "engrun_ss01"
+    child.mkdir(parents=True, exist_ok=True)
+    (child / "problem.json").write_text(
+        json.dumps(_kb_problem("EV-SS-1", "KX", "kh" * 32)),
+        encoding="utf-8")
+    (child / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_ss01"}), encoding="utf-8")
+    s1 = ri.extract_search_state(str(child))
+    s2 = ri.extract_search_state(str(child))
+    assert s1["canonical_state_hash"] == s2["canonical_state_hash"]
+    assert s1["knowledge_binding"]["trigger_event_id"] == "EV-SS-1"
+    assert s1["operator_regions"]["state"] == \
+        "UNKNOWN_NO_MECHANISM_SPACE"
+
+
+def test_delta_falsifier_problem_only(tmp_path):
+    runs = tmp_path / "runs"
+    for name, pid in (("engrun_dfa", "pp0_a"), ("engrun_dfb", "pp0_b")):
+        d = runs / name
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "problem.json").write_text(
+            json.dumps(dict(PARENT_PROBLEM, problem_id=pid)),
+            encoding="utf-8")
+        (d / "run_manifest.json").write_text(
+            json.dumps({"run_id": name}), encoding="utf-8")
+    s0 = ri.extract_search_state(str(runs / "engrun_dfa"))
+    s1 = ri.extract_search_state(str(runs / "engrun_dfb"))
+    assert s0["problem_sha256"] != s1["problem_sha256"]
+    delta = ri.measure_search_delta(s0, s1)
+    assert delta["substantive"] is False
+    assert delta["all_fields"]["problem_only"] is True
+
+
+def test_delta_substantive_kill_path(tmp_path):
+    import hashlib as _hl
+    art = dict(_ART)
+    art_sha = _hl.sha256(json.dumps(
+        art, sort_keys=True,
+        separators=(",", ":")).encode()).hexdigest()
+    runs = tmp_path / "runs"
+    plain = runs / "engrun_dneg"
+    plain.mkdir(parents=True, exist_ok=True)
+    (plain / "problem.json").write_text(
+        json.dumps(dict(PARENT_PROBLEM, problem_id="pp0_neg")),
+        encoding="utf-8")
+    (plain / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_dneg"}), encoding="utf-8")
+    kbdir = runs / "engrun_dpos"
+    kbdir.mkdir(parents=True, exist_ok=True)
+    (kbdir / "problem.json").write_text(
+        json.dumps(_kb_problem("EV-DP-2", "KX", art_sha)),
+        encoding="utf-8")
+    (kbdir / "run_manifest.json").write_text(
+        json.dumps(dict(_kb_manifest("EV-DP-2", "KX", art_sha,
+                                     "engrun_dpos"),
+                        run_id="engrun_dpos")), encoding="utf-8")
+    s0 = ri.extract_search_state(str(plain), cemetery_path=None)
+    s1 = ri.extract_search_state(str(kbdir), cemetery_path=None)
+    cem0 = {"state": "READ", "entry_count": 0, "head_sha256": "EMPTY"}
+    cem1 = {"state": "READ", "entry_count": 1, "head_sha256": "h1"}
+    s0["cemetery"], s1["cemetery"] = cem0, cem1
+    v0 = ri.verify_consumption(
+        str(plain), _kb_expected("EV-DP-2", "KX", art_sha),
+        _resolver_for({"KX": art}))
+    v1 = ri.verify_consumption(
+        str(kbdir), _kb_expected("EV-DP-2", "KX", art_sha),
+        _resolver_for({"KX": art}))
+    assert v0["verified"] is False
+    assert v1["verified"] is True
+    delta = ri.measure_search_delta(s0, s1)
+    assert delta["substantive"] is True
+    assert "cemetery_flip" in delta["changed_fields"]
+    assert "knowledge_bound" in delta["changed_fields"]
+
+
+def test_negative_control_no_delta(tmp_path):
+    runs = tmp_path / "runs"
+    for name in ("engrun_nc1", "engrun_nc2"):
+        d = runs / name
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "problem.json").write_text(
+            json.dumps(dict(PARENT_PROBLEM,
+                            problem_id="pp0_nc_" + name[-1])),
+            encoding="utf-8")
+        (d / "run_manifest.json").write_text(
+            json.dumps({"run_id": name}), encoding="utf-8")
+    s0 = ri.extract_search_state(str(runs / "engrun_nc1"))
+    s1 = ri.extract_search_state(str(runs / "engrun_nc2"))
+    delta = ri.measure_search_delta(s0, s1)
+    assert delta["substantive"] is False
+    out = ri.verify_consumption(
+        str(runs / "engrun_nc2"),
+        _kb_expected("EV-NC-1", "KX", "kh" * 32),
+        _resolver_for({"KX": dict(_ART)}))
+    assert out["verified"] is False
+
+
+def test_e2e_verified_consumption_measured_delta(tmp_path):
+    import os as _os
+    if _os.name == "nt":
+        pytest = __import__("pytest")
+        pytest.skip("production child_run_id values contain colons "
+                    "(canonical engrun:...:... lineage); Windows "
+                    "filesystems reject them. Production runs Linux.")
+    from discovery_fabric.engine.adapters import STAGE_ORDER
+    dis = list(STAGE_ORDER)
+    cem_file = _kill_cemetery(tmp_path)
+
+    def _resolver(kid):
+        data = json.loads(Path(cem_file).read_text())
+        for e in data.get("entries", []):
+            if e.get("entry_id") == kid:
+                return e
+        return None
+
+    def _real(req):
+        return ri.default_run_launcher(
+            req, str(tmp_path / "runs"), disabled_stages=dis)
+
+    with _cemetery(tmp_path):
+        rec = _exec(_event("EV-E2E-2", verdict="KILL"),
+                    str(tmp_path / "ledger"), run_launcher=_real,
+                    parent_problem=dict(PARENT_PROBLEM),
+                    parent_run_id=PARENT_RUN,
+                    cemetery_path=cem_file)
+    assert rec["executed"] is True
+    assert rec["child"]["request_status"] == "LAUNCHED"
+    kid = rec["branch_record"]["cemetery_entry_id"]
+    child_id = rec["child"]["child_run_id"]
+    child_dir = tmp_path / "runs" / child_id
+    exp = {"trigger_event_id": "EV-E2E-2", "parent_run_id": PARENT_RUN,
+           "knowledge_record_id": kid, "launch_id": "lid-x"}
+    verified = ri.verify_consumption(str(child_dir), exp, _resolver)
+    assert verified["verified"] is True, verified["reason"]
+    assert verified["contract"]["knowledge_record_id"] == kid
+    parent_dir = tmp_path / "runs" / "engrun_parent_e2e"
+    parent_dir.mkdir(parents=True, exist_ok=True)
+    (parent_dir / "problem.json").write_text(
+        json.dumps(dict(PARENT_PROBLEM, problem_id="pp0_e2e_parent")),
+        encoding="utf-8")
+    (parent_dir / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_parent_e2e"}), encoding="utf-8")
+    s0 = ri.extract_search_state(str(parent_dir),
+                                 cemetery_path=cem_file)
+    s1 = ri.extract_search_state(str(child_dir),
+                                 cemetery_path=cem_file)
+    delta = ri.measure_search_delta(s0, s1)
+    assert delta["substantive"] is True, delta
+    assert "knowledge_bound" in delta["changed_fields"]
+    impact = json.loads((tmp_path / "ledger" / "search_impact" /
+                         "EV-E2E-2.json").read_text())
+    assert impact["behavioral_change_observed"] == \
+        "CHILD_CONSUMED_VERIFIED", impact["behavioral_change_observed"]
+    assert impact["child_consumed_delta"]["artifact_verification"] == \
+        "RESOLVED"
+    assert impact["operator_region_after"] is not None
+    with _cemetery(tmp_path):
+        out = ri.reconcile_unknown_launch(
+            str(tmp_path / "ledger"), "EV-E2E-2", _real,
+            ri.default_execution_checker(str(tmp_path / "runs")))
+    assert out["state"] == "LAUNCHED"
+
+
+def _vrun_dir(tmp_path, name, problem, manifest_extra=None,
+              receipt=None):
+    d = tmp_path / "runs" / name
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "problem.json").write_text(json.dumps(problem),
+                                    encoding="utf-8")
+    manifest = {"run_id": name}
+    manifest.update(manifest_extra or {})
+    (d / "run_manifest.json").write_text(json.dumps(manifest),
+                                         encoding="utf-8")
+    if receipt is not None:
+        (d / "CONSUMPTION.json").write_text(json.dumps(receipt),
+                                            encoding="utf-8")
+    return d
+
+
+def _vexp(eid, kid, art_sha):
+    return {"trigger_event_id": eid, "parent_run_id": PARENT_RUN,
+            "knowledge_record_id": kid, "launch_id": "lid-" + eid}
+
+
+_VART = {"mechanism": "linear regulator holds bus voltage",
+         "entry_id": "KA-TEST-001"}
+
+
+def _vresolver(mapping):
+    def _resolve(kid):
+        return mapping.get(kid)
+    return _resolve
+
+
+def _vprob(eid, kid, art_sha):
+    problem = dict(PARENT_PROBLEM)
+    problem["constraint"] = "base [REALITY %s: KILL knowledge %s " \
+        "constrains this search]" % (eid, kid)
+    problem["reality_constraints"] = {
+        "trigger_event_id": eid, "knowledge_record_id": kid,
+        "knowledge_artifact_sha256": art_sha,
+        "parent_run_id": PARENT_RUN,
+        "parent_problem_sha256": "ph" * 32,
+        "branch": "KILL", "constraint_clause": "c"}
+    problem["problem_id"] = "pp0_kbv_" + eid.lower()
+    return problem
+
+
+def _vman(eid, kid, art_sha, run_id):
+    return {"run_id": run_id,
+            "knowledge_consumed": {
+                "trigger_event_id": eid,
+                "knowledge_record_id": kid,
+                "knowledge_artifact_sha256": art_sha,
+                "parent_run_id": PARENT_RUN,
+                "parent_problem_sha256": "ph" * 32,
+                "branch": "KILL"}}
+
+
+def test_forged_receipt_without_binding_fails(tmp_path):
+    problem = dict(PARENT_PROBLEM, problem_id="pp0_forge02")
+    child = _vrun_dir(tmp_path, "engrun_forge02", problem,
+                      {"run_id": "engrun_forge02"},
+                      receipt={"consumed": True,
+                               "knowledge_record_id": "KX",
+                               "artifact_verification": "RESOLVED"})
+    out = ri.verify_consumption(
+        str(child), _vexp("EV-VF-1", "KX", "kh" * 32),
+        _vresolver({"KX": dict(_VART)}))
+    assert out["verified"] is False
+    assert "manifest does not bind" in out["reason"]
+
+
+def test_hash_mismatch_fails(tmp_path):
+    problem = _vprob("EV-VH-1", "KX", "kh" * 32)
+    child = _vrun_dir(tmp_path, "engrun_vh01", problem,
+                      dict(_vman("EV-VH-1", "KX", "kh" * 32,
+                                 "engrun_vh01"),
+                           run_id="engrun_vh01"))
+    out = ri.verify_consumption(
+        str(child), _vexp("EV-VH-1", "KX", "kh" * 32),
+        _vresolver({"KX": {"mechanism": "something else entirely"}}))
+    assert out["verified"] is False
+    assert out["checks"]["artifact"] == "TAMPERED"
+
+
+def test_different_artifact_same_id_fails(tmp_path):
+    problem = _vprob("EV-VD-1", "KX", "kh" * 32)
+    child = _vrun_dir(tmp_path, "engrun_vd01", problem,
+                      dict(_vman("EV-VD-1", "KX", "kh" * 32,
+                                 "engrun_vd01"),
+                           run_id="engrun_vd01"))
+    out = ri.verify_consumption(
+        str(child), _vexp("EV-VD-1", "KX", "kh" * 32),
+        _vresolver({"KX": {"mechanism": "unrelated other device"}}))
+    assert out["verified"] is False
+
+
+def test_problem_without_manifest_binding_fails(tmp_path):
+    problem = _vprob("EV-VP-1", "KX", "kh" * 32)
+    child = _vrun_dir(tmp_path, "engrun_vp01", problem,
+                      {"run_id": "engrun_vp01"})
+    out = ri.verify_consumption(
+        str(child), _vexp("EV-VP-1", "KX", "kh" * 32),
+        _vresolver({"KX": dict(_VART)}))
+    assert out["verified"] is False
+    assert "manifest does not bind" in out["reason"]
+
+
+def test_absent_knowledge_unresolved(tmp_path):
+    problem = _vprob("EV-VA-1", "KX", "kh" * 32)
+    child = _vrun_dir(tmp_path, "engrun_va01", problem,
+                      dict(_vman("EV-VA-1", "KX", "kh" * 32,
+                                 "engrun_va01"),
+                           run_id="engrun_va01"))
+    out = ri.verify_consumption(
+        str(child), _vexp("EV-VA-1", "KX", "kh" * 32),
+        _vresolver({}))
+    assert out["verified"] is False
+    assert out["checks"]["artifact"] == "UNRESOLVED_ABSENT"
+
+
+def test_unused_knowledge_fails(tmp_path):
+    problem = dict(PARENT_PROBLEM, problem_id="pp0_plain03")
+    child = _vrun_dir(tmp_path, "engrun_plain03", problem,
+                      {"run_id": "engrun_plain03"})
+    out = ri.verify_consumption(
+        str(child), _vexp("EV-VU-1", "KX", "kh" * 32),
+        _vresolver({"KX": dict(_VART)}))
+    assert out["verified"] is False
+
+
+def test_rehearsal_refused_by_verifier(tmp_path):
+    problem = _vprob("EV-VR-1", "KX", "kh" * 32)
+    child = _vrun_dir(tmp_path, "engrun_vr01", problem,
+                      dict(_vman("EV-VR-1", "KX", "kh" * 32,
+                                 "engrun_vr01"),
+                           run_id="engrun_vr01"))
+    exp = _vexp("EV-VR-1", "KX", "kh" * 32)
+    exp["rehearsal"] = True
+    out = ri.verify_consumption(str(child), exp,
+                                _vresolver({"KX": dict(_VART)}))
+    assert out["verified"] is False
+    assert "REHEARSAL" in out["reason"]
+
+
+def test_verifier_replay_stable(tmp_path):
+    import hashlib as _hl
+    art = dict(_VART)
+    art_sha = _hl.sha256(json.dumps(
+        art, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    problem = _vprob("EV-VS-1", "KX", art_sha)
+    child = _vrun_dir(tmp_path, "engrun_vs01", problem,
+                      dict(_vman("EV-VS-1", "KX", art_sha, "engrun_vs01"),
+                           run_id="engrun_vs01"))
+    exp = _vexp("EV-VS-1", "KX", art_sha)
+    r1 = ri.verify_consumption(str(child), exp,
+                               _vresolver({"KX": art}))
+    r2 = ri.verify_consumption(str(child), exp,
+                               _vresolver({"KX": art}))
+    assert r1["verified"] is True and r2["verified"] is True
+    assert r1["contract"] == r2["contract"]
+
+
+def test_duplicate_receipt_no_upgrade(tmp_path):
+    import hashlib as _hl
+    art = dict(_VART)
+    art_sha = _hl.sha256(json.dumps(
+        art, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    foreign = dict(PARENT_PROBLEM, problem_id="pp0_foreign")
+    child = _vrun_dir(tmp_path, "engrun_vdup01", foreign,
+                      {"run_id": "engrun_vdup01"},
+                      receipt={"consumed": True,
+                               "knowledge_record_id": "KX",
+                               "artifact_verification": "RESOLVED"})
+    out = ri.verify_consumption(
+        str(child), _vexp("EV-VDUP-1", "KX", art_sha),
+        _vresolver({"KX": art}))
+    assert out["verified"] is False
+
+
+def test_precreated_receipt_ignored_when_supported(tmp_path):
+    import hashlib as _hl
+    art = dict(_VART)
+    art_sha = _hl.sha256(json.dumps(
+        art, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    problem = _vprob("EV-VPC-1", "KX", art_sha)
+    child = _vrun_dir(tmp_path, "engrun_vpc01", problem,
+                      dict(_vman("EV-VPC-1", "KX", art_sha, "engrun_vpc01"),
+                           run_id="engrun_vpc01"),
+                      receipt={"consumed": False,
+                               "reason": "planted lie"})
+    out = ri.verify_consumption(
+        str(child), _vexp("EV-VPC-1", "KX", art_sha),
+        _vresolver({"KX": art}))
+    assert out["verified"] is True
+
+
+def test_search_state_stable_hash(tmp_path):
+    runs = tmp_path / "runs"
+    child = runs / "engrun_vss01"
+    child.mkdir(parents=True, exist_ok=True)
+    (child / "problem.json").write_text(
+        json.dumps(_vprob("EV-VSS-1", "KX", "kh" * 32)),
+        encoding="utf-8")
+    (child / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_vss01"}), encoding="utf-8")
+    s1 = ri.extract_search_state(str(child))
+    s2 = ri.extract_search_state(str(child))
+    assert s1["canonical_state_hash"] == s2["canonical_state_hash"]
+    assert s1["knowledge_binding"]["trigger_event_id"] == "EV-VSS-1"
+    assert s1["operator_regions"]["state"] == \
+        "UNKNOWN_NO_MECHANISM_SPACE"
+
+
+def test_delta_falsifier_problem_only(tmp_path):
+    runs = tmp_path / "runs"
+    for name, pid in (("engrun_vdfa", "pp0_a"), ("engrun_vdfb", "pp0_b")):
+        d = runs / name
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "problem.json").write_text(
+            json.dumps(dict(PARENT_PROBLEM, problem_id=pid)),
+            encoding="utf-8")
+        (d / "run_manifest.json").write_text(
+            json.dumps({"run_id": name}), encoding="utf-8")
+    s0 = ri.extract_search_state(str(runs / "engrun_vdfa"))
+    s1 = ri.extract_search_state(str(runs / "engrun_vdfb"))
+    assert s0["problem_sha256"] != s1["problem_sha256"]
+    delta = ri.measure_search_delta(s0, s1)
+    assert delta["substantive"] is False
+    assert delta["all_fields"]["problem_only"] is True
+
+
+def test_delta_substantive_kill_path(tmp_path):
+    import hashlib as _hl
+    art = dict(_VART)
+    art_sha = _hl.sha256(json.dumps(
+        art, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    runs = tmp_path / "runs"
+    plain = runs / "engrun_vdneg"
+    plain.mkdir(parents=True, exist_ok=True)
+    (plain / "problem.json").write_text(
+        json.dumps(dict(PARENT_PROBLEM, problem_id="pp0_neg")),
+        encoding="utf-8")
+    (plain / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_vdneg"}), encoding="utf-8")
+    kbdir = runs / "engrun_vdpos"
+    kbdir.mkdir(parents=True, exist_ok=True)
+    (kbdir / "problem.json").write_text(
+        json.dumps(_vprob("EV-VD-2", "KX", art_sha)), encoding="utf-8")
+    (kbdir / "run_manifest.json").write_text(
+        json.dumps(dict(_vman("EV-VD-2", "KX", art_sha, "engrun_vdpos"),
+                        run_id="engrun_vdpos")), encoding="utf-8")
+    s0 = ri.extract_search_state(str(plain), cemetery_path=None)
+    s1 = ri.extract_search_state(str(kbdir), cemetery_path=None)
+    s0["cemetery"] = {"state": "READ", "entry_count": 0,
+                      "head_sha256": "EMPTY"}
+    s1["cemetery"] = {"state": "READ", "entry_count": 1,
+                      "head_sha256": "h1"}
+    v0 = ri.verify_consumption(
+        str(plain), _vexp("EV-VD-2", "KX", art_sha),
+        _vresolver({"KX": art}))
+    v1 = ri.verify_consumption(
+        str(kbdir), _vexp("EV-VD-2", "KX", art_sha),
+        _vresolver({"KX": art}))
+    assert v0["verified"] is False
+    assert v1["verified"] is True
+    delta = ri.measure_search_delta(s0, s1)
+    assert delta["substantive"] is True
+    assert "cemetery_flip" in delta["changed_fields"]
+    assert "knowledge_bound" in delta["changed_fields"]
+
+
+def test_negative_control_no_delta(tmp_path):
+    runs = tmp_path / "runs"
+    for name in ("engrun_vnc1", "engrun_vnc2"):
+        d = runs / name
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "problem.json").write_text(
+            json.dumps(dict(PARENT_PROBLEM,
+                            problem_id="pp0_nc_" + name[-1])),
+            encoding="utf-8")
+        (d / "run_manifest.json").write_text(
+            json.dumps({"run_id": name}), encoding="utf-8")
+    s0 = ri.extract_search_state(str(runs / "engrun_vnc1"))
+    s1 = ri.extract_search_state(str(runs / "engrun_vnc2"))
+    delta = ri.measure_search_delta(s0, s1)
+    assert delta["substantive"] is False
+    out = ri.verify_consumption(
+        str(runs / "engrun_vnc2"),
+        _vexp("EV-VNC-1", "KX", "kh" * 32),
+        _vresolver({"KX": dict(_VART)}))
+    assert out["verified"] is False
+
+
+def test_e2e_verified_consumption_measured_delta(tmp_path):
+    import os as _os
+    if _os.name == "nt":
+        pytest = __import__("pytest")
+        pytest.skip("production child_run_id values contain colons "
+                    "(canonical engrun:...:... lineage format); Windows "
+                    "filesystems reject them. Production runs Linux.")
+    from discovery_fabric.engine.adapters import STAGE_ORDER
+    dis = list(STAGE_ORDER)
+    cem_file = _kill_cemetery(tmp_path)
+
+    def _resolver(kid):
+        data = json.loads(Path(cem_file).read_text())
+        for e in data.get("entries", []):
+            if e.get("entry_id") == kid:
+                return e
+        return None
+
+    def _real(req):
+        return ri.default_run_launcher(
+            req, str(tmp_path / "runs"), disabled_stages=dis,
+            knowledge_resolver=_resolver)
+
+    with _cemetery(tmp_path):
+        rec = _exec(_event("EV-E2E-2", verdict="KILL"),
+                    str(tmp_path / "ledger"), run_launcher=_real,
+                    parent_problem=dict(PARENT_PROBLEM),
+                    parent_run_id=PARENT_RUN,
+                    cemetery_path=cem_file)
+    assert rec["executed"] is True
+    assert rec["child"]["request_status"] == "LAUNCHED"
+    kid = rec["branch_record"]["cemetery_entry_id"]
+    child_id = rec["child"]["child_run_id"]
+    child_dir = tmp_path / "runs" / child_id
+    exp = {"trigger_event_id": "EV-E2E-2", "parent_run_id": PARENT_RUN,
+           "knowledge_record_id": kid, "launch_id": "lid-x"}
+    verified = ri.verify_consumption(str(child_dir), exp, _resolver)
+    assert verified["verified"] is True, verified["reason"]
+    assert verified["contract"]["knowledge_record_id"] == kid
+    parent_dir = tmp_path / "runs" / "engrun_parent_e2e"
+    parent_dir.mkdir(parents=True, exist_ok=True)
+    (parent_dir / "problem.json").write_text(
+        json.dumps(dict(PARENT_PROBLEM, problem_id="pp0_e2e_parent")),
+        encoding="utf-8")
+    (parent_dir / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_parent_e2e"}), encoding="utf-8")
+    s0 = ri.extract_search_state(str(parent_dir),
+                                 cemetery_path=cem_file)
+    s1 = ri.extract_search_state(str(child_dir),
+                                 cemetery_path=cem_file)
+    delta = ri.measure_search_delta(s0, s1)
+    assert delta["substantive"] is True, delta
+    assert "knowledge_bound" in delta["changed_fields"]
+    impact = json.loads((tmp_path / "ledger" / "search_impact" /
+                         "EV-E2E-2.json").read_text())
+    assert impact["behavioral_change_observed"] == \
+        "CHILD_CONSUMED_VERIFIED", impact["behavioral_change_observed"]
+    assert impact["child_consumed_delta"]["artifact_verification"] == \
+        "RESOLVED"
+    assert impact["operator_region_after"] is not None
+    with _cemetery(tmp_path):
+        out = ri.reconcile_unknown_launch(
+            str(tmp_path / "ledger"), "EV-E2E-2", _real,
             ri.default_execution_checker(str(tmp_path / "runs")))
     assert out["state"] == "LAUNCHED"
