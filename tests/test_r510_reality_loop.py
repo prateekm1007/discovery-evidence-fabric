@@ -81,6 +81,38 @@ def _fake_launcher(calls):
     return _launch
 
 
+class _FakeStore:
+    """Injectable credential store (tests only): session_id ->
+    issued owner capability. Mirrors TOSCANINI.sessions.session_access
+    verdicts (OWNER | PUBLIC | DENY | None) without touching real
+    sessions (Art. IX)."""
+
+    def __init__(self, mapping):
+        self._m = dict(mapping)
+
+    def session_access(self, sid, key):
+        if sid not in self._m:
+            return None
+        return "OWNER" if self._m[sid] == key else "DENY"
+
+
+STORE_OK = _FakeStore({"TS-1": "owner-1"})
+AUTH_OK = {"session_id": "TS-1", "owner_key": "owner-1"}
+
+
+def _exec(ev, ledger, **kw):
+    kw.setdefault("auth", dict(AUTH_OK))
+    kw.setdefault("session_store", STORE_OK)
+    return ri.execute_reality_event(ev, ledger, **kw)
+
+
+def _raising_store():
+    class _Raising:
+        def session_access(self, sid, key):
+            raise ConnectionError("vault unreachable")
+    return _Raising()
+
+
 def _kill_cemetery(tmp_path):
     return str(tmp_path / "cemetery" / "CEMETERY.json")
 
@@ -88,7 +120,7 @@ def _kill_cemetery(tmp_path):
 # valid real KEEP -------------------------------------------------------
 def test_valid_real_keep_mutates_with_linkage(tmp_path):
     with _cemetery(tmp_path):
-        rec = ri.execute_reality_event(
+        rec = _exec(
             _event("EV-KEEP-1"), str(tmp_path / "ledger"),
             parent_problem=dict(PARENT_PROBLEM),
             parent_run_id=PARENT_RUN,
@@ -108,7 +140,7 @@ def test_valid_real_keep_mutates_with_linkage(tmp_path):
 def test_missing_provenance_invalid(tmp_path):
     ev = _event("EV-BAD-1")
     del ev["attestation"]
-    rec = ri.execute_reality_event(ev, str(tmp_path / "ledger"))
+    rec = _exec(ev, str(tmp_path / "ledger"))
     assert rec["executed"] is False
     assert rec["execution_state"] == "EXECUTION_INVALID"
     assert not (tmp_path / "ledger").exists()
@@ -116,7 +148,7 @@ def test_missing_provenance_invalid(tmp_path):
 
 def test_invalid_hash_invalid(tmp_path):
     ev = _event("EV-BAD-2", raw_data_hash="xyz")
-    rec = ri.execute_reality_event(ev, str(tmp_path / "ledger"))
+    rec = _exec(ev, str(tmp_path / "ledger"))
     assert rec["executed"] is False
     assert any("sha256" in p for p in rec["problems"])
 
@@ -127,9 +159,9 @@ def test_duplicate_returns_stored_result(tmp_path):
               parent_run_id=PARENT_RUN,
               cemetery_path=_kill_cemetery(tmp_path))
     with _cemetery(tmp_path):
-        r1 = ri.execute_reality_event(_event("EV-DUP-1"),
+        r1 = _exec(_event("EV-DUP-1"),
                                       str(tmp_path / "ledger"), **kw)
-        r2 = ri.execute_reality_event(_event("EV-DUP-1"),
+        r2 = _exec(_event("EV-DUP-1"),
                                       str(tmp_path / "ledger"), **kw)
     assert r2["duplicate"] is True and r2["replayed"] is True
     assert r2["entry_sha256"] == r1["entry_sha256"]
@@ -145,7 +177,7 @@ def test_concurrent_duplicate_single_ingest(tmp_path):
     results = []
     with _cemetery(tmp_path):
         def _one():
-            results.append(ri.execute_reality_event(
+            results.append(_exec(
                 _event("EV-RACE-1"), str(tmp_path / "ledger"), **kw))
         threads = [threading.Thread(target=_one) for _i in range(8)]
         [t.start() for t in threads]
@@ -161,7 +193,7 @@ def test_concurrent_duplicate_single_ingest(tmp_path):
 # rehearsal isolation ------------------------------------------------------
 def test_rehearsal_never_counts_never_appends(tmp_path):
     with _cemetery(tmp_path):
-        rec = ri.execute_reality_event(
+        rec = _exec(
             _event("EV-REH-1", source="CONTROLLED_REHEARSAL"),
             str(tmp_path / "ledger"),
             parent_problem=dict(PARENT_PROBLEM),
@@ -176,7 +208,7 @@ def test_rehearsal_never_counts_never_appends(tmp_path):
 def test_rehearsal_kill_isolation_attack(tmp_path):
     calls = []
     with _cemetery(tmp_path):
-        rec = ri.execute_reality_event(
+        rec = _exec(
             _event("EV-REH-K-1", verdict="KILL",
                    source="CONTROLLED_REHEARSAL"),
             str(tmp_path / "ledger"), run_launcher=_fake_launcher(calls),
@@ -186,14 +218,16 @@ def test_rehearsal_kill_isolation_attack(tmp_path):
     assert calls == [], "rehearsal must never invoke the launcher"
     assert rec["branch_record"]["rehearsal_cemetery_skipped"]
     assert not (tmp_path / "cemetery" / "CEMETERY.json").exists()
-    assert rec["child"]["request_status"] == "REQUESTED"
+    assert rec["child"]["request_status"] == "NO_REQUEST", \
+        "rehearsal child requests are in-memory only: nothing durable "\
+        "to launch later (stronger than REQUESTED-and-held)"
     assert rec["counts_as_physical_learning"] is False
 
 
 # real KILL -----------------------------------------------------------------
 def test_real_kill_appends_constrains_requests(tmp_path):
     with _cemetery(tmp_path):
-        rec = ri.execute_reality_event(
+        rec = _exec(
             _event("EV-KILL-1", verdict="KILL"),
             str(tmp_path / "ledger"),
             parent_problem=dict(PARENT_PROBLEM),
@@ -225,7 +259,7 @@ def test_real_kill_appends_constrains_requests(tmp_path):
 # MODIFY + MIXED -------------------------------------------------------------
 def test_modify_registers_hypothesis_and_delta(tmp_path):
     with _cemetery(tmp_path):
-        rec = ri.execute_reality_event(
+        rec = _exec(
             _event("EV-MOD-1", verdict="MODIFY"),
             str(tmp_path / "ledger"),
             parent_problem=dict(PARENT_PROBLEM),
@@ -240,7 +274,7 @@ def test_modify_registers_hypothesis_and_delta(tmp_path):
 
 def test_mixed_routes_modify_conservatively(tmp_path):
     with _cemetery(tmp_path):
-        rec = ri.execute_reality_event(
+        rec = _exec(
             _event("EV-MIX-1", verdict="MIXED"),
             str(tmp_path / "ledger"),
             parent_problem=dict(PARENT_PROBLEM),
@@ -257,10 +291,10 @@ def test_child_launch_and_no_duplicate(tmp_path):
               parent_run_id=PARENT_RUN,
               cemetery_path=_kill_cemetery(tmp_path))
     with _cemetery(tmp_path):
-        r1 = ri.execute_reality_event(
+        r1 = _exec(
             _event("EV-CH-1", verdict="KILL"), str(tmp_path / "ledger"),
             run_launcher=_fake_launcher(calls), **kw)
-        r2 = ri.execute_reality_event(
+        r2 = _exec(
             _event("EV-CH-1", verdict="KILL"), str(tmp_path / "ledger"),
             run_launcher=_fake_launcher(calls), **kw)
     assert calls == ["EV-CH-1"], calls
@@ -277,7 +311,7 @@ def test_restart_before_launch_then_after(tmp_path):
               parent_run_id=PARENT_RUN,
               cemetery_path=_kill_cemetery(tmp_path))
     with _cemetery(tmp_path):
-        r1 = ri.execute_reality_event(
+        r1 = _exec(
             _event("EV-RS-1", verdict="KILL"), str(tmp_path / "ledger"),
             run_launcher=None, **kw)
         assert r1["child"]["request_status"] == "REQUESTED"
@@ -295,7 +329,7 @@ def test_restart_before_launch_then_after(tmp_path):
 def test_child_consumes_knowledge_with_measured_delta(tmp_path):
     calls = []
     with _cemetery(tmp_path):
-        rec = ri.execute_reality_event(
+        rec = _exec(
             _event("EV-CO-1", verdict="KILL"), str(tmp_path / "ledger"),
             run_launcher=_fake_launcher(calls),
             parent_problem=dict(PARENT_PROBLEM),
@@ -330,7 +364,7 @@ def test_verdict_flip_proves_consumption(tmp_path):
         before = mc.check_candidate_against_cemetery(probe)
         assert before.get("verdict") == "PROCEED", before
         assert before.get("hard_blocks") == []
-        ri.execute_reality_event(
+        _exec(
             _event("EV-FL-1", verdict="KILL"), str(tmp_path / "ledger"),
             parent_problem=dict(PARENT_PROBLEM),
             parent_run_id=PARENT_RUN,
@@ -346,7 +380,7 @@ def test_learning_without_numbers_stays_false(tmp_path):
     ev["baseline_result"] = "warm"
     ev["candidate_result"] = "warmer"
     with _cemetery(tmp_path):
-        rec = ri.execute_reality_event(
+        rec = _exec(
             ev, str(tmp_path / "ledger"),
             parent_problem=dict(PARENT_PROBLEM),
             parent_run_id=PARENT_RUN,
@@ -360,7 +394,7 @@ def test_infra_failure_never_scientific_kill(tmp_path):
     ev = _event("EV-INF-1")
     ev["decision"] = {"verdict": "EXECUTION_BLOCKED"}
     with _cemetery(tmp_path):
-        rec = ri.execute_reality_event(
+        rec = _exec(
             ev, str(tmp_path / "ledger"),
             parent_problem=dict(PARENT_PROBLEM),
             parent_run_id=PARENT_RUN,
@@ -374,7 +408,7 @@ def test_infra_failure_never_scientific_kill(tmp_path):
 def test_no_fabricated_observation(tmp_path):
     ev = _event("EV-FAB-1")
     with _cemetery(tmp_path):
-        rec = ri.execute_reality_event(
+        rec = _exec(
             ev, str(tmp_path / "ledger"),
             parent_problem=dict(PARENT_PROBLEM),
             parent_run_id=PARENT_RUN,
@@ -387,3 +421,190 @@ def test_no_fabricated_observation(tmp_path):
                 "decision"):
         assert stored[key] == ev[key], key
     assert rec["entry_sha256"]
+
+
+# auth binding (§4) -----------------------------------------------------------
+def test_auth_accept_owner_executes(tmp_path):
+    rec = _exec(_event("EV-AU-1"), str(tmp_path / "ledger"),
+                parent_problem=dict(PARENT_PROBLEM),
+                parent_run_id=PARENT_RUN,
+                cemetery_path=_kill_cemetery(tmp_path))
+    assert rec["executed"] is True
+    assert rec["auth"] == {"mode": "owner-capability",
+                           "session_id": "TS-1", "access": "OWNER",
+                           "authenticated": True}
+    assert "owner_key" not in json.dumps(rec), "key values never persist"
+
+
+def test_auth_wrong_key_blocked_before_state(tmp_path):
+    rec = ri.execute_reality_event(
+        _event("EV-AU-2"), str(tmp_path / "ledger"),
+        auth={"session_id": "TS-1", "owner_key": "wrong"},
+        session_store=STORE_OK)
+    assert rec["executed"] is False
+    assert rec["execution_state"] == "EXECUTION_BLOCKED"
+    assert rec["auth"]["access"] == "DENY"
+    assert not (tmp_path / "ledger").exists(), \
+        "denied callers leave no state (fail-closed)"
+
+
+def test_auth_missing_blocked(tmp_path):
+    rec = ri.execute_reality_event(_event("EV-AU-3"),
+                                   str(tmp_path / "ledger"),
+                                   session_store=STORE_OK)
+    assert rec["executed"] is False
+    assert "no caller capability" in rec["auth"]["reason"]
+
+
+def test_auth_store_unreachable_typed(tmp_path):
+    rec = ri.execute_reality_event(
+        _event("EV-AU-4"), str(tmp_path / "ledger"),
+        auth=dict(AUTH_OK), session_store=_raising_store())
+    assert rec["executed"] is False
+    assert "unreachable" in rec["auth"]["reason"]
+    assert not (tmp_path / "ledger").exists()
+
+
+# legacy-flag separation (§18) --------------------------------------------------
+def test_legacy_learning_flag_never_proves_learning():
+    ev = {"source_type": "EXTERNAL_SYSTEM"}
+    assert ri._learning_countable(
+        ev, {"adjudication": {"verdict": "INSUFFICIENT_DATA",
+                              "counts_as_learning": True}}) is False
+    assert ri._learning_countable(
+        ev, {"adjudication": {"verdict": "MODEL_IMPROVED",
+                              "counts_as_learning": False}}) is True
+    assert ri._learning_countable(ev, {}) == "UNDETERMINED"
+
+
+# claim concurrency: exactly one launch right (§10) ------------------------------
+def test_concurrent_claim_single_launch(tmp_path):
+    with _cemetery(tmp_path):
+        rec = _exec(_event("EV-CC-1", verdict="KILL"),
+                    str(tmp_path / "ledger"), run_launcher=None,
+                    parent_problem=dict(PARENT_PROBLEM),
+                    parent_run_id=PARENT_RUN,
+                    cemetery_path=_kill_cemetery(tmp_path))
+    assert rec["child"]["request_status"] == "REQUESTED"
+    calls = []
+    results = []
+
+    def _resume():
+        results.append(ri.resume_pending_children(
+            str(tmp_path / "ledger"), _fake_launcher(calls)))
+
+    threads = [threading.Thread(target=_resume) for _i in range(8)]
+    [t.start() for t in threads]
+    [t.join() for t in threads]
+    assert calls == ["EV-CC-1"], calls
+    total = sum(len(r["launched"]) for r in results)
+    assert total == 1, [r["launched"] for r in results]
+
+
+# phased resume: crash between request and finalize (§12 C/D) ----------------------
+def test_resume_after_request_before_finalize(tmp_path):
+    with _cemetery(tmp_path):
+        _exec(_event("EV-PH-1", verdict="KILL"),
+              str(tmp_path / "ledger"), run_launcher=None,
+              parent_problem=dict(PARENT_PROBLEM),
+              parent_run_id=PARENT_RUN,
+              cemetery_path=_kill_cemetery(tmp_path))
+    (tmp_path / "ledger" / "executions" / "EV-PH-1.json").unlink()
+    calls = []
+    with _cemetery(tmp_path):
+        rec = ri.resume_execution(
+            str(tmp_path / "ledger"), "EV-PH-1",
+            run_launcher=_fake_launcher(calls),
+            parent_problem=dict(PARENT_PROBLEM),
+            parent_run_id=PARENT_RUN,
+            cemetery_path=_kill_cemetery(tmp_path),
+            auth=dict(AUTH_OK), session_store=STORE_OK)
+    assert rec["executed"] is True
+    assert rec["resumed_after_crash"] is True
+    assert calls == ["EV-PH-1"], calls
+    data = json.loads((tmp_path / "cemetery" / "CEMETERY.json")
+                      .read_text())
+    assert sum(1 for e in data["entries"]
+               if "EV-PH-1" in (e.get("evidence_sources") or [])) == 1
+
+
+def test_resume_finalized_replays_without_reexecution(tmp_path):
+    with _cemetery(tmp_path):
+        r1 = _exec(_event("EV-PH-2", verdict="KILL"),
+                   str(tmp_path / "ledger"), run_launcher=None,
+                   parent_problem=dict(PARENT_PROBLEM),
+                   parent_run_id=PARENT_RUN,
+                   cemetery_path=_kill_cemetery(tmp_path))
+        assert r1["executed"] is True
+        calls = []
+        r2 = ri.resume_execution(
+            str(tmp_path / "ledger"), "EV-PH-2",
+            run_launcher=_fake_launcher(calls),
+            parent_problem=dict(PARENT_PROBLEM),
+            parent_run_id=PARENT_RUN,
+            cemetery_path=_kill_cemetery(tmp_path),
+            auth=dict(AUTH_OK), session_store=STORE_OK)
+    assert r2["duplicate"] is True and r2["replayed"] is True
+    assert calls == []
+
+
+def test_resume_unknown_event_and_denied_caller(tmp_path):
+    r = ri.resume_execution(str(tmp_path / "ledger"), "EV-NOPE",
+                            auth=dict(AUTH_OK), session_store=STORE_OK)
+    assert r["executed"] is False
+    assert r["execution_state"] == "UNKNOWN"
+    r = ri.resume_execution(str(tmp_path / "ledger"), "EV-NOPE",
+                            auth={"session_id": "TS-1",
+                                  "owner_key": "wrong"},
+                            session_store=STORE_OK)
+    assert r["executed"] is False
+    assert r["execution_state"] == "EXECUTION_BLOCKED"
+
+
+# registry rebuild identity + canonical mutation (§5) --------------------------------
+def test_registry_rebuild_identity_and_mutation_linkage(tmp_path):
+    with _cemetery(tmp_path):
+        rec = _exec(_event("EV-RG-1"), str(tmp_path / "ledger"),
+                    parent_problem=dict(PARENT_PROBLEM),
+                    parent_run_id=PARENT_RUN,
+                    cemetery_path=_kill_cemetery(tmp_path))
+    impact = rec["search_impact"]
+    assert impact["measurement_basis"].startswith("mutation sidecars")
+    reg_path = tmp_path / "ledger" / "REALITY_STATE.json"
+    assert reg_path.exists()
+    live_packages = json.loads(reg_path.read_text()).get("packages")
+    pkg = live_packages["PKG-1"]
+    assert pkg["status"] == "OBSERVED_KEEP"
+    assert pkg["last_event_id"] == "EV-RG-1"
+    assert pkg["mutation_ids"], "KEEP mutations must be registered"
+    expected = ri._loop_sha({"artifact_type": "REALITY_STATE/1.0.0",
+                             "packages": live_packages})
+    assert ri.rebuild_reality_state(
+        str(tmp_path / "ledger"))["match"] is True
+    reg_path.unlink()
+    rebuilt = ri.rebuild_reality_state(str(tmp_path / "ledger"))
+    assert rebuilt["rebuilt_hash"] == expected, rebuilt
+    assert rebuilt["match"] is False, rebuilt
+
+
+# expanded impact shape (§9) ----------------------------------------------------------
+def test_impact_expanded_shape_kill(tmp_path):
+    with _cemetery(tmp_path):
+        rec = _exec(_event("EV-IM-1", verdict="KILL"),
+                    str(tmp_path / "ledger"),
+                    parent_problem=dict(PARENT_PROBLEM),
+                    parent_run_id=PARENT_RUN,
+                    cemetery_path=_kill_cemetery(tmp_path))
+    impact = rec["search_impact"]
+    for key in ("knowledge_delta_id", "operator_region_before",
+                "operator_region_after", "cemetery_constraints_before",
+                "cemetery_constraints_after", "query_policy_before",
+                "query_policy_after", "child_consumed_delta",
+                "measurement_basis"):
+        assert key in impact, key
+    before = impact["cemetery_constraints_before"]
+    after = impact["cemetery_constraints_after"]
+    assert before["state"] == "UNKNOWN_NO_CEMETERY_PATH", before
+    assert after["entry_count"] == 1, after
+    assert after["head_sha256"]
+    assert impact["query_policy_before"] == "UNKNOWN_NO_QUERY_REGISTRY"

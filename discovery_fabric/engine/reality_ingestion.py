@@ -852,7 +852,8 @@ def _cemetery_has_trigger(cemetery_path: str, event_id: str,
         if os.path.exists(sidecar):
             try:
                 return json.load(
-                    open(sidecar, encoding="utf-8")).get("entry_id")
+                    open(sidecar, encoding="utf-8")).get(
+                        "cemetery_entry_id")
             except Exception:
                 pass
     if not os.path.exists(cemetery_path):
@@ -884,6 +885,20 @@ def _exec_path(ledger_dir: str, event_id: str) -> str:
     return os.path.join(ledger_dir, "executions", event_id + ".json")
 
 
+def _ledger_entry(ledger_path: str, event_id: str) -> Optional[Dict]:
+    """Read one ledger entry by id (resume path; read-only)."""
+    if not os.path.exists(ledger_path):
+        return None
+    try:
+        for e in json.load(
+                open(ledger_path, encoding="utf-8")).get("entries", []):
+            if e.get("event_id") == event_id:
+                return e
+    except Exception:
+        pass
+    return None
+
+
 def _load_execution(ledger_dir: str, event_id: str) -> Optional[Dict]:
     p = _exec_path(ledger_dir, event_id)
     if not os.path.exists(p):
@@ -894,12 +909,57 @@ def _load_execution(ledger_dir: str, event_id: str) -> Optional[Dict]:
         return None
 
 
+def _default_session_store():
+    """The approved application credential path, resolved lazily (same
+    pattern as the cemetery import: no layer inversion at module load).
+    Caller identity is the owner capability the server issues and the
+    session store recognizes — never a new key type (nothing invented)."""
+    from TOSCANINI import sessions as _sessions
+    return _sessions
+
+
+def _authorize_caller(auth, session_store=None):
+    """Bind authenticated caller identity (§4). A caller-provided
+    operator/organization STRING is provenance metadata, never
+    authentication. Authentication = presenting the owner capability
+    the session store issued for the claimed session id
+    (TOSCANINI.sessions.session_access: OWNER | PUBLIC | DENY | None).
+
+    Returns (ok, record). The record carries session_id + access
+    verdict ONLY — key values are never persisted, printed, or
+    returned (BS-021). Missing/invalid/unreachable capability ->
+    fail-closed denial (typed, never a scientific verdict).
+    """
+    base = {"mode": "owner-capability", "authenticated": False}
+    if not isinstance(auth, dict):
+        return False, dict(base, reason="no caller capability presented "
+                                        "(fail-closed)")
+    sid, key = auth.get("session_id"), auth.get("owner_key")
+    if not sid or not key:
+        return False, dict(
+            base, reason="session_id + owner_key both required",
+            session_id=sid)
+    try:
+        store = session_store or _default_session_store()
+        access = store.session_access(sid, key)
+    except Exception as exc:  # noqa: BLE001 — typed (Art. XXV)
+        return False, dict(
+            base, session_id=sid,
+            reason="credential store unreachable: %s (typed; not a "
+                   "scientific verdict)" % (type(exc).__name__,))
+    ok = access in ("OWNER", "PUBLIC")
+    return ok, {"mode": "owner-capability", "session_id": sid,
+                "access": access, "authenticated": ok}
+
+
 def execute_reality_event(event: Dict[str, Any], ledger_dir: str,
                           run_launcher=None,
                           parent_problem: Optional[Dict] = None,
                           parent_run_id: Optional[str] = None,
                           cemetery_path: Optional[str] = None,
-                          runs_root: Optional[str] = None) -> Dict:
+                          runs_root: Optional[str] = None,
+                          auth=None, session_store=None,
+                          parent_run_dir: Optional[str] = None) -> Dict:
     """THE canonical production reality entrypoint (P0 §A).
 
     validate -> authorize (provenance/attestation, from mandatory
@@ -912,7 +972,12 @@ def execute_reality_event(event: Dict[str, Any], ledger_dir: str,
     (tests redirect to tmp; production omits it and uses the
     canonical file — canonical state never touched by tests, Art.
     IX). runs_root: where a default launcher materializes child
-    runs (tests pass tmp or a fake launcher).
+    runs (tests pass tmp or a fake launcher). auth: caller
+    capability {"session_id", "owner_key"} bound via the approved
+    owner-capability path (fail-closed; §4). session_store: injectable
+    credential store (tests pass fakes; default is the production
+    session surface). parent_run_dir: optional parent run directory
+    for operator-region reads (else typed UNKNOWN).
     """
     evid = (event or {}).get("event_id", "unknown-event")
     problems = validate_reality_event_v2(event)
@@ -922,6 +987,15 @@ def execute_reality_event(event: Dict[str, Any], ledger_dir: str,
                 "problems": problems,
                 "note": "ingestion failure is an execution state, never "
                         "a scientific verdict (Art. LXI)"}
+    authed, auth_rec = _authorize_caller(auth, session_store)
+    if not authed:
+        return {"executed": False, "event_id": evid,
+                "execution_state": "EXECUTION_BLOCKED",
+                "auth": auth_rec,
+                "note": "unauthenticated caller is refused before any "
+                        "state is read or written (fail-closed; the "
+                        "event's declared operator string is provenance "
+                        "metadata, never authentication)"}
     rehearsal = event.get("source_type") == "CONTROLLED_REHEARSAL"
     prior = _load_execution(ledger_dir, event["event_id"])
     if prior is not None:
@@ -934,11 +1008,92 @@ def execute_reality_event(event: Dict[str, Any], ledger_dir: str,
         else "REALITY_EVENT_LEDGER.json")
     ing = ingest_reality_event_durable(event, ledger_path)
     if not ing.get("ingested"):
+        # Double-entry here is AMBIGUOUS by construction: it means a
+        # crashed predecessor (resumable) OR an in-flight concurrent
+        # ingester (must not be disturbed). The ingester cannot tell
+        # them apart, so it BLOCKS with resumable:true and never
+        # auto-continues (auto-continue turned 8 concurrent ingesters
+        # into 8 executions — caught by the concurrent-duplicate
+        # battery). Crash recovery is the explicit resume_execution()
+        # path below, never re-execution.
         return {"executed": False, "event_id": event["event_id"],
                 "execution_state": "EXECUTION_BLOCKED",
                 "problems": ing.get("problems"),
+                "resumable": _ledger_entry(ledger_path,
+                                           event["event_id"]) is not None,
                 "note": "ledger refused the event; nothing downstream "
-                        "ran (Art. LXI)"}
+                        "ran (Art. LXI). A durable-but-unfinalized event "
+                        "is resumed explicitly, never by re-execution."}
+    _mark_phase(ledger_dir, event["event_id"], "EVENT_PERSISTED")
+    return _continue_execution(
+        event, ledger_dir, ing, cemetery_path, run_launcher,
+        parent_problem, parent_run_id, parent_run_dir, rehearsal,
+        auth_rec, _cem_target=None, resumed=False)
+
+
+def resume_execution(ledger_dir: str, event_id: str, run_launcher=None,
+                     parent_problem: Optional[Dict] = None,
+                     parent_run_id: Optional[str] = None,
+                     cemetery_path: Optional[str] = None,
+                     auth=None, session_store=None,
+                     parent_run_dir: Optional[str] = None) -> Dict:
+    """Explicit crash recovery (§12 boundaries C/D): continue a
+    durable-but-unfinalized event. Auth enforced identically
+    (fail-closed). Ledger entry absent -> UNKNOWN (nothing to resume,
+    never invented). Execution record FINALIZED -> replay-return
+    duplicate. Else re-run branch+finalize with re-supplied inputs;
+    every non-idempotent step is guarded (cemetery sidecar, child
+    claim, deterministic record overwrites). The event bytes come
+    from the DURABLE ledger entry itself, never re-supplied."""
+    _, auth_rec = _authorize_caller(auth, session_store)
+    if not _authorize_caller(auth, session_store)[0]:
+        return {"executed": False, "event_id": event_id,
+                "execution_state": "EXECUTION_BLOCKED",
+                "auth": auth_rec,
+                "note": "resume requires the same capability as "
+                        "execution (fail-closed)"}
+    entry = None
+    for _ledger in ("REALITY_EVENT_LEDGER.json",
+                    "REHEARSAL_EVENT_LEDGER.json"):
+        entry = _ledger_entry(os.path.join(ledger_dir, _ledger),
+                              event_id)
+        if entry is not None:
+            break
+    if entry is None:
+        return {"executed": False, "event_id": event_id,
+                "execution_state": "UNKNOWN",
+                "note": "no durable ledger entry for this event id; "
+                        "nothing to resume (Art. XXV)"}
+    prior = _load_execution(ledger_dir, event_id)
+    if prior is not None and prior.get("executed"):
+        replayed = dict(prior)
+        replayed["duplicate"] = True
+        replayed["replayed"] = True
+        return replayed
+    event = entry.get("record") or {}
+    rehearsal = event.get("source_type") == "CONTROLLED_REHEARSAL"
+    ing = {"ingested": True,
+           "entry_sha256": entry.get("entry_sha256"),
+           "ledger_entry_count": None, "real_event_count": None,
+           "resumed_after_crash": True}
+    return _continue_execution(
+        event, ledger_dir, ing, cemetery_path, run_launcher,
+        parent_problem, parent_run_id, parent_run_dir, rehearsal,
+        auth_rec, _cem_target=None, resumed=True)
+
+
+def _continue_execution(event, ledger_dir, ing, cemetery_path,
+                        run_launcher, parent_problem, parent_run_id,
+                        parent_run_dir, rehearsal, auth_rec,
+                        _cem_target, resumed: bool) -> Dict:
+    """Shared execution tail: verdict routing -> branch -> registry ->
+    finalize -> execution record. Used by execute (fresh ingest) and
+    resume (durable entry) alike."""
+    from orchestrator import mechanism_cemetery as _mc
+    if _cem_target is None:
+        _cem_target = str(cemetery_path) if cemetery_path else str(
+            _mc.CEMETERY_PATH)
+    _cem_before = _cemetery_head(_cem_target)
     verdict = (event.get("decision") or {}).get("verdict")
     if verdict in ("EXECUTION_INVALID", "EXECUTION_BLOCKED"):
         rec = {"executed": False, "event_id": event["event_id"],
@@ -966,21 +1121,36 @@ def execute_reality_event(event: Dict[str, Any], ledger_dir: str,
             "superset path (never auto-KILL on ambiguity)"
             % (verdict,))
     counts_learning = _learning_countable(event, out)
-    fin = _finalize_execution(event, ledger_dir, branch, out,
-                              run_launcher, parent_problem, rehearsal)
+    _mark_phase(ledger_dir, event["event_id"], "BRANCH_EXECUTED")
+    if rehearsal:
+        _reg_before = _reg_after = "REHEARSAL_NO_REGISTRY_WRITE"
+    else:
+        _reg_before, _reg_after = _apply_event_to_state(
+            ledger_dir, event, branch, out)
+    _cem_after = _cemetery_head(_cem_target)
+    fin = _finalize_execution(
+        event, ledger_dir, branch, out, run_launcher, parent_problem,
+        rehearsal, parent_run_dir=parent_run_dir,
+        cemetery_path=cemetery_path,
+        registry_hashes={"before": _reg_before, "after": _reg_after},
+        cemetery_bounds={"before": _cem_before, "after": _cem_after})
     rec = {"executed": True, "event_id": event["event_id"],
            "execution_state": ("EXECUTED_REHEARSAL" if rehearsal
                                else "EXECUTED_REAL"),
            "branch": branch,
+           "resumed_after_crash": resumed,
            "entry_sha256": ing["entry_sha256"],
            "reality_class": ("CONTROLLED_REHEARSAL" if rehearsal
                              else "REAL"),
            "counts_as_physical_learning": counts_learning,
+           "auth": auth_rec,
            "branch_record": out,
            "search_impact": fin["search_impact"],
            "child": fin["child"],
+           "phase": "FINALIZED",
            "loop_version": REALITY_LOOP_VERSION,
            "reviewer_provenance": "AI_REVIEW"}
+    _mark_phase(ledger_dir, event["event_id"], "FINALIZED")
     _atomic_write_json(_exec_path(ledger_dir, event["event_id"]), rec)
     return rec
 
@@ -990,7 +1160,13 @@ def _learning_countable(event: Dict, branch_out: Dict) -> object:
     for rehearsal, ALWAYS. For REAL: True only when the adjudication
     verdict is MODEL_IMPROVED; INSUFFICIENT_DATA/LEARNING_FAILED stay
     False (a field named true would be worthless there). UNDETERMINED
-    when no adjudication ran (never guessed)."""
+    when no adjudication ran (never guessed).
+
+    §18 separation: a legacy counts_as_learning flag carried inside an
+    adjudication record is NEVER consulted here — only the verdict
+    rules. The legacy helper keeps its historical semantics untouched;
+    this rule is the explicit authoritative eligibility for physical-
+    learning claims, and a regression test pins the separation."""
     if event.get("source_type") == "CONTROLLED_REHEARSAL":
         return False
     adj = (branch_out or {}).get("adjudication") or {}
@@ -1290,16 +1466,22 @@ def _request_child(event, ledger_dir, parent_problem, parent_run_id,
 
 
 def _search_impact_record(event, branch_out, child_req,
-                          parent_problem) -> Dict:
-    """Canonical SEARCH-IMPACT (§G): BEFORE/AFTER derived from actual
-    canonical records (problem hashes), never free-text assertion."""
+                          parent_problem, parent_run_dir,
+                          cemetery_before, cemetery_after,
+                          registry_before, registry_after,
+                          consumption) -> Dict:
+    """Canonical SEARCH-IMPACT (§G/§9): BEFORE/AFTER derived from actual
+    canonical records (hashes/references, never narrative). Unknowns
+    stay typed (Art. XXV)."""
     before = _loop_sha(parent_problem) if isinstance(
         parent_problem, dict) else "NO_PARENT_SUPPLIED"
     after = child_req.get("child_problem_sha256", "NO_CHILD_PROBLEM")
     knowledge_id = child_req.get("knowledge_record_id")
+    regions = _parent_operator_regions(parent_run_dir)
     return {"artifact_type": "SEARCH_IMPACT/1.0.0",
             "parent_run_id": child_req.get("parent_run_id"),
             "trigger_event_id": event["event_id"],
+            "knowledge_delta_id": knowledge_id,
             "knowledge_record_id": knowledge_id,
             "search_state_before": {
                 "parent_problem_sha256": before,
@@ -1311,12 +1493,23 @@ def _search_impact_record(event, branch_out, child_req,
                 "child_problem_sha256": after,
                 "child_constraint": (child_req.get("child_problem")
                                      or {}).get("constraint")},
+            "operator_region_before": regions.get("operator_ids",
+                                                  regions.get("state")),
+            "operator_region_after": "PENDING_CHILD_EXECUTION",
+            "cemetery_constraints_before": cemetery_before,
+            "cemetery_constraints_after": cemetery_after,
+            "query_policy_before": "UNKNOWN_NO_QUERY_REGISTRY",
+            "query_policy_after": "UNKNOWN_NO_QUERY_REGISTRY",
             "behavioral_change_expected": _expected_change(
                 branch_out.get("path")),
             "behavioral_change_observed": (
                 "PENDING_CHILD_LAUNCH" if child_req.get("launchable")
                 else "NO_CHILD_EXPECTED"),
             "child_run_id": child_req.get("child_run_id"),
+            "child_consumed_delta": consumption,
+            "measurement_basis": "sha256 over canonical record bytes "
+                                 "before/after; consumption read from "
+                                 "the child request + launch receipt",
             "recorded_at": _loop_now()}
 
 
@@ -1333,63 +1526,341 @@ def _expected_change(branch_path: str) -> str:
                         branch_path, "unknown branch")
 
 
+def _mark_phase(ledger_dir: str, event_id: str, phase: str) -> None:
+    """Persist a restart-recovery phase marker (§12 boundaries A-D).
+    Markers are informational waypoints; the idempotency guards do the
+    real resume work. The marker write is serialized like any ledger
+    write (concurrent markers collide on Windows otherwise) and is
+    best-effort: a marker that cannot be written must never fail the
+    execution it describes (markers serve execution, not vice versa)."""
+    path = os.path.join(ledger_dir, "executions", event_id + ".phase")
+    try:
+        with _LedgerLocked(path):
+            _atomic_write_json(path, {"event_id": event_id,
+                                      "phase": phase, "at": _loop_now()})
+    except Exception:
+        pass
+
+
+def _claim_child(ledger_dir: str, event_id: str):
+    """Atomically claim the child-launch right (§10): under the request
+    file's lock, transition REQUESTED -> CLAIMED. Returns (True, req) on
+    claim, else (False, reason). The lock is released before any launch
+    (never held across EngineRun execution or remote calls). Retries,
+    duplicates, concurrent workers, restarts and replays all resolve
+    through this single gate: exactly one claim per trigger."""
+    req_path = os.path.join(ledger_dir, "child_requests",
+                            event_id + ".json")
+    with _LedgerLocked(req_path):
+        try:
+            req = json.load(open(req_path, encoding="utf-8"))
+        except Exception:
+            return False, "unreadable request (typed; left untouched)"
+        if req.get("rehearsal"):
+            return False, "rehearsal requests never launch"
+        if req.get("status") != "REQUESTED" or not req.get("launchable"):
+            return False, "status=%s (only REQUESTED launchable claims)" \
+                % (req.get("status"),)
+        req["status"] = "CLAIMED"
+        req["claim"] = {"claimed_at": _loop_now(),
+                        "note": "launch right claimed; lock released "
+                                "before worker execution (§10)"}
+        _atomic_write_json(req_path, req)
+        return True, req
+
+
+def _mark_launched(ledger_dir: str, event_id: str, receipt) -> None:
+    req_path = os.path.join(ledger_dir, "child_requests",
+                            event_id + ".json")
+    with _LedgerLocked(req_path):
+        try:
+            req = json.load(open(req_path, encoding="utf-8"))
+        except Exception:
+            return
+        req["status"] = "LAUNCHED"
+        req["launch_receipt"] = receipt
+        _atomic_write_json(req_path, req)
+
+
+def _mark_launch_failed(ledger_dir: str, event_id: str,
+                        error: str) -> None:
+    req_path = os.path.join(ledger_dir, "child_requests",
+                            event_id + ".json")
+    with _LedgerLocked(req_path):
+        try:
+            req = json.load(open(req_path, encoding="utf-8"))
+        except Exception:
+            return
+        req["status"] = "LAUNCH_FAILED"
+        req["launch_error"] = error
+        _atomic_write_json(req_path, req)
+
+
+def _reality_state_path(ledger_dir: str) -> str:
+    return os.path.join(ledger_dir, "REALITY_STATE.json")
+
+
+def _read_reality_state(ledger_dir: str) -> Dict:
+    """Canonical reality-derived state (versioned registry). DERIVED
+    state: rebuildable byte-identically from the ledger +
+    executions/ via rebuild_reality_state() (Art. X: the ledger is
+    the authority; this registry is its materialized view)."""
+    p = _reality_state_path(ledger_dir)
+    if os.path.exists(p):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            pass
+    return {"artifact_type": "REALITY_STATE/1.0.0", "packages": {}}
+
+
+def _apply_event_to_state(ledger_dir: str, event, branch: str,
+                          out: Dict) -> tuple:
+    """Apply one executed event to the canonical registry. Returns
+    (before_hash, after_hash) over the registry bytes — the
+    canonical_state_before/after pair (§5). Commercial maturity is
+    NEVER advanced here (no buyer/commercial gates move on reality
+    reception alone, §6); package reality status is recorded."""
+    with _LedgerLocked(_reality_state_path(ledger_dir)):
+        state = _read_reality_state(ledger_dir)
+        before = _loop_sha(state)
+        pkg = state["packages"].setdefault(event["package_id"], {})
+        pkg["status"] = "OBSERVED_%s" % (branch,)
+        pkg["last_event_id"] = event["event_id"]
+        pkg["last_branch"] = branch
+        pkg.setdefault("mutation_ids", [])
+        pkg.setdefault("knowledge_ids", [])
+        if branch == "KEEP":
+            for layer, rec in (out.get("layers") or {}).items():
+                if isinstance(rec, dict) and rec.get("mutation_id"):
+                    pkg["mutation_ids"].append(rec["mutation_id"])
+        kid = None
+        if branch == "KILL":
+            kid = (out.get("search_constraint") or {}).get(
+                "excluded_cemetery_entry")
+        elif branch == "MODIFY":
+            kid = (out.get("hypothesis") or {}).get("hypothesis_id")
+        if kid:
+            pkg["knowledge_ids"].append(kid)
+        # Canonical order (Art. X): these lists cross a sort_keys
+        # JSON round-trip between live construction and rebuild-from-
+        # ledger. Unsorted insertion order would make identical sets
+        # hash differently — a canonicalization defect, not a data
+        # difference. Sorted here, sorted in rebuild.
+        pkg["mutation_ids"] = sorted(pkg["mutation_ids"])
+        pkg["knowledge_ids"] = sorted(pkg["knowledge_ids"])
+        state["updated_at"] = _loop_now()
+        _atomic_write_json(_reality_state_path(ledger_dir), state)
+        return before, _loop_sha(state)
+
+
+def rebuild_reality_state(ledger_dir: str) -> Dict:
+    """Re-derive the registry from durable records (proves derived
+    status): replay REAL ledger entries in order through the same
+    transition used live. Returns {match, rebuilt_hash, live_hash}.
+    Comparison projects out updated_at (a volatile timestamp, never
+    state) on both sides."""
+    live = _read_reality_state(ledger_dir)
+    live_hash = _loop_sha(
+        {"artifact_type": live.get("artifact_type"),
+         "packages": live.get("packages", {})})
+    led_path = os.path.join(ledger_dir, "REALITY_EVENT_LEDGER.json")
+    entries = []
+    if os.path.exists(led_path):
+        try:
+            entries = json.load(
+                open(led_path, encoding="utf-8")).get("entries", [])
+        except Exception:
+            entries = []
+    state: Dict = {"artifact_type": "REALITY_STATE/1.0.0",
+                   "packages": {}}
+    for e in entries:
+        rec = _load_execution(ledger_dir, e.get("event_id", ""))
+        if rec is None or not rec.get("executed"):
+            continue
+        branch = rec.get("branch")
+        out = rec.get("branch_record") or {}
+        pkg = state["packages"].setdefault(
+            e.get("package_id", ""), {})
+        pkg["status"] = "OBSERVED_%s" % (branch,)
+        pkg["last_event_id"] = e.get("event_id")
+        pkg["last_branch"] = branch
+        pkg.setdefault("mutation_ids", [])
+        pkg.setdefault("knowledge_ids", [])
+        if branch == "KEEP":
+            for _layer, _rec in (out.get("layers") or {}).items():
+                if isinstance(_rec, dict) and _rec.get("mutation_id"):
+                    pkg["mutation_ids"].append(_rec["mutation_id"])
+        _kid = None
+        if branch == "KILL":
+            _kid = (out.get("search_constraint") or {}).get(
+                "excluded_cemetery_entry")
+        elif branch == "MODIFY":
+            _kid = (out.get("hypothesis") or {}).get("hypothesis_id")
+        if _kid:
+            pkg["knowledge_ids"].append(_kid)
+        pkg["mutation_ids"] = sorted(pkg["mutation_ids"])
+        pkg["knowledge_ids"] = sorted(pkg["knowledge_ids"])
+    rebuilt_hash = _loop_sha(
+        {"artifact_type": state["artifact_type"],
+         "packages": state["packages"]})
+    live_core = _loop_sha(
+        {"artifact_type": live.get("artifact_type"),
+         "packages": live.get("packages", {})})
+    return {"match": rebuilt_hash == live_core,
+            "rebuilt_hash": rebuilt_hash, "live_hash": live_core}
+
+
+def _cemetery_head(cemetery_path) -> Dict:
+    """Count + head hash of a cemetery file (UNKNOWN-typed when
+    unreadable; never guessed)."""
+    if cemetery_path is None or not os.path.exists(str(cemetery_path)):
+        return {"state": "UNKNOWN_NO_CEMETERY_PATH"}
+    try:
+        data = json.load(open(str(cemetery_path), encoding="utf-8"))
+        entries = data.get("entries", [])
+        return {"state": "READ", "entry_count": len(entries),
+                "head_sha256": _loop_sha(entries[-1]) if entries else
+                "EMPTY"}
+    except Exception as exc:
+        return {"state": "UNKNOWN_UNREADABLE",
+                "error": type(exc).__name__}
+
+
+def _parent_operator_regions(parent_run_dir) -> Dict:
+    """Operator regions of the parent run's mechanism space, if a
+    parent run dir is supplied (else typed UNKNOWN)."""
+    if not parent_run_dir:
+        return {"state": "UNKNOWN_NO_PARENT_RUN_DIR"}
+    ms_path = os.path.join(str(parent_run_dir), "envelope_MECHANISM_SPACE.json")
+    if not os.path.exists(ms_path):
+        alt = os.path.join(str(parent_run_dir), "mechanism_space.json")
+        ms_path = alt if os.path.exists(alt) else ms_path
+    try:
+        d = json.load(open(ms_path, encoding="utf-8"))
+        space = d.get("mechanism_space", d)
+        ops = space.get("operator_results") or []
+        return {"state": "READ",
+                "operator_ids": space.get("operator_ids"),
+                "operators_examined": [
+                    {"operator": o.get("operator"),
+                     "state": o.get("state")} for o in ops]}
+    except Exception as exc:
+        return {"state": "UNKNOWN_UNREADABLE",
+                "error": type(exc).__name__}
+
+
 def _finalize_execution(event, ledger_dir, branch, branch_out,
-                        run_launcher, parent_problem, rehearsal):
-    """SEARCH-IMPACT + child request + launch-or-defer, shared by all
-    branches (KEEP requests no child: success path mutates state)."""
+                        run_launcher, parent_problem, rehearsal,
+                        parent_run_dir=None, cemetery_path=None,
+                        registry_hashes=None, cemetery_bounds=None):
+    """SEARCH-IMPACT + child request + claim-launch-or-defer, shared by
+    all branches (KEEP requests no child: success path mutates state).
+
+    Launch discipline (§10): the launch right is CLAIMED atomically
+    first; the lock is released before any worker execution; the
+    launcher runs outside every lock."""
     if branch == "KEEP":
         impact = {"artifact_type": "SEARCH_IMPACT/1.0.0",
                   "parent_run_id": None,
                   "trigger_event_id": event["event_id"],
+                  "knowledge_delta_id": None,
                   "knowledge_record_id": None,
                   "search_state_before": "NOT_APPLICABLE_KEEP_PATH",
                   "knowledge_added": {"branch": "KEEP"},
                   "search_state_after": "NOT_APPLICABLE_KEEP_PATH",
+                  "operator_region_before": "NOT_APPLICABLE_KEEP_PATH",
+                  "operator_region_after": "NOT_APPLICABLE_KEEP_PATH",
+                  "cemetery_constraints_before":
+                      (cemetery_bounds or {}).get("before",
+                                                 "UNKNOWN_UNREAD"),
+                  "cemetery_constraints_after":
+                      (cemetery_bounds or {}).get("after",
+                                                 "UNKNOWN_UNREAD"),
+                  "query_policy_before": "UNKNOWN_NO_QUERY_REGISTRY",
+                  "query_policy_after": "UNKNOWN_NO_QUERY_REGISTRY",
                   "behavioral_change_expected":
                       _expected_change("KEEP"),
                   "behavioral_change_observed": "NO_CHILD_EXPECTED",
                   "child_run_id": None,
+                  "child_consumed_delta": None,
+                  "measurement_basis": "mutation sidecars hash-chained "
+                                       "to parent refs",
                   "recorded_at": _loop_now()}
         if not rehearsal:
             _atomic_write_json(os.path.join(
                 ledger_dir, "search_impact",
                 event["event_id"] + ".json"), impact)
+            _mark_phase(ledger_dir, event["event_id"], "IMPACT_PERSISTED")
         return {"search_impact": impact, "child": None}
     child_req = branch_out.get("child_request") or {}
-    impact = _search_impact_record(event, branch_out, child_req,
-                                   parent_problem)
+    consumption = {"reality_state_hash_read":
+                   (registry_hashes or {}).get("after"),
+                   "knowledge_record_id":
+                   child_req.get("knowledge_record_id")}
+    impact = _search_impact_record(
+        event, branch_out, child_req, parent_problem, parent_run_dir,
+        (cemetery_bounds or {}).get("before", "UNKNOWN_UNREAD"),
+        (cemetery_bounds or {}).get("after", "UNKNOWN_UNREAD"),
+        (registry_hashes or {}).get("before"),
+        (registry_hashes or {}).get("after"), consumption)
     if not rehearsal:
         _atomic_write_json(os.path.join(
             ledger_dir, "search_impact", event["event_id"] + ".json"),
             impact)
+        _mark_phase(ledger_dir, event["event_id"], "IMPACT_PERSISTED")
     child_out, receipt = None, None
-    if child_req.get("launchable") and child_req.get("status") == \
-            "REQUESTED" and run_launcher is not None:
-        try:
-            receipt = run_launcher(child_req)
-            child_req["status"] = "LAUNCHED"
-            child_req["launch_receipt"] = receipt
-            child_out = child_req.get("child_run_id")
-        except Exception as exc:  # noqa: BLE001 — typed, retryable
-            child_req["status"] = "LAUNCH_FAILED"
-            child_req["launch_error"] = "%s: %s" % (
-                type(exc).__name__, str(exc)[:200])
-        if not rehearsal:
-            _atomic_write_json(os.path.join(
-                ledger_dir, "child_requests",
-                event["event_id"] + ".json"), child_req)
+    if child_req.get("launchable") and run_launcher is not None:
+        claimed, req_or_reason = _claim_child(ledger_dir,
+                                              event["event_id"])
+        if claimed:
+            _mark_phase(ledger_dir, event["event_id"], "CHILD_CLAIMED")
+            try:
+                receipt = run_launcher(req_or_reason)
+                consumption["launch_receipt"] = receipt
+                consumption["reality_state_hash_read"] = (
+                    registry_hashes or {}).get("after")
+                _mark_launched(ledger_dir, event["event_id"], receipt)
+                _mark_phase(ledger_dir, event["event_id"],
+                            "CHILD_LAUNCHED")
+                child_out = req_or_reason.get("child_run_id")
+            except Exception as exc:  # noqa: BLE001 — typed, retryable
+                _mark_launch_failed(
+                    ledger_dir, event["event_id"], "%s: %s" % (
+                        type(exc).__name__, str(exc)[:200]))
+                _mark_phase(ledger_dir, event["event_id"],
+                            "CHILD_LAUNCH_FAILED")
+    status_now = _load_execution_child_status(ledger_dir,
+                                              event["event_id"])
     return {"search_impact": impact,
             "child": {"child_run_id": child_out,
                       "launch_receipt": receipt,
-                      "request_status": child_req.get("status")}}
+                      "consumption": consumption,
+                      "request_status": status_now}}
+
+
+def _load_execution_child_status(ledger_dir, event_id):
+    req_path = os.path.join(ledger_dir, "child_requests",
+                            event_id + ".json")
+    if not os.path.exists(req_path):
+        return "NO_REQUEST"
+    try:
+        return json.load(
+            open(req_path, encoding="utf-8")).get("status")
+    except Exception:
+        return "UNKNOWN_UNREADABLE"
 
 
 def resume_pending_children(ledger_dir: str, run_launcher) -> Dict:
-    """Restart recovery (Art. LXXIV): launch every REQUESTED, launchable,
-    non-rehearsal child request exactly once. Rehearsal requests are
-    never launched by this path (recorded skip). Already-LAUNCHED or
-    failed requests are left untouched (failure stays retryable by an
-    explicit re-resume with the error on record — never silent)."""
+    """Restart recovery (Art. LXXIV): claim-and-launch every REQUESTED,
+    launchable, non-rehearsal child request exactly once. The claim is
+    atomic (§10): concurrent resumers serialize on the request lock and
+    exactly one wins. Rehearsal requests never launch (recorded skip).
+    Already-CLAIMED requests (crash between claim and launch) are
+    RECOVERED by re-claiming deterministically: a CLAIMED request whose
+    claim predates this resume with no launch receipt is treated as
+    abandoned and re-claimed (the claim record carries the evidence).
+    Launch failures stay typed and retryable, never silent."""
     import glob as _glob
     launched, skipped, failed = [], [], []
     for req_path in sorted(_glob.glob(os.path.join(
@@ -1406,26 +1877,59 @@ def resume_pending_children(ledger_dir: str, run_launcher) -> Dict:
                             "reason": "rehearsal requests never launch "
                                       "in the production path"})
             continue
-        if req.get("status") != "REQUESTED" or not req.get("launchable"):
+        if not req.get("launchable"):
             skipped.append({"trigger": req.get("trigger_event_id"),
-                            "reason": "status=%s (only REQUESTED "
-                                      "launchable requests resume)"
+                            "reason": "not launchable"})
+            continue
+        if req.get("status") == "LAUNCHED":
+            skipped.append({"trigger": req.get("trigger_event_id"),
+                            "reason": "already LAUNCHED"})
+            continue
+        if req.get("status") not in ("REQUESTED", "CLAIMED",
+                                     "LAUNCH_FAILED"):
+            skipped.append({"trigger": req.get("trigger_event_id"),
+                            "reason": "status=%s (not resumable)"
                                       % (req.get("status"),)})
             continue
+        if req.get("status") in ("CLAIMED", "LAUNCH_FAILED"):
+            with _LedgerLocked(req_path):
+                try:
+                    cur = json.load(open(req_path, encoding="utf-8"))
+                except Exception:
+                    failed.append(
+                        {"trigger": req.get("trigger_event_id"),
+                         "error": "unreadable on recover"})
+                    continue
+                if cur.get("status") == "LAUNCHED":
+                    skipped.append(
+                        {"trigger": req.get("trigger_event_id"),
+                         "reason": "already LAUNCHED (recovered race)"})
+                    continue
+                cur["status"] = "REQUESTED"
+                cur["recovered_from"] = cur.get("status")
+                _atomic_write_json(req_path, cur)
+        claimed, req_or_reason = _claim_child(
+            ledger_dir, req.get("trigger_event_id", ""))
+        if not claimed:
+            skipped.append({"trigger": req.get("trigger_event_id"),
+                            "reason": req_or_reason})
+            continue
         try:
-            receipt = run_launcher(req)
-            req["status"] = "LAUNCHED"
-            req["launch_receipt"] = receipt
-            _atomic_write_json(req_path, req)
+            receipt = run_launcher(req_or_reason)
+            _mark_launched(ledger_dir, req.get("trigger_event_id"),
+                           receipt)
             launched.append({"trigger": req.get("trigger_event_id"),
-                             "child_run_id": req.get("child_run_id")})
+                             "child_run_id": req_or_reason.get(
+                                 "child_run_id"),
+                             "recovered": req.get("status") in (
+                                 "CLAIMED", "LAUNCH_FAILED")})
         except Exception as exc:  # noqa: BLE001 — typed, retryable
-            req["status"] = "LAUNCH_FAILED"
-            req["launch_error"] = "%s: %s" % (
-                type(exc).__name__, str(exc)[:200])
-            _atomic_write_json(req_path, req)
+            _mark_launch_failed(
+                ledger_dir, req.get("trigger_event_id"), "%s: %s" % (
+                    type(exc).__name__, str(exc)[:200]))
             failed.append({"trigger": req.get("trigger_event_id"),
-                           "error": req["launch_error"]})
+                           "error": "%s: %s" % (
+                               type(exc).__name__, str(exc)[:200])})
     return {"launched": launched, "skipped": skipped, "failed": failed}
 
 
