@@ -2639,6 +2639,18 @@ def canonical_search_snapshot(space: Dict, constraint_text: str,
         for e in (b.get("entries") or []):
             if e:
                 _blocked_ids.add(str(e))
+    _warned_ids = set()
+    _full_results = space.get("operator_candidates_full") or []
+    for _or in (_full_results if isinstance(_full_results, list)
+                else []):
+        if not isinstance(_or, dict):
+            continue
+        for _c in (_or.get("candidates") or []):
+            if not isinstance(_c, dict):
+                continue
+            for _w in (_c.get("cemetery_warnings") or []):
+                if isinstance(_w, dict) and _w.get("cemetery_entry"):
+                    _warned_ids.add(str(_w.get("cemetery_entry")))
     cands = space.get("candidates") or []
 
     def _cand_block_ids(c):
@@ -2686,6 +2698,7 @@ def canonical_search_snapshot(space: Dict, constraint_text: str,
             "n_blocked": ccons.get("n_blocked", 0),
             "n_warned": ccons.get("n_warned", 0),
             "blocked_entry_ids": sorted(_blocked_ids),
+            "warned_entry_ids": sorted(_warned_ids),
         },
         "candidates": {
             "n_retained": len(cands),
@@ -3001,23 +3014,70 @@ def verify_search_consumption(child_run_dir: str, expected: Dict,
                 "checks": checks}
     ccons = (snapshot.get("cemetery_consultation") or {})
     blocked_ids = set(ccons.get("blocked_entry_ids") or [])
+    warned_ids = set(ccons.get("warned_entry_ids") or [])
     entry_id = expected.get("cemetery_entry_id")
-    checks["decision_cemetery_kill_bound"] = bool(
-        entry_id and entry_id in blocked_ids)
+    knowledge_hash = expected.get("knowledge_artifact_sha256")
+    record_hash = record.get("search_state_hash")
+    space_state = snapshot.get("space_state")
+    executed = space_state in ("BUILT", "BUILT_BELOW_MIN",
+                               "NO_CANDIDATES")
+    decisions = []
+    if entry_id and entry_id in blocked_ids:
+        decisions.append({"decision_type": "CEMETERY_KILL",
+                          "decision_ref": entry_id,
+                          "knowledge_hash": knowledge_hash,
+                          "record_hash": record_hash})
+    if entry_id and entry_id in warned_ids:
+        decisions.append({"decision_type": "CEMETERY_WARNING",
+                          "decision_ref": entry_id,
+                          "knowledge_hash": knowledge_hash,
+                          "record_hash": record_hash})
+    if executed and snapshot.get("selected_operator") and int(
+            snapshot.get("contracts_satisfied") or 0) >= 1:
+        decisions.append({"decision_type": "OPERATOR_SELECTION",
+                          "decision_ref": snapshot.get(
+                              "selected_operator"),
+                          "knowledge_hash": knowledge_hash,
+                          "record_hash": record_hash})
+    if executed and int((snapshot.get("candidates") or {}).get(
+            "n_retained") or 0) >= 1:
+        decisions.append({"decision_type": "CANDIDATE_SELECTION",
+                          "decision_ref": "retained=%d" % (
+                              (snapshot.get("candidates") or {}).get(
+                                  "n_retained")),
+                          "knowledge_hash": knowledge_hash,
+                          "record_hash": record_hash})
+    if executed and (snapshot.get("operators_examined") or []):
+        decisions.append({"decision_type": "ADMISSION_MAP",
+                          "decision_ref": "examined=%d" % (
+                              len(snapshot.get("operators_examined"))),
+                          "knowledge_hash": knowledge_hash,
+                          "record_hash": record_hash})
+    checks["decisions"] = [d["decision_type"] for d in decisions]
     checks["decision_n_blocked"] = int(ccons.get("n_blocked") or 0)
-    if checks["decision_cemetery_kill_bound"]:
+    checks["decision_n_warned"] = int(ccons.get("n_warned") or 0)
+    if decisions:
         return {"state": "SEARCH_CONSUMPTION_VERIFIED",
                 "knowledge_state": knowledge_state,
-                "reason": "manifest binding plus an executed "
-                          "search-stage kill decision bound to this "
-                          "knowledge (cemetery entry %s)" % (entry_id,),
+                "record_hash": record_hash,
+                "decisions": decisions,
+                "reason": "manifest binding plus %d executed "
+                          "search-stage decision(s) bound to this "
+                          "knowledge (%s)" % (
+                              len(decisions),
+                              ", ".join(d["decision_type"]
+                                        for d in decisions)),
                 "checks": checks, "record": record}
     return {"state": "SEARCH_CONSUMPTION_UNPROVEN",
             "knowledge_state": knowledge_state,
+            "record_hash": record_hash,
+            "decisions": decisions,
             "reason": "record integrity holds but no executed search "
                       "decision is bound to this knowledge "
-                      "(n_blocked=%d; KNOWLEDGE_BOUND does not imply "
-                      "consumption)" % (checks["decision_n_blocked"],),
+                      "(n_blocked=%d, n_warned=%d; KNOWLEDGE_BOUND "
+                      "does not imply consumption)" % (
+                          checks["decision_n_blocked"],
+                          checks["decision_n_warned"]),
             "checks": checks, "record": record}
 
 
@@ -3134,15 +3194,16 @@ def extract_search_state(run_dir: str, cemetery_path=None) -> Dict:
 
 def measure_search_delta(s0: Dict, s1: Dict) -> Dict:
     """MEASURED_DELTA = DIFF(S0, S1) with substantive-field rules.
-    A different problem_id, serialized constraint, or clause TEXT
-    alone is NEVER substantive (§6/§8: wording is not learning).
-    constraint_applied is substantive ONLY when the search-stage
-    artifact proves the constraint changed an EXECUTED search
-    decision: a knowledge-bound cemetery kill in S1's search
-    snapshot, or a causal operator/candidate/policy decision
-    difference S0->S1 with S1 knowledge-bound. hypothesis text and
-    clause presence without decision evidence are INFORMATIONAL
-    ONLY."""
+    A different problem_id, serialized constraint, clause TEXT,
+    cemetery file change, or run-configuration change alone is
+    NEVER substantive (wording, archival writes, and config are
+    not learning). constraint_applied is substantive ONLY with
+    record-linked executed-decision evidence: an entry-linked
+    cemetery kill/warning, or a causal operator/candidate/region
+    decision difference S0->S1 with S1's search-consumption record
+    present and integrity-held. decision_evidence cites the exact
+    supporting artifact (decision type, ref, knowledge hash, record
+    hash, causal field) — never a bare boolean."""
     def _norm_constraint(text):
         import re as _re
         return _re.sub(r"\[REALITY [^\]]*\]", "", str(text or "")
@@ -3160,10 +3221,6 @@ def measure_search_delta(s0: Dict, s1: Dict) -> Dict:
     cemetery_flip = bool(
         cem0.get("state") == "READ" and cem1.get("state") == "READ"
         and cem0.get("head_sha256") != cem1.get("head_sha256"))
-    op0 = ((s0.get("operator_regions") or {}).get("operator_ids"))
-    op1 = ((s1.get("operator_regions") or {}).get("operator_ids"))
-    operator_change = bool(
-        op0 is not None and op1 is not None and op0 != op1)
     pol0 = (s0.get("candidate_selection_policy") or {})
     pol1 = (s1.get("candidate_selection_policy") or {})
     policy_change = bool(
@@ -3178,75 +3235,181 @@ def measure_search_delta(s0: Dict, s1: Dict) -> Dict:
     clause_text_present = bool(_clause(_s1raw) and not _clause(_s0raw))
     sn0 = (s0.get("search_snapshot") or {})
     sn1 = (s1.get("search_snapshot") or {})
+    sc1 = (s1.get("search_consumption") or {})
+    record_linked = bool(
+        sc1.get("state") == "RECORDED"
+        and sc1.get("integrity") is True
+        and sc1.get("search_state_hash")
+        == (sn1.get("snapshot_hash")))
+    record_hash = sc1.get("search_state_hash")
+    knowledge_hash = kb1.get("knowledge_artifact_sha256")
     _s1blocked = set(((sn1.get("cemetery_consultation") or {})
                       .get("blocked_entry_ids")) or [])
     _s0blocked = set(((sn0.get("cemetery_consultation") or {})
                       .get("blocked_entry_ids")) or [])
     _new_blocks = _s1blocked - _s0blocked
+    _s1warned = set(((sn1.get("cemetery_consultation") or {})
+                     .get("warned_entry_ids")) or [])
+    _s0warned = set(((sn0.get("cemetery_consultation") or {})
+                     .get("warned_entry_ids")) or [])
+    _new_warned = _s1warned - _s0warned
     _entry_id = kb1.get("cemetery_entry_id")
     kill_decision_bound = bool(
-        knowledge_bound and _entry_id and _entry_id in _new_blocks)
+        knowledge_bound and record_linked and _entry_id
+        and _entry_id in _new_blocks)
+    warning_decision_bound = bool(
+        knowledge_bound and record_linked and _entry_id
+        and _entry_id in _new_warned)
     kill_decision_unlinked = bool(
-        knowledge_bound and _new_blocks and not _entry_id)
-    _op_sel = (sn0.get("selected_operator") != sn1.get(
-        "selected_operator") and sn1.get("selected_operator")
-        is not None)
-    _cand_dec = ((sn0.get("candidates") or {}).get("decisions")
-                 != (sn1.get("candidates") or {}).get("decisions"))
-    decision_diff = bool(
-        knowledge_bound and sn0 and sn1
-        and (_op_sel or _cand_dec or policy_change))
-    constraint_applied = bool(kill_decision_bound or decision_diff)
+        knowledge_bound and _new_blocks
+        and not kill_decision_bound)
+    _op_sel = bool(
+        sn0 and sn1
+        and sn0.get("selected_operator") != sn1.get(
+            "selected_operator")
+        and sn1.get("selected_operator") is not None)
+    _op_ids = bool(
+        sn0 and sn1
+        and (sn0.get("operator_ids") or []) != (
+            sn1.get("operator_ids") or [])
+        and (sn1.get("operator_ids") or []))
+    _cand_dec = bool(
+        sn0 and sn1
+        and (sn0.get("candidates") or {}).get("decisions")
+        != (sn1.get("candidates") or {}).get("decisions"))
+    _reg0 = sorted((d.get("operator"), d.get("state"))
+                   for d in (sn0.get("operators_examined") or [])
+                   if isinstance(d, dict))
+    _reg1 = sorted((d.get("operator"), d.get("state"))
+                   for d in (sn1.get("operators_examined") or [])
+                   if isinstance(d, dict))
+    _reg_dec = bool(sn0 and sn1 and _reg0 != _reg1 and _reg1)
+    operator_selection_diff = bool(
+        knowledge_bound and record_linked and (_op_sel or _op_ids))
+    candidate_decision_diff = bool(
+        knowledge_bound and record_linked and _cand_dec)
+    region_admission_diff = bool(
+        knowledge_bound and record_linked and _reg_dec)
+    constraint_applied = bool(
+        kill_decision_bound or warning_decision_bound
+        or operator_selection_diff or candidate_decision_diff
+        or region_admission_diff)
+    decision_evidence = None
+    if kill_decision_bound:
+        decision_evidence = {
+            "decision_type": "CEMETERY_KILL",
+            "decision_ref": _entry_id,
+            "knowledge_hash": knowledge_hash,
+            "record_hash": record_hash,
+            "causal_field": "kill_decision_bound"}
+    elif warning_decision_bound:
+        decision_evidence = {
+            "decision_type": "CEMETERY_WARNING",
+            "decision_ref": _entry_id,
+            "knowledge_hash": knowledge_hash,
+            "record_hash": record_hash,
+            "causal_field": "warning_decision_bound"}
+    elif operator_selection_diff:
+        decision_evidence = {
+            "decision_type": "OPERATOR_SELECTION",
+            "decision_ref": sn1.get("selected_operator"),
+            "knowledge_hash": knowledge_hash,
+            "record_hash": record_hash,
+            "causal_field": "operator_selection_diff"}
+    elif candidate_decision_diff:
+        decision_evidence = {
+            "decision_type": "CANDIDATE_SELECTION",
+            "decision_ref": "decisions-changed",
+            "knowledge_hash": knowledge_hash,
+            "record_hash": record_hash,
+            "causal_field": "candidate_decision_diff"}
+    elif region_admission_diff:
+        decision_evidence = {
+            "decision_type": "ADMISSION_MAP",
+            "decision_ref": "admission-changed",
+            "knowledge_hash": knowledge_hash,
+            "record_hash": record_hash,
+            "causal_field": "region_admission_diff"}
     hypothesis_new = bool(s1c and s1c != s0c)
     changed = {
         "knowledge_bound": knowledge_bound,
-        "cemetery_flip": cemetery_flip,
-        "operator_change": operator_change,
-        "policy_change": policy_change,
-        "constraint_applied": constraint_applied,
+        "record_linked": record_linked,
         "kill_decision_bound": kill_decision_bound,
+        "warning_decision_bound": warning_decision_bound,
+        "operator_selection_diff": operator_selection_diff,
+        "candidate_decision_diff": candidate_decision_diff,
+        "region_admission_diff": region_admission_diff,
+        "constraint_applied": constraint_applied,
         "kill_decision_unlinked_informational_only":
             kill_decision_unlinked,
-        "decision_diff": decision_diff,
+        "cemetery_flip_informational_only": cemetery_flip,
+        "policy_change_informational_only": policy_change,
         "clause_text_present_informational_only": clause_text_present,
         "hypothesis_new_informational_only": hypothesis_new,
         "problem_only": (
             s0.get("problem_sha256") != s1.get("problem_sha256")
-            and not (knowledge_bound or cemetery_flip
-                     or operator_change or policy_change
-                     or constraint_applied)),
+            and not (knowledge_bound or constraint_applied)),
     }
-    substantive = bool(
-        knowledge_bound and (cemetery_flip or operator_change
-                             or policy_change or constraint_applied))
-    return {"substantive": substantive,
-            "changed_fields": sorted(k for k, v in changed.items() if v),
-            "all_fields": changed,
-            "falsifier": "problem_id/constraint-only differences are "
-                         "excluded by construction; hypothesis text "
-                         "without binding is informational only"}
+    substantive = bool(knowledge_bound and record_linked
+                       and constraint_applied)
+    out = {"substantive": substantive,
+           "changed_fields": sorted(
+               k for k, v in changed.items() if v),
+           "all_fields": changed,
+           "decision_evidence": decision_evidence,
+           "falsifier": "problem_id/constraint/clause wording, "
+                        "cemetery-file changes, and run configuration "
+                        "are excluded by construction; hypothesis text "
+                        "without binding is informational only"}
+    return out
 
 
-def adjudicate_search_learning(delta: Dict) -> Dict:
+def adjudicate_search_learning(delta: Dict,
+                               search_verification=None) -> Dict:
     """LEARNING ADJUDICATION over a MEASURED_DELTA (distinct from the
-    candidate adjudicator adjudicate_learning() at line 397 — that
-    name is kept untouched). Pure verdict: LEARNING_CANDIDATE iff
-    the delta is substantive (an executed search decision changed
-    under bound knowledge); else NO_LEARNING (bound input without
-    consumed search is archival, not learning). Deterministic, no
-    I/O, no LLM."""
+    candidate adjudicator adjudicate_learning() — that name is kept
+    untouched). The chain is structural: KNOWLEDGE_BOUND alone is
+    never enough; the delta alone is never enough.
+      no verified search consumption -> NO_LEARNING;
+      verified + no substantive delta -> NO_LEARNING;
+      verified + substantive but delta evidence unlinked from the
+        verified record -> NO_LEARNING;
+      verified + substantive + record-linked causal evidence ->
+        LEARNING_CANDIDATE.
+    search_verification is {"state":..., "record_hash":...} from
+    verify_search_consumption(). Deterministic, no I/O, no LLM."""
     delta = delta or {}
     changed = list(delta.get("changed_fields") or [])
-    if delta.get("substantive") is True:
-        return {"verdict": "LEARNING_CANDIDATE",
-                "reason": "measured substantive search delta: %s" % (
-                    ", ".join(changed),),
+    verification = search_verification or {}
+    if verification.get("state") != "SEARCH_CONSUMPTION_VERIFIED":
+        return {"verdict": "NO_LEARNING",
+                "reason": "no verified search consumption (state=%s; "
+                          "KNOWLEDGE_BOUND and raw deltas never imply "
+                          "learning)" % (
+                              verification.get("state"),),
                 "changed_fields": changed}
-    return {"verdict": "NO_LEARNING",
-            "reason": "no substantive search delta (changed: %s; "
-                      "KNOWLEDGE_BOUND alone is not learning)" % (
-                          ", ".join(changed) or "none",),
-            "changed_fields": changed}
+    if delta.get("substantive") is not True:
+        return {"verdict": "NO_LEARNING",
+                "reason": "verified search consumption without a "
+                          "measured substantive delta (changed: %s)" % (
+                              ", ".join(changed) or "none",),
+                "changed_fields": changed}
+    evidence = delta.get("decision_evidence") or {}
+    if evidence.get("record_hash") != verification.get("record_hash") \
+            or not evidence.get("record_hash"):
+        return {"verdict": "NO_LEARNING",
+                "reason": "substantive delta is not linked to the "
+                          "verified search-consumption record "
+                          "(unlinked evidence never implies learning)",
+                "changed_fields": changed}
+    return {"verdict": "LEARNING_CANDIDATE",
+            "reason": "verified search consumption %s plus "
+                      "record-linked causal delta (%s: %s)" % (
+                          verification.get("record_hash"),
+                          evidence.get("decision_type"),
+                          evidence.get("causal_field")),
+            "changed_fields": changed,
+            "decision_evidence": evidence}
 
 
 def default_run_launcher(child_request: Dict, runs_root: str,

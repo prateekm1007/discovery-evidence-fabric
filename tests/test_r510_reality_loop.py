@@ -1881,9 +1881,13 @@ def test_delta_substantive_kill_path(tmp_path):
     assert v0["verified"] is False
     assert v1["verified"] is True
     delta = ri.measure_search_delta(s0, s1)
-    assert delta["substantive"] is True
-    assert "cemetery_flip" in delta["changed_fields"]
+    assert delta["substantive"] is False, delta
     assert "knowledge_bound" in delta["changed_fields"]
+    assert "cemetery_flip_informational_only" in delta["changed_fields"]
+    assert "constraint_applied" not in delta["changed_fields"]
+    assert "record_linked" not in delta["changed_fields"]
+    adj = ri.adjudicate_search_learning(delta, None)
+    assert adj["verdict"] == "NO_LEARNING", adj
 
 
 def test_negative_control_no_delta(tmp_path):
@@ -1968,7 +1972,9 @@ def test_e2e_verified_consumption_measured_delta(tmp_path):
         str(child_dir), dict(exp, cemetery_entry_id=kid), _resolver)
     assert search["state"] == "SEARCH_CONSUMPTION_UNPROVEN", search
     assert search["knowledge_state"] == "KNOWLEDGE_BOUND", search
-    adj = ri.adjudicate_search_learning(delta)
+    adj = ri.adjudicate_search_learning(
+        delta, {"state": search["state"],
+                "record_hash": search.get("record_hash")})
     assert adj["verdict"] == "NO_LEARNING", adj
     impact = json.loads((tmp_path / "ledger" / "search_impact" /
                          "EV-E2E-2.json").read_text())
@@ -2014,8 +2020,8 @@ def _sc_candidates():
              "novel_design_variable": _CAND_TEXT}]
 
 
-def _sc_space(cemetery_record, candidates):
-    return {"mechanism_space_version": "mechanism_space/1.0.0",
+def _sc_space(cemetery_record, candidates, full=None):
+    space = {"mechanism_space_version": "mechanism_space/1.0.0",
             "state": "BUILT",
             "problem_id": "pp0_sc",
             "operator_ids": ["DIRECT_TRANSFER"],
@@ -2035,6 +2041,9 @@ def _sc_space(cemetery_record, candidates):
                      "selection_basis": "test"}}],
             "cemetery_consumption": cemetery_record,
             "candidates": candidates}
+    if full is not None:
+        space["operator_candidates_full"] = full
+    return space
 
 
 def _sc_dir(tmp_path, name, eid, art_sha, run_id, space):
@@ -2142,7 +2151,9 @@ def test_control_treatment_no_search_difference_nonsubstantive(tmp_path):
     delta = ri.measure_search_delta(s0, s1)
     assert delta["substantive"] is False, delta
     assert "kill_decision_bound" not in delta["changed_fields"]
-    assert ri.adjudicate_search_learning(delta)["verdict"] == "NO_LEARNING"
+    assert delta.get("decision_evidence") is None
+    adj = ri.adjudicate_search_learning(delta, None)
+    assert adj["verdict"] == "NO_LEARNING", adj
 
 
 def test_treatment_verified_search_change_substantive(tmp_path):
@@ -2183,8 +2194,14 @@ def test_treatment_verified_search_change_substantive(tmp_path):
     assert delta["substantive"] is True, delta
     assert "kill_decision_bound" in delta["changed_fields"]
     assert "constraint_applied" in delta["changed_fields"]
-    assert ri.adjudicate_search_learning(delta)["verdict"] == \
-        "LEARNING_CANDIDATE"
+    ev = delta.get("decision_evidence") or {}
+    assert ev.get("decision_type") == "CEMETERY_KILL", ev
+    assert ev.get("decision_ref") == "CE-TEST-K1", ev
+    assert ev.get("record_hash") == out.get("record_hash"), ev
+    adj = ri.adjudicate_search_learning(
+        delta, {"state": out["state"],
+                "record_hash": out.get("record_hash")})
+    assert adj["verdict"] == "LEARNING_CANDIDATE", adj
 
 
 def test_search_verify_replay_no_second_effect(tmp_path):
@@ -2230,6 +2247,13 @@ def test_true_e2e_search_consumption(tmp_path):
                 return e
         return None
 
+    runs = tmp_path / "runs"
+    control = EngineRun(problem=dict(PARENT_PROBLEM,
+                                     problem_id="pp0_true_ctrl"),
+                        out_dir=str(runs / "engrun_true_ctrl"),
+                        run_id="engrun_true_ctrl",
+                        disabled_stages=list(dis)).run()
+    assert control.get("run_id") == "engrun_true_ctrl"
     with _cemetery(tmp_path):
         rec = _exec(_event("EV-TRUE-1", verdict="KILL"),
                     str(tmp_path / "ledger"),
@@ -2244,13 +2268,6 @@ def test_true_e2e_search_consumption(tmp_path):
     base_constraint = str(PARENT_PROBLEM["constraint"])
     assert str(req["child_problem"]["constraint"]).startswith(
         base_constraint)
-    runs = tmp_path / "runs"
-    control = EngineRun(problem=dict(PARENT_PROBLEM,
-                                     problem_id="pp0_true_ctrl"),
-                        out_dir=str(runs / "engrun_true_ctrl"),
-                        run_id="engrun_true_ctrl",
-                        disabled_stages=list(dis)).run()
-    assert control.get("run_id") == "engrun_true_ctrl"
     treatment = EngineRun(problem=dict(req["child_problem"]),
                           out_dir=str(runs / "engrun_true_trt"),
                           run_id="engrun_true_trt",
@@ -2287,13 +2304,154 @@ def test_true_e2e_search_consumption(tmp_path):
     assert s0["canonical_state_hash"] == json.loads(
         (snap_dir / "S0.json").read_text())["canonical_state_hash"]
     delta = ri.measure_search_delta(s0, s1)
-    adj = ri.adjudicate_search_learning(delta)
-    if sc["state"] == "SEARCH_CONSUMPTION_VERIFIED":
+    ver = {"state": sc["state"], "record_hash": sc.get("record_hash")}
+    adj = ri.adjudicate_search_learning(delta, ver)
+    if adj["verdict"] == "LEARNING_CANDIDATE":
+        assert sc["state"] == "SEARCH_CONSUMPTION_VERIFIED", sc
         assert delta["substantive"] is True, delta
         assert "constraint_applied" in delta["changed_fields"]
-        assert adj["verdict"] == "LEARNING_CANDIDATE", adj
+        ev = delta.get("decision_evidence") or {}
+        assert ev.get("record_hash") == sc.get("record_hash"), ev
     else:
-        assert sc["state"] == "SEARCH_CONSUMPTION_UNPROVEN", sc
-        assert delta["substantive"] is False, delta
-        assert "constraint_applied" not in delta["changed_fields"]
         assert adj["verdict"] == "NO_LEARNING", adj
+        if sc["state"] == "SEARCH_CONSUMPTION_VERIFIED":
+            assert delta["substantive"] is False, delta
+            assert delta.get("decision_evidence") is None, delta
+        else:
+            assert sc["state"] == "SEARCH_CONSUMPTION_UNPROVEN", sc
+            assert delta["substantive"] is False, delta
+            assert "constraint_applied" not in delta["changed_fields"]
+
+
+_WENTRY = dict(_KENTRY, entry_id="CE-TEST-W1",
+               epistemic_class="STRONG_CONSTRAINT",
+               physical_constraint="")
+
+
+def test_kill_citing_foreign_entry_unattributed(tmp_path):
+    art, art_sha = _sc_art()
+    from discovery_fabric.engine import mechanism_space as _ms
+    with _cemetery(tmp_path):
+        Path(tmp_path / "cemetery").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "cemetery" / "CEMETERY.json").write_text(
+            json.dumps({"entries": [dict(_KENTRY)]}), encoding="utf-8")
+        cands = _sc_candidates()
+        rec1 = _ms._consult_cemetery(cands)
+        assert rec1["n_blocked"] == 1, rec1
+    treat = _sc_dir(tmp_path, "engrun_sfe1", "EV-SF-2", art_sha,
+                    "engrun_sfe1", _sc_space(rec1, cands))
+    out = ri.verify_search_consumption(
+        str(treat),
+        _sc_exp("EV-SF-2", art_sha, "engrun_sfe1",
+                entry_id="CE-TEST-OTHER"),
+        _vresolver({"KX": art}))
+    assert "CEMETERY_KILL" not in out["checks"]["decisions"], out
+    runs = tmp_path / "runs"
+    plain = runs / "engrun_sfe0"
+    plain.mkdir(parents=True, exist_ok=True)
+    (plain / "problem.json").write_text(
+        json.dumps(dict(PARENT_PROBLEM, problem_id="pp0_sfe0")),
+        encoding="utf-8")
+    (plain / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_sfe0"}), encoding="utf-8")
+    s0 = ri.extract_search_state(str(plain))
+    s1 = ri.extract_search_state(str(treat))
+    s1["knowledge_binding"]["cemetery_entry_id"] = "CE-TEST-OTHER"
+    delta = ri.measure_search_delta(s0, s1)
+    assert "kill_decision_bound" not in delta["changed_fields"], delta
+    assert "kill_decision_unlinked_informational_only" in \
+        delta["changed_fields"], delta
+
+
+def test_warning_decision_verified_to_learning(tmp_path):
+    art, art_sha = _sc_art()
+    from discovery_fabric.engine import mechanism_space as _ms
+    with _cemetery(tmp_path):
+        Path(tmp_path / "cemetery").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "cemetery" / "CEMETERY.json").write_text(
+            json.dumps({"entries": []}), encoding="utf-8")
+        rec0 = _ms._consult_cemetery(_sc_candidates())
+        assert rec0["n_warned"] == 0
+        (tmp_path / "cemetery" / "CEMETERY.json").write_text(
+            json.dumps({"entries": [dict(_WENTRY)]}), encoding="utf-8")
+        cands = _sc_candidates()
+        rec1 = _ms._consult_cemetery(cands)
+        assert rec1["n_blocked"] == 0, rec1
+        assert rec1["n_warned"] == 1, rec1
+    assert cands[0]["cemetery_warnings"][0]["cemetery_entry"] == \
+        "CE-TEST-W1"
+    runs = tmp_path / "runs"
+    plain = runs / "engrun_swv0"
+    plain.mkdir(parents=True, exist_ok=True)
+    (plain / "problem.json").write_text(
+        json.dumps(dict(PARENT_PROBLEM, problem_id="pp0_swv0")),
+        encoding="utf-8")
+    (plain / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_swv0"}), encoding="utf-8")
+    space = _sc_space(rec1, cands, full=[{"candidates": cands}])
+    treat = _sc_dir(tmp_path, "engrun_swv1", "EV-SW-1", art_sha,
+                    "engrun_swv1", space)
+    exp = _sc_exp("EV-SW-1", art_sha, "engrun_swv1",
+                  entry_id="CE-TEST-W1")
+    out = ri.verify_search_consumption(str(treat), exp,
+                                       _vresolver({"KX": art}))
+    assert out["state"] == "SEARCH_CONSUMPTION_VERIFIED", out
+    assert "CEMETERY_WARNING" in out["checks"]["decisions"], out
+    assert "CEMETERY_KILL" not in out["checks"]["decisions"], out
+    s0 = ri.extract_search_state(str(plain))
+    s1 = ri.extract_search_state(str(treat))
+    s1["knowledge_binding"]["cemetery_entry_id"] = "CE-TEST-W1"
+    delta = ri.measure_search_delta(s0, s1)
+    assert delta["substantive"] is True, delta
+    assert "warning_decision_bound" in delta["changed_fields"]
+    assert "constraint_applied" in delta["changed_fields"]
+    ev = delta.get("decision_evidence") or {}
+    assert ev.get("decision_type") == "CEMETERY_WARNING", ev
+    assert ev.get("record_hash") == out.get("record_hash"), ev
+    adj = ri.adjudicate_search_learning(
+        delta, {"state": out["state"],
+                "record_hash": out.get("record_hash")})
+    assert adj["verdict"] == "LEARNING_CANDIDATE", adj
+    assert adj.get("decision_evidence", {}).get(
+        "decision_type") == "CEMETERY_WARNING", adj
+
+
+def test_adjudicator_gates(tmp_path):
+    art, art_sha = _sc_art()
+    from discovery_fabric.engine import mechanism_space as _ms
+    with _cemetery(tmp_path):
+        Path(tmp_path / "cemetery").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "cemetery" / "CEMETERY.json").write_text(
+            json.dumps({"entries": [dict(_KENTRY)]}), encoding="utf-8")
+        cands = _sc_candidates()
+        rec1 = _ms._consult_cemetery(cands)
+    runs = tmp_path / "runs"
+    plain = runs / "engrun_sag0"
+    plain.mkdir(parents=True, exist_ok=True)
+    (plain / "problem.json").write_text(
+        json.dumps(dict(PARENT_PROBLEM, problem_id="pp0_sag0")),
+        encoding="utf-8")
+    (plain / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_sag0"}), encoding="utf-8")
+    treat = _sc_dir(tmp_path, "engrun_sag1", "EV-SG-1", art_sha,
+                    "engrun_sag1", _sc_space(rec1, cands))
+    s0 = ri.extract_search_state(str(plain))
+    s1 = ri.extract_search_state(str(treat))
+    s1["knowledge_binding"]["cemetery_entry_id"] = "CE-TEST-K1"
+    delta = ri.measure_search_delta(s0, s1)
+    assert delta["substantive"] is True, delta
+    assert ri.adjudicate_search_learning(delta, None)["verdict"] == \
+        "NO_LEARNING"
+    assert ri.adjudicate_search_learning(
+        delta, {"state": "SEARCH_CONSUMPTION_UNPROVEN",
+                "record_hash": None})["verdict"] == "NO_LEARNING"
+    flat = ri.measure_search_delta(s0, s0)
+    assert flat["substantive"] is False
+    ver = {"state": "SEARCH_CONSUMPTION_VERIFIED",
+           "record_hash": (delta.get("decision_evidence") or {}).get(
+               "record_hash")}
+    assert ri.adjudicate_search_learning(flat, ver)["verdict"] == \
+        "NO_LEARNING"
+    bad_link = dict(ver, record_hash="00" * 32)
+    assert ri.adjudicate_search_learning(delta, bad_link)["verdict"] \
+        == "NO_LEARNING"
