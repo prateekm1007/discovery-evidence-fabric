@@ -301,6 +301,96 @@ def test_attack_independence_context_is_not_provider_separation():
         "INDEPENDENCE_UNAVAILABLE"
 
 
+# ---------------- per-candidate independent attack E2E route (fast)
+def _independent_attack_fixture_spec(pack):
+    """The independent_attack fixture spec from a pack (must exist)."""
+    specs = [s for s in pack["specs"]
+             if s.get("purpose_exact") == "independent_attack"]
+    assert specs, "pack missing independent_attack fixture"
+    return specs[0]
+
+
+def test_independent_attack_fixture_completes_through_real_instrument():
+    """The matched purpose_exact='independent_attack' fixture flows
+    through the REAL independent_attack() parser and produces a
+    COMPLETED attack (SURVIVED, never ATTACK_INCOMPLETE). This is the
+    path-B counterpart to the A2 direct test: EngineRun ->
+    independent_attack -> purpose='independent_attack' ->
+    FixtureTransport -> independent_attack parser -> persisted result.
+    """
+    from discovery_fabric.engine import independent_attack as _ia
+    for pid, pack in PACKS.items():
+        spec = _independent_attack_fixture_spec(pack)
+        assert "SURVIVE" in spec["content"], pid
+        fx = dr.FixtureTransport(
+            [dict(s) for s in pack["specs"]], bundle_id="t/1")
+        tok = cctx.bind_fixture(fx)
+        try:
+            cand = {
+                "candidate_id": "cand:ia:%s" % pid,
+                "mechanism": "test mechanism for %s" % pid,
+                "intervention": "test intervention",
+                "predicted_effect": "test predicted effect",
+                "testable_prediction": "test testable prediction",
+                "novel_design_variable": "",
+                "known_failure_modes": [],
+                "constraint_set": {},
+            }
+            rec = _ia.independent_attack(
+                cand, dict(pack["problem"]), list(pack["evidence"]),
+                None)
+        finally:
+            cctx.unbind_fixture(tok)
+        # the attack COMPLETED through the real parser
+        assert rec.get("overall") == "SURVIVED", (pid, rec)
+        assert rec.get("state") == "ATTACK_RUN", pid
+        assert rec.get("llm_status") == "OK", pid
+        assert rec.get("overall") != "ATTACK_INCOMPLETE", pid
+        # a completed attack is transport-available + context-only
+        assert dr._attack_transport_state(rec) == "TRANSPORT_AVAILABLE", pid
+        assert dr._attack_independence_state(rec) == \
+            "SEPARATE_CONTEXT_ONLY", pid
+        assert dr._attack_drop_transition(
+            rec.get("overall"), True) == "ATTACK_SURVIVED", pid
+
+
+def test_independent_attack_unmatched_fails_closed():
+    """Without an independent_attack fixture, the real engine call is
+    PROVIDER_UNAVAILABLE -> TRANSPORT_UNAVAILABLE -> ATTACK_INCOMPLETE,
+    and ATTACK_INCOMPLETE is NEVER converted to KILLED or SURVIVED."""
+    from discovery_fabric.engine import independent_attack as _ia
+    for pid, pack in PACKS.items():
+        # build a transport that omits the independent_attack spec
+        specs = [dict(s) for s in pack["specs"]
+                 if s.get("purpose_exact") != "independent_attack"]
+        fx = dr.FixtureTransport(specs, bundle_id="t/1")
+        tok = cctx.bind_fixture(fx)
+        try:
+            cand = {
+                "candidate_id": "cand:ia:unmatched:%s" % pid,
+                "mechanism": "test mechanism",
+                "intervention": "test intervention",
+                "predicted_effect": "test predicted effect",
+                "testable_prediction": "test testable prediction",
+                "novel_design_variable": "",
+                "known_failure_modes": [],
+                "constraint_set": {},
+            }
+            rec = _ia.independent_attack(
+                cand, dict(pack["problem"]), list(pack["evidence"]),
+                None)
+        finally:
+            cctx.unbind_fixture(tok)
+        assert rec.get("overall") == "ATTACK_INCOMPLETE", (pid, rec)
+        assert rec.get("state") == "ATTACK_INCOMPLETE", pid
+        assert rec.get("overall") != "KILLED", pid
+        assert rec.get("overall") != "SURVIVED", pid
+        assert dr._attack_transport_state(rec) == "TRANSPORT_UNAVAILABLE", pid
+        # never converted: incomplete stays incomplete in the drop taxonomy
+        assert dr._attack_drop_transition(
+            rec.get("overall"), True) == "ATTACK_INCOMPLETE", pid
+
+
 # --------------------------------------- isolation/construction fast
 def test_constructor_refuses_fixture_without_dryrun(tmp_path):
     fx = dr.FixtureTransport([], bundle_id="t/1")

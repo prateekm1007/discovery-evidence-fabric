@@ -453,7 +453,9 @@ def _attack_drop_transition(indep_overall: str, reached: bool) -> str:
         return "ATTACK_NOT_REACHED"
     if indep_overall == "KILLED":
         return "ATTACK_KILLED"
-    if indep_overall == "PASS":
+    # the real instrument emits overall="SURVIVED" (independent_attack.py)
+    # for a surviving candidate; "PASS" is kept for any legacy consumer.
+    if indep_overall in ("SURVIVED", "PASS"):
         return "ATTACK_SURVIVED"
     if indep_overall in ("ATTACK_INCOMPLETE", "UNKNOWN", ""):
         return "ATTACK_INCOMPLETE"
@@ -865,7 +867,7 @@ def build_funnel(run_dir: str, stage_log: List[Dict],
     atk_survived = sum(
         1 for c in port_cands
         if isinstance(c, dict) and ((c.get("attack") or {}).get(
-            "independent_attack_overall")) == "PASS")
+            "independent_attack_overall")) in ("SURVIVED", "PASS"))
     naive_attack_overall = None
     _atk_env, _ = _read_json(_os.path.join(run_dir,
                                            "envelope_ATTACK.json"))

@@ -442,6 +442,35 @@ def attack_text(kill_basis: str) -> str:
     return "\n".join(lines) + "\n"
 
 
+def independent_attack_text() -> str:
+    """Deterministic per-candidate independent-attack response matching
+    the real independent_attack.py parser contract (ATTACK_PROMPT
+    format: '<CLASS>: <KILL|RISK|SURVIVE> — <basis> GROUNDED_IN:
+    <binding>', one line per class, em-dash separated). All six classes
+    SURVIVE so the attack is COMPLETED (transport available, parser
+    runs, verdicts recorded, overall=SURVIVED) — a deterministic control
+    proving the per-candidate independent-attack path executes end to
+    end. SURVIVE verdicts require no grounding (only KILL verdicts do),
+    so the content is valid for every candidate without depending on
+    per-candidate fields. This is controlled test material only; it is
+    NOT discovery evidence and never claims a kill."""
+    lines = [
+        "MECHANISM_FAILURE: SURVIVE \u2014 mechanism failure not "
+        "demonstrated GROUNDED_IN: EVIDENCE bundle",
+        "BOUNDARY_CONDITION_FAILURE: SURVIVE \u2014 boundary failure not "
+        "demonstrated GROUNDED_IN: EVIDENCE bundle",
+        "EVIDENCE_CONTRADICTION: SURVIVE \u2014 no contradiction observed "
+        "GROUNDED_IN: EVIDENCE bundle",
+        "BASELINE_EQUIVALENCE: SURVIVE \u2014 baseline not exceeded "
+        "GROUNDED_IN: EVIDENCE bundle",
+        "IMPLEMENTATION_IMPOSSIBILITY: SURVIVE \u2014 implementation "
+        "feasible GROUNDED_IN: EVIDENCE bundle",
+        "MEASUREMENT_AMBIGUITY: SURVIVE \u2014 ambiguity resolved "
+        "GROUNDED_IN: EVIDENCE bundle",
+    ]
+    return "\n".join(lines) + "\n"
+
+
 P1_KILL = ("bonded manifold sensors cannot separate vapor-bubble "
            "collapse signatures in the 40 to 90 kilohertz band from "
            "cavitation erosion noise occupying the same band per "
@@ -480,6 +509,8 @@ def problem_pack(problem: Dict[str, Any],
          "content": full_text(by_label["operator"], boundary)},
         {"purpose_exact": "attack",
          "content": attack_text(kill_basis)},
+        {"purpose_exact": "independent_attack",
+         "content": independent_attack_text()},
     ]
     for angle, key in ANGLE_KEYS.items():
         specs.append({"purpose_prefix": "diversity_exploration",
