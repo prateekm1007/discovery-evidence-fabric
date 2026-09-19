@@ -1,0 +1,111 @@
+{
+ "adversarial_results": {
+  "architectural_defects_found_and_fixed": [
+   "lock-factory check-then-act race (_THREAD_LOCKS creation unguarded; concurrent test flipped red under load; fixed with import-time _FACTORY_GUARD; 5/5 isolated + full-file green after)",
+   "sidecar key mismatch (writer cemetery_entry_id vs reader entry_id) hid double-appends; fixed + regression test",
+   "canonical-order list hash instability across sort_keys round-trips (mutation_ids/knowledge_ids now sorted at write; Art. X)",
+   "corrupted ledger/missing-file crash (traceback) -> typed EXECUTION_BLOCKED/UNKNOWN (attack-prompted hardening)"
+  ],
+  "attacks_attempted": [
+   "duplicate launch (8-thread claim race: single launch proven)",
+   "stale/abandoned claim recovery (CLAIMED without receipt relaunches exactly once)",
+   "forged FINALIZED record without ledger entry (returns UNKNOWN, never trusts)",
+   "missing ledger on resume (UNKNOWN)",
+   "corrupted ledger file (typed BLOCKED, no traceback)",
+   "corrupted registry (refuses to fork; typed BLOCKED)",
+   "observer disconnect model (keyless 404s vs owner-key COMPLETE on battery-2)",
+   "credential lookup failure / wrong capability / missing capability (all BLOCKED pre-state)",
+   "replay of finalized (duplicate replay, no re-execution)",
+   "duplicate resume (second resume skips; single launch total)",
+   "malformed impact linkage (none found; expanded shape asserted)",
+   "legacy-state injection (legacy counts_as_learning=True + INSUFFICIENT_DATA verdict records False)"
+  ],
+  "bypass_verdict": "no successful bypass observed; two genuine defects found by the battery itself and fixed in-cycle (above)"
+ },
+ "art_lxxiv_mapping": {
+  "ambiguous_state_blocks": "double-entry BLOCKED+resumable; auth denial; corrupt refusal (all tested)",
+  "execution_not_observation": "execution records vs observer probe outputs are distinct artifacts (tested: replay returns stored record)",
+  "observation_failure_not_execution_failure": "keyless HTTP_404 ownership mask vs owner-key COMPLETE terminals on battery-2 (precedent evidence, R510 harvest record)",
+  "polling_does_not_keep_alive": "poll() is GET-only; battery-2 terminals predated and outlived poll windows (precedent evidence)",
+  "remote_survives_disconnect": "durable-branch harvest after observer windows closed (R506/R510 precedent); local resume proven by test, remote-server case is design-covered, not locally re-tested (stated, not hidden)",
+  "retry_idempotent": "duplicate/claim/resume tests (all green)",
+  "resume_durable": "phased resume tests incl. crash-between-request-and-finalize (green)",
+  "unknown_not_failed": "resume-unknown, impact UNKNOWN_* fields, forged-completion UNKNOWN (all green)"
+ },
+ "artifact_type": "R510_P0_CUSTODY_AUDIT_RECORD",
+ "authoritative_base_sha": "582616cb9bc57d2334cfe26a8f0b55c562d09f2f",
+ "audited_at_utc": "2026-09-19T03:49:24Z",
+ "constitution": {
+  "sha256": "6aab103cb4f00cc5d4b10b82f63587d78f5b4269ca7bdf2633b5807448d2922d",
+  "version": "2.10.0"
+ },
+ "exact_blocker": "No fresh REAL observation has traversed validate->adjudicate->branch->impact->child->measured-delta on a keyed ring with a deployed build. The loop is proven on fixtures/mocks (28 battery tests) and the entrypoint/production wiring is implemented, but acceptance requires a keyed environment (provider credentials), a real allowed observation, deployment identity match, and the §16 closure record. Until then: HOLD / RED.",
+ "governance_files_read": [
+  "GOVERNANCE/AUDITOR_SELF_GOVERNANCE_v1.md",
+  "GOVERNANCE/AUDITOR_BLINDSPOT_REGISTER.md",
+  "GOVERNANCE/AUDIT_LOOP_PROTOCOL_v1.md"
+ ],
+ "local_only_unreachable_ids": "NONE — every claimed identifier resolves. The 2026-09-19 custody challenge asserting 5daeaf11 unresolvable is REFUTED by fresh-fetch evidence below; likely cause on the auditor side is a stale (unfetched) viewport (BS-001) — recorded as the leading hypothesis, not as fact about their viewport, which I cannot observe.",
+ "next_authorized_scope": "Only what the auditor accepts next, in this order: fresh REAL proof on a keyed ring (§14) -> deploy exact SHA + health verify (§15) -> §16 closure record. No new subsystems, no threshold/matcher/prompt changes, no scored-set contact. Cemetery matcher repair stays banked (Cycle A).",
+ "reachability": {
+  "branch_containing_all": [
+   "main",
+   "remotes/origin/HEAD -> origin/main",
+   "remotes/origin/main"
+  ],
+  "chain_from_base": [
+   "3f8e5e86",
+   "02fa945b",
+   "5daeaf11",
+   "a3206b22"
+  ],
+  "chain_method": "git log 582616cb..origin/main + merge-base --is-ancestor per SHA (exit 0, all three)",
+  "custody_challenge_response": "Direction claimed 5daeaf11 unresolvable from GitHub with UNVERIFIED_LOCAL_STACK status. Refuted: after `git fetch origin`, ls-remote origin/main == a3206b22 AND 3f8e5e86/02fa945b/5daeaf11 are all ancestors of origin/main (merge-base exit 0) AND present on remotes/origin/main. Per BS-026 this disagreement is surfaced, not smoothed: either the auditor viewport predates the push or a different remote was inspected. Re-fetch recommended; happy to re-prove on demand.",
+  "local_types": {
+   "02fa945b": "commit",
+   "3f8e5e86": "commit",
+   "5daeaf11": "commit",
+   "a3206b22": "commit"
+  },
+  "names_in_origin_main_bytes": {
+   "EXECUTION_BLOCKED": "present (reality_ingestion.py)",
+   "REALITY_STATE": "present (14 lines)",
+   "SEARCH_IMPACT": "present",
+   "resume_execution": "present (1 def)",
+   "session_access": "present (TOSCANINI/sessions.py)"
+  },
+  "origin_main": "a3206b22c05d993e11a7ab0fe65758acb4f57a53",
+  "remote": "https://github.com/prateekm1007/discovery-evidence-fabric.git"
+ },
+ "reproduced_test_evidence": {
+  "artifact_hashes": "commit SHAs as above; battery file tests/test_r510_reality_loop.py (32 tests)",
+  "commands": [
+   "python -m pytest tests/test_r510_reality_loop.py -q (clean checkout @ a3206b22)",
+   "python -m pytest <9-file regression set> -q (working tree)"
+  ],
+  "counts": {
+   "battery": "32 passed, 0 failed",
+   "regression": "207 passed, 6 failed (all 6 proven pre-existing via stash: 5 TestIndependentAttack fake-signature drift + cost_policy pin)"
+  },
+  "environment": "Windows win32, CPython 3.12, keyless/hermetic (conftest strips provider keys; no network except loopback-excluded probes)",
+  "exact_tested_sha": "a3206b22c05d993e11a7ab0fe65758acb4f57a53 (detached clean worktree, tree clean)",
+  "pre_existing_failures_preserved": "all 6 retained byte-identical in behavior; stash-proven unrelated (independent_attack fake drift + cost_policy pin)",
+  "skipped": 0,
+  "timestamp": "2026-09-19T03:49:24Z window"
+ },
+ "reviewer_provenance": "AI_REVIEW",
+ "state_separation": {
+  "DEPLOYED": "d15aaa75 (stale; predates the P0 work by design, not acceptance)",
+  "FRESHLY_VERIFIED": "nothing beyond hermetic battery + clean-checkout reproduction (no keyed ring on this box)",
+  "IMPLEMENTED": "P0 entrypoint + durability + branches + impact + child + resume (in a3206b22-tracked code, verified by byte audit §2)",
+  "NOT_VERIFIED": "remote-server disconnect survival; multi-process flock on POSIX; default launcher with real EngineRun",
+  "TESTED": "32-test battery green from clean checkout + 207-test regression (6 pre-existing failures)",
+  "UNKNOWN": "live-ring yield effect; fresh-observation behavior; production wiring until deployed"
+ },
+ "unresolved_unknowns": [
+  "default_run_launcher with a real EngineRun (needs keyed providers; fakes prove handoff only)",
+  "remote-execution disconnect survival on the server (design + precedent only)",
+  "multi-process flock correctness on POSIX (typed fallback proven here)",
+  "fresh REAL observation end-to-end (needs keyed ring + allowed observation + deploy)"
+ ]
+}
