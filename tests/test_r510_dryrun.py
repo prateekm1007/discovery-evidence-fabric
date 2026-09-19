@@ -257,6 +257,50 @@ def test_diversity_gate_starved_on_single_candidate(tmp_path):
     assert dr._diversity_gate(2)["gate"] == "PASS"
 
 
+# ------------------------- attack measurement (never assumed) fast
+def test_attack_drop_never_converts_incomplete_to_killed_or_survived():
+    """Art. XXV/LXI/XXIX: ATTACK_INCOMPLETE stays ATTACK_INCOMPLETE —
+    never promoted to KILLED, never to SURVIVED."""
+    assert dr._attack_drop_transition(
+        "ATTACK_INCOMPLETE", True) == "ATTACK_INCOMPLETE"
+    assert dr._attack_drop_transition(
+        "UNKNOWN", True) == "ATTACK_INCOMPLETE"
+    assert dr._attack_drop_transition("", True) == "ATTACK_INCOMPLETE"
+    assert dr._attack_drop_transition(
+        "KILLED", True) == "ATTACK_KILLED"
+    assert dr._attack_drop_transition("PASS", True) == "ATTACK_SURVIVED"
+    assert dr._attack_drop_transition(
+        "KILLED", False) == "ATTACK_NOT_REACHED"
+    assert dr._attack_drop_transition(
+        "PASS", False) == "ATTACK_NOT_REACHED"
+
+
+def test_attack_transport_classifies_fixture_refusal_honestly():
+    """PROVIDER_UNAVAILABLE (the dry-run fixture refusal) is transport
+    unavailable — infrastructure, never a scientific verdict."""
+    assert dr._attack_transport_state(
+        {"llm_status": "PROVIDER_UNAVAILABLE"}) == \
+        "TRANSPORT_UNAVAILABLE"
+    assert dr._attack_transport_state(
+        {"llm_status": "AUTH_FAILED"}) == "TRANSPORT_UNAVAILABLE"
+    assert dr._attack_transport_state(
+        {"llm_status": "OK"}) == "TRANSPORT_AVAILABLE"
+    assert dr._attack_transport_state({}) == "UNKNOWN"
+
+
+def test_attack_independence_context_is_not_provider_separation():
+    """Art. XLV: SEPARATE_CONTEXT is never claimed as provider
+    separation; absence of a record is INDEPENDENCE_UNAVAILABLE."""
+    assert dr._attack_independence_state(
+        {"independence_mode": "SEPARATE_CONTEXT"}) == \
+        "SEPARATE_CONTEXT_ONLY"
+    assert dr._attack_independence_state(
+        {"independence_mode": "SEPARATE_PROVIDER"}) == \
+        "SEPARATE_PROVIDER"
+    assert dr._attack_independence_state({}) == \
+        "INDEPENDENCE_UNAVAILABLE"
+
+
 # --------------------------------------- isolation/construction fast
 def test_constructor_refuses_fixture_without_dryrun(tmp_path):
     fx = dr.FixtureTransport([], bundle_id="t/1")

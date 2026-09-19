@@ -82,6 +82,16 @@ def check(problem_id, root):
     for k in ("submitted", "premise", "evidence", "mechanisms",
               "distinct", "ranked"):
         _ok(fa[k] == fb[k], "funnel.%s %s != %s" % (k, fa[k], fb[k]))
+    # Attack-state classifications must match exactly across A/B
+    # (Art. LXXXIII/LXI: measured, never assumed; transport /
+    # independence / drop identical; ATTACK_INCOMPLETE stays distinct
+    # from KILLED and SURVIVED).
+    for k in ("attack_reached", "attack_naive_overall",
+              "attack_candidates_reached", "attack_survived",
+              "attack_state_aggregate", "attack_measurement",
+              "attack_state"):
+        _ok(fa.get(k) == fb.get(k),
+            "funnel.attack.%s differs" % k)
     for k in ("ranking_stable_hash", "deterministic_input_identity",
               "bundle_identity", "grid_state",
               "mechanism_space_state"):

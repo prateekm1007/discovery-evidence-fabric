@@ -415,12 +415,60 @@ def _diversity_gate(n_distinct: int) -> Dict[str, Any]:
             else "MECHANISM_STARVED"}
 
 
+def _attack_transport_state(obj: Any) -> str:
+    """Attack transport state from the independent-attack record's own
+    llm_status — the honest infrastructure classification, never a
+    scientific verdict (Art. XXV/LXI). PROVIDER_UNAVAILABLE (the
+    dry-run fixture refusal) is transport unavailable, distinct from a
+    kill and from a survival."""
+    st = str((obj or {}).get("llm_status") or "")
+    if st in ("PROVIDER_UNAVAILABLE", "AUTH_FAILED", "TIMEOUT",
+              "RATE_LIMITED", "SEARCH_FAILED"):
+        return "TRANSPORT_UNAVAILABLE"
+    if st in ("OK", "SERVED", "COMPLETED"):
+        return "TRANSPORT_AVAILABLE"
+    return "TRANSPORT_UNKNOWN" if st else "UNKNOWN"
+
+
+def _attack_independence_state(obj: Any) -> str:
+    """Independence classification from the record's own
+    independence_mode. SEPARATE_PROVIDER = true provider separation;
+    SEPARATE_CONTEXT = separate reasoning context only (never claimed
+    as provider separation — Art. XLV); absence of a record is
+    INDEPENDENCE_UNAVAILABLE, not PASS."""
+    mode = str((obj or {}).get("independence_mode") or "")
+    if mode == "SEPARATE_PROVIDER":
+        return "SEPARATE_PROVIDER"
+    if mode == "SEPARATE_CONTEXT":
+        return "SEPARATE_CONTEXT_ONLY"
+    return "INDEPENDENCE_UNAVAILABLE"
+
+
+def _attack_drop_transition(indep_overall: str, reached: bool) -> str:
+    """Attack survivor-eligibility loss, from measured states only.
+    ATTACK_INCOMPLETE is NEVER converted into KILLED or SURVIVED
+    (Art. XXV/LXI/XXIX: an attack that did not run is not a kill and
+    is not a survival)."""
+    if not reached:
+        return "ATTACK_NOT_REACHED"
+    if indep_overall == "KILLED":
+        return "ATTACK_KILLED"
+    if indep_overall == "PASS":
+        return "ATTACK_SURVIVED"
+    if indep_overall in ("ATTACK_INCOMPLETE", "UNKNOWN", ""):
+        return "ATTACK_INCOMPLETE"
+    return "UNKNOWN"
+
+
 def _pool_attack_states(run_dir: str) -> Dict[str, Dict[str, Any]]:
     """Per-candidate attack states from the run's own persisted pool
     records. INDEPENDENT_ATTACK_{key}.json carries candidate_id;
     ENGINEERING_ATTACK_{key}.json pairs by pool key. Missing files =
     attack never reached for that candidate (NOT_RUN — never
-    inferred)."""
+    inferred). The attack is MEASURED, never assumed: transport,
+    independence and drop-transition are read from the records' own
+    persisted fields (llm_status / independence_mode / overall),
+    keeping ATTACK_INCOMPLETE distinct from KILLED and SURVIVED."""
     states: Dict[str, Dict[str, Any]] = {}
     by_key: Dict[str, str] = {}
     try:
@@ -437,8 +485,15 @@ def _pool_attack_states(run_dir: str) -> Dict[str, Dict[str, Any]]:
                 continue
             key = n[len("INDEPENDENT_ATTACK_"):-len(".json")]
             by_key[key] = str(cid)
+            reached = str(obj.get("overall") or "") != "NOT_RUN"
             states[str(cid)] = {
                 "independent_attack_overall": obj.get("overall"),
+                "independent_attack_attempted": reached,
+                "independent_attack_state": obj.get("state"),
+                "attack_reached": reached,
+                "attack_transport_state": _attack_transport_state(obj),
+                "attack_independence_state": _attack_independence_state(
+                    obj),
                 "pool_key": key,
             }
     for n in names:
@@ -452,6 +507,10 @@ def _pool_attack_states(run_dir: str) -> Dict[str, Dict[str, Any]]:
                 continue
             states[cid]["engineering_attack_overall"] = obj.get(
                 "overall")
+    for cid, s in states.items():
+        s["attack_drop_transition"] = _attack_drop_transition(
+            str(s.get("independent_attack_overall") or ""),
+            bool(s.get("attack_reached")))
     return states
 
 
@@ -652,12 +711,26 @@ def build_portfolio(run_dir: str, problem: Dict[str, Any],
             "attack": {
                 "independent_attack_overall": _atk.get(
                     "independent_attack_overall", "NOT_RUN"),
+                "independent_attack_attempted": bool(
+                    _atk.get("independent_attack_attempted")),
+                "independent_attack_status": _atk.get(
+                    "independent_attack_overall", "NOT_RUN"),
                 "engineering_attack_overall": _atk.get(
                     "engineering_attack_overall", "NOT_RUN"),
+                "engineering_attack_status": _atk.get(
+                    "engineering_attack_overall", "NOT_RUN"),
+                "attack_reached": bool(_atk.get("attack_reached")),
+                "attack_transport_state": _atk.get(
+                    "attack_transport_state", "UNKNOWN"),
+                "attack_independence_state": _atk.get(
+                    "attack_independence_state",
+                    "INDEPENDENCE_UNAVAILABLE"),
+                "attack_drop_transition": _atk.get(
+                    "attack_drop_transition", "ATTACK_NOT_REACHED"),
                 "pool_key": _atk.get("pool_key"),
             },
-            "attack_status": _atk.get("independent_attack_overall",
-                                      "NOT_RUN"),
+            "attack_status": _atk.get("attack_drop_transition",
+                                      "ATTACK_NOT_REACHED"),
             "uncertainties": {
                 "empty_mechanism_dims": empty_dims,
                 "feasibility": "UNKNOWN",
@@ -801,15 +874,53 @@ def build_funnel(run_dir: str, stage_log: List[Dict],
                                  or {}).get("overall"))
     _port_cands = port_cands
     atk_detail = "; ".join(
-        "%s=%s/%s" % (
+        "%s=%s/%s(%s)" % (
             str(c.get("candidate_id") or "?")[-12:],
             ((c.get("attack") or {}).get(
                 "independent_attack_overall") or "NOT_RUN"),
             ((c.get("attack") or {}).get(
-                "engineering_attack_overall") or "NOT_RUN"))
+                "engineering_attack_overall") or "NOT_RUN"),
+            ((c.get("attack") or {}).get(
+                "attack_drop_transition") or "ATTACK_NOT_REACHED"))
         for c in _port_cands if isinstance(c, dict)) or "no candidates"
     atk_state = ("naive=%s; pool: %s" % (
         naive_attack_overall or "NO_ATTACK_STAGE", atk_detail))
+    # Art. LXXXIII/LXI: attack is MEASURED, never assumed — classify
+    # each pool candidate's transport/independence/drop from the
+    # persisted records, keeping ATTACK_INCOMPLETE distinct from
+    # KILLED and SURVIVED. Infrastructure failure (transport
+    # unavailable in the dry-run) is never a scientific rejection.
+    attack_measurement = {}
+    for c in _port_cands:
+        if not isinstance(c, dict):
+            continue
+        _a = (c.get("attack") or {})
+        attack_measurement[str(c.get("candidate_id"))] = {
+            "attack_reached": bool(_a.get("attack_reached")),
+            "independent_attack_attempted": bool(
+                _a.get("independent_attack_attempted")),
+            "independent_attack_status": _a.get(
+                "independent_attack_overall", "NOT_RUN"),
+            "engineering_attack_status": _a.get(
+                "engineering_attack_overall", "NOT_RUN"),
+            "attack_transport_state": _a.get(
+                "attack_transport_state", "UNKNOWN"),
+            "attack_independence_state": _a.get(
+                "attack_independence_state",
+                "INDEPENDENCE_UNAVAILABLE"),
+            "attack_drop_transition": _a.get(
+                "attack_drop_transition", "ATTACK_NOT_REACHED"),
+        }
+    attack_agg = {
+        "NOT_REACHED": 0, "ATTEMPTED": 0, "COMPLETED": 0,
+        "INCOMPLETE": 0, "KILLED": 0, "SURVIVED": 0, "UNKNOWN": 0}
+    for _m in attack_measurement.values():
+        dt = _m["attack_drop_transition"]
+        key = {"ATTACK_NOT_REACHED": "NOT_REACHED",
+               "ATTACK_INCOMPLETE": "INCOMPLETE",
+               "ATTACK_KILLED": "KILLED",
+               "ATTACK_SURVIVED": "SURVIVED"}.get(dt, "UNKNOWN")
+        attack_agg[key] += 1
     problem = problem or {}
     # The run's terminal status is final_state.json (post-evolution);
     # the passed final_status (naive candidate level) is the fallback.
@@ -850,6 +961,8 @@ def build_funnel(run_dir: str, stage_log: List[Dict],
         "attack_candidates_reached": atk_reached,
         "attack_survived": atk_survived,
         "attack_state": atk_state,
+        "attack_measurement": attack_measurement,
+        "attack_state_aggregate": attack_agg,
         "contradiction_survived": 0,
         "experimentally_discriminated": 0,
         "mutated_survivors": 0,

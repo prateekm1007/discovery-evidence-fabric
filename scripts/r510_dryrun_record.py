@@ -134,6 +134,35 @@ def main() -> int:
             root, "dry-p1_A", "engrun_dry_p1_A",
             "DRY_RUN_FUNNEL.json"), encoding="utf-8") as fh:
         fun = json.load(fh)
+    # Attack measurement (Art. LXXXIII/LXI): each run's funnel
+    # persists the per-candidate attack classification (transport /
+    # independence / drop), keeping ATTACK_INCOMPLETE distinct from
+    # KILLED and SURVIVED. Aggregate here from the runs' own funnels;
+    # nothing inferred.
+    attack_measurement = {}
+    attack_aggregate = {"NOT_REACHED": 0, "ATTEMPTED": 0,
+                        "COMPLETED": 0, "INCOMPLETE": 0,
+                        "KILLED": 0, "SURVIVED": 0, "UNKNOWN": 0}
+    for pid in ("dry-p1", "dry-p2", "dry-p3"):
+        for rnd in ("A", "B"):
+            key = "%s_%s" % (pid, rnd)
+            fun_path = os.path.join(
+                root, key, "engrun_%s_%s" % (
+                    pid.replace("-", "_"), rnd), "DRY_RUN_FUNNEL.json")
+            with open(fun_path, encoding="utf-8") as fh:
+                f2 = json.load(fh)
+            attack_measurement[key] = {
+                "attack_naive_overall": f2.get("attack_naive_overall"),
+                "attack_candidates_reached": f2.get(
+                    "attack_candidates_reached"),
+                "attack_survived": f2.get("attack_survived"),
+                "attack_state_aggregate": f2.get(
+                    "attack_state_aggregate") or {},
+                "per_candidate": f2.get("attack_measurement") or {},
+            }
+            agg = f2.get("attack_state_aggregate") or {}
+            for k in attack_aggregate:
+                attack_aggregate[k] += agg.get(k, 0)
     record = {
         "artifact": "R510_DRYRUN_PROOF_RECORD/1.0.0",
         "constitution": "2.10.1",
@@ -149,6 +178,8 @@ def main() -> int:
         "runs": entries,
         "repeatability": repeats,
         "candidate_transition_measurement": transitions,
+        "attack_measurement": attack_measurement,
+        "attack_measurement_aggregate": attack_aggregate,
         "funnel_sample_p1a": {
             k: fun[k] for k in (
                 "submitted", "premise", "evidence", "mechanisms",
