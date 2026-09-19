@@ -2629,11 +2629,28 @@ def verify_consumption(child_run_dir: str, expected: Dict,
                 "checks": {"manifest_readable": False}}
     checks["run_executed"] = bool(manifest.get("run_id"))
     man_knowledge = manifest.get("knowledge_consumed") or {}
-    checks["manifest_binds_knowledge"] = bool(
+    checks["manifest_run_id_match"] = (
+        manifest.get("run_id") == expected.get("child_run_id"))
+    checks["manifest_trigger_match"] = (
         man_knowledge.get("trigger_event_id")
-        == expected.get("trigger_event_id")
-        and man_knowledge.get("knowledge_record_id")
+        == expected.get("trigger_event_id"))
+    checks["manifest_knowledge_match"] = (
+        man_knowledge.get("knowledge_record_id")
         == expected.get("knowledge_record_id"))
+    checks["manifest_artifact_match"] = (
+        man_knowledge.get("knowledge_artifact_sha256")
+        == expected.get("knowledge_artifact_sha256"))
+    checks["manifest_parent_run_match"] = (
+        man_knowledge.get("parent_run_id")
+        == expected.get("parent_run_id"))
+    checks["manifest_parent_problem_match"] = (
+        man_knowledge.get("parent_problem_sha256")
+        == expected.get("parent_problem_sha256"))
+    checks["manifest_branch_match"] = (
+        man_knowledge.get("branch") == expected.get("branch"))
+    checks["manifest_binds_knowledge"] = bool(
+        checks["manifest_trigger_match"]
+        and checks["manifest_knowledge_match"])
     problem_path = os.path.join(child_run_dir, "problem.json")
     try:
         problem = json.load(open(problem_path, encoding="utf-8"))
@@ -2673,6 +2690,20 @@ def verify_consumption(child_run_dir: str, expected: Dict,
     failures = []
     if not checks["run_executed"]:
         failures.append("no run identity in manifest")
+    if not checks["manifest_run_id_match"]:
+        failures.append("manifest run_id != expected child_run_id")
+    if not checks["manifest_trigger_match"]:
+        failures.append("manifest trigger mismatch")
+    if not checks["manifest_knowledge_match"]:
+        failures.append("manifest knowledge mismatch")
+    if not checks["manifest_artifact_match"]:
+        failures.append("manifest artifact-hash mismatch")
+    if not checks["manifest_parent_run_match"]:
+        failures.append("manifest parent-run mismatch")
+    if not checks["manifest_parent_problem_match"]:
+        failures.append("manifest parent-problem-hash mismatch")
+    if not checks["manifest_branch_match"]:
+        failures.append("manifest branch mismatch")
     if not checks["manifest_binds_knowledge"]:
         failures.append("manifest does not bind the expected knowledge")
     if not checks["block_trigger_match"]:
@@ -2774,6 +2805,7 @@ def extract_search_state(run_dir: str, cemetery_path=None) -> Dict:
             "disabled_stages": sorted(manifest.get("disabled_stages", [])),
             "stage_order": manifest.get("stage_order"),
         } if manifest else "UNKNOWN_NO_MANIFEST",
+        "query_policy": "UNKNOWN_NO_QUERY_REGISTRY",
         "cemetery": cemetery,
         "active_hypotheses_constraints": [
             str(problem.get("constraint") or "")] if prob_ok else [],
@@ -2787,9 +2819,13 @@ def measure_search_delta(s0: Dict, s1: Dict) -> Dict:
     """MEASURED_DELTA = DIFF(S0, S1) with substantive-field rules (§7).
     A different problem_id or serialized constraint ALONE is NOT
     substantive (the §7 falsifier is built in, not bolted on).
-    Substantive requires knowledge binding PLUS at least one of:
-    cemetery flip, operator-region change, or newly admitted
-    hypothesis/constraint content beyond the reality clause itself."""
+    Substantive requires knowledge binding PLUS at least one
+    GROUNDED signal: cemetery flip, operator-region change,
+    candidate-selection-policy change, or a BOUND active constraint
+    (clause present in S1, absent in S0, with verified knowledge
+    binding — unbound text diffs never qualify). hypothesis_new is
+    reported as INFORMATIONAL ONLY, never sufficient (constraint text
+    without binding is wording, not learning)."""
     def _norm_constraint(text):
         import re as _re
         return _re.sub(r"\[REALITY [^\]]*\]", "", str(text or "")
@@ -2811,25 +2847,42 @@ def measure_search_delta(s0: Dict, s1: Dict) -> Dict:
     op1 = ((s1.get("operator_regions") or {}).get("operator_ids"))
     operator_change = bool(
         op0 is not None and op1 is not None and op0 != op1)
+    pol0 = (s0.get("candidate_selection_policy") or {})
+    pol1 = (s1.get("candidate_selection_policy") or {})
+    policy_change = bool(
+        isinstance(pol0, dict) and isinstance(pol1, dict)
+        and (pol0.get("disabled_stages") != pol1.get("disabled_stages")
+             or pol0.get("stage_order") != pol1.get("stage_order")))
+    import re as _re2
+    _clause = lambda t: bool(_re2.search(r"\[REALITY [^\]]*\]",
+                                         str(t or "")))
+    _s0raw = (s0.get("active_hypotheses_constraints") or [""])[0]
+    _s1raw = (s1.get("active_hypotheses_constraints") or [""])[0]
+    constraint_applied = bool(
+        knowledge_bound and _clause(_s1raw) and not _clause(_s0raw))
     hypothesis_new = bool(s1c and s1c != s0c)
     changed = {
         "knowledge_bound": knowledge_bound,
         "cemetery_flip": cemetery_flip,
         "operator_change": operator_change,
-        "hypothesis_new": hypothesis_new,
+        "policy_change": policy_change,
+        "constraint_applied": constraint_applied,
+        "hypothesis_new_informational_only": hypothesis_new,
         "problem_only": (
             s0.get("problem_sha256") != s1.get("problem_sha256")
             and not (knowledge_bound or cemetery_flip
-                     or operator_change or hypothesis_new)),
+                     or operator_change or policy_change
+                     or constraint_applied)),
     }
     substantive = bool(
         knowledge_bound and (cemetery_flip or operator_change
-                             or hypothesis_new))
+                             or policy_change or constraint_applied))
     return {"substantive": substantive,
             "changed_fields": sorted(k for k, v in changed.items() if v),
             "all_fields": changed,
             "falsifier": "problem_id/constraint-only differences are "
-                         "excluded by construction"}
+                         "excluded by construction; hypothesis text "
+                         "without binding is informational only"}
 
 
 def default_run_launcher(child_request: Dict, runs_root: str,
