@@ -1,0 +1,118 @@
+{
+ "artifact_type": "R510_NEXT_CLIFF_MEASUREMENT",
+ "round": "R510",
+ "directive": "R510 NEXT CLIFF \u2014 EXECUTION ONLY",
+ "reviewer_provenance": "AI_REVIEW",
+ "created_at_utc": "2026-09-19T21:44:00Z",
+ "channel_separation": {
+  "verdict": "CHANNEL_SEPARATION_VERIFIED",
+  "evidence": "The frozen discovery-yield instrument (scripts/r506_discovery_yield.py:378-404) computes attack_survivors exclusively from envelope_ATTACK.json -> attack_results.overall (the RUN-LEVEL A2 gauntlet, path A; attacker_provenance=RUN_LEVEL_A2_GAUNTLET_NOT_SEALED_BAR_CALIBRATED). It does NOT consume attack_naive_overall, independent_attack_status, attack_state_aggregate, or any dry_run-module field. The per-candidate independent-attack fields (path B) are confined to the dry-run funnel (DRY_RUN_FIXTURE / r506_eligible=False, dry_run.py:962-967). The only dry_run importer is run.py:432 gated on dry_run=True. attack_naive_overall feeds NO frozen yield funnel, survivor eligibility, discovery classification, or terminal scientific acceptance. Therefore no CHANNEL_CONFLATION_FOUND."
+ },
+ "synthetic_battery": {
+  "verdict": "SCIENTIFIC_CLIFF = NONE",
+  "evidence": "Controlled dry-run 3x A/B battery at commit 267e64a2: all 34 pool candidates independent-attack SURVIVED (attack COMPLETE, transport available); the only dropout is the intentional P2 cemetery control (2). No scientific dropout remains in the dry-run funnel. Per RULE 9, no repair invented, no non-dropping stage optimized."
+ },
+ "blind_battery": {
+  "status": "CANONICAL_BLIND_BATTERY_EXISTS_AND_EXECUTED",
+  "path": "scripts/r506_battery_driver.py (preflight/submit/harvest) + R510/BATTERY2_PROBLEMS.json (manifest 6ba26a4d committed 310a3123 before submission) + frozen instrument r506_discovery_yield/1.0.0 (831f1a0e)",
+  "battery": "R510-blind-yield (battery-2), 6 fresh ODII problems, corpus-disjoint (240647 8-grams checked), family declared, all attempts recorded",
+  "measurement": "R510/YIELD2_MEASUREMENT.json (harvested 2026-09-19T00:38:02Z)"
+ },
+ "funnel": [
+  {
+   "transition": "fresh_submitted",
+   "reached": 6,
+   "of_n": 6,
+   "rate": 1.0
+  },
+  {
+   "transition": "premise_coherent",
+   "reached": 6,
+   "of_n": 6,
+   "rate": 1.0
+  },
+  {
+   "transition": "evidence_verified",
+   "reached": 6,
+   "of_n": 6,
+   "rate": 1.0
+  },
+  {
+   "transition": "mechanisms_found",
+   "reached": 2,
+   "of_n": 6,
+   "rate": 0.3333
+  },
+  {
+   "transition": "candidates_generated_distinct",
+   "reached": 2,
+   "of_n": 6,
+   "rate": 0.3333
+  },
+  {
+   "transition": "attack_survivors",
+   "reached": 3,
+   "of_n": 6,
+   "rate": 0.5
+  },
+  {
+   "transition": "contradiction_survivors",
+   "reached": 2,
+   "of_n": 6,
+   "rate": 0.3333
+  },
+  {
+   "transition": "experimentally_discriminated",
+   "reached": 0,
+   "of_n": 6,
+   "rate": 0.0
+  },
+  {
+   "transition": "mutated_survivors",
+   "reached": 2,
+   "of_n": 6,
+   "rate": 0.3333
+  },
+  {
+   "transition": "buyer_ready",
+   "reached": 0,
+   "of_n": 6,
+   "rate": 0.0
+  }
+ ],
+ "dropoff_attribution_ranked": [
+  {
+   "lost_at::reason": "mechanisms_found::NO_CANDIDATES",
+   "n_runs": 4
+  },
+  {
+   "lost_at::reason": "contradiction_survivors::BLOCKING_CONTRADICTIONS",
+   "n_runs": 2
+  }
+ ],
+ "next_cliff": {
+  "stage": "mechanisms_found::NO_CANDIDATES",
+  "n_runs": 4,
+  "of_n": 6,
+  "rate": 0.3333,
+  "basis": "largest non-control dropout from the blind battery-2 frozen funnel (YIELD2_MEASUREMENT.json aggregate)"
+ },
+ "fix_status": {
+  "verdict": "OWNER_GATED_FIX_BLOCKER",
+  "standing_stop": "R510/MECHANISM_STARVATION_BASELINE.json: 'STOP stands: no build until the fix design is authorized against this baseline.' and 'fix_direction_not_implemented: ... No code touched this turn.'",
+  "next_authorized": "R510/R510_EXECUTION2_HARVEST.json: 'next_authorized: NOTHING beyond harvest... all wait on funnel review + word-acts.'",
+  "worklog": "cemetery matcher untouched (banked Cycle A); NEXT BOTTLENECK: cemetery false-positive matcher (banked Cycle A) + contradiction blocks (#1/#4-class)",
+  "recorded_fix_design": "cemetery applicability gating (hard-block requires vocab overlap >=2 AND constraint-applicability context present; context-mismatch downgrades to warning). Smallest candidate per MECHANISM_STARVATION_BASELINE.json. NOT IMPLEMENTED - owner authorization required.",
+  "action_required": "Owner word-act authorizing the cemetery applicability-gating fix (or an alternative named fix for mechanisms_found::NO_CANDIDATES) before any engine build. Per Art. LXV, this escalates and does not idle."
+ },
+ "path_b_kill_semantics": {
+  "status": "VERIFIED_TEST_ONLY",
+  "a_grounded_kill": "GROUNDED KILL (evidence-id bound) -> overall KILLED (real parser, test-only)",
+  "b_ungrounded_kill": "UNGROUNDED KILL (absence ground) -> demoted ABSTAIN -> ESCALATED_OBJECTION, never KILLED (test-only)",
+  "c_survive": "SURVIVE -> overall SURVIVED (test-only)",
+  "tests": "tests/test_r510_dryrun.py: test_independent_attack_fixture_completes_through_real_instrument, test_independent_attack_unmatched_fails_closed, test_independent_attack_grounded_kill_yields_killed, test_independent_attack_ungrounded_kill_demotes_escalated",
+  "note": "test-only; no engine/fixture/threshold/calibration/attacker change"
+ },
+ "tests": "51 passed (42 fast + 9 proof-gated against committed proof output)",
+ "push": "article LXXXV push-for-auditability"
+}
