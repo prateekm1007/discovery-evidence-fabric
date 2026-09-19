@@ -53,6 +53,23 @@ def _commit() -> str:
         return "UNKNOWN_GIT_UNAVAILABLE"
 
 
+def _run_commit(entries: Dict[str, Dict[str, Any]]) -> str:
+    """The commit the measured runs ACTUALLY executed at, read from the
+    runs' own proof summaries (the runs are the authority — Art.
+    LXXXV / the R510 memory artifact: commit first, execute second,
+    record third; the record's code_commit must equal the run commit,
+    never the record-generation-time HEAD). INCONSISTENT_RUN_COMMITS
+    when the runs disagree — never fabricated, never silently the
+    first value."""
+    commits = {str(e.get("code_commit") or "")
+               for e in entries.values()}
+    commits.discard("")
+    if len(commits) == 1:
+        return commits.pop()
+    return "INCONSISTENT_RUN_COMMITS" if commits else \
+        "UNKNOWN_RUN_COMMIT"
+
+
 def main() -> int:
     root = sys.argv[1]
     entries = {}
@@ -166,7 +183,7 @@ def main() -> int:
     record = {
         "artifact": "R510_DRYRUN_PROOF_RECORD/1.0.0",
         "constitution": "2.10.1",
-        "code_commit": _commit(),
+        "code_commit": _run_commit(entries),
         "epistemic_status": (
             "CONTROLLED TEST MATERIAL ONLY. These problems are "
             "machine-authored for funnel-measurement (Art. LXXXIII "
