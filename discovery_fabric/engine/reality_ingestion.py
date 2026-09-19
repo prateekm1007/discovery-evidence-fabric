@@ -1548,11 +1548,16 @@ def _execute_kill(event, ledger_dir, parent_problem, parent_run_id,
             "adjudication": adj, "child_request": child}
 
 
-def _child_problem(parent_problem, event, knowledge_id, branch):
+def _child_problem(parent_problem, event, knowledge_id, branch,
+                   parent_run_id=None, parent_problem_sha256=None,
+                   knowledge_artifact_sha256=None):
     """Deterministic child problem: parent bytes preserved verbatim;
     ONE appended reality-constraint clause (delimited, sourced) plus a
-    reality_constraints block carrying lineage. No other byte changes.
-    """
+    reality_constraints block carrying full lineage (trigger, knowledge
+    id + artifact hash, parent run id + problem hash). No other byte
+    changes. The block is what the child execution path reads to
+    produce its consumption receipt — lineage travels in the problem,
+    never in side channels."""
     import copy as _copy
     child = _copy.deepcopy(parent_problem)
     clause = "[REALITY %s: %s knowledge %s constrains this search]" % (
@@ -1562,6 +1567,9 @@ def _child_problem(parent_problem, event, knowledge_id, branch):
     child["reality_constraints"] = {
         "trigger_event_id": event["event_id"],
         "knowledge_record_id": knowledge_id,
+        "knowledge_artifact_sha256": knowledge_artifact_sha256,
+        "parent_run_id": parent_run_id,
+        "parent_problem_sha256": parent_problem_sha256,
         "branch": branch,
         "constraint_clause": clause,
     }
@@ -1601,8 +1609,12 @@ def _request_child(event, ledger_dir, parent_problem, parent_run_id,
         if not rehearsal:
             _atomic_write_json(req_path, req)
         return req
-    child_problem = _child_problem(parent_problem, event, knowledge_id,
-                                   branch)
+    child_problem = _child_problem(
+        parent_problem, event, knowledge_id, branch,
+        parent_run_id=parent_run_id,
+        parent_problem_sha256=_loop_sha(parent_problem),
+        knowledge_artifact_sha256=_loop_sha(knowledge_artifact)
+        if isinstance(knowledge_artifact, dict) else "NOT_SUPPLIED")
     child_run_id = "engrun:%s:%s" % (
         child_problem.get("problem_id"),
         event["event_id"][-8:])
@@ -1964,7 +1976,28 @@ def _refresh_impact(ledger_dir: str, event_id: str) -> bool:
         impact["launch_attempts"] = req.get("launch_attempts", 0)
         impact["reconciliation_history"] = req.get(
             "reconciliation_history", [])
-        if status == "LAUNCHED":
+        _cons = ((req.get("launch_receipt") or {}).get("consumption")
+                 or {})
+        _crec = (_cons.get("receipt")
+                 if isinstance(_cons, dict) else None) or {}
+        _ver = _cons.get("artifact_verification",
+                         _crec.get("artifact_verification"))
+        if status == "LAUNCHED" and _cons.get("consumed") is True:
+            impact["behavioral_change_observed"] = \
+                "CHILD_CONSUMED_VERIFIED" if _ver in (
+                    "RESOLVED", "CARRIED_NOT_REVERIFIED") else \
+                "CHILD_CONSUMED_UNVERIFIED"
+            impact["child_consumed_delta"] = {
+                "knowledge_record_id":
+                    _crec.get("knowledge_record_id"),
+                "artifact_verification": _ver,
+                "operator_region_evidence":
+                    _crec.get("operator_region_evidence"),
+                "constraint_clause_present":
+                    _crec.get("constraint_clause_present"),
+                "child_problem_sha256":
+                    _crec.get("child_problem_sha256")}
+        elif status == "LAUNCHED":
             impact["behavioral_change_observed"] = \
                 "CHILD_LAUNCHED_AWAITING_EXECUTION_EVIDENCE"
         elif status == "LAUNCH_FAILED":
@@ -1973,6 +2006,13 @@ def _refresh_impact(ledger_dir: str, event_id: str) -> bool:
         elif status in ("UNKNOWN_LAUNCH", "UNKNOWN_TAMPERED"):
             impact["behavioral_change_observed"] = \
                 "UNKNOWN_LAUNCH_OUTCOME"
+        _cons2 = ((req.get("launch_receipt") or {}).get("consumption")
+                 or {})
+        _crec2 = (_cons2.get("receipt")
+                 if isinstance(_cons2, dict) else None) or {}
+        if _crec2.get("operator_region_evidence"):
+            impact["operator_region_after"] = \
+                _crec2["operator_region_evidence"]
         impact["impact_refreshed_at"] = _loop_now()
         _atomic_write_json(imp_path, impact)
         return True
@@ -2159,8 +2199,15 @@ def rebuild_reality_state(ledger_dir: str) -> Dict:
     live_core = _loop_sha(
         {"artifact_type": live.get("artifact_type"),
          "packages": live.get("packages", {})})
-    return {"match": rebuilt_hash == live_core,
-            "rebuilt_hash": rebuilt_hash, "live_hash": live_core}
+    out = {"match": rebuilt_hash == live_core,
+           "rebuilt_hash": rebuilt_hash, "live_hash": live_core}
+    if not out["match"]:
+        # Diagnosability (Art. XV): a mismatch without both sides is
+        # undebuggable. Both package maps ride the record (hashes
+        # already leak nothing beyond equality).
+        out["rebuilt_packages"] = state["packages"]
+        out["live_packages"] = live.get("packages", {})
+    return out
 
 
 def _cemetery_head(cemetery_path) -> Dict:
@@ -2442,13 +2489,22 @@ def _promote_claimed_unknown(ledger_dir: str, event_id: str) -> None:
 def record_child_consumption(child_run_dir: str, parent_event_id: str,
                              parent_run_id, knowledge_record_id: str,
                              knowledge_artifact_sha256: str,
-                             parent_problem_sha256: str) -> Dict:
+                             parent_problem_sha256: str,
+                             knowledge_artifact=None) -> Dict:
     """Machine-readable consumption receipt (§10/§11), produced FROM
-    the child execution path (called post-run by default_run_launcher;
+    the child execution path (EngineRun post-run; default_run_launcher;
     tests call it against crafted run dirs). Binds parent event/run,
     knowledge id + artifact hash, child run/problem hashes, operator-
     region evidence, and before/after problem hashes. Unknowns stay
-    typed (a disabled/experimental stage list is not evidence)."""
+    typed (a disabled/experimental stage list is not evidence).
+
+    Verification ladder for the knowledge artifact itself:
+      RESOLVED — artifact bytes supplied and hash matches;
+      TAMPERED — bytes supplied but hash differs (consumed=False);
+      CARRIED_NOT_REVERIFIED — no bytes supplied (binding only).
+    Lineage refs inside the child problem must agree with the passed
+    ids; disagreement is consumed=False (fail-closed, never a
+    same-ID-different-artifact consumption)."""
     child_run_dir = str(child_run_dir)
     problem_path = os.path.join(child_run_dir, "problem.json")
     manifest_path = os.path.join(child_run_dir, "run_manifest.json")
@@ -2462,6 +2518,27 @@ def record_child_consumption(child_run_dir: str, parent_event_id: str,
         manifest = json.load(open(manifest_path, encoding="utf-8"))
     except Exception:
         manifest = {"manifest_state": "UNKNOWN_NO_MANIFEST"}
+    rec = child_problem.get("reality_constraints") or {}
+    if rec.get("trigger_event_id") != parent_event_id or \
+            rec.get("knowledge_record_id") != knowledge_record_id:
+        return {"consumed": False,
+                "reason": "child lineage refs disagree with the claimed "
+                          "parent/knowledge ids (fail-closed; tampered or "
+                          "foreign child)",
+                "lineage_refs": {
+                    "trigger_event_id": rec.get("trigger_event_id"),
+                    "knowledge_record_id":
+                        rec.get("knowledge_record_id")}}
+    if isinstance(knowledge_artifact, dict):
+        if _loop_sha(knowledge_artifact) == knowledge_artifact_sha256:
+            verification = "RESOLVED"
+        else:
+            return {"consumed": False,
+                    "reason": "knowledge artifact bytes do not match "
+                              "the bound hash (TAMPERED; fail-closed)",
+                    "artifact_verification": "TAMPERED"}
+    else:
+        verification = "CARRIED_NOT_REVERIFIED"
     ms_path = os.path.join(child_run_dir, "envelope_MECHANISM_SPACE.json")
     if os.path.exists(ms_path):
         try:
@@ -2474,13 +2551,13 @@ def record_child_consumption(child_run_dir: str, parent_event_id: str,
                        "error": type(exc).__name__}
     else:
         regions = {"state": "UNKNOWN_NO_MECHANISM_SPACE"}
-    rec = child_problem.get("reality_constraints") or {}
     receipt = {
         "artifact_type": "CHILD_CONSUMPTION/1.0.0",
         "parent_event_id": parent_event_id,
         "parent_run_id": parent_run_id,
         "knowledge_record_id": knowledge_record_id,
         "knowledge_artifact_sha256": knowledge_artifact_sha256,
+        "artifact_verification": verification,
         "child_run_id": manifest.get("run_id",
                                      child_problem.get("problem_id")),
         "child_input_manifest_hash": _loop_sha({
@@ -2502,7 +2579,8 @@ def record_child_consumption(child_run_dir: str, parent_event_id: str,
 
 
 def default_run_launcher(child_request: Dict, runs_root: str,
-                         disabled_stages=None) -> Dict:
+                         disabled_stages=None,
+                         knowledge_resolver=None) -> Dict:
     """Production child launcher: materialize the child as a genuine
     EngineRun (canonical worker machinery — never a parallel engine)
     and execute it. Used in keyed environments; tests pass fakes.
@@ -2527,20 +2605,66 @@ def default_run_launcher(child_request: Dict, runs_root: str,
     except (KeyError, TypeError, ValueError) as exc:
         raise LauncherRejected("invalid child request: %s" % (exc,))
     result = run.run()
-    consumption = record_child_consumption(
-        out_dir,
-        child_request.get("trigger_event_id"),
-        child_request.get("parent_run_id"),
-        child_request.get("knowledge_record_id"),
-        child_request.get("knowledge_artifact_sha256",
-                          "NOT_SUPPLIED"),
-        child_request.get("parent_problem_sha256"))
+    _cons_path = _os.path.join(out_dir, "CONSUMPTION.json")
+    if _os.path.exists(_cons_path):
+        try:
+            _child_receipt = json.load(open(_cons_path, encoding="utf-8"))
+            consumption = {"consumed": True,
+                           "receipt": _child_receipt,
+                           "note": "receipt authored by the child run "
+                                   "itself (not synthesized by the "
+                                   "parent)"}
+        except Exception as exc:
+            consumption = {"consumed": False,
+                           "reason": "child receipt unreadable: %s" %
+                                     (type(exc).__name__,)}
+    else:
+        consumption = record_child_consumption(
+            out_dir,
+            child_request.get("trigger_event_id"),
+            child_request.get("parent_run_id"),
+            child_request.get("knowledge_record_id"),
+            child_request.get("knowledge_artifact_sha256",
+                              "NOT_SUPPLIED"),
+            child_request.get("parent_problem_sha256"))
+    verification = {"artifact_verification": "UNRESOLVED_NO_RESOLVER",
+                    "note": "no knowledge resolver supplied; artifact "
+                            "hash carried, not independently re-verified"}
+    if knowledge_resolver is not None:
+        try:
+            artifact = knowledge_resolver(
+                child_request.get("knowledge_record_id"))
+        except Exception as exc:
+            artifact = None
+            verification = {"artifact_verification": "UNRESOLVED",
+                            "reason": "resolver failed: %s" %
+                                      (type(exc).__name__,)}
+        if artifact is None and \
+                verification.get("artifact_verification") != "UNRESOLVED":
+            verification = {"artifact_verification": "UNRESOLVED",
+                            "reason": "knowledge artifact not resolvable; "
+                                      "never synthesized (fail-closed)"}
+        elif isinstance(artifact, dict):
+            if _loop_sha(artifact) == child_request.get(
+                    "knowledge_artifact_sha256"):
+                verification = {"artifact_verification": "RESOLVED"}
+            else:
+                verification = {"artifact_verification": "TAMPERED",
+                                "reason": "resolved bytes do not match "
+                                          "the bound hash; consumption "
+                                          "rejected (fail-closed)"}
+                consumption = {"consumed": False,
+                               "artifact_verification": "TAMPERED",
+                               "reason": verification["reason"]}
+        _atomic_write_json(_os.path.join(
+            out_dir, "CONSUMPTION_VERIFICATION.json"), verification)
     return {"child_run_id": child_request["child_run_id"],
             "launcher": "default_engine_run",
             "launched_at": _loop_now(),
             "run_state": (result or {}).get("state",
                                             "UNKNOWN_NO_RESULT"),
-            "consumption": consumption}
+            "consumption": consumption,
+            "artifact_verification": verification}
 
 
 def default_execution_checker(runs_root: str):

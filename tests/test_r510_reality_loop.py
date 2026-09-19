@@ -1039,8 +1039,18 @@ def test_default_launcher_real_path_disabled_stages(tmp_path):
            "knowledge_artifact_sha256": "kh" * 32,
            "parent_run_id": PARENT_RUN,
            "parent_problem_sha256": "ph" * 32,
-           "child_problem": dict(PARENT_PROBLEM,
-                                 problem_id="pp0_reality_evdl01"),
+           "child_problem": dict(
+               PARENT_PROBLEM, problem_id="pp0_reality_evdl01",
+               constraint="base [REALITY EV-DL-1: KILL knowledge KX "
+                          "constrains this search]",
+               reality_constraints={
+                   "trigger_event_id": "EV-DL-1",
+                   "knowledge_record_id": "KX",
+                   "knowledge_artifact_sha256": "kh" * 32,
+                   "parent_run_id": PARENT_RUN,
+                   "parent_problem_sha256": "ph" * 32,
+                   "branch": "KILL",
+                   "constraint_clause": "c"}),
            "child_run_id": "engrun_pp0_reality_evdl01",
            "launch_id": "lid-test-01",
            "session_id": None}
@@ -1100,3 +1110,167 @@ def test_full_cycle_real_launcher_reconcile(tmp_path):
     assert cons["parent_event_id"] == "EV-FC-1"
     assert cons["knowledge_record_id"] == \
         rec["branch_record"]["cemetery_entry_id"]
+
+
+def _reality_problem(eid, kid):
+    problem = dict(PARENT_PROBLEM)
+    problem["constraint"] = "base [REALITY %s: KILL knowledge %s " \
+        "constrains this search]" % (eid, kid)
+    problem["reality_constraints"] = {
+        "trigger_event_id": eid, "knowledge_record_id": kid,
+        "knowledge_artifact_sha256": "kh" * 32,
+        "parent_run_id": PARENT_RUN,
+        "parent_problem_sha256": "ph" * 32,
+        "branch": "KILL", "constraint_clause": "c"}
+    problem["problem_id"] = "pp0_reality_" + eid.lower()
+    return problem
+
+
+# EngineRun writes the receipt from its own executed state --------------
+def test_enginerun_writes_consumption_from_child(tmp_path):
+    from discovery_fabric.engine.run import EngineRun
+    from discovery_fabric.engine.adapters import STAGE_ORDER
+    out = tmp_path / "runs" / "engrun_pp0_reality_evrc01"
+    run = EngineRun(problem=_reality_problem("EV-RC-01", "KX"),
+                    out_dir=str(out), run_id="engrun_pp0_reality_evrc01",
+                    disabled_stages=list(STAGE_ORDER))
+    run.run()
+    assert (out / "problem.json").exists()
+    assert (out / "CONSUMPTION.json").exists(), \
+        "receipt must come from the child execution path"
+    rcp = json.loads((out / "CONSUMPTION.json").read_text())
+    assert rcp["parent_event_id"] == "EV-RC-01"
+    assert rcp["knowledge_record_id"] == "KX"
+    assert rcp["constraint_clause_present"] is True
+    assert rcp["artifact_verification"] == "CARRIED_NOT_REVERIFIED"
+
+
+def test_enginerun_no_block_no_receipt(tmp_path):
+    from discovery_fabric.engine.run import EngineRun
+    from discovery_fabric.engine.adapters import STAGE_ORDER
+    out = tmp_path / "runs" / "engrun_pp0_plain01"
+    run = EngineRun(problem=dict(PARENT_PROBLEM,
+                                 problem_id="pp0_plain01"),
+                    out_dir=str(out), run_id="engrun_pp0_plain01",
+                    disabled_stages=list(STAGE_ORDER))
+    run.run()
+    assert not (out / "CONSUMPTION.json").exists()
+    assert not (out / "CONSUMPTION_ERROR.json").exists()
+
+
+def test_enginerun_rehearsal_never_receipts(tmp_path):
+    from discovery_fabric.engine.run import EngineRun
+    from discovery_fabric.engine.adapters import STAGE_ORDER
+    out = tmp_path / "runs" / "engrun_pp0_rehearsal01"
+    run = EngineRun(problem=_reality_problem("EV-RC-RH", "KX"),
+                    out_dir=str(out), run_id="engrun_pp0_rehearsal01",
+                    disabled_stages=list(STAGE_ORDER))
+    run.rehearsal = True
+    run.run()
+    assert not (out / "CONSUMPTION.json").exists()
+
+
+# tampered / absent artifact at consumption ------------------------------
+def test_consumption_tampered_artifact_rejected(tmp_path):
+    runs = tmp_path / "runs"
+    child = runs / "engrun_pp0_tamper01"
+    child.mkdir(parents=True, exist_ok=True)
+    problem = _reality_problem("EV-CB-T", "KX")
+    (child / "problem.json").write_text(json.dumps(problem),
+                                        encoding="utf-8")
+    (child / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_pp0_tamper01"}), encoding="utf-8")
+    out = ri.record_child_consumption(
+        str(child), "EV-CB-T", PARENT_RUN, "KX", "kh" * 32, "ph" * 32,
+        knowledge_artifact={"different": "bytes"})
+    assert out["consumed"] is False
+    assert out["artifact_verification"] == "TAMPERED"
+    assert not (child / "CONSUMPTION.json").exists()
+
+
+def test_consumption_absent_artifact_unresolved(tmp_path):
+    runs = tmp_path / "runs"
+    child = runs / "engrun_pp0_absent01"
+    child.mkdir(parents=True, exist_ok=True)
+    problem = _reality_problem("EV-CB-A", "KX")
+    (child / "problem.json").write_text(json.dumps(problem),
+                                        encoding="utf-8")
+    (child / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_pp0_absent01"}), encoding="utf-8")
+    out = ri.record_child_consumption(
+        str(child), "EV-CB-A", PARENT_RUN, "KX", "kh" * 32, "ph" * 32,
+        knowledge_artifact=None)
+    assert out["consumed"] is True
+    assert out["receipt"]["artifact_verification"] == \
+        "CARRIED_NOT_REVERIFIED"
+
+
+def test_consumption_lineage_mismatch_rejected(tmp_path):
+    runs = tmp_path / "runs"
+    child = runs / "engrun_pp0_foreign01"
+    child.mkdir(parents=True, exist_ok=True)
+    problem = _reality_problem("EV-OTHER", "KX-OTHER")
+    (child / "problem.json").write_text(json.dumps(problem),
+                                        encoding="utf-8")
+    (child / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_pp0_foreign01"}), encoding="utf-8")
+    out = ri.record_child_consumption(
+        str(child), "EV-CB-F", PARENT_RUN, "KX", "kh" * 32, "ph" * 32)
+    assert out["consumed"] is False
+    assert "lineage" in out["reason"]
+    assert not (child / "CONSUMPTION.json").exists()
+
+
+# full §15 chain on the real launcher (disabled stages, offline) --------
+def test_e2e_real_launcher_consumption_closed(tmp_path):
+    import os as _os
+    if _os.name == "nt":
+        pytest = __import__("pytest")
+        pytest.skip("production child_run_id values contain colons "
+                    "(canonical engrun:...:... lineage format); Windows "
+                    "filesystems reject them. Production runs Linux. "
+                    "Covered on Windows by the colon-free launcher test "
+                    "above; full-shape proof requires a POSIX host.")
+    from discovery_fabric.engine.adapters import STAGE_ORDER
+    dis = list(STAGE_ORDER)
+
+    def _resolver(kid):
+        data = json.loads((tmp_path / "cemetery" / "CEMETERY.json")
+                          .read_text())
+        for e in data.get("entries", []):
+            if e.get("entry_id") == kid:
+                return e
+        return None
+
+    def _real(req):
+        return ri.default_run_launcher(
+            req, str(tmp_path / "runs"), disabled_stages=dis,
+            knowledge_resolver=_resolver)
+
+    with _cemetery(tmp_path):
+        rec = _exec(_event("EV-E2E-1", verdict="KILL"),
+                    str(tmp_path / "ledger"), run_launcher=_real,
+                    parent_problem=dict(PARENT_PROBLEM),
+                    parent_run_id=PARENT_RUN,
+                    cemetery_path=_kill_cemetery(tmp_path))
+    assert rec["executed"] is True
+    assert rec["child"]["request_status"] == "LAUNCHED"
+    child_id = rec["child"]["child_run_id"]
+    child_dir = tmp_path / "runs" / child_id.replace(":", "_")
+    assert (child_dir / "CONSUMPTION.json").exists()
+    cons = json.loads((child_dir / "CONSUMPTION.json").read_text())
+    assert cons["parent_event_id"] == "EV-E2E-1"
+    assert cons["knowledge_record_id"] == \
+        rec["branch_record"]["cemetery_entry_id"]
+    assert cons["constraint_clause_present"] is True
+    impact = json.loads((tmp_path / "ledger" / "search_impact" /
+                         "EV-E2E-1.json").read_text())
+    assert impact["behavioral_change_observed"] == \
+        "CHILD_CONSUMED_VERIFIED", impact["behavioral_change_observed"]
+    assert impact["child_consumed_delta"]["artifact_verification"] == \
+        "RESOLVED"
+    with _cemetery(tmp_path):
+        out = ri.reconcile_unknown_launch(
+            str(tmp_path / "ledger"), "EV-E2E-1", _real,
+            ri.default_execution_checker(str(tmp_path / "runs")))
+    assert out["state"] == "LAUNCHED"

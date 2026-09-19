@@ -245,9 +245,43 @@ class EngineRun:
         _ctx_token = _cctx.bind_run(self.run_id,
                                     session_id=self.session_id)
         try:
-            return self._run_inner(manifest)
+            result = self._run_inner(manifest)
         finally:
             _cctx.unbind(_ctx_token)
+        self._write_reality_consumption()
+        return result
+
+    def _write_reality_consumption(self):
+        """R510 consumption receipt (§11): a run whose problem carries a
+        reality_constraints block writes CONSUMPTION.json from its OWN
+        executed state (problem + manifest + mechanism-space envelope
+        as persisted by this run). Gated on the block's presence AND
+        non-rehearsal runs (rehearsal drivers must never produce
+        learning receipts). Artifact-byte verification is NOT done
+        here (bytes unavailable in-run; recorded CARRIED) — the
+        launcher verifies against its resolver afterwards. A receipt
+        failure never fails the run: it is recorded as
+        CONSUMPTION_ERROR.json, typed and visible."""
+        block = (self.problem or {}).get("reality_constraints")
+        if not isinstance(block, dict) or self.rehearsal:
+            return
+        try:
+            from .reality_ingestion import record_child_consumption as _rcc
+            _rcc(str(self.out),
+                 block.get("trigger_event_id"),
+                 block.get("parent_run_id"),
+                 block.get("knowledge_record_id"),
+                 block.get("knowledge_artifact_sha256", "NOT_SUPPLIED"),
+                 block.get("parent_problem_sha256"))
+        except Exception as exc:  # noqa: BLE001 — visible, never fatal
+            try:
+                self._persist(
+                    "CONSUMPTION_ERROR.json",
+                    {"error": "%s: %s" % (type(exc).__name__,
+                                          str(exc)[:200]),
+                     "trigger_event_id": block.get("trigger_event_id")})
+            except Exception:
+                pass
 
     def _run_inner(self, manifest: Dict[str, Any]) -> Dict[str, Any]:
 

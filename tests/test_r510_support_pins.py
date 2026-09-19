@@ -135,10 +135,15 @@ def test_no_engine_delta():
     # loop lives in reality_ingestion.py (entrypoint + hardened ingest
     # + executing branches + SEARCH-IMPACT + child launcher + resume;
     # thresholds/contracts/matcher untouched). Same accounting.
+    # R510-CONSUMPTION AMENDMENT (disclosed): EngineRun writes
+    # CONSUMPTION.json from its own executed state when the problem
+    # carries reality_constraints (gated; rehearsal excluded); the
+    # run is otherwise untouched.
     assert set(files) <= {
         "discovery_fabric/engine/adapters.py",
         "discovery_fabric/engine/mechanism_space.py",
-        "discovery_fabric/engine/reality_ingestion.py"}, files
+        "discovery_fabric/engine/reality_ingestion.py",
+        "discovery_fabric/engine/run.py"}, files
 
 
 def test_english_only_new_files():
