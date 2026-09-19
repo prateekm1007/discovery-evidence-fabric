@@ -42,6 +42,7 @@ import hashlib
 import json
 import os
 import re
+import threading
 from typing import Any, Dict, List, Optional, Tuple
 
 # ---------------------------------------------------------------------------
@@ -659,3 +660,789 @@ def apply_kill_path(decision: Dict[str, Any],
                 "branch); the cemetery is READ by the generator "
                 "(mechanism_space/adapters/run), not just written",
     }
+
+
+# ---------------------------------------------------------------------------
+# R510 P0 — canonical production reality loop (entrypoint + executors).
+#
+# Closes the describe-vs-execute gap: success_path_steps() describes the
+# KEEP chain and apply_kill_path() stops at the cemetery. This section
+# EXECUTES both branches, records SEARCH-IMPACT, and launches the next
+# search automatically — the missing constitutional loop (Art. LI).
+#
+# Design rules (auditor P0 directive, Constitution supreme):
+#   - ONE entrypoint (execute_reality_event); no second subsystem.
+#   - NOTHING here generates observation values (Art. XXXVII/XXXVIII).
+#   - REHEARSAL executes machinery only: no cemetery append, no
+#     learning count, no real child, permanently distinguishable.
+#   - Thresholds, contracts, matcher: untouched (Cycle A banked).
+#   - Canonical package/buyer schemas are never edited: mutations are
+#     hash-chained sidecar records (new canonical state, versioned),
+#     never foreign-schema edits (Art. IX).
+# ---------------------------------------------------------------------------
+REALITY_LOOP_VERSION = "reality_loop/1.0.0"
+
+_KEEP_LAYERS = ("evidence", "engineering_model", "package_state",
+                "commercial_state")
+
+
+def _loop_now() -> str:
+    import datetime as _dt
+    return _dt.datetime.now(
+        _dt.timezone.utc).isoformat(timespec="seconds") + "Z"
+
+
+def _loop_sha(obj) -> str:
+    return _record_hash(obj)
+
+
+def _atomic_write_json(path: str, obj: Dict[str, Any]) -> None:
+    """Durable write (repo R484 pattern): tmp sibling + flush + fsync +
+    os.replace. A reader never sees a torn file."""
+    import os as _os
+    d = _os.path.dirname(path)
+    if d:
+        _os.makedirs(d, exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8", newline="\n") as f:
+        json.dump(obj, f, indent=1, sort_keys=True)
+        f.flush()
+        try:
+            _os.fsync(f.fileno())
+        except Exception:
+            pass
+    _os.replace(tmp, path)
+
+
+def ledger_write_mechanism() -> Dict[str, str]:
+    """Report the active ledger-write mechanism (observability for §3:
+    callers/tests pin behavior, not internals)."""
+    try:
+        import fcntl  # noqa: F401
+        return {"lock": "thread+fcntl.flock", "write": "tmp+fsync+replace"}
+    except Exception:
+        return {"lock": "thread-only-typed",
+                "write": "tmp+fsync+replace",
+                "note": "no POSIX flock on this platform; in-process "
+                        "threads serialize via a per-path lock and every "
+                        "write is atomic; concurrent multi-PROCESS "
+                        "writers are NOT proven here (Art. XXV)"}
+
+
+class _LedgerLocked:
+    """Best-effort exclusive file lock around read-modify-write, reusing
+    the repository's flock convention (mechanism_cemetery); degrades to
+    a TYPED no-lock state where fcntl is unavailable (never silent).
+
+    A per-path in-process threading lock ALWAYS applies (cheap,
+    cross-platform): without it, two threads can read the same ledger
+    state and last-writer-wins one entry away even though each write
+    is atomic. Cross-process serialization additionally uses flock
+    where the platform provides it."""
+
+    _THREAD_LOCKS: Dict[str, object] = {}
+    # Factory guard, created once at import (single-threaded) so lock
+    # creation itself can never race (a lazily-created factory guard
+    # would reintroduce the exact lost-update race this class exists
+    # to prevent — caught by the concurrent-duplicate battery test).
+    _FACTORY_GUARD = threading.Lock()
+
+    def __init__(self, ledger_path: str):
+        self._path = ledger_path + ".lock"
+        self._fh = None
+        self._tlock = None
+        self.state = "UNLOCKED"
+
+    def __enter__(self):
+        import os as _os
+        d = _os.path.dirname(self._path)
+        if d:
+            _os.makedirs(d, exist_ok=True)
+        key = _os.path.abspath(self._path)
+        with _LedgerLocked._FACTORY_GUARD:
+            lock = self._THREAD_LOCKS.get(key)
+            if lock is None:
+                lock = threading.Lock()
+                self._THREAD_LOCKS[key] = lock
+        lock.acquire()
+        self._tlock = lock
+        try:
+            import fcntl
+            self._fh = open(self._path, "w")
+            fcntl.flock(self._fh, fcntl.LOCK_EX)
+            self.state = "FLOCK_EXCLUSIVE+THREAD"
+        except Exception:
+            self._fh = None
+            self.state = "THREAD_ONLY_TYPED_SINGLE_PROCESS"
+        return self
+
+    def __exit__(self, *exc):
+        try:
+            if self._fh is not None:
+                import fcntl
+                fcntl.flock(self._fh, fcntl.LOCK_UN)
+                self._fh.close()
+        except Exception:
+            pass
+        try:
+            if self._tlock is not None:
+                self._tlock.release()
+        except Exception:
+            pass
+        return False
+
+
+def ingest_reality_event_durable(event: Dict[str, Any],
+                                 ledger_path: str) -> Dict:
+    """Durable variant of ingest_reality_event: identical validation,
+    double-entry, hash-chain and return semantics; the read-modify-write
+    runs under _LedgerLocked and persistence is atomic. The legacy
+    function is preserved byte-for-behavior (R407 battery pins it)."""
+    problems = validate_reality_event_v2(event)
+    if problems:
+        return {"ingested": False, "problems": problems}
+    with _LedgerLocked(ledger_path) as _lk:
+        ledger: Dict[str, Any] = {"artifact_type": "REALITY_EVENT_LEDGER",
+                                   "entries": []}
+        if os.path.exists(ledger_path):
+            with open(ledger_path, encoding="utf-8") as f:
+                ledger = json.load(f)
+        if any(e.get("event_id") == event["event_id"]
+               for e in ledger.get("entries", [])):
+            return {"ingested": False,
+                    "problems": [f"event_id {event['event_id']} already in "
+                                 "the ledger (double entry rejected)"]}
+        prev = ledger["entries"][-1]["entry_sha256"] \
+            if ledger["entries"] else "GENESIS"
+        entry = {
+            "event_id": event["event_id"],
+            "package_id": event["package_id"],
+            "experiment_id": event["experiment_id"],
+            "source_type": event["source_type"],
+            "timestamp": event["timestamp"],
+            "reality_class": ("REAL" if event["source_type"]
+                              in REAL_SOURCE_TYPES
+                              else "CONTROLLED_REHEARSAL"),
+            "record": event,
+            "prev_entry_sha256": prev,
+        }
+        entry["entry_sha256"] = _record_hash(
+            {"prev": prev, "record": event})
+        ledger["entries"].append(entry)
+        ledger["entry_count"] = len(ledger["entries"])
+        ledger["real_event_count"] = sum(
+            1 for e in ledger["entries"] if e["reality_class"] == "REAL")
+        _atomic_write_json(ledger_path, ledger)
+    return {"ingested": True, "entry_sha256": entry["entry_sha256"],
+            "ledger_entry_count": ledger["entry_count"],
+            "real_event_count": ledger["real_event_count"]}
+
+
+def _cemetery_has_trigger(cemetery_path: str, event_id: str,
+                          ledger_dir=None) -> Optional[str]:
+    """Idempotency guard: has this event already produced a cemetery
+    entry? Consults the loop's trigger sidecar first (exact linkage,
+    written at append time), then falls back to scanning raw file
+    entries (trigger linkage may not survive the dataclass projection;
+    evidence_sources carries the event id). Returns the entry_id or
+    None."""
+    if ledger_dir is not None:
+        sidecar = os.path.join(ledger_dir, "cemetery_links",
+                               event_id + ".json")
+        if os.path.exists(sidecar):
+            try:
+                return json.load(
+                    open(sidecar, encoding="utf-8")).get("entry_id")
+            except Exception:
+                pass
+    if not os.path.exists(cemetery_path):
+        return None
+    try:
+        data = json.load(open(cemetery_path, encoding="utf-8"))
+    except Exception:
+        return None
+    for e in data.get("entries", []):
+        if isinstance(e, dict) and (e.get("trigger_event_id") == event_id
+                                    or event_id in
+                                    (e.get("evidence_sources") or [])):
+            return e.get("entry_id")
+    return None
+
+
+def _record_cemetery_link(ledger_dir: str, event_id: str,
+                          entry_id: str) -> None:
+    """Persist the event->entry linkage the dataclass projection drops
+    (trigger_event_id is not a CemeteryEntry field). Without this, a
+    re-execution cannot prove its own prior append (Art. XI)."""
+    _atomic_write_json(os.path.join(
+        ledger_dir, "cemetery_links", event_id + ".json"),
+        {"trigger_event_id": event_id, "cemetery_entry_id": entry_id,
+         "recorded_at": _loop_now()})
+
+
+def _exec_path(ledger_dir: str, event_id: str) -> str:
+    return os.path.join(ledger_dir, "executions", event_id + ".json")
+
+
+def _load_execution(ledger_dir: str, event_id: str) -> Optional[Dict]:
+    p = _exec_path(ledger_dir, event_id)
+    if not os.path.exists(p):
+        return None
+    try:
+        return json.load(open(p, encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def execute_reality_event(event: Dict[str, Any], ledger_dir: str,
+                          run_launcher=None,
+                          parent_problem: Optional[Dict] = None,
+                          parent_run_id: Optional[str] = None,
+                          cemetery_path: Optional[str] = None,
+                          runs_root: Optional[str] = None) -> Dict:
+    """THE canonical production reality entrypoint (P0 §A).
+
+    validate -> authorize (provenance/attestation, from mandatory
+    fields; no new auth infra) -> idempotency (stored execution
+    returned, never re-executed) -> durable append -> adjudicate ->
+    branch execution (KEEP/MODIFY/KILL) -> SEARCH-IMPACT ->
+    child request -> launch-or-defer.
+
+    cemetery_path: override for the canonical cemetery location
+    (tests redirect to tmp; production omits it and uses the
+    canonical file — canonical state never touched by tests, Art.
+    IX). runs_root: where a default launcher materializes child
+    runs (tests pass tmp or a fake launcher).
+    """
+    evid = (event or {}).get("event_id", "unknown-event")
+    problems = validate_reality_event_v2(event)
+    if problems:
+        return {"executed": False, "event_id": evid,
+                "execution_state": "EXECUTION_INVALID",
+                "problems": problems,
+                "note": "ingestion failure is an execution state, never "
+                        "a scientific verdict (Art. LXI)"}
+    rehearsal = event.get("source_type") == "CONTROLLED_REHEARSAL"
+    prior = _load_execution(ledger_dir, event["event_id"])
+    if prior is not None:
+        replayed = dict(prior)
+        replayed["duplicate"] = True
+        replayed["replayed"] = True
+        return replayed
+    ledger_path = os.path.join(
+        ledger_dir, "REHEARSAL_EVENT_LEDGER.json" if rehearsal
+        else "REALITY_EVENT_LEDGER.json")
+    ing = ingest_reality_event_durable(event, ledger_path)
+    if not ing.get("ingested"):
+        return {"executed": False, "event_id": event["event_id"],
+                "execution_state": "EXECUTION_BLOCKED",
+                "problems": ing.get("problems"),
+                "note": "ledger refused the event; nothing downstream "
+                        "ran (Art. LXI)"}
+    verdict = (event.get("decision") or {}).get("verdict")
+    if verdict in ("EXECUTION_INVALID", "EXECUTION_BLOCKED"):
+        rec = {"executed": False, "event_id": event["event_id"],
+               "execution_state": verdict,
+               "entry_sha256": ing["entry_sha256"],
+               "note": "the frozen contract itself reports an execution "
+                       "state; no scientific branch runs"}
+        _atomic_write_json(_exec_path(ledger_dir, event["event_id"]), rec)
+        return rec
+    if verdict in ("KEEP", "SUPPORTED"):
+        branch, out = "KEEP", _execute_keep(
+            event, ledger_dir, parent_problem, parent_run_id, rehearsal)
+    elif verdict == "MODIFY":
+        branch, out = "MODIFY", _execute_modify(
+            event, ledger_dir, parent_problem, parent_run_id, rehearsal)
+    elif verdict in ("KILL", "KILLED"):
+        branch, out = "KILL", _execute_kill(
+            event, ledger_dir, parent_problem, parent_run_id, rehearsal,
+            cemetery_path)
+    else:  # MIXED or any other machine verdict: conservative superset
+        branch, out = "MODIFY", _execute_modify(
+            event, ledger_dir, parent_problem, parent_run_id, rehearsal)
+        out["mixed_routing"] = (
+            "verdict %r is ambiguous; MODIFY is the non-destructive "
+            "superset path (never auto-KILL on ambiguity)"
+            % (verdict,))
+    counts_learning = _learning_countable(event, out)
+    fin = _finalize_execution(event, ledger_dir, branch, out,
+                              run_launcher, parent_problem, rehearsal)
+    rec = {"executed": True, "event_id": event["event_id"],
+           "execution_state": ("EXECUTED_REHEARSAL" if rehearsal
+                               else "EXECUTED_REAL"),
+           "branch": branch,
+           "entry_sha256": ing["entry_sha256"],
+           "reality_class": ("CONTROLLED_REHEARSAL" if rehearsal
+                             else "REAL"),
+           "counts_as_physical_learning": counts_learning,
+           "branch_record": out,
+           "search_impact": fin["search_impact"],
+           "child": fin["child"],
+           "loop_version": REALITY_LOOP_VERSION,
+           "reviewer_provenance": "AI_REVIEW"}
+    _atomic_write_json(_exec_path(ledger_dir, event["event_id"]), rec)
+    return rec
+
+
+def _learning_countable(event: Dict, branch_out: Dict) -> object:
+    """counts_as_physical_learning (entrypoint rule, disclosed): False
+    for rehearsal, ALWAYS. For REAL: True only when the adjudication
+    verdict is MODEL_IMPROVED; INSUFFICIENT_DATA/LEARNING_FAILED stay
+    False (a field named true would be worthless there). UNDETERMINED
+    when no adjudication ran (never guessed)."""
+    if event.get("source_type") == "CONTROLLED_REHEARSAL":
+        return False
+    adj = (branch_out or {}).get("adjudication") or {}
+    if not adj:
+        return "UNDETERMINED"
+    return True if adj.get("verdict") == "MODEL_IMPROVED" else False
+
+
+def _adjudicate_if_numbered(event: Dict) -> Dict:
+    """Run the existing adjudicator on the event's own numbers where
+    present (optional prediction_before/prediction_after keys; the
+    measurement is candidate_result when numeric). Absent numbers ->
+    honest INSUFFICIENT_DATA (never invented)."""
+    def _num(v):
+        return v if isinstance(v, (int, float)) and v == v else None
+    actual = _num(event.get("candidate_result"))
+    before = _num(event.get("baseline_result"))
+    after = _num(event.get("prediction_after"))
+    held = event.get("held_out") if isinstance(
+        event.get("held_out"), dict) else None
+    return adjudicate_learning(before, actual, after, held_out=held,
+                               reality_event=event,
+                               unit=(event.get("measurement_units") or {})
+                               .get("unit"))
+
+
+def _parent_hashes(parent_problem, parent_run_id) -> Dict:
+    if not isinstance(parent_problem, dict):
+        return {"parent_problem": "NOT_SUPPLIED"}
+    blob = json.dumps(parent_problem, sort_keys=True, separators=(",", ":"))
+    return {"parent_problem_sha256": hashlib.sha256(
+        blob.encode()).hexdigest(),
+        "parent_run_id": parent_run_id}
+
+
+def _execute_keep(event, ledger_dir, parent_problem, parent_run_id,
+                  rehearsal: bool) -> Dict:
+    """KEEP/SUPPORTED executor: evidence link + model-error adjudication
+    + package/commercial MUTATION sidecars (new hash-chained canonical
+    records; foreign schemas never edited — Art. IX). Layers without
+    bound parents record NOT_APPLICABLE with reason (never fabricated).
+    """
+    scope = "rehearsal" if rehearsal else "real"
+    layers = {}
+    layers["evidence"] = {
+        "state": "LINKED",
+        "link": {"event_id": event["event_id"],
+                 "package_id": event["package_id"],
+                 "experiment_id": event["experiment_id"],
+                 **_parent_hashes(parent_problem, parent_run_id)},
+    }
+    adj = _adjudicate_if_numbered(event)
+    layers["model_error"] = {
+        "state": ("ADJUDICATED" if adj.get("verdict") !=
+                  "INSUFFICIENT_DATA" else "NOT_APPLICABLE"),
+        "adjudication": adj,
+        "reason": (None if adj.get("verdict") != "INSUFFICIENT_DATA"
+                   else "no numeric prediction_before/after on the event; "
+                        "measurement alone is not a model update"),
+    }
+    for layer in ("package_state", "commercial_state"):
+        if parent_run_id is None:
+            layers[layer] = {"state": "NOT_APPLICABLE",
+                             "reason": "no parent run bound; nothing to "
+                                       "mutate (Art. XXV)"}
+            continue
+        mut = {"artifact_type": "REALITY_MUTATION/1.0.0",
+               "mutation_id": "MUT-%s-%s" % (event["event_id"], layer),
+               "event_id": event["event_id"],
+               "package_id": event["package_id"],
+               "experiment_id": event["experiment_id"],
+               "layer": layer,
+               "parent": _parent_hashes(parent_problem, parent_run_id),
+               "new_state": "REALITY_CONFIRMED",
+               "scope": scope,
+               "recorded_at": _loop_now()}
+        mut["mutation_sha256"] = _loop_sha(mut)
+        if not rehearsal:
+            _atomic_write_json(os.path.join(
+                ledger_dir, "mutations",
+                event["event_id"] + "." + layer + ".json"), mut)
+        layers[layer] = {"state": "MUTATED", "mutation_id":
+                         mut["mutation_id"],
+                         "mutation_sha256": mut["mutation_sha256"]}
+    return {"path": "KEEP", "scope": scope, "layers": layers,
+            "adjudication": adj}
+
+
+def _delta_rendering(event: Dict) -> Dict:
+    """Deterministic delta from the event's own numbers (arithmetic
+    only, never prose): candidate vs baseline with the pre-registered
+    threshold. Non-numeric inputs stay UNKNOWN (never coerced)."""
+    def _num(v):
+        return v if isinstance(v, (int, float)) and v == v else None
+    cand, base = _num(event.get("candidate_result")), _num(
+        event.get("baseline_result"))
+    thr = _num(event.get("pre_registered_threshold"))
+    if cand is None or base is None:
+        return {"direction": "UNKNOWN",
+                "reason": "non-numeric candidate/baseline on the event"}
+    direction = "up" if cand > base else (
+        "down" if cand < base else "equal")
+    met = (cand >= thr) if thr is not None else "UNKNOWN"
+    return {"candidate": cand, "baseline": base, "direction": direction,
+            "threshold": thr, "threshold_met": met}
+
+
+def _execute_modify(event, ledger_dir, parent_problem, parent_run_id,
+                    rehearsal: bool) -> Dict:
+    """MODIFY executor: registered hypothesis (deterministic delta) +
+    next-search request. The hypothesis is a record, never an assertion
+    of improvement."""
+    scope = "rehearsal" if rehearsal else "real"
+    hyp = {"artifact_type": "REALITY_HYPOTHESIS/1.0.0",
+           "hypothesis_id": "HYP-" + str(event["event_id"]),
+           "event_id": event["event_id"],
+           "package_id": event["package_id"],
+           "experiment_id": event["experiment_id"],
+           "delta": _delta_rendering(event),
+           "decision_trace": (event.get("decision") or {}),
+           "parent": _parent_hashes(parent_problem, parent_run_id),
+           "scope": scope,
+           "recorded_at": _loop_now()}
+    hyp["hypothesis_sha256"] = _loop_sha(hyp)
+    if not rehearsal:
+        _atomic_write_json(os.path.join(
+            ledger_dir, "hypotheses", event["event_id"] + ".json"), hyp)
+    adj = _adjudicate_if_numbered(event)
+    child = _request_child(event, ledger_dir, parent_problem,
+                           parent_run_id, hyp["hypothesis_id"],
+                           "MODIFY", rehearsal)
+    return {"path": "MODIFY", "scope": scope, "hypothesis": hyp,
+            "adjudication": adj, "child_request": child}
+
+
+def _append_cemetery_entries(entries, cemetery_path: str) -> None:
+    """Append cemetery entries atomically to an EXPLICIT path (the loop's
+    own append — never the canonical file by accident). Semantics mirror
+    the canonical append (history-preserving extend + _chain_extend +
+    counts) with atomic tmp+replace writes and best-effort locking.
+    Rationale (recorded): the canonical append hardcodes CEMETERY_PATH
+    (untestable without touching canonical state, Art. IX) and crashes
+    where fcntl is unavailable; this path-parameterized variant keeps
+    byte-compatible semantics. No matcher logic lives here (Cycle A
+    banked)."""
+    import dataclasses as _dc
+    from orchestrator import mechanism_cemetery as mc
+    with _LedgerLocked(cemetery_path):
+        if os.path.exists(cemetery_path):
+            with open(cemetery_path, encoding="utf-8") as f:
+                data = json.load(f)
+        else:
+            data = {"description": "Library of impossibilities — every "
+                                   "killed invention with reusable "
+                                   "lessons.",
+                    "entries": []}
+        data.setdefault("entries", []).extend(
+            _dc.asdict(e) for e in entries)
+        mc._chain_extend(data)
+        data["entry_count"] = len(data["entries"])
+        data["updated_at"] = _loop_now()
+        _atomic_write_json(cemetery_path, data)
+
+
+def _execute_kill(event, ledger_dir, parent_problem, parent_run_id,
+                  rehearsal: bool, cemetery_path=None) -> Dict:
+    """KILL executor: cemetery append (REAL only — rehearsal NEVER
+    appends, recorded as rehearsal_cemetery_skipped) + failure memory
+    + search constraint + child request. Idempotent: an existing entry
+    with this trigger is reused, never double-appended."""
+    scope = "rehearsal" if rehearsal else "real"
+    from orchestrator import mechanism_cemetery as mc
+    cpath = str(cemetery_path) if cemetery_path else None
+    if rehearsal:
+        payload = kill_path_entry(event.get("decision") or {},
+                                  event)
+        return {"path": "KILL", "scope": scope,
+                "rehearsal_cemetery_skipped": {
+                    "reason": "CONTROLLED_REHEARSAL must never append "
+                              "real negative knowledge (Art. "
+                              "XXXVII/XXXVIII)",
+                    "would_be_entry": payload.get("entry_id"),
+                    "would_be_class": payload.get("epistemic_class")},
+                "failure_memory": {
+                    "lesson": payload.get("reusable_lesson"),
+                    "rehearsal": True},
+                "search_constraint": None,
+                "child_request": _request_child(
+                    event, ledger_dir, parent_problem, parent_run_id,
+                    None, "KILL", True)}
+    target = cpath or str(mc.CEMETERY_PATH)
+    existing = _cemetery_has_trigger(target, event["event_id"], ledger_dir)
+    if existing is not None:
+        entry_id, appended = existing, False
+        check_verdict = "REUSED_EXISTING_ENTRY"
+    else:
+        payload = kill_path_entry(event.get("decision") or {}, event)
+        entry = mc.CemeteryEntry(**{
+            k: v for k, v in payload.items()
+            if k in mc.CemeteryEntry.__dataclass_fields__
+            and k != "epistemic_class_justification"})
+        _append_cemetery_entries([entry], target)
+        _record_cemetery_link(ledger_dir, event["event_id"],
+                              payload.get("entry_id"))
+        check = mc.check_candidate_against_cemetery(
+            payload["what_to_avoid"] + " " + payload["reusable_lesson"])
+        entry_id, appended = payload.get("entry_id"), True
+        check_verdict = check.get("verdict")
+    constraint = {
+        "excluded_cemetery_entry": entry_id,
+        "trigger_event_id": event["event_id"],
+        "rule": "future candidates matching this entry consult it "
+                "through the existing cemetery gate (no new matcher)",
+    }
+    child = _request_child(event, ledger_dir, parent_problem,
+                           parent_run_id, entry_id, "KILL", False)
+    adj = _adjudicate_if_numbered(event)
+    return {"path": "KILL", "scope": scope, "cemetery_entry_id": entry_id,
+            "cemetery_appended": appended, "search_constraint": constraint,
+            "cemetery_check_verdict": check_verdict,
+            "failure_memory": {
+                "lesson": ("kill condition fired on measured data; "
+                           "see cemetery entry %s" % (entry_id,)),
+                "failed_assumption": "the mechanism survived its own "
+                                     "pre-registered kill condition",
+                "affected_artifacts": [event.get("package_id"),
+                                       event.get("experiment_id")]},
+            "adjudication": adj, "child_request": child}
+
+
+def _child_problem(parent_problem, event, knowledge_id, branch):
+    """Deterministic child problem: parent bytes preserved verbatim;
+    ONE appended reality-constraint clause (delimited, sourced) plus a
+    reality_constraints block carrying lineage. No other byte changes.
+    """
+    import copy as _copy
+    child = _copy.deepcopy(parent_problem)
+    clause = "[REALITY %s: %s knowledge %s constrains this search]" % (
+        event["event_id"], branch, knowledge_id)
+    prior = str(child.get("constraint") or "")
+    child["constraint"] = (prior + " " + clause).strip()
+    child["reality_constraints"] = {
+        "trigger_event_id": event["event_id"],
+        "knowledge_record_id": knowledge_id,
+        "branch": branch,
+        "constraint_clause": clause,
+    }
+    pid = str(child.get("problem_id") or "problem")
+    child["problem_id"] = pid + "+reality-" + str(
+        event["event_id"])[-8:]
+    return child
+
+
+def _request_child(event, ledger_dir, parent_problem, parent_run_id,
+                   knowledge_id, branch, rehearsal: bool) -> Dict:
+    """Persist the child-search request BEFORE any launch (restart
+    recovery reads these). Exactly one request per trigger: existing
+    file is reused. Rehearsal requests are launchable:false, forever.
+    A missing parent problem makes the request UNLAUNCHABLE (typed —
+    no fabricated problem, Art. XXV)."""
+    req_path = os.path.join(ledger_dir, "child_requests",
+                            event["event_id"] + ".json")
+    if os.path.exists(req_path):
+        try:
+            prior = json.load(open(req_path, encoding="utf-8"))
+            prior["duplicate"] = True
+            return prior
+        except Exception:
+            pass
+    if not isinstance(parent_problem, dict):
+        req = {"trigger_event_id": event["event_id"], "branch": branch,
+               "knowledge_record_id": knowledge_id,
+               "launchable": False, "status": "UNLAUNCHABLE",
+               "reason": "no parent problem supplied; no problem is "
+                         "fabricated (Art. XXV)",
+               "rehearsal": rehearsal}
+        if not rehearsal:
+            _atomic_write_json(req_path, req)
+        return req
+    child_problem = _child_problem(parent_problem, event, knowledge_id,
+                                   branch)
+    req = {"trigger_event_id": event["event_id"], "branch": branch,
+           "knowledge_record_id": knowledge_id,
+           "parent_run_id": parent_run_id,
+           "parent_problem_sha256": _loop_sha(parent_problem),
+           "child_problem": child_problem,
+           "child_problem_sha256": _loop_sha(child_problem),
+           "child_run_id": "engrun:%s:%s" % (
+               child_problem.get("problem_id"),
+               event["event_id"][-8:]),
+           "launchable": not rehearsal, "status": "REQUESTED",
+           "rehearsal": rehearsal,
+           "requested_at": _loop_now()}
+    if not rehearsal:
+        _atomic_write_json(req_path, req)
+    return req
+
+
+def _search_impact_record(event, branch_out, child_req,
+                          parent_problem) -> Dict:
+    """Canonical SEARCH-IMPACT (§G): BEFORE/AFTER derived from actual
+    canonical records (problem hashes), never free-text assertion."""
+    before = _loop_sha(parent_problem) if isinstance(
+        parent_problem, dict) else "NO_PARENT_SUPPLIED"
+    after = child_req.get("child_problem_sha256", "NO_CHILD_PROBLEM")
+    knowledge_id = child_req.get("knowledge_record_id")
+    return {"artifact_type": "SEARCH_IMPACT/1.0.0",
+            "parent_run_id": child_req.get("parent_run_id"),
+            "trigger_event_id": event["event_id"],
+            "knowledge_record_id": knowledge_id,
+            "search_state_before": {
+                "parent_problem_sha256": before,
+                "parent_constraint": (parent_problem or {}).get(
+                    "constraint")},
+            "knowledge_added": {"branch": branch_out.get("path"),
+                                "record_id": knowledge_id},
+            "search_state_after": {
+                "child_problem_sha256": after,
+                "child_constraint": (child_req.get("child_problem")
+                                     or {}).get("constraint")},
+            "behavioral_change_expected": _expected_change(
+                branch_out.get("path")),
+            "behavioral_change_observed": (
+                "PENDING_CHILD_LAUNCH" if child_req.get("launchable")
+                else "NO_CHILD_EXPECTED"),
+            "child_run_id": child_req.get("child_run_id"),
+            "recorded_at": _loop_now()}
+
+
+def _expected_change(branch_path: str) -> str:
+    return {"KILL": "previous mechanism family suppressed / failure "
+                    "territory excluded via the appended reality clause; "
+                    "cemetery gate consults the new entry on every "
+                    "candidate",
+            "MODIFY": "new boundary/hypothesis admitted via the appended "
+                      "reality clause; hypothesis record bound to the "
+                      "child",
+            "KEEP": "none-expected (success path performs mutations, "
+                    "no search modification)"}.get(
+                        branch_path, "unknown branch")
+
+
+def _finalize_execution(event, ledger_dir, branch, branch_out,
+                        run_launcher, parent_problem, rehearsal):
+    """SEARCH-IMPACT + child request + launch-or-defer, shared by all
+    branches (KEEP requests no child: success path mutates state)."""
+    if branch == "KEEP":
+        impact = {"artifact_type": "SEARCH_IMPACT/1.0.0",
+                  "parent_run_id": None,
+                  "trigger_event_id": event["event_id"],
+                  "knowledge_record_id": None,
+                  "search_state_before": "NOT_APPLICABLE_KEEP_PATH",
+                  "knowledge_added": {"branch": "KEEP"},
+                  "search_state_after": "NOT_APPLICABLE_KEEP_PATH",
+                  "behavioral_change_expected":
+                      _expected_change("KEEP"),
+                  "behavioral_change_observed": "NO_CHILD_EXPECTED",
+                  "child_run_id": None,
+                  "recorded_at": _loop_now()}
+        if not rehearsal:
+            _atomic_write_json(os.path.join(
+                ledger_dir, "search_impact",
+                event["event_id"] + ".json"), impact)
+        return {"search_impact": impact, "child": None}
+    child_req = branch_out.get("child_request") or {}
+    impact = _search_impact_record(event, branch_out, child_req,
+                                   parent_problem)
+    if not rehearsal:
+        _atomic_write_json(os.path.join(
+            ledger_dir, "search_impact", event["event_id"] + ".json"),
+            impact)
+    child_out, receipt = None, None
+    if child_req.get("launchable") and child_req.get("status") == \
+            "REQUESTED" and run_launcher is not None:
+        try:
+            receipt = run_launcher(child_req)
+            child_req["status"] = "LAUNCHED"
+            child_req["launch_receipt"] = receipt
+            child_out = child_req.get("child_run_id")
+        except Exception as exc:  # noqa: BLE001 — typed, retryable
+            child_req["status"] = "LAUNCH_FAILED"
+            child_req["launch_error"] = "%s: %s" % (
+                type(exc).__name__, str(exc)[:200])
+        if not rehearsal:
+            _atomic_write_json(os.path.join(
+                ledger_dir, "child_requests",
+                event["event_id"] + ".json"), child_req)
+    return {"search_impact": impact,
+            "child": {"child_run_id": child_out,
+                      "launch_receipt": receipt,
+                      "request_status": child_req.get("status")}}
+
+
+def resume_pending_children(ledger_dir: str, run_launcher) -> Dict:
+    """Restart recovery (Art. LXXIV): launch every REQUESTED, launchable,
+    non-rehearsal child request exactly once. Rehearsal requests are
+    never launched by this path (recorded skip). Already-LAUNCHED or
+    failed requests are left untouched (failure stays retryable by an
+    explicit re-resume with the error on record — never silent)."""
+    import glob as _glob
+    launched, skipped, failed = [], [], []
+    for req_path in sorted(_glob.glob(os.path.join(
+            ledger_dir, "child_requests", "*.json"))):
+        try:
+            req = json.load(open(req_path, encoding="utf-8"))
+        except Exception:
+            failed.append({"file": req_path,
+                           "error": "unreadable request (typed; left "
+                                    "untouched)"})
+            continue
+        if req.get("rehearsal"):
+            skipped.append({"trigger": req.get("trigger_event_id"),
+                            "reason": "rehearsal requests never launch "
+                                      "in the production path"})
+            continue
+        if req.get("status") != "REQUESTED" or not req.get("launchable"):
+            skipped.append({"trigger": req.get("trigger_event_id"),
+                            "reason": "status=%s (only REQUESTED "
+                                      "launchable requests resume)"
+                                      % (req.get("status"),)})
+            continue
+        try:
+            receipt = run_launcher(req)
+            req["status"] = "LAUNCHED"
+            req["launch_receipt"] = receipt
+            _atomic_write_json(req_path, req)
+            launched.append({"trigger": req.get("trigger_event_id"),
+                             "child_run_id": req.get("child_run_id")})
+        except Exception as exc:  # noqa: BLE001 — typed, retryable
+            req["status"] = "LAUNCH_FAILED"
+            req["launch_error"] = "%s: %s" % (
+                type(exc).__name__, str(exc)[:200])
+            _atomic_write_json(req_path, req)
+            failed.append({"trigger": req.get("trigger_event_id"),
+                           "error": req["launch_error"]})
+    return {"launched": launched, "skipped": skipped, "failed": failed}
+
+
+def default_run_launcher(child_request: Dict, runs_root: str) -> Dict:
+    """Production child launcher: materialize the child as a genuine
+    EngineRun (canonical worker machinery — never a parallel engine)
+    and execute it. Used in keyed environments; tests pass fakes."""
+    from .run import EngineRun
+    import os as _os
+    out_dir = _os.path.join(runs_root, child_request["child_run_id"])
+    run = EngineRun(problem=dict(child_request["child_problem"]),
+                    out_dir=out_dir,
+                    run_id=child_request["child_run_id"],
+                    session_id=child_request.get("session_id"))
+    result = run.run()
+    return {"child_run_id": child_request["child_run_id"],
+            "launcher": "default_engine_run",
+            "launched_at": _loop_now(),
+            "run_state": (result or {}).get("state",
+                                            "UNKNOWN_NO_RESULT")}

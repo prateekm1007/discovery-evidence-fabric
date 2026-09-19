@@ -539,6 +539,13 @@ class TestDeletionAccounting(unittest.TestCase):
                     # lean-side selection. Same mandate accounting
                     # otherwise.
                     "discovery_fabric/engine/mechanism_space.py",
+                    # R510-P0 AMENDMENT (disclosed): the canonical
+                    # production reality loop lives in
+                    # reality_ingestion.py (entrypoint + hardened ingest
+                    # + executing branches + SEARCH-IMPACT + child
+                    # launcher + resume; thresholds/contracts/matcher
+                    # untouched). Same mandate accounting otherwise.
+                    "discovery_fabric/engine/reality_ingestion.py",
                     # R495 AMENDMENT (disclosed): the A2 burden-of-
                     # proof instrument is the R490-owned calibration
                     # surface — v4.2 (the attacker-computes standard)

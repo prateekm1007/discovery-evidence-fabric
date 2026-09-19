@@ -131,9 +131,14 @@ def test_no_engine_delta():
                if l.startswith("+++ ") or l.startswith("--- ")]
     files = sorted(l[6:].removeprefix("b/") for l in touched
                    if l.startswith("+++ "))
+    # R510-P0 AMENDMENT (disclosed): the canonical production reality
+    # loop lives in reality_ingestion.py (entrypoint + hardened ingest
+    # + executing branches + SEARCH-IMPACT + child launcher + resume;
+    # thresholds/contracts/matcher untouched). Same accounting.
     assert set(files) <= {
         "discovery_fabric/engine/adapters.py",
-        "discovery_fabric/engine/mechanism_space.py"}, files
+        "discovery_fabric/engine/mechanism_space.py",
+        "discovery_fabric/engine/reality_ingestion.py"}, files
 
 
 def test_english_only_new_files():
