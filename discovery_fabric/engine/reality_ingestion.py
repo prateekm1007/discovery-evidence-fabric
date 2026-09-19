@@ -960,6 +960,46 @@ def _load_execution(ledger_dir: str, event_id: str) -> Optional[Dict]:
         return None
 
 
+def _execution_is_corrupt(ledger_dir: str, event_id: str) -> bool:
+    """True iff an execution record file exists but is unparseable.
+    A corrupt record must NEVER be treated as absence (that would
+    relaunch finalized work). Fail-closed UNKNOWN instead (§7)."""
+    p = _exec_path(ledger_dir, event_id)
+    if not os.path.exists(p):
+        return False
+    try:
+        json.load(open(p, encoding="utf-8"))
+        return False
+    except Exception:
+        return True
+
+
+def _ledgers_verify(ledger_dir: str) -> Dict:
+    """verify_ledger() as an actual precondition (§8): every ledger
+    file present must chain-verify; a present-but-invalid ledger
+    fails recovery closed. Absent files are not evidence either way
+    (reported, never assumed)."""
+    out = {}
+    for name in ("REALITY_EVENT_LEDGER.json",
+                 "REHEARSAL_EVENT_LEDGER.json"):
+        p = os.path.join(ledger_dir, name)
+        if not os.path.exists(p):
+            out[name] = {"present": False}
+            continue
+        out[name] = dict({"present": True}, **verify_ledger(p))
+    return out
+
+
+def _ledgers_all_valid(ledger_dir: str):
+    """(ok, detail): True iff every PRESENT ledger verifies."""
+    detail = _ledgers_verify(ledger_dir)
+    bad = {k: v for k, v in detail.items()
+           if v.get("present") and not v.get("valid")}
+    if bad:
+        return False, {"invalid_ledgers": bad}
+    return True, detail
+
+
 def _default_session_store():
     """The approved application credential path, resolved lazily (same
     pattern as the cemetery import: no layer inversion at module load).
@@ -1082,6 +1122,41 @@ def execute_reality_event(event: Dict[str, Any], ledger_dir: str,
         auth_rec, _cem_target=None, resumed=False)
 
 
+def _resume_ledger_gate(ledger_dir: str, event_id: str):
+    """verify_ledger() as a resume precondition (§8): locate the durable
+    entry, then require its ledger file to chain-verify. Returns
+    (ledger_path, entry, refusal). A present-but-invalid chain fails
+    recovery closed — resume must not consume a parseable record whose
+    hash chain is broken. A corrupt execution record fails closed too
+    (never treated as absence: relaunching finalized work would fork
+    execution)."""
+    if _execution_is_corrupt(ledger_dir, event_id):
+        return None, None, {"gate": "execution-record-corrupt",
+                            "reason": "an execution record file exists "
+                                      "but is unparseable; refusing to "
+                                      "treat it as absence (fail-closed)"}
+    for _ledger in ("REALITY_EVENT_LEDGER.json",
+                    "REHEARSAL_EVENT_LEDGER.json"):
+        _path = os.path.join(ledger_dir, _ledger)
+        if not os.path.exists(_path):
+            continue
+        _entry = _ledger_entry(_path, event_id)
+        if _entry is None:
+            continue
+        _verdict = verify_ledger(_path)
+        if not _verdict.get("valid"):
+            return None, None, {
+                "gate": "ledger-invalid",
+                "ledger": _ledger,
+                "reason": _verdict.get("reason"),
+                "note": "resume refuses to consume from a hash-broken "
+                        "chain (fail-closed)"}
+        return _path, _entry, None
+    return None, None, {"gate": "no-durable-entry",
+                        "reason": "no ledger entry for this event id; "
+                                  "nothing to resume (Art. XXV)"}
+
+
 def resume_execution(ledger_dir: str, event_id: str, run_launcher=None,
                      parent_problem: Optional[Dict] = None,
                      parent_run_id: Optional[str] = None,
@@ -1104,17 +1179,13 @@ def resume_execution(ledger_dir: str, event_id: str, run_launcher=None,
                 "note": "resume requires the same capability as "
                         "execution (fail-closed)"}
     entry = None
-    for _ledger in ("REALITY_EVENT_LEDGER.json",
-                    "REHEARSAL_EVENT_LEDGER.json"):
-        entry = _ledger_entry(os.path.join(ledger_dir, _ledger),
-                              event_id)
-        if entry is not None:
-            break
-    if entry is None:
+    _lpath, _entry, _refusal = _resume_ledger_gate(ledger_dir, event_id)
+    if _refusal is not None:
         return {"executed": False, "event_id": event_id,
                 "execution_state": "UNKNOWN",
-                "note": "no durable ledger entry for this event id; "
-                        "nothing to resume (Art. XXV)"}
+                "resume_gate": _refusal,
+                "note": "resume refused at the ledger gate (fail-closed)"}
+    entry = _entry
     prior = _load_execution(ledger_dir, event_id)
     if prior is not None and prior.get("executed"):
         replayed = dict(prior)
@@ -1356,7 +1427,8 @@ def _execute_modify(event, ledger_dir, parent_problem, parent_run_id,
     adj = _adjudicate_if_numbered(event)
     child = _request_child(event, ledger_dir, parent_problem,
                            parent_run_id, hyp["hypothesis_id"],
-                           "MODIFY", rehearsal)
+                           "MODIFY", rehearsal,
+                           knowledge_artifact=hyp)
     return {"path": "MODIFY", "scope": scope, "hypothesis": hyp,
             "adjudication": adj, "child_request": child}
 
@@ -1390,6 +1462,23 @@ def _append_cemetery_entries(entries, cemetery_path: str) -> None:
         _atomic_write_json(cemetery_path, data)
 
 
+def _cemetery_entry_by_id(cemetery_path: str,
+                          entry_id: str) -> Optional[Dict]:
+    """Read one cemetery entry by id (verbatim bytes for knowledge
+    binding). None when absent/unreadable (typed by callers, never
+    guessed)."""
+    if not os.path.exists(str(cemetery_path)):
+        return None
+    try:
+        data = json.load(open(str(cemetery_path), encoding="utf-8"))
+    except Exception:
+        return None
+    for e in data.get("entries", []):
+        if isinstance(e, dict) and e.get("entry_id") == entry_id:
+            return e
+    return None
+
+
 def _execute_kill(event, ledger_dir, parent_problem, parent_run_id,
                   rehearsal: bool, cemetery_path=None) -> Dict:
     """KILL executor: cemetery append (REAL only — rehearsal NEVER
@@ -1421,6 +1510,7 @@ def _execute_kill(event, ledger_dir, parent_problem, parent_run_id,
     if existing is not None:
         entry_id, appended = existing, False
         check_verdict = "REUSED_EXISTING_ENTRY"
+        knowledge_artifact = _cemetery_entry_by_id(target, entry_id)
     else:
         payload = kill_path_entry(event.get("decision") or {}, event)
         entry = mc.CemeteryEntry(**{
@@ -1434,6 +1524,7 @@ def _execute_kill(event, ledger_dir, parent_problem, parent_run_id,
             payload["what_to_avoid"] + " " + payload["reusable_lesson"])
         entry_id, appended = payload.get("entry_id"), True
         check_verdict = check.get("verdict")
+        knowledge_artifact = payload
     constraint = {
         "excluded_cemetery_entry": entry_id,
         "trigger_event_id": event["event_id"],
@@ -1441,7 +1532,8 @@ def _execute_kill(event, ledger_dir, parent_problem, parent_run_id,
                 "through the existing cemetery gate (no new matcher)",
     }
     child = _request_child(event, ledger_dir, parent_problem,
-                           parent_run_id, entry_id, "KILL", False)
+                           parent_run_id, entry_id, "KILL", False,
+                           knowledge_artifact=knowledge_artifact)
     adj = _adjudicate_if_numbered(event)
     return {"path": "KILL", "scope": scope, "cemetery_entry_id": entry_id,
             "cemetery_appended": appended, "search_constraint": constraint,
@@ -1480,12 +1572,16 @@ def _child_problem(parent_problem, event, knowledge_id, branch):
 
 
 def _request_child(event, ledger_dir, parent_problem, parent_run_id,
-                   knowledge_id, branch, rehearsal: bool) -> Dict:
+                   knowledge_id, branch, rehearsal: bool,
+                   knowledge_artifact=None) -> Dict:
     """Persist the child-search request BEFORE any launch (restart
     recovery reads these). Exactly one request per trigger: existing
     file is reused. Rehearsal requests are launchable:false, forever.
     A missing parent problem makes the request UNLAUNCHABLE (typed —
-    no fabricated problem, Art. XXV)."""
+    no fabricated problem, Art. XXV). The knowledge artifact hash is
+    bound here (not reconstructed later) so consumption receipts can
+    verify identity without re-derivation.
+    """
     req_path = os.path.join(ledger_dir, "child_requests",
                             event["event_id"] + ".json")
     if os.path.exists(req_path):
@@ -1516,10 +1612,12 @@ def _request_child(event, ledger_dir, parent_problem, parent_run_id,
            "parent_problem_sha256": _loop_sha(parent_problem),
            "child_problem": child_problem,
            "child_problem_sha256": _loop_sha(child_problem),
-           "child_run_id": child_run_id,
-           "launch_id": _launch_id_for(event["event_id"], child_run_id,
-                                       knowledge_id),
-           "launch_attempts": 0,
+            "child_run_id": child_run_id,
+            "launch_id": _launch_id_for(event["event_id"], child_run_id,
+                                        knowledge_id),
+            "knowledge_artifact_sha256": _loop_sha(knowledge_artifact)
+            if isinstance(knowledge_artifact, dict) else "NOT_SUPPLIED",
+            "launch_attempts": 0,
            "reconciliation_history": [],
            "launchable": not rehearsal, "status": "REQUESTED",
            "rehearsal": rehearsal,
@@ -1646,6 +1744,7 @@ def _claim_child(ledger_dir: str, event_id: str):
             {"at": _loop_now(), "action": "claimed",
              "token": req["claim"]["token"]})
         _atomic_write_json(req_path, req)
+        _refresh_impact(ledger_dir, event_id)
         return True, req
 
 
@@ -1672,12 +1771,23 @@ def reconcile_unknown_launch(ledger_dir: str, event_id: str,
             return {"reconciled": True, "state": "LAUNCHED",
                     "note": "already launched; duplicate reconcile is "
                             "a no-op"}
+        if _execution_is_corrupt(ledger_dir, event_id):
+            return {"reconciled": False, "state": "UNKNOWN",
+                    "reason": "execution record corrupt; never treated "
+                              "as absence (§7)"}
+        _lpath, _entry, _refusal = _resume_ledger_gate(
+            ledger_dir, event_id)
+        if _refusal is not None:
+            return {"reconciled": False, "state": "UNKNOWN",
+                    "reason": "ledger gate refused: %s" %
+                              (_refusal.get("gate"),),
+                    "resume_gate": _refusal}
         if req.get("status") not in ("UNKNOWN_LAUNCH", "CLAIMED",
-                                      "LAUNCH_FAILED"):
+                                      "LAUNCHING", "LAUNCH_FAILED"):
             return {"reconciled": False, "state": req.get("status"),
-                    "reason": "only UNKNOWN_LAUNCH/CLAIMED/LAUNCH_FAILED "
-                              "reconcile (retry of a proven rejection "
-                              "reuses the same launch id)"}
+                    "reason": "only UNKNOWN_LAUNCH/CLAIMED/LAUNCHING/"
+                              "LAUNCH_FAILED reconcile (retry of a proven "
+                              "rejection reuses the same launch id)"}
         ok, why = _verify_request(req)
         if not ok:
             req["status"] = "UNKNOWN_TAMPERED"
@@ -1718,6 +1828,7 @@ def reconcile_unknown_launch(ledger_dir: str, event_id: str,
                                               found if isinstance(
                                                   found, str) else None)})
             _atomic_write_json(req_path, req)
+            _refresh_impact(ledger_dir, event_id)
             return {"reconciled": True, "state": "LAUNCHED",
                     "child_run_id": req.get("child_run_id")}
         if execution_checker is None:
@@ -1732,39 +1843,56 @@ def reconcile_unknown_launch(ledger_dir: str, event_id: str,
         req.setdefault("reconciliation_history", []).append(
             {"at": _loop_now(), "action": "relaunch-same-id",
              "launch_id": lid,
+             "recovered_from": req.get("status"),
              "attempt": req["launch_attempts"]})
         _atomic_write_json(req_path, req)
+        _refresh_impact(ledger_dir, event_id)
     try:
         receipt = run_launcher(req)
     except LauncherRejected as exc:
         with _LedgerLocked(req_path):
-            cur = json.load(open(req_path, encoding="utf-8"))
+            try:
+                cur = json.load(open(req_path, encoding="utf-8"))
+            except Exception:
+                return {"reconciled": False, "state": "UNKNOWN_UNREADABLE",
+                        "reason": "request unreadable post-rejection"}
             cur["status"] = "LAUNCH_FAILED"
             cur["launch_error"] = "LauncherRejected: %s" % (str(exc)[:200],)
             cur.setdefault("reconciliation_history", []).append(
                 {"at": _loop_now(), "action": "relaunch-rejected",
                  "reason": cur["launch_error"]})
             _atomic_write_json(req_path, cur)
+        _refresh_impact(ledger_dir, event_id)
         return {"reconciled": False, "state": "LAUNCH_FAILED",
                 "reason": cur["launch_error"]}
     except Exception as exc:
         with _LedgerLocked(req_path):
-            cur = json.load(open(req_path, encoding="utf-8"))
+            try:
+                cur = json.load(open(req_path, encoding="utf-8"))
+            except Exception:
+                return {"reconciled": False, "state": "UNKNOWN_UNREADABLE",
+                        "reason": "request unreadable post-ambiguity"}
             cur.setdefault("reconciliation_history", []).append(
                 {"at": _loop_now(), "action": "relaunch-ambiguous",
                  "error": "%s: %s" % (
                      type(exc).__name__, str(exc)[:200])})
             _atomic_write_json(req_path, cur)
+        _refresh_impact(ledger_dir, event_id)
         return {"reconciled": False, "state": "UNKNOWN_LAUNCH",
                 "reason": "relaunch outcome ambiguous; stays unknown"}
     with _LedgerLocked(req_path):
-        cur = json.load(open(req_path, encoding="utf-8"))
+        try:
+            cur = json.load(open(req_path, encoding="utf-8"))
+        except Exception:
+            return {"reconciled": False, "state": "UNKNOWN_UNREADABLE",
+                    "reason": "request unreadable post-launch"}
         cur["status"] = "LAUNCHED"
         cur["launch_receipt"] = receipt
         cur.setdefault("reconciliation_history", []).append(
             {"at": _loop_now(), "action": "relaunched-ok",
              "launch_id": lid})
         _atomic_write_json(req_path, cur)
+    _refresh_impact(ledger_dir, event_id)
     return {"reconciled": True, "state": "LAUNCHED",
             "child_run_id": cur.get("child_run_id")}
 
@@ -1785,6 +1913,71 @@ def _note_launch_attempt(ledger_dir: str, event_id: str) -> int:
         return req["launch_attempts"]
 
 
+def _mark_launching(ledger_dir: str, event_id: str) -> None:
+    """Persist LAUNCHING immediately before invoking the launcher.
+    CLAIMED means the launch right is owned but the launcher was never
+    invoked (safe to invoke once); LAUNCHING means invocation started
+    with unknown outcome (reconcile only, never blind-invoke). The
+    distinction is the entire crash-boundary semantics (§3)."""
+    req_path = os.path.join(ledger_dir, "child_requests",
+                            event_id + ".json")
+    with _LedgerLocked(req_path):
+        try:
+            req = json.load(open(req_path, encoding="utf-8"))
+        except Exception:
+            return
+        if req.get("status") != "CLAIMED":
+            return
+        req["status"] = "LAUNCHING"
+        req.setdefault("reconciliation_history", []).append(
+            {"at": _loop_now(), "action": "launch-invoked"})
+        _atomic_write_json(req_path, req)
+
+
+def _refresh_impact(ledger_dir: str, event_id: str) -> bool:
+    """Rewrite the persisted SEARCH-IMPACT artifact from current
+    durable request state (§9: no stale PENDING after a receipt
+    exists). Locks the impact path only (distinct from the request
+    path, so callers holding the request lock cannot deadlock; lock
+    ordering is always request-then-impact). Returns False when
+    there is no impact file yet (nothing stale to fix)."""
+    imp_path = os.path.join(ledger_dir, "search_impact",
+                            event_id + ".json")
+    if not os.path.exists(imp_path):
+        return False
+    with _LedgerLocked(imp_path):
+        try:
+            impact = json.load(open(imp_path, encoding="utf-8"))
+        except Exception:
+            return False
+        req_path = os.path.join(ledger_dir, "child_requests",
+                                event_id + ".json")
+        try:
+            req = json.load(open(req_path, encoding="utf-8")) \
+                if os.path.exists(req_path) else {}
+        except Exception:
+            req = {}
+        status = req.get("status")
+        impact["child_run_id"] = req.get("child_run_id")
+        impact["request_status"] = status
+        impact["launch_receipt"] = req.get("launch_receipt")
+        impact["launch_attempts"] = req.get("launch_attempts", 0)
+        impact["reconciliation_history"] = req.get(
+            "reconciliation_history", [])
+        if status == "LAUNCHED":
+            impact["behavioral_change_observed"] = \
+                "CHILD_LAUNCHED_AWAITING_EXECUTION_EVIDENCE"
+        elif status == "LAUNCH_FAILED":
+            impact["behavioral_change_observed"] = \
+                "NO_CHILD_LAUNCHED_FAILED"
+        elif status in ("UNKNOWN_LAUNCH", "UNKNOWN_TAMPERED"):
+            impact["behavioral_change_observed"] = \
+                "UNKNOWN_LAUNCH_OUTCOME"
+        impact["impact_refreshed_at"] = _loop_now()
+        _atomic_write_json(imp_path, impact)
+        return True
+
+
 def _mark_launched(ledger_dir: str, event_id: str, receipt) -> None:
     req_path = os.path.join(ledger_dir, "child_requests",
                             event_id + ".json")
@@ -1798,6 +1991,7 @@ def _mark_launched(ledger_dir: str, event_id: str, receipt) -> None:
         req.setdefault("reconciliation_history", []).append(
             {"at": _loop_now(), "action": "launched"})
         _atomic_write_json(req_path, req)
+    _refresh_impact(ledger_dir, event_id)
 
 
 def _mark_launch_unknown(ledger_dir: str, event_id: str,
@@ -1818,6 +2012,7 @@ def _mark_launch_unknown(ledger_dir: str, event_id: str,
             {"at": _loop_now(), "action": "launch-ambiguous",
              "error": error})
         _atomic_write_json(req_path, req)
+    _refresh_impact(ledger_dir, event_id)
 
 
 def _mark_launch_failed(ledger_dir: str, event_id: str,
@@ -1835,6 +2030,7 @@ def _mark_launch_failed(ledger_dir: str, event_id: str,
             {"at": _loop_now(), "action": "launch-failed-typed",
              "error": error})
         _atomic_write_json(req_path, req)
+    _refresh_impact(ledger_dir, event_id)
 
 
 def _reality_state_path(ledger_dir: str) -> str:
@@ -2156,6 +2352,13 @@ def resume_pending_children(ledger_dir: str, run_launcher,
                                       "never launch"})
             continue
         if status == "REQUESTED":
+            _gl, _ge, _gr = _resume_ledger_gate(ledger_dir, trig or "")
+            if _gr is not None:
+                skipped.append({"trigger": trig,
+                                "reason": "ledger gate refused: %s "
+                                          "(fail-closed; no claim, no "
+                                          "launch)" % (_gr.get("gate"),)})
+                continue
             claimed, req_or_reason = _claim_child(ledger_dir, trig or "")
             if not claimed:
                 skipped.append({"trigger": trig,
@@ -2187,7 +2390,8 @@ def resume_pending_children(ledger_dir: str, run_launcher,
                                "error": "ambiguous launch outcome; "
                                         "recorded UNKNOWN_LAUNCH"})
             continue
-        if status in ("CLAIMED", "UNKNOWN_LAUNCH", "LAUNCH_FAILED"):
+        if status in ("CLAIMED", "UNKNOWN_LAUNCH", "LAUNCHING",
+                        "LAUNCH_FAILED"):
             if status == "CLAIMED":
                 _promote_claimed_unknown(ledger_dir, trig or "")
             out = reconcile_unknown_launch(
@@ -2227,6 +2431,7 @@ def _promote_claimed_unknown(ledger_dir: str, event_id: str) -> None:
         req["status"] = "UNKNOWN_LAUNCH"
         req.setdefault("reconciliation_history", []).append(
             {"at": _loop_now(), "action": "promote-claimed-unknown",
+             "recovered_from": "CLAIMED",
              "reason": "claim without launch receipt after a claim "
                        "interval: crashed worker and slow worker are "
                        "indistinguishable; reconcile, never blindly "
@@ -2234,7 +2439,70 @@ def _promote_claimed_unknown(ledger_dir: str, event_id: str) -> None:
         _atomic_write_json(req_path, req)
 
 
-def default_run_launcher(child_request: Dict, runs_root: str) -> Dict:
+def record_child_consumption(child_run_dir: str, parent_event_id: str,
+                             parent_run_id, knowledge_record_id: str,
+                             knowledge_artifact_sha256: str,
+                             parent_problem_sha256: str) -> Dict:
+    """Machine-readable consumption receipt (§10/§11), produced FROM
+    the child execution path (called post-run by default_run_launcher;
+    tests call it against crafted run dirs). Binds parent event/run,
+    knowledge id + artifact hash, child run/problem hashes, operator-
+    region evidence, and before/after problem hashes. Unknowns stay
+    typed (a disabled/experimental stage list is not evidence)."""
+    child_run_dir = str(child_run_dir)
+    problem_path = os.path.join(child_run_dir, "problem.json")
+    manifest_path = os.path.join(child_run_dir, "run_manifest.json")
+    try:
+        child_problem = json.load(open(problem_path, encoding="utf-8"))
+    except Exception as exc:
+        return {"consumed": False,
+                "reason": "child problem.json unreadable: %s (typed; "
+                          "no consumption claimed)" % (type(exc).__name__,)}
+    try:
+        manifest = json.load(open(manifest_path, encoding="utf-8"))
+    except Exception:
+        manifest = {"manifest_state": "UNKNOWN_NO_MANIFEST"}
+    ms_path = os.path.join(child_run_dir, "envelope_MECHANISM_SPACE.json")
+    if os.path.exists(ms_path):
+        try:
+            _ms = json.load(open(ms_path, encoding="utf-8"))
+            _space = _ms.get("mechanism_space", _ms)
+            regions = {"state": "READ",
+                       "operator_ids": _space.get("operator_ids")}
+        except Exception as exc:
+            regions = {"state": "UNKNOWN_UNREADABLE",
+                       "error": type(exc).__name__}
+    else:
+        regions = {"state": "UNKNOWN_NO_MECHANISM_SPACE"}
+    rec = child_problem.get("reality_constraints") or {}
+    receipt = {
+        "artifact_type": "CHILD_CONSUMPTION/1.0.0",
+        "parent_event_id": parent_event_id,
+        "parent_run_id": parent_run_id,
+        "knowledge_record_id": knowledge_record_id,
+        "knowledge_artifact_sha256": knowledge_artifact_sha256,
+        "child_run_id": manifest.get("run_id",
+                                     child_problem.get("problem_id")),
+        "child_input_manifest_hash": _loop_sha({
+            "problem": child_problem,
+            "manifest_run_id": manifest.get("run_id")}),
+        "parent_problem_sha256": parent_problem_sha256,
+        "child_problem_sha256": _loop_sha(child_problem),
+        "constraint_clause_present": "[REALITY %s:" % (parent_event_id,)
+        in str(child_problem.get("constraint") or ""),
+        "lineage_refs": {
+            "trigger_event_id": rec.get("trigger_event_id"),
+            "knowledge_record_id": rec.get("knowledge_record_id")},
+        "operator_region_evidence": regions,
+        "consumed_at": _loop_now(),
+    }
+    _atomic_write_json(os.path.join(child_run_dir, "CONSUMPTION.json"),
+                       receipt)
+    return {"consumed": True, "receipt": receipt}
+
+
+def default_run_launcher(child_request: Dict, runs_root: str,
+                         disabled_stages=None) -> Dict:
     """Production child launcher: materialize the child as a genuine
     EngineRun (canonical worker machinery — never a parallel engine)
     and execute it. Used in keyed environments; tests pass fakes.
@@ -2254,15 +2522,25 @@ def default_run_launcher(child_request: Dict, runs_root: str) -> Dict:
         run = EngineRun(problem=problem,
                         out_dir=out_dir,
                         run_id=child_run_id,
-                        session_id=child_request.get("session_id"))
+                        session_id=child_request.get("session_id"),
+                        disabled_stages=disabled_stages)
     except (KeyError, TypeError, ValueError) as exc:
         raise LauncherRejected("invalid child request: %s" % (exc,))
     result = run.run()
+    consumption = record_child_consumption(
+        out_dir,
+        child_request.get("trigger_event_id"),
+        child_request.get("parent_run_id"),
+        child_request.get("knowledge_record_id"),
+        child_request.get("knowledge_artifact_sha256",
+                          "NOT_SUPPLIED"),
+        child_request.get("parent_problem_sha256"))
     return {"child_run_id": child_request["child_run_id"],
             "launcher": "default_engine_run",
             "launched_at": _loop_now(),
             "run_state": (result or {}).get("state",
-                                            "UNKNOWN_NO_RESULT")}
+                                            "UNKNOWN_NO_RESULT"),
+            "consumption": consumption}
 
 
 def default_execution_checker(runs_root: str):

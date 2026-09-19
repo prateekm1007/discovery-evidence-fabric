@@ -902,3 +902,201 @@ def test_default_execution_checker_filesystem(tmp_path):
     assert found and found["child_run_id"] == "engrun_pp0_x"
     assert check("any-launch-id",
                  {"child_run_id": "engrun_pp0_absent"}) is None
+
+
+# trace integrity: recovered_from captures the prior state (§6) --------------
+def test_recovered_from_claimed_on_promote(tmp_path):
+    _kill_request(tmp_path, "EV-TR-1")
+    p = tmp_path / "ledger" / "child_requests" / "EV-TR-1.json"
+    req = json.loads(p.read_text())
+    req["status"] = "CLAIMED"
+    p.write_text(json.dumps(req), encoding="utf-8")
+    fx = _EffectLauncher()
+    with _cemetery(tmp_path):
+        ri.resume_pending_children(str(tmp_path / "ledger"), fx,
+                                   fx.check)
+    cur = json.loads(p.read_text())
+    recs = [r for r in cur.get("reconciliation_history", [])
+            if r.get("action") == "promote-claimed-unknown"]
+    assert recs and recs[0]["recovered_from"] == "CLAIMED", recs
+
+
+def test_recovered_from_failed_on_retry(tmp_path):
+    _kill_request(tmp_path, "EV-TR-2")
+    p = tmp_path / "ledger" / "child_requests" / "EV-TR-2.json"
+    req = json.loads(p.read_text())
+    req["status"] = "LAUNCH_FAILED"
+    req["launch_error"] = "LauncherRejected: bad shape (seeded)"
+    p.write_text(json.dumps(req), encoding="utf-8")
+    fx = _EffectLauncher()
+    with _cemetery(tmp_path):
+        ri.resume_pending_children(str(tmp_path / "ledger"), fx,
+                                   fx.check)
+    cur = json.loads(p.read_text())
+    assert cur["status"] == "LAUNCHED"
+    relaunch = [r for r in cur.get("reconciliation_history", [])
+                if r.get("action") == "relaunch-same-id"]
+    assert relaunch and relaunch[0]["recovered_from"] == \
+        "LAUNCH_FAILED", relaunch
+
+
+# corrupt execution record is never absence (§7) ---------------------------------
+def test_corrupt_execution_record_fail_closed(tmp_path):
+    with _cemetery(tmp_path):
+        _exec(_event("EV-CX-1", verdict="KILL"),
+              str(tmp_path / "ledger"), run_launcher=None,
+              parent_problem=dict(PARENT_PROBLEM),
+              parent_run_id=PARENT_RUN,
+              cemetery_path=_kill_cemetery(tmp_path))
+    (tmp_path / "ledger" / "executions" / "EV-CX-1.json").write_text(
+        "{corrupt", encoding="utf-8")
+    with _cemetery(tmp_path):
+        rec = ri.resume_execution(
+            str(tmp_path / "ledger"), "EV-CX-1",
+            parent_problem=dict(PARENT_PROBLEM),
+            parent_run_id=PARENT_RUN,
+            cemetery_path=_kill_cemetery(tmp_path),
+            auth=dict(AUTH_OK), session_store=STORE_OK)
+    assert rec["executed"] is False
+    assert rec["execution_state"] == "UNKNOWN"
+
+
+# hash-broken ledger blocks resume (§8) ----------------------------------------------
+def test_hash_broken_ledger_blocks_resume(tmp_path):
+    with _cemetery(tmp_path):
+        _exec(_event("EV-HB-1", verdict="KILL"),
+              str(tmp_path / "ledger"), run_launcher=None,
+              parent_problem=dict(PARENT_PROBLEM),
+              parent_run_id=PARENT_RUN,
+              cemetery_path=_kill_cemetery(tmp_path))
+    (tmp_path / "ledger" / "executions" / "EV-HB-1.json").unlink()
+    led_path = tmp_path / "ledger" / "REALITY_EVENT_LEDGER.json"
+    led = json.loads(led_path.read_text())
+    led["entries"][0]["record"]["package_id"] = "TAMPERED"
+    led_path.write_text(json.dumps(led), encoding="utf-8")
+    with _cemetery(tmp_path):
+        rec = ri.resume_execution(
+            str(tmp_path / "ledger"), "EV-HB-1",
+            parent_problem=dict(PARENT_PROBLEM),
+            parent_run_id=PARENT_RUN,
+            cemetery_path=_kill_cemetery(tmp_path),
+            auth=dict(AUTH_OK), session_store=STORE_OK)
+    assert rec["executed"] is False
+    assert rec["execution_state"] == "UNKNOWN"
+    assert rec["resume_gate"]["gate"] == "ledger-invalid", rec
+
+
+# LAUNCHING reconciles without blind invoke ----------------------------------------------
+def test_launching_reconciles_not_reinvokes(tmp_path):
+    _kill_request(tmp_path, "EV-LG-1")
+    p = tmp_path / "ledger" / "child_requests" / "EV-LG-1.json"
+    req = json.loads(p.read_text())
+    req["status"] = "LAUNCHING"
+    p.write_text(json.dumps(req), encoding="utf-8")
+    fx = _EffectLauncher()
+    with _cemetery(tmp_path):
+        out = ri.reconcile_unknown_launch(
+            str(tmp_path / "ledger"), "EV-LG-1", fx, fx.check)
+    assert out["state"] == "LAUNCHED"
+    assert len(fx.effects) == 1
+    cur = json.loads(p.read_text())
+    assert cur["status"] == "LAUNCHED"
+
+
+# consumption receipt from crafted child dir ----------------------------------------------
+def test_consumption_receipt_binds_lineage(tmp_path):
+    runs = tmp_path / "runs"
+    child = runs / "engrun_pp0_reality_evtest01"
+    child.mkdir(parents=True, exist_ok=True)
+    problem = dict(PARENT_PROBLEM)
+    problem["constraint"] = "base [REALITY EV-CB-1: KILL knowledge " \
+        "KX constrains this search]"
+    problem["reality_constraints"] = {"trigger_event_id": "EV-CB-1",
+                                      "knowledge_record_id": "KX"}
+    (child / "problem.json").write_text(json.dumps(problem),
+                                        encoding="utf-8")
+    (child / "run_manifest.json").write_text(
+        json.dumps({"run_id": "engrun_pp0_reality_evtest01"}),
+        encoding="utf-8")
+    out = ri.record_child_consumption(
+        str(child), "EV-CB-1", PARENT_RUN, "KX", "kh" * 32,
+        "ph" * 32)
+    assert out["consumed"] is True
+    rcp = out["receipt"]
+    assert rcp["parent_event_id"] == "EV-CB-1"
+    assert rcp["knowledge_record_id"] == "KX"
+    assert rcp["constraint_clause_present"] is True
+    assert rcp["parent_problem_sha256"] == "ph" * 32
+    assert rcp["child_problem_sha256"] != "ph" * 32
+    assert (child / "CONSUMPTION.json").exists()
+
+
+# real default launcher path, stages disabled (offline-honest) --------------
+def test_default_launcher_real_path_disabled_stages(tmp_path):
+    from discovery_fabric.engine.adapters import STAGE_ORDER
+    req = {"trigger_event_id": "EV-DL-1",
+           "knowledge_record_id": "KX",
+           "knowledge_artifact_sha256": "kh" * 32,
+           "parent_run_id": PARENT_RUN,
+           "parent_problem_sha256": "ph" * 32,
+           "child_problem": dict(PARENT_PROBLEM,
+                                 problem_id="pp0_reality_evdl01"),
+           "child_run_id": "engrun_pp0_reality_evdl01",
+           "launch_id": "lid-test-01",
+           "session_id": None}
+    runs = tmp_path / "runs"
+    receipt = ri.default_run_launcher(
+        req, str(runs), disabled_stages=list(STAGE_ORDER))
+    assert receipt["child_run_id"] == "engrun_pp0_reality_evdl01"
+    assert receipt["launcher"] == "default_engine_run"
+    child_dir = runs / "engrun_pp0_reality_evdl01"
+    assert (child_dir / "run_manifest.json").exists()
+    assert (child_dir / "problem.json").exists()
+    cons = receipt["consumption"]
+    assert cons["consumed"] is True
+    assert cons["receipt"]["knowledge_record_id"] == "KX"
+    assert cons["receipt"]["parent_run_id"] == PARENT_RUN
+    assert cons["receipt"]["knowledge_artifact_sha256"] == "kh" * 32
+    check = ri.default_execution_checker(str(runs))
+    found = check("lid-test-01",
+                  {"child_run_id": "engrun_pp0_reality_evdl01"})
+    assert found and found["child_run_id"] == \
+        "engrun_pp0_reality_evdl01"
+
+
+# full cycle on the real launcher: execute -> launch -> reconcile ------
+def test_full_cycle_real_launcher_reconcile(tmp_path):
+    import os as _os
+    if _os.name == "nt":
+        pytest = __import__("pytest")
+        pytest.skip("production child_run_id values contain colons "
+                    "(canonical engrun:...:... lineage format); Windows "
+                    "filesystems reject them. Production runs Linux. "
+                    "Covered on Windows by the colon-free launcher test "
+                    "above; full-shape proof requires a POSIX host.")
+    from discovery_fabric.engine.adapters import STAGE_ORDER
+    dis = list(STAGE_ORDER)
+
+    def _real(req):
+        return ri.default_run_launcher(req, str(tmp_path / "runs"),
+                                       disabled_stages=dis)
+
+    with _cemetery(tmp_path):
+        rec = _exec(_event("EV-FC-1", verdict="KILL"),
+                    str(tmp_path / "ledger"), run_launcher=_real,
+                    parent_problem=dict(PARENT_PROBLEM),
+                    parent_run_id=PARENT_RUN,
+                    cemetery_path=_kill_cemetery(tmp_path))
+    assert rec["child"]["request_status"] == "LAUNCHED"
+    child_id = rec["child"]["child_run_id"]
+    with _cemetery(tmp_path):
+        out = ri.reconcile_unknown_launch(
+            str(tmp_path / "ledger"), "EV-FC-1", _real,
+            ri.default_execution_checker(str(tmp_path / "runs")))
+    assert out["state"] == "LAUNCHED"
+    cons_path = tmp_path / "runs" / child_id / "CONSUMPTION.json"
+    assert cons_path.exists(), "consumption receipt on the real path"
+    cons = json.loads(cons_path.read_text())
+    assert cons["parent_event_id"] == "EV-FC-1"
+    assert cons["knowledge_record_id"] == \
+        rec["branch_record"]["cemetery_entry_id"]
