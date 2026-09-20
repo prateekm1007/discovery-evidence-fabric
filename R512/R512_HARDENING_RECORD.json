@@ -1,0 +1,35 @@
+{
+ "artifact": "R512_HARDENING_RECORD/1.0",
+ "round": "R512-audit-hardening",
+ "baseline": "1ce5764d137883902cabd6f2fa33be87a8746d2d (R512 implementation + DELIVERY_BLOCKED record)",
+ "implementation_commit": "7761081dcb7b9c426231c638f23cf5e46e2fe48f",
+ "auditor_findings_addressed": {
+  "independent_serial_reference": "added FROZEN_REFERENCE_SERIAL: verbatim pre-R512 loop (47b60e73) embedded in tests/test_r512_retrieve_fanout.py; test_parallel_matches_frozen_reference compares parallel canonical pool + lane states + engine items against it",
+  "lane_state_ordering": "planner now emits ONE ordered plan (job and immediate-lane-state units interleaved at LANE_SOURCE_MAP positions); assembler walks plan order; test_missing_connector_ordering_parity covers interspersed missing connector across parallel/serial/reference",
+  "exception_contract": "narrowed and pinned adversarially (test_exception_contract_adversarial): identical exception identity both modes; lane/canonical prefix identical; parallel extra executed searches disclosed and asserted (serial stops at first raise, true old semantics)",
+  "attribution_math": "network_ms/total_network_s renamed to search_call_ms/total_search_call_s (connector search-call durations, not pure network); orchestration_overhead_s replaced by worker_queue_wait_s = fanout_wall - max_job_wall - assemble, documented as queue-wait-dominated residual, reported raw"
+ },
+ "serial_mode_semantics": "ENGINE_RETRIEVE_FANOUT=serial now stops at the first raising job (later jobs never execute), matching the pre-R512 inline loop exactly, including the exception path",
+ "test_evidence": {
+  "new": "tests/test_r512_retrieve_fanout.py 11 passed (8 prior + frozen-reference + ordering + exception-adversarial)",
+  "regression": "r409 56 passed (parallel default); r449+r499+r375+source_registry 103 passed; r451_c13+r510_transitions+r510_diversity 59 passed; r510_dryrun 22 passed (+9 pre-existing DRYRUN_PROOF_DIR failures identical on baseline); f_series 13 passed (+10 pre-existing R440.17 failures identical on baseline); r440 5 passed (+10 pre-existing failures identical on baseline: 1 cp1252 + 9 gate/env); r414 47 passed (+3 pre-existing failures identical on baseline)",
+  "no_new_failures": true,
+  "ci_status": "GitHub reports no CI statuses/workflow runs for these commits; results above are locally verified, not independently certified (Art. XXVI)"
+ },
+ "production_deployment": {
+  "target_sha": "7761081dcb7b9c426231c638f23cf5e46e2fe48f",
+  "deployed_sha": "ef7ff0980c6c95b445a9497c59d48886c4e80847",
+  "deploy_id": null,
+  "health_check_result": "GREEN (stale build: live /api/version reports ef7ff098, const 2.10.1)",
+  "drift": "GREEN (for the stale build; target NOT deployed)",
+  "blocked_by": "HF_TOKEN missing (env-injection only, fail-closed). Re-checked 2026-09-20, names only: session env absent; local vault absent; HF cache token absent.",
+  "what_unblocks": "operator injects HF_TOKEN (+ GITHUB_TOKEN for the deploy driver) into the session environment, then deploy exact commit 7761081dcb7b9c426231c638f23cf5e46e2fe48f and run the post-change performance battery vs R511 baseline (154.0-291.6 s/run, aggregate 1108.58 s)"
+ },
+ "delivery_status": "DELIVERY_BLOCKED (Art. LXXI section 4; deployed_sha != target_sha)",
+ "escalation_count": 2,
+ "escalation_note": "second consecutive round blocked on HF_TOKEN. Per Art. LXXI section 4, a credential blocker persisting more than two consecutive rounds must appear as the first item in the next auditor report with its cost stated: the measured RETRIEVE fix (now audit-hardened) sits merged-but-undeployed; no before/after production measurement exists.",
+ "optimization_verdict": "PENDING_DEPLOYMENT (code hardened and merged; production speedup NOT claimed — no after-measurement exists)",
+ "constitution": "2.10.1 (read in full before coding and before committing; unchanged)",
+ "created_at_utc": "2026-09-20T15:14:24Z",
+ "reviewer_provenance": "AI_REVIEW"
+}
