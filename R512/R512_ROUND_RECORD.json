@@ -1,0 +1,30 @@
+{
+ "artifact": "R512_ROUND_RECORD/1.0",
+ "round": "R512-retrieve-fanout-cliff",
+ "baseline": "47b60e73dde62be6b8ed9cbb99761ae195c3b99c (R511 attribution)",
+ "implementation_commit": "0ca8e0539145a6caa1bd39f20441cc7baaa00ad8",
+ "measured_basis": "R511/PRODUCTION_RUNTIME_ATTRIBUTION.json: RETRIEVE largest stage 5/5 runs (154.0-291.6 s/run, aggregate 1108.58 s, 47.6% of stage time)",
+ "change": "bounded parallel source-query fan-out (ThreadPoolExecutor, default max_workers=5 per prior_art_v2 precedent, ceiling 16, ENGINE_RETRIEVE_FANOUT/ENGINE_RETRIEVE_MAX_WORKERS operator controls); deterministic ingest reassembly in job order (Canonicalizer untouched from workers); shared status/ingest implementation for both modes; serial fallback retained (Art. LXIV KEPT_BECAUSE parity reference + operator fallback); retrieval attribution record (schema RETRIEVAL_ATTRIBUTION/1.0) + RETRIEVAL_ATTRIBUTION.json run-dir persist",
+ "production_deployment": {
+  "target_sha": "0ca8e0539145a6caa1bd39f20441cc7baaa00ad8",
+  "deployed_sha": "ef7ff0980c6c95b445a9497c59d48886c4e80847",
+  "deploy_id": null,
+  "health_check_result": "GREEN (stale build: live /api/version reports ef7ff098, const 2.10.1, verified 2026-09-20)",
+  "drift": "GREEN (for the stale build; target NOT deployed)",
+  "blocked_by": "HF_TOKEN missing (env-injection only, fail-closed). Checked, names only, values never read or printed: session env absent; local vault C:\\Users\\Administrator\\.secrets.env absent; HF cache token absent. Space secret surface is write-only and cannot supply values.",
+  "what_unblocks": "operator injects HF_TOKEN (+ GITHUB_TOKEN for the deploy driver) into the session environment, then re-run scripts/r510_space_deploy.py (or current deploy driver) for exact commit 0ca8e0539145a6caa1bd39f20441cc7baaa00ad8"
+ },
+ "delivery_status": "DELIVERY_BLOCKED (Art. LXXI section 4; deployed_sha != target_sha)",
+ "escalation_count": 1,
+ "escalation_note": "first round blocked on HF_TOKEN in this thread; prior rounds deployed successfully from other sessions. Cost of non-decision: the measured RETRIEVE fix sits merged-but-undeployed; no before/after production measurement exists yet.",
+ "pre_deploy_evidence": {
+  "parity": "tests/test_r512_retrieve_fanout.py 8 passed (parallel-vs-serial byte-identical evidence content incl. dedup winners, lane states, failure taxonomy; raise-contract parity; TypeError fallback; bound respected)",
+  "regression": "test_r409_retrieval_fabric.py 56 passed (parallel default path); r449+r499+r375+source_registry 103 passed; r451_c13+r510_transitions+r510_diversity 59 passed; r510_dryrun 22 passed (+9 pre-existing DRYRUN_PROOF_DIR failures identical on baseline); f_series 13 passed (+10 pre-existing R440.17 failures identical on baseline); r440 2 passed (+1 pre-existing cp1252 failure identical on baseline); r414 47 passed (+3 pre-existing failures identical on baseline)",
+  "no_new_failures": true
+ },
+ "post_deploy_battery": "NOT_RUN (blocked on deployment). Required after deploy: fresh production performance battery on 0ca8e053, same retrieval runtime fields, before/after vs R511 baseline (154.0-291.6 s/run, aggregate 1108.58 s), coverage comparison, failures as infrastructure states.",
+ "optimization_verdict": "PENDING_DEPLOYMENT (neither accepted nor reverted: code merged, production measurement outstanding)",
+ "constitution": "2.10.1 (read in full before starting and before committing; unchanged)",
+ "created_at_utc": "2026-09-20T14:52:25Z",
+ "reviewer_provenance": "AI_REVIEW"
+}
