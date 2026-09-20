@@ -902,6 +902,7 @@ class EngineRun:
                     try:
                         import time as _time2
                         _evo_t0 = _time2.perf_counter()
+                        _cctx.set_stage("POST_RANK_EVOLUTION")
                         evolution_summary = self._evolution_pipeline(
                             {"run_id": self.run_id}, final)
                         self._tail_durations["evolution_s"] = (
@@ -1073,6 +1074,43 @@ class EngineRun:
         envelope. Any failure records an explicit FAILED state in the run
         directory; it never fabricates a package."""
         import os as _os
+        import time as _ptime
+        # R511 measurement-only attribution (NO semantic change): phase
+        # wall times + per-candidate gauntlet rows for the runtime
+        # attribution report. Additive sidecar only (POST_RANK_
+        # ATTRIBUTION.json); every persist is guarded so measurement
+        # can never fail the run (Art. IX). Call-context phase labels
+        # (POST_RANK_* namespace, never STAGE_ORDER names) make
+        # post-rank LLM spend attributable in the routing ledger via
+        # the existing R451-C1.3-3 mechanism — no ledger change.
+        _pra: Dict[str, Any] = {"phase_s": {}, "candidates": [],
+                                "pool": {}, "mutations": {}}
+        _pra_t0: Dict[str, float] = {}
+
+        def _pra_start(_k: str) -> None:
+            _pra_t0[_k] = _ptime.perf_counter()
+
+        def _pra_stop(_k: str) -> None:
+            _t = _pra_t0.pop(_k, None)
+            if _t is not None:
+                _pra["phase_s"][_k] = _pra["phase_s"].get(_k, 0.0) + (
+                    _ptime.perf_counter() - _t)
+
+        def _pra_persist() -> None:
+            try:
+                self._persist("POST_RANK_ATTRIBUTION.json", {
+                    "schema": "POST_RANK_ATTRIBUTION/1.0",
+                    "run_id": self.run_id,
+                    "phases": dict(_pra["phase_s"]),
+                    "pool": dict(_pra["pool"]),
+                    "candidates": list(_pra["candidates"]),
+                    "mutations": dict(_pra["mutations"]),
+                    "recorded_at": utc_now()})
+            except Exception:
+                pass
+
+        _cctx.set_stage("POST_RANK")
+        _pra_start("POST_RANK")
         # R440.1: `from .package_factory import generate_buyer_package` is
         # REMOVED — the old factory is retired from production (archived,
         # Art. LXIV); the canonical package compiler owns packaging.
@@ -1118,6 +1156,8 @@ class EngineRun:
             # stamps the decision; zero verified items -> SKIPPED with
             # the measured counts (never a silent code path).
             ensemble = None
+            _cctx.set_stage("POST_RANK_ENSEMBLE")
+            _pra_start("ENSEMBLE")
             _ens_entry = stage_entry.justify(
                 "ENSEMBLE", self.env, self.failed_stages,
                 self._skipped_stages)
@@ -1152,6 +1192,11 @@ class EngineRun:
                                 "entry": _ens_entry,
                                 "error": f"{type(exc).__name__}: {exc}"}
             self._persist("ENSEMBLE_DISAGREEMENT.json", ensemble)
+            _pra_stop("ENSEMBLE")
+            _pra["pool"]["ensemble_members"] = len(
+                (ensemble or {}).get("members") or [])
+            _pra["pool"]["ensemble_status"] = (ensemble or {}).get("status")
+            _cctx.set_stage("POST_RANK")
             if ensemble.get("disagreements"):
                 spec = dict(spec,
                             _ensemble_disagreements=ensemble["disagreements"])
@@ -1173,6 +1218,9 @@ class EngineRun:
             # failure the prior-art state is UNRESOLVED_INSUFFICIENT_
             # EVIDENCE with the error recorded — inherited art is never
             # silently reused and unknown is never converted (Art. XXV).
+            _pra_start("POOL_BUILD")
+            _cctx.set_stage("POST_RANK_POOL")
+
             def _collision_for_candidate(mm: Dict[str, Any]):
                 """Returns (result_dict_or_None, error_string_or_None).
                 ALWAYS a 2-tuple — a bare dict return would unpack its
@@ -1181,7 +1229,14 @@ class EngineRun:
                 fresh medical run)."""
                 try:
                     from .prior_art_v2_bridge import candidate_collision
-                    return candidate_collision(mm, self.problem), None
+                    _cc_t0 = _ptime.perf_counter()
+                    _cc_res = candidate_collision(mm, self.problem)
+                    _pra["phase_s"]["POOL_COLLISION"] = (
+                        _pra["phase_s"].get("POOL_COLLISION", 0.0)
+                        + (_ptime.perf_counter() - _cc_t0))
+                    _pra["pool"]["pool_collision_runs"] = (
+                        _pra["pool"].get("pool_collision_runs", 0) + 1)
+                    return _cc_res, None
                 except Exception as exc:  # noqa: BLE001 — honest record
                     return None, f"{type(exc).__name__}: {exc}"
 
@@ -1262,6 +1317,9 @@ class EngineRun:
             adjudication_blocked = bool(
                 (self.env.epistemic_state or {}).get("adjudication_blocked"))
             grid_result = None
+            _grid_status: Optional[str] = None
+            _cctx.set_stage("POST_RANK_GRID")
+            _pra_start("GRID")
             if adjudication_blocked:
                 self._persist("EXPLORATION_GRID.json", {
                     "status": "SKIPPED_ADJUDICATION_BLOCKED",
@@ -1272,6 +1330,7 @@ class EngineRun:
                                "cannot be discovery-verified either. "
                                "Re-run the loop when transport recovers."),
                 })
+                _grid_status = "SKIPPED_ADJUDICATION_BLOCKED"
             if not self._naive_survivor and not adjudication_blocked:
                 # R399 W2.3 (the directive's exact gate): the diversity
                 # grid is expensive candidate generation — it requires
@@ -1295,6 +1354,7 @@ class EngineRun:
                                      "grid candidates were generated on "
                                      "unverified evidence (R399 W2.3)"),
                     })
+                    _grid_status = "SKIPPED_EVIDENCE_VERIFICATION_FAILED"
                 else:
                     try:
                         from .candidate_diversity import (generate_diverse_candidates,
@@ -1351,6 +1411,14 @@ class EngineRun:
                             "error": f"{type(exc).__name__}: {exc}",
                             "traceback": _tb.format_exc()[-2000:]})
                         grid_result = None
+                        _grid_status = "GRID_ERROR"
+            _pra_stop("GRID")
+            if _grid_status is None and grid_result is not None:
+                _grid_status = (grid_result.get("status") or "OK")
+            _pra["pool"]["grid_candidates"] = len(
+                (grid_result or {}).get("candidates") or [])
+            _pra["pool"]["grid_status"] = _grid_status
+            _cctx.set_stage("POST_RANK")
 
             # ---- R401: the structured mechanism space candidates ----
             # Every mechanism-space candidate joins the gauntlet pool
@@ -1434,6 +1502,14 @@ class EngineRun:
             # and deferred candidates keep their FULL structured record
             # on disk (learning-critical information, never lost).
             # Every skip carries the explicit reason.
+            _pra_stop("POOL_BUILD")
+            _cctx.set_stage("POST_RANK")
+            _pra["pool"]["n_total"] = len(pool)
+            _pra["pool"]["origins"] = {
+                str(_o): sum(1 for _c in pool
+                             if str(_c.get("origin", "")).startswith(_o))
+                for _o in ("DISCOVERY_LOOP_SURVIVOR", "ENSEMBLE",
+                           "EXPLORATION_GRID", "MECHANISM_SPACE")}
             ms_pool_keys = [c["key"] for c in pool
                             if c["key"].startswith("mech-")]
             if ms_pool_keys:
@@ -1498,8 +1574,22 @@ class EngineRun:
 
             # ---------- E15-F/E15-G: attack all, repair viable ------------
             evaluated: List[Dict[str, Any]] = []
+            _cctx.set_stage("POST_RANK_GAUNTLET")
+            _pra_start("GAUNTLET")
             for c in pool:
                 key = c["key"]
+                _ct0 = _ptime.perf_counter()
+                _crow: Dict[str, Any] = {
+                    "key": key,
+                    "candidate_id": c.get("candidate_id"),
+                    "origin": c.get("origin"),
+                    "phase_s": {},
+                    "outcome": None}
+
+                def _crow_finish(_outcome: str) -> None:
+                    _crow["outcome"] = _outcome
+                    _crow["wall_s"] = _ptime.perf_counter() - _ct0
+                    _pra["candidates"].append(_crow)
                 # R401 resume-robustness (the R399 W2.5 class): a
                 # candidate whose terminal KILL record was already
                 # persisted in a previous (interrupted) execution of
@@ -1521,6 +1611,7 @@ class EngineRun:
                         "kill_stage": _kill.get("stage"),
                         "kill_reason": (_kill.get("reason") or
                                         "")[:200]})
+                    _crow_finish("RESUMED_KILL")
                     continue
                 if key.startswith("mech-"):
                     screen = c.get("cheap_screen")
@@ -1541,9 +1632,12 @@ class EngineRun:
                             "key": key, "killed": True,
                             "cheap_screen": screen,
                             "killed_by": "CHEAP_SCREEN"})
+                        _crow_finish("CHEAP_SCREEN_KILL")
                         continue
+                _pt = _ptime.perf_counter()
                 s = c["spec"] or build_invention_spec(c["env_view"],
                                                       run_ctx)
+                _crow["phase_s"]["SPEC"] = _ptime.perf_counter() - _pt
                 if c["spec"] is None:
                     if key.startswith("grid-"):
                         # E16-F honesty marker: this candidate came from
@@ -1590,7 +1684,10 @@ class EngineRun:
                                             "never converted "
                                             "(R401 Phase 4)")})
                     self._persist(f"INVENTION_SPECIFICATION_{key}.json", s)
+                _pt = _ptime.perf_counter()
                 eng1 = build_engineering_spec(s, c["env_view"], run_ctx)
+                _crow["phase_s"]["ENGINEERING"] = (
+                    _ptime.perf_counter() - _pt)
                 # R396 Phase D + R397 Phase 2: the physics gate —
                 # plausibility bounds (before expensive simulation), the
                 # failure-mode contract, and the BASELINE comparison with
@@ -1608,8 +1705,11 @@ class EngineRun:
                 #     refusal (the release must disclose it).
                 try:
                     from .physics_gate import evaluate_candidate_physics
+                    _pt = _ptime.perf_counter()
                     eng1["physics_evaluation"] = evaluate_candidate_physics(
                         s, eng1, run_ctx)
+                    _crow["phase_s"]["PHYSICS_GATE"] = (
+                        _ptime.perf_counter() - _pt)
                 except Exception as exc:  # noqa: BLE001 — disclosed
                     eng1["physics_evaluation"] = {
                         "gate_version": "physics_gate/1.0.0",
@@ -1634,6 +1734,7 @@ class EngineRun:
                         "killed": True,
                         "physics_lifecycle": physics_lifecycle,
                         "physics_kill": True})
+                    _crow_finish("PHYSICS_KILL")
                     continue
 
                 if key == "primary":
@@ -1641,7 +1742,10 @@ class EngineRun:
                     # attack, selection or the quality gate later rejects
                     # it (Art. V: the run directory is the record)
                     self._persist("ENGINEERING_SPECIFICATION.json", eng1)
+                _pt = _ptime.perf_counter()
                 attack1 = attack_engineering(s, eng1, c["env_view"])
+                _crow["phase_s"]["ENGINEERING_ATTACK"] = (
+                    _ptime.perf_counter() - _pt)
                 self._persist(f"ENGINEERING_ATTACK_{key}.json", attack1)
                 if attack1["overall"] == "KILLED":
                     # E15-F: a killed candidate gets NO dossier
@@ -1654,6 +1758,7 @@ class EngineRun:
                     evaluated.append({
                         "candidate_id": c["candidate_id"],
                         "key": key, "attack": attack1, "killed": True})
+                    _crow_finish("ENGINEERING_ATTACK_KILL")
                     continue
                 # ---- R401 Phase 6: the INDEPENDENT adversarial attack ---
                 # The generator's reasoning context never attacks its own
@@ -1665,6 +1770,7 @@ class EngineRun:
                 # kills (Art. XXIX: an attack that did not run is not a
                 # mechanism failure) — the marker travels with the
                 # candidate.
+                _pt = _ptime.perf_counter()
                 indep_attack = None
                 if key.startswith("mech-") or key.startswith("grid-"):
                     # R401 resume-robustness: a persisted independent
@@ -1758,6 +1864,9 @@ class EngineRun:
                         "key": key, "attack": attack1,
                         "independent_attack": indep_attack,
                         "killed": True})
+                    _crow["phase_s"]["INDEPENDENT_ATTACK"] = (
+                        _ptime.perf_counter() - _pt)
+                    _crow_finish("INDEPENDENT_ATTACK_KILL")
                     continue
                 if indep_attack and indep_attack.get("attack_outcome") \
                         == "ESCALATED_OBJECTION":
@@ -1773,7 +1882,10 @@ class EngineRun:
                          "escalation": indep_attack.get("escalation"),
                          "preserved_objections":
                              indep_attack.get("preserved_objections")})
+                _crow["phase_s"]["INDEPENDENT_ATTACK"] = (
+                    _ptime.perf_counter() - _pt)
                 eng_final, repaired = eng1, False
+                _pt = _ptime.perf_counter()
                 if attack1["counts"].get("REPAIR", 0) > 0:
                     eng2 = repair_engineering(s, eng1, attack1)
                     if (eng2.get("repair_ledger") or {}).get(
@@ -1781,12 +1893,16 @@ class EngineRun:
                         self._persist(
                             f"ENGINEERING_SPECIFICATION_V1_{key}.json", eng1)
                         eng_final, repaired = eng2, True
+                _crow["phase_s"]["REPAIR"] = _ptime.perf_counter() - _pt
                 # candidate-level dossier quality (pre-selection screen —
                 # R440 note: this is the CANDIDATE gate, distinct from the
                 # package boundary gates now owned by the compiler + the
                 # independent package quality gate)
                 from .dossier_quality import evaluate_dossier_quality
+                _pt = _ptime.perf_counter()
                 quality = evaluate_dossier_quality(s, eng_final)
+                _crow["phase_s"]["QUALITY"] = (
+                    _ptime.perf_counter() - _pt)
                 if quality["verdict"] == "FAIL":
                     # Coder 2 register #1: the rejected candidate carries
                     # its EXACT deficient areas in the run record — the
@@ -1810,6 +1926,10 @@ class EngineRun:
                     "killed": False,
                     "physics_lifecycle": physics_lifecycle,
                     "span_underived": bool(c.get("span_underived"))})
+                _crow_finish("SURVIVED_GAUNTLET")
+
+            _pra_stop("GAUNTLET")
+            _cctx.set_stage("POST_RANK")
 
             # ---------- R481 P0-1: the IMPROVE stage (kill point) ------
             # The loop-closure stage executes HERE — the only point
@@ -1988,6 +2108,9 @@ class EngineRun:
                     "generation": 1,
                     "max_children": int(os.environ.get(
                         "ENGINE_IMPROVE_MAX_CHILDREN", "3"))}
+                _cctx.set_stage("POST_RANK_IMPROVE")
+                _pra_start("KILL_IMPROVE")
+                _imp_children = 0
                 try:
                     from .adapters import ADAPTERS as _AD
                     _imp_entry = self.env.run_stage(
@@ -2006,6 +2129,7 @@ class EngineRun:
                     for _ch in (_imp_entry.get("result_meta") or {}) \
                             .get("children", []) or []:
                         evaluated.append(_ch)
+                        _imp_children += 1
                 except StageFailure as _sf:
                     # the stage failed explicitly — recorded by run_stage,
                     # the pipeline proceeds with the dead staying dead
@@ -2013,8 +2137,14 @@ class EngineRun:
                     self._persist("stage_IMPROVE_FAILURE.json",
                                   {"stage": "IMPROVE",
                                    "error": _sf.error})
+                _pra_stop("KILL_IMPROVE")
+                _pra["mutations"]["kill_point_children_admitted"] = (
+                    _imp_children)
+                _cctx.set_stage("POST_RANK")
 
             # ---------- E15-H: select the strongest survivor ---------------
+            _cctx.set_stage("POST_RANK_SELECTION")
+            _pra_start("SELECTION")
             selection = select_survivors(evaluated)
             selection["rejection_details"] = {
                 e["candidate_id"]: {
@@ -2023,6 +2153,11 @@ class EngineRun:
                     .get("deficient_areas", [])[:10]}
                 for e in evaluated if not e.get("killed")}
             self._persist("SURVIVOR_SELECTION.json", selection)
+            _pra_stop("SELECTION")
+            _pra["pool"]["selected"] = selection.get("selected")
+            _pra["pool"]["ranked_n"] = len(selection.get("ranked", []))
+            _cctx.set_stage("POST_RANK")
+            _pra_persist()
             if not selection.get("selected"):
                 self.package_failure = (
                     "E15-H selection: no viable survivor (all candidates "
@@ -2069,7 +2204,11 @@ class EngineRun:
             # a higher kill rate is acceptable); transport failure is
             # honest IMPROVEMENT_BLOCKED_TRANSPORT (parent proceeds —
             # infrastructure is not a research verdict, Art. XXV).
+            _cctx.set_stage("POST_RANK_IMPROVEMENT")
+            _pra_start("IMPROVEMENT_PASS")
             improvement = self._improvement_pass(chosen, spec_rel, run_ctx)
+            _pra_stop("IMPROVEMENT_PASS")
+            _cctx.set_stage("POST_RANK")
             if improvement is not None:
                 if improvement["outcome"] == "IMPROVED":
                     rebuilt = improvement["rebuilt"]
@@ -2100,6 +2239,7 @@ class EngineRun:
                         "reason": improvement["reason"],
                         "ledger": "IMPROVEMENT_LEDGER.json",
                     })
+                    _pra_persist()
                     return
 
             # ---------- R379: TECHNICAL IMPROVEMENT ENGINE V2 pass -----
@@ -2120,8 +2260,12 @@ class EngineRun:
             # proceeds with the ledger on disk. Transport failure is
             # BLOCKED_TRANSPORT (Art. XXV: infrastructure is not a
             # research verdict).
+            _cctx.set_stage("POST_RANK_TECH_IMPROVEMENT")
+            _pra_start("TECHNICAL_IMPROVEMENT_PASS")
             technical = self._technical_improvement_pass(
                 chosen, spec_rel, run_ctx)
+            _pra_stop("TECHNICAL_IMPROVEMENT_PASS")
+            _cctx.set_stage("POST_RANK")
             if technical is not None:
                 if technical["outcome"] == "TECHNICALLY_IMPROVED":
                     rebuilt = technical["rebuilt"]
@@ -2152,6 +2296,7 @@ class EngineRun:
                         "reason": technical["reason"],
                         "ledger": "TECHNICAL_IMPROVEMENT_LEDGER.json",
                     })
+                    _pra_persist()
                     return
 
             # ---------- R399 W2.1: SCIENTIFIC REJECTION -> NO DOSSIER -----
@@ -2194,6 +2339,7 @@ class EngineRun:
                                  "no release path, so the compute buys "
                                  "nothing (R399 audit W2.1)")},
                 })
+                _pra_persist()
                 return
 
             # ---------- R380: 3D ENGINEERING DESIGN PIPELINE pass -------
@@ -2208,6 +2354,8 @@ class EngineRun:
             # validation is equally honest data: the ledger records it
             # and packaging proceeds WITHOUT a 3D section (a broken
             # model must never be smuggled into a package).
+            _cctx.set_stage("POST_RANK_CAD")
+            _pra_start("CAD")
             try:
                 from .cad_pipeline import (
                     get_parametric_model, run_cad_pass)
@@ -2235,6 +2383,10 @@ class EngineRun:
                                     "an engine defect never kills "
                                     "research)"),
                     "timestamp": utc_now()})
+            _pra_stop("CAD")
+            _cctx.set_stage("POST_RANK")
+
+            # CEO A1: resolve the package identity through the canonical
 
             # CEO A1: resolve the package identity through the canonical
             # registry — AFTER survivor selection, so killed candidates
@@ -2286,6 +2438,8 @@ class EngineRun:
                           "of the invention)"),
                 "recorded_at": utc_now(),
             })
+            _pra_stop("POST_RANK")
+            _pra_persist()
         except Exception as exc:  # noqa: BLE001 — explicit, never fabricated
             import traceback as _tb
             self.package_failure = f"{type(exc).__name__}: {exc}"
