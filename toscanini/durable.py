@@ -300,6 +300,19 @@ def _run_dir_files(run_dir: Path) -> List[Path]:
     # R418: the bridge's visual artifacts (MODEL/model-00N.glb) and the
     # generation models — the product surface's 3D layer; the per-file
     # size cap below filters anything oversized
+    # R510 visual-delivery closure: the strict geometry evaluator relies
+    # on persisted identity/current-generation anchors, not the CIO copy.
+    # Keep the anchors durable alongside the GLB so a container restart
+    # cannot leave a real model present but uncertifiable.
+    for identity_file in (
+            "ARTIFACT_IDENTITY.json",
+            "ARTIFACT_IDENTITY.sha256",
+            "DESIGN_LINEAGE.json",
+            "GEOMETRY_SPEC.json",
+    ):
+        p = model_dir / identity_file
+        if p.is_file():
+            out.append(p)
     model_dir = run_dir / "MODEL"
     if model_dir.is_dir():
         out.extend(sorted(model_dir.glob("*.glb")))
