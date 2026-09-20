@@ -2287,3 +2287,61 @@ READ HANDOFF
 ```
 
 The remote repository remains the ultimate evidence surface for the code and committed artifacts.
+
+---
+
+# CURRENT AUDIT — 2026-09-20
+
+## First broken transition
+
+Fresh durable runtime runs showed real GLB and technology-package artifacts reaching `runtime-state-hf`, while the strict visual certification chain lost its persisted identity/current-generation anchors across the durable boundary.
+
+The first measured cliff is:
+
+`FRESH RUN ARTIFACTS → DURABLE SNAPSHOT → PERSISTED VISUAL IDENTITY CHAIN`
+
+The omitted files were:
+
+- `MODEL/ARTIFACT_IDENTITY.json`
+- `MODEL/ARTIFACT_IDENTITY.sha256`
+- `MODEL/DESIGN_LINEAGE.json`
+- `MODEL/GEOMETRY_SPEC.json`
+
+`toscanini/visual_join.py` requires the persisted identity chain and an independent current-generation anchor. The CIO-carried identity is diagnostic only and cannot certify the artifact after restart.
+
+## One fix
+
+`toscanini/durable.py::_run_dir_files()` now persists those four `MODEL/*` files whenever they exist, alongside the canonical GLB and presentation records.
+
+A regression was added to `tests/test_r423_durable_incremental.py` asserting that all four anchors survive a durable snapshot.
+
+The compare from the pre-audit `origin/main` tip contains only those two changed paths.
+
+## Verification
+
+Static AST/reproduction validation of the changed selector and regression body passed.
+
+GitHub Actions was triggered for the code changes, but the certification workflow failed in its initial path-classification job before the test/certification stages executed. Therefore this audit does not claim CI verification.
+
+The current remote `main` is:
+
+`1b3fe776059445c41d790c886e2239096a5c04d1`
+
+No production deployment of this fix has been proven. The committed historical deployment record still names engine SHA:
+
+`0ad82593d79999029f0d3529e2407995e16f12e1`
+
+External production identity remains `UNKNOWN`.
+
+## Current demo state
+
+The durable runtime evidence proves the system can produce a canonical GLB and a technology package on a fresh run. The current code repair closes the durability hole that could erase the certification anchors on restart.
+
+The post-fix production vertical slice is still unproven until the repaired commit is deployed and a fresh ordinary user request verifies:
+
+`survivor → bridge → 3D → package → CIO → API → frontend`
+
+The processing-time UI remains partial: current-stage/activity presentation exists, but a telemetry-backed remaining-time estimate is not yet established.
+
+The larger scientific gaps remain unchanged: fresh mechanism yield, attacker calibration, reality validation, learning, buyer-package validation, and cross-domain/generalized discovery qualification.
+
