@@ -1,0 +1,1903 @@
+{
+ "invention_id": {
+  "value": "inv:ui_bus_bunching_and_headway_irregularity_918585:49deda73ca42",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_bus_bunching_and_headway_irregularity_918585",
+   "device": "city bus transit fleet",
+   "failure": "Documented problem 'bus bunching and headway irregularity' concerning city bus transit fleet. User-submitted engineering problem (session input): \"City bus routes bunch up so three buses arrive together then nothing for half an hour. Commuters want evenly spaced arrivals without adding buses.\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "bus bunching and headway irregularity",
+   "constraint": "must be achieved with the existing number of buses on each route."
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:09adbf1f"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of city bus transit fleet",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Bus travel time within urban corridors is governed by dynamic variables including traffic flow rate, general travel time, and average stream patronage per bus stop, with patronage showing the strongest influence on bus travel time in three of the four corridors; headway irregularity arises when these dynamic variables shift without adaptive control, as demonstrated by Multiple Linear Regression (MLR) and Support Vector Regression (SVR) models applied across distinct urban corridors.",
+   "intervention": "Replace fixed-schedule dispatching with a multisource big data approach that models bus travel times using dynamic variables like traffic flow rate, general travel time, and average stream patronage per bus stop, applying Multiple Linear Regression (MLR) or Support Vector Regression (SVR) to predict bus travel time changes due to corridor modifications and dynamically hold buses at control points to equalize headways using the existing fleet across all urban corridors.",
+   "expected_effect": "Headway variance falls and buses self-separate into even intervals, so three-bus bunching followed by 30-minute gaps is eliminated with no added buses.",
+   "mechanism_source_span": "Employing Multiple Linear Regression (MLR), Artificial Neural Networks (ANN), Support Vector Regression (SVR), and Random Forest (RF), bus travel times are modelled across four distinct urban corridors in A Coruña, Spain, considering dynamic variables like traffic flow rate, general travel time, and average stream patronage per bus stop, with patronage showing the strongest influence on bus travel time in three of the four corridors",
+   "span_derivation": {
+    "n_shared": 31,
+    "shared_terms": [
+     "across",
+     "average",
+     "bus",
+     "corridor",
+     "distinct",
+     "dynamic",
+     "flow",
+     "four",
+     "general",
+     "influence",
+     "like",
+     "linear",
+     "mlr",
+     "multiple",
+     "patronage",
+     "per",
+     "rate",
+     "regression",
+     "showing",
+     "stop"
+    ],
+    "span_terms_n": 42,
+    "ratio": 0.738,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "If real-time prediction of bus travel time using dynamic variables like traffic flow rate and average stream patronage per bus stop fails to reduce measured headway variance compared to fixed-schedule dispatching across urban corridors, the mechanism is falsified.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.1186/s12544-026-00815-3",
+     "source_span": "Employing Multiple Linear Regression (MLR), Artificial Neural Networks (ANN), Support Vector Regression (SVR), and Random Forest (RF), bus travel times are modelled across four distinct urban corridors in A Coruña, Spain, considering dynamic variables like traffic flow rate, general travel time, and average stream patronage per bus stop, with patronage showing the strongest influence on bus travel time in three of the four corridors"
+    }
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/covid6070130"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Assessment of the COVID-19 Pandemic on Public Transportation Ridership: A Comparative Analysis of Six Metropolitan Areas in North America, the Middle East, Asia, and Africa",
+   "mechanism": "Institutional adaptation — a transit system can sustain service regularity under disruptive, demand-varying conditions through adaptive operational rules and technological preparation rather than by expanding capacity (fleet size).",
+   "intervention_site": "city bus transit fleet",
+   "expected_effect": "Headway variance falls and buses self-separate into even intervals, so three-bus bunching followed by 30-minute gaps is eliminated with no added buses.",
+   "falsification_test": "Run a 4-week A/B trial on one bunched route (treatment: adaptive headway control; control: fixed schedule, same fleet), logging per-stop arrival times; the mechanism is falsified if headway standard deviation and the fraction of headways below 3 minutes do not decrease by at least 20% on the treatment route versus control."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/covid6070130"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "multi_source_directions": {
+    "discovery": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "destruction": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "transfer": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "reality": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    }
+   }
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "legacy_status": "LIKELY_PRIOR_ART_EXISTS",
+   "differentiation_resolution": {
+    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "NO_FAMILIES",
+    "per_family": [],
+    "n_families": 0,
+    "n_search_errors": 10,
+    "search_errors": [
+     {
+      "query": "transit fleet bus city bunching headway",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "transit fleet bus city bunching headway",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"519aecc7-787e-4554-a0c4-4af97c3d615b\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "transit fleet institutional adaptation sustain service",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "transit fleet institutional adaptation sustain service",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"a1cccc57-5a82-4021-90ab-8fda3cb72aaa\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "schedule fleet adaptive headway buses rules demand route",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "schedule fleet adaptive headway buses rules demand route",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"e642a20f-4ab7-431a-8cd1-45998c036968\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "transit variance bunching dispatching existing tracking",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "transit variance bunching dispatching existing tracking",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"58504ae3-5665-44e3-852b-8a908e2191d7\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "transit fleet bus city headway bunching",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "transit fleet bus city headway bunching",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"e2d1c384-641d-492e-948c-e599c8dd39e4\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     }
+    ],
+    "search_execution": {
+     "mandatory_complete": false,
+     "n_errors": 10,
+     "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+    },
+    "relevance_model_version": "collision_resolution/2.0.0",
+    "determinism_contract": {
+     "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+     "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+    },
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    }
+   },
+   "nearest": [],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "transit fleet bus city bunching headway"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "transit fleet institutional adaptation sustain service"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "schedule fleet adaptive headway buses rules demand route"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "transit variance bunching dispatching existing tracking"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "transit fleet bus city headway bunching"
+    }
+   ],
+   "scientific": [
+    {
+     "title": "AI for Intelligent Transportation Systems: A Systematic Review of Applications in Demand-Responsive Transport.",
+     "id": "42590720",
+     "query": "city bus transit fleet Documented problem"
+    },
+    {
+     "title": "Road safety policies and motor vehicle fatalities in Ecuador: a geographical and temporal analysis from 1990 to 2022.",
+     "id": "42299252",
+     "query": "city bus transit fleet Documented problem"
+    },
+    {
+     "title": "'Even if they're late or it takes forever … I will get home': Exploring lived experiences of older paratransit users.",
+     "id": "40519249",
+     "query": "city bus transit fleet Documented problem"
+    },
+    {
+     "title": "Understanding Supply-Side Implementation Barriers Affecting Child Nutrition Outcomes in the Take-Home Ration Scheme: A Qualitative Study From Madhya Pradesh, India.",
+     "id": "42078275",
+     "query": "Institutional adaptation transit sustain service regularity"
+    },
+    {
+     "title": "I'd rather have the girls eat first: a mixed-methods study on the nutritional health of migrant children in Chile.",
+     "id": "41769648",
+     "query": "Institutional adaptation transit sustain service regularity"
+    }
+   ]
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Replace fixed-schedule dispatching with a multisource big data approach that models bus travel times using dynamic variables like traffic flow rate, general travel time, and average stream patronage per bus stop, applying Multiple Linear Regression (MLR) or Support Vector Regression (SVR) to predict bus travel time changes due to corridor modifications and dynamically hold buses at control points to equalize headways using the existing fleet across all urban corridors.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/covid6070130"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "must be achieved with the existing number of buses on each route.",
+   "failure_mode_of_device": "bus bunching and headway irregularity"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:09adbf1f"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [
+   {
+    "dimension": "unsupported_mechanism",
+    "attack_verdict": "PASS - no physical or chemical invalidity in the claimed causal chain for adaptive headway management.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "weak_transfer",
+    "attack_verdict": "KILLED - the mechanism_source_span cites Cairo's \"institutional adaptation\" as the basis, but the source_evidence explicitly states Cairo \"did not decline because of institutional adaptation, but rather because of economic dependence\", meaning the specific mechanism element (institutional adaptation) is directly negated by the record's own cited source and cannot transfer to bus operations.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "obvious_combination",
+    "attack_verdict": "RISK - AVL/APC tracking and dynamic holding are standard transit techniques, but the record itself contains no evidence describing them as a combined known solution for this constraint.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "prior_art",
+    "attack_verdict": "RISK - the skipped papers list titles like \"Bunching transition in a time-headway model of a bus route\" and \"Applying the Support Vector Machine to Predicting Headway-Based Bus Bunching\", indicating prior art exists, but their abstracts are missing from the record so I cannot cite a specific disclosure.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "contradiction",
+    "attack_verdict": "PASS - the provided source_evidence does not contain numerical values that conflict with the candidate's claims.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "boundary_failure",
+    "attack_verdict": "RISK - the claim that bunching is \"eliminated\" under all demand fluctuations without adding buses may violate capacity boundaries during peak loads, but the record provides no demand numbers to compute this defect.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "engineering_infeasibility",
+    "attack_verdict": "PASS - no specific engineering limit is violated by the proposed real-time AVL/APC and holding rules.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "regulatory_incompatibility",
+    "attack_verdict": "PASS - no specific regulatory regime, clause, or standard is named or violated.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.3911112714439877,
+   "eig_per_cost": 0.3911112714439877,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Headway variance falls and buses self-separate into even intervals, so three-bus bunching followed by 30-minute gaps is eliminated with no added buses.",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-20T15:48:13.684871+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-20T15:48:13.684871+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.3911112714439877,
+     "eig_per_cost": 0.3911112714439877,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1103/physreve.63.036115",
+    "title": "Bunching transition in a time-headway model of a bus route",
+    "source_uri": "https://doi.org/10.1103/physreve.63.036115",
+    "doi": "10.1103/physreve.63.036115",
+    "content_hash": "96e719a6eb75bf300bad19637dd20c7569e92f32c388a5e31f467bbb996d3e8a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1061/9780784482292.135",
+    "title": "Applying the Support Vector Machine to Predicting Headway-Based Bus Bunching",
+    "source_uri": "https://doi.org/10.1061/9780784482292.135",
+    "doi": "10.1061/9780784482292.135",
+    "content_hash": "48479ca05fa56c9523869513b4b6777a5852f9db76d073b0c63df7b486eeab03",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/icite59717.2023.10733869",
+    "title": "Headway-Based Bus Bunching Prediction Using LSTM with Attention",
+    "source_uri": "https://doi.org/10.1109/icite59717.2023.10733869",
+    "doi": "10.1109/icite59717.2023.10733869",
+    "content_hash": "870454a0ca4a1c9b366202fc58664c011291eae94363ea3449a1e3a94790b9dc",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1186/s12544-026-00815-3",
+    "title": "Bus travel time prediction in mixed traffic: a multisource big data approach with multiple modelling strategies",
+    "source_uri": "https://doi.org/10.1186/s12544-026-00815-3",
+    "doi": "10.1186/s12544-026-00815-3",
+    "content_hash": "bb9964462d30631e43103c2da486b0008fc345f2d72c2c176fb80ef5b34aa92a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.32866/001c.13489",
+    "title": "Mobility Changes, Teleworking, and Remote Communication during the COVID-19 Pandemic in Chile",
+    "source_uri": "https://doi.org/10.32866/001c.13489",
+    "doi": "10.32866/001c.13489",
+    "content_hash": "202f01b342498676f2a850f87b2700ec860c840691276bd81ce6304e0d46f36e",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/covid6070130",
+    "title": "Assessment of the COVID-19 Pandemic on Public Transportation Ridership: A Comparative Analysis of Six Metropolitan Areas in North America, the Middle East, Asia, and Africa",
+    "source_uri": "https://doi.org/10.3390/covid6070130",
+    "doi": "10.3390/covid6070130",
+    "content_hash": "e672c99078991229b073f0991797dc5b6b52a10e2256fc4adeae3ad16a02ba4d",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.33915/etd.600",
+    "title": "Optimization tool for transit bus fleet management",
+    "source_uri": "https://doi.org/10.33915/etd.600",
+    "doi": "10.33915/etd.600",
+    "content_hash": "fef26f488c387a03b5c3ed4da06864477d02398a57672adfbe5e4712e0b79ff8",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5353/th_b3126011",
+    "title": "Bus transit planning in Johor Bahru City, Malaysia",
+    "source_uri": "https://doi.org/10.5353/th_b3126011",
+    "doi": "10.5353/th_b3126011",
+    "content_hash": "81fd9926f4e83c60fe360e27bda2ab02adcddf635d4bc979b9585953b7a151b8",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5353/th_b3122506",
+    "title": "Bus routing strategies in a transit oriented city : a case study of Kowloon Motor Bus (1975-1986)",
+    "source_uri": "https://doi.org/10.5353/th_b3122506",
+    "doi": "10.5353/th_b3122506",
+    "content_hash": "5f71d5d321330d6c2371190ac051e43e8717d0df5299efb235263b970e1986e3",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2210.00201",
+    "title": "Integrating Conventional Headway Control with Reinforcement Learning to Avoid Bus Bunching",
+    "source_uri": "https://doi.org/10.48550/arxiv.2210.00201",
+    "doi": "10.48550/arxiv.2210.00201",
+    "content_hash": "9afe54338eec6c31385e332827331bf293b66e8f4f019026fbe96e5b8aa1edff",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1812.00609",
+    "title": "Bus bunching as a synchronisation phenomenon",
+    "source_uri": "https://doi.org/10.48550/arxiv.1812.00609",
+    "doi": "10.48550/arxiv.1812.00609",
+    "content_hash": "6403cf1a855693418a595e781478cce67d1ce907fac47f1f5dcf042464bc06dc",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2202.06039",
+    "title": "Application of Modular Vehicle Technology to Mitigate Bus Bunching",
+    "source_uri": "https://doi.org/10.48550/arxiv.2202.06039",
+    "doi": "10.48550/arxiv.2202.06039",
+    "content_hash": "9479da53f2444ca7e49a9f58ea727aaacff8a8891b02ac9303abd1823dcaa608",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.procs.2014.05.440",
+    "title": "Bus Control Strategy Application: Case Study of Santiago Transit System",
+    "source_uri": "https://doi.org/10.1016/j.procs.2014.05.440",
+    "doi": "10.1016/j.procs.2014.05.440",
+    "content_hash": "163078e047d8895327d210b8547d8879225caf404084bdb9c2f6b3b7a6fd7238",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.trc.2016.09.007",
+    "title": "Headway-based bus bunching prediction using transit smart card data",
+    "source_uri": "https://doi.org/10.1016/j.trc.2016.09.007",
+    "doi": "10.1016/j.trc.2016.09.007",
+    "content_hash": "6e445638d6390eed362157322f35386220d81c0555d9b1ad8ccd785f9df004e7",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1007/s12469-019-00203-2",
+    "title": "Modelling bus bunching under variable transit demand using cellular automata",
+    "source_uri": "https://doi.org/10.1007/s12469-019-00203-2",
+    "doi": "10.1007/s12469-019-00203-2",
+    "content_hash": "b85d3a2dcafe302a3a961459e2e2862a94b04954f9bc5fb14c050a2af72fa9c2",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1007/s11116-022-10270-3",
+    "title": "Mitigating bus bunching with real-time crowding information",
+    "source_uri": "https://doi.org/10.1007/s11116-022-10270-3",
+    "doi": "10.1007/s11116-022-10270-3",
+    "content_hash": "ae4eae603871067a3ff233eff6f2d74566ea67a37a43274af021fdaafcab5fe5",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1007/s11116-022-10270-3",
+   "doi:10.1007/s12469-019-00203-2",
+   "doi:10.1016/j.procs.2014.05.440",
+   "doi:10.1016/j.trc.2016.09.007",
+   "doi:10.1061/9780784482292.135",
+   "doi:10.1103/physreve.63.036115",
+   "doi:10.1109/icite59717.2023.10733869",
+   "doi:10.1186/s12544-026-00815-3",
+   "doi:10.32866/001c.13489",
+   "doi:10.3390/covid6070130",
+   "doi:10.33915/etd.600",
+   "doi:10.48550/arxiv.1812.00609",
+   "doi:10.48550/arxiv.2202.06039",
+   "doi:10.48550/arxiv.2210.00201",
+   "doi:10.5353/th_b3122506",
+   "doi:10.5353/th_b3126011"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:evidence:doi:10.3390/covid6070130",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['adaptation', 'institutional', 'not', 'rather'] in: 'Cairo also exhibited resilience driven by necessity and did no]",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:evidence:doi:10.1016/j.trc.2016.09.007",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['not'] in: 'Moreover, the detection accuracy does not significantly deteriorate as the prediction lead time increas]",
+    "severity": "HIGH"
+   },
+   {
+    "unresolved_source": "transit fleet bus city bunching headway",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "transit fleet bus city bunching headway",
+    "error": "HTTP 401: {\"reference\":\"519aecc7-787e-4554-a0c4-4af97c3d615b\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "transit fleet institutional adaptation sustain service",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "transit fleet institutional adaptation sustain service",
+    "error": "HTTP 401: {\"reference\":\"a1cccc57-5a82-4021-90ab-8fda3cb72aaa\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "schedule fleet adaptive headway buses rules demand route",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "schedule fleet adaptive headway buses rules demand route",
+    "error": "HTTP 401: {\"reference\":\"e642a20f-4ab7-431a-8cd1-45998c036968\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "transit variance bunching dispatching existing tracking",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "transit variance bunching dispatching existing tracking",
+    "error": "HTTP 401: {\"reference\":\"58504ae3-5665-44e3-852b-8a908e2191d7\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "transit fleet bus city headway bunching",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "transit fleet bus city headway bunching",
+    "error": "HTTP 401: {\"reference\":\"e2d1c384-641d-492e-948c-e599c8dd39e4\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Run a 4-week A/B trial on one bunched route (treatment: adaptive headway control; control: fixed schedule, same fleet), logging per-stop arrival times; the mechanism is falsified if headway standard deviation and the fraction of headways below 3 minutes do not decrease by at least 20% on the treatment route versus control."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_bus_bunching_and_headway_irregularity_918585:2026-09-20T15:36:25",
+   "final_envelope_hash": "49deda73ca429c01ece568807af9bb0260373ad29587999c438b1ab8444f81cb",
+   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.3911112714439877
+    },
+    "score": 0.2582,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-20T15:48:13+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": true,
+    "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+    "verdict": "CONTESTED"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-20T15:48:13+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1103/physreve.63.036115": {
+   "id": "doi:10.1103/physreve.63.036115",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1103/physreve.63.036115",
+   "source_uri": "https://doi.org/10.1103/physreve.63.036115",
+   "title": "Bunching transition in a time-headway model of a bus route",
+   "abstract": "",
+   "doi": "10.1103/physreve.63.036115",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2001",
+   "retrieval_timestamp": "2026-09-20T15:36:49.104303+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "96e719a6eb75bf300bad19637dd20c7569e92f32c388a5e31f467bbb996d3e8a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1103/physreve.63.036115"
+    },
+    "queries_by_source": {
+     "crossref": "city bus transit fleet bus bunching and headway irregularity"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1103/physreve.63.036115",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "city bus transit fleet bus bunching and headway irregularity",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1061/9780784482292.135": {
+   "id": "doi:10.1061/9780784482292.135",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1061/9780784482292.135",
+   "source_uri": "https://doi.org/10.1061/9780784482292.135",
+   "title": "Applying the Support Vector Machine to Predicting Headway-Based Bus Bunching",
+   "abstract": "",
+   "doi": "10.1061/9780784482292.135",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2019",
+   "retrieval_timestamp": "2026-09-20T15:36:49.104395+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "48479ca05fa56c9523869513b4b6777a5852f9db76d073b0c63df7b486eeab03",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1061/9780784482292.135"
+    },
+    "queries_by_source": {
+     "crossref": "city bus transit fleet bus bunching and headway irregularity"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1061/9780784482292.135",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "city bus transit fleet bus bunching and headway irregularity",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1109/icite59717.2023.10733869": {
+   "id": "doi:10.1109/icite59717.2023.10733869",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/icite59717.2023.10733869",
+   "source_uri": "https://doi.org/10.1109/icite59717.2023.10733869",
+   "title": "Headway-Based Bus Bunching Prediction Using LSTM with Attention",
+   "abstract": "",
+   "doi": "10.1109/icite59717.2023.10733869",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2023",
+   "retrieval_timestamp": "2026-09-20T15:36:49.104424+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "870454a0ca4a1c9b366202fc58664c011291eae94363ea3449a1e3a94790b9dc",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/icite59717.2023.10733869"
+    },
+    "queries_by_source": {
+     "crossref": "city bus transit fleet bus bunching and headway irregularity"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/icite59717.2023.10733869",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "city bus transit fleet bus bunching and headway irregularity",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1186/s12544-026-00815-3": {
+   "id": "doi:10.1186/s12544-026-00815-3",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:bc650b9e4d2c95453a199350ad4a2d4fae4100a3",
+   "source_uri": "https://doi.org/10.1186/s12544-026-00815-3",
+   "title": "Bus travel time prediction in mixed traffic: a multisource big data approach with multiple modelling strategies",
+   "abstract": "This study examines the prediction of bus travel times within urban corridors, using an extensive dataset from transit management databases and on-street sensors. The analysis focuses on a range of variables, including corridor configuration, general traffic conditions, and intrinsic bus transit factors. Employing Multiple Linear Regression (MLR), Artificial Neural Networks (ANN), Support Vector Regression (SVR), and Random Forest (RF), bus travel times are modelled across four distinct urban corridors in A Coruña, Spain, considering dynamic variables like traffic flow rate, general travel time, and average stream patronage per bus stop, with patronage showing the strongest influence on bus travel time in three of the four corridors, similar to the sum of all general traffic variables. Furthermore, these models are applied to a joint dataset encompassing all corridors, incorporating static variables such as bus stops per kilometre, and, for the first time in the field, the percentage of corridors with adjacent parking and percentage with one lane, both considered as an interaction. This allows predictions of bus travel time changes due to corridor modifications and travel times for new bus routes in unserved areas. Findings reveal that, for our dataset, none of the three ML approaches has consistently proven to be preferable in bus travel time predictions, while MLR provides competitive results, balancing accuracy and interpretability despite its flexibility constraints. The study underscores the importance of selecting models based on data range and transit context, advocating for simplicity in constrained scenarios. This developed methodology provides a valuable planning tool for transport agencies, adaptable to other urban contexts, and highlights the benefits of optimising corridor configurations to enhance bus travel time performance.",
+   "doi": "10.1186/s12544-026-00815-3",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-20T15:36:49.104447+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bb9964462d30631e43103c2da486b0008fc345f2d72c2c176fb80ef5b34aa92a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:bc650b9e4d2c95453a199350ad4a2d4fae4100a3"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.5038/2375-0901.22.1.1"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "4a0d1cba2eda88819fc0a2b0b42a4fb6377f63fe8097623cfabd13ea6aeb7cc3",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-20T15:36:49.000971+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1186/s12544-026-00815-3",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.5038/2375-0901.22.1.1",
+   "source_rank": 3,
+   "fulltext_url": "https://link.springer.com/content/pdf/10.1186/s12544-026-00815-3.pdf",
+   "authors": [
+    "Yaiza Montero-Lamas",
+    "A. Fernandez",
+    "M. Gestal",
+    "M. Novales",
+    "A. Orro"
+   ],
+   "raw_record_hash": "4a0d1cba2eda88819fc0a2b0b42a4fb6377f63fe8097623cfabd13ea6aeb7cc3",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.32866/001c.13489": {
+   "id": "doi:10.32866/001c.13489",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:86373c1893caaeb1613346995f94d734a770e092",
+   "source_uri": "https://doi.org/10.32866/001c.13489",
+   "title": "Mobility Changes, Teleworking, and Remote Communication during the COVID-19 Pandemic in Chile",
+   "abstract": "Results from a mobility survey from Chile during the COVID-19 pandemic show a decrease of 44% of trips in Santiago, with metro (55%), ride-hailing (51%), and bus (45%) presenting the highest reduction. Modes with the lowest reduction are motorcycle (28%), auto (34%), and walking (39%). While 77% of workers from low-income households had to go out and work, 80% of workers from high-income households worked from home. Other important factors that correlate with teleworking are gender, educational level, employment status, and occupation. Regarding the number of trips for purposes other than work, significant factors are gender, age, and employment status.",
+   "doi": "10.32866/001c.13489",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-09-20T15:36:49.104468+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "202f01b342498676f2a850f87b2700ec860c840691276bd81ce6304e0d46f36e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:86373c1893caaeb1613346995f94d734a770e092"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.5038/2375-0901.22.1.1"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "59566507fdc7933e5585792600bee6feedf4e0cefdd3eb330849bd9af58b5412",
+    "publication_status_evidence": [
+     "publication_types=['Review']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.32866/001c.13489",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.5038/2375-0901.22.1.1",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [
+    "Sebastian Astroza",
+    "Alejandro Tirachini",
+    "Ricardo Hurtubia",
+    "J. Carrasco",
+    "Angelo Guevara",
+    "M. Munizaga",
+    "M. Figueroa",
+    "V. Torres"
+   ],
+   "raw_record_hash": "59566507fdc7933e5585792600bee6feedf4e0cefdd3eb330849bd9af58b5412",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  },
+  "doi:10.3390/covid6070130": {
+   "id": "doi:10.3390/covid6070130",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:5336fa00bd2bcb4b04a4c16febe35ea00ca075de",
+   "source_uri": "https://doi.org/10.3390/covid6070130",
+   "title": "Assessment of the COVID-19 Pandemic on Public Transportation Ridership: A Comparative Analysis of Six Metropolitan Areas in North America, the Middle East, Asia, and Africa",
+   "abstract": "The COVID-19 pandemic has caused unprecedented upheaval to the worldwide transportation infrastructure and as such, has redefined trends in urban mobility. In the current research, the authors plan to compare six metropolitan areas, including Houston (Texas) and Chicago (Illinois), Singapore, Dubai (United Arab Emirates), Calgary (Canada), and Cairo (Egypt), to assess the effects of the pandemic on transit ridership during the period of 2018 to 2022. The monthly data provided by the official transit agencies was analysed using paired t-tests and correlation statistics to measure the change in the ridership and how they are related to population, urban area, and network length. The results are consistent, and the effects are a three-stage course shock, stabilization, and recovery, but as the rates of recovery are different to the governance, economic structure, and technological preparation. Digitally developed, high-income metropolises like Singapore and Dubai were a bit faster in recovery, and those that relied on cars like Chicago and Calgary showed prolonged declines. Cairo also exhibited resilience driven by necessity and did not decline because of institutional adaptation, but rather because of economic dependence. The paper suggests a three-part model of resilience, including governance, technology, and necessity, that explains these differences and how mobility systems can be changed in response to crises. These findings have both theoretical and policy implications for designing adaptive, equitable, and technology-enhanced transportation planning in the post-pandemic age.",
+   "doi": "10.3390/covid6070130",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-20T15:36:49.104486+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e672c99078991229b073f0991797dc5b6b52a10e2256fc4adeae3ad16a02ba4d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:5336fa00bd2bcb4b04a4c16febe35ea00ca075de"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.5038/2375-0901.22.1.1"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "4a0d1cba2eda88819fc0a2b0b42a4fb6377f63fe8097623cfabd13ea6aeb7cc3",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.3390/covid6070130",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.5038/2375-0901.22.1.1",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [
+    "N. M. Alshabibi"
+   ],
+   "raw_record_hash": "4a0d1cba2eda88819fc0a2b0b42a4fb6377f63fe8097623cfabd13ea6aeb7cc3",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.33915/etd.600": {
+   "id": "doi:10.33915/etd.600",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.33915/etd.600",
+   "source_uri": "https://doi.org/10.33915/etd.600",
+   "title": "Optimization tool for transit bus fleet management",
+   "abstract": "",
+   "doi": "10.33915/etd.600",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-20T15:36:49.104507+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "fef26f488c387a03b5c3ed4da06864477d02398a57672adfbe5e4712e0b79ff8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.33915/etd.600"
+    },
+    "queries_by_source": {
+     "crossref": "city bus transit fleet bus bunching and headway irregularity"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.33915/etd.600",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "city bus transit fleet bus bunching and headway irregularity",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.5353/th_b3126011": {
+   "id": "doi:10.5353/th_b3126011",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5353/th_b3126011",
+   "source_uri": "https://doi.org/10.5353/th_b3126011",
+   "title": "Bus transit planning in Johor Bahru City, Malaysia",
+   "abstract": "",
+   "doi": "10.5353/th_b3126011",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-20T15:36:49.104524+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "81fd9926f4e83c60fe360e27bda2ab02adcddf635d4bc979b9585953b7a151b8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5353/th_b3126011"
+    },
+    "queries_by_source": {
+     "crossref": "city bus transit fleet bus bunching and headway irregularity"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5353/th_b3126011",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "city bus transit fleet bus bunching and headway irregularity",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.5353/th_b3122506": {
+   "id": "doi:10.5353/th_b3122506",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5353/th_b3122506",
+   "source_uri": "https://doi.org/10.5353/th_b3122506",
+   "title": "Bus routing strategies in a transit oriented city : a case study of Kowloon Motor Bus (1975-1986)",
+   "abstract": "",
+   "doi": "10.5353/th_b3122506",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-20T15:36:49.104662+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5f71d5d321330d6c2371190ac051e43e8717d0df5299efb235263b970e1986e3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5353/th_b3122506"
+    },
+    "queries_by_source": {
+     "crossref": "city bus transit fleet bus bunching and headway irregularity"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5353/th_b3122506",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "city bus transit fleet bus bunching and headway irregularity",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2210.00201": {
+   "id": "doi:10.48550/arxiv.2210.00201",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2210.00201v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2210.00201",
+   "title": "Integrating Conventional Headway Control with Reinforcement Learning to Avoid Bus Bunching",
+   "abstract": "Bus bunching is a natural-occurring phenomenon that undermines the efficiency and stability of the public transportation system. The mainstream solutions control the bus to intentionally stay longer at certain stations. Existing control methods include conventional methods that provide a formula to calculate the control time and reinforcement learning (RL) methods that determine the control policy through repeated interactions with the system. In this paper, we propose an integrated proximal policy optimization model with dual-headway (IPPO-DH). IPPO-DH integrates the conventional headway control with reinforcement learning, so that it acquires the advantages of both algorithms -- it is more efficient in normal environments and more stable in harsh ones. To demonstrate such an advantage, we design a bus simulation environment and compare IPPO-DH with RL and several conventional methods. The results show that the proposed model maintains the application value of the conventional method by avoiding the instability of the RL method in certain environments, and improves the efficiency compared with the conventional control, shedding new light on real-world bus transit system optimization.",
+   "doi": "10.48550/arxiv.2210.00201",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-20T15:36:49.104683+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9afe54338eec6c31385e332827331bf293b66e8f4f019026fbe96e5b8aa1edff",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2210.00201v1"
+    },
+    "queries_by_source": {
+     "arxiv": "city bus transit fleet bus bunching and headway irregularity"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2210.00201",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "city bus transit fleet bus bunching and headway irregularity",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2210.00201v1",
+   "authors": [
+    "Xiheng Wang"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.1812.00609": {
+   "id": "doi:10.48550/arxiv.1812.00609",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1812.00609v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.1812.00609",
+   "title": "Bus bunching as a synchronisation phenomenon",
+   "abstract": "Bus bunching is a perennial phenomenon that not only diminishes the efficiency of a bus system, but also prevents transit authorities from keeping buses on schedule. We present a physical theory of buses serving a loop of bus stops as a ring of coupled self-oscillators, analogous to the Kuramoto model. Sustained bunching is a repercussion of the process of phase synchronisation whereby the phases of the oscillators are locked to each other. This emerges when demand exceeds a critical threshold. Buses also bunch at low demand, albeit temporarily, due to frequency detuning arising from different human drivers' distinct natural speeds. We calculate the critical transition when \\emph{complete phase locking} (full synchronisation) occurs for the bus system, and posit the critical transition to \\emph{completely no phase locking} (zero synchronisation). The intermediate regime is the phase where clusters of partially phase locked buses exist. Intriguingly, these theoretical results are in close correspondence to real buses in a university's shuttle bus system.",
+   "doi": "10.48550/arxiv.1812.00609",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-20T15:36:49.104701+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6403cf1a855693418a595e781478cce67d1ce907fac47f1f5dcf042464bc06dc",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1812.00609v2"
+    },
+    "queries_by_source": {
+     "arxiv": "city bus transit fleet bus bunching and headway irregularity"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1812.00609",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "city bus transit fleet bus bunching and headway irregularity",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/1812.00609v2",
+   "authors": [
+    "Vee-Liem Saw",
+    "Ning Ning Chung",
+    "Wei Liang Quek",
+    "Yi En Ian Pang",
+    "Lock Yue Chew"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2202.06039": {
+   "id": "doi:10.48550/arxiv.2202.06039",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2202.06039v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2202.06039",
+   "title": "Application of Modular Vehicle Technology to Mitigate Bus Bunching",
+   "abstract": "The stochastic nature of public transport systems leads to headway variability and bus bunching, causing both operator and passenger cost to increase significantly. Traditional strategies to counter bus bunching, including bus-holding, stop-skipping, and bus substitution/insertion, suffer from trade-offs and shortcomings. Autonomous modular vehicle (AMV) technology provides an additional level of flexibility in bus dispatching and operations, which can offer significant benefits in mitigating bus bunching compared to strategies available with conventional buses. This paper introduces a novel alternative to stop-skipping by leveraging the new capabilities offered by AMVs (in particular, en-route coupling and decoupling of modular units). We develop a simple bus-splitting strategy that directs a modular bus to decouple into individual units when it experiences a headway longer than a given threshold. We then use a macroscopic simulation to present a proof-of-concept evaluation of the proposed modular strategy compared to a benchmark traditional stop-skipping strategy and the base (no control) case. We find that the proposed strategy outperforms the benchmark in decreasing each of the three travel time components: waiting time, in-vehicle time, and walking time (which it eliminates completely). It therefore reduces the overhead of bus bunching and thus the travel cost by more than twice as much as the benchmark for busy bus lines. Simultaneously, it also reduces headway variability to a comparable degree. Furthermore, we analyze different control thresholds for applying the proposed strategy, and show that it is most effective when applied proactively, i.e. with the control action being triggered even by small headway deviations.",
+   "doi": "10.48550/arxiv.2202.06039",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-20T15:36:49.104724+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9479da53f2444ca7e49a9f58ea727aaacff8a8891b02ac9303abd1823dcaa608",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2202.06039v1"
+    },
+    "queries_by_source": {
+     "arxiv": "city bus transit fleet bus bunching and headway irregularity"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2202.06039",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "city bus transit fleet bus bunching and headway irregularity",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2202.06039v1",
+   "authors": [
+    "Zaid Saeed Khan",
+    "Weili He",
+    "Monica Menendez"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.1016/j.procs.2014.05.440": {
+   "id": "doi:10.1016/j.procs.2014.05.440",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W2009530844",
+   "source_uri": "https://doi.org/10.1016/j.procs.2014.05.440",
+   "title": "Bus Control Strategy Application: Case Study of Santiago Transit System",
+   "abstract": "Buses have an inherent tendency to bunch due to randomness in passenger demand and congestion. Many sophisticated control strategies have been developed to reduce bus bunching, however, few of them have been implemented in high frequency real services. Building upon a control strategy comprised of a rolling horizon mathematical programming model that yields the optimal holding time that minimizes user-waiting times6, we have developed real-time software and implemented it on two bus services in Santiago using different technologies to communicate the instructions to bus drivers. The results presented in this paper are encouraging, on the days the system was implemented less bus bunching was observed, which translated in fewer headway-irregularity fines. Moreover lower passenger fare evasion was observed when the bus control strategy was used.",
+   "doi": "10.1016/j.procs.2014.05.440",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-20T15:36:49.104744+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "163078e047d8895327d210b8547d8879225caf404084bdb9c2f6b3b7a6fd7238",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W2009530844"
+    },
+    "queries_by_source": {
+     "openalex": "city bus transit fleet bus bunching headway irregularity"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.1016/j.procs.2014.05.440",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "city bus transit fleet bus bunching headway irregularity",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "doi:10.1016/j.trc.2016.09.007": {
+   "id": "doi:10.1016/j.trc.2016.09.007",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:70732790",
+   "source_uri": "https://doi.org/10.1016/j.trc.2016.09.007",
+   "title": "Headway-based bus bunching prediction using transit smart card data",
+   "abstract": "Bus bunching severely deteriorates the quality of transit service with poor on-time performance and excessive waiting time. To mitigate bus bunching, this paper presents a predictive framework to capture the stop-level headway irregularity based on transit smart card data. Historical headway, passenger demands, and travel time are utilized to model the headway fluctuation at the following stops. A Least Squares Support Vector Machine regression is established to detect bus bunching with the predicted headway pattern. An empirical experiment with two bus routes in Beijing is conducted to demonstrate the effectiveness of the proposed approach. The predictive method can successfully identify more than 95% of bus bunching occurrences in comparison with other well-established prediction algorithms. Moreover, the detection accuracy does not significantly deteriorate as the prediction lead time increases. Instead of regularizing the headways at all costs by adopting certain correction actions, the proposed framework can provide timely and accurate information for potential bus bunching prevention and inform passengers when the next bus will arrive. This feature will greatly increase transit ridership and reduce operating costs for transit authorities",
+   "doi": "10.1016/j.trc.2016.09.007",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-20T15:36:49.104761+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6e445638d6390eed362157322f35386220d81c0555d9b1ad8ccd785f9df004e7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:70732790"
+    },
+    "queries_by_source": {
+     "core": "city bus transit fleet bus bunching headway irregularity"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1016/j.trc.2016.09.007",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "city bus transit fleet bus bunching headway irregularity",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Wu, Zhihai",
+    "Yu, Haiyang",
+    "Ma, Xiaolei",
+    "Wang, Yunpeng",
+    "Chen, Dongwei"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1007/s12469-019-00203-2": {
+   "id": "doi:10.1007/s12469-019-00203-2",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:75572348",
+   "source_uri": "https://doi.org/10.1007/s12469-019-00203-2",
+   "title": "Modelling bus bunching under variable transit demand using cellular automata",
+   "abstract": "Bunching is an operational problem, in bus transit systems with high service frequency, that can lower capacity and affects user satisfaction. The headway (i.e. amount of time between transit vehicle arrivals at a stop) is intrinsically unstable, such that minor disturbances can cause divergence from the scheduled service. In this paper, a bus route is modelled using a one-dimensional cellular automata to investigate the effects of variations in passenger demand on headway instability and the bus bunching phenomenon. Unlike previous research, this study utilizes a typical route design approach, rather than obtaining a phase diagram from random passenger demand and service frequency. The results show that a one-second decrease in boarding and alighting times per passenger can significantly reduce bunching formation. Such a reduction can be achieved by adopting in-station fare collection methods as opposed to onboard ones, and/or using low-floor buses with wider/multiple doors/channels. In addition, an active mitigation strategy is proposed to prevent the formation of bunching. It is shown that limiting the waiting time for the delayed bus at stops has a great effect on regulating headways and mitigating bunching. Further, to compare different bunching situations, a new index is proposed to evaluate bunching severity (i.e. the number of buses involved in bunching) and intensity (i.e. the overall deviation from the scheduled headway). Using the developed index, it is found that a high Peak-Hour Coefficient acts like an uncontrolled traffic light that regulates the bus flow, resulting in less severe bunching, regardless of the subsequent total delay in the service",
+   "doi": "10.1007/s12469-019-00203-2",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-20T15:36:49.104778+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b85d3a2dcafe302a3a961459e2e2862a94b04954f9bc5fb14c050a2af72fa9c2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:75572348"
+    },
+    "queries_by_source": {
+     "core": "city bus transit fleet bus bunching headway irregularity"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-20T15:36:49.060307+00:00",
+     "is_oa": false,
+     "oa_status": "closed",
+     "host_type": null,
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1007/s12469-019-00203-2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "city bus transit fleet bus bunching headway irregularity",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Atashgah, M. A. Amiri",
+    "Idris, Ahmed Osman",
+    "Enayatollahi, Fatemeh"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1007/s11116-022-10270-3": {
+   "id": "doi:10.1007/s11116-022-10270-3",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W4214931511",
+   "source_uri": "https://doi.org/10.1007/s11116-022-10270-3",
+   "title": "Mitigating bus bunching with real-time crowding information",
+   "abstract": "A common problem in public transport systems is bus bunching, characterized by a negative feedback loop between service headways, number of boarding passengers and dwell times. In this study, we examine whether providing real-time crowding information (RTCI) at the stop regarding the two next vehicle departures can stimulate passengers to wait for a less-crowded departure, and thus alleviate the bunching effect. To this end, we leverage on results from own stated-preference survey and develop a boarding choice model. The model accounts for the presence of RTCI and is implemented within dynamic public transport simulation framework. Application to the case-study model of a major bus corridor in Warsaw (Poland) reveals that RTCI can induce a significant probability (30-70%) of intentionally skipping an overcrowded bus and waiting for a later departure instead. This behaviour, in turn, results in significantly lower vehicle headway and load variations, without deteriorations in total waiting utility. Overall, journey experience improves by 6%, and crucially-the prevalence of denial-of-boarding and excessive on-board overcrowding is substantially reduced, by ca. 40%. Results of our study indicate that the willingness to wait induced by RTCI can be a potential demand management strategy in counteracting bunching, with benefits already attainable at limited RTCI response rates.",
+   "doi": "10.1007/s11116-022-10270-3",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-20T15:36:49.104794+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ae4eae603871067a3ff233eff6f2d74566ea67a37a43274af021fdaafcab5fe5",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W4214931511"
+    },
+    "queries_by_source": {
+     "openalex": "city bus transit fleet bus bunching headway irregularity"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.1007/s11116-022-10270-3",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "city bus transit fleet bus bunching headway irregularity",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "problem:09adbf1f": {
+   "id": "problem:09adbf1f",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "09adbf1fd2158a13115634eb789ea16b652107a360e971882958dee8a97a35ed",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": true,
+  "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+  "verdict": "CONTESTED"
+ },
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-20T15:48:13+00:00Z"
+ },
+ "_improvement": {
+  "parent_spec_hash": "7db6a5c7726aac05faccce710068a6d16fe25b89ec53046d6fde56662dd75aa1",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:8642ebef1d0e",
+   "mutation_type": "MECHANISM_STRENGTHENING",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.508,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:742e6e5899b1",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.8-max:free",
+    "prompt_hash": "27b735a2f5a2b9f9b7ee823133288c59b6257573c5b39dc0b6c06aad98245a17",
+    "output_hash": "742e6e5899b1a6b9480ec78ef407d6170086cd83e0ace917c6fc275b4d30fcc5",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.1186/s12544-026-00815-3",
+     "span_verbatim_in_evidence": true,
+     "mutation_changes_candidate": true,
+     "span_derivation": {
+      "n_shared": 31,
+      "shared_terms": [
+       "across",
+       "average",
+       "bus",
+       "corridor",
+       "distinct",
+       "dynamic",
+       "flow",
+       "four",
+       "general",
+       "influence",
+       "like",
+       "linear",
+       "mlr",
+       "multiple",
+       "patronage",
+       "per",
+       "rate",
+       "regression",
+       "showing",
+       "stop"
+      ],
+      "span_terms_n": 42,
+      "ratio": 0.738,
+      "underived": false,
+      "state": "MEASURED",
+      "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+     },
+     "span_derivation_cleared": 0.738
+    },
+    "reasons": [],
+    "validated_at": "2026-09-20T15:51:24+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "Bus travel time within urban corridors is governed by dynamic variables including traffic flow rate, general travel time, and average stream patronage per bus stop, with patronage showing the strongest influence on bus travel time in three of the four corridors; headway irregularity arises when thes",
+     "after": "Bus travel time within urban corridors is governed by dynamic variables including traffic flow rate, general travel time, and average stream patronage per bus stop, with patronage showing the strongest influence on bus travel time in three of the four corridors; headway irregularity arises when thes"
+    },
+    "intervention": {
+     "before": "Replace fixed-schedule dispatching with a multisource big data approach that models bus travel times using dynamic variables like traffic flow rate, general travel time, and average stream patronage per bus stop, applying Multiple Linear Regression or Support Vector Regression to predict travel time",
+     "after": "Replace fixed-schedule dispatching with a multisource big data approach that models bus travel times using dynamic variables like traffic flow rate, general travel time, and average stream patronage per bus stop, applying Multiple Linear Regression (MLR) or Support Vector Regression (SVR) to predict"
+    },
+    "mechanism_source_span": {
+     "before": "bus travel times within urban corridors, using an extensive dataset from transit management databases and on-street sensors. The analysis focuses on a range of variables, including corridor configuration, general traffic conditions, and intrinsic bus transit factors. Employing Multiple Linear Regres",
+     "after": "Employing Multiple Linear Regression (MLR), Artificial Neural Networks (ANN), Support Vector Regression (SVR), and Random Forest (RF), bus travel times are modelled across four distinct urban corridors in A Coruña, Spain, considering dynamic variables like traffic flow rate, general travel time, and"
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "con:evidence:doi:10.3390/covid6070130",
+     "con:evidence:doi:10.1016/j.trc.2016.09.007",
+     "transit fleet bus city bunching headway",
+     "transit fleet bus city bunching headway",
+     "transit fleet institutional adaptation sustain service",
+     "transit fleet institutional adaptation sustain service",
+     "schedule fleet adaptive headway buses rules demand route",
+     "schedule fleet adaptive headway buses rules demand route",
+     "transit variance bunching dispatching existing tracking",
+     "transit variance bunching dispatching existing tracking",
+     "transit fleet bus city headway bunching",
+     "transit fleet bus city headway bunching"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "7db6a5c7726aac05faccce710068a6d16fe25b89ec53046d6fde56662dd75aa1",
+   "child_spec_hash": null,
+   "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-deriving the mechanism and intervention to reuse verbatim technical vocabulary from the evidence span, ensuring the span-derivation ratio exceeds 0.20.",
+   "applied_at": "2026-09-20T15:51:24+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:90a79553cbee",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.154,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:b26e6cc9e891",
+     "provider": "xkiro",
+     "model": "qwen/qwen3.8-max:free",
+     "prompt_hash": "83430894a746537e2097b50f508eaee716e260db085ab8da9b1dc20f31bf4031",
+     "output_hash": "b26e6cc9e891f5a0cb2f9a262342b5b901ed84897838c96b0f72ba2fcee858d9",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1186/s12544-026-00815-3",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 30,
+       "shared_terms": [
+        "average",
+        "bus",
+        "corridor",
+        "dynamic",
+        "flow",
+        "four",
+        "general",
+        "including",
+        "influence",
+        "like",
+        "linear",
+        "multiple",
+        "patronage",
+        "per",
+        "rate",
+        "regression",
+        "showing",
+        "stop",
+        "stream",
+        "strongest"
+       ],
+       "span_terms_n": 59,
+       "ratio": 0.508,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 0.508
+     },
+     "reasons": [],
+     "validated_at": "2026-09-20T15:50:28+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Institutional adaptation — a transit system can sustain service regularity under disruptive, demand-varying conditions through adaptive operational rules and technological preparation rather than by expanding capacity (fleet size).",
+      "after": "Bus travel time within urban corridors is governed by dynamic variables including traffic flow rate, general travel time, and average stream patronage per bus stop, with patronage showing the strongest influence on bus travel time in three of the four corridors; headway irregularity arises when thes"
+     },
+     "intervention": {
+      "before": "Replace fixed-schedule dispatching with adaptive headway management on existing buses: real-time AVL/APC tracking, dynamic holding at control points, and adaptive interlining/turnback rules that re-time the same fleet to equalize gaps as demand fluctuates along the route.",
+      "after": "Replace fixed-schedule dispatching with a multisource big data approach that models bus travel times using dynamic variables like traffic flow rate, general travel time, and average stream patronage per bus stop, applying Multiple Linear Regression or Support Vector Regression to predict travel time"
+     },
+     "mechanism_source_span": {
+      "before": "Cairo also exhibited resilience driven by necessity and did not decline because of institutional adaptation, but",
+      "after": "bus travel times within urban corridors, using an extensive dataset from transit management databases and on-street sensors. The analysis focuses on a range of variables, including corridor configuration, general traffic conditions, and intrinsic bus transit factors. Employing Multiple Linear Regres"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.3390/covid6070130",
+      "con:evidence:doi:10.1016/j.trc.2016.09.007",
+      "transit fleet bus city bunching headway",
+      "transit fleet bus city bunching headway",
+      "transit fleet institutional adaptation sustain service",
+      "transit fleet institutional adaptation sustain service",
+      "schedule fleet adaptive headway buses rules demand route",
+      "schedule fleet adaptive headway buses rules demand route",
+      "transit variance bunching dispatching existing tracking",
+      "transit variance bunching dispatching existing tracking",
+      "transit fleet bus city headway bunching",
+      "transit fleet bus city headway bunching"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "31bdb48b7e398d17a6170ba7dbbaa70aefb08259d5732064b406e9e0f9bd9848",
+    "child_spec_hash": null,
+    "reason": "This repairs the",
+    "applied_at": "2026-09-20T15:50:28+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:8642ebef1d0e",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.508,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:742e6e5899b1",
+     "provider": "xkiro",
+     "model": "qwen/qwen3.8-max:free",
+     "prompt_hash": "27b735a2f5a2b9f9b7ee823133288c59b6257573c5b39dc0b6c06aad98245a17",
+     "output_hash": "742e6e5899b1a6b9480ec78ef407d6170086cd83e0ace917c6fc275b4d30fcc5",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1186/s12544-026-00815-3",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 31,
+       "shared_terms": [
+        "across",
+        "average",
+        "bus",
+        "corridor",
+        "distinct",
+        "dynamic",
+        "flow",
+        "four",
+        "general",
+        "influence",
+        "like",
+        "linear",
+        "mlr",
+        "multiple",
+        "patronage",
+        "per",
+        "rate",
+        "regression",
+        "showing",
+        "stop"
+       ],
+       "span_terms_n": 42,
+       "ratio": 0.738,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 0.738
+     },
+     "reasons": [],
+     "validated_at": "2026-09-20T15:51:24+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Bus travel time within urban corridors is governed by dynamic variables including traffic flow rate, general travel time, and average stream patronage per bus stop, with patronage showing the strongest influence on bus travel time in three of the four corridors; headway irregularity arises when thes",
+      "after": "Bus travel time within urban corridors is governed by dynamic variables including traffic flow rate, general travel time, and average stream patronage per bus stop, with patronage showing the strongest influence on bus travel time in three of the four corridors; headway irregularity arises when thes"
+     },
+     "intervention": {
+      "before": "Replace fixed-schedule dispatching with a multisource big data approach that models bus travel times using dynamic variables like traffic flow rate, general travel time, and average stream patronage per bus stop, applying Multiple Linear Regression or Support Vector Regression to predict travel time",
+      "after": "Replace fixed-schedule dispatching with a multisource big data approach that models bus travel times using dynamic variables like traffic flow rate, general travel time, and average stream patronage per bus stop, applying Multiple Linear Regression (MLR) or Support Vector Regression (SVR) to predict"
+     },
+     "mechanism_source_span": {
+      "before": "bus travel times within urban corridors, using an extensive dataset from transit management databases and on-street sensors. The analysis focuses on a range of variables, including corridor configuration, general traffic conditions, and intrinsic bus transit factors. Employing Multiple Linear Regres",
+      "after": "Employing Multiple Linear Regression (MLR), Artificial Neural Networks (ANN), Support Vector Regression (SVR), and Random Forest (RF), bus travel times are modelled across four distinct urban corridors in A Coruña, Spain, considering dynamic variables like traffic flow rate, general travel time, and"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.3390/covid6070130",
+      "con:evidence:doi:10.1016/j.trc.2016.09.007",
+      "transit fleet bus city bunching headway",
+      "transit fleet bus city bunching headway",
+      "transit fleet institutional adaptation sustain service",
+      "transit fleet institutional adaptation sustain service",
+      "schedule fleet adaptive headway buses rules demand route",
+      "schedule fleet adaptive headway buses rules demand route",
+      "transit variance bunching dispatching existing tracking",
+      "transit variance bunching dispatching existing tracking",
+      "transit fleet bus city headway bunching",
+      "transit fleet bus city headway bunching"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "7db6a5c7726aac05faccce710068a6d16fe25b89ec53046d6fde56662dd75aa1",
+    "child_spec_hash": null,
+    "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-deriving the mechanism and intervention to reuse verbatim technical vocabulary from the evidence span, ensuring the span-derivation ratio exceeds 0.20.",
+    "applied_at": "2026-09-20T15:51:24+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "72ea420b6f24582f74146b29167739f9e9f45deacf76a181b8e758b90be17cb2"
+}
