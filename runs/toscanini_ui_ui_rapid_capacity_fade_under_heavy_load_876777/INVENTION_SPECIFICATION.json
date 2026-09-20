@@ -1,6 +1,6 @@
 {
  "invention_id": {
-  "value": "inv:ui_rapid_capacity_fade_under_heavy_load_876777:e6ab12674c37",
+  "value": "inv:ui_rapid_capacity_fade_under_heavy_load_876777:80b16eb164c2",
   "epistemic_class": "COMPUTED",
   "origin_stage": "INVENTION_SPEC",
   "evidence_ids": [],
@@ -30,31 +30,31 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Pooling many small units into one integrated aggregate produces greater power/capacity than any single unit can deliver alone, and smooths unit-level heterogeneity (weakest-unit limitations).",
-   "intervention": "Rebuild the drill battery pack as a modular multi-bank array: several smaller cell modules wired in parallel with an active balancing controller and current-sharing bus, so heavy-load current is split across all modules instead of stressing one string; add a supercapacitor buffer at the output port to absorb transition surges at load onset.",
-   "expected_effect": "Sustained heavy-load output through a full shift with markedly lower per-cell current and heat, because aggregate capacity is pooled across modules and no single cell carries the full load, slowing capacity fade.",
+   "mechanism": "Capacity fade under heavy load is driven by per-cell current density and temperature: high current density raises overpotential, causing resistive (I²R) heating and lithium plating / SEI growth side reactions whose rates accelerate with temperature (Arrhenius); fade is therefore a function of the thermal-electrochemical stress per cell, not of pack-level nominal capacity. Paralleling N cell banks under an active balancing controller reduces current per bank toward 1/N of the load (governed by Kirchhoff's current law, with impedance-dependent sharing that the controller corrects), which lowers per-cell heating and side-reaction rate; this is a physical current-division effect, not an averaging or \"pooling increases power\" effect.",
+   "intervention": "Rebuild the pack as a modular multi-bank array of N parallel cell modules, each with its own cell-level fuse, per-bank current-sense shunt, and a balancing controller that continuously trims per-bank current share to keep impedance-driven imbalance within tolerance; add a supercapacitor buffer at the output port to supply load-onset current spikes so the cells never see the transient peak. Thermal design ties per-bank temperature sensing to a current limit that throttles any bank exceeding a set cell temperature.",
+   "expected_effect": "",
    "mechanism_source_span": "Meta-analysis was used to integrate smaller studies and increase the statistical power over that of any single study",
    "span_derivation": null
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
   "evidence_ids": [
-   "doi:10.3168/jds.2015-9528"
+   "doi:10.1016/j.jpowsour.2016.08.054"
   ],
   "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
  },
  "causal_chain": {
   "value": {
-   "source_observation": "Effects of dietary fat on fertility of dairy cattle: A meta-analysis and meta-regression.",
-   "mechanism": "Pooling many small units into one integrated aggregate produces greater power/capacity than any single unit can deliver alone, and smooths unit-level heterogeneity (weakest-unit limitations).",
+   "source_observation": "UNKNOWN",
+   "mechanism": "Capacity fade under heavy load is driven by per-cell current density and temperature: high current density raises overpotential, causing resistive (I²R) heating and lithium plating / SEI growth side reactions whose rates accelerate with temperature (Arrhenius); fade is therefore a function of the thermal-electrochemical stress per cell, not of pack-level nominal capacity. Paralleling N cell banks under an active balancing controller reduces current per bank toward 1/N of the load (governed by Kirchhoff's current law, with impedance-dependent sharing that the controller corrects), which lowers per-cell heating and side-reaction rate; this is a physical current-division effect, not an averaging or \"pooling increases power\" effect.",
    "intervention_site": "cordless power drill battery pack",
-   "expected_effect": "Sustained heavy-load output through a full shift with markedly lower per-cell current and heat, because aggregate capacity is pooled across modules and no single cell carries the full load, slowing capacity fade.",
-   "falsification_test": "Run the multi-bank pack and a baseline single-string pack of equal nominal capacity on identical heavy-load drilling duty cycles; log per-cell current, temperature, and capacity retention over a full shift and 500 cycles. Hypothesis is falsified if the multi-bank pack shows no measurable reduction in per-cell stress/temperature and no slower fade, or if balancing leaves cells outside a set tolerance (e.g., >50 mV divergence)."
+   "expected_effect": "",
+   "falsification_test": ""
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
   "evidence_ids": [
-   "doi:10.3168/jds.2015-9528"
+   "doi:10.1016/j.jpowsour.2016.08.054"
   ],
   "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
  },
@@ -89,7 +89,7 @@
  "prior_art": {
   "value": {
    "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
-   "legacy_status": "LIKELY_PRIOR_ART_EXISTS",
+   "legacy_status": "",
    "differentiation_resolution": {
     "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
     "epistemic_class": "SEARCH_RESULT",
@@ -97,72 +97,60 @@
     "evidence_tier_summary": "NO_FAMILIES",
     "per_family": [],
     "n_families": 0,
-    "n_search_errors": 10,
+    "n_search_errors": 8,
     "search_errors": [
      {
-      "query": "power capacity cordless battery batteries drill",
+      "query": "power pack packs capacity cordless battery",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "power capacity cordless battery batteries drill",
+      "query": "power pack packs capacity cordless battery",
       "source": "lens_patent",
-      "error": "HTTP 401: {\"reference\":\"eb3a8676-d1f8-4a49-8125-890a5f7c4a48\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "error": "HTTP 401: {\"reference\":\"abd97d0b-ed11-42e2-9ab5-79754b10903d\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "power capacity aggregate pooling integrated produces",
+      "query": "pack power capacity fade under heavy",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "power capacity aggregate pooling integrated produces",
+      "query": "pack power capacity fade under heavy",
       "source": "lens_patent",
-      "error": "HTTP 401: {\"reference\":\"55b12f22-a396-4d8d-8797-5d60bbe17157\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "error": "HTTP 401: {\"reference\":\"83d86900-55ca-41dd-933e-12b2202915bb\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "rebuild modular several battery drill pack heavy load",
+      "query": "pack load current balancing controller impedance thermal temperature",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "rebuild modular several battery drill pack heavy load",
+      "query": "pack load current balancing controller impedance thermal temperature",
       "source": "lens_patent",
-      "error": "HTTP 401: {\"reference\":\"04d62597-1e65-46a4-9755-9753917b2731\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "error": "HTTP 401: {\"reference\":\"b8db243d-77b0-4342-b0f7-838c2dd17998\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "power capacity slowing balancing sharing stressing",
+      "query": "power sensing balancing impedance imbalance tolerance",
       "source": "google_patents",
       "error": "HTTP 503",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      },
      {
-      "query": "power capacity slowing balancing sharing stressing",
+      "query": "power sensing balancing impedance imbalance tolerance",
       "source": "lens_patent",
-      "error": "HTTP 401: {\"reference\":\"ed410067-ac74-4057-a92f-f079f7b9ef08\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
-      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
-     },
-     {
-      "query": "power capacity cordless battery aggregate batteries",
-      "source": "google_patents",
-      "error": "HTTP 503",
-      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
-     },
-     {
-      "query": "power capacity cordless battery aggregate batteries",
-      "source": "lens_patent",
-      "error": "HTTP 401: {\"reference\":\"d8dbeb75-1f97-42ab-9759-807e6adf7609\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "error": "HTTP 401: {\"reference\":\"bea71d4c-9eec-4975-bae4-a5dd59e919d6\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
       "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
      }
     ],
     "search_execution": {
      "mandatory_complete": false,
-     "n_errors": 10,
+     "n_errors": 8,
      "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
     },
     "relevance_model_version": "collision_resolution/2.0.0",
@@ -205,52 +193,22 @@
    "queries": [
     {
      "query_class": "ENTITY",
-     "query": "power capacity cordless battery batteries drill"
+     "query": "power pack packs capacity cordless battery"
     },
     {
      "query_class": "MECHANISM",
-     "query": "power capacity aggregate pooling integrated produces"
+     "query": "pack power capacity fade under heavy"
     },
     {
      "query_class": "DISTINGUISHING",
-     "query": "rebuild modular several battery drill pack heavy load"
+     "query": "pack load current balancing controller impedance thermal temperature"
     },
     {
      "query_class": "FUNCTION",
-     "query": "power capacity slowing balancing sharing stressing"
-    },
-    {
-     "query_class": "ADJACENT",
-     "query": "power capacity cordless battery aggregate batteries"
+     "query": "power sensing balancing impedance imbalance tolerance"
     }
    ],
-   "scientific": [
-    {
-     "title": "Abstracts of the 2014 NATA Annual Meeting & Clinical Symposia, June 26-28, 2014, Indianapolis, Indiana.",
-     "id": "24941222",
-     "query": "cordless power drill battery pack Documented"
-    },
-    {
-     "title": "Abstracts of the 2010 NATA (National Athletic Trainers' Association) Annual Meeting and Clinical Symposia. June 23-25, 2010. Philadelphia, Pennsylvania, USA.",
-     "id": "20586582",
-     "query": "cordless power drill battery pack Documented"
-    },
-    {
-     "title": "Invited review: Recommendations for reporting intervention studies on reproductive performance in dairy cattle: Improving design, analysis, and interpretation of research on reproduction.",
-     "id": "26387020",
-     "query": "cordless power drill battery pack Documented"
-    },
-    {
-     "title": "Designing Governance Boundaries for Hospital Bed Management: Balancing Centralized Pooling and Local Protection.",
-     "id": "42450960",
-     "query": "Pooling many small units into one"
-    },
-    {
-     "title": "SparsePool: A Graph Pooling Framework via Sparse Representation for Graph Classification.",
-     "id": "42122349",
-     "query": "Pooling many small units into one"
-    }
-   ]
+   "scientific": []
   },
   "epistemic_class": "COMPUTED",
   "origin_stage": "COLLISION",
@@ -259,7 +217,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Rebuild the drill battery pack as a modular multi-bank array: several smaller cell modules wired in parallel with an active balancing controller and current-sharing bus, so heavy-load current is split across all modules instead of stressing one string; add a supercapacitor buffer at the output port to absorb transition surges at load onset.",
+   "intervention": "Rebuild the pack as a modular multi-bank array of N parallel cell modules, each with its own cell-level fuse, per-bank current-sense shunt, and a balancing controller that continuously trims per-bank current share to keep impedance-driven imbalance within tolerance; add a supercapacitor buffer at the output port to supply load-onset current spikes so the cells never see the transient peak. Thermal design ties per-bank temperature sensing to a current limit that throttles any bank exceeding a set cell temperature.",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -267,7 +225,7 @@
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
   "evidence_ids": [
-   "doi:10.3168/jds.2015-9528"
+   "doi:10.1016/j.jpowsour.2016.08.054"
   ],
   "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
  },
@@ -560,44 +518,36 @@
     "severity": "HIGH"
    },
    {
-    "unresolved_source": "power capacity cordless battery batteries drill",
+    "unresolved_source": "power pack packs capacity cordless battery",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "power capacity cordless battery batteries drill",
-    "error": "HTTP 401: {\"reference\":\"eb3a8676-d1f8-4a49-8125-890a5f7c4a48\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+    "unresolved_source": "power pack packs capacity cordless battery",
+    "error": "HTTP 401: {\"reference\":\"abd97d0b-ed11-42e2-9ab5-79754b10903d\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
    },
    {
-    "unresolved_source": "power capacity aggregate pooling integrated produces",
+    "unresolved_source": "pack power capacity fade under heavy",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "power capacity aggregate pooling integrated produces",
-    "error": "HTTP 401: {\"reference\":\"55b12f22-a396-4d8d-8797-5d60bbe17157\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+    "unresolved_source": "pack power capacity fade under heavy",
+    "error": "HTTP 401: {\"reference\":\"83d86900-55ca-41dd-933e-12b2202915bb\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
    },
    {
-    "unresolved_source": "rebuild modular several battery drill pack heavy load",
+    "unresolved_source": "pack load current balancing controller impedance thermal temperature",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "rebuild modular several battery drill pack heavy load",
-    "error": "HTTP 401: {\"reference\":\"04d62597-1e65-46a4-9755-9753917b2731\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+    "unresolved_source": "pack load current balancing controller impedance thermal temperature",
+    "error": "HTTP 401: {\"reference\":\"b8db243d-77b0-4342-b0f7-838c2dd17998\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
    },
    {
-    "unresolved_source": "power capacity slowing balancing sharing stressing",
+    "unresolved_source": "power sensing balancing impedance imbalance tolerance",
     "error": "HTTP 503"
    },
    {
-    "unresolved_source": "power capacity slowing balancing sharing stressing",
-    "error": "HTTP 401: {\"reference\":\"ed410067-ac74-4057-a92f-f079f7b9ef08\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
-   },
-   {
-    "unresolved_source": "power capacity cordless battery aggregate batteries",
-    "error": "HTTP 503"
-   },
-   {
-    "unresolved_source": "power capacity cordless battery aggregate batteries",
-    "error": "HTTP 401: {\"reference\":\"d8dbeb75-1f97-42ab-9759-807e6adf7609\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+    "unresolved_source": "power sensing balancing impedance imbalance tolerance",
+    "error": "HTTP 401: {\"reference\":\"bea71d4c-9eec-4975-bae4-a5dd59e919d6\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
    }
   ],
   "epistemic_class": "COMPUTED",
@@ -610,7 +560,7 @@
    {
     "assumption": "mechanism transfers across domain context",
     "basis": "MODELLED",
-    "test": "Run the multi-bank pack and a baseline single-string pack of equal nominal capacity on identical heavy-load drilling duty cycles; log per-cell current, temperature, and capacity retention over a full shift and 500 cycles. Hypothesis is falsified if the multi-bank pack shows no measurable reduction in per-cell stress/temperature and no slower fade, or if balancing leaves cells outside a set tolerance (e.g., >50 mV divergence)."
+    "test": ""
    },
    {
     "assumption": "searched sources approximate the prior-art universe",
@@ -626,7 +576,7 @@
  "provenance": {
   "value": {
    "run_id": "engrun:ui_rapid_capacity_fade_under_heavy_load_876777:2026-09-20T03:59:37",
-   "final_envelope_hash": "e6ab12674c37bae1ce2b6bdba55e1ad6f8937ea67c2f8a6931f923eb6d128795",
+   "final_envelope_hash": "80b16eb164c2e3781bd615b50e53a0d7a3ea503a663831f749a9852e8b5cdfc4",
    "final_status": "AUTOMATED_INVENTION_CANDIDATE",
    "adjudication_verdict": "CONTESTED",
    "ranking": {
@@ -653,7 +603,7 @@
     "verdict": "CONTESTED"
    },
    "code_commit": null,
-   "built_at": "2026-09-20T04:09:11+00:00Z"
+   "built_at": "2026-09-20T04:09:51+00:00Z"
   },
   "epistemic_class": "COMPUTED",
   "origin_stage": "INVENTION_SPEC",
@@ -1548,10 +1498,28 @@
   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
   "verdict": "CONTESTED"
  },
- "_spec_hash": "6c19e0c058764a59fe417413c39558f82eaa1b84abb4222542a9c0a9f5a8a779",
+ "_spec_hash": "f5041a81d4220de6c10013a5331f64a77563025710a1f4ff6bf74b5b1b6a29ee",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
-  "checked_at": "2026-09-20T04:09:11+00:00Z"
+  "checked_at": "2026-09-20T04:09:51+00:00Z"
+ },
+ "_mechanism_space_candidate": {
+  "marker": "MECHANISM_SPACE_CANDIDATE",
+  "transformation_operator": "IMPROVE_G1",
+  "mechanism_support_state": null,
+  "support_counts": null,
+  "contradictions_visible": null,
+  "consequence": "IMPROVE child: the mutated mechanism has no mechanism-space adjudication; the E16-H release gate holds it for human review (R401 Phase 4)"
+ },
+ "_improve_child": {
+  "marker": "IMPROVE_STAGE_CHILD",
+  "stage_version": "improve_stage/1.0.0 (R481 P0-1)",
+  "lineage": {
+   "parent_id": "cand:A2:ui_rapid_capacity_fade_under_heavy_load_876777:4f861a55e0b46689",
+   "generation": 1,
+   "kill_basis_hash": "047a07bfc71d5c2c6c71042dbc1ad9234ea841480103d8dfd98ef7cdc1088eb6",
+   "created_at": "2026-09-20T04:09:46+00:00Z"
+  }
  }
 }
