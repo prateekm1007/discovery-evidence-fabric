@@ -1,0 +1,147 @@
+{
+ "shortlist": [
+  {
+   "experiment": "falsification_test_from_candidate",
+   "source_stage": "KILLER_EXPERIMENT",
+   "expected_information_gain": 0.4293511312282866,
+   "eig_per_cost": 0.4293511312282866,
+   "decision_impact": 0.9,
+   "kill_probability": "UNKNOWN (no sourced base rate exists)",
+   "cost": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+   "time": "UNKNOWN",
+   "dependency": "design article must exist first (see build plan)",
+   "is_selected_killer": true,
+   "basis": "COMPUTED (Bayesian EIG over MODEL_DERIVED priors)",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Because the reference signal does not photodegrade, any measured drop in FND emission relative to baseline is attributable to genuine EUV source/optics throughput loss rather than probe decay, enablin",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-20T06:08:02.036623+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-20T06:08:02.036623+00:00"
+     }
+    }
+   ]
+  },
+  {
+   "experiment": "run killer experiment: falsification_test_from_candidate",
+   "source_stage": "NEXT_BEST_ACTION",
+   "action_id": "action:killer_experiment",
+   "expected_information_gain": 0.4293511312282866,
+   "score": 0.36,
+   "decision_impact": 0.9,
+   "probability_of_decision_change": 0.8,
+   "kill_probability": "UNKNOWN (no sourced base rate exists)",
+   "cost": 0.8587022624565732,
+   "time": "UNKNOWN",
+   "dependency": "physical_lab",
+   "basis": "COMPUTED (NBA score formula engine-v1)"
+  },
+  {
+   "experiment": "contradiction_attacking_experiment",
+   "source_stage": "KILLER_EXPERIMENT",
+   "expected_information_gain": 0.34249274537077934,
+   "eig_per_cost": 0.1712463726853897,
+   "decision_impact": 0.6,
+   "kill_probability": "UNKNOWN (no sourced base rate exists)",
+   "cost": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+   "time": "UNKNOWN",
+   "dependency": "design article must exist first (see build plan)",
+   "is_selected_killer": false,
+   "basis": "COMPUTED (Bayesian EIG over MODEL_DERIVED priors)"
+  }
+ ],
+ "administrative_actions_excluded": [
+  {
+   "action_id": "action:inspect_patent_claims",
+   "description": "fetch and audit claims of nearest collision patents",
+   "provider": "google_patents",
+   "exclusion_reason": "administrative/research action, not a falsification experiment (R377: the decisive experiment must be an experiment; recorded here — a valid next-best-action but not a decisive experiment)"
+  },
+  {
+   "action_id": "con:collision:adjacent",
+   "description": "attack contradiction: patent-side collision found adjacent candidates; claims not yet inspected",
+   "provider": "internal_attack",
+   "exclusion_reason": "administrative/research action, not a falsification experiment (R377: the decisive experiment must be an experiment; recorded here — a valid next-best-action but not a decisive experiment)"
+  }
+ ],
+ "exclusion_note": "R377: administrative actions from next_best_action are excluded from the decisive-experiment shortlist (measured defect: all six R376 survivors selected 'fetch and audit claims of nearest collision patents' as the decisive experiment — a literature task cannot distinguish the candidate from existing approaches)",
+ "selected": {
+  "experiment": "falsification_test_from_candidate",
+  "source_stage": "KILLER_EXPERIMENT",
+  "expected_information_gain": 0.4293511312282866,
+  "eig_per_cost": 0.4293511312282866,
+  "decision_impact": 0.9,
+  "kill_probability": "UNKNOWN (no sourced base rate exists)",
+  "cost": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+  "time": "UNKNOWN",
+  "dependency": "design article must exist first (see build plan)",
+  "is_selected_killer": true,
+  "basis": "COMPUTED (Bayesian EIG over MODEL_DERIVED priors)",
+  "hypotheses": [
+   {
+    "name": "H_effect_holds",
+    "description": "expected effect holds: Because the reference signal does not photodegrade, any measured drop in FND emission relative to baseline is attributable to genuine EUV source/optics throughput loss rather than probe decay, enablin",
+    "prior_probability": 0.6,
+    "provenance": {
+     "source": "adjudication.evidence_verification + candidate text",
+     "epistemic_class": "MODEL_DERIVED",
+     "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+     "created_at": "2026-09-20T06:08:02.036623+00:00"
+    }
+   },
+   {
+    "name": "H_effect_fails",
+    "description": "expected effect does not reproduce outside source context",
+    "prior_probability": 0.4,
+    "provenance": {
+     "source": "adjudication.evidence_verification + candidate text",
+     "epistemic_class": "MODEL_DERIVED",
+     "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+     "created_at": "2026-09-20T06:08:02.036623+00:00"
+    }
+   }
+  ]
+ },
+ "explanation": "This is the next experiment because it has the greatest expected ability to change the candidate decision (KILLER_EXPERIMENT ranking; EIG/cost 0.4293511312282866)",
+ "no_invented_values_note": "cost/time/kill_probability remain UNKNOWN where no stage recorded them (Art. XXV)",
+ "falsification_contract": {
+  "HYPOTHESIS": "expected effect holds: Because the reference signal does not photodegrade, any measured drop in FND emission relative to baseline is attributable to genuine EUV source/optics throughput loss rather than probe decay, enablin (recorded prior 0.6, epistemic class MODEL_DERIVED per the killer-experiment provenance)",
+  "TREATMENT": "Add a small-area NV0-dominant FND scintillator film on a fiber-optic plate/sensor at a diagnostic pick-off or beam-stop in the EUV illumination path to measure 13.5 nm irradiance and dose uniformity in real time without placing the scintillator in the main imaging beam.",
+  "CONTROL_BLOCKER": "no executed baseline comparison on record (physics chain executed: ['PRE_REQUIREMENTS']; lifecycle MECHANISM_NOT_SIMULATABLE) — the control arm is not invented from the problem statement",
+  "MEASUREMENT": "Under fixed 13.5 nm illumination, integrated red fluorescence from the NV0-FND diagnostic film decreases monotonically as calibrated EUV attenuators reduce in-band irradiance, with response remaining linear across the scanner’s nominal dose range.",
+  "APPARATUS_BLOCKER": "no separate apparatus record exists; the falsification test does not state a quantified instrumented procedure",
+  "SAMPLE_BLOCKER": "no sample-size / n= record exists in any engine stage (honest UNKNOWN — Art. XXV)",
+  "ACCEPTANCE_THRESHOLD": "Optical throughput degradation becomes a continuously measured quantity at 13.5 nm, reducing detection latency and enabling exposure correction before printed dose/CD error exceeds the process budget, while nanometer patterning precision and wafer throughput are preserved.",
+  "FALSIFICATION_THRESHOLD": "the recorded falsification test ('Under fixed 13.5 nm illumination, integrated red fluorescence from the NV0-FND diagnostic film decreases monotonically as calibrated EUV attenuators reduce in-band irradiance, with response remaining ') fails to show the recorded expected effect ('Optical throughput degradation becomes a continuously measured quantity at 13.5 nm, reducing detection latency and enabling exposure correction before printed dose/CD error exceeds the process budget,') — the mechanism is killed by its own test's negative outcome; the recorded failing hypothesis is 'expected effect does not reproduce outside source context'",
+  "FALSIFICATION_BANDS": {
+   "expected_effect_numbers": [
+    "13.5"
+   ],
+   "falsification_test_numbers": [
+    "13.5",
+    "0"
+   ],
+   "basis": "verbatim numbers extracted from the candidate's own records (never computed, never inferred — Art. VI)"
+  },
+  "UNCERTAINTY": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)",
+  "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+  "TIME": "UNKNOWN (no stage recorded a time estimate)",
+  "SAFETY_BLOCKER": "no safety-analysis stage output exists in the engine (honest UNKNOWN — Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+ },
+ "timestamp": "2026-09-20T06:10:25+00:00Z"
+}
