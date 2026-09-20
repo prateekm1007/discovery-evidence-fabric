@@ -30,11 +30,37 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Integrating multiple smaller units aggregates their contributions, producing greater power/capacity than any single unit alone.",
-   "intervention": "Reconfigure the drill battery pack so multiple smaller lithium-ion cells are paralleled within the existing form factor, sharing heavy-load current across cells instead of stressing a single series string, and add cell balancing to manage cell-to-cell heterogeneity.",
-   "expected_effect": "Lower per-cell current and heat under heavy load, reducing rapid capacity fade and sustaining power through a full shift without swapping packs.",
-   "mechanism_source_span": "Meta-analysis was used to integrate smaller studies and increase the statistical power over that of any single study",
-   "span_derivation": null
+   "mechanism": "Capacity fade of a lithium-ion battery under cyclic loading conditions is driven by per-cell current and heat stress during heavy-load discharge; paralleling multiple lithium-ion cells distributes the pack's heavy-load current, lowering per-cell current and heat so no single string carries the stress that drives capacity fade under cyclic loading conditions.",
+   "intervention": "Reconfigure the drill battery pack so multiple smaller lithium-ion battery cells are paralleled within the existing form factor, share heavy-load current across cells, and receive cell balancing; operation must remain inside the stress regime addressed by capacity fade modelling of lithium-ion battery under cyclic loading conditions.",
+   "expected_effect": "Lower per-cell current and heat under heavy load, reducing capacity fade of the lithium-ion battery pack under cyclic loading conditions and sustaining power through a full shift without swapping packs.",
+   "mechanism_source_span": "Capacity fade modelling of lithium-ion battery under cyclic loading conditions",
+   "span_derivation": {
+    "n_shared": 10,
+    "shared_terms": [
+     "battery",
+     "capacity",
+     "condition",
+     "cyclic",
+     "fade",
+     "ion",
+     "lithium",
+     "loading",
+     "modelling",
+     "under"
+    ],
+    "span_terms_n": 10,
+    "ratio": 1.0,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "Discharge the candidate and the baseline single series string of lithium-ion cells in the existing drill battery pack under identical heavy-load cycles; if the candidate does not show statistically higher capacity retention and lower per-cell temperature, the fade-reduction claim is falsified.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.1016/j.jpowsour.2016.08.054",
+     "source_span": "Capacity fade modelling of lithium-ion battery under cyclic loading conditions"
+    }
+   }
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
@@ -259,7 +285,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Reconfigure the drill battery pack so multiple smaller lithium-ion cells are paralleled within the existing form factor, sharing heavy-load current across cells instead of stressing a single series string, and add cell balancing to manage cell-to-cell heterogeneity.",
+   "intervention": "Reconfigure the drill battery pack so multiple smaller lithium-ion battery cells are paralleled within the existing form factor, share heavy-load current across cells, and receive cell balancing; operation must remain inside the stress regime addressed by capacity fade modelling of lithium-ion battery under cyclic loading conditions.",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -274,7 +300,19 @@
  "constraints": {
   "value": {
    "stated_constraint": "battery must fit existing drill form factor and operate safely on construction sites",
-   "failure_mode_of_device": "rapid capacity fade under heavy load"
+   "failure_mode_of_device": "rapid capacity fade under heavy load",
+   "evidence_derived": [
+    {
+     "constraint": "The pack must keep per-cell current and heat low enough to reduce capacity fade in lithium-ion battery cells under cyclic loading conditions.",
+     "evidence_id": "doi:10.1016/j.jpowsour.2016.08.054",
+     "span": "Capacity fade modelling of lithium-ion battery under cyclic loading conditions"
+    },
+    {
+     "constraint": "The paralleling and cell balancing must keep every cell inside the stress regime addressed by capacity fade modelling of lithium-ion battery under cyclic loading conditions (doi:10.1016/j.jpowsour.2016.08.054).",
+     "evidence_id": "doi:10.1016/j.jpowsour.2016.08.054",
+     "span": "Capacity fade modelling of lithium-ion battery under cyclic loading conditions"
+    }
+   ]
   },
   "epistemic_class": "SOURCE_FACT",
   "origin_stage": "PROBLEM",
@@ -1552,10 +1590,222 @@
   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
   "verdict": "CONTESTED"
  },
- "_spec_hash": "872cb1374ad622f42f7e60f4363f333d3b0e5f40914ab3b7bf0a10e66ba41946",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
   "checked_at": "2026-09-20T15:50:13+00:00Z"
- }
+ },
+ "_improvement": {
+  "parent_spec_hash": "f31fbc9d7253d766f227d1787a02ff753af09e119f8cd7a9eaa9248c358affa4",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:1f18d5bccb34",
+   "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.372,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:eb203ec6b497",
+    "provider": "zai",
+    "model": "Atria-Dawn-Preview",
+    "prompt_hash": "979f2036d152cd8ffde68a9f913b619e9d6f00af518938561c74fa4531033a00",
+    "output_hash": "eb203ec6b497b762001f7252ad5ad0135aa48cf57f035b5fc723ad5b40f332ec",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.1016/j.jpowsour.2016.08.054",
+     "span_verbatim_in_evidence": true,
+     "evidence_support": 0.205,
+     "evidence_support_cleared": 0.205,
+     "constraint_traceable_to_evidence": "The paralleling and cell balancing must keep every cell inside the stress regime addressed by capacity fade modelling of"
+    },
+    "reasons": [],
+    "validated_at": "2026-09-20T15:55:27+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "The mechanism is grounded in capacity fade modelling of lithium-ion battery cells under cyclic loading conditions: paralleling multiple cells distributes the pack’s heavy-load current, lowering per-cell current and heat so no single string carries the stress that drives fade.",
+     "after": "Capacity fade of a lithium-ion battery under cyclic loading conditions is driven by per-cell current and heat stress during heavy-load discharge; paralleling multiple lithium-ion cells distributes the pack's heavy-load current, lowering per-cell current and heat so no single string carries the stres"
+    },
+    "intervention": {
+     "before": "Reconfigure the drill battery pack so multiple smaller lithium-ion battery cells are paralleled within the existing form factor, share heavy-load current across cells, and receive cell balancing; operation must remain inside the stress regime addressed by capacity fade modelling of lithium-ion batte",
+     "after": "Reconfigure the drill battery pack so multiple smaller lithium-ion battery cells are paralleled within the existing form factor, share heavy-load current across cells, and receive cell balancing; operation must remain inside the stress regime addressed by capacity fade modelling of lithium-ion batte"
+    },
+    "mechanism_source_span": {
+     "before": "Capacity fade modelling of lithium-ion battery under cyclic loading conditions",
+     "after": "Capacity fade modelling of lithium-ion battery under cyclic loading conditions"
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "con:evidence:doi:10.1111/rda.14634",
+     "power capacity cordless battery pack batteries",
+     "power capacity cordless battery pack batteries",
+     "power capacity integrating multiple smaller aggregates",
+     "power capacity integrating multiple smaller aggregates",
+     "reconfigure lithium battery pack drill smaller heavy load",
+     "reconfigure lithium battery pack drill smaller heavy load",
+     "power reducing capacity sustaining swapping existing",
+     "power reducing capacity sustaining swapping existing",
+     "power capacity cordless battery pack packs",
+     "power capacity cordless battery pack packs"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "f31fbc9d7253d766f227d1787a02ff753af09e119f8cd7a9eaa9248c358affa4",
+   "child_spec_hash": null,
+   "reason": "Repairs the measured I1_MECHANISM_EVIDENCE_DERIVATION deficit (0.372) by re-anchoring the MECHANISM and INTERVENTION in the verbatim vocabulary of doi:10.1016/j.jpowsour.2016.08.054 and adding an evidence-derived operating constraint.",
+   "applied_at": "2026-09-20T15:55:27+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:9f773740a5ea",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.294,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:59e01c9db067",
+     "provider": "zai",
+     "model": "Atria-Dawn-Preview",
+     "prompt_hash": "4a567076c3085e1ff73d69f2e4581ac9a99c9063d66c762e44294c39930104ff",
+     "output_hash": "59e01c9db0670f166169908f1436991b53e77959ee7fb6db9ee414c42052c216",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1016/j.jpowsour.2016.08.054",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.209,
+      "evidence_support_cleared": 0.209,
+      "constraint_traceable_to_evidence": "The pack must keep per-cell current and heat low enough to reduce capacity fade in lithium-ion battery cells under cycli"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-20T15:54:02+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Integrating multiple smaller units aggregates their contributions, producing greater power/capacity than any single unit alone.",
+      "after": "The mechanism is grounded in capacity fade modelling of lithium-ion battery cells under cyclic loading conditions: paralleling multiple cells distributes the pack’s heavy-load current, lowering per-cell current and heat so no single string carries the stress that drives fade."
+     },
+     "intervention": {
+      "before": "Reconfigure the drill battery pack so multiple smaller lithium-ion cells are paralleled within the existing form factor, sharing heavy-load current across cells instead of stressing a single series string, and add cell balancing to manage cell-to-cell heterogeneity.",
+      "after": "Reconfigure the drill battery pack so multiple smaller lithium-ion battery cells are paralleled within the existing form factor, share heavy-load current across cells, and receive cell balancing; operation must remain inside the stress regime addressed by capacity fade modelling of lithium-ion batte"
+     },
+     "mechanism_source_span": {
+      "before": "Meta-analysis was used to integrate smaller studies and increase the statistical power over that of any single study",
+      "after": "Capacity fade modelling of lithium-ion battery under cyclic loading conditions"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.1111/rda.14634",
+      "power capacity cordless battery pack batteries",
+      "power capacity cordless battery pack batteries",
+      "power capacity integrating multiple smaller aggregates",
+      "power capacity integrating multiple smaller aggregates",
+      "reconfigure lithium battery pack drill smaller heavy load",
+      "reconfigure lithium battery pack drill smaller heavy load",
+      "power reducing capacity sustaining swapping existing",
+      "power reducing capacity sustaining swapping existing",
+      "power capacity cordless battery pack packs",
+      "power capacity cordless battery pack packs"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "872cb1374ad622f42f7e60f4363f333d3b0e5f40914ab3b7bf0a10e66ba41946",
+    "child_spec_hash": null,
+    "reason": "This repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism and intervention in the verbatim evidence span so its non-generic terms—capacity fade, lithium-ion battery, and cyclic loading conditions—are directly reused.",
+    "applied_at": "2026-09-20T15:54:02+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:1f18d5bccb34",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.372,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:eb203ec6b497",
+     "provider": "zai",
+     "model": "Atria-Dawn-Preview",
+     "prompt_hash": "979f2036d152cd8ffde68a9f913b619e9d6f00af518938561c74fa4531033a00",
+     "output_hash": "eb203ec6b497b762001f7252ad5ad0135aa48cf57f035b5fc723ad5b40f332ec",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1016/j.jpowsour.2016.08.054",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.205,
+      "evidence_support_cleared": 0.205,
+      "constraint_traceable_to_evidence": "The paralleling and cell balancing must keep every cell inside the stress regime addressed by capacity fade modelling of"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-20T15:55:27+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "The mechanism is grounded in capacity fade modelling of lithium-ion battery cells under cyclic loading conditions: paralleling multiple cells distributes the pack’s heavy-load current, lowering per-cell current and heat so no single string carries the stress that drives fade.",
+      "after": "Capacity fade of a lithium-ion battery under cyclic loading conditions is driven by per-cell current and heat stress during heavy-load discharge; paralleling multiple lithium-ion cells distributes the pack's heavy-load current, lowering per-cell current and heat so no single string carries the stres"
+     },
+     "intervention": {
+      "before": "Reconfigure the drill battery pack so multiple smaller lithium-ion battery cells are paralleled within the existing form factor, share heavy-load current across cells, and receive cell balancing; operation must remain inside the stress regime addressed by capacity fade modelling of lithium-ion batte",
+      "after": "Reconfigure the drill battery pack so multiple smaller lithium-ion battery cells are paralleled within the existing form factor, share heavy-load current across cells, and receive cell balancing; operation must remain inside the stress regime addressed by capacity fade modelling of lithium-ion batte"
+     },
+     "mechanism_source_span": {
+      "before": "Capacity fade modelling of lithium-ion battery under cyclic loading conditions",
+      "after": "Capacity fade modelling of lithium-ion battery under cyclic loading conditions"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.1111/rda.14634",
+      "power capacity cordless battery pack batteries",
+      "power capacity cordless battery pack batteries",
+      "power capacity integrating multiple smaller aggregates",
+      "power capacity integrating multiple smaller aggregates",
+      "reconfigure lithium battery pack drill smaller heavy load",
+      "reconfigure lithium battery pack drill smaller heavy load",
+      "power reducing capacity sustaining swapping existing",
+      "power reducing capacity sustaining swapping existing",
+      "power capacity cordless battery pack packs",
+      "power capacity cordless battery pack packs"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "f31fbc9d7253d766f227d1787a02ff753af09e119f8cd7a9eaa9248c358affa4",
+    "child_spec_hash": null,
+    "reason": "Repairs the measured I1_MECHANISM_EVIDENCE_DERIVATION deficit (0.372) by re-anchoring the MECHANISM and INTERVENTION in the verbatim vocabulary of doi:10.1016/j.jpowsour.2016.08.054 and adding an evidence-derived operating constraint.",
+    "applied_at": "2026-09-20T15:55:27+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "280fd3257d609592115382d4fff7e2225fcf2b2cd589249b6df091a38d2206db"
 }
