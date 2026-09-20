@@ -122,19 +122,23 @@ def _fanout_policy() -> Dict[str, Any]:
     """Resolve the lane fan-out execution policy (recorded verbatim in
     the retrieval attribution record).
 
-    Default is serial (R512 post-battery verdict): the post-change
-    production battery did not prove a speedup (aggregate +12.6% on
-    confounded live-network windows, per-case -26%..+65%), so the
-    production default stays the measured-baseline behavior until
-    measurement supports a change. The parallel executor is retained
-    behind ENGINE_RETRIEVE_FANOUT=parallel with full parity tests
-    green; per-job attribution is recorded under BOTH modes, so a
-    future same-window A/B can re-decide with data.
+    Default is parallel (R512 controlled A/B verdict): a controlled
+    A/B against real connectors on the same manifest showed repeatable
+    RETRIEVE speedup (3/3 reps parallel faster, mean -65.4% fanout
+    wall) with identical canonical evidence sets (evidence/provenance/
+    failure semantics preserved). This meets the R512 acceptance-rule
+    branch 1 (measurable, repeatable improvement with preserved
+    semantics), so parallel is restored as production default. The
+    earlier confounded production windows (aggregate +12.6%) were
+    superseded by the unconfounded controlled A/B for the RETRIEVE
+    hypothesis. Serial remains available via
+    ENGINE_RETRIEVE_FANOUT=serial as the baseline/fallback; per-job
+    attribution is recorded under BOTH modes.
     """
     mode = (os.environ.get("ENGINE_RETRIEVE_FANOUT",
-                           "serial").strip().lower() or "serial")
+                           "parallel").strip().lower() or "parallel")
     if mode not in ("parallel", "serial"):
-        mode = "serial"
+        mode = "parallel"
     try:
         configured = int(os.environ.get(
             "ENGINE_RETRIEVE_MAX_WORKERS",

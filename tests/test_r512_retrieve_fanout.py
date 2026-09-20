@@ -226,12 +226,14 @@ def test_parallel_matches_serial_content(monkeypatch):
             == m_s["best_record"]["abstract"])
 
 
-def test_default_mode_is_serial_and_recorded(monkeypatch):
+def test_default_mode_is_parallel_and_recorded(monkeypatch):
     _, rep = _run(monkeypatch)
     attrib = rep["retrieval_attribution"]
-    assert attrib["mode"] == "serial"
-    assert attrib["max_workers_effective"] == 1
-    assert attrib["peak_concurrency_observed"] == 1
+    assert attrib["mode"] == "parallel"
+    assert attrib["max_workers_effective"] >= 1
+    assert attrib["peak_concurrency_observed"] >= 1
+    assert (attrib["peak_concurrency_observed"]
+            <= attrib["max_workers_effective"])
 
 
 def test_attribution_record_complete(monkeypatch):
@@ -282,9 +284,9 @@ def test_max_workers_bound_respected(monkeypatch):
             == 16)
 
 
-def test_invalid_mode_falls_back_to_serial(monkeypatch):
+def test_invalid_mode_falls_back_to_parallel(monkeypatch):
     _, rep = _run(monkeypatch, mode="bogus")
-    assert rep["retrieval_attribution"]["mode"] == "serial"
+    assert rep["retrieval_attribution"]["mode"] == "parallel"
 
 
 def test_typeerror_fallback_preserved_in_parallel(monkeypatch):
