@@ -364,6 +364,32 @@ class TestDossier:
         assert t["download"].endswith("/package")
         assert t["package_maturity"] == "EARLY"
 
+    def test_key_unknowns_carry_canonical_statements(self, tmp_path):
+        """The dossier projection must read the canonical
+        UNKNOWN_ROADMAP field (unknown_statement), not the legacy
+        statement/what keys — otherwise every key unknown renders
+        with an empty statement while the package carries the real
+        text (measured live: 8 empty bullets on a real run)."""
+        s = _mk_run(tmp_path)
+        (Path(s["run_dir"]) / "DOWNLOAD" /
+         "UNKNOWN_ROADMAP.json").write_text(json.dumps(
+            {"unknowns": [
+                {"unknown_id": "U-01",
+                 "unknown_statement": "fatigue life at 37C unmeasured",
+                 "classification": "ENGINEERING_DESIGN_REQUIRED",
+                 "priority": "MEDIUM"},
+                {"unknown_id": "U-02",
+                 "unknown_statement": "seal swell under coolant exposure",
+                 "classification": "LITERATURE_RESOLVABLE",
+                 "priority": "HIGH"}]}))
+        d = dos.build_dossier(s)
+        ku = d["tabs"]["overview"]["key_unknowns"]
+        assert [u["statement"] for u in ku] == [
+            "fatigue life at 37C unmeasured",
+            "seal swell under coolant exposure"]
+        c = dos.dossier_package_consistency(s)
+        assert c["consistent"] is True, c["checks"]
+
 
 # ---------------------------------------------------------------------------
 # Section 16: package <-> dossier consistency

@@ -1374,10 +1374,11 @@ def build_dossier(session: Dict[str, Any]) -> Dict[str, Any]:
     unknowns = []
     if roadmap:
         unknowns = [
-            {"statement": (u.get("statement") or u.get("what")
+            {"statement": (u.get("unknown_statement")
+                           or u.get("statement") or u.get("what")
                            or "")[:220],
-             "classification": u.get("classification"),
-             "priority": u.get("priority")}
+              "classification": u.get("classification"),
+              "priority": u.get("priority")}
             for u in (roadmap.get("unknowns") or [])[:8]
             if isinstance(u, dict)]
     elif (cio or {}).get("identity"):
@@ -1893,7 +1894,8 @@ def dossier_package_consistency(session: Dict[str, Any]) -> Dict[str, Any]:
         u.get("statement") for u in
         (d["tabs"]["overview"].get("key_unknowns") or [])]
     pkg_unknowns = [
-        (u.get("statement") or u.get("what")) for u in
+        (u.get("unknown_statement") or u.get("statement")
+         or u.get("what")) for u in
         (roadmap.get("unknowns") or [])[:len(dossier_unknowns) or None]
         if isinstance(u, dict)]
     check("unknowns", dossier_unknowns, pkg_unknowns)
