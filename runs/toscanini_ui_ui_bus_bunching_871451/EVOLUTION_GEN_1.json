@@ -1,0 +1,33 @@
+{
+ "gen": 1,
+ "invention_id": "inv:cd32427c19:gen1",
+ "parent_id": null,
+ "lineage": [
+  "inv:cd32427c19:gen1"
+ ],
+ "origin": "BASELINE_SYNTHESIS",
+ "architecture": {
+  "mechanism": "Real-time dynamic bus holding times at stops, computed by optimization, to counteract headway instability and prevent buses of the same line from cruising head-to-tail or arriving simultaneously.",
+  "intervention": "Add a real-time headway-control layer to the existing route control system that tracks each bus's position/headway and computes optimal holding times at stops (linear objective minimizing bunching penalties under quadratic constraints, solved with a beam-search heuristic for sub-3-second decisions on 60-bus instances), holding early/fast buses at control stops until the target headway is restored — no additional vehicles required.",
+  "expected_effect": "Significantly reduced bus bunching and more evenly spaced arrivals, with shorter average passenger waiting times, all at constant fleet size.",
+  "falsification_test": "On one route, run the holding-time controller in an A/B trial (controller active vs. inactive) across matched service periods and measure the coefficient of variation of headways at high-demand stops plus bunching events per day; the mechanism is falsified if active control does not significantly reduce headway variance and bunching frequency versus baseline."
+ },
+ "state": "INVENTION_SURVIVED",
+ "maturity": "GENERATED",
+ "challenge": {
+  "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+  "attack_overall": "PASS",
+  "evidence_verified": true,
+  "killed": false,
+  "failure_class": null,
+  "kill_reason": "all checks passed: evidence verified, no specific disclosure, adversarial survived, falsification concrete",
+  "final_status": "AUTOMATED_INVENTION_CANDIDATE"
+ },
+ "causal_delta": null,
+ "change_delta": null,
+ "reason_for_change": null,
+ "fresh_evidence": null,
+ "model": null,
+ "artifacts": {},
+ "evidence_verified": true
+}
