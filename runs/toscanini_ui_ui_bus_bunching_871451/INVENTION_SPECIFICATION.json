@@ -30,11 +30,47 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Real-time dynamic bus holding times at stops, computed by optimization, to counteract headway instability and prevent buses of the same line from cruising head-to-tail or arriving simultaneously.",
-   "intervention": "Add a real-time headway-control layer to the existing route control system that tracks each bus's position/headway and computes optimal holding times at stops (linear objective minimizing bunching penalties under quadratic constraints, solved with a beam-search heuristic for sub-3-second decisions on 60-bus instances), holding early/fast buses at control stops until the target headway is restored — no additional vehicles required.",
-   "expected_effect": "Significantly reduced bus bunching and more evenly spaced arrivals, with shorter average passenger waiting times, all at constant fleet size.",
-   "mechanism_source_span": "implementing bus holding times at the stops as a control strategy",
-   "span_derivation": null
+   "mechanism": "Real-time bus holding times at the stops, determined by a new mathematical model with quadratic constraints but a linear objective function that minimizes the bus bunching penalties, counteract headway instability by minimizing the number of buses of the same line cruising head-to-tail or arriving at a stop simultaneously, thereby maintaining quasi-regular headways and reducing real-time bus bunching in bus rapid transit systems.",
+   "intervention": "Add a real-time headway-control layer to the existing route control system that tracks each bus's position/headway and implements bus holding times at the stops as a control strategy by solving the proposed mathematical model — quadratic constraints with a linear objective function that minimizes the bus bunching penalties — using a beam-search heuristic to reduce computational solution time for large instances, so that solutions for real-world instances with 60 buses have an optimality gap of less than 5% in less than 3 s, holding early/fast buses at control stops until the target headway is restored — no additional vehicles required (fleet size unchanged).",
+   "expected_effect": "A bus bunching reduction of 45% compared to the case without optimization, with passenger waiting times reduced by 30% in some scenarios, yielding quasi-regular headways and more evenly spaced arrivals at constant fleet size.",
+   "mechanism_source_span": "This work focuses on minimizing the number of buses of the same line cruising head-to-tail or arriving at a stop simultaneously by implementing bus holding times at the stops as a control strategy. We propose a new mathematical model to determine the bus holding times. It has quadratic constraints but a linear objective function that minimizes the bus bunching penalties. We also propose a beam-search heuristic to reduce computational solution time to solve large instances.",
+   "span_derivation": {
+    "n_shared": 37,
+    "shared_terms": [
+     "arriving",
+     "beam",
+     "bunching",
+     "bus",
+     "buse",
+     "but",
+     "computational",
+     "constraint",
+     "control",
+     "cruising",
+     "function",
+     "head",
+     "heuristic",
+     "holding",
+     "instance",
+     "large",
+     "line",
+     "linear",
+     "mathematical",
+     "minimize"
+    ],
+    "span_terms_n": 46,
+    "ratio": 0.804,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "Run the headway-control layer on a simulated bus rapid transit system of 60 buses and measure bus bunching and average passenger waiting time against the case without optimization; if the bus bunching reduction is not at least 10 percentage points (absolute) below the case without optimization while waiting time does not also drop, the mechanism fails.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.1007/s12469-023-00326-7",
+     "source_span": "This work focuses on minimizing the number of buses of the same line cruising head-to-tail or arriving at a stop simultaneously by implementing bus holding times at the stops as a control strategy. We propose a new mathematical model to determine the bus holding times. It has quadratic constraints but a linear objective function that minimizes the bus bunching penalties. We also propose a beam-search heuristic to reduce computational solution time to solve large instances."
+    }
+   }
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
@@ -259,7 +295,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Add a real-time headway-control layer to the existing route control system that tracks each bus's position/headway and computes optimal holding times at stops (linear objective minimizing bunching penalties under quadratic constraints, solved with a beam-search heuristic for sub-3-second decisions on 60-bus instances), holding early/fast buses at control stops until the target headway is restored — no additional vehicles required.",
+   "intervention": "Add a real-time headway-control layer to the existing route control system that tracks each bus's position/headway and implements bus holding times at the stops as a control strategy by solving the proposed mathematical model — quadratic constraints with a linear objective function that minimizes the bus bunching penalties — using a beam-search heuristic to reduce computational solution time for large instances, so that solutions for real-world instances with 60 buses have an optimality gap of less than 5% in less than 3 s, holding early/fast buses at control stops until the target headway is restored — no additional vehicles required (fleet size unchanged).",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -274,7 +310,19 @@
  "constraints": {
   "value": {
    "stated_constraint": "no increase in fleet size",
-   "failure_mode_of_device": "bus bunching"
+   "failure_mode_of_device": "bus bunching",
+   "evidence_derived": [
+    {
+     "constraint": "The beam-search heuristic must produce solutions with an optimality gap of less than 5% in less than 3 s for real-world instances with 60 buses, as demonstrated in the cited study.",
+     "evidence_id": "doi:10.1007/s12469-023-00326-7",
+     "span": "This work focuses on minimizing the number of buses of the same line cruising head-to-tail or arriving at a stop simultaneously by implementing bus holding times at the stops as a control strategy. We propose a new mathematical model to determine the bus holding times. It has quadratic constraints b"
+    },
+    {
+     "constraint": "The headway-control layer must determine bus holding times by solving a mathematical model that \"has quadratic constraints but a linear objective function that minimizes the bus bunching penalties\" and must use a beam-search heuristic so that, \"for real-world instances with 60 buses\", solutions have \"an optimality gap of less than 5% in less than 3 s\" (verbatim spans from doi:10.1007/s12469-023-00326-7); fleet size must not increase.",
+     "evidence_id": "doi:10.1007/s12469-023-00326-7",
+     "span": "This work focuses on minimizing the number of buses of the same line cruising head-to-tail or arriving at a stop simultaneously by implementing bus holding times at the stops as a control strategy. We propose a new mathematical model to determine the bus holding times. It has quadratic constraints b"
+    }
+   ]
   },
   "epistemic_class": "SOURCE_FACT",
   "origin_stage": "PROBLEM",
@@ -1590,10 +1638,222 @@
   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
   "verdict": "CONTESTED"
  },
- "_spec_hash": "5e2fce6fab57e02f9902c080b8a2b05d39aa8a0d70e2426bac2bae365b7f7fba",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
   "checked_at": "2026-09-20T02:39:57+00:00Z"
- }
+ },
+ "_improvement": {
+  "parent_spec_hash": "116f63215a72bd4bd3b7e4345af2eda18065e2c8bfafde53ac284e50694040b6",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:f0a217b3dd49",
+   "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.583,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:226a3c936e60",
+    "provider": "zai",
+    "model": "Atria-Dawn-Preview",
+    "prompt_hash": "dab4a2e992dd012121345842442bc18741d27e7a9ed63c78af3a0fccbbf9a52c",
+    "output_hash": "226a3c936e60ca109d761fa73319100153d4258fa5207ff08eedf8f9a2fa9b85",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.1007/s12469-023-00326-7",
+     "span_verbatim_in_evidence": true,
+     "evidence_support": 0.641,
+     "evidence_support_cleared": 0.641,
+     "constraint_traceable_to_evidence": "The headway-control layer must determine bus holding times by solving a mathematical model that \"has quadratic constrain"
+    },
+    "reasons": [],
+    "validated_at": "2026-09-20T02:48:06+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "Real-time bus holding times at stops, computed by a mathematical model with quadratic constraints and a linear objective function that minimizes the bus bunching penalties, counteract headway instability and prevent buses of the same line from cruising head-to-tail or arriving at a stop simultaneous",
+     "after": "Real-time bus holding times at the stops, determined by a new mathematical model with quadratic constraints but a linear objective function that minimizes the bus bunching penalties, counteract headway instability by minimizing the number of buses of the same line cruising head-to-tail or arriving a"
+    },
+    "intervention": {
+     "before": "Add a real-time headway-control layer to the existing route control system that tracks each bus's position/headway and computes bus holding times at the stops as a control strategy by solving the proposed mathematical model with quadratic constraints and a linear objective function that minimizes th",
+     "after": "Add a real-time headway-control layer to the existing route control system that tracks each bus's position/headway and implements bus holding times at the stops as a control strategy by solving the proposed mathematical model — quadratic constraints with a linear objective function that minimizes th"
+    },
+    "mechanism_source_span": {
+     "before": "This work focuses on minimizing the number of buses of the same line cruising head-to-tail or arriving at a stop simultaneously by implementing bus holding times at the stops as a control strategy. We propose a new mathematical model to determine the bus holding times. It has quadratic constraints b",
+     "after": "This work focuses on minimizing the number of buses of the same line cruising head-to-tail or arriving at a stop simultaneously by implementing bus holding times at the stops as a control strategy. We propose a new mathematical model to determine the bus holding times. It has quadratic constraints b"
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "con:evidence:doi:10.1371/journal.pone.0232799",
+     "bus headway control buses city route",
+     "bus headway control buses city route",
+     "bus headway buses time dynamic holding",
+     "bus headway buses time dynamic holding",
+     "position computes headway bus buses time route holding",
+     "position computes headway bus buses time route holding",
+     "bus bunching waiting existing position holding",
+     "bus bunching waiting existing position holding",
+     "bus headway control city route system",
+     "bus headway control city route system"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "116f63215a72bd4bd3b7e4345af2eda18065e2c8bfafde53ac284e50694040b6",
+   "child_spec_hash": null,
+   "reason": "Repairs the measured I1_MECHANISM_EVIDENCE_DERIVATION weakness (0.583) by re-anchoring the MECHANISM and INTERVENTION in a verbatim evidence span whose own technical vocabulary (bus holding times, quadratic constraints, linear objective function, bus bunching penalties, beam-search heuristic) is reused, and by deriving the added constraint from quoted spans of the cited evidence rather than asserting it.",
+   "applied_at": "2026-09-20T02:48:06+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:fbef975d07ae",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.174,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:8b7ce4d04ef3",
+     "provider": "xkiro",
+     "model": "minimax/minimax-m3:free",
+     "prompt_hash": "499b11a63e2ddf2136de4e037dac99452438f202b81a36fbf38976201df23bd9",
+     "output_hash": "8b7ce4d04ef32e958665395b79b54fa82a005c3b83dde7a895cab31199491264",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1007/s12469-023-00326-7",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.65,
+      "evidence_support_cleared": 0.65,
+      "constraint_traceable_to_evidence": "The beam-search heuristic must produce solutions with an optimality gap of less than 5% in less than 3 s for real-world "
+     },
+     "reasons": [],
+     "validated_at": "2026-09-20T02:41:55+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Real-time dynamic bus holding times at stops, computed by optimization, to counteract headway instability and prevent buses of the same line from cruising head-to-tail or arriving simultaneously.",
+      "after": "Real-time bus holding times at stops, computed by a mathematical model with quadratic constraints and a linear objective function that minimizes the bus bunching penalties, counteract headway instability and prevent buses of the same line from cruising head-to-tail or arriving at a stop simultaneous"
+     },
+     "intervention": {
+      "before": "Add a real-time headway-control layer to the existing route control system that tracks each bus's position/headway and computes optimal holding times at stops (linear objective minimizing bunching penalties under quadratic constraints, solved with a beam-search heuristic for sub-3-second decisions o",
+      "after": "Add a real-time headway-control layer to the existing route control system that tracks each bus's position/headway and computes bus holding times at the stops as a control strategy by solving the proposed mathematical model with quadratic constraints and a linear objective function that minimizes th"
+     },
+     "mechanism_source_span": {
+      "before": "implementing bus holding times at the stops as a control strategy",
+      "after": "This work focuses on minimizing the number of buses of the same line cruising head-to-tail or arriving at a stop simultaneously by implementing bus holding times at the stops as a control strategy. We propose a new mathematical model to determine the bus holding times. It has quadratic constraints b"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.1371/journal.pone.0232799",
+      "bus headway control buses city route",
+      "bus headway control buses city route",
+      "bus headway buses time dynamic holding",
+      "bus headway buses time dynamic holding",
+      "position computes headway bus buses time route holding",
+      "position computes headway bus buses time route holding",
+      "bus bunching waiting existing position holding",
+      "bus bunching waiting existing position holding",
+      "bus headway control city route system",
+      "bus headway control city route system"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "5e2fce6fab57e02f9902c080b8a2b05d39aa8a0d70e2426bac2bae365b7f7fba",
+    "child_spec_hash": null,
+    "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness (measured 0.174, under the 0.7 floor) by re-anchoring the mechanism's non-generic technical vocabulary (quadratic constraints, linear objective function, bus bunching penalties, beam-search heuristic, optimality gap, 60 buses) in the verbatim text of doi:10.1007/s12469-023-00326-7, raising span-term overlap above",
+    "applied_at": "2026-09-20T02:41:55+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:f0a217b3dd49",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.583,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:226a3c936e60",
+     "provider": "zai",
+     "model": "Atria-Dawn-Preview",
+     "prompt_hash": "dab4a2e992dd012121345842442bc18741d27e7a9ed63c78af3a0fccbbf9a52c",
+     "output_hash": "226a3c936e60ca109d761fa73319100153d4258fa5207ff08eedf8f9a2fa9b85",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1007/s12469-023-00326-7",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.641,
+      "evidence_support_cleared": 0.641,
+      "constraint_traceable_to_evidence": "The headway-control layer must determine bus holding times by solving a mathematical model that \"has quadratic constrain"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-20T02:48:06+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Real-time bus holding times at stops, computed by a mathematical model with quadratic constraints and a linear objective function that minimizes the bus bunching penalties, counteract headway instability and prevent buses of the same line from cruising head-to-tail or arriving at a stop simultaneous",
+      "after": "Real-time bus holding times at the stops, determined by a new mathematical model with quadratic constraints but a linear objective function that minimizes the bus bunching penalties, counteract headway instability by minimizing the number of buses of the same line cruising head-to-tail or arriving a"
+     },
+     "intervention": {
+      "before": "Add a real-time headway-control layer to the existing route control system that tracks each bus's position/headway and computes bus holding times at the stops as a control strategy by solving the proposed mathematical model with quadratic constraints and a linear objective function that minimizes th",
+      "after": "Add a real-time headway-control layer to the existing route control system that tracks each bus's position/headway and implements bus holding times at the stops as a control strategy by solving the proposed mathematical model — quadratic constraints with a linear objective function that minimizes th"
+     },
+     "mechanism_source_span": {
+      "before": "This work focuses on minimizing the number of buses of the same line cruising head-to-tail or arriving at a stop simultaneously by implementing bus holding times at the stops as a control strategy. We propose a new mathematical model to determine the bus holding times. It has quadratic constraints b",
+      "after": "This work focuses on minimizing the number of buses of the same line cruising head-to-tail or arriving at a stop simultaneously by implementing bus holding times at the stops as a control strategy. We propose a new mathematical model to determine the bus holding times. It has quadratic constraints b"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.1371/journal.pone.0232799",
+      "bus headway control buses city route",
+      "bus headway control buses city route",
+      "bus headway buses time dynamic holding",
+      "bus headway buses time dynamic holding",
+      "position computes headway bus buses time route holding",
+      "position computes headway bus buses time route holding",
+      "bus bunching waiting existing position holding",
+      "bus bunching waiting existing position holding",
+      "bus headway control city route system",
+      "bus headway control city route system"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "116f63215a72bd4bd3b7e4345af2eda18065e2c8bfafde53ac284e50694040b6",
+    "child_spec_hash": null,
+    "reason": "Repairs the measured I1_MECHANISM_EVIDENCE_DERIVATION weakness (0.583) by re-anchoring the MECHANISM and INTERVENTION in a verbatim evidence span whose own technical vocabulary (bus holding times, quadratic constraints, linear objective function, bus bunching penalties, beam-search heuristic) is reused, and by deriving the added constraint from quoted spans of the cited evidence rather than asserting it.",
+    "applied_at": "2026-09-20T02:48:06+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "195899ddd0cd20fff5ea4b1a01ab5aa7861a66c7acd2c22a4bc9b080d7a7e3b9"
 }
