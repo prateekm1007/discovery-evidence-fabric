@@ -62,6 +62,40 @@ def _pkg_dir(run_dir: Optional[Path]) -> Optional[Path]:
     return None
 
 
+def _read_pkg_zip_json(run_dir: Optional[Path],
+                       rel: str) -> Optional[Dict[str, Any]]:
+    """Read one machine-layer JSON from the run-root package ZIP.
+
+    Restart-resilience (R510 production closure): the promoted
+    TECHNOLOGY_PACKAGE/ tree is not part of the durable snapshot, so
+    after a container rebuild only the run-root ZIP carries the
+    canonical machine layers. The ZIP is byte-complete and
+    manifest-hashed — reading it read-only is recovery from the
+    authority, never fabrication (Art. X/XXV). Returns None when no
+    ZIP or no such member exists.
+    """
+    if not run_dir:
+        return None
+    try:
+        zips = sorted(
+            run_dir.glob("TECHNOLOGY_TRANSFER_PACKAGE*.zip")) or \
+            sorted(run_dir.glob("TECHNOLOGY_PACKAGE_*.zip"))
+        if not zips:
+            return None
+        import zipfile
+        with zipfile.ZipFile(zips[0]) as zf:
+            for name in ("TECHNOLOGY_PACKAGE/" + rel, rel):
+                try:
+                    raw = zf.read(name)
+                except KeyError:
+                    continue
+                doc = json.loads(raw.decode("utf-8"))
+                return doc if isinstance(doc, dict) else None
+    except Exception:  # noqa: BLE001 — absent stays absent
+        return None
+    return None
+
+
 def _tab(avail: str, epi: str, note: str, **content) -> Dict[str, Any]:
     assert avail in _AVAIL, avail
     return {"availability": avail, "epistemic_class": epi,
@@ -1345,6 +1379,16 @@ def build_dossier(session: Dict[str, Any]) -> Dict[str, Any]:
         if pkg_dir else None
     roadmap = _read_json(pkg_dir / "UNKNOWN_ROADMAP.json") \
         if pkg_dir else None
+    if roadmap is None:
+        roadmap = _read_pkg_zip_json(run_dir, "UNKNOWN_ROADMAP.json")
+    if roadmap is None:
+        # restart-resilience: the promoted TECHNOLOGY_PACKAGE/ tree is
+        # not part of the durable snapshot (only the run-root ZIP is),
+        # so after a container rebuild the tree is absent while the
+        # byte-complete ZIP remains — read the roadmap from the ZIP
+        # read-only instead of reporting absence (Art. XXV).
+        roadmap = _read_pkg_zip_json(
+            run_dir, "UNKNOWN_ROADMAP.json")
     dex_contract = _read_json(pkg_dir / "04_DECISIVE_EXPERIMENT.json") \
         if pkg_dir else None
     eng_def = _read_json(pkg_dir / "02_ENGINEERING_DEFINITION.json") \
@@ -1388,8 +1432,11 @@ def build_dossier(session: Dict[str, Any]) -> Dict[str, Any]:
         if isinstance(unc, dict):
             unc = unc.get("value")
         if isinstance(unc, list):
+            # string items only: a dict repr is not a statement
+            # (Art. XXV — absence over a fabricated-looking value)
             unknowns = [{"statement": str(u)[:220], "classification":
-                         None, "priority": None} for u in unc[:8]]
+                         None, "priority": None} for u in unc[:8]
+                        if isinstance(u, str)]
 
     strongest_evidence = None
     ev_items = ((cio or {}).get("evidence") or {}).get("records") or []
@@ -1839,6 +1886,8 @@ def dossier_package_consistency(session: Dict[str, Any]) -> Dict[str, Any]:
     eng_def = _read_json(pkg_dir / "02_ENGINEERING_DEFINITION.json") or {}
     dex = _read_json(pkg_dir / "04_DECISIVE_EXPERIMENT.json") or {}
     roadmap = _read_json(pkg_dir / "UNKNOWN_ROADMAP.json") or {}
+    if not roadmap:
+        roadmap = _read_pkg_zip_json(run_dir, "UNKNOWN_ROADMAP.json") or {}
     manifest = _read_json(pkg_dir / "PACKAGE_MANIFEST.json") or {}
 
     def check(name: str, a: Any, b: Any, cmp: str = "eq") -> None:

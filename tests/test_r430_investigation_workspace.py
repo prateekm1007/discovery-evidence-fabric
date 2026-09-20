@@ -390,6 +390,51 @@ class TestDossier:
         c = dos.dossier_package_consistency(s)
         assert c["consistent"] is True, c["checks"]
 
+    def test_key_unknowns_resolve_from_run_root_zip(self, tmp_path):
+        """Restart-resilience: when the promoted TECHNOLOGY_PACKAGE/
+        tree is absent (container rebuilds only snapshot the run-root
+        ZIP), the dossier must still project the canonical roadmap
+        statements from the byte-complete ZIP — never empty bullets,
+        never dict reprs."""
+        import zipfile
+        s = _mk_run(tmp_path)
+        rd = Path(s["run_dir"])
+        roadmap = {"unknowns": [
+            {"unknown_id": "U-01",
+             "unknown_statement": "seal swell under coolant exposure",
+             "classification": "LITERATURE_RESOLVABLE",
+             "priority": "HIGH"}]}
+        for p in (rd / "DOWNLOAD").rglob("*"):
+            if p.is_file():
+                p.unlink()
+        with zipfile.ZipFile(
+                rd / "TECHNOLOGY_TRANSFER_PACKAGE_INV-430.zip", "w",
+                zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("TECHNOLOGY_PACKAGE/UNKNOWN_ROADMAP.json",
+                        json.dumps(roadmap))
+        d = dos.build_dossier(s)
+        ku = d["tabs"]["overview"]["key_unknowns"]
+        assert [u["statement"] for u in ku] == [
+            "seal swell under coolant exposure"]
+
+    def test_key_unknowns_skip_non_string_fallback(self, tmp_path):
+        """The invention-uncertainties fallback must never render a
+        dict repr as a statement (Art. XXV)."""
+        s = _mk_run(tmp_path)
+        rd = Path(s["run_dir"])
+        for p in (rd / "DOWNLOAD").rglob("*"):
+            if p.is_file():
+                p.unlink()
+        spec = json.loads((rd / "INVENTION_SPECIFICATION.json")
+                          .read_text())
+        spec["uncertainties"] = {"value": [
+            {"description": "not a string item"}, "plain unknown"]}
+        (rd / "INVENTION_SPECIFICATION.json").write_text(
+            json.dumps(spec))
+        d = dos.build_dossier(s)
+        ku = d["tabs"]["overview"]["key_unknowns"]
+        assert [u["statement"] for u in ku] == ["plain unknown"]
+
 
 # ---------------------------------------------------------------------------
 # Section 16: package <-> dossier consistency
