@@ -26,8 +26,11 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
+from threading import Lock
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from discovery_fabric.retrieval_fabric.adapters import (
@@ -102,6 +105,51 @@ SOURCE_VARIANT_POLICY = {
 UNPAYWALL_TOP_K = 5
 PATENT_CLAIM_FETCH_TOP_K = 2
 
+#: R512 latency-cliff fan-out policy (bounded parallel source queries).
+#: Default bound 5 follows the standing in-repo precedent for a source
+#: fan-out (prior_art_v2/sources.py ThreadPoolExecutor(max_workers=5))
+#: and keeps concurrent load per public host low; several fabric
+#: sources are metered/rate-limited, so the bound stays small.
+#: Ceiling 16 is a hard cap so a misconfigured environment cannot
+#: spawn unbounded threads. Both knobs are operator controls recorded
+#: in the attribution record (never benchmark tuning: retrieval
+#: EXECUTION timing, not retrieval form/selection/thresholds).
+RETRIEVE_FANOUT_DEFAULT_MAX_WORKERS = 5
+RETRIEVE_FANOUT_MAX_WORKERS_CEILING = 16
+
+
+def _fanout_policy() -> Dict[str, Any]:
+    """Resolve the lane fan-out execution policy (recorded verbatim in
+    the retrieval attribution record)."""
+    mode = (os.environ.get("ENGINE_RETRIEVE_FANOUT",
+                           "parallel").strip().lower() or "parallel")
+    if mode not in ("parallel", "serial"):
+        mode = "parallel"
+    try:
+        configured = int(os.environ.get(
+            "ENGINE_RETRIEVE_MAX_WORKERS",
+            str(RETRIEVE_FANOUT_DEFAULT_MAX_WORKERS)))
+    except ValueError:
+        configured = RETRIEVE_FANOUT_DEFAULT_MAX_WORKERS
+    configured = max(1, min(configured,
+                            RETRIEVE_FANOUT_MAX_WORKERS_CEILING))
+    return {"mode": mode, "max_workers_configured": configured,
+            "default_max_workers": RETRIEVE_FANOUT_DEFAULT_MAX_WORKERS,
+            "ceiling": RETRIEVE_FANOUT_MAX_WORKERS_CEILING}
+
+
+def _classify_job_outcome(variant_statuses: List[str],
+                          total_records: int) -> str:
+    """Typed per-job outcome for attribution (Art. XXI.3 taxonomy)."""
+    if any(s in ("OK", "EMPTY") for s in variant_statuses):
+        return "successful" if total_records else "empty"
+    if any(s == "TIMEOUT" for s in variant_statuses):
+        return "timeout"
+    if any(s in ("UNAVAILABLE", "RATE_LIMITED", "AUTH_FAILED")
+           for s in variant_statuses):
+        return "unavailable"
+    return "other_typed_failure"
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -125,6 +173,276 @@ def _select_variants(variants: List[Dict[str, Any]],
           "derivation_basis": "keyword-form of the primary query"}
     if policy == "PRIMARY":
         return [primary] if primary else []
+    if policy == "KEYWORD_FORM":
+        return [kw] if primary else []
+    if policy == "DOMAIN_NARROW":
+        v = by_class.get("DOMAIN_NARROW") or kw
+        return [v]
+    if policy == "NARROW_OR_PRIMARY":
+        v = by_class.get("DOMAIN_NARROW")
+        return [v, primary] if (v and primary) else ([primary] if primary else [])
+    if policy == "PRIMARY_AND_CROSS_DOMAIN":
+        out = [primary] if primary else []
+        cd = by_class.get("CROSS_DOMAIN_TERM")
+        if cd:
+            out.append(cd)
+        return out
+    # R417: additive comparison-targeted routing for the sources the
+    # V3 measurement named (the numeric-bearing reference records were
+    # europepmc/core-indexed; the comparison form retrieved them)
+    if policy == "PRIMARY_AND_COMPARISON":
+        out = [primary] if primary else []
+        comp = by_class.get("COMPARISON_TARGETED")
+        if comp:
+            out.append(comp)
+        return out
+    if policy == "NARROW_AND_COMPARISON":
+        v = by_class.get("DOMAIN_NARROW") or kw
+        out = [v]
+        comp = by_class.get("COMPARISON_TARGETED")
+        if comp:
+            out.append(comp)
+        return out
+    return [primary] if primary else []
+
+
+def _plan_fanout_jobs(
+        all_variants: List[Dict[str, Any]]
+) -> Tuple[List[Dict[str, Any]], List[LaneRunState]]:
+    """Plan the lane fan-out as ordered independent jobs (NO network).
+
+    Replicates the serial loop's lane/source/variant selection EXACTLY
+    (LANE_SOURCE_MAP order, SOURCE_VARIANT_POLICY, THESIS scoping):
+    job N in this list is the Nth (lane, source) unit the serial loop
+    would have executed. Sources with no connector produce the same
+    immediate NOT_IMPLEMENTED lane state here; sources with no fabric
+    record or no chosen variants produce nothing (as in serial).
+    Each job carries its OWN connector instance (fresh cls() per job,
+    as today), so workers never share connector state.
+    """
+    jobs: List[Dict[str, Any]] = []
+    immediate: List[LaneRunState] = []
+    for lane, source_ids in LANE_SOURCE_MAP.items():
+        for source_id in source_ids:
+            fabric_src = get_fabric_source(source_id)
+            if fabric_src is None:
+                continue  # not in this fabric version
+            policy = SOURCE_VARIANT_POLICY.get(source_id, "PRIMARY")
+            scoped = "THESIS" if (lane == "THESIS" and
+                                  source_id in ("crossref", "datacite")) else None
+            chosen = _select_variants(all_variants, policy)
+            if lane == "THESIS" and source_id in ("openaire", "core"):
+                # thesis lane on post-hoc sources: use a CROSS_DOMAIN
+                # variant if present (alternative terminology is the
+                # measured discovery path for theses)
+                chosen = ([v for v in all_variants
+                           if v["derivation_class"] == "CROSS_DOMAIN_TERM"][:1]
+                          or chosen)
+            if not chosen:
+                continue
+            conn = _connector_for(source_id, scoped)
+            if conn is None:
+                immediate.append(LaneRunState(
+                    lane=lane, source_id=source_id,
+                    queries=[v["query"] for v in chosen],
+                    status="NOT_IMPLEMENTED", fabric_health="DEGRADED",
+                    error="connector unavailable in registry wiring"))
+                continue
+            jobs.append({
+                "index": len(jobs),
+                "lane": lane,
+                "source_id": source_id,
+                "connector": conn,
+                "scoped": scoped,
+                "variants": [{"query": v["query"],
+                              "derivation_class": v["derivation_class"]}
+                             for v in chosen],
+            })
+    return jobs, immediate
+
+
+def _run_fanout_job(job: Dict[str, Any]) -> Dict[str, Any]:
+    """Execute ONE planned job (worker-safe): variant searches only.
+
+    No shared state is touched here — no Canonicalizer, no lane_states.
+    Returns variant outcomes with per-variant call latency. The
+    TypeError fallback (registry connectors without the retrieval_role
+    kwarg) matches the serial path exactly. Any OTHER exception is
+    captured (never swallowed: the assembler re-raises the first one
+    in deterministic job order, preserving the serial raise contract).
+    """
+    import time as _t
+    wall_t0 = _t.perf_counter()
+    variant_outcomes: List[Dict[str, Any]] = []
+    for v in job["variants"]:
+        q = v["query"]
+        call_t0 = _t.perf_counter()
+        try:
+            try:
+                result: SourceQueryResult = job["connector"].search(
+                    q, retrieval_role="DISCOVERY")
+            except TypeError:
+                # some registry connectors (prior_art_v2 wrappers) do
+                # not accept the retrieval_role kwarg — call without
+                # it (the custody log entry is still written by the
+                # wrapper's own _finish path)
+                result = job["connector"].search(q)
+            variant_outcomes.append({
+                "query": q,
+                "derivation_class": v["derivation_class"],
+                "status": result.status,
+                "records": result.records,
+                "error": result.error,
+                "latency_ms": int((_t.perf_counter() - call_t0) * 1000),
+                "raised": None,
+            })
+        except Exception as exc:  # noqa: BLE001 — captured, re-raised in order
+            variant_outcomes.append({
+                "query": q,
+                "derivation_class": v["derivation_class"],
+                "status": "WORKER_RAISED",
+                "records": [],
+                "error": None,
+                "latency_ms": int((_t.perf_counter() - call_t0) * 1000),
+                "raised": exc,
+            })
+            break
+    return {"index": job["index"], "lane": job["lane"],
+            "source_id": job["source_id"],
+            "variant_outcomes": variant_outcomes,
+            "job_wall_s": _t.perf_counter() - wall_t0}
+
+
+def _assemble_fanout(
+        jobs: List[Dict[str, Any]],
+        job_results: List[Dict[str, Any]],
+        canonicalizer: Canonicalizer,
+        lane_states: List[LaneRunState]) -> Dict[str, Any]:
+    """Reassemble job results in deterministic job order (main thread).
+
+    Single shared implementation for both execution modes: per-job
+    status aggregation + sequential _ingest_record into the shared
+    Canonicalizer (never called from workers — Canonicalizer.add is
+    order-dependent: origin_source/first-wins best_record/merge order).
+    A captured worker raise is re-raised here, first in job order
+    (the serial raise contract).
+    Returns the attribution rows + counts for this fan-out.
+    """
+    job_rows: List[Dict[str, Any]] = []
+    records_returned = 0
+    for job, res in zip(jobs, job_results):
+        assert job["index"] == res["index"]
+        state = LaneRunState(lane=job["lane"], source_id=job["source_id"],
+                             queries=[v["query"] for v in job["variants"]])
+        total_records = 0
+        variant_statuses: List[str] = []
+        errors: List[str] = []
+        network_ms = 0
+        for vo in res["variant_outcomes"]:
+            if vo["raised"] is not None:
+                raise vo["raised"]
+            variant_statuses.append(vo["status"])
+            total_records += len(vo["records"])
+            network_ms += vo["latency_ms"] or 0
+            if vo["error"]:
+                errors.append(f"[{vo['status']}] {str(vo['error'])[:120]}")
+            for rec in vo["records"]:
+                _ingest_record(canonicalizer, job["source_id"], rec,
+                               vo["query"], vo["derivation_class"],
+                               lane_states, job["lane"], job["scoped"])
+        # multi-variant honesty: the source is AVAILABLE when ANY
+        # variant was answered (OK/EMPTY); a variant-level failure is
+        # recorded in the error string, never masked as total failure
+        any_answered = any(s in ("OK", "EMPTY") for s in variant_statuses)
+        if any_answered:
+            state.status = "OK" if total_records else "EMPTY"
+        else:
+            state.status = variant_statuses[-1] if variant_statuses else "SEARCH_FAILED"
+        state.record_count = total_records
+        state.error = "; ".join(errors)[:300] or None
+        state.fabric_health = fabric_health_of(state.status)
+        lane_states.append(state)
+        records_returned += total_records
+        job_rows.append({
+            "index": job["index"],
+            "lane": job["lane"],
+            "source_id": job["source_id"],
+            "variant_classes": [v["derivation_class"]
+                                for v in job["variants"]],
+            "n_variants": len(job["variants"]),
+            "network_ms": network_ms,
+            "job_wall_s": round(res["job_wall_s"], 3),
+            "outcome": _classify_job_outcome(variant_statuses,
+                                             total_records),
+            "variant_statuses": variant_statuses,
+            "records_returned": total_records,
+            "error": state.error,
+        })
+    return {"job_rows": job_rows, "records_returned": records_returned}
+
+
+def _drive_fanout(
+        jobs: List[Dict[str, Any]],
+        canonicalizer: Canonicalizer,
+        lane_states: List[LaneRunState],
+        policy: Dict[str, Any]) -> Dict[str, Any]:
+    """Execute planned jobs (parallel bounded executor or serial
+    reference) and assemble in deterministic order.
+
+    Returns the retrieval attribution record (directive fields).
+    """
+    import time as _t
+    wall_t0 = _t.perf_counter()
+    peak = {"current": 0, "max": 0}
+    peak_lock = Lock()
+
+    def _tracked(job: Dict[str, Any]) -> Dict[str, Any]:
+        with peak_lock:
+            peak["current"] += 1
+            peak["max"] = max(peak["max"], peak["current"])
+        try:
+            return _run_fanout_job(job)
+        finally:
+            with peak_lock:
+                peak["current"] -= 1
+
+    results: List[Dict[str, Any]] = []
+    if policy["mode"] == "serial" or not jobs:
+        for job in jobs:
+            results.append(_run_fanout_job(job))
+        effective_workers = 1
+        peak["max"] = 1 if jobs else 0
+    else:
+        effective_workers = max(1, min(policy["max_workers_configured"],
+                                       len(jobs)))
+        with ThreadPoolExecutor(
+                max_workers=effective_workers,
+                thread_name_prefix="retrieve-fanout") as ex:
+            futures = [ex.submit(_tracked, job) for job in jobs]
+            results = [f.result() for f in futures]
+    assemble_t0 = _t.perf_counter()
+    asm = _assemble_fanout(jobs, results, canonicalizer, lane_states)
+    assemble_s = _t.perf_counter() - assemble_t0
+    wall_s = _t.perf_counter() - wall_t0
+    total_network_s = sum(r["network_ms"] for r in asm["job_rows"]) / 1000.0
+    max_job_wall_s = max([r["job_wall_s"] for r in asm["job_rows"]]
+                         + [0.0])
+    return {
+        "schema": "RETRIEVAL_ATTRIBUTION/1.0",
+        "mode": policy["mode"],
+        "max_workers_configured": policy["max_workers_configured"],
+        "max_workers_effective": effective_workers,
+        "peak_concurrency_observed": peak["max"],
+        "n_jobs": len(jobs),
+        "fanout_wall_s": round(wall_s, 3),
+        "total_network_s": round(total_network_s, 3),
+        "max_job_wall_s": round(max_job_wall_s, 3),
+        "assemble_s": round(assemble_s, 3),
+        "orchestration_overhead_s": round(
+            wall_s - max_job_wall_s - assemble_s, 3),
+        "jobs": asm["job_rows"],
+        "records_returned": asm["records_returned"],
+    }
     if policy == "KEYWORD_FORM":
         return [kw] if primary else []
     if policy == "DOMAIN_NARROW":
@@ -207,70 +525,31 @@ def retrieve_fabric(problem: Dict[str, Any],
     all_variants = variants + llm_variants
 
     # ---- 3. lane fan-out (each source through the 7-step chain) -----
-    for lane, source_ids in LANE_SOURCE_MAP.items():
-        for source_id in source_ids:
-            fabric_src = get_fabric_source(source_id)
-            if fabric_src is None:
-                continue  # not in this fabric version
-            policy = SOURCE_VARIANT_POLICY.get(source_id, "PRIMARY")
-            scoped = "THESIS" if (lane == "THESIS" and
-                                  source_id in ("crossref", "datacite")) else None
-            chosen = _select_variants(all_variants, policy)
-            if lane == "THESIS" and source_id in ("openaire", "core"):
-                # thesis lane on post-hoc sources: use a CROSS_DOMAIN
-                # variant if present (alternative terminology is the
-                # measured discovery path for theses)
-                chosen = ([v for v in all_variants
-                           if v["derivation_class"] == "CROSS_DOMAIN_TERM"][:1]
-                          or chosen)
-            if not chosen:
-                continue
-            conn = _connector_for(source_id, scoped)
-            if conn is None:
-                lane_states.append(LaneRunState(
-                    lane=lane, source_id=source_id,
-                    queries=[v["query"] for v in chosen],
-                    status="NOT_IMPLEMENTED", fabric_health="DEGRADED",
-                    error="connector unavailable in registry wiring"))
-                continue
-            state = LaneRunState(lane=lane, source_id=source_id,
-                                 queries=[v["query"] for v in chosen])
-            total_records = 0
-            variant_statuses: List[str] = []
-            errors: List[str] = []
-            for v in chosen:
-                q = v["query"]
-                try:
-                    result: SourceQueryResult = conn.search(
-                        q, retrieval_role="DISCOVERY")
-                except TypeError:
-                    # some registry connectors (prior_art_v2 wrappers) do
-                    # not accept the retrieval_role kwarg — call without
-                    # it (the custody log entry is still written by the
-                    # wrapper's own _finish path)
-                    result = conn.search(q)
-                variant_statuses.append(result.status)
-                total_records += len(result.records)
-                if result.error:
-                    errors.append(f"[{result.status}] {str(result.error)[:120]}")
-                for rec in result.records:
-                    _ingest_record(canonicalizer, source_id, rec, q,
-                                   v["derivation_class"], lane_states, lane,
-                                   scoped)
-            # multi-variant honesty: the source is AVAILABLE when ANY
-            # variant was answered (OK/EMPTY); a variant-level failure is
-            # recorded in the error string, never masked as total failure
-            any_answered = any(s in ("OK", "EMPTY") for s in variant_statuses)
-            if any_answered:
-                state.status = "OK" if total_records else "EMPTY"
-            else:
-                state.status = variant_statuses[-1] if variant_statuses else "SEARCH_FAILED"
-            state.record_count = total_records
-            state.error = "; ".join(errors)[:300] or None
-            state.fabric_health = fabric_health_of(state.status)
-            lane_states.append(state)
+    # R512 latency cliff: independent (source_id, query_variant) jobs
+    # run concurrently on a bounded executor; ingest + status assembly
+    # stay sequential in deterministic job order (shared Canonicalizer
+    # is order-dependent and is never touched from workers).
+    # ENGINE_RETRIEVE_FANOUT=serial restores the original inline loop
+    # (parity reference + operator fallback; Art. LXIV KEPT_BECAUSE).
+    _fanout_policy_resolved = _fanout_policy()
+    _fanout_t0 = time.perf_counter()
+    _canon_before = len(canonicalizer.canonical_records())
+    _merges_before = len(canonicalizer.merge_events)
+    _fanout_jobs, _fanout_immediate = _plan_fanout_jobs(all_variants)
+    lane_states.extend(_fanout_immediate)
+    _retrieval_attribution = _drive_fanout(
+        _fanout_jobs, canonicalizer, lane_states,
+        _fanout_policy_resolved)
+    _retrieval_attribution["records_admitted"] = (
+        len(canonicalizer.canonical_records()) - _canon_before)
+    _retrieval_attribution["canonical_merges"] = (
+        len(canonicalizer.merge_events) - _merges_before)
 
     # ---- PATENT lane: claim-level fetch for top hits ------------------
+    # (enrichment AFTER source retrieval; timed for attribution —
+    # enrichment time is reported separately from source fan-out time)
+    _enrich_s: Dict[str, float] = {}
+    _enrich_t0 = time.perf_counter()
     patent_records = [r for r in canonicalizer.canonical_records()
                       if r.document_type == "PATENT"]
     claim_fetches: List[Dict[str, Any]] = []
@@ -291,6 +570,8 @@ def retrieve_fabric(problem: Dict[str, Any],
         })
 
     # ---- 4. reciprocal expansion (bounded, S2) -------------------------
+    _enrich_s["patent_claims"] = time.perf_counter() - _enrich_t0
+    _enrich_t0 = time.perf_counter()
     reciprocal_report: Dict[str, Any] = {"enabled": enable_reciprocal,
                                          "calls": [], "records_added": 0}
     if enable_reciprocal:
@@ -327,6 +608,8 @@ def retrieve_fabric(problem: Dict[str, Any],
                 }
 
     # ---- 5. Unpaywall full-text resolution (resolution, not discovery) -
+    _enrich_s["reciprocal"] = time.perf_counter() - _enrich_t0
+    _enrich_t0 = time.perf_counter()
     unpaywall_report: Dict[str, Any] = {"enabled": enable_unpaywall,
                                         "resolved": 0, "oa_found": 0,
                                         "lookups": []}
@@ -373,6 +656,9 @@ def retrieve_fabric(problem: Dict[str, Any],
                     unpaywall_report["resolved"] += 1
 
     # ---- 6-8. canonicalization done; compute diversity + stats --------
+    _enrich_s["unpaywall"] = time.perf_counter() - _enrich_t0
+    _retrieval_attribution["enrichment_s"] = {
+        k: round(v, 3) for k, v in _enrich_s.items()}
     canonical_records = canonicalizer.canonical_records()
     record_sources: Dict[str, List[str]] = {
         r.canonical_id: r.indexing_sources for r in canonical_records}
@@ -504,6 +790,7 @@ def retrieve_fabric(problem: Dict[str, Any],
         "patent_claim_fetches": claim_fetches,
         "reciprocal_expansion": reciprocal_report,
         "unpaywall_resolution": unpaywall_report,
+        "retrieval_attribution": _retrieval_attribution,
         "evidence_pool": {"items_by_lane": lane_item_counts,
                           "total_items": len(items),
                           "lane_caps": lane_caps,

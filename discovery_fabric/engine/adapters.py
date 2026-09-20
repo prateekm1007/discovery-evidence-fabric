@@ -306,6 +306,23 @@ class A2RetrievalAdapter(BaseAdapter):
                                 default=str))
             except Exception:  # noqa: BLE001 — best-effort persistence
                 pass
+        # R512: persist the retrieval attribution record inside the run
+        # directory (same custody pattern as EVIDENCE_FABRIC_REPORT.json:
+        # the next audit reads run bytes, not ephemeral module state).
+        # Skipped when the caller supplies no out_dir (never write test
+        # CWD pollution into the repo — production always passes the
+        # run directory).
+        try:
+            import json as _json2
+            _out_dir = run_ctx.get("out_dir")
+            if _out_dir:
+                _p2 = Path(_out_dir)
+                _p2.mkdir(parents=True, exist_ok=True)
+                (_p2 / "RETRIEVAL_ATTRIBUTION.json").write_text(
+                    _json2.dumps(report.get("retrieval_attribution", {}),
+                                 indent=1, ensure_ascii=False, default=str))
+        except Exception:  # noqa: BLE001 — best-effort persistence
+            pass
         return _engine_result(
             {"evidence": items,
              "evidence_ids": [i.get("id", "") for i in items],
