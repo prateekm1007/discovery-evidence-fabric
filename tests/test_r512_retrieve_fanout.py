@@ -226,15 +226,12 @@ def test_parallel_matches_serial_content(monkeypatch):
             == m_s["best_record"]["abstract"])
 
 
-def test_default_mode_is_parallel_and_recorded(monkeypatch):
+def test_default_mode_is_serial_and_recorded(monkeypatch):
     _, rep = _run(monkeypatch)
     attrib = rep["retrieval_attribution"]
-    assert attrib["mode"] == "parallel"
-    assert attrib["max_workers_configured"] == 5
-    assert attrib["max_workers_effective"] >= 1
-    assert attrib["peak_concurrency_observed"] >= 1
-    assert (attrib["peak_concurrency_observed"]
-            <= attrib["max_workers_effective"])
+    assert attrib["mode"] == "serial"
+    assert attrib["max_workers_effective"] == 1
+    assert attrib["peak_concurrency_observed"] == 1
 
 
 def test_attribution_record_complete(monkeypatch):
@@ -285,9 +282,9 @@ def test_max_workers_bound_respected(monkeypatch):
             == 16)
 
 
-def test_invalid_mode_falls_back_to_parallel(monkeypatch):
+def test_invalid_mode_falls_back_to_serial(monkeypatch):
     _, rep = _run(monkeypatch, mode="bogus")
-    assert rep["retrieval_attribution"]["mode"] == "parallel"
+    assert rep["retrieval_attribution"]["mode"] == "serial"
 
 
 def test_typeerror_fallback_preserved_in_parallel(monkeypatch):
@@ -332,6 +329,81 @@ def test_all_failed_honest_with_attribution(monkeypatch):
     assert a["records_admitted"] == 0
     assert all(j["outcome"] in ("unavailable", "other_typed_failure")
                for j in a["jobs"])
+
+
+# ---------------------------------------------------------------------------
+# C. durable keep-list: attribution sidecars + gauntlet verdicts must
+#    reach the durable branch (measured R512: absent from
+#    _run_dir_files, so they lived only on the ephemeral container)
+# ---------------------------------------------------------------------------
+
+def _load_run_dir_files_fn():
+    """Execute the repo's own _run_dir_files body in isolation.
+
+    toscanini.durable is unimportable on Windows (module-level
+    fcntl), so the test extracts the function source from the
+    committed file and execs it with only pathlib + the real
+    FILE_CAP_BYTES constant — the tested logic is the repo's own
+    bytes, never a copy.
+    """
+    import ast
+    import re
+    from pathlib import Path as _Path
+    src = Path(
+        __file__).resolve().parents[1].joinpath(
+            "toscanini", "durable.py").read_text(encoding="utf-8")
+    tree = ast.parse(src)
+    m = re.search(r"FILE_CAP_BYTES\s*=\s*([0-9* +]+)", src)
+    assert m, "FILE_CAP_BYTES assignment missing"
+    cap = eval(compile(ast.parse(m.group(1), mode="eval"),  # noqa: S307
+                       "<cap>", "eval"),
+               {"__builtins__": {}})
+    fn_src = None
+    for node in tree.body:
+        if (isinstance(node, ast.FunctionDef)
+                and node.name == "_run_dir_files"):
+            fn_src = ast.get_source_segment(src, node)
+    assert fn_src, "_run_dir_files missing from toscanini/durable.py"
+    ns = {"Path": _Path, "List": list, "FILE_CAP_BYTES": cap}
+    exec(compile(fn_src, "durable_keep_list", "exec"), ns)
+    return ns["_run_dir_files"]
+
+
+def test_durable_keep_list_covers_attribution_sidecars(tmp_path):
+    run_dir_files = _load_run_dir_files_fn()
+    run_dir = tmp_path / "run"
+    (run_dir / "MODEL").mkdir(parents=True)
+    for n in ("problem.json", "candidate_envelope.json",
+              "POST_RANK_ATTRIBUTION.json",
+              "RETRIEVAL_ATTRIBUTION.json",
+              "EVIDENCE_FABRIC_REPORT.json",
+              "IMPROVE_LEDGER.json",
+              "IMPROVEMENT_LEDGER.json",
+              "TECHNICAL_IMPROVEMENT_LEDGER.json",
+              "ENGINEERING_ATTACK_primary.json",
+              "INDEPENDENT_ATTACK_mech-DIRECT_TRANSFER-1.json",
+              "ENGINEERING_SPECIFICATION_V1_grid-a.json",
+              "QUALITY_REJECTION_primary.json",
+              "PACKAGE_FAILED_primary.json",
+              "PACKAGE_SKIPPED_CHEAP_SCREEN_mech-x.json",
+              "INVENTION_SPECIFICATION_primary.json"):
+        (run_dir / n).write_text("{}")
+    names = {f.name for f in run_dir_files(run_dir)}
+    for n in ("POST_RANK_ATTRIBUTION.json",
+              "RETRIEVAL_ATTRIBUTION.json",
+              "EVIDENCE_FABRIC_REPORT.json",
+              "IMPROVE_LEDGER.json",
+              "IMPROVEMENT_LEDGER.json",
+              "TECHNICAL_IMPROVEMENT_LEDGER.json",
+              "ENGINEERING_ATTACK_primary.json",
+              "INDEPENDENT_ATTACK_mech-DIRECT_TRANSFER-1.json",
+              "ENGINEERING_SPECIFICATION_V1_grid-a.json",
+              "QUALITY_REJECTION_primary.json",
+              "PACKAGE_FAILED_primary.json",
+              "PACKAGE_SKIPPED_CHEAP_SCREEN_mech-x.json",
+              "INVENTION_SPECIFICATION_primary.json",
+              "problem.json", "candidate_envelope.json"):
+        assert n in names, "%s not collected for durable snapshot" % n
 
 
 # ---------------------------------------------------------------------------
@@ -451,7 +523,7 @@ def test_parallel_matches_frozen_reference(monkeypatch):
     del pool["google_patents"]
     canonicalizer, lane_states = _reference_run(monkeypatch, pool)
     _stub_pool(monkeypatch, dict(pool))
-    monkeypatch.delenv("ENGINE_RETRIEVE_FANOUT", raising=False)
+    monkeypatch.setenv("ENGINE_RETRIEVE_FANOUT", "parallel")
     monkeypatch.delenv("ENGINE_RETRIEVE_MAX_WORKERS", raising=False)
     items, report = fabric_pipeline.retrieve_fabric(
         PROBLEM, enable_reciprocal=False, enable_unpaywall=False)

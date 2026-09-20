@@ -291,11 +291,33 @@ def _run_dir_files(run_dir: Path) -> List[Path]:
         # refusal record — the durable record is the acceptance evidence
         # that a degraded-capability run spent zero retrieval calls
         "CAPABILITY_GATE.json",
+        # R511/R512 audit-attribution sidecars — the runtime
+        # measurement records the next audit reads from run bytes
+        # (measured R512: without these entries the sidecars live
+        # only on the ephemeral container disk and never reach the
+        # durable branch, so per-job/per-candidate attribution is
+        # unauditable post-hoc):
+        "POST_RANK_ATTRIBUTION.json",
+        "RETRIEVAL_ATTRIBUTION.json",
+        "EVIDENCE_FABRIC_REPORT.json",
+        "IMPROVE_LEDGER.json",
+        "IMPROVEMENT_LEDGER.json",
+        "TECHNICAL_IMPROVEMENT_LEDGER.json",
     }
+    # R511/R512 per-candidate gauntlet verdicts (bounded JSON verdict
+    # records — the multiplier-table evidence for runs that reach the
+    # gauntlet; same per-file size cap applies).
+    _gauntlet_prefixes = (
+        "ENGINEERING_ATTACK_", "INDEPENDENT_ATTACK_",
+        "ENGINEERING_SPECIFICATION_V1_", "QUALITY_REJECTION_",
+        "PACKAGE_FAILED_", "PACKAGE_SKIPPED_",
+        "INVENTION_SPECIFICATION_",
+    )
     out: List[Path] = []
     for f in sorted(run_dir.glob("*.json")):
         if f.name in keep_json or f.name.startswith("envelope_") \
-                or f.name.startswith("EVOLUTION_GEN_"):
+                or f.name.startswith("EVOLUTION_GEN_") \
+                or f.name.startswith(_gauntlet_prefixes):
             out.append(f)
     # R418: the bridge's visual artifacts (MODEL/model-00N.glb) and the
     # generation models — the product surface's 3D layer; the per-file

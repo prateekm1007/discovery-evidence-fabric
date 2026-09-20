@@ -120,11 +120,21 @@ RETRIEVE_FANOUT_MAX_WORKERS_CEILING = 16
 
 def _fanout_policy() -> Dict[str, Any]:
     """Resolve the lane fan-out execution policy (recorded verbatim in
-    the retrieval attribution record)."""
+    the retrieval attribution record).
+
+    Default is serial (R512 post-battery verdict): the post-change
+    production battery did not prove a speedup (aggregate +12.6% on
+    confounded live-network windows, per-case -26%..+65%), so the
+    production default stays the measured-baseline behavior until
+    measurement supports a change. The parallel executor is retained
+    behind ENGINE_RETRIEVE_FANOUT=parallel with full parity tests
+    green; per-job attribution is recorded under BOTH modes, so a
+    future same-window A/B can re-decide with data.
+    """
     mode = (os.environ.get("ENGINE_RETRIEVE_FANOUT",
-                           "parallel").strip().lower() or "parallel")
+                           "serial").strip().lower() or "serial")
     if mode not in ("parallel", "serial"):
-        mode = "parallel"
+        mode = "serial"
     try:
         configured = int(os.environ.get(
             "ENGINE_RETRIEVE_MAX_WORKERS",
