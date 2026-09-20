@@ -1,0 +1,120 @@
+{
+ "shortlist": [
+  {
+   "experiment": "run killer experiment: falsification_test_from_candidate",
+   "source_stage": "NEXT_BEST_ACTION",
+   "action_id": "action:killer_experiment",
+   "expected_information_gain": 0.2809867409759369,
+   "score": 0.36,
+   "decision_impact": 0.9,
+   "probability_of_decision_change": 0.8,
+   "kill_probability": "UNKNOWN (no sourced base rate exists)",
+   "cost": 0.5619734819518738,
+   "time": "UNKNOWN",
+   "dependency": "physical_lab",
+   "basis": "COMPUTED (NBA score formula engine-v1)"
+  },
+  {
+   "experiment": "falsification_test_from_candidate",
+   "source_stage": "KILLER_EXPERIMENT",
+   "expected_information_gain": 0.2809867409759369,
+   "eig_per_cost": 0.2809867409759369,
+   "decision_impact": 0.9,
+   "kill_probability": "UNKNOWN (no sourced base rate exists)",
+   "cost": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+   "time": "UNKNOWN",
+   "dependency": "design article must exist first (see build plan)",
+   "is_selected_killer": true,
+   "basis": "COMPUTED (Bayesian EIG over MODEL_DERIVED priors)",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Once the water input is exhausted, output will show a measurable withdrawal-like decay to zero rather than infinite mileage, demonstrating external-input dependence and compliance with the first and s",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-20T03:49:27.929026+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-20T03:49:27.929026+00:00"
+     }
+    }
+   ]
+  },
+  {
+   "experiment": "contradiction_attacking_experiment",
+   "source_stage": "KILLER_EXPERIMENT",
+   "expected_information_gain": 0.34249274537077934,
+   "eig_per_cost": 0.1712463726853897,
+   "decision_impact": 0.6,
+   "kill_probability": "UNKNOWN (no sourced base rate exists)",
+   "cost": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+   "time": "UNKNOWN",
+   "dependency": "design article must exist first (see build plan)",
+   "is_selected_killer": false,
+   "basis": "COMPUTED (Bayesian EIG over MODEL_DERIVED priors)"
+  }
+ ],
+ "administrative_actions_excluded": [
+  {
+   "action_id": "con:evidence:doi:10.1007/s00134-023-07238-x",
+   "description": "attack contradiction: user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/",
+   "provider": "internal_attack",
+   "exclusion_reason": "administrative/research action, not a falsification experiment (R377: the decisive experiment must be an experiment; recorded here — a valid next-best-action but not a decisive experiment)"
+  },
+  {
+   "action_id": "con:evidence:doi:10.1097/ccm.0000000000006068",
+   "description": "attack contradiction: user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/",
+   "provider": "internal_attack",
+   "exclusion_reason": "administrative/research action, not a falsification experiment (R377: the decisive experiment must be an experiment; recorded here — a valid next-best-action but not a decisive experiment)"
+  },
+  {
+   "action_id": "con:evidence:doi:10.1002/14651858.cd002243.pub5",
+   "description": "attack contradiction: user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/",
+   "provider": "internal_attack",
+   "exclusion_reason": "administrative/research action, not a falsification experiment (R377: the decisive experiment must be an experiment; recorded here — a valid next-best-action but not a decisive experiment)"
+  }
+ ],
+ "exclusion_note": "R377: administrative actions from next_best_action are excluded from the decisive-experiment shortlist (measured defect: all six R376 survivors selected 'fetch and audit claims of nearest collision patents' as the decisive experiment — a literature task cannot distinguish the candidate from existing approaches)",
+ "selected": {
+  "experiment": "run killer experiment: falsification_test_from_candidate",
+  "source_stage": "NEXT_BEST_ACTION",
+  "action_id": "action:killer_experiment",
+  "expected_information_gain": 0.2809867409759369,
+  "score": 0.36,
+  "decision_impact": 0.9,
+  "probability_of_decision_change": 0.8,
+  "kill_probability": "UNKNOWN (no sourced base rate exists)",
+  "cost": 0.5619734819518738,
+  "time": "UNKNOWN",
+  "dependency": "physical_lab",
+  "basis": "COMPUTED (NBA score formula engine-v1)"
+ },
+ "explanation": "This is the next experiment because it has the greatest expected ability to change the candidate decision (NEXT_BEST_ACTION ranking; score 0.36)",
+ "no_invented_values_note": "cost/time/kill_probability remain UNKNOWN where no stage recorded them (Art. XXV)",
+ "falsification_contract": {
+  "HYPOTHESIS": "expected effect holds: Once the water input is exhausted, output will show a measurable withdrawal-like decay to zero rather than infinite mileage, demonstrating external-input dependence and compliance with the first and s (recorded prior 0.6, epistemic class MODEL_DERIVED per the killer-experiment provenance)",
+  "TREATMENT": "Fit the water-powered car with an input-dependence audit analogous to ICU infusion/dose-duration tracking and withdrawal screening: log cumulative water/energy input versus shaft work output, then cut off the single glass of water and continue logging to detect the post-input deficit.",
+  "CONTROL_BLOCKER": "no executed baseline comparison on record (physics chain executed: ['PRE_REQUIREMENTS']; lifecycle MECHANISM_NOT_SIMULATABLE) — the control arm is not invented from the problem statement",
+  "MEASUREMENT": "Run the vehicle on one precisely measured glass of water with no other energy input, logging torque and speed until stop; if work output remains constant indefinitely after the water is consumed, the perpetual-motion claim survives — any decay or stop falsifies it.",
+  "APPARATUS_BLOCKER": "no separate apparatus record exists; the falsification test does not state a quantified instrumented procedure",
+  "SAMPLE_BLOCKER": "no sample-size / n= record exists in any engine stage (honest UNKNOWN — Art. XXV)",
+  "ACCEPTANCE_THRESHOLD_BLOCKER": "the recorded expected effect carries no numeric band ('Once the water input is exhausted, output will show a measurable withdrawal-like decay to zero rather than infinite mileage, demonstrating external-input depend') — a prose expectation is not an acceptance threshold (Art. LII/XXVII: the band is not invented by inference); the candidate must state the measurable quantity and its band",
+  "FALSIFICATION_THRESHOLD_BLOCKER": "the kill outcome cannot be stated NUMERICALLY from records: the recorded expected effect carries no numeric band — a prose kill sentence is not a threshold (R478 P0-3; Art. LII/XXVII: the band is not invented)",
+  "UNCERTAINTY": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)",
+  "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+  "TIME": "UNKNOWN (no stage recorded a time estimate)",
+  "SAFETY_BLOCKER": "no safety-analysis stage output exists in the engine (honest UNKNOWN — Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+ },
+ "timestamp": "2026-09-20T03:54:54+00:00Z"
+}

@@ -30,11 +30,37 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Carbon-based microwave susceptors absorb microwave energy and convert it into localized thermal energy, with uptake governed by the susceptor's surface area and porosity, enabling targeted heating at lower bulk power.",
-   "intervention": "Install a food-safe, high-surface-area carbon-loaded susceptor plate/sleeve inside the countertop cavity, positioned beneath and around the food, so it preferentially captures microwave energy from the standing-wave field and re-emits it as evenly distributed conductive/radiant heat into the food center, flattening the hot-edge/cold-center gradient with no user stirring.",
-   "expected_effect": "Markedly lower spatial temperature non-uniformity across the load (edges no longer burn while the center stays cold), achieved passively within the existing countertop form factor and a standard single cycle.",
-   "mechanism_source_span": "the key role of the surface area and porosity of the carbon microwave susceptor in absorbing microwave",
-   "span_derivation": null
+   "mechanism": "The surface area and porosity of the carbon microwave susceptor play the key role in absorbing microwave radiation; the absorbed microwave energy is converted into heat at the susceptor and redistributed conductively and radiantly toward the food center.",
+   "intervention": "Install a food-safe carbon microwave susceptor plate/sleeve beneath and around the food, with its surface area and porosity selected and validated because they play the key role in absorbing microwave radiation, so the susceptor re-emits heat into the load without user stirring.",
+   "expected_effect": "Reduced edge-to-center temperature non-uniformity in a standard countertop microwave cycle, with less edge burning and a warmer food center.",
+   "mechanism_source_span": "this study highlights the key role of the surface area and porosity of the carbon microwave susceptor in absorbing microwave radiation",
+   "span_derivation": {
+    "n_shared": 10,
+    "shared_terms": [
+     "absorbing",
+     "area",
+     "carbon",
+     "key",
+     "microwave",
+     "porosity",
+     "radiation",
+     "role",
+     "surface",
+     "susceptor"
+    ],
+    "span_terms_n": 13,
+    "ratio": 0.769,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "Heat an identical food simulant in a standard countertop cycle with the susceptor and measure spatial temperature; if the maximum edge-to-center temperature difference is not reduced by at least 50% versus the control, the mechanism is falsified.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.3390/molecules28237769",
+     "source_span": "this study highlights the key role of the surface area and porosity of the carbon microwave susceptor in absorbing microwave radiation"
+    }
+   }
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
@@ -249,7 +275,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Install a food-safe, high-surface-area carbon-loaded susceptor plate/sleeve inside the countertop cavity, positioned beneath and around the food, so it preferentially captures microwave energy from the standing-wave field and re-emits it as evenly distributed conductive/radiant heat into the food center, flattening the hot-edge/cold-center gradient with no user stirring.",
+   "intervention": "Install a food-safe carbon microwave susceptor plate/sleeve beneath and around the food, with its surface area and porosity selected and validated because they play the key role in absorbing microwave radiation, so the susceptor re-emits heat into the load without user stirring.",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -264,7 +290,19 @@
  "constraints": {
   "value": {
    "stated_constraint": "must fit countertop form factor and heat food evenly without user intervention",
-   "failure_mode_of_device": "uneven heating hot spots"
+   "failure_mode_of_device": "uneven heating hot spots",
+   "evidence_derived": [
+    {
+     "constraint": "The susceptor must be specified by measured surface area and porosity because those properties govern absorption of microwave radiation.",
+     "evidence_id": "doi:10.3390/molecules28237769",
+     "span": "Furthermore, this study highlights the key role of the surface area and porosity of the carbon microwave susceptor in absorbing microwave radiation, offering exciting new avenues for optimization."
+    },
+    {
+     "constraint": "The susceptor’s surface area and porosity must be selected and validated as the variables playing the key role in absorbing microwave radiation.",
+     "evidence_id": "doi:10.3390/molecules28237769",
+     "span": "this study highlights the key role of the surface area and porosity of the carbon microwave susceptor in absorbing microwave radiation"
+    }
+   ]
   },
   "epistemic_class": "SOURCE_FACT",
   "origin_stage": "PROBLEM",
@@ -1353,10 +1391,222 @@
   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
   "verdict": "CONTESTED"
  },
- "_spec_hash": "6252a383bf6b2706897b207646567b0a4d8a5c2a593b0c8c5a0f42d1ac2b547c",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
   "checked_at": "2026-09-20T03:49:20+00:00Z"
- }
+ },
+ "_improvement": {
+  "parent_spec_hash": "021447b3d294a7b04ede46ae98ecd3eee566d3ff3670aac8584791c430063122",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:5f0840719d40",
+   "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.282,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:7cc64c53569d",
+    "provider": "zai",
+    "model": "Atria-Dawn-Preview",
+    "prompt_hash": "870df7e2697c9a0223148f083e72a75feacc55112a611130a19df133f5f70a5b",
+    "output_hash": "7cc64c53569d860e319722d48385a90b585e77cbb8f47b9907c4aa244ab7132f",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.3390/molecules28237769",
+     "span_verbatim_in_evidence": true,
+     "evidence_support": 0.286,
+     "evidence_support_cleared": 0.286,
+     "constraint_traceable_to_evidence": "The susceptor’s surface area and porosity must be selected and validated as the variables playing the key role in absorb"
+    },
+    "reasons": [],
+    "validated_at": "2026-09-20T03:52:32+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "A carbon microwave susceptor absorbs microwave radiation, with the uptake governed by the susceptor’s surface area and porosity, so the captured radiation is converted into localized thermal energy that can be redistributed toward the food center.",
+     "after": "The surface area and porosity of the carbon microwave susceptor play the key role in absorbing microwave radiation; the absorbed microwave energy is converted into heat at the susceptor and redistributed conductively and radiantly toward the food center."
+    },
+    "intervention": {
+     "before": "Install a food-safe carbon microwave susceptor plate/sleeve beneath and around the food, selected and validated for the surface area and porosity required to absorb microwave radiation across the cavity, so it re-emits conductive and radiant heat into the load without user stirring.",
+     "after": "Install a food-safe carbon microwave susceptor plate/sleeve beneath and around the food, with its surface area and porosity selected and validated because they play the key role in absorbing microwave radiation, so the susceptor re-emits heat into the load without user stirring."
+    },
+    "mechanism_source_span": {
+     "before": "Furthermore, this study highlights the key role of the surface area and porosity of the carbon microwave susceptor in absorbing microwave radiation, offering exciting new avenues for optimization.",
+     "after": "this study highlights the key role of the surface area and porosity of the carbon microwave susceptor in absorbing microwave radiation"
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "con:evidence:doi:10.47836/pjst.32.5.16",
+     "microwave countertop heating based oven ovens",
+     "microwave countertop heating based oven ovens",
+     "microwave heating based susceptors convert localized",
+     "microwave heating based susceptors convert localized",
+     "microwave countertop surface susceptor area carbon energy center",
+     "microwave countertop surface susceptor area carbon energy center",
+     "microwave suppression uniformity existing cavity standing",
+     "microwave suppression uniformity existing cavity standing",
+     "microwave countertop heating based oven lower",
+     "microwave countertop heating based oven lower"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "021447b3d294a7b04ede46ae98ecd3eee566d3ff3670aac8584791c430063122",
+   "child_spec_hash": null,
+   "reason": "This repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism and intervention in the verbatim evidence statement that surface area and porosity of a carbon microwave susceptor play the key role in absorbing microwave radiation.",
+   "applied_at": "2026-09-20T03:52:32+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:99045434265c",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.2,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:116041321624",
+     "provider": "zai",
+     "model": "Atria-Dawn-Preview",
+     "prompt_hash": "f0da491e36879a41df5944b8333a21fee6e372d6cc3f3f11eb240f60e967031e",
+     "output_hash": "116041321624afc1a73ac9d7ec03dd8307b05876c2778d2e6bd90e056e831104",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.3390/molecules28237769",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.308,
+      "evidence_support_cleared": 0.308,
+      "constraint_traceable_to_evidence": "The susceptor must be specified by measured surface area and porosity because those properties govern absorption of micr"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-20T03:50:32+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Carbon-based microwave susceptors absorb microwave energy and convert it into localized thermal energy, with uptake governed by the susceptor's surface area and porosity, enabling targeted heating at lower bulk power.",
+      "after": "A carbon microwave susceptor absorbs microwave radiation, with the uptake governed by the susceptor’s surface area and porosity, so the captured radiation is converted into localized thermal energy that can be redistributed toward the food center."
+     },
+     "intervention": {
+      "before": "Install a food-safe, high-surface-area carbon-loaded susceptor plate/sleeve inside the countertop cavity, positioned beneath and around the food, so it preferentially captures microwave energy from the standing-wave field and re-emits it as evenly distributed conductive/radiant heat into the food ce",
+      "after": "Install a food-safe carbon microwave susceptor plate/sleeve beneath and around the food, selected and validated for the surface area and porosity required to absorb microwave radiation across the cavity, so it re-emits conductive and radiant heat into the load without user stirring."
+     },
+     "mechanism_source_span": {
+      "before": "the key role of the surface area and porosity of the carbon microwave susceptor in absorbing microwave",
+      "after": "Furthermore, this study highlights the key role of the surface area and porosity of the carbon microwave susceptor in absorbing microwave radiation, offering exciting new avenues for optimization."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.47836/pjst.32.5.16",
+      "microwave countertop heating based oven ovens",
+      "microwave countertop heating based oven ovens",
+      "microwave heating based susceptors convert localized",
+      "microwave heating based susceptors convert localized",
+      "microwave countertop surface susceptor area carbon energy center",
+      "microwave countertop surface susceptor area carbon energy center",
+      "microwave suppression uniformity existing cavity standing",
+      "microwave suppression uniformity existing cavity standing",
+      "microwave countertop heating based oven lower",
+      "microwave countertop heating based oven lower"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "6252a383bf6b2706897b207646567b0a4d8a5c2a593b0c8c5a0f42d1ac2b547c",
+    "child_spec_hash": null,
+    "reason": "This repairs the weak mechanism-evidence derivation by anchoring the mechanism in a verbatim evidence span and deriving the surface-area-and-porosity constraint directly from that cited evidence.",
+    "applied_at": "2026-09-20T03:50:32+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:5f0840719d40",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.282,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:7cc64c53569d",
+     "provider": "zai",
+     "model": "Atria-Dawn-Preview",
+     "prompt_hash": "870df7e2697c9a0223148f083e72a75feacc55112a611130a19df133f5f70a5b",
+     "output_hash": "7cc64c53569d860e319722d48385a90b585e77cbb8f47b9907c4aa244ab7132f",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.3390/molecules28237769",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.286,
+      "evidence_support_cleared": 0.286,
+      "constraint_traceable_to_evidence": "The susceptor’s surface area and porosity must be selected and validated as the variables playing the key role in absorb"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-20T03:52:32+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "A carbon microwave susceptor absorbs microwave radiation, with the uptake governed by the susceptor’s surface area and porosity, so the captured radiation is converted into localized thermal energy that can be redistributed toward the food center.",
+      "after": "The surface area and porosity of the carbon microwave susceptor play the key role in absorbing microwave radiation; the absorbed microwave energy is converted into heat at the susceptor and redistributed conductively and radiantly toward the food center."
+     },
+     "intervention": {
+      "before": "Install a food-safe carbon microwave susceptor plate/sleeve beneath and around the food, selected and validated for the surface area and porosity required to absorb microwave radiation across the cavity, so it re-emits conductive and radiant heat into the load without user stirring.",
+      "after": "Install a food-safe carbon microwave susceptor plate/sleeve beneath and around the food, with its surface area and porosity selected and validated because they play the key role in absorbing microwave radiation, so the susceptor re-emits heat into the load without user stirring."
+     },
+     "mechanism_source_span": {
+      "before": "Furthermore, this study highlights the key role of the surface area and porosity of the carbon microwave susceptor in absorbing microwave radiation, offering exciting new avenues for optimization.",
+      "after": "this study highlights the key role of the surface area and porosity of the carbon microwave susceptor in absorbing microwave radiation"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.47836/pjst.32.5.16",
+      "microwave countertop heating based oven ovens",
+      "microwave countertop heating based oven ovens",
+      "microwave heating based susceptors convert localized",
+      "microwave heating based susceptors convert localized",
+      "microwave countertop surface susceptor area carbon energy center",
+      "microwave countertop surface susceptor area carbon energy center",
+      "microwave suppression uniformity existing cavity standing",
+      "microwave suppression uniformity existing cavity standing",
+      "microwave countertop heating based oven lower",
+      "microwave countertop heating based oven lower"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "021447b3d294a7b04ede46ae98ecd3eee566d3ff3670aac8584791c430063122",
+    "child_spec_hash": null,
+    "reason": "This repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism and intervention in the verbatim evidence statement that surface area and porosity of a carbon microwave susceptor play the key role in absorbing microwave radiation.",
+    "applied_at": "2026-09-20T03:52:32+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "25d6c0fecdd36d61b3d7e59aa43061ad3f1d1786f5a99ba68da22062b74f5ea1"
 }
