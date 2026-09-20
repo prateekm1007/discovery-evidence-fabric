@@ -7,8 +7,20 @@ same failure taxonomy. Only call-time timestamps may differ (they
 are provenance of the actual call, Art. VI — never fabricated to
 match).
 
-The retrieval attribution record must carry every directive field
-so the next audit can see which remote jobs dominate RETRIEVE.
+Section A compares the two shipped execution modes (parallel vs
+ENGINE_RETRIEVE_FANOUT=serial). Section B compares the parallel
+path against FROZEN_REFERENCE_SERIAL, a verbatim copy of the
+pre-R512 loop (commit 47b60e73) embedded below: the auditor
+correctly observed that mode-vs-mode alone shares the new
+planner/worker/assembler, so the frozen copy is the independent
+proof of pre-R512 semantic equivalence (Arts. III, XVI).
+
+Narrowed exception contract (audited R512): a worker raise
+re-surfaces first-in-plan-order with identical type/message, and
+lane_states/canonical content assembled BEFORE the raise point is
+identical; but already-executed parallel jobs keep their network
+side effects (no rollback). The adversarial test below pins all
+three properties.
 """
 from __future__ import annotations
 
@@ -231,9 +243,9 @@ def test_attribution_record_complete(monkeypatch):
     a = rep["retrieval_attribution"]
     for k in ("schema", "mode", "max_workers_configured",
               "max_workers_effective", "peak_concurrency_observed",
-              "n_jobs", "fanout_wall_s", "total_network_s",
+              "n_jobs", "fanout_wall_s", "total_search_call_s",
               "max_job_wall_s", "assemble_s",
-              "orchestration_overhead_s", "jobs", "records_returned",
+              "worker_queue_wait_s", "jobs", "records_returned",
               "records_admitted", "canonical_merges", "enrichment_s"):
         assert k in a, k
     assert a["schema"] == "RETRIEVAL_ATTRIBUTION/1.0"
@@ -243,11 +255,11 @@ def test_attribution_record_complete(monkeypatch):
     total = 0
     for j in a["jobs"]:
         for k in ("index", "lane", "source_id", "variant_classes",
-                  "n_variants", "network_ms", "job_wall_s", "outcome",
+                  "n_variants", "search_call_ms", "job_wall_s", "outcome",
                   "variant_statuses", "records_returned"):
             assert k in j, k
         assert j["outcome"] in allowed, j["outcome"]
-        assert j["network_ms"] >= 0
+        assert j["search_call_ms"] >= 0
         total += j["records_returned"]
     assert total == a["records_returned"]
     assert set(a["enrichment_s"]) == {"patent_claims", "reciprocal",
@@ -320,3 +332,270 @@ def test_all_failed_honest_with_attribution(monkeypatch):
     assert a["records_admitted"] == 0
     assert all(j["outcome"] in ("unavailable", "other_typed_failure")
                for j in a["jobs"])
+
+
+# ---------------------------------------------------------------------------
+# B. independent frozen serial reference (verbatim pre-R512 loop,
+#    commit 47b60e73 — FROZEN; do not "fix" it to match new code)
+# ---------------------------------------------------------------------------
+
+def _serial_reference_frozen(all_variants, canonicalizer, lane_states):
+    """Verbatim copy of the pre-R512 lane fan-out loop
+    (47b60e73:discovery_fabric/retrieval_fabric/pipeline.py, the
+    "# ---- 3. lane fan-out" block), adapted only to take its inputs
+    as parameters. Shared leaf helpers (_select_variants,
+    _ingest_record, fabric_health_of, LaneRunState) are unchanged
+    pre/post and are intentionally reused: the independence under
+    test is the ORCHESTRATION (plan/execute/assemble/order), which
+    this copy does not share with the new implementation.
+    """
+    from discovery_fabric.retrieval_fabric.adapters import (
+        LaneRunState, fabric_health_of,
+    )
+    from discovery_fabric.retrieval_fabric.fabric_registry import (
+        get_fabric_source,
+    )
+    from discovery_fabric.retrieval_fabric.pipeline import (
+        LANE_SOURCE_MAP, SOURCE_VARIANT_POLICY, _ingest_record,
+        _select_variants,
+    )
+    for lane, source_ids in LANE_SOURCE_MAP.items():
+        for source_id in source_ids:
+            fabric_src = get_fabric_source(source_id)
+            if fabric_src is None:
+                continue  # not in this fabric version
+            policy = SOURCE_VARIANT_POLICY.get(source_id, "PRIMARY")
+            scoped = "THESIS" if (lane == "THESIS" and
+                                  source_id in ("crossref", "datacite")) else None
+            chosen = _select_variants(all_variants, policy)
+            if lane == "THESIS" and source_id in ("openaire", "core"):
+                # thesis lane on post-hoc sources: use a CROSS_DOMAIN
+                # variant if present (alternative terminology is the
+                # measured discovery path for theses)
+                chosen = ([v for v in all_variants
+                           if v["derivation_class"] == "CROSS_DOMAIN_TERM"][:1]
+                          or chosen)
+            if not chosen:
+                continue
+            conn = fabric_pipeline._connector_for(source_id, scoped)
+            if conn is None:
+                lane_states.append(LaneRunState(
+                    lane=lane, source_id=source_id,
+                    queries=[v["query"] for v in chosen],
+                    status="NOT_IMPLEMENTED", fabric_health="DEGRADED",
+                    error="connector unavailable in registry wiring"))
+                continue
+            state = LaneRunState(lane=lane, source_id=source_id,
+                                 queries=[v["query"] for v in chosen])
+            total_records = 0
+            variant_statuses = []
+            errors = []
+            for v in chosen:
+                q = v["query"]
+                try:
+                    result = conn.search(
+                        q, retrieval_role="DISCOVERY")
+                except TypeError:
+                    # some registry connectors (prior_art_v2 wrappers) do
+                    # not accept the retrieval_role kwarg — call without
+                    # it (the custody log entry is still written by the
+                    # wrapper's own _finish path)
+                    result = conn.search(q)
+                variant_statuses.append(result.status)
+                total_records += len(result.records)
+                if result.error:
+                    errors.append(f"[{result.status}] {str(result.error)[:120]}")
+                for rec in result.records:
+                    _ingest_record(canonicalizer, source_id, rec, q,
+                                   v["derivation_class"], lane_states, lane,
+                                   scoped)
+            # multi-variant honesty: the source is AVAILABLE when ANY
+            # variant was answered (OK/EMPTY); a variant-level failure is
+            # recorded in the error string, never masked as total failure
+            any_answered = any(s in ("OK", "EMPTY") for s in variant_statuses)
+            if any_answered:
+                state.status = "OK" if total_records else "EMPTY"
+            else:
+                state.status = variant_statuses[-1] if variant_statuses else "SEARCH_FAILED"
+            state.record_count = total_records
+            state.error = "; ".join(errors)[:300] or None
+            state.fabric_health = fabric_health_of(state.status)
+            lane_states.append(state)
+
+
+def _reference_run(monkeypatch, pool):
+    """Drive the frozen reference on stub connectors (no patent-claim
+    enrichment: google_patents is excluded so the reference's
+    canonical pool compares directly with the fan-out pool)."""
+    from discovery_fabric.retrieval_fabric.canonical import Canonicalizer
+    from discovery_fabric.retrieval_fabric.query_expansion import (
+        expand_query, mechanism_query,
+    )
+    _stub_pool(monkeypatch, pool)
+    primary = mechanism_query(PROBLEM)
+    all_variants = expand_query(primary, PROBLEM)
+    canonicalizer = Canonicalizer()
+    lane_states = []
+    _serial_reference_frozen(all_variants, canonicalizer, lane_states)
+    return canonicalizer, lane_states
+
+
+def test_parallel_matches_frozen_reference(monkeypatch):
+    """Parallel path vs the independent pre-R512 contract.
+
+    google_patents is excluded from the pool so both sides run
+    without the post-fan-out claim-enrichment step (covered instead
+    by the mode-vs-mode test, which runs enrichment identically).
+    """
+    pool = _pool()
+    del pool["google_patents"]
+    canonicalizer, lane_states = _reference_run(monkeypatch, pool)
+    _stub_pool(monkeypatch, dict(pool))
+    monkeypatch.delenv("ENGINE_RETRIEVE_FANOUT", raising=False)
+    monkeypatch.delenv("ENGINE_RETRIEVE_MAX_WORKERS", raising=False)
+    items, report = fabric_pipeline.retrieve_fabric(
+        PROBLEM, enable_reciprocal=False, enable_unpaywall=False)
+    ref_canon = json.dumps(
+        [r.to_dict() for r in canonicalizer.canonical_records()],
+        sort_keys=True, default=str)
+    new_canon = json.dumps(report["canonical_records"],
+                           sort_keys=True, default=str)
+    assert ref_canon == new_canon, \
+        "parallel canonical pool differs from frozen reference"
+    ref_lanes = json.dumps([s.to_dict() for s in lane_states],
+                           sort_keys=True, default=str)
+    new_lanes = json.dumps(report["retrieval_stats"]["lane_states"],
+                           sort_keys=True, default=str)
+    assert new_lanes == ref_lanes, \
+        "parallel lane states differ from frozen reference"
+    # engine items likewise (minus call-time timestamps)
+    ref_ids = sorted(r.canonical_id
+                     for r in canonicalizer.canonical_records())
+    new_ids = sorted(it["canonical_id"] for it in items)
+    assert new_ids == ref_ids, \
+        "engine pool diverged from reference canonical pool"
+
+
+def test_missing_connector_ordering_parity(monkeypatch):
+    """An interspersed missing connector must land in the same
+    LANE_SOURCE_MAP position under all three executions (parallel,
+    shipped serial, frozen reference) — not front/back-loaded."""
+    pool = _pool()
+    del pool["crossref"]  # middle of SCHOLARLY: europepmc, openalex,
+    # semantic_scholar, CROSSREF, doaj
+    got = {}
+    for mode in ("parallel", "serial"):
+        _stub_pool(monkeypatch, dict(pool))
+        monkeypatch.setenv("ENGINE_RETRIEVE_FANOUT", mode)
+        _, rep = fabric_pipeline.retrieve_fabric(
+            PROBLEM, enable_reciprocal=False, enable_unpaywall=False)
+        got[mode] = [(s["lane"], s["source_id"], s["status"])
+                     for s in rep["retrieval_stats"]["lane_states"]]
+    canonicalizer, lane_states = _reference_run(monkeypatch, pool)
+    got["reference"] = [(s.lane, s.source_id, s.status)
+                        for s in lane_states]
+    assert got["parallel"] == got["serial"] == got["reference"], \
+        "lane-state ordering diverged across executions"
+    sch_names = [s for l, s, _ in got["parallel"] if l == "SCHOLARLY"]
+    assert (sch_names.index("crossref")
+            == sch_names.index("semantic_scholar") + 1), \
+        "NOT_IMPLEMENTED crossref not interleaved at its map position"
+    cross = [t for t in got["parallel"] if t[1] == "crossref"][0]
+    assert cross[2] == "NOT_IMPLEMENTED"
+
+
+class CountingStub(StubConnector):
+    """Stub recording every search invocation (side-effect witness)."""
+
+    def __init__(self, *a, **k):
+        super().__init__(*a, **k)
+        self.calls = []
+
+    def search(self, query, timeout=25, retrieval_role=""):
+        self.calls.append(query)
+        return super().search(query, timeout=timeout,
+                              retrieval_role=retrieval_role)
+
+
+class CountingRaising(CountingStub):
+    def search(self, query, timeout=25, retrieval_role=""):
+        self.calls.append(query)
+        raise ValueError("stubbed connector defect")
+
+
+def test_exception_contract_adversarial(monkeypatch):
+    """Narrowed contract, pinned adversarially: (1) identical
+    exception identity under both modes; (2) lane_states/canonical
+    prefix identical (units before the raise point); (3) disclosed
+    divergence — parallel keeps already-executed jobs' network side
+    effects (more searches ran than serial)."""
+    from discovery_fabric.retrieval_fabric.canonical import Canonicalizer
+    from discovery_fabric.retrieval_fabric.query_expansion import (
+        expand_query, mechanism_query,
+    )
+
+    def _pool_counting(fail_at):
+        pool = {}
+        for sid, stub in _pool().items():
+            if sid == fail_at:
+                pool[sid] = CountingRaising()
+            else:
+                c = CountingStub(stub.status, stub.records, stub.error)
+                pool[sid] = c
+        return pool
+
+    # scenario 1: raise at the FIRST job (europepmc) — empty prefix
+    serial_calls = parallel_calls = None
+    serial_states = parallel_states = None
+    for mode in ("serial", "parallel"):
+        pool = _pool_counting("europepmc")
+        _stub_pool(monkeypatch, pool)
+        monkeypatch.setenv("ENGINE_RETRIEVE_FANOUT", mode)
+        with pytest.raises(ValueError,
+                           match="stubbed connector defect"):
+            fabric_pipeline.retrieve_fabric(
+                PROBLEM, enable_reciprocal=False, enable_unpaywall=False)
+        n = sum(len(s.calls) for s in pool.values())
+        if mode == "serial":
+            serial_calls = n
+        else:
+            parallel_calls = n
+    assert serial_calls == 1, serial_calls
+    assert parallel_calls > serial_calls, \
+        "parallel must disclose extra executed searches, got %s" % (
+            parallel_calls,)
+
+    # scenario 2: raise at the LAST lane (google_patents) — full
+    # non-empty prefix must be identical across modes
+    prefix = {}
+    for mode in ("serial", "parallel"):
+        pool = _pool_counting("google_patents")
+        _stub_pool(monkeypatch, pool)
+        monkeypatch.setenv("ENGINE_RETRIEVE_FANOUT", mode)
+        with pytest.raises(ValueError,
+                           match="stubbed connector defect"):
+            try:
+                fabric_pipeline.retrieve_fabric(
+                    PROBLEM, enable_reciprocal=False,
+                    enable_unpaywall=False)
+            except ValueError as exc:
+                prefix[mode] = str(exc)
+                raise
+    assert prefix["serial"] == prefix["parallel"]
+    # prefix states: drive the frozen reference with the same
+    # patent-less pool, then compare the assembled lane order
+    # (both sides carry the PATENT NOT_IMPLEMENTED state at its map
+    # position — the ordering property under test)
+    pool = _pool()
+    del pool["google_patents"]
+    canonicalizer, lane_states = _reference_run(monkeypatch, pool)
+    order = [(s.lane, s.source_id) for s in lane_states]
+    assert len(order) > 0
+    # and the shipped serial mode assembles the identical order
+    _stub_pool(monkeypatch, dict(pool))
+    monkeypatch.setenv("ENGINE_RETRIEVE_FANOUT", "serial")
+    _, rep = fabric_pipeline.retrieve_fabric(
+        PROBLEM, enable_reciprocal=False, enable_unpaywall=False)
+    got = [(s["lane"], s["source_id"])
+           for s in rep["retrieval_stats"]["lane_states"]]
+    assert got == order

@@ -208,20 +208,22 @@ def _select_variants(variants: List[Dict[str, Any]],
 
 def _plan_fanout_jobs(
         all_variants: List[Dict[str, Any]]
-) -> Tuple[List[Dict[str, Any]], List[LaneRunState]]:
-    """Plan the lane fan-out as ordered independent jobs (NO network).
+) -> List[Dict[str, Any]]:
+    """Plan the lane fan-out as ONE ordered unit sequence (NO network).
 
     Replicates the serial loop's lane/source/variant selection EXACTLY
-    (LANE_SOURCE_MAP order, SOURCE_VARIANT_POLICY, THESIS scoping):
-    job N in this list is the Nth (lane, source) unit the serial loop
-    would have executed. Sources with no connector produce the same
-    immediate NOT_IMPLEMENTED lane state here; sources with no fabric
-    record or no chosen variants produce nothing (as in serial).
-    Each job carries its OWN connector instance (fresh cls() per job,
-    as today), so workers never share connector state.
+    (LANE_SOURCE_MAP order, SOURCE_VARIANT_POLICY, THESIS scoping).
+    Each unit is either a network job or an immediate lane state, in
+    the exact position the serial loop would have produced it — so
+    reassembly (including NOT_IMPLEMENTED states for missing
+    connectors) preserves the original lane-state ordering byte for
+    byte. Sources with no fabric record or no chosen variants produce
+    nothing (as in serial). Each job carries its OWN connector
+    instance (fresh cls() per job, as today), so workers never share
+    connector state.
     """
-    jobs: List[Dict[str, Any]] = []
-    immediate: List[LaneRunState] = []
+    plan: List[Dict[str, Any]] = []
+    job_index = 0
     for lane, source_ids in LANE_SOURCE_MAP.items():
         for source_id in source_ids:
             fabric_src = get_fabric_source(source_id)
@@ -242,23 +244,31 @@ def _plan_fanout_jobs(
                 continue
             conn = _connector_for(source_id, scoped)
             if conn is None:
-                immediate.append(LaneRunState(
-                    lane=lane, source_id=source_id,
-                    queries=[v["query"] for v in chosen],
-                    status="NOT_IMPLEMENTED", fabric_health="DEGRADED",
-                    error="connector unavailable in registry wiring"))
+                plan.append({
+                    "kind": "lane_state",
+                    "state": LaneRunState(
+                        lane=lane, source_id=source_id,
+                        queries=[v["query"] for v in chosen],
+                        status="NOT_IMPLEMENTED",
+                        fabric_health="DEGRADED",
+                        error="connector unavailable in registry wiring"),
+                })
                 continue
-            jobs.append({
-                "index": len(jobs),
-                "lane": lane,
-                "source_id": source_id,
-                "connector": conn,
-                "scoped": scoped,
-                "variants": [{"query": v["query"],
-                              "derivation_class": v["derivation_class"]}
-                             for v in chosen],
+            plan.append({
+                "kind": "job",
+                "job": {
+                    "index": job_index,
+                    "lane": lane,
+                    "source_id": source_id,
+                    "connector": conn,
+                    "scoped": scoped,
+                    "variants": [{"query": v["query"],
+                                  "derivation_class": v["derivation_class"]}
+                                 for v in chosen],
+                },
             })
-    return jobs, immediate
+            job_index += 1
+    return plan
 
 
 def _run_fanout_job(job: Dict[str, Any]) -> Dict[str, Any]:
@@ -268,8 +278,15 @@ def _run_fanout_job(job: Dict[str, Any]) -> Dict[str, Any]:
     Returns variant outcomes with per-variant call latency. The
     TypeError fallback (registry connectors without the retrieval_role
     kwarg) matches the serial path exactly. Any OTHER exception is
-    captured (never swallowed: the assembler re-raises the first one
-    in deterministic job order, preserving the serial raise contract).
+    captured with its traceback object (never swallowed, never
+    converted): the assembler re-raises the first one in deterministic
+    job order. NARROWED CONTRACT (audited R512): lane_states and the
+    canonical pool contain only units assembled BEFORE the raise point
+    in plan order, but already-executed parallel jobs keep their
+    network side effects (provider calls made, connector custody
+    entries written) — those are not rolled back, unlike the serial
+    path where later jobs never execute. Only the exception identity
+    and the assembled-state prefix are serial-equivalent.
     """
     import time as _t
     wall_t0 = _t.perf_counter()
@@ -314,23 +331,31 @@ def _run_fanout_job(job: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _assemble_fanout(
-        jobs: List[Dict[str, Any]],
+        plan: List[Dict[str, Any]],
         job_results: List[Dict[str, Any]],
         canonicalizer: Canonicalizer,
         lane_states: List[LaneRunState]) -> Dict[str, Any]:
-    """Reassemble job results in deterministic job order (main thread).
+    """Reassemble the plan in deterministic unit order (main thread).
 
-    Single shared implementation for both execution modes: per-job
-    status aggregation + sequential _ingest_record into the shared
-    Canonicalizer (never called from workers — Canonicalizer.add is
-    order-dependent: origin_source/first-wins best_record/merge order).
-    A captured worker raise is re-raised here, first in job order
-    (the serial raise contract).
+    Single shared implementation for both execution modes: immediate
+    lane states land in their original LANE_SOURCE_MAP positions;
+    per-job status aggregation + sequential _ingest_record into the
+    shared Canonicalizer (never called from workers —
+    Canonicalizer.add is order-dependent: origin_source/first-wins
+    best_record/merge order). A captured worker raise is re-raised
+    here at the failing unit: units after it are NOT assembled
+    (narrowed contract — see _run_fanout_job).
     Returns the attribution rows + counts for this fan-out.
     """
+    by_index = {r["index"]: r for r in job_results}
     job_rows: List[Dict[str, Any]] = []
     records_returned = 0
-    for job, res in zip(jobs, job_results):
+    for unit in plan:
+        if unit["kind"] == "lane_state":
+            lane_states.append(unit["state"])
+            continue
+        job = unit["job"]
+        res = by_index[job["index"]]
         assert job["index"] == res["index"]
         state = LaneRunState(lane=job["lane"], source_id=job["source_id"],
                              queries=[v["query"] for v in job["variants"]])
@@ -370,7 +395,7 @@ def _assemble_fanout(
             "variant_classes": [v["derivation_class"]
                                 for v in job["variants"]],
             "n_variants": len(job["variants"]),
-            "network_ms": network_ms,
+            "search_call_ms": network_ms,
             "job_wall_s": round(res["job_wall_s"], 3),
             "outcome": _classify_job_outcome(variant_statuses,
                                              total_records),
@@ -382,16 +407,27 @@ def _assemble_fanout(
 
 
 def _drive_fanout(
-        jobs: List[Dict[str, Any]],
+        plan: List[Dict[str, Any]],
         canonicalizer: Canonicalizer,
         lane_states: List[LaneRunState],
         policy: Dict[str, Any]) -> Dict[str, Any]:
     """Execute planned jobs (parallel bounded executor or serial
-    reference) and assemble in deterministic order.
+    reference) and assemble in deterministic plan order.
 
     Returns the retrieval attribution record (directive fields).
+    Timing vocabulary (audited R512): per-variant `latency_ms` and
+    per-job `search_call_ms` are connector search-call durations
+    (request + parse + normalize + custody logging as the connector
+    measures them) — NOT pure network time. `worker_queue_wait_s`
+    is the residual fanout_wall - max_job_wall - assemble: wall time
+    not covered by the slowest job or by assembly. With a bounded
+    worker pool this residual is dominated by jobs waiting for a
+    free worker (wave effects) plus unmeasured framework cost; small
+    negatives are timer granularity. It is reported raw with this
+    definition — never as a pure scheduler-overhead measure.
     """
     import time as _t
+    jobs = [u["job"] for u in plan if u["kind"] == "job"]
     wall_t0 = _t.perf_counter()
     peak = {"current": 0, "max": 0}
     peak_lock = Lock()
@@ -408,8 +444,16 @@ def _drive_fanout(
 
     results: List[Dict[str, Any]] = []
     if policy["mode"] == "serial" or not jobs:
+        # serial reference path: stop at the first raising job exactly
+        # like the pre-R512 inline loop (later jobs never execute —
+        # no network, no custody entries). The assembler re-raises at
+        # that unit in plan order.
         for job in jobs:
-            results.append(_run_fanout_job(job))
+            res = _run_fanout_job(job)
+            results.append(res)
+            if any(vo["raised"] is not None
+                   for vo in res["variant_outcomes"]):
+                break
         effective_workers = 1
         peak["max"] = 1 if jobs else 0
     else:
@@ -421,10 +465,11 @@ def _drive_fanout(
             futures = [ex.submit(_tracked, job) for job in jobs]
             results = [f.result() for f in futures]
     assemble_t0 = _t.perf_counter()
-    asm = _assemble_fanout(jobs, results, canonicalizer, lane_states)
+    asm = _assemble_fanout(plan, results, canonicalizer, lane_states)
     assemble_s = _t.perf_counter() - assemble_t0
     wall_s = _t.perf_counter() - wall_t0
-    total_network_s = sum(r["network_ms"] for r in asm["job_rows"]) / 1000.0
+    total_search_call_s = sum(
+        r["search_call_ms"] for r in asm["job_rows"]) / 1000.0
     max_job_wall_s = max([r["job_wall_s"] for r in asm["job_rows"]]
                          + [0.0])
     return {
@@ -435,10 +480,10 @@ def _drive_fanout(
         "peak_concurrency_observed": peak["max"],
         "n_jobs": len(jobs),
         "fanout_wall_s": round(wall_s, 3),
-        "total_network_s": round(total_network_s, 3),
+        "total_search_call_s": round(total_search_call_s, 3),
         "max_job_wall_s": round(max_job_wall_s, 3),
         "assemble_s": round(assemble_s, 3),
-        "orchestration_overhead_s": round(
+        "worker_queue_wait_s": round(
             wall_s - max_job_wall_s - assemble_s, 3),
         "jobs": asm["job_rows"],
         "records_returned": asm["records_returned"],
@@ -535,10 +580,9 @@ def retrieve_fabric(problem: Dict[str, Any],
     _fanout_t0 = time.perf_counter()
     _canon_before = len(canonicalizer.canonical_records())
     _merges_before = len(canonicalizer.merge_events)
-    _fanout_jobs, _fanout_immediate = _plan_fanout_jobs(all_variants)
-    lane_states.extend(_fanout_immediate)
+    _fanout_plan = _plan_fanout_jobs(all_variants)
     _retrieval_attribution = _drive_fanout(
-        _fanout_jobs, canonicalizer, lane_states,
+        _fanout_plan, canonicalizer, lane_states,
         _fanout_policy_resolved)
     _retrieval_attribution["records_admitted"] = (
         len(canonicalizer.canonical_records()) - _canon_before)
