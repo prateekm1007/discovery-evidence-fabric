@@ -166,6 +166,32 @@ class TestIncrementalSnapshot:
         assert out["integrity_verified"] is True, out
         assert out["sessions"] == 1
 
+    def test_visual_identity_chain_survives_snapshot(self, durable_env):
+        """R510 regression: durable snapshots must carry the persisted
+        visual identity/current-generation anchors alongside the canonical
+        GLB. Without these MODEL files a restart preserves the bytes but
+        the strict visual contract correctly downgrades the artifact to
+        geometry_unverified."""
+        model = durable_env["run_dir"] / "MODEL"
+        identity = "{\"artifact\": \"ARTIFACT_IDENTITY\", \"geometry_hash\": \"h\", \"generation_id\": \"gen-1\"}\n"
+        identity_sha = "sha  ARTIFACT_IDENTITY.json\n"
+        lineage = "{\"generation_models\": [{\"generation\": 1, \"generation_id\": \"gen-1\", \"glb\": \"MODEL/model-001.glb\", \"current\": true}]}\n"
+        geometry_spec = "{\"schema_version\": \"1.0.0\", \"geometry\": {}}\n"
+        (model / "ARTIFACT_IDENTITY.json").write_text(identity)
+        (model / "ARTIFACT_IDENTITY.sha256").write_text(identity_sha)
+        (model / "DESIGN_LINEAGE.json").write_text(lineage)
+        (model / "GEOMETRY_SPEC.json").write_text(geometry_spec)
+
+        report = durable.snapshot("terminal:COMPLETE:s1:visual-identity")
+        assert report["ok"] is True, report
+
+        repo = durable.STATE_REPO
+        persisted = repo / "runs" / "toscanini_ui_problem1" / "MODEL"
+        assert (persisted / "ARTIFACT_IDENTITY.json").read_text() == identity
+        assert (persisted / "ARTIFACT_IDENTITY.sha256").read_text() == identity_sha
+        assert (persisted / "DESIGN_LINEAGE.json").read_text() == lineage
+        assert (persisted / "GEOMETRY_SPEC.json").read_text() == geometry_spec
+
     def test_refusal_when_disabled_is_explicit(self, durable_env,
                                                monkeypatch):
         monkeypatch.setenv("DURABLE_STATE_ENABLED", "")
