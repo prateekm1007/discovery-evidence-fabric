@@ -2345,3 +2345,104 @@ The processing-time UI remains partial: current-stage/activity presentation exis
 
 The larger scientific gaps remain unchanged: fresh mechanism yield, attacker calibration, reality validation, learning, buyer-package validation, and cross-domain/generalized discovery qualification.
 
+
+---
+
+# CURRENT AUDIT — 2026-09-21 — R513 CLOSURE
+
+## Authoritative repository state
+
+Remote main is now:
+7e2dfa62c491951f2a3505fd29bbd0eacb4ddd0a
+
+The R513 closure was merged as PR #9: R513 closure: retire MULTI_SOURCE_DISCOVERY and reconcile architecture maps.
+
+The deployed production engine remains:
+4d4964e89a6f02e8fdb5a2c4127938635c535fb3
+
+Do not claim the closure commit is production-deployed unless the production URL is independently verified at that exact SHA.
+
+## R513 closure result
+
+R513 semantic removal: SUCCESSFUL AND DEPLOYED.
+R513 retirement cleanup: CLOSED IN REPOSITORY.
+R513 documentation/state reconciliation: CLOSED.
+
+The retired implementation orchestrator/multi_source_discovery.py has been deleted.
+The dead MultiSourceDiscoveryAdapter has been deleted from discovery_fabric/engine/adapters.py.
+The former test-only caller was removed from tests/test_engine_integration.py.
+The runtime capability registry no longer contains an active MULTI_SOURCE_DISCOVERY capability.
+The active discovery graph now records the actual 16-stage chain.
+The production module inventory now contains 187 production-closure Python files and 104,910 LOC.
+
+## Exact caller-audit conclusion
+
+The repository-wide GitHub code-search index returned zero hits for orchestrator.multi_source_discovery, run_four_search_attack, MultiSourceDiscoveryAdapter, and MULTI_SOURCE_DISCOVERY.
+
+Exact source inspection then found the remaining concrete test-only caller in tests/test_engine_integration.py; it was removed before deleting the implementation.
+
+The deleted module was therefore not retained as an undocumented second implementation.
+
+## Current executable D8 chain
+
+RETRIEVE → FREEZE → PREMISE_GATE → SYNTHESIZE → VERIFY → MECHANISM_SPACE → COLLISION → PHYSICS → ATTACK → CONTRADICTION → KILLER_EXPERIMENT → IMPROVE → ADJUDICATION → CLASSIFY → NEXT_BEST_ACTION → RANK
+
+Count: 16.
+
+MULTI_SOURCE_DISCOVERY is not in the executable chain, adapter registry, active graph, or production module inventory.
+
+## R513 record-consistency audit
+
+The earlier apparent discrepancy in records_found = 15 for cases C/D is resolved.
+
+records_found is the evidence_state retrieval-record count, not a count of engine stages.
+The product phase_progression projection exposes 15 named stages and does not surface IMPROVE. The captured C/D state payloads nevertheless contain run-owned IMPROVE activity in model_route.
+
+Therefore the evidence does not establish a missing IMPROVE persistence event. The discrepancy was an accounting-layer/documentation ambiguity, not proof of a broken 16-stage engine.
+
+This resolution is recorded in R513/POST_BATTERY_REMOVAL_MEASUREMENT.json.
+
+## Files reconciled by the closure
+
+- discovery_fabric/engine/adapters.py
+- tests/test_engine_integration.py
+- orchestrator/multi_source_discovery.py — deleted
+- ACTIVE_PATH.md
+- ACTIVE_DISCOVERY_GRAPH.json
+- RUNTIME_CAPABILITY_REGISTRY.json
+- MODULE_INVENTORY.json
+- R513/POST_BATTERY_REMOVAL_MEASUREMENT.json
+
+## Validation status
+
+The remote repository state was re-read after merge.
+
+Verified:
+- main HEAD = 7e2dfa62...
+- deleted module returns 404 on main
+- discovery_fabric/engine/adapters.py contains no dead multi-source adapter
+- active graph contains the 16-stage chain
+- runtime registry contains no active MULTI_SOURCE_DISCOVERY capability
+- module inventory contains no retired module
+- module inventory = 187 production files / 104,910 LOC
+
+No GitHub Actions status was available for the closure commit, and the local container could not clone the repository because outbound DNS/network access is unavailable. Therefore do not claim a fresh full test-suite pass from this chat.
+
+## Production delivery status
+
+The prior R513 deployment evidence records production removal build 4d4964e8... as drift GREEN, tamper false, and build == running SHA.
+
+The closure commit 7e2dfa62... has not been independently proven as the running production SHA from the available connectors. Treat production identity for the closure commit as UNKNOWN until the production URL reports that exact SHA.
+
+Do not manually edit the production console, JSON, credentials, or deployment state. Use the repository's existing automated deployment machinery when a deployment of the closure is required.
+
+## Next task
+
+R513 closure itself is complete.
+
+The next optimization round must NOT start until the closure's production-delivery requirement is either independently verified or explicitly recorded as a typed deployment blocker.
+
+After that, return to the measurement loop:
+fresh attribution → identify one valid funnel cliff → one coherent fix → equivalent fresh battery → compare.
+
+Do not optimize another stage merely because it is expensive. Historical R511 attribution still identifies RETRIEVE as the dominant runtime sink; R512 already addressed it with bounded parallel fan-out. R513 removed approximately 3.6% dead work. Any further change needs a new measurement.
