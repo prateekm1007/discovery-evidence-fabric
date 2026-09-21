@@ -402,20 +402,75 @@ def _assemble_fanout(
         state.fabric_health = fabric_health_of(state.status)
         lane_states.append(state)
         records_returned += total_records
+        # R517 per-operation attribution (additive, on existing
+        # machinery — no new framework). Every field carries explicit
+        # provenance per Phase 1 contract.
+        _query_hashes = [
+            hashlib.sha256(v["query"].encode("utf-8")).hexdigest()[:16]
+            for v in job["variants"]]
+        _variant_details = []
+        for idx, vo in enumerate(res["variant_outcomes"]):
+            _q = job["variants"][idx]["query"] if idx < len(
+                job["variants"]) else ""
+            _variant_details.append({
+                "variant_index": idx,
+                "query_hash": hashlib.sha256(
+                    _q.encode("utf-8")).hexdigest()[:16],
+                "derivation_class": vo.get("derivation_class"),
+                "attempt_index": 1,
+                "attempt_provenance": "OBSERVED_IN_STAGE: single attempt per variant in fanout (no retry loop)",
+                "retry_backoff_s": 0,
+                "retry_provenance": "OBSERVED_IN_STAGE: no retry/backoff in current fanout path",
+                "fallback": False,
+                "fallback_provenance": "OBSERVED_IN_STAGE: no fallback in current variant path",
+                "transport_status": vo.get("status"),
+                "transport_provenance": "OBSERVED_IN_STAGE: connector SourceQueryResult.status",
+                "latency_ms": vo.get("latency_ms"),
+                "latency_provenance": "OBSERVED_IN_STAGE: connector-measured search_call_ms",
+                "records_returned": len(vo.get("records") or []),
+                "failure_class": vo.get("status") if vo.get("status") not in ("OK", "EMPTY") else None,
+                "failure_provenance": "OBSERVED_IN_STAGE" if vo.get("status") not in ("OK", "EMPTY") else "OBSERVED_IN_STAGE: no failure",
+            })
         job_rows.append({
             "index": job["index"],
             "lane": job["lane"],
             "source_id": job["source_id"],
+            "provider": job["source_id"],
+            "provider_provenance": "OBSERVED_IN_STAGE: source_id is the provider identity in this fabric",
+            "logical_retrieval_operation": f"{job['lane']}:{job['source_id']}",
+            "logical_operation_provenance": "OFFLINE_DERIVED: lane+source composite, deterministic from plan",
             "variant_classes": [v["derivation_class"]
                                 for v in job["variants"]],
+            "query_hashes": _query_hashes,
+            "query_hash_provenance": "OFFLINE_DERIVED: sha256(query)[:16] per variant",
             "n_variants": len(job["variants"]),
             "search_call_ms": network_ms,
+            "search_call_provenance": "OBSERVED_IN_STAGE: sum of connector latency_ms per variant",
             "job_wall_s": round(res["job_wall_s"], 3),
+            "job_wall_provenance": "OBSERVED_IN_STAGE: perf_counter wall per job",
+            "concurrency_position": {
+                "serialization_index": job["index"],
+                "n_jobs": len([u for u in plan if u["kind"] == "job"]),
+                "provenance": "OBSERVED_IN_STAGE: plan order index; execution concurrency is peak_concurrency_observed only (per-job start time not measured => UNKNOWN for execution order)",
+                "execution_concurrency": "UNKNOWN: per-job start timestamp not recorded in current machinery",
+            },
+            "attempt_index": 1,
+            "attempt_provenance": "OBSERVED_IN_STAGE: one attempt per variant (no retry loop)",
+            "retry_backoff_s": 0,
+            "retry_provenance": "OBSERVED_IN_STAGE: no retry in fanout",
+            "fallback": False,
+            "fallback_provenance": "OBSERVED_IN_STAGE: no fallback",
             "outcome": _classify_job_outcome(variant_statuses,
                                              total_records),
+            "outcome_provenance": "OFFLINE_DERIVED: _classify_job_outcome over variant_statuses",
             "variant_statuses": variant_statuses,
+            "variant_details": _variant_details,
             "records_returned": total_records,
+            "records_returned_provenance": "OBSERVED_IN_STAGE: sum len(records) per variant",
+            "canonical_contribution": "UNKNOWN: per-source admitted count requires join with Canonicalizer merge order (not attributed per-job in current machinery)",
+            "canonical_contribution_provenance": "UNKNOWN",
             "error": state.error,
+            "error_provenance": "OBSERVED_IN_STAGE: LaneRunState.error aggregated",
         })
     return {"job_rows": job_rows, "records_returned": records_returned}
 
