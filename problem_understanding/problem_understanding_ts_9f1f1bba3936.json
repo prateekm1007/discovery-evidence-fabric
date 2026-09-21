@@ -1,8 +1,8 @@
 {
  "schema": "CODER1_PROBLEM_UNDERSTANDING/1.0.0",
- "session_id": "ts_dd733590d006",
+ "session_id": "ts_9f1f1bba3936",
  "problem_statement": {
-  "value": "[R517-BATTERY2 declared_family=mechanical source=odi:11217594 battery=R517-retrieval-attribution-2]\n\nTL* THE CONTACT OWNS A 2019 CHEVROLET SILVERADO 1500. THE CONTACT STATED THAT THE PROPELLER SHAFT THAT HELD THE TIRES IN THE REAR OF THE VEHICLE FRACTURED. THE FAILURE CAUSED THE VEHICLE TO SHAKE AND BECAME UNSTABLE WHILE BEING DRIVEN. THE VEHICLE WAS TOWED TO BERT OGDEN MISSION CHEVROLET (1400 E EXPRESSWAY 83, MISSION, TX 78572, (956) 205-1431) WHERE THEY REPAIRED THE VEHICLE AND REPLACED THE SAME PART. THE CONTACT STILL FELT UNSAFE DRIVING THE VEHICLE EVEN WITH THE REPAIRS BEING COMPLETED. THE MANUFACTURER WAS NOT CONTACTED. THE FAILURE MILEAGE WAS 5,049.",
+  "value": "[R517-BATTERY2 declared_family=thermal source=odi:11684485 battery=R517-retrieval-attribution-2]\n\nThe contact owns a 2020 Nissan Rogue. The contact stated that the vehicle had been parked at the residence for approximately two hours when she looked out her window and noticed that the vehicle had caught fire. There were no warning lights prior to the failure. There were no reported injuries. The fire department was able to extinguish the fire. There was no reported crash, police report, or air bag deployment. The local dealer was not notified. The vehicle was not diagnosed or repaired. The manufacturer was not contacted regarding the incident. The approximate failure mileage was 140,000.",
   "origin": "USER_STATED",
   "basis": "the user's message, verbatim",
   "confidence": null
@@ -15,7 +15,8 @@
  },
  "observed_failure": {
   "value": [
-   "the failure"
+   "prior to the failure",
+   "the approximate failure"
   ],
   "origin": "USER_STATED",
   "basis": "failure noun phrase found verbatim in the user's message",
@@ -31,7 +32,7 @@
  },
  "context": {
   "value": {
-   "message_length_chars": 664,
+   "message_length_chars": 695,
    "interrogative_form": false,
    "stated_domain_words": []
   },
@@ -42,30 +43,42 @@
  "domain_hypothesis": {
   "value": "automotive",
   "origin": "INFERRED_MODEL",
-  "basis": "keyword score 2 (hits: vehicle, tire); full ranking recorded in domain_scores",
+  "basis": "keyword score 1 (hits: vehicle); full ranking recorded in domain_scores",
   "confidence": 0.6
  },
  "domain_scores": [
   {
    "domain_hypothesis": "automotive",
    "keyword_hits": [
-    "vehicle",
-    "tire"
+    "vehicle"
    ],
-   "score": 2
-  },
-  {
-   "domain_hypothesis": "industrial",
-   "keyword_hits": [
-    "manufactur",
-    "press"
-   ],
-   "score": 2
+   "score": 1
   },
   {
    "domain_hypothesis": "energy",
    "keyword_hits": [
     "battery"
+   ],
+   "score": 1
+  },
+  {
+   "domain_hypothesis": "industrial",
+   "keyword_hits": [
+    "manufactur"
+   ],
+   "score": 1
+  },
+  {
+   "domain_hypothesis": "medical",
+   "keyword_hits": [
+    "diagnos"
+   ],
+   "score": 1
+  },
+  {
+   "domain_hypothesis": "thermal",
+   "keyword_hits": [
+    "thermal"
    ],
    "score": 1
   }
@@ -77,9 +90,9 @@
   "confidence": null
  },
  "target_variable": {
-  "value": "TL* THE CONTACT OWNS A 2019 CHEVROLET SILVERADO 1500. THE CONTACT STATED THAT ON SEVERAL OCCASIONS WHILE MOVING OFF FROM A STAND STILL, THERE WAS A HARD SHIFT IN THE TRANSMISSION BETWEEN FIRST AND SECOND GEAR. THE FAILURE WAS ALSO EVIDENT ON THE DOWNSHIFT FROM THIRD GEAR TO SECOND GEAR WHILE SLOWING THE VEHICLE. THE VEHICLE WAS TAKEN TO PRIDE CHEVROLET LOCATED AT 715 LYNNWAY, LYNN, MA 01905,  (781) 780-4587 TO BE DIAGNOSED. THE MECHANIC WAS UNABLE TO DUPLICATE THE FAILURE. THE VEHICLE WAS NOT REPAIRED. THE FAILURE WAS INTERMITTENT. THE MANUFACTURER WAS MADE AWARE OF THE FAILURE. THE APPROXIMATE FAILURE MILEAGE WAS 1,800.",
-  "origin": "USER_STATED",
-  "basis": "user clarification answer (conversation)",
+  "value": null,
+  "origin": "UNKNOWN",
+  "basis": "no target quantity identified — this is the canonical clarification trigger (see clarification.py)",
   "confidence": null
  },
  "unknowns": [
@@ -87,6 +100,11 @@
    "field": "desired_outcome",
    "why_unknown": "no outcome verb phrase found in the user text",
    "what_would_resolve": "one user sentence naming the desired outcome"
+  },
+  {
+   "field": "target_variable",
+   "why_unknown": "no target quantity identified — this is the canonical clarification trigger (see clarification.py)",
+   "what_would_resolve": "one user sentence naming the target variable"
   },
   {
    "field": "physical_system",
@@ -114,7 +132,7 @@
   "basis": "the engine's standing falsification contract (Art. XX/LII)",
   "confidence": null
  },
- "built_at": "2026-09-21T14:11:18Z",
+ "built_at": "2026-09-21T14:12:26Z",
  "construction": {
   "deterministic": true,
   "llm_fields_merged": 0,
@@ -124,12 +142,5 @@
    "MODEL_DERIVED_LLM",
    "UNKNOWN"
   ]
- },
- "clarification_history": [
-  {
-   "field": "target_variable",
-   "answer": "TL* THE CONTACT OWNS A 2019 CHEVROLET SILVERADO 1500. THE CONTACT STATED THAT ON SEVERAL OCCASIONS WHILE MOVING OFF FROM A STAND STILL, THERE WAS A HARD SHIFT IN THE TRANSMISSION BETWEEN FIRST AND SECOND GEAR. THE FAILURE WAS ALSO EVIDENT ON THE DOWNSHIFT FROM THIRD GEAR TO SECOND GEAR WHILE SLOWING THE VEHICLE. THE VEHICLE WAS TAKEN TO PRIDE CHEVROLET LOCATED AT 715 LYNNWAY, LYNN, MA 01905,  (781) 780-4587 TO BE DIAGNOSED. THE MECHANIC WAS UNABLE TO DUPLICATE THE FAILURE. THE VEHICLE WAS NOT REPAIRED. THE FAILURE WAS INTERMITTENT. THE MANUFACTURER WAS MADE AWARE OF THE FAILURE. THE APPROXIMATE FAILURE MILEAGE WAS 1,800.",
-   "applied_at": "2026-09-21T14:12:23Z"
-  }
- ]
+ }
 }
