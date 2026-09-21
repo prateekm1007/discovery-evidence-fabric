@@ -1,0 +1,206 @@
+{
+  "spec_version": "1.1.0",
+  "canonical_family": "energy",
+  "canonical_family_label": "Energy harvesting & storage systems",
+  "canonical_family_basis": {
+    "canonical_family": "energy",
+    "label": "Energy harvesting & storage systems",
+    "basis": {
+      "source": "engineering_specification.why_this_domain.canonical_family (the upstream R445 authority \u2014 consumed, never re-derived)",
+      "ladder_step": 1,
+      "upstream_record": true
+    },
+    "archetype": "ENERGY_STORAGE",
+    "archetype_basis": "registry routing: canonical family 'energy' -> archetype 'ENERGY_STORAGE'"
+  },
+  "technology_class": "ENERGY_STORAGE",
+  "technology_class_role": "bridge geometry archetype (presentation routing, R445)",
+  "dimension_class": "ABSTRACT_PRESENTATION_UNITS",
+  "measurement_basis": "TOPOLOGY_ONLY",
+  "intervention_site": "cordless power drill battery pack",
+  "selection_basis": {
+    "family": "ENERGY_STORAGE",
+    "label": "energy storage architecture",
+    "score": 12,
+    "min_form_score": 3,
+    "score_table": [
+      {
+        "family": "VEHICLE",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "MEDICAL_DEVICE",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "FLUID_DEVICE",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "THERMAL_SYSTEM",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "MECHANICAL_COMPONENT",
+        "score": 11,
+        "hits": [
+          {
+            "keyword": "bearing",
+            "weight": 5,
+            "count": 1
+          },
+          {
+            "keyword": "structural",
+            "weight": 2,
+            "count": 1
+          },
+          {
+            "keyword": "load path",
+            "weight": 3,
+            "count": 1
+          },
+          {
+            "keyword": "fatigue",
+            "weight": 1,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "family": "ELECTRONIC_SYSTEM",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "ENERGY_STORAGE",
+        "score": 12,
+        "hits": [
+          {
+            "keyword": "battery pack",
+            "weight": 5,
+            "count": 1
+          },
+          {
+            "keyword": "battery",
+            "weight": 3,
+            "count": 1
+          },
+          {
+            "keyword": "pack",
+            "weight": 2,
+            "count": 2
+          }
+        ]
+      }
+    ],
+    "basis": {
+      "derived_from": [
+        "problem text",
+        "intervention site",
+        "recorded subsystem names"
+      ],
+      "rule": "highest keyword score wins; ties resolve by registry order; below the form threshold the generic architecture family is selected and labeled",
+      "deterministic": true
+    }
+  },
+  "components": [
+    {
+      "component_id": "cell_stack",
+      "label": "cell stack",
+      "form": "stack",
+      "material_class": "battery",
+      "mapped_from": null,
+      "structural": true,
+      "role": "cell stack (structural presentation element)"
+    },
+    {
+      "component_id": "pack_enclosure",
+      "label": "pack enclosure",
+      "form": "enclosure",
+      "material_class": "body_metal",
+      "mapped_from": null,
+      "structural": true,
+      "role": "pack enclosure (structural presentation element)"
+    },
+    {
+      "component_id": "bus_bars",
+      "label": "bus bars",
+      "form": "bus",
+      "material_class": "machined_metal",
+      "mapped_from": null,
+      "structural": true,
+      "role": "series interconnect bus bars (family-definitional presentation element of the energy-storage acceptance case; mapped subsystem recorded as alias)"
+    },
+    {
+      "component_id": "module_01",
+      "label": "module: load path / structural backbone",
+      "form": "module",
+      "material_class": "polymer",
+      "mapped_from": "load path / structural backbone",
+      "structural": false,
+      "role": "recorded subsystem 'load path / structural backbone' (no canonical slot in the energy storage architecture; mounted as a labeled module)"
+    },
+    {
+      "component_id": "module_02",
+      "label": "module: actuation or compliance element",
+      "form": "module",
+      "material_class": "polymer",
+      "mapped_from": "actuation or compliance element",
+      "structural": false,
+      "role": "recorded subsystem 'actuation or compliance element' (no canonical slot in the energy storage architecture; mounted as a labeled module)"
+    },
+    {
+      "component_id": "module_03",
+      "label": "module: guidance / bearing interfaces",
+      "form": "module",
+      "material_class": "polymer",
+      "mapped_from": "guidance / bearing interfaces",
+      "structural": false,
+      "role": "recorded subsystem 'guidance / bearing interfaces' (no canonical slot in the energy storage architecture; mounted as a labeled module)"
+    },
+    {
+      "component_id": "module_04",
+      "label": "module: fatigue-critical features register",
+      "form": "module",
+      "material_class": "polymer",
+      "mapped_from": "fatigue-critical features register",
+      "structural": false,
+      "role": "recorded subsystem 'fatigue-critical features register' (no canonical slot in the energy storage architecture; mounted as a labeled module)"
+    }
+  ],
+  "interfaces": [
+    {
+      "interface_id": "es_cells_bus",
+      "from": "cell_stack",
+      "to": "bus_bars",
+      "kind": "electrical",
+      "material_class": "conduit_power",
+      "form": "conduit"
+    }
+  ],
+  "fidelity": {
+    "recorded_subsystems": [
+      "load path / structural backbone",
+      "actuation or compliance element",
+      "guidance / bearing interfaces",
+      "fatigue-critical features register"
+    ],
+    "mapped": [
+      "module_01",
+      "module_02",
+      "module_03",
+      "module_04"
+    ],
+    "structural_form_components": [
+      "cell_stack",
+      "pack_enclosure",
+      "bus_bars"
+    ],
+    "unmapped_note": "every recorded subsystem appears as a canonical slot, an alias, or a labeled module \u2014 the fidelity contract of the conceptual layer"
+  },
+  "spec_sha256": "506a5010caab33df77a739b5e4a2d09ea8a21911a667e4d32b1ab57039c4083f"
+}
