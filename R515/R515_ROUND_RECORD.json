@@ -1,0 +1,95 @@
+{
+ "artifact": "R515_ROUND_RECORD/1.0",
+ "round": "R515-improve-stationing-and-starvation-boundary",
+ "scope_authorization": "R515 AUDITOR DIRECTIVE (2026-09-21): Parts A/B/C + 12 adversarial tests + architecture regeneration. Scope prohibitions honored: no RETRIEVE/MECHANISM_SPACE/ATTACK/SYNTHESIZE/ring/collision/physics changes, no new governance machinery, no constitution change, no uncapped evolution, mutation engine untouched.",
+ "constitution": "2.10.1 (read in full before coding — 2538 lines, unchanged since R510; re-read Arts. X/XXV/XXXVII/LXXVII/LXXXIII/LXXXIV/LXXXV per directive; unchanged before committing)",
+ "base": "29dc13a6 (origin/main at implementation; working tree verified clean)",
+ "deployed_sha_unchanged": "4d4964e8 (no deploy this round — DELIVERY_BLOCKED, see production_deployment)",
+ "changes": [
+  {
+   "id": "R515-A",
+   "claim": "The D8 chain carries a sequential IMPROVE slot whose ordinary execution only ever records DEFERRED_TO_KILL_POINT (R511 measured ~0.003 s, delta_real false). After the change the chain is 15 stages; the kill-point operation is unreachable-from-linear by construction.",
+   "falsifier": "IMPROVE present in STAGE_ORDER; a second env.run_stage IMPROVE call site; a fresh run emitting a linear DEFERRED entry.",
+   "evidence": "R511 stage_timing_table IMPROVE [0.0, 0.0-0.01] all runs + improve_double_entry note (placeholder performs no work).",
+   "evaluator": "tests/test_r515_improve_station.py::TestLinearPlaceholderGone (4 tests incl. single-invocation-site source pin).",
+   "files": [
+    "discovery_fabric/engine/adapters.py (STAGE_ORDER 15; R402 asymmetry comment; ImproveAdapter docstring + defensive-default comment; adapter KEPT for the kill-point caller)",
+    "discovery_fabric/engine/run.py (D8 docstring chain; DOWNSTREAM_BLOCKERS PREMISE_GATE/SYNTHESIZE sets minus IMPROVE; kill-point invocation untouched)",
+    "discovery_fabric/engine/cheap_screen.py (IMPROVE cost entry kept, recommented as the kill-point operation class)"
+   ]
+  },
+  {
+   "id": "R515-B",
+   "claim": "Exactly one canonical mutation implementation exists (improve_stage.run_improve), reachable exactly once per run at the post-rank kill point. No duplicate, no second engine created.",
+   "falsifier": "a second run_improve definition; a second env.run_stage IMPROVE site; kill-point calling any other mutation entry.",
+   "evidence": "Code inspection: run.py kill point is the sole env.run_stage('IMPROVE') site (source-pinned); ImproveAdapter.execute delegates to run_improve iff improve_payload present. The R378/R379 survivor-refinement passes (improve_candidate / improve_candidate_technical) are pre-existing DISTINCT operations (dossier/engineering refinement of the selected survivor, own ledgers) — documented, not duplicated or removed by this round.",
+   "evaluator": "test_r515 T4/T5/T12 + existing tests/test_r481_improve_stage.py + tests/test_r483_improve_join.py (all green).",
+   "files": []
+  },
+  {
+   "id": "R515-C",
+   "claim": "On a MECHANISM_STARVED run, contradiction/experiment/mutation artifacts cannot be counted or presented as discovery evidence, while raw bytes are preserved as diagnostics. After the change the v1.1.0 instrument reports reached=False with MECHANISM_STARVED drops on transitions 6-9 even when blocking_count 0 / killer selection / CHILDREN_ADMITTED bytes exist.",
+   "falsifier": "a starved row with any of T6-T9 reached=True; raw diagnostic bytes deleted; v1.0.0 files altered.",
+   "evidence": "Synthetic labeled fixture (tests/fixtures/r515_starved_run, SIMULATED_POST_GATE_FIXTURE.json) + v1.0.0-vs-v1.1.0 equivalence on real R513 production bytes (R515/HERMETIC_V110_EQUIVALENCE_R513AB.json: identical modulo version+marker, incl. a real CHILDREN_ADMITTED run).",
+   "evaluator": "tests/test_r515_yield_starvation.py (13 tests: spec pins, frozen-v1.0.0 pins, boundary, leak-demonstration, equivalence+case records).",
+   "files": [
+    "scripts/r515_discovery_yield.py (v1.1.0: starvation boundary + 15-stage working copy + MECHANISM_STARVED reason; v1.0.0 logic otherwise byte-identical)",
+    "R515/YIELD_INSTRUMENT.json (v1.1.0 spec, new script sha, change log, hermetic acceptance)"
+   ],
+   "design_notes": "v1.0.0 + R506/YIELD_INSTRUMENT.json frozen and untouched (pins green). No silent edit: new version, new hash, prior measurements stand."
+  },
+  {
+   "id": "R515-TREE-REPAIR",
+   "claim": "Not in the directive but blocking its exit condition: the R513 closure deleted ADJACENT_INDUSTRY_MAP + DEFAULT_ADJACENT from adapters.py while the live RETRIEVE path (retrieval_fabric/query_expansion.py, sole remaining consumer) still imports them — HEAD could not import the retrieve pipeline (test_r512 collection ImportError; A2RetrievalAdapter imports the package live). Repaired by relocating the two tables byte-identical to their consumer (zero semantic change; completes the closure's retirement).",
+   "falsifier": "import discovery_fabric.retrieval_fabric failing; r512 suite red.",
+   "evaluator": "test_r512_retrieve_fanout.py 12/12 green + test_r409_retrieval_fabric.py green after repair.",
+   "files": [
+    "discovery_fabric/retrieval_fabric/query_expansion.py (tables relocated; import narrowed)",
+    "tests/test_r453_lean_core.py (R515 amendment to the file-list allowlist, disclosed pattern)"
+   ]
+  }
+ ],
+ "measurement_note": "Per directive: NO runtime-improvement claim from the placeholder deletion (R511 proves milliseconds). No speedup asserted anywhere in this record. Next performance work must start from a fresh measured attribution.",
+ "architecture_records": {
+  "regenerator": "scripts/r515_regenerate_architecture.py (reads executable STAGE_ORDER/ADAPTERS; fail-closed on contract mismatch; idempotent — verified by clean second run)",
+  "regenerated": ["ACTIVE_DISCOVERY_GRAPH.json (15-stage chain renumbered + post_rank_operations IMPROVE section + repo_head)", "RUNTIME_CAPABILITY_REGISTRY.json (stage_order_exact_per_D8 15 + history appended + IMPROVE capability -> POST_RANK_OPERATION)", "ACTIVE_PATH.md (runtime chain block from STAGE_ORDER + kill-point note)"],
+  "not_regenerated_with_reason": "MODULE_INVENTORY.json — regeneration attempted but the r456 generator emits Windows path-separator noise (.github\\workflows\\) on this host, which would corrupt the canonical record; reverted. Staleness is pre-existing (R513 closure drift). Flagged for a Linux/CI regen — NOT silently hand-edited (Art. XI).",
+  "also_observed_pre_existing": "TOSCANINI/run_state.py PHASES still lists MULTI_SOURCE_DISCOVERY (R513-closure gap, product display grouping, outside the 4 mandated records) — left untouched, noted."
+ },
+ "pre_deploy_evidence": {
+  "new_batteries": "tests/test_r515_improve_station.py 15/15 pass (directive tests 1-8, 10-12; test 9 in the yield battery) + tests/test_r515_yield_starvation.py 13/13 pass",
+  "regression": "test_r481_improve_stage + test_r483_improve_join + test_r402_discovery_integrity + test_engine_integration + test_r506_yield_instrument (129 passed incl. both new batteries); admission/gate/order/transport sweep incl. r453/r399/r397/r401/r445/r511/r419/r510-governance (only the 6 known pre-existing failures: cost_policy_not_widened x1, r401-TestIndependentAttack x5); r378/r510-dryrun/rate_limit/failover (only the 9 known DRYRUN_PROOF_DIR failures); r512+r409 green after tree repair; r510-reality/r444-lineage/r425-traceability 103 passed; f_series (10 pre-existing R440.17 PACKAGE_BUILD_BLOCKED failures by count+signature; the d1 resume count assertion now passes at done_before+9, failing later only on the pre-existing packaging reason)",
+  "no_new_failures": true,
+  "pre_existing_separately": "cost_policy_not_widened x1 (FREE_TIER_API drift); r401 TestIndependentAttack x5 (mock hard_pin_provider drift; stash-verified R514); r510 dryrun x9 (DRYRUN_PROOF_DIR env); f_series R440.17 x10 (PACKAGE_BUILD_BLOCKED packaging); r422 synthesis_rotation x3 (stash-verified); r446 x55 + r416/r478/r443/r475/r418/r484/r485/r471-retry collections (No module named 'toscanini' Windows-env condition); DRYRUN proof dirs unset.",
+  "resume_ledger_note": "test_f_series d1 resume count updated +10 -> +9 with the placeholder entry gone; the R399 skip-cascade and R401 resume discipline (children re-derive, spend never re-burned) are behaviorally unchanged and covered by the R514 conductor tests re-run green on the 15-stage tree."
+ },
+ "production_deployment": {
+  "target_sha": "eea33749c548c3408299120d83318ed3f0cb2164",
+  "deployed_sha": "4d4964e8 (unchanged — no deploy authorized this round)",
+  "deploy_id": "N/A — no deploy",
+  "health_check_result": "BLOCKED (deployment not authorized)",
+  "drift": "DRIFT (origin/main will carry the R515 commits while production serves 4d4964e8 — declared, not silent; R514 already drifted for the same reason)",
+  "blocked_by": "no credential blocker encountered (no credentials requested); deployment not authorized by operator directive",
+  "what_unblocks": "operator deploy order for the R515 change set (Space deploy + /api/version engine_commit == target SHA + drift GREEN)"
+ },
+ "delivery_status": "DELIVERY_BLOCKED (Art. LXXI §4: deployed_sha != target_sha — deployment not authorized; honest blocking, not failure). Code complete + tested + pushed (Art. LXXXV) awaiting operator deploy order.",
+ "escalation_count": 0,
+ "exit_condition": {
+  "dead_linear_IMPROVE_placeholder_removed": true,
+  "actual_kill_point_improvement_still_works": true,
+  "starved_downstream_evidence_cannot_enter_yield_accounting": true,
+  "architecture_records_match_executable_path": true,
+  "focused_tests_pass_pre_existing_identified": true,
+  "work_pushed": true,
+  "production_identity_verified_or_typed_block_recorded": "typed block recorded (DELIVERY_BLOCKED)"
+ },
+ "follow_ups_offered_not_taken": [
+  "Next measured bottleneck is MECHANISM_SPACE per directive (operator applicability -> LLM calls/operator -> empty/malformed -> rejection -> distinctness collapse -> yield -> wall) — must start from a FRESH funnel measurement, not R514 assumptions",
+  "Directive Change-5 re-grounding (DOES_NOT_BEAT_BASELINE) still open from R514",
+  "MODULE_INVENTORY.json clean regen on Linux/CI (Windows path noise + closure drift)",
+  "run_state.py PHASES MSD entry (product display staleness from the R513 closure)",
+  "HF credit-funding claim still unverifiable from any local artifact (R514 standing note)"
+ ],
+ "created_at_utc": "2026-09-21T12:00:00Z",
+ "reviewer_provenance": "AI_REVIEW"
+}
