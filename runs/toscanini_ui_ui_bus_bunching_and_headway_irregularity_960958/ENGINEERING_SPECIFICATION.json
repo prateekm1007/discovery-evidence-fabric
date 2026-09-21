@@ -41,7 +41,7 @@
   "canonical_family_basis": {
    "canonical_family": "mechanical",
    "label": "Mechanical & structural systems",
-   "score": 60,
+   "score": 64,
    "min_form_score": 3,
    "score_table": [
     {
@@ -71,7 +71,7 @@
     },
     {
      "family": "mechanical",
-     "score": 60,
+     "score": 64,
      "hits": [
       {
        "keyword": "vehicle",
@@ -81,7 +81,7 @@
       {
        "keyword": "bus",
        "weight": 4,
-       "count": 10
+       "count": 11
       }
      ]
     },
@@ -157,7 +157,8 @@
     "design_outputs_dependent": [
      "DI-001",
      "DI-002",
-     "DI-004"
+     "DI-004",
+     "DI-005"
     ],
     "failure_modes_that_would_vanish": [
      "FM-002",
@@ -172,11 +173,12 @@
    "epistemic_class": "MODEL_DERIVED"
   },
   "equation_applicability_summary": {
-   "applicable": [],
+   "applicable": [
+    "ML-001"
+   ],
    "conditional": [
     "ML-002",
-    "ML-003",
-    "ML-001"
+    "ML-003"
    ],
    "rejected": []
   }
@@ -276,7 +278,7 @@
   "statistics"
  ],
  "system_architecture": {
-  "description": "PROPOSED architecture (no physical system exists): data ingestion and labeling pipeline; feature / representation layer; model + uncertainty quantification; deployment target + monitoring loop — realizing: Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
+  "description": "PROPOSED architecture (no physical system exists): data ingestion and labeling pipeline; feature / representation layer; model + uncertainty quantification; deployment target + monitoring loop — realizing: Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.",
   "subsystems": [
    {
     "name": "data ingestion and labeling pipeline",
@@ -285,23 +287,26 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
-      "additional",
-      "adjustment",
-      "ahead",
+      "adding",
+      "available",
       "buses",
-      "combine",
+      "combining",
+      "control",
+      "coordinate",
       "deploy",
-      "enforce",
       "existing",
       "fleet",
-      "headway",
       "holding",
-      "minor",
+      "hybrid",
+      "implementing",
+      "measures",
+      "methods",
+      "other",
       "scheme",
-      "spacing",
-      "speed",
       "stops",
-      "trailing"
+      "testing",
+      "validate",
+      "without"
      ]
     }
    },
@@ -312,23 +317,26 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
-      "additional",
-      "adjustment",
-      "ahead",
+      "adding",
+      "available",
       "buses",
-      "combine",
+      "combining",
+      "control",
+      "coordinate",
       "deploy",
-      "enforce",
       "existing",
       "fleet",
-      "headway",
       "holding",
-      "minor",
+      "hybrid",
+      "implementing",
+      "measures",
+      "methods",
+      "other",
       "scheme",
-      "spacing",
-      "speed",
       "stops",
-      "trailing"
+      "testing",
+      "validate",
+      "without"
      ]
     }
    },
@@ -339,23 +347,26 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
-      "additional",
-      "adjustment",
-      "ahead",
+      "adding",
+      "available",
       "buses",
-      "combine",
+      "combining",
+      "control",
+      "coordinate",
       "deploy",
-      "enforce",
       "existing",
       "fleet",
-      "headway",
       "holding",
-      "minor",
+      "hybrid",
+      "implementing",
+      "measures",
+      "methods",
+      "other",
       "scheme",
-      "spacing",
-      "speed",
       "stops",
-      "trailing"
+      "testing",
+      "validate",
+      "without"
      ]
     }
    },
@@ -366,30 +377,33 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
-      "additional",
-      "adjustment",
-      "ahead",
+      "adding",
+      "available",
       "buses",
-      "combine",
+      "combining",
+      "control",
+      "coordinate",
       "deploy",
-      "enforce",
       "existing",
       "fleet",
-      "headway",
       "holding",
-      "minor",
+      "hybrid",
+      "implementing",
+      "measures",
+      "methods",
+      "other",
       "scheme",
-      "spacing",
-      "speed",
       "stops",
-      "trailing"
+      "testing",
+      "validate",
+      "without"
      ]
     }
    }
   ]
  },
  "mechanism_architecture": {
-  "physical_changes": "PROPOSED: Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
+  "physical_changes": "PROPOSED: Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.",
   "key_physics": "Data architecture / machine learning governing relations proposed for this invention; SYMBOLIC ONLY until inputs are sourced",
   "status": "MODELLED",
   "source_refs": [
@@ -414,7 +428,7 @@
   {
    "id": "DI-002",
    "input": "Mechanism driver (proposed)",
-   "value": "Holding control — deliberately delaying buses at stops (or combining holding with other measures) so that buses on the same route do not travel closely together, thereby regularizing headways.",
+   "value": "Hybrid methods combining holding with other measures have outperformed standalone holding methods because the combined control actions regularize bus movement and reduce bus bunching more effectively than holding alone.",
    "source": "MODELLED (LLM synthesis)",
    "evidence_class": "MODELLED",
    "parent_ids": [
@@ -426,7 +440,7 @@
   {
    "id": "DI-003",
    "input": "Expected effect target",
-   "value": "Evenly spaced arrivals and reduced bunching (fewer \"three buses together, then nothing\" events), lower headway variance, and shorter average commuter waiting time without fleet expansion.",
+   "value": "Evenly spaced arrivals and reduced bus bunching (fewer \"three buses together, then nothing\" events), lower headway variance, and shorter average commuter waiting time without fleet expansion.",
    "source": "MODELLED (LLM synthesis)",
    "evidence_class": "MODELLED",
    "parent_ids": [
@@ -451,15 +465,14 @@
   {
    "id": "DI-005",
    "input": "Domain design input pattern: available labeled/unlabeled data inventory",
-   "value": "invention applicability: NOT_ESTABLISHED (candidate pattern; confirm against the actual use profile)",
+   "value": "invention applicability: TIED via tokens ['available']",
    "source": "ENGINEERING_PROPOSED (domain registry pattern)",
    "evidence_class": "ENGINEERING_PROPOSED",
    "parent_ids": [
     "UIN-001"
    ],
    "evidence_refs": [],
-   "design_role": "CONTEXT",
-   "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
+   "design_role": "PRIMARY"
   },
   {
    "id": "DI-006",
@@ -718,9 +731,10 @@
    "id": "DO-001",
    "kind": "architecture_block",
    "parent_ids": [
-    "DI-002"
+    "DI-002",
+    "DI-005"
    ],
-   "description": "data ingestion and labeling pipeline realizing Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
+   "description": "data ingestion and labeling pipeline realizing Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -730,18 +744,21 @@
    "role_in_invention": {
     "invention_tied": true,
     "matched_tokens": [
-     "additional",
-     "adjustment",
-     "ahead",
+     "adding",
+     "available",
      "buses",
-     "combine",
+     "combining",
+     "control",
+     "coordinate",
      "deploy",
-     "enforce",
      "existing",
      "fleet",
-     "headway",
      "holding",
-     "minor"
+     "hybrid",
+     "implementing",
+     "measures",
+     "methods",
+     "other"
     ]
    }
   },
@@ -751,7 +768,7 @@
    "parent_ids": [
     "DI-002"
    ],
-   "description": "feature / representation layer realizing Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
+   "description": "feature / representation layer realizing Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -761,18 +778,21 @@
    "role_in_invention": {
     "invention_tied": true,
     "matched_tokens": [
-     "additional",
-     "adjustment",
-     "ahead",
+     "adding",
+     "available",
      "buses",
-     "combine",
+     "combining",
+     "control",
+     "coordinate",
      "deploy",
-     "enforce",
      "existing",
      "fleet",
-     "headway",
      "holding",
-     "minor"
+     "hybrid",
+     "implementing",
+     "measures",
+     "methods",
+     "other"
     ]
    }
   },
@@ -782,7 +802,7 @@
    "parent_ids": [
     "DI-002"
    ],
-   "description": "model + uncertainty quantification realizing Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
+   "description": "model + uncertainty quantification realizing Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -792,18 +812,21 @@
    "role_in_invention": {
     "invention_tied": true,
     "matched_tokens": [
-     "additional",
-     "adjustment",
-     "ahead",
+     "adding",
+     "available",
      "buses",
-     "combine",
+     "combining",
+     "control",
+     "coordinate",
      "deploy",
-     "enforce",
      "existing",
      "fleet",
-     "headway",
      "holding",
-     "minor"
+     "hybrid",
+     "implementing",
+     "measures",
+     "methods",
+     "other"
     ]
    }
   },
@@ -813,7 +836,7 @@
    "parent_ids": [
     "DI-002"
    ],
-   "description": "deployment target + monitoring loop realizing Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
+   "description": "deployment target + monitoring loop realizing Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -823,18 +846,21 @@
    "role_in_invention": {
     "invention_tied": true,
     "matched_tokens": [
-     "additional",
-     "adjustment",
-     "ahead",
+     "adding",
+     "available",
      "buses",
-     "combine",
+     "combining",
+     "control",
+     "coordinate",
      "deploy",
-     "enforce",
      "existing",
      "fleet",
-     "headway",
      "holding",
-     "minor"
+     "hybrid",
+     "implementing",
+     "measures",
+     "methods",
+     "other"
     ]
    }
   },
@@ -846,7 +872,7 @@
     "DO-002",
     "DI-002"
    ],
-   "description": "data ingestion and labeling pipeline interfaces with feature / representation layer: signal/energy/material hand-off for Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
+   "description": "data ingestion and labeling pipeline interfaces with feature / representation layer: signal/energy/material hand-off for Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -865,7 +891,7 @@
     "DO-003",
     "DI-002"
    ],
-   "description": "feature / representation layer interfaces with model + uncertainty quantification: signal/energy/material hand-off for Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
+   "description": "feature / representation layer interfaces with model + uncertainty quantification: signal/energy/material hand-off for Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -884,7 +910,7 @@
     "DO-004",
     "DI-002"
    ],
-   "description": "model + uncertainty quantification interfaces with deployment target + monitoring loop: signal/energy/material hand-off for Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
+   "description": "model + uncertainty quantification interfaces with deployment target + monitoring loop: signal/energy/material hand-off for Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -902,7 +928,7 @@
     "DO-001",
     "DI-002"
    ],
-   "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
+   "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "connector standards selection",
@@ -928,7 +954,7 @@
     "DI-002",
     "DI-004"
    ],
-   "description": "Flow/force/signal path geometry realizing the mechanism (Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.); every dimension is a named design decision with UNKNOWN value",
+   "description": "Flow/force/signal path geometry realizing the mechanism (Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.); every dimension is a named design decision with UNKNOWN value",
    "status": "UNKNOWN",
    "missing_inputs": [
     "all dimensions",
@@ -1081,7 +1107,7 @@
     "DO-001",
     "DI-002"
    ],
-   "description": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
+   "description": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.",
    "status": "PROPOSED",
    "missing_inputs": [
     "sensing modality selection",
@@ -1214,36 +1240,35 @@
    "total_items": 21,
    "tokens_used": [
     "absence",
+    "actions",
     "active",
     "added",
     "adding",
     "additional",
-    "adjustment",
-    "ahead",
     "archived",
     "arrivals",
     "arrive",
     "audit",
+    "available",
     "average",
+    "because",
     "bunch",
     "bunching",
     "buses",
-    "closely",
-    "combine",
+    "combined",
     "combining",
     "commuter",
     "commuters",
     "concerning",
     "connector",
     "control",
+    "coordinate",
     "current",
     "decision",
-    "delaying",
-    "deliberately",
     "deploy",
     "documented",
     "domain",
-    "enforce",
+    "effectively",
     "engineering",
     "evenly",
     "every",
@@ -1256,23 +1281,24 @@
     "grammar",
     "headway",
     "holding",
+    "hybrid",
     "implementation",
+    "implementing",
     "includes",
     "lower",
-    "minor",
+    "measures",
+    "methods",
+    "movement",
     "nothing",
     "other",
     "outcome",
+    "outperformed",
     "parameters",
     "problem",
     "problems",
     "production",
     "provider",
-    "recorded",
-    "records",
-    "reduced",
-    "regularizing",
-    "retrieval"
+    "recorded"
    ]
   },
   "contract": "CEO A7: CONCEPTUAL/PROPOSED/UNKNOWN vocabulary; no geometry invented"
@@ -1323,46 +1349,48 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
-      "additional",
-      "adjustment",
-      "ahead",
+      "actions",
+      "adding",
       "arrivals",
+      "available",
       "average",
+      "because",
       "bunch",
       "bunching",
       "buses",
-      "closely",
-      "combine",
+      "combined",
       "combining",
       "commuter",
       "control",
-      "delaying",
-      "deliberately",
+      "coordinate",
       "deploy",
-      "enforce",
+      "effectively",
       "evenly",
       "existing",
       "fleet",
       "headway",
       "holding",
+      "hybrid",
+      "implementing",
       "lower",
-      "minor",
+      "measures",
+      "methods",
+      "movement",
       "nothing",
       "other",
+      "outperformed",
+      "reduce",
       "reduced",
-      "regularizing",
-      "route",
+      "regularize",
       "scheme",
       "shorter",
       "spaced",
-      "spacing",
-      "speed",
+      "standalone",
       "stops",
-      "thereby",
+      "testing",
       "three",
       "together",
-      "trailing",
-      "travel",
+      "validate",
       "waiting",
       "without"
      ]
@@ -1376,46 +1404,48 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
-      "additional",
-      "adjustment",
-      "ahead",
+      "actions",
+      "adding",
       "arrivals",
+      "available",
       "average",
+      "because",
       "bunch",
       "bunching",
       "buses",
-      "closely",
-      "combine",
+      "combined",
       "combining",
       "commuter",
       "control",
-      "delaying",
-      "deliberately",
+      "coordinate",
       "deploy",
-      "enforce",
+      "effectively",
       "evenly",
       "existing",
       "fleet",
       "headway",
       "holding",
+      "hybrid",
+      "implementing",
       "lower",
-      "minor",
+      "measures",
+      "methods",
+      "movement",
       "nothing",
       "other",
+      "outperformed",
+      "reduce",
       "reduced",
-      "regularizing",
-      "route",
+      "regularize",
       "scheme",
       "shorter",
       "spaced",
-      "spacing",
-      "speed",
+      "standalone",
       "stops",
-      "thereby",
+      "testing",
       "three",
       "together",
-      "trailing",
-      "travel",
+      "validate",
       "waiting",
       "without"
      ]
@@ -1449,7 +1479,7 @@
   "interfaces": [
    {
     "id": "DO-008",
-    "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
+    "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.",
     "status": "CONCEPTUAL",
     "detail": [
      {
@@ -1793,10 +1823,21 @@
      ],
      "selection_rationale": {
       "epistemic_class": "MODEL_DERIVED",
-      "verdict": "CONDITIONAL",
-      "reason": "domain template justifies this relation for the domain, but the invention text does not yet engage its variables; applicability must be confirmed by the first characterization",
-      "engaged_variables": [],
-      "engagement_evidence": [],
+      "verdict": "APPLICABLE",
+      "reason": "invention mechanism engages the model variables: U",
+      "engaged_variables": [
+       "U"
+      ],
+      "engagement_evidence": [
+       {
+        "symbol": "U",
+        "shared_concepts": [],
+        "matched_description_words": [
+         "action"
+        ],
+        "grounding": "legacy description-word match (no declared concepts on this variable)"
+       }
+      ],
       "mechanism_asserted_concepts": {},
       "assumption_check": {
        "assumptions": [
@@ -1813,8 +1854,10 @@
      ],
      "invention_tie": {
       "linkage_kind": "applicability_judgment",
-      "verdict": "CONDITIONAL",
-      "engaged_variables": [],
+      "verdict": "APPLICABLE",
+      "engaged_variables": [
+       "U"
+      ],
       "mechanism_mention_count": 0
      }
     }
@@ -1828,7 +1871,7 @@
     "canonical_family_basis": {
      "canonical_family": "mechanical",
      "label": "Mechanical & structural systems",
-     "score": 60,
+     "score": 64,
      "min_form_score": 3,
      "score_table": [
       {
@@ -1858,7 +1901,7 @@
       },
       {
        "family": "mechanical",
-       "score": 60,
+       "score": 64,
        "hits": [
         {
          "keyword": "vehicle",
@@ -1868,7 +1911,7 @@
         {
          "keyword": "bus",
          "weight": 4,
-         "count": 10
+         "count": 11
         }
        ]
       },
@@ -1944,7 +1987,8 @@
       "design_outputs_dependent": [
        "DI-001",
        "DI-002",
-       "DI-004"
+       "DI-004",
+       "DI-005"
       ],
       "failure_modes_that_would_vanish": [
        "FM-002",
@@ -1959,11 +2003,12 @@
      "epistemic_class": "MODEL_DERIVED"
     },
     "equation_applicability_summary": {
-     "applicable": [],
+     "applicable": [
+      "ML-001"
+     ],
      "conditional": [
       "ML-002",
-      "ML-003",
-      "ML-001"
+      "ML-003"
      ],
      "rejected": []
     }
@@ -2382,8 +2427,8 @@
   "external_precedent": "domain module Data architecture / machine learning; standards listed as candidates requiring applicability verification",
   "proposed_design": {
    "input": "no additional buses may be added to the existing fleet",
-   "mechanism": "Holding control — deliberately delaying buses at stops (or combining holding with other measures) so that buses on the same route do not travel closely together, thereby regularizing headways.",
-   "transformation": "Evenly spaced arrivals and reduced bunching (fewer \"three buses together, then nothing\" events), lower headway variance, and shorter average commuter waiting time without fleet expansion.",
+   "mechanism": "Hybrid methods combining holding with other measures have outperformed standalone holding methods because the combined control actions regularize bus movement and reduce bus bunching more effectively than holding alone.",
+   "transformation": "Evenly spaced arrivals and reduced bus bunching (fewer \"three buses together, then nothing\" events), lower headway variance, and shorter average commuter waiting time without fleet expansion.",
    "output": "NOT ESTABLISHED (no measured output exists)",
    "component_architecture": "data ingestion and labeling pipeline; feature / representation layer; model + uncertainty quantification; deployment target + monitoring loop",
    "status": "MODELLED / ENGINEERING_PROPOSED"
@@ -3339,7 +3384,7 @@
   "integrity": {
    "passed": true,
    "problems": [],
-   "checked_at": "2026-09-21T03:39:59+00:00Z"
+   "checked_at": "2026-09-21T03:43:56+00:00Z"
   },
   "gaps": [
    {
@@ -3407,7 +3452,8 @@
    },
    "do_parent_di": {
     "DO-001": [
-     "DI-002"
+     "DI-002",
+     "DI-005"
     ],
     "DO-002": [
      "DI-002"
@@ -3501,7 +3547,7 @@
     "id": "DI-005",
     "kind": "DESIGN_INPUT",
     "label": "Domain design input pattern: available labeled/unlabeled data inventory",
-    "design_role": "CONTEXT"
+    "design_role": "PRIMARY"
    },
    {
     "id": "DI-006",
@@ -3608,47 +3654,47 @@
    {
     "id": "DO-001",
     "kind": "DESIGN_OUTPUT",
-    "label": "data ingestion and labeling pipeline realizing Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required."
+    "label": "data ingestion and labeling pipeline realizing Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses."
    },
    {
     "id": "DO-002",
     "kind": "DESIGN_OUTPUT",
-    "label": "feature / representation layer realizing Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required."
+    "label": "feature / representation layer realizing Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses."
    },
    {
     "id": "DO-003",
     "kind": "DESIGN_OUTPUT",
-    "label": "model + uncertainty quantification realizing Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required."
+    "label": "model + uncertainty quantification realizing Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses."
    },
    {
     "id": "DO-004",
     "kind": "DESIGN_OUTPUT",
-    "label": "deployment target + monitoring loop realizing Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required."
+    "label": "deployment target + monitoring loop realizing Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses."
    },
    {
     "id": "DO-005",
     "kind": "DESIGN_OUTPUT",
-    "label": "data ingestion and labeling pipeline interfaces with feature / representation layer: signal/energy/material hand-off for Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required."
+    "label": "data ingestion and labeling pipeline interfaces with feature / representation layer: signal/energy/material hand-off for Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses."
    },
    {
     "id": "DO-006",
     "kind": "DESIGN_OUTPUT",
-    "label": "feature / representation layer interfaces with model + uncertainty quantification: signal/energy/material hand-off for Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required."
+    "label": "feature / representation layer interfaces with model + uncertainty quantification: signal/energy/material hand-off for Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses."
    },
    {
     "id": "DO-007",
     "kind": "DESIGN_OUTPUT",
-    "label": "model + uncertainty quantification interfaces with deployment target + monitoring loop: signal/energy/material hand-off for Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required."
+    "label": "model + uncertainty quantification interfaces with deployment target + monitoring loop: signal/energy/material hand-off for Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses."
    },
    {
     "id": "DO-008",
     "kind": "DESIGN_OUTPUT",
-    "label": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required."
+    "label": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses."
    },
    {
     "id": "DO-009",
     "kind": "DESIGN_OUTPUT",
-    "label": "Flow/force/signal path geometry realizing the mechanism (Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.); every dimension is a named design decision with UNKNOWN value"
+    "label": "Flow/force/signal path geometry realizing the mechanism (Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.); every dimension is a named design decision with UNKNOWN value"
    },
    {
     "id": "DO-010",
@@ -3683,7 +3729,7 @@
    {
     "id": "DO-016",
     "kind": "DESIGN_OUTPUT",
-    "label": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required."
+    "label": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses."
    },
    {
     "id": "DO-017",
@@ -3814,10 +3860,10 @@
  },
  "_spec_ref": {
   "invention_id": "inv:ui_bus_bunching_and_headway_irregularity_960958:9a5b676b366e",
-  "spec_hash": "1144446a7afe8a5a91f84e59928a21603f6a6578b4b6ddbdb6bf43014cebc0d0",
+  "spec_hash": "f1187a48c858ebfd5203899a112d03a621b015e9ff03a0993052490ff24a5ff4",
   "final_envelope_hash": "9a5b676b366ea4e0068f31acab1f47b726702fa42bc829f86a9eb72303f5e424",
   "run_id": "engrun:ui_bus_bunching_and_headway_irregularity_960958:2026-09-21T03:22:38",
-  "built_at": "2026-09-21T03:39:59+00:00Z"
+  "built_at": "2026-09-21T03:43:56+00:00Z"
  },
  "_epistemic_summary": {
   "SOURCE_FACT_fields": [
@@ -4169,7 +4215,7 @@
        "evidence_ids": [],
        "refs": {
         "equation_id": "ML-001",
-        "verdict": "CONDITIONAL"
+        "verdict": "APPLICABLE"
        }
       }
      },
@@ -4202,8 +4248,8 @@
        "evidence_ids": [],
        "refs": {
         "applicability": "utility table fully specified; probabilities calibrated",
-        "applicability_verdict": "CONDITIONAL",
-        "applicability_reason": "domain template justifies this relation for the domain, but the invention text does not yet engage its variables; applicability must be confirmed by the first characterization"
+        "applicability_verdict": "APPLICABLE",
+        "applicability_reason": "invention mechanism engages the model variables: U"
        }
       }
      },
@@ -5966,8 +6012,8 @@
     ]
    }
   ],
-  "built_at": "2026-09-21T03:39:59+00:00Z",
-  "hash": "784a8c1e863a9393ad45f761dcd18c3420a00ffeb31b8525a9d20bdaa3d4e1d6"
+  "built_at": "2026-09-21T03:43:56+00:00Z",
+  "hash": "ec3deebc9a43e1e834156696545e71a0e9d6a75b8dda26580ed04c22907f402d"
  },
  "chain_enforcement": {
   "rule": "CEO E15-C: every critical engineering claim carries the 8-role causal chain with provenance-carrying nodes; parameters with value_status UNKNOWN are excluded (an unknown has no engineering reasoning to bind — it is recorded as a gap instead)",
@@ -5977,18 +6023,8 @@
   "violations": [],
   "enforced": true
  },
- "physics_evaluation": {
-  "gate_version": "physics_gate/1.0.0",
-  "applicable": false,
-  "applicability": {
-   "domain": "ml_data",
-   "solver_domain": "fluidics_hydraulic",
-   "reason": "the V0 solver's declared domain is 1D hydraulic networks; this candidate's domain is outside it — no physics comparison is FABRICATED (R396 D / R394 s9: honest refusal, not a claim)"
-  },
-  "solver_version": "hydraulic_network_1d/1.0.0"
- },
  "engineering_attack_summary": {
-  "attack": "ENGINEERING_ATTACK (E15-F)",
+  "attack": "ENGINEERING_ATTACK (E15-F, re-run on the improved candidate R378)",
   "overall": "SURVIVED_WITH_UNCERTAINTIES",
   "counts": {
    "KILL": 0,
@@ -5996,32 +6032,7 @@
    "UNCERTAIN": 4,
    "SURVIVE": 6
   },
-  "targets": [
-   "mechanism_feasibility",
-   "equation_applicability",
-   "critical_assumptions",
-   "parameter_values",
-   "novelty",
-   "obviousness",
-   "failure_modes",
-   "manufacturing_feasibility",
-   "regulatory_assumption",
-   "buyer_value"
-  ],
-  "attack_record": "ENGINEERING_ATTACK_primary.json",
   "repaired_to_v2": false,
-  "selection_basis": {
-   "candidate_id": "cand:A2:ui_bus_bunching_and_headway_irregularity_960958:3759ad41d9a4a617",
-   "killed": false,
-   "attack_overall": "SURVIVED_WITH_UNCERTAINTIES",
-   "uncertain_count": 4,
-   "quality_verdict": "CONDITIONAL",
-   "quality_deficient_count": 2,
-   "repaired": false,
-   "span_underived": false,
-   "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
-   "_verdict_rank": 1,
-   "_physics_rank": 1
-  }
+  "improvement_mutation_id": "mut:6fe4880296e0"
  }
 }

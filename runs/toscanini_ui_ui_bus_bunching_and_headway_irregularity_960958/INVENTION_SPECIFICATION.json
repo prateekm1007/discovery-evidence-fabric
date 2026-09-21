@@ -30,11 +30,39 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Holding control — deliberately delaying buses at stops (or combining holding with other measures) so that buses on the same route do not travel closely together, thereby regularizing headways.",
-   "intervention": "Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
-   "expected_effect": "Evenly spaced arrivals and reduced bunching (fewer \"three buses together, then nothing\" events), lower headway variance, and shorter average commuter waiting time without fleet expansion.",
-   "mechanism_source_span": "Hybrid methods combining holding with other measures have outperformed standalone holding methods",
-   "span_derivation": null
+   "mechanism": "Hybrid methods combining holding with other measures have outperformed standalone holding methods because the combined control actions regularize bus movement and reduce bus bunching more effectively than holding alone.",
+   "intervention": "Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.",
+   "expected_effect": "Evenly spaced arrivals and reduced bus bunching (fewer \"three buses together, then nothing\" events), lower headway variance, and shorter average commuter waiting time without fleet expansion.",
+   "mechanism_source_span": "Hybrid methods combining holding with other measures have outperformed standalone holding methods but need real-world testing.",
+   "span_derivation": {
+    "n_shared": 12,
+    "shared_terms": [
+     "combining",
+     "have",
+     "holding",
+     "hybrid",
+     "measure",
+     "method",
+     "other",
+     "outperformed",
+     "real",
+     "standalone",
+     "testing",
+     "world"
+    ],
+    "span_terms_n": 14,
+    "ratio": 0.857,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "If deploying hybrid methods combining holding with other measures does not reduce instances where two or more buses on the same route travel closely together compared to standalone holding methods, the mechanism is falsified.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.1080/01441647.2024.2313969",
+     "source_span": "Hybrid methods combining holding with other measures have outperformed standalone holding methods but need real-world testing."
+    }
+   }
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
@@ -242,7 +270,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
+   "intervention": "Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses.",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -257,7 +285,14 @@
  "constraints": {
   "value": {
    "stated_constraint": "no additional buses may be added to the existing fleet",
-   "failure_mode_of_device": "bus bunching and headway irregularity"
+   "failure_mode_of_device": "bus bunching and headway irregularity",
+   "evidence_derived": [
+    {
+     "constraint": "Control strategies must use hybrid methods combining holding with other measures rather than standalone holding methods, as hybrid methods have outperformed standalone holding methods.",
+     "evidence_id": "doi:10.1080/01441647.2024.2313969",
+     "span": "Bus bunching, where two or more buses on the same route travel closely together, significantly undermines service reliability. This paper reviews bus bunching, its causes and consequences, and control strategies from demand, supply, and decision-making perspectives. It identifies gaps in the literat"
+    }
+   ]
   },
   "epistemic_class": "SOURCE_FACT",
   "origin_stage": "PROBLEM",
@@ -1478,10 +1513,261 @@
   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
   "verdict": "CONTESTED"
  },
- "_spec_hash": "1144446a7afe8a5a91f84e59928a21603f6a6578b4b6ddbdb6bf43014cebc0d0",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
   "checked_at": "2026-09-21T03:39:59+00:00Z"
- }
+ },
+ "_improvement": {
+  "parent_spec_hash": "0430ed934ed7ae1dfa913ecfb91d8a17f1482b93169c9c0bc859a9fb279d4f16",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:6fe4880296e0",
+   "mutation_type": "MECHANISM_STRENGTHENING",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.303,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:2a88111be9da",
+    "provider": "zai",
+    "model": "Atria-Dawn-Preview",
+    "prompt_hash": "879427312f40e47e9fa0a032fe9093c2b51aa0d52e85eba2274162d245abfb3e",
+    "output_hash": "2a88111be9da89c92ce3bd01a638e6fb182533ba95347fce382f020890243b21",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.1080/01441647.2024.2313969",
+     "span_verbatim_in_evidence": true,
+     "mutation_changes_candidate": true,
+     "span_derivation": {
+      "n_shared": 12,
+      "shared_terms": [
+       "combining",
+       "have",
+       "holding",
+       "hybrid",
+       "measure",
+       "method",
+       "other",
+       "outperformed",
+       "real",
+       "standalone",
+       "testing",
+       "world"
+      ],
+      "span_terms_n": 14,
+      "ratio": 0.857,
+      "underived": false,
+      "state": "MEASURED",
+      "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+     },
+     "span_derivation_cleared": 0.857
+    },
+    "reasons": [],
+    "validated_at": "2026-09-21T03:43:56+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "Hybrid methods combining holding with other measures to prevent bus bunching, where two or more buses on the same route travel closely together, thereby regularizing headways and improving service reliability.",
+     "after": "Hybrid methods combining holding with other measures have outperformed standalone holding methods because the combined control actions regularize bus movement and reduce bus bunching more effectively than holding alone."
+    },
+    "intervention": {
+     "before": "Deploy an AVL/APC-driven scheme using hybrid methods combining holding with other measures on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no addition",
+     "after": "Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses."
+    },
+    "mechanism_source_span": {
+     "before": "Bus bunching, where two or more buses on the same route travel closely together, significantly undermines service reliability. This paper reviews bus bunching, its causes and consequences, and control strategies from demand, supply, and decision-making perspectives. It identifies gaps in the literat",
+     "after": "Hybrid methods combining holding with other measures have outperformed standalone holding methods but need real-world testing."
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "headway together buses transit fleet routes",
+     "headway together buses transit fleet routes",
+     "together headways buses route holding control",
+     "together headways buses route holding control",
+     "predecessor headway buses fleet holding bus stops runs",
+     "predecessor headway buses fleet holding bus stops runs",
+     "headway bunching nothing variance waiting expansion",
+     "headway bunching nothing variance waiting expansion",
+     "together headway transit fleet routes city",
+     "together headway transit fleet routes city"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "0430ed934ed7ae1dfa913ecfb91d8a17f1482b93169c9c0bc859a9fb279d4f16",
+   "child_spec_hash": null,
+   "reason": "The measured mechanism-evidence derivation defect is repaired by deriving the mechanism and intervention directly from the evidence span stating that hybrid methods combining holding with other measures outperform standalone holding methods and require real-world testing.",
+   "applied_at": "2026-09-21T03:43:56+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:e8785e8651ba",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.086,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:df1684e0f740",
+     "provider": "xkiro",
+     "model": "qwen/qwen3-max:free",
+     "prompt_hash": "878c7d0d4a6ae0dbe0dea4a68f942d4716247451b970c81c53b8a68f662ecbad",
+     "output_hash": "df1684e0f740df2cb53ea0e9301f34ba7f0ad42bee0f2a0b60e59f51151b20a5",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1080/01441647.2024.2313969",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.4,
+      "evidence_support_cleared": 0.4,
+      "constraint_traceable_to_evidence": "Control strategies must use hybrid methods combining holding with other measures rather than standalone holding methods,"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-21T03:41:34+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Holding control — deliberately delaying buses at stops (or combining holding with other measures) so that buses on the same route do not travel closely together, thereby regularizing headways.",
+      "after": "Hybrid methods combining holding with other measures to prevent bus bunching, where two or more buses on the same route travel closely together, thereby regularizing headways and improving service reliability."
+     },
+     "intervention": {
+      "before": "Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no additional buses required.",
+      "after": "Deploy an AVL/APC-driven scheme using hybrid methods combining holding with other measures on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no addition"
+     },
+     "mechanism_source_span": {
+      "before": "Hybrid methods combining holding with other measures have outperformed standalone holding methods",
+      "after": "Bus bunching, where two or more buses on the same route travel closely together, significantly undermines service reliability. This paper reviews bus bunching, its causes and consequences, and control strategies from demand, supply, and decision-making perspectives. It identifies gaps in the literat"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "headway together buses transit fleet routes",
+      "headway together buses transit fleet routes",
+      "together headways buses route holding control",
+      "together headways buses route holding control",
+      "predecessor headway buses fleet holding bus stops runs",
+      "predecessor headway buses fleet holding bus stops runs",
+      "headway bunching nothing variance waiting expansion",
+      "headway bunching nothing variance waiting expansion",
+      "together headway transit fleet routes city",
+      "together headway transit fleet routes city"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "1144446a7afe8a5a91f84e59928a21603f6a6578b4b6ddbdb6bf43014cebc0d0",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION (measured 0.086) by re-anchoring the mechanism and intervention in the verbatim technical vocabulary of the cited evidence span, ensuring shared content terms exceed the 20 percent threshold.",
+    "applied_at": "2026-09-21T03:41:34+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:6fe4880296e0",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.303,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:2a88111be9da",
+     "provider": "zai",
+     "model": "Atria-Dawn-Preview",
+     "prompt_hash": "879427312f40e47e9fa0a032fe9093c2b51aa0d52e85eba2274162d245abfb3e",
+     "output_hash": "2a88111be9da89c92ce3bd01a638e6fb182533ba95347fce382f020890243b21",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1080/01441647.2024.2313969",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 12,
+       "shared_terms": [
+        "combining",
+        "have",
+        "holding",
+        "hybrid",
+        "measure",
+        "method",
+        "other",
+        "outperformed",
+        "real",
+        "standalone",
+        "testing",
+        "world"
+       ],
+       "span_terms_n": 14,
+       "ratio": 0.857,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 0.857
+     },
+     "reasons": [],
+     "validated_at": "2026-09-21T03:43:56+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Hybrid methods combining holding with other measures to prevent bus bunching, where two or more buses on the same route travel closely together, thereby regularizing headways and improving service reliability.",
+      "after": "Hybrid methods combining holding with other measures have outperformed standalone holding methods because the combined control actions regularize bus movement and reduce bus bunching more effectively than holding alone."
+     },
+     "intervention": {
+      "before": "Deploy an AVL/APC-driven scheme using hybrid methods combining holding with other measures on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing — no addition",
+      "after": "Deploy an AVL/APC-driven scheme implementing hybrid methods combining holding with other measures on the existing fleet: hold ahead-of-schedule buses at time-point stops and coordinate with other available control measures, then validate through real-world testing without adding buses."
+     },
+     "mechanism_source_span": {
+      "before": "Bus bunching, where two or more buses on the same route travel closely together, significantly undermines service reliability. This paper reviews bus bunching, its causes and consequences, and control strategies from demand, supply, and decision-making perspectives. It identifies gaps in the literat",
+      "after": "Hybrid methods combining holding with other measures have outperformed standalone holding methods but need real-world testing."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "headway together buses transit fleet routes",
+      "headway together buses transit fleet routes",
+      "together headways buses route holding control",
+      "together headways buses route holding control",
+      "predecessor headway buses fleet holding bus stops runs",
+      "predecessor headway buses fleet holding bus stops runs",
+      "headway bunching nothing variance waiting expansion",
+      "headway bunching nothing variance waiting expansion",
+      "together headway transit fleet routes city",
+      "together headway transit fleet routes city"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "0430ed934ed7ae1dfa913ecfb91d8a17f1482b93169c9c0bc859a9fb279d4f16",
+    "child_spec_hash": null,
+    "reason": "The measured mechanism-evidence derivation defect is repaired by deriving the mechanism and intervention directly from the evidence span stating that hybrid methods combining holding with other measures outperform standalone holding methods and require real-world testing.",
+    "applied_at": "2026-09-21T03:43:56+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "f1187a48c858ebfd5203899a112d03a621b015e9ff03a0993052490ff24a5ff4"
 }
