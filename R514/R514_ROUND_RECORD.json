@@ -1,0 +1,72 @@
+{
+ "artifact": "R514_ROUND_RECORD/1.0",
+ "round": "R514-starvation-gate-and-empty-retry",
+ "scope_authorization": "operator-selected 'Re-grounded fixes' (2026-09-21): ATTACK/COLLISION n_distinct gate + LLM timeout/fallback tuning, with tests, no deploy. The R514 directive's Changes 1/3/4/5 as written were REFUTED against local evidence (see audit_reconciliation) and were NOT implemented.",
+ "constitution": "2.10.1 (read in full, 2538 lines, before coding and before committing; unchanged)",
+ "base": "54242326 (origin/main at implementation; R513 closure 7e2dfa62 + 54242326 landed mid-round — realigned per Art. XXII, working-tree R514 changes verified disjoint then fast-forwarded)",
+ "deployed_sha_unchanged": "4d4964e8 (no deploy this round per scope)",
+ "changes": [
+  {
+   "id": "R514-GATE",
+   "claim": "Runs with <2 materially distinct mechanisms execute COLLISION/ATTACK and report the results as discovery evidence (Art. LXXXIV violation). After the change they record SKIPPED_ADMISSION/MINIMUM_DIVERSITY and terminate MECHANISM_STARVED.",
+   "falsifier": "a starved fixture whose ATTACK executes; a diverse (>=2) fixture gated; a fixture with no distinctness adjudication gated (must fail open).",
+   "evidence": "R513 durable envelopes (origin/runtime-state-hf): run A n_distinct=1/retained=1 executed ATTACK (KILLED); run B n_distinct=0/NO_CANDIDATES executed ATTACK (PASS); both terminated INVENTION_REQUIRES_EXPERIMENT.",
+   "evaluator": "tests/test_r514_starvation_gate.py (12 tests: justify door units + REAL conductor on stub adapters + promoting-evolution adversarial for the terminal guard) + existing suites (below).",
+   "files": [
+    "discovery_fabric/engine/stage_entry.py (MINIMUM_DIVERSITY_STAGES={COLLISION,ATTACK}, MINIMUM_DISTINCT_MECHANISMS=2, mechanism_diversity_facts(), mechanism_starved(), justify rule, ENTRY_HELPER_VERSION 1.1.0->1.2.0)",
+    "discovery_fabric/engine/run.py (_final_state MECHANISM_STARVED branch reading the same helper; evolution-overwrite guard preserving a starved terminal)"
+   ],
+   "design_notes": "No new governance subsystem (R399 directive): the rule rides the existing adaptive-admission door; CONTRADICTION deliberately ungated (deterministic, consumes evidence-issues independent of candidates); terminal mirrors the RUN_BLOCKED_CAPABILITY precedent; resume-safe (reads the persisted mechanism-space envelope restored by _restore_progress)."
+  },
+  {
+   "id": "R514-EMPTY-RETRY",
+   "claim": "EmptyContentWithFinish at the max token budget retries the identical model/budget (no mechanism to succeed differently), burning up to 3 full generations per rung. After the change the cascade advances immediately; the below-ceiling larger-budget rescue is preserved.",
+   "falsifier": "an at-ceiling empty retried identically; a below-ceiling empty that does not grow budget and retry.",
+   "evidence": "R513 durable model_routing ledger: 16 empty-content failures at max_tokens=2048 (atria x5 / zai x10 / xkiro x1, 25-245 s each), every one resolved via provider change, none via identical retry.",
+   "evaluator": "tests/test_r514_starvation_gate.py::TestEmptyContentAtCeiling (2 tests) + repaired tests/test_r445_transport_timeout_override.py (5/5 green after test-only mock repair for R451 cost-policy/admission drift).",
+   "files": [
+    "discovery_fabric/engine/llm_registry.py (EmptyContentWithFinish handler: identical retry only when the budget grew)"
+   ],
+   "design_notes": "Art. V preserved by construction (fallback cascade untouched; a call that would have succeeded still succeeds on the next rung). The 60 s SYNTHESIZE timeout and tier-routing proposals were NOT implemented (contradicted by a2/synthesize.py:211-212 measurement and the inverted-tier/non-existent-symbol findings)."
+  }
+ ],
+ "audit_reconciliation": {
+  "context": "The R513 stage-efficiency audit (external/AI_REVIEW) bundled two changes (MSD removal + alleged HF credit funding) and issued an R514 directive. Verified claim-by-claim against R513 captured payloads + durable branch before implementing (Art. I/XXIV).",
+  "confirmed": "Change A clean (16 stages, MSD absent, 5/5 COMPLETE); R513 wall arithmetic matches session timestamps; IMPROVE role calls present in runs A/C/E; attack KILLED/PASS (3/2).",
+  "refuted": [
+   "CHANGE B (HF credits funded, tier-2 serving): ZERO hf-provider calls in all 62 logged LLM calls (run_state.model_route.calls in R513/REMOVAL_BATTERY_RUNS/*_result.json) — all atria/xkiro/zai/unorouter free-tier. No gpt-oss-120b, no GLM-5.3, no quality_tier=2 HF.",
+   "Case A 'router transition' outlier: ~50-75 of 84 min was AWAITING_CLARIFICATION parking (first driver lacked auto-answer; battery session log), not router transition.",
+   "Directive Change 1 premise (no IMPROVE cap): false — MAX_ITERATIONS_DEFAULT=2 (improvement_engine.py:131), loop range-bound (:1321), ENGINE_EVOLUTION_MAX_GENERATIONS=3 (evolution.py:904); sketched ImprovementResult/cycle_count do not exist. Measured IMPROVE cost is fallback chains + post-rank passes, not uncapped cycles.",
+   "Directive Change 3 (ROLE_TIER_MAP/SYNTHESIS_DRAFT/llm_generate role): symbols do not exist; routing is purpose-based (mechanism_space.py:100-104 -> role_for_purpose); tier convention inverted (quality_tier 1 = best, llm_registry.py:67) — the edit as written would do the opposite of its intent.",
+   "Directive Change 4 (60 s SYNTHESIZE timeout): contradicts the measured finding in-code ('60 s produced systematic timeouts', a2/synthesize.py:211-212).",
+   "Directive Change 5 (physics_beats_baseline in equations.py): symbol exists nowhere in engine code; real token is DOES_NOT_BEAT_BASELINE (evolution.py:377). Not implemented (needs re-grounding, offered as follow-up).",
+   "Directive Change 2 machinery (_record_skip): does not exist; implemented instead through the standing adaptive-admission door + constitutional Art. LXXXIV (stronger: terminal MECHANISM_STARVED, not just skips)."
+  ]
+ },
+ "pre_deploy_evidence": {
+  "new_battery": "tests/test_r514_starvation_gate.py 12/12 pass (incl. REAL-conductor starved/diverse runs + promoting-evolution adversarial + at-ceiling/below-ceiling retry semantics)",
+  "regression": "test_r453_lean_core (36 pass + version pin updated to 1.2.0; 1 pre-existing cost_policy_not_widened failure identical on baseline), test_r399_gates + test_r399_canonical_engine pass, test_r445_transport_timeout_override 5/5 pass after test-only mock repair, test_r514+test_engine_integration 60 pass on rebased tree, test_r401_mechanism_space (5 pre-existing TestIndependentAttack mock-drift failures identical on baseline), test_r510_dryrun (9 pre-existing DRYRUN_PROOF_DIR failures identical on baseline), test_r481/test_r483/test_engine_integration pass, transport/registry sweep (rate_limit_backoff, source_failover, r451_c13, r451_transport_capability, r456, r469, r505, r483_span_route, r483_synthesis_routing) pass, test_r422_synthesis_rotation (3 pre-existing failures identical on baseline via stash-compare), governance/yield/english-only/r402/r506/r507 (84) pass, f_series (10 pre-existing R440.17 PACKAGE_BUILD_BLOCKED failures identical on baseline by count+signature)",
+  "no_new_failures": true,
+  "stash_compare": "test_r422_synthesis_rotation (3) + test_r446_conversational_orchestrator sample fail identically on the pristine tree (pre-existing: mock drift + ModuleNotFoundError). r446 (55, module-missing), r416/r478/r443/r475-collection (No module named 'toscanini') likewise pre-existing and untouched by this change set.",
+  "note": "Suite labels above reflect the runs in this session; counts recorded at commit time in the commit message trailer."
+ },
+ "production_deployment": {
+  "target_sha": "034d2f6f767cfe55c89e995ceab0641bfb64941b",
+  "deployed_sha": "4d4964e8 (unchanged — no deploy this round per scope)",
+  "deploy_id": "N/A — no deploy",
+  "health_check_result": "BLOCKED (by scope: deploy explicitly excluded)",
+  "drift": "DRIFT (origin/main will carry the R514 commit while production serves 4d4964e8 — declared, not silent)",
+  "blocked_by": "N/A — no credential blocker; deploy excluded by operator scope decision",
+  "what_unblocks": "operator deploy order for the R514 change set (Space deploy + /api/version engine_commit == target SHA + drift GREEN)"
+ },
+ "delivery_status": "DELIVERY_BLOCKED (Art. LXXI §4: deployed_sha != target_sha by scope decision — honest blocking, not failure). Code complete + tested + pushed (Art. LXXXV) awaiting operator deploy order.",
+ "escalation_count": 0,
+ "follow_ups_offered_not_taken": [
+  "Directive Change 5 re-grounded on DOES_NOT_BEAT_BASELINE (needs its own measurement round)",
+  "Evolution LLM spend on starved-but-retained runs (terminal now guarded; spend question open)",
+  "ENGINE_LLM_TIMEOUT_S operator lever (exists, R445-C) — no code change proposed",
+  "HF credit-funding claim: unverifiable from any local artifact — needs operator confirmation (CHANGE B neither confirmed nor denied, only its 'serving tier-2' corollary refuted)"
+ ],
+ "created_at_utc": "2026-09-21T07:30:00Z",
+ "reviewer_provenance": "AI_REVIEW"
+}
