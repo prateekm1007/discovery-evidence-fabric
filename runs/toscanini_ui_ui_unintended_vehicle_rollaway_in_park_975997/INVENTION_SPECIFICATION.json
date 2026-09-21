@@ -1,0 +1,1271 @@
+{
+ "invention_id": {
+  "value": "inv:ui_unintended_vehicle_rollaway_in_park_975997:4841d34bb5b8",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_unintended_vehicle_rollaway_in_park_975997",
+   "device": "Toyota Camry automated stop system",
+   "failure": "Documented problem 'unintended vehicle rollaway in park' concerning Toyota Camry automated stop system. User-submitted engineering problem (session input): \"[R516-BATTERY declared_family=mechanical source=odi:11349407 battery=R516-mechanism-attribution]\n\n2020 TOYOTA CAMRY. CONSUMER WRITES IN REGARDS TO UNINTENDED ACCELERATION. *LD    THE CONSUMER STATED WHILE THE VEHICLE WAS IN PARK ON A FLAT SURFACE, THE CONSUMER EXITED THE VEHICLE AND IT BEGAN ROLLING\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "unintended vehicle rollaway in park",
+   "constraint": "vehicle must remain stationary when parked on a flat surface with occupants exited"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:439e9b20"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of Toyota Camry automated stop system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Event-driven remote assistance as a fallback layer — when the automated system leaves its nominal operational state, tasks are divided between the vehicle and a remote human operator whose cognitive reasoning resolves the off-nominal situation.",
+   "intervention": "Add an event-driven fallback to the Camry automated stop system: continuously verify the parked state (gear position, wheel speed, inclinometer) and, if motion begins while Park is commanded on a flat surface, immediately command the electronic parking brake to hold the vehicle while escalating an alert to a remote operator/owner app for cognitive verification and confirmation of the secure state.",
+   "expected_effect": "Any unintended rollaway is caught as an off-nominal event and corrected by the fallback (automated brake application plus remote human verification), so the vehicle remains stationary when parked on a flat surface with occupants exited.",
+   "mechanism_source_span": "Remote Assistance (RA) represents an event-driven class of teleoperation with a distinct division of tasks between the Autonomous Vehicle (AV) and the remote human operator.",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.48550/arxiv.2308.15167"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Dynamic Collaborative Path Planning for Remote Assistance of Highly-Automated Vehicles",
+   "mechanism": "Event-driven remote assistance as a fallback layer — when the automated system leaves its nominal operational state, tasks are divided between the vehicle and a remote human operator whose cognitive reasoning resolves the off-nominal situation.",
+   "intervention_site": "Toyota Camry automated stop system",
+   "expected_effect": "Any unintended rollaway is caught as an off-nominal event and corrected by the fallback (automated brake application plus remote human verification), so the vehicle remains stationary when parked on a flat surface with occupants exited.",
+   "falsification_test": "Place the vehicle on a flat surface in Park with occupants exited, simulate a park-mechanism disengagement, and verify the system detects motion within a fixed threshold (e.g., <0.5 s and <0.3 m travel), applies the electronic parking brake to a full stop, and logs the remote escalation; repeat across many trials confirming zero rollaways beyond threshold and no false triggers during normal park cycles."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.48550/arxiv.2308.15167"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Add an event-driven fallback to the Camry automated stop system: continuously verify the parked state (gear position, wheel speed, inclinometer) and, if motion begins while Park is commanded on a flat surface, immediately command the electronic parking brake to hold the vehicle while escalating an alert to a remote operator/owner app for cognitive verification and confirmation of the secure state.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.48550/arxiv.2308.15167"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "vehicle must remain stationary when parked on a flat surface with occupants exited",
+   "failure_mode_of_device": "unintended vehicle rollaway in park"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:439e9b20"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.3911112714439877,
+   "eig_per_cost": 0.3911112714439877,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Any unintended rollaway is caught as an off-nominal event and corrected by the fallback (automated brake application plus remote human verification), so the vehicle remains stationary when parked on a",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-21T07:38:57.674246+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-21T07:38:57.674246+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.3911112714439877,
+     "eig_per_cost": 0.3911112714439877,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1016/j.protcy.2013.12.294",
+    "title": "Performance Analysis on Power Train Drive System of the 2012 Toyota Camry Hybrid",
+    "source_uri": "https://doi.org/10.1016/j.protcy.2013.12.294",
+    "doi": "10.1016/j.protcy.2013.12.294",
+    "content_hash": "74939323917d5c8d39140cfd64e50275f99cbb3dda023b40cbb65966b86edf21",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.9744/century.9.2.41-48",
+    "title": "ANALISIS MAKNA KATA IKLAN TOYOTA SIENTA, TOYOTA CAMRY DAN TOYOTA YARIS-L CHINA 中国Sienta广告、Camry 广告、Yaris-L广告的词义分析",
+    "source_uri": "https://doi.org/10.9744/century.9.2.41-48",
+    "doi": "10.9744/century.9.2.41-48",
+    "content_hash": "7e5738a10e9088ab112bb8c056844a1de14aed70e548349b9da699ee308dcd99",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/vppc.2009.5289778",
+    "title": "Comparative evaluation and analysis of the 2008 Toyota Lexus, Camry and 2004 Prius DC link capacitor assembly vs. the SBE Power Ring DC link capacitor",
+    "source_uri": "https://doi.org/10.1109/vppc.2009.5289778",
+    "doi": "10.1109/vppc.2009.5289778",
+    "content_hash": "2a7544d4f53d78a114b22d74ab5cd4b57ea51e9dd6e278bc509d72af41ef5b13",
+    "frozen": false
+   },
+   {
+    "id": "title:b89da6c6518d21d4",
+    "title": "Examples of Risk Information Concealment Practice",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "18d283842712c17b668105d6a484364f88c7c15ee7b36d01df1f6acb15f2c58c",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.14711/thesis-b936924",
+    "title": "An ultrasonic self-localized automated guided vehicle system",
+    "source_uri": "https://doi.org/10.14711/thesis-b936924",
+    "doi": "10.14711/thesis-b936924",
+    "content_hash": "032a4d8614e2dd167c7ba9641cf6ece0bc100cde6d084f36f75d325eb2da55de",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.33915/etd.9716",
+    "title": "An automated damage detection system for Armoured Vehicle Launched Bridge.",
+    "source_uri": "https://doi.org/10.33915/etd.9716",
+    "doi": "10.33915/etd.9716",
+    "content_hash": "c8340dbea9b19d61a7fd3bfd66ac5dffb51e68d3dbc5180c2c48b68c9f9285e0",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.25148/etd.fidc001241",
+    "title": "Potential Implication of Automated Vehicle Technologies on Travel Behavior and System Modeling",
+    "source_uri": "https://doi.org/10.25148/etd.fidc001241",
+    "doi": "10.25148/etd.fidc001241",
+    "content_hash": "9a8accff001be92f7784f2b0ec808f43f8f477e0ab16a0f9df1d280c949d987b",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2308.15167",
+    "title": "Dynamic Collaborative Path Planning for Remote Assistance of Highly-Automated Vehicles",
+    "source_uri": "https://doi.org/10.48550/arxiv.2308.15167",
+    "doi": "10.48550/arxiv.2308.15167",
+    "content_hash": "96763811827515ab108392fcc77105166302b9882d7572f40f6941e9915509f3",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2309.01461",
+    "title": "Joint vehicle state and parameters estimation via Twin-in-the-Loop observers",
+    "source_uri": "https://doi.org/10.48550/arxiv.2309.01461",
+    "doi": "10.48550/arxiv.2309.01461",
+    "content_hash": "f6635afe11219c68e13122dd34e9629be361ebf21ab0861398ed582370fce098",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2511.01369",
+    "title": "Lateral Velocity Model for Vehicle Parking Applications",
+    "source_uri": "https://doi.org/10.48550/arxiv.2511.01369",
+    "doi": "10.48550/arxiv.2511.01369",
+    "content_hash": "6cbaa378dab6560280c8a36f46340def43d49eadb6e82f8ff3efc4d6ae0b9928",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.2172/974796",
+    "title": "2007 Toyota Camry-6330 Hybrid Electric Vehicle Battery Test Results",
+    "source_uri": "https://doi.org/10.2172/974796",
+    "doi": "10.2172/974796",
+    "content_hash": "9575bc9f59496ef7190398de0f58876f1a3ad0b87b5fb86a32b21a7c3b4f9a63",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.2172/974751",
+    "title": "2007 Toyota Camry-7129 Hybrid Electric Vehicle Battery Test Results",
+    "source_uri": "https://doi.org/10.2172/974751",
+    "doi": "10.2172/974751",
+    "content_hash": "f313a6daa6cb4960c15b40785a31b235b56eda8c0a878f491156b0ef15655991",
+    "frozen": false
+   },
+   {
+    "id": "title:3d0619f77d50d281",
+    "title": "Modernization of the suspension system of a Toyota Camry Solara vehicle with a study of stability",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "d1fadfcd8c6c215baeb75ddf0055a1cc5beeb4d18ba1a78c94aa605449e11f39",
+    "frozen": false
+   },
+   {
+    "id": "title:bcdd14c9ca25eec2",
+    "title": "The phenomenon of vehicle park brake rollaway",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "8fac8c4e30ee23730cdff3baa03dd9f2ee136912270876999a9939a46abf3c68",
+    "frozen": false
+   },
+   {
+    "id": "title:b37c441907183995",
+    "title": "Design and Control of Toyota Camry 2021",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "ea973c15b37083c96915a3094bff9d7043d65ab7427caf2a50c69f0e9079f778",
+    "frozen": false
+   },
+   {
+    "id": "title:f785347bdc945075",
+    "title": "The advertising plan of Toyota Camry for Toyota Motor Thailand Co. Ltd",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "609d8545a50d550359c07cc721bb1de65658b3363cbe90d249315da9a384fef3",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1016/j.protcy.2013.12.294",
+   "doi:10.1109/vppc.2009.5289778",
+   "doi:10.14711/thesis-b936924",
+   "doi:10.2172/974751",
+   "doi:10.2172/974796",
+   "doi:10.25148/etd.fidc001241",
+   "doi:10.33915/etd.9716",
+   "doi:10.48550/arxiv.2308.15167",
+   "doi:10.48550/arxiv.2309.01461",
+   "doi:10.48550/arxiv.2511.01369",
+   "doi:10.9744/century.9.2.41-48",
+   "title:3d0619f77d50d281",
+   "title:b37c441907183995",
+   "title:b89da6c6518d21d4",
+   "title:bcdd14c9ca25eec2",
+   "title:f785347bdc945075"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:evidence:doi:10.48550/arxiv.2511.01369",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['not'] in: 'It is well established that this assumption does not hold during low-speed driving and researchers thus]",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:evidence:title:bcdd14c9ca25eec2",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['not', 'rollaway'] in: 'The research found that rollaway does not always start with a uniform motion, but with a st]",
+    "severity": "HIGH"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Place the vehicle on a flat surface in Park with occupants exited, simulate a park-mechanism disengagement, and verify the system detects motion within a fixed threshold (e.g., <0.5 s and <0.3 m travel), applies the electronic parking brake to a full stop, and logs the remote escalation; repeat across many trials confirming zero rollaways beyond threshold and no false triggers during normal park cycles."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_unintended_vehicle_rollaway_in_park_975997:2026-09-21T07:33:17",
+   "final_envelope_hash": "4841d34bb5b8fb2a0a5c2159c0295161e04ccc469b9a2942fa26cf4bb5348f3b",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.3911112714439877
+    },
+    "score": 0.2582,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-21T07:38:57+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-21T07:38:57+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1016/j.protcy.2013.12.294": {
+   "id": "doi:10.1016/j.protcy.2013.12.294",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1016/j.protcy.2013.12.294",
+   "source_uri": "https://doi.org/10.1016/j.protcy.2013.12.294",
+   "title": "Performance Analysis on Power Train Drive System of the 2012 Toyota Camry Hybrid",
+   "abstract": "",
+   "doi": "10.1016/j.protcy.2013.12.294",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2013",
+   "retrieval_timestamp": "2026-09-21T07:33:34.151349+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "74939323917d5c8d39140cfd64e50275f99cbb3dda023b40cbb65966b86edf21",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1016/j.protcy.2013.12.294"
+    },
+    "queries_by_source": {
+     "crossref": "Toyota Camry automated stop system unintended vehicle rollaway in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1016/j.protcy.2013.12.294",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Toyota Camry automated stop system unintended vehicle rollaway in park",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.9744/century.9.2.41-48": {
+   "id": "doi:10.9744/century.9.2.41-48",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.9744/century.9.2.41-48",
+   "source_uri": "https://doi.org/10.9744/century.9.2.41-48",
+   "title": "ANALISIS MAKNA KATA IKLAN TOYOTA SIENTA, TOYOTA CAMRY DAN TOYOTA YARIS-L CHINA 中国Sienta广告、Camry 广告、Yaris-L广告的词义分析",
+   "abstract": "",
+   "doi": "10.9744/century.9.2.41-48",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2021",
+   "retrieval_timestamp": "2026-09-21T07:33:34.151431+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "7e5738a10e9088ab112bb8c056844a1de14aed70e548349b9da699ee308dcd99",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.9744/century.9.2.41-48"
+    },
+    "queries_by_source": {
+     "crossref": "Toyota Camry automated stop system unintended vehicle rollaway in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.9744/century.9.2.41-48",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Toyota Camry automated stop system unintended vehicle rollaway in park",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1109/vppc.2009.5289778": {
+   "id": "doi:10.1109/vppc.2009.5289778",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/vppc.2009.5289778",
+   "source_uri": "https://doi.org/10.1109/vppc.2009.5289778",
+   "title": "Comparative evaluation and analysis of the 2008 Toyota Lexus, Camry and 2004 Prius DC link capacitor assembly vs. the SBE Power Ring DC link capacitor",
+   "abstract": "",
+   "doi": "10.1109/vppc.2009.5289778",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2009",
+   "retrieval_timestamp": "2026-09-21T07:33:34.151462+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "2a7544d4f53d78a114b22d74ab5cd4b57ea51e9dd6e278bc509d72af41ef5b13",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/vppc.2009.5289778"
+    },
+    "queries_by_source": {
+     "crossref": "Toyota Camry automated stop system unintended vehicle rollaway in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/vppc.2009.5289778",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Toyota Camry automated stop system unintended vehicle rollaway in park",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "title:b89da6c6518d21d4": {
+   "id": "title:b89da6c6518d21d4",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:PMC7175960",
+   "source_uri": "",
+   "title": "Examples of Risk Information Concealment Practice",
+   "abstract": "",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2015-08-20",
+   "retrieval_timestamp": "2026-09-21T07:33:34.151483+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "18d283842712c17b668105d6a484364f88c7c15ee7b36d01df1f6acb15f2c58c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:PMC7175960"
+    },
+    "queries_by_source": {
+     "europepmc": "toyota camry automated stop system unintended experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "title:b89da6c6518d21d4",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "toyota camry automated stop system unintended experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.14711/thesis-b936924": {
+   "id": "doi:10.14711/thesis-b936924",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.14711/thesis-b936924",
+   "source_uri": "https://doi.org/10.14711/thesis-b936924",
+   "title": "An ultrasonic self-localized automated guided vehicle system",
+   "abstract": "",
+   "doi": "10.14711/thesis-b936924",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T07:33:34.151504+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "032a4d8614e2dd167c7ba9641cf6ece0bc100cde6d084f36f75d325eb2da55de",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.14711/thesis-b936924"
+    },
+    "queries_by_source": {
+     "crossref": "Toyota Camry automated stop system unintended vehicle rollaway in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.14711/thesis-b936924",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Toyota Camry automated stop system unintended vehicle rollaway in park",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.33915/etd.9716": {
+   "id": "doi:10.33915/etd.9716",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.33915/etd.9716",
+   "source_uri": "https://doi.org/10.33915/etd.9716",
+   "title": "An automated damage detection system for Armoured Vehicle Launched Bridge.",
+   "abstract": "",
+   "doi": "10.33915/etd.9716",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T07:33:34.151522+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c8340dbea9b19d61a7fd3bfd66ac5dffb51e68d3dbc5180c2c48b68c9f9285e0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.33915/etd.9716"
+    },
+    "queries_by_source": {
+     "crossref": "Toyota Camry automated stop system unintended vehicle rollaway in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.33915/etd.9716",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Toyota Camry automated stop system unintended vehicle rollaway in park",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.25148/etd.fidc001241": {
+   "id": "doi:10.25148/etd.fidc001241",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.25148/etd.fidc001241",
+   "source_uri": "https://doi.org/10.25148/etd.fidc001241",
+   "title": "Potential Implication of Automated Vehicle Technologies on Travel Behavior and System Modeling",
+   "abstract": "",
+   "doi": "10.25148/etd.fidc001241",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T07:33:34.151537+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9a8accff001be92f7784f2b0ec808f43f8f477e0ab16a0f9df1d280c949d987b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.25148/etd.fidc001241"
+    },
+    "queries_by_source": {
+     "crossref": "Toyota Camry automated stop system unintended vehicle rollaway in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.25148/etd.fidc001241",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Toyota Camry automated stop system unintended vehicle rollaway in park",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2308.15167": {
+   "id": "doi:10.48550/arxiv.2308.15167",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2308.15167v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2308.15167",
+   "title": "Dynamic Collaborative Path Planning for Remote Assistance of Highly-Automated Vehicles",
+   "abstract": "Given its increasing popularity in recent years, teleoperation technology is now recognized as a robust fallback solution for Automated Driving (AD). Remote Assistance (RA) represents an event-driven class of teleoperation with a distinct division of tasks between the Autonomous Vehicle (AV) and the remote human operator. This paper presents a novel approach for RA of AVs in urban environments. The concept draws inspiration from the potential synergy between highly-automated systems and human operators to collaboratively solve complex driving situations. Utilizing a hybrid algorithm that makes use of the Operational Design Domain (ODD) modification idea, it considers actions that go beyond the nominal operational space. Combined with the advanced cognitive reasoning of the human remote operator, the concept offers features that hold the potential to significantly improve both RA and AD user experiences.",
+   "doi": "10.48550/arxiv.2308.15167",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T07:33:34.151554+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "96763811827515ab108392fcc77105166302b9882d7572f40f6941e9915509f3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2308.15167v1"
+    },
+    "queries_by_source": {
+     "arxiv": "Toyota Camry automated stop system unintended vehicle rollaway in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2308.15167",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Toyota Camry automated stop system unintended vehicle rollaway in park",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2308.15167v1",
+   "authors": [
+    "Domagoj Majstorovic",
+    "Frank Diermeyer"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2309.01461": {
+   "id": "doi:10.48550/arxiv.2309.01461",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2309.01461v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2309.01461",
+   "title": "Joint vehicle state and parameters estimation via Twin-in-the-Loop observers",
+   "abstract": "Vehicular control systems are required to be both extremely reliable and robust to different environmental conditions, e.g. load or tire-road friction. In this paper, we extend a new paradigm for state estimation, called Twin-in-the-Loop filtering (TiL-F), to the estimation of the unknown parameters describing the vehicle operating conditions. In such an approach, a digital-twin of the vehicle (usually already available to the car manufacturer) is employed on-board as a plant replica within a closed-loop scheme, and the observer gains are tuned purely from experimental data. The proposed approach is validated against experimental data, showing to significantly outperform the state-of-the-art solutions.",
+   "doi": "10.48550/arxiv.2309.01461",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T07:33:34.151570+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f6635afe11219c68e13122dd34e9629be361ebf21ab0861398ed582370fce098",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2309.01461v1"
+    },
+    "queries_by_source": {
+     "arxiv": "Toyota Camry automated stop system unintended vehicle rollaway in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2309.01461",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Toyota Camry automated stop system unintended vehicle rollaway in park",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2309.01461v1",
+   "authors": [
+    "Federico Dettù",
+    "Simone Formentin",
+    "Sergio Matteo Savaresi"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2511.01369": {
+   "id": "doi:10.48550/arxiv.2511.01369",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2511.01369v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2511.01369",
+   "title": "Lateral Velocity Model for Vehicle Parking Applications",
+   "abstract": "Automated parking requires accurate localization for quick and precise maneuvering in tight spaces. While the longitudinal velocity can be measured using wheel encoders, the estimation of the lateral velocity remains a key challenge due to the absence of dedicated sensors in consumer-grade vehicles. Existing approaches often rely on simplified vehicle models, such as the zero-slip model, which assumes no lateral velocity at the rear axle. It is well established that this assumption does not hold during low-speed driving and researchers thus introduce additional heuristics to account for differences. In this work, we analyze real-world data from parking scenarios and identify a systematic deviation from the zero-slip assumption. We provide explanations for the observed effects and then propose a lateral velocity model that better captures the lateral dynamics of the vehicle during parking. The model improves estimation accuracy, while relying on only two parameters, making it well-suited for integration into consumer-grade applications.",
+   "doi": "10.48550/arxiv.2511.01369",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T07:33:34.151587+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6cbaa378dab6560280c8a36f46340def43d49eadb6e82f8ff3efc4d6ae0b9928",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2511.01369v1"
+    },
+    "queries_by_source": {
+     "arxiv": "Toyota Camry automated stop system unintended vehicle rollaway in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2511.01369",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Toyota Camry automated stop system unintended vehicle rollaway in park",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2511.01369v1",
+   "authors": [
+    "Luis Diener",
+    "Jens Kalkkuhl",
+    "Markus Enzweiler"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.2172/974796": {
+   "id": "doi:10.2172/974796",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2172/974796",
+   "source_uri": "https://doi.org/10.2172/974796",
+   "title": "2007 Toyota Camry-6330 Hybrid Electric Vehicle Battery Test Results",
+   "abstract": "",
+   "doi": "10.2172/974796",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2010",
+   "retrieval_timestamp": "2026-09-21T07:33:34.151613+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9575bc9f59496ef7190398de0f58876f1a3ad0b87b5fb86a32b21a7c3b4f9a63",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2172/974796"
+    },
+    "queries_by_source": {
+     "crossref": "Toyota Camry automated stop system unintended vehicle rollaway in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=report"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "REPORT",
+   "document_type": "",
+   "evidence_lane": "TECHNICAL_REPORT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2172/974796",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Toyota Camry automated stop system unintended vehicle rollaway in park",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.2172/974751": {
+   "id": "doi:10.2172/974751",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2172/974751",
+   "source_uri": "https://doi.org/10.2172/974751",
+   "title": "2007 Toyota Camry-7129 Hybrid Electric Vehicle Battery Test Results",
+   "abstract": "",
+   "doi": "10.2172/974751",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2010",
+   "retrieval_timestamp": "2026-09-21T07:33:34.151642+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f313a6daa6cb4960c15b40785a31b235b56eda8c0a878f491156b0ef15655991",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2172/974751"
+    },
+    "queries_by_source": {
+     "crossref": "Toyota Camry automated stop system unintended vehicle rollaway in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=report"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "REPORT",
+   "document_type": "",
+   "evidence_lane": "TECHNICAL_REPORT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2172/974751",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Toyota Camry automated stop system unintended vehicle rollaway in park",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "title:3d0619f77d50d281": {
+   "id": "title:3d0619f77d50d281",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:376607712",
+   "source_uri": "",
+   "title": "Modernization of the suspension system of a Toyota Camry Solara vehicle with a study of stability",
+   "abstract": "У кваліфікаційній роботі магістра розглянуто модернізацію підвіски автомобіля Toyota Camry Solara з метою підвищення стійкості та покращення експлуатаційних характеристик. Проаналізовано конструктивні особливості підвіски, стан пружних елементів і їх вплив на кінематику підвіски. Особливу увагу приділено дослідженню показників стійкості автомобіля за різних умов руху та навантаження, а також їх взаємозв’язку з комфортом і активною безпекою. Обґрунтовано напрями модернізації елементів підвіски та технічні рішення, спрямовані на підвищення стійкості, керованості й комфорту руху.In the master’s qualification thesis, the modernization of the suspension of a Toyota Camry Solara vehicle is considered with the aim of improving stability and enhancing operational performance. The design features of the suspension, the condition of elastic elements, and their influence on suspension kinematics are analyzed. Particular attention is paid to studying vehicle stability indicators under various driving and loading conditions, as well as their relationship with ride comfort and active safety. The directions for suspension modernization and technical solutions aimed at improving stability, handling, and ride comfort are substantiated",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T07:33:34.151669+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d1fadfcd8c6c215baeb75ddf0055a1cc5beeb4d18ba1a78c94aa605449e11f39",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:376607712"
+    },
+    "queries_by_source": {
+     "core": "toyota camry automated stop system unintended experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:3d0619f77d50d281",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "toyota camry automated stop system unintended experimental comparison",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Kolosinskyi, Maksym",
+    "Колосінський, Максим Юрійович"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:bcdd14c9ca25eec2": {
+   "id": "title:bcdd14c9ca25eec2",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:366392586",
+   "source_uri": "",
+   "title": "The phenomenon of vehicle park brake rollaway",
+   "abstract": "When a vehicle is parked on a slope with hot brakes, what appears to be a sufficient parking brake action can sometimes become insufficient. When the brakes cool\n\ndown, the braking force reduces due to relaxation of the entire parking brake system, and the vehicle may start to move, leading to obvious catastrophic consequences. This phenomenon is known as vehicle rollaway. This thesis describes the problem in detail and postulates a mechanism that accounts for the occurrence of the rollaway event on vehicles using integrated rear callipers.\n\n\n\nDifferent testing methods are presented that are used to investigate the propensity of a vehicle's parking brake system to rollaway. These include on-vehicle evaluations\n\nand laboratory based measurements. A description is given of a novel dynamometer facility that was developed for this research that is capable of testing vehicle parking\n\nbrake systems for rollaway.\n\n\n\nTwo mathematical modelling techniques are presented that demonstrate how the parking brake system parameters influence the likelihood of rollaway occurring. A\n\nfinite element model was used to simulate the change in contact pressure at the frictional interface during a rollaway event. A numerical model was also used to\n\npredict the change in torque developed by a parking brake system cooling from an initial elevated temperature. The change in clamp load at the frictional interface was\n\nmodelled using an essentially I-D quasi-static system that showed how the stiffness and the thermal properties of the system qualitatively affect the phenomenon.\n\n\n\nThe research found that rollaway does not always start with a uniform motion, but with a stick/slip motion. The likelihood of rollaway occurring was found to be directly linked to the temperature of the brake when the vehicle is parked. Rollaway can be reduced by lowering the initial temperature of the brake prior to parking. Rollaway can also be reduced by increasing the input load to the system when applying the parking brake. The research identifies the key design parameters of the brake system components whose values require close control within the real system\n\nif rollaway is to be avoided",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T07:33:34.151694+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8fac8c4e30ee23730cdff3baa03dd9f2ee136912270876999a9939a46abf3c68",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:366392586"
+    },
+    "queries_by_source": {
+     "core": "Toyota Camry automated stop unintended vehicle rollaway park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:bcdd14c9ca25eec2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Toyota Camry automated stop unintended vehicle rollaway park",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "McKinlay, Andrew James"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:b37c441907183995": {
+   "id": "title:b37c441907183995",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:303795529",
+   "source_uri": "",
+   "title": "Design and Control of Toyota Camry 2021",
+   "abstract": "The thesis explores the contribution of Hybrid Electric Vehicles to sustainable transportation through emission reduction and less reliance on fossil fuels. A literature review describes the major advantages of Hybrid Electric Vehicles over traditional Internal Combustion Engine (ICE) vehicles and fully electric vehicles. An extensive survey of control techniques in Hybrid Electric Vehicles is presented. The vehicle dynamics of the 2021 Toyota Camry is also assessed. Variable-structure dynamic models of conventional and hybrid vehicles are created in MATLAB to analyze their performance. Results confirm the improved fuel economy and smoother acceleration performance of Hybrid Electric Vehicles, sustaining the proposition that Hybrid Electric Vehicles are a sustainable transportation solution capable of bridging the gap between ICE and fully electric vehicles.BSc/BAMechatronical Engineerin",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T07:33:34.151717+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ea973c15b37083c96915a3094bff9d7043d65ab7427caf2a50c69f0e9079f778",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:303795529"
+    },
+    "queries_by_source": {
+     "core": "toyota camry automated stop system unintended experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:b37c441907183995",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "toyota camry automated stop system unintended experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Maalim, Abdiwahid Abdullahi"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:f785347bdc945075": {
+   "id": "title:f785347bdc945075",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:39990778",
+   "source_uri": "",
+   "title": "The advertising plan of Toyota Camry for Toyota Motor Thailand Co. Ltd",
+   "abstract": "The purpose of this study is to target the efforts of Toyota Motor Thailand to create an effective advertising plan for the Camry",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T07:33:34.151738+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "609d8545a50d550359c07cc721bb1de65658b3363cbe90d249315da9a384fef3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:39990778"
+    },
+    "queries_by_source": {
+     "core": "toyota camry automated stop system unintended experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:f785347bdc945075",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "toyota camry automated stop system unintended experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Kosumapa, Ampika"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:439e9b20": {
+   "id": "problem:439e9b20",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "439e9b20fd91cdba9f4f87db46518a070b6c05df413fd622eca4bbcd82b172c1",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "ba73499b172ffc88c2d81d7ddcbfd22f051b1f95abf3a22e9aea01d7d4ccdaf0",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-21T07:38:57+00:00Z"
+ }
+}
