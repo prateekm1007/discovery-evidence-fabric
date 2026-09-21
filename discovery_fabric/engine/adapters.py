@@ -303,6 +303,12 @@ class A2RetrievalAdapter(BaseAdapter):
                                  indent=1, ensure_ascii=False, default=str))
         except Exception:  # noqa: BLE001 — best-effort persistence
             pass
+        # R517 Phase 1: per-operation retrieval attribution is
+        # durable via the envelope (not the sidecar file alone —
+        # the sidecar is best-effort and not yet on the durable
+        # branch push allowlist). The envelope's provenance is the
+        # single durable authority (Art. X).
+        _retr_attr = report.get("retrieval_attribution") or {}
         return _engine_result(
             {"evidence": items,
              "evidence_ids": [i.get("id", "") for i in items],
@@ -331,9 +337,11 @@ class A2RetrievalAdapter(BaseAdapter):
                                 "canonical_record_count": report.get(
                                     "canonical_record_count"),
                                 "evidence_fabric": ef_provenance,
+                                "retrieval_attribution": _retr_attr,
                             }}},
             retrieved_count=len(items),
-            retrieval_fabric_version="V2")
+            retrieval_fabric_version="V2",
+            retrieval_attribution=_retr_attr)
 
 
 class EvidenceFreezeAdapter(BaseAdapter):
