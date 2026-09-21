@@ -139,26 +139,6 @@ FUNCTION_EQUIV_EXPANSION = {
     "prediction": ["forecasting", "prognostication"],
 }
 
-ADJACENT_INDUSTRY_MAP = {
-    "valve": ["automotive fluid systems", "aerospace hydraulics"],
-    "sensor": ["automotive sensing", "industrial instrumentation"],
-    "battery": ["consumer electronics power", "automotive energy"],
-    "coating": ["marine anti-fouling", "medical device surfaces"],
-    "catheter": ["minimally invasive surgery", "interventional radiology"],
-    "flow": ["process industry fluidics", "aerospace fuel systems"],
-}
-DEFAULT_ADJACENT = ["aerospace", "automotive", "industrial automation"]
-
-
-def _keyword_hits(text: str, table: Dict[str, List[str]]) -> List[str]:
-    t = text.lower()
-    out: List[str] = []
-    for k, vs in table.items():
-        if k in t:
-            out.extend(vs)
-    return out
-
-
 def _engine_result(apply_to: Dict[str, Any], **meta) -> Dict[str, Any]:
     d = {"_engine_result": True, "apply_to": apply_to}
     d.update(meta)
@@ -931,7 +911,7 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
 
 class MechanismSpaceAdapter(BaseAdapter):
     """R401: the structured mechanism space — a FIRST-CLASS stage
-    between VERIFY and MULTI_SOURCE_DISCOVERY. Canonical:
+    between VERIFY and COLLISION. Canonical:
     discovery_fabric/engine/mechanism_space.py::build_mechanism_space.
 
     Converts custodied evidence into STRUCTURED data (11 fields),
@@ -998,77 +978,6 @@ class MechanismSpaceAdapter(BaseAdapter):
             {"mechanism_space": space},
             state=space.get("state"),
             n_candidates=space.get("n_candidates_retained", 0))
-
-
-class MultiSourceDiscoveryAdapter(BaseAdapter):
-    """ARCHIVED (MULTI_SOURCE_DISCOVERY removal round): no longer in
-    STAGE_ORDER/ADAPTERS — unreachable from the live D8 loop. Retained
-    as reference per Art. LXIV (ARCHIVED_TO
-    orchestrator/multi_source_discovery.py::run_four_search_attack).
-
-    Canonical: orchestrator/multi_source_discovery.py::run_four_search_attack
-    (the CEO v28.3 four-direction search: discovery/destruction/transfer/reality)."""
-    capability_id = "MULTI_SOURCE_DISCOVERY"
-    module_path = "orchestrator/multi_source_discovery.py"
-    canonical_fn = "run_four_search_attack(name, mechanism, problem, failure_mode, adjacent)"
-    needs_network = True
-    depends_on = []
-
-    def execute(self, env, run_ctx):
-        msd = importlib.import_module("orchestrator.multi_source_discovery")
-        mm = env.mechanism_map
-        text = " ".join([mm.get("intervention", ""), mm.get("mechanism", ""),
-                         env.problem.get("failure", "")]).lower()
-        adjacent = _keyword_hits(text, ADJACENT_INDUSTRY_MAP) or DEFAULT_ADJACENT
-        res = msd.run_four_search_attack(
-            candidate_name=(mm.get("intervention") or env.problem_id)[:100],
-            mechanism_description=mm.get("mechanism", "")[:400],
-            physical_problem=env.problem.get("failure", "")[:300],
-            failure_mode=env.problem.get("failure_mode", ""),
-            adjacent_industries=adjacent)
-        d = asdict(res) if not hasattr(res, "to_dict") else res.to_dict()
-        # R401A A5: the ROLE of this stage is explicit — the four-
-        # direction search here VERIFIES a serious candidate (it runs
-        # AFTER VERIFY, feeding collision/adjudication). The evidence
-        # used to CREATE mechanisms is the DISCOVERY_SUPPORT plane
-        # (RETRIEVE -> MECHANISM_SPACE, stamped in the structured
-        # evidence record). Both planes keep the full honesty
-        # vocabulary: SEARCH_FAILED / SEARCH_PARTIAL / UNRESOLVED /
-        # UNKNOWN are never converted to absence (Art. XXI.3/XXV).
-        d["evidence_plane"] = {
-            "role": "VERIFICATION_SUPPORT",
-            "purpose": ("four-direction search attack around a serious "
-                        "candidate: discovery/destruction/transfer/"
-                        "reality directions feed collision, "
-                        "adjudication and the dossier"),
-            "complementary_plane": {
-                "role": "DISCOVERY_SUPPORT",
-                "location": ("RETRIEVE -> MECHANISM_SPACE (the "
-                              "structured evidence consumed by the "
-                              "five transformation operators)"),
-                "stamp": "mechanism_space.structured_evidence."
-                          "items[].retrieval_role",
-            },
-            "state_vocabulary_contract": (
-                "SEARCH_FAILED / SEARCH_PARTIAL / UNRESOLVED / UNKNOWN "
-                "stay exactly what they are on BOTH planes — no outage "
-                "may become absence; per-source error/unavailable "
-                "fields are preserved in sources_hit"),
-        }
-        d["adjacent_industries_derivation"] = {
-            "value": adjacent, "epistemic_class": "MODEL_DERIVED",
-            "method": "keyword map ADJACENT_INDUSTRY_MAP in adapters.py"}
-        sources_hit = []
-        for direction in ("discovery", "destruction", "transfer", "reality"):
-            for s in (d.get(direction) or {}).get("searches", []):
-                if s.get("total") not in (None, 0) or s.get("error"):
-                    sources_hit.append(
-                        {"source": s.get("source"), "total": s.get("total"),
-                         "error": s.get("error")})
-        d["sources_hit"] = sources_hit
-        return _engine_result({"multi_source": d},
-                              directions=["discovery", "destruction",
-                                          "transfer", "reality"])
 
 
 class CollisionEngineAdapter(BaseAdapter):
@@ -1837,8 +1746,8 @@ ADAPTERS = {
 # R481 (external-audit P0-1): IMPROVE is a FIRST-CLASS stage between
 # KILLER_EXPERIMENT and ADJUDICATION — the loop closure (dead ->
 # mutated child -> the same gauntlet -> re-entry or typed re-kill).
-# The chain is 17 stages. Deliberate, documented contract change (the
-# same pattern as R394/R397/R401); the execution point is the
+# The chain remains 16 stages after R513 removal. IMPROVE remains between
+# KILLER_EXPERIMENT and ADJUDICATION; the execution point is the
 # Directive-1 pipeline's kill-evidence point (the cemetery-update
 # precedent) and the loop position records the typed deferral;
 # pinned tests updated with the new arithmetic.
