@@ -1736,9 +1736,9 @@ ADAPTERS = {
 # simulation, the four failure modes, the baseline comparison, and
 # lifecycle verdicts that gate the candidate (consultant finding:
 # "the physics solver is validated code but not part of the live run
-# chain"). The D8 chain is 15 stages.
+# chain"). The D8 chain is 16 stages.
 # R401: MECHANISM_SPACE is a FIRST-CLASS stage between VERIFY and
-# MULTI_SOURCE_DISCOVERY — the structured mechanism space (structured
+# COLLISION — the structured mechanism space (structured
 # evidence -> five transformation operators -> distinctness ->
 # mechanism-level verification). The chain is 16 stages. Deliberate,
 # documented contract change (same pattern as R394 PREMISE_GATE and
