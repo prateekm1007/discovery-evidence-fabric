@@ -1,0 +1,897 @@
+{
+ "invention_id": {
+  "value": "inv:ui_unintended_rollaway_while_gear_selector_in_986933:dbf23a1b0147",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_unintended_rollaway_while_gear_selector_in_986933",
+   "device": "automatic transmission parking mechanism",
+   "failure": "Documented problem 'unintended rollaway while gear selector in park' concerning automatic transmission parking mechanism. User-submitted engineering problem (session input): \"[R516-BATTERY declared_family=mechanical source=odi:11349407 battery=R516-mechanism-attribution-after]\n\n2020 TOYOTA CAMRY. CONSUMER WRITES IN REGARDS TO UNINTENDED ACCELERATION. *LD    THE CONSUMER STATED WHILE THE VEHICLE WAS IN PARK ON A FLAT SURFACE, THE CONSUMER EXITED THE VEHICLE AND IT BEGAN R\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "unintended rollaway while gear selector in park",
+   "constraint": "must explain rollaway on flat surface with gear selector in park and automated stop failure"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:0e8a01f2"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of automatic transmission parking mechanism",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Continuous-curvature (clothoid) target-tree path planning eliminates curvature discontinuity so the vehicle parks accurately and terminates motion smoothly at the goal.",
+   "intervention": "Replace the circular/straight-segment parking paths in the automated stop-and-park maneuver with clothoid-based continuous-curvature target-tree paths, so the vehicle arrives at the parking goal accurately and at a complete, discontinuity-free stop before the parking mechanism is engaged.",
+   "expected_effect": "Because the vehicle reaches the goal at zero speed without curvature-induced residual motion or oscillation, the transmission park pawl engages cleanly and holds the vehicle, preventing unintended rollaway on a flat surface with the selector in park.",
+   "mechanism_source_span": "a target tree includes clothoid paths to address such curvature-discontinuity",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.48550/arxiv.2201.03163"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Continuous-Curvature Target Tree Algorithm for Path Planning in Complex Parking Environments",
+   "mechanism": "Continuous-curvature (clothoid) target-tree path planning eliminates curvature discontinuity so the vehicle parks accurately and terminates motion smoothly at the goal.",
+   "intervention_site": "automatic transmission parking mechanism",
+   "expected_effect": "Because the vehicle reaches the goal at zero speed without curvature-induced residual motion or oscillation, the transmission park pawl engages cleanly and holds the vehicle, preventing unintended rollaway on a flat surface with the selector in park.",
+   "falsification_test": "On a flat surface, run repeated automated park maneuvers with the clothoid target-tree planner, logging vehicle speed at park engagement and post-engagement rollaway distance; if any run shows nonzero speed at engagement, measurable rollaway, or no improvement versus a circular/straight-path baseline, the mechanism is falsified."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.48550/arxiv.2201.03163"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Replace the circular/straight-segment parking paths in the automated stop-and-park maneuver with clothoid-based continuous-curvature target-tree paths, so the vehicle arrives at the parking goal accurately and at a complete, discontinuity-free stop before the parking mechanism is engaged.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.48550/arxiv.2201.03163"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "must explain rollaway on flat surface with gear selector in park and automated stop failure",
+   "failure_mode_of_device": "unintended rollaway while gear selector in park"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:0e8a01f2"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.2809867409759369,
+   "eig_per_cost": 0.2809867409759369,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Because the vehicle reaches the goal at zero speed without curvature-induced residual motion or oscillation, the transmission park pawl engages cleanly and holds the vehicle, preventing unintended rol",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-21T10:42:14.810553+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-21T10:42:14.810553+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.2809867409759369,
+     "eig_per_cost": 0.2809867409759369,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1016/0389-4304(96)83186-9",
+    "title": "9538924 Simulation of a pawl and gear parking system for an automatic transmission time response analysis of a pawl and gear parking system Kiyoshi Kudo (Aichi Machine Industry Co., Ltd.), Yoshihiro Wakabayashi (ESTECH Corp.)",
+    "source_uri": "https://doi.org/10.1016/0389-4304(96)83186-9",
+    "doi": "10.1016/0389-4304(96)83186-9",
+    "content_hash": "133cf76be21a24911e37b613d814bdd806dcd205339c854372a792545b8a5942",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.26686/wgtn.17072627",
+    "title": "Car Park House Share: Reclaiming Wellington's Car Parking Buildings",
+    "source_uri": "https://doi.org/10.26686/wgtn.17072627",
+    "doi": "10.26686/wgtn.17072627",
+    "content_hash": "cd0998db6898fccb2ee9ac8594e5a7f8b14ab0a7c648337b2cbba3d8b5f6b615",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.37099/mtu.dc.etdr/133",
+    "title": "MODELING, SIMULATION AND CONTROL OF HYBRID ELECTRIC VEHICLE DRIVE WHILE MINIMIZING ENERGY INPUT REQUIREMENTS USING OPTIMIZED GEAR RATIOS",
+    "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/133",
+    "doi": "10.37099/mtu.dc.etdr/133",
+    "content_hash": "fe2d49651e56fa9587cf9d9f983495b7d0eab63e5a207864c095fb76c76a52a4",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+    "title": "Influence of gear transmission oils degradation on tribological performance and gearbox efficiency",
+    "source_uri": "https://doi.org/10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+    "doi": "10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+    "content_hash": "7ab85e197d2190288a321026968ae7f09cdc7ec9efeb54827cd0e6385e310d10",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2201.03163",
+    "title": "Continuous-Curvature Target Tree Algorithm for Path Planning in Complex Parking Environments",
+    "source_uri": "https://doi.org/10.48550/arxiv.2201.03163",
+    "doi": "10.48550/arxiv.2201.03163",
+    "content_hash": "eb72ee8f34517cd003fc8d8263c8af930c276cc0725233ed28b151a8bf2b1792",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2303.15321",
+    "title": "Changes in service distances of urban parks before and after the COVID-19 Pandemic: Applying a modified gravity model for Seoul Metropolitan Area",
+    "source_uri": "https://doi.org/10.48550/arxiv.2303.15321",
+    "doi": "10.48550/arxiv.2303.15321",
+    "content_hash": "3dbf2c647c6fcd57667c8b29f7c56cf0b61d478d86e471fe83851967ba5bf0ff",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2208.14231",
+    "title": "Prediction-based One-shot Dynamic Parking Pricing",
+    "source_uri": "https://doi.org/10.48550/arxiv.2208.14231",
+    "doi": "10.48550/arxiv.2208.14231",
+    "content_hash": "5d9c4c8d0c8af7cd1ad07579b252ae345fd1759411441b7c3e872b886f1b90b3",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5703/1288284315873",
+    "title": "Trevi Park: Automatic Parking System",
+    "source_uri": "https://doi.org/10.5703/1288284315873",
+    "doi": "10.5703/1288284315873",
+    "content_hash": "55802ec94ca16c6035efd30adb0d8ba1140a2ed927f1d0855deecda7e9d3957b",
+    "frozen": false
+   },
+   {
+    "id": "title:bcdd14c9ca25eec2",
+    "title": "The phenomenon of vehicle park brake rollaway",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "8fac8c4e30ee23730cdff3baa03dd9f2ee136912270876999a9939a46abf3c68",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4271/j646_198812",
+    "title": "PLANETARY GEAR(S) - TERMINOLOGY",
+    "source_uri": "https://doi.org/10.4271/j646_198812",
+    "doi": "10.4271/j646_198812",
+    "content_hash": "907c095f94768cab10215e79511fbd5b5ab36239a7380f783daae19336a66d57",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1016/0389-4304(96)83186-9",
+   "doi:10.26686/wgtn.17072627",
+   "doi:10.37099/mtu.dc.etdr/133",
+   "doi:10.4271/j646_198812",
+   "doi:10.48550/arxiv.2201.03163",
+   "doi:10.48550/arxiv.2208.14231",
+   "doi:10.48550/arxiv.2303.15321",
+   "doi:10.5703/1288284315873",
+   "doi:10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+   "title:bcdd14c9ca25eec2"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:evidence:title:bcdd14c9ca25eec2",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['motion', 'not', 'rollaway'] in: 'The research found that rollaway does not always start with a uniform motion, but]",
+    "severity": "MEDIUM"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "On a flat surface, run repeated automated park maneuvers with the clothoid target-tree planner, logging vehicle speed at park engagement and post-engagement rollaway distance; if any run shows nonzero speed at engagement, measurable rollaway, or no improvement versus a circular/straight-path baseline, the mechanism is falsified."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_unintended_rollaway_while_gear_selector_in_986933:2026-09-21T10:35:33",
+   "final_envelope_hash": "dbf23a1b0147c9130a96d0e2f5edbf125b87eaf29c8b3b31a5ed7790b54ad630",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.2809867409759369
+    },
+    "score": 0.2362,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-21T10:42:15+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-21T10:42:15+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1016/0389-4304(96)83186-9": {
+   "id": "doi:10.1016/0389-4304(96)83186-9",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1016/0389-4304(96)83186-9",
+   "source_uri": "https://doi.org/10.1016/0389-4304(96)83186-9",
+   "title": "9538924 Simulation of a pawl and gear parking system for an automatic transmission time response analysis of a pawl and gear parking system Kiyoshi Kudo (Aichi Machine Industry Co., Ltd.), Yoshihiro Wakabayashi (ESTECH Corp.)",
+   "abstract": "",
+   "doi": "10.1016/0389-4304(96)83186-9",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "1996",
+   "retrieval_timestamp": "2026-09-21T10:36:41.100882+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "133cf76be21a24911e37b613d814bdd806dcd205339c854372a792545b8a5942",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1016/0389-4304(96)83186-9"
+    },
+    "queries_by_source": {
+     "crossref": "automatic transmission parking mechanism unintended rollaway while gear selector in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1016/0389-4304(96)83186-9",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission parking mechanism unintended rollaway while gear selector in park",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.26686/wgtn.17072627": {
+   "id": "doi:10.26686/wgtn.17072627",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.26686/wgtn.17072627",
+   "source_uri": "https://doi.org/10.26686/wgtn.17072627",
+   "title": "Car Park House Share: Reclaiming Wellington's Car Parking Buildings",
+   "abstract": "",
+   "doi": "10.26686/wgtn.17072627",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:36:41.101015+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "cd0998db6898fccb2ee9ac8594e5a7f8b14ab0a7c648337b2cbba3d8b5f6b615",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.26686/wgtn.17072627"
+    },
+    "queries_by_source": {
+     "crossref": "automatic transmission parking mechanism unintended rollaway while gear selector in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.26686/wgtn.17072627",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission parking mechanism unintended rollaway while gear selector in park",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.37099/mtu.dc.etdr/133": {
+   "id": "doi:10.37099/mtu.dc.etdr/133",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.37099/mtu.dc.etdr/133",
+   "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/133",
+   "title": "MODELING, SIMULATION AND CONTROL OF HYBRID ELECTRIC VEHICLE DRIVE WHILE MINIMIZING ENERGY INPUT REQUIREMENTS USING OPTIMIZED GEAR RATIOS",
+   "abstract": "",
+   "doi": "10.37099/mtu.dc.etdr/133",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:36:41.101072+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "fe2d49651e56fa9587cf9d9f983495b7d0eab63e5a207864c095fb76c76a52a4",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.37099/mtu.dc.etdr/133"
+    },
+    "queries_by_source": {
+     "crossref": "automatic transmission parking mechanism unintended rollaway while gear selector in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.37099/mtu.dc.etdr/133",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission parking mechanism unintended rollaway while gear selector in park",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf": {
+   "id": "doi:10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+   "source_uri": "https://doi.org/10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+   "title": "Influence of gear transmission oils degradation on tribological performance and gearbox efficiency",
+   "abstract": "",
+   "doi": "10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:36:41.101110+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "7ab85e197d2190288a321026968ae7f09cdc7ec9efeb54827cd0e6385e310d10",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf"
+    },
+    "queries_by_source": {
+     "crossref": "automatic transmission parking mechanism unintended rollaway while gear selector in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission parking mechanism unintended rollaway while gear selector in park",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2201.03163": {
+   "id": "doi:10.48550/arxiv.2201.03163",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2201.03163v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.2201.03163",
+   "title": "Continuous-Curvature Target Tree Algorithm for Path Planning in Complex Parking Environments",
+   "abstract": "Rapidly-exploring random tree (RRT) has been applied for autonomous parking due to quickly solving high-dimensional motion planning and easily reflecting constraints. However, planning time increases by the low probability of extending toward narrow parking spots without collisions. To reduce the planning time, the target tree algorithm was proposed, substituting a parking goal in RRT with a set (target tree) of backward parking paths. However, it consists of circular and straight paths, and an autonomous vehicle cannot park accurately because of curvature-discontinuity. Moreover, the planning time increases in complex environments; backward paths can be blocked by obstacles. Therefore, this paper introduces the continuous-curvature target tree algorithm for complex parking environments. First, a target tree includes clothoid paths to address such curvature-discontinuity. Second, to reduce the planning time further, a cost function is defined to construct a target tree that considers obstacles. Integrated with optimal-variant RRT and searching for the shortest path among the reached backward paths, the proposed algorithm obtains a near-optimal path as the sampling time increases. Experiment results in real environments show that the vehicle more accurately parks, and continuous-curvature paths are obtained more quickly and with higher success rates than those acquired with other sampling-based algorithms.",
+   "doi": "10.48550/arxiv.2201.03163",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:36:41.101142+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "eb72ee8f34517cd003fc8d8263c8af930c276cc0725233ed28b151a8bf2b1792",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2201.03163v2"
+    },
+    "queries_by_source": {
+     "arxiv": "automatic transmission parking mechanism unintended rollaway while gear selector in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2201.03163",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission parking mechanism unintended rollaway while gear selector in park",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2201.03163v2",
+   "authors": [
+    "Minsoo Kim",
+    "Joonwoo Ahn",
+    "Jaeheung Park"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2303.15321": {
+   "id": "doi:10.48550/arxiv.2303.15321",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2303.15321v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2303.15321",
+   "title": "Changes in service distances of urban parks before and after the COVID-19 Pandemic: Applying a modified gravity model for Seoul Metropolitan Area",
+   "abstract": "COVID-19 significantly has changed the lifestyle in the urban areas. Urban parks reemerged as a savior of leisure activities and social joints under strict social-distancing measures. Thus, there have been significant changes in the thresholds of service distances of urban parks: People have become more willing to visit parks in farther areas. This paper aims to examine the difference between before and after the COVID-19 pandemic by applying a gravity model. We examine variations in the service areas of urban parks, dependig on the accessibility and design components of the park, using a dataset consisting of the park visitor's 'origin (home)' and 'destination (park)'. This LBD (Location-based Big Data) provides the home location of the urban park visitor. The data was constructed by SK Telecom, using individual smartphone signal data on a daily basis. Adjusted coefficients are estimated by OLS(ordinary least squares) with cluster-robust standard errors to compare the difference between 2019 and 2020. Contrary to a common belief, the transit accessibility of the park plays a more significant role than the physical traits of each parks. Accessibility itself determines a lot of the threshold distance of the park visit. While previous studies have identified the factors influencing the reaching distance of park services, this study also attempts to determine how the effects of the factors have changed due to the COVID-19 pandemic. As proven in this study, the marginal effects of those factors vary before and after the pandemic. By identifying the factors that determine the distance to visit in urban parks, it is possible to see which factors should be more focused on in planning small parks for residents in the neighborhood or large parks for more visitors from the entire region.",
+   "doi": "10.48550/arxiv.2303.15321",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:36:41.101176+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3dbf2c647c6fcd57667c8b29f7c56cf0b61d478d86e471fe83851967ba5bf0ff",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2303.15321v1"
+    },
+    "queries_by_source": {
+     "arxiv": "automatic transmission parking mechanism unintended rollaway while gear selector in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2303.15321",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission parking mechanism unintended rollaway while gear selector in park",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2303.15321v1",
+   "authors": [
+    "Dawon Oh",
+    "In Kwon Park"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2208.14231": {
+   "id": "doi:10.48550/arxiv.2208.14231",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2208.14231v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2208.14231",
+   "title": "Prediction-based One-shot Dynamic Parking Pricing",
+   "abstract": "Many U.S. metropolitan cities are notorious for their severe shortage of parking spots. To this end, we present a proactive prediction-driven optimization framework to dynamically adjust parking prices. We use state-of-the-art deep learning technologies such as neural ordinary differential equations (NODEs) to design our future parking occupancy rate prediction model given historical occupancy rates and price information. Owing to the continuous and bijective characteristics of NODEs, in addition, we design a one-shot price optimization method given a pre-trained prediction model, which requires only one iteration to find the optimal solution. In other words, we optimize the price input to the pre-trained prediction model to achieve targeted occupancy rates in the parking blocks. We conduct experiments with the data collected in San Francisco and Seattle for years. Our prediction model shows the best accuracy in comparison with various temporal or spatio-temporal forecasting models. Our one-shot optimization method greatly outperforms other black-box and white-box search methods in terms of the search time and always returns the optimal price solution.",
+   "doi": "10.48550/arxiv.2208.14231",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:36:41.101206+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5d9c4c8d0c8af7cd1ad07579b252ae345fd1759411441b7c3e872b886f1b90b3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2208.14231v1"
+    },
+    "queries_by_source": {
+     "arxiv": "automatic transmission parking mechanism unintended rollaway while gear selector in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2208.14231",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission parking mechanism unintended rollaway while gear selector in park",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2208.14231v1",
+   "authors": [
+    "Seoyoung Hong",
+    "Heejoo Shin",
+    "Jeongwhan Choi",
+    "Noseong Park"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.5703/1288284315873": {
+   "id": "doi:10.5703/1288284315873",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5703/1288284315873",
+   "source_uri": "https://doi.org/10.5703/1288284315873",
+   "title": "Trevi Park: Automatic Parking System",
+   "abstract": "",
+   "doi": "10.5703/1288284315873",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2007",
+   "retrieval_timestamp": "2026-09-21T10:36:41.101236+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "55802ec94ca16c6035efd30adb0d8ba1140a2ed927f1d0855deecda7e9d3957b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5703/1288284315873"
+    },
+    "queries_by_source": {
+     "crossref": "automatic transmission parking mechanism unintended rollaway while gear selector in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=report"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "REPORT",
+   "document_type": "",
+   "evidence_lane": "TECHNICAL_REPORT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5703/1288284315873",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission parking mechanism unintended rollaway while gear selector in park",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "title:bcdd14c9ca25eec2": {
+   "id": "title:bcdd14c9ca25eec2",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:366392586",
+   "source_uri": "",
+   "title": "The phenomenon of vehicle park brake rollaway",
+   "abstract": "When a vehicle is parked on a slope with hot brakes, what appears to be a sufficient parking brake action can sometimes become insufficient. When the brakes cool\n\ndown, the braking force reduces due to relaxation of the entire parking brake system, and the vehicle may start to move, leading to obvious catastrophic consequences. This phenomenon is known as vehicle rollaway. This thesis describes the problem in detail and postulates a mechanism that accounts for the occurrence of the rollaway event on vehicles using integrated rear callipers.\n\n\n\nDifferent testing methods are presented that are used to investigate the propensity of a vehicle's parking brake system to rollaway. These include on-vehicle evaluations\n\nand laboratory based measurements. A description is given of a novel dynamometer facility that was developed for this research that is capable of testing vehicle parking\n\nbrake systems for rollaway.\n\n\n\nTwo mathematical modelling techniques are presented that demonstrate how the parking brake system parameters influence the likelihood of rollaway occurring. A\n\nfinite element model was used to simulate the change in contact pressure at the frictional interface during a rollaway event. A numerical model was also used to\n\npredict the change in torque developed by a parking brake system cooling from an initial elevated temperature. The change in clamp load at the frictional interface was\n\nmodelled using an essentially I-D quasi-static system that showed how the stiffness and the thermal properties of the system qualitatively affect the phenomenon.\n\n\n\nThe research found that rollaway does not always start with a uniform motion, but with a stick/slip motion. The likelihood of rollaway occurring was found to be directly linked to the temperature of the brake when the vehicle is parked. Rollaway can be reduced by lowering the initial temperature of the brake prior to parking. Rollaway can also be reduced by increasing the input load to the system when applying the parking brake. The research identifies the key design parameters of the brake system components whose values require close control within the real system\n\nif rollaway is to be avoided",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:36:41.101263+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8fac8c4e30ee23730cdff3baa03dd9f2ee136912270876999a9939a46abf3c68",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:366392586"
+    },
+    "queries_by_source": {
+     "core": "automatic transmission parking mechanism unintended rollaway while gear selector park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:bcdd14c9ca25eec2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission parking mechanism unintended rollaway while gear selector park",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "McKinlay, Andrew James"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.4271/j646_198812": {
+   "id": "doi:10.4271/j646_198812",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4271/j646_198812",
+   "source_uri": "https://doi.org/10.4271/j646_198812",
+   "title": "PLANETARY GEAR(S) - TERMINOLOGY",
+   "abstract": "",
+   "doi": "10.4271/j646_198812",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:36:41.101291+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "907c095f94768cab10215e79511fbd5b5ab36239a7380f783daae19336a66d57",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4271/j646_198812"
+    },
+    "queries_by_source": {
+     "crossref": "automatic transmission parking mechanism unintended rollaway while gear selector in park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=standard"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4271/j646_198812",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission parking mechanism unintended rollaway while gear selector in park",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "problem:0e8a01f2": {
+   "id": "problem:0e8a01f2",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "0e8a01f20f3e897550c2478030de13c824c7c97ece2628eafeb9668ccaa335c4",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "d51daaa46be655a43ccf452cfd5b91d3e85b9cf1c6cd591c0092ec0666da0a71",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-21T10:42:15+00:00Z"
+ }
+}
