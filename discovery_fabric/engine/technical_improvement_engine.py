@@ -335,8 +335,9 @@ def propose_technical_mutation(ctx: CandidateContext,
     """One LLM mutation proposal attempt (untrusted; validated after)."""
     from .llm_registry import SelectionPolicy, generate
     prompt = build_mutation_prompt(ctx, evaluation, feedback=feedback)
+    # R518: Zai retired from post-rank tech improvement (R517: frequent MODEL_FAILURE)
     preferred = [provider] if provider else [
-        p for p in ("zai", "gemini", "openrouter", "nvidia", "mistral")]
+        p for p in ("gemini", "openrouter", "nvidia", "mistral")]
     res = generate(
         prompt,
         system=("You are a technical design engineer. Respond in the "

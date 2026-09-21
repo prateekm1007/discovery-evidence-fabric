@@ -256,7 +256,9 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
         else:
             pin_status = f"requested_but_unavailable ({pin})"
     policy = SelectionPolicy(
-        preferred_providers=preferred or ["atria", "zai", "openrouter",
+        # R518: Atria retired from mechanism_space (R517: 110-226s latency);
+        # Zai retired from post-rank improvement paths (R517: frequent failures)
+        preferred_providers=preferred or ["openrouter",
                                            "nvidia", "anthropic", "openai",
                                            "gemini", "qwen", "deepseek",
                                            "mistral"],

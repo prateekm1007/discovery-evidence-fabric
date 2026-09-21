@@ -353,8 +353,9 @@ def propose_mutation(ctx: CandidateContext,
     from .llm_registry import SelectionPolicy, generate
     prompt = build_proposal_prompt(ctx, diagnosis, target_index,
                                    feedback=feedback)
+    # R518: Zai retired from post-rank improvement (R517: frequent MODEL_FAILURE)
     preferred = [provider] if provider else [
-        p for p in ("zai", "gemini", "openrouter", "nvidia", "mistral")]
+        p for p in ("gemini", "openrouter", "nvidia", "mistral")]
     res = generate(
         prompt,
         system=("You are a mechanism-improvement engineer. Respond in "

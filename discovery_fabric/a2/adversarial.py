@@ -328,8 +328,9 @@ def llm_chat(prompt, system="", max_retries=1, timeout=420,
             preferred_providers=[pin], max_preference_fallback=0,
             purpose="attack")
     else:
+        # R518: Atria retired from attack (R517 battery: 5/5 first-hop failures)
         policy = reg.SelectionPolicy(
-            preferred_providers=["atria", "nvidia", "openrouter",
+            preferred_providers=["nvidia", "openrouter",
                                  "deepseek", "gemini", "qwen", "openai",
                                  "anthropic", "mistral"],
             purpose="attack")

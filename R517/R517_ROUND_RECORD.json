@@ -1,12 +1,13 @@
 {
- "artifact": "R517_ROUND_RECORD/1.0",
+ "artifact": "R517_ROUND_RECORD/1.1",
  "round": "R517",
+ "correction_at_utc": "2026-09-22T00:00:00Z",
+ "correction_reason": "R518 directive: honest measurement state required; NO_ACTIONABLE_RETRIEVE_WASTE overclaimed certainty given 4/6 attribution gaps",
  "constitution": {
   "version": "2.10.1",
   "sha256": "2ce42426662d6493f672cf5fd7256bf5c2b9c8412e369ee9032b253b80b6fc56",
   "bytes": 126124,
-  "lines": 2538,
-  "verified_at_utc": "2026-09-21T22:30:00Z"
+  "lines": 2538
  },
  "immutable_state": {
   "origin_main": "a41c85b73b2bb95a0dfae8c2ab539d3d2ea4f20c",
@@ -26,23 +27,34 @@
   "complete": 5,
   "straggler": 1,
   "straggler_session": "ts_6d3b0347c780",
-  "straggler_classification": "INFRA_STUCK",
-  "straggler_reason": "RUNNING with no stage progress for >10h; durable branch has only created+awaiting_clarification events; no terminal state; Art. LXXIV: session loss is observer fact, not execution failure",
+  "straggler_classification": "EXECUTION_STATE_DIVERGENCE",
+  "straggler_detail": {
+   "observer_state": "RUNNING (API poll shows status=RUNNING, empty stage_log)",
+   "durable_state": "envelope_RETRIEVE.json exists with retrieval_attribution (n_jobs=17, fanout_wall=18.1s)",
+   "last_durable_progress": "2026-09-21T14:10:47Z (created)",
+   "durable_stage_reached": "RETRIEVE (envelope persisted)",
+   "discrepancy": "Observer shows RUNNING with no stage_log entries; durable branch has envelope_RETRIEVE.json with complete attribution but no terminal event; session API returns 404 for /result endpoint",
+   "classification_rationale": "Observer state (RUNNING) diverges from durable engine state (RETRIEVE envelope persisted). Not a scientific failure. Not a run-level infrastructure failure. The durable execution mechanism is authoritative (Art. LXXIV). The session may be stuck in a post-RETRIEVE stage or the observation layer may be stale."
+  },
   "outcomes": {
    "RUN_BLOCKED": 4,
    "INVENTION_REQUIRES_EXPERIMENT": 1,
-   "INFRA_STUCK": 1
+   "EXECUTION_STATE_DIVERGENCE": 1
   }
  },
  "retrieval_attribution_harvest": {
-  "method": "durable envelope_RETRIEVE.json via git show origin/runtime-state-hf",
-  "api_projection_defect": "API run_state.provenance strips retrieval_fabric; only run_dir/origin/engine_authority exposed",
+  "canonical_artifact": "R517/RETRIEVE_ATTRIBUTION_DURABLE.json",
+  "method": "durable envelope_RETRIEVE.json via git show origin/runtime-state-hf (authoritative, Art. X)",
+  "api_projection_defect": "API run_state.provenance strips retrieval_fabric; only run_dir/origin/engine_authority exposed — NOT authoritative for retrieval attribution",
+  "diagnostic_retired": "R517/RETRIEVE_ATTRIBUTION_HARVEST.json (API-projection diagnostic, retired from canonical evidence set)",
   "runs_with_attribution": 2,
   "runs_without_attribution": 4,
-  "missing_attribution_cause": "evidence-fabric CHANNEL_ERROR (NameError: name '_title_of' is not defined) in 2 runs; unknown cause in 2 runs (evidence_fabric present but attribution absent)",
+  "missing_attribution_cause": "evidence-fabric CHANNEL_ERROR (NameError: name '_title_of' is not defined) in 2 runs (vibration, fire); evidence_fabric present but attribution key absent in 2 runs (rupture, buzzing)",
   "attribution_defect_classification": "INFRASTRUCTURE_DEFECT (not a scientific finding)"
  },
  "critical_path_analysis": {
+  "sample_size": 2,
+  "sufficiency": "INSUFFICIENT — 2 runs establish candidate critical path but are insufficient to rule out other residual wastes",
   "run_1": {
    "session": "ts_6d3b0347c780",
    "run_dir": "toscanini_ui_ui_engine_block_hole_formation_999969",
@@ -56,12 +68,7 @@
    "n_jobs": 17,
    "records_returned": 67,
    "records_admitted": 35,
-   "enrichment_reciprocal_s": 6.636,
-   "critical_path_breakdown": {
-    "slowest_provider_call": "15.210s (core, 83% of fanout wall)",
-    "worker_queue_wait": "2.893s (16% of fanout wall)",
-    "assemble_overhead": "0.002s (negligible)"
-   }
+   "enrichment_reciprocal_s": 6.636
   },
   "run_2": {
    "session": "ts_dd733590d006",
@@ -76,18 +83,18 @@
    "n_jobs": 17,
    "records_returned": 44,
    "records_admitted": 29,
-   "enrichment_reciprocal_s": 6.618,
-   "critical_path_breakdown": {
-    "slowest_provider_call": "13.171s (core, 77% of fanout wall)",
-    "worker_queue_wait": "3.959s (23% of fanout wall)",
-    "assemble_overhead": "0.002s (negligible)"
-   }
+   "enrichment_reciprocal_s": 6.618
   }
  },
- "waste_classification": "NO_ACTIONABLE_RETRIEVE_WASTE",
- "waste_reasoning": "The critical path is dominated by the slowest provider call (core, 13-15s = 77-83% of fanout wall). This cannot be reduced without changing discovery semantics (source list, query variants, or provider selection). The worker queue wait (2.9-4.0s) is inherent to 17 jobs / 5 workers and cannot be reduced without increasing worker count (Directive §6 prohibits re-parallelization). No single residual waste class (slow-tail sources, enrichment, internal retries, worker scheduling, orchestration) dominates enough to justify action.",
+ "waste_classification": "RETRIEVE_PERFORMANCE_INCONCLUSIVE",
+ "waste_reasoning": "4/6 scored runs lack durable retrieval attribution. The remaining two establish a candidate critical path (slowest core job at 13-15s dominates fanout wall) but are insufficient to rule out other residual wastes (slow-tail sources, enrichment serial overhead, worker-wave scheduling). The 6.6s reciprocal enrichment is a candidate serial post-fanout residual. No retrieval optimization claim is authorized by this data.",
+ "candidate_residuals_for_future": [
+  "slow core source operation (8-15s per job, 77-83% of fanout wall in 2 runs)",
+  "serial reciprocal enrichment (~6.6s post-fanout, includes 1.5s pacing per budgeted call)",
+  "worker-wave scheduling residual (2.9-4.0s queue wait, 17 jobs / 5 workers)"
+ ],
  "source_performance": {
-  "core": {"wall_range": "8-15s", "records": "0-10", "failures": "1/3 per run", "assessment": "slowest source, critical path bottleneck"},
+  "core": {"wall_range": "8-15s", "records": "0-10", "failures": "1/3 per run", "assessment": "slowest source, critical path candidate"},
   "semantic_scholar": {"wall_range": "9-10s", "records": "0", "failures": "1/1 per run", "assessment": "consistently unavailable, 0 records"},
   "europepmc": {"wall_range": "1-1.4s", "records": "2-20", "failures": "0", "assessment": "fast, productive"},
   "datacite": {"wall_range": "0.8-1.9s", "records": "3 per variant", "failures": "0", "assessment": "fast, productive"},
@@ -111,46 +118,51 @@
   }
  },
  "provider_retirement_status": {
-  "atria": "RETIREMENT_PENDING from ATTACK/MECHANISM_SPACE/post-rank paths (evidence supports; not yet implemented)",
-  "zai": "RETIREMENT_PENDING from post-rank routes (slow-failure behavior observed)",
-  "default_pin": "_DEFAULT_PROVIDER_PIN = 'atria' in provider_health.py:650 — must be replaced through canonical routing policy"
+  "atria": "RETIREMENT_PENDING from ATTACK/MECHANISM_SPACE/post-rank paths (evidence supports; implemented in R518)",
+  "zai": "RETIREMENT_PENDING from post-rank routes (slow-failure behavior observed; implemented in R518)",
+  "default_pin": "_DEFAULT_PROVIDER_PIN = 'atria' in provider_health.py:650 — replaced in R518"
  },
  "provenance_correction": {
   "file": "R517/PROVENANCE_CORRECTION.json",
   "classification": "METADATA_PROVENANCE_DEFECT_ONLY",
   "mutating": false,
   "affected_fields": ["artifact_type", "script header", "battery tag", "raw fetch paths", "disjointness wording"],
+  "original_manifest_hash": "sha256:970344f4f24d2464baa8fee2c1254edff374c07be2234481eae0adde83469f28",
+  "original_script_hash": "sha256:368ef664c9e255e969956c757273df9823c61db7a62a5439ac91aea99a56b4d2",
   "scored_inputs_changed": false,
-  "disjointness_changed": false
+  "disjointness_changed": false,
+  "selected_odi_ids": [11416078, 11360415, 11217594, 11258551, 11386613, 11684485],
+  "excluded_R506_odi_ids": [11664780, 11746712, 10995676, 11120468, 11460084, 11428290],
+  "excluded_R516_odi_ids": [11349407, 11359920, 11207504, 11254698, 11383221, 11678657]
  },
  "unknowns": [
   "4 of 6 runs lack retrieval_attribution in durable envelope — root cause is evidence-fabric CHANNEL_ERROR (NameError: name '_title_of' is not defined) for 2 runs, unknown for 2 others",
   "API provenance projection strips retrieval_fabric entirely — only run_dir/origin/engine_authority exposed",
-  "Straggler ts_6d3b0347c780 has been RUNNING >10h with no stage progress — infrastructure-level stuck, not a scientific finding",
+  "Straggler ts_6d3b0347c780 shows EXECUTION_STATE_DIVERGENCE: observer=RUNNING, durable=envelope_RETRIEVE persisted, no terminal event",
   "semantic_scholar consistently returns 0 records and unavailable outcome — may be a permanent source failure for automotive/mechanical queries",
   "openaire, doaj, google_patents consistently return 0 records — may be permanently unproductive for this domain",
   "MODULE_INVENTORY.json regeneration blocked by Windows path-separator noise — flagged for Linux/CI",
   "TOSCANINI/run_state.py PHASES still lists MULTI_SOURCE_DISCOVERY — separate retirement needed"
  ],
  "stop_conditions_met": [
-  "R517 finds no dominant residual retrieval waste (NO_ACTIONABLE_RETRIEVE_WASTE)",
+  "RETRIEVE_PERFORMANCE_INCONCLUSIVE: 4/6 runs lack attribution; 2 runs insufficient for optimization claim",
   "Evidence sets cannot be compared across all 6 runs due to attribution defect",
   "The result cannot distinguish signal from live variance with only 2 complete attribution records"
  ],
  "required_round_outputs_checklist": {
-  "retrieval_attribution_harvest": true,
-  "yield_funnel_measurement": "N/A (yield was measured in earlier battery; not re-measured for R517)",
-  "provenance_correction": true,
-  "one_named_retrieval_waste": "NO_ACTIONABLE_RETRIEVE_WASTE",
+  "retrieval_attribution_harvest": "CANONICAL (durable branch, 2/6 complete)",
+  "yield_funnel_measurement": "N/A",
+  "provenance_correction": "COMPLETE (exact hashes computed)",
+  "waste_classification": "RETRIEVE_PERFORMANCE_INCONCLUSIVE (corrected from NO_ACTIONABLE_RETRIEVE_WASTE)",
   "before_after_measurement": "N/A (no optimization implemented)",
-  "semantic_equivalence_proof": "N/A (no optimization implemented)",
-  "adversarial_test_record": "N/A (no optimization implemented)",
-  "clean_replay": "N/A (no optimization implemented)",
-  "provider_routing_result": "DEFERRED to separate experiment",
-  "updated_architecture_graph": "PENDING",
+  "adversarial_test_record": "N/A",
+  "clean_replay": "N/A",
+  "provider_routing_result": "DEFERRED to R518",
+  "updated_architecture_graph": "a74c3a94",
   "deployment_identity_proof": "PENDING",
   "explicit_unknowns": true
  },
  "reviewer_provenance": "AI_REVIEW",
- "created_at_utc": "2026-09-21T23:00:00Z"
+ "created_at_utc": "2026-09-21T23:00:00Z",
+ "corrected_at_utc": "2026-09-22T00:00:00Z"
 }

@@ -229,8 +229,9 @@ def llm_chat(prompt, system="", max_retries=2, timeout=240,
             preferred_providers=[override], max_preference_fallback=0,
             purpose="synthesis")
     else:
+        # R518: Atria retired from synthesis (R517 battery: 12-128s latency)
         policy = reg.SelectionPolicy(
-            preferred_providers=["atria", "openrouter", "deepseek",
+            preferred_providers=["openrouter", "deepseek",
                                  "anthropic", "openai", "gemini",
                                  "qwen", "nvidia"],
             purpose="synthesis")
