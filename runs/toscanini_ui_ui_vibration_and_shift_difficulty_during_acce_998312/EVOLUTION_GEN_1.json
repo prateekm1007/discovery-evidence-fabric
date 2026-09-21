@@ -1,0 +1,33 @@
+{
+ "gen": 1,
+ "invention_id": "inv:cadf11546e:gen1",
+ "parent_id": null,
+ "lineage": [
+  "inv:cadf11546e:gen1"
+ ],
+ "origin": "BASELINE_SYNTHESIS",
+ "architecture": {
+  "mechanism": "A difficulty-aware simulator synthesizes instances across a spectrum of difficulty levels (easy, moderate, hard) — using a modified GAN for moderate samples and a \"Copycat\" that imitates the classifier's behavior for hard examples — so the system is exposed to real-world diversity and its response to unknown, unpredictable inputs becomes predictable rather than erratic.",
+  "intervention": "Apply this to the 2019 Silverado 1500 transmission control module (TCM) calibration/validation pipeline by building a difficulty-aware shift simulator that generates acceleration and shift events across difficulty levels — easy (normal torque, smooth road load), moderate (high load/tow/grade, partial clutch slip) and hard (unknown anomalous states: torque converter shudder, driveline resonance, clutch apply-pressure deviation at 40–60 mph) — with a Copycat-style nominal-response model that imitates the transmission's healthy shift behavior and flags deviations as unknown states, then re-tuning shift scheduling, line pressure, and torque converter lock-up strategy against the full difficulty spectrum.",
+  "expected_effect": "The TCM becomes robust to previously unknown anomalous operating states during acceleration, detecting and counteracting vibration and shift difficulty (via line pressure, shift timing, converter lock-up adjustments) without requiring a warning indicator to illuminate, because the hard-difficulty vibration regimes were already simulated and calibrated for.",
+  "falsification_test": "On a hardware-in-the-loop transmission test bench or vehicle, run the difficulty-aware simulator to inject easy/moderate/hard acceleration-shift scenarios including induced shudder at 40–60 mph; the mechanism is falsified if the Copycat-based nominal-response detector fails to identify the vibration state, or if a TCM calibrated on the difficulty spectrum does not measurably reduce vibration and shift difficulty versus a baseline calibration never exposed to the simulated difficulty range."
+ },
+ "state": "INVENTION_SURVIVED",
+ "maturity": "GENERATED",
+ "challenge": {
+  "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+  "attack_overall": null,
+  "evidence_verified": true,
+  "killed": false,
+  "failure_class": null,
+  "kill_reason": "the mechanism-space distinctness adjudication counts 0 materially distinct mechanism(s) (< 2, mechanism_distinctness/2.0.0) — the run generated nothing worth attacking (Art. LXXXIV, R514)",
+  "final_status": "MECHANISM_STARVED"
+ },
+ "causal_delta": null,
+ "change_delta": null,
+ "reason_for_change": null,
+ "fresh_evidence": null,
+ "model": null,
+ "artifacts": {},
+ "evidence_verified": true
+}
