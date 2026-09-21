@@ -15,11 +15,25 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-# Reuse the existing deterministic tables (no second factory, Art. XXXIV):
-# FUNCTION_EQUIV_EXPANSION + ADJACENT_INDUSTRY_MAP live in engine/adapters.py
-from discovery_fabric.engine.adapters import (
-    ADJACENT_INDUSTRY_MAP, DEFAULT_ADJACENT, FUNCTION_EQUIV_EXPANSION,
-)
+# Reuse the existing deterministic table (no second factory, Art. XXXIV):
+# FUNCTION_EQUIV_EXPANSION lives in engine/adapters.py. R515: the
+# ADJACENT_INDUSTRY_MAP + DEFAULT_ADJACENT tables moved HERE from
+# engine/adapters.py — the R513 closure retired them from adapters
+# with the MSD removal but query_expansion.py (the live RETRIEVE
+# path's adjacent-industry expansion, line ~180) is their sole
+# remaining consumer. Values byte-identical to the retired copies
+# (zero semantic change; completes the closure's retirement).
+from discovery_fabric.engine.adapters import FUNCTION_EQUIV_EXPANSION
+
+ADJACENT_INDUSTRY_MAP = {
+    "valve": ["automotive fluid systems", "aerospace hydraulics"],
+    "sensor": ["automotive sensing", "industrial instrumentation"],
+    "battery": ["consumer electronics power", "automotive energy"],
+    "coating": ["marine anti-fouling", "medical device surfaces"],
+    "catheter": ["minimally invasive surgery", "interventional radiology"],
+    "flow": ["process industry fluidics", "aerospace fuel systems"],
+}
+DEFAULT_ADJACENT = ["aerospace", "automotive", "industrial automation"]
 
 #: domain-term translation table — terminology that DIFFERS between
 #: domains for the same physical mechanism (measured need: the P13

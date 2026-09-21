@@ -555,24 +555,35 @@ class TestDeletionAccounting(unittest.TestCase):
                     # rounds tuned under the R490 plan; the R481
                     # mandate's own files remain untouched
                     "discovery_fabric/v4_corrections.py",
-                    "discovery_fabric/a2/adversarial.py"),
+                    "discovery_fabric/a2/adversarial.py",
+                    # R515 AMENDMENT (disclosed): the R513 closure
+                    # retired ADJACENT_INDUSTRY_MAP + DEFAULT_ADJACENT
+                    # from engine/adapters.py but left the live
+                    # RETRIEVE path (retrieval_fabric/query_expansion.py,
+                    # its sole remaining consumer) unimportable — tree
+                    # integrity repair: the two tables relocated
+                    # byte-identical to their consumer (zero semantic
+                    # change; completes the closure's retirement)
+                    "discovery_fabric/retrieval_fabric/"
+                    "query_expansion.py"),
                 f"the mandate's file list is exhaustive: {f} is outside "
                 "run.py/stage_entry.py/adapters.py/llm_registry.py")
 
     def test_stage_order_unchanged(self):
-        """R481 AMENDMENT (disclosed): IMPROVE joined between
-        KILLER_EXPERIMENT and ADJUDICATION (the external audit's P0-1
-        loop closure — the R453 freeze was 16 stages; the deliberate,
-        documented contract change follows the R394/R397/R401
-        pattern). MULTI_SOURCE_DISCOVERY removal (disclosed): the
-        stage left the critical path — 16 stages, same relative
-        order otherwise."""
+        """R515 AMENDMENT (disclosed): the IMPROVE linear placeholder
+        left the D8 chain (its ordinary execution only ever recorded
+        DEFERRED_TO_KILL_POINT; the kill-point operation lives
+        post-rank) — 15 stages, same relative order otherwise (the
+        deliberate, documented contract change follows the
+        R394/R397/R401 pattern)."""
         from discovery_fabric.engine.adapters import STAGE_ORDER
-        self.assertEqual(len(STAGE_ORDER), 16)
+        self.assertEqual(len(STAGE_ORDER), 15)
         self.assertEqual(STAGE_ORDER[5], "MECHANISM_SPACE")
         self.assertEqual(STAGE_ORDER[6], "COLLISION")
-        self.assertEqual(STAGE_ORDER[11], "IMPROVE")
+        self.assertEqual(STAGE_ORDER[10], "KILLER_EXPERIMENT")
+        self.assertEqual(STAGE_ORDER[11], "ADJUDICATION")
         self.assertEqual(STAGE_ORDER[-1], "RANK")
+        self.assertNotIn("IMPROVE", STAGE_ORDER)
 
     def test_entry_helper_version_bumped(self):
         """The door's version records the semantic change.

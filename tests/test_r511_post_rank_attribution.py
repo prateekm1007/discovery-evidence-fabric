@@ -79,7 +79,7 @@ def test_post_rank_phase_labels_resolve_via_call_context():
             "RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
             "VERIFY", "MECHANISM_SPACE",
             "COLLISION", "PHYSICS", "ATTACK", "CONTRADICTION",
-            "KILLER_EXPERIMENT", "IMPROVE", "ADJUDICATION",
+            "KILLER_EXPERIMENT", "ADJUDICATION",
             "CLASSIFY", "NEXT_BEST_ACTION", "RANK"), \
             "post-rank labels must never collide with STAGE_ORDER names"
     finally:

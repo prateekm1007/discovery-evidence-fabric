@@ -1,9 +1,12 @@
 """R481 — the IMPROVE stage (external-audit P0-1): the loop closure.
 
-Pins the audit's exact acceptance:
-  - IMPROVE is a FIRST-CLASS stage: STAGE_ORDER 17, between
-    KILLER_EXPERIMENT and ADJUDICATION; the ADAPTERS invariant holds.
-  - The loop position NEVER fakes work: the deferral is typed.
+Pins the audit's exact acceptance (R515 AMENDMENT, disclosed: the
+linear D8 placeholder is removed — the D8 chain is 15 stages and
+ADAPTERS keeps the kill-point operation under the R402 recorded
+asymmetry; the deferral branch survives as the defensive default):
+  - IMPROVE is a FIRST-CLASS operation: registered in ADAPTERS,
+    executed post-rank with kill evidence (never in STAGE_ORDER).
+  - A payload-less invocation NEVER fakes work: the deferral is typed.
   - Dead candidates are mutated FROM THE KILL BASIS; a COPY of the
     parent is refused (Art. XXXVII — no synthetic loops).
   - The child re-runs the SAME gauntlet gates with the SAME functions;
@@ -29,18 +32,24 @@ from discovery_fabric.engine.candidate import sha256_obj
 # the contract arithmetic
 # ---------------------------------------------------------------------
 
-def test_stage_order_16_with_improve_between_killer_and_adjudication():
-    # MULTI_SOURCE_DISCOVERY removal: 16 stages (R481 17 minus the
-    # removed stage; documented change)
-    assert len(STAGE_ORDER) == 16
-    assert STAGE_ORDER.index("IMPROVE") == \
-        STAGE_ORDER.index("KILLER_EXPERIMENT") + 1
+def test_stage_order_15_without_linear_improve_slot():
+    # R515: the linear D8 placeholder is removed (its ordinary
+    # execution only ever recorded DEFERRED_TO_KILL_POINT) — 15
+    # stages; KILLER_EXPERIMENT is directly followed by
+    # ADJUDICATION; the kill-point operation lives post-rank.
+    assert len(STAGE_ORDER) == 15
+    assert "IMPROVE" not in STAGE_ORDER
     assert STAGE_ORDER.index("ADJUDICATION") == \
-        STAGE_ORDER.index("IMPROVE") + 1
+        STAGE_ORDER.index("KILLER_EXPERIMENT") + 1
 
 
-def test_adapters_invariant_holds_and_improve_contract():
-    assert set(ADAPTERS) == set(STAGE_ORDER)
+def test_adapters_holds_kill_point_operation_under_r402_asymmetry():
+    # R515: ADAPTERS keeps ImproveAdapter for the post-rank
+    # kill-point caller (run.py addresses it by name) — the R402
+    # recorded asymmetry (CODER_DIRECTIVE_R402.md W7): ADAPTERS ==
+    # STAGE_ORDER + {"IMPROVE"}.
+    assert set(ADAPTERS) == set(STAGE_ORDER) | {"IMPROVE"}
+    assert len(ADAPTERS) == len(STAGE_ORDER) + 1 == 16
     a = ADAPTERS["IMPROVE"]
     assert isinstance(a, ImproveAdapter)
     assert a.capability_id == "IMPROVE"
@@ -48,7 +57,6 @@ def test_adapters_invariant_holds_and_improve_contract():
     pos = {s: i for i, s in enumerate(STAGE_ORDER)}
     for dep in a.depends_on:
         assert dep in pos, f"unresolvable depends_on entry: {dep}"
-        assert pos[dep] < pos["IMPROVE"], "dependency must precede"
 
 
 # ---------------------------------------------------------------------

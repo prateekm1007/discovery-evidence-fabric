@@ -1,11 +1,17 @@
 """discovery_fabric/engine/run.py — D6 conductor. Orchestration ONLY.
 
-Executes the D8 loop:
+Executes the D8 loop (15 stages; R515 removed the IMPROVE linear
+placeholder — the kill-point operation lives post-rank, see below):
 
   PROBLEM -> RETRIEVE -> FREEZE -> PREMISE_GATE -> SYNTHESIZE
           -> VERIFY -> MECHANISM_SPACE -> COLLISION -> PHYSICS
-          -> ATTACK -> CONTRADICTION -> KILLER_EXPERIMENT -> IMPROVE
+          -> ATTACK -> CONTRADICTION -> KILLER_EXPERIMENT
           -> ADJUDICATION -> CLASSIFY -> NEXT_BEST_ACTION -> RANK
+
+Post-rank, and ONLY when gauntlet kill evidence exists, the
+Directive-1 pipeline invokes the IMPROVE operation
+(improve_stage.run_improve, the single canonical mutation
+implementation) through the same env.run_stage protocol.
 
 No business logic lives here. Every stage persists its envelope snapshot to
 the run directory (no manual file editing between stages — D8). Stage failures
@@ -48,12 +54,12 @@ DOWNSTREAM_BLOCKERS = {
     # recorded a misleading OK — found live by the R396 P3 probe
     # against the local instance, fixed with a pinned test).
     "PREMISE_GATE": {"SYNTHESIZE", "VERIFY", "MECHANISM_SPACE", "COLLISION", "PHYSICS", "ATTACK", "CONTRADICTION",
-                     "KILLER_EXPERIMENT", "IMPROVE", "ADJUDICATION",
+                     "KILLER_EXPERIMENT", "ADJUDICATION",
                      "CLASSIFY",
                      "NEXT_BEST_ACTION", "RANK"},
     "SYNTHESIZE": {"VERIFY", "MECHANISM_SPACE",
                    "COLLISION", "PHYSICS", "ATTACK", "CONTRADICTION",
-                   "KILLER_EXPERIMENT", "IMPROVE", "ADJUDICATION",
+                   "KILLER_EXPERIMENT", "ADJUDICATION",
                    "CLASSIFY", "NEXT_BEST_ACTION", "RANK"},
     # R401: MECHANISM_SPACE consumes the frozen evidence � a retrieval
     # failure leaves it nothing to structure (SKIPPED_UPSTREAM_FAILURE,
@@ -61,6 +67,39 @@ DOWNSTREAM_BLOCKERS = {
     "RETRIEVE": {"VERIFY", "SYNTHESIZE", "MECHANISM_SPACE"},
 
 }
+
+
+#: R515: stage_IMPROVE.json statuses that prove the kill-point
+#: mutation spend already happened (any of them). The resume guard
+#: consults exactly this set — never a subset, never an inference.
+IMPROVE_EXECUTED_STATUSES = frozenset({
+    "CHILDREN_ADMITTED", "NO_CHILD_ADMITTED", "NO_KILL_EVIDENCE",
+    "IMPROVEMENT_BLOCKED_TRANSPORT", "DISABLED_BY_OPERATOR"})
+
+
+def improve_kill_point_resume_state(out_dir: Any) -> tuple:
+    """R515: the kill-point resume predicate (a pure predicate over
+    run-dir bytes, extracted for testability — not a framework).
+
+    Returns (already_done, status): already_done True iff
+    stage_IMPROVE.json carries an executed outcome — the mutation
+    spend is never re-burned (R401 resume discipline, Art. X: the
+    record on disk is the authority). Missing/corrupt/unparseable
+    file, or a non-executed status (e.g. DEFERRED_TO_KILL_POINT or a
+    stage_IMPROVE_FAILURE record), returns (False, status-or-None):
+    re-execution is safe because no executed outcome exists on disk.
+    Never raises (fail-open to re-execution, disclosed by the
+    caller-visible status).
+    """
+    try:
+        raw = (Path(out_dir) / "stage_IMPROVE.json").read_text()
+    except Exception:  # noqa: BLE001 — missing/unreadable: not done
+        return (False, None)
+    try:
+        status = (json.loads(raw) or {}).get("status")
+    except Exception:  # noqa: BLE001 — corrupt record: not done
+        return (False, None)
+    return (status in IMPROVE_EXECUTED_STATUSES, status)
 
 
 def _cemetery_sandbox_path(out_dir: Any) -> Path:
@@ -1952,19 +1991,8 @@ class EngineRun:
             # inherited). Typed outcomes: CHILDREN_ADMITTED /
             # NO_CHILD_ADMITTED / NO_KILL_EVIDENCE /
             # IMPROVEMENT_BLOCKED_TRANSPORT / DISABLED_BY_OPERATOR.
-            _improve_stage_file = self.out / "stage_IMPROVE.json"
-            _improve_done = False
-            if _improve_stage_file.exists():
-                try:
-                    _improve_prev = json.loads(
-                        _improve_stage_file.read_text())
-                    _improve_done = _improve_prev.get("status") in (
-                        "CHILDREN_ADMITTED", "NO_CHILD_ADMITTED",
-                        "NO_KILL_EVIDENCE",
-                        "IMPROVEMENT_BLOCKED_TRANSPORT",
-                        "DISABLED_BY_OPERATOR")
-                except Exception:  # noqa: BLE001 — corrupt record
-                    _improve_done = False
+            _improve_done = improve_kill_point_resume_state(
+                self.out)[0]
             if _improve_done:
                 # resume: the stage already executed this run — the
                 # record on disk is the authority (Art. X); the

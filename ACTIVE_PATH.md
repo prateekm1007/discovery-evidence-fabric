@@ -83,10 +83,8 @@ Every stage carries a gate; no stage's pass credit transfers to the next
 | ENGINEERING DOSSIER | `engine/package_compiler.py` (the live compiler) + `invention_bridge/package.py`; R455: the historical `premium_package_factory/` is ARCHIVED_TO `archive/r455-lean/` (the R374 `pathway.py` chain verifier retained for the cemetery cross-check) | gate certificates |
 | BUYER PACKAGE | `engine/package_compiler.py` + `invention_bridge/package.py` (the live path) + `scripts/r386_release_chain.py` (four-state verifier; R455: `scripts/r385_root_docs_regeneration.py`'s factory dependency is archived — rebuild-from-source of R371-era docs now requires git history; delivery verification unaffected) | Article XXXIX chain: ENGINE RECORD ↔ CANONICAL MANIFEST ↔ PORTFOLIO TREE ↔ BUYER ZIP; 21 hermetic negative controls in `tests/test_r386_release_chain.py` |
 
-Engine stage order (runtime): `RETRIEVE → FREEZE → PREMISE_GATE → SYNTHESIZE → VERIFY →
-MECHANISM_SPACE → COLLISION → PHYSICS → ATTACK → CONTRADICTION →
-KILLER_EXPERIMENT → IMPROVE → ADJUDICATION → CLASSIFY → NEXT_BEST_ACTION → RANK`
-(`discovery_fabric/engine/adapters.py`; 16 stages; `MULTI_SOURCE_DISCOVERY` retired from the live path).
+Engine stage order (runtime): `RETRIEVE -> FREEZE -> PREMISE_GATE -> SYNTHESIZE -> VERIFY -> MECHANISM_SPACE -> COLLISION -> PHYSICS -> ATTACK -> CONTRADICTION -> KILLER_EXPERIMENT -> ADJUDICATION -> CLASSIFY -> NEXT_BEST_ACTION -> RANK`
+(`discovery_fabric/engine/adapters.py`; 15 stages; `MULTI_SOURCE_DISCOVERY` retired from the live path R513; the `IMPROVE` linear placeholder retired R515 — the kill-point operation `improve_stage.run_improve` executes post-rank with kill evidence only).
 
 ## What is NOT in the active path (and where it lives now)
 

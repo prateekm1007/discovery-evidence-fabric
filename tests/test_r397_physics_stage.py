@@ -87,10 +87,10 @@ def test_stage_order_has_physics_between_collision_and_attack():
     # R401: MECHANISM_SPACE between VERIFY and COLLISION
     # (MULTI_SOURCE_DISCOVERY removed from the critical path — the
     # stage no longer sits between MECHANISM_SPACE and COLLISION).
-    # R481: IMPROVE between KILLER_EXPERIMENT and ADJUDICATION — the
-    # chain is 16 stages since the MULTI_SOURCE_DISCOVERY removal
-    # (17 stages since R481 minus the removed stage; documented change)
-    assert len(STAGE_ORDER) == 16
+    # R515: the IMPROVE linear placeholder is removed (kill-point
+    # operation lives post-rank) — the chain is 15 stages
+    # (documented change)
+    assert len(STAGE_ORDER) == 15
 
 
 def test_physics_adapter_registered_and_offline():

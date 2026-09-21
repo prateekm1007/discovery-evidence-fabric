@@ -150,14 +150,16 @@ def test_stage_order_is_exact_d8_chain():
     # every ordinary user run (consultant finding: "validated code but
     # not part of the live run chain"). R401: MECHANISM_SPACE between
     # VERIFY and COLLISION (MULTI_SOURCE_DISCOVERY removed from the
-    # critical path). R513 closure removed the retired stage entirely. R481: IMPROVE between
-    # KILLER_EXPERIMENT and ADJUDICATION (the audit's P0-1 loop
-    # closure) — the D8 chain is 16 stages.
+    # critical path). R513 closure removed the retired stage entirely.
+    # R515: the IMPROVE linear placeholder is removed (its ordinary
+    # execution only ever recorded DEFERRED_TO_KILL_POINT) — the D8
+    # chain is 15 stages; the kill-point operation lives post-rank
+    # (ImproveAdapter stays registered; R402 recorded asymmetry).
     assert STAGE_ORDER == [
         "RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE", "VERIFY",
         "MECHANISM_SPACE", "COLLISION",
         "PHYSICS", "ATTACK",
-        "CONTRADICTION", "KILLER_EXPERIMENT", "IMPROVE", "ADJUDICATION",
+        "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION",
         "CLASSIFY",
         "NEXT_BEST_ACTION", "RANK"]
 

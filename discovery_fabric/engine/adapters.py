@@ -1419,20 +1419,23 @@ class KillerExperimentAdapter(BaseAdapter):
 
 
 class ImproveAdapter(BaseAdapter):
-    """R481 (external-audit P0-1): the IMPROVE stage — the loop
+    """R481 (external-audit P0-1): the IMPROVE operation — the loop
     closure. Dead candidates are mutated FROM THEIR RECORDED KILL
     BASIS and the children RE-RUN the same gauntlet gates; a child
     that passes every gate re-enters the competition with fresh
     scores, one that fails dies again with a typed record.
 
     Execution point (the cemetery precedent): the Directive-1
-    pipeline's kill-evidence point — the stage chain itself holds no
-    per-candidate kill verdicts until the gauntlet has run, so the
-    LOOP-position execution records the typed
-    DEFERRED_TO_KILL_POINT and the pipeline executes the real stage
-    through the same env.run_stage first-class protocol. The contract
-    arithmetic (STAGE_ORDER, the registry, the resume ledger) treats
-    IMPROVE exactly like every other stage.
+    pipeline's kill-evidence point — invoked post-rank with
+    kill evidence via the same env.run_stage first-class protocol
+    (run.py kill point; stage_IMPROVE.json + IMPROVE_LEDGER.json
+    persist the typed record). R515: NO linear D8 slot — the former
+    loop-position entry only ever recorded DEFERRED_TO_KILL_POINT
+    and is removed from STAGE_ORDER (the adapter stays registered
+    because the kill-point caller addresses it by name; R402
+    recorded asymmetry). The no-payload branch below is the
+    defensive default for a payload-less invocation (fail-closed,
+    never a synthetic child).
 
     Art. XXXVII guard: the loop is real or it does not exist — no
     kill evidence -> NO_KILL_EVIDENCE (never a synthetic child);
@@ -1449,17 +1452,19 @@ class ImproveAdapter(BaseAdapter):
     def execute(self, env, run_ctx):
         payload = (run_ctx or {}).get("improve_payload")
         if not payload:
-            # the loop-position execution (fresh run): the gauntlet has
-            # not run yet — the typed deferral, never a fake no-op
+            # R515: the defensive default — the kill-point caller
+            # always passes improve_payload, so a payload-less
+            # invocation means the gauntlet has not run (or the
+            # caller is not the kill point): the typed deferral,
+            # never a fake no-op and never a synthetic child.
             return {"_engine_result": True, "apply_to": {},
                     "status": "DEFERRED_TO_KILL_POINT",
                     "stage_version": "improve_stage/1.0.0 (R481 P0-1)",
-                    "note": ("the IMPROVE stage executes at the "
-                             "Directive-1 pipeline's kill-evidence "
-                             "point (the cemetery-update precedent); "
-                             "at stage-chain time no candidate has "
-                             "died yet — the deferral is the recorded "
-                             "design")}
+                    "note": ("the IMPROVE operation executes at the "
+                              "Directive-1 pipeline's kill-evidence "
+                              "point (the cemetery-update precedent); "
+                              "invoked without kill evidence the "
+                              "deferral is the recorded design")}
         from .improve_stage import run_improve
         return run_improve(payload)
 
@@ -1718,10 +1723,14 @@ ADAPTERS = {
     "RANK": PortfolioRankingAdapter(),
 }
 # R402 (audit CB-9): the dead "CEMETERY_CHECK" registration is removed —
-# ADAPTERS keys == STAGE_ORDER entries, one namespace, no unreachable
-# registrations (the cemetery check is the ADJUDICATION sub-check via
-# _CemeterySubCheck; the cemetery UPDATE is conductor-level after a
-# final KILL/REJECT). Pinned by test.
+# one namespace, no unreachable registrations (the cemetery check is the
+# ADJUDICATION sub-check via _CemeterySubCheck; the cemetery UPDATE is
+# conductor-level after a final KILL/REJECT). R515: ADAPTERS ⊃
+# STAGE_ORDER by exactly {"IMPROVE"} — the kill-point operation (see
+# ImproveAdapter below; invoked post-rank with kill evidence, never in
+# the linear chain). The asymmetry is the RECORDED, TESTED contract
+# the R402 directive allows ("or the asymmetry is a recorded, tested
+# contract", CODER_DIRECTIVE_R402.md W7). Pinned by test.
 
 # Stage order per CEO directive D8 (exact chain; cemetery negative-knowledge
 # check is a sub-check of ADJUDICATION; cemetery UPDATE is conductor-level).
@@ -1743,17 +1752,19 @@ ADAPTERS = {
 # mechanism-level verification). The chain is 16 stages. Deliberate,
 # documented contract change (same pattern as R394 PREMISE_GATE and
 # R397 PHYSICS); pinned tests updated with the new arithmetic.
-# R481 (external-audit P0-1): IMPROVE is a FIRST-CLASS stage between
+# R481 (external-audit P0-1): IMPROVE was a FIRST-CLASS stage between
 # KILLER_EXPERIMENT and ADJUDICATION — the loop closure (dead ->
 # mutated child -> the same gauntlet -> re-entry or typed re-kill).
-# The chain remains 16 stages after R513 removal. IMPROVE remains between
-# KILLER_EXPERIMENT and ADJUDICATION; the execution point is the
-# Directive-1 pipeline's kill-evidence point (the cemetery-update
-# precedent) and the loop position records the typed deferral;
-# pinned tests updated with the new arithmetic.
+# R515 (auditor directive): the linear D8 placeholder is REMOVED — its
+# ordinary execution only ever recorded DEFERRED_TO_KILL_POINT (no
+# work; measured milliseconds, R511). The chain is 15 stages. The
+# real execution point is UNCHANGED: the Directive-1 pipeline's
+# kill-evidence point (post-rank, kill evidence present) invokes the
+# same ImproveAdapter through the same env.run_stage protocol; pinned
+# tests updated with the new arithmetic.
 STAGE_ORDER = ["RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
                "VERIFY", "MECHANISM_SPACE",
                "COLLISION", "PHYSICS",
-               "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT", "IMPROVE",
+               "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT",
                "ADJUDICATION",
                "CLASSIFY", "NEXT_BEST_ACTION", "RANK"]

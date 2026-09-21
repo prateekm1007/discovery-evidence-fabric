@@ -1,6 +1,6 @@
 {
   "artifact_id": "ACTIVE_DISCOVERY_GRAPH",
-  "repo_head": "2444cd9e9288a44e27da9b9bc93507e84dd36d94",
+  "repo_head": "29dc13a636932321cc1a27cc954892a501669759",
   "entry_point": "discovery_fabric/engine/run.py::EngineRun.run()",
   "executable_chain": [
     {
@@ -93,14 +93,6 @@
     },
     {
       "order": 12,
-      "stage": "IMPROVE",
-      "capability_id": "IMPROVE",
-      "module_path": "discovery_fabric/engine/improve_stage.py",
-      "canonical_fn": "improve_stage.run_improve",
-      "needs_network": true
-    },
-    {
-      "order": 13,
       "stage": "ADJUDICATION",
       "capability_id": "ADJUDICATION",
       "module_path": "discovery_fabric/engine/adapters.py (glue over canonical inputs)",
@@ -108,7 +100,7 @@
       "needs_network": false
     },
     {
-      "order": 14,
+      "order": 13,
       "stage": "CLASSIFY",
       "capability_id": "EPISTEMIC_CLASSIFICATION",
       "module_path": "discovery_fabric/a2/classify.py",
@@ -116,7 +108,7 @@
       "needs_network": false
     },
     {
-      "order": 15,
+      "order": 14,
       "stage": "NEXT_BEST_ACTION",
       "capability_id": "NEXT_BEST_ACTION",
       "module_path": "orchestrator/next_best_action.py",
@@ -124,7 +116,7 @@
       "needs_network": false
     },
     {
-      "order": 16,
+      "order": 15,
       "stage": "RANK",
       "capability_id": "PORTFOLIO_RANKING",
       "module_path": "orchestrator/portfolio.py + deterministic score in adapter",
@@ -152,5 +144,24 @@
     "ATTACK (NVIDIA_API_KEY or OPENROUTER_API_KEY)",
     "PRIOR_ART_V2_ELITE_STACK (.env.keys)"
   ],
-  "registry": "RUNTIME_CAPABILITY_REGISTRY.json"
+  "registry": "RUNTIME_CAPABILITY_REGISTRY.json",
+  "post_rank_operations": [
+    {
+      "operation": "IMPROVE",
+      "capability_id": "IMPROVE",
+      "module_path": "discovery_fabric/engine/improve_stage.py",
+      "canonical_fn": "improve_stage.run_improve",
+      "invocation": "post-rank Directive-1 kill-evidence point ONLY (run.py kill point, improve_payload present); never in the linear D8 chain since R515",
+      "needs_network": true,
+      "typed_outcomes": [
+        "CHILDREN_ADMITTED",
+        "NO_CHILD_ADMITTED",
+        "NO_KILL_EVIDENCE",
+        "IMPROVEMENT_BLOCKED_TRANSPORT",
+        "DISABLED_BY_OPERATOR",
+        "DEFERRED_TO_KILL_POINT"
+      ],
+      "record": "R515 (auditor directive Part A/B): the linear placeholder removed; the canonical mutation implementation unchanged and reachable exactly once, at the kill point"
+    }
+  ]
 }

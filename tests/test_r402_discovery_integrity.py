@@ -533,17 +533,30 @@ class TestStageGraphResolves:
 
     def test_adapters_keys_equal_stage_order(self):
         from discovery_fabric.engine.adapters import ADAPTERS, STAGE_ORDER
-        assert set(ADAPTERS) == set(STAGE_ORDER), (
+        # R515: the R402 recorded asymmetry (CODER_DIRECTIVE_R402.md
+        # W7) — ADAPTERS == STAGE_ORDER + the kill-point IMPROVE
+        # operation (reachable post-rank with kill evidence, never in
+        # the linear chain). No other unreachable registrations.
+        assert set(ADAPTERS) == set(STAGE_ORDER) | {"IMPROVE"}, (
             "registered-but-unreachable or unreachable-but-registered "
             "stages (audit CB-9)")
-        # MULTI_SOURCE_DISCOVERY removal: 16 stages (R481 17 minus
-        # the removed stage; documented change)
-        assert len(ADAPTERS) == len(STAGE_ORDER) == 16
+        # IMPROVE linear placeholder removal: 15 chain stages, 16
+        # registered operations (documented change)
+        assert len(STAGE_ORDER) == 15
+        assert len(ADAPTERS) == 16
 
     def test_dependencies_are_acyclic_and_ordered(self):
         from discovery_fabric.engine.adapters import ADAPTERS, STAGE_ORDER
         pos = {s: i for i, s in enumerate(STAGE_ORDER)}
         for stage, adapter in ADAPTERS.items():
+            if stage == "IMPROVE":
+                # R515: the kill-point operation has no linear position;
+                # its declared deps must still resolve (checked above)
+                # and its execution point (post-rank, after the gauntlet
+                # that produces kill evidence) is after both — the
+                # depends_on declaration stays truthful.
+                assert set(adapter.depends_on) <= set(STAGE_ORDER)
+                continue
             for dep in adapter.depends_on:
                 assert pos[dep] < pos[stage], (
                     f"{stage} depends on {dep} which appears LATER in "

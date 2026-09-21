@@ -1,0 +1,88 @@
+{
+ "artifact_type": "DISCOVERY_YIELD_INSTRUMENT_SPEC",
+ "instrument_id": "r506_discovery_yield",
+ "instrument_version": "1.1.0",
+ "frozen_at_round": "R515",
+ "lineage": "exact-copy lineage from v1.0.0 (R506/YIELD_INSTRUMENT.json script_sha 831f1a0e075cb9dd370c18325bf2b19fac9f7fa69d1218b980d8c4b22946a2ac — frozen, still pinned, untouched by this round)",
+ "script_path": "scripts/r515_discovery_yield.py",
+ "script_sha256": "62ba6717d24ca600a0164315e45fee15abce26e18c9116401740faf05e38cf02",
+ "freeze_rule": "Inherited from v1.0.0: ANY instrument edit produces a new version string; old measurements stand unchanged. v1.0.0 and its measurements are preserved byte-identical (proven by the equivalence re-runs below).",
+ "change_log_v1_0_0_to_v1_1_0": [
+  "MECHANISM_STARVED boundary (Art. LXXXIV, enforced engine-side since R514): transitions 6-9 (attack/contradiction/experiment/mutation) on a starved run keep their raw bytes as diagnostic extras but report reached=False with the new MECHANISM_STARVED drop reason. Non-starved rows are byte-identical to v1.0.0 modulo the version string and the additive starvation_terminal marker.",
+  "STAGE_ORDER working copy updated to the 15-stage executable chain (MULTI_SOURCE_DISCOVERY retired R513; IMPROVE linear placeholder retired R515). Tie-breaking only (pick_work_envelope); never counting.",
+  "Transition 9 byte source UNCHANGED: the post-rank kill point still records through env.run_stage('IMPROVE'), so kill-point stage_log IMPROVE entries read exactly as v1.0.0 read them. The retired linear DEFERRED_TO_KILL_POINT entry simply stops appearing on new runs (old rows keep reading it).",
+  "Reason vocabulary: v1.0.0 frozen set + MECHANISM_STARVED (new version carries it)."
+ ],
+ "what_it_measures": "Whether the machine DISCOVERS, not whether it completes. Funnel rows are computed from each run's own durable bytes only — never self-reported values, never narratives, never summaries (Art. XXIV). The instrument is observational and never writes to the run directory it reads (Art. IX). v1.1.0 additionally reports the starvation terminal consistently (Art. LXXXIV/LXXXIII) instead of letting later downstream artifacts read as independently reached scientific transitions.",
+ "funnel_transitions": [
+  {"index": 1, "name": "fresh_submitted",
+   "byte_source": "problem.json + run_manifest.json/final_state.json",
+   "counter": "1 per run directory"},
+  {"index": 2, "name": "premise_coherent",
+   "byte_source": "stage_log PREMISE_GATE result_meta.premise_verdict / envelope premise_gate.verdict",
+   "drop_typed": ["PREMISE_INCOHERENT", "STAGE_INCOMPLETE"]},
+  {"index": 3, "name": "evidence_verified",
+   "byte_source": "attack_results.evidence_verified / adjudication.evidence_verification.verified / stage_log VERIFY result_meta.verified",
+   "drop_typed": ["EVIDENCE_UNVERIFIED", "STAGE_INCOMPLETE"],
+   "note": "the run's own typed verification issues (e.g. missing_source_span, mechanism_span_not_verbatim) are carried in verification_issues"},
+  {"index": 4, "name": "mechanisms_found",
+   "byte_source": "envelope_MECHANISM_SPACE mechanism_space.n_candidates_generated + state / stage_log MECHANISM_SPACE",
+   "drop_typed": ["NO_CANDIDATES", "STAGE_INCOMPLETE"]},
+  {"index": 5, "name": "candidates_generated_distinct",
+   "byte_source": "mechanism_space.distinctness.n_distinct (three-verdict instrument, Art. XLII)",
+   "count_rule": "DISTINCT only; INDETERMINATE counted separately and never as invention (Art. XLII: INDETERMINATE is a legitimate verdict, not DISTINCT); grid-advanced counts never counted (LXXVIII)",
+   "drop_typed": ["NO_DISTINCT_CANDIDATES", "ALL_DISTINCTNESS_INDETERMINATE"]},
+  {"index": 6, "name": "attack_survivors",
+   "byte_source": "attack_results.overall + attacks{} per-dimension verdicts",
+   "count_rule": "the primary candidate's gauntlet outcome; SURVIVOR_SELECTION.ranked non-killed entries are recorded as grid_advanced_not_counted, NEVER as survivors",
+   "honesty_pin": "attacker_provenance is always RUN_LEVEL_A2_GAUNTLET_NOT_SEALED_BAR_CALIBRATED",
+   "drop_typed": ["ATTACK_KILLED", "STAGE_INCOMPLETE", "MECHANISM_STARVED"],
+   "starvation_note": "on a MECHANISM_STARVED run the attack never executed (R514 gate): reached=False with MECHANISM_STARVED (never the ATTACK_KILLED mislabel v1.0.0 emitted for absent attack bytes)"},
+  {"index": 7, "name": "contradiction_survivors",
+   "byte_source": "contradictions.blocking_count (the engine's own ADJUDICATION no_blocking_contradictions definition)",
+   "count_rule": "survivor iff blocking_count == 0 AND the run is not MECHANISM_STARVED (an empty queue on a starved run is diagnostic bytes, never a survived transition)",
+   "drop_typed": ["BLOCKING_CONTRADICTIONS", "STAGE_INCOMPLETE", "MECHANISM_STARVED"]},
+  {"index": 8, "name": "experimentally_discriminated",
+   "byte_source": "killer_experiment.selected + DECISIVE_EXPERIMENT.falsification_contract + DISCOVERY_RELEASE.real_loop_verified",
+   "count_rule": "SELECTED is not EXECUTED; v1.1.0 counts EXECUTED only via the Art. XXXVIII REAL_LOOP_VERIFIED byte state (inherited); on a MECHANISM_STARVED run selection bytes are diagnostic-only regardless",
+   "drop_typed": ["NO_NON_VACUOUS_EXPERIMENT", "MECHANISM_STARVED"]},
+  {"index": 9, "name": "mutated_survivors",
+   "byte_source": "stage_log IMPROVE entries: status==CHILDREN_ADMITTED + entry-level delta_real + ledger{children_admitted, children_rekilled, loop_closure} + EVOLUTION_GEN_1.json (the post-rank kill point records through env.run_stage('IMPROVE') — unchanged by the R515 linear-slot retirement)",
+   "count_rule": "children admitted AND delta_real true AND re-evaluated AND the run is not MECHANISM_STARVED (even admitted children on a starved run are diagnostic bytes, never discovery evidence)",
+   "drop_typed": ["NO_MUTATED_SURVIVOR", "MECHANISM_STARVED"]},
+  {"index": 10, "name": "buyer_ready",
+   "byte_source": "DISCOVERY_RELEASE.json status + package_zip + loop_verification_state + real_loop_verified + INVENTION_LINEAGE.survivor_reached",
+   "count_rule": "ZIP emitted AND release in RELEASED/SHIPPED/TECHNOLOGY_TRANSFER_READY; HELD_FOR_HUMAN_REVIEW is a typed drop carrying failure_reason",
+   "drop_typed": ["RELEASE_NOT_EMITTED", "RELEASE_HELD", "PACKAGE_NOT_EMITTED"]}
+ ],
+ "mid_flight_rule": "A run directory without run_manifest.json is MID_FLIGHT_OR_PARTIAL_PER_LXXIV — an observation, never a terminal (the R487/R489 terminal-divergence ruling). Terminal and mid-flight rows are never collapsed in aggregates.",
+ "reason_vocabulary_frozen": ["PREMISE_INCOHERENT", "EVIDENCE_UNVERIFIED", "NO_CANDIDATES", "NO_DISTINCT_CANDIDATES", "ALL_DISTINCTNESS_INDETERMINATE", "ATTACK_KILLED", "BLOCKING_CONTRADICTIONS", "NO_NON_VACUOUS_EXPERIMENT", "NO_MUTATED_SURVIVOR", "RELEASE_NOT_EMITTED", "RELEASE_HELD", "PACKAGE_NOT_EMITTED", "STAGE_INCOMPLETE", "MID_FLIGHT_PER_LXXIV", "MECHANISM_STARVED"],
+ "honesty_pins": [
+  "NOVELTY_LEFT_UNRESOLVED_BY_RING_FAILURES: collision mandatory_searches.complete=false is carried on every row; novelty is never resolved from failed searches (Art. XXI.3, LXXV.2)",
+  "cost/debits typed UNKNOWN_PER_ART_XXV when no metered cost bytes exist in the run records — never invented",
+  "attacker_provenance typed on every attack_survivors transition",
+  "declared_family ABSENT_IN_DURABLE_RECORD when problem.json carries no canonical_family (the R489 submission-path gap, disclosed)",
+  "STARVATION_DIAGNOSTIC_ONLY: on a MECHANISM_STARVED run, transitions 6-9 carry epistemic_use DIAGNOSTIC_ONLY_NOT_DISCOVERY_EVIDENCE — raw bytes preserved, never counted (Art. LXXXIV)"
+ ],
+ "hermetic_acceptance": {
+  "equivalence_proof": "v1.1.0 re-ran on real R513 production bytes (origin/runtime-state-hf runs ..._957140 and ..._958938, pre-gate: ATTACK executed): rows byte-identical to v1.0.0 modulo the instrument version string and the additive starvation_terminal marker (both is_starved False). Prior measurements stand unchanged.",
+  "equivalence_record": "R515/HERMETIC_V110_EQUIVALENCE_R513AB.json",
+  "case_4_starved_terminal": {
+   "name": "R515 simulated post-gate starved run (SYNTHETIC FIXTURE, labeled — not production observations)",
+   "bytes": "tests/fixtures/r515_starved_run/runs/r515_simulated_starved_01 (n_distinct=0, ATTACK/COLLISION SKIPPED_ADMISSION, terminal MECHANISM_STARVED, with blocking_count 0 + killer selection + CHILDREN_ADMITTED bytes deliberately present)",
+   "expected": "lost_at candidates_generated_distinct::NO_DISTINCT_CANDIDATES; attack/contradiction/experiment/mutation reached=False with MECHANISM_STARVED drops and DIAGNOSTIC_ONLY markers; raw bytes preserved in extras",
+   "record": "R515/HERMETIC_V110_CASE4_STARVED.json"
+  },
+  "verdict": "HERMETIC ACCEPTANCE MET"
+ },
+ "determinism": "byte-identical output verified across two invocations on the same run bytes (inherited property; same serialization contract as v1.0.0)",
+ "durable_population_baseline": {
+  "note": "v1.0.0's R506 baseline stands unchanged (prior measurements never re-derived under a new version). v1.1.0 applies going forward from post-gate builds; historical rows are not rewritten."
+ },
+ "battery_requirements_from_directive": {
+  "problems": "6-10 blind fresh problems, >=3 families, corpus-disjoint against R446/R412/R458/R492-DEV/sealed corpora (test-enforced), family-declared at submission",
+  "rules": "pinned healthy ring, committed driver only, zero human bytes, freeze gates + instrument for the battery duration, NO mid-battery fixes, all attempts published incl. zeros",
+  "void_rule": "a battery with re-tuned gates mid-run is void",
+  "reproducibility": "a second container re-runs the yield computation from the same durable bytes and must reproduce the funnel exactly"
+ }
+}
