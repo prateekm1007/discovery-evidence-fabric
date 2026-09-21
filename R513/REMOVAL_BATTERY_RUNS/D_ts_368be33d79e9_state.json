@@ -1,0 +1,339 @@
+{
+ "run_id": "ts_368be33d79e9",
+ "user_problem": "City bus routes bunch up so three buses arrive together then nothing for half an hour. Commuters want evenly spaced arrivals without adding buses.",
+ "created_at": "2026-09-21T03:21:48Z",
+ "status": "COMPLETE",
+ "model_route": {
+  "calls": [
+   {
+    "role": "SYNTHESIZE",
+    "provider": "atria",
+    "model": "Atria-Dawn-Preview",
+    "status": "OK",
+    "call_class": "RUN_OWNED",
+    "task": "STRONG",
+    "actual_task_capability": "STRONG",
+    "task_capability_match": true,
+    "latency_ms": 86830
+   },
+   {
+    "role": "MECHANISM_SPACE",
+    "provider": "atria",
+    "model": "Atria-Dawn-Preview",
+    "status": "OK",
+    "call_class": "RUN_OWNED",
+    "task": "STRONG",
+    "actual_task_capability": "STRONG",
+    "task_capability_match": true,
+    "latency_ms": 12146
+   },
+   {
+    "role": "ATTACK",
+    "provider": "atria",
+    "model": "Atria-Dawn-Preview",
+    "status": "FAILED",
+    "call_class": "RUN_OWNED",
+    "task": "FAST",
+    "actual_task_capability": "FAST",
+    "task_capability_match": true,
+    "latency_ms": 191209,
+    "failure_class": "MODEL_FAILURE"
+   },
+   {
+    "role": "ATTACK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free",
+    "status": "OK",
+    "call_class": "RUN_OWNED",
+    "task": "FAST",
+    "actual_task_capability": "FAST",
+    "task_capability_match": true,
+    "latency_ms": 11821
+   },
+   {
+    "role": "POST_RANK_IMPROVEMENT",
+    "provider": "zai",
+    "model": "Atria-Dawn-Preview",
+    "status": "FAILED",
+    "call_class": "RUN_OWNED",
+    "task": "STRONG",
+    "actual_task_capability": "STRONG",
+    "task_capability_match": true,
+    "latency_ms": 51058,
+    "failure_class": "MODEL_FAILURE"
+   },
+   {
+    "role": "POST_RANK_IMPROVEMENT",
+    "provider": "unorouter",
+    "model": "qwen3.8-27b:free",
+    "status": "FAILED",
+    "call_class": "RUN_OWNED",
+    "task": "STRONG",
+    "actual_task_capability": "STRONG",
+    "task_capability_match": true,
+    "latency_ms": 6906,
+    "failure_class": "RATE_LIMITED"
+   },
+   {
+    "role": "POST_RANK_IMPROVEMENT",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free",
+    "status": "OK",
+    "call_class": "RUN_OWNED",
+    "task": "STRONG",
+    "actual_task_capability": "STRONG",
+    "task_capability_match": true,
+    "latency_ms": 12950
+   },
+   {
+    "role": "POST_RANK_IMPROVEMENT",
+    "provider": "zai",
+    "model": "Atria-Dawn-Preview",
+    "status": "OK",
+    "call_class": "RUN_OWNED",
+    "task": "STRONG",
+    "actual_task_capability": "STRONG",
+    "task_capability_match": true,
+    "latency_ms": 130351
+   },
+   {
+    "role": "POST_RANK_TECH_IMPROVEMENT",
+    "provider": "zai",
+    "model": "Atria-Dawn-Preview",
+    "status": "FAILED",
+    "call_class": "RUN_OWNED",
+    "task": "CHEAP",
+    "actual_task_capability": "CHEAP",
+    "task_capability_match": true,
+    "latency_ms": 99536,
+    "failure_class": "MODEL_FAILURE"
+   },
+   {
+    "role": "POST_RANK_TECH_IMPROVEMENT",
+    "provider": "xkiro",
+    "model": "minimax/minimax-m2.7:free",
+    "status": "FAILED",
+    "call_class": "RUN_OWNED",
+    "task": "CHEAP",
+    "actual_task_capability": "CHEAP",
+    "task_capability_match": true,
+    "latency_ms": 98668,
+    "failure_class": "MODEL_FAILURE"
+   }
+  ],
+  "call_count": 10,
+  "call_count_note": "run-owned calls in the run's own routing ledger \u2014 capability probes and standalone calls are not run-owned (R451-C1.3-3)",
+  "capability_probe_lines": 0,
+  "basis": "ROUTING_LEDGER_RUN.json \u2014 the run's own run-id-isolated routing ledger (R451-C1.3-3)",
+  "note": "derived from the routing ledger filtered by run_id (R455-LEAN-1 \u00a74); configuration is never reported as execution and envelopes are never aggregated"
+ },
+ "retrieval_route": "UNKNOWN",
+ "evidence_state": {
+  "state": "GATHERED",
+  "records_found": 15,
+  "sources": [
+   "core",
+   "crossref",
+   "europepmc",
+   "semantic_scholar"
+  ],
+  "retrieval_route": "UNKNOWN",
+  "provider_outcomes": []
+ },
+ "mechanism_state": {
+  "state": "GENERATED",
+  "mechanism": "Holding control \u2014 deliberately delaying buses at stops (or combining holding with other measures) so that buses on the same route do not travel closely together, thereby regularizing headways.",
+  "intervention": "Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing \u2014 no additional buses required.",
+  "expected_effect": "Evenly spaced arrivals and reduced bunching (fewer \"three buses together, then nothing\" events), lower headway variance, and shorter average commuter waiting time without fleet expansion.",
+  "candidate_count": 0,
+  "reason": null
+ },
+ "invention_state": {
+  "state": "EXISTS",
+  "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+  "specification_present": true,
+  "survivor_recorded": true,
+  "package_built": false
+ },
+ "physics_state": {
+  "state": "NOT_SIMULATABLE",
+  "lifecycle_verdict": "MECHANISM_NOT_SIMULATABLE",
+  "baseline_outcome": null,
+  "epistemic_class": null,
+  "note": "the physics decision system's honest refusal: the mechanism's domain has no validated solver (R413 registry)"
+ },
+ "novelty_state": {
+  "state": "NOT_REACHED",
+  "prior_art_count": 0,
+  "collision_results_present": true,
+  "language_rule": "novelty signals only \u2014 legal patentability is NEVER asserted (not a patent court)"
+ },
+ "attack_state": {
+  "state": "EXECUTED",
+  "overall": "PASS",
+  "independence": null
+ },
+ "experiment_state": {
+  "state": "SPECIFIED_NOT_EXECUTED",
+  "decisive_experiment_present": true,
+  "falsification_contract": {
+   "answered_fields": [],
+   "unknown_fields": {
+    "HYPOTHESIS": "no record exists for this field",
+    "TREATMENT": "no record exists for this field",
+    "CONTROL": "no record exists for this field",
+    "MEASUREMENT": "no record exists for this field",
+    "APPARATUS": "no record exists for this field",
+    "SAMPLE": "no record exists for this field",
+    "ACCEPTANCE_THRESHOLD": "no record exists for this field",
+    "FALSIFICATION_THRESHOLD": "no record exists for this field",
+    "UNCERTAINTY": "no record exists for this field",
+    "COST": "no record exists for this field",
+    "TIME": "no record exists for this field",
+    "SAFETY": "no record exists for this field"
+   },
+   "falsification_threshold_answered": false,
+   "contract_complete": false,
+   "basis": "Art. LII: the contract is complete only when an experimental outcome that kills the mechanism is stated; UNKNOWN fields are honest states (Art. XXV) and are listed with their blockers \u2014 they limit maturity, not existence"
+  },
+  "note": "the decisive physical experiment is the run's own falsification contract (Art. LII); in this machine it is specified for survivors and executed only through the reality-loop interface; the contract is COMPLETE only when the FALSIFICATION_THRESHOLD answers what outcome kills the mechanism \u2014 an experiment without that answer is a specified experiment, never a complete one"
+ },
+ "package_state": {
+  "state": "BLOCKED",
+  "package_state": "BLOCKED",
+  "blocked_stage": "QUALITY_GATE_BLOCKED",
+  "blocked_reason": "{\"state\": \"PACKAGE_BUILD_BLOCKED\", \"zip_emitted\": false, \"buyer_release\": false, \"reason\": \"one or more mandatory dimensions failed (R440.17)\", \"failed_gates\": [\"C\"], \"failed_dimensions\": [\"DOMAIN_INTEGRITY\"], \"failure_digest\": [{\"gate\": \"C\", \"code\": \"C-FOREIGN-DOMAIN-FIELDS\", \"message\": \"02_ENGINEERING_DEFINITION.json:design_outputs carries unbound software_ml-domain content in a mechanical package\"}, {\"gate\": \"C\", \"code\": \"C-FOREIGN-DOMAIN-FIELDS\", \"message\": \"TECHNOLOGY_PACKAGE_MODEL.json:engineering carries unbound software_ml-domain content in a mechanical package\"}]}",
+  "release_verdict": {
+   "verdict": "BLOCK",
+   "failed_gates": [
+    "C"
+   ],
+   "warned_gates": [
+    "N"
+   ],
+   "source": "PACKAGE_QUALITY_GATE_VERDICT.json"
+  },
+  "next_action": {
+   "action": "RESOLVE_GATE_FAILURES",
+   "text": "the package quality gate blocked this build (C); the run's geometry, evidence and experiment records remain inspectable \u2014 no package is presented until the recorded gate failures are resolved"
+  },
+  "maturity": null,
+  "zip_name": null,
+  "package_kind": null,
+  "package_origin": null
+ },
+ "failure_state": {
+  "state": "NONE",
+  "error": null,
+  "failed_stages": {},
+  "machine_status": "COMPLETE",
+  "note": "infrastructure failures are never scientific rejections (Art. LXI) \u2014 RUN_BLOCKED exists so the product can say THIS honestly"
+ },
+ "outcome": "INVENTION_REQUIRES_EXPERIMENT",
+ "outcome_label": "Invention requires experiment",
+ "outcome_basis": "final_status=INVENTION_REQUIRES_EXPERIMENT \u2014 the baseline fallback generation survived the challenge gauntlet; the decisive physical experiment is specified, not executed (0 evolution generations; no evolution claimed \u2014 the honest fallback presentation, TSC-008)",
+ "learning_card": null,
+ "phase_progression": [
+  {
+   "phase": "INVESTIGATING",
+   "label": "Investigating your problem",
+   "state": "DONE",
+   "stages": {}
+  },
+  {
+   "phase": "GATHERING_EVIDENCE",
+   "label": "Gathering evidence",
+   "state": "DONE",
+   "stages": {
+    "RETRIEVE": "OK",
+    "FREEZE": "OK",
+    "VERIFY": "OK"
+   }
+  },
+  {
+   "phase": "MAPPING_MECHANISMS",
+   "label": "Inventing architecture 1",
+   "state": "DONE",
+   "stages": {
+    "PREMISE_GATE": "OK",
+    "SYNTHESIZE": "OK",
+    "MECHANISM_SPACE": "OK",
+    "COLLISION": "OK"
+   }
+  },
+  {
+   "phase": "STRESS_TESTING",
+   "label": "Challenging architecture 1",
+   "state": "DONE",
+   "stages": {
+    "PHYSICS": "OK",
+    "ATTACK": "OK",
+    "CONTRADICTION": "OK"
+   }
+  },
+  {
+   "phase": "PREPARING_PACKAGE",
+   "label": "Preparing technology package",
+   "state": "DONE",
+   "stages": {
+    "KILLER_EXPERIMENT": "OK",
+    "ADJUDICATION": "OK",
+    "CLASSIFY": "OK",
+    "NEXT_BEST_ACTION": "OK",
+    "RANK": "OK"
+   }
+  }
+ ],
+ "generations": {
+  "generations": [
+   {
+    "gen": 1,
+    "label": "INVENTION 01",
+    "invention_id": "inv:643fe304cb:gen1",
+    "parent_id": null,
+    "origin": "BASELINE_SYNTHESIS",
+    "state": "INVENTION_SURVIVED",
+    "maturity": "EVIDENCE_SUPPORTED",
+    "architecture": {
+     "mechanism": "Holding control \u2014 deliberately delaying buses at stops (or combining holding with other measures) so that buses on the same route do not travel closely together, thereby regularizing headways.",
+     "intervention": "Deploy an AVL/APC-driven holding scheme on the existing fleet: when a bus runs ahead of its predecessor's headway target, hold it at time-point stops (and combine with minor speed adjustment of the trailing bus) to enforce even spacing \u2014 no additional buses required.",
+     "expected_effect": "Evenly spaced arrivals and reduced bunching (fewer \"three buses together, then nothing\" events), lower headway variance, and shorter average commuter waiting time without fleet expansion.",
+     "falsification_test": "Run the holding controller on one trial route for a set period while a comparable route stays uncontrolled; measure headway variance, bunching-incident count, and mean passenger wait before/after \u2014 if the trial route shows no statistically significant reduction in headway variance and bunching versus the control, the mechanism is falsified."
+    },
+    "what_changed": null,
+    "reason_for_change": null,
+    "causal_delta": null,
+    "challenge": {
+     "killed": false,
+     "kill_stage": null,
+     "kill_reason": "all checks passed: evidence verified, no specific disclosure, adversarial survived, falsification concrete",
+     "attack_overall": "PASS",
+     "independent_attack": null,
+     "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+     "survived": null,
+     "evidence_verified": true,
+     "escalated_objection": null
+    },
+    "diagnosis": null,
+    "fresh_evidence": null,
+    "model_available": true,
+    "stop_note": null
+   }
+  ],
+  "n_generations": 1,
+  "n_evolution_generations": 0,
+  "current_invention": {
+   "gen": 1,
+   "invention_id": "inv:643fe304cb:gen1",
+   "state": "INVENTION_SURVIVED",
+   "maturity": "EVIDENCE_SUPPORTED"
+  },
+  "survivor_reached": true,
+  "survivor_gen": 1,
+  "stop_reason": "SURVIVOR_REACHED",
+  "status": null,
+  "honesty_contract": "every generation's maturity label is derived from its own verification events (Art. LX); generated content carries AI_PROPOSED provenance and never claims evidence; infrastructure failures are typed and never converted into scientific verdicts (Art. LXI); the current invention is always presented with its true maturity, never softened (Art. LXVIII)"
+ },
+ "evolution_state": null,
+ "schema_version": "1.1.0"
+}
