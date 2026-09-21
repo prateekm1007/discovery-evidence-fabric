@@ -100,29 +100,6 @@
    "rejected_alternatives": []
   },
   {
-   "capability_id": "MULTI_SOURCE_DISCOVERY",
-   "module_path": "orchestrator/multi_source_discovery.py",
-   "canonical_function": "run_four_search_attack(candidate_name, mechanism_description, physical_problem, failure_mode, adjacent_industries)",
-   "purpose": "CEO v28.3 four-direction search: discovery / destruction / transfer / reality across 6 free sources (PubMed, ClinicalTrials, openFDA, NIH RePORTER, Crossref, NASA NTRS)",
-   "current_status": "ACTIVE",
-   "adapter": "discovery_fabric/engine/adapters.py::MultiSourceDiscoveryAdapter",
-   "input_contract": {
-    "envelope.mechanism_map": "intervention + mechanism",
-    "problem": "failure/failure_mode"
-   },
-   "output_contract": "envelope.multi_source = FourSearchResult asdict + adjacent_industries_derivation {value, epistemic_class: MODEL_DERIVED, method} + sources_hit",
-   "provenance_contract": "per-source totals/errors preserved verbatim from canonical result; derivation heuristics recorded inline",
-   "tests": [
-    "tests/test_engine_integration.py::test_multisource_adapter_live (network, gated)"
-   ],
-   "historical_validation": "UNPROVEN at HEAD per D1 audit (zero importers, zero tests) until this promotion; source modules use subprocess curl; graveyard/goldmine signal hardcoding in triangulation engine is the reason THIS module (not triangulation) is canonical",
-   "promotion_status": "PROMOTED_D5",
-   "canonical_choice_rationale": "implements the four-epistemic-direction doctrine directly; keyless (works without credentials); per-source failures degrade to explicit error elements instead of exceptions",
-   "rejected_alternatives": [
-    "orchestrator/triangulation_engine.py (graveyard/goldmine signals hardcoded False; kept as PROMOTION_CANDIDATE for later)"
-   ]
-  },
-  {
    "capability_id": "COLLISION_ENGINE",
    "module_path": "discovery_fabric/a2/prior_art.py + discovery_fabric/prior_art_v2/sources.py",
    "canonical_function": "search_prior_art(intervention, device) + search_google_patents(query)",
@@ -479,7 +456,7 @@
    "canonical_function": "generate_buyer_package(out_dir, spec, eng, env, run_ctx, rehearsal) -> report",
    "purpose": "E4/E10/E12: survivor -> canonical package record -> FROZEN premium_package_factory/templates/build_portfolio_v4.py builders -> 00..05 PDFs + PACKAGE_MANIFEST.json + ENGINEERING_TRACEABILITY.json (structural DI->DO->FM->VF chains with hashes) + MATURITY_BASIS.json + zip mirroring the portfolio hierarchy. Declares loop_verification_state=NONE, real_loop_verified=false, transfer_ready=false; rehearsal packages flagged SYNTHETIC_REHEARSAL=TRUE.",
    "current_status": "NEW_E4",
-   "adapter": "loads build_portfolio_v4 by path; per-package builders are pure (pi, d, op) \u2014 no template recreation, no global state mutation",
+   "adapter": "loads build_portfolio_v4 by path; per-package builders are pure (pi, d, op) — no template recreation, no global state mutation",
    "input_contract": "invention spec + engineering spec + survivor envelope",
    "output_contract": "report{folder, zip, rendered[sha256], failed, missing_links, complete, maturity, posture, traceability_passed}",
    "provenance_contract": "PACKAGE_CLAIM -> INVENTION_FIELD -> CANDIDATE_STAGE -> EVIDENCE_ID -> SOURCE -> HASH; structural links only",
@@ -756,7 +733,7 @@
    "canonical_function": "improve_stage.run_improve",
    "purpose": "R481 (external-audit P0-1) the loop closure: dead candidates are mutated FROM THEIR RECORDED KILL BASIS and the children re-run the SAME gauntlet gates (physics, engineering attack, INDEPENDENT attack, dossier quality); a passing child re-enters the competition with fresh scores, a failing child is re-killed with a typed record. Typed states: CHILDREN_ADMITTED / NO_CHILD_ADMITTED / NO_KILL_EVIDENCE / IMPROVEMENT_BLOCKED_TRANSPORT / DISABLED_BY_OPERATOR / DEFERRED_TO_KILL_POINT.",
    "current_status": "ACTIVE",
-   "adapter": "ImproveAdapter (STAGE_ORDER position 13 of 17, between KILLER_EXPERIMENT and ADJUDICATION; execution point: the Directive-1 pipeline's kill-evidence point, the cemetery-update precedent)",
+   "adapter": "ImproveAdapter (STAGE_ORDER position 12 of 16, between KILLER_EXPERIMENT and ADJUDICATION; execution point: the Directive-1 pipeline's kill-evidence point, the cemetery-update precedent)",
    "input_contract": {
     "dead": "the gauntlet's typed kill records (kill class + basis read from the persisted PACKAGE_FAILED_/QUALITY_REJECTION_ files, Art. X)",
     "bound": "ENGINE_IMPROVE_MAX_CHILDREN (default 3); one mutation per dead candidate per run"
@@ -776,7 +753,6 @@
    "SYNTHESIZE",
    "VERIFY",
    "MECHANISM_SPACE",
-   "MULTI_SOURCE_DISCOVERY",
    "COLLISION",
    "PHYSICS",
    "ATTACK",
@@ -795,8 +771,15 @@
     "regenerated_at": "2026-09-16T18:39:47Z",
     "round": "R481",
     "repo_head": "e8c93e0116bc1bbee0fce77b45c2b44eff83580e",
-    "was": "13 stages (the drift the external audit measured as A1 at 17504061: this artifact lagged the executable STAGE_ORDER \u2014 R394/R397/R401 first-class stages never regenerated it)",
-    "now": "17 stages: the R394/R397/R401 additions AND R481's IMPROVE (the P0-1 loop closure) \u2014 the registry now matches the executable arithmetic exactly, pinned by tests/test_r402_discovery_integrity.py"
+    "was": "13 stages (the drift the external audit measured as A1 at 17504061: this artifact lagged the executable STAGE_ORDER — R394/R397/R401 first-class stages never regenerated it)",
+    "now": "17 stages: the R394/R397/R401 additions AND R481's IMPROVE (the P0-1 loop closure) — the registry now matches the executable arithmetic exactly, pinned by tests/test_r402_discovery_integrity.py"
+   },
+   {
+    "regenerated_at": "2026-09-21",
+    "round": "R513-CLOSURE",
+    "repo_head": "4d4964e89a6f02e8fdb5a2c4127938635c535fb3",
+    "was": "17 stages including MULTI_SOURCE_DISCOVERY; capability remained ACTIVE in the registry after the executable stage was removed",
+    "now": "16 stages; MULTI_SOURCE_DISCOVERY removed from the registry; executable STAGE_ORDER remains the authority"
    }
   ]
  },
@@ -812,7 +795,7 @@
    "transfer_ready": false
   }
  },
- "last_updated_directive": "R481 (external-audit P0-1): IMPROVE joined as a first-class stage \u2014 the registry regeneration the audit's A1 finding demanded; conductor chain 13 -> 17, the executable STAGE_ORDER is the single authority",
+ "last_updated_directive": "R513-CLOSURE: MULTI_SOURCE_DISCOVERY retired from the runtime registry after successful live removal and 5/5 production battery; executable STAGE_ORDER remains the authority",
  "a_series_directives": {
   "directives": "A1-A12 (CEO dossier-grade generation gate)",
   "acceptance": "AUTOMATIC_DISCOVERY_TO_INVENTION / INVENTION_TO_ENGINEERING / ENGINEERING_TO_DOSSIER / DOSSIER_TO_BUYER_PACKAGE / PACKAGE_TO_ZIP = PASS; 15/15 benchmark floors; 15/15 isolation; 0 fabricated facts / unsupported numbers / material truncation / cross-package contamination / orphan critical design inputs / untraceable claims",
