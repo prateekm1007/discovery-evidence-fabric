@@ -1,132 +1,156 @@
 {
- "artifact_id": "ACTIVE_DISCOVERY_GRAPH",
- "repo_head": "post-490099e",
- "entry_point": "discovery_fabric/engine/run.py::EngineRun.run()",
- "executable_chain": [
-  {
-   "order": 1,
-   "stage": "RETRIEVE",
-   "capability_id": "A2_RETRIEVAL",
-   "module_path": "discovery_fabric/a2/retrieve.py",
-   "canonical_fn": "retrieve(problem)",
-   "needs_network": true
-  },
-  {
-   "order": 2,
-   "stage": "FREEZE",
-   "capability_id": "EVIDENCE_FREEZE",
-   "module_path": "orchestrator/evidence_custody.py",
-   "canonical_fn": "promote_to_evidence(record, source, query, class, binding)",
-   "needs_network": false
-  },
-  {
-   "order": 3,
-   "stage": "SYNTHESIZE",
-   "capability_id": "SYNTHESIS",
-   "module_path": "discovery_fabric/a2/synthesize.py",
-   "canonical_fn": "synthesize(problem, evidence)",
-   "needs_network": true
-  },
-  {
-   "order": 4,
-   "stage": "VERIFY",
-   "capability_id": "EVIDENCE_VERIFY",
-   "module_path": "discovery_fabric/a2/verify.py",
-   "canonical_fn": "verify_evidence(candidate, evidence)",
-   "needs_network": false
-  },
-  {
-   "order": 5,
-   "stage": "MULTI_SOURCE_DISCOVERY",
-   "capability_id": "MULTI_SOURCE_DISCOVERY",
-   "module_path": "orchestrator/multi_source_discovery.py",
-   "canonical_fn": "run_four_search_attack(name, mechanism, problem, failure_mode, adjacent)",
-   "needs_network": true
-  },
-  {
-   "order": 6,
-   "stage": "COLLISION",
-   "capability_id": "COLLISION_ENGINE",
-   "module_path": "discovery_fabric/a2/prior_art.py + discovery_fabric/prior_art_v2/sources.py",
-   "canonical_fn": "search_prior_art + search_google_patents",
-   "needs_network": true
-  },
-  {
-   "order": 7,
-   "stage": "ATTACK",
-   "capability_id": "ATTACK_ENGINE",
-   "module_path": "discovery_fabric/a2/adversarial.py",
-   "canonical_fn": "adversarial_challenge(candidate, evidence_verified, prior_art_state)",
-   "needs_network": true
-  },
-  {
-   "order": 8,
-   "stage": "CONTRADICTION",
-   "capability_id": "CONTRADICTION_QUEUE",
-   "module_path": "orchestrator/contradiction_queue.py",
-   "canonical_fn": "ContradictionQueue.add / to_dict",
-   "needs_network": false
-  },
-  {
-   "order": 9,
-   "stage": "KILLER_EXPERIMENT",
-   "capability_id": "KILLER_EXPERIMENT",
-   "module_path": "epistemic_integrity/invention_loop_engine/bayesian_eig.py",
-   "canonical_fn": "BayesianEIGCalculator.rank_experiments",
-   "needs_network": false
-  },
-  {
-   "order": 10,
-   "stage": "ADJUDICATION",
-   "capability_id": "ADJUDICATION",
-   "module_path": "discovery_fabric/engine/adapters.py (glue over canonical inputs)",
-   "canonical_fn": "deterministic check aggregation",
-   "needs_network": false
-  },
-  {
-   "order": 11,
-   "stage": "CLASSIFY",
-   "capability_id": "EPISTEMIC_CLASSIFICATION",
-   "module_path": "discovery_fabric/a2/classify.py",
-   "canonical_fn": "classify(candidate, evidence_verification, prior_art, adversarial)",
-   "needs_network": false
-  },
-  {
-   "order": 12,
-   "stage": "NEXT_BEST_ACTION",
-   "capability_id": "NEXT_BEST_ACTION",
-   "module_path": "orchestrator/next_best_action.py",
-   "canonical_fn": "NextBestAction.rank_actions/select_best",
-   "needs_network": false
-  },
-  {
-   "order": 13,
-   "stage": "RANK",
-   "capability_id": "PORTFOLIO_RANKING",
-   "module_path": "orchestrator/portfolio.py + deterministic score in adapter",
-   "canonical_fn": "Portfolio.get_portfolio_scoreboard",
-   "needs_network": false
-  }
- ],
- "conductor_side_effects": [
-  {
-   "trigger": "final REJECTED (research kill only)",
-   "action": "MECHANISM_CEMETERY append-only update",
-   "module_path": "orchestrator/mechanism_cemetery.py"
-  }
- ],
- "quarantined_not_in_graph": [
-  "KNOWLEDGE_GRAPH",
-  "SIMULATION",
-  "TEE_MECHANISM_EXTRACTION",
-  "TEE_MECHANISM_ABSTRACTION",
-  "TEE_CROSS_DOMAIN_TRANSFER",
-  "INVENTION_CORPUS_GENERATION"
- ],
- "credential_blocked_stages": [
-  "SYNTHESIZE (OPENROUTER_API_KEY)",
-  "ATTACK (NVIDIA_API_KEY or OPENROUTER_API_KEY)",
-  "PRIOR_ART_V2_ELITE_STACK (.env.keys)"
- ],
- "registry": "RUNTIME_CAPABILITY_REGISTRY.json"
+  "artifact_id": "ACTIVE_DISCOVERY_GRAPH",
+  "repo_head": "2444cd9e9288a44e27da9b9bc93507e84dd36d94",
+  "entry_point": "discovery_fabric/engine/run.py::EngineRun.run()",
+  "executable_chain": [
+    {
+      "order": 1,
+      "stage": "RETRIEVE",
+      "capability_id": "A2_RETRIEVAL",
+      "module_path": "discovery_fabric/a2/retrieve.py",
+      "canonical_fn": "retrieve(problem)",
+      "needs_network": true
+    },
+    {
+      "order": 2,
+      "stage": "FREEZE",
+      "capability_id": "EVIDENCE_FREEZE",
+      "module_path": "orchestrator/evidence_custody.py + snapshot-hash pattern of a2/run.py",
+      "canonical_fn": "promote_to_evidence(...) + EvidenceRecord.verify()",
+      "needs_network": false
+    },
+    {
+      "order": 3,
+      "stage": "PREMISE_GATE",
+      "capability_id": "PREMISE_GATE",
+      "module_path": "discovery_fabric/engine/premise_gate.py",
+      "canonical_fn": "check_premise(problem)",
+      "needs_network": false
+    },
+    {
+      "order": 4,
+      "stage": "SYNTHESIZE",
+      "capability_id": "SYNTHESIS",
+      "module_path": "discovery_fabric/a2/synthesize.py",
+      "canonical_fn": "synthesize(problem, evidence)",
+      "needs_network": true
+    },
+    {
+      "order": 5,
+      "stage": "VERIFY",
+      "capability_id": "EVIDENCE_VERIFY",
+      "module_path": "discovery_fabric/a2/verify.py",
+      "canonical_fn": "verify_evidence(candidate, evidence)",
+      "needs_network": false
+    },
+    {
+      "order": 6,
+      "stage": "MECHANISM_SPACE",
+      "capability_id": "MECHANISM_SPACE",
+      "module_path": "discovery_fabric/engine/mechanism_space.py",
+      "canonical_fn": "build_mechanism_space(problem, evidence)",
+      "needs_network": true
+    },
+    {
+      "order": 7,
+      "stage": "COLLISION",
+      "capability_id": "COLLISION_ENGINE",
+      "module_path": "discovery_fabric/a2/prior_art.py + discovery_fabric/prior_art_v2/sources.py",
+      "canonical_fn": "search_prior_art + search_google_patents",
+      "needs_network": true
+    },
+    {
+      "order": 8,
+      "stage": "PHYSICS",
+      "capability_id": "PHYSICS",
+      "module_path": "discovery_fabric/engine/physics_stage.py",
+      "canonical_fn": "evaluate_envelope_physics(env, run_ctx)",
+      "needs_network": false
+    },
+    {
+      "order": 9,
+      "stage": "ATTACK",
+      "capability_id": "ATTACK_ENGINE",
+      "module_path": "discovery_fabric/a2/adversarial.py",
+      "canonical_fn": "adversarial_challenge(candidate, evidence_verified, prior_art_state)",
+      "needs_network": true
+    },
+    {
+      "order": 10,
+      "stage": "CONTRADICTION",
+      "capability_id": "CONTRADICTION_QUEUE",
+      "module_path": "orchestrator/contradiction_queue.py",
+      "canonical_fn": "ContradictionQueue.add/get_blocking/to_dict",
+      "needs_network": false
+    },
+    {
+      "order": 11,
+      "stage": "KILLER_EXPERIMENT",
+      "capability_id": "KILLER_EXPERIMENT",
+      "module_path": "epistemic_integrity/invention_loop_engine/bayesian_eig.py",
+      "canonical_fn": "BayesianEIGCalculator.rank_experiments(hypotheses, options)",
+      "needs_network": false
+    },
+    {
+      "order": 12,
+      "stage": "IMPROVE",
+      "capability_id": "IMPROVE",
+      "module_path": "discovery_fabric/engine/improve_stage.py",
+      "canonical_fn": "improve_stage.run_improve",
+      "needs_network": true
+    },
+    {
+      "order": 13,
+      "stage": "ADJUDICATION",
+      "capability_id": "ADJUDICATION",
+      "module_path": "discovery_fabric/engine/adapters.py (glue over canonical inputs)",
+      "canonical_fn": "hash-bound deterministic check council",
+      "needs_network": false
+    },
+    {
+      "order": 14,
+      "stage": "CLASSIFY",
+      "capability_id": "EPISTEMIC_CLASSIFICATION",
+      "module_path": "discovery_fabric/a2/classify.py",
+      "canonical_fn": "classify(candidate, evidence_verification, prior_art, adversarial)",
+      "needs_network": false
+    },
+    {
+      "order": 15,
+      "stage": "NEXT_BEST_ACTION",
+      "capability_id": "NEXT_BEST_ACTION",
+      "module_path": "orchestrator/next_best_action.py",
+      "canonical_fn": "NextBestAction.rank_actions / select_best",
+      "needs_network": false
+    },
+    {
+      "order": 16,
+      "stage": "RANK",
+      "capability_id": "PORTFOLIO_RANKING",
+      "module_path": "orchestrator/portfolio.py + deterministic score in adapter",
+      "canonical_fn": "Portfolio.get_portfolio_scoreboard",
+      "needs_network": false
+    }
+  ],
+  "conductor_side_effects": [
+    {
+      "trigger": "final REJECTED (research kill only)",
+      "action": "MECHANISM_CEMETERY append-only update",
+      "module_path": "orchestrator/mechanism_cemetery.py"
+    }
+  ],
+  "quarantined_not_in_graph": [
+    "KNOWLEDGE_GRAPH",
+    "SIMULATION",
+    "TEE_MECHANISM_EXTRACTION",
+    "TEE_MECHANISM_ABSTRACTION",
+    "TEE_CROSS_DOMAIN_TRANSFER",
+    "INVENTION_CORPUS_GENERATION"
+  ],
+  "credential_blocked_stages": [
+    "SYNTHESIZE (OPENROUTER_API_KEY)",
+    "ATTACK (NVIDIA_API_KEY or OPENROUTER_API_KEY)",
+    "PRIOR_ART_V2_ELITE_STACK (.env.keys)"
+  ],
+  "registry": "RUNTIME_CAPABILITY_REGISTRY.json"
 }
