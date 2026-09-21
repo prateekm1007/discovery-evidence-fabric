@@ -3,13 +3,10 @@
  "domain_detection": {
   "epistemic_class": "MODEL_DERIVED",
   "matched_signals": [
-   "conduction",
    "cooling",
-   "heat",
-   "temperature rise",
    "thermal"
   ],
-  "note": "2 phenomena anchor(s) + 5 routing signal(s); selection basis: PHENOMENA_DOMINANT",
+  "note": "2 phenomena anchor(s) + 2 routing signal(s); selection basis: PHENOMENA_DOMINANT",
   "label": "Thermal management / heat transfer",
   "selection_basis": "PHENOMENA_DOMINANT",
   "phenomena_layer": {
@@ -22,10 +19,7 @@
    "mechanism": {
     "thermal": [
      "thermal",
-     "heat",
-     "temperature rise",
-     "cooling",
-     "conduction"
+     "cooling"
     ]
    },
    "wrapper": {
@@ -55,53 +49,54 @@
  "why_this_domain": {
   "domain": "thermal",
   "label": "Thermal management / heat transfer",
-  "canonical_family": "mechanical",
-  "canonical_family_label": "Mechanical & structural systems",
+  "canonical_family": "biomedical",
+  "canonical_family_label": "Biomedical & life-science systems",
   "canonical_family_basis": {
-   "canonical_family": "mechanical",
-   "label": "Mechanical & structural systems",
-   "score": 82,
+   "canonical_family": "biomedical",
+   "label": "Biomedical & life-science systems",
+   "score": 87,
    "min_form_score": 3,
    "score_table": [
     {
      "family": "biomedical",
-     "score": 0,
-     "hits": []
-    },
-    {
-     "family": "thermal",
-     "score": 64,
+     "score": 5,
      "hits": [
       {
-       "keyword": "thermal runaway",
+       "keyword": "stent",
        "weight": 5,
-       "count": 4
-      },
-      {
-       "keyword": "cooling",
-       "weight": 4,
-       "count": 3
-      },
-      {
-       "keyword": "thermal",
-       "weight": 3,
-       "count": 10
-      },
-      {
-       "keyword": "heat",
-       "weight": 2,
        "count": 1
       }
      ]
     },
     {
+     "family": "thermal",
+     "score": 87,
+     "hits": [
+      {
+       "keyword": "thermal runaway",
+       "weight": 5,
+       "count": 5
+      },
+      {
+       "keyword": "cooling",
+       "weight": 4,
+       "count": 8
+      },
+      {
+       "keyword": "thermal",
+       "weight": 3,
+       "count": 10
+      }
+     ]
+    },
+    {
      "family": "fluid",
-     "score": 2,
+     "score": 6,
      "hits": [
       {
        "keyword": "channel",
        "weight": 2,
-       "count": 1
+       "count": 3
       }
      ]
     },
@@ -117,21 +112,16 @@
     },
     {
      "family": "mechanical",
-     "score": 82,
+     "score": 75,
      "hits": [
       {
        "keyword": "vehicle",
        "weight": 5,
-       "count": 15
+       "count": 14
       },
       {
        "keyword": "automotive",
        "weight": 5,
-       "count": 1
-      },
-      {
-       "keyword": "joint",
-       "weight": 2,
        "count": 1
       }
      ]
@@ -143,22 +133,27 @@
     },
     {
      "family": "energy",
-     "score": 34,
+     "score": 47,
      "hits": [
+      {
+       "keyword": "battery pack",
+       "weight": 5,
+       "count": 2
+      },
       {
        "keyword": "cell",
        "weight": 2,
-       "count": 2
+       "count": 1
       },
       {
        "keyword": "battery",
        "weight": 3,
-       "count": 8
+       "count": 9
       },
       {
        "keyword": "pack",
        "weight": 2,
-       "count": 3
+       "count": 4
       }
      ]
     },
@@ -173,22 +168,26 @@
      "hits": []
     }
    ],
+   "whole_form_basis": {
+    "matched_form_signals": [
+     "stent"
+    ],
+    "rule": "whole-form device identity: the problem's own device/site statement declares an implantable or medical-device form — the application family is biomedical and dominates component-mention keyword scores (the bridge whole-form precedent; deployment words are deliberately excluded: a hospital dashboard stays software_ml)",
+    "keyword_runner_up": "thermal"
+   },
    "basis": {
     "derived_from": [
      "problem text",
      "intervention site",
      "recorded subsystem names"
     ],
-    "rule": "highest keyword score wins; ties resolve by registry order; below the form threshold the generic family is selected and labeled",
+    "rule": "whole-form device identity layer, then highest keyword score; ties resolve by registry order; below the form threshold the generic family is selected and labeled",
     "authority": "discovery_fabric/engine/domains.py::CANONICAL_DOMAIN_FAMILIES (R445 — the one canonical domain-family vocabulary)",
     "deterministic": true
    }
   },
   "matched_signals": [
-   "conduction",
    "cooling",
-   "heat",
-   "temperature rise",
    "thermal"
   ],
   "matched_in_text": true,
@@ -199,7 +198,7 @@
   },
   "basis": "domain selected by the PHENOMENA layer (physical quantities/effects the domain's governing equations model) matched against THIS invention's own mechanism/problem text, with keyword routing as fallback/tiebreak — CEO item 2: keywords route, never justify; the layered evidence is recorded in domain_detection",
   "epistemic_class": "MODEL_DERIVED",
-  "note": "2 phenomena anchor(s) + 5 routing signal(s); selection basis: PHENOMENA_DOMINANT",
+  "note": "2 phenomena anchor(s) + 2 routing signal(s); selection basis: PHENOMENA_DOMINANT",
   "selection_basis": "PHENOMENA_DOMINANT",
   "why_selected": "domain thermal selected by PHYSICAL PHENOMENA the invention's own text states: cooling, temperatur (2 phenomena anchor(s) vs 0 for the runner-up); routing keywords confirm but do not decide (CEO item 2: keywords route, never justify)",
   "applicable_models": [
@@ -240,7 +239,8 @@
     "rejected_models_would_return": "0 equation(s) rejected for THIS mechanism would re-enter candidate selection under a different mechanism — the rejection is mechanism-specific, not absolute",
     "design_outputs_dependent": [
      "DI-001",
-     "DI-002"
+     "DI-002",
+     "DI-006"
     ],
     "failure_modes_that_would_vanish": [
      "FM-DOM-001",
@@ -265,14 +265,19 @@
  },
  "applicability": {
   "artifact": "PROBLEM_CONTEXT_APPLICABILITY",
-  "context_class": "UNKNOWN",
-  "score": 0,
+  "context_class": "MEDICAL_IN_VIVO",
+  "score": 5,
   "min_context_score": 4,
   "score_table": [
    {
     "context_class": "MEDICAL_IN_VIVO",
-    "score": 0,
-    "hits": []
+    "score": 5,
+    "hits": [
+     {
+      "signal": "stent",
+      "weight": 5
+     }
+    ]
    },
    {
     "context_class": "MEDICAL_EX_VIVO",
@@ -295,78 +300,70 @@
     "hits": []
    }
   ],
-  "matched_signals": [],
+  "matched_signals": [
+   {
+    "signal": "stent",
+    "weight": 5
+   }
+  ],
   "basis": "context class selected by deterministic signal score over the canonical problem text (user problem + recorded problem statement + invention mechanism/intervention site); ties resolve by fixed registry order; below the minimum score the honest UNKNOWN class is selected — every downstream requirement becomes UNKNOWN, never a default guess",
   "epistemic_class": "MODEL_DERIVED",
   "deterministic": true,
   "note": "context is separate from domain physics: a catheter is a fluid device as PHYSICS but medical as CONTEXT only when the problem's own text carries medical context signals",
   "requirements": {
    "artifact": "CONTEXT_REQUIREMENTS_PROJECTION",
-   "context_class": "UNKNOWN",
+   "context_class": "MEDICAL_IN_VIVO",
    "buyer_type": {
-    "statement": "UNKNOWN — buyer class not determinable from the canonical problem text",
-    "applicability": "UNKNOWN",
-    "epistemic_class": "UNKNOWN",
-    "basis": "context detection below the minimum score — the honest state is UNKNOWN, never a default buyer guess"
+    "statement": "medical device company (candidate buyer class for an in-vivo medical technology)",
+    "applicability": "APPLICABLE",
+    "epistemic_class": "MODELLED",
+    "basis": "canonical context MEDICAL_IN_VIVO"
    },
    "engineering_capability": [
     {
-     "statement": "UNKNOWN — required engineering capability not determinable without a context decision",
-     "applicability": "UNKNOWN",
-     "epistemic_class": "UNKNOWN",
-     "basis": "context UNKNOWN"
+     "statement": "medical device design engineering with the domain's physics (see engineering specification governing model)",
+     "applicability": "APPLICABLE",
+     "epistemic_class": "MODELLED",
+     "basis": "domain + context composition"
     }
    ],
    "manufacturing_capability": [
     {
-     "statement": "UNKNOWN — required manufacturing capability not determinable without a context decision",
-     "applicability": "UNKNOWN",
-     "epistemic_class": "UNKNOWN",
-     "basis": "context UNKNOWN"
+     "statement": "medical-grade manufacturing (cleanroom assembly, medical extrusion/molding as the device requires) under a certified QMS",
+     "applicability": "APPLICABLE",
+     "epistemic_class": "MODELLED",
+     "basis": "canonical context MEDICAL_IN_VIVO"
+    },
+    {
+     "statement": "sterilization-validation capability",
+     "applicability": "APPLICABLE",
+     "epistemic_class": "MODELLED",
+     "basis": "in-vivo use requires a validated sterilization process (the specific method is UNKNOWN until the design is defined)"
     }
    ],
    "regulatory": {
-    "statement": "UNKNOWN — regulatory applicability not determinable from the canonical problem text",
-    "applicability": "UNKNOWN",
-    "epistemic_class": "UNKNOWN",
-    "basis": "context UNKNOWN: no medical NOT_APPLICABLE statement is claimable either (the context itself is undetermined)"
+    "statement": "medical-device regulatory pathway determination (FDA 510(k)/PMA or market jurisdiction equivalent) with biocompatibility evaluation (ISO 10993) and QMS (ISO 13485)",
+    "applicability": "APPLICABLE",
+    "basis": "the canonical problem context is MEDICAL (patient-contact / clinical use signals in the problem's own text); the pathway ITSELF is UNKNOWN until determined — no pathway is inferred from device class (R370C)",
+    "epistemic_class": "MODELLED"
    },
    "market_channels": [
     {
-     "statement": "UNKNOWN — market channels not determinable without a context decision",
-     "applicability": "UNKNOWN",
-     "epistemic_class": "UNKNOWN",
-     "basis": "context UNKNOWN"
+     "statement": "clinical/hospital market channels",
+     "applicability": "APPLICABLE",
+     "epistemic_class": "MODELLED",
+     "basis": "canonical context MEDICAL_IN_VIVO"
     }
    ],
    "basis": "derived deterministically from the canonical applicability decision (R443 applicability registry v1); every statement carries its own basis and epistemic class; honest states are UNKNOWN/NOT_APPLICABLE/UNSUPPORTED — never a silent default"
   },
-  "domain_content_exclusions": [
-   {
-    "kind": "material",
-    "key": "biocompatible thermal spreader (graphite/AlN)",
-    "applicability_context": "MEDICAL",
-    "reason": "medical-context candidate excluded — canonical problem context is UNKNOWN"
-   },
-   {
-    "kind": "manufacturing",
-    "key": "bonded spreader + encapsulation",
-    "applicability_context": "MEDICAL",
-    "reason": "medical-context candidate excluded — canonical problem context is UNKNOWN"
-   },
-   {
-    "kind": "standard",
-    "key": "IEC 60601-1 (medical electrical equipment safety, thermal)",
-    "applicability_context": "MEDICAL",
-    "reason": "medical-context candidate excluded — canonical problem context is UNKNOWN"
-   }
-  ],
-  "filter_basis": "domain module content filtered by the canonical applicability decision (context UNKNOWN); excluded candidates recorded — never silently dropped, never globally stripped",
+  "domain_content_exclusions": [],
+  "filter_basis": "domain module content filtered by the canonical applicability decision (context MEDICAL_IN_VIVO); excluded candidates recorded — never silently dropped, never globally stripped",
   "canonical_domain": {
    "domain": "thermal",
    "label": "Thermal management / heat transfer",
-   "canonical_family": "mechanical",
-   "canonical_family_label": "Mechanical & structural systems",
+   "canonical_family": "biomedical",
+   "canonical_family_label": "Biomedical & life-science systems",
    "selection": "engineering_specification.why_this_domain (the E21-D phenomena-layer domain decision — physics authority, unchanged by R443; the canonical family resolved per R445 from the problem's own words via domains.py::CANONICAL_DOMAIN_FAMILIES)"
   }
  },
@@ -376,7 +373,7 @@
   "materials science"
  ],
  "system_architecture": {
-  "description": "PROPOSED architecture (no physical system exists): heat source characterization; conduction path / spreader; reject interface; safety limit interlock — realizing: Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy.",
+  "description": "PROPOSED architecture (no physical system exists): heat source characterization; conduction path / spreader; reject interface; safety limit interlock — realizing: Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy.",
   "subsystems": [
    {
     "name": "heat source characterization",
@@ -387,25 +384,25 @@
      "matched_tokens": [
       "added",
       "breaks",
-      "conduction",
+      "channel",
       "contain",
       "containment",
       "continuous",
       "cooling",
-      "cools",
+      "increase",
       "insulation",
-      "local",
-      "module",
+      "joined",
+      "level",
+      "longer",
       "plate",
-      "providing",
+      "rapid",
       "replace",
-      "segment",
       "segmented",
-      "separated",
-      "single",
+      "segments",
       "source",
-      "thermal",
-      "without"
+      "temperature",
+      "temperatures",
+      "thermal"
      ]
     }
    },
@@ -418,25 +415,25 @@
      "matched_tokens": [
       "added",
       "breaks",
-      "conduction",
+      "channel",
       "contain",
       "containment",
       "continuous",
       "cooling",
-      "cools",
+      "increase",
       "insulation",
-      "local",
-      "module",
+      "joined",
+      "level",
+      "longer",
       "plate",
-      "providing",
+      "rapid",
       "replace",
-      "segment",
       "segmented",
-      "separated",
-      "single",
+      "segments",
       "spread",
-      "thermal",
-      "without"
+      "temperature",
+      "temperatures",
+      "thermal"
      ]
     }
    },
@@ -449,24 +446,24 @@
      "matched_tokens": [
       "added",
       "breaks",
-      "conduction",
+      "channel",
       "contain",
       "containment",
       "continuous",
       "cooling",
-      "cools",
+      "increase",
       "insulation",
-      "local",
-      "module",
+      "joined",
+      "level",
+      "longer",
       "plate",
-      "providing",
+      "rapid",
       "replace",
-      "segment",
       "segmented",
-      "separated",
-      "single",
-      "thermal",
-      "without"
+      "segments",
+      "temperature",
+      "temperatures",
+      "thermal"
      ]
     }
    },
@@ -479,31 +476,31 @@
      "matched_tokens": [
       "added",
       "breaks",
-      "conduction",
+      "channel",
       "contain",
       "containment",
       "continuous",
       "cooling",
-      "cools",
+      "increase",
       "insulation",
-      "local",
-      "module",
+      "joined",
+      "level",
+      "longer",
       "plate",
-      "providing",
+      "rapid",
       "replace",
-      "segment",
       "segmented",
-      "separated",
-      "single",
-      "thermal",
-      "without"
+      "segments",
+      "temperature",
+      "temperatures",
+      "thermal"
      ]
     }
    }
   ]
  },
  "mechanism_architecture": {
-  "physical_changes": "PROPOSED: Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy.",
+  "physical_changes": "PROPOSED: Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy.",
   "key_physics": "Thermal management / heat transfer governing relations proposed for this invention; SYMBOLIC ONLY until inputs are sourced",
   "status": "MODELLED",
   "source_refs": [
@@ -528,7 +525,7 @@
   {
    "id": "DI-002",
    "input": "Mechanism driver (proposed)",
-   "value": "In a plate-cooled vehicle battery, the cooling plate functions as a continuous high-conductivity thermal channel, so heat from a cell in thermal runaway is conducted laterally across the pack and propagates the runaway to neighboring modules; adding thermal insulation to contain the rapid temperature rise instead widens the region of elevated temperature.",
+   "value": "In a cooling plate cooled battery pack, the propagation of thermal runaway is consistently severe because the cooling plate acts as a channel for high temperatures, while thermal insulation added to contain the rapid increase in temperature results in wider spread higher temperatures.",
    "source": "MODELLED (LLM synthesis)",
    "evidence_class": "MODELLED",
    "parent_ids": [
@@ -540,7 +537,7 @@
   {
    "id": "DI-003",
    "input": "Expected effect target",
-   "value": "Reduced severity and lateral spread of thermal runaway propagation at pack level, i.e., lower peak temperatures at untriggered adjacent modules and fewer modules reaching runaway after a single-cell trigger.",
+   "value": "Reduced severity and lateral spread of the propagation of thermal runaway at pack level — lower peak temperatures at untriggered adjacent modules and fewer modules reaching runaway after a single-cell trigger, avoiding the wider spread higher temperatures produced by added insulation and helping restore braking ability with the ABS, ESC, and check engine indicators cleared.",
    "source": "MODELLED (LLM synthesis)",
    "evidence_class": "MODELLED",
    "parent_ids": [
@@ -586,11 +583,23 @@
     "UIN-001"
    ],
    "evidence_refs": [],
+   "design_role": "PRIMARY"
+  },
+  {
+   "id": "DI-007",
+   "input": "Regulatory design input: compliance with candidate standard(s) IEC 60601-1 (medical electrical equipment safety, thermal)",
+   "value": "candidate standards from the engineering domain registry; pathway UNKNOWN (per R370C the pathway is never inferred from device class alone); applicability verification is the first engineering action",
+   "source": "ENGINEERING_PROPOSED (domain regulatory pattern)",
+   "evidence_class": "ENGINEERING_PROPOSED",
+   "parent_ids": [
+    "UIN-001"
+   ],
+   "evidence_refs": [],
    "design_role": "CONTEXT",
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-007",
+   "id": "DI-008",
    "input": "Custodied observation: A Review of Failure Modes and Safety Strategies of Lithium-Ion Batteries from Materials to Systems.",
    "value": "source https://doi.org/10.1002/advs.76228; content_hash 8086ba9bc7ca875870ee52d73f81b2b79bfd8b831df7bdda4d63a12ce136e862",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -605,7 +614,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-008",
+   "id": "DI-009",
    "input": "Custodied observation: Review on Thermal Runaway of Lithium-Ion Batteries for Electric Vehicles",
    "value": "source https://doi.org/10.1007/s11664-021-09281-0; content_hash 9562b15eb3dbc81ecb3c726a50cd8cb7076ecfd016e827b6ba8c42e88855ba0a",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -620,7 +629,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-009",
+   "id": "DI-010",
    "input": "Custodied observation: Thermal runaway mechanism of lithium ion battery for electric vehicles: A review",
    "value": "source https://doi.org/10.1016/j.ensm.2017.05.013; content_hash 0a2674d838726cc18f74593ed67292e52a974a38a44925d3a08cde50f699ca27",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -635,7 +644,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-010",
+   "id": "DI-011",
    "input": "Custodied observation: Thermal runaway-induced short-circuit arc in highly integrated lithium-ion battery systems: mechanisms, thresholds, and mitigation strategies.",
    "value": "source https://doi.org/10.1038/s44172-026-00657-w; content_hash 230c3959fda06368c9d7a05838f099578a1a8eb3520cfe0e9d7a1e560d0183d1",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -650,7 +659,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-011",
+   "id": "DI-012",
    "input": "Custodied observation: Case Study of an Electric Vehicle Battery Thermal Runaway and Online Internal Short-Circuit Detection",
    "value": "source https://doi.org/10.1109/tpel.2020.3013191; content_hash 046cab6056f2eae51b9787361cccf6e6133bf85ba10f78bae07ae0e02bc82fe1",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -665,7 +674,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-012",
+   "id": "DI-013",
    "input": "Custodied observation: Electric Vehicle Battery Pack Design for Mitigating Thermal Runaway Propagation",
    "value": "source https://doi.org/10.1109/vtc2022-fall57202.2022.10012777; content_hash 8059a82ca105c15ac210f35791b3d3c2b8c20a035dad824f1f88f6c9bc5d72db",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -680,7 +689,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-013",
+   "id": "DI-014",
    "input": "Custodied observation: A Critical Review of Thermal Issues in Lithium-Ion Batteries",
    "value": "source https://doi.org/10.1149/1.3515880; content_hash e221fb24bd791cbeb0d97ec4ecb8c0ddb8bf1044eb0ecb8273736eaf36394cf7",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -695,7 +704,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-014",
+   "id": "DI-015",
    "input": "Custodied observation: Payload Regulation Considering Thermal Runaway Propagation in Electric Vehicle Battery Packs",
    "value": "source https://doi.org/10.2139/ssrn.5096668; content_hash 9f0801a5176ac3f6201eb4bfa0e47fd8975b4ee68a355a8c9d40e1d5bb10ec38",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -710,7 +719,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-015",
+   "id": "DI-016",
    "input": "Custodied observation: Battery Crush Test Procedures in Standards and Regulation: Need for Augmentation and Harmonisation",
    "value": "source https://doi.org/10.3390/batteries7030063; content_hash b039517a2974d0cd949be96dda7cc8c749d493d5bccd17ebb851d37c68e0b780",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -725,7 +734,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-016",
+   "id": "DI-017",
    "input": "Custodied observation: The Impact of Mechanical Failure of 18650 Batteries on the Safety of Electric Transport Operations",
    "value": "source https://doi.org/10.3390/en17235980; content_hash a5c3fee0fcbb9c238a4440d7403e923505d38fbfdb8ad9da6eba27554cb3ca08",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -740,7 +749,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-017",
+   "id": "DI-018",
    "input": "Custodied observation: Modern Approaches to Assessing the Technical Condition of Traction Lithium-Ion Batteries: Review Article",
    "value": "source https://doi.org/10.3390/wevj17040205; content_hash f93ce326e0b750ac62d633f81eb0330542ebcdd1b7b2acdc8c8fb8da33a5f8c1",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -755,7 +764,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-018",
+   "id": "DI-019",
    "input": "Custodied observation: Thermal instability and runaway criteria: the dangers of disregarding dynamics",
    "value": "source https://doi.org/10.48550/arxiv.1202.5550; content_hash c9f91436003a82bc4cac410a71e56be04681699e91ec0dc044021811a54cb8a9",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -770,7 +779,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-019",
+   "id": "DI-020",
    "input": "Custodied observation: Deep Learning Methods for Detecting Thermal Runaway Events in Battery Production Lines",
    "value": "source https://doi.org/10.48550/arxiv.2504.08632; content_hash 9c4c6b2ac484e60bb38ce6b30405c7cca0a873741718606a5ecb70fc1580b048",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -785,7 +794,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-020",
+   "id": "DI-021",
    "input": "Custodied observation: A Numerical and Experimental Analysis of Battery Thermal Runaway Phenomena to Enhance the Development of Hybrid and Electric Vehicles",
    "value": "source https://doi.org/10.4995/thesis/10251/224812; content_hash 794d467e1ac6921bf7c35532ed060e97792f670e261b00a361e0f59e81168078",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -800,7 +809,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-021",
+   "id": "DI-022",
    "input": "Custodied observation: Reconfigurable Electric Vehicle Battery Balancing and Power Dispatch via Tropical Dynamic Programming and Pareto Dominance Filters",
    "value": "source https://doi.org/10.5281/zenodo.22865624; content_hash f17449aa486d63b0c646ffe2f9d729a1064d294b8561ec384d1c870878614312",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -815,7 +824,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-022",
+   "id": "DI-023",
    "input": "Custodied observation: Data for Experimental analysis of a novel cooling material for large format automotive lithium-ion cells",
    "value": "source https://doi.org/10.82444/warw.33778027; content_hash 0c8c6cc0fe03fd6608085967f385dc6941cfd7784b24ab08765ca196857c6b56",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -835,9 +844,10 @@
    "id": "DO-001",
    "kind": "architecture_block",
    "parent_ids": [
-    "DI-002"
+    "DI-002",
+    "DI-006"
    ],
-   "description": "heat source characterization realizing Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy.",
+   "description": "heat source characterization realizing Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -849,15 +859,16 @@
     "matched_tokens": [
      "added",
      "breaks",
-     "conduction",
+     "channel",
      "contain",
      "containment",
      "continuous",
      "cooling",
-     "cools",
+     "increase",
      "insulation",
-     "local",
-     "module",
+     "joined",
+     "level",
+     "longer",
      "plate"
     ]
    }
@@ -868,7 +879,7 @@
    "parent_ids": [
     "DI-002"
    ],
-   "description": "conduction path / spreader realizing Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy.",
+   "description": "conduction path / spreader realizing Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -880,15 +891,16 @@
     "matched_tokens": [
      "added",
      "breaks",
-     "conduction",
+     "channel",
      "contain",
      "containment",
      "continuous",
      "cooling",
-     "cools",
+     "increase",
      "insulation",
-     "local",
-     "module",
+     "joined",
+     "level",
+     "longer",
      "plate"
     ]
    }
@@ -899,7 +911,7 @@
    "parent_ids": [
     "DI-002"
    ],
-   "description": "reject interface realizing Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy.",
+   "description": "reject interface realizing Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -911,15 +923,16 @@
     "matched_tokens": [
      "added",
      "breaks",
-     "conduction",
+     "channel",
      "contain",
      "containment",
      "continuous",
      "cooling",
-     "cools",
+     "increase",
      "insulation",
-     "local",
-     "module",
+     "joined",
+     "level",
+     "longer",
      "plate"
     ]
    }
@@ -930,7 +943,7 @@
    "parent_ids": [
     "DI-002"
    ],
-   "description": "safety limit interlock realizing Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy.",
+   "description": "safety limit interlock realizing Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -942,15 +955,16 @@
     "matched_tokens": [
      "added",
      "breaks",
-     "conduction",
+     "channel",
      "contain",
      "containment",
      "continuous",
      "cooling",
-     "cools",
+     "increase",
      "insulation",
-     "local",
-     "module",
+     "joined",
+     "level",
+     "longer",
      "plate"
     ]
    }
@@ -963,7 +977,7 @@
     "DO-002",
     "DI-002"
    ],
-   "description": "heat source characterization interfaces with conduction path / spreader: signal/energy/material hand-off for Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy.",
+   "description": "heat source characterization interfaces with conduction path / spreader: signal/energy/material hand-off for Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -982,7 +996,7 @@
     "DO-003",
     "DI-002"
    ],
-   "description": "conduction path / spreader interfaces with reject interface: signal/energy/material hand-off for Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy.",
+   "description": "conduction path / spreader interfaces with reject interface: signal/energy/material hand-off for Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -1001,7 +1015,7 @@
     "DO-004",
     "DI-002"
    ],
-   "description": "reject interface interfaces with safety limit interlock: signal/energy/material hand-off for Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy.",
+   "description": "reject interface interfaces with safety limit interlock: signal/energy/material hand-off for Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -1019,7 +1033,7 @@
     "DO-001",
     "DI-002"
    ],
-   "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy.",
+   "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy.",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "connector standards selection",
@@ -1044,7 +1058,7 @@
    "parent_ids": [
     "DI-002"
    ],
-   "description": "Flow/force/signal path geometry realizing the mechanism (Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy.); every dimension is a named design decision with UNKNOWN value",
+   "description": "Flow/force/signal path geometry realizing the mechanism (Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy.); every dimension is a named design decision with UNKNOWN value",
    "status": "UNKNOWN",
    "missing_inputs": [
     "all dimensions",
@@ -1197,7 +1211,7 @@
     "DO-001",
     "DI-002"
    ],
-   "description": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy.",
+   "description": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy.",
    "status": "PROPOSED",
    "missing_inputs": [
     "sensing modality selection",
@@ -1322,36 +1336,35 @@
    "tokens_used": [
     "ability",
     "absence",
-    "across",
     "active",
     "added",
-    "adding",
     "adjacent",
     "after",
     "archived",
     "attempting",
     "audit",
+    "avoiding",
     "battery",
+    "because",
     "braking",
     "breaks",
+    "channel",
     "check",
     "chevrolet",
     "clear",
     "concerning",
-    "conducted",
-    "conduction",
     "connector",
+    "consistently",
     "contact",
     "contain",
     "containment",
     "continuous",
+    "cooled",
     "cooling",
-    "cools",
     "current",
     "decision",
     "documented",
     "domain",
-    "elevated",
     "engine",
     "engineering",
     "every",
@@ -1360,26 +1373,27 @@
     "extracted",
     "failure",
     "fewer",
-    "functions",
     "grammar",
+    "helping",
+    "higher",
     "illuminated",
     "implementation",
     "includes",
+    "increase",
     "indicators",
-    "instead",
     "insulation",
+    "joined",
     "lateral",
-    "laterally",
-    "local",
+    "level",
+    "longer",
     "lower",
-    "module",
     "modules",
-    "neighboring",
     "outcome",
     "parameters",
     "plate",
     "problem",
-    "problems"
+    "problems",
+    "produced"
    ]
   },
   "contract": "CEO A7: CONCEPTUAL/PROPOSED/UNKNOWN vocabulary; no geometry invented"
@@ -1394,8 +1408,25 @@
   "reject interface definition",
   "safety interlock and cutoff concept"
  ],
- "external_engineering_precedent": [],
+ "external_engineering_precedent": [
+  {
+   "precedent": "IEC 60601-1 (medical electrical equipment safety, thermal)",
+   "class": "EXTERNAL_PRECEDENT_CANDIDATE",
+   "verify_applicability": true
+  }
+ ],
  "bom": [
+  {
+   "item": "biocompatible thermal spreader (graphite/AlN)",
+   "qty": "NOT ESTABLISHED",
+   "description": "domain candidate material (no sourced spec)",
+   "material": "biocompatible thermal spreader (graphite/AlN)",
+   "supplier": "NOT ESTABLISHED",
+   "component_type": "NOT ESTABLISHED",
+   "criticality": "NOT ESTABLISHED",
+   "verification": "applicability verification required",
+   "status": "ENGINEERING_PROPOSED"
+  },
   {
    "item": "copper / aluminum alloys and graphite thermal spreaders",
    "qty": "NOT ESTABLISHED",
@@ -1421,6 +1452,72 @@
  ],
  "materials": [
   {
+   "material": "biocompatible thermal spreader (graphite/AlN)",
+   "component": "domain candidate material",
+   "candidate_material": "biocompatible thermal spreader (graphite/AlN)",
+   "source": "implant electronics thermal practice",
+   "precedent_basis": "implant electronics thermal practice",
+   "verification_required": true,
+   "status": "ENGINEERING_PROPOSED",
+   "verify_applicability": true,
+   "invention_tie": {
+    "invention_tied": true,
+    "matched_tokens": [
+     "ability",
+     "added",
+     "adjacent",
+     "after",
+     "avoiding",
+     "battery",
+     "because",
+     "braking",
+     "breaks",
+     "channel",
+     "check",
+     "clear",
+     "consistently",
+     "contain",
+     "containment",
+     "continuous",
+     "cooled",
+     "cooling",
+     "engine",
+     "fewer",
+     "helping",
+     "higher",
+     "increase",
+     "indicators",
+     "insulation",
+     "joined",
+     "lateral",
+     "level",
+     "longer",
+     "lower",
+     "modules",
+     "plate",
+     "produced",
+     "propagation",
+     "rapid",
+     "reaching",
+     "reduced",
+     "replace",
+     "restore",
+     "results",
+     "runaway",
+     "segmented",
+     "segments",
+     "severe",
+     "severity",
+     "spread",
+     "temperature",
+     "temperatures",
+     "thermal",
+     "untriggered",
+     "wider"
+    ]
+   }
+  },
+  {
    "material": "copper / aluminum alloys and graphite thermal spreaders",
    "component": "domain candidate material",
    "candidate_material": "copper / aluminum alloys and graphite thermal spreaders",
@@ -1432,55 +1529,57 @@
    "invention_tie": {
     "invention_tied": true,
     "matched_tokens": [
-     "across",
+     "ability",
      "added",
-     "adding",
      "adjacent",
      "after",
+     "avoiding",
      "battery",
+     "because",
+     "braking",
      "breaks",
-     "conducted",
-     "conduction",
+     "channel",
+     "check",
+     "clear",
+     "consistently",
      "contain",
      "containment",
      "continuous",
+     "cooled",
      "cooling",
-     "cools",
-     "elevated",
+     "engine",
      "fewer",
-     "functions",
-     "instead",
+     "helping",
+     "higher",
+     "increase",
+     "indicators",
      "insulation",
+     "joined",
      "lateral",
-     "laterally",
-     "local",
+     "level",
+     "longer",
      "lower",
-     "module",
      "modules",
-     "neighboring",
      "plate",
-     "propagates",
+     "produced",
      "propagation",
-     "providing",
      "rapid",
      "reaching",
      "reduced",
-     "region",
      "replace",
+     "restore",
+     "results",
      "runaway",
-     "segment",
      "segmented",
-     "separated",
+     "segments",
+     "severe",
      "severity",
-     "single",
      "spread",
      "temperature",
      "temperatures",
      "thermal",
      "untriggered",
-     "vehicle",
-     "widens",
-     "without"
+     "wider"
     ]
    }
   },
@@ -1496,55 +1595,57 @@
    "invention_tie": {
     "invention_tied": true,
     "matched_tokens": [
-     "across",
+     "ability",
      "added",
-     "adding",
      "adjacent",
      "after",
+     "avoiding",
      "battery",
+     "because",
+     "braking",
      "breaks",
-     "conducted",
-     "conduction",
+     "channel",
+     "check",
+     "clear",
+     "consistently",
      "contain",
      "containment",
      "continuous",
+     "cooled",
      "cooling",
-     "cools",
-     "elevated",
+     "engine",
      "fewer",
-     "functions",
-     "instead",
+     "helping",
+     "higher",
+     "increase",
+     "indicators",
      "insulation",
+     "joined",
      "lateral",
-     "laterally",
-     "local",
+     "level",
+     "longer",
      "lower",
-     "module",
      "modules",
-     "neighboring",
      "plate",
-     "propagates",
+     "produced",
      "propagation",
-     "providing",
      "rapid",
      "reaching",
      "reduced",
-     "region",
      "replace",
+     "restore",
+     "results",
      "runaway",
-     "segment",
      "segmented",
-     "separated",
+     "segments",
+     "severe",
      "severity",
-     "single",
      "spread",
      "temperature",
      "temperatures",
      "thermal",
      "untriggered",
-     "vehicle",
-     "widens",
-     "without"
+     "wider"
     ]
    }
   }
@@ -1559,55 +1660,57 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
-      "across",
+      "ability",
       "added",
-      "adding",
       "adjacent",
       "after",
+      "avoiding",
       "battery",
+      "because",
+      "braking",
       "breaks",
-      "conducted",
-      "conduction",
+      "channel",
+      "check",
+      "clear",
+      "consistently",
       "contain",
       "containment",
       "continuous",
+      "cooled",
       "cooling",
-      "cools",
-      "elevated",
+      "engine",
       "fewer",
-      "functions",
-      "instead",
+      "helping",
+      "higher",
+      "increase",
+      "indicators",
       "insulation",
+      "joined",
       "lateral",
-      "laterally",
-      "local",
+      "level",
+      "longer",
       "lower",
-      "module",
       "modules",
-      "neighboring",
       "plate",
-      "propagates",
+      "produced",
       "propagation",
-      "providing",
       "rapid",
       "reaching",
       "reduced",
-      "region",
       "replace",
+      "restore",
+      "results",
       "runaway",
-      "segment",
       "segmented",
-      "separated",
+      "segments",
+      "severe",
       "severity",
-      "single",
       "spread",
       "temperature",
       "temperatures",
       "thermal",
       "untriggered",
-      "vehicle",
-      "widens",
-      "without"
+      "wider"
      ]
     }
    },
@@ -1619,55 +1722,57 @@
     "invention_tie": {
      "invention_tied": true,
      "matched_tokens": [
-      "across",
+      "ability",
       "added",
-      "adding",
       "adjacent",
       "after",
+      "avoiding",
       "battery",
+      "because",
+      "braking",
       "breaks",
-      "conducted",
-      "conduction",
+      "channel",
+      "check",
+      "clear",
+      "consistently",
       "contain",
       "containment",
       "continuous",
+      "cooled",
       "cooling",
-      "cools",
-      "elevated",
+      "engine",
       "fewer",
-      "functions",
-      "instead",
+      "helping",
+      "higher",
+      "increase",
+      "indicators",
       "insulation",
+      "joined",
       "lateral",
-      "laterally",
-      "local",
+      "level",
+      "longer",
       "lower",
-      "module",
       "modules",
-      "neighboring",
       "plate",
-      "propagates",
+      "produced",
       "propagation",
-      "providing",
       "rapid",
       "reaching",
       "reduced",
-      "region",
       "replace",
+      "restore",
+      "results",
       "runaway",
-      "segment",
       "segmented",
-      "separated",
+      "segments",
+      "severe",
       "severity",
-      "single",
       "spread",
       "temperature",
       "temperatures",
       "thermal",
       "untriggered",
-      "vehicle",
-      "widens",
-      "without"
+      "wider"
      ]
     }
    }
@@ -1684,8 +1789,7 @@
    {
     "standard": "IEC 60601-1 (medical electrical equipment safety, thermal)",
     "class": "EXTERNAL_PRECEDENT_CANDIDATE",
-    "verify_applicability": true,
-    "repair_note": "E15-G: imported by the adversarial pass"
+    "verify_applicability": true
    }
   ],
   "status": "NOT_ESTABLISHED",
@@ -1700,7 +1804,7 @@
   "interfaces": [
    {
     "id": "DO-008",
-    "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy.",
+    "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy.",
     "status": "CONCEPTUAL",
     "detail": [
      {
@@ -1763,7 +1867,7 @@
   },
   "verify_precedent_applicability": {
    "instruction": "every external precedent/standard candidate carries verify_applicability=true; applicability to THIS design is unverified",
-   "count": 0
+   "count": 1
   },
   "open_uncertainties": [
    {
@@ -2008,14 +2112,7 @@
        "violations": [],
        "epistemic_class": "MODEL_DERIVED (mechanically evaluated, recorded for audit)"
       },
-      "mechanism_mentions": [
-       {
-        "symbol": "q",
-        "description": "heat flow",
-        "unit": "W",
-        "role": "output"
-       }
-      ]
+      "mechanism_mentions": []
      },
      "model_applicability": "steady state; h characterized for the actual flow geometry",
      "model_assumptions": [
@@ -2027,7 +2124,7 @@
       "engaged_variables": [
        "dT"
       ],
-      "mechanism_mention_count": 1
+      "mechanism_mention_count": 0
      }
     },
     {
@@ -2050,10 +2147,9 @@
      "selection_rationale": {
       "epistemic_class": "MODEL_DERIVED",
       "verdict": "APPLICABLE",
-      "reason": "invention mechanism engages the model variables: R_total, k_i",
+      "reason": "invention mechanism engages the model variables: R_total",
       "engaged_variables": [
-       "R_total",
-       "k_i"
+       "R_total"
       ],
       "engagement_evidence": [
        {
@@ -2061,14 +2157,6 @@
         "shared_concepts": [],
         "matched_description_words": [
          "thermal"
-        ],
-        "grounding": "legacy description-word match (no declared concepts on this variable)"
-       },
-       {
-        "symbol": "k_i",
-        "shared_concepts": [],
-        "matched_description_words": [
-         "conductivity"
         ],
         "grounding": "legacy description-word match (no declared concepts on this variable)"
        }
@@ -2095,8 +2183,7 @@
       "linkage_kind": "applicability_judgment",
       "verdict": "APPLICABLE",
       "engaged_variables": [
-       "R_total",
-       "k_i"
+       "R_total"
       ],
       "mechanism_mention_count": 0
      }
@@ -2133,8 +2220,7 @@
         "symbol": "k",
         "shared_concepts": [],
         "matched_description_words": [
-         "thermal",
-         "conductivity"
+         "thermal"
         ],
         "grounding": "legacy description-word match (no declared concepts on this variable)"
        },
@@ -2163,12 +2249,6 @@
       },
       "mechanism_mentions": [
        {
-        "symbol": "q",
-        "description": "heat flow",
-        "unit": "W",
-        "role": "output"
-       },
-       {
         "symbol": "k",
         "description": "thermal conductivity",
         "unit": "W/(m.K)",
@@ -2195,7 +2275,7 @@
        "k",
        "dT/dx"
       ],
-      "mechanism_mention_count": 3
+      "mechanism_mention_count": 2
      }
     }
    ],
@@ -2203,53 +2283,54 @@
    "why_this_domain": {
     "domain": "thermal",
     "label": "Thermal management / heat transfer",
-    "canonical_family": "mechanical",
-    "canonical_family_label": "Mechanical & structural systems",
+    "canonical_family": "biomedical",
+    "canonical_family_label": "Biomedical & life-science systems",
     "canonical_family_basis": {
-     "canonical_family": "mechanical",
-     "label": "Mechanical & structural systems",
-     "score": 82,
+     "canonical_family": "biomedical",
+     "label": "Biomedical & life-science systems",
+     "score": 87,
      "min_form_score": 3,
      "score_table": [
       {
        "family": "biomedical",
-       "score": 0,
-       "hits": []
-      },
-      {
-       "family": "thermal",
-       "score": 64,
+       "score": 5,
        "hits": [
         {
-         "keyword": "thermal runaway",
+         "keyword": "stent",
          "weight": 5,
-         "count": 4
-        },
-        {
-         "keyword": "cooling",
-         "weight": 4,
-         "count": 3
-        },
-        {
-         "keyword": "thermal",
-         "weight": 3,
-         "count": 10
-        },
-        {
-         "keyword": "heat",
-         "weight": 2,
          "count": 1
         }
        ]
       },
       {
+       "family": "thermal",
+       "score": 87,
+       "hits": [
+        {
+         "keyword": "thermal runaway",
+         "weight": 5,
+         "count": 5
+        },
+        {
+         "keyword": "cooling",
+         "weight": 4,
+         "count": 8
+        },
+        {
+         "keyword": "thermal",
+         "weight": 3,
+         "count": 10
+        }
+       ]
+      },
+      {
        "family": "fluid",
-       "score": 2,
+       "score": 6,
        "hits": [
         {
          "keyword": "channel",
          "weight": 2,
-         "count": 1
+         "count": 3
         }
        ]
       },
@@ -2265,21 +2346,16 @@
       },
       {
        "family": "mechanical",
-       "score": 82,
+       "score": 75,
        "hits": [
         {
          "keyword": "vehicle",
          "weight": 5,
-         "count": 15
+         "count": 14
         },
         {
          "keyword": "automotive",
          "weight": 5,
-         "count": 1
-        },
-        {
-         "keyword": "joint",
-         "weight": 2,
          "count": 1
         }
        ]
@@ -2291,22 +2367,27 @@
       },
       {
        "family": "energy",
-       "score": 34,
+       "score": 47,
        "hits": [
+        {
+         "keyword": "battery pack",
+         "weight": 5,
+         "count": 2
+        },
         {
          "keyword": "cell",
          "weight": 2,
-         "count": 2
+         "count": 1
         },
         {
          "keyword": "battery",
          "weight": 3,
-         "count": 8
+         "count": 9
         },
         {
          "keyword": "pack",
          "weight": 2,
-         "count": 3
+         "count": 4
         }
        ]
       },
@@ -2321,22 +2402,26 @@
        "hits": []
       }
      ],
+     "whole_form_basis": {
+      "matched_form_signals": [
+       "stent"
+      ],
+      "rule": "whole-form device identity: the problem's own device/site statement declares an implantable or medical-device form — the application family is biomedical and dominates component-mention keyword scores (the bridge whole-form precedent; deployment words are deliberately excluded: a hospital dashboard stays software_ml)",
+      "keyword_runner_up": "thermal"
+     },
      "basis": {
       "derived_from": [
        "problem text",
        "intervention site",
        "recorded subsystem names"
       ],
-      "rule": "highest keyword score wins; ties resolve by registry order; below the form threshold the generic family is selected and labeled",
+      "rule": "whole-form device identity layer, then highest keyword score; ties resolve by registry order; below the form threshold the generic family is selected and labeled",
       "authority": "discovery_fabric/engine/domains.py::CANONICAL_DOMAIN_FAMILIES (R445 — the one canonical domain-family vocabulary)",
       "deterministic": true
      }
     },
     "matched_signals": [
-     "conduction",
      "cooling",
-     "heat",
-     "temperature rise",
      "thermal"
     ],
     "matched_in_text": true,
@@ -2347,7 +2432,7 @@
     },
     "basis": "domain selected by the PHENOMENA layer (physical quantities/effects the domain's governing equations model) matched against THIS invention's own mechanism/problem text, with keyword routing as fallback/tiebreak — CEO item 2: keywords route, never justify; the layered evidence is recorded in domain_detection",
     "epistemic_class": "MODEL_DERIVED",
-    "note": "2 phenomena anchor(s) + 5 routing signal(s); selection basis: PHENOMENA_DOMINANT",
+    "note": "2 phenomena anchor(s) + 2 routing signal(s); selection basis: PHENOMENA_DOMINANT",
     "selection_basis": "PHENOMENA_DOMINANT",
     "why_selected": "domain thermal selected by PHYSICAL PHENOMENA the invention's own text states: cooling, temperatur (2 phenomena anchor(s) vs 0 for the runner-up); routing keywords confirm but do not decide (CEO item 2: keywords route, never justify)",
     "applicable_models": [
@@ -2388,7 +2473,8 @@
       "rejected_models_would_return": "0 equation(s) rejected for THIS mechanism would re-enter candidate selection under a different mechanism — the rejection is mechanism-specific, not absolute",
       "design_outputs_dependent": [
        "DI-001",
-       "DI-002"
+       "DI-002",
+       "DI-006"
       ],
       "failure_modes_that_would_vanish": [
        "FM-DOM-001",
@@ -2833,8 +2919,8 @@
   "external_precedent": "domain module Thermal management / heat transfer; standards listed as candidates requiring applicability verification",
   "proposed_design": {
    "input": "must restore braking ability and clear ABS, ESC, and check engine warning indicators",
-   "mechanism": "In a plate-cooled vehicle battery, the cooling plate functions as a continuous high-conductivity thermal channel, so heat from a cell in thermal runaway is conducted laterally across the pack and propagates the runaway to neighboring modules; adding thermal insulation to contain the rapid temperature rise instead widens the region of elevated temperature.",
-   "transformation": "Reduced severity and lateral spread of thermal runaway propagation at pack level, i.e., lower peak temperatures at untriggered adjacent modules and fewer modules reaching runaway after a single-cell trigger.",
+   "mechanism": "In a cooling plate cooled battery pack, the propagation of thermal runaway is consistently severe because the cooling plate acts as a channel for high temperatures, while thermal insulation added to contain the rapid increase in temperature results in wider spread higher temperatures.",
+   "transformation": "Reduced severity and lateral spread of the propagation of thermal runaway at pack level — lower peak temperatures at untriggered adjacent modules and fewer modules reaching runaway after a single-cell trigger, avoiding the wider spread higher temperatures produced by added insulation and helping restore braking ability with the ABS, ESC, and check engine indicators cleared.",
    "output": "NOT ESTABLISHED (no measured output exists)",
    "component_architecture": "heat source characterization; conduction path / spreader; reject interface; safety limit interlock",
    "status": "MODELLED / ENGINEERING_PROPOSED"
@@ -2891,7 +2977,6 @@
      ],
      "matched_invention_tokens": [
       "lateral",
-      "local",
       "spread",
       "temperature"
      ],
@@ -2956,8 +3041,9 @@
      "matched_applicability_signals": [],
      "matched_invention_tokens": [
       "active",
-      "conduction",
+      "channel",
       "cooling",
+      "level",
       "temperature",
       "temperatures"
      ],
@@ -3021,11 +3107,9 @@
     "domain_basis": "Thermal management / heat transfer",
     "content_class": "PHYSICAL_MECHANISM",
     "invention_applicability": {
-     "verdict": "TIED",
+     "verdict": "NOT_ESTABLISHED",
      "matched_applicability_signals": [],
-     "matched_invention_tokens": [
-      "local"
-     ],
+     "matched_invention_tokens": [],
      "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
     },
     "verification_gap": {
@@ -3153,11 +3237,6 @@
     "binding": "CP-006"
    },
    {
-    "unknown": "acceptance criterion for verification VF-001",
-    "reason": "criterion status ENGINEERING_PROPOSED: no sourced threshold exists; the numeric margin is fixed at pre-registration from the measured baseline",
-    "binding": "VF-001"
-   },
-   {
     "unknown": "acceptance criterion for verification VF-002",
     "reason": "criterion status ENGINEERING_PROPOSED: no sourced threshold exists; the numeric margin is fixed at pre-registration from the measured baseline",
     "binding": "VF-002"
@@ -3171,11 +3250,6 @@
     "unknown": "acceptance criterion for verification VF-004",
     "reason": "criterion status ENGINEERING_PROPOSED: no sourced threshold exists; the numeric margin is fixed at pre-registration from the measured baseline",
     "binding": "VF-004"
-   },
-   {
-    "unknown": "acceptance criterion for verification VF-005",
-    "reason": "criterion status ENGINEERING_PROPOSED: no sourced threshold exists; the numeric margin is fixed at pre-registration from the measured baseline",
-    "binding": "VF-005"
    },
    {
     "unknown": "acceptance criterion for verification VF-006",
@@ -3241,7 +3315,6 @@
     ],
     "matched_invention_tokens": [
      "lateral",
-     "local",
      "spread",
      "temperature"
     ],
@@ -3306,8 +3379,9 @@
     "matched_applicability_signals": [],
     "matched_invention_tokens": [
      "active",
-     "conduction",
+     "channel",
      "cooling",
+     "level",
      "temperature",
      "temperatures"
     ],
@@ -3371,11 +3445,9 @@
    "domain_basis": "Thermal management / heat transfer",
    "content_class": "PHYSICAL_MECHANISM",
    "invention_applicability": {
-    "verdict": "TIED",
+    "verdict": "NOT_ESTABLISHED",
     "matched_applicability_signals": [],
-    "matched_invention_tokens": [
-     "local"
-    ],
+    "matched_invention_tokens": [],
     "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
    },
    "verification_gap": {
@@ -3541,8 +3613,8 @@
      "FM-001"
     ]
    },
-   "acceptance": "pre-registered decision rule fixed BEFORE the test: the measured effect must exceed the measured baseline under the identical setup by the pre-registration margin; the numeric margin is fixed from the measured baseline at pre-registration (no value is invented here — Art. VIII)",
-   "acceptance_status": "ENGINEERING_PROPOSED"
+   "acceptance": "verify against the cited standard candidate whose vocabulary matches this verification method (standard identity, class and applicability-verification flag recorded in the regulatory block's candidate_standards — EXTERNAL_PRECEDENT_CANDIDATE)",
+   "acceptance_status": "EXTERNAL_PRECEDENT_CANDIDATE"
   },
   {
    "id": "VF-002",
@@ -3661,8 +3733,8 @@
      "FM-DOM-002"
     ]
    },
-   "acceptance": "pre-registered decision rule fixed BEFORE the test: the measured effect must exceed the measured baseline under the identical setup by the pre-registration margin; the numeric margin is fixed from the measured baseline at pre-registration (no value is invented here — Art. VIII)",
-   "acceptance_status": "ENGINEERING_PROPOSED"
+   "acceptance": "verify against the cited standard candidate whose vocabulary matches this verification method (standard identity, class and applicability-verification flag recorded in the regulatory block's candidate_standards — EXTERNAL_PRECEDENT_CANDIDATE)",
+   "acceptance_status": "EXTERNAL_PRECEDENT_CANDIDATE"
   },
   {
    "id": "VF-006",
@@ -3772,7 +3844,7 @@
  "design_graph": {
   "counts": {
    "UIN": 1,
-   "DI": 22,
+   "DI": 23,
    "DO": 21,
    "FM": 6,
    "VF": 7,
@@ -3781,7 +3853,7 @@
   "integrity": {
    "passed": true,
    "problems": [],
-   "checked_at": "2026-09-21T07:49:14+00:00Z"
+   "checked_at": "2026-09-21T07:55:39+00:00Z"
   },
   "gaps": [
    {
@@ -3814,7 +3886,8 @@
    },
    "do_parent_di": {
     "DO-001": [
-     "DI-002"
+     "DI-002",
+     "DI-006"
     ],
     "DO-002": [
      "DI-002"
@@ -3913,100 +3986,106 @@
     "id": "DI-006",
     "kind": "DESIGN_INPUT",
     "label": "Domain design input pattern: safety temperature ceilings (to be sourced)",
-    "design_role": "CONTEXT"
+    "design_role": "PRIMARY"
    },
    {
     "id": "DI-007",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: A Review of Failure Modes and Safety Strategies of Lithium-Ion Batteries from Materials to Systems.",
+    "label": "Regulatory design input: compliance with candidate standard(s) IEC 60601-1 (medical electrical equipment safety, thermal)",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-008",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Review on Thermal Runaway of Lithium-Ion Batteries for Electric Vehicles",
+    "label": "Custodied observation: A Review of Failure Modes and Safety Strategies of Lithium-Ion Batteries from Materials to Systems.",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-009",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Thermal runaway mechanism of lithium ion battery for electric vehicles: A review",
+    "label": "Custodied observation: Review on Thermal Runaway of Lithium-Ion Batteries for Electric Vehicles",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-010",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Thermal runaway-induced short-circuit arc in highly integrated lithium-ion battery systems: mechanisms, thresholds, and mitigation strategies.",
+    "label": "Custodied observation: Thermal runaway mechanism of lithium ion battery for electric vehicles: A review",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-011",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Case Study of an Electric Vehicle Battery Thermal Runaway and Online Internal Short-Circuit Detection",
+    "label": "Custodied observation: Thermal runaway-induced short-circuit arc in highly integrated lithium-ion battery systems: mechanisms, thresholds, and mitigation strategies.",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-012",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Electric Vehicle Battery Pack Design for Mitigating Thermal Runaway Propagation",
+    "label": "Custodied observation: Case Study of an Electric Vehicle Battery Thermal Runaway and Online Internal Short-Circuit Detection",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-013",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: A Critical Review of Thermal Issues in Lithium-Ion Batteries",
+    "label": "Custodied observation: Electric Vehicle Battery Pack Design for Mitigating Thermal Runaway Propagation",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-014",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Payload Regulation Considering Thermal Runaway Propagation in Electric Vehicle Battery Packs",
+    "label": "Custodied observation: A Critical Review of Thermal Issues in Lithium-Ion Batteries",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-015",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Battery Crush Test Procedures in Standards and Regulation: Need for Augmentation and Harmonisation",
+    "label": "Custodied observation: Payload Regulation Considering Thermal Runaway Propagation in Electric Vehicle Battery Packs",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-016",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: The Impact of Mechanical Failure of 18650 Batteries on the Safety of Electric Transport Operations",
+    "label": "Custodied observation: Battery Crush Test Procedures in Standards and Regulation: Need for Augmentation and Harmonisation",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-017",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Modern Approaches to Assessing the Technical Condition of Traction Lithium-Ion Batteries: Review Article",
+    "label": "Custodied observation: The Impact of Mechanical Failure of 18650 Batteries on the Safety of Electric Transport Operations",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-018",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Thermal instability and runaway criteria: the dangers of disregarding dynamics",
+    "label": "Custodied observation: Modern Approaches to Assessing the Technical Condition of Traction Lithium-Ion Batteries: Review Article",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-019",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Deep Learning Methods for Detecting Thermal Runaway Events in Battery Production Lines",
+    "label": "Custodied observation: Thermal instability and runaway criteria: the dangers of disregarding dynamics",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-020",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: A Numerical and Experimental Analysis of Battery Thermal Runaway Phenomena to Enhance the Development of Hybrid and Electric Vehicles",
+    "label": "Custodied observation: Deep Learning Methods for Detecting Thermal Runaway Events in Battery Production Lines",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-021",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Reconfigurable Electric Vehicle Battery Balancing and Power Dispatch via Tropical Dynamic Programming and Pareto Dominance Filters",
+    "label": "Custodied observation: A Numerical and Experimental Analysis of Battery Thermal Runaway Phenomena to Enhance the Development of Hybrid and Electric Vehicles",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-022",
+    "kind": "DESIGN_INPUT",
+    "label": "Custodied observation: Reconfigurable Electric Vehicle Battery Balancing and Power Dispatch via Tropical Dynamic Programming and Pareto Dominance Filters",
+    "design_role": "CONTEXT"
+   },
+   {
+    "id": "DI-023",
     "kind": "DESIGN_INPUT",
     "label": "Custodied observation: Data for Experimental analysis of a novel cooling material for large format automotive lithium-ion cells",
     "design_role": "CONTEXT"
@@ -4014,47 +4093,47 @@
    {
     "id": "DO-001",
     "kind": "DESIGN_OUTPUT",
-    "label": "heat source characterization realizing Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy."
+    "label": "heat source characterization realizing Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy."
    },
    {
     "id": "DO-002",
     "kind": "DESIGN_OUTPUT",
-    "label": "conduction path / spreader realizing Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy."
+    "label": "conduction path / spreader realizing Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy."
    },
    {
     "id": "DO-003",
     "kind": "DESIGN_OUTPUT",
-    "label": "reject interface realizing Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy."
+    "label": "reject interface realizing Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy."
    },
    {
     "id": "DO-004",
     "kind": "DESIGN_OUTPUT",
-    "label": "safety limit interlock realizing Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy."
+    "label": "safety limit interlock realizing Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy."
    },
    {
     "id": "DO-005",
     "kind": "DESIGN_OUTPUT",
-    "label": "heat source characterization interfaces with conduction path / spreader: signal/energy/material hand-off for Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy."
+    "label": "heat source characterization interfaces with conduction path / spreader: signal/energy/material hand-off for Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy."
    },
    {
     "id": "DO-006",
     "kind": "DESIGN_OUTPUT",
-    "label": "conduction path / spreader interfaces with reject interface: signal/energy/material hand-off for Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy."
+    "label": "conduction path / spreader interfaces with reject interface: signal/energy/material hand-off for Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy."
    },
    {
     "id": "DO-007",
     "kind": "DESIGN_OUTPUT",
-    "label": "reject interface interfaces with safety limit interlock: signal/energy/material hand-off for Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy."
+    "label": "reject interface interfaces with safety limit interlock: signal/energy/material hand-off for Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy."
    },
    {
     "id": "DO-008",
     "kind": "DESIGN_OUTPUT",
-    "label": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy."
+    "label": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy."
    },
    {
     "id": "DO-009",
     "kind": "DESIGN_OUTPUT",
-    "label": "Flow/force/signal path geometry realizing the mechanism (Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy.); every dimension is a named design decision with UNKNOWN value"
+    "label": "Flow/force/signal path geometry realizing the mechanism (Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy.); every dimension is a named design decision with UNKNOWN value"
    },
    {
     "id": "DO-010",
@@ -4089,7 +4168,7 @@
    {
     "id": "DO-016",
     "kind": "DESIGN_OUTPUT",
-    "label": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for Replace the single continuous cooling plate with a segmented cooling plate separated by thermal breaks (low-conductivity joints/gaps between module-level plate segments) so each segment cools its local module without providing a cross-pack conduction path, and do not rely on added thermal insulation as the containment strategy."
+    "label": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for Replace the continuous cooling plate with module-level segmented cooling plate segments joined by thermal breaks so the cooling plate no longer acts as a channel for high temperatures, and do not use thermal insulation added to contain the rapid increase in temperature as the containment strategy."
    },
    {
     "id": "DO-017",
@@ -4190,10 +4269,10 @@
  },
  "_spec_ref": {
   "invention_id": "inv:ui_thermal_runaway_976487:97d7dfe08039",
-  "spec_hash": "7468b51fa4ea42d69803384b674e041805eac363ccc7153e91cf2bb494e7ea90",
+  "spec_hash": "a5fa5bc13bceea2925e4a62df8a0de96a80ed9ae479073c7316ae3990f788845",
   "final_envelope_hash": "97d7dfe08039a927c76814aa4ff67d688a724bc45482739358087d9d0f194d0a",
   "run_id": "engrun:ui_thermal_runaway_976487:2026-09-21T07:41:27",
-  "built_at": "2026-09-21T07:49:14+00:00Z"
+  "built_at": "2026-09-21T07:55:39+00:00Z"
  },
  "_epistemic_summary": {
   "SOURCE_FACT_fields": [
@@ -4438,7 +4517,7 @@
        "refs": {
         "applicability": "one-dimensional steady conduction through layers",
         "applicability_verdict": "APPLICABLE",
-        "applicability_reason": "invention mechanism engages the model variables: R_total, k_i"
+        "applicability_reason": "invention mechanism engages the model variables: R_total"
        }
       }
      },
@@ -6226,8 +6305,8 @@
     ]
    }
   ],
-  "built_at": "2026-09-21T07:49:14+00:00Z",
-  "hash": "84cc8f8c0904bc9e92711f1fba8194626d357d777bf8fc088c94aaf149f71add"
+  "built_at": "2026-09-21T07:55:39+00:00Z",
+  "hash": "10e24ffb9c7e0f1f85d02bfb7a87168e6167be63769c107143bb7053e355e9d2"
  },
  "chain_enforcement": {
   "rule": "CEO E15-C: every critical engineering claim carries the 8-role causal chain with provenance-carrying nodes; parameters with value_status UNKNOWN are excluded (an unknown has no engineering reasoning to bind — it is recorded as a gap instead)",
@@ -6237,86 +6316,16 @@
   "violations": [],
   "enforced": true
  },
- "physics_evaluation": {
-  "gate_version": "physics_gate/1.0.0",
-  "applicable": false,
-  "applicability": {
-   "domain": "thermal",
-   "solver_domain": "fluidics_hydraulic",
-   "reason": "the V0 solver's declared domain is 1D hydraulic networks; this candidate's domain is outside it — no physics comparison is FABRICATED (R396 D / R394 s9: honest refusal, not a claim)"
-  },
-  "solver_version": "hydraulic_network_1d/1.0.0"
- },
- "spec_version": 2,
- "repaired_from_hash": "aae4758705e166af13aac42a3ced37bc741a91cfd7e1101210e8c796357ffad7",
- "repair_ledger": {
-  "rule": "E15-G: the engineering artifact itself must mutate; cosmetic sentence changes do not pass. Every mutation records before/after node hashes.",
-  "mutations": [
-   {
-    "repair_id": "RP-regulatory_assumption",
-    "attack_target": "regulatory_assumption",
-    "attack_verdict_id": "no candidate standards and no pathway — the regulatory surface is not even enumerated",
-    "mutated_path": "regulatory.candidate_standards",
-    "before_hash": "ff277a667626f92f66ee321759fea342b8493610e5d69493f708eca4ab1d45ac",
-    "after_hash": "5c7b1e62de57b82160e6dc39f662e9ad9ce62d957b620a4d88a7a200a1b62c56",
-    "change_summary": "1 candidate standard(s) imported",
-    "mutation_kind": "STRUCTURAL"
-   }
-  ],
-  "structural_mutation_count": 1,
-  "mutated_paths": [
-   "regulatory.candidate_standards"
-  ],
-  "artifact_mutated": true,
-  "before_artifact_hash": "aae4758705e166af13aac42a3ced37bc741a91cfd7e1101210e8c796357ffad7",
-  "after_artifact_hash": "4720b916e344d67957f533be3a03d002e12c4d5a997c1aa47f46c06a1d7da62c",
-  "repaired_at": "2026-09-21T07:53:00+00:00Z",
-  "post_repair_attack": {
-   "overall": "SURVIVED_WITH_UNCERTAINTIES",
-   "counts": {
-    "KILL": 0,
-    "REPAIR": 0,
-    "UNCERTAIN": 4,
-    "SURVIVE": 6
-   },
-   "remaining_repairs": []
-  }
- },
  "engineering_attack_summary": {
-  "attack": "ENGINEERING_ATTACK (E15-F)",
-  "overall": "NEEDS_REPAIR",
+  "attack": "ENGINEERING_ATTACK (E15-F, re-run on the improved candidate R378)",
+  "overall": "SURVIVED_WITH_UNCERTAINTIES",
   "counts": {
    "KILL": 0,
-   "REPAIR": 1,
+   "REPAIR": 0,
    "UNCERTAIN": 4,
-   "SURVIVE": 5
+   "SURVIVE": 6
   },
-  "targets": [
-   "mechanism_feasibility",
-   "equation_applicability",
-   "critical_assumptions",
-   "parameter_values",
-   "novelty",
-   "obviousness",
-   "failure_modes",
-   "manufacturing_feasibility",
-   "regulatory_assumption",
-   "buyer_value"
-  ],
-  "attack_record": "ENGINEERING_ATTACK_mech-DIRECT_TRANSFER-1.json",
-  "repaired_to_v2": true,
-  "selection_basis": {
-   "candidate_id": "cand:MS:DIRECT_TRANSFER:ab50b0e4849a",
-   "killed": false,
-   "attack_overall": "NEEDS_REPAIR",
-   "uncertain_count": 4,
-   "quality_verdict": "CONDITIONAL",
-   "quality_deficient_count": 2,
-   "repaired": true,
-   "span_underived": false,
-   "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
-   "_verdict_rank": 1,
-   "_physics_rank": 1
-  }
+  "repaired_to_v2": false,
+  "improvement_mutation_id": "mut:bf92322cd98a"
  }
 }
