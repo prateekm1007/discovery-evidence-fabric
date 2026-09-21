@@ -74,7 +74,7 @@ Every stage carries a gate; no stage's pass credit transfers to the next
 |---|---|---|
 | PROBLEM | `toscanini/problem_builder.py` (user problem → structured hypothesis; MODEL_DERIVED extraction flagged as such) | problem existence gate (Art. XX) |
 | EVIDENCE | `discovery_fabric/connectors/` + `discovery_fabric/a2/retrieve.py` + `discovery_fabric/source_registry/` (RETRIEVE → FREEZE with content hashes) | per-source status ledger; freeze hashes |
-| MECHANISM + CANDIDATES | `discovery_fabric/a2/synthesize.py` + `engine/candidate_diversity.py` + `orchestrator/multi_source_discovery.py` (four-search attack: discovery/destruction/transfer/reality) | exploration grid ≥10 recorded angles |
+| MECHANISM + CANDIDATES | `discovery_fabric/a2/synthesize.py` + `engine/candidate_diversity.py` + `discovery_fabric/engine/mechanism_space.py` (structured mechanism-space generation, distinctness, and mechanism-level verification) | exploration grid ≥10 recorded angles |
 | ATTACK | `discovery_fabric/a2/adversarial.py` + `discovery_fabric/prior_art_v2/` + `discovery_fabric/v4_corrections.py` firewalls | adversarial gate; prior-art firewall; boundary/invalid guards |
 | INVENTION DIAGNOSTIC + IMPROVE | `discovery_fabric/engine/improvement_engine.py` (R379 technical state), `engine/collision.py`, `engine/engineering_attack.py` | adversarial call graph (`PRODUCTION_ADVERSARIAL_CALL_GRAPH.md`) |
 | TECHNICAL EVALUATION | `discovery_fabric/engine/equations.py` (R383 analytical evaluator: 9 closed-form relations, deterministic binding, margins, bisection solve, K8 keep gate) | `ADR_R383_ANALYTICAL_EVALUATOR.md`; live demos `TOSCANINI/R383_LIVE_QUANTITATIVE/` |
@@ -83,10 +83,10 @@ Every stage carries a gate; no stage's pass credit transfers to the next
 | ENGINEERING DOSSIER | `engine/package_compiler.py` (the live compiler) + `invention_bridge/package.py`; R455: the historical `premium_package_factory/` is ARCHIVED_TO `archive/r455-lean/` (the R374 `pathway.py` chain verifier retained for the cemetery cross-check) | gate certificates |
 | BUYER PACKAGE | `engine/package_compiler.py` + `invention_bridge/package.py` (the live path) + `scripts/r386_release_chain.py` (four-state verifier; R455: `scripts/r385_root_docs_regeneration.py`'s factory dependency is archived — rebuild-from-source of R371-era docs now requires git history; delivery verification unaffected) | Article XXXIX chain: ENGINE RECORD ↔ CANONICAL MANIFEST ↔ PORTFOLIO TREE ↔ BUYER ZIP; 21 hermetic negative controls in `tests/test_r386_release_chain.py` |
 
-Engine stage order (runtime): `RETRIEVE → FREEZE → SYNTHESIZE → VERIFY →
-MULTI_SOURCE_DISCOVERY → COLLISION → ATTACK → CONTRADICTION →
-KILLER_EXPERIMENT → ADJUDICATION → CLASSIFY → NEXT_BEST_ACTION → RANK`
-(`discovery_fabric/engine/adapters.py`).
+Engine stage order (runtime): `RETRIEVE → FREEZE → PREMISE_GATE → SYNTHESIZE → VERIFY →
+MECHANISM_SPACE → COLLISION → PHYSICS → ATTACK → CONTRADICTION →
+KILLER_EXPERIMENT → IMPROVE → ADJUDICATION → CLASSIFY → NEXT_BEST_ACTION → RANK`
+(`discovery_fabric/engine/adapters.py`; 16 stages; `MULTI_SOURCE_DISCOVERY` retired from the live path).
 
 ## What is NOT in the active path (and where it lives now)
 
