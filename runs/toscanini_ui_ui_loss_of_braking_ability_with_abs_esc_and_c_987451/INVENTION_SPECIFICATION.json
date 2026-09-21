@@ -1,0 +1,908 @@
+{
+ "invention_id": {
+  "value": "inv:ui_loss_of_braking_ability_with_abs_esc_and_c_987451:50d39e4c0b5a",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_loss_of_braking_ability_with_abs_esc_and_c_987451",
+   "device": "Chevrolet Silverado 1500 braking system",
+   "failure": "Documented problem 'loss of braking ability with ABS, ESC, and check engine warnings' concerning Chevrolet Silverado 1500 braking system. User-submitted engineering problem (session input): \"[R516-BATTERY declared_family=thermal source=odi:11254698 battery=R516-mechanism-attribution-after]\n\nTL* THE CONTACT OWNS A 2019 CHEVROLET SILVERADO 1500. WHILE THE CONTACT WAS ATTEMPTING TO PULL OUT OF THE DRIVEWAY, THE ABS, ESC, AND CHECK ENGINE WARNING INDICATORS ILLUMINATED AND THE VEHICLE LOST \".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "loss of braking ability with ABS, ESC, and check engine warnings",
+   "constraint": "braking ability must be restored and ABS, ESC, and check engine warnings must be resolved"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:35d863d2"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of Chevrolet Silverado 1500 braking system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Dual Control for Exploration-Exploitation (DCEE) with a Regularized Particle Filter plus Markov Chain Monte Carlo step that jointly estimates vehicle states and road-surface (environment) parameters, folding estimation directly into the ABS controller instead of keeping it separate.",
+   "intervention": "Reflash/reprogram the 2019 Silverado 1500's ABS/ESC ECU to run the DCEE estimator, fusing wheel-speed, yaw-rate, steering, and engine/PCM data (the check-engine channel) so that vehicle state and peak friction coefficient are estimated online and consumed by the brake-control loop, eliminating the detached estimation path that sets the fault state.",
+   "expected_effect": "Braking ability is restored and the ABS, ESC, and check engine warnings clear, because the controller no longer operates on neglected/mismatched state and environment estimates that trigger degraded-mode operation and sub-optimal braking.",
+   "mechanism_source_span": "Estimation uncertainties in the vehicle state and environment (road surface) are often neglected or handled separately from the ABS controller, leading to sub-optimal braking.",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.48550/arxiv.2306.14730"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "An Exploration-Exploitation Approach to Anti-lock Brake Systems",
+   "mechanism": "Dual Control for Exploration-Exploitation (DCEE) with a Regularized Particle Filter plus Markov Chain Monte Carlo step that jointly estimates vehicle states and road-surface (environment) parameters, folding estimation directly into the ABS controller instead of keeping it separate.",
+   "intervention_site": "Chevrolet Silverado 1500 braking system",
+   "expected_effect": "Braking ability is restored and the ABS, ESC, and check engine warnings clear, because the controller no longer operates on neglected/mismatched state and environment estimates that trigger degraded-mode operation and sub-optimal braking.",
+   "falsification_test": "Reproduce the fault in the vehicle, then flash the DCEE estimator and drive the same low-speed driveway maneuver plus a documented stopping-distance run; the mechanism is falsified if any of the three warnings re-illuminates or if stopping distance/time fails to return to the pre-fault baseline."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.48550/arxiv.2306.14730"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Reflash/reprogram the 2019 Silverado 1500's ABS/ESC ECU to run the DCEE estimator, fusing wheel-speed, yaw-rate, steering, and engine/PCM data (the check-engine channel) so that vehicle state and peak friction coefficient are estimated online and consumed by the brake-control loop, eliminating the detached estimation path that sets the fault state.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.48550/arxiv.2306.14730"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "braking ability must be restored and ABS, ESC, and check engine warnings must be resolved",
+   "failure_mode_of_device": "loss of braking ability with ABS, ESC, and check engine warnings"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:35d863d2"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.3748378146840293,
+   "eig_per_cost": 0.3748378146840293,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Braking ability is restored and the ABS, ESC, and check engine warnings clear, because the controller no longer operates on neglected/mismatched state and environment estimates that trigger degraded-m",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-21T10:49:21.933632+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-21T10:49:21.933632+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.3748378146840293,
+     "eig_per_cost": 0.3748378146840293,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.17760/d20009277",
+    "title": "Carbon nanotube powered regenerative braking system",
+    "source_uri": "https://doi.org/10.17760/d20009277",
+    "doi": "10.17760/d20009277",
+    "content_hash": "3acc8849620695649df16d6faf9c2ad3f1de7d4ed9dd1a95e67f3dd39faabc45",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.2298/bg20120926cirovic",
+    "title": "The potentional application of artificial intelligence in motor vehicles braking system performance",
+    "source_uri": "https://doi.org/10.2298/bg20120926cirovic",
+    "doi": "10.2298/bg20120926cirovic",
+    "content_hash": "850c53e02c90b4fd16546fab250565d07c1ede58eda46e13f954b407cd76b02c",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.54014/056g-f8ct",
+    "title": "Comprehensive Current Flow Modeling And Circuit Parameter Analysis For A Brushed Dc Motor Regenerative Braking System",
+    "source_uri": "https://doi.org/10.54014/056g-f8ct",
+    "doi": "10.54014/056g-f8ct",
+    "content_hash": "89136065949c51be40efc802bc319c30b0785570c0441053daba7088c1ae1e73",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2306.14730",
+    "title": "An Exploration-Exploitation Approach to Anti-lock Brake Systems",
+    "source_uri": "https://doi.org/10.48550/arxiv.2306.14730",
+    "doi": "10.48550/arxiv.2306.14730",
+    "content_hash": "62d4a5135f4fd35f9161778537482b1a08e051c47d8dc558b657529c395fcebc",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1604.01231",
+    "title": "Possible evolution of the pulsar braking index from larger than three to about one",
+    "source_uri": "https://doi.org/10.48550/arxiv.1604.01231",
+    "doi": "10.48550/arxiv.1604.01231",
+    "content_hash": "0658f0bff56a5beeb4b4e38abe12b24602a7eacd9d730e23adea46c15dc3726a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2606.19856",
+    "title": "On the braking index evolution of PSR B0540-69: wind braking of pulsars",
+    "source_uri": "https://doi.org/10.48550/arxiv.2606.19856",
+    "doi": "10.48550/arxiv.2606.19856",
+    "content_hash": "d992b9c0c9dec5b3618aa487c7d57f43baf144b0d0b91effd26602da81a026e7",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4271/cpgm2_10chssty",
+    "title": "J1349 Certified Power Engine Data for GM L20 as used in 2010 Chevrolet Silverado/GMC Sierra, Chevrolet Tahoe/GMC Yukon w/Base Exhaust System - Level 2",
+    "source_uri": "https://doi.org/10.4271/cpgm2_10chssty",
+    "doi": "10.4271/cpgm2_10chssty",
+    "content_hash": "60d9934e9872bbba329463d3b34f98684e10f25d65829b30ccdf2074b9fcb8f0",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4271/cpgm2_10cgssbe",
+    "title": "J1349 Certified Power Engine Data for GM LMG/LC9 as used in 2010 Chevrolet Silverado/GMC Sierra Gasoline w/Base Exhaust System - Level 2",
+    "source_uri": "https://doi.org/10.4271/cpgm2_10cgssbe",
+    "doi": "10.4271/cpgm2_10cgssbe",
+    "content_hash": "0ede46edaae2f8bff418b00f7d91a193a7dbe0ae8c621403368f84f74c43d663",
+    "frozen": false
+   },
+   {
+    "id": "title:3add3acc67bdf27f",
+    "title": "Model-based Fault Detection and Diagnosis of the Anti-lock Braking System",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "0a220c6851b476da52ebcf555f2985b9fa7b1fbd9eac055142b9104c94693b09",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1080/00423114.2012.690041",
+    "title": "An ABS control logic based on wheel force measurement",
+    "source_uri": "https://doi.org/10.1080/00423114.2012.690041",
+    "doi": "10.1080/00423114.2012.690041",
+    "content_hash": "c781d60328edf4a89e81a2c7c5655c406950d0a57192f11fb92eb3523aceb612",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1080/00423114.2012.690041",
+   "doi:10.17760/d20009277",
+   "doi:10.2298/bg20120926cirovic",
+   "doi:10.4271/cpgm2_10cgssbe",
+   "doi:10.4271/cpgm2_10chssty",
+   "doi:10.48550/arxiv.1604.01231",
+   "doi:10.48550/arxiv.2306.14730",
+   "doi:10.48550/arxiv.2606.19856",
+   "doi:10.54014/056g-f8ct",
+   "title:3add3acc67bdf27f"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:evidence:doi:10.1080/00423114.2012.690041",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['estimation', 'not', 'road', 'that'] in: 'The availability of force information allows to design a logic that does ]",
+    "severity": "HIGH"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Reproduce the fault in the vehicle, then flash the DCEE estimator and drive the same low-speed driveway maneuver plus a documented stopping-distance run; the mechanism is falsified if any of the three warnings re-illuminates or if stopping distance/time fails to return to the pre-fault baseline."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_loss_of_braking_ability_with_abs_esc_and_c_987451:2026-09-21T10:44:11",
+   "final_envelope_hash": "50d39e4c0b5a7be9d988b3c27c59a6e31f9f9582ff18722af022d065517614af",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.3748378146840293
+    },
+    "score": 0.255,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-21T10:49:22+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-21T10:49:22+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.17760/d20009277": {
+   "id": "doi:10.17760/d20009277",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.17760/d20009277",
+   "source_uri": "https://doi.org/10.17760/d20009277",
+   "title": "Carbon nanotube powered regenerative braking system",
+   "abstract": "",
+   "doi": "10.17760/d20009277",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:45:14.647160+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3acc8849620695649df16d6faf9c2ad3f1de7d4ed9dd1a95e67f3dd39faabc45",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.17760/d20009277"
+    },
+    "queries_by_source": {
+     "crossref": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.17760/d20009277",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.2298/bg20120926cirovic": {
+   "id": "doi:10.2298/bg20120926cirovic",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2298/bg20120926cirovic",
+   "source_uri": "https://doi.org/10.2298/bg20120926cirovic",
+   "title": "The potentional application of artificial intelligence in motor vehicles braking system performance",
+   "abstract": "",
+   "doi": "10.2298/bg20120926cirovic",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:45:14.647274+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "850c53e02c90b4fd16546fab250565d07c1ede58eda46e13f954b407cd76b02c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2298/bg20120926cirovic"
+    },
+    "queries_by_source": {
+     "crossref": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2298/bg20120926cirovic",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.54014/056g-f8ct": {
+   "id": "doi:10.54014/056g-f8ct",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.54014/056g-f8ct",
+   "source_uri": "https://doi.org/10.54014/056g-f8ct",
+   "title": "Comprehensive Current Flow Modeling And Circuit Parameter Analysis For A Brushed Dc Motor Regenerative Braking System",
+   "abstract": "",
+   "doi": "10.54014/056g-f8ct",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:45:14.647342+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "89136065949c51be40efc802bc319c30b0785570c0441053daba7088c1ae1e73",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.54014/056g-f8ct"
+    },
+    "queries_by_source": {
+     "crossref": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.54014/056g-f8ct",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2306.14730": {
+   "id": "doi:10.48550/arxiv.2306.14730",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2306.14730v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2306.14730",
+   "title": "An Exploration-Exploitation Approach to Anti-lock Brake Systems",
+   "abstract": "Anti-lock Brake System (ABS) is a mandatory active safety feature on road vehicles with analogous systems for aircraft and locomotives. This feature aims to prevent locking of the wheels when braking and to improve the handling performance, as well as reduce stopping distance of the vehicle. Estimation uncertainties in the vehicle state and environment (road surface) are often neglected or handled separately from the ABS controller, leading to sub-optimal braking. In this paper, a Dual Control for Exploration-Exploitation (DCEE) approach is taken toward the ABS problem which achieves both accurate state (and environment) estimation and superior braking performance. Compared with popular Extremum Seeking methods, improvements of up to $15\\%$ and $8.5\\%$ are shown in stopping time and stopping distance, respectively. A Regularized Particle Filter with Markov Chain Monte Carlo step is used to estimate vehicle states and parameters of the Magic Formula tyre model that includes the peak friction coefficient for the environment. The effectiveness of the DCEE approach is demonstrated across a range of driving scenarios such as low and high speeds; snow, wet and dry roads and changing road surfaces.",
+   "doi": "10.48550/arxiv.2306.14730",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:45:14.647421+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "62d4a5135f4fd35f9161778537482b1a08e051c47d8dc558b657529c395fcebc",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2306.14730v1"
+    },
+    "queries_by_source": {
+     "arxiv": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2306.14730",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2306.14730v1",
+   "authors": [
+    "Benjamin Sullivan",
+    "Jingjing Jiang",
+    "Georgios Mavros",
+    "Wen-Hua Chen"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.1604.01231": {
+   "id": "doi:10.48550/arxiv.1604.01231",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1604.01231v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.1604.01231",
+   "title": "Possible evolution of the pulsar braking index from larger than three to about one",
+   "abstract": "The coupled evolution of pulsar rotation and inclination angle in the wind braking model is calculated. The oblique pulsar tends to align. The pulsar alignment will affect its spin-down behavior. As a pulsar evolves from the magneto-dipole radiation dominated case to the particle wind dominated case, the braking index will first increase and then decrease. In the early time, the braking index may be larger than 3. And during the following long time, the braking index will be always smaller than 3. The minimum braking index is about one. This can explain the existence of high braking index larger than 3, and low braking index of pulsars simultaneously. The pulsar braking index is expected to evolve from larger than three to about one. A general trend is that the pulsar braking index will evolve from the Crab-like case to the Vela-like case.",
+   "doi": "10.48550/arxiv.1604.01231",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:45:14.647459+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0658f0bff56a5beeb4b4e38abe12b24602a7eacd9d730e23adea46c15dc3726a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1604.01231v2"
+    },
+    "queries_by_source": {
+     "arxiv": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1604.01231",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/1604.01231v2",
+   "authors": [
+    "H. Tong",
+    "F. F. Kou"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2606.19856": {
+   "id": "doi:10.48550/arxiv.2606.19856",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2606.19856v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.2606.19856",
+   "title": "On the braking index evolution of PSR B0540-69: wind braking of pulsars",
+   "abstract": "The pulsar PSR B0540-69 has both a braking index measurement and spin-down state change. After its spin-down state change, it shows an increasing braking index with time. Previously, it is pointed out that the spin-down state change may be caused by an enhanced particle wind. The prediction is that its braking index will be smaller in the high spin-down state. The current measured braking index is approaching the previous prediction. The transient variation of braking index may be due to a small varying part of the particle density. The braking index evolution of PSR B0540-69 is found to be in an exponential form. Its braking index is expected to approach some steady value. Future braking index measurement may make clear the physics for the braking index evolution. It may also help to make test the particle acceleration mechanism in the pulsar magnetosphere. Finally, a phenomenological treatment of the wind braking model is presented in the appendix. It can simplify the applications of wind braking model to pulsar braking index, intermittent pulsars and PSR B0540-69.",
+   "doi": "10.48550/arxiv.2606.19856",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:45:14.647491+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d992b9c0c9dec5b3618aa487c7d57f43baf144b0d0b91effd26602da81a026e7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2606.19856v2"
+    },
+    "queries_by_source": {
+     "arxiv": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2606.19856",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2606.19856v2",
+   "authors": [
+    "H. Tong"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.4271/cpgm2_10chssty": {
+   "id": "doi:10.4271/cpgm2_10chssty",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4271/cpgm2_10chssty",
+   "source_uri": "https://doi.org/10.4271/cpgm2_10chssty",
+   "title": "J1349 Certified Power Engine Data for GM L20 as used in 2010 Chevrolet Silverado/GMC Sierra, Chevrolet Tahoe/GMC Yukon w/Base Exhaust System - Level 2",
+   "abstract": "",
+   "doi": "10.4271/cpgm2_10chssty",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:45:14.647516+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "60d9934e9872bbba329463d3b34f98684e10f25d65829b30ccdf2074b9fcb8f0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4271/cpgm2_10chssty"
+    },
+    "queries_by_source": {
+     "crossref": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=standard"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4271/cpgm2_10chssty",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.4271/cpgm2_10cgssbe": {
+   "id": "doi:10.4271/cpgm2_10cgssbe",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4271/cpgm2_10cgssbe",
+   "source_uri": "https://doi.org/10.4271/cpgm2_10cgssbe",
+   "title": "J1349 Certified Power Engine Data for GM LMG/LC9 as used in 2010 Chevrolet Silverado/GMC Sierra Gasoline w/Base Exhaust System - Level 2",
+   "abstract": "",
+   "doi": "10.4271/cpgm2_10cgssbe",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:45:14.647540+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0ede46edaae2f8bff418b00f7d91a193a7dbe0ae8c621403368f84f74c43d663",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4271/cpgm2_10cgssbe"
+    },
+    "queries_by_source": {
+     "crossref": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=standard"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4271/cpgm2_10cgssbe",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Chevrolet Silverado 1500 braking system loss of braking ability with abs, esc, and check engine warnings",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "title:3add3acc67bdf27f": {
+   "id": "title:3add3acc67bdf27f",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:332609232",
+   "source_uri": "",
+   "title": "Model-based Fault Detection and Diagnosis of the Anti-lock Braking System",
+   "abstract": "The ABS is one of the latest improvements to the braking system, which prevent the vehicle’s brakes from locking up and skidding during hard stops on icy or wet roads. ABS controllers are characterized by robust adaptive behaviour with respect to highly uncertain tyre characteristics and fast changing road surface properties. Performance improvement is typically sought in the areas of stability, steerability and stopping distance. In this paper, a non-linear mathematical model of the ABS is developed and ABS system is modelled using Simulink and some of the results are displayed which demonstrate the potential of the proposed model-based prognostics approach",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:45:14.647565+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0a220c6851b476da52ebcf555f2985b9fa7b1fbd9eac055142b9104c94693b09",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:332609232"
+    },
+    "queries_by_source": {
+     "core": "Chevrolet Silverado 1500 braking loss braking ability abs esc check"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:3add3acc67bdf27f",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Chevrolet Silverado 1500 braking loss braking ability abs esc check",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Gu, Fengshou",
+    "Ball, Andrew",
+    "Elshanti, Ali",
+    "Badri, A",
+    "University of Manchester",
+    "University of Huddersfield",
+    "Shi, John Z."
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1080/00423114.2012.690041": {
+   "id": "doi:10.1080/00423114.2012.690041",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:4834320",
+   "source_uri": "https://doi.org/10.1080/00423114.2012.690041",
+   "title": "An ABS control logic based on wheel force measurement",
+   "abstract": "The paper presents an anti-lock braking system (ABS) control logic based on the measurement of the longitudinal forces at the hub bearings. The availability of force information allows to design a logic that does not rely on the estimation of the tyre-road friction coefficient, since it continuously tries to exploit the maximum longitudinal tyre force. The logic is designed by means of computer simulation and then tested on a specific hardware in the loop test bench: the experimental results confirm that measured wheel force can lead to a significant improvement of the ABS performances in terms of stopping distance also in the presence of road with variable friction coefficien",
+   "doi": "10.1080/00423114.2012.690041",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T10:45:14.647593+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c781d60328edf4a89e81a2c7c5655c406950d0a57192f11fb92eb3523aceb612",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:4834320"
+    },
+    "queries_by_source": {
+     "core": "Chevrolet Silverado 1500 braking loss braking ability abs esc check"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1080/00423114.2012.690041",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Chevrolet Silverado 1500 braking loss braking ability abs esc check",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Van Leeuwen, B.",
+    "Galvagno, Enrico",
+    "Vigliani, Alessandro",
+    "B. van Leeuwen",
+    "Capra, Damiano",
+    "Ondrak, V.",
+    "V. Ondrak"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:35d863d2": {
+   "id": "problem:35d863d2",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "35d863d2c353a6901d77527dfc851e49ed4edafb28a5fc04d9d11242bcdaf10c",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "130fe0bd2449cbf312ae6f1dd0a25bdc9b8f7d16d6ab89bbd13d5c792c729459",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-21T10:49:22+00:00Z"
+ }
+}

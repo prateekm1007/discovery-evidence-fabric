@@ -1,0 +1,98 @@
+{
+ "schema": "INVENTION_LINEAGE/1.0.0",
+ "run_id": "engrun:ui_loss_of_braking_ability_with_abs_esc_and_c_987451:2026-09-21T10:44:11",
+ "generations": [
+  {
+   "gen": 1,
+   "invention_id": "inv:ad2eeef01f:gen1",
+   "parent_id": null,
+   "lineage": [
+    "inv:ad2eeef01f:gen1"
+   ],
+   "origin": "BASELINE_SYNTHESIS",
+   "architecture": {
+    "mechanism": "Dual Control for Exploration-Exploitation (DCEE) with a Regularized Particle Filter plus Markov Chain Monte Carlo step that jointly estimates vehicle states and road-surface (environment) parameters, folding estimation directly into the ABS controller instead of keeping it separate.",
+    "intervention": "Reflash/reprogram the 2019 Silverado 1500's ABS/ESC ECU to run the DCEE estimator, fusing wheel-speed, yaw-rate, steering, and engine/PCM data (the check-engine channel) so that vehicle state and peak friction coefficient are estimated online and consumed by the brake-control loop, eliminating the detached estimation path that sets the fault state.",
+    "expected_effect": "Braking ability is restored and the ABS, ESC, and check engine warnings clear, because the controller no longer operates on neglected/mismatched state and environment estimates that trigger degraded-mode operation and sub-optimal braking.",
+    "falsification_test": "Reproduce the fault in the vehicle, then flash the DCEE estimator and drive the same low-speed driveway maneuver plus a documented stopping-distance run; the mechanism is falsified if any of the three warnings re-illuminates or if stopping distance/time fails to return to the pre-fault baseline."
+   },
+   "state": "INVENTION_SURVIVED",
+   "maturity": "EVIDENCE_SUPPORTED",
+   "challenge": {
+    "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+    "attack_overall": null,
+    "evidence_verified": true,
+    "killed": false,
+    "failure_class": null,
+    "kill_reason": "the mechanism-space distinctness adjudication counts 0 materially distinct mechanism(s) (< 2, mechanism_distinctness/2.0.0) — the run generated nothing worth attacking (Art. LXXXIV, R514)",
+    "final_status": "MECHANISM_STARVED"
+   },
+   "causal_delta": null,
+   "change_delta": null,
+   "reason_for_change": null,
+   "fresh_evidence": null,
+   "model": null,
+   "artifacts": {},
+   "evidence_verified": true
+  }
+ ],
+ "n_generations": 1,
+ "n_evolution_generations": 0,
+ "survivor_reached": true,
+ "survivor_gen": 1,
+ "current_invention": {
+  "gen": 1,
+  "invention_id": "inv:ad2eeef01f:gen1",
+  "state": "INVENTION_SURVIVED",
+  "maturity": "EVIDENCE_SUPPORTED"
+ },
+ "stop_reason": "SURVIVOR_REACHED",
+ "budget": {
+  "max_evolution_generations": 3,
+  "engine_evolution_env": "1"
+ },
+ "honesty_contract": "every generation's maturity label is derived from its own verification events (Art. LX); generated content carries AI_PROPOSED provenance and never claims evidence; infrastructure failures are typed and never converted into scientific verdicts (Art. LXI); the current invention is always presented with its true maturity, never softened (Art. LXVIII)",
+ "resumed": false,
+ "final_state": {
+  "run_id": "engrun:ui_loss_of_braking_ability_with_abs_esc_and_c_987451:2026-09-21T10:44:11",
+  "problem_id": "ui_loss_of_braking_ability_with_abs_esc_and_c_987451",
+  "device": "Chevrolet Silverado 1500 braking system",
+  "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+  "capability_gate": null,
+  "epistemic_state": "CANDIDATE_CONNECTION",
+  "reason": "the mandatory baseline architecture survived the challenge gauntlet after the synthesis path failed (BASELINE_FALLBACK_GENERATION, 0 evolution generations, no causal delta) — the idea is presented honestly: it requires its decisive experiment; nothing evolved and no evolution is claimed; the decisive physical experiment is specified, not executed",
+  "premise_verdict": "PREMISE_COHERENT",
+  "premise_explanation": "no definitional contradiction matched; the gate cannot prove physical truth — only rule-table incoherence is checkable (disclosed limit)",
+  "evidence_verified": true,
+  "evidence_classification_counts": {
+   "DIRECT_SUPPORT": 2,
+   "PARTIAL_SUPPORT": 5,
+   "BACKGROUND": 0,
+   "ANALOGY": 2,
+   "CONTRADICTORY": 1,
+   "IRRELEVANT": 0
+  },
+  "prior_art_status": null,
+  "collision_novelty_risk": null,
+  "collision_search_execution": null,
+  "adversarial_overall": null,
+  "adjudication_verdict": "CONTESTED",
+  "ranking_score": 0.255,
+  "next_best_action": "run killer experiment: falsification_test_from_candidate",
+  "failed_stages": {},
+  "final_envelope_hash": "50d39e4c0b5a7be9d988b3c27c59a6e31f9f9582ff18722af022d065517614af",
+  "code_commit": "c30bc07e24ecc5b22ce45ab0aa39fef187ee7b29",
+  "timestamp": "2026-09-21T10:49:22+00:00Z",
+  "evolution": {
+   "n_generations": 1,
+   "stop_reason": "SURVIVOR_REACHED",
+   "current_invention": {
+    "gen": 1,
+    "invention_id": "inv:ad2eeef01f:gen1",
+    "state": "INVENTION_SURVIVED",
+    "maturity": "EVIDENCE_SUPPORTED"
+   },
+   "survivor_reached": true
+  }
+ }
+}
