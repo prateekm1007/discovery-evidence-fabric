@@ -1,0 +1,1328 @@
+{
+ "invention_id": {
+  "value": "inv:ui_spontaneous_parked_vehicle_fire_913:bbcf07f1b6c6",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_spontaneous_parked_vehicle_fire_913",
+   "device": "2020 Nissan Rogue battery system",
+   "failure": "Documented problem 'spontaneous parked-vehicle fire' concerning 2020 Nissan Rogue battery system. User-submitted engineering problem (session input): \"[R517-BATTERY2 declared_family=thermal source=odi:11684485 battery=R517-retrieval-attribution-2]\n\nThe contact owns a 2020 Nissan Rogue. The contact stated that the vehicle had been parked at the residence for approximately two hours when she looked out her window and noticed that the vehicle had cau\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "spontaneous parked-vehicle fire",
+   "constraint": "Any solution must detect or mitigate fire risk while the vehicle is parked and without relying on prior warning lights."
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:56c28f3e"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of 2020 Nissan Rogue battery system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Spatiotemporal similarity-based averaging — grouping measurement units (voxels) that exhibit similar dynamic behavior and averaging them to suppress noise while preserving true dynamic signal.",
+   "intervention": "Apply a 4D-similarity-filter-style algorithm to the parked Rogue's battery thermal sensor array: register each cell's temperature time series, cluster cells with similar dynamic thermal trajectories, and average within-cluster readings to denoise; cells whose trajectory deviates from all similarity clusters are flagged as anomalous hot spots, triggering a parked-vehicle alert (e.g., app notification or local alarm) independent of dashboard warning lights.",
+   "expected_effect": "Reduced thermal-sensor noise on parked vehicles reveals subtle, localized temperature excursions (early thermal-runaway precursors) that raw single-sensor readings mask, enabling fire-risk detection during parking without reliance on prior warning lights.",
+   "mechanism_source_span": "The 4DSF reduces noise by averaging voxels that have similar dynamic behavior after adaptive iterative dose reduction 3D (AIDR3D) and deformable image registration were applied.",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1097/md.0000000000020804"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Improvement of image quality on low-dose dynamic myocardial perfusion computed tomography with a novel 4-dimensional similarity filter",
+   "mechanism": "Spatiotemporal similarity-based averaging — grouping measurement units (voxels) that exhibit similar dynamic behavior and averaging them to suppress noise while preserving true dynamic signal.",
+   "intervention_site": "2020 Nissan Rogue battery system",
+   "expected_effect": "Reduced thermal-sensor noise on parked vehicles reveals subtle, localized temperature excursions (early thermal-runaway precursors) that raw single-sensor readings mask, enabling fire-risk detection during parking without reliance on prior warning lights.",
+   "falsification_test": "Instrument a parked 2020 Rogue battery pack with cell-level thermistors; inject a controlled low-power heater into one cell to produce a sub-threshold temperature drift (~1–2 °C above ambient drift) while logging raw and 4DSF-processed data; the mechanism is falsified if the similarity-filtered output does not isolate the heated cell and raise an alert significantly earlier (e.g., ≥5 minutes) and at lower temperature rise than fixed-threshold detection on raw data."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1097/md.0000000000020804"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Apply a 4D-similarity-filter-style algorithm to the parked Rogue's battery thermal sensor array: register each cell's temperature time series, cluster cells with similar dynamic thermal trajectories, and average within-cluster readings to denoise; cells whose trajectory deviates from all similarity clusters are flagged as anomalous hot spots, triggering a parked-vehicle alert (e.g., app notification or local alarm) independent of dashboard warning lights.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1097/md.0000000000020804"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "Any solution must detect or mitigate fire risk while the vehicle is parked and without relying on prior warning lights.",
+   "failure_mode_of_device": "spontaneous parked-vehicle fire"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:56c28f3e"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.2809867409759369,
+   "eig_per_cost": 0.2809867409759369,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Reduced thermal-sensor noise on parked vehicles reveals subtle, localized temperature excursions (early thermal-runaway precursors) that raw single-sensor readings mask, enabling fire-risk detection d",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-21T14:41:31.246672+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-21T14:41:31.246672+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.2809867409759369,
+     "eig_per_cost": 0.2809867409759369,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1097/md.0000000000020804",
+    "title": "Improvement of image quality on low-dose dynamic myocardial perfusion computed tomography with a novel 4-dimensional similarity filter",
+    "source_uri": "https://doi.org/10.1097/md.0000000000020804",
+    "doi": "10.1097/md.0000000000020804",
+    "content_hash": "0c60f6304b67b28652987b4380c5ff37ae662493f0641ba8d23595e327ed059a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1186/s13244-019-0713-y",
+    "title": "ECR 2019: Book of Abstracts : Vienna, Austria. February 27 - March 3, 2019.",
+    "source_uri": "https://doi.org/10.1186/s13244-019-0713-y",
+    "doi": "10.1186/s13244-019-0713-y",
+    "content_hash": "f5e878a7843faa702fcd635c4bd79852e94aea57c27c7553bbb13ca71c710954",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1007/s00330-021-08178-0",
+    "title": "Dedicated breast CT: state of the art—Part II. Clinical application and future outlook",
+    "source_uri": "https://doi.org/10.1007/s00330-021-08178-0",
+    "doi": "10.1007/s00330-021-08178-0",
+    "content_hash": "79dc9be5e413cae4ba0598b685c078da592eb7b9da9efa9ad0a24e85006c0c69",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1007/s00330-021-08179-z",
+    "title": "Dedicated breast CT: state of the art—Part I. Historical evolution and technical aspects",
+    "source_uri": "https://doi.org/10.1007/s00330-021-08179-z",
+    "doi": "10.1007/s00330-021-08179-z",
+    "content_hash": "26ba94f8e6c8b9ed0b9cdb9ac69af72358d5fc41a91572efbdb10a81595c8e9c",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.32657/10356/69469",
+    "title": "Design, development and analysis of a battery electric vehicle energy storage system",
+    "source_uri": "https://doi.org/10.32657/10356/69469",
+    "doi": "10.32657/10356/69469",
+    "content_hash": "b39e6a41b558503f058d98d2be6aef995a015967b202e6594dfe2a88bf9c5029",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.17760/d20741570",
+    "title": "Development of a remotely controlled robotic vehicle system for liquid\n               nitrogen-based fire extinction",
+    "source_uri": "https://doi.org/10.17760/d20741570",
+    "doi": "10.17760/d20741570",
+    "content_hash": "f026bf4f96e9475270914c4f5582ed6167c7568744139c5802aa66c3903fc147",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5204/thesis.eprints.228154",
+    "title": "Design and application of a smart battery management system for a small electric vehicle",
+    "source_uri": "https://doi.org/10.5204/thesis.eprints.228154",
+    "doi": "10.5204/thesis.eprints.228154",
+    "content_hash": "72b63163f67c66207ce70ca5268e503f7015b93ca77efe0b602b4d5ad6b1567b",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.2139/ssrn.7080804",
+    "title": "Comparative Analysis of Battery Parameters and Battery Management Systems in Leading Electric Vehicle Manufacturers: Tesla, Tata Motors, Mahindra, Nissan, and Toyota",
+    "source_uri": "https://doi.org/10.2139/ssrn.7080804",
+    "doi": "10.2139/ssrn.7080804",
+    "content_hash": "48ae72b081f3138cceef53fc4aa09347da026f1600ac0e75687ff1837f77dcba",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1808.03318",
+    "title": "Data Likelihood of Active Fires Satellite Detection and Applications to Ignition Estimation and Data Assimilation",
+    "source_uri": "https://doi.org/10.48550/arxiv.1808.03318",
+    "doi": "10.48550/arxiv.1808.03318",
+    "content_hash": "1579a9e5108d983f4671e1f73fc1072ece90ee8c3d4ddc90e0021ae08f8d1783",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.0706.3074",
+    "title": "A review of wildland fire spread modelling, 1990-present, 1: Physical and quasi-physical models",
+    "source_uri": "https://doi.org/10.48550/arxiv.0706.3074",
+    "doi": "10.48550/arxiv.0706.3074",
+    "content_hash": "1b3047636427613f9d007d33aa1d2578e295ab139874ee75f9cf987fa1ef9927",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.26616/nioshfffacef200903",
+    "title": "Volunteer fire fighter sitting in his parked vehicle warning oncoming traffic of a motor vehicle incident was struck and killed by a tractor-trailer - Montana.",
+    "source_uri": "https://doi.org/10.26616/nioshfffacef200903",
+    "doi": "10.26616/nioshfffacef200903",
+    "content_hash": "8ce39a9370147de0c8477a600b0d1bf2bd382eb7ba726730b27a165318ea2527",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.2172/974759",
+    "title": "2007 Nissan Altima-2351 Hybrid Electric Vehicle Battery Test Results",
+    "source_uri": "https://doi.org/10.2172/974759",
+    "doi": "10.2172/974759",
+    "content_hash": "452d55370c5c52716dd00cf7fbfc17be62c760cc7045351ae488a71f251a305c",
+    "frozen": false
+   },
+   {
+    "id": "title:41d4ca227da494e7",
+    "title": "The impact of domestic plug-in hybrid electric vehicles on power distribution system loads",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "9ac4725cc3d3483f65ccfcb2ddf268750ee71cbd72088f5fee32be1138f23d2f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1038/nphys3263",
+    "title": "Triggering extreme events at the nanoscale in photonic seas",
+    "source_uri": "https://doi.org/10.1038/nphys3263",
+    "doi": "10.1038/nphys3263",
+    "content_hash": "9fe6fe7dd3781022401425ed6767ad690106e66e1a069dec3dd37f5f09d30451",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1021/acs.est.2c08581.s001",
+    "title": "Ecotoxicity Evaluation of Fire-Extinguishing Water from Large-Scale Battery and Battery Electric Vehicle Fire Tests",
+    "source_uri": "https://doi.org/10.1021/acs.est.2c08581.s001",
+    "doi": "10.1021/acs.est.2c08581.s001",
+    "content_hash": "0962e9ef45b353b85a580bad6ec6f3133ad1283b4b47cf78e71811ad25ea794b",
+    "frozen": false
+   },
+   {
+    "id": "title:cf31f8ab53a8b822",
+    "title": "Multicomponent rogue waves",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "bf7de12b67951a8ff3aeb5b7756e43c3d844d08eb9c6b2ebb60042e7b49bfa47",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1007/s00330-021-08178-0",
+   "doi:10.1007/s00330-021-08179-z",
+   "doi:10.1021/acs.est.2c08581.s001",
+   "doi:10.1038/nphys3263",
+   "doi:10.1097/md.0000000000020804",
+   "doi:10.1186/s13244-019-0713-y",
+   "doi:10.17760/d20741570",
+   "doi:10.2139/ssrn.7080804",
+   "doi:10.2172/974759",
+   "doi:10.26616/nioshfffacef200903",
+   "doi:10.32657/10356/69469",
+   "doi:10.48550/arxiv.0706.3074",
+   "doi:10.48550/arxiv.1808.03318",
+   "doi:10.5204/thesis.eprints.228154",
+   "title:41d4ca227da494e7",
+   "title:cf31f8ab53a8b822"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:evidence:doi:10.1038/nphys3263",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['localized', 'not', 'that'] in: 'Such localized energy patterns are formed in a deterministic dielectric structure ]",
+    "severity": "MEDIUM"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Instrument a parked 2020 Rogue battery pack with cell-level thermistors; inject a controlled low-power heater into one cell to produce a sub-threshold temperature drift (~1–2 °C above ambient drift) while logging raw and 4DSF-processed data; the mechanism is falsified if the similarity-filtered output does not isolate the heated cell and raise an alert significantly earlier (e.g., ≥5 minutes) and at lower temperature rise than fixed-threshold detection on raw data."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_spontaneous_parked_vehicle_fire_913:2026-09-21T14:28:33",
+   "final_envelope_hash": "bbcf07f1b6c677e539291468f518923042624d3bc084dc8563928bed04a7e0fa",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.2809867409759369
+    },
+    "score": 0.2362,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-21T14:41:31+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-21T14:41:31+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1097/md.0000000000020804": {
+   "id": "doi:10.1097/md.0000000000020804",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:ed98ec5af916e3ac1340075f63801a58cc39e615",
+   "source_uri": "https://doi.org/10.1097/md.0000000000020804",
+   "title": "Improvement of image quality on low-dose dynamic myocardial perfusion computed tomography with a novel 4-dimensional similarity filter",
+   "abstract": "Abstract The aim of this study was to evaluate the effect of a novel 4-dimensional similarity filter (4DSF) on quantitative and qualitative parameters of low-dose dynamic myocardial computed tomography perfusion (CTP) images. In this retrospective study, medical records of 32 patients with suspected or known coronary artery disease who underwent dynamic myocardial CTP at 80 kV were included. The 4DSF reduces noise by averaging voxels that have similar dynamic behavior after adaptive iterative dose reduction 3D (AIDR3D) and deformable image registration were applied. Qualitative (artefact, contour sharpness, and myocardial homogeneity [1 = poor; 2 = intermediate; 3 = good]) and quantitative measurement (standard deviation [SD] and signal-to-noise ratio [SNR]) were compared between the 4DSF and AIDR3D. Contrast-to-noise ratio (CNR) between ischemic and normal remote myocardium was also assessed using myocardial perfusion magnetic resonance imaging as the reference standard in seven patients. The 4DSF was successfully applied to all the images. Improvement in subjective image quality yielded by 4DSF was higher than that yielded by AIDR3D (homogeneity, 1.0 [3 vs 2]; artefact, 1.5 [3 vs 1.5]; P < .001) in all patients. The 4DSF significantly decreased the SD by 59% (AIDR3D vs 4DSF: 33.5 ± 0.4 vs 13.8 ± 0.4, P < .001), increased the SNR by 134% (AIDR3D vs 4DSF: 4.4 ± 0.2 vs 10.3 ± 0.2, P < .001), and increased the CNR by 131% (AIDR3D vs 4DSF: 1.6 ± 0.2 vs 3.7 ± 0.2, P < .001). The 4DSF improved the qualitative and quantitative parameters of low-dose dynamic myocardial CTP images.",
+   "doi": "10.1097/md.0000000000020804",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-09-21T14:28:56.918688+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0c60f6304b67b28652987b4380c5ff37ae662493f0641ba8d23595e327ed059a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:ed98ec5af916e3ac1340075f63801a58cc39e615"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1186/s13244-019-0713-y"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "97c3a0986b9038fc189fa860bc81dd8617731dc9df82ea0be1ba291619de627a",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1097/md.0000000000020804",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1186/s13244-019-0713-y",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "S. Tsuneta",
+    "N. Oyama-Manabe",
+    "Hiroyuki Kameda",
+    "T. Harada",
+    "F. Kato",
+    "E. Smit",
+    "M. Prokop",
+    "K. Kudo"
+   ],
+   "raw_record_hash": "97c3a0986b9038fc189fa860bc81dd8617731dc9df82ea0be1ba291619de627a",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.1186/s13244-019-0713-y": {
+   "id": "doi:10.1186/s13244-019-0713-y",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:30806851",
+   "source_uri": "https://doi.org/10.1186/s13244-019-0713-y",
+   "title": "ECR 2019: Book of Abstracts : Vienna, Austria. February 27 - March 3, 2019.",
+   "abstract": "",
+   "doi": "10.1186/s13244-019-0713-y",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2019-02-26",
+   "retrieval_timestamp": "2026-09-21T14:28:56.918809+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f5e878a7843faa702fcd635c4bd79852e94aea57c27c7553bbb13ca71c710954",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:30806851"
+    },
+    "queries_by_source": {
+     "europepmc": "2020 nissan rogue battery system spontaneous experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1186/s13244-019-0713-y",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 nissan rogue battery system spontaneous experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1007/s00330-021-08178-0": {
+   "id": "doi:10.1007/s00330-021-08178-0",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:29bff9b7eb320a1ef5a379e023f14c45f37b3870",
+   "source_uri": "https://doi.org/10.1007/s00330-021-08178-0",
+   "title": "Dedicated breast CT: state of the art—Part II. Clinical application and future outlook",
+   "abstract": "",
+   "doi": "10.1007/s00330-021-08178-0",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2021",
+   "retrieval_timestamp": "2026-09-21T14:28:56.918861+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "79dc9be5e413cae4ba0598b685c078da592eb7b9da9efa9ad0a24e85006c0c69",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:29bff9b7eb320a1ef5a379e023f14c45f37b3870"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1186/s13244-019-0713-y"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "97c3a0986b9038fc189fa860bc81dd8617731dc9df82ea0be1ba291619de627a",
+    "publication_status_evidence": [
+     "publication_types=['Review', 'JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1007/s00330-021-08178-0",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1186/s13244-019-0713-y",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Yue-Qiang Zhu",
+    "A. O'Connell",
+    "Yue Ma",
+    "Ai-Di Liu",
+    "Hai-Jie Li",
+    "Yu-Wei Zhang",
+    "Xiaohua Zhang",
+    "Zhaoxiang Ye"
+   ],
+   "raw_record_hash": "97c3a0986b9038fc189fa860bc81dd8617731dc9df82ea0be1ba291619de627a",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.1007/s00330-021-08179-z": {
+   "id": "doi:10.1007/s00330-021-08179-z",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:dc328496b6dbfef2f0564480cb7037ac1e0fd021",
+   "source_uri": "https://doi.org/10.1007/s00330-021-08179-z",
+   "title": "Dedicated breast CT: state of the art—Part I. Historical evolution and technical aspects",
+   "abstract": "",
+   "doi": "10.1007/s00330-021-08179-z",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2021",
+   "retrieval_timestamp": "2026-09-21T14:28:56.918901+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "26ba94f8e6c8b9ed0b9cdb9ac69af72358d5fc41a91572efbdb10a81595c8e9c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:dc328496b6dbfef2f0564480cb7037ac1e0fd021"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1186/s13244-019-0713-y"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "97c3a0986b9038fc189fa860bc81dd8617731dc9df82ea0be1ba291619de627a",
+    "publication_status_evidence": [
+     "publication_types=['Review', 'JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1007/s00330-021-08179-z",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1186/s13244-019-0713-y",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Yue-Qiang Zhu",
+    "A. O'Connell",
+    "Yue Ma",
+    "Ai-Di Liu",
+    "Hai-Jie Li",
+    "Yu-Wei Zhang",
+    "Xiaohua Zhang",
+    "Zhaoxiang Ye"
+   ],
+   "raw_record_hash": "97c3a0986b9038fc189fa860bc81dd8617731dc9df82ea0be1ba291619de627a",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.32657/10356/69469": {
+   "id": "doi:10.32657/10356/69469",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.32657/10356/69469",
+   "source_uri": "https://doi.org/10.32657/10356/69469",
+   "title": "Design, development and analysis of a battery electric vehicle energy storage system",
+   "abstract": "",
+   "doi": "10.32657/10356/69469",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T14:28:56.918932+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b39e6a41b558503f058d98d2be6aef995a015967b202e6594dfe2a88bf9c5029",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.32657/10356/69469"
+    },
+    "queries_by_source": {
+     "crossref": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.32657/10356/69469",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.17760/d20741570": {
+   "id": "doi:10.17760/d20741570",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.17760/d20741570",
+   "source_uri": "https://doi.org/10.17760/d20741570",
+   "title": "Development of a remotely controlled robotic vehicle system for liquid\n               nitrogen-based fire extinction",
+   "abstract": "",
+   "doi": "10.17760/d20741570",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T14:28:56.918957+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f026bf4f96e9475270914c4f5582ed6167c7568744139c5802aa66c3903fc147",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.17760/d20741570"
+    },
+    "queries_by_source": {
+     "crossref": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.17760/d20741570",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.5204/thesis.eprints.228154": {
+   "id": "doi:10.5204/thesis.eprints.228154",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5204/thesis.eprints.228154",
+   "source_uri": "https://doi.org/10.5204/thesis.eprints.228154",
+   "title": "Design and application of a smart battery management system for a small electric vehicle",
+   "abstract": "",
+   "doi": "10.5204/thesis.eprints.228154",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T14:28:56.918984+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "72b63163f67c66207ce70ca5268e503f7015b93ca77efe0b602b4d5ad6b1567b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5204/thesis.eprints.228154"
+    },
+    "queries_by_source": {
+     "crossref": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5204/thesis.eprints.228154",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.2139/ssrn.7080804": {
+   "id": "doi:10.2139/ssrn.7080804",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2139/ssrn.7080804",
+   "source_uri": "https://doi.org/10.2139/ssrn.7080804",
+   "title": "Comparative Analysis of Battery Parameters and Battery Management Systems in Leading Electric Vehicle Manufacturers: Tesla, Tata Motors, Mahindra, Nissan, and Toyota",
+   "abstract": "",
+   "doi": "10.2139/ssrn.7080804",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-21T14:28:56.919014+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "48ae72b081f3138cceef53fc4aa09347da026f1600ac0e75687ff1837f77dcba",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2139/ssrn.7080804"
+    },
+    "queries_by_source": {
+     "crossref": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2139/ssrn.7080804",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.1808.03318": {
+   "id": "doi:10.48550/arxiv.1808.03318",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1808.03318v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1808.03318",
+   "title": "Data Likelihood of Active Fires Satellite Detection and Applications to Ignition Estimation and Data Assimilation",
+   "abstract": "Data likelihood of fire detection is the probability of the observed detection outcome given the state of the fire spread model. We derive fire detection likelihood of satellite data as a function of the fire arrival time on the model grid. The data likelihood is constructed by a combination of the burn model, the logistic regression of the active fires detections, and the Gaussian distribution of the geolocation error. The use of the data likelihood is then demonstrated by an estimation of the ignition point of a wildland fire by the maximization of the likelihood of MODIS and VIIRS data over multiple possible ignition points.",
+   "doi": "10.48550/arxiv.1808.03318",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T14:28:56.919044+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "1579a9e5108d983f4671e1f73fc1072ece90ee8c3d4ddc90e0021ae08f8d1783",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1808.03318v1"
+    },
+    "queries_by_source": {
+     "arxiv": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1808.03318",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/1808.03318v1",
+   "authors": [
+    "James Haley",
+    "Angel Farguell Caus",
+    "Adam K. Kochanski",
+    "Sher Schranz",
+    "Jan Mandel"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.0706.3074": {
+   "id": "doi:10.48550/arxiv.0706.3074",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:0706.3074v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.0706.3074",
+   "title": "A review of wildland fire spread modelling, 1990-present, 1: Physical and quasi-physical models",
+   "abstract": "In recent years, advances in computational power and spatial data analysis (GIS, remote sensing, etc) have led to an increase in attempts to model the spread and behaviour of wildland fires across the landscape. This series of review papers endeavours to critically and comprehensively review all types of surface fire spread models developed since 1990. This paper reviews models of a physical or quasi-physical nature. These models are based on the fundamental chemistry and/or physics of combustion and fire spread. Other papers in the series review models of an empirical or quasi-empirical nature, and mathematical analogues and simulation models. Many models are extensions or refinements of models developed before 1990. Where this is the case, these models are also discussed but much less comprehensively.",
+   "doi": "10.48550/arxiv.0706.3074",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T14:28:56.919077+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "1b3047636427613f9d007d33aa1d2578e295ab139874ee75f9cf987fa1ef9927",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:0706.3074v1"
+    },
+    "queries_by_source": {
+     "arxiv": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.0706.3074",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/0706.3074v1",
+   "authors": [
+    "A. L. Sullivan"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.26616/nioshfffacef200903": {
+   "id": "doi:10.26616/nioshfffacef200903",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.26616/nioshfffacef200903",
+   "source_uri": "https://doi.org/10.26616/nioshfffacef200903",
+   "title": "Volunteer fire fighter sitting in his parked vehicle warning oncoming traffic of a motor vehicle incident was struck and killed by a tractor-trailer - Montana.",
+   "abstract": "",
+   "doi": "10.26616/nioshfffacef200903",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2009",
+   "retrieval_timestamp": "2026-09-21T14:28:56.919107+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8ce39a9370147de0c8477a600b0d1bf2bd382eb7ba726730b27a165318ea2527",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.26616/nioshfffacef200903"
+    },
+    "queries_by_source": {
+     "crossref": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=report"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "REPORT",
+   "document_type": "",
+   "evidence_lane": "TECHNICAL_REPORT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.26616/nioshfffacef200903",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.2172/974759": {
+   "id": "doi:10.2172/974759",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2172/974759",
+   "source_uri": "https://doi.org/10.2172/974759",
+   "title": "2007 Nissan Altima-2351 Hybrid Electric Vehicle Battery Test Results",
+   "abstract": "",
+   "doi": "10.2172/974759",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2010",
+   "retrieval_timestamp": "2026-09-21T14:28:56.919128+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "452d55370c5c52716dd00cf7fbfc17be62c760cc7045351ae488a71f251a305c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2172/974759"
+    },
+    "queries_by_source": {
+     "crossref": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=report"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "REPORT",
+   "document_type": "",
+   "evidence_lane": "TECHNICAL_REPORT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2172/974759",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "title:41d4ca227da494e7": {
+   "id": "title:41d4ca227da494e7",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:340369630",
+   "source_uri": "",
+   "title": "The impact of domestic plug-in hybrid electric vehicles on power distribution system loads",
+   "abstract": "The market for Plug-in Hybrid Electric Vehicle (PHEVs) is expected to grow significantly over the next few years and a number of new products are soon to come onto the market, such as the Toyota Prius plug-in version, . The charging demand of wide-scale use of PHEVs may have a significant impact on domestic electricity loads and could risk of overloading the power system if appropriate charging strategies not applied to prevent this. A Monte Carlo Simulation (MCS) model of domestic PHEV use and availability has been developed based on probabilistic characterisations obtained from UKTUS and quantifies charging demand of PHEVs as a function of time of day. The MCS model has been developed in order to simulate the impact on the electricity distribution system. This article also discusses the potential for responsive battery charging load from PHEVs",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T14:28:56.919147+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9ac4725cc3d3483f65ccfcb2ddf268750ee71cbd72088f5fee32be1138f23d2f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:340369630"
+    },
+    "queries_by_source": {
+     "core": "2020 nissan rogue energy harvester system spontaneous parked-vehicle fire"
+    },
+    "query_variant_derivation": "CROSS_DOMAIN_TERM",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:41d4ca227da494e7",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 nissan rogue energy harvester system spontaneous parked-vehicle fire",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Infield, David",
+    "Huang, Sikai"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1038/nphys3263": {
+   "id": "doi:10.1038/nphys3263",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:18392145",
+   "source_uri": "https://doi.org/10.1038/nphys3263",
+   "title": "Triggering extreme events at the nanoscale in photonic seas",
+   "abstract": "This work is supported by Kaust (Award No. CRG-1-2012-FRA-005), by NanoNextNL of the Dutch ministry EL&I and 130 partners and by the EU FET project ‘SPANGL4Q’.Hurricanes, tsunamis, rogue waves and tornadoes are rare natural phenomena that embed an exceptionally large amount of energy, which appears and quickly disappears in a probabilistic fashion. This makes them difficult to predict and hard to generate on demand. Here we demonstrate that we can trigger the onset of rare events akin to rogue waves controllably, and systematically use their generation to break the diffraction limit of light propagation. We illustrate this phenomenon in the case of a random field, where energy oscillates among incoherent degrees of freedom. Despite the low energy carried by each wave, we illustrate how to control a mechanism of spontaneous synchronization, which constructively builds up the spectral energy available in the whole bandwidth of the field into giant structures, whose statistics is predictable. The larger the frequency bandwidth of the random field, the larger the amplitude of rare events that are built up by this mechanism. Our system is composed of an integrated optical resonator, realized on a photonic crystal chip. Through near-field imaging experiments, we record confined rogue waves characterized by a spatial localization of 206 nm and with an ultrashort duration of 163 fs at a wavelength of 1.55 μm. Such localized energy patterns are formed in a deterministic dielectric structure that does not require nonlinear properties.Peer reviewe",
+   "doi": "10.1038/nphys3263",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T14:28:56.919164+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9fe6fe7dd3781022401425ed6767ad690106e66e1a069dec3dd37f5f09d30451",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:18392145"
+    },
+    "queries_by_source": {
+     "core": "2020 nissan rogue energy harvester system spontaneous parked-vehicle fire"
+    },
+    "query_variant_derivation": "CROSS_DOMAIN_TERM",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1038/nphys3263",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 nissan rogue energy harvester system spontaneous parked-vehicle fire",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Liu, Changxu",
+    "Krauss, T. F.",
+    "R. E. C. van der Wel",
+    "L. Kuipers",
+    "Krauss, Thomas Fraser",
+    "N. Rotenberg",
+    "A. Fratalocchi",
+    "Kuipers, L.",
+    "Di Falco, Andrea",
+    "A. Di Falco",
+    "Van Der Wel, Ruben E C",
+    "Fratalocchi, Andrea",
+    "Fratalocchi, A.",
+    "C. Liu",
+    "Kuipers, Laurens Kobus",
+    "Di Falco, A.",
+    "van der Wel, R. E. C.",
+    "T. F. Krauss",
+    "Rotenberg, Nir",
+    "Liu, C."
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1021/acs.est.2c08581.s001": {
+   "id": "doi:10.1021/acs.est.2c08581.s001",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1021/acs.est.2c08581.s001",
+   "source_uri": "https://doi.org/10.1021/acs.est.2c08581.s001",
+   "title": "Ecotoxicity Evaluation of Fire-Extinguishing Water from Large-Scale Battery and Battery Electric Vehicle Fire Tests",
+   "abstract": "",
+   "doi": "10.1021/acs.est.2c08581.s001",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T14:28:56.919180+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0962e9ef45b353b85a580bad6ec6f3133ad1283b4b47cf78e71811ad25ea794b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1021/acs.est.2c08581.s001"
+    },
+    "queries_by_source": {
+     "crossref": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=component"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1021/acs.est.2c08581.s001",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Nissan Rogue battery system spontaneous parked-vehicle fire",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "title:cf31f8ab53a8b822": {
+   "id": "title:cf31f8ab53a8b822",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:24004013",
+   "source_uri": "",
+   "title": "Multicomponent rogue waves",
+   "abstract": "We overview theoretical and experimental advances in the field of rogue wave solutions of multi-component optical wave systems. In these systems, the transfer of energy among the coupled waves may lead to novel and complex extreme wave phenomena. We focus our attention on the case of vector field co-propagation in randomly birefringent optical fibers, and on the coupling among counter propagating waves in a periodic nonlinear waveguide",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-21T14:28:56.919196+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bf7de12b67951a8ff3aeb5b7756e43c3d844d08eb9c6b2ebb60042e7b49bfa47",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:24004013"
+    },
+    "queries_by_source": {
+     "core": "2020 nissan rogue battery system spontaneous experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:cf31f8ab53a8b822",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 nissan rogue battery system spontaneous experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Conforti, M.",
+    "Degasperis, Antonio",
+    "Aceves, A. B.",
+    "Wabnitz, Stefan",
+    "Baronio, F.",
+    "Wabnitz, S.",
+    "Morin, Philippe",
+    "Lombardo, Sara",
+    "Morin, P.",
+    "Aceves, Alejandro B.",
+    "Kibler, B.",
+    "Degasperis, A.",
+    "Lombardo, Sara; id_orcid",
+    "Baronio, Fabio",
+    "Kibler, Bertrand",
+    "Millot, G.",
+    "Conforti, Matteo",
+    "Frisquet, Benoit",
+    "Aceves, Alejandro",
+    "Millot, Guy"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:56c28f3e": {
+   "id": "problem:56c28f3e",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "56c28f3ef0f9169720dd8747b6652a535c07677c03655e692d2ea41b359e9610",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "ba133f1abd5e9f3dec93d1a633329aa4ac833f4fbc70696588d320a113c49452",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-21T14:41:31+00:00Z"
+ }
+}
