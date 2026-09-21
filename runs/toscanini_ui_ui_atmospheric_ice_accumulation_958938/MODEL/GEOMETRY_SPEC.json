@@ -1,0 +1,183 @@
+{
+  "spec_version": "1.1.0",
+  "canonical_family": "energy",
+  "canonical_family_label": "Energy harvesting & storage systems",
+  "canonical_family_basis": {
+    "canonical_family": "energy",
+    "label": "Energy harvesting & storage systems",
+    "basis": {
+      "source": "engineering_specification.why_this_domain.canonical_family (the upstream R445 authority \u2014 consumed, never re-derived)",
+      "ladder_step": 1,
+      "upstream_record": true
+    },
+    "archetype": "ENERGY_STORAGE",
+    "archetype_basis": "registry routing: canonical family 'energy' -> archetype 'ENERGY_STORAGE'"
+  },
+  "technology_class": "ENERGY_STORAGE",
+  "technology_class_role": "bridge geometry archetype (presentation routing, R445)",
+  "dimension_class": "ABSTRACT_PRESENTATION_UNITS",
+  "measurement_basis": "TOPOLOGY_ONLY",
+  "intervention_site": "offshore wind turbine blade",
+  "selection_basis": {
+    "family": "GENERIC_ARCHITECTURE",
+    "label": "generic system architecture",
+    "score": 2,
+    "min_form_score": 3,
+    "score_table": [
+      {
+        "family": "VEHICLE",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "MEDICAL_DEVICE",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "FLUID_DEVICE",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "THERMAL_SYSTEM",
+        "score": 2,
+        "hits": [
+          {
+            "keyword": "heat",
+            "weight": 2,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "family": "MECHANICAL_COMPONENT",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "ELECTRONIC_SYSTEM",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "ENERGY_STORAGE",
+        "score": 0,
+        "hits": []
+      }
+    ],
+    "basis": {
+      "derived_from": [
+        "problem text",
+        "intervention site",
+        "recorded subsystem names"
+      ],
+      "rule": "highest keyword score wins; ties resolve by registry order; below the form threshold the generic architecture family is selected and labeled",
+      "deterministic": true
+    }
+  },
+  "components": [
+    {
+      "component_id": "cell_stack",
+      "label": "cell stack",
+      "form": "stack",
+      "material_class": "battery",
+      "mapped_from": null,
+      "structural": true,
+      "role": "cell stack (structural presentation element)"
+    },
+    {
+      "component_id": "pack_enclosure",
+      "label": "pack enclosure",
+      "form": "enclosure",
+      "material_class": "body_metal",
+      "mapped_from": null,
+      "structural": true,
+      "role": "pack enclosure (structural presentation element)"
+    },
+    {
+      "component_id": "bus_bars",
+      "label": "bus bars",
+      "form": "bus",
+      "material_class": "machined_metal",
+      "mapped_from": null,
+      "structural": true,
+      "role": "series interconnect bus bars (family-definitional presentation element of the energy-storage acceptance case; mapped subsystem recorded as alias)"
+    },
+    {
+      "component_id": "thermal_barrier",
+      "label": "thermal barrier plates",
+      "form": "slot",
+      "material_class": "ceramic",
+      "mapped_from": "conduction path / spreader",
+      "structural": false,
+      "role": "recorded subsystem 'conduction path / spreader' mapped onto the thermal barrier plates slot"
+    },
+    {
+      "component_id": "module_01",
+      "label": "module: heat source characterization",
+      "form": "module",
+      "material_class": "polymer",
+      "mapped_from": "heat source characterization",
+      "structural": false,
+      "role": "recorded subsystem 'heat source characterization' (no canonical slot in the energy storage architecture; mounted as a labeled module)"
+    },
+    {
+      "component_id": "module_02",
+      "label": "module: reject interface",
+      "form": "module",
+      "material_class": "polymer",
+      "mapped_from": "reject interface",
+      "structural": false,
+      "role": "recorded subsystem 'reject interface' (no canonical slot in the energy storage architecture; mounted as a labeled module)"
+    },
+    {
+      "component_id": "module_03",
+      "label": "module: safety limit interlock",
+      "form": "module",
+      "material_class": "polymer",
+      "mapped_from": "safety limit interlock",
+      "structural": false,
+      "role": "recorded subsystem 'safety limit interlock' (no canonical slot in the energy storage architecture; mounted as a labeled module)"
+    }
+  ],
+  "interfaces": [
+    {
+      "interface_id": "es_cells_bus",
+      "from": "cell_stack",
+      "to": "bus_bars",
+      "kind": "electrical",
+      "material_class": "conduit_power",
+      "form": "conduit"
+    },
+    {
+      "interface_id": "es_barrier_cells",
+      "from": "thermal_barrier",
+      "to": "cell_stack",
+      "kind": "thermal",
+      "material_class": "conduit_power",
+      "form": "conduit"
+    }
+  ],
+  "fidelity": {
+    "recorded_subsystems": [
+      "heat source characterization",
+      "conduction path / spreader",
+      "reject interface",
+      "safety limit interlock"
+    ],
+    "mapped": [
+      "thermal_barrier",
+      "module_01",
+      "module_02",
+      "module_03"
+    ],
+    "structural_form_components": [
+      "cell_stack",
+      "pack_enclosure",
+      "bus_bars"
+    ],
+    "unmapped_note": "every recorded subsystem appears as a canonical slot, an alias, or a labeled module \u2014 the fidelity contract of the conceptual layer"
+  },
+  "spec_sha256": "289eb349408c94c2ce1f3bb4ac270e2f5c299040832772389e7b9f2cdfd390ce"
+}
