@@ -868,11 +868,16 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             constraint=problem.get("constraint", ""),
             record_text=_ms._item_abstract(item)[:2600]
             or "(record text unavailable)")
+        # R516D: the initial budget is the rescue-proven level
+        # (_ms.OPERATOR_INSTANTIATION_MAX_TOKENS), not the 700
+        # default — 0/10 first-attempt successes at 700 across two
+        # batteries is systematic budget starvation, not flakes.
         meta = _ms.llm_generate(
             prompt,
             system="You are a rigorous mechanism engineer. Every "
                    "claim must derive from the given evidence.",
-            purpose=f"operator_{sel_id}")
+            purpose=f"operator_{sel_id}",
+            max_tokens=_ms.OPERATOR_INSTANTIATION_MAX_TOKENS)
         _llm_meta = meta
         _clk.mark("llm_instantiation_wall",
                   {"provider": meta.get("provider"),
@@ -959,7 +964,11 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     space["min_candidates_required"] = 1
     space["metrics"] = _ms._metrics(space, all_candidates, retained,
                                     verifications, len(items))
-    _clk.mark("serialization_persistence")
+    # R516B-E section 2: named for the actual work (post-verification
+    # assembly: transition ledger, public candidates, metrics) — the
+    # old "serialization_persistence" label did not measure
+    # persistence. Durations byte-identical; positional mapping pinned.
+    _clk.mark("post_support_assembly")
     # R516 Part A: the candidate funnel + LLM detail, all counts and
     # states from the existing typed vocabulary (no new epistemic
     # states; unexecuted steps read as absent/None with the

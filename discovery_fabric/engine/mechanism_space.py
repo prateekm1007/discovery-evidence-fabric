@@ -1070,6 +1070,26 @@ TRANSFORMATION_OPERATORS: List[Dict[str, Any]] = [
 ]
 OPERATOR_IDS = tuple(op["operator_id"] for op in TRANSFORMATION_OPERATORS)
 
+#: R516D (auditor directive Part D — the ONE measured optimization).
+#: Initial token budget for operator instantiation calls.
+#: Provenance (Art. XXVII): R516 fresh battery (6 runs) + R513 battery
+#: (5 runs) — 0/10 first-attempt successes at the 700 default on
+#: Atria-Dawn-Preview (systematic first-attempt empties; the
+#: larger-budget rescue at min(8192, 2800) converts every one); no
+#: 240 s-class socket stall anywhere in the operator path (fast-fail
+#: signature bounds each failure well under 240 s); synthesis on the
+#: same provider/window succeeds first-try at 512 on shorter outputs
+#: while the 8-field operator output needs ~400-500 visible tokens
+#: plus reasoning. Class: ENGINEERING (a generation budget, NOT a
+#: gate/admission threshold — span, semantic, distinctness, and
+#: support verdicts judge identically whatever the budget; same
+#: provider, model, ring, prompt, and contracts). Uncertainty: token
+#: need varies by problem; extreme cases still hit the standing
+#: larger-budget rescue (preserved, never removed). Expected effect:
+#: skip one burned ~14-100 s failed generation per operator call;
+#: measured in Part E, never asserted here.
+OPERATOR_INSTANTIATION_MAX_TOKENS = 2800
+
 
 def apply_operator(op: Dict[str, Any],
                    structured_evidence: List[Dict[str, Any]],

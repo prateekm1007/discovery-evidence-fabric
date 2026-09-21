@@ -565,7 +565,16 @@ class TestDeletionAccounting(unittest.TestCase):
                     # byte-identical to their consumer (zero semantic
                     # change; completes the closure's retirement)
                     "discovery_fabric/retrieval_fabric/"
-                    "query_expansion.py"),
+                    "query_expansion.py",
+                    # R516 AMENDMENT (disclosed): the MECHANISM_SPACE
+                    # attribution instrument module
+                    # (mechanism_attribution.py — R516 Part A, clock +
+                    # funnel + LLM detail, observational only) and the
+                    # R516B-E span rename (serialization_persistence
+                    # -> post_support_assembly: label hygiene on the
+                    # same measured span, durations byte-identical)
+                    "discovery_fabric/engine/"
+                    "mechanism_attribution.py"),
                 f"the mandate's file list is exhaustive: {f} is outside "
                 "run.py/stage_entry.py/adapters.py/llm_registry.py")
 

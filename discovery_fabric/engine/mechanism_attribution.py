@@ -54,7 +54,13 @@ SUBPHASES = (
     "cemetery_consultation",
     "distinctness_dedup",
     "mechanism_support_verification",
-    "serialization_persistence",
+    # R516B-E (auditor directive section 2): the old name
+    # "serialization_persistence" did not measure persistence — it
+    # covers post-verification in-function assembly (transition
+    # ledger, public candidates, metrics, return). Renamed to the
+    # actual work; durations byte-identical, positional mapping
+    # pinned by test.
+    "post_support_assembly",
 )
 
 _OFFLINE_SPLIT_MARKER = {

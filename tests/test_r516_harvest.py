@@ -101,9 +101,12 @@ class TestHarvestReads(unittest.TestCase):
             row["internal_attribution"]["present"])
         self.assertEqual(
             row["wrapper_protocol_overhead"]["class"], "UNKNOWN")
-        # funnel still shells out to v1.1.0 on the same bytes
-        self.assertEqual(
-            row["funnel_row"]["class"], "OBSERVED_IN_STAGE")
+        # funnel still shells out to v1.1.0 on the same bytes (the
+        # full instrument row is preserved; the harvest
+        # classification rides alongside, never inside the row)
+        self.assertEqual(row["funnel_row_class"], "OBSERVED_IN_STAGE")
+        self.assertEqual(row["funnel_row"]["instrument"],
+                         "r506_discovery_yield/1.1.0")
 
     def test_wrapper_derivation_labels(self):
         import tempfile
@@ -148,9 +151,9 @@ class TestHarvestReads(unittest.TestCase):
             row = harvest.measure_run(
                 rd, harvest.load_ledger(_ledger(Path(td) / "l.jsonl")))
         for key in ("internal_attribution", "outer_stage_wall",
-                    "wrapper_protocol_overhead", "funnel_row",
-                    "ledger_join"):
+                    "wrapper_protocol_overhead", "ledger_join"):
             self.assertIn(row[key]["class"], allowed, key)
+        self.assertIn(row["funnel_row_class"], allowed)
 
 
 if __name__ == "__main__":

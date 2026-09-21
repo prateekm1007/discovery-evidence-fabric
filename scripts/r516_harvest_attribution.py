@@ -158,35 +158,26 @@ def measure_run(run_dir: Path, ledger_lines: list):
     }
 
     # ---- funnel row via the frozen-behavior instrument ----
+    # The FULL instrument row is preserved (YIELD_MEASUREMENT +
+    # aggregate read it verbatim); the harvest classification rides
+    # alongside as funnel_row_class (never inside the row).
     r = subprocess.run(
         [sys.executable, str(INSTRUMENT), "--run-dir", str(run_dir)],
         capture_output=True, text=True, timeout=300)
     if r.returncode != 0:
-        row["funnel_row"] = {
-            "class": "UNKNOWN",
-            "note": f"instrument error: {r.stderr[-200:]}"}
+        row["funnel_row"] = None
+        row["funnel_row_class"] = "UNKNOWN"
+        row["funnel_row_note"] = \
+            f"instrument error: {r.stderr[-200:]}"
     else:
         try:
             payload = json.loads(r.stdout)
-            frow = (payload.get("rows") or [{}])[0]
-            row["funnel_row"] = {
-                "class": "OBSERVED_IN_STAGE",
-                "instrument": frow.get("instrument"),
-                "lost_at": frow.get("lost_at"),
-                "typed_drop_reason":
-                    frow.get("typed_drop_reason"),
-                "starvation_terminal":
-                    frow.get("starvation_terminal"),
-                "mechanisms_found": {
-                    "reached": (frow.get("mechanisms_found") or {})
-                    .get("reached")},
-                "distinct": ((frow.get(
-                    "candidates_generated_distinct") or {})
-                    .get("count")),
-            }
+            row["funnel_row"] = (payload.get("rows") or [{}])[0]
+            row["funnel_row_class"] = "OBSERVED_IN_STAGE"
         except Exception as exc:  # noqa: BLE001
-            row["funnel_row"] = {"class": "UNKNOWN",
-                                 "note": f"row parse: {exc}"[:160]}
+            row["funnel_row"] = None
+            row["funnel_row_class"] = "UNKNOWN"
+            row["funnel_row_note"] = f"row parse: {exc}"[:160]
 
     # ---- ledger join (OFFLINE_DERIVED / UNKNOWN) ----
     sid = _session_of(run_dir)

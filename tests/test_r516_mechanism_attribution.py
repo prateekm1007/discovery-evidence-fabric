@@ -144,6 +144,10 @@ class TestAttributionEmitted(unittest.TestCase):
                          mattr.ATTRIBUTION_VERSION)
         names = [s["subphase"] for s in rec["subphases"]]
         self.assertEqual(names, list(mattr.SUBPHASES))
+        # R516B-E section 2: the 12th span is named for the actual
+        # work (post-verification assembly), never persistence.
+        self.assertIn("post_support_assembly", names)
+        self.assertNotIn("serialization_persistence", names)
         for s in rec["subphases"]:
             if s["subphase"] == "provider_call_split_offline":
                 self.assertIsNone(
@@ -255,9 +259,39 @@ class TestNoSemanticChange(unittest.TestCase):
             return _run_adapter(_verified_env(),
                                 _fake_llm(calls))
 
+        def _first_diff_path(x, y, path="$"):
+            if type(x) is not type(y):
+                return f"{path}: type {type(x).__name__} vs " \
+                       f"{type(y).__name__}"
+            if isinstance(x, dict):
+                if set(x) != set(y):
+                    return f"{path}: keys {sorted(set(x) ^ set(y))} " \
+                           f"differ"
+                for k in x:
+                    hit = _first_diff_path(x[k], y[k],
+                                           f"{path}.{k}")
+                    if hit:
+                        return hit
+                return None
+            if isinstance(x, list):
+                if len(x) != len(y):
+                    return f"{path}: len {len(x)} vs {len(y)}"
+                for i, (a, c) in enumerate(zip(x, y)):
+                    hit = _first_diff_path(a, c, f"{path}[{i}]")
+                    if hit:
+                        return hit
+                return None
+            if x != y:
+                return f"{path}: {str(x)[:80]!r} vs " \
+                       f"{str(y)[:80]!r}"
+            return None
+
         a, b = _once(), _once()
-        self.assertEqual(_strip_volatile(a), _strip_volatile(b),
-                         "instrument perturbs deterministic outputs")
+        sa, sb = _strip_volatile(a), _strip_volatile(b)
+        self.assertIsNone(
+            _first_diff_path(sa, sb),
+            "instrument perturbs deterministic outputs at "
+            f"{_first_diff_path(sa, sb)}")
         # ...except the attribution itself, which re-measures
         self.assertIn("runtime_attribution", a)
         self.assertIn("runtime_attribution", b)
