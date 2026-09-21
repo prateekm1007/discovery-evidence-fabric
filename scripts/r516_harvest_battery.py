@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -29,10 +30,14 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
 sys.path.insert(0, str(REPO))
 
-SESSIONS = REPO / "R516" / "BATTERY_SESSIONS.json"
+SESSIONS = REPO / os.environ.get("R516_SESSIONS",
+                                 "R516/BATTERY_SESSIONS.json")
 MANIFEST = REPO / "R516" / "BATTERY_PROBLEMS.json"
-REDACTED = REPO / "R516" / "BATTERY_SESSIONS_REDACTED.json"
-OUT_HARVEST = REPO / "R516" / "MS_ATTRIBUTION_HARVEST.json"
+REDACTED = REPO / os.environ.get(
+    "R516_REDACTED", "R516/BATTERY_SESSIONS_REDACTED.json")
+OUT_HARVEST = REPO / os.environ.get(
+    "R516_OUT_HARVEST", "R516/MS_ATTRIBUTION_HARVEST.json")
+YIELD_ROW_PREFIX = os.environ.get("R516_YIELD_ROW_PREFIX", "YIELD_ROW_")
 INSTRUMENT_ID = "r506_discovery_yield"
 INSTRUMENT_VERSION = "1.1.0"
 
@@ -133,7 +138,8 @@ def main() -> int:
             # the --out bytes must equal what measure_run read (same
             # input bytes -> same output bytes, Art. LXII); a mismatch
             # is recorded loudly, never papered over.
-            out = REPO / "R516" / f"YIELD_ROW_{idx}_{slug}.json"
+            out = REPO / "R516" / \
+                f"{YIELD_ROW_PREFIX}{idx}_{slug}.json"
             r2 = subprocess.run(
                 [sys.executable, str(hv.INSTRUMENT), "--run-dir",
                  str(dest), "--out", str(out)],
