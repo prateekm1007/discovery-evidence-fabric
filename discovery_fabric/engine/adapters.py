@@ -694,11 +694,19 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     no second evaluator — Art. IV)."""
     import hashlib as _h
     from . import stage_entry
+    from . import mechanism_attribution as _mattr
     from discovery_fabric.engine import mechanism_space as _ms
 
+    # R516 Part A: attribution clock (observational only — marks sit
+    # between existing statements; no branch, threshold, or decision
+    # below reads the clock).
+    _clk = _mattr.AttributionClock()
     problem = env.problem or {}
+    _clk.mark("entry_setup")
     verified = stage_entry.verified_evidence_items(env)
     by_id = {str(it.get("id")): it for it in (env.evidence or [])}
+    _clk.mark("verified_evidence_collection",
+              {"n_verified_items_examined": len(verified)})
     items: List[Dict[str, Any]] = []
     for cls_item in verified:
         rec = by_id.get(str(cls_item.get("source_id"))) or {}
@@ -744,6 +752,8 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             "relevance": cls_item.get("relevance"),
             "_record_text": record_text,
         })
+    _clk.mark("evidence_item_construction",
+              {"n_structured_items": len(items)})
     space: Dict[str, Any] = {
         "mechanism_space_version": _ms.MECHANISM_SPACE_VERSION,
         "construction": "R453_LEAN (external auditor mandate: no "
@@ -771,6 +781,16 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             [], "NONE", "NO_EVIDENCE", {}, {"state": "NOT_CONSULTED",
                                             "blocked": []}, {}, [], {},
             {})
+        space["runtime_attribution"] = _mattr.build_record(
+            _clk,
+            {"verified_evidence_items": 0,
+             "applicable_operator_contracts": {
+                 "n_evaluated": 0, "n_satisfied": 0},
+             "selected_operator": "NONE",
+             "llm_outcome": "NOT_ATTEMPTED",
+             "terminal_reason": "NO_EVIDENCE"},
+            _mattr.llm_call_detail(0, None),
+            "NO_EVIDENCE")
         return space
     space["structured_evidence"] = {
         "state": "BUILT", "n_items": len(items),
@@ -785,8 +805,16 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     #      is one call, the span/semantic gates themselves are
     #      unchanged) ---------------------------------------------------
     sel = _lean_select_operator(items, problem)
+    _clk.mark("operator_selection",
+              {"n_contracts_evaluated": len(sel.get("evaluated") or []),
+               "n_satisfied": sum(
+                   1 for e in (sel.get("evaluated") or [])
+                   if e.get("satisfied")),
+               "selected_operator": (sel.get("operator") or {}).get(
+                   "operator_id", "NONE") if sel.get("operator") else "NONE"})
     op = sel["operator"]
     item = sel["item"] if sel["item"] is not None else items[0]
+    _llm_meta = None
     contract = sel["contract"]
     sel_id = op["operator_id"] if op else "NONE"
     space["operator_ids"] = [sel_id] if op else []
@@ -845,6 +873,11 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             system="You are a rigorous mechanism engineer. Every "
                    "claim must derive from the given evidence.",
             purpose=f"operator_{sel_id}")
+        _llm_meta = meta
+        _clk.mark("llm_instantiation_wall",
+                  {"provider": meta.get("provider"),
+                   "model": meta.get("model"),
+                   "transport_status": meta.get("status")})
         if not meta.get("ok"):
             operator_result.update({
                 "state": "OPERATOR_INSTANTIATION_FAILED",
@@ -853,9 +886,15 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             })
         else:
             fields = _ms._parse_candidate_fields(meta["content"] or "")
+            _clk.mark("candidate_parsing",
+                      {"n_fields_nonempty": sum(
+                          1 for v in fields.values() if str(v or ""))})
             cand = _ms.assemble_candidate(op, item, fields, problem, meta)
             sem = _ms.operator_semantic_check(
                 sel_id, item, cand, problem)
+            _clk.mark("semantic_validation",
+                      {"semantic_verdict": sem.get("semantic_verdict"),
+                       "candidate_state": cand.get("candidate_state")})
             cand["operator_semantic_check"] = sem
             operator_result["candidates"] = [cand]
             operator_result["state"] = (
@@ -880,16 +919,30 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                       if isinstance(c, dict)
                       and c.get("candidate_state") == "CANDIDATE"]
     space["cemetery_consumption"] = _ms._consult_cemetery(all_candidates)
+    _clk.mark("cemetery_consultation",
+              {"n_consulted": (space["cemetery_consumption"] or {}).get(
+                  "n_candidates_consulted", 0),
+               "n_blocked": (space["cemetery_consumption"] or {}).get(
+                   "n_blocked", 0)})
     dedup = _ms.deduplicate_candidates(all_candidates)
     space["distinctness"] = dedup
     _dd_by_id = {str(c.get("candidate_id")): {
         "verdict": c.get("distinctness_verdict"),
         "basis": c.get("distinctness_basis")} for c in all_candidates}
     retained = _ms._retained_candidates(all_candidates, dedup)
+    _clk.mark("distinctness_dedup",
+              {"n_distinct": dedup.get("n_distinct"),
+               "n_indeterminate": dedup.get("n_indeterminate"),
+               "n_retained": len(retained)})
     verifications = [_ms.verify_mechanism_support(c, items, problem)
                      for c in retained]
     for c, v in zip(retained, verifications):
         c["mechanism_support"] = v
+    _clk.mark("mechanism_support_verification",
+              {"support_states": [
+                  (v.get("mechanism_support_state")
+                   if isinstance(v, dict) else None)
+                  for v in verifications]})
     from . import transition_trace as _tt
     space["candidate_transitions"] = _tt.build_transition_ledger(
         _assembled, sel_id, str(operator_result.get("state") or ""),
@@ -906,6 +959,41 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     space["min_candidates_required"] = 1
     space["metrics"] = _ms._metrics(space, all_candidates, retained,
                                     verifications, len(items))
+    _clk.mark("serialization_persistence")
+    # R516 Part A: the candidate funnel + LLM detail, all counts and
+    # states from the existing typed vocabulary (no new epistemic
+    # states; unexecuted steps read as absent/None with the
+    # terminal-state reason pointing at the responsible typed state).
+    _assembled = operator_result.get("candidates") or []
+    _sem_verdicts = [
+        (c.get("operator_semantic_check") or {}).get("semantic_verdict")
+        for c in _assembled]
+    if _llm_meta is None:
+        _llm_outcome = operator_result.get("state")
+    else:
+        _llm_outcome = _llm_meta.get("status")
+    space["runtime_attribution"] = _mattr.build_record(
+        _clk,
+        {"verified_evidence_items": len(items),
+         "applicable_operator_contracts": {
+             "n_evaluated": len(sel.get("evaluated") or []),
+             "n_satisfied": sum(
+                 1 for e in (sel.get("evaluated") or [])
+                 if e.get("satisfied"))},
+         "selected_operator": sel_id,
+         "llm_outcome": _llm_outcome,
+         "llm_output_empty": (not bool(_llm_meta.get("content"))
+                              if _llm_meta is not None else None),
+         "n_assembled": len(_assembled),
+         "semantic_verdicts": _sem_verdicts,
+         "distinctness": {
+             "n_distinct": dedup.get("n_distinct"),
+             "n_indeterminate": dedup.get("n_indeterminate")},
+         "n_retained": len(retained),
+         "terminal_reason": space["state"]},
+        _mattr.llm_call_detail(
+            0 if _llm_meta is None else 1, _llm_meta),
+        space["state"])
     return space
 
 
