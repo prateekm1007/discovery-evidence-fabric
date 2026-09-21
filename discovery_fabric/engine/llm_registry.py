@@ -2078,11 +2078,30 @@ def generate(prompt: str, system: str = "",
                         f"(finish_reason={exc.finish_reason}); same "
                         f"provider/model retried with max_tokens="
                         f"{attempt_budget}")
-                if retries_used < max_retries:
-                    retries_used += 1
-                    attempt += 1
-                    time.sleep(2 * retries_used)
-                    continue
+                    if retries_used < max_retries:
+                        retries_used += 1
+                        attempt += 1
+                        time.sleep(2 * retries_used)
+                        continue
+                else:
+                    # R514: at-ceiling empty content — the identical
+                    # same-model retry is SKIPPED. An identical budget
+                    # on an identical model after a completed-but-empty
+                    # generation has no mechanism to succeed
+                    # differently; measured R513 (durable
+                    # model_routing ledger): 16 at-ceiling
+                    # empty-content failures (atria/zai/xkiro,
+                    # max_tokens=2048), every one resolved via provider
+                    # change, none via identical retry (each wasted
+                    # 25-245 s). Falls through to hop recording +
+                    # cascade advance (the next rung is the recovery
+                    # path, Art. V). The below-ceiling larger-budget
+                    # rescue above is preserved untouched.
+                    retry_notes.append(
+                        f"attempt {attempt + 1}: empty content at max "
+                        f"budget (max_tokens={attempt_budget}) — "
+                        "identical same-model retry skipped, cascade "
+                        "advances (R514)")
             except Exception as exc:  # noqa: BLE001 — recorded, retried
                 last_err = f"{type(exc).__name__}: {exc}"
                 ftype = classify_failure(exc)

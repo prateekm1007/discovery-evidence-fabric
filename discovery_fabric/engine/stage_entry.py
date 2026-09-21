@@ -34,6 +34,13 @@ has something for them to work on —
         or design experiments for (attack is skippable ONLY when there
         is nothing to attack; a verified primary candidate or a
         retained mechanism-space candidate both count as something)
+    SKIPPED / MINIMUM_DIVERSITY                    fewer than 2
+        MATERIALLY distinct mechanisms (the Art. XLII distinctness
+        adjudication, INDETERMINATE never counted) — the run is
+        MECHANISM_STARVED (Art. LXXXIV): attack results may not be
+        reported as discovery evidence and collision spend has
+        nothing to differentiate (retention is not distinctness —
+        one retained candidate is still a starved run)
 
 Semantics:
     entry_status     ALLOWED | SKIPPED
@@ -54,7 +61,7 @@ from typing import Any, Dict, List, Optional, Set
 
 from discovery_fabric.engine.candidate import Candidate
 
-ENTRY_HELPER_VERSION = "stage_entry/1.1.0"
+ENTRY_HELPER_VERSION = "stage_entry/1.2.0"
 
 #: R453-LEAN-CORE: the stages whose compute is admitted only when the
 #: run has something for them to work on. ADJUDICATION and CLASSIFY are
@@ -66,6 +73,21 @@ ADAPTIVE_ADMISSION_STAGES = frozenset({
     "PHYSICS", "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT",
     "NEXT_BEST_ACTION", "RANK",
 })
+
+#: R514 (Art. LXXXIV minimum-diversity gate): the stages that consume
+#: materially distinct mechanisms AS discovery evidence. ATTACK results
+#: on <2 distinct mechanisms may not be reported as discovery evidence
+#: (the article's explicit bar); COLLISION novelty verdicts on a
+#: starved run are dead metered-search spend with nothing to
+#: differentiate. CONTRADICTION is deliberately NOT here (deterministic;
+#: it also consumes evidence-verification issues independent of
+#: candidates — R478 P0-2) and neither is IMPROVE (its own
+#: NO_KILL_EVIDENCE admission owns the empty-input case — R481).
+MINIMUM_DIVERSITY_STAGES = frozenset({"COLLISION", "ATTACK"})
+
+#: Art. LXXXIV: "fewer than 2 materially distinct candidate
+#: mechanisms (per the Art. XLII distinctness definition)".
+MINIMUM_DISTINCT_MECHANISMS = 2
 
 # Evidence classes that count as a VERIFIED_EVIDENCE_ITEM: an item the
 # classification adjudicated as carrying mechanism support (R394 s5).
@@ -164,6 +186,9 @@ def retained_candidate_facts(env: Optional[Candidate]) -> Dict[str, Any]:
                 "primary_verified": False, "basis": "no envelope"}
     ms = env.mechanism_space or {}
     ms_retained = int(ms.get("n_candidates_retained") or 0)
+    # NOTE (R514): retention is not distinctness — see
+    # mechanism_diversity_facts() below for the Art. XLII measure the
+    # MINIMUM_DIVERSITY rule rests on.
     verified = bool(((env.adjudication or {})
                      .get("evidence_verification") or {})
                     .get("verified", False))
@@ -176,6 +201,67 @@ def retained_candidate_facts(env: Optional[Candidate]) -> Dict[str, Any]:
                   "candidate's evidence verification — either is "
                   "something to attack/rank; neither is a fabrication"),
     }
+
+
+def mechanism_diversity_facts(env: Optional[Candidate]) -> Dict[str, Any]:
+    """R514 (Art. LXXXIV/Art. XLII): the measured distinctness facts —
+    is there more than one MATERIALLY distinct mechanism to attack?
+
+    Reads the Art. XLII distinctness adjudication the MECHANISM_SPACE
+    stage stamps onto its envelope
+    (envelope.mechanism_space.distinctness.n_distinct — INDETERMINATE
+    never counted, Art. XLVIII). Absent adjudication (legacy/empty
+    envelope, skipped/failed mechanism space) is present=False: the
+    gate does not fire on unknown (Art. XXV) — those paths keep their
+    own failure/skip semantics.
+    """
+    if env is None:
+        return {"present": False, "n_distinct": None,
+                "basis": "no envelope"}
+    ms = env.mechanism_space or {}
+    if not isinstance(ms, dict):
+        return {"present": False, "n_distinct": None,
+                "basis": "mechanism-space envelope is not a record"}
+    dd = ms.get("distinctness") or {}
+    if not isinstance(dd, dict) or dd.get("n_distinct") is None:
+        return {"present": False, "n_distinct": None,
+                "ms_state": ms.get("state"),
+                "basis": ("no distinctness adjudication on the "
+                          "mechanism-space envelope (legacy or empty "
+                          "envelope) — the MINIMUM_DIVERSITY gate does "
+                          "not fire on unknown (Art. XXV)")}
+    try:
+        n = int(dd.get("n_distinct"))
+    except (TypeError, ValueError):
+        return {"present": False, "n_distinct": None,
+                "ms_state": ms.get("state"),
+                "basis": "distinctness n_distinct is not countable"}
+    return {
+        "present": True,
+        "n_distinct": n,
+        "minimum_required": MINIMUM_DISTINCT_MECHANISMS,
+        "instrument_version": dd.get("instrument_version"),
+        "ms_state": ms.get("state"),
+        "basis": ("Art. XLII distinctness adjudication (INDETERMINATE "
+                  "never counted toward DISTINCT — Art. XLVIII)"),
+    }
+
+
+def mechanism_starved(env: Optional[Candidate]) -> Optional[Dict[str, Any]]:
+    """R514 (Art. LXXXIV): the starvation verdict, or None.
+
+    Returns the diversity facts iff a distinctness adjudication is
+    present AND counts fewer than MINIMUM_DISTINCT_MECHANISMS
+    materially distinct mechanisms. None otherwise (diverse run, or
+    unknown — the gate never fires on unknown). The conductor and
+    _final_state read this one helper so the skip and the terminal
+    cannot disagree (one authority, Art. X).
+    """
+    facts = mechanism_diversity_facts(env)
+    if facts.get("present") and \
+            (facts.get("n_distinct") or 0) < MINIMUM_DISTINCT_MECHANISMS:
+        return facts
+    return None
 
 
 def justify(stage: str,
@@ -271,6 +357,32 @@ def justify(stage: str,
                         "for (R453-LEAN-CORE; attack is skippable only "
                         "when there is nothing to attack)"),
                     "prerequisite_evidence": facts,
+                })
+                return out
+        # R514 (Art. LXXXIV minimum-diversity gate): retention is not
+        # distinctness — one retained candidate is still a starved run.
+        # COLLISION and ATTACK consume materially distinct mechanisms
+        # AS discovery evidence; with <2 they record the typed refusal
+        # instead of executing (measured R513: n_distinct 1 and 0 runs
+        # executed ATTACK and reported KILLED/PASS as discovery
+        # evidence). Runs without a distinctness adjudication keep
+        # their existing semantics (fail-open on unknown, Art. XXV).
+        if stage in MINIMUM_DIVERSITY_STAGES:
+            starved = mechanism_starved(env)
+            if starved is not None:
+                out.update({
+                    "entry_status": "SKIPPED",
+                    "prerequisite": "MINIMUM_DIVERSITY",
+                    "skip_reason": (
+                        "MINIMUM_DIVERSITY: the mechanism-space "
+                        "distinctness adjudication counts "
+                        f"{starved['n_distinct']} materially distinct "
+                        "mechanism(s) (< 2) — the run is "
+                        "MECHANISM_STARVED (Art. LXXXIV): attack results "
+                        "may not be reported as discovery evidence and "
+                        "collision spend has nothing to differentiate "
+                        "(R514)"),
+                    "prerequisite_evidence": starved,
                 })
                 return out
     # 2. verified-evidence prerequisite for expensive candidate

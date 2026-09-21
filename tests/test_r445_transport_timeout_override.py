@@ -60,7 +60,8 @@ def _hermetic(monkeypatch, captured, content="FIELD: ok",
     monkeypatch.setattr(reg, "_call_openai_flavor", fake_call)
 
     def fake_ladder(task, role=None, avoid_provider=None,
-                    preferred_providers=None, available_providers=None):
+                    preferred_providers=None, available_providers=None,
+                    max_rungs=8, now=None, purpose=None):
         return {"rungs": [{"provider": "nvidia",
                            "model": "test/test-model", "band": "PRIMARY"}],
                 "provenance": {"source": "TEST"}}
@@ -71,11 +72,33 @@ def _hermetic(monkeypatch, captured, content="FIELD: ok",
     def fake_available(pid):
         return True
 
-    # availability matrix must see a credential for the pinned provider
+    # availability matrix must see a credential for the pinned provider.
+    # R514 evaluator repair (Art. LXIV.2/XVI): the R451 cost-policy
+    # authority added cost_policy_eligible to the matrix rows these
+    # mocks emit — the mock, not the code, went stale (production
+    # R513 runs prove generate() works). The mock is restored to the
+    # row shape generate() consumes; runtime admission is stubbed
+    # admitted (this battery measures timeout plumbing, never probe
+    # semantics — the hermetic contract in the module docstring).
     monkeypatch.setenv("NVIDIA_API_KEY", "fake-key-hermetic-test")
     monkeypatch.setattr(reg, "availability_matrix",
                         lambda: [{"provider_id": "nvidia",
-                                  "available": True}])
+                                  "available": True,
+                                  "cost_policy_eligible": True}])
+    # the sandbox default cost policy (ZERO_PAID_COST) refuses the
+    # PAID_API nvidia rung — this battery measures timeout plumbing,
+    # never cost policy (same UNRESTRICTED precedent as the R455
+    # capability-gate battery).
+    monkeypatch.setattr(reg._cost_policy, "active_policy",
+                        lambda: "UNRESTRICTED")
+    import discovery_fabric.engine.runtime_admission as ra_mod
+    monkeypatch.setattr(ra_mod, "requires_probe",
+                        lambda provider_id, model_id, now=None: False)
+    monkeypatch.setattr(
+        ra_mod, "runtime_admission",
+        lambda provider_id, model_id, policy=None, now=None,
+        available=None: (True, "TEST_ADMITTED",
+                         {"state": "PROBE_OK"}))
 
 
 class TestTimeoutOverride:

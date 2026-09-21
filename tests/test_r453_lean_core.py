@@ -575,9 +575,12 @@ class TestDeletionAccounting(unittest.TestCase):
         self.assertEqual(STAGE_ORDER[-1], "RANK")
 
     def test_entry_helper_version_bumped(self):
-        """The door's version records the semantic change."""
+        """The door's version records the semantic change.
+
+        R514: 1.1.0 -> 1.2.0 (the MINIMUM_DIVERSITY rule for
+        COLLISION/ATTACK on Art. LXXXIV starved runs)."""
         self.assertEqual(stage_entry.ENTRY_HELPER_VERSION,
-                         "stage_entry/1.1.0")
+                         "stage_entry/1.2.0")
 
 
 if __name__ == "__main__":

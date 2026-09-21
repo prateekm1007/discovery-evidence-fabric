@@ -906,8 +906,22 @@ class EngineRun:
                             _time2.perf_counter() - _evo_t0)
                         if evolution_summary and \
                                 evolution_summary.get("final_state"):
-                            final = dict(evolution_summary["final_state"])
-                            self._persist("final_state.json", final)
+                            _evo_final = evolution_summary["final_state"]
+                            if (final_pre_evolution.get("final_status")
+                                    == "MECHANISM_STARVED"):
+                                # R514 (Art. LXXXIV): a starved run stays
+                                # MECHANISM_STARVED — the evolution layer
+                                # records its lineage but cannot promote
+                                # a starved run to an invention-bearing
+                                # terminal (final_state.json already
+                                # holds the starvation terminal from the
+                                # standard path above; the cemetery
+                                # decision uses final_pre_evolution for
+                                # the same reason).
+                                _evo_final = None
+                            if _evo_final is not None:
+                                final = dict(_evo_final)
+                                self._persist("final_state.json", final)
                     except Exception as exc:  # noqa: BLE001 — recorded honest
                         self._persist("INVENTION_LINEAGE.json", {
                             "schema": "INVENTION_LINEAGE/1.0.0",
@@ -2824,6 +2838,10 @@ class EngineRun:
             str(v).startswith("POLICY_STOP:")
             for v in self.failed_stages.values())
         status = eps.get("final_status")
+        # R514: the starvation verdict is read ONCE here (pure helper,
+        # no side effects) so the terminal branch below and the
+        # admission gate cannot disagree (one authority, Art. X).
+        _starved = stage_entry.mechanism_starved(self.env)
         if premise_reject:
             # R394 s6: the REQUIRED outcome — a self-explaining terminal
             # state. 'MALFORMED_OR_FALSE_PREMISE' is NOT a REJECTED
@@ -2864,6 +2882,24 @@ class EngineRun:
                       "a capable route; this is an infrastructure "
                       "class state, never a scientific rejection "
                       "(Art. LXI)")
+        elif _starved is not None:
+            # R514 (Art. LXXXIV): fewer than 2 materially distinct
+            # mechanisms — the run is MECHANISM_STARVED, not
+            # INVENTION_REQUIRES_EXPERIMENT (the former means the
+            # system generated nothing worth attacking; the latter
+            # means it invented something but could not test it).
+            # COLLISION/ATTACK recorded SKIPPED_ADMISSION /
+            # MINIMUM_DIVERSITY above, so no attack/contradiction/
+            # experiment results travel as discovery evidence.
+            # Resume-safe (the persisted mechanism-space envelope is
+            # restored by _restore_progress).
+            status = "MECHANISM_STARVED"
+            reason = ("the mechanism-space distinctness adjudication "
+                      f"counts {_starved['n_distinct']} materially "
+                      "distinct mechanism(s) (< 2, "
+                      f"{_starved.get('instrument_version')}) — the run "
+                      "generated nothing worth attacking (Art. LXXXIV, "
+                      "R514)")
         elif not synthesis_ok:
             # R416 honest-cause fix: a SYNTHESIZE stage failure means the
             # mechanism GENERATION failed BEFORE any candidate existed.
