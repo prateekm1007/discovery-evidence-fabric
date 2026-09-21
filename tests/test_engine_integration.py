@@ -150,7 +150,7 @@ def test_stage_order_is_exact_d8_chain():
     # every ordinary user run (consultant finding: "validated code but
     # not part of the live run chain"). R401: MECHANISM_SPACE between
     # VERIFY and COLLISION (MULTI_SOURCE_DISCOVERY removed from the
-    # critical path). R481: IMPROVE between
+    # critical path). R513 closure removed the retired stage entirely. R481: IMPROVE between
     # KILLER_EXPERIMENT and ADJUDICATION (the audit's P0-1 loop
     # closure) — the D8 chain is 16 stages.
     assert STAGE_ORDER == [
@@ -404,11 +404,3 @@ def test_retrieval_adapter_live():
         "constraint": "long-term patency"}, problem_id="live_probe")
     A.A2RetrievalAdapter().execute(env, {"run_id": "live", "problem_id": "live_probe"})
     assert len(env.evidence) >= 1
-
-
-@pytest.mark.skipif(not __import__("os").environ.get("ENGINE_LIVE"),
-                    reason="network test; set ENGINE_LIVE=1")
-def test_multisource_adapter_live():
-    env = fixture_envelope()
-    A.MultiSourceDiscoveryAdapter().execute(env, CTX)
-    assert env.multi_source.get("sources_hit") is not None
