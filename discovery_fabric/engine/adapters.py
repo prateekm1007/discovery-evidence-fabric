@@ -1001,13 +1001,18 @@ class MechanismSpaceAdapter(BaseAdapter):
 
 
 class MultiSourceDiscoveryAdapter(BaseAdapter):
-    """Canonical: orchestrator/multi_source_discovery.py::run_four_search_attack
+    """ARCHIVED (MULTI_SOURCE_DISCOVERY removal round): no longer in
+    STAGE_ORDER/ADAPTERS — unreachable from the live D8 loop. Retained
+    as reference per Art. LXIV (ARCHIVED_TO
+    orchestrator/multi_source_discovery.py::run_four_search_attack).
+
+    Canonical: orchestrator/multi_source_discovery.py::run_four_search_attack
     (the CEO v28.3 four-direction search: discovery/destruction/transfer/reality)."""
     capability_id = "MULTI_SOURCE_DISCOVERY"
     module_path = "orchestrator/multi_source_discovery.py"
     canonical_fn = "run_four_search_attack(name, mechanism, problem, failure_mode, adjacent)"
     needs_network = True
-    depends_on = ["SYNTHESIZE"]
+    depends_on = []
 
     def execute(self, env, run_ctx):
         msd = importlib.import_module("orchestrator.multi_source_discovery")
@@ -1792,7 +1797,6 @@ ADAPTERS = {
     "SYNTHESIZE": SynthesizeAdapter(),
     "VERIFY": EvidenceVerifyAdapter(),
     "MECHANISM_SPACE": MechanismSpaceAdapter(),
-    "MULTI_SOURCE_DISCOVERY": MultiSourceDiscoveryAdapter(),
     "COLLISION": CollisionEngineAdapter(),
     "PHYSICS": PhysicsStageAdapter(),
     "ATTACK": AttackEngineAdapter(),
@@ -1839,7 +1843,7 @@ ADAPTERS = {
 # precedent) and the loop position records the typed deferral;
 # pinned tests updated with the new arithmetic.
 STAGE_ORDER = ["RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
-               "VERIFY", "MECHANISM_SPACE", "MULTI_SOURCE_DISCOVERY",
+               "VERIFY", "MECHANISM_SPACE",
                "COLLISION", "PHYSICS",
                "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT", "IMPROVE",
                "ADJUDICATION",

@@ -62,7 +62,7 @@ ENTRY_HELPER_VERSION = "stage_entry/1.1.0"
 #: must stay reachable to record the honest UNKNOWN/INSUFFICIENT state
 #: (the mandate's capability fail-closed contract).
 ADAPTIVE_ADMISSION_STAGES = frozenset({
-    "MECHANISM_SPACE", "MULTI_SOURCE_DISCOVERY", "COLLISION",
+    "MECHANISM_SPACE", "COLLISION",
     "PHYSICS", "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT",
     "NEXT_BEST_ACTION", "RANK",
 })

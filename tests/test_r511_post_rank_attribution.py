@@ -77,7 +77,7 @@ def test_post_rank_phase_labels_resolve_via_call_context():
         assert prov["call_class"] == "RUN_OWNED"
         assert prov["engine_stage"] not in (
             "RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
-            "VERIFY", "MECHANISM_SPACE", "MULTI_SOURCE_DISCOVERY",
+            "VERIFY", "MECHANISM_SPACE",
             "COLLISION", "PHYSICS", "ATTACK", "CONTRADICTION",
             "KILLER_EXPERIMENT", "IMPROVE", "ADJUDICATION",
             "CLASSIFY", "NEXT_BEST_ACTION", "RANK"), \

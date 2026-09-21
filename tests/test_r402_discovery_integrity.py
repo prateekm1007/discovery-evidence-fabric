@@ -536,8 +536,9 @@ class TestStageGraphResolves:
         assert set(ADAPTERS) == set(STAGE_ORDER), (
             "registered-but-unreachable or unreachable-but-registered "
             "stages (audit CB-9)")
-        # R481: 17 stages (IMPROVE joined; documented change)
-        assert len(ADAPTERS) == len(STAGE_ORDER) == 17
+        # MULTI_SOURCE_DISCOVERY removal: 16 stages (R481 17 minus
+        # the removed stage; documented change)
+        assert len(ADAPTERS) == len(STAGE_ORDER) == 16
 
     def test_dependencies_are_acyclic_and_ordered(self):
         from discovery_fabric.engine.adapters import ADAPTERS, STAGE_ORDER

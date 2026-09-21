@@ -29,8 +29,10 @@ from discovery_fabric.engine.candidate import sha256_obj
 # the contract arithmetic
 # ---------------------------------------------------------------------
 
-def test_stage_order_17_with_improve_between_killer_and_adjudication():
-    assert len(STAGE_ORDER) == 17
+def test_stage_order_16_with_improve_between_killer_and_adjudication():
+    # MULTI_SOURCE_DISCOVERY removal: 16 stages (R481 17 minus the
+    # removed stage; documented change)
+    assert len(STAGE_ORDER) == 16
     assert STAGE_ORDER.index("IMPROVE") == \
         STAGE_ORDER.index("KILLER_EXPERIMENT") + 1
     assert STAGE_ORDER.index("ADJUDICATION") == \

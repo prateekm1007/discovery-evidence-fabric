@@ -140,7 +140,7 @@ def test_retrieve_failure_cascades_to_rank(tmp_path, monkeypatch):
     assert log["VERIFY"] == "SKIPPED_UPSTREAM_FAILURE"
     # the R399 fix: everything downstream of the SKIP is skipped too —
     # no stage reports OK on an empty envelope
-    for stage in ("MULTI_SOURCE_DISCOVERY", "COLLISION", "PHYSICS",
+    for stage in ("COLLISION", "PHYSICS",
                   "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT",
                   "ADJUDICATION", "CLASSIFY", "NEXT_BEST_ACTION", "RANK"):
         assert log[stage] == "SKIPPED_UPSTREAM_FAILURE", stage
@@ -201,7 +201,7 @@ def test_grid_and_ensemble_skipped_on_unverified_evidence(tmp_path):
     run1.env = env
     run1._persist("problem.json", run1.problem)
     for stage in ("RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
-                  "VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION",
+                  "VERIFY", "COLLISION",
                   "PHYSICS", "ATTACK", "CONTRADICTION",
                   "KILLER_EXPERIMENT", "ADJUDICATION", "CLASSIFY",
                   "NEXT_BEST_ACTION", "RANK"):
@@ -211,7 +211,7 @@ def test_grid_and_ensemble_skipped_on_unverified_evidence(tmp_path):
     run2 = EngineRun.from_run_dir(
         str(tmp_path),
         disabled_stages=["RETRIEVE", "FREEZE", "PREMISE_GATE",
-                         "SYNTHESIZE", "MULTI_SOURCE_DISCOVERY",
+                         "SYNTHESIZE",
                          "COLLISION", "ATTACK"])
     manifest = run2.run()
     grid = json.loads((tmp_path / "EXPLORATION_GRID.json").read_text())
@@ -256,7 +256,7 @@ def test_rejected_run_generates_no_package_artifacts(tmp_path):
     run1.env = env
     run1._persist("problem.json", run1.problem)
     for stage in ("RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
-                  "VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION",
+                  "VERIFY", "COLLISION",
                   "PHYSICS", "ATTACK", "CONTRADICTION",
                   "KILLER_EXPERIMENT", "ADJUDICATION", "CLASSIFY",
                   "NEXT_BEST_ACTION", "RANK"):
@@ -286,7 +286,7 @@ def test_rejected_run_generates_no_package_artifacts(tmp_path):
     run2 = EngineRun.from_run_dir(
         str(tmp_path),
         disabled_stages=["RETRIEVE", "FREEZE", "PREMISE_GATE",
-                         "SYNTHESIZE", "MULTI_SOURCE_DISCOVERY",
+                         "SYNTHESIZE",
                          "COLLISION", "ATTACK"],
         package_registry_path=str(tmp_path / "sandbox_registry.json"))
     manifest = run2.run()

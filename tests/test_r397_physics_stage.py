@@ -84,11 +84,13 @@ def test_stage_order_has_physics_between_collision_and_attack():
     assert STAGE_ORDER.index("PHYSICS") == \
         STAGE_ORDER.index("COLLISION") + 1
     assert STAGE_ORDER.index("ATTACK") == STAGE_ORDER.index("PHYSICS") + 1
-    # R401: MECHANISM_SPACE between VERIFY and MULTI_SOURCE_DISCOVERY
+    # R401: MECHANISM_SPACE between VERIFY and COLLISION
+    # (MULTI_SOURCE_DISCOVERY removed from the critical path — the
+    # stage no longer sits between MECHANISM_SPACE and COLLISION).
     # R481: IMPROVE between KILLER_EXPERIMENT and ADJUDICATION — the
-    # chain is 17 stages since R481 (documented change, the audit's
-    # P0-1 loop closure)
-    assert len(STAGE_ORDER) == 17
+    # chain is 16 stages since the MULTI_SOURCE_DISCOVERY removal
+    # (17 stages since R481 minus the removed stage; documented change)
+    assert len(STAGE_ORDER) == 16
 
 
 def test_physics_adapter_registered_and_offline():

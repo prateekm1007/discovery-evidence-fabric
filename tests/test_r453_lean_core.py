@@ -106,7 +106,7 @@ class TestAdaptiveAdmissionSemantics(unittest.TestCase):
     def test_no_retained_candidate_skips_the_consuming_stages(self):
         env = _env_with(provenance=_ok_synthesis_provenance())
         # zero mechanism-space retention + unverified primary
-        for stage in ("MULTI_SOURCE_DISCOVERY", "COLLISION", "PHYSICS",
+        for stage in ("COLLISION", "PHYSICS",
                       "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT",
                       "NEXT_BEST_ACTION", "RANK"):
             block = stage_entry.justify(stage, env, {}, set())
@@ -272,13 +272,13 @@ class TestCapabilityFailClosed(unittest.TestCase):
         applies via the same justify door."""
         env = _env_with(provenance=_degraded_synthesis_provenance())
         skipped = []
-        for stage in ("MECHANISM_SPACE", "MULTI_SOURCE_DISCOVERY",
+        for stage in ("MECHANISM_SPACE",
                       "COLLISION", "PHYSICS", "ATTACK", "CONTRADICTION",
                       "KILLER_EXPERIMENT", "NEXT_BEST_ACTION", "RANK"):
             if stage_entry.justify(stage, env, {}, set())[
                     "entry_status"] == "SKIPPED":
                 skipped.append(stage)
-        self.assertEqual(len(skipped), 9,
+        self.assertEqual(len(skipped), 8,
                          "the full expensive tail must skip")
 
 
@@ -564,11 +564,14 @@ class TestDeletionAccounting(unittest.TestCase):
         KILLER_EXPERIMENT and ADJUDICATION (the external audit's P0-1
         loop closure — the R453 freeze was 16 stages; the deliberate,
         documented contract change follows the R394/R397/R401
-        pattern). 17 stages, same relative order otherwise."""
+        pattern). MULTI_SOURCE_DISCOVERY removal (disclosed): the
+        stage left the critical path — 16 stages, same relative
+        order otherwise."""
         from discovery_fabric.engine.adapters import STAGE_ORDER
-        self.assertEqual(len(STAGE_ORDER), 17)
+        self.assertEqual(len(STAGE_ORDER), 16)
         self.assertEqual(STAGE_ORDER[5], "MECHANISM_SPACE")
-        self.assertEqual(STAGE_ORDER[12], "IMPROVE")
+        self.assertEqual(STAGE_ORDER[6], "COLLISION")
+        self.assertEqual(STAGE_ORDER[11], "IMPROVE")
         self.assertEqual(STAGE_ORDER[-1], "RANK")
 
     def test_entry_helper_version_bumped(self):

@@ -2,10 +2,10 @@
 
 Executes the D8 loop:
 
-  PROBLEM -> RETRIEVE -> FREEZE -> SYNTHESIZE -> VERIFY
-          -> MULTI_SOURCE_DISCOVERY -> COLLISION -> ATTACK
-          -> CONTRADICTION -> KILLER_EXPERIMENT -> ADJUDICATION
-          -> CLASSIFY -> NEXT_BEST_ACTION -> RANK
+  PROBLEM -> RETRIEVE -> FREEZE -> PREMISE_GATE -> SYNTHESIZE
+          -> VERIFY -> MECHANISM_SPACE -> COLLISION -> PHYSICS
+          -> ATTACK -> CONTRADICTION -> KILLER_EXPERIMENT -> IMPROVE
+          -> ADJUDICATION -> CLASSIFY -> NEXT_BEST_ACTION -> RANK
 
 No business logic lives here. Every stage persists its envelope snapshot to
 the run directory (no manual file editing between stages — D8). Stage failures
@@ -47,22 +47,19 @@ DOWNSTREAM_BLOCKERS = {
     # has no mechanism to evaluate; executing it after a fatality
     # recorded a misleading OK — found live by the R396 P3 probe
     # against the local instance, fixed with a pinned test).
-    "PREMISE_GATE": {"SYNTHESIZE", "VERIFY", "MECHANISM_SPACE",
-                     "MULTI_SOURCE_DISCOVERY",
-                     "COLLISION", "PHYSICS", "ATTACK", "CONTRADICTION",
+    "PREMISE_GATE": {"SYNTHESIZE", "VERIFY", "MECHANISM_SPACE", "COLLISION", "PHYSICS", "ATTACK", "CONTRADICTION",
                      "KILLER_EXPERIMENT", "IMPROVE", "ADJUDICATION",
                      "CLASSIFY",
                      "NEXT_BEST_ACTION", "RANK"},
     "SYNTHESIZE": {"VERIFY", "MECHANISM_SPACE",
-                   "MULTI_SOURCE_DISCOVERY", "COLLISION",
-                   "PHYSICS", "ATTACK",
-                   "CONTRADICTION", "KILLER_EXPERIMENT", "IMPROVE",
-                   "ADJUDICATION",
+                   "COLLISION", "PHYSICS", "ATTACK", "CONTRADICTION",
+                   "KILLER_EXPERIMENT", "IMPROVE", "ADJUDICATION",
                    "CLASSIFY", "NEXT_BEST_ACTION", "RANK"},
-    # R401: MECHANISM_SPACE consumes the frozen evidence — a retrieval
+    # R401: MECHANISM_SPACE consumes the frozen evidence � a retrieval
     # failure leaves it nothing to structure (SKIPPED_UPSTREAM_FAILURE,
-    # the recorded refusal — never OK-on-empty-input)
+    # the recorded refusal � never OK-on-empty-input)
     "RETRIEVE": {"VERIFY", "SYNTHESIZE", "MECHANISM_SPACE"},
+
 }
 
 

@@ -545,7 +545,7 @@ class TestModelRouteProvenance:
             "provider": "unpaywall", "retrieved_at": "2026-09-10",
             "api_version": "v2", "query_or_method": "search"}}]
         for stage in ("RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
-                      "VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION",
+                      "VERIFY", "COLLISION",
                       "PHYSICS", "ATTACK", "CONTRADICTION",
                       "KILLER_EXPERIMENT", "ADJUDICATION", "CLASSIFY",
                       "NEXT_BEST_ACTION", "RANK", "MECHANISM_SPACE"):

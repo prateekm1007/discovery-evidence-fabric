@@ -516,9 +516,12 @@ def test_multi_source_discovery_no_curl_dependency():
                      if not l.strip().startswith("#"))
     assert "import subprocess" not in code
     assert '["curl"' not in code and "'curl'" not in code
-    # and the adapters carry it
-    from discovery_fabric.engine.adapters import ADAPTERS
-    assert "MULTI_SOURCE_DISCOVERY" in ADAPTERS
+    # the orchestrator module is retained but detached from the live
+    # critical path (MULTI_SOURCE_DISCOVERY removal round): neither
+    # STAGE_ORDER nor ADAPTERS may carry it anymore
+    from discovery_fabric.engine.adapters import ADAPTERS, STAGE_ORDER
+    assert "MULTI_SOURCE_DISCOVERY" not in ADAPTERS
+    assert "MULTI_SOURCE_DISCOVERY" not in STAGE_ORDER
 
 
 def test_multi_source_search_reports_connector_states():

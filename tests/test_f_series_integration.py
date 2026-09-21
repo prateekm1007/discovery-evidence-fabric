@@ -1032,7 +1032,7 @@ def test_d1_resume_continues_killed_run_without_rerunning_stages():
         # DISABLED_BY_CONFIG); the automatic pipeline + release complete
         run2 = EngineRun.from_run_dir(
             str(td), disabled_stages=["RETRIEVE", "FREEZE", "SYNTHESIZE",
-                                      "MULTI_SOURCE_DISCOVERY", "COLLISION",
+                                      "COLLISION",
                                       "ATTACK"])
         assert run2.resume is True
         manifest = run2.run()
@@ -1043,7 +1043,7 @@ def test_d1_resume_continues_killed_run_without_rerunning_stages():
         stages = [e["stage"] for e in run2.env.stage_log]
         for stg, _ in CHAIN_PLAN:
             assert stages.count(stg) == 1, stg
-        # +6 DISABLED entries + 1 for the R394 PREMISE_GATE stage + 1
+        # +5 DISABLED entries + 1 for the R394 PREMISE_GATE stage + 1
         # for the R397 PHYSICS stage (neither is in the disabled list,
         # so the resumed conductor EXECUTES both — the fixture problem
         # is premise-coherent and the physics stage is deterministic
@@ -1051,13 +1051,14 @@ def test_d1_resume_continues_killed_run_without_rerunning_stages():
         # out-of-domain verdict completes OK without fabricating a
         # comparison). R401: the MECHANISM_SPACE stage also executes
         # (or honestly skips with zero verified evidence) on the resume
-        # path — the chain is 17 stages since R481. IMPROVE contributes
-        # TWO entries on this path: the loop position's typed
+        # path — the chain is 16 stages since the MULTI_SOURCE_DISCOVERY
+        # removal (17 since R481 minus the removed stage). IMPROVE
+        # contributes TWO entries on this path: the loop position's typed
         # DEFERRED_TO_KILL_POINT deferral (+1) AND the Directive-1
         # pipeline's kill-point execution (NO_KILL_EVIDENCE in this
-        # fixture — nothing died; +1) — the total is +11 vs the R401
-        # count of +9.
-        assert len(run2.env.stage_log) == done_before + 11
+        # fixture — nothing died; +1) — the total is +10 vs the R481
+        # count of +11.
+        assert len(run2.env.stage_log) == done_before + 10
         # the automatic survivor -> package pipeline ran in phase 2
         assert (td / "INVENTION_SPECIFICATION.json").exists()
         assert (td / "ENGINEERING_SPECIFICATION.json").exists()
