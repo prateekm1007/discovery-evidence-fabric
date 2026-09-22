@@ -49,7 +49,11 @@ sys.path.insert(0, str(REPO / "scripts"))
 sys.path.insert(0, str(REPO))
 
 ARM = os.environ.get("R519_ARM", "").strip().lower()
-if ARM not in ("baseline", "optimized"):
+# --compare reads two finished harvest files and needs no arm/session
+# context; arm is required only for --live / durable harvest modes.
+_NEEDS_ARM = ("--live" in sys.argv) or (
+    "--compare" not in sys.argv)
+if _NEEDS_ARM and ARM not in ("baseline", "optimized"):
     print("FATAL: R519_ARM must be 'baseline' or 'optimized'")
     sys.exit(2)
 SESSIONS = REPO / os.environ.get(

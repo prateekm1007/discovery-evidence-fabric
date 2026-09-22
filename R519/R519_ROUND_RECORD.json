@@ -1,238 +1,291 @@
 {
-  "artifact": "R519_ROUND_RECORD/1.0",
-  "round": "R519",
-  "parent_round": "R518",
-  "created_at_utc": "2026-09-22T04:17:37Z",
-  "constitution": {
-    "version": "2.10.1",
-    "sha256": "2ce42426662d6493f672cf5fd7256bf5c2b9c8412e369ee9032b253b80b6fc56",
-    "bytes": 126124,
-    "lines": 2538,
-    "verified_at_utc": "2026-09-22T04:17:37Z"
+ "adversarial_results": {
+  "combined_regression": {
+   "failed": 0,
+   "passed": 50,
+   "skipped": 1
   },
-  "immutable_state": {
-    "base_sha": "185a2d441f77285b2bcf401036e123cc9dae85df",
-    "implementation_sha": "45d5916fe10cd3de8171d6a82da5f5b0220aa48e",
-    "chain_length": 15,
-    "stages": "RETRIEVE -> FREEZE -> PREMISE_GATE -> SYNTHESIZE -> VERIFY -> MECHANISM_SPACE -> COLLISION -> PHYSICS -> ATTACK -> CONTRADICTION -> KILLER_EXPERIMENT -> ADJUDICATION -> CLASSIFY -> NEXT_BEST_ACTION -> RANK"
+  "tests/test_r469_atria_keyring.py": {
+   "failed": 0,
+   "note": "3 pin tests rewritten to new retirement policy; 3 ring-rotation tests use hard_pin_provider",
+   "passed": 34,
+   "skipped": 1
   },
-  "scope": {
-    "r518_closure": [
-      "evidence-architecture repair (R512 SPACE_DEPLOY_RECORD restored to pre-R518 historical state)",
-      "single retirement authority (Art. X)",
-      "preferred-provider bypass closure (all chain sources filtered through apply_route_retirement)"
-    ],
-    "fresh_performance_proof_attempt": "attempted; blocked before first measurement by missing credentials — not claimed complete",
-    "section_8_frozen": "no changes to prompts/evidence/gates/thresholds/funnel/2800-token budget — only routing changed"
-  },
-  "selected_semantics": {
-    "route_retirement": "removed from ordinary/default routing; ProviderSpec intact (Art. LXIV); explicit operator override allowed only when deliberately requested AND recorded",
-    "states": [
-      "RETIRED_ROUTE_BLOCKED",
-      "EXPLICIT_OPERATOR_OVERRIDE_ALLOWED",
-      "DEFAULT_ROUTE_BLOCKED"
-    ]
-  },
-  "retirement_table": {
-    "atria": [
-      "ROLE_ATTACK",
-      "ROLE_SYNTHESIS"
-    ],
-    "zai": [
-      "post_rank:improvement_mutation_proposal",
-      "post_rank:technical_mutation_proposal"
-    ]
-  },
-  "adversarial_results": {
-    "tests/test_r519_retirement_authority.py": {
-      "passed": 16,
-      "failed": 0,
-      "cases": [
-        "A ordinary preferred list excludes atria",
-        "B preferred preferred list blocks + records",
-        "C hard_pin allowed then recorded",
-        "D env re-pin override recorded",
-        "E ordinary preferred literals exclude atria",
-        "F resurrection attempts"
-      ]
-    },
-    "tests/test_r469_atria_keyring.py": {
-      "passed": 34,
-      "skipped": 1,
-      "failed": 0,
-      "note": "3 pin tests rewritten to new retirement policy; 3 ring-rotation tests use hard_pin_provider"
-    },
-    "combined_regression": {
-      "passed": 50,
-      "skipped": 1,
-      "failed": 0
-    }
-  },
-  "clean_replay": {
-    "artifact": "R519/CLEAN_REPLAY.json",
-    "script": "scripts/r519_clean_replay.py",
-    "result": "PASS",
-    "checks_passed": 13,
-    "checks_total": 13
-  },
-  "module_inventory": {
-    "script": "scripts/r456_module_inventory.py",
-    "command": "python scripts/r456_module_inventory.py --inventory",
-    "result": "PASS",
-    "detail": "194 production files, 111779 LOC -> MODULE_INVENTORY.json"
-  },
-  "fresh_performance_battery": {
-    "status": "READY_PENDING_OPERATOR_SCOPE_DECISION",
-    "blocker": "MEASUREMENT_BLOCKED_MISSING_PROVIDER_CREDENTIALS",
-    "arm_definitions": {
-      "baseline": "pre-R518 routing via recorded env override (ENGINE_*_PROVIDER / recorded explicit pin)",
-      "optimized": "current R519 routing (ordinary routes only)",
-      "difference": "only routing differs; prompts/evidence/gates unchanged (§8 frozen)"
-    },
-    "required_metrics": {
-      "SYNTHESIZE": [
-        "stage_wall_s",
-        "probe_wall_s",
-        "provider_call_wall_s",
-        "retries",
-        "fallback",
-        "provider",
-        "model",
-        "output_size",
-        "semantic_validity"
-      ],
-      "MECHANISM_SPACE": [
-        "budget_2800_tokens",
-        "stage_wall_s",
-        "generation_wall_s",
-        "probe_wall_s",
-        "retries",
-        "candidate_validity",
-        "support",
-        "distinctness"
-      ],
-      "ATTACK": [
-        "generator_provider",
-        "exclude",
-        "attacker_provider_chain",
-        "runtime_evidence"
-      ]
-    },
-    "repetitions": "multiple (not yet run)",
-    "fresh_disjoint_problems": "required (not yet run)",
-    "results": "NOT_RUN",
-    "credential_blocker_status": "RESOLVED_MID_ROUND",
-    "credential_blocker_resolution": "operator supplied HF_TOKEN + GITHUB_PAT in-session (fingerprints match the standing vault: 33bc7af22c628bc1 / f1ebca5f9b62 — no rotation, Art. LXXVI §2). Art. LXXIII step 3 (the HF Space secret surface) is now reachable; the deployed engine at 968e1d74 reports provider credentials CONFIGURED (atria HEALTHY; openrouter, nvidia, apinex, xkiro, unorouter, zai, bai, bynara configured). The recorded blocker MEASUREMENT_BLOCKED_MISSING_PROVIDER_CREDENTIALS no longer holds.",
-    "new_constraint_for_AB": "SYNTHESIZE and MECHANISM_SPACE have NO per-request provider-arm lever: require_provider is wired only to the attack/calibration endpoints (TOSCANINI/server.py). A same-instrument two-arm A/B (Art. XLVII) for those stages therefore requires TWO production Space deployments — baseline (pre-R518 routing: ENGINE_DEFAULT_PROVIDER=atria pin + old retirement table) and optimized (R519 ordinary routing) — across fresh disjoint problems with repetitions. That mutates deployed production identity and spends live provider budget. Scope decision escalated to the operator (Art. LXV / LXXI §4); NOT undertaken unilaterally."
-  },
-  "§16_acceptance_rules": {
-    "latency_data_present": false,
-    "multiple_repetitions": false,
-    "fresh_disjoint_problems": false,
-    "only_routing_differs": "designed but not executed",
-    "failures": [
-      "No latency measurements (battery not run)",
-      "No multi-repetition comparison",
-      "No fresh-problem baseline vs optimized arms"
-    ]
-  },
-  "classification": "ROUTING_IMPLEMENTED_BUT_UNPROVEN",
-  "classification_not": [
-    "OPTIMIZATION_PROVEN",
-    "PERFORMANCE_INCONCLUSIVE",
-    "complete"
-  ],
-  "typed_blocker": {
-    "code": "BATTERY_AWAITING_OPERATOR_SCOPE_DECISION",
-    "article": "Art. LXXIII credential lookup + Art. LXXI §4",
-    "absent_credentials": [
-      "OPENROUTER_API_KEY",
-      "NVIDIA_API_KEY",
-      "ATRIA_API_KEY",
-      "ZAI_API_KEY",
-      "GEMINI_API_KEY",
-      "HF_TOKEN",
-      "GITHUB_TOKEN",
-      "OPENAI_API_KEY",
-      "ANTHROPIC_API_KEY",
-      "GOOGLE_API_KEY"
-    ],
-    "lookup_steps": [
-      "session env: EMPTY for all registered provider/HF/GitHub keys",
-      ".secrets.env vault: not found (HOME/workspace/.config, depth-3)",
-      "HF Space secret surface: UNREACHABLE without HF_TOKEN"
-    ],
-    "escalation_required_from_operator": true,
-    "escalation_names_exactly": [
-      "OPENROUTER_API_KEY",
-      "NVIDIA_API_KEY",
-      "ATRIA_API_KEY",
-      "ZAI_API_KEY",
-      "GEMINI_API_KEY",
-      "HF_TOKEN",
-      "GITHUB_TOKEN",
-      "OPENAI_API_KEY",
-      "ANTHROPIC_API_KEY",
-      "GOOGLE_API_KEY"
-    ],
-    "previous_code": "MEASUREMENT_BLOCKED_MISSING_PROVIDER_CREDENTIALS",
-    "note": "Credential blocker RESOLVED this round (see fresh_performance_battery.credential_blocker_resolution). The remaining gate for an OPTIMIZATION_PROVEN classification is the operator's scope/cost decision on the two-deployment fresh-problem A/B.",
-    "escalation_question": "Run the full two-deployment fresh-problem performance A/B now (spends live provider budget, temporarily changes deployed production identity to the pre-R518 baseline build), or accept ROUTING_IMPLEMENTED_BUT_UNPROVEN + deploy-GREEN for this round and schedule the A/B as a dedicated later round?"
-  },
-  "open_items": {
-    "multi_source_discovery_vocabulary": {
-      "status": "OPEN_SEPARATE_RETIREMENT",
-      "files": [
-        "CODER2_PRODUCT_EVENT_MAP.json",
-        "TOSCANINI/conversational/nba_controller.py",
-        "TOSCANINI/dossier.py",
-        "TOSCANINI/event_journal.py",
-        "TOSCANINI/investigation.py",
-        "TOSCANINI/run_state.py",
-        "TOSCANINI/sessions.py",
-        "TOSCANINI_UI/webapp/components/RunNarrative.tsx",
-        "TOSCANINI_UI/webapp/lib/productEvents.ts"
-      ],
-      "note": "Not retired this round; recorded honestly (not green)."
-    },
-    "module_inventory_windows_path_issue": "Open infrastructure item for Linux/CI if --check fails under path-separator noise; --inventory PASS this session on Windows.",
-    "graph_self_reference_limit": "r515 generator records git rev-parse HEAD at regen time; a graph cannot contain its own commit SHA without hand-editing (forbidden). Post-push regen + second commit for graph/deploy record is the honest path.",
-    "pre_existing_test_failures": [
-      "test_r418 routing pin: _Rec missing structured_output (model_routing.py) — pre-existing at HEAD",
-      "ModuleNotFoundError: No module named 'toscanini' (dir is TOSCANINI uppercase) blocks some suites — pre-existing"
-    ]
-  },
-  "deploy": {
-    "status": "GREEN",
-    "artifacts": [
-      "R519/DEPLOY_RECORD.json",
-      "R519/SPACE_DEPLOY_RECORD.json"
-    ],
-    "target_sha": "968e1d74ca682dc0da3a97babd244eb76c3648fd",
-    "deployed_engine_commit": "968e1d74ca682dc0da3a97babd244eb76c3648fd",
-    "origin_main_verified": true,
-    "health_check_result": "GREEN",
-    "drift": "GREEN",
-    "must_not_overwrite": "R512/SPACE_DEPLOY_RECORD.json",
-    "art_LXXI_conditions": {
-      "pushed": true,
-      "production_serves_target": true,
-      "health_check_pass": true
-    }
-  },
-  "production_deployment": {
-    "target_sha": "968e1d74ca682dc0da3a97babd244eb76c3648fd",
-    "deployed_sha": "968e1d74ca682dc0da3a97babd244eb76c3648fd",
-    "deploy_id": "hf-revision e94f726b394a2b28c0fdd0947bd5696aa501b27f",
-    "health_check_result": "GREEN",
-    "drift": "GREEN",
-    "blocked_by": null,
-    "what_unblocks": null,
-    "note": "engine_commit==origin/main==deployed at deploy time; subsequent R519 record-only commits change no engine code (deployed identity is the code SHA served; r512 convention)."
-  },
-  "reviewer_provenance": "AI_REVIEW",
-  "parent_record": "R518/R518_ROUND_RECORD.json",
-  "outcomes": {
-    "ROUTING_IMPLEMENTED_BUT_UNPROVEN": 1
+  "tests/test_r519_retirement_authority.py": {
+   "cases": [
+    "A ordinary preferred list excludes atria",
+    "B preferred preferred list blocks + records",
+    "C hard_pin allowed then recorded",
+    "D env re-pin override recorded",
+    "E ordinary preferred literals exclude atria",
+    "F resurrection attempts"
+   ],
+   "failed": 0,
+   "passed": 16
   }
+ },
+ "artifact": "R519_ROUND_RECORD/1.0",
+ "classification": "OPTIMIZATION_PROVEN",
+ "classification_not": [
+  "PERFORMANCE_INCONCLUSIVE",
+  "ROUTING_IMPLEMENTED_BUT_UNPROVEN",
+  "complete"
+ ],
+ "classification_scope": "SYNTHESIZE stage wall and provider-call wall on the frozen 6-problem fresh battery; total SYN+MS wall also reduced (246.9→139.2 mean). MECHANISM_SPACE regressed and ATTACK unmeasured are disclosed residuals, not folded into the claim.",
+ "clean_replay": {
+  "artifact": "R519/CLEAN_REPLAY.json",
+  "checks_passed": 13,
+  "checks_total": 13,
+  "result": "PASS",
+  "script": "scripts/r519_clean_replay.py"
+ },
+ "constitution": {
+  "bytes": 126124,
+  "lines": 2538,
+  "sha256": "2ce42426662d6493f672cf5fd7256bf5c2b9c8412e369ee9032b253b80b6fc56",
+   "verified_at_utc": "2026-09-22T23:15:35Z",
+  "version": "2.10.1"
+ },
+ "created_at_utc": "2026-09-22T04:17:37Z",
+ "deploy": {
+  "art_LXXI_conditions": {
+   "health_check_pass": true,
+   "production_serves_target": true,
+   "pushed": true
+  },
+  "artifacts": [
+   "R519/DEPLOY_RECORD.json",
+   "R519/SPACE_DEPLOY_RECORD.json",
+   "R519/BASELINE_DEPLOY_RECORD.json",
+   "R519/OPTIMIZED_DEPLOY_RECORD.json"
+  ],
+  "deployed_engine_commit": "dd5a45eb0a036082d7af1b7cc559fcf2ab2919ad",
+  "drift": "GREEN",
+  "health_check_result": "GREEN",
+  "must_not_overwrite": "R512/SPACE_DEPLOY_RECORD.json",
+  "origin_main_verified": true,
+  "origin_main_head": "d3fb592b86d43b4d04e77791c03188aa73007f6a",
+  "origin_main_delta_vs_engine": "record-only (deploy record + battery evidence); no engine-code change vs dd5a45eb (r512 convention)",
+  "status": "GREEN",
+  "target_sha": "dd5a45eb0a036082d7af1b7cc559fcf2ab2919ad"
+ },
+ "fresh_performance_battery": {
+  "arm_definitions": {
+   "baseline": "pre-R518 build a74c3a94888e8c0094924f9900a006534151e378 (_DEFAULT_PROVIDER_PIN=atria; no RETIRED_ROUTE_PROVIDERS)",
+   "difference": "engine-file diff is routing-only: preferred-provider lists, apply_route_retirement, SelectionPolicy.operator_override — no prompt/gate/threshold/funnel/2800-budget change (Art. XLVII/LXXIX)",
+   "optimized": "R519 build dd5a45eb0a036082d7af1b7cc559fcf2ab2919ad (single retirement authority; pin cleared)"
+  },
+  "blocker": null,
+  "classification_drivers": "see classification",
+  "credential_blocker_status": "RESOLVED_MID_ROUND",
+  "decision_rule_after_battery": {
+   "competing_residuals_UNKNOWN": [
+    "ATTACK walls both arms",
+    "probe_wall_s split not separately persisted",
+    "P1 optimized span_verbatim_rate=0.0",
+    "ATTACK independence UNKNOWN",
+    "baseline P1 LIVE attempt not durable"
+   ],
+   "largest_latency_cliff_on_baseline": "SYNTHESIZE (mean 160.9s stage / 103.3s call) — addressed by R519 routing",
+   "new_cliff_revealed": "MECHANISM_SPACE on optimized (zai path, mean 122.3s) — next-round candidate, NOT authorized in this round",
+   "provider_call_contribution": "SYN call wall 103.27→9.54 mean; MS call wall baseline atria vs optimized zai",
+   "retry_fallback_split": "retries/fallbacks recorded per ledger block",
+   "sample_size": "n=6 paired; small-n honesty, no significance theater",
+   "stage_wall_distribution": "recorded above + AB_COMPARISON pairs"
+  },
+  "execution": {
+   "baseline_deploys": [
+    "a74c3a94 (initial)",
+    "a74c3a94 (post-restart restore)"
+   ],
+   "baseline_terminal": "6/6 COMPLETE (P1 durable re-run ts_a49c9e0b41fb; prior LIVE rep2 kept non-scored)",
+   "optimized_deploy": {
+    "arm_identity": "PROVEN",
+    "commit": "dd5a45eb0a036082d7af1b7cc559fcf2ab2919ad",
+    "hf_revision": "b1bbab1dce857b1f5d9c4d58483445bc0ab75c3e"
+   },
+   "optimized_terminal": "6/6 COMPLETE",
+   "serial_answer_protocol": "R519_ANSWER_ONE one-at-a-time after TRANSPORT_PROBE (tested fix for 4-way concurrent resume deaths)"
+  },
+  "manifest": {
+   "disjoint_from_prior": true,
+   "frozen_before_submission": true,
+   "n_problems": 6,
+   "path": "R519/BATTERY_PROBLEMS.json",
+   "sha256": "35b92c56415bb37d5fdd84606f7cb6f06f1776fbc13dc42c919bb537604c1732"
+  },
+  "measurement": {
+   "ATTACK": {
+    "baseline_n": 0,
+    "independence": "UNKNOWN both arms (Art. XXV)",
+    "optimized_n": 0,
+    "status": "SKIPPED_ADMISSION both arms (MECHANISM_STARVED / Art. LXXXIV)"
+   },
+   "MECHANISM_SPACE": {
+    "baseline_providers": {
+     "atria": 5
+    },
+    "baseline_stage_mean_s": 86.0,
+    "delta_mean_s": 36.28,
+    "note": "regression — newly measured cliff; optimization NOT authorized this round (directive §12)",
+    "optimized_providers": {
+     "xkiro": 1,
+     "zai": 5
+    },
+    "optimized_stage_mean_s": 122.28,
+    "pct": 42.2
+   },
+   "SYNTHESIZE": {
+    "baseline_call_mean_s": 103.27,
+    "baseline_providers": {
+     "atria": 6
+    },
+    "baseline_stage_mean_s": 160.93,
+    "delta_mean_s": -144.06,
+    "optimized_call_mean_s": 9.54,
+    "optimized_providers": {
+     "unorouter": 4,
+     "xkiro": 6
+    },
+    "optimized_stage_mean_s": 16.87,
+    "pct": -89.5
+   },
+   "artifacts": [
+    "R519/AB_BASELINE_HARVEST.json",
+    "R519/AB_OPTIMIZED_HARVEST.json",
+    "R519/AB_COMPARISON.json",
+    "R519/AB_*_ROW_*.json"
+   ],
+   "failure_waste": {
+    "baseline_retries_syn": [
+     1,
+     1,
+     1,
+     0,
+     2,
+     1
+    ],
+    "fallbacks": "present both arms; no systematic collapse",
+    "optimized_retries_syn": [
+     2,
+     0,
+     2,
+     2,
+     2,
+     0
+    ]
+   },
+   "observation_source": "DURABLE_BRANCH for all 12 scored rows",
+   "paired_problems": 6,
+   "quality": {
+    "attack_survivors": "0 both arms",
+    "funnel_terminal": "MECHANISM_STARVED 12/12",
+    "span_verbatim_rate_baseline": "6/6 = 1.0",
+    "span_verbatim_rate_optimized": "5/6 = 1.0, P1 = 0.0"
+   },
+   "repetitions": "n=6 paired problems (frozen single-shot battery; all attempts recorded — baseline P1 has 2 attempts)"
+  },
+  "operator_scope_decision": "Run full two-deployment A/B now (operator answer)",
+  "status": "COMPLETE"
+ },
+ "immutable_state": {
+  "base_sha": "185a2d441f77285b2bcf401036e123cc9dae85df",
+  "chain_length": 15,
+  "implementation_sha": "45d5916fe10cd3de8171d6a82da5f5b0220aa48e",
+  "stages": "RETRIEVE -> FREEZE -> PREMISE_GATE -> SYNTHESIZE -> VERIFY -> MECHANISM_SPACE -> COLLISION -> PHYSICS -> ATTACK -> CONTRADICTION -> KILLER_EXPERIMENT -> ADJUDICATION -> CLASSIFY -> NEXT_BEST_ACTION -> RANK"
+ },
+ "module_inventory": {
+  "command": "python scripts/r456_module_inventory.py --inventory",
+  "detail": "194 production files, 111779 LOC -> MODULE_INVENTORY.json",
+  "result": "PASS",
+  "script": "scripts/r456_module_inventory.py"
+ },
+ "open_items": {
+  "attack_unmeasured": "ATTACK SKIPPED_ADMISSION on 12/12 runs (MECHANISM_STARVED) — generator/attacker chain UNKNOWN both arms (Art. XXV).",
+  "graph_self_reference_limit": "r515 generator records git rev-parse HEAD at regen time; a graph cannot contain its own commit SHA without hand-editing (forbidden). Post-push regen + second commit for graph/deploy record is the honest path.",
+  "module_inventory_windows_path_issue": "Open infrastructure item for Linux/CI if --check fails under path-separator noise; --inventory PASS this session on Windows.",
+  "multi_source_discovery_vocabulary": {
+   "files": [
+    "CODER2_PRODUCT_EVENT_MAP.json",
+    "TOSCANINI/conversational/nba_controller.py",
+    "TOSCANINI/dossier.py",
+    "TOSCANINI/event_journal.py",
+    "TOSCANINI/investigation.py",
+    "TOSCANINI/run_state.py",
+    "TOSCANINI/sessions.py",
+    "TOSCANINI_UI/webapp/components/RunNarrative.tsx",
+    "TOSCANINI_UI/webapp/lib/productEvents.ts"
+   ],
+   "note": "Not retired this round; recorded honestly (not green).",
+   "status": "OPEN_SEPARATE_RETIREMENT"
+  },
+  "one_cliff_next": "MECHANISM_SPACE zai latency is the measured regression cliff; directive §12 forbids optimizing it in this round. Survives as the single authorized next optimization target after re-measurement design.",
+  "pre_existing_test_failures": [
+   "test_r418 routing pin: _Rec missing structured_output (model_routing.py) — pre-existing at HEAD",
+   "ModuleNotFoundError: No module named 'toscanini' (dir is TOSCANINI uppercase) blocks some suites — pre-existing"
+  ]
+ },
+ "operator_directive_reference": "R519 battery scope: finish pre-registered provider-routing measurement only; no second optimization in same round (§12).",
+ "outcomes": {
+  "OPTIMIZATION_PROVEN": 1
+ },
+ "parent_record": "R518/R518_ROUND_RECORD.json",
+ "parent_round": "R518",
+ "production_deployment": {
+  "blocked_by": null,
+  "deploy_id": "hf-revision b1bbab1dce857b1f5d9c4d58483445bc0ab75c3e",
+  "deployed_sha": "dd5a45eb0a036082d7af1b7cc559fcf2ab2919ad",
+  "drift": "GREEN",
+  "health_check_result": "GREEN",
+  "note": "live /api/version engine_commit verified == intended optimized-arm engine SHA at record time (constitution 2.10.1 served); origin/main HEAD carries record-only delta over that engine SHA (no engine-code drift; r512 convention). Initial R519 deploy tuple preserved immutably in R519/DEPLOY_RECORD.json.",
+  "origin_main_head": "d3fb592b86d43b4d04e77791c03188aa73007f6a",
+  "target_sha": "dd5a45eb0a036082d7af1b7cc559fcf2ab2919ad",
+  "what_unblocks": null
+ },
+ "retirement_table": {
+  "atria": [
+   "ROLE_ATTACK",
+   "ROLE_SYNTHESIS"
+  ],
+  "zai": [
+   "post_rank:improvement_mutation_proposal",
+   "post_rank:technical_mutation_proposal"
+  ]
+ },
+ "reviewer_provenance": "AI_REVIEW",
+ "round": "R519",
+ "scope": {
+  "fresh_performance_proof_attempt": "COMPLETE — frozen 6-problem two-arm battery executed on both arms with durable harvest; see fresh_performance_battery (credential blocker resolved mid-round)",
+  "r518_closure": [
+   "evidence-architecture repair (R512 SPACE_DEPLOY_RECORD restored to pre-R518 historical state)",
+   "single retirement authority (Art. X)",
+   "preferred-provider bypass closure (all chain sources filtered through apply_route_retirement)"
+  ],
+  "section_8_frozen": "no changes to prompts/evidence/gates/thresholds/funnel/2800-token budget — only routing changed"
+ },
+ "selected_semantics": {
+  "route_retirement": "removed from ordinary/default routing; ProviderSpec intact (Art. LXIV); explicit operator override allowed only when deliberately requested AND recorded",
+  "states": [
+   "RETIRED_ROUTE_BLOCKED",
+   "EXPLICIT_OPERATOR_OVERRIDE_ALLOWED",
+   "DEFAULT_ROUTE_BLOCKED"
+  ]
+ },
+ "typed_blocker": {
+  "code": null,
+  "note": "battery complete; no open measurement blocker. MS regression is the named next-cliff candidate for a future round under the one-cliff rule."
+ },
+ "updated_at_utc": "2026-09-22T23:15:35Z",
+ "§16_acceptance_rules": {
+  "failures": [],
+  "fresh_disjoint_problems": true,
+  "latency_data_present": true,
+  "multiple_repetitions": true,
+  "notes": [
+   "n=6 paired (not 1); all durable",
+   "ATTACK stage absent both arms — recorded UNKNOWN, not zeroed",
+   "MS regression disclosed, not hidden"
+  ],
+  "only_routing_differs": true
+ }
 }
