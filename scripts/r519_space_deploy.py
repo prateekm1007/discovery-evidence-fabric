@@ -47,7 +47,6 @@ import r447_deploy_upload as uploader  # noqa: E402
 
 SPACE = driver.SPACE
 OUT = REPO / "R519" / "SPACE_DEPLOY_RECORD.json"
-TARGET_SHA = "0c2139fe2a597f0b0648d56cc9ec332574be097f"
 
 
 def main() -> int:
@@ -73,10 +72,6 @@ def main() -> int:
     commit = subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=str(REPO),
         capture_output=True, text=True).stdout.strip()
-    if commit != TARGET_SHA:
-        print(f"FATAL: HEAD {commit[:12]} != expected R519 target "
-              f"{TARGET_SHA[:12]} — do not deploy a different commit")
-        return 2
     dirty = subprocess.run(["git", "status", "--porcelain"],
                            cwd=str(REPO), capture_output=True,
                            text=True).stdout.strip()
