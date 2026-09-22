@@ -1,0 +1,1282 @@
+{
+ "invention_id": {
+  "value": "inv:ui_false_emergency_braking_activation_from_se_108159:8787bd5449fc",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_false_emergency_braking_activation_from_se_108159",
+   "device": "automatic emergency braking front sensor",
+   "failure": "Documented problem 'false emergency braking activation from sensor contamination' concerning automatic emergency braking front sensor. User-submitted engineering problem (session input): \"[R519-BATTERY declared_family=electrical source=odi:11303063 battery=R519-routing-AB-optimized]\n\nTL* THE CONTACT OWNS A 2020 NISSAN ROGUE. THE CONTACT STATED WHILE DRIVING 45 MPH, WHEN THE ASSIST EMERGENCY BRAKING WAS APPLIED INDEPENDENTLY. THE CONTACT STATED ASSIST EMERGENCY BRAKING( AEB) WARNING L\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "false emergency braking activation from sensor contamination",
+   "constraint": "must maintain reliable emergency braking performance in inclement weather"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:380e2af3"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of automatic emergency braking front sensor",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Multidirectional (360-degree) multichannel ultrasonic sensor array with strategic spatial positioning, empirically validated to maintain 97.5% detection accuracy under controlled rain (50 mm/h) and fog conditions, with robust performance at mid-to-long detection ranges despite reduced near-range performance in rain.",
+   "intervention": "Replace or supplement the front AEB sensor suite on the 2020 Nissan Rogue with a multidirectional multichannel ultrasonic sensor array, strategically positioned across the front fascia to provide redundant spatial coverage that tolerates sensor contamination (mud, salt, ice, dust) because contamination-induced blockage of any single channel does not eliminate detection coverage; integrate with the existing AEB controller via sensor fusion so that ultrasonic confirmation corroborates radar/camera triggers and suppresses false-positive AEB activations caused by contamination on a single sensing modality.",
+   "expected_effect": "Reliable automatic emergency braking activation in inclement weather (rain, fog) with suppression of false-positive activations triggered by front-sensor contamination, since the multichannel array maintains aggregate detection accuracy even when one or more channels are occluded by road grime or precipitation residue, while preserving true-positive emergency braking performance for actual forward collision threats.",
+   "mechanism_source_span": "Eight sensors were strategically positioned to ensure full spatial coverage, and scenario-based field experiments were conducted under controlled rain (50 mm/h) and fog (visibility",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/s25175287"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Empirical Validation of a Multidirectional Ultrasonic Pedestrian Detection System for Heavy-Duty Vehicles Under Adverse Weather Conditions.",
+   "mechanism": "Multidirectional (360-degree) multichannel ultrasonic sensor array with strategic spatial positioning, empirically validated to maintain 97.5% detection accuracy under controlled rain (50 mm/h) and fog conditions, with robust performance at mid-to-long detection ranges despite reduced near-range performance in rain.",
+   "intervention_site": "automatic emergency braking front sensor",
+   "expected_effect": "Reliable automatic emergency braking activation in inclement weather (rain, fog) with suppression of false-positive activations triggered by front-sensor contamination, since the multichannel array maintains aggregate detection accuracy even when one or more channels are occluded by road grime or precipitation residue, while preserving true-positive emergency braking performance for actual forward collision threats.",
+   "falsification_test": "On a contaminated-vehicle test track, deliberately coat the primary front sensor (camera/radar) with uniform mud splatter to reproduce the false-AEB condition, then run the multidirectional ultrasonic array through (a) a controlled rain chamber at 50 mm/h and (b) a fog chamber; record (1) false-positive AEB activations per 100 km of contaminated driving and (2) true-positive AEB activation latency against a standardized pedestrian surrogate at 45 mph. Pass criterion: false-positive rate drops by ≥80% versus the single-sensor baseline while true-positive detection latency remains within 150 ms of baseline at mid-to-long range."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/s25175287"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Replace or supplement the front AEB sensor suite on the 2020 Nissan Rogue with a multidirectional multichannel ultrasonic sensor array, strategically positioned across the front fascia to provide redundant spatial coverage that tolerates sensor contamination (mud, salt, ice, dust) because contamination-induced blockage of any single channel does not eliminate detection coverage; integrate with the existing AEB controller via sensor fusion so that ultrasonic confirmation corroborates radar/camera triggers and suppresses false-positive AEB activations caused by contamination on a single sensing modality.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/s25175287"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "must maintain reliable emergency braking performance in inclement weather",
+   "failure_mode_of_device": "false emergency braking activation from sensor contamination"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:380e2af3"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.40850255913657185,
+   "eig_per_cost": 0.40850255913657185,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Reliable automatic emergency braking activation in inclement weather (rain, fog) with suppression of false-positive activations triggered by front-sensor contamination, since the multichannel array ma",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-22T20:20:19.981883+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-22T20:20:19.981883+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.40850255913657185,
+     "eig_per_cost": 0.40850255913657185,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1109/ivs.2019.8814142",
+    "title": "Robust Function and Sensor Design Considering Sensor Measurement Errors Applied to Automatic Emergency Braking",
+    "source_uri": "https://doi.org/10.1109/ivs.2019.8814142",
+    "doi": "10.1109/ivs.2019.8814142",
+    "content_hash": "fde3044c39a019b9d41b95ec52741a3c465a6a79c47faeda929ea48263c00bf9",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/iccas.2013.6704164",
+    "title": "Vehicle recognition based on radar and vision sensor fusion for automatic emergency braking",
+    "source_uri": "https://doi.org/10.1109/iccas.2013.6704164",
+    "doi": "10.1109/iccas.2013.6704164",
+    "content_hash": "217d8dd863e36534276b9aa674d4725528191b3dfcf8b964bbe6753a5a85c9c5",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5220/0005114905690576",
+    "title": "Development of an Emergency Braking System for Teleoperated Vehicles Based on Lidar Sensor Data",
+    "source_uri": "https://doi.org/10.5220/0005114905690576",
+    "doi": "10.5220/0005114905690576",
+    "content_hash": "6b7bb3d830af0c3330d2b148ef145ba9a87399740a12f203169535754698334c",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.14741/ijcet/22774106/spl.4.2016.67",
+    "title": "Design and Implementation of Automatic Emergency Braking System",
+    "source_uri": "https://doi.org/10.14741/ijcet/22774106/spl.4.2016.67",
+    "doi": "10.14741/ijcet/22774106/spl.4.2016.67",
+    "content_hash": "ada54c0f68bb125044e187b1dfdf253285993ccfb89bab64f59240a2d7ddd1c9",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.55248/gengpi.5.0424.10108",
+    "title": "Automatic Emergency Braking System",
+    "source_uri": "https://doi.org/10.55248/gengpi.5.0424.10108",
+    "doi": "10.55248/gengpi.5.0424.10108",
+    "content_hash": "1ac131e27c1a569050754c4a156989777334c6747e16dd974382119bf0ce50e2",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/s25175287",
+    "title": "Empirical Validation of a Multidirectional Ultrasonic Pedestrian Detection System for Heavy-Duty Vehicles Under Adverse Weather Conditions.",
+    "source_uri": "https://doi.org/10.3390/s25175287",
+    "doi": "10.3390/s25175287",
+    "content_hash": "c5eadc9918cae2107c3b8906c25e9baafee0493b8320bc1d56d77bb6682f6da2",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.18220587",
+    "title": "MH 370 Exact Location. (Broken Ridge and a Depth of 4,648.35 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S).(3428S-9336E).",
+    "source_uri": "https://doi.org/10.5281/zenodo.18220587",
+    "doi": "10.5281/zenodo.18220587",
+    "content_hash": "cbbf1635b59dd1f382ad748e7e3cdc68792e6cb9c266a9ebe552af1fe9bdee1a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.18203470",
+    "title": "MH370: Mathematical Proof of the Survival of All Passengers Within a Plasma Tensorial Capsule at Broken Ridge and a Depth of 4,648.35 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S (3428S-9336E). via 165D Mechanics Tensor of the Hamzah Equation.",
+    "source_uri": "https://doi.org/10.5281/zenodo.18203470",
+    "doi": "10.5281/zenodo.18203470",
+    "content_hash": "d7518b6f7cacea3b414710f486fa1ef1c216b6e6adf5fd41eaf7f286ead319d6",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.18203365",
+    "title": "MH370: Mathematical Proof of the Survival of All Passengers Within a Tensorial Capsule at Broken Ridge and a Depth of 4650 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S via 165D Mechanics Tensor of the Hamzah Equation.",
+    "source_uri": "https://doi.org/10.5281/zenodo.18203365",
+    "doi": "10.5281/zenodo.18203365",
+    "content_hash": "16b907786e76e8c0e52fda6e87f14c11568c7eb243c7cefa98432f97d25a0a56",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2410.04928",
+    "title": "Windshield Integration of Thermal and Color Fusion for Automatic Emergency Braking in Low Visibility Conditions",
+    "source_uri": "https://doi.org/10.48550/arxiv.2410.04928",
+    "doi": "10.48550/arxiv.2410.04928",
+    "content_hash": "b2fa904f36f5e5708e3b340a2dc6cd0c4336cdef8f164d7a0d17024c537a6cc2",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1902.11210",
+    "title": "Implementing an Autonomous Emergency Braking with Simulink using two Radar Sensors",
+    "source_uri": "https://doi.org/10.48550/arxiv.1902.11210",
+    "doi": "10.48550/arxiv.1902.11210",
+    "content_hash": "52c49bd43d877698bf3a0a99b9e2cdd3489a6ca4cee11d7b61248ae1c85c016d",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2504.03704",
+    "title": "OPC UA for IO-Link Wireless in a Cyber Physical Finite Element Sensor Network for Shape Measurement",
+    "source_uri": "https://doi.org/10.48550/arxiv.2504.03704",
+    "doi": "10.48550/arxiv.2504.03704",
+    "content_hash": "530060e3675cd4dd5597b6d3fa35ed95e9d515eb19d4ceacd076df1249e83b4f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1088/1741-2560/8/5/056001",
+    "title": "EEG potentials predict upcoming emergency brakings during simulated driving",
+    "source_uri": "https://doi.org/10.1088/1741-2560/8/5/056001",
+    "doi": "10.1088/1741-2560/8/5/056001",
+    "content_hash": "d75704766d2d2eb48e9f505c880cb9f7aa31290b1f4df5ceb1a87fe10f225f2e",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1155/2020/5172305",
+    "title": "An Automatic Emergency Braking Model considering Driver’s Intention Recognition of the Front Vehicle",
+    "source_uri": "https://doi.org/10.1155/2020/5172305",
+    "doi": "10.1155/2020/5172305",
+    "content_hash": "58bc3b3ec082284ab40b7df8aa01fbddd69515501ffb1c4b9cf01a2753defb09",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4271/j3339_202607",
+    "title": "Reverse Automatic Emergency Braking (AEB) Testing Summary",
+    "source_uri": "https://doi.org/10.4271/j3339_202607",
+    "doi": "10.4271/j3339_202607",
+    "content_hash": "b7ec4c1fa6932820e0cdbf9214c7598fdfcca90029453afbcfd2268d17561d3a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1088/1757-899x/386/1/012019",
+    "title": "New testing methods of automatic emergency braking systems and the experience of their application",
+    "source_uri": "https://doi.org/10.1088/1757-899x/386/1/012019",
+    "doi": "10.1088/1757-899x/386/1/012019",
+    "content_hash": "255ef10c84c55dd09f91677beddf95f3f463fff2382890f10f833f7e85c94474",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1088/1741-2560/8/5/056001",
+   "doi:10.1088/1757-899x/386/1/012019",
+   "doi:10.1109/iccas.2013.6704164",
+   "doi:10.1109/ivs.2019.8814142",
+   "doi:10.1155/2020/5172305",
+   "doi:10.14741/ijcet/22774106/spl.4.2016.67",
+   "doi:10.3390/s25175287",
+   "doi:10.4271/j3339_202607",
+   "doi:10.48550/arxiv.1902.11210",
+   "doi:10.48550/arxiv.2410.04928",
+   "doi:10.48550/arxiv.2504.03704",
+   "doi:10.5220/0005114905690576",
+   "doi:10.5281/zenodo.18203365",
+   "doi:10.5281/zenodo.18203470",
+   "doi:10.5281/zenodo.18220587",
+   "doi:10.55248/gengpi.5.0424.10108"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:evidence:doi:10.3390/s25175287",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['condition', 'multidirectional', 'ultrasonic', 'under', 'vehicle', 'weather'] in: 'Empirical Validation of a Multid]",
+    "severity": "HIGH"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "On a contaminated-vehicle test track, deliberately coat the primary front sensor (camera/radar) with uniform mud splatter to reproduce the false-AEB condition, then run the multidirectional ultrasonic array through (a) a controlled rain chamber at 50 mm/h and (b) a fog chamber; record (1) false-positive AEB activations per 100 km of contaminated driving and (2) true-positive AEB activation latency against a standardized pedestrian surrogate at 45 mph. Pass criterion: false-positive rate drops by ≥80% versus the single-sensor baseline while true-positive detection latency remains within 150 ms of baseline at mid-to-long range."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_false_emergency_braking_activation_from_se_108159:2026-09-22T20:15:59",
+   "final_envelope_hash": "8787bd5449fc0a277dfc81e2ce320016763e50ab1b4ddadf3dbb87d4c0afa657",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.40850255913657185
+    },
+    "score": 0.2617,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-22T20:20:20+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-22T20:20:20+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1109/ivs.2019.8814142": {
+   "id": "doi:10.1109/ivs.2019.8814142",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/ivs.2019.8814142",
+   "source_uri": "https://doi.org/10.1109/ivs.2019.8814142",
+   "title": "Robust Function and Sensor Design Considering Sensor Measurement Errors Applied to Automatic Emergency Braking",
+   "abstract": "",
+   "doi": "10.1109/ivs.2019.8814142",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2019",
+   "retrieval_timestamp": "2026-09-22T20:16:18.787266+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "fde3044c39a019b9d41b95ec52741a3c465a6a79c47faeda929ea48263c00bf9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/ivs.2019.8814142"
+    },
+    "queries_by_source": {
+     "crossref": "automatic emergency braking front sensor false emergency braking activation from sensor contamination"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/ivs.2019.8814142",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false emergency braking activation from sensor contamination",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1109/iccas.2013.6704164": {
+   "id": "doi:10.1109/iccas.2013.6704164",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/iccas.2013.6704164",
+   "source_uri": "https://doi.org/10.1109/iccas.2013.6704164",
+   "title": "Vehicle recognition based on radar and vision sensor fusion for automatic emergency braking",
+   "abstract": "",
+   "doi": "10.1109/iccas.2013.6704164",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2013",
+   "retrieval_timestamp": "2026-09-22T20:16:18.787489+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "217d8dd863e36534276b9aa674d4725528191b3dfcf8b964bbe6753a5a85c9c5",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/iccas.2013.6704164"
+    },
+    "queries_by_source": {
+     "crossref": "automatic emergency braking front sensor false emergency braking activation from sensor contamination"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/iccas.2013.6704164",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false emergency braking activation from sensor contamination",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.5220/0005114905690576": {
+   "id": "doi:10.5220/0005114905690576",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5220/0005114905690576",
+   "source_uri": "https://doi.org/10.5220/0005114905690576",
+   "title": "Development of an Emergency Braking System for Teleoperated Vehicles Based on Lidar Sensor Data",
+   "abstract": "",
+   "doi": "10.5220/0005114905690576",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2014",
+   "retrieval_timestamp": "2026-09-22T20:16:18.787525+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6b7bb3d830af0c3330d2b148ef145ba9a87399740a12f203169535754698334c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5220/0005114905690576"
+    },
+    "queries_by_source": {
+     "crossref": "automatic emergency braking front sensor false emergency braking activation from sensor contamination"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5220/0005114905690576",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false emergency braking activation from sensor contamination",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.14741/ijcet/22774106/spl.4.2016.67": {
+   "id": "doi:10.14741/ijcet/22774106/spl.4.2016.67",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.14741/ijcet/22774106/spl.4.2016.67",
+   "source_uri": "https://doi.org/10.14741/ijcet/22774106/spl.4.2016.67",
+   "title": "Design and Implementation of Automatic Emergency Braking System",
+   "abstract": "",
+   "doi": "10.14741/ijcet/22774106/spl.4.2016.67",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2011",
+   "retrieval_timestamp": "2026-09-22T20:16:18.787546+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ada54c0f68bb125044e187b1dfdf253285993ccfb89bab64f59240a2d7ddd1c9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.14741/ijcet/22774106/spl.4.2016.67"
+    },
+    "queries_by_source": {
+     "crossref": "automatic emergency braking front sensor false emergency braking activation from sensor contamination"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.14741/ijcet/22774106/spl.4.2016.67",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false emergency braking activation from sensor contamination",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.55248/gengpi.5.0424.10108": {
+   "id": "doi:10.55248/gengpi.5.0424.10108",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.55248/gengpi.5.0424.10108",
+   "source_uri": "https://doi.org/10.55248/gengpi.5.0424.10108",
+   "title": "Automatic Emergency Braking System",
+   "abstract": "",
+   "doi": "10.55248/gengpi.5.0424.10108",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-22T20:16:18.787565+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "1ac131e27c1a569050754c4a156989777334c6747e16dd974382119bf0ce50e2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.55248/gengpi.5.0424.10108"
+    },
+    "queries_by_source": {
+     "crossref": "automatic emergency braking front sensor false emergency braking activation from sensor contamination"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.55248/gengpi.5.0424.10108",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false emergency braking activation from sensor contamination",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.3390/s25175287": {
+   "id": "doi:10.3390/s25175287",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:40942717",
+   "source_uri": "https://doi.org/10.3390/s25175287",
+   "title": "Empirical Validation of a Multidirectional Ultrasonic Pedestrian Detection System for Heavy-Duty Vehicles Under Adverse Weather Conditions.",
+   "abstract": "Pedestrian accidents involving heavy vehicles such as trucks and buses remain a critical safety issue, primarily due to structural blind spots. While existing systems like radar-based FCW and BSD have been adopted, they are not fully optimized for pedestrian detection, particularly under adverse weather conditions. This study focused on the empirical validation of a 360-degree pedestrian collision avoidance system using multichannel ultrasonic sensors specifically designed for heavy-duty vehicles. Eight sensors were strategically positioned to ensure full spatial coverage, and scenario-based field experiments were conducted under controlled rain (50 mm/h) and fog (visibility MAE ), coefficient of variation ( CV ), and false-negative rate ( FNR ). The results demonstrated that the system maintained average accuracy of 97.5% even under adverse weather. Although rain affected near-range detection ( FNR up to 17.5% at 100 cm), performance remained robust at mid-to-long ranges. Fog conditions led to lower variance and fewer detection failures. These empirical findings demonstrate the system's effectiveness and robustness in real-world conditions and emphasize the importance of evaluating both distance accuracy and detection reliability in pedestrian safety applications.",
+   "doi": "10.3390/s25175287",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-08-25",
+   "retrieval_timestamp": "2026-09-22T20:16:18.787584+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c5eadc9918cae2107c3b8906c25e9baafee0493b8320bc1d56d77bb6682f6da2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:40942717"
+    },
+    "queries_by_source": {
+     "europepmc": "automatic emergency braking front sensor false experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s25175287",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false experimental comparison",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.5281/zenodo.18220587": {
+   "id": "doi:10.5281/zenodo.18220587",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.18220587",
+   "source_uri": "https://doi.org/10.5281/zenodo.18220587",
+   "title": "MH 370 Exact Location. (Broken Ridge and a Depth of 4,648.35 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S).(3428S-9336E).",
+   "abstract": "                                    MH370 Related Research Papers:\n\nMH370: Mathematical Proof of the Survival of All Passengers Within a Tensorial Capsule at Broken Ridge and a Depth of 4,648.35 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S (3428S-9336E). via 165D Mechanics Tensor of the Hamzah Equation.\n\nhttps://zenodo.org/records/18203470\n\nMH 370 Exact Location. (Broken Ridge and a Depth of 4,648.35 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S).(3428S-9336E).\n\nhttps://zenodo.org/records/18237321\n\nMH 370: All 239 Passengers Are Alive.(Temporal Stasis).\n\nhttps://zenodo.org/records/18271880\n\nMH370: Proof of the Authenticity of the 2014 Luminous Orb Videos of MH370 UAP Abduction Based on the 165-Dimensional Tensor Mechanics of the Hamzah Equation.\n\nhttps://zenodo.org/records/18689118\n\nMH-370: Proven Extreme Recovery Stress Tests for MH 370 from Indian Ocean to L32 Runway of KLIA Air Port.\n\nhttps://zenodo.org/records/18216360\n\nMH 370 Complete Searching Simulator.\n\nhttps://zenodo.org/records/18273887\n\nMH 370: The Innocence of Captain Zaharie Ahmad Shah and MAS Airline Proven Through Mathematical and Aerodynamic Analysis.\n\nhttps://zenodo.org/records/18251198\n\nMH 370: Critical Nuclear-Scale Catastrophe and Imminent Risk of Total Annihilation.\n\nhttps://zenodo.org/records/18384212\n\nMH 370: The Imminent Structural Collapse of Current Civilization. A Critical Examination of the Intersection of MH370, the January 2026 Financial Downturn, and the Emergence of the 165-Dimensional Manifold.\n\nhttps://zenodo.org/records/18687928\n\nMH370: The 2026 Tensorial Civilizational Leap and Its Triangular Correlation of MH17, MH370 Aviation, and COVID-19 Pandemic.\n\nhttps://zenodo.org/records/18706609\n\nMH370 is the Ark of the Covenant and Proven Through the 165-Dimensional Tensor Mechanics of the Hamzah Equation — Lost Ark of Tranquility of the Religions.\n\nhttps://zenodo.org/records/18726603\n\n….…………………………………………………………………\n\nHow MH 370 will be recover to surface?\n\nBy Tensorial Metric Tunneling from deepth of occeian to the L32 runway KLIA within Max 8.4 Seconds not the classical invasive methods.\n\n                                             (RED ALERT)\n\n.........................................................................................................................................",
+   "doi": "10.5281/zenodo.18220587",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-22T20:16:18.787609+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "cbbf1635b59dd1f382ad748e7e3cdc68792e6cb9c266a9ebe552af1fe9bdee1a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.18220587"
+    },
+    "queries_by_source": {
+     "datacite": "automatic emergency braking front sensor false emergency braking activation from sensor contamination"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Text"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.18220587",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false emergency braking activation from sensor contamination",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "JALALI, SEYED RASOUL"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.5281/zenodo.18203470": {
+   "id": "doi:10.5281/zenodo.18203470",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.18203470",
+   "source_uri": "https://doi.org/10.5281/zenodo.18203470",
+   "title": "MH370: Mathematical Proof of the Survival of All Passengers Within a Plasma Tensorial Capsule at Broken Ridge and a Depth of 4,648.35 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S (3428S-9336E). via 165D Mechanics Tensor of the Hamzah Equation.",
+   "abstract": "                                 MH370 Related Research Papers:\n\nMH370: Mathematical Proof of the Survival of All Passengers Within a Tensorial Capsule at Broken Ridge and a Depth of 4,648.35 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S (3428S-9336E). via 165D Mechanics Tensor of the Hamzah Equation.\n\nhttps://zenodo.org/records/18203470\n\nMH 370 Exact Location. (Broken Ridge and a Depth of 4,648.35 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S).(3428S-9336E).\n\nhttps://zenodo.org/records/18237321\n\nMH 370: All 239 Passengers Are Alive.(Temporal Stasis).\n\nhttps://zenodo.org/records/18271880\n\nMH370: Proof of the Authenticity of the 2014 Luminous Orb Videos of MH370 UAP Abduction Based on the 165-Dimensional Tensor Mechanics of the Hamzah Equation.\n\nhttps://zenodo.org/records/18689118\n\nMH-370: Proven Extreme Recovery Stress Tests for MH 370 from Indian Ocean to L32 Runway of KLIA Air Port.\n\nhttps://zenodo.org/records/18216360\n\nMH 370 Complete Searching Simulator.\n\nhttps://zenodo.org/records/18273887\n\nMH 370: The Innocence of Captain Zaharie Ahmad Shah and MAS Airline Proven Through Mathematical and Aerodynamic Analysis.\n\nhttps://zenodo.org/records/18251198\n\nMH 370: Critical Nuclear-Scale Catastrophe and Imminent Risk of Total Annihilation.\n\nhttps://zenodo.org/records/18384212\n\nMH 370: The Imminent Structural Collapse of Current Civilization. A Critical Examination of the Intersection of MH370, the January 2026 Financial Downturn, and the Emergence of the 165-Dimensional Manifold.\n\nhttps://zenodo.org/records/18687928\n\nMH370: The 2026 Tensorial Civilizational Leap and Its Triangular Correlation of MH17, MH370 Aviation, and COVID-19 Pandemic.\n\nhttps://zenodo.org/records/18706609\n\nMH370 is the Ark of the Covenant and Proven Through the 165-Dimensional Tensor Mechanics of the Hamzah Equation — Lost Ark of Tranquility of the Religions.\n\nhttps://zenodo.org/records/18726603\n\n….…………………………………………………………………\n\nMH 370 AT IGARI Point. (18:25 UTC on 8 March 2014)\n\nTwelve years of fruitless searching for MH 370 marked the greatest computational error in the history of aviation, because the world was looking for the wreckage of a classic crash, whereas the actual event was a tensorial transfer at the IGARI point. At 18:25 UTC on 8 March 2014, eyewitnesses such as the New Zealander M",
+   "doi": "10.5281/zenodo.18203470",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-22T20:16:18.787635+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d7518b6f7cacea3b414710f486fa1ef1c216b6e6adf5fd41eaf7f286ead319d6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.18203470"
+    },
+    "queries_by_source": {
+     "datacite": "automatic emergency braking front sensor false emergency braking activation from sensor contamination"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Text"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.18203470",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false emergency braking activation from sensor contamination",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "JALALI, SEYED RASOUL"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.5281/zenodo.18203365": {
+   "id": "doi:10.5281/zenodo.18203365",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.18203365",
+   "source_uri": "https://doi.org/10.5281/zenodo.18203365",
+   "title": "MH370: Mathematical Proof of the Survival of All Passengers Within a Tensorial Capsule at Broken Ridge and a Depth of 4650 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S via 165D Mechanics Tensor of the Hamzah Equation.",
+   "abstract": "                              Hamzah Quantum Intelligence (HQI).\n\n.................................................................................................................................................................................................................................................................\n\n12 Years Classical Search Method (2014-2026) for MH 370 Was Exactly Like Trying to See X-rays While Wearing Sunglasses — A Completely Wrong Tool for an Entirely Different Task.”\n\n.................................................................................................................................................................................................................................................................\n\nDedicated Lagrangian for the Recovery of MH370 (Level 165):\n\n\n\n$$\\mathcal{L}_{MH370}^{(165)} = \\oint_{\\partial \\mathcal{V}_{165}} \\left[ \\mathcal{Q}_{H} \\left( IGARI_{sync} \\right) + \\Xi_{SIO} \\left( \\mathcal{G}_{\\mu\\nu}^{161} \\otimes \\mathcal{P}_{lock} \\right) - \\frac{\\hbar_{H} \\mathcal{S}_{cabin}}{\\exp(\\mathcal{I}_{DNA}^{2014})} \\right] \\sqrt{-\\mathbb{G}_{165}} \\, d\\Omega$$\n\n\n\nThe nexus between this formula and MH370 explains why we are still searching in January 2026. From this Lagrangian perspective:\n\n\n\n\n\nThe aircraft is there (Coordinates 34.48° S).\n\n\n\n\nThe aircraft is invisible (Due to the $\\mathbb{G}$ metric deviation).\n\n\n\n\nThe aircraft must not be touched (Due to the risk of collapsing the passenger safeguard).\n\n\n\n\n.................................................................................................................................................................................................................................................................\n\n                            Status of Life: The Passengers are Alive\n\nContrary to the laws of classical physics which dictate biological death, the Hamzah Equation (HCP) proves that the 239 occupants are in a state of ‘Conscious Stasis’.\n\n\n\n\n\nProof: Due to the entropy suppression term, biological time within the cabin has stopped. For them, not even a single second has passed until now since 2014.\n\n\n\n2. Geographical Position and Precise Depth\n\nThe aircraft is stabilised in the ‘Earth’s Informational Sanctuary’:\n\n\n\n\n\nCoordinates: 34.4812° S (Latitude) / 93.6165° E (Longitude).\n\n\n\n\nLocation: Near the Broken Ridge submarine plateau.\n\n\n\n\nDep",
+   "doi": "10.5281/zenodo.18203365",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-22T20:16:18.787658+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "16b907786e76e8c0e52fda6e87f14c11568c7eb243c7cefa98432f97d25a0a56",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.18203365"
+    },
+    "queries_by_source": {
+     "datacite": "automatic emergency braking front sensor false emergency braking activation from sensor contamination"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Text"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.18203365",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false emergency braking activation from sensor contamination",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "JALALI, SEYED RASOUL"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.48550/arxiv.2410.04928": {
+   "id": "doi:10.48550/arxiv.2410.04928",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2410.04928v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2410.04928",
+   "title": "Windshield Integration of Thermal and Color Fusion for Automatic Emergency Braking in Low Visibility Conditions",
+   "abstract": "The new NHSTA regulations require Automatic Emergency Braking (AEB) systems to operate at night, to protect pedestrians in the deadliest conditions. We propose thermal imaging as a new sensor to complement the AEB sensor suite, alongside the visible front camera and RADAR. This paper explores the benefits of visible-thermal fusion, proposes a windshield integration for such a system, and evaluates the minimum performance requirements for a thermal camera compliant with the NHSTA standards, based on a field study of pedestrian detection range.",
+   "doi": "10.48550/arxiv.2410.04928",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T20:16:18.787678+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b2fa904f36f5e5708e3b340a2dc6cd0c4336cdef8f164d7a0d17024c537a6cc2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2410.04928v1"
+    },
+    "queries_by_source": {
+     "arxiv": "automatic emergency braking front sensor false emergency braking activation from sensor contamination"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2410.04928",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false emergency braking activation from sensor contamination",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2410.04928v1",
+   "authors": [
+    "Gabriel Jobert",
+    "Guillaume Delubac",
+    "Jessy Matias",
+    "Quentin Noir",
+    "Xavier Brenière",
+    "Pauline Girard",
+    "Tatiana Severin-Fabiani",
+    "Sebastien Tinnes"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.1902.11210": {
+   "id": "doi:10.48550/arxiv.1902.11210",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1902.11210v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1902.11210",
+   "title": "Implementing an Autonomous Emergency Braking with Simulink using two Radar Sensors",
+   "abstract": "In this paper we have implemented the autonomous emergency braking using two radar sensors with different angle of coverage. The synthetic radar data is generated by radar detection generator block available in AEBTestBench simulation module. AEBTestBench is autonomous emergency simulation module available in Matlab 2018b version under ADAS toolbox. From different EURO NCAP standard scenarios available, we have covered 5 scenarios with their results analysis showing where forward collision warning is displayed and what is the AEB status. The observation of simulation results are carried out for 10 seconds. Data fusion for two radar sensors is carried by Kalman filter algorithm present inside the simulation module.",
+   "doi": "10.48550/arxiv.1902.11210",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T20:16:18.787697+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "52c49bd43d877698bf3a0a99b9e2cdd3489a6ca4cee11d7b61248ae1c85c016d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1902.11210v1"
+    },
+    "queries_by_source": {
+     "arxiv": "automatic emergency braking front sensor false emergency braking activation from sensor contamination"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1902.11210",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false emergency braking activation from sensor contamination",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/1902.11210v1",
+   "authors": [
+    "Ritesh Kapse",
+    "S. Adarsh"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2504.03704": {
+   "id": "doi:10.48550/arxiv.2504.03704",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2504.03704v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2504.03704",
+   "title": "OPC UA for IO-Link Wireless in a Cyber Physical Finite Element Sensor Network for Shape Measurement",
+   "abstract": "This paper presents the integration of OPC UA as a communication protocol in a wireless sensor network and the associated companion specifications as a semantic template for an information model. The Cyber Physical Finite Element Sensor Network (CPFEN ) for Shape Measurements, a distributed wireless system, uses IO-Link Wireless for data transmission at the sensor level, OPC UA provides a unified interface for data access, configuration, monitoring, and calibration tailored to the needs of the CPFEN for all level above. This opens up additional possibilities, such as integrated quality assurance or creating a digital twin, while improving scalability.",
+   "doi": "10.48550/arxiv.2504.03704",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T20:16:18.787714+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "530060e3675cd4dd5597b6d3fa35ed95e9d515eb19d4ceacd076df1249e83b4f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2504.03704v1"
+    },
+    "queries_by_source": {
+     "arxiv": "automatic emergency braking front sensor false emergency braking activation from sensor contamination"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2504.03704",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false emergency braking activation from sensor contamination",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2504.03704v1",
+   "authors": [
+    "Henry Beuster",
+    "Lars-Michel Bretthauer",
+    "Gerd Scholl"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.1088/1741-2560/8/5/056001": {
+   "id": "doi:10.1088/1741-2560/8/5/056001",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W2079610602",
+   "source_uri": "https://doi.org/10.1088/1741-2560/8/5/056001",
+   "title": "EEG potentials predict upcoming emergency brakings during simulated driving",
+   "abstract": "Emergency braking assistance has the potential to prevent a large number of car crashes. State-of-the-art systems operate in two stages. Basic safety measures are adopted once external sensors indicate a potential upcoming crash. If further activity at the brake pedal is detected, the system automatically performs emergency braking. Here, we present the results of a driving simulator study indicating that the driver's intention to perform emergency braking can be detected based on muscle activation and cerebral activity prior to the behavioural response. Identical levels of predictive accuracy were attained using electroencephalography (EEG), which worked more quickly than electromyography (EMG), and using EMG, which worked more quickly than pedal dynamics. A simulated assistance system using EEG and EMG was found to detect emergency brakings 130 ms earlier than a system relying only on pedal responses. At 100 km h(-1) driving speed, this amounts to reducing the braking distance by 3.66 m. This result motivates a neuroergonomic approach to driving assistance. Our EEG analysis yielded a characteristic event-related potential signature that comprised components related to the sensory registration of a critical traffic situation, mental evaluation of the sensory percept and motor preparation. While all these components should occur often during normal driving, we conjecture that it is their characteristic spatio-temporal superposition in emergency braking situations that leads to the considerable prediction performance we observed.",
+   "doi": "10.1088/1741-2560/8/5/056001",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T20:16:18.787732+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d75704766d2d2eb48e9f505c880cb9f7aa31290b1f4df5ceb1a87fe10f225f2e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W2079610602"
+    },
+    "queries_by_source": {
+     "openalex": "automatic emergency braking front sensor false emergency braking activation sensor"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.1088/1741-2560/8/5/056001",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false emergency braking activation sensor",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "doi:10.1155/2020/5172305": {
+   "id": "doi:10.1155/2020/5172305",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:115642303",
+   "source_uri": "https://doi.org/10.1155/2020/5172305",
+   "title": "An Automatic Emergency Braking Model considering Driver’s Intention Recognition of the Front Vehicle",
+   "abstract": "Driver’s intention of the front vehicle plays an important role in the automatic emergency braking (AEB) system. If the front vehicle brakes suddenly, there is potential collision risk for following vehicle. Therefore, we propose a driver’s intention recognition model for the front vehicle, which is based on the backpropagation (BP) neural network and hidden Markov model (HMM). The brake pedal, accelerator pedal, and vehicle speed data are used as the input of the proposed BP-HMM model to recognize the driver’s intention, which includes uniform driving, normal braking, and emergency braking. According to the recognized driver’s intention transmitted by Internet of vehicles, an AEB model for the following vehicle is proposed, which can dynamically change the critical braking distance under different driving conditions to avoid rear-end collision. In order to verify the performance of the proposed models, we conducted driver’s intention recognition and AEB simulation tests in the cosimulation environment of Simulink and PreScan. The simulation test results show that the average recognition accuracy of the proposed BP-HMM model was 98%, which was better than that of the BP and HMM models. In the Car to Car Rear moving (CCRm) and Car to Car Rear braking (CCRb) tests, the minimum relative distance between the following vehicle and the front vehicle was within the range of 1.5 m–2.7 m and 2.63 m–5.28 m, respectively. The proposed AEB model has better collision avoidance performance than the traditional AEB model and can adapt to individual drivers",
+   "doi": "10.1155/2020/5172305",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T20:16:18.787748+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "58bc3b3ec082284ab40b7df8aa01fbddd69515501ffb1c4b9cf01a2753defb09",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:115642303"
+    },
+    "queries_by_source": {
+     "core": "automatic emergency braking front sensor false experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1155/2020/5172305",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Xiaolei Qu",
+    "Wei Yang",
+    "Kaixia Zhou",
+    "Zhang, Zhiwei",
+    "Qu, Xiaolei",
+    "Zhiwei Zhang",
+    "Jiajun Liu",
+    "Yang, Wei",
+    "Liu, Jiajun",
+    "Zhou, Kaixia"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.4271/j3339_202607": {
+   "id": "doi:10.4271/j3339_202607",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:344627544",
+   "source_uri": "https://doi.org/10.4271/j3339_202607",
+   "title": "Reverse Automatic Emergency Braking (AEB) Testing Summary",
+   "abstract": "&lt;div class=\"section abstract\"&gt;\n\n\n&lt;div class=\"htmlview paragraph\"&gt;This SAE Information Report provides a broad summary of existing Reverse Automatic Emergency Braking test protocols to help assess whether additional test protocols are needed.&lt;/div&gt;\n&lt;div class=\"htmlview paragraph\"&gt;Eventually, the task force may develop additional protocols to support testing of Reverse Automatic Emergency Braking systems.&lt;/div&gt;&lt;/div&gt;</jats:p",
+   "doi": "10.4271/j3339_202607",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T20:16:18.787773+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b7ec4c1fa6932820e0cdbf9214c7598fdfcca90029453afbcfd2268d17561d3a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:344627544"
+    },
+    "queries_by_source": {
+     "core": "automatic emergency braking front sensor false experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.4271/j3339_202607",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "null null",
+    "Active Safety and Driver Support Systems Standards Committee"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1088/1757-899x/386/1/012019": {
+   "id": "doi:10.1088/1757-899x/386/1/012019",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W2885567167",
+   "source_uri": "https://doi.org/10.1088/1757-899x/386/1/012019",
+   "title": "New testing methods of automatic emergency braking systems and the experience of their application",
+   "abstract": "This article offers testing methods of automatic emergency braking systems (\"AEBS\") for automobiles. Checking of the \"AEBS\" is carried out during the vehicle's moving towards different static \"targets\". It is estimated a possibility of the \"AEBS\" to recognize different \"targets\", the warning moment of collision situation and automatic braking effectiveness. The test drives are performed on different support surfaces. To avoid the damage of an automobile during the crash with the \"target\" or the \"soft target\" is used. This target is made of cardboard material. Besides, avoidance of crashing may be achieved by performing the maneuver \"detour of obstacle\". The method of synchronization of a collision warning signal with a parametric record of arrival is described also. There were performed tests of the \"AEBS\" of \"Infiniti QX 60 Hi-tech\" automobile model. Also there we analyzed reasons of the \"AEBS\" failures in various conditions. It was estimated that the technical vision units of the \"AEBS of \"Infiniti QX 60 Hi-tech\" automobile model recognize the \"soft target\" as the obstacle.",
+   "doi": "10.1088/1757-899x/386/1/012019",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T20:16:18.787789+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "255ef10c84c55dd09f91677beddf95f3f463fff2382890f10f833f7e85c94474",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W2885567167"
+    },
+    "queries_by_source": {
+     "openalex": "automatic emergency braking front sensor false emergency braking activation sensor"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.1088/1757-899x/386/1/012019",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic emergency braking front sensor false emergency braking activation sensor",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "problem:380e2af3": {
+   "id": "problem:380e2af3",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "380e2af36874031dc739ec8c0bb4fa9c947c93d8bbb952cddb7de78417b419b8",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "d58f8bdc6b10d2e9718894ab8d295f9232689b06a1b24480802a719b9ffc5eef",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-22T20:20:20+00:00Z"
+ }
+}
