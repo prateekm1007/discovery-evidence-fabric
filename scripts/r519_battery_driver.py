@@ -77,6 +77,14 @@ BATTERY_NAME = os.environ.get("R519_BATTERY_NAME",
                               f"R519-routing-AB-{ARM}")
 BATTERY_TAG = os.environ.get("R519_TAG", "R519-BATTERY")
 EXPECT_COMMIT = os.environ.get("R519_EXPECT_COMMIT", "")
+# Wave scheduling (R519 §11 tested fix): after the 4-way concurrent
+# resume deaths, answers are STAGGERED (one at a time, each verified
+# past TRANSPORT_PROBE before the next). R519_ONLY="2,3,4" restricts
+# this wave to the listed manifest selection_index values. Scheduling
+# only — problem set, prompts, budgets, and measurement are untouched
+# (not tuning; Art. LXXIX void conditions unaffected).
+ONLY = {int(x) for x in os.environ.get("R519_ONLY", "").split(",")
+        if x.strip().isdigit()}
 
 BASE = "https://prateekm1-toscanini-prod-validation.hf.space"
 HF_TOKEN = os.environ.get("HF_TOKEN", "")
@@ -183,6 +191,9 @@ def submit():
     subs = {s.get("problem_index") for s in sessions["submissions"]}
     for p in m["problems"]:
         idx = p["selection_index"]
+        if ONLY and idx not in ONLY:
+            print(f"#{idx} not in R519_ONLY wave filter — skip")
+            continue
         if idx in subs:
             print(f"#{idx} already submitted ({p['source_id']}) — skip")
             continue
@@ -238,7 +249,11 @@ def answer_clarifications():
     sessions = json.loads(SESSIONS.read_text(encoding="utf-8"))
     m = json.loads(MANIFEST.read_text(encoding="utf-8"))
     by_idx = {p["selection_index"]: p for p in m["problems"]}
+    one = os.environ.get("R519_ANSWER_ONE", "").strip()
     for s in sessions["submissions"]:
+        if one and str(s["problem_index"]) != one:
+            print(f"#{s['problem_index']} deferred (R519_ANSWER_ONE={one})")
+            continue
         sid = s.get("session_id")
         if not sid:
             continue
