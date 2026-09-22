@@ -399,8 +399,15 @@ def test_generate_rotates_on_exhaustion_same_rung(monkeypatch):
 
     monkeypatch.setattr(lr, "_call_openai_flavor", fake_call)
     monkeypatch.setattr(lr, "_call_anthropic_flavor", fake_call)
+    # R519: atria is retired from ORDINARY synthesis routing (R518/R519
+    # route retirement). This test measures the R469 KEY RING, which is a
+    # measurement act — it reaches atria through the R491 explicit
+    # measurement pin (hard_pin_provider), the single sanctioned
+    # operator-override path for a retired provider (kept + recorded,
+    # never silent).
     res = lr.generate("test prompt", schema=["FIELD_MECHANISM"],
-                      role="synthesis", max_retries=0)
+                      role="synthesis", max_retries=0,
+                      hard_pin_provider="atria")
     assert res.ok is True
     assert res.provider_id == "atria"
     assert calls == [K1, K2]
@@ -430,7 +437,8 @@ def test_generate_ring_exhaustion_falls_through_typed(monkeypatch):
 
     monkeypatch.setattr(lr, "_call_openai_flavor", fake_call)
     monkeypatch.setattr(lr, "_call_anthropic_flavor", fake_call)
-    res = lr.generate("test prompt", role="synthesis", max_retries=0)
+    res = lr.generate("test prompt", role="synthesis", max_retries=0,
+                      hard_pin_provider="atria")
     assert res.ok is False
     assert res.status == lr.ST_CALL_FAILED
     assert res.failure_type == "CREDIT_EXHAUSTED"    # typed, never a bill
@@ -457,7 +465,8 @@ def test_generate_does_not_rotate_on_gone(monkeypatch):
 
     monkeypatch.setattr(lr, "_call_openai_flavor", fake_call)
     monkeypatch.setattr(lr, "_call_anthropic_flavor", fake_call)
-    res = lr.generate("test prompt", role="synthesis", max_retries=0)
+    res = lr.generate("test prompt", role="synthesis", max_retries=0,
+                      hard_pin_provider="atria")
     assert res.ok is False
     assert len(attempts) == 1                        # NO ring consumption
     assert lr.active_key_slot(lr._SPEC_BY_ID["atria"]) == 0
@@ -480,18 +489,31 @@ def _matrix_two_providers(monkeypatch):
 
 
 def test_pinned_default_heads_the_order(monkeypatch):
+    # R518/R519: the R469 "atria heads the default order" policy is
+    # SUPERSEDED — the default pin was cleared and atria is retired from
+    # ORDINARY synthesis routing. With no explicit operator act, atria is
+    # absent from the order (Art. LXIV: the superseded expectation is
+    # retired, not left silently true).
     monkeypatch.delenv("ENGINE_DEFAULT_PROVIDER", raising=False)
     matrix = _matrix_two_providers(monkeypatch)
     order = ph.order_for_role(matrix, "synthesis")
-    assert order[0] == "atria"
+    assert "atria" not in order                      # retired from ordinary route
+    assert order[0] == "unorouter"                   # natural rank serves
 
 
 def test_pin_disabled_restores_natural_rank(monkeypatch):
+    # R519 §5: an EXPLICIT operator re-pin (ENGINE_DEFAULT_PROVIDER=atria)
+    # remains possible under the selected semantics — retirement removes a
+    # provider from ORDINARY routing, not from a deliberate, RECORDED
+    # operator override. The re-pin is never silent: the order_for_role
+    # out_events record the EXPLICIT_OPERATOR_OVERRIDE_ALLOWED state.
     matrix = _matrix_two_providers(monkeypatch)
-    monkeypatch.setenv("ENGINE_DEFAULT_PROVIDER", "")
-    order = ph.order_for_role(matrix, "synthesis")
-    assert order[0] == "unorouter"
-    assert order[1] == "atria"
+    monkeypatch.setenv("ENGINE_DEFAULT_PROVIDER", "atria")
+    events = []
+    order = ph.order_for_role(matrix, "synthesis", out_events=events)
+    assert order[0] == "atria"                       # explicit operator act serves
+    assert any(e["retirement_state"] ==
+               "EXPLICIT_OPERATOR_OVERRIDE_ALLOWED" for e in events)
 
 
 def test_pin_env_overrides_to_another_provider(monkeypatch):
@@ -514,12 +536,11 @@ def test_unknown_pin_is_a_noop(monkeypatch):
     assert order[0] == "unorouter"                   # natural rank
 
 
-def test_pin_does_not_rewrite_quality_tiers(monkeypatch):
+def test_ordinary_synthesis_route_has_no_default_pin(monkeypatch):
+    # R519: the code-level default pin is cleared to prevent silent
+    # re-promotion of a retired provider (R518 rationale in provider_health).
     monkeypatch.delenv("ENGINE_DEFAULT_PROVIDER", raising=False)
-    _matrix_two_providers(monkeypatch)
-    spec = lr._SPEC_BY_ID["atria"]
-    assert spec.quality_tier == 2                    # honest tier stands
-    assert ph._DEFAULT_PROVIDER_PIN == "atria"
+    assert ph._DEFAULT_PROVIDER_PIN == ""
 
 
 def test_catalog_discovery_uses_active_ring_key(monkeypatch):

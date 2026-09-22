@@ -1,0 +1,208 @@
+{
+  "artifact": "R519_CLEAN_REPLAY/1.0",
+  "round": "R519",
+  "parent_round": "R518",
+  "generated_at_utc": "2026-09-22T04:15:34Z",
+  "method": "Automated live-code replay of the R519 single retirement authority (provider_health.is_route_retired / apply_route_retirement / order_for_role + llm_registry ProviderSpec table). No hand-edited claims.",
+  "checks": [
+    {
+      "name": "deterministic_order",
+      "ok": true,
+      "detail": {
+        "order1": [
+          "anthropic",
+          "openai",
+          "openrouter",
+          "zai"
+        ],
+        "order2": [
+          "anthropic",
+          "openai",
+          "openrouter",
+          "zai"
+        ]
+      }
+    },
+    {
+      "name": "ordinary_synthesis_excludes_atria",
+      "ok": true,
+      "detail": {
+        "order": [
+          "anthropic",
+          "openai",
+          "openrouter",
+          "zai"
+        ]
+      }
+    },
+    {
+      "name": "ordinary_attack_excludes_atria",
+      "ok": true,
+      "detail": {
+        "order": [
+          "anthropic",
+          "openai",
+          "openrouter",
+          "zai"
+        ],
+        "events": [
+          {
+            "provider": "atria",
+            "role": "attack",
+            "purpose": null,
+            "retirement_state": "RETIRED_ROUTE_BLOCKED"
+          }
+        ]
+      }
+    },
+    {
+      "name": "explicit_override_allowed_and_recorded",
+      "ok": true,
+      "detail": {
+        "kept": [
+          "atria",
+          "openrouter"
+        ],
+        "removed": [
+          {
+            "provider": "atria",
+            "role": "synthesis",
+            "purpose": null,
+            "retirement_state": "EXPLICIT_OPERATOR_OVERRIDE_ALLOWED"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ordinary_route_blocks_and_records",
+      "ok": true,
+      "detail": {
+        "kept": [
+          "openrouter"
+        ],
+        "removed": [
+          {
+            "provider": "atria",
+            "role": "synthesis",
+            "purpose": null,
+            "retirement_state": "RETIRED_ROUTE_BLOCKED"
+          }
+        ]
+      }
+    },
+    {
+      "name": "provider_specs_preserved",
+      "ok": true,
+      "detail": {
+        "atria_spec": true,
+        "zai_spec": true
+      }
+    },
+    {
+      "name": "default_pin_cleared",
+      "ok": true,
+      "detail": {
+        "_DEFAULT_PROVIDER_PIN": ""
+      }
+    },
+    {
+      "name": "no_health_book_repromotion",
+      "ok": true,
+      "detail": {
+        "order": [
+          "anthropic",
+          "openai",
+          "openrouter",
+          "zai"
+        ]
+      }
+    },
+    {
+      "name": "empty_by_retirement_typed_block",
+      "ok": true,
+      "detail": {
+        "kept": [],
+        "removed": [
+          {
+            "provider": "atria",
+            "role": "synthesis",
+            "purpose": null,
+            "retirement_state": "RETIRED_ROUTE_BLOCKED"
+          }
+        ]
+      }
+    },
+    {
+      "name": "retirement_events_reproducible",
+      "ok": true,
+      "detail": {
+        "events1": [
+          {
+            "provider": "atria",
+            "role": "synthesis",
+            "purpose": null,
+            "retirement_state": "RETIRED_ROUTE_BLOCKED"
+          }
+        ],
+        "events2": [
+          {
+            "provider": "atria",
+            "role": "synthesis",
+            "purpose": null,
+            "retirement_state": "RETIRED_ROUTE_BLOCKED"
+          }
+        ]
+      }
+    },
+    {
+      "name": "no_provider_branch_in_predicate",
+      "ok": true,
+      "detail": {
+        "predicate_sha256": "6aa8adbe1a76951be0b6b99c6aac685224ffb4f847902a650253bd545375a705"
+      }
+    },
+    {
+      "name": "zai_is_table_data",
+      "ok": true,
+      "detail": {
+        "table": {
+          "atria": [
+            "attack",
+            "synthesis"
+          ],
+          "zai": [
+            "post_rank:improvement_mutation_proposal",
+            "post_rank:technical_mutation_proposal"
+          ]
+        }
+      }
+    },
+    {
+      "name": "preferred_list_filters_retired",
+      "ok": true,
+      "detail": {
+        "kept": [
+          "openrouter",
+          "deepseek"
+        ],
+        "removed": [
+          {
+            "provider": "atria",
+            "role": "synthesis",
+            "purpose": "synthesis",
+            "retirement_state": "RETIRED_ROUTE_BLOCKED"
+          }
+        ]
+      }
+    }
+  ],
+  "checks_total": 13,
+  "checks_passed": 13,
+  "failures": [],
+  "result": "PASS",
+  "notes": [
+    "§23 requirements: deterministic ordering, retirement on ordinary routes, explicit-override recording, no health-book re-promotion, no hidden pin, typed empty-chain reason, provenance reproducibility — all covered above.",
+    "Live generate() empty-chain path returns ST_POLICY_BLOCKED with DEFAULT_ROUTE_BLOCKED text; covered by tests/test_r519_retirement_authority.py (16 tests).",
+    "No provider credentials required for this replay."
+  ]
+}

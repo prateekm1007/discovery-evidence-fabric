@@ -225,9 +225,13 @@ def llm_chat(prompt, system="", max_retries=2, timeout=240,
     if override:
         print(f"  [synthesize] OPERATOR OVERRIDE: synthesis provider pinned "
               f"to '{override}' (fallback forbidden; recorded in meta)")
+        # R519 §5/§7: honoring the ENGINE_* env pin is an explicit
+        # operator act — marked as such so the single routing-retirement
+        # authority keeps (and records) the override instead of silently
+        # blocking it. Retirement still filters ORDINARY routing.
         policy = reg.SelectionPolicy(
             preferred_providers=[override], max_preference_fallback=0,
-            purpose="synthesis")
+            purpose="synthesis", operator_override=True)
     else:
         # R518: Atria retired from synthesis (R517 battery: 12-128s latency)
         policy = reg.SelectionPolicy(

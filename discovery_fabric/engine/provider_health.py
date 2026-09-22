@@ -652,45 +652,116 @@ ROLE_TRANSFORM = "transform"        # simple JSON shaping (prefer no LLM)
 # high latency). Default pin cleared to prevent silent re-promotion.
 _DEFAULT_PROVIDER_PIN = ""
 
-# R518: Provider-route retirement table. Maps provider_id -> set of
-# roles from which the provider is retired. Retired providers are
-# filtered from the role's ordered list in order_for_role(). The
-# provider's ProviderSpec is preserved (Art. LXIV: historical
-# configuration and measurements are never deleted). Retired state
-# is deterministic, auditable, and prevents the default pin from
-# silently restoring the provider to head of route.
+# R518/R519: THE single routing-retirement authority (Art. X: one
+# canonical state; R519 §5-6: no scattered hard-coded retirement tuples
+# and no dead-code provider branches). Maps provider_id -> set of
+# retirement SCOPES. A scope is EITHER a role token (ROLE_SYNTHESIS /
+# ROLE_ATTACK / ROLE_EXTRACTION / ROLE_TRANSFORM) OR a purpose token
+# (PURPOSE_POST_RANK_* below). is_route_retired() is the ONE predicate
+# every routing path consults; order_for_role(), the provider chain in
+# generate()/select_provider(), and the rung ladder all filter through
+# it, so no path can answer "retired" while another answers "allowed"
+# (R519 §7: the routing authority must never produce contradictory
+# answers).
+#
+# Selected semantics (R519 §5, recommended interpretation): route
+# retirement removes the provider from ORDINARY / DEFAULT routing —
+# the role order, the ordinary preferred_providers lists, and the rung
+# ladder. The provider's ProviderSpec remains intact (Art. LXIV:
+# historical config and measurements are never deleted), so an
+# EXPLICIT operator override (an ENGINE_*_PROVIDER env var or the
+# R491 hard_pin_provider, or a caller-set SelectionPolicy.
+# operator_override) remains possible; when exercised it is recorded
+# on the selection ledger (never silent — Art. XV/XXVII).
+# Purpose retirement scopes for post-rank paths. These are NOT ROLE_*
+# constants — the post-rank engines route under ROLE_SYNTHESIS but are
+# distinguished by purpose, so retirement keys on the purpose token.
+PURPOSE_POST_RANK_IMPROVEMENT = "post_rank:improvement_mutation_proposal"
+PURPOSE_POST_RANK_TECHNICAL = "post_rank:technical_mutation_proposal"
+
 RETIRED_ROUTE_PROVIDERS: Dict[str, set] = {
-    # Atria: retired from ATTACK (first-hop 5/5 failures in R517
-    # battery), MECHANISM_SPACE (110-226s inference latency in R517
-    # battery), SYNTHESIZE (12-128s latency in R517 battery), and
-    # post-rank paths (mixed success/failure in R517 battery).
+    # Atria: retired from ATTACK (first-hop 5/5 failures in the R517
+    # battery), and from SYNTHESIS — which covers SYNTHESIZE and
+    # MECHANISM_SPACE, both ROLE_SYNTHESIS (110-226s / 12-128s latency
+    # in the R517 battery).
     "atria": {ROLE_ATTACK, ROLE_SYNTHESIS},
-    # Zai: retired from post-rank improvement paths (frequent
-    # MODEL_FAILURE in R517 battery). Not globally retired —
-    # evidence does not support universal unusability.
-    # Post-rank roles are not in the ROLE_* constants; they are
-    # identified by purpose string matching in is_route_retired().
+    # Zai: NOT globally retired — the R517 evidence supports only
+    # targeted POST-RANK retirement (frequent MODEL_FAILURE in the
+    # post-rank improvement batteries). Represented through the SAME
+    # authoritative mechanism as Atria, via purpose scopes, not via
+    # provider-specific code branches (R519 §6).
+    "zai": {PURPOSE_POST_RANK_IMPROVEMENT, PURPOSE_POST_RANK_TECHNICAL},
 }
+
+
+def retirement_scopes_for_role(role: Optional[str]) -> set:
+    """The retirement scopes implied by a ROLE_* token."""
+    return {role} if role else set()
+
+
+def retirement_scopes_for_purpose(purpose: Optional[str]) -> set:
+    """The retirement scopes implied by a call purpose. This is the
+    single resolver that maps the post-rank improvement purposes to
+    their retirement tokens — so zai's targeted post-rank retirement
+    is data in RETIRED_ROUTE_PROVIDERS, never a hard-coded provider
+    check (R519 §6)."""
+    p = (purpose or "").lower()
+    scopes = set()
+    if "mutation_proposal" in p or "improvement" in p:
+        if "technical" in p:
+            scopes.add(PURPOSE_POST_RANK_TECHNICAL)
+        if "improvement" in p or ("mutation_proposal" in p
+                                  and "technical" not in p):
+            scopes.add(PURPOSE_POST_RANK_IMPROVEMENT)
+    return scopes
 
 
 def is_route_retired(provider_id: str, role: Optional[str] = None,
                      purpose: Optional[str] = None) -> bool:
-    """Check if a provider is retired from a given role or purpose.
-    Returns True if the provider should be excluded from routing."""
+    """THE single routing-retirement predicate (R519 §5). Returns True
+    iff provider_id is retired from any scope implied by `role` and/or
+    `purpose`. Consults only RETIRED_ROUTE_PROVIDERS — no provider-
+    specific code branches, no scattered tuples."""
     if provider_id not in RETIRED_ROUTE_PROVIDERS:
         return False
-    retired_roles = RETIRED_ROUTE_PROVIDERS[provider_id]
-    if role and role in retired_roles:
+    retired_scopes = RETIRED_ROUTE_PROVIDERS[provider_id]
+    if retired_scopes & (retirement_scopes_for_role(role)
+                         | retirement_scopes_for_purpose(purpose)):
         return True
-    # Post-rank purposes are retired for zai but not in ROLE_* constants
-    p = (purpose or "").lower()
-    if "improvement" in p or "mutation_proposal" in p:
-        if role is None or role == ROLE_SYNTHESIS:
-            # improvement engines use ROLE_SYNTHESIS purpose but are
-            # post-rank — check if the purpose matches retirement
-            if provider_id == "zai":
-                return True
     return False
+
+
+def apply_route_retirement(candidates, *, role: Optional[str] = None,
+                           purpose: Optional[str] = None,
+                           explicit_override: bool = False):
+    """The one routing-retirement filter used by every path that
+    assembles a provider order (R519 §5-7). Returns
+    (kept, removed_records).
+
+    - When explicit_override is False (ordinary/default routing),
+      retired providers are removed and each removal is recorded.
+    - When explicit_override is True (an ENGINE_*_PROVIDER env pin, the
+      R491 hard_pin, or a caller-set SelectionPolicy.operator_override),
+      the retired provider is KEPT but the kept-override is recorded
+      (selected semantics: explicit operator override remains possible
+      and is explicitly recorded — never silent, Art. XV).
+    """
+    kept = []
+    removed = []
+    for pid in candidates:
+        retired = is_route_retired(pid, role=role, purpose=purpose)
+        if retired and not explicit_override:
+            removed.append({"provider": pid,
+                            "role": role, "purpose": purpose,
+                            "retirement_state": "RETIRED_ROUTE_BLOCKED"})
+            continue
+        if retired and explicit_override:
+            removed.append({"provider": pid,
+                            "role": role, "purpose": purpose,
+                            "retirement_state":
+                                "EXPLICIT_OPERATOR_OVERRIDE_ALLOWED"})
+        kept.append(pid)
+    return kept, removed
 
 _PURPOSE_ROLE_HINTS = {
     # purposes in use across the engine (grep-verified) -> roles
@@ -721,7 +792,10 @@ def role_for_purpose(purpose: str) -> str:
 
 def order_for_role(matrix: List[Dict[str, Any]], role: str,
                    avoid_provider: Optional[str] = None,
-                   book: Optional[ProviderHealthBook] = None) -> List[str]:
+                   book: Optional[ProviderHealthBook] = None,
+                   purpose: Optional[str] = None,
+                   out_events: Optional[List[Dict[str, Any]]] = None
+                   ) -> List[str]:
     """Deterministic provider ORDER for one role. Inputs: the registry's
     own availability matrix (availability, tiers, context capacity) and
     the health book (cooldown, recent failure rate). Ordering rules:
@@ -770,19 +844,35 @@ def order_for_role(matrix: List[Dict[str, Any]], role: str,
 
     ranked = sorted(avail, key=_rank)
     order = [m["provider_id"] for m in ranked]
-    # R518: filter retired providers from the role's ordered list.
-    # Retired providers are never removed from ProviderSpec (Art. LXIV)
-    # but are excluded from preferred routing for the specified roles.
-    order = [p for p in order if not is_route_retired(p, role=role)]
-    # R469: the default-provider pin (see docstring) — applied AFTER the
-    # rank sort (stable move-to-head) and BEFORE cooldown demotion (a
-    # cooled pinned provider still slides to the end — Art. V wins)
-    pin = os.environ.get("ENGINE_DEFAULT_PROVIDER",
-                         _DEFAULT_PROVIDER_PIN).strip()
-    if (pin and pin in order
-            and not is_route_retired(pin, role=role)
-            and not (role == ROLE_ATTACK and pin == avoid_provider)):
-        order = [pin] + [p for p in order if p != pin]
+    # R519: filter retired providers through THE single authority.
+    # is_route_retired()/apply_route_retirement() are the only retirement
+    # predicates; order_for_role passes purpose so post-rank purpose
+    # scopes (zai) resolve consistently with the role order. Retired
+    # providers are never removed from ProviderSpec (Art. LXIV) but are
+    # excluded from ordinary/default routing for the specified scopes.
+    order, _removed = apply_route_retirement(
+        order, role=role, purpose=purpose, explicit_override=False)
+    if out_events is not None:
+        out_events.extend(_removed)
+    # R469: the operator's DEFAULT-PROVIDER pin. ENGINE_DEFAULT_PROVIDER is
+    # an EXPLICIT operator-override class (R391/R418/R445): under the R519
+    # §5 selected semantics an explicit override remains possible but is
+    # NEVER silent — the re-promotion event is recorded on out_events and
+    # the provider is kept. This is the one place a retired provider can
+    # re-enter the order, and only by an explicit operator act.
+    pin_env = os.environ.get("ENGINE_DEFAULT_PROVIDER")
+    pin = (pin_env if pin_env is not None else _DEFAULT_PROVIDER_PIN).strip()
+    if pin and pin in [m["provider_id"] for m in avail]:
+        pin_retired = is_route_retired(pin, role=role, purpose=purpose)
+        if pin_retired:
+            if out_events is not None:
+                out_events.append({
+                    "provider": pin, "role": role, "purpose": purpose,
+                    "retirement_state":
+                        "EXPLICIT_OPERATOR_OVERRIDE_ALLOWED",
+                    "mechanism": "ENGINE_DEFAULT_PROVIDER"})
+        if not (role == ROLE_ATTACK and pin == avoid_provider):
+            order = [pin] + [p for p in order if p != pin]
     cooled = [p for p in order if b.in_cooldown(p)]
     if cooled and len(order) > 1:
         order = [p for p in order if p not in cooled] + cooled

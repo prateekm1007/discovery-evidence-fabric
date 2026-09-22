@@ -957,6 +957,13 @@ class SelectionPolicy:
     preferred_providers: List[str] = field(default_factory=list)
     max_preference_fallback: int = 8
     purpose: str = "general"          # synthesis | attack | evaluation | general
+    # R519 §5/§7: the single routing-retirement authority treats a
+    # caller-set explicit operator override as DELIBERATE (kept but
+    # recorded), never as ordinary routing. Ordinary preferred_providers
+    # lists are subject to route retirement; setting operator_override=True
+    # marks a call an intentional operator act whose override must appear
+    # on the selection ledger (never silent — Art. XV/XXVII).
+    operator_override: bool = False
 
 
 @dataclass
@@ -1612,7 +1619,8 @@ def generate(prompt: str, system: str = "",
                               purpose=_purpose, run_id=run_id,
                               timeout=timeout, route=_route)
     from .provider_health import (ROLE_SYNTHESIS, HEALTH, classify_failure,
-                                  order_for_role, role_for_purpose)
+                                  order_for_role, role_for_purpose,
+                                  apply_route_retirement)
     from . import model_routing as mr
 
     # R445-C transport override: ENGINE_LLM_TIMEOUT_S bounds the per-call
@@ -1652,16 +1660,41 @@ def generate(prompt: str, system: str = "",
         {"provider": m["provider_id"], "reason": m["cost_policy_note"]}
         for m in matrix if m["available"] and not m["cost_policy_eligible"]]
     # -- the provider chain (policy order, then role ordering) -------------
+    # R519 §5/§7: THE single routing-retirement authority. Every chain
+    # source — ordinary preferred_providers, the role order, the cost
+    # extension, and the rung ladder — is filtered through
+    # apply_route_retirement(), so no path can answer "retired" while
+    # another answers "allowed" (R519 §7: the authority must never give
+    # contradictory answers). An EXPLICIT operator override — the R491
+    # hard_pin_provider, or a call site that set policy.operator_override
+    # because it is honoring an ENGINE_*_PROVIDER env pin — remains
+    # possible under the selected R519 §5 semantics but is NEVER silent:
+    # the kept override is recorded in retirement_events and travels on
+    # the selection ledger. Ordinary (call-site-listed) preferred lists
+    # are subject to route retirement.
+    _purpose_tag0 = (policy.purpose if policy else "") or ""
+    _explicit_override = bool(
+        hard_pin_provider
+        or getattr(policy, "operator_override", False))
+    retirement_events: List[Dict[str, Any]] = []
     if policy and policy.preferred_providers:
         chain = [pid for pid in policy.preferred_providers
                  if pid in avail_ids]
-        chain_source = "policy.preferred_providers"
+        _chain_role = role or role_for_purpose(_purpose_tag0) or ROLE_SYNTHESIS
+        chain, _rr = apply_route_retirement(
+            chain, role=_chain_role, purpose=_purpose_tag0,
+            explicit_override=_explicit_override)
+        retirement_events.extend(_rr)
+        chain_source = "policy.preferred_providers" + (
+            " (EXPLICIT_OPERATOR_OVERRIDE)" if _explicit_override else "")
     else:
         eff_role = role or (role_for_purpose(
             policy.purpose if policy else "") if policy else None) \
             or ROLE_SYNTHESIS
         chain = order_for_role(matrix, eff_role,
-                               avoid_provider=avoid_provider)
+                               avoid_provider=avoid_provider,
+                               purpose=_purpose_tag0,
+                               out_events=retirement_events)
         chain_source = f"role_order:{eff_role}"
     # cooldown demotion applies to BOTH chain sources: a rate-limited
     # provider slides to the end (never removed — a lone cooled provider
@@ -1687,25 +1720,50 @@ def generate(prompt: str, system: str = "",
     cost_policy_chain_extension = [p for p in avail_ids
                                    if p not in chain] if not chain else []
     if cost_policy_chain_extension:
+        # R519 §7: the cost extension also passes through the single
+        # authority so an exhausted ordinary chain cannot silently
+        # re-promote a retired provider. Under an explicit override the
+        # retired provider is kept and the kept event is recorded.
+        _chain_role = role or role_for_purpose(
+            _purpose_tag0) or ROLE_SYNTHESIS
+        cost_policy_chain_extension, _rr = apply_route_retirement(
+            cost_policy_chain_extension, role=_chain_role,
+            purpose=_purpose_tag0, explicit_override=_explicit_override)
+        retirement_events.extend(_rr)
         chain = list(cost_policy_chain_extension)
     if not chain:
         # preferred_providers exhausted or policy-refused with no
         # eligible provider: keep the historical honest semantics (no
         # silent widening beyond the operator's list — Art. IV) and
-        # name the COST POLICY refusal when that is the cause
+        # name the COST POLICY refusal when that is the cause. R519: if
+        # the chain emptied because route retirement removed every
+        # candidate, that is the typed reason — DEFAULT_ROUTE_BLOCKED,
+        # never a silent provider-unavailable (routing provenance is
+        # complete, R519 §16 rule 6).
         _, ledger = select_provider(policy)
         any_avail = any(m["available"] for m in matrix)
+        _retired_all = any(e["retirement_state"] == "RETIRED_ROUTE_BLOCKED"
+                           for e in retirement_events)
+        _status = (ST_POLICY_BLOCKED if (_retired_all or any_avail)
+                   else ST_PROVIDER_UNAVAILABLE)
+        _err = (
+            f"route retirement blocked every eligible provider for "
+            f"this role/purpose (R519 single retirement authority): "
+            f"{[e['provider'] for e in retirement_events if e['retirement_state'] == 'RETIRED_ROUTE_BLOCKED']} — "
+            f"DEFAULT_ROUTE_BLOCKED; an explicit operator override "
+            f"(hard_pin_provider / operator_override) remains the only "
+            f"sanctioned path to a retired provider"
+            if _retired_all else
+            (f"the active cost policy "
+             f"{_cost_policy.active_policy()} refused every "
+             f"available provider — paid routes are never silently "
+             f"used (R451 §1)" if any_avail else
+             "no provider credential available (see selection_ledger)"))
         return LLMCallResult(
-            status=(ST_POLICY_BLOCKED if any_avail
-                    else ST_PROVIDER_UNAVAILABLE),
-            error=(
-                f"the active cost policy "
-                f"{_cost_policy.active_policy()} refused every "
-                f"available provider — paid routes are never silently "
-                f"used (R451 §1)" if any_avail else
-                "no provider credential available (see selection_ledger)"),
+            status=_status, error=_err,
             prompt_hash=_sha(prompt),
             selection_ledger={**ledger,
+                              "retirement_events": list(retirement_events),
                               "cost_policy_refusals": policy_refusals
                               or ledger.get("cost_policy_refusals")},
             call_provenance=call_prov)
@@ -1740,6 +1798,23 @@ def generate(prompt: str, system: str = "",
     rungs = _rungs_kept
     ladder.setdefault("cost_policy", _cost_policy.active_policy())
     ladder.setdefault("cost_policy_rung_refusals", _rung_refusals)
+    # R519 §7: the rung list is ALSO routed through the single authority.
+    # The ladder's LAST_RESORT band can add a retired provider the chain
+    # never asked for; ordinary routing must not reach it. Under an
+    # explicit override (hard_pin_provider / operator_override / env pin)
+    # the retired provider is kept and the kept event is recorded.
+    _retire_role = role or role_for_purpose(purpose_tag) or ROLE_SYNTHESIS
+    _rung_provider_order: List[str] = []
+    for provider_id, _model_id, _r in rungs:
+        if provider_id not in _rung_provider_order:
+            _rung_provider_order.append(provider_id)
+    _allowed_providers, _rr = apply_route_retirement(
+        _rung_provider_order, role=_retire_role, purpose=purpose_tag,
+        explicit_override=bool(hard_pin_provider) or _explicit_override)
+    retirement_events.extend(_rr)
+    _allowed_set = set(_allowed_providers)
+    rungs = [x for x in rungs if x[0] in _allowed_set]
+    ladder["retirement_events"] = list(retirement_events)
     # the ladder may add last-resort providers beyond the policy chain
     # (the directive's LAST-RESORT rung); bound the walk:
     # 1 + max_provider_fallbacks + 2 model hops

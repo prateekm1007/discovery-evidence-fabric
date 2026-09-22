@@ -249,10 +249,15 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
     # call, and the pin status travels in the call meta (never silent).
     pin = os.environ.get("ENGINE_LLM_PROVIDER", "").strip()
     pin_status = "not_set"
+    operator_override = False
     if pin:
         if pin in preferred:
             preferred = [pin] + [p for p in preferred if p != pin]
             pin_status = "pinned_to_head"
+            operator_override = True   # R519 §5/§7: an env pin is an
+                                        # explicit operator act; retirement
+                                        # must remain possible but never
+                                        # silent (see SelectionPolicy).
         else:
             pin_status = f"requested_but_unavailable ({pin})"
     policy = SelectionPolicy(
@@ -262,7 +267,8 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
                                            "nvidia", "anthropic", "openai",
                                            "gemini", "qwen", "deepseek",
                                            "mistral"],
-        purpose=purpose)
+        purpose=purpose,
+        operator_override=operator_override)
     res = generate(prompt, system=system, timeout=timeout,
                    max_retries=2, policy=policy, max_tokens=max_tokens,
                    max_provider_fallbacks=2)
