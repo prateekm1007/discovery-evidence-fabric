@@ -1,14 +1,14 @@
 {
  "arm": "baseline",
  "artifact_type": "R519_AB_HARVEST",
+ "attempts_policy": "all attempts recorded; scoring prefers DURABLE_BRANCH (see harvester _pick_scored)",
  "battery": "R519-routing-AB",
  "durable_harvest_note": "rows tagged DURABLE_BRANCH (default observation_source); live rows merged by session_id survive re-harvest",
- "harvested_at_utc": "2026-09-22T18:39:22Z",
+ "harvested_at_utc": "2026-09-22T19:31:50Z",
  "instrument": "r506_discovery_yield/1.1.0",
  "manifest_sha256": "35b92c56415bb37d5fdd84606f7cb6f06f1776fbc13dc42c919bb537604c1732",
  "ms_module": "scripts/r516_harvest_attribution.py (frozen import)",
- "n_rows": 6,
- "p1_restore_note": "P1 LIVE_API row restored from commit HEAD after durable placeholder clobber (Art. XXIV); durable P1 rep2 still absent on branch",
+ "n_rows": 7,
  "reviewer_provenance": "AI_REVIEW",
  "rows": [
   {
@@ -1439,6 +1439,7 @@
     },
     "overall": null
    },
+   "attempt_note": "rep2 live observation; superseded for scoring by durable p1d re-run ts_a49c9e0b41fb on same frozen problem (Art. LXXIX all attempts kept)",
    "declared_family": "mechanical",
    "funnel_row": null,
    "funnel_row_class": "UNKNOWN",
@@ -1509,6 +1510,7 @@
     "final_status": "MECHANISM_STARVED",
     "status": "COMPLETE"
    },
+   "scored_row": false,
    "session_id": "ts_978e95844598",
    "source_id": "odi:11501419",
    "stage_walls": {
@@ -1543,6 +1545,524 @@
    "terminal_stage_statuses": {
     "ATTACK": null,
     "MECHANISM_SPACE": null,
+    "SYNTHESIZE": "OK"
+   }
+  },
+  {
+   "arm": "baseline",
+   "attack": {
+    "attacker_chain": null,
+    "class": "OBSERVED_IN_STAGE",
+    "evidence": "envelope_ATTACK.json $.attack_results",
+    "generator_provider": "atria",
+    "independence": {
+     "class": "UNKNOWN",
+     "note": "ATTACK did not run to OK on this run — independence unmeasured (Art. XXV/LXI)"
+    },
+    "instrument": null,
+    "killed_count": null,
+    "n_dimensions": null,
+    "overall": null
+   },
+   "declared_family": "mechanical",
+   "determinism_note": "instrument --out bytes == harvest-time read (Art. LXII self-check via file write)",
+   "funnel_row": {
+    "attack_survivors": {
+     "attack_overall": null,
+     "attacker_provenance": "RUN_LEVEL_A2_GAUNTLET_NOT_SEALED_BAR_CALIBRATED",
+     "count": 0,
+     "epistemic_use": "DIAGNOSTIC_ONLY_NOT_DISCOVERY_EVIDENCE (MECHANISM_STARVED terminal; Art. LXXXIV, R515)",
+     "evidence": {
+      "file": "envelope_IMPROVE.json",
+      "pointer": "$.attack_results.overall"
+     },
+     "grid_advanced_not_counted": 1,
+     "grid_advanced_note": "SURVIVOR_SELECTION.ranked non-killed entries are exploration-grid advancements (the SURVIVOR_GATE resolution records that discovery-level verification is NOT re-run per grid candidate); Article LXXVIII: grid-advanced counts are never invention counts, so they are recorded but never counted as attack survivors",
+     "killed_dimensions": [],
+     "note": "the run-level A2 adversarial gauntlet is a different attacker from the engine independent_attack instrument whose R412/R446/R447/R487 sealed-bar calibration gates the engine consumption sites (R489 composition finding)",
+     "reached": false,
+     "typed_drop_reason": "MECHANISM_STARVED"
+    },
+    "buyer_ready": {
+     "evidence": {
+      "file": "DISCOVERY_RELEASE.json",
+      "pointer": "$.package_zip + $.status"
+     },
+     "failure_reason": null,
+     "lineage_sha": "3722a57398cdf881176a166a2784db5b1e6c37c3a01cbbddcbee381c8d2ed078",
+     "lineage_survivor_reached": true,
+     "loop_verification_state": "NONE",
+     "package_zip": null,
+     "reached": false,
+     "real_loop_verified": false,
+     "release_sha": "f40b7192d5bffd92eadaba887d2cb6c6125af6b9c644fffe83a785ae95c1a548",
+     "release_status": "NOT_A_SURVIVOR",
+     "typed_drop_reason": "PACKAGE_NOT_EMITTED"
+    },
+    "byte_hashes": {
+     "final_state.json": "c3b9c33bd01787869f56a73c11c14045c57d33350e6c0bd0f74d3093db3be35c",
+     "problem.json": "b121f1c37f4a5c38702177f0e665ca6609f762b07c6a99058acc746282fbb08e",
+     "run_manifest.json": "5f7e2f0e0e627baa536016aed757a53e8dfeca6a06584890623fb9b84bbd0459"
+    },
+    "candidates_generated_distinct": {
+     "count": 1,
+     "distinctness": {
+      "instrument_version": "mechanism_distinctness/2.0.0",
+      "n_distinct": 1,
+      "n_equivalent_merged": 0,
+      "n_indeterminate": 0,
+      "n_input": 1,
+      "n_retained": null
+     },
+     "evidence": {
+      "file": "envelope_MECHANISM_SPACE.json",
+      "pointer": "$.mechanism_space.distinctness.n_distinct"
+     },
+     "reached": true
+    },
+    "contradiction_survivors": {
+     "blocking_count": 2,
+     "count": 0,
+     "epistemic_use": "DIAGNOSTIC_ONLY_NOT_DISCOVERY_EVIDENCE (MECHANISM_STARVED terminal; Art. LXXXIV, R515)",
+     "evidence": {
+      "file": "envelope_CONTRADICTION.json",
+      "pointer": "$.contradictions.blocking_count"
+     },
+     "reached": false,
+     "typed_drop_reason": "MECHANISM_STARVED"
+    },
+    "cost_debits": "UNKNOWN_PER_ART_XXV_NO_METERED_COST_BYTES_IN_RUN_RECORDS",
+    "declared_family": null,
+    "evidence_verified": {
+     "evidence": {
+      "file": "envelope_IMPROVE.json",
+      "pointer": "$.adjudication.evidence_verification"
+     },
+     "reached": true,
+     "stage_ran": true,
+     "verification_issues": []
+    },
+    "experimentally_discriminated": {
+     "epistemic_use": "DIAGNOSTIC_ONLY_NOT_DISCOVERY_EVIDENCE (MECHANISM_STARVED terminal; Art. LXXXIV, R515)",
+     "evidence": {
+      "file": "DECISIVE_EXPERIMENT.json",
+      "pointer": "$.falsification_contract + $.selected"
+     },
+     "note": "v1.0.0 counts EXECUTED only via the Art. XXXVIII REAL_LOOP_VERIFIED byte state; synthetic executions never count (Art. XXXVII)",
+     "reached": false,
+     "real_loop_verified": false,
+     "state": "CONTRACT_ISSUED_NOT_EXECUTED",
+     "typed_drop_reason": "MECHANISM_STARVED"
+    },
+    "failed_stages": {},
+    "fresh_submitted": {
+     "evidence": {
+      "file": "problem.json",
+      "pointer": "$"
+     },
+     "problem_id": "ui_torque_converter_shudder_102972",
+     "reached": true
+    },
+    "instrument": "r506_discovery_yield/1.1.0",
+    "lost_at": "attack_survivors",
+    "manifest_final_status": "MECHANISM_STARVED",
+    "mechanisms_found": {
+     "evidence": {
+      "file": "envelope_MECHANISM_SPACE.json",
+      "pointer": "$.mechanism_space.n_candidates_generated"
+     },
+     "n_candidates_generated": 1,
+     "reached": true,
+     "state": "BUILT"
+    },
+    "mutated_survivors": {
+     "children": [],
+     "count": 0,
+     "deferred_to_kill_point": false,
+     "delta_real": false,
+     "epistemic_use": "DIAGNOSTIC_ONLY_NOT_DISCOVERY_EVIDENCE (MECHANISM_STARVED terminal; Art. LXXXIV, R515)",
+     "evidence": {
+      "file": "envelope_IMPROVE.json",
+      "pointer": "$.stage_log[IMPROVE] delta_real + result_meta.status==CHILDREN_ADMITTED"
+     },
+     "evolution_record": true,
+     "hash_transition": [],
+     "improve_statuses": [
+      "NO_KILL_EVIDENCE"
+     ],
+     "ledger": null,
+     "reached": false,
+     "typed_drop_reason": "MECHANISM_STARVED"
+    },
+    "novelty_resolution": {
+     "mandatory_complete": null,
+     "novelty_risk": null,
+     "typed": "NOVELTY_LEFT_UNRESOLVED_BY_RING_FAILURES"
+    },
+    "premise_coherent": {
+     "evidence": {
+      "file": "envelope_PREMISE_GATE.json",
+      "pointer": "$.premise_gate.verdict"
+     },
+     "reached": true,
+     "verdict": "PREMISE_COHERENT"
+    },
+    "run_slug": "toscanini_ui_ui_torque_converter_shudder_102972",
+    "run_state": "TERMINAL_COMMIT_PER_LXXIV",
+    "session_id": "ts_a49c9e0b41fb",
+    "stage_order_served": [
+     "RETRIEVE",
+     "FREEZE",
+     "PREMISE_GATE",
+     "SYNTHESIZE",
+     "VERIFY",
+     "MECHANISM_SPACE",
+     "COLLISION",
+     "PHYSICS",
+     "ATTACK",
+     "CONTRADICTION",
+     "KILLER_EXPERIMENT",
+     "ADJUDICATION",
+     "CLASSIFY",
+     "NEXT_BEST_ACTION",
+     "RANK"
+    ],
+    "starvation_terminal": {
+     "evidence": {
+      "file": "final_state.json",
+      "pointer": "$.final_status"
+     },
+     "final_status": "MECHANISM_STARVED",
+     "is_starved": true
+    },
+    "survived_all": false,
+    "terminal": true,
+    "transports_observed": [
+     {
+      "stage": "SYNTHESIZE",
+      "transport": {
+       "model": "Atria-Dawn-Preview",
+       "provider": "atria"
+      }
+     }
+    ],
+    "typed_drop_reason": "MECHANISM_STARVED",
+    "work_envelope": "IMPROVE"
+   },
+   "funnel_row_class": "OBSERVED_IN_STAGE",
+   "ledger_per_stage": {
+    "ATTACK": {
+     "class": "UNKNOWN",
+     "note": "no ledger lines — unmeasured stays unmeasured (Art. XXV)"
+    },
+    "MECHANISM_SPACE": {
+     "attempts_seen": [
+      1
+     ],
+     "class": "OFFLINE_DERIVED",
+     "failures": [],
+     "fallback_hops": [],
+     "first_ok_provider": "atria",
+     "models": [
+      "Atria-Dawn-Preview"
+     ],
+     "n_calls": 1,
+     "n_fallback_hops": 0,
+     "n_ok": 1,
+     "ok_call_wall_s": 18.386,
+     "provider_call_wall_s": 18.386,
+     "provider_chain": [
+      "atria"
+     ],
+     "retries_note": "max(attempt)-1 per ledger; None when attempt numbers absent (Art. XXV)",
+     "retries_observed": 0
+    },
+    "POST_RANK_IMPROVEMENT": {
+     "attempts_seen": [
+      1,
+      2,
+      3
+     ],
+     "class": "OFFLINE_DERIVED",
+     "failures": [
+      "MODEL_FAILURE",
+      "RATE_LIMITED"
+     ],
+     "fallback_hops": [
+      {
+       "from": "zai",
+       "reason": "MODEL_FAILURE: EmptyContentWithFinish: zai returned empty content (finish_reason=length, max_tokens=2048) -> fallback to xkiro",
+       "to": "xkiro"
+      },
+      {
+       "from": "zai",
+       "reason": "MODEL_FAILURE: EmptyContentWithFinish: zai returned empty content (finish_reason=length, max_tokens=2048) -> fallback to unorouter",
+       "to": "unorouter"
+      },
+      {
+       "from": "unorouter",
+       "reason": "RATE_LIMITED: HTTPError: HTTP Error 429: Too Many Requests -> fallback to xkiro",
+       "to": "xkiro"
+      },
+      {
+       "from": "zai",
+       "reason": "MODEL_FAILURE: EmptyContentWithFinish: zai returned empty content (finish_reason=length, max_tokens=2048) -> fallback to xkiro",
+       "to": "xkiro"
+      }
+     ],
+     "first_ok_provider": "xkiro",
+     "models": [
+      "Atria-Dawn-Preview",
+      "minimax/minimax-m3:free",
+      "deepseek-v4-flash:free"
+     ],
+     "n_calls": 9,
+     "n_fallback_hops": 4,
+     "n_ok": 5,
+     "ok_call_wall_s": 257.905,
+     "provider_call_wall_s": 863.642,
+     "provider_chain": [
+      "zai",
+      "xkiro",
+      "unorouter"
+     ],
+     "retries_note": "max(attempt)-1 per ledger; None when attempt numbers absent (Art. XXV)",
+     "retries_observed": 2
+    },
+    "POST_RANK_TECHNICAL": {
+     "class": "UNKNOWN",
+     "note": "no ledger lines — unmeasured stays unmeasured (Art. XXV)"
+    },
+    "SYNTHESIZE": {
+     "attempts_seen": [
+      1
+     ],
+     "class": "OFFLINE_DERIVED",
+     "failures": [],
+     "fallback_hops": [],
+     "first_ok_provider": "atria",
+     "models": [
+      "Atria-Dawn-Preview"
+     ],
+     "n_calls": 2,
+     "n_fallback_hops": 0,
+     "n_ok": 2,
+     "ok_call_wall_s": 79.295,
+     "provider_call_wall_s": 79.295,
+     "provider_chain": [
+      "atria"
+     ],
+     "retries_note": "max(attempt)-1 per ledger; None when attempt numbers absent (Art. XXV)",
+     "retries_observed": 0
+    }
+   },
+   "mechanism_space_2800_budget": {
+    "OPERATOR_INSTANTIATION_MAX_TOKENS": 2800,
+    "class": "OFFLINE_DERIVED",
+    "note": "code constant verified identical on both arm builds (git show a74c3a94 / HEAD); budget frozen, only routing differs"
+   },
+   "mechanism_space_attribution_present": true,
+   "mechanism_space_two_level": {
+    "internal_attribution": {
+     "attribution_version": "mechanism_attribution/1.0.0 (R516)",
+     "class": "OBSERVED_IN_STAGE",
+     "evidence": "envelope_MECHANISM_SPACE.json$.mechanism_space.runtime_attribution",
+     "funnel": {
+      "applicable_operator_contracts": {
+       "n_evaluated": 65,
+       "n_satisfied": 16
+      },
+      "distinctness": {
+       "n_distinct": 1,
+       "n_indeterminate": 0
+      },
+      "llm_outcome": "OK",
+      "llm_output_empty": false,
+      "n_assembled": 1,
+      "n_retained": 1,
+      "selected_operator": "DIRECT_TRANSFER",
+      "semantic_verdicts": [
+       "SEMANTICALLY_VALID"
+      ],
+      "terminal_reason": "BUILT",
+      "verified_evidence_items": 13
+     },
+     "llm": {
+      "failure_type": null,
+      "fallback_occurred": false,
+      "join_keys": {
+       "model": "Atria-Dawn-Preview",
+       "output_hash": "913de3dcbccdfea817fd021b583bc80e5a74e35bd1f49b008c49e82234e8d865",
+       "prompt_hash": "6502dd2bcb36318eca2c11bb4f627294dd206e5087e7782e96fe21f002a1b038",
+       "provider": "atria"
+      },
+      "llm_retries": 0,
+      "model": "Atria-Dawn-Preview",
+      "n_llm_calls": 1,
+      "n_route_hops": 1,
+      "output_empty": false,
+      "path_taken": true,
+      "provider": "atria",
+      "provider_vs_overhead_split": "OFFLINE_VIA_ROUTING_LEDGER (in-stage wall only; join the routing ledger on prompt_hash/output_hash for per-hop latencies — Art. XXV)",
+      "retry_basis": "one call is one call on the lean path (R453-LEAN; no corrective retry)",
+      "routed_hops": [
+       {
+        "failure_type": null,
+        "fallback_provider": null,
+        "provider": "atria"
+       }
+      ],
+      "transport_error": null,
+      "transport_status": "OK"
+     },
+     "present": true,
+     "subphases": [
+      {
+       "duration_s": 0.0,
+       "subphase": "entry_setup"
+      },
+      {
+       "duration_s": 0.0,
+       "n_verified_items_examined": 13,
+       "subphase": "verified_evidence_collection"
+      },
+      {
+       "duration_s": 0.0,
+       "n_structured_items": 13,
+       "subphase": "evidence_item_construction"
+      },
+      {
+       "duration_s": 0.007,
+       "n_contracts_evaluated": 65,
+       "n_satisfied": 16,
+       "selected_operator": "DIRECT_TRANSFER",
+       "subphase": "operator_selection"
+      },
+      {
+       "duration_s": 20.068,
+       "model": "Atria-Dawn-Preview",
+       "provider": "atria",
+       "subphase": "llm_instantiation_wall",
+       "transport_status": "OK"
+      },
+      {
+       "derivation": "OFFLINE_VIA_ROUTING_LEDGER — not measurable in-stage; join routing-ledger per-hop latencies on the llm.join_keys (Art. XXV: unmeasured stays unmeasured, never zero)",
+       "duration_s": null,
+       "subphase": "provider_call_split_offline"
+      },
+      {
+       "duration_s": 0.0,
+       "n_fields_nonempty": 8,
+       "subphase": "candidate_parsing"
+      },
+      {
+       "candidate_state": "CANDIDATE",
+       "duration_s": 0.001,
+       "semantic_verdict": "SEMANTICALLY_VALID",
+       "subphase": "semantic_validation"
+      },
+      {
+       "duration_s": 0.004,
+       "n_blocked": 0,
+       "n_consulted": 1,
+       "subphase": "cemetery_consultation"
+      },
+      {
+       "duration_s": 0.0,
+       "n_distinct": 1,
+       "n_indeterminate": 0,
+       "n_retained": 1,
+       "subphase": "distinctness_dedup"
+      },
+      {
+       "duration_s": 0.006,
+       "subphase": "mechanism_support_verification",
+       "support_states": [
+        "PARTIALLY_SUPPORTED"
+       ]
+      },
+      {
+       "duration_s": 0.0,
+       "subphase": "post_support_assembly"
+      }
+     ],
+     "terminal_state": "BUILT",
+     "total_s": 20.086
+    },
+    "ledger_join": {
+     "class": "OFFLINE_DERIVED",
+     "failures": [],
+     "models": [
+      "Atria-Dawn-Preview"
+     ],
+     "n_lines": 1,
+     "note": "per-hop latencies from the routing ledger; routing/fallback overhead = llm wall minus provider sum (computed by the analyst, never written back in-stage)",
+     "ok_latency_s": 18.386,
+     "provider_execution_s": 18.386,
+     "providers": [
+      "atria"
+     ]
+    },
+    "outer_stage_wall": {
+     "class": "OBSERVED_IN_STAGE",
+     "duration_monotonic_s": 20.095422541955486,
+     "entry_status": "OK",
+     "evidence": "work-envelope stage_log[MECHANISM_SPACE].duration_monotonic_s"
+    },
+    "wrapper_protocol_overhead": {
+     "class": "OFFLINE_DERIVED",
+     "derivation": "stage_log duration_monotonic_s minus runtime_attribution.total_s",
+     "note": "Candidate.run_stage envelope application (apply_to merge, deep-copy), before/after envelope hashing, entry bookkeeping. Recorded as measured; a negative value would be kept as-is with a rounding note, never clamped.",
+     "wrapper_protocol_overhead_s": 0.009
+    }
+   },
+   "observation_source": "DURABLE_BRANCH",
+   "problem_index": 1,
+   "row_file": "R519\\AB_BASELINE_ROW_1_toscanini_ui_ui_torque_converter_shudder_102972.json",
+   "run_slug": "toscanini_ui_ui_torque_converter_shudder_102972",
+   "scored_row": true,
+   "session_id": "ts_a49c9e0b41fb",
+   "source_id": "odi:11501419",
+   "stage_walls": {
+    "ATTACK": {
+     "class": "OBSERVED_IN_STAGE",
+     "duration_monotonic_s": null,
+     "evidence": "work-envelope stage_log[ATTACK]",
+     "status": "SKIPPED_ADMISSION"
+    },
+    "MECHANISM_SPACE": {
+     "class": "OBSERVED_IN_STAGE",
+     "duration_monotonic_s": 20.095422541955486,
+     "evidence": "work-envelope stage_log[MECHANISM_SPACE]",
+     "status": "OK"
+    },
+    "SYNTHESIZE": {
+     "class": "OBSERVED_IN_STAGE",
+     "duration_monotonic_s": 83.91871645196807,
+     "evidence": "work-envelope stage_log[SYNTHESIZE]",
+     "status": "OK"
+    }
+   },
+   "synthesize_output_size": {
+    "class": "OBSERVED_IN_STAGE",
+    "envelope_bytes": 217586,
+    "evidence": "envelope_SYNTHESIZE.json file bytes + span chars",
+    "span_chars_total": 236
+   },
+   "synthesize_validity": {
+    "class": "OBSERVED_IN_STAGE",
+    "evidence": "envelope_SYNTHESIZE.json $.mechanism_map + $.evidence",
+    "evidence_texts_available": 34,
+    "n_mechanisms_seen": 1,
+    "n_spans_present": 2,
+    "n_spans_verbatim_in_own_evidence": 2,
+    "note": "presence = source span nonempty; verbatim = exact byte-substring of the run's own evidence abstracts/titles (Art. II). span_verbatim_rate is NOT recorded by either arm build — derived here offline from durable bytes.",
+    "span_present": true,
+    "span_verbatim_rate": 1.0
+   },
+   "terminal_stage_statuses": {
+    "ATTACK": "SKIPPED_ADMISSION",
+    "MECHANISM_SPACE": "OK",
     "SYNTHESIZE": "OK"
    }
   },

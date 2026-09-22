@@ -650,13 +650,44 @@ def _num(x):
     return x if isinstance(x, (int, float)) else None
 
 
+def _pick_scored(rows_by_idx):
+    """One scored row per problem_index; prefer DURABLE_BRANCH.
+
+    Multiple attempts on the same problem are preserved in the harvest
+    (Art. LXXIX — all attempts recorded); the scored pair uses the
+    durable row when present, else the live row. Never invents a row.
+    """
+    picked = {}
+    for idx, candidates in rows_by_idx.items():
+        durable = [r for r in candidates
+                   if r.get("observation_source") == "DURABLE_BRANCH"]
+        picked[idx] = durable[0] if durable else candidates[0]
+    return picked
+
+
 def compare(base_path: str, opt_path: str, out_path: str) -> int:
     a = json.loads(Path(base_path).read_text(encoding="utf-8"))
     b = json.loads(Path(opt_path).read_text(encoding="utf-8"))
-    ar = {r["problem_index"]: r for r in a["rows"]
-          if "harvest" not in r}
-    br = {r["problem_index"]: r for r in b["rows"]
-          if "harvest" not in r}
+    ar_groups = {}
+    for r in a["rows"]:
+        if "harvest" in r:
+            continue
+        ar_groups.setdefault(r["problem_index"], []).append(r)
+    br_groups = {}
+    for r in b["rows"]:
+        if "harvest" in r:
+            continue
+        br_groups.setdefault(r["problem_index"], []).append(r)
+    ar = _pick_scored(ar_groups)
+    br = _pick_scored(br_groups)
+    attempts_note = {
+        "baseline_attempt_counts": {str(k): len(v)
+                                    for k, v in sorted(ar_groups.items())},
+        "optimized_attempt_counts": {str(k): len(v)
+                                     for k, v in sorted(br_groups.items())},
+        "rule": ("one scored row per problem (DURABLE_BRANCH preferred); "
+                 "extra attempts remain in the harvest files, never "
+                 "dropped (Art. LXXIX)")}
     pairs = []
     def _wall(r, stage):
         w = r["stage_walls"][stage] or {}
@@ -732,6 +763,7 @@ def compare(base_path: str, opt_path: str, out_path: str) -> int:
         "n_paired_problems": len(pairs),
         "pairs": pairs,
         "aggregates": agg,
+        "attempts": attempts_note,
         "statistics_note": ("raw paired rows + arm means only (small-n "
                             "honesty; no significance theater). "
                             "Classification lives in the round record."),
