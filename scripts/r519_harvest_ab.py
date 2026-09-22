@@ -367,10 +367,21 @@ def _load_existing():
     return None, {}
 
 
+def _is_placeholder(r):
+    return "stage_walls" not in r and "harvest" in r
+
+
 def _write_merged(header_extra, new_rows):
     header, rows = _load_existing()
     for r in new_rows:
-        rows[r["session_id"]] = r
+        sid = r.get("session_id")
+        prev = rows.get(sid)
+        # A NOT_YET placeholder must never clobber an existing live or
+        # durable measurement row (Art. XXIV — preserve both; the fuller
+        # row wins on the same session_id).
+        if prev is not None and _is_placeholder(r) and not _is_placeholder(prev):
+            continue
+        rows[sid] = r
     out = {
         "artifact_type": "R519_AB_HARVEST",
         "battery": "R519-routing-AB",
