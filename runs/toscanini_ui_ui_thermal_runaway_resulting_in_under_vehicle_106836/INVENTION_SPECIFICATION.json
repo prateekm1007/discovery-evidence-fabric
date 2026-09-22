@@ -1,0 +1,1281 @@
+{
+ "invention_id": {
+  "value": "inv:ui_thermal_runaway_resulting_in_under_vehicle_106836:8a6f65573d40",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_thermal_runaway_resulting_in_under_vehicle_106836",
+   "device": "hybrid traction battery pack",
+   "failure": "Documented problem 'thermal runaway resulting in under-vehicle fire' concerning hybrid traction battery pack. User-submitted engineering problem (session input): \"[R519-BATTERY declared_family=thermal source=odi:11373822 battery=R519-routing-AB-optimized]\n\nTL* THE CONTACT OWNED A 2020 TOYOTA CAMRY. THE CONTACT STATED WHILE DRIVING AT 65 MPH, WHEN ANOTHER DRIVER INFORMED HIM THE VEHICLE HAD SMOKE EXITING UNDER OF THE VEHICLE. THE CONTACT STATED THE CHECK ENGIN\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "thermal runaway resulting in under-vehicle fire",
+   "constraint": "must contain thermal events before fire or smoke exits the vehicle"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:4145c950"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of hybrid traction battery pack",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Machine learning-based supercapacitor (SC) current reference generation using an LSTM neural network to dynamically offload high transient loads from the battery, reducing peak battery current, peak power demand, and battery energy consumption, which improves thermal performance and reduces battery stress.",
+   "intervention": "Integrate a supercapacitor module into the hybrid traction battery pack of the 2020 Toyota Camry with an LSTM-ONNX-based controller that predicts and supplies transient current demands, offloading high-frequency/high-magnitude current pulses from the Li-ion battery cells to keep cell-level thermal load within safe limits prior to thermal runaway.",
+   "expected_effect": "Lower peak battery current, lower I²R heat generation within battery cells, smoother current ripple, and reduced battery temperature rise during high-load driving (e.g., 65 mph cruise with transient accelerations), which suppresses the thermal events that precede under-vehicle smoke/fire originating from the traction battery pack.",
+   "mechanism_source_span": "neural network is trained using real-world drive cycle data and exported in Open Neural Network Exchange (ONNX) format for real-time deployment within a Simulink-based control environment.",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-025-11330-1"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Machine learning-based approach for reduction of energy consumption in hybrid energy storage electric vehicle.",
+   "mechanism": "Machine learning-based supercapacitor (SC) current reference generation using an LSTM neural network to dynamically offload high transient loads from the battery, reducing peak battery current, peak power demand, and battery energy consumption, which improves thermal performance and reduces battery stress.",
+   "intervention_site": "hybrid traction battery pack",
+   "expected_effect": "Lower peak battery current, lower I²R heat generation within battery cells, smoother current ripple, and reduced battery temperature rise during high-load driving (e.g., 65 mph cruise with transient accelerations), which suppresses the thermal events that precede under-vehicle smoke/fire originating from the traction battery pack.",
+   "falsification_test": "Instrument the Camry hybrid traction battery pack with cell-level thermocouples and current sensors, then run a controlled drive cycle (e.g., IM240 and EUDC equivalents at 65 mph with transient load steps) with and without the LSTM-controlled supercapacitor offload active; the mechanism is falsified if pack cell temperatures do not show a statistically significant reduction (e.g., <5% peak temperature reduction) or if peak battery current is not measurably reduced, since the paper reports 21.3–33.5% peak current reduction and thermal improvement as the mechanistic effect."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-025-11330-1"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Integrate a supercapacitor module into the hybrid traction battery pack of the 2020 Toyota Camry with an LSTM-ONNX-based controller that predicts and supplies transient current demands, offloading high-frequency/high-magnitude current pulses from the Li-ion battery cells to keep cell-level thermal load within safe limits prior to thermal runaway.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-025-11330-1"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "must contain thermal events before fire or smoke exits the vehicle",
+   "failure_mode_of_device": "thermal runaway resulting in under-vehicle fire"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:4145c950"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Lower peak battery current, lower I²R heat generation within battery cells, smoother current ripple, and reduced battery temperature rise during high-load driving (e.g., 65 mph cruise with transient a",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-22T20:01:14.200722+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-22T20:01:14.200722+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1038/s41598-025-11330-1",
+    "title": "Machine learning-based approach for reduction of energy consumption in hybrid energy storage electric vehicle.",
+    "source_uri": "https://doi.org/10.1038/s41598-025-11330-1",
+    "doi": "10.1038/s41598-025-11330-1",
+    "content_hash": "6898ac890a05f66c5bbf5bf9982d2863e4e373d0fd4292cb9f599c1e5df32723",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1038/s41598-025-16050-0",
+    "title": "Research on the hazard characteristics of thermal runaway fire in electric vehicle power battery pack",
+    "source_uri": "https://doi.org/10.1038/s41598-025-16050-0",
+    "doi": "10.1038/s41598-025-16050-0",
+    "content_hash": "ea7e7b9c5cebf4bb55afbd14550faca6dcc8e1645f2b4a3e53398fef6714bb7e",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/vtc2022-fall57202.2022.10012777",
+    "title": "Electric Vehicle Battery Pack Design for Mitigating Thermal Runaway Propagation",
+    "source_uri": "https://doi.org/10.1109/vtc2022-fall57202.2022.10012777",
+    "doi": "10.1109/vtc2022-fall57202.2022.10012777",
+    "content_hash": "8059a82ca105c15ac210f35791b3d3c2b8c20a035dad824f1f88f6c9bc5d72db",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1002/advs.202600050",
+    "title": "Advanced Technologies for Characterizing and Detecting Battery Thermal Failure: A Review.",
+    "source_uri": "https://doi.org/10.1002/advs.202600050",
+    "doi": "10.1002/advs.202600050",
+    "content_hash": "f0130cf4b54e567a4a0686c73931308c74d4e0c5d96691c7eedcadfa4a82ca9e",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1038/s41598-025-26279-4",
+    "title": "Hybrid fuzzy-MPC based multi-objective control strategy for fast charging of electric vehicles with advanced battery thermal management and renewable grid support.",
+    "source_uri": "https://doi.org/10.1038/s41598-025-26279-4",
+    "doi": "10.1038/s41598-025-26279-4",
+    "content_hash": "d760197d4ba9f58807026b67c53ea3b7b826e4a5d88c2e908b164e09d35f6aa5",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.heliyon.2024.e36950",
+    "title": "Recent advancements in battery thermal management system (BTMS): A review of performance enhancement techniques with an emphasis on nano-enhanced phase change materials.",
+    "source_uri": "https://doi.org/10.1016/j.heliyon.2024.e36950",
+    "doi": "10.1016/j.heliyon.2024.e36950",
+    "content_hash": "b4af618d1b99f9261b8f8efbcad14890024c48e6629592e74666206fe8ba74ca",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.18203470",
+    "title": "MH370: Mathematical Proof of the Survival of All Passengers Within a Plasma Tensorial Capsule at Broken Ridge and a Depth of 4,648.35 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S (3428S-9336E). via 165D Mechanics Tensor of the Hamzah Equation.",
+    "source_uri": "https://doi.org/10.5281/zenodo.18203470",
+    "doi": "10.5281/zenodo.18203470",
+    "content_hash": "d7518b6f7cacea3b414710f486fa1ef1c216b6e6adf5fd41eaf7f286ead319d6",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4995/thesis/10251/224812",
+    "title": "A Numerical and Experimental Analysis of Battery Thermal Runaway Phenomena to Enhance the Development of Hybrid and Electric Vehicles",
+    "source_uri": "https://doi.org/10.4995/thesis/10251/224812",
+    "doi": "10.4995/thesis/10251/224812",
+    "content_hash": "794d467e1ac6921bf7c35532ed060e97792f670e261b00a361e0f59e81168078",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.70675/497c904dzece7z47d6z964fz2edc46bfbf0f",
+    "title": "Contribution to thermal behaviour study of lithium-ion battery for electric and hybrid electric vehicle",
+    "source_uri": "https://doi.org/10.70675/497c904dzece7z47d6z964fz2edc46bfbf0f",
+    "doi": "10.70675/497c904dzece7z47d6z964fz2edc46bfbf0f",
+    "content_hash": "26febdc3c5111968a94f209493970b2f0ef915a5a0a4797a4fa97d51bcf4a204",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2504.10119",
+    "title": "Non-intrusive Auto-detecting and Adaptive Hybrid Scheme for Multiscale Heat Transfer: Thermal Runaway in a Battery Pack",
+    "source_uri": "https://doi.org/10.48550/arxiv.2504.10119",
+    "doi": "10.48550/arxiv.2504.10119",
+    "content_hash": "070a6a837b9f1537d48a6cf81366ebda10ca376fb49c43fe16fdd564933ecea5",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2303.11087",
+    "title": "Non-intrusive Hybrid Scheme for Multiscale Heat Transfer: Thermal Runaway in a Battery Pack",
+    "source_uri": "https://doi.org/10.48550/arxiv.2303.11087",
+    "doi": "10.48550/arxiv.2303.11087",
+    "content_hash": "efc56ea86b80bcd697c30a83aaf2f9edc59b49700afe8e512f9d06bce62eb417",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2606.18983",
+    "title": "A finite element-based eigenvalue analysis for predicting thermal runaway in Li-ion battery packs",
+    "source_uri": "https://doi.org/10.48550/arxiv.2606.18983",
+    "doi": "10.48550/arxiv.2606.18983",
+    "content_hash": "dcca4fcd739abf34352a932dad93d4ac14d2b18489e48624e153f7f148f93a21",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.jechem.2020.10.017",
+    "title": "A review of lithium-ion battery safety concerns: The issues, strategies, and testing standards",
+    "source_uri": "https://doi.org/10.1016/j.jechem.2020.10.017",
+    "doi": "10.1016/j.jechem.2020.10.017",
+    "content_hash": "c916fa3738a649d2b400ad64d8294f3289bd20f53ecea6b490b0345383ed738d",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/pr10061192",
+    "title": "A Review of Lithium-Ion Battery Thermal Runaway Modeling and Diagnosis Approaches",
+    "source_uri": "https://doi.org/10.3390/pr10061192",
+    "doi": "10.3390/pr10061192",
+    "content_hash": "31f2e5fab88dca6b7b50c0236fb48915ddd4611d9a70e9afb37b055e5d50ab9e",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/en7095675",
+    "title": "An Acausal Li-Ion Battery Pack Model for  Automotive Applications",
+    "source_uri": "https://doi.org/10.3390/en7095675",
+    "doi": "10.3390/en7095675",
+    "content_hash": "19ad78a06c1b24152c64d8457eb6d13d3ec4d7c4f93900f1b2c0972b5abe8c0f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/vppc.2010.5729220",
+    "title": "A Multiphase Traction/Fast-Battery-Charger Drive for Electric or Plug-in Hybrid Vehicles",
+    "source_uri": "https://doi.org/10.1109/vppc.2010.5729220",
+    "doi": "10.1109/vppc.2010.5729220",
+    "content_hash": "a164c0c3c21bc68d88d1d85bb623f2153c063c987e892789c9785cc81306cae4",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1002/advs.202600050",
+   "doi:10.1016/j.heliyon.2024.e36950",
+   "doi:10.1016/j.jechem.2020.10.017",
+   "doi:10.1038/s41598-025-11330-1",
+   "doi:10.1038/s41598-025-16050-0",
+   "doi:10.1038/s41598-025-26279-4",
+   "doi:10.1109/vppc.2010.5729220",
+   "doi:10.1109/vtc2022-fall57202.2022.10012777",
+   "doi:10.3390/en7095675",
+   "doi:10.3390/pr10061192",
+   "doi:10.48550/arxiv.2303.11087",
+   "doi:10.48550/arxiv.2504.10119",
+   "doi:10.48550/arxiv.2606.18983",
+   "doi:10.4995/thesis/10251/224812",
+   "doi:10.5281/zenodo.18203470",
+   "doi:10.70675/497c904dzece7z47d6z964fz2edc46bfbf0f"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Instrument the Camry hybrid traction battery pack with cell-level thermocouples and current sensors, then run a controlled drive cycle (e.g., IM240 and EUDC equivalents at 65 mph with transient load steps) with and without the LSTM-controlled supercapacitor offload active; the mechanism is falsified if pack cell temperatures do not show a statistically significant reduction (e.g., <5% peak temperature reduction) or if peak battery current is not measurably reduced, since the paper reports 21.3–33.5% peak current reduction and thermal improvement as the mechanistic effect."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_thermal_runaway_resulting_in_under_vehicle_106836:2026-09-22T19:53:56",
+   "final_envelope_hash": "8a6f65573d4008262d4c640072557d76dbc5e8042fe8c77657005da42b9d3a9a",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-22T20:01:14+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-22T20:01:14+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1038/s41598-025-11330-1": {
+   "id": "doi:10.1038/s41598-025-11330-1",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:40790311",
+   "source_uri": "https://doi.org/10.1038/s41598-025-11330-1",
+   "title": "Machine learning-based approach for reduction of energy consumption in hybrid energy storage electric vehicle.",
+   "abstract": "This research introduces a novel machine learning-based strategy for generating supercapacitor (SC) reference current to optimize energy distribution in Battery Electric Vehicles (BEV) and Hybrid Battery Electric Vehicles (HBEV). A Long Short-Term Memory (LSTM) neural network is trained using real-world drive cycle data and exported in Open Neural Network Exchange (ONNX) format for real-time deployment within a Simulink-based control environment. This enables adaptive SC current prediction to dynamically offload high transient loads from the battery. The system is modeled using the Nissan Sakura EV and evaluated under EUDC and IM240 drive cycles. With SC support, the EUDC cycle exhibits a 21.3% reduction in battery peak current, 18.1% reduction in peak power demand, and 5.75% lower battery energy consumption. In the IM240 cycle, peak battery current is reduced by 33.5%, peak power by 31.6%, and energy consumption by 12.36%. These improvements validate the proposed LSTM-ONNX framework in reducing battery stress, improving thermal performance, and enhancing energy efficiency. Additionally, SC assistance leads to smoother traction motor torque, reduced current ripple, and optimized power delivery. A comprehensive model is developed and tested in Simscape to confirm the real-time applicability of this data-driven control strategy for electric vehicles.",
+   "doi": "10.1038/s41598-025-11330-1",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-08-11",
+   "retrieval_timestamp": "2026-09-22T19:54:21.072754+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6898ac890a05f66c5bbf5bf9982d2863e4e373d0fd4292cb9f599c1e5df32723",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:40790311"
+    },
+    "queries_by_source": {
+     "europepmc": "hybrid traction battery pack thermal runaway experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-025-11330-1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway experimental comparison",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1038/s41598-025-16050-0": {
+   "id": "doi:10.1038/s41598-025-16050-0",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1038/s41598-025-16050-0",
+   "source_uri": "https://doi.org/10.1038/s41598-025-16050-0",
+   "title": "Research on the hazard characteristics of thermal runaway fire in electric vehicle power battery pack",
+   "abstract": "",
+   "doi": "10.1038/s41598-025-16050-0",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-22T19:54:21.072870+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ea7e7b9c5cebf4bb55afbd14550faca6dcc8e1645f2b4a3e53398fef6714bb7e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1038/s41598-025-16050-0"
+    },
+    "queries_by_source": {
+     "crossref": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1038/s41598-025-16050-0",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1109/vtc2022-fall57202.2022.10012777": {
+   "id": "doi:10.1109/vtc2022-fall57202.2022.10012777",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/vtc2022-fall57202.2022.10012777",
+   "source_uri": "https://doi.org/10.1109/vtc2022-fall57202.2022.10012777",
+   "title": "Electric Vehicle Battery Pack Design for Mitigating Thermal Runaway Propagation",
+   "abstract": "The production of electric vehicle battery packs with ever-increasing energy densities has accelerated the electrification of the world’s automotive industry. With increased attention on the electric vehicle markets, it is vital to increase the safety of these vehicles which now hold higher hazardous potential. This paper aims to explore the field of pack-level thermal runaway mechanisms and evaluate potential mitigation strategies. Most available literature concentrates on the micromanagement of thermal runaway whereas this paper takes a more holistic approach. Thermal simulations for analysing thermal runaway of modules in differing locations are run to characterise the behaviour of a thermal runaway event at pack-level. Results suggest that the propagation of thermal runaway is consistently severe in a cooling plate cooled battery pack as the cooling plate acts as a channel for high temperatures. Additionally, thermal insulation added to contain the rapid increase in temperature unfortunately results in wider spread higher temperatures",
+   "doi": "10.1109/vtc2022-fall57202.2022.10012777",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2022",
+   "retrieval_timestamp": "2026-09-22T19:54:21.072905+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8059a82ca105c15ac210f35791b3d3c2b8c20a035dad824f1f88f6c9bc5d72db",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "core",
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/vtc2022-fall57202.2022.10012777",
+     "core": "core:124810181"
+    },
+    "queries_by_source": {
+     "crossref": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire",
+     "core": "hybrid traction battery pack thermal runaway experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/vtc2022-fall57202.2022.10012777",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Jiang, Jing",
+    "Sun, Hongjian",
+    "Copsey, Ewan"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records",
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1002/advs.202600050": {
+   "id": "doi:10.1002/advs.202600050",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42101825",
+   "source_uri": "https://doi.org/10.1002/advs.202600050",
+   "title": "Advanced Technologies for Characterizing and Detecting Battery Thermal Failure: A Review.",
+   "abstract": "Energy storage is essential in accelerating the global transition toward clean and sustainable energy across various sectors. Lithium-ion batteries (LIBs) have become increasingly significant for energy storage due to their high energy density, low maintenance, and high coulombic efficiency. However, a challenge arises from the risk of thermal failure across all cell formats and chemistries, particularly under harsh electrochemical and thermal conditions and mechanical stress. In severe cases, such failures have led to catastrophic fires or explosions, posing substantial safety risks and environmental concerns due to gas emissions and toxic discharge. Therefore, an understanding of thermal failure mechanisms is essential for ensuring the safe deployment of batteries across various applications. This review first examines the causes and consequences of thermal failure, providing didactic mechanistic insights. It then compares recent progress in thermal and electrochemical failure analysis using advanced characterization techniques, including X-ray imaging, optical sensing, acoustic field imaging, and spectroscopy, to study the thermal runaway (TR) mechanism and reveal how thermal failures develop and propagate in batteries. It further examines how these advanced characterization tools can inform battery management systems and industrial practice and concludes by outlining future challenges and perspectives for achieving safe energy storage systems.",
+   "doi": "10.1002/advs.202600050",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-05-08",
+   "retrieval_timestamp": "2026-09-22T19:54:21.072929+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f0130cf4b54e567a4a0686c73931308c74d4e0c5d96691c7eedcadfa4a82ca9e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42101825"
+    },
+    "queries_by_source": {
+     "europepmc": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1002/advs.202600050",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1038/s41598-025-26279-4": {
+   "id": "doi:10.1038/s41598-025-26279-4",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41309692",
+   "source_uri": "https://doi.org/10.1038/s41598-025-26279-4",
+   "title": "Hybrid fuzzy-MPC based multi-objective control strategy for fast charging of electric vehicles with advanced battery thermal management and renewable grid support.",
+   "abstract": "The growing adoption of electric vehicles (EVs) and the increasing integration of variable renewable energy sources (RES), such as solar and wind, present significant challenges for grid stability, battery health, and energy management during fast charging. This study proposes a novel hybrid control strategy that combines offline-tuned Fuzzy Logic Control (FLC) with Model Predictive Control (MPC) to enhance the efficiency and reliability of EV fast charging in grid-connected, RES-driven environments. Unlike conventional approaches that rely solely on MPC or FLC, the proposed method leverages FLC's adaptive decision-making to optimize key MPC parameters offline, thereby improving real-time responsiveness and control robustness. Once tuned, the MPC controller predicts grid states, renewable power fluctuations, and EV charging dynamics to optimize charging speed while maintaining thermal safety, reducing battery degradation, and minimizing grid stress. Simulation and experimental results under various operating conditions-including fluctuating renewable inputs, multiple EV charging demands, and dynamic grid behaviour, demonstrate that the proposed hybrid controller significantly outperforms traditional methods in terms of charging efficiency, power quality, battery protection, and renewable energy utilization. The findings also highlight the potential for extending this control framework to future vehicle-to-grid (V2G) applications, contributing to more resilient and sustainable smart grid operations.",
+   "doi": "10.1038/s41598-025-26279-4",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-11-27",
+   "retrieval_timestamp": "2026-09-22T19:54:21.072950+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d760197d4ba9f58807026b67c53ea3b7b826e4a5d88c2e908b164e09d35f6aa5",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41309692"
+    },
+    "queries_by_source": {
+     "europepmc": "hybrid traction battery pack thermal runaway experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-025-26279-4",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway experimental comparison",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1016/j.heliyon.2024.e36950": {
+   "id": "doi:10.1016/j.heliyon.2024.e36950",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:39286145",
+   "source_uri": "https://doi.org/10.1016/j.heliyon.2024.e36950",
+   "title": "Recent advancements in battery thermal management system (BTMS): A review of performance enhancement techniques with an emphasis on nano-enhanced phase change materials.",
+   "abstract": "Because of their numerous benefits such as high charge cycle count, low self-discharge rate, low maintenance requirements, and tiny footprint, Li-batteries have been extensively employed in recent times. However, mostly Li-batteries have a limited lifespan of up to three years after production, may catch fire if the separator is damaged, and cannot be recharged when they are fully depleted. Due to the significant heat generation that li-batteries produce while they are operating, the temperature difference inside the battery module rises. This reduces the operating safety of battery and limits its life. Therefore, maintaining safe battery temperatures requires efficient thermal management using both active and passive. Thermal optimization may be achieved battery thermal management system (BTMS) that employs phase change materials (PCMs). However, PCM's shortcomings in secondary heat dissipation and restricted thermal conductivity still require development in the design, structure, and materials used in BTMS. We summarize new methods to control temperature of batteries using Nano-Enhanced Phase Change Materials (NEPCMs), air cooling, metallic fin intensification, and enhanced composite materials using nanoparticles which work well to boost their performance. To the scientific community, the idea of nano-enhancing PCMs is new and very appealing. Hybrid and ternary battery modules are already receiving attention for the li-battery life span enhancement ultimately facilitating their broader adoption across various applications, from portable electronics to electric vehicles and beyond.",
+   "doi": "10.1016/j.heliyon.2024.e36950",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024-08-30",
+   "retrieval_timestamp": "2026-09-22T19:54:21.072970+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b4af618d1b99f9261b8f8efbcad14890024c48e6629592e74666206fe8ba74ca",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:39286145"
+    },
+    "queries_by_source": {
+     "europepmc": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1016/j.heliyon.2024.e36950",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.5281/zenodo.18203470": {
+   "id": "doi:10.5281/zenodo.18203470",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.18203470",
+   "source_uri": "https://doi.org/10.5281/zenodo.18203470",
+   "title": "MH370: Mathematical Proof of the Survival of All Passengers Within a Plasma Tensorial Capsule at Broken Ridge and a Depth of 4,648.35 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S (3428S-9336E). via 165D Mechanics Tensor of the Hamzah Equation.",
+   "abstract": "                                 MH370 Related Research Papers:\n\nMH370: Mathematical Proof of the Survival of All Passengers Within a Tensorial Capsule at Broken Ridge and a Depth of 4,648.35 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S (3428S-9336E). via 165D Mechanics Tensor of the Hamzah Equation.\n\nhttps://zenodo.org/records/18203470\n\nMH 370 Exact Location. (Broken Ridge and a Depth of 4,648.35 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S).(3428S-9336E).\n\nhttps://zenodo.org/records/18237321\n\nMH 370: All 239 Passengers Are Alive.(Temporal Stasis).\n\nhttps://zenodo.org/records/18271880\n\nMH370: Proof of the Authenticity of the 2014 Luminous Orb Videos of MH370 UAP Abduction Based on the 165-Dimensional Tensor Mechanics of the Hamzah Equation.\n\nhttps://zenodo.org/records/18689118\n\nMH-370: Proven Extreme Recovery Stress Tests for MH 370 from Indian Ocean to L32 Runway of KLIA Air Port.\n\nhttps://zenodo.org/records/18216360\n\nMH 370 Complete Searching Simulator.\n\nhttps://zenodo.org/records/18273887\n\nMH 370: The Innocence of Captain Zaharie Ahmad Shah and MAS Airline Proven Through Mathematical and Aerodynamic Analysis.\n\nhttps://zenodo.org/records/18251198\n\nMH 370: Critical Nuclear-Scale Catastrophe and Imminent Risk of Total Annihilation.\n\nhttps://zenodo.org/records/18384212\n\nMH 370: The Imminent Structural Collapse of Current Civilization. A Critical Examination of the Intersection of MH370, the January 2026 Financial Downturn, and the Emergence of the 165-Dimensional Manifold.\n\nhttps://zenodo.org/records/18687928\n\nMH370: The 2026 Tensorial Civilizational Leap and Its Triangular Correlation of MH17, MH370 Aviation, and COVID-19 Pandemic.\n\nhttps://zenodo.org/records/18706609\n\nMH370 is the Ark of the Covenant and Proven Through the 165-Dimensional Tensor Mechanics of the Hamzah Equation — Lost Ark of Tranquility of the Religions.\n\nhttps://zenodo.org/records/18726603\n\n….…………………………………………………………………\n\nMH 370 AT IGARI Point. (18:25 UTC on 8 March 2014)\n\nTwelve years of fruitless searching for MH 370 marked the greatest computational error in the history of aviation, because the world was looking for the wreckage of a classic crash, whereas the actual event was a tensorial transfer at the IGARI point. At 18:25 UTC on 8 March 2014, eyewitnesses such as the New Zealander M",
+   "doi": "10.5281/zenodo.18203470",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-22T19:54:21.072995+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d7518b6f7cacea3b414710f486fa1ef1c216b6e6adf5fd41eaf7f286ead319d6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.18203470"
+    },
+    "queries_by_source": {
+     "datacite": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Text"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.18203470",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "JALALI, SEYED RASOUL"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.4995/thesis/10251/224812": {
+   "id": "doi:10.4995/thesis/10251/224812",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4995/thesis/10251/224812",
+   "source_uri": "https://doi.org/10.4995/thesis/10251/224812",
+   "title": "A Numerical and Experimental Analysis of Battery Thermal Runaway Phenomena to Enhance the Development of Hybrid and Electric Vehicles",
+   "abstract": "",
+   "doi": "10.4995/thesis/10251/224812",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T19:54:21.073018+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "794d467e1ac6921bf7c35532ed060e97792f670e261b00a361e0f59e81168078",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4995/thesis/10251/224812"
+    },
+    "queries_by_source": {
+     "crossref": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4995/thesis/10251/224812",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.70675/497c904dzece7z47d6z964fz2edc46bfbf0f": {
+   "id": "doi:10.70675/497c904dzece7z47d6z964fz2edc46bfbf0f",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70675/497c904dzece7z47d6z964fz2edc46bfbf0f",
+   "source_uri": "https://doi.org/10.70675/497c904dzece7z47d6z964fz2edc46bfbf0f",
+   "title": "Contribution to thermal behaviour study of lithium-ion battery for electric and hybrid electric vehicle",
+   "abstract": "",
+   "doi": "10.70675/497c904dzece7z47d6z964fz2edc46bfbf0f",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T19:54:21.073036+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "26febdc3c5111968a94f209493970b2f0ef915a5a0a4797a4fa97d51bcf4a204",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70675/497c904dzece7z47d6z964fz2edc46bfbf0f"
+    },
+    "queries_by_source": {
+     "crossref": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70675/497c904dzece7z47d6z964fz2edc46bfbf0f",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2504.10119": {
+   "id": "doi:10.48550/arxiv.2504.10119",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2504.10119v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2504.10119",
+   "title": "Non-intrusive Auto-detecting and Adaptive Hybrid Scheme for Multiscale Heat Transfer: Thermal Runaway in a Battery Pack",
+   "abstract": "Accurately capturing and simulating multiscale systems is a formidable challenge, as both spatial and temporal scales can span many orders of magnitude. Rigorous upscaling methods not only ensure efficient computation, but also maintains errors within a priori prescribed limits. This provides a balance between computational costs and accuracy. However, the most significant difficulties arise when the conditions under which upscaled models can be applied cease to hold. To address this, we develop an automatic-detecting and adaptive, nonintrusive two-sided hybrid method for multiscale heat transfer and apply it to thermal runaway in a battery pack. To allow adaptive hybrid simulations, two kernels are developed to dynamically map the values between the fine-scale and the upscaled subdomains in a single simulation. The accuracy of the developed hybrid method is demonstrated through conducting a series of thermal runaway test cases in a battery pack. Our results show that the maximum spatial errors consistently remain below the threshold bounded by upscaling errors.",
+   "doi": "10.48550/arxiv.2504.10119",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T19:54:21.073054+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "070a6a837b9f1537d48a6cf81366ebda10ca376fb49c43fe16fdd564933ecea5",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2504.10119v1"
+    },
+    "queries_by_source": {
+     "arxiv": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2504.10119",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2504.10119v1",
+   "authors": [
+    "Yinuo Noah Yao",
+    "Ilenia Battiato"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2303.11087": {
+   "id": "doi:10.48550/arxiv.2303.11087",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2303.11087v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.2303.11087",
+   "title": "Non-intrusive Hybrid Scheme for Multiscale Heat Transfer: Thermal Runaway in a Battery Pack",
+   "abstract": "Accurate analytical and numerical modeling of multiscale systems is a daunting task. The need to properly resolve spatial and temporal scales spanning multiple orders of magnitude pushes the limits of both our theoretical models as well as our computational capabilities. Rigorous upscaling techniques enable efficient computation while bounding/tracking errors and helping to make informed cost-accuracy tradeoffs. The biggest challenges arise when the applicability conditions of upscaled models break down. Here, we present a non-intrusive two-way (iterative bottom-up top-down) coupled hybrid model, applied to thermal runaway in battery packs, that combines fine-scale and upscaled equations in the same numerical simulation to achieve predictive accuracy while limiting computational costs. First, we develop two methods with different orders of accuracy to enforce continuity at the coupling boundary. Then, we derive weak (i.e., variational) formulations of the fine-scale and upscaled governing equations for finite element (FE) discretization and numerical implementation in FEniCS. We demonstrate that hybrid simulations can accurately predict the average temperature fields within error bounds determined a priori by homogenization theory. Finally, we demonstrate the computational efficiency of the hybrid algorithm against fine-scale simulations.",
+   "doi": "10.48550/arxiv.2303.11087",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T19:54:21.073072+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "efc56ea86b80bcd697c30a83aaf2f9edc59b49700afe8e512f9d06bce62eb417",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2303.11087v2"
+    },
+    "queries_by_source": {
+     "arxiv": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2303.11087",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2303.11087v2",
+   "authors": [
+    "Yinuo Noah Yao",
+    "Perry Harabin",
+    "Morad Behandish",
+    "Ilenia Battiato"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2606.18983": {
+   "id": "doi:10.48550/arxiv.2606.18983",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2606.18983v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2606.18983",
+   "title": "A finite element-based eigenvalue analysis for predicting thermal runaway in Li-ion battery packs",
+   "abstract": "Thermal runaway remains a critical safety concern in battery systems and other thermally active devices, necessitating reliable methods for predicting the conditions under which thermal runaway may occur. In this work, we develop a finite element framework for assessing thermal stability in systems undergoing transient heat conduction with temperature-dependent internal heat generation. The formulation leads naturally to a generalized eigenvalue problem, wherein the sign of the smallest eigenvalue provides a direct criterion for determining the onset of thermal runaway. This approach enables direct prediction of thermal runaway thresholds in geometrically complicated problems without requiring computationally expensive transient analysis. The proposed methodology is validated through comparison with analytical solutions for a cylindrical Li-ion cell, as well as with a pack of cylindrical cells, demonstrating excellent agreement in both cases. Based on this model, the influence of material properties, boundary conditions, geometric parameters, and spatially varying heat generation on stability limits is examined. A key advantage of this formulation is its effectiveness even for complex geometries where analytical methods become impractical. By providing a systematic and computationally efficient means to identify stability thresholds, the present work offers a practical tool for the thermal design and safety assessment of battery systems.",
+   "doi": "10.48550/arxiv.2606.18983",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T19:54:21.073088+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "dcca4fcd739abf34352a932dad93d4ac14d2b18489e48624e153f7f148f93a21",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2606.18983v1"
+    },
+    "queries_by_source": {
+     "arxiv": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2606.18983",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway resulting in under-vehicle fire",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2606.18983v1",
+   "authors": [
+    "Shailendra Rahi",
+    "Vinay Dhakal",
+    "Ankur Jain",
+    "Manish Agrawal"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.1016/j.jechem.2020.10.017": {
+   "id": "doi:10.1016/j.jechem.2020.10.017",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W3127891378",
+   "source_uri": "https://doi.org/10.1016/j.jechem.2020.10.017",
+   "title": "A review of lithium-ion battery safety concerns: The issues, strategies, and testing standards",
+   "abstract": "Efficient and reliable energy storage systems are crucial for our modern society. Lithium-ion batteries (LIBs) with excellent performance are widely used in portable electronics and electric vehicles (EVs), but frequent fires and explosions limit their further and more widespread applications. This review summarizes aspects of LIB safety and discusses the related issues, strategies, and testing standards. Specifically, it begins with a brief introduction to LIB working principles and cell structures, and then provides an overview of the notorious thermal runaway, with an emphasis on the effects of mechanical, electrical, and thermal abuse. The following sections examine strategies for improving cell safety, including approaches through cell chemistry, cooling, and balancing, afterwards describing current safety standards and corresponding tests. The review concludes with insights into potential future developments and the prospects for safer LIBs.",
+   "doi": "10.1016/j.jechem.2020.10.017",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T19:54:21.073106+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c916fa3738a649d2b400ad64d8294f3289bd20f53ecea6b490b0345383ed738d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W3127891378"
+    },
+    "queries_by_source": {
+     "openalex": "hybrid traction battery pack thermal runaway resulting under-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.1016/j.jechem.2020.10.017",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway resulting under-vehicle fire",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "doi:10.3390/pr10061192": {
+   "id": "doi:10.3390/pr10061192",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W4283013046",
+   "source_uri": "https://doi.org/10.3390/pr10061192",
+   "title": "A Review of Lithium-Ion Battery Thermal Runaway Modeling and Diagnosis Approaches",
+   "abstract": "Lithium-ion (Li-ion) batteries have been utilized increasingly in recent years in various applications, such as electric vehicles (EVs), electronics, and large energy storage systems due to their long lifespan, high energy density, and high-power density, among other qualities. However, there can be faults that occur internally or externally that affect battery performance which can potentially lead to serious safety concerns, such as thermal runaway. Thermal runaway is a major challenge in the Li-ion battery field due to its uncontrollable and irreversible nature, which can lead to fires and explosions, threatening the safety of the public. Therefore, thermal runaway prognosis and diagnosis are significant topics of research. To efficiently study and develop thermal runaway prognosis and diagnosis algorithms, thermal runaway modeling is also important. Li-ion battery thermal runaway modeling, prediction, and detection can help in the development of prevention and mitigation approaches to ensure the safety of the battery system. This paper provides a comprehensive review of Li-ion battery thermal runaway modeling. Various prognostic and diagnostic approaches for thermal runaway are also discussed.",
+   "doi": "10.3390/pr10061192",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T19:54:21.073122+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "31f2e5fab88dca6b7b50c0236fb48915ddd4611d9a70e9afb37b055e5d50ab9e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W4283013046"
+    },
+    "queries_by_source": {
+     "openalex": "hybrid traction battery pack thermal runaway resulting under-vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.3390/pr10061192",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway resulting under-vehicle fire",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "doi:10.3390/en7095675": {
+   "id": "doi:10.3390/en7095675",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:17446431",
+   "source_uri": "https://doi.org/10.3390/en7095675",
+   "title": "An Acausal Li-Ion Battery Pack Model for  Automotive Applications",
+   "abstract": "In this work, a novel acausal and reconfigurable battery pack model is presented. The model structure adopted for the battery cell is based on an equivalent circuit representation. The circuit elements are modified to take account of both hysteresis and diffusion limitation. The latter is known to be a nonlinear function of large operating currents or long operating times. It is shown that the integration of a current dependent time constant within the cell model better emulates the solid diffusional dynamics of lithium intercalation into the active material under large electrical loads. The advantages of an acausal modeling approach, when scaling-up individual cell models into a complete battery system are also presented. Particular consideration is given to emulating the impact of cell to cell variations on pack performance. Using statistical analysis of battery tests, cell model parameter variations are characterized and quantified. The cell and scaled-up pack model are parameterized for a number of commercially available cell formats, energy capacities and chemistries. The new models are validated using transient, real-world, electrical data measured from an electric vehicle (EV) operating within an urban environment",
+   "doi": "10.3390/en7095675",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T19:54:21.073137+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "19ad78a06c1b24152c64d8457eb6d13d3ec4d7c4f93900f1b2c0972b5abe8c0f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:17446431"
+    },
+    "queries_by_source": {
+     "core": "hybrid traction battery pack thermal runaway experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.3390/en7095675",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Taylor, Nigel",
+    "James Marco",
+    "Christopher Lyness",
+    "Marco, James",
+    "Nigel Taylor",
+    "Alessandro Picarelli",
+    "Uddin, Kotub",
+    "Kotub Uddin",
+    "Picarelli, Alessandro",
+    "Lyness, Christopher"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1109/vppc.2010.5729220": {
+   "id": "doi:10.1109/vppc.2010.5729220",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:7076259",
+   "source_uri": "https://doi.org/10.1109/vppc.2010.5729220",
+   "title": "A Multiphase Traction/Fast-Battery-Charger Drive for Electric or Plug-in Hybrid Vehicles",
+   "abstract": "For Electric Vehicles (EV), the charger is one of the main technical and economical weaknesses. This paper focuses on an original electric drive [1]-[3] dedicated to the vehicle traction and configurable as a battery charger without need of additional components. This cheap solution can outfit either electric or plug-in hybrid automotive vehicles, without needing additional mass and volume dedicated to the charger. Moreover, it allows a high charging power, for short duration charge cycles. However, this solution needs specific cares concerning the electrical machine control. This paper deals with the control of this drive [1], focusing on traction mode. In introduction, a review is done about topologies of combined on-board chargers. Then, the studied topology is introduced; using a 3-phase brushless machine supplied with a 6-leg Voltage Source Inverter (VSI). A model for its control is defined in the generalized Concordia frame, considering the traction mode. Then, an analysis of this model is established using a multimachine theory and a graphical formalism (the Energetic Macroscopic Representation denoted EMR). Using EMR, a description of energy flows shows specific control constraints. Indeed, numerical simulations illustrate the perturbations on the currents and the torque when controlling the machine with standard control methodologies. An improved control, deduced from the previous analysis, shows good performances, strongly reducing currents and torque ripples.Fui8 funding within the SOFRACI projec",
+   "doi": "10.1109/vppc.2010.5729220",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T19:54:21.073153+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a164c0c3c21bc68d88d1d85bb623f2153c063c987e892789c9785cc81306cae4",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:7076259"
+    },
+    "queries_by_source": {
+     "core": "hybrid traction battery pack thermal runaway experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1109/vppc.2010.5729220",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "hybrid traction battery pack thermal runaway experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "BOUCHEZ, Boris",
+    "E. Semail",
+    "DE SOUSA, Luis",
+    "A. Bruyere",
+    "KESTELYN, Xavier",
+    "P. Sandulescu",
+    "SEMAIL, Eric",
+    "SANDULESCU, Paul",
+    "B. Bouchez",
+    "X. Kestelyn",
+    "BRUYERE, Antoine",
+    "L. De Sousa"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:4145c950": {
+   "id": "problem:4145c950",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "4145c950b8d67056c0dcece08960258761b77cb1b23442d42a98d0bcec0bb7a1",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "ddcd9d9a3da9ad82f48d71e30832a47e28563b5a22dae918b36b41660618df19",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-22T20:01:14+00:00Z"
+ }
+}
