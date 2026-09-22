@@ -350,6 +350,211 @@ def harvest_row(dest: Path, ledger_lines, idx, source_id, family,
     return row
 
 
+def _load_existing():
+    if OUT_HARVEST.exists():
+        try:
+            d = json.loads(OUT_HARVEST.read_text(encoding="utf-8"))
+            if d.get("arm") != ARM:
+                print(f"FATAL: existing harvest is arm={d.get('arm')}, "
+                      f"not {ARM} — refusing cross-arm merge")
+                sys.exit(2)
+            rows = {r.get("session_id"): r for r in d.get("rows", [])}
+            return d, rows
+        except SystemExit:
+            raise
+        except Exception:
+            pass
+    return None, {}
+
+
+def _write_merged(header_extra, new_rows):
+    header, rows = _load_existing()
+    for r in new_rows:
+        rows[r["session_id"]] = r
+    out = {
+        "artifact_type": "R519_AB_HARVEST",
+        "battery": "R519-routing-AB",
+        "arm": ARM,
+        "instrument": f"{INSTRUMENT_ID}/{INSTRUMENT_VERSION}",
+        "ms_module": "scripts/r516_harvest_attribution.py (frozen import)",
+        "manifest_sha256": hashlib.sha256(
+            MANIFEST.read_bytes()).hexdigest(),
+        "harvested_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                          time.gmtime()),
+        "n_rows": len(rows),
+        "rows": [rows[k] for k in sorted(rows)],
+        "reviewer_provenance": "AI_REVIEW",
+    }
+    out.update(header_extra or {})
+    OUT_HARVEST.write_text(json.dumps(out, indent=1, sort_keys=True,
+                                      ensure_ascii=False) + "\n",
+                           encoding="utf-8")
+    print(f"wrote {OUT_HARVEST} ({len(rows)} rows total)")
+    return out
+
+
+def _iso_seconds(a, b):
+    try:
+        from datetime import datetime
+
+        def p(s):
+            s = (s or "").replace("Z", "+00:00")
+            if s.endswith("+00:00+00:00"):
+                s = s[:-6]
+            return datetime.fromisoformat(s)
+        return (p(b) - p(a)).total_seconds()
+    except Exception:
+        return None
+
+
+def harvest_live(result_path: str, idx: int) -> int:
+    """Harvest one run from its LIVE /result payload (owner-scoped).
+
+    Used when the durable branch lags the live store (snapshot pushes
+    stalled). Every number is tagged LIVE_API vs DURABLE_BRANCH so the
+    observation source is never ambiguous (Art. XXIV). Fields the live
+    payload lacks (attempt numbers, fallback hops, envelope spans,
+    MS runtime_attribution) are UNKNOWN with named reasons — never
+    backfilled from the other arm or from memory.
+    """
+    d = json.loads(Path(result_path).read_text(encoding="utf-8"))
+    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    by_idx = {p["selection_index"]: p for p in manifest["problems"]}
+    p = by_idx[idx]
+    sid = d.get("session_id")
+    row = {"arm": ARM, "problem_index": idx,
+           "source_id": p["source_id"],
+           "declared_family": p["declared_family"],
+           "session_id": sid,
+           "observation_source": "LIVE_API",
+           "observation_note": (
+               "harvested from the live owner-scoped /result payload "
+               "because durable-branch snapshot pushes stalled on this "
+               "deployment (shrink-guard deadlock, see round record); "
+               "the durable row, when it lands, supersedes only on "
+               "byte-identical session_id with fuller evidence")}
+
+    walls = {}
+    for e in d.get("stages") or []:
+        st = e.get("stage")
+        if st in STAGES_OF_INTEREST:
+            dur = _iso_seconds(e.get("started_at"), e.get("finished_at"))
+            walls[st] = {
+                "class": "OFFLINE_DERIVED_FROM_TIMESTAMPS",
+                "duration_s": round(dur, 3) if dur is not None else None,
+                "status": e.get("status"),
+                "evidence": "live /result stages[] started/finished_at",
+            }
+    for st in STAGES_OF_INTEREST:
+        walls.setdefault(st, {
+            "class": "UNKNOWN",
+            "note": "stage absent from live stages[] — unmeasured "
+                    "(Art. XXV)"})
+    row["stage_walls"] = walls
+    row["terminal_stage_statuses"] = {
+        st: walls[st].get("status") for st in STAGES_OF_INTEREST}
+    row["run_terminal"] = {
+        "class": "OBSERVED_LIVE",
+        "status": d.get("status"),
+        "final_status": d.get("final_status"),
+    }
+
+    calls = ((d.get("run_state") or {}).get("model_route") or {}).get(
+        "calls") or []
+    led = {}
+    for st in LEDGER_STAGES:
+        lines = [c for c in calls
+                 if (c.get("role") or "") == st]
+        if not lines:
+            led[st] = {"class": "UNKNOWN",
+                       "note": "no live model_route calls for this "
+                               "role — unmeasured (Art. XXV)"}
+            continue
+        provs, models = [], []
+        for c in lines:
+            if c.get("provider") not in provs:
+                provs.append(c.get("provider"))
+            if c.get("model") not in models:
+                models.append(c.get("model"))
+        wall = sum(float(c.get("latency_ms") or 0)
+                   for c in lines) / 1000.0
+        led[st] = {
+            "class": "LIVE_API",
+            "n_calls": len(lines),
+            "n_ok": sum(1 for c in lines if c.get("status") == "OK"),
+            "attempts_seen": None,
+            "retries_observed": None,
+            "retries_note": "live calls carry no attempt numbers",
+            "provider_chain": provs,
+            "models": models,
+            "provider_call_wall_s": round(wall, 3),
+            "fallback_hops": None,
+            "fallback_note": "live calls carry no fallback edges",
+            "failures": sorted({str(c.get("status")) for c in lines
+                                if c.get("status") != "OK"}),
+            "first_ok_provider": next(
+                (c.get("provider") for c in lines
+                 if c.get("status") == "OK"), None),
+        }
+    row["ledger_per_stage"] = led
+
+    ms = ((d.get("run_state") or {}).get("mechanism_state") or {})
+    row["synthesize_validity"] = {
+        "class": "LIVE_API_PARTIAL",
+        "mechanism_text_chars": len(str(ms.get("mechanism") or "")),
+        "candidate_count": ms.get("candidate_count"),
+        "evidence_pack_present": bool(d.get("evidence_pack")),
+        "span_verbatim_rate": None,
+        "span_note": ("envelope-level spans unavailable live; "
+                      "verbatim rate UNKNOWN until the durable "
+                      "SYNTHESIZE envelope lands (Art. XXV)"),
+    }
+    row["synthesize_output_size"] = {
+        "class": "LIVE_API",
+        "result_payload_bytes": Path(result_path).stat().st_size,
+        "mechanism_chars": len(str(ms.get("mechanism") or "")),
+    }
+    row["mechanism_space_attribution_present"] = None
+    row["mechanism_space_2800_budget"] = {
+        "class": "OFFLINE_DERIVED",
+        "OPERATOR_INSTANTIATION_MAX_TOKENS": 2800,
+        "note": "code constant verified identical on both arm builds",
+    }
+    atk_overall = (d.get("final_state") or {}).get("adversarial_overall")
+    gen = (led.get("SYNTHESIZE") or {}).get("first_ok_provider")
+    atk_led = led.get("ATTACK") or {}
+    atk_chain = atk_led.get("provider_chain")
+    atk_ran = bool(atk_chain)
+    row["attack"] = {
+        "class": "LIVE_API",
+        "overall": atk_overall,
+        "generator_provider": gen,
+        "attacker_chain": atk_chain,
+    }
+    if not atk_ran:
+        row["attack"]["independence"] = {
+            "class": "UNKNOWN",
+            "note": "ATTACK has no live calls on this run "
+                    "(MECHANISM_STARVED short-circuit) — independence "
+                    "unmeasured (Art. XXV/LXI)"}
+    else:
+        atk_ok = atk_led.get("first_ok_provider")
+        row["attack"]["independence"] = {
+            "class": "OFFLINE_DERIVED",
+            "degree": independence_degree(gen, atk_ok),
+            "generator": gen, "attacker": atk_ok,
+            "authority": "provider_health.independence_degree (Art. X)",
+        }
+    row["funnel_row"] = None
+    row["funnel_row_class"] = "UNKNOWN"
+    row["funnel_row_note"] = ("funnel instrument needs durable run "
+                              "bytes; pending branch push")
+    _write_merged({"live_harvest_note": (
+        "rows tagged LIVE_API predate their durable rows; re-harvest "
+        "merges by session_id when the branch lands")}, [row])
+    return 0
+
+
 def harvest_arm() -> int:
     branch = "origin/runtime-state-hf"
     print("fetching durable branch ...")
@@ -418,30 +623,15 @@ def harvest_arm() -> int:
             row = harvest_row(dest, ledger_lines, idx,
                               p["source_id"], p["declared_family"],
                               sid, slug)
+            row["observation_source"] = "DURABLE_BRANCH"
             rows.append(row)
             print(f"#{idx} {slug}: synth={row['stage_walls']['SYNTHESIZE'].get('status')} "
                   f"ms={row['stage_walls']['MECHANISM_SPACE'].get('status')} "
                   f"attack={row['stage_walls']['ATTACK'].get('status')}")
 
-    harvest = {
-        "artifact_type": "R519_AB_HARVEST",
-        "battery": sessions.get("battery"),
-        "arm": ARM,
-        "expected_commit": sessions.get("expected_commit"),
-        "instrument": f"{INSTRUMENT_ID}/{INSTRUMENT_VERSION}",
-        "ms_module": "scripts/r516_harvest_attribution.py (frozen import)",
-        "manifest_sha256": hashlib.sha256(
-            MANIFEST.read_bytes()).hexdigest(),
-        "harvested_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ",
-                                          time.gmtime()),
-        "n_rows": len(rows),
-        "rows": rows,
-        "reviewer_provenance": "AI_REVIEW",
-    }
-    OUT_HARVEST.write_text(json.dumps(harvest, indent=1, sort_keys=True,
-                                      ensure_ascii=False) + "\n",
-                           encoding="utf-8")
-    print(f"wrote {OUT_HARVEST} ({len(rows)} rows)")
+    _write_merged({"durable_harvest_note": (
+        "rows tagged DURABLE_BRANCH (default observation_source); "
+        "live rows merged by session_id survive re-harvest")}, rows)
     return 0
 
 
@@ -457,16 +647,20 @@ def compare(base_path: str, opt_path: str, out_path: str) -> int:
     br = {r["problem_index"]: r for r in b["rows"]
           if "harvest" not in r}
     pairs = []
+    def _wall(r, stage):
+        w = r["stage_walls"][stage] or {}
+        return _num(w.get("duration_monotonic_s") if w.get(
+            "duration_monotonic_s") is not None else w.get("duration_s"))
+
     for idx in sorted(set(ar) & set(br)):
         ra, rb = ar[idx], br[idx]
         pair = {"problem_index": idx,
                 "source_id": ra["source_id"],
-                "declared_family": ra["declared_family"]}
+                "declared_family": ra["declared_family"],
+                "baseline_source": ra.get("observation_source"),
+                "optimized_source": rb.get("observation_source")}
         for stage in STAGES_OF_INTEREST:
-            wa = _num((ra["stage_walls"][stage] or {}).get(
-                "duration_monotonic_s"))
-            wb = _num((rb["stage_walls"][stage] or {}).get(
-                "duration_monotonic_s"))
+            wa, wb = _wall(ra, stage), _wall(rb, stage)
             pair[stage] = {
                 "baseline_wall_s": wa, "optimized_wall_s": wb,
                 "delta_s": (round(wb - wa, 3)
@@ -504,9 +698,9 @@ def compare(base_path: str, opt_path: str, out_path: str) -> int:
         }
         pairs.append(pair)
 
-    def mean(rows, key, sub):
-        vs = [_num(r[key][sub]) for r in rows
-              if _num(r[key][sub]) is not None]
+    def mean_walls(rows, stage):
+        vs = [_wall(r, stage) for r in rows]
+        vs = [v for v in vs if v is not None]
         return {"n": len(vs),
                 "mean": round(sum(vs) / len(vs), 3) if vs else None,
                 "values": vs}
@@ -516,12 +710,8 @@ def compare(base_path: str, opt_path: str, out_path: str) -> int:
                       ("optimized", [br[i] for i in sorted(set(ar) & set(br))])):
         agg[tag] = {
             "n_paired": len(rows),
-            "synth_wall": mean(
-                [{"SYNTHESIZE": r["stage_walls"]["SYNTHESIZE"]}
-                 for r in rows], "SYNTHESIZE", "duration_monotonic_s"),
-            "attack_wall": mean(
-                [{"ATTACK": r["stage_walls"]["ATTACK"]} for r in rows],
-                "ATTACK", "duration_monotonic_s"),
+            "synth_wall": mean_walls(rows, "SYNTHESIZE"),
+            "attack_wall": mean_walls(rows, "ATTACK"),
         }
     out = {
         "artifact_type": "R519_AB_COMPARISON",
@@ -549,8 +739,17 @@ if __name__ == "__main__":
     ap.add_argument("--compare", nargs=2, metavar=("BASE", "OPT"),
                     default=None)
     ap.add_argument("--out", default=None)
+    ap.add_argument("--live", default=None,
+                    help="live /result payload path to harvest")
+    ap.add_argument("--idx", type=int, default=None,
+                    help="manifest selection_index for --live")
     args = ap.parse_args()
     if args.compare:
         sys.exit(compare(args.compare[0], args.compare[1],
                          args.out or "R519/AB_COMPARISON.json"))
+    if args.live:
+        if args.idx is None:
+            print("FATAL: --live requires --idx")
+            sys.exit(2)
+        sys.exit(harvest_live(args.live, args.idx))
     sys.exit(harvest_arm())
