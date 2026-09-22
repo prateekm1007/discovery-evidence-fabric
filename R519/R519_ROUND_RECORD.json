@@ -82,7 +82,7 @@
     "detail": "194 production files, 111779 LOC -> MODULE_INVENTORY.json"
   },
   "fresh_performance_battery": {
-    "status": "NOT_RUN_CREDENTIAL_BLOCKED",
+    "status": "READY_PENDING_OPERATOR_SCOPE_DECISION",
     "blocker": "MEASUREMENT_BLOCKED_MISSING_PROVIDER_CREDENTIALS",
     "arm_definitions": {
       "baseline": "pre-R518 routing via recorded env override (ENGINE_*_PROVIDER / recorded explicit pin)",
@@ -120,7 +120,10 @@
     },
     "repetitions": "multiple (not yet run)",
     "fresh_disjoint_problems": "required (not yet run)",
-    "results": "NOT_RUN"
+    "results": "NOT_RUN",
+    "credential_blocker_status": "RESOLVED_MID_ROUND",
+    "credential_blocker_resolution": "operator supplied HF_TOKEN + GITHUB_PAT in-session (fingerprints match the standing vault: 33bc7af22c628bc1 / f1ebca5f9b62 — no rotation, Art. LXXVI §2). Art. LXXIII step 3 (the HF Space secret surface) is now reachable; the deployed engine at 968e1d74 reports provider credentials CONFIGURED (atria HEALTHY; openrouter, nvidia, apinex, xkiro, unorouter, zai, bai, bynara configured). The recorded blocker MEASUREMENT_BLOCKED_MISSING_PROVIDER_CREDENTIALS no longer holds.",
+    "new_constraint_for_AB": "SYNTHESIZE and MECHANISM_SPACE have NO per-request provider-arm lever: require_provider is wired only to the attack/calibration endpoints (TOSCANINI/server.py). A same-instrument two-arm A/B (Art. XLVII) for those stages therefore requires TWO production Space deployments — baseline (pre-R518 routing: ENGINE_DEFAULT_PROVIDER=atria pin + old retirement table) and optimized (R519 ordinary routing) — across fresh disjoint problems with repetitions. That mutates deployed production identity and spends live provider budget. Scope decision escalated to the operator (Art. LXV / LXXI §4); NOT undertaken unilaterally."
   },
   "§16_acceptance_rules": {
     "latency_data_present": false,
@@ -140,7 +143,7 @@
     "complete"
   ],
   "typed_blocker": {
-    "code": "MEASUREMENT_BLOCKED_MISSING_PROVIDER_CREDENTIALS",
+    "code": "BATTERY_AWAITING_OPERATOR_SCOPE_DECISION",
     "article": "Art. LXXIII credential lookup + Art. LXXI §4",
     "absent_credentials": [
       "OPENROUTER_API_KEY",
@@ -171,7 +174,10 @@
       "OPENAI_API_KEY",
       "ANTHROPIC_API_KEY",
       "GOOGLE_API_KEY"
-    ]
+    ],
+    "previous_code": "MEASUREMENT_BLOCKED_MISSING_PROVIDER_CREDENTIALS",
+    "note": "Credential blocker RESOLVED this round (see fresh_performance_battery.credential_blocker_resolution). The remaining gate for an OPTIMIZATION_PROVEN classification is the operator's scope/cost decision on the two-deployment fresh-problem A/B.",
+    "escalation_question": "Run the full two-deployment fresh-problem performance A/B now (spends live provider budget, temporarily changes deployed production identity to the pre-R518 baseline build), or accept ROUTING_IMPLEMENTED_BUT_UNPROVEN + deploy-GREEN for this round and schedule the A/B as a dedicated later round?"
   },
   "open_items": {
     "multi_source_discovery_vocabulary": {
@@ -198,7 +204,10 @@
   },
   "deploy": {
     "status": "GREEN",
-    "artifacts": ["R519/DEPLOY_RECORD.json", "R519/SPACE_DEPLOY_RECORD.json"],
+    "artifacts": [
+      "R519/DEPLOY_RECORD.json",
+      "R519/SPACE_DEPLOY_RECORD.json"
+    ],
     "target_sha": "968e1d74ca682dc0da3a97babd244eb76c3648fd",
     "deployed_engine_commit": "968e1d74ca682dc0da3a97babd244eb76c3648fd",
     "origin_main_verified": true,
@@ -219,11 +228,7 @@
     "drift": "GREEN",
     "blocked_by": null,
     "what_unblocks": null,
-    "note": (
-      "engine_commit==origin/main==deployed at deploy time; subsequent "
-      "R519 record-only commits change no engine code (deployed identity "
-      "is the code SHA served; r512 convention)."
-    )
+    "note": "engine_commit==origin/main==deployed at deploy time; subsequent R519 record-only commits change no engine code (deployed identity is the code SHA served; r512 convention)."
   },
   "reviewer_provenance": "AI_REVIEW",
   "parent_record": "R518/R518_ROUND_RECORD.json",
