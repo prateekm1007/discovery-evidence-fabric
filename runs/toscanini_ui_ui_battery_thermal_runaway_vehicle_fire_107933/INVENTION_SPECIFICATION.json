@@ -1,0 +1,1309 @@
+{
+ "invention_id": {
+  "value": "inv:ui_battery_thermal_runaway_vehicle_fire_107933:dcda947056a9",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_battery_thermal_runaway_vehicle_fire_107933",
+   "device": "vehicle battery system",
+   "failure": "Documented problem 'battery thermal runaway vehicle fire' concerning vehicle battery system. User-submitted engineering problem (session input): \"[R519-BATTERY declared_family=thermal source=odi:11704685 battery=R519-routing-AB-optimized]\n\nThe contact owned a 2020 Nissan Rogue. The contact stated while driving approximately 20 MPH during rush hour traffic, the contact became aware of a chemical odor, and within seconds there was black smoke e\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "battery thermal runaway vehicle fire",
+   "constraint": "thermal event mitigation must prevent cabin smoke ingress and preserve occupant egress"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:8fa27d52"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of vehicle battery system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "IoT-based real-time fire detection with automatic cooling activation triggered when temperature exceeds a predefined safety threshold of 45°C, using continuous monitoring to detect abnormal thermal conditions and reduce battery temperature.",
+   "intervention": "Install LM35 temperature sensors and a flame detection unit on the 2020 Nissan Rogue battery pack (and in the cabin air intake path) with an Arduino-based controller that, upon detecting ≥45°C or flame signature, (1) activates active cooling of the battery module, (2) triggers a cabin positive-pressure ventilation / HVAC recirculation shutoff with HEPA-grade filtration to block smoke ingress, (3) automatically unlocks doors and powers window controls to preserve occupant egress, and (4) pushes an alert to the driver and first responders via cloud IoT dashboard within the 1.8-second detection window.",
+   "expected_effect": "Thermal runaway propagation is suppressed by reducing battery temperature by 12–15°C within 90 seconds of cooling activation; smoke ingress into the cabin is blocked and egress paths (doors, windows) remain functional, giving occupants a safe evacuation window before the runaway progresses to the black-smoke stage observed in the complaint.",
+   "mechanism_source_span": "detects abnormal thermal conditions within 1.8 seconds and reduces battery temperature by approximately 12–15°C within 90 seconds of cooling activation.",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.5935/jetia.v12i59.3731"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "IOT – BASED FIRE ACCIDENT-AVOIDANCE SYSTEM  IN EV VEHICLE",
+   "mechanism": "IoT-based real-time fire detection with automatic cooling activation triggered when temperature exceeds a predefined safety threshold of 45°C, using continuous monitoring to detect abnormal thermal conditions and reduce battery temperature.",
+   "intervention_site": "vehicle battery system",
+   "expected_effect": "Thermal runaway propagation is suppressed by reducing battery temperature by 12–15°C within 90 seconds of cooling activation; smoke ingress into the cabin is blocked and egress paths (doors, windows) remain functional, giving occupants a safe evacuation window before the runaway progresses to the black-smoke stage observed in the complaint.",
+   "falsification_test": "Instrument a representative R519-class Li-ion battery pack with the LM35 + flame detector + Arduino Nano + cooling-fan loop and a cabin smoke-ingress mock-up; induce thermal runaway via nail penetration or overcharge, and measure (a) time-to-detection (must be ≤1.8 s), (b) battery temperature drop (must reach 12–15°C reduction within 90 s of activation), (c) cabin PM2.5/CO concentration during the event (must stay below ACUC/UL 2580 occupant-exposure limits), and (d) door-unlock and window-drop actuation latency (must complete before smoke opacity reaches the cabin). The mechanism is falsified if any of these four metrics fail their target under three repeated trials."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.5935/jetia.v12i59.3731"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Install LM35 temperature sensors and a flame detection unit on the 2020 Nissan Rogue battery pack (and in the cabin air intake path) with an Arduino-based controller that, upon detecting ≥45°C or flame signature, (1) activates active cooling of the battery module, (2) triggers a cabin positive-pressure ventilation / HVAC recirculation shutoff with HEPA-grade filtration to block smoke ingress, (3) automatically unlocks doors and powers window controls to preserve occupant egress, and (4) pushes an alert to the driver and first responders via cloud IoT dashboard within the 1.8-second detection window.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.5935/jetia.v12i59.3731"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "thermal event mitigation must prevent cabin smoke ingress and preserve occupant egress",
+   "failure_mode_of_device": "battery thermal runaway vehicle fire"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:8fa27d52"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.42821491027630476,
+   "eig_per_cost": 0.42821491027630476,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Thermal runaway propagation is suppressed by reducing battery temperature by 12–15°C within 90 seconds of cooling activation; smoke ingress into the cabin is blocked and egress paths (doors, windows) ",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-22T20:19:57.646931+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-22T20:19:57.646931+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.42821491027630476,
+     "eig_per_cost": 0.42821491027630476,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.5935/jetia.v12i59.3731",
+    "title": "IOT – BASED FIRE ACCIDENT-AVOIDANCE SYSTEM  IN EV VEHICLE",
+    "source_uri": "https://doi.org/10.5935/jetia.v12i59.3731",
+    "doi": "10.5935/jetia.v12i59.3731",
+    "content_hash": "de98aeafe6eb4a5541b9d153eb73d307f09d0f82fe1511d851a4182fc239734e",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/fire8100395",
+    "title": "Mapping the Evolution of New Energy Vehicle Fire Risk Research: A Comprehensive Bibliometric Analysis",
+    "source_uri": "https://doi.org/10.3390/fire8100395",
+    "doi": "10.3390/fire8100395",
+    "content_hash": "fc1fe6aa1845739f6e4e05f19239db28057e3bd5861a96e134ef0e900656ed3e",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1002/advs.76228",
+    "title": "A Review of Failure Modes and Safety Strategies of Lithium-Ion Batteries from Materials to Systems.",
+    "source_uri": "https://doi.org/10.1002/advs.76228",
+    "doi": "10.1002/advs.76228",
+    "content_hash": "8086ba9bc7ca875870ee52d73f81b2b79bfd8b831df7bdda4d63a12ce136e862",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.dibe.2026.100889",
+    "title": "FIRE-EVSim: A BIM and 3D simulation-based framework for enhanced early fire detection in electric vehicle charging infrastructure",
+    "source_uri": "https://doi.org/10.1016/j.dibe.2026.100889",
+    "doi": "10.1016/j.dibe.2026.100889",
+    "content_hash": "973d2ae0c3436b0848a794d03539c3cf6d51309ebb6287fd09f565333b20837b",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/wevj17070348",
+    "title": "Reliability Analysis of a PCM–Liquid Hybrid Battery Thermal Management System for Electric Vehicles",
+    "source_uri": "https://doi.org/10.3390/wevj17070348",
+    "doi": "10.3390/wevj17070348",
+    "content_hash": "0fc7747107a492c05370c2e663fdcc60d5ac18cb9ae046ea030e64d1bff7d3b8",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.csite.2026.108516",
+    "title": "Experimental study on smoke development patterns of lithium-ion battery vehicle fires in extra-long tunnels",
+    "source_uri": "https://doi.org/10.1016/j.csite.2026.108516",
+    "doi": "10.1016/j.csite.2026.108516",
+    "content_hash": "8ebf24f55931143dab11e238f4ecab656018565e731e42f954fe834ef99638bc",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.21223128",
+    "title": "EV SAFE GUARD: Smart EV Battery Health and Safety Monitoring System",
+    "source_uri": "https://doi.org/10.5281/zenodo.21223128",
+    "doi": "10.5281/zenodo.21223128",
+    "content_hash": "0910b8314695d4151b5125931789f1af8c1644c784a3df4a862a5a75e825438a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.19573669",
+    "title": "Next-Generation Single-Passenger eVTOL Architecture: A High-Performance, Production-Ready Design Paradigm",
+    "source_uri": "https://doi.org/10.5281/zenodo.19573669",
+    "doi": "10.5281/zenodo.19573669",
+    "content_hash": "0b64774a33c3ffc1daffa53691c80f18da4fb3e3d4e7a325005060a39eff073c",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.21468461",
+    "title": "MH 370: All 239 Passengers Are Alive.(Temporal Stasis).",
+    "source_uri": "https://doi.org/10.5281/zenodo.21468461",
+    "doi": "10.5281/zenodo.21468461",
+    "content_hash": "005b9cb4ec8e80a65ab393d81879b600ab638d0f19aa86231337fb6e09ab5b10",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2502.07070",
+    "title": "Comprehensive Analysis of Thermal Dissipation in Lithium-Ion Battery Packs",
+    "source_uri": "https://doi.org/10.48550/arxiv.2502.07070",
+    "doi": "10.48550/arxiv.2502.07070",
+    "content_hash": "dd0c3bc089db5e229239e7fedbb753155bc8e4bc0d1eb22d3a126ce4b43e3f2d",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2309.01461",
+    "title": "Joint vehicle state and parameters estimation via Twin-in-the-Loop observers",
+    "source_uri": "https://doi.org/10.48550/arxiv.2309.01461",
+    "doi": "10.48550/arxiv.2309.01461",
+    "content_hash": "f6635afe11219c68e13122dd34e9629be361ebf21ab0861398ed582370fce098",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2102.13477",
+    "title": "B-ETS: A Trusted Blockchain-based Emissions Trading System for Vehicle-to-Vehicle Networks",
+    "source_uri": "https://doi.org/10.48550/arxiv.2102.13477",
+    "doi": "10.48550/arxiv.2102.13477",
+    "content_hash": "550cd4f42dcc77596cbe7fe5af3831bb1ca6e614ab2ead1911434a482b6c52a2",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.jechem.2020.10.017",
+    "title": "A review of lithium-ion battery safety concerns: The issues, strategies, and testing standards",
+    "source_uri": "https://doi.org/10.1016/j.jechem.2020.10.017",
+    "doi": "10.1016/j.jechem.2020.10.017",
+    "content_hash": "c916fa3738a649d2b400ad64d8294f3289bd20f53ecea6b490b0345383ed738d",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.rser.2022.112474",
+    "title": "Thermal runaway and fire of electric vehicle lithium-ion battery and contamination of infrastructure facility",
+    "source_uri": "https://doi.org/10.1016/j.rser.2022.112474",
+    "doi": "10.1016/j.rser.2022.112474",
+    "content_hash": "d15a933b7ec7ae1c3d9fbd4404a8bfc7ce2df7e4364ad0fb39180a309c8ad7c6",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/en7095675",
+    "title": "An Acausal Li-Ion Battery Pack Model for  Automotive Applications",
+    "source_uri": "https://doi.org/10.3390/en7095675",
+    "doi": "10.3390/en7095675",
+    "content_hash": "19ad78a06c1b24152c64d8457eb6d13d3ec4d7c4f93900f1b2c0972b5abe8c0f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1007/s10694-019-00944-3",
+    "title": "A Review of Battery Fires in Electric Vehicles",
+    "source_uri": "https://doi.org/10.1007/s10694-019-00944-3",
+    "doi": "10.1007/s10694-019-00944-3",
+    "content_hash": "13ac46e52564a85e689c6538bd8a5b429ee7becff07c698f694ba1cf36c8518c",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1002/advs.76228",
+   "doi:10.1007/s10694-019-00944-3",
+   "doi:10.1016/j.csite.2026.108516",
+   "doi:10.1016/j.dibe.2026.100889",
+   "doi:10.1016/j.jechem.2020.10.017",
+   "doi:10.1016/j.rser.2022.112474",
+   "doi:10.3390/en7095675",
+   "doi:10.3390/fire8100395",
+   "doi:10.3390/wevj17070348",
+   "doi:10.48550/arxiv.2102.13477",
+   "doi:10.48550/arxiv.2309.01461",
+   "doi:10.48550/arxiv.2502.07070",
+   "doi:10.5281/zenodo.19573669",
+   "doi:10.5281/zenodo.21223128",
+   "doi:10.5281/zenodo.21468461",
+   "doi:10.5935/jetia.v12i59.3731"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:evidence:doi:10.5281/zenodo.21468461",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['not', 'record', 'within', 'year'] in: 'https://zenodo.org/records/18726603\n\n….…………………………………………………………………\n\n\"If Twelv]",
+    "severity": "HIGH"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Instrument a representative R519-class Li-ion battery pack with the LM35 + flame detector + Arduino Nano + cooling-fan loop and a cabin smoke-ingress mock-up; induce thermal runaway via nail penetration or overcharge, and measure (a) time-to-detection (must be ≤1.8 s), (b) battery temperature drop (must reach 12–15°C reduction within 90 s of activation), (c) cabin PM2.5/CO concentration during the event (must stay below ACUC/UL 2580 occupant-exposure limits), and (d) door-unlock and window-drop actuation latency (must complete before smoke opacity reaches the cabin). The mechanism is falsified if any of these four metrics fail their target under three repeated trials."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_battery_thermal_runaway_vehicle_fire_107933:2026-09-22T20:12:13",
+   "final_envelope_hash": "dcda947056a9fc37c3eb243ffd951b22d6798d9aa432df9d2fb4ad23bc01eaf0",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.42821491027630476
+    },
+    "score": 0.2656,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-22T20:19:57+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-22T20:19:57+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.5935/jetia.v12i59.3731": {
+   "id": "doi:10.5935/jetia.v12i59.3731",
+   "source_type": "scientific_paper",
+   "source": "doaj",
+   "source_id": "doaj:doaj:4624c47ce51b4239815469d6ba61845d",
+   "source_uri": "https://doi.org/10.5935/jetia.v12i59.3731",
+   "title": "IOT – BASED FIRE ACCIDENT-AVOIDANCE SYSTEM  IN EV VEHICLE",
+   "abstract": "\nElectric Vehicle (EV) battery systems are highly susceptible to thermal runaway and fire hazards due to voltage instability and excessive temperature rise. This paper presents an IoT-based real-time fire detection and intelligent thermal management system designed to enhance EV battery safety and reliability. The proposed system employs an Arduino Nano integrated with LM35 temperature sensors, voltage monitoring modules, and a flame detection unit to continuously monitor battery health parameters. When the temperature exceeds a predefined safety threshold of 45°C, an automatic cooling mechanism is activated, and alert notifications are generated through LCD display, buzzer, and cloud-based IoT dashboard. Experimental validation shows that the system detects abnormal thermal conditions within 1.8 seconds and reduces battery temperature by approximately 12–15°C within 90 seconds of cooling activation. The proposed architecture offers a low-cost, scalable, and energy-efficient solution for enhancing battery lifespan and preventing fire accidents in electric vehicles.\n",
+   "doi": "10.5935/jetia.v12i59.3731",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-22T20:12:47.072810+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "de98aeafe6eb4a5541b9d153eb73d307f09d0f82fe1511d851a4182fc239734e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "doaj",
+    "indexing_sources": [
+     "doaj"
+    ],
+    "record_ids_by_source": {
+     "doaj": "doaj:4624c47ce51b4239815469d6ba61845d"
+    },
+    "queries_by_source": {
+     "doaj": "vehicle battery system battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "oa_journal_registry",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "oa_journal_registry",
+   "canonical_id": "doi:10.5935/jetia.v12i59.3731",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery system battery thermal runaway vehicle fire",
+   "source_rank": 0,
+   "fulltext_url": "https://itegam-jetia.org/journal/index.php/jetia/article/view/3731",
+   "authors": [
+    "Sriram T",
+    "ANGAYARKANNI N",
+    "ADHITHYA R",
+    "DINESH SURYA S"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DOAJ covers only journals admitted to the index (peer-reviewed OA, no APC condition) — absence here is not absence of the science (Art. XXV)"
+   ]
+  },
+  "doi:10.3390/fire8100395": {
+   "id": "doi:10.3390/fire8100395",
+   "source_type": "scientific_paper",
+   "source": "doaj",
+   "source_id": "doaj:doaj:2625c0e4d22d4cb39080c05a901768f3",
+   "source_uri": "https://doi.org/10.3390/fire8100395",
+   "title": "Mapping the Evolution of New Energy Vehicle Fire Risk Research: A Comprehensive Bibliometric Analysis",
+   "abstract": "To gain a comprehensive understanding of the current research landscape in the field of new energy vehicle (NEV) fires and to explore its knowledge base and emerging trends, bibliometric methods—such as co-occurrence, clustering, and co-citation analyses—were employed to examine the relevant literature. A research knowledge framework was established, encompassing four primary themes: thermal management and performance optimization of power batteries, battery materials and their safety characteristics, thermal runaway (TR) and fire risk assessment, and fire prevention and control strategies. The key research frontiers in this domain could be classified into five categories: mechanisms and propagation of TR, development of high-safety battery materials and flame-retardant technologies, thermal management and thermal safety control, intelligent early warning and fault diagnosis, and fire suppression and firefighting techniques. The focus of research has gradually shifted from passive identification of causes and failure mechanisms to proactive approaches involving thermal control, predictive alerts, and integrated system-level fire safety solutions. As the field advances, increasing complexity and interdisciplinary integration have emerged as defining trends. Future research is expected to benefit from broader cross-disciplinary collaboration. These findings provide a valuable reference for researchers seeking a rapid overview of the evolving landscape of NEV fire-related studies.",
+   "doi": "10.3390/fire8100395",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-22T20:12:47.072927+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "fc1fe6aa1845739f6e4e05f19239db28057e3bd5861a96e134ef0e900656ed3e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "doaj",
+    "indexing_sources": [
+     "doaj"
+    ],
+    "record_ids_by_source": {
+     "doaj": "doaj:2625c0e4d22d4cb39080c05a901768f3"
+    },
+    "queries_by_source": {
+     "doaj": "vehicle battery system battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "oa_journal_registry",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "oa_journal_registry",
+   "canonical_id": "doi:10.3390/fire8100395",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery system battery thermal runaway vehicle fire",
+   "source_rank": 1,
+   "fulltext_url": "https://www.mdpi.com/2571-6255/8/10/395",
+   "authors": [
+    "Yali Zhao",
+    "Jie Kong",
+    "Yimeng Cao",
+    "Hui Liu",
+    "Wenjiao You"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DOAJ covers only journals admitted to the index (peer-reviewed OA, no APC condition) — absence here is not absence of the science (Art. XXV)"
+   ]
+  },
+  "doi:10.1002/advs.76228": {
+   "id": "doi:10.1002/advs.76228",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42376912",
+   "source_uri": "https://doi.org/10.1002/advs.76228",
+   "title": "A Review of Failure Modes and Safety Strategies of Lithium-Ion Batteries from Materials to Systems.",
+   "abstract": "Lithium-ion batteries (LIBs) have rapidly proliferated due to their high energy density, fast charging capability, and long cycle life. However, intrinsic thermal instability poses serious safety concerns, as failures can trigger fires or explosions, hindering large-scale deployment in electric vehicles and energy storage systems. This review examines thermal runaway mechanisms of LIBs by dividing them into sequential stages involving anode-electrolyte interface breakdown, separator shrinkage, electrolyte decomposition, and cathode oxygen release, and by analyzing how multiphysical couplings among thermal, electrochemical, mechanical, and chemical factors govern cascade evolution. Furthermore, the review explores safety enhancement strategies across multiple scales, ranging from material-level improvements such as surface coating and doping of Ni-rich cathodes, ceramic-based separators, and non-flammable electrolyte additives, to structural designs of cells, modules, and packs, as well as system-level diagnostics and control frameworks utilizing battery management systems, artificial intelligence, and digital twin-based prediction models. Addressing the increasing risks associated with LIB applications remains a critical challenge in battery and fire safety engineering. This review therefore proposes a cascade-aware safety framework that links quantitative, stage-specific failure indicators to material-, cell-, module-, pack- and system-level interventions for intrinsic safety design in high-energy-density LIBs.",
+   "doi": "10.1002/advs.76228",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-06-30",
+   "retrieval_timestamp": "2026-09-22T20:12:47.072968+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8086ba9bc7ca875870ee52d73f81b2b79bfd8b831df7bdda4d63a12ce136e862",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42376912"
+    },
+    "queries_by_source": {
+     "europepmc": "vehicle battery system battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1002/advs.76228",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery system battery thermal runaway vehicle fire",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1016/j.dibe.2026.100889": {
+   "id": "doi:10.1016/j.dibe.2026.100889",
+   "source_type": "scientific_paper",
+   "source": "doaj",
+   "source_id": "doaj:doaj:298e8714cef745f0a0358276259a9510",
+   "source_uri": "https://doi.org/10.1016/j.dibe.2026.100889",
+   "title": "FIRE-EVSim: A BIM and 3D simulation-based framework for enhanced early fire detection in electric vehicle charging infrastructure",
+   "abstract": "The expansion of electric vehicle (EV) charging infrastructure introduces unique fire safety challenges, particularly those associated with lithium-ion battery thermal runaway and high-voltage electrical faults, which differ from conventional fire scenarios. Current fire detection systems are limited by the scarcity of domain-specific training data in EV charging environments. To address this limitation, a simulation-driven data augmentation framework, Fire Incident Response Enhancement via Electric Vehicle Simulation (FIRE-EVSim), is proposed. This platform integrates real-world EV charging station configurations with advanced simulation technologies to generate large-scale synthetic fire datasets. Realistic 3D models are developed using Autodesk Revit for Building Information Modeling (BIM) and rendered in Unreal Engine 5 (UE5) to simulate diverse fire scenarios across varying intensities, environmental conditions, and temporal settings. The system produces 100 distinct fire scenarios and 10,000 annotated images capturing a wide range of fire behaviors and contextual factors. A YOLO11 deep learning model is trained using a hybrid dataset that combines the synthetic data with real fire imagery, demonstrating significantly improved detection performance. Evaluation results show a precision of 0.918, recall of 0.884, mAP@50 of 0.917, and F1-score of 0.901. The proposed vision-based approach leverages existing CCTV infrastructure to provide a low-cost and scalable platform for enhancing EV charging infrastructure safety through smart fire detection systems.",
+   "doi": "10.1016/j.dibe.2026.100889",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-22T20:12:47.072990+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "973d2ae0c3436b0848a794d03539c3cf6d51309ebb6287fd09f565333b20837b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "doaj",
+    "indexing_sources": [
+     "doaj"
+    ],
+    "record_ids_by_source": {
+     "doaj": "doaj:298e8714cef745f0a0358276259a9510"
+    },
+    "queries_by_source": {
+     "doaj": "vehicle battery system battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "oa_journal_registry",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "oa_journal_registry",
+   "canonical_id": "doi:10.1016/j.dibe.2026.100889",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery system battery thermal runaway vehicle fire",
+   "source_rank": 3,
+   "fulltext_url": "http://www.sciencedirect.com/science/article/pii/S2666165926000475",
+   "authors": [
+    "Minh-Truyen Do",
+    "Pa Pa Win Aung",
+    "Khoa Tran Dang Vo",
+    "Minsoo Park",
+    "Seunghee Park"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DOAJ covers only journals admitted to the index (peer-reviewed OA, no APC condition) — absence here is not absence of the science (Art. XXV)"
+   ]
+  },
+  "doi:10.3390/wevj17070348": {
+   "id": "doi:10.3390/wevj17070348",
+   "source_type": "scientific_paper",
+   "source": "doaj",
+   "source_id": "doaj:doaj:0e8c2f95807d4c4fb9d9477668a82073",
+   "source_uri": "https://doi.org/10.3390/wevj17070348",
+   "title": "Reliability Analysis of a PCM–Liquid Hybrid Battery Thermal Management System for Electric Vehicles",
+   "abstract": "Electric vehicles (EVs) utilize batteries that generate thermal energy during charging and discharging processes. Inadequate heat management can result in thermal runaway, which is marked by a rapid and uncontrolled increase in battery temperature and may lead to fire or explosion. Battery Thermal Management Systems (BTMSs) are implemented to reduce the risk of thermal runaway by maintaining battery temperature within a defined safe operating range. Hybrid BTMS configurations integrate multiple cooling methods to enhance operational effectiveness and reliability, surpassing the performance of conventional liquid coolant systems. This work investigates the enhanced efficiency of an integrated phase change material (PCM)–liquid hybrid approach evaluated under severe 3C discharge conditions over a 10,000 h operational reliability window. Our study carefully investigates the system-level reliability using a Functional Fault Tree Analysis (FTA) framework to classify top, intermediate, and basic events. Multi-physics and probabilistic evaluation results demonstrate that the hybrid system achieves a 5 °C reduction in peak cell temperature and a 3 °C improvement in spatial temperature uniformity compared to standard liquid cooling. Reliability assessment establishes a system top-event failure probability of 6% over the 10,000 h window, identifying the coolant pump as the primary failure bottleneck with an individual contribution of 27%. These quantitative insights advance our understanding of hybrid safety architectures, providing essential baseline metrics for future electric vehicle thermal management development.",
+   "doi": "10.3390/wevj17070348",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-22T20:12:47.073018+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0fc7747107a492c05370c2e663fdcc60d5ac18cb9ae046ea030e64d1bff7d3b8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "doaj",
+    "indexing_sources": [
+     "doaj"
+    ],
+    "record_ids_by_source": {
+     "doaj": "doaj:0e8c2f95807d4c4fb9d9477668a82073"
+    },
+    "queries_by_source": {
+     "doaj": "vehicle battery system battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "oa_journal_registry",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "oa_journal_registry",
+   "canonical_id": "doi:10.3390/wevj17070348",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery system battery thermal runaway vehicle fire",
+   "source_rank": 4,
+   "fulltext_url": "https://www.mdpi.com/2032-6653/17/7/348",
+   "authors": [
+    "Shujaat Husain",
+    "Haroon Ashfaq",
+    "Mohammad Asjad",
+    "Pratibha Kumari",
+    "Rajeev Kumar"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DOAJ covers only journals admitted to the index (peer-reviewed OA, no APC condition) — absence here is not absence of the science (Art. XXV)"
+   ]
+  },
+  "doi:10.1016/j.csite.2026.108516": {
+   "id": "doi:10.1016/j.csite.2026.108516",
+   "source_type": "scientific_paper",
+   "source": "doaj",
+   "source_id": "doaj:doaj:3f98e65e84ed44e383463e24b2af07af",
+   "source_uri": "https://doi.org/10.1016/j.csite.2026.108516",
+   "title": "Experimental study on smoke development patterns of lithium-ion battery vehicle fires in extra-long tunnels",
+   "abstract": "A lithium-ion battery combustion experiment was conducted in the Dinghuaimen Yangtze River Tunnel in Nanjing, China. It aimed to investigate the smoke development behaviour of lithium-ion battery vehicle fires in extra-long tunnels. The test battery was a 20 kWh lithium-ion phosphate battery with a state of charge (SOC) of 100%. A combined lateral-longitudinal ventilation system was employed. Key parameters, including smoke layer temperature, spread velocity, smoke layer height, and the concentrations of CO and HF, were systematically measured and analysed. The results showed that lithium-ion battery fires underwent four distinct stages: thermal runaway, chain explosion, steady combustion, and decay. The highest temperature measured was 96.4 °C at the ceiling 5 m upstream. Additionally, the ceiling temperature distribution exhibited a depression, influenced by cell explosions and the location of exhaust vents. Smoke spread exhibited a distinct two-layer structure, with an upper smoke layer appearing earlier and propagating more rapidly, followed by a darker lower smoke layer with a slower initial propagation rate. The formation and evolution of this stratified structure were associated with the combined effects of time-dependent smoke generation, thermal buoyancy, density differences, and ventilation-induced transport. Multiple peaks in CO and HF concentrations were observed during the fire development process, reflecting the strongly transient characteristics of gas release. These findings provide essential experimental evidence and critical engineering guidance for fire prevention and ventilation design in extra-long tunnels.",
+   "doi": "10.1016/j.csite.2026.108516",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-22T20:12:47.073050+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8ebf24f55931143dab11e238f4ecab656018565e731e42f954fe834ef99638bc",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "doaj",
+    "indexing_sources": [
+     "doaj"
+    ],
+    "record_ids_by_source": {
+     "doaj": "doaj:3f98e65e84ed44e383463e24b2af07af"
+    },
+    "queries_by_source": {
+     "doaj": "vehicle battery system battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "oa_journal_registry",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "oa_journal_registry",
+   "canonical_id": "doi:10.1016/j.csite.2026.108516",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery system battery thermal runaway vehicle fire",
+   "source_rank": 5,
+   "fulltext_url": "http://www.sciencedirect.com/science/article/pii/S2214157X26008798",
+   "authors": [
+    "Zhilei Wang",
+    "Maohua Wang",
+    "Xudong Yang",
+    "Yaolun Shi",
+    "Xuhai Pan",
+    "Jialiang Liu",
+    "Shuang Zhao",
+    "Shuai Zhang",
+    "Chengwei Liao",
+    "Xiangyu Xu",
+    "Min Hua"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DOAJ covers only journals admitted to the index (peer-reviewed OA, no APC condition) — absence here is not absence of the science (Art. XXV)"
+   ]
+  },
+  "doi:10.5281/zenodo.21223128": {
+   "id": "doi:10.5281/zenodo.21223128",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.21223128",
+   "source_uri": "https://doi.org/10.5281/zenodo.21223128",
+   "title": "EV SAFE GUARD: Smart EV Battery Health and Safety Monitoring System",
+   "abstract": "EV SAFE GUARD is an intelligent Electric Vehicle (EV) Battery Health and Safety Monitoring System developed to enhance the safety, reliability, and operational efficiency of lithium-ion battery packs used in electric vehicles. The system continuously monitors critical battery parameters such as voltage, current, temperature, State of Charge (SoC), State of Health (SoH), and charging/discharging conditions to ensure optimal battery performance and early detection of abnormal operating conditions.\n\nThe project integrates sensors, embedded systems, and real-time monitoring techniques to identify potential issues such as overheating, overcharging, over-discharging, voltage imbalance, excessive current flow, and possible thermal runaway. When unsafe conditions are detected, the system generates immediate alerts, enabling preventive action to reduce the risk of battery damage, fire hazards, and unexpected failures.\n\nEV SAFE GUARD aims to improve battery lifespan, increase vehicle reliability, minimize maintenance costs, and enhance user safety through continuous monitoring and intelligent fault detection. The proposed solution can be applied to electric cars, electric two-wheelers, battery-powered industrial equipment, and energy storage systems.\n\nThis project was developed as an academic engineering project to demonstrate practical applications of battery management systems, embedded electronics, sensor integration, and electric vehicle safety technologies. It is intended for educational, research, and non-commercial purposes and serves as a foundation for future advancements in smart EV battery monitoring and predictive maintenance systems.",
+   "doi": "10.5281/zenodo.21223128",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-22T20:12:47.073086+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0910b8314695d4151b5125931789f1af8c1644c784a3df4a862a5a75e825438a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.21223128"
+    },
+    "queries_by_source": {
+     "datacite": "vehicle battery system battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Text"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.21223128",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery system battery thermal runaway vehicle fire",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "TAMIZHARASAN K",
+    "KAVIRAJ S",
+    "RAMANA K",
+    "PRADEEP S"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.5281/zenodo.19573669": {
+   "id": "doi:10.5281/zenodo.19573669",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.19573669",
+   "source_uri": "https://doi.org/10.5281/zenodo.19573669",
+   "title": "Next-Generation Single-Passenger eVTOL Architecture: A High-Performance, Production-Ready Design Paradigm",
+   "abstract": "Next-Generation Single-Passenger eVTOL Architecture: A High-Performance, Production-Ready Design Paradigm\n\nIntroduction: The Imperative for a Paradigm Shift in Personal Aerial Mobility\n\nThe aerospace sector is currently undergoing a profound metamorphosis, catalyzed by the rapid maturation of distributed electric propulsion (DEP), advanced composite manufacturing, and high-density energy storage. At the nexus of this transformation lies the electric vertical takeoff and landing (eVTOL) aircraft, a platform category poised to redefine urban air mobility (UAM), logistics, and personal transportation.1 Over the past half-decade, a highly publicized sub-sector has emerged: the single-passenger, personal eVTOL. Ostensibly designed to democratize flight, these vehicles combine the vertical lift capabilities of traditional rotorcraft with the mechanical simplicity of multirotor drones.1 However, despite substantial capitalization and enthusiastic public reception, the current state-of-the-art in this category remains fundamentally constrained by a confluence of aerodynamic inefficiencies, outdated regulatory frameworks, and the gravimetric limitations of conventional lithium-ion battery technology.4\n\nThe mandate to design a production-ready, single-passenger drone that comprehensively surpasses all known performance metrics requires a total departure from the incremental engineering that characterizes the contemporary market. Current platforms, while mechanically elegant, function primarily as low-endurance recreational vehicles rather than practical, point-to-point transportation assets. To shatter existing benchmarks—specifically regarding cruise velocity, operational range, acoustic stealth, and payload capacity—engineers must abandon the multirotor and lift-plus-cruise architectures that dominate the sector.6\n\nThis comprehensive research report presents an exhaustive architectural, aerodynamic, and manufacturing blueprint for a next-generation personal eVTOL. By synthesizing aerodynamically optimized tilt-wing structures, ultra-high-density solid-state batteries (SSBs), yokeless axial flux electric motors, silicon carbide (SiC) power electronics, toroidal acoustic suppression systems, and military-grade micro-SWaP (Size, Weight, and Power) avionics, the proposed paradigm establishes a compounding positive design spiral. Furthermore, this report details the tran",
+   "doi": "10.5281/zenodo.19573669",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-22T20:12:47.073119+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0b64774a33c3ffc1daffa53691c80f18da4fb3e3d4e7a325005060a39eff073c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.19573669"
+    },
+    "queries_by_source": {
+     "datacite": "vehicle battery system battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Dataset"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.19573669",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery system battery thermal runaway vehicle fire",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Brewer, Mark Anthony"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.5281/zenodo.21468461": {
+   "id": "doi:10.5281/zenodo.21468461",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.21468461",
+   "source_uri": "https://doi.org/10.5281/zenodo.21468461",
+   "title": "MH 370: All 239 Passengers Are Alive.(Temporal Stasis).",
+   "abstract": "                                         MH370 Related Research Papers:\n\nMH370: Mathematical Proof of the Survival of All Passengers Within a Tensorial Capsule at Broken Ridge and a Depth of 4,648.35 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S (3428S-9336E). via 165D Mechanics Tensor of the Hamzah Equation.\n\nhttps://zenodo.org/records/18203470\n\nMH 370 Exact Location. (Broken Ridge and a Depth of 4,648.35 Meters in the Southern Indian Ocean, at Coordinates Longitude 93.6165° E and Latitude 34.4812° S).(3428S-9336E).\n\nhttps://zenodo.org/records/18237321\n\nMH 370: All 239 Passengers Are Alive.(Temporal Stasis).\n\nhttps://zenodo.org/records/18271880\n\nMH370: Proof of the Authenticity of the 2014 Luminous Orb Videos of MH370 UAP Abduction Based on the 165-Dimensional Tensor Mechanics of the Hamzah Equation.\n\nhttps://zenodo.org/records/18689118\n\nMH-370: Proven Extreme Recovery Stress Tests for MH 370 from Indian Ocean to L32 Runway of KLIA Air Port.\n\nhttps://zenodo.org/records/18216360\n\nMH 370 Complete Searching Simulator.\n\nhttps://zenodo.org/records/18273887\n\nMH 370: The Innocence of Captain Zaharie Ahmad Shah and MAS Airline Proven Through Mathematical and Aerodynamic Analysis.\n\nhttps://zenodo.org/records/18251198\n\nMH 370: Critical Nuclear-Scale Catastrophe and Imminent Risk of Total Annihilation.\n\nhttps://zenodo.org/records/18384212\n\nMH 370: The Imminent Structural Collapse of Current Civilization. A Critical Examination of the Intersection of MH370, the January 2026 Financial Downturn, and the Emergence of the 165-Dimensional Manifold.\n\nhttps://zenodo.org/records/18687928\n\nMH370: The 2026 Tensorial Civilizational Leap and Its Triangular Correlation of MH17, MH370 Aviation, and COVID-19 Pandemic.\n\nhttps://zenodo.org/records/18706609\n\nMH370 is the Ark of the Covenant and Proven Through the 165-Dimensional Tensor Mechanics of the Hamzah Equation — Lost Ark of Tranquility of the Religions.\n\nhttps://zenodo.org/records/18726603\n\n….…………………………………………………………………\n\n\"If Twelve Years of Multi-Billion-Dollar Technology have Failed to Recover So Much as a Single Bolt from MH 370,\n\nOccam’s Razor Dictates that the Flaw Lies not Within the 'Search Perimeter,' but within Your Very 'Physical Foundations.\"\n\n.................................................................................................................................",
+   "doi": "10.5281/zenodo.21468461",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-22T20:12:47.073151+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "005b9cb4ec8e80a65ab393d81879b600ab638d0f19aa86231337fb6e09ab5b10",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.21468461"
+    },
+    "queries_by_source": {
+     "datacite": "vehicle battery system battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Text"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.21468461",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery system battery thermal runaway vehicle fire",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "JALALI, SEYED RASOUL"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.48550/arxiv.2502.07070": {
+   "id": "doi:10.48550/arxiv.2502.07070",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2502.07070v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2502.07070",
+   "title": "Comprehensive Analysis of Thermal Dissipation in Lithium-Ion Battery Packs",
+   "abstract": "Effective thermal management is critical for lithium-ion battery packs' safe and efficient operations, particularly in applications such as drones, where compact designs and varying airflow conditions present unique challenges. This study investigates the thermal performance of a 16-cell lithium-ion battery pack by optimizing cooling airflow configurations and integrating phase change materials (PCMs) for enhanced heat dissipation. Seven geometric configurations were evaluated under airflow speeds ranging from 0 to 15 m/s, reflecting the operational conditions of civilian drones. A comprehensive 3D simulation approach was used to analyze the effects of inlet and outlet configurations, airflow dynamics, and PCM phase transition behavior. Results indicate that the trapezoidal (wide-base) configuration, paired with a 5-inlet and 1-outlet setup, achieves the most balanced performance, effectively maintaining optimal operating temperatures across low and high-speed airflow conditions. PCM integration further stabilized thermal behavior, with phase change durations extending to 12.5 min under tested conditions. These findings highlight the importance of geometric optimization and material integration in advancing compact and reliable thermal management systems for energy-dense battery packs. This study provides a foundation for designing efficient cooling strategies tailored to lightweight applications such as drones and portable energy storage systems.",
+   "doi": "10.48550/arxiv.2502.07070",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T20:12:47.073179+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "dd0c3bc089db5e229239e7fedbb753155bc8e4bc0d1eb22d3a126ce4b43e3f2d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2502.07070v1"
+    },
+    "queries_by_source": {
+     "arxiv": "vehicle battery system battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2502.07070",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery system battery thermal runaway vehicle fire",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2502.07070v1",
+   "authors": [
+    "Xuguang Zhang",
+    "Hexiang Zhang",
+    "Amjad Almansour",
+    "Mrityunjay Singh",
+    "Hengling Zhu",
+    "Michael C. Halbig",
+    "Yi Zheng"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2309.01461": {
+   "id": "doi:10.48550/arxiv.2309.01461",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2309.01461v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2309.01461",
+   "title": "Joint vehicle state and parameters estimation via Twin-in-the-Loop observers",
+   "abstract": "Vehicular control systems are required to be both extremely reliable and robust to different environmental conditions, e.g. load or tire-road friction. In this paper, we extend a new paradigm for state estimation, called Twin-in-the-Loop filtering (TiL-F), to the estimation of the unknown parameters describing the vehicle operating conditions. In such an approach, a digital-twin of the vehicle (usually already available to the car manufacturer) is employed on-board as a plant replica within a closed-loop scheme, and the observer gains are tuned purely from experimental data. The proposed approach is validated against experimental data, showing to significantly outperform the state-of-the-art solutions.",
+   "doi": "10.48550/arxiv.2309.01461",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T20:12:47.073199+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f6635afe11219c68e13122dd34e9629be361ebf21ab0861398ed582370fce098",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2309.01461v1"
+    },
+    "queries_by_source": {
+     "arxiv": "vehicle battery system battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2309.01461",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery system battery thermal runaway vehicle fire",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2309.01461v1",
+   "authors": [
+    "Federico Dettù",
+    "Simone Formentin",
+    "Sergio Matteo Savaresi"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2102.13477": {
+   "id": "doi:10.48550/arxiv.2102.13477",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2102.13477v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.2102.13477",
+   "title": "B-ETS: A Trusted Blockchain-based Emissions Trading System for Vehicle-to-Vehicle Networks",
+   "abstract": "Urban areas are negatively impacted by Carbon Dioxide (CO2 ) and Nitrogen Oxide (NOx) emissions. In order to achieve a cost-effective reduction of greenhouse gas emissions and to combat climate change, the European Union (EU) introduced an Emissions Trading System (ETS) where organizations can buy or receive emission allowances as needed. The current ETS is a centralized one, consisting of a set of complex rules. It is currently administered at the organizational level and is used for fixed-point sources of pollution such as factories, power plants, and refineries. However, the current ETS cannot efficiently cope with vehicle mobility, even though vehicles are one of the primary sources of CO2 and NOx emissions. In this study, we propose a new distributed Blockchain-based emissions allowance trading system called B-ETS. This system enables transparent and trustworthy data exchange as well as trading of allowances among vehicles, relying on vehicle-to-vehicle communication. In addition, we introduce an economic incentive-based mechanism that appeals to individual drivers and leads them to modify their driving behavior in order to reduce emissions. The efficiency of the proposed system is studied through extensive simulations, showing how increased vehicle connectivity can lead to a reduction of the emissions generated from those vehicles. We demonstrate that our method can be used for full life-cycle monitoring and fuel economy reporting. This leads us to conjecture that the proposed system could lead to important behavioral changes among the drivers",
+   "doi": "10.48550/arxiv.2102.13477",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T20:12:47.073216+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "550cd4f42dcc77596cbe7fe5af3831bb1ca6e614ab2ead1911434a482b6c52a2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2102.13477v2"
+    },
+    "queries_by_source": {
+     "arxiv": "vehicle battery system battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2102.13477",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery system battery thermal runaway vehicle fire",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2102.13477v2",
+   "authors": [
+    "Lam Duc Nguyen",
+    "Amari N. Lewis",
+    "Israel Leyva-Mayorga",
+    "Amelia Regan",
+    "Petar Popovski"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.1016/j.jechem.2020.10.017": {
+   "id": "doi:10.1016/j.jechem.2020.10.017",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W3127891378",
+   "source_uri": "https://doi.org/10.1016/j.jechem.2020.10.017",
+   "title": "A review of lithium-ion battery safety concerns: The issues, strategies, and testing standards",
+   "abstract": "Efficient and reliable energy storage systems are crucial for our modern society. Lithium-ion batteries (LIBs) with excellent performance are widely used in portable electronics and electric vehicles (EVs), but frequent fires and explosions limit their further and more widespread applications. This review summarizes aspects of LIB safety and discusses the related issues, strategies, and testing standards. Specifically, it begins with a brief introduction to LIB working principles and cell structures, and then provides an overview of the notorious thermal runaway, with an emphasis on the effects of mechanical, electrical, and thermal abuse. The following sections examine strategies for improving cell safety, including approaches through cell chemistry, cooling, and balancing, afterwards describing current safety standards and corresponding tests. The review concludes with insights into potential future developments and the prospects for safer LIBs.",
+   "doi": "10.1016/j.jechem.2020.10.017",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T20:12:47.073235+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c916fa3738a649d2b400ad64d8294f3289bd20f53ecea6b490b0345383ed738d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W3127891378"
+    },
+    "queries_by_source": {
+     "openalex": "vehicle battery battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.1016/j.jechem.2020.10.017",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery battery thermal runaway vehicle fire",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "doi:10.1016/j.rser.2022.112474": {
+   "id": "doi:10.1016/j.rser.2022.112474",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W4281257578",
+   "source_uri": "https://doi.org/10.1016/j.rser.2022.112474",
+   "title": "Thermal runaway and fire of electric vehicle lithium-ion battery and contamination of infrastructure facility",
+   "abstract": "Thermal runaway and the subsequent fire of electric vehicle lithium-ion batteries cause a specific type of contamination. In order to assess the resulting risks of damage to critical infrastructure and to human health, we perform practical thermal runaway experiments with lithium-ion battery modules of an approved, commercially available electric vehicle. Extensive chemical analyses identify and quantify the soot depositions in ventilated and non-ventilated rooms. Contamination mainly consists of the metal oxides of the cathode material, lithium and fluoride compounds. Their influence on surfaces, protective textiles as well as their corrosiveness to typical metals and the impairment of electrical and electronic devices is low. The analysis of sprinkling and cooling water shows the necessary extent of its decontamination. Recommendations include preventive and mitigating measures for the appropriate handling of contamination caused by fires from lithium-ion battery powered electric vehicles.",
+   "doi": "10.1016/j.rser.2022.112474",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T20:12:47.073253+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d15a933b7ec7ae1c3d9fbd4404a8bfc7ce2df7e4364ad0fb39180a309c8ad7c6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W4281257578"
+    },
+    "queries_by_source": {
+     "openalex": "vehicle battery battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.1016/j.rser.2022.112474",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery battery thermal runaway vehicle fire",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "doi:10.3390/en7095675": {
+   "id": "doi:10.3390/en7095675",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:17446431",
+   "source_uri": "https://doi.org/10.3390/en7095675",
+   "title": "An Acausal Li-Ion Battery Pack Model for  Automotive Applications",
+   "abstract": "In this work, a novel acausal and reconfigurable battery pack model is presented. The model structure adopted for the battery cell is based on an equivalent circuit representation. The circuit elements are modified to take account of both hysteresis and diffusion limitation. The latter is known to be a nonlinear function of large operating currents or long operating times. It is shown that the integration of a current dependent time constant within the cell model better emulates the solid diffusional dynamics of lithium intercalation into the active material under large electrical loads. The advantages of an acausal modeling approach, when scaling-up individual cell models into a complete battery system are also presented. Particular consideration is given to emulating the impact of cell to cell variations on pack performance. Using statistical analysis of battery tests, cell model parameter variations are characterized and quantified. The cell and scaled-up pack model are parameterized for a number of commercially available cell formats, energy capacities and chemistries. The new models are validated using transient, real-world, electrical data measured from an electric vehicle (EV) operating within an urban environment",
+   "doi": "10.3390/en7095675",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T20:12:47.073269+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "19ad78a06c1b24152c64d8457eb6d13d3ec4d7c4f93900f1b2c0972b5abe8c0f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:17446431"
+    },
+    "queries_by_source": {
+     "core": "vehicle battery system battery thermal runaway experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.3390/en7095675",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery system battery thermal runaway experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Taylor, Nigel",
+    "James Marco",
+    "Christopher Lyness",
+    "Marco, James",
+    "Nigel Taylor",
+    "Alessandro Picarelli",
+    "Uddin, Kotub",
+    "Kotub Uddin",
+    "Picarelli, Alessandro",
+    "Lyness, Christopher"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1007/s10694-019-00944-3": {
+   "id": "doi:10.1007/s10694-019-00944-3",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W2999837629",
+   "source_uri": "https://doi.org/10.1007/s10694-019-00944-3",
+   "title": "A Review of Battery Fires in Electric Vehicles",
+   "abstract": "",
+   "doi": "10.1007/s10694-019-00944-3",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-22T20:12:47.073286+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "13ac46e52564a85e689c6538bd8a5b429ee7becff07c698f694ba1cf36c8518c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W2999837629"
+    },
+    "queries_by_source": {
+     "openalex": "vehicle battery battery thermal runaway vehicle fire"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.1007/s10694-019-00944-3",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle battery battery thermal runaway vehicle fire",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "problem:8fa27d52": {
+   "id": "problem:8fa27d52",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "8fa27d522920e02016429152d615f764bfad6553505fc68680aa4545410348f8",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "9e3d4759edb1685c18a6a970ad79360bfa777da0407d01a4f4bab27571308dc1",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-22T20:19:57+00:00Z"
+ }
+}
