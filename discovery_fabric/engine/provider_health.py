@@ -678,6 +678,15 @@ _DEFAULT_PROVIDER_PIN = ""
 # distinguished by purpose, so retirement keys on the purpose token.
 PURPOSE_POST_RANK_IMPROVEMENT = "post_rank:improvement_mutation_proposal"
 PURPOSE_POST_RANK_TECHNICAL = "post_rank:technical_mutation_proposal"
+# R520: the MECHANISM_SPACE operator-instantiation route scope. The MS
+# stage's LLM traffic is the operator-instantiation call (adapters lean
+# path + mechanism_space full path + recorded corrective retries), all
+# routed with purposes operator_{OPERATOR_ID}[_retry] under
+# ROLE_SYNTHESIS. Retiring a provider from THIS purpose scope reroutes
+# exactly the MS instantiation route — SYNTHESIZE (purpose synthesis),
+# ATTACK, evidence extraction (ROLE_EXTRACTION), and post-rank purposes
+# are untouched. One route, one intervention.
+PURPOSE_MS_OPERATOR_INSTANTIATION = "ms:operator_instantiation"
 
 RETIRED_ROUTE_PROVIDERS: Dict[str, set] = {
     # Atria: retired from ATTACK (first-hop 5/5 failures in the R517
@@ -690,7 +699,12 @@ RETIRED_ROUTE_PROVIDERS: Dict[str, set] = {
     # post-rank improvement batteries). Represented through the SAME
     # authoritative mechanism as Atria, via purpose scopes, not via
     # provider-specific code branches (R519 §6).
-    "zai": {PURPOSE_POST_RANK_IMPROVEMENT, PURPOSE_POST_RANK_TECHNICAL},
+    # R520: zai is additionally retired from the MECHANISM_SPACE
+    # operator-instantiation route (R519 battery: MS 86.0→122.28s mean,
+    # zai 5/6). SYNTHESIZE/ATTACK/extraction/post-rank routing unchanged
+    # — the scope below resolves ONLY operator_* instantiation purposes.
+    "zai": {PURPOSE_POST_RANK_IMPROVEMENT, PURPOSE_POST_RANK_TECHNICAL,
+            PURPOSE_MS_OPERATOR_INSTANTIATION},
 }
 
 
@@ -704,8 +718,11 @@ def retirement_scopes_for_purpose(purpose: Optional[str]) -> set:
     single resolver that maps the post-rank improvement purposes to
     their retirement tokens — so zai's targeted post-rank retirement
     is data in RETIRED_ROUTE_PROVIDERS, never a hard-coded provider
-    check (R519 §6)."""
-    p = (purpose or "").lower()
+    check (R519 §6). R520 adds the MS operator-instantiation family:
+    every operator_* purpose is an MS instantiation call (adapters lean
+    path, mechanism_space full path, recorded retries — grep-verified),
+    so they resolve the MS scope and nothing else."""
+    p = (purpose or "").strip().lower()
     scopes = set()
     if "mutation_proposal" in p or "improvement" in p:
         if "technical" in p:
@@ -713,6 +730,8 @@ def retirement_scopes_for_purpose(purpose: Optional[str]) -> set:
         if "improvement" in p or ("mutation_proposal" in p
                                   and "technical" not in p):
             scopes.add(PURPOSE_POST_RANK_IMPROVEMENT)
+    if p.startswith("operator_"):
+        scopes.add(PURPOSE_MS_OPERATOR_INSTANTIATION)
     return scopes
 
 
