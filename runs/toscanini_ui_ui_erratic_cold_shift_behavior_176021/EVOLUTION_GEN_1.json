@@ -1,0 +1,33 @@
+{
+ "gen": 1,
+ "invention_id": "inv:b6c9a15d7f:gen1",
+ "parent_id": null,
+ "lineage": [
+  "inv:b6c9a15d7f:gen1"
+ ],
+ "origin": "BASELINE_SYNTHESIS",
+ "architecture": {
+  "mechanism": "Low-temperature hardening of materials shifts baseline mechanical response (increased torque/force, decreased rotational speed), and a change-point detection algorithm with Z-score normalization can identify the transition between normal and frozen/hardened states in real time.",
+  "intervention": "Instrument the 8-speed automatic transmission (2020 Kia Sorento V6) with a cold-state detection algorithm that runs Z-score normalization on live shift-hydraulic pressure, torque-converter slip, and solenoid current signals, then uses change-point detection to flag the cold-engine state at startup; use that flag to apply a cold-mode shift map (higher line pressure, delayed upshifts, modified torque-converter lockup schedule) until the algorithm detects the warmed-state change-point.",
+  "expected_effect": "Erratic cold-shift behavior is reduced because the transmission controller explicitly recognizes the cold-soak condition and applies a calibrations map matched to cold-fluid viscosity, instead of using the warm-state shift logic that causes the reported harshness and inconsistency.",
+  "falsification_test": "Instrument 6 vehicles (3 baseline TCM calibration, 3 with the cold-state algorithm and cold-mode map) with CAN data loggers; perform 20 cold-soak shifts per vehicle (ambient <0 °C, soak >8 h); compare cold-to-warm shift-event timing variance, shift jerk (m/s^3), and number of complaints-grade shift events between the two groups using a paired t-test (alpha = 0.05); if the algorithm group does not show a statistically significant reduction in variance and jerk versus baseline, the mechanism is falsified for this application."
+ },
+ "state": "INVENTION_SURVIVED",
+ "maturity": "GENERATED",
+ "challenge": {
+  "physics_lifecycle": "BEATS_BASELINE",
+  "attack_overall": null,
+  "evidence_verified": true,
+  "killed": false,
+  "failure_class": null,
+  "kill_reason": "the mechanism-space distinctness adjudication counts 0 materially distinct mechanism(s) (< 2, mechanism_distinctness/2.0.0) — the run generated nothing worth attacking (Art. LXXXIV, R514)",
+  "final_status": "MECHANISM_STARVED"
+ },
+ "causal_delta": null,
+ "change_delta": null,
+ "reason_for_change": null,
+ "fresh_evidence": null,
+ "model": null,
+ "artifacts": {},
+ "evidence_verified": true
+}
