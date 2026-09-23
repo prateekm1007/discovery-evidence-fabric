@@ -106,6 +106,17 @@ def main() -> int:
     ap.add_argument("--allowed-diff-file", default="",
                     help="the single engine file permitted to differ "
                          "between arms")
+    ap.add_argument("--set-variable", action="append", default=[],
+                    metavar="KEY=VALUE",
+                    help="repeatable: Space variable override for this "
+                         "arm ONLY (the R521 intervention is an env "
+                         "knob; every override is recorded in the "
+                         "deploy record)")
+    ap.add_argument("--env-only", action="store_true",
+                    help="the arms differ by environment delta ONLY "
+                         "(engine bytes identical); skips the "
+                         "engine-diff guard and records the variable "
+                         "delta as the intervention")
     args = ap.parse_args()
     from huggingface_hub import HfApi
 
@@ -156,25 +167,40 @@ def main() -> int:
           f"(reachable from origin/main: PROVEN)")
 
     # proof 3 (cheap, local, before staging): engine diff must be
-    # exactly the one allowed file.
+    # exactly the one allowed file — OR the arms are env-only
+    # (byte-identical engine, the delta is variables).
     if args.counterpart_commit:
-        if not args.allowed_diff_file:
-            print("FATAL: --counterpart-commit without "
-                  "--allowed-diff-file — refusing open-ended diff")
-            return 2
-        d = sh("git", "diff", "--name-only", args.counterpart_commit,
-               args.commit, "--", *ENGINE_PATHS)
-        changed = sorted(d.stdout.split())
-        print(f"[r521-arm] engine-diff "
-              f"{args.counterpart_commit[:12]}..{args.commit[:12]}: "
-              f"{changed}")
-        if changed != [args.allowed_diff_file]:
-            print(f"FATAL: engine diff is not exactly "
-                  f"{args.allowed_diff_file} — arms differ by more than "
-                  f"the one intervention (Art. XLVII)")
-            return 2
-        print("[r521-arm] engine-diff guard PROVEN "
-              f"({args.allowed_diff_file} only)")
+        if args.env_only:
+            d = sh("git", "diff", "--name-only", args.counterpart_commit,
+                   args.commit, "--", *ENGINE_PATHS)
+            changed = sorted(d.stdout.split())
+            print(f"[r521-arm] engine-diff "
+                  f"{args.counterpart_commit[:12]}..{args.commit[:12]}: "
+                  f"{changed}")
+            if changed:
+                print("FATAL: --env-only but engine bytes differ — "
+                      "name the file via --allowed-diff-file instead")
+                return 2
+            print("[r521-arm] engine-diff guard PROVEN (byte-identical "
+                  "engine; the intervention is environment)")
+        else:
+            if not args.allowed_diff_file:
+                print("FATAL: --counterpart-commit without "
+                      "--allowed-diff-file — refusing open-ended diff")
+                return 2
+            d = sh("git", "diff", "--name-only", args.counterpart_commit,
+                   args.commit, "--", *ENGINE_PATHS)
+            changed = sorted(d.stdout.split())
+            print(f"[r521-arm] engine-diff "
+                  f"{args.counterpart_commit[:12]}..{args.commit[:12]}: "
+                  f"{changed}")
+            if changed != [args.allowed_diff_file]:
+                print(f"FATAL: engine diff is not exactly "
+                      f"{args.allowed_diff_file} — arms differ by more than "
+                      f"the one intervention (Art. XLVII)")
+                return 2
+            print("[r521-arm] engine-diff guard PROVEN "
+                  f"({args.allowed_diff_file} only)")
 
     try:
         before = r491.space_get("/api/version", hf_token)
@@ -271,18 +297,31 @@ def main() -> int:
         print(f"[r521-arm] upload DONE in {time.time()-t0:.0f}s — "
               f"revision: {rev}")
 
-    for k, v in (("PORT", "7860"),
-                 ("ZAI_BASE_URL",
-                  "https://api.atria-asi.ai/v1/chat/completions"),
-                 ("ZAI_MODEL", "Atria-Dawn-Preview"),
-                 ("DURABLE_STATE_ENABLED", "1"),
-                 ("DURABLE_STATE_BRANCH", "runtime-state-hf"),
-                 ("LOCAL_QWEN_ENABLE", "1"),
-                 ("LOCAL_QWEN_CTX", "8192"),
-                 ("LOCAL_EMBED_ENABLE", "1"),
-                 ("LOCAL_EMBED_THREADS", "1")):
+    standing_vars = {
+        "PORT": "7860",
+        "ZAI_BASE_URL": "https://api.atria-asi.ai/v1/chat/completions",
+        "ZAI_MODEL": "Atria-Dawn-Preview",
+        "DURABLE_STATE_ENABLED": "1",
+        "DURABLE_STATE_BRANCH": "runtime-state-hf",
+        "LOCAL_QWEN_ENABLE": "1",
+        "LOCAL_QWEN_CTX": "8192",
+        "LOCAL_EMBED_ENABLE": "1",
+        "LOCAL_EMBED_THREADS": "1",
+    }
+    overrides = {}
+    for item in args.set_variable:
+        if "=" not in item:
+            print(f"FATAL: --set-variable must be KEY=VALUE, got {item!r}")
+            return 2
+        k, v = item.split("=", 1)
+        overrides[k.strip()] = v
+    for k, v in {**standing_vars, **overrides}.items():
         api.add_space_variable(repo_id=SPACE, key=k, value=v)
-    print("[r521-arm] variables re-applied identically (no arm delta)")
+    if overrides:
+        print(f"[r521-arm] ARM VARIABLE DELTA (the intervention): "
+              f"{overrides}")
+    else:
+        print("[r521-arm] variables re-applied identically (no arm delta)")
 
     api.add_space_secret(repo_id=SPACE, key="GITHUB_TOKEN", value=gh_token)
     val = vault.get("PORTFOLIO_COMMIT") or "0914755c5832f332abe5d74ed1655cd27764ecc0"
@@ -304,8 +343,15 @@ def main() -> int:
             "marker_present_in_staged_bytes": marker_found,
         },
         "engine_diff_guard": (
-            f"{args.allowed_diff_file} only"
-            if args.counterpart_commit else "not run (no counterpart)"),
+            "byte-identical engine (env-only intervention)"
+            if (args.counterpart_commit and args.env_only)
+            else (f"{args.allowed_diff_file} only"
+                  if args.counterpart_commit else "not run (no counterpart)")),
+        "variable_delta": overrides or None,
+        "intervention": (
+            "ENGINE_EVIDENCE_FABRIC=0 (evidence-fabric sequential "
+            "channels off; V2 fabric only)"
+            if overrides.get("ENGINE_EVIDENCE_FABRIC") == "0" else None),
         "before_identity": before,
         "constitution_served": const_v,
         "image_slimming": accounting,

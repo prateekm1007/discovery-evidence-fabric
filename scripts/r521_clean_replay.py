@@ -145,10 +145,52 @@ def main() -> int:
             dirty.append({"file": f.name, "hits": hits})
     check("secret_scan_clean", not dirty, {"dirty": dirty})
 
-    # Layer B: cliff-intervention checks (absent until the change lands)
-    checks.append({"name": "cliff_intervention_checks", "ok": None,
-                   "detail": "ABSENT until the single R521 behavioral "
-                             "change lands (not failed)"})
+    # Layer B: cliff-intervention checks (the ENGINE_EVIDENCE_FABRIC=0
+    # env knob). Before-arm rows must show the burning shape
+    # (CHANNEL_ERROR crash or SUMMARY_RAN with pool=0); after-arm rows
+    # must show the disabled shape (ABSENT envelope state 6/6).
+    hb = _load("ATTR_BEFORE_HARVEST.json")
+    ha = _load("ATTR_AFTER_HARVEST.json")
+    if hb is not None:
+        states = {}
+        pools = []
+        for r in hb.get("rows", []):
+            if "stage_table" not in r:
+                continue
+            ef = (r.get("retrieve_two_level") or {}).get(
+                "evidence_fabric") or {}
+            st = ef.get("envelope_state", "MISSING_KEY")
+            states[st] = states.get(st, 0) + 1
+            if st == "SUMMARY_RAN":
+                pools.append(ef.get("pool_items"))
+        burning = (states.get("CHANNEL_ERROR", 0)
+                   + states.get("SUMMARY_RAN", 0) == len(
+                       [r for r in hb.get("rows", [])
+                        if "stage_table" in r]) and
+                   all(p == 0 for p in pools))
+        check("before_ef_burning_shape", burning,
+              {"envelope_states": states, "summary_pools": pools,
+               "note": "before arm must show the measured burn: "
+                       "crashed or ran-dry channels, zero pool"})
+    if ha is not None:
+        states_a = {}
+        for r in ha.get("rows", []):
+            if "stage_table" not in r:
+                continue
+            ef = (r.get("retrieve_two_level") or {}).get(
+                "evidence_fabric") or {}
+            st = ef.get("envelope_state", "MISSING_KEY")
+            states_a[st] = states_a.get(st, 0) + 1
+        n_a = len([r for r in ha.get("rows", [])
+                   if "stage_table" in r])
+        check("after_ef_disabled_shape",
+              states_a.get("ABSENT", 0) == n_a and n_a > 0,
+              {"envelope_states": states_a,
+               "note": "after arm must show the disabled shape: "
+                       "ABSENT envelope state on every scored row"})
+    else:
+        checks.append({"name": "after_ef_disabled_shape", "ok": None,
+                       "detail": "after harvest not run yet (not failed)"})
 
     out = {"artifact": "R521_CLEAN_REPLAY/1.0",
            "ran_at_utc": _utcnow(),

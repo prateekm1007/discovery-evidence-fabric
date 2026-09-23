@@ -261,6 +261,19 @@ def _retrieve_two_level(ret_env, run_dir_files):
         "fanout_wall_s", "total_search_call_s", "max_job_wall_s",
         "assemble_s", "worker_queue_wait_s")}
     ef = fab.get("evidence_fabric") or {}
+    # envelope-state discriminator: ABSENT (channel disabled — no key
+    # or null) vs CHANNEL_ERROR (crashed) vs SUMMARY (ran). This is
+    # the before/after proof for an env-knob intervention.
+    if "evidence_fabric" not in fab or fab.get("evidence_fabric") is None:
+        ef_envelope_state = "ABSENT"
+    elif isinstance(fab.get("evidence_fabric"), dict) and \
+            fab["evidence_fabric"].get("state"):
+        ef_envelope_state = fab["evidence_fabric"]["state"]
+    elif isinstance(fab.get("evidence_fabric"), dict) and \
+            "version" in fab["evidence_fabric"]:
+        ef_envelope_state = "SUMMARY_RAN"
+    else:
+        ef_envelope_state = "UNKNOWN_SHAPE"
     ef_report = None
     for f in run_dir_files:
         if f.endswith("EVIDENCE_FABRIC_REPORT.json"):
@@ -297,6 +310,7 @@ def _retrieve_two_level(ret_env, run_dir_files):
         "sources_failed": fab.get("sources_failed"),
         "sources_rate_limited": fab.get("sources_rate_limited"),
         "evidence_fabric": {
+            "envelope_state": ef_envelope_state,
             "channels": ef.get("channels"),
             "unknown_channels": ef.get("unknown_channels"),
             "pool_items": ef.get("pool_items"),
