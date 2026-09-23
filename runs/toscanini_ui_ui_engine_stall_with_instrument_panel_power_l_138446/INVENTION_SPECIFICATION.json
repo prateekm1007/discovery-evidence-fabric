@@ -1,6 +1,6 @@
 {
  "invention_id": {
-  "value": "inv:ui_engine_stall_with_instrument_panel_power_l_138446:bdbfa99c1f20",
+  "value": "inv:ui_engine_stall_with_instrument_panel_power_l_138446:b8d65e81a7d0",
   "epistemic_class": "COMPUTED",
   "origin_stage": "INVENTION_SPEC",
   "evidence_ids": [],
@@ -30,38 +30,38 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Controlled charge/discharge of vehicle battery using local frequency measurements to stabilize electrical power and reduce voltage/frequency fluctuations during transients.",
-   "intervention": "Install a voltage/frequency supervisory controller on the 2021 Subaru Outback that monitors the 12V bus and instrument panel supply; when it detects undervoltage or stall-correlated droop, it commands the high-voltage battery (or a DC-DC boost stage) to discharge into the 12V bus and momentarily assist the alternator/regulator to hold the instrument panel and ECU rails above the reset threshold.",
-   "expected_effect": "Prevents instrument panel blackout and engine stall at idle and during transient electrical loads by actively stabilizing bus voltage, restoring sustained engine operation and electrical system function.",
-   "mechanism_source_span": "V2G leads to improved steady-state stability, larger region of stability, reduced frequency and voltage fluctuations during transients and longer critical clearing times.",
+   "mechanism": "V2G-style bidirectional power transfer controlled by local frequency deviation feedback, where distributed energy resources inject or absorb real power in response to measured local frequency to damp transients and stabilize the supply bus.",
+   "intervention": "Add a bidirectional DC-DC converter stage between the Subaru Outback high-voltage battery pack and the 12 V accessory bus, with a local voltage/frequency-equivalent deviation detector at the DC bus that commands charge/discharge current to support the alternator and instrument panel rail during transient loading at idle.",
+   "expected_effect": "Engine-stall events with instrument panel power loss are reduced because the DC bus is actively buffered against the transient current demand that otherwise collapses alternator output and drops panel illumination.",
+   "mechanism_source_span": "\"smart control of PEVs can improve the stability of power grids using only local frequency measurements. We evaluate the proposed control strategy on the IEEE Case 3 and the IEEE New England power systems. The results show that V2G leads to improved steady-state stability, larger region of stability, reduced frequency and voltage fluctuations during transients and longer critical clearing times.\"",
    "span_derivation": null
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
   "evidence_ids": [
-   "doi:10.48550/arxiv.1506.07097"
+   "doi:10.1533/9780857090836.2.348"
   ],
   "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
  },
  "causal_chain": {
   "value": {
-   "source_observation": "A Strategy for Power System Stability Improvement via Controlled Charge/Discharge of Plug-in Electric Vehicles",
-   "mechanism": "Controlled charge/discharge of vehicle battery using local frequency measurements to stabilize electrical power and reduce voltage/frequency fluctuations during transients.",
+   "source_observation": "UNKNOWN",
+   "mechanism": "V2G-style bidirectional power transfer controlled by local frequency deviation feedback, where distributed energy resources inject or absorb real power in response to measured local frequency to damp transients and stabilize the supply bus.",
    "intervention_site": "Subaru Outback electrical powertrain system",
-   "expected_effect": "Prevents instrument panel blackout and engine stall at idle and during transient electrical loads by actively stabilizing bus voltage, restoring sustained engine operation and electrical system function.",
-   "falsification_test": "On a dynamometer, induce the stall condition (simulated alternator drop at idle with accessory load) and run 50 trials with the controller enabled vs. 50 disabled; the intervention is falsified if instrument panel dropout rate or engine stall rate does not drop by at least 80% with the controller active, or if post-repair stall events recur in normal driving within 500 miles."
+   "expected_effect": "Engine-stall events with instrument panel power loss are reduced because the DC bus is actively buffered against the transient current demand that otherwise collapses alternator output and drops panel illumination.",
+   "falsification_test": "With the intervention active, during a simulated idle stall-load transient the 12 V rail sag depth will decrease and the instrument-panel dropout duration will shorten relative to the unmodified baseline, holding ambient temperature and SoC within the stated envelope."
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
   "evidence_ids": [
-   "doi:10.48550/arxiv.1506.07097"
+   "doi:10.1533/9780857090836.2.348"
   ],
   "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
  },
  "novelty_hypothesis": {
   "value": {
-   "collision_novelty_risk": null,
-   "prior_art_status": null,
+   "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
    "multi_source_directions": {}
   },
   "epistemic_class": "COMPUTED",
@@ -71,11 +71,142 @@
  },
  "prior_art": {
   "value": {
-   "status": "",
+   "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
    "legacy_status": "",
-   "differentiation_resolution": {},
+   "differentiation_resolution": {
+    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "NO_FAMILIES",
+    "per_family": [],
+    "n_families": 0,
+    "n_search_errors": 10,
+    "search_errors": [
+     {
+      "query": "power measured outback electrical powertrain subaru",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "power measured outback electrical powertrain subaru",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"58b9be2b-ea23-443b-b4a9-f5d4892bb2c5\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "power measured transients bidirectional transfer controlled",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "power measured transients bidirectional transfer controlled",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"eaa15d73-3a05-4ae3-8c52-be13826677ef\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "outback transient bidirectional subaru bus frequency deviation current",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "outback transient bidirectional subaru bus frequency deviation current",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"4bb64f2f-36df-4518-8d95-210546f9b708\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "power instrument illumination deviation during loading",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "power instrument illumination deviation during loading",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"08c64de0-4079-43ac-a992-e69b26c72f8f\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "transient bus reduced because actively buffered",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "transient bus reduced because actively buffered",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"44bad2ea-2d5e-48c2-bc3c-08ef5dac515c\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     }
+    ],
+    "search_execution": {
+     "mandatory_complete": false,
+     "n_errors": 10,
+     "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+    },
+    "relevance_model_version": "collision_resolution/2.0.0",
+    "determinism_contract": {
+     "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+     "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+    },
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    }
+   },
    "nearest": [],
-   "queries": [],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "power measured outback electrical powertrain subaru"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "power measured transients bidirectional transfer controlled"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "outback transient bidirectional subaru bus frequency deviation current"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "power instrument illumination deviation during loading"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "transient bus reduced because actively buffered"
+    }
+   ],
    "scientific": []
   },
   "epistemic_class": "COMPUTED",
@@ -85,7 +216,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Install a voltage/frequency supervisory controller on the 2021 Subaru Outback that monitors the 12V bus and instrument panel supply; when it detects undervoltage or stall-correlated droop, it commands the high-voltage battery (or a DC-DC boost stage) to discharge into the 12V bus and momentarily assist the alternator/regulator to hold the instrument panel and ECU rails above the reset threshold.",
+   "intervention": "Add a bidirectional DC-DC converter stage between the Subaru Outback high-voltage battery pack and the 12 V accessory bus, with a local voltage/frequency-equivalent deviation detector at the DC bus that commands charge/discharge current to support the alternator and instrument panel rail during transient loading at idle.",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -93,7 +224,7 @@
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
   "evidence_ids": [
-   "doi:10.48550/arxiv.1506.07097"
+   "doi:10.1533/9780857090836.2.348"
   ],
   "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
  },
@@ -260,7 +391,48 @@
   "note": "custodied evidence with content hashes"
  },
  "uncertainties": {
-  "value": [],
+  "value": [
+   {
+    "unresolved_source": "power measured outback electrical powertrain subaru",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "power measured outback electrical powertrain subaru",
+    "error": "HTTP 401: {\"reference\":\"58b9be2b-ea23-443b-b4a9-f5d4892bb2c5\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "power measured transients bidirectional transfer controlled",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "power measured transients bidirectional transfer controlled",
+    "error": "HTTP 401: {\"reference\":\"eaa15d73-3a05-4ae3-8c52-be13826677ef\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "outback transient bidirectional subaru bus frequency deviation current",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "outback transient bidirectional subaru bus frequency deviation current",
+    "error": "HTTP 401: {\"reference\":\"4bb64f2f-36df-4518-8d95-210546f9b708\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "power instrument illumination deviation during loading",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "power instrument illumination deviation during loading",
+    "error": "HTTP 401: {\"reference\":\"08c64de0-4079-43ac-a992-e69b26c72f8f\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "transient bus reduced because actively buffered",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "transient bus reduced because actively buffered",
+    "error": "HTTP 401: {\"reference\":\"44bad2ea-2d5e-48c2-bc3c-08ef5dac515c\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   }
+  ],
   "epistemic_class": "COMPUTED",
   "origin_stage": "CONTRADICTION",
   "evidence_ids": [],
@@ -271,7 +443,7 @@
    {
     "assumption": "mechanism transfers across domain context",
     "basis": "MODELLED",
-    "test": "On a dynamometer, induce the stall condition (simulated alternator drop at idle with accessory load) and run 50 trials with the controller enabled vs. 50 disabled; the intervention is falsified if instrument panel dropout rate or engine stall rate does not drop by at least 80% with the controller active, or if post-repair stall events recur in normal driving within 500 miles."
+    "test": "With the intervention active, during a simulated idle stall-load transient the 12 V rail sag depth will decrease and the instrument-panel dropout duration will shorten relative to the unmodified baseline, holding ambient temperature and SoC within the stated envelope."
    },
    {
     "assumption": "searched sources approximate the prior-art universe",
@@ -287,7 +459,7 @@
  "provenance": {
   "value": {
    "run_id": "engrun:ui_engine_stall_with_instrument_panel_power_l_138446:2026-09-23T04:40:46",
-   "final_envelope_hash": "bdbfa99c1f20021bc4e062bfc63be312474672a1c4eb866c9a1efe2b7c54d75b",
+   "final_envelope_hash": "b8d65e81a7d0f36717b153f80323c880ee07dc9564d175b77d79479075030907",
    "final_status": "UNKNOWN",
    "adjudication_verdict": "CONTESTED",
    "ranking": {
@@ -315,7 +487,7 @@
     "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
    },
    "code_commit": null,
-   "built_at": "2026-09-23T04:46:31+00:00Z"
+   "built_at": "2026-09-23T04:46:38+00:00Z"
   },
   "epistemic_class": "COMPUTED",
   "origin_stage": "INVENTION_SPEC",
@@ -825,10 +997,24 @@
   "verdict": "CONTESTED",
   "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
  },
- "_spec_hash": "1260dcfb7c7714baaf907fb8d5823842f46333da24d56aa3e27e4b4af1ec9dbc",
+ "_spec_hash": "b684bda38b546f4ea01603d35ebb4ac182eb6661b81cacbf98b94cb06f94ab96",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
-  "checked_at": "2026-09-23T04:46:31+00:00Z"
+  "checked_at": "2026-09-23T04:46:38+00:00Z"
+ },
+ "_mechanism_space_candidate": {
+  "marker": "MECHANISM_SPACE_CANDIDATE",
+  "transformation_operator": "DIRECT_TRANSFER",
+  "mechanism_support_state": "PARTIALLY_SUPPORTED",
+  "support_counts": {
+   "SUPPORTS": 0,
+   "PARTIALLY_SUPPORTS": 2,
+   "CONTRADICTS": 0,
+   "IRRELEVANT": 0,
+   "NOT_ENOUGH_EVIDENCE": 1
+  },
+  "contradictions_visible": [],
+  "consequence": "the E16-H release gate holds this dossier for human review unless mechanism-level evidence support is SUPPORTED; contradictions and partial support are never converted (R401 Phase 4)"
  }
 }
