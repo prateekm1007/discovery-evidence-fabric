@@ -128,11 +128,13 @@ def main() -> int:
         print("FATAL: --counterpart-commit must be a full 40-hex SHA")
         return 2
     if args.arm == "after" and not (
-            args.intervention_marker and args.intervention_file
-            and args.allowed_diff_file):
-        print("FATAL: after-arm deploy requires --intervention-marker, "
-              "--intervention-file and --allowed-diff-file (the cliff is "
-              "named after attribution; refusing unmarked after-arm)")
+            (args.intervention_marker and args.intervention_file
+             and args.allowed_diff_file)
+            or (args.env_only and args.set_variable)):
+        print("FATAL: after-arm deploy requires either the code-marker "
+              "trio (--intervention-marker, --intervention-file, "
+              "--allowed-diff-file) or the env-knob pair (--env-only "
+              "with --set-variable); refusing unmarked after-arm")
         return 2
     vault = r491._load_vault()
     hf_token = vault.get("HF_TOKEN") or os.environ.get("HF_TOKEN", "")
