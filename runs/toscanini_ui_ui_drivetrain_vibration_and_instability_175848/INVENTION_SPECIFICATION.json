@@ -1,0 +1,1399 @@
+{
+ "invention_id": {
+  "value": "inv:ui_drivetrain_vibration_and_instability_175848:c140ca158e3b",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_drivetrain_vibration_and_instability_175848",
+   "device": "vehicle drivetrain assembly",
+   "failure": "Documented problem 'drivetrain vibration and instability' concerning vehicle drivetrain assembly. User-submitted engineering problem (session input): \"[R522-BATTERY declared_family=mechanical source=odi:11501254 battery=R522-OPENALEX-EXCLUSION-baseline]\n\nThe contact owns a 2021 Chevrolet Equinox. The contact stated while driving at various speeds, the vehicle was shaking and wobbling. There was no warning light illuminated. The vehicle was taken t\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "drivetrain vibration and instability",
+   "constraint": "must correct the vibration in"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:6452d682"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of vehicle drivetrain assembly",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Generator-side inverter control that modulates electromagnetic torque to reduce the instantaneous torque mismatch with mechanical input torque, thereby damping drivetrain torsional vibrations.",
+   "intervention": "Add a torque-damping controller to the vehicle's electric drive (or hybrid powertrain) inverter that actively adjusts electromagnetic torque to counteract measured rotational speed oscillations at the output shaft, using a resonant integrator tuned to the dominant shake/wobble frequency.",
+   "expected_effect": "Reduced torsional oscillation amplitude at the drivetrain output shaft, eliminating the felt vehicle shaking and wobbling across various speeds without warning lights.",
+   "mechanism_source_span": "the difference in immediate torque between the mechanical output torque and the electromagnetic torque (ET) of a permanent magnet synchronous generator",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1371/journal.pone.0347737"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Research on the dynamic characteristics of a wind turbine drivetrain based on different control strategies for the generator-side inverter.",
+   "mechanism": "Generator-side inverter control that modulates electromagnetic torque to reduce the instantaneous torque mismatch with mechanical input torque, thereby damping drivetrain torsional vibrations.",
+   "intervention_site": "vehicle drivetrain assembly",
+   "expected_effect": "Reduced torsional oscillation amplitude at the drivetrain output shaft, eliminating the felt vehicle shaking and wobbling across various speeds without warning lights.",
+   "falsification_test": "Instrument the drivetrain with a torque/speed sensor at the output shaft, command the controller to engage over a 0–120 km/h sweep, and measure whether the peak-to-peak shaft speed ripple decreases by at least 50% versus the un-controlled baseline; repeat on a shaker/road-test and compare driver-rated shake severity before vs. after enabling the controller."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1371/journal.pone.0347737"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Add a torque-damping controller to the vehicle's electric drive (or hybrid powertrain) inverter that actively adjusts electromagnetic torque to counteract measured rotational speed oscillations at the output shaft, using a resonant integrator tuned to the dominant shake/wobble frequency.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1371/journal.pone.0347737"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "must correct the vibration in",
+   "failure_mode_of_device": "drivetrain vibration and instability"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:6452d682"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Reduced torsional oscillation amplitude at the drivetrain output shaft, eliminating the felt vehicle shaking and wobbling across various speeds without warning lights.",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-23T15:05:59.073695+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-23T15:05:59.073695+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1371/journal.pone.0347737",
+    "title": "Research on the dynamic characteristics of a wind turbine drivetrain based on different control strategies for the generator-side inverter.",
+    "source_uri": "https://doi.org/10.1371/journal.pone.0347737",
+    "doi": "10.1371/journal.pone.0347737",
+    "content_hash": "ce83ba1e359f807f87504eb3946986ec30bc7fc7363707275494d1cabf4c4001",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1038/s41598-026-37505-y",
+    "title": "Predictive temperature control of electric two wheeler hub motor using gradient aware neural regulation with degradation tracking and fault tolerant multi condition torque adaptation.",
+    "source_uri": "https://doi.org/10.1038/s41598-026-37505-y",
+    "doi": "10.1038/s41598-026-37505-y",
+    "content_hash": "97fc98039fd6441eda7c2bd147f50197526da968fff539f8656f411e9ec23450",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4271/2018-01-0319",
+    "title": "Benchmarking a 2016 Honda Civic 1.5-liter L15B7 Turbocharged Engine and Evaluating the Future Efficiency Potential of Turbocharged Engines.",
+    "source_uri": "https://doi.org/10.4271/2018-01-0319",
+    "doi": "10.4271/2018-01-0319",
+    "content_hash": "6968f0e47c58df09bdbedaa12dff87f02c04fa2dbe8b42ba8380baffb801a7ea",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/s25216547",
+    "title": "Vibration Analysis of Aviation Electric Propulsion Test Stand with Active Main Rotor.",
+    "source_uri": "https://doi.org/10.3390/s25216547",
+    "doi": "10.3390/s25216547",
+    "content_hash": "19bee98ab4378bd5aa1a05fae1a4dc1881aa5152817c7d0f1e1056bc90574d7d",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5194/gmd-18-9945-2025",
+    "title": "Traffic impact modelling in SURFEX-TEB V9.0 model for improved road surface temperature prediction",
+    "source_uri": "https://doi.org/10.5194/gmd-18-9945-2025",
+    "doi": "10.5194/gmd-18-9945-2025",
+    "content_hash": "84bf301f4c669846178f415b251f47004ab162c7e893becf5a37514fc6661352",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.jenvman.2026.129350",
+    "title": "Balancing torque, efficiency, and emissions: A framework for engine optimization using modern metaheuristics.",
+    "source_uri": "https://doi.org/10.1016/j.jenvman.2026.129350",
+    "doi": "10.1016/j.jenvman.2026.129350",
+    "content_hash": "544d508996c26b5714e76b6215d0bd97bb836a674c0774e9178736845837c65c",
+    "frozen": false
+   },
+   {
+    "id": "patent:US10214219B2",
+    "title": "Methods and systems for powertrain NVH control in a vehicle",
+    "source_uri": "https://patents.google.com/patent/US10214219B2/en",
+    "doi": null,
+    "content_hash": "9f6b39613830882fa9884a2cffa59d37a3b0a56cd617f9af40fd912c1cccedd7",
+    "frozen": false
+   },
+   {
+    "id": "patent:US9925974B2",
+    "title": "System and methods for improving fuel economy",
+    "source_uri": "https://patents.google.com/patent/US9925974B2/en",
+    "doi": null,
+    "content_hash": "eef423da98e40c776f3e5c371885886f8b310316058e38af13dfb23b9ba8503e",
+    "frozen": false
+   },
+   {
+    "id": "patent:US10272913B2",
+    "title": "Regenerative braking system and method",
+    "source_uri": "https://patents.google.com/patent/US10272913B2/en",
+    "doi": null,
+    "content_hash": "bad885d5dc0045c1466d55bf00e67abd4a1548d048783e2e2f24c56b42ae3f61",
+    "frozen": false
+   },
+   {
+    "id": "patent:US12276977B2",
+    "title": "Systems and methods for platooning and automation safety",
+    "source_uri": "https://patents.google.com/patent/US12276977B2/en",
+    "doi": null,
+    "content_hash": "370bf7530677a47f406c241c49e3c9306444fe87046d08409cf462ddd604aa4c",
+    "frozen": false
+   },
+   {
+    "id": "patent:CN110248861B",
+    "title": "Guiding a vehicle using a machine learning model during vehicle maneuvers",
+    "source_uri": "https://patents.google.com/patent/CN110248861B/en",
+    "doi": null,
+    "content_hash": "5a27a0b48dca3f7c09933084685b88bfe32e1ff148dabc7dd795e8160a430fb2",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.16331466",
+    "title": "ALGO",
+    "source_uri": "https://doi.org/10.5281/zenodo.16331466",
+    "doi": "10.5281/zenodo.16331466",
+    "content_hash": "6167085e5e8fea69fd5720c93337eff200cb56dee4b2cf24d9f968dbc4af2357",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.16376539",
+    "title": "ALGO Mobility Systems",
+    "source_uri": "https://doi.org/10.5281/zenodo.16376539",
+    "doi": "10.5281/zenodo.16376539",
+    "content_hash": "de8bdc155864c0a307fe2b7af281e29a0adf741862195a1aff27061ac632eacc",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.14264/311878",
+    "title": "Driveshaft and drivetrain development of the Formula SAE vehicle",
+    "source_uri": "https://doi.org/10.14264/311878",
+    "doi": "10.14264/311878",
+    "content_hash": "e4098dadedec5d66d91bf3e601204e66a253b1d82ffdb754219898dac0539b08",
+    "frozen": false
+   },
+   {
+    "id": "title:b56c7b1f314d2c8e",
+    "title": "Electric Vehicle Drivetrain",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "71cd0c5c639260879157db9aa94eea5343cdd3fd5c3ad82b15f44bf067d3beef",
+    "frozen": false
+   },
+   {
+    "id": "title:391bb011f34e4afc",
+    "title": "Testing and characterisation of large high-energy lithium-ion batteries for electric and hybrid electric vehicles",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "9d5fdeb023c9ec7b45c0beb1e6f1c774ab7af3811074d4810c834cadf1c3d3eb",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4271/j1144_197607",
+    "title": "TOWED VEHICLE DRIVETRAIN TEST PROCEDURE—PASSENGER CARS",
+    "source_uri": "https://doi.org/10.4271/j1144_197607",
+    "doi": "10.4271/j1144_197607",
+    "content_hash": "607796855849ec39b3db86950966e6c656e47ffa9a337620361cc0a85a6117e1",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4271/j2455_201504",
+    "title": "Drivetrain Systems Vibration Analysis Data Requirements",
+    "source_uri": "https://doi.org/10.4271/j2455_201504",
+    "doi": "10.4271/j2455_201504",
+    "content_hash": "d608581e5013614d270851811fd00b987b25c610c13da91ecf4e83a284ba02c6",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1016/j.jenvman.2026.129350",
+   "doi:10.1038/s41598-026-37505-y",
+   "doi:10.1371/journal.pone.0347737",
+   "doi:10.14264/311878",
+   "doi:10.3390/s25216547",
+   "doi:10.4271/2018-01-0319",
+   "doi:10.4271/j1144_197607",
+   "doi:10.4271/j2455_201504",
+   "doi:10.5194/gmd-18-9945-2025",
+   "doi:10.5281/zenodo.16331466",
+   "doi:10.5281/zenodo.16376539",
+   "patent:CN110248861B",
+   "patent:US10214219B2",
+   "patent:US10272913B2",
+   "patent:US12276977B2",
+   "patent:US9925974B2",
+   "title:391bb011f34e4afc",
+   "title:b56c7b1f314d2c8e"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Instrument the drivetrain with a torque/speed sensor at the output shaft, command the controller to engage over a 0–120 km/h sweep, and measure whether the peak-to-peak shaft speed ripple decreases by at least 50% versus the un-controlled baseline; repeat on a shaker/road-test and compare driver-rated shake severity before vs. after enabling the controller."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_drivetrain_vibration_and_instability_175848:2026-09-23T15:04:08",
+   "final_envelope_hash": "c140ca158e3b6118d92f5087524fad1335dfb58a49b66c4cc11463c0c5bf4e5e",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-23T15:05:59+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-23T15:05:59+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1371/journal.pone.0347737": {
+   "id": "doi:10.1371/journal.pone.0347737",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42113826",
+   "source_uri": "https://doi.org/10.1371/journal.pone.0347737",
+   "title": "Research on the dynamic characteristics of a wind turbine drivetrain based on different control strategies for the generator-side inverter.",
+   "abstract": "Within the operational context of wind turbines (WTs), the dynamic properties of the drivetrain significantly influence the overall system stability. The implementation of both active and passive control mechanisms within a WT facilitates smooth drivetrain operation. Various methods exist for controlling WTs to ensure optimal performance. This study is focused on the drivetrain of an 8 MW WT, and vibration control is examined as the primary research objective. A dynamic model of the electromechanical system associated with the WT drivetrain is developed. This research focuses on controlling the generator inverter to reduce the difference in immediate torque between the mechanical output torque and the electromagnetic torque (ET) of a permanent magnet synchronous generator (PMSG). Additionally, this study aims to decrease the speed variation between the generator rotor and the output shaft of the gear system to enhance tracking precision. A resonant integrator is designed to introduce specific harmonics to mitigate the harmonics present in both the ET and the current of the generator, ultimately enhancing efficiency. The results of this research demonstrate that the proposed control strategy effectively reduces transverse vibrations in critical components of the gear system while suppressing harmonics in generator current and electromagnetic fields. This approach is a viable solution for the active reduction in vibrations within the WT drivetrain.",
+   "doi": "10.1371/journal.pone.0347737",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-05-11",
+   "retrieval_timestamp": "2026-09-23T15:05:22.788427+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ce83ba1e359f807f87504eb3946986ec30bc7fc7363707275494d1cabf4c4001",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42113826"
+    },
+    "queries_by_source": {
+     "europepmc": "vehicle drivetrain assembly drivetrain vibration and instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1371/journal.pone.0347737",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration and instability",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1038/s41598-026-37505-y": {
+   "id": "doi:10.1038/s41598-026-37505-y",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41826393",
+   "source_uri": "https://doi.org/10.1038/s41598-026-37505-y",
+   "title": "Predictive temperature control of electric two wheeler hub motor using gradient aware neural regulation with degradation tracking and fault tolerant multi condition torque adaptation.",
+   "abstract": "Thermal stress in electric two-wheeler hub motors is a major bottleneck affecting drivetrain reliability, safety, and efficiency-especially under varied terrain, aggressive riding profiles, and sensor reliability degradation. This paper presents a novel Hybrid Gradient-Aware Neural Regulation (GANR) framework designed to enable predictive motor temperature control, real-time thermal degradation monitoring, and fault-tolerant torque shaping. The system integrates three distinct yet interlinked control layers: (i) gradient-sensitive neural temperature estimation, (ii) cumulative thermal damage indexing through a Motor Health Index (MHI), and (iii) multi-condition torque derating logic that adapts to ambient temperature, health state, and usage intensity. The controller combines a physics-based thermal model with a lightweight neural network estimator capable of learning under sensor drift, latency, or complete failure. A fallback and safety-mode flowchart ensure robust operation by switching to boundary-scaled torque caps and enabling a real-time decision layer that balances energy consumption, performance demand, and thermal safety. The system's intelligence also extends to an ambient-aware derating boundary and a thermal margin estimator to prevent runaway heating events. A detailed simulation framework is developed using real vehicle specifications, encompassing city, aggressive, and worst-case thermal cycles. Results reveal that the proposed control system can delay torque derating by up to 14%, improve energy efficiency by ~ 7.4%, and achieve prediction RMSE below 2.1 °C even under multiple sensor fault scenarios. In addition, a full real-time deployment analysis is presented using a mid-tier embedded platform with CPU-cycle, memory, and scheduling footprint assessments. This study offers an original, fault-resilient, and hardware-feasible solution to a largely unaddressed domain-intelligent thermal-aware torque control in electric two-wheelers, creating a new pathway toward smarter, safer, and more robust electric mobility systems.",
+   "doi": "10.1038/s41598-026-37505-y",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-03-13",
+   "retrieval_timestamp": "2026-09-23T15:05:22.788513+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "97fc98039fd6441eda7c2bd147f50197526da968fff539f8656f411e9ec23450",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41826393"
+    },
+    "queries_by_source": {
+     "europepmc": "vehicle drivetrain assembly drivetrain vibration and instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-23T15:05:22.749435+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-026-37505-y",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration and instability",
+   "source_rank": 1,
+   "fulltext_url": "https://www.nature.com/articles/s41598-026-37505-y_reference.pdf",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.4271/2018-01-0319": {
+   "id": "doi:10.4271/2018-01-0319",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:31275509",
+   "source_uri": "https://doi.org/10.4271/2018-01-0319",
+   "title": "Benchmarking a 2016 Honda Civic 1.5-liter L15B7 Turbocharged Engine and Evaluating the Future Efficiency Potential of Turbocharged Engines.",
+   "abstract": "As part of the U.S. Environmental Protection Agency's (EPA's) continuing assessment of advanced light-duty automotive technologies to support the setting of appropriate national greenhouse gas standards and to evaluate the impact of new technologies on in- use emissions, a 2016 Honda Civic with a 4-cylinder 1.5-liter L15B7 turbocharged engine and continuously variable transmission (CVT) was benchmarked. The test method involved installing the engine and its CVT in an engine dynamometer test cell with the engine wiring harness tethered to its vehicle parked outside the test cell. Engine and transmission torque, fuel flow, key engine temperatures and pressures, and onboard diagnostics (OBD)/CAN bus data were recorded. This paper documents the test results for idle, low, medium and high load engine operation, as well as motoring torque, wide-open throttle torque and fuel consumption during transient operation using both EPA Tier 2 and Tier 3 test fuels. Particular attention is given to characterizing enrichment control during high load engine operation. Results are used to create complete engine fuel consumption and efficiency maps and estimate CO2 emissions using EPA's ALPHA full vehicle simulation model, over regulatory drive cycles. The design and performance of the 1.5-liter Honda engine are compared to several other past, present, and future downsized-boosted engines and potential advancements are evaluated.",
+   "doi": "10.4271/2018-01-0319",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2018-01-01",
+   "retrieval_timestamp": "2026-09-23T15:05:22.788544+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6968f0e47c58df09bdbedaa12dff87f02c04fa2dbe8b42ba8380baffb801a7ea",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:31275509"
+    },
+    "queries_by_source": {
+     "europepmc": "vehicle drivetrain assembly drivetrain vibration and instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.4271/2018-01-0319",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration and instability",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.3390/s25216547": {
+   "id": "doi:10.3390/s25216547",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41228771",
+   "source_uri": "https://doi.org/10.3390/s25216547",
+   "title": "Vibration Analysis of Aviation Electric Propulsion Test Stand with Active Main Rotor.",
+   "abstract": "This paper focuses on the vibration analysis of a prototype helicopter rotor test stand, with particular attention to the dynamic response of its electric propulsion system. The stand is driven by an induction motor and equipped with composite rotor blades of various geometries, including blades with shape memory alloy (SMA)-based torsion actuators for angle of attack (AoA) adjustment. These variable geometries significantly influence the system's dynamic behavior, where resonance phenomena may pose risks to structural integrity. The objective was to investigate how selected operational parameters specifically motor speed and AoA affect the vibration response of the propulsion system. Structural vibrations were measured using a tri-axial piezoelectric accelerometer system integrated with calibrated signal conditioning and high-resolution data acquisition modules. This setup enabled precise, time-synchronized recording of dynamic responses along all three axes. Fast Fourier Transform (FFT) and Power Spectral Density (PSD) methods were applied to identify dominant frequency components, including those associated with rotor harmonics and SMA activation. The highest vibration amplitudes were observed at an AoA of 16°, but all results remained within the vibration limits defined by MIL-STD-810H for rotorcraft drive systems. The study confirms the importance of sensor-based diagnostics in evaluating electromechanical propulsion systems operating under dynamic loading conditions.",
+   "doi": "10.3390/s25216547",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-10-24",
+   "retrieval_timestamp": "2026-09-23T15:05:22.788566+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "19bee98ab4378bd5aa1a05fae1a4dc1881aa5152817c7d0f1e1056bc90574d7d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41228771"
+    },
+    "queries_by_source": {
+     "europepmc": "vehicle drivetrain assembly drivetrain vibration and instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s25216547",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration and instability",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.5194/gmd-18-9945-2025": {
+   "id": "doi:10.5194/gmd-18-9945-2025",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:ca5cc4b9903dbb32b06fc2fe2a1f680bdbac324d",
+   "source_uri": "https://doi.org/10.5194/gmd-18-9945-2025",
+   "title": "Traffic impact modelling in SURFEX-TEB V9.0 model for improved road surface temperature prediction",
+   "abstract": "Abstract. The impact of road traffic on local climate has often been overlooked, being modelled as an aggregated sensible heat flux released into the atmosphere, although it has multiple effects including turbulence, heat from energy inefficiencies of vehicles, tyre friction, snow compaction, and shadowing. These effects can impact road surface conditions and exacerbate the phenomenon of Urban Heat Island (UHI). This study aims to improve the representation of traffic impacts in the Town Energy Balance (TEB) V9.0 urban climate model. Particular attention has been paid to preserve physical consistency among the parameterisations of tyre friction, turbulence, energy inefficiencies, and radiation impacts of the road traffic within the model. In addition, a method has been developed to model the average engine efficiency of the entire automobile fleet with internal combustion engines (ICEs) using the Worldwide Harmonized Light vehicles Test Cycles (WLTC). The new parameterisations are evaluated using observations from two road weather stations in southern Finland, Nupuri and Palojärvi, which are characterised by clear commuting patterns. To evaluate the new traffic parameterisation, road surface temperature (RST) differences between the two road carriageways are used to isolate the traffic-induced effects from the natural factors. The results show that the new parameterisation is able to simulate the traffic-induced impacts on road surface temperatures. In addition, wind-induced impact and rolling friction have been shown to drive traffic effects on RST. Taking explicitly into account the traffic impacts might be better suited to simulate their actual impacts on the local scale.",
+   "doi": "10.5194/gmd-18-9945-2025",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-23T15:05:22.788585+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "84bf301f4c669846178f415b251f47004ab162c7e893becf5a37514fc6661352",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:ca5cc4b9903dbb32b06fc2fe2a1f680bdbac324d"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.4271/2018-01-0319"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "04878a7181c1dfc4dc656c23f4d5f65a7ae5f3dc2216a066802b43d17c37c6d8",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.5194/gmd-18-9945-2025",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.4271/2018-01-0319",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [
+    "Gabriel Colas",
+    "Valéry Masson",
+    "François Bouttier",
+    "L. Bouilloud"
+   ],
+   "raw_record_hash": "04878a7181c1dfc4dc656c23f4d5f65a7ae5f3dc2216a066802b43d17c37c6d8",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.1016/j.jenvman.2026.129350": {
+   "id": "doi:10.1016/j.jenvman.2026.129350",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:663571525e6e7fd348f78b993b5c74866340b3bc",
+   "source_uri": "https://doi.org/10.1016/j.jenvman.2026.129350",
+   "title": "Balancing torque, efficiency, and emissions: A framework for engine optimization using modern metaheuristics.",
+   "abstract": "Modern internal combustion engines must satisfy increasingly strict and often conflicting requirements: high torque demand must be delivered without sacrificing fuel efficiency, while emissions compliance depends on maintaining suitable exhaust thermal conditions for effective aftertreatment operation. These objectives are strongly coupled and highly nonlinear, so improving one metric can deteriorate others, and the feasible region is further constrained by complex actuator interactions and operating-regime variability. To address this challenge, this study applies a suite of recent bio-inspired metaheuristic algorithms to multi-target engine calibration, leveraging their derivative-free global search capability to handle multimodality, nonconvexity, and black-box constraints that limit conventional gradient-based tuning. A high-fidelity surrogate model was first constructed from a public engine dataset using Principal Component Analysis (PCA) and Gaussian Process Regression (GPR) and validated via k-fold cross-validation, enabling fast and accurate prediction of torque, brake thermal efficiency (BTE), and exhaust gas temperature as the fitness function. Five optimizers were then benchmarked in terms of solution quality and convergence behavior in this realistic calibration setting: Meerkat Optimization Algorithm (MOA), Dumbo Octopus Algorithm (DOA), Pufferfish Optimization Algorithm (POA), Hybrid Jellyfish Search-Particle Swarm Optimization (HJSPSO), and Dendritic Growth Optimization (DGO). Finally, an automated DOA-based calibration workflow was used to generate efficiency-oriented control maps. Across all tested operating conditions, the DOA-based calibration maintained percentage errors of up to 6% relative to all reference targets, with the analysis focused on high-efficiency setpoints, as indicated by BTE reference values of at least 30%.",
+   "doi": "10.1016/j.jenvman.2026.129350",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-23T15:05:22.788606+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "544d508996c26b5714e76b6215d0bd97bb836a674c0774e9178736845837c65c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:663571525e6e7fd348f78b993b5c74866340b3bc"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.4271/2018-01-0319"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "04878a7181c1dfc4dc656c23f4d5f65a7ae5f3dc2216a066802b43d17c37c6d8",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1016/j.jenvman.2026.129350",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.4271/2018-01-0319",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [
+    "Marcos Henrique Carvalho Silva",
+    "André Vinícius Oliveira Maggio",
+    "Paulo Alexandre Pizará Hayashida",
+    "Armando Antônio Maria Laganá",
+    "B. S. Pereira",
+    "J. F. Justo"
+   ],
+   "raw_record_hash": "04878a7181c1dfc4dc656c23f4d5f65a7ae5f3dc2216a066802b43d17c37c6d8",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "patent:US10214219B2": {
+   "id": "patent:US10214219B2",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:US10214219B2",
+   "source_uri": "https://patents.google.com/patent/US10214219B2/en",
+   "title": "Methods and systems for powertrain NVH control in a vehicle",
+   "abstract": "Methods and systems are provided for adjusting noise, vibration, and harshness (NVH) limits for a vehicle based on a number of occupants in the vehicle. In one example, a method may include responsive to detecting zero occupants, reducing NVH constraints for operating the vehicle and adjusting one &hellip;",
+   "doi": null,
+   "patent_number": "US10214219B2",
+   "publication_number": "US10214219B2",
+   "publication_date": "2019-02-26",
+   "retrieval_timestamp": "2026-09-23T15:05:22.788627+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9f6b39613830882fa9884a2cffa59d37a3b0a56cd617f9af40fd912c1cccedd7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:US10214219B2"
+    },
+    "queries_by_source": {
+     "google_patents": "vehicle drivetrain assembly drivetrain vibration and instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "8c1fc9620c1512dfc9ac8c84ab7dc7d844e8c289cfaada42e355a1ba33696b33",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:US10214219B2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration and instability",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "8c1fc9620c1512dfc9ac8c84ab7dc7d844e8c289cfaada42e355a1ba33696b33",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:US9925974B2": {
+   "id": "patent:US9925974B2",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:US9925974B2",
+   "source_uri": "https://patents.google.com/patent/US9925974B2/en",
+   "title": "System and methods for improving fuel economy",
+   "abstract": "Methods and systems are provided for controlling hybrid vehicle engine operation, where the vehicle engine comprises one or more cylinders dedicated to recirculating exhaust to an intake manifold. In one example, during an engine cold-start event or other event where temperature of one or more &hellip;",
+   "doi": null,
+   "patent_number": "US9925974B2",
+   "publication_number": "US9925974B2",
+   "publication_date": "2018-03-27",
+   "retrieval_timestamp": "2026-09-23T15:05:22.788647+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "eef423da98e40c776f3e5c371885886f8b310316058e38af13dfb23b9ba8503e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:US9925974B2"
+    },
+    "queries_by_source": {
+     "google_patents": "vehicle drivetrain assembly drivetrain vibration and instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "813a1e9b5b7bda6e48f3969a1ad9217e6b13e296255be73329484b98acb84c81",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:US9925974B2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration and instability",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "813a1e9b5b7bda6e48f3969a1ad9217e6b13e296255be73329484b98acb84c81",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:US10272913B2": {
+   "id": "patent:US10272913B2",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:US10272913B2",
+   "source_uri": "https://patents.google.com/patent/US10272913B2/en",
+   "title": "Regenerative braking system and method",
+   "abstract": "A method for recovering energy during braking of a vehicle is provided. The vehicle has at least one rotatable ground engaging member, a generator operatively connected to the at least one rotatable ground engaging member, and at least one energy storage device coupled to the generator. The method &hellip;",
+   "doi": null,
+   "patent_number": "US10272913B2",
+   "publication_number": "US10272913B2",
+   "publication_date": "2019-04-30",
+   "retrieval_timestamp": "2026-09-23T15:05:22.788664+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bad885d5dc0045c1466d55bf00e67abd4a1548d048783e2e2f24c56b42ae3f61",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:US10272913B2"
+    },
+    "queries_by_source": {
+     "google_patents": "vehicle drivetrain assembly drivetrain vibration and instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "52f79ee87b8bebe83cb0c0bf6d4ddcb816a24338044fbc840d16b6027f31fecc",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:US10272913B2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration and instability",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "52f79ee87b8bebe83cb0c0bf6d4ddcb816a24338044fbc840d16b6027f31fecc",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:US12276977B2": {
+   "id": "patent:US12276977B2",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:US12276977B2",
+   "source_uri": "https://patents.google.com/patent/US12276977B2/en",
+   "title": "Systems and methods for platooning and automation safety",
+   "abstract": "What is claimed is: 1. A method for platooning comprising: establishing a communication link between a first vehicle and a second vehicle; forming a platoon including the first vehicle and the second vehicle; determining a plurality of safety goals, wherein the plurality of safety goals includes:",
+   "doi": null,
+   "patent_number": "US12276977B2",
+   "publication_number": "US12276977B2",
+   "publication_date": "2025-04-15",
+   "retrieval_timestamp": "2026-09-23T15:05:22.788679+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "370bf7530677a47f406c241c49e3c9306444fe87046d08409cf462ddd604aa4c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:US12276977B2"
+    },
+    "queries_by_source": {
+     "google_patents": "vehicle drivetrain assembly drivetrain vibration and instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "c7b0f445a84df7163ac316335c802e6e65e329a37a1762652457401f7c59fc28",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:US12276977B2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration and instability",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "c7b0f445a84df7163ac316335c802e6e65e329a37a1762652457401f7c59fc28",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:CN110248861B": {
+   "id": "patent:CN110248861B",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:CN110248861B",
+   "source_uri": "https://patents.google.com/patent/CN110248861B/en",
+   "title": "Guiding a vehicle using a machine learning model during vehicle maneuvers",
+   "abstract": "In various examples, a trigger signal may be received that indicates that a vehicle maneuver is to be performed by the vehicle. In response to the received trigger signal, a recommended vehicle trajectory for the vehicle maneuver is determined. To determine the recommended vehicle trajectory, &hellip;",
+   "doi": null,
+   "patent_number": "CN110248861B",
+   "publication_number": "CN110248861B",
+   "publication_date": "2023-05-30",
+   "retrieval_timestamp": "2026-09-23T15:05:22.788694+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5a27a0b48dca3f7c09933084685b88bfe32e1ff148dabc7dd795e8160a430fb2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:CN110248861B"
+    },
+    "queries_by_source": {
+     "google_patents": "vehicle drivetrain assembly drivetrain vibration and instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "bbc0e3270664efe3299593e21d36e01d4c1e9a301467635a223de78a6ea09b8a",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:CN110248861B",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration and instability",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "bbc0e3270664efe3299593e21d36e01d4c1e9a301467635a223de78a6ea09b8a",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "doi:10.5281/zenodo.16331466": {
+   "id": "doi:10.5281/zenodo.16331466",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.16331466",
+   "source_uri": "https://doi.org/10.5281/zenodo.16331466",
+   "title": "ALGO",
+   "abstract": "Defense Publication: ALGO (Abstract and Product Design)\n\nField of Disclosure\n\nThis disclosure relates to high-performance sports car architecture, and more specifically to a precision-engineered carbon-fiber monocoque body with integrated cooling passages and adaptive aerodynamic elements.  \n\nBackground\n\nLuxury sports cars demand a seamless fusion of lightweight strength, thermal management, and aerodynamic efficiency. Conventional designs rely on separate sub-assemblies for cooling, chassis, and aero components, leading to added weight, complexity, and compromises in performance.  \n\nSummary of Disclosure\n\nThe present disclosure provides a unified vehicle structure that:  \n\n- Integrates interlocking hexagonal monocoque panels with molded fluid-cooling channels  - Incorporates twisting ribbon-shaped aero surfaces that dynamically adjust to driving conditions  - Embeds microchip-controlled cooling fans and sensor modules for real-time thermal regulation  - Employs a hybrid powertrain with wind-turbine electric assist and predictive diagnostics  \n\nThese innovations combine to deliver enhanced rigidity, superior downforce control, and optimized heat dissipation without added packaging complexity.  \n\nDetailed Description\n\n1. Monocoque Structure     - Constructed from multi-axial carbon-fiber layups shaped into tessellated hexagonal panels.     - Each hexagon houses internal fluid ducts for engine, inverter, and battery cooling.     - Panels interlock via soft-join terminations that maintain load paths under torsion.  \n\n2. Twist-Ribbon Aero Elements     - Aero ribbons originate at front fascia vents, sweeping over door sills and terminating at rear diffuser fins.     - Actuated by micro-servo links to adjust camber and curvature according to vehicle speed and yaw rate.  \n\n3. Thermal Management Module     - Network of microchip-controlled fans mounted at duct exits, modulating flow based on real-time temperature maps.     - Phase-change material inserts adjacent to battery cells buffer peak thermal loads during track mode.  \n\n4. Hybrid Powertrain Integration     - Mid-engine layout combining internal-combustion unit, electric motor, and a compact wind-turbine generator.     - Dry-sump lubrication and torque-vectoring telemetry enable consistent performance at high lateral loads.  \n\nClaims\n\n1. A sports car comprising:     a carbon-fiber monocoque body formed by inte",
+   "doi": "10.5281/zenodo.16331466",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-23T15:05:22.788713+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6167085e5e8fea69fd5720c93337eff200cb56dee4b2cf24d9f968dbc4af2357",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.16331466"
+    },
+    "queries_by_source": {
+     "datacite": "vehicle drivetrain assembly drivetrain vibration and instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Text; resource_type=Patent"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.16331466",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration and instability",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Bledsoe, Dashawn"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.5281/zenodo.16376539": {
+   "id": "doi:10.5281/zenodo.16376539",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.16376539",
+   "source_uri": "https://doi.org/10.5281/zenodo.16376539",
+   "title": "ALGO Mobility Systems",
+   "abstract": "Defense Publication: ALGO Mobility Systems (Abstract and Product Design)\n\nField of Disclosure\n\nThis disclosure relates to high-performance sports car architecture, and more specifically to a precision-engineered carbon-fiber monocoque body with integrated cooling passages and adaptive aerodynamic elements.  \n\nBackground\n\nLuxury sports cars demand a seamless fusion of lightweight strength, thermal management, and aerodynamic efficiency. Conventional designs rely on separate sub-assemblies for cooling, chassis, and aero components, leading to added weight, complexity, and compromises in performance.  \n\nSummary of Disclosure\n\nThe present disclosure provides a unified vehicle structure that:  \n\n- Integrates interlocking hexagonal monocoque panels with molded fluid-cooling channels  - Incorporates twisting ribbon-shaped aero surfaces that dynamically adjust to driving conditions  - Embeds microchip-controlled cooling fans and sensor modules for real-time thermal regulation  - Employs a hybrid powertrain with wind-turbine electric assist and predictive diagnostics  \n\nThese innovations combine to deliver enhanced rigidity, superior downforce control, and optimized heat dissipation without added packaging complexity.  \n\nDetailed Description\n\n1. Monocoque Structure     - Constructed from multi-axial carbon-fiber layups shaped into tessellated hexagonal panels.     - Each hexagon houses internal fluid ducts for engine, inverter, and battery cooling.     - Panels interlock via soft-join terminations that maintain load paths under torsion.  \n\n2. Twist-Ribbon Aero Elements     - Aero ribbons originate at front fascia vents, sweeping over door sills and terminating at rear diffuser fins.     - Actuated by micro-servo links to adjust camber and curvature according to vehicle speed and yaw rate.  \n\n3. Thermal Management Module     - Network of microchip-controlled fans mounted at duct exits, modulating flow based on real-time temperature maps.     - Phase-change material inserts adjacent to battery cells buffer peak thermal loads during track mode.  \n\n4. Hybrid Powertrain Integration     - Mid-engine layout combining internal-combustion unit, electric motor, and a compact wind-turbine generator.     - Dry-sump lubrication and torque-vectoring telemetry enable consistent performance at high lateral loads.  \n\nClaims\n\n1. A sports car comprising:     a carbon-fiber monocoque bo",
+   "doi": "10.5281/zenodo.16376539",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-23T15:05:22.788732+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "de8bdc155864c0a307fe2b7af281e29a0adf741862195a1aff27061ac632eacc",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.16376539"
+    },
+    "queries_by_source": {
+     "datacite": "vehicle drivetrain assembly drivetrain vibration and instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Text; resource_type=Patent"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.16376539",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration and instability",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Bledsoe, Dashawn"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.14264/311878": {
+   "id": "doi:10.14264/311878",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.14264/311878",
+   "source_uri": "https://doi.org/10.14264/311878",
+   "title": "Driveshaft and drivetrain development of the Formula SAE vehicle",
+   "abstract": "",
+   "doi": "10.14264/311878",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T15:05:22.788749+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e4098dadedec5d66d91bf3e601204e66a253b1d82ffdb754219898dac0539b08",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.14264/311878"
+    },
+    "queries_by_source": {
+     "crossref": "vehicle drivetrain assembly drivetrain vibration and instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.14264/311878",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration and instability",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "title:b56c7b1f314d2c8e": {
+   "id": "title:b56c7b1f314d2c8e",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:18938918",
+   "source_uri": "",
+   "title": "Electric Vehicle Drivetrain",
+   "abstract": "This document serves to outline the design and development of Sharpell Technologies\\u27 ST5 electric vehicle drivetrain. Background research was conducted on various drivetrain components and testing methods, leading to the development of our drivetrain’s design requirements. Compiled in this report are the specifications of the components that will be integrated into our drivetrain design. All component calculations and specifications can be located in the appendices. An in-depth manufacturing plan features the modifications necessary to create several key components such as the shafts and housing. The assembly plan details a step-by-step process in which the components are arranged to ensure a safe and functional drivetrain unit. Our drivetrain design was validated through a series of static and dynamic tests, confirming that all the design requirements have been met, or exceeded",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T15:05:22.788768+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "71cd0c5c639260879157db9aa94eea5343cdd3fd5c3ad82b15f44bf067d3beef",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:18938918"
+    },
+    "queries_by_source": {
+     "core": "vehicle drivetrain assembly drivetrain vibration instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:b56c7b1f314d2c8e",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration instability",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "King, Jimmy Andrew",
+    "Seid, Charissa Cadence",
+    "Moore, Kevin Kristopher"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:391bb011f34e4afc": {
+   "id": "title:391bb011f34e4afc",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:224444",
+   "source_uri": "",
+   "title": "Testing and characterisation of large high-energy lithium-ion batteries for electric and hybrid electric vehicles",
+   "abstract": "This thesis considers the drivetrain and battery system requirements of Hybrid Electric Vehicles. The data herein proves that a series hybrid electric drivetrain with Lithium-ion batteries and plug-in recharge promises to be viable and sustainable. However, for mass production of series HEVs comprehensive performance characteristics and prediction of ageing behaviour of Lithium-ion batteries is essential but currently not available.The main part of the thesis, following a graphical comparison of different energy storage solutions, is a detailed treatise on large Li-ion batteries. Construction and Li-ion working principles are summarised, together with several effects such as Peukert and memory effects, ageing of Li-ion cells, their temperature dependence and safety, and limits of charging/discharging.Preliminary performance tests on 50 and 100 Ah Li-ion cells showed the necessity for a careful investigation of suitable reference conditions in order to achieve reproducibly precise results from repeated discharge/charge cycles. Then the main tests result in detailed graphs and tables of the discharge and charge characteristics. These main tests include effects of rate of discharge, energy-efficiency, temperature, resting time between test-cycles, hysteresis, ageing, and degradation. A new testing method that is based on the step response technique is suggested and investigated to whether it gives a meaningful but rapid measure of open circuit voltage and equivalent circuit models of the battery. Statistically significant theoretical models, equations and graphs are included.The Appendix gives summaries of the author's seven main publications and presentations dealing with Systems Approach and five publications on Large Li-ion batteries, followed by most of these in full",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T15:05:22.788802+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9d5fdeb023c9ec7b45c0beb1e6f1c774ab7af3811074d4810c834cadf1c3d3eb",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:224444"
+    },
+    "queries_by_source": {
+     "core": "vehicle drivetrain assembly drivetrain vibration instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:391bb011f34e4afc",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration instability",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Doerffel, Dennis"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.4271/j1144_197607": {
+   "id": "doi:10.4271/j1144_197607",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4271/j1144_197607",
+   "source_uri": "https://doi.org/10.4271/j1144_197607",
+   "title": "TOWED VEHICLE DRIVETRAIN TEST PROCEDURE—PASSENGER CARS",
+   "abstract": "",
+   "doi": "10.4271/j1144_197607",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T15:05:22.788829+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "607796855849ec39b3db86950966e6c656e47ffa9a337620361cc0a85a6117e1",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4271/j1144_197607"
+    },
+    "queries_by_source": {
+     "crossref": "vehicle drivetrain assembly drivetrain vibration and instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=standard"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4271/j1144_197607",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration and instability",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.4271/j2455_201504": {
+   "id": "doi:10.4271/j2455_201504",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4271/j2455_201504",
+   "source_uri": "https://doi.org/10.4271/j2455_201504",
+   "title": "Drivetrain Systems Vibration Analysis Data Requirements",
+   "abstract": "",
+   "doi": "10.4271/j2455_201504",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T15:05:22.788859+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d608581e5013614d270851811fd00b987b25c610c13da91ecf4e83a284ba02c6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4271/j2455_201504"
+    },
+    "queries_by_source": {
+     "crossref": "vehicle drivetrain assembly drivetrain vibration and instability"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=standard"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4271/j2455_201504",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle drivetrain assembly drivetrain vibration and instability",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "problem:6452d682": {
+   "id": "problem:6452d682",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "6452d682d4363bcd5f20517c132725a33ef2edcd6e7918ef371418ec8f59ac7e",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "83f90ee27ea900c3eb080fb797a73843c4884566b482416c2bd38d96cc8e0879",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-23T15:05:59+00:00Z"
+ }
+}
