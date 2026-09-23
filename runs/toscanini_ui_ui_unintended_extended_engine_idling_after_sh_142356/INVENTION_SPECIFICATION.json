@@ -1,0 +1,1260 @@
+{
+ "invention_id": {
+  "value": "inv:ui_unintended_extended_engine_idling_after_sh_142356:b0486dc29dad",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_unintended_extended_engine_idling_after_sh_142356",
+   "device": "engine idle-stop and remote-start system",
+   "failure": "Documented problem 'unintended extended engine idling after shutdown request' concerning engine idle-stop and remote-start system. User-submitted engineering problem (session input): \"[R521-BATTERY declared_family=mechanical source=odi:11457634 battery=R521-STAGE-ATTRIBUTION-before]\n\nI walked outside my house yesterday morning to find my 2021 Outback XT idling in the driveway. I may have failed to turn the engine off, or it may have started itself. Nonetheless, I calculate that i\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "unintended extended engine idling after shutdown request",
+   "constraint": "The system must retain normal remote-start and start-stop operation while ensuring the engine cannot idle unattended for hours."
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:6a8094d9"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of engine idle-stop and remote-start system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Closed-loop operator-state adaptation using a finite-state machine and composite fatigue/attention scoring from biosignals to autonomously modulate system behavior.",
+   "intervention": "Apply a finite-state machine and composite attention/idle-score monitor (driver-presence via seat sensor/camera, door state, key-fob proximity, and engine-on duration) to the engine control module so that a sustained \"attended idle\" state transitions to an auto-shutdown state, while preserving manual remote-start and idle-stop cycles gated by authenticated operator presence.",
+   "expected_effect": "Prevents unintended extended idling after shutdown request by forcing engine-off when the composite score indicates unattended idling beyond a threshold, without disabling normal remote-start or start-stop functionality.",
+   "mechanism_source_span": "closed-loop operator-state adaptation. The Perception module pairs MediaPipe hand-landmark tracking and a Random Forest gesture classifier",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3389/frobt.2026.1897261"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Predictive fatigue-aware human-robot collaboration: a real-time, open-source ROS 2 instantiation of a three-module human-centric digital twin framework on a standard cobot.",
+   "mechanism": "Closed-loop operator-state adaptation using a finite-state machine and composite fatigue/attention scoring from biosignals to autonomously modulate system behavior.",
+   "intervention_site": "engine idle-stop and remote-start system",
+   "expected_effect": "Prevents unintended extended idling after shutdown request by forcing engine-off when the composite score indicates unattended idling beyond a threshold, without disabling normal remote-start or start-stop functionality.",
+   "falsification_test": "On a stationary vehicle, simulate an unattended idle (driver door closed, no seat occupancy, key-fob out of range) for 30 minutes; verify the engine auto-stops within the configured threshold, while a second trial with authenticated driver present and remote-start command confirms normal idle-stop and remote-start operation still function."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3389/frobt.2026.1897261"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Apply a finite-state machine and composite attention/idle-score monitor (driver-presence via seat sensor/camera, door state, key-fob proximity, and engine-on duration) to the engine control module so that a sustained \"attended idle\" state transitions to an auto-shutdown state, while preserving manual remote-start and idle-stop cycles gated by authenticated operator presence.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3389/frobt.2026.1897261"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "The system must retain normal remote-start and start-stop operation while ensuring the engine cannot idle unattended for hours.",
+   "failure_mode_of_device": "unintended extended engine idling after shutdown request"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:6a8094d9"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Prevents unintended extended idling after shutdown request by forcing engine-off when the composite score indicates unattended idling beyond a threshold, without disabling normal remote-start or start",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-23T05:49:23.116316+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-23T05:49:23.116316+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.4271/2005-01-0069",
+    "title": "Development of an Engine Stop/Start at Idle System",
+    "source_uri": "https://doi.org/10.4271/2005-01-0069",
+    "doi": "10.4271/2005-01-0069",
+    "content_hash": "48728cc2644cd98e2013bba0feba964f24649d8d8b4cb51521c1357a3c1bebe0",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3389/frobt.2026.1897261",
+    "title": "Predictive fatigue-aware human-robot collaboration: a real-time, open-source ROS 2 instantiation of a three-module human-centric digital twin framework on a standard cobot.",
+    "source_uri": "https://doi.org/10.3389/frobt.2026.1897261",
+    "doi": "10.3389/frobt.2026.1897261",
+    "content_hash": "96c092729206d1f671da5c17e7bd9ae9c272ebc118f783cc1dd4b49f11bb1690",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4271/2014-01-1700",
+    "title": "Extended Range Cam Phasing Effects on Engine Stop/Start Quality",
+    "source_uri": "https://doi.org/10.4271/2014-01-1700",
+    "doi": "10.4271/2014-01-1700",
+    "content_hash": "e65a90a9d626cc4fc23f4205f88308eddab6123bbd062accde290d01691c4b61",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.33387/protk.v13i1.10621",
+    "title": "Application And Performance Of Arduino-Based Idle Stop System On Carburetor Engine",
+    "source_uri": "https://doi.org/10.33387/protk.v13i1.10621",
+    "doi": "10.33387/protk.v13i1.10621",
+    "content_hash": "6d73531641b36e9056ca117bddaa51fb335f0ad670b4bbb3e1563008b737752d",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/s25185831",
+    "title": "Feasibility of an AI-Enabled Smart Mirror Integrating MA-rPPG, Facial Affect, and Conversational Guidance in Realtime.",
+    "source_uri": "https://doi.org/10.3390/s25185831",
+    "doi": "10.3390/s25185831",
+    "content_hash": "0c135f365875470c9114049bea01793f3da8b72e3cf4a3abf2063caf84a726d5",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/s26154730",
+    "title": "Practical Integration of Open-Source Control Architectures on Custom Quadruped Robots: Simulation Validation and Hardware Interfacing.",
+    "source_uri": "https://doi.org/10.3390/s26154730",
+    "doi": "10.3390/s26154730",
+    "content_hash": "ae6c41eb260fea0065c8be6a00661536a5263847fb38a3258d2011e950a2c2b6",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.37099/mtu.dc.etdr/990",
+    "title": "ENERGY CONSUMPTION AND SAVINGS ANALYSIS OF A PHEV IN REAL WORLD DRIVING THROUGH VEHICLE CONNECTIVITY USING VEHICLE PLATOONING, BLENDED MODE OPERATION AND ENGINE START-STOP OPTIMIZERS",
+    "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/990",
+    "doi": "10.37099/mtu.dc.etdr/990",
+    "content_hash": "0dabaf6df7a659e136e6449177bd3eb0115cf2cc48ea3a619ac21d1c5f3347cf",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.37099/mtu.dc.etdr/897",
+    "title": "OPTIMIZATION OF DIESEL ENGINE AND AFTER-TREATMENT SYSTEM FOR SERIES HYBRID FORKLIFT APPLICATION",
+    "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/897",
+    "doi": "10.37099/mtu.dc.etdr/897",
+    "content_hash": "58ff1ccb86b469a3cf6fec283d1084037f8e40de9f230cd78c1e3c5c1288ab80",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.37099/mtu.dc.etdr/1994",
+    "title": "METHOD FOR ASSESSING GASOLINE POWERED INTERNAL COMBUSTION ENGINE EXHAUST ACCUMULATION WHEN IDLING IN ENCLOSED SPACE BY AUTOMATIC SHUT OFF",
+    "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/1994",
+    "doi": "10.37099/mtu.dc.etdr/1994",
+    "content_hash": "227774ee58ad92b18491d6b29842eb1ac4e971e5bf40a4fd2fe1074bb5f1cca7",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1903.02690",
+    "title": "Energy extraction of a chaotic system in a cyclic process: a Szilárd Engine perspective",
+    "source_uri": "https://doi.org/10.48550/arxiv.1903.02690",
+    "doi": "10.48550/arxiv.1903.02690",
+    "content_hash": "fa97a573c8e7458ef077d1e59f4759a2f2dea48c9ce1e007b60dc529d3d4a8bb",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2201.05326",
+    "title": "Security Orchestration, Automation, and Response Engine for Deployment of Behavioural Honeypots",
+    "source_uri": "https://doi.org/10.48550/arxiv.2201.05326",
+    "doi": "10.48550/arxiv.2201.05326",
+    "content_hash": "5030229a8074198f2fe626e87fea17375de153fe3edfabc3dd1f14b81a1cd5b6",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.64628/aa.q47wp75d4",
+    "title": "How to cut your fuel bill, clear the air and reduce emissions: stop engine idling",
+    "source_uri": "https://doi.org/10.64628/aa.q47wp75d4",
+    "doi": "10.64628/aa.q47wp75d4",
+    "content_hash": "4a907672bafb846b1e18324216db53cd28361c56dd7ed2a1e7af2318025c7921",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1201/b19371-19",
+    "title": "H-infinity control strategy research for engine idle start/stop control",
+    "source_uri": "https://doi.org/10.1201/b19371-19",
+    "doi": "10.1201/b19371-19",
+    "content_hash": "42e61e546bffe49ce0fc04ae633afc99e628cf40a11cfb95196b6ba041ad7a8c",
+    "frozen": false
+   },
+   {
+    "id": "title:50bfd09ff8975f3e",
+    "title": "Taxonomy of Spyware and Empirical Study of Network Drive-By-Downloads",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "83b15725020b2b161fb9cf6c47954b7902e23348da9b3222ea99573b8b86fcb4",
+    "frozen": false
+   },
+   {
+    "id": "title:8ed3dcf71dcb2736",
+    "title": "An examination of sudden acceleration",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "f69eb3393ea39161e88100ff4081e9c3457e22107752560ab92d5a0bb69c3d1a",
+    "frozen": false
+   },
+   {
+    "id": "title:97f4decd7a83d974",
+    "title": "Human Perception of Diesel Engine Idle Vibration",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "305c62e7e322cd4716920d3dc7ce4c50a5195613808f43a65165d2d757605db3",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1201/b19371-19",
+   "doi:10.33387/protk.v13i1.10621",
+   "doi:10.3389/frobt.2026.1897261",
+   "doi:10.3390/s25185831",
+   "doi:10.3390/s26154730",
+   "doi:10.37099/mtu.dc.etdr/1994",
+   "doi:10.37099/mtu.dc.etdr/897",
+   "doi:10.37099/mtu.dc.etdr/990",
+   "doi:10.4271/2005-01-0069",
+   "doi:10.4271/2014-01-1700",
+   "doi:10.48550/arxiv.1903.02690",
+   "doi:10.48550/arxiv.2201.05326",
+   "doi:10.64628/aa.q47wp75d4",
+   "title:50bfd09ff8975f3e",
+   "title:8ed3dcf71dcb2736",
+   "title:97f4decd7a83d974"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "On a stationary vehicle, simulate an unattended idle (driver door closed, no seat occupancy, key-fob out of range) for 30 minutes; verify the engine auto-stops within the configured threshold, while a second trial with authenticated driver present and remote-start command confirms normal idle-stop and remote-start operation still function."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_unintended_extended_engine_idling_after_sh_142356:2026-09-23T05:45:56",
+   "final_envelope_hash": "b0486dc29dad70f301b5b63c51fec793049c58e8bb6738805aef7016652ce56f",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-23T05:49:23+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-23T05:49:23+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.4271/2005-01-0069": {
+   "id": "doi:10.4271/2005-01-0069",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4271/2005-01-0069",
+   "source_uri": "https://doi.org/10.4271/2005-01-0069",
+   "title": "Development of an Engine Stop/Start at Idle System",
+   "abstract": "",
+   "doi": "10.4271/2005-01-0069",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2005",
+   "retrieval_timestamp": "2026-09-23T05:46:21.901687+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "48728cc2644cd98e2013bba0feba964f24649d8d8b4cb51521c1357a3c1bebe0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4271/2005-01-0069"
+    },
+    "queries_by_source": {
+     "crossref": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4271/2005-01-0069",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.3389/frobt.2026.1897261": {
+   "id": "doi:10.3389/frobt.2026.1897261",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42614170",
+   "source_uri": "https://doi.org/10.3389/frobt.2026.1897261",
+   "title": "Predictive fatigue-aware human-robot collaboration: a real-time, open-source ROS 2 instantiation of a three-module human-centric digital twin framework on a standard cobot.",
+   "abstract": "Industry 5.0 cobotics calls for collaborative robots that adapt to the operator's physical and cognitive state in real time. Most current industrial deployments remain reactive, responding only after explicit commands and ignoring the operator's psychophysiological condition. The three-module Human-Centric Digital Twin (HCDT) framework establishes the upstream perception-and-reasoning architecture for such systems using Vision-Language Models, and identifies closed-loop feedback and physical-assistance mechanisms as the natural next layer in the framework's development. Building on that foundation, this paper presents a complementary, real-time instantiation specialised for the resource-constrained, vision-plus-biosignal setting typical of ergonomics-and-safety HRC, deployed on a standard collaborative robot (Universal Robots UR3 with a Robotiq 2F-85 gripper) and extended with closed-loop operator-state adaptation. The Perception module pairs MediaPipe hand-landmark tracking and a Random Forest gesture classifier with Tobii Pro Glasses 3 pupillometry. The Reasoning module combines a ten-state finite-state machine, a weighted composite fatigue score (blink rate, blink duration, PERCLOS, hand-jerk) banded into FRESH, MILD, MODERATE and SEVERE, a saccade-gated commitment fixation, and a Task-Evoked Pupillary Response (TEPR) detector for acute-stress soft-emergency-stop. The Motion module provides a closed-form analytical inverse-kinematics solver, workspace clamping and a slew-rate-limited joint-velocity controller. Velocity-based linear extrapolation of hand position over a 0.5 s horizon enables anticipatory robot pre-positioning. The system is presented as a single-operator feasibility study rather than a generalisation claim. On a leak-free split-then-augment evaluation (520 raw test samples not seen by the training fold in any orientation), the Random Forest classifier reaches 99.62% accuracy with both errors falling in the Okay-Neutral confusion pair that the geometric override layer is designed to catch; a comparison against MLP and KNN baselines on the same split shows all three classifiers within the real-time control budget. Saccade-gated early-commit is designed to recover the modelled 150-300 ms gaze-to-motion lead, and the TEPR Soft E-Stop operates on an independent 300-500 ms channel. End-to-end gesture-to-motion latency has a conservative worst-ca",
+   "doi": "10.3389/frobt.2026.1897261",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-08-04",
+   "retrieval_timestamp": "2026-09-23T05:46:21.901772+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "96c092729206d1f671da5c17e7bd9ae9c272ebc118f783cc1dd4b49f11bb1690",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42614170"
+    },
+    "queries_by_source": {
+     "europepmc": "engine idle-stop and remote-start system unintended experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-23T05:46:21.754995+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3389/frobt.2026.1897261",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop and remote-start system unintended experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": "https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2026.1897261/pdf",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.4271/2014-01-1700": {
+   "id": "doi:10.4271/2014-01-1700",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4271/2014-01-1700",
+   "source_uri": "https://doi.org/10.4271/2014-01-1700",
+   "title": "Extended Range Cam Phasing Effects on Engine Stop/Start Quality",
+   "abstract": "",
+   "doi": "10.4271/2014-01-1700",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2014",
+   "retrieval_timestamp": "2026-09-23T05:46:21.901812+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e65a90a9d626cc4fc23f4205f88308eddab6123bbd062accde290d01691c4b61",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4271/2014-01-1700"
+    },
+    "queries_by_source": {
+     "crossref": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4271/2014-01-1700",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.33387/protk.v13i1.10621": {
+   "id": "doi:10.33387/protk.v13i1.10621",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.33387/protk.v13i1.10621",
+   "source_uri": "https://doi.org/10.33387/protk.v13i1.10621",
+   "title": "Application And Performance Of Arduino-Based Idle Stop System On Carburetor Engine",
+   "abstract": "",
+   "doi": "10.33387/protk.v13i1.10621",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-23T05:46:21.901843+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6d73531641b36e9056ca117bddaa51fb335f0ad670b4bbb3e1563008b737752d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.33387/protk.v13i1.10621"
+    },
+    "queries_by_source": {
+     "crossref": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.33387/protk.v13i1.10621",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.3390/s25185831": {
+   "id": "doi:10.3390/s25185831",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41013066",
+   "source_uri": "https://doi.org/10.3390/s25185831",
+   "title": "Feasibility of an AI-Enabled Smart Mirror Integrating MA-rPPG, Facial Affect, and Conversational Guidance in Realtime.",
+   "abstract": "This paper presents a real-time smart mirror system combining multiple AI modules for multimodal health monitoring. The proposed platform integrates three core components: facial expression analysis, remote photoplethysmography (rPPG), and conversational AI. A key innovation lies in transforming the Moving Average rPPG (MA-rPPG) model-originally developed for offline batch processing-into a real-time, continuously streaming setup, enabling seamless heart rate and peripheral oxygen saturation (SpO 2 ) monitoring using standard webcams. The system also incorporates the DeepFace facial analysis library for live emotion, age detection, and a Generative Pre-trained Transformer 4o (GPT-4o)-based mental health chatbot with bilingual (English/Korean) support and voice synthesis. Embedded into a touchscreen mirror with Graphical User Interface (GUI), this solution delivers ambient, low-interruption interaction and real-time user feedback. By unifying these AI modules within an interactive smart mirror, our findings demonstrate the feasibility of integrating multimodal sensing (rPPG, affect detection) and conversational AI into a real-time smart mirror platform. This system is presented as a feasibility-stage prototype to promote real-time health awareness and empathetic feedback. The physiological validation was limited to a single subject, and the user evaluation constituted only a small formative assessment; therefore, results should be interpreted strictly as preliminary feasibility evidence. The system is not intended to provide clinical diagnosis or generalizable accuracy at this stage.",
+   "doi": "10.3390/s25185831",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-09-18",
+   "retrieval_timestamp": "2026-09-23T05:46:21.901874+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0c135f365875470c9114049bea01793f3da8b72e3cf4a3abf2063caf84a726d5",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41013066"
+    },
+    "queries_by_source": {
+     "europepmc": "engine idle-stop and remote-start system unintended experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s25185831",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop and remote-start system unintended experimental comparison",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.3390/s26154730": {
+   "id": "doi:10.3390/s26154730",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42590507",
+   "source_uri": "https://doi.org/10.3390/s26154730",
+   "title": "Practical Integration of Open-Source Control Architectures on Custom Quadruped Robots: Simulation Validation and Hardware Interfacing.",
+   "abstract": "Custom-built quadrupedal platforms offer an accessible path for robotics research, yet researchers frequently encounter a \"framework gap\" when porting complex open-source control software to custom hardware. This paper documents the integration and validation process of Scotty, a custom quadrupedal robot, evaluating two distinct open-source control frameworks: the torque-based MIT Mini Cheetah and the position-based CHAMP architectures. Due to minimal documentation, hardware-dependent complexities, and a tightly coupled architecture, it was difficult to achieve a satisfactory result using the MIT framework within our system's scope. Conversely, CHAMP's structured integration documentation enabled the deployment of a locomotion pipeline validated in Gazebo simulation alongside a functional hardware interface middle layer. To overcome CHAMP's lack of native operational state management, we developed a custom state-based controller with a web-based GUI that safely orchestrates transitions across Idle, Ready, Down, Stand, and Walk configurations. While walking was successfully validated in the simulation environment to verify the control software pipeline, physical hardware evaluation was restricted to individual joint control, localized leg movements, and GUI-based parameter tuning. Full closed-loop hardware locomotion was not achieved, as the extensive tuning of gait parameters and controller gains under full system weight was bounded by project constraints. The integration logs, practical hurdles, and architectural lessons documented in this work are shared openly to provide a clear, transferable roadmap for future developers of robotic systems.",
+   "doi": "10.3390/s26154730",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-07-25",
+   "retrieval_timestamp": "2026-09-23T05:46:21.901904+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ae6c41eb260fea0065c8be6a00661536a5263847fb38a3258d2011e950a2c2b6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42590507"
+    },
+    "queries_by_source": {
+     "europepmc": "engine idle-stop and remote-start system unintended experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-23T05:46:21.814879+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s26154730",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop and remote-start system unintended experimental comparison",
+   "source_rank": 5,
+   "fulltext_url": "https://doi.org/10.3390/s26154730",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.37099/mtu.dc.etdr/990": {
+   "id": "doi:10.37099/mtu.dc.etdr/990",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.37099/mtu.dc.etdr/990",
+   "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/990",
+   "title": "ENERGY CONSUMPTION AND SAVINGS ANALYSIS OF A PHEV IN REAL WORLD DRIVING THROUGH VEHICLE CONNECTIVITY USING VEHICLE PLATOONING, BLENDED MODE OPERATION AND ENGINE START-STOP OPTIMIZERS",
+   "abstract": "",
+   "doi": "10.37099/mtu.dc.etdr/990",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T05:46:21.901927+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0dabaf6df7a659e136e6449177bd3eb0115cf2cc48ea3a619ac21d1c5f3347cf",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.37099/mtu.dc.etdr/990"
+    },
+    "queries_by_source": {
+     "crossref": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.37099/mtu.dc.etdr/990",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.37099/mtu.dc.etdr/897": {
+   "id": "doi:10.37099/mtu.dc.etdr/897",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.37099/mtu.dc.etdr/897",
+   "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/897",
+   "title": "OPTIMIZATION OF DIESEL ENGINE AND AFTER-TREATMENT SYSTEM FOR SERIES HYBRID FORKLIFT APPLICATION",
+   "abstract": "",
+   "doi": "10.37099/mtu.dc.etdr/897",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T05:46:21.901946+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "58ff1ccb86b469a3cf6fec283d1084037f8e40de9f230cd78c1e3c5c1288ab80",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.37099/mtu.dc.etdr/897"
+    },
+    "queries_by_source": {
+     "crossref": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.37099/mtu.dc.etdr/897",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.37099/mtu.dc.etdr/1994": {
+   "id": "doi:10.37099/mtu.dc.etdr/1994",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.37099/mtu.dc.etdr/1994",
+   "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/1994",
+   "title": "METHOD FOR ASSESSING GASOLINE POWERED INTERNAL COMBUSTION ENGINE EXHAUST ACCUMULATION WHEN IDLING IN ENCLOSED SPACE BY AUTOMATIC SHUT OFF",
+   "abstract": "",
+   "doi": "10.37099/mtu.dc.etdr/1994",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T05:46:21.901963+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "227774ee58ad92b18491d6b29842eb1ac4e971e5bf40a4fd2fe1074bb5f1cca7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.37099/mtu.dc.etdr/1994"
+    },
+    "queries_by_source": {
+     "crossref": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.37099/mtu.dc.etdr/1994",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.1903.02690": {
+   "id": "doi:10.48550/arxiv.1903.02690",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1903.02690v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.1903.02690",
+   "title": "Energy extraction of a chaotic system in a cyclic process: a Szilárd Engine perspective",
+   "abstract": "Inspired by the available examples of Microcanonical Szilárd Engines and by the original Szilárd Engine, we devise a system with two degrees of freedom whose ensemble average energy, starting with a microcanical ensemble, decreases after a cyclic variation of its external parameters. We use the Ergodic Adiabatic Theorem to motivate our cycle and numerical simulations to check the decrement in the average energy. We then compare our system to the aforementioned Szilárd Engines, Microcanonical or not, and speculate about symmetry breaking being the cause of energy extraction in cyclic processes, even when non-integrability and chaos are present.",
+   "doi": "10.48550/arxiv.1903.02690",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T05:46:21.901981+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "fa97a573c8e7458ef077d1e59f4759a2f2dea48c9ce1e007b60dc529d3d4a8bb",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1903.02690v2"
+    },
+    "queries_by_source": {
+     "arxiv": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1903.02690",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/1903.02690v2",
+   "authors": [
+    "Artur Soriani",
+    "Marcus V. S. Bonança"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2201.05326": {
+   "id": "doi:10.48550/arxiv.2201.05326",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2201.05326v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2201.05326",
+   "title": "Security Orchestration, Automation, and Response Engine for Deployment of Behavioural Honeypots",
+   "abstract": "Cyber Security is a critical topic for organizations with IT/OT networks as they are always susceptible to attack, whether insider or outsider. Since the cyber landscape is an ever-evolving scenario, one must keep upgrading its security systems to enhance the security of the infrastructure. Tools like Security Information and Event Management (SIEM), Endpoint Detection and Response (EDR), Threat Intelligence Platform (TIP), Information Technology Service Management (ITSM), along with other defensive techniques like Intrusion Detection System (IDS), Intrusion Protection System (IPS), and many others enhance the cyber security posture of the infrastructure. However, the proposed protection mechanisms have their limitations, they are insufficient to ensure security, and the attacker penetrates the network. Deception technology, along with Honeypots, provides a false sense of vulnerability in the target systems to the attackers. The attacker deceived reveals threat intel about their modus operandi. We have developed a Security Orchestration, Automation, and Response (SOAR) Engine that dynamically deploys custom honeypots inside the internal network infrastructure based on the attacker's behavior. The architecture is robust enough to support multiple VLANs connected to the system and used for orchestration. The presence of botnet traffic and DDOS attacks on the honeypots in the network is detected, along with a malware collection system. After being exposed to live traffic for four days, our engine dynamically orchestrated the honeypots 40 times, detected 7823 attacks, 965 DDOS attack packets, and three malicious samples. While our experiments with static honeypots show an average attacker engagement time of 102 seconds per instance, our SOAR Engine-based dynamic honeypots engage attackers on average 3148 seconds.",
+   "doi": "10.48550/arxiv.2201.05326",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T05:46:21.902002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5030229a8074198f2fe626e87fea17375de153fe3edfabc3dd1f14b81a1cd5b6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2201.05326v1"
+    },
+    "queries_by_source": {
+     "arxiv": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2201.05326",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2201.05326v1",
+   "authors": [
+    "Upendra Bartwal",
+    "Subhasis Mukhopadhyay",
+    "Rohit Negi",
+    "Sandeep Shukla"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.64628/aa.q47wp75d4": {
+   "id": "doi:10.64628/aa.q47wp75d4",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.64628/aa.q47wp75d4",
+   "source_uri": "https://doi.org/10.64628/aa.q47wp75d4",
+   "title": "How to cut your fuel bill, clear the air and reduce emissions: stop engine idling",
+   "abstract": "",
+   "doi": "10.64628/aa.q47wp75d4",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-09-23T05:46:21.902020+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4a907672bafb846b1e18324216db53cd28361c56dd7ed2a1e7af2318025c7921",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.64628/aa.q47wp75d4"
+    },
+    "queries_by_source": {
+     "crossref": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.64628/aa.q47wp75d4",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1201/b19371-19": {
+   "id": "doi:10.1201/b19371-19",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1201/b19371-19",
+   "source_uri": "https://doi.org/10.1201/b19371-19",
+   "title": "H-infinity control strategy research for engine idle start/stop control",
+   "abstract": "",
+   "doi": "10.1201/b19371-19",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2015",
+   "retrieval_timestamp": "2026-09-23T05:46:21.902045+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "42e61e546bffe49ce0fc04ae633afc99e628cf40a11cfb95196b6ba041ad7a8c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1201/b19371-19"
+    },
+    "queries_by_source": {
+     "crossref": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=book-chapter"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1201/b19371-19",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop and remote-start system unintended extended engine idling after shutdown request",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "title:50bfd09ff8975f3e": {
+   "id": "title:50bfd09ff8975f3e",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W1519180117",
+   "source_uri": "",
+   "title": "Taxonomy of Spyware and Empirical Study of Network Drive-By-Downloads",
+   "abstract": "Spyware has rapidly become a major security concern in government and corporate networks as well as for home computers. Spyware is able to circumvent common security practices, funneling information to remote parties and consuming system resources with impunity. This malicious software has infiltrated common search engines and Internet sectors generally considered \"safe.\" Making use of browser vulnerabilities, spyware infection is wide-spread. This thesis considers common infection vectors and reviews current definitions in arriving at an improved definition of spyware. It identifies four common activities present in all spyware which lead to multiple behavioral capabilities. An empirical analysis of network drive-by-downloads shows the presence of spyware in bank, online travel, and real estate-related Internet sectors. The impact of system security patch maintenance on spyware susceptibility, and browser differences in the context of drive-by-downloads is also presented.",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T05:46:21.902071+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "83b15725020b2b161fb9cf6c47954b7902e23348da9b3222ea99573b8b86fcb4",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W1519180117"
+    },
+    "queries_by_source": {
+     "openalex": "engine idle-stop remote-start unintended extended engine idling after shutdown request"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "title:50bfd09ff8975f3e",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop remote-start unintended extended engine idling after shutdown request",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "title:8ed3dcf71dcb2736": {
+   "id": "title:8ed3dcf71dcb2736",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W2778367221",
+   "source_uri": "",
+   "title": "An examination of sudden acceleration",
+   "abstract": "This report describes the results of a study to identify and evaluate factors which could potentially cause or contribute to the occurrence of \"Sudden Acceleration Incidents\" (SAI). SAI are defined in this report as unintended, unexpected, high-power accelerations from a stationary position or a very low initial speed accompanied by an apparent loss of braking effectiveness. Ten vehicles with above-average SAI complaint rates were selected for particular scrutiny. In the course of conducting this study, the Transportation Systems Center: (1) convened a panel of independent experts in various disciplines related to SAI concerns to review this material with TSC; (2) collected the relevant literature and case documentation on the vehicles'; (3) studied the fuel-systems, braking systems, and driving controls of the vehicles; (4) performed appropriate tests and experiments or arranged for their\\nconduct at NHTSA's Vehicle Research and Test Center (VRTC); and (5) documented the\\nfindings and conclusions, as noted below. (1) No malfunctions were found which could cause high engine power without opening the throttle. (2) Certain malfunctions were identified which could cause throttle opening or sticking, but these would be readily detectable in post-SAI investigation. (3) Other malfunctions were found that could cause modest increases in engine power, some of which would be difficult to detect in an investigation. These malfunctions could not directly cause an SAI but might startle the driver into a pedal misapplication (depression of the accelerator instead of, or in addition to, the brake pedal). (4) Vehicle pedal design features were identified which might increase the probability of a pedal misapplication. All the vehicles with high SAI-compliant rates which were measured were found to possess pedal designs conducive to pedal misapplication. \\n",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T05:46:21.902100+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f69eb3393ea39161e88100ff4081e9c3457e22107752560ab92d5a0bb69c3d1a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W2778367221"
+    },
+    "queries_by_source": {
+     "openalex": "engine idle-stop remote-start unintended extended engine idling after shutdown request"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "title:8ed3dcf71dcb2736",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop remote-start unintended extended engine idling after shutdown request",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "title:97f4decd7a83d974": {
+   "id": "title:97f4decd7a83d974",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:346986055",
+   "source_uri": "",
+   "title": "Human Perception of Diesel Engine Idle Vibration",
+   "abstract": "While the human perception of diesel engine noise has been the subject of numerous studies, the\r\nperception of the vibrational disturbance reaching the driver has not previously been investigated.\r\nThis contribution presents the results of a recent research study performed at Sheffield University\r\nwhich analysed the nature of diesel engine idle, and modelled the associated human growth function.\r\nThe results have shown that the largest component of diesel idle irregularity arriving at the steering\r\nwheel is amplitude modulation of the firing frequency and that the human subjective response grows\r\nwith a power exponent greater than 1.0 for modulation values greater than 0.2",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T05:46:21.902126+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "305c62e7e322cd4716920d3dc7ce4c50a5195613808f43a65165d2d757605db3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:346986055"
+    },
+    "queries_by_source": {
+     "core": "engine idle-stop remote-start unintended extended engine idling after shutdown request"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:97f4decd7a83d974",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine idle-stop remote-start unintended extended engine idling after shutdown request",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Giacomin, J",
+    "Ajovalasit, M"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:6a8094d9": {
+   "id": "problem:6a8094d9",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "6a8094d900efc42e0ee8785cb3d93a9800af5f3bf1b3923b38d5f41a56b1e0f6",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "8529181f6acabfc787277913f696305f269bc1a4bfc377e4a54a7f08af4075a4",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-23T05:49:23+00:00Z"
+ }
+}
