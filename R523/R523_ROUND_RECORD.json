@@ -1,0 +1,133 @@
+{
+  "artifact": "R523_MEASUREMENT_CLOSE/1.0",
+  "round": "R523",
+  "round_question": "What is the next largest current-production runtime sink after the proven R512-R522 removals?",
+  "created_at_utc": "2026-09-24",
+  "reviewer_provenance": "AI_REVIEW",
+  "status": "MEASUREMENT_CLOSED__CLIFF_NAMED__AFTER_ARM_AUTHORIZED",
+
+  "current_arm_configuration": {
+    "engine": "8f4fc755a20df507e7b928b859fc2d8af4711e52",
+    "engine_identity_verified_live": "api/version + api/health engine_commit == 8f4fc755..., drift GREEN, identity_tamper false",
+    "ENGINE_RETRIEVE_EXCLUDE_SOURCES": "openalex",
+    "ENGINE_EVIDENCE_FABRIC": "0",
+    "arm_label": "current",
+    "driver": "scripts/r523_battery_driver.py (wrapper over the frozen R519 driver; one implementation)"
+  },
+
+  "battery": {
+    "name": "R523-CURRENT-PRODUCTION-ATTRIBUTION",
+    "manifest": "R523/BATTERY_PROBLEMS.json",
+    "manifest_sha256": "590bffef9ea8d9cba7cfcfb8d49d018d1ed5a39a78169dd5ddf9cac591fa802e",
+    "n_problems": 6,
+    "n_families": 3,
+    "freshness": "46 unique prior scored ODI IDs excluded mechanically; no overlap",
+    "execution": "single-shot, fixed configuration, no tuning, all attempts recorded",
+    "session_ids": [
+      "ts_4b5c9a16bcc3", "ts_8f24aa36c146", "ts_78f576297be2",
+      "ts_d8d2c786b9b3", "ts_6cc14d4f8316", "ts_50f2ce369e92"
+    ],
+    "session_files": "R523/BATTERY_SESSIONS_CURRENT.json is local-only (Art. XLIV custody); never committed"
+  },
+
+  "measurement_coverage": {
+    "rows": 6,
+    "observation_source": "DURABLE_BRANCH (origin/runtime-state-hf); live API fallback not used",
+    "stage_table": "15-stage chain, every stage EXECUTED / SKIPPED_ADMISSION / SKIPPED_UPSTREAM_FAILURE / NOT_IN_LOG; no unexecuted stage scored as 0 s",
+    "retrieve_levels": ["stage wall", "sub-operations", "per-V2-source job wall", "critical-path identity"],
+    "provider_ledger": "per engine_stage role: provider, models, attempts, fallbacks, failure classes, provider-call wall, successful-call wall (OFFLINE_DERIVED from durable ledger bytes)"
+  },
+
+  "A_stage_rank_by_mean_wall_s": {
+    "RETRIEVE": 24.08,
+    "SYNTHESIZE": 11.714,
+    "MECHANISM_SPACE": 10.797,
+    "all_other_executed_stages": "<= 0.125",
+    "note": "5/6 runs are 38-61 s total; in-chain work is dominated by RETRIEVE+SYNTHESIZE+MECHANISM_SPACE"
+  },
+
+  "B_retrieve_attribution": {
+    "fanout_mean_s": 16.952,
+    "core_source": "critical path 4/6, successful, 125 records total — evidence-bearing, NOT avoidable waste",
+    "semantic_scholar": {
+      "mean_job_wall_s": 8.368,
+      "records": "0 on 6/6 jobs",
+      "states": ["unavailable", "other_typed_failure"],
+      "avoidable_candidate_flag": true,
+      "counterfactual_fanout_saving_mean_s": 0.826,
+      "note": "critically NOT a large cliff: on 4/6 problems core holds the fan-out critical path and semantic_scholar's ~9.3 s sits under it; exclusion counterfactual saving is ~0.8 s/run mean"
+    }
+  },
+
+  "D_provider_attribution": {
+    "POST_RANK_TECH_IMPROVEMENT": {
+      "provider_call_wall_s_mean": 1147.61,
+      "ok_call_wall_s_mean": 72.319,
+      "failure_wall_s": 1075.291,
+      "failure_classes": ["MODEL_FAILURE"],
+      "detail": "stage=TECHNICAL_STATE_EXTRACTION: zai/Atria-Dawn-Preview returned EMPTY content at finish_reason=length (max_tokens=3000) on attempts of 257.8 s and 817.5 s; xkiro first-OK 28.2 s / 24.6 s after every fallback"
+    },
+    "POST_RANK_GAUNTLET": {
+      "provider_call_wall_s_mean": 189.461,
+      "ok_call_wall_s": 0.0,
+      "n_ok": 0,
+      "detail": "stage=independent_attack: zai 182.7 s empty-content MODEL_FAILURE (max_tokens=2048), then unorouter RATE_LIMITED 429; 0/2 OK"
+    }
+  },
+
+  "named_cliff": {
+    "one_cliff": "post-rank technical-state-extraction provider-failure wall (zai EmptyContentWithFinish MODEL_FAILURE, finish_reason=length)",
+    "magnitude": "1075.3 s failure wall on the single measured run that reached technical improvement (problem_index 2, run wall 1523 s vs 38-61 s for the other 5)",
+    "wiring_defect": "technical_state.py:222 hard-codes 'zai' as FIRST preferred provider for purpose TECHNICAL_STATE_EXTRACTION, and provider_health.retirement_scopes_for_purpose() does not resolve that purpose to PURPOSE_POST_RANK_TECHNICAL — so zai's existing R518/R520 post-rank retirement never fires on this measured path (Art. XVI: implementation is not proof)",
+    "secondary_measured_component_same_class": "POST_RANK_GAUNTLET 189.461 s, 0/2 OK (zai empty-content + unorouter 429) — recorded as residual, NOT part of the one intervention",
+    "avoidable_action": "extend retirement_scopes_for_purpose() so technical_-prefixed purposes resolve the PURPOSE_POST_RANK_TECHNICAL scope; zai's existing retirement entry then filters it from the technical-state-extraction chain via the ONE centralized authority — no prompt, gate, budget, or engine-semantics change"
+  },
+
+  "decision_rule": "rank by measured avoidable wall = provider failure wall (+ zero-contribution source counterfactual); largest avoidable measured sink wins; at most ONE cliff",
+  "ranking_comparison": {
+    "post_rank_tech_improvement_failure_wall_per_run": 179.2,
+    "semantic_scholar_exclusion_counterfactual_per_run": 0.83,
+    "note": "expected-value per run: 1075.3/6 ~= 179 s/run vs ~0.8 s/run for semantic_scholar exclusion — order-of-magnitude dominance; decision is not close"
+  },
+
+  "classification": "CLIFF_NAMED_OPTIMIZATION_AUTHORIZED",
+  "classification_not": [
+    "NOT claimed: zai is universally bad (transport probe OK; zai is not retired from ROLE_ATTACK/independent_attack or ordinary synthesis)",
+    "NOT claimed: the gauntlet independent_attack zai exposure (189.5 s incl. unorouter 429) is fixed by this round — it is a recorded residual",
+    "NOT claimed: the current arm proves an end-to-end speedup — this is the measurement arm"
+  ],
+  "classification_scope": {
+    "one_cliff": "TECHNICAL_STATE_EXTRACTION provider-call failure waste (post-rank technical improvement pass)",
+    "out_of_scope": [
+      "linear ATTACK stage routing (independent_attack purpose stays zai-allowed; pinned by test_r519)",
+      "unorouter RATE_LIMITED cooldown policy",
+      "ENGINE_TS_MAX_TOKENS budget (no change)",
+      "all gates, prompts, admission, funnel, starvation, and evidence semantics",
+      "_title_of correctness defect (separate correctness round)"
+    ]
+  },
+
+  "quality_result_current_arm": {
+    "span_verbatim_rate": "1.0 on 6/6 durable rows",
+    "funnel": "OBSERVED_IN_STAGE on 6/6",
+    "starvation_typed": "COLLISION/ATTACK SKIPPED_ADMISSION with MINIMUM_DIVERSITY reasons 6/6; never zeroed",
+    "final_status": "MECHANISM_STARVED on 6/6 (0 or 1 distinct mechanisms)"
+  },
+
+  "clean_replay": {"result": "PASS", "note": "11/13 checks ok; 2 expected not-yet notes (after arm pending at measurement close)"},
+
+  "deployment": null,
+  "deployment_tuple": "pending after arm",
+
+  "remaining_blind_spots": [
+    "POST_RANK_GAUNTLET independent_attack zai exposure (189.5 s, 1/6) — not covered by this round's intervention; needs its own scoped measurement",
+    "semantic_scholar 0/6 records + ~9.4 s job wall — avoidable_candidate=true but counterfactual fanout saving ~0.8 s/run mean; NOT promoted (no large cliff)",
+    "zai empty-content root cause (finish_reason=length at max_tokens cap) is provider/model behavior — not diagnosed further this round",
+    "MECHANISM_STARVED on 6/6 runs — funnel yield is the Article LXXXIII instrument, separate from wall time"
+  ],
+
+  "session_files": "BATTERY_SESSIONS_CURRENT.json local-only (redacted mirror policy); not committed",
+  "immutable_state": "runtime-state-hf durable branch is the byte authority for all measured walls",
+  "parent_round": "R522",
+  "reviewer_provenance": "AI_REVIEW"
+}
