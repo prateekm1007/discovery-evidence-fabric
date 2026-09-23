@@ -1,6 +1,6 @@
 {
  "invention_id": {
-  "value": "inv:ui_fuel_pump_flow_failure_causing_engine_stal_178459:18f86e95c613",
+  "value": "inv:ui_fuel_pump_flow_failure_causing_engine_stal_178459:cd392b253e98",
   "epistemic_class": "COMPUTED",
   "origin_stage": "INVENTION_SPEC",
   "evidence_ids": [],
@@ -30,39 +30,76 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Closed-loop PID control with variable frequency drive (VFD) airflow regulation to dynamically match charge air temperature and pressure conditions, reducing pressure drop and stabilizing air-fuel ratio.",
-   "intervention": "Retrofit the 2021 Chevrolet Equinox fuel pump feed line with a closed-loop PID-controlled variable speed drive on the fuel pump, using manifold pressure and fuel rail pressure sensors as feedback to dynamically adjust pump speed and maintain target rail pressure under transient loads (acceleration, turning).",
-   "expected_effect": "Stabilized fuel rail pressure and flow during transient maneuvers (e.g., turn-lane acceleration), preventing momentary fuel starvation that causes engine stall, analogous to the 6–8% efficiency gain and pressure-drop reduction (10 kPa to 1.2 kPa) shown for the charge air system.",
-   "mechanism_source_span": "closed-loop PID controller was implemented on the engine dynamometer. The proposed setup enables accurate emulation of vehicle charge air temperature and pressure conditions under both stationary and transient operating modes.",
-   "span_derivation": null
+   "mechanism": "An air-to-air charge air cooler configuration incorporating a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller stabilizes charge air cooler delta temperature variation and air pulsation, reducing pressure drop, improving air density, stabilizing AFR, and reducing pumping loss under stationary and transient operating modes.",
+   "intervention": "Implement a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller on the engine dynamometer charge air circuit to emulate vehicle charge air cooler temperature and pressure conditions under both stationary and transient operating modes, replacing the conventional water-cooled CAC setup.",
+   "expected_effect": "Significant reduction in charge air cooler pressure drop (emulating the demonstrated reduction from 10 kPa to 1.2 kPa) and improved temperature control (emulating 49 °C to 39 °C), yielding a 6-8% efficiency improvement, more stable AFR, reduced air pulsation (pumping loss), and reduced stall-inducing flow transients.",
+   "mechanism_source_span": "a novel air-to-air (A2A) CAC configuration incorporating a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller was implemented on the engine dynamometer. The proposed setup enables accurate emulation of vehicle charge air temperature and pressure conditions under both stationary and transient operating modes.",
+   "span_derivation": {
+    "n_shared": 31,
+    "shared_terms": [
+     "air",
+     "airflow",
+     "both",
+     "cac",
+     "charge",
+     "closed",
+     "condition",
+     "configuration",
+     "controlled",
+     "controller",
+     "drive",
+     "dynamically",
+     "dynamometer",
+     "engine",
+     "frequency",
+     "incorporating",
+     "loop",
+     "mode",
+     "operating",
+     "pid"
+    ],
+    "span_terms_n": 38,
+    "ratio": 0.816,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "On a 2021 Chevrolet Equinox engine dynamometer charge air circuit, command the charge air cooler airflow via a variable frequency drive and closed-loop PID controller and measure pressure drop, delta temperature, AFR deviation, and air pulsation amplitude during a 0–100% transient torque sweep, compared against the conventional water-cooled CAC baseline.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.1038/s41598-026-53715-w",
+     "source_span": "a novel air-to-air (A2A) CAC configuration incorporating a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller was implemented on the engine dynamometer. The proposed setup enables accurate emulation of vehicle charge air temperature and pressure conditions under both stationary and transient operating modes."
+    }
+   }
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
   "evidence_ids": [
-   "doi:10.1038/s41598-026-53715-w"
+   "doi:10.1016/j.renene.2010.04.026"
   ],
   "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
  },
  "causal_chain": {
   "value": {
-   "source_observation": "Experimental emulation of charge air cooler temperature and pressure on an engine dynamometer for air-fuel ratio optimization and pulsation reduction.",
-   "mechanism": "Closed-loop PID control with variable frequency drive (VFD) airflow regulation to dynamically match charge air temperature and pressure conditions, reducing pressure drop and stabilizing air-fuel ratio.",
+   "source_observation": "UNKNOWN",
+   "mechanism": "Dynamically controlled actuator speed paired with closed-loop PID feedback emulates real-circuit fluid delivery conditions, stabilizing mass flow density and reducing pulsation-driven pumping variance in the supply circuit.",
    "intervention_site": "fuel pump system",
-   "expected_effect": "Stabilized fuel rail pressure and flow during transient maneuvers (e.g., turn-lane acceleration), preventing momentary fuel starvation that causes engine stall, analogous to the 6–8% efficiency gain and pressure-drop reduction (10 kPa to 1.2 kPa) shown for the charge air system.",
-   "falsification_test": "On a chassis dynamometer, induce repeated turn-lane acceleration events while monitoring fuel rail pressure with a high-speed transducer; the intervention passes if pressure deviation from target remains within ±2% during all transients and no stall occurs across 50 trials, and fails if any stall or pressure sag greater than 5% below target is observed, compared to a baseline reproduction of the stall on the unmodified pump."
+   "expected_effect": "Reduction in fuel rail pressure pulsation amplitude and tighter control of delivered fuel density, cutting stall-inducing flow transients and stabilizing commanded AFR under transient load.",
+   "falsification_test": "At the 2021 Chevrolet Equinox no-stall operating point, swapping fixed-duty pump control for closed-loop PID pump-speed control reduces peak-to-peak fuel rail pressure pulsation by at least one order of magnitude (analogous to the 10 kPa → 1.2 kPa charge-air drop observed) and lowers the coefficient of variation of metered fuel mass per stroke, which should eliminate the turn-lane stall under matched thermal and load transients."
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
   "evidence_ids": [
-   "doi:10.1038/s41598-026-53715-w"
+   "doi:10.1016/j.renene.2010.04.026"
   ],
   "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
  },
  "novelty_hypothesis": {
   "value": {
-   "collision_novelty_risk": null,
-   "prior_art_status": null,
-   "multi_source_directions": {}
+   "collision_novelty_risk": "ADJACENT_COLLISION_CANDIDATES",
+   "prior_art_status": "RESOLVED_DIFFERENTIATED",
+   "multi_source_directions": {},
+   "differentiation_resolution_state": "RESOLVED_DIFFERENTIATED"
   },
   "epistemic_class": "COMPUTED",
   "origin_stage": "COLLISION",
@@ -71,11 +108,1079 @@
  },
  "prior_art": {
   "value": {
-   "status": "",
+   "status": "RESOLVED_DIFFERENTIATED",
    "legacy_status": "",
-   "differentiation_resolution": {},
-   "nearest": [],
-   "queries": [],
+   "differentiation_resolution": {
+    "state": "RESOLVED_DIFFERENTIATED",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "CLAIMS:0 ABSTRACT:8 TITLE:0",
+    "per_family": [
+     {
+      "family_id": "PA-FAM-01",
+      "representative": {
+       "patent_id": "CN102388208B",
+       "title": "System and process for storing an additive and injecting it into the exhaust &hellip;",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/CN102388208B/en",
+       "assignee": "['因勒纪汽车系统研究公司']",
+       "publication_date": "2013-12-04"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "CN102388208B"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "System and process for storing an additive and injecting it into the exhaust &hellip; System for storing an additive solution and injecting it into the exhaust gases of an internal combustion engine, said system comprising at least one tank (10) for storing the additive, one pump (1) equipped with an inlet and an outlet and that is capable of generating a direct flow (in injection &hellip;  System for storing an additive solution and injecting it into the exhaust gases of an internal combustion engine, said system comprising at least one tank (10) for storing the additive, one pump (1) equipped with an inlet and an outlet and that is capable of generating a direct flow (in injection mode) or a reverse flow (in drawing off mode), at least two additive solution suction points and an injector (7), characterized in that a first suction point is connected to the pump inlet and is only active when the pump operates in injection mode and in that the second suction point is connected to the pump outlet and is only active when the pump operates in drawing off mode.",
+      "adjudicated_text_sha256": "1ab5ce1e0fd671e6286915fb72acefd85332c373767550098631c0bb553191b3",
+      "coverage": {
+       "coverage_class": "NONE",
+       "mechanism_overlap_terms": [
+        "system"
+       ],
+       "distinguishing_terms_covered": [
+        "engine",
+        "mode"
+       ],
+       "distinguishing_terms_surviving": [
+        "air",
+        "airflow",
+        "both",
+        "cac",
+        "charge",
+        "circuit",
+        "closed",
+        "condition",
+        "controlled",
+        "controller",
+        "conventional",
+        "cooled",
+        "cooler",
+        "drive",
+        "dynamically",
+        "dynamometer",
+        "emulate",
+        "frequency",
+        "loop",
+        "operating",
+        "pid",
+        "pressure",
+        "replacing",
+        "setup",
+        "stationary",
+        "temperature",
+        "transient",
+        "under",
+        "variable",
+        "vehicle",
+        "vfd",
+        "water"
+       ],
+       "coverage_ratio": 0.059,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-02",
+      "representative": {
+       "patent_id": "US20080178849A1",
+       "title": "Fuel pressure control",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/US20080178849A1/en",
+       "assignee": "['Ti Group Automotive Systems, Llc']",
+       "publication_date": "2008-07-31"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "US20080178849A1"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Fuel pressure control A method of relieving hot soak pressure in a fuel rail of a fuel injected internal combustion engine includes pressurizing fuel with a fuel pump when the engine is operating, and conveying the pressurized fuel through a check valve that prevents backflow of fuel from the fuel rail toward the fuel &hellip;  A method of relieving hot soak pressure in a fuel rail of a fuel injected internal combustion engine includes pressurizing fuel with a fuel pump when the engine is operating, and conveying the pressurized fuel through a check valve that prevents backflow of fuel from the fuel rail toward the fuel pump. A bypass path is in fluid communication between a location downstream of the check valve and a location downstream of the fuel pump and upstream of the check valve. The bypass path is opened when the engine is not operating so as to relieve fuel pressure downstream of the check valve to a level below a system operating pressure. Apparatuses are provided for carrying out the method.",
+      "adjudicated_text_sha256": "56b645b68c689f9b750bedef2514f5eee7ad4f58f458f210760f6df3165e8a0f",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "pressure",
+        "system"
+       ],
+       "distinguishing_terms_covered": [
+        "engine",
+        "operating",
+        "pressure"
+       ],
+       "distinguishing_terms_surviving": [
+        "air",
+        "airflow",
+        "both",
+        "cac",
+        "charge",
+        "circuit",
+        "closed",
+        "condition",
+        "controlled",
+        "controller",
+        "conventional",
+        "cooled",
+        "cooler",
+        "drive",
+        "dynamically",
+        "dynamometer",
+        "emulate",
+        "frequency",
+        "loop",
+        "mode",
+        "pid",
+        "replacing",
+        "setup",
+        "stationary",
+        "temperature",
+        "transient",
+        "under",
+        "variable",
+        "vehicle",
+        "vfd",
+        "water"
+       ],
+       "coverage_ratio": 0.088,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-03",
+      "representative": {
+       "patent_id": "JP4483974B2",
+       "title": "Fuel supply device",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/JP4483974B2/en",
+       "assignee": "['株式会社デンソー']",
+       "publication_date": "2010-06-16"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "JP4483974B2"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Fuel supply device A fuel supply device that supplies fuel in a fuel tank to a component of a high-pressure fuel system in an internal combustion engine and recirculates a part of the fuel increased in pressure in the component of the high-pressure fuel system to the fuel tank as surplus fuel There, A fuel pump that &hellip;  ",
+      "adjudicated_text_sha256": "581833d0925ab0e74e8bd3b477601c6fa835617bd939f3ff983fd2148cd0507f",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "pressure",
+        "system"
+       ],
+       "distinguishing_terms_covered": [
+        "engine",
+        "pressure"
+       ],
+       "distinguishing_terms_surviving": [
+        "air",
+        "airflow",
+        "both",
+        "cac",
+        "charge",
+        "circuit",
+        "closed",
+        "condition",
+        "controlled",
+        "controller",
+        "conventional",
+        "cooled",
+        "cooler",
+        "drive",
+        "dynamically",
+        "dynamometer",
+        "emulate",
+        "frequency",
+        "loop",
+        "mode",
+        "operating",
+        "pid",
+        "replacing",
+        "setup",
+        "stationary",
+        "temperature",
+        "transient",
+        "under",
+        "variable",
+        "vehicle",
+        "vfd",
+        "water"
+       ],
+       "coverage_ratio": 0.059,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-04",
+      "representative": {
+       "patent_id": "SU201115A1",
+       "title": "PUSHING SYSTEM",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/SU201115A1/en",
+       "assignee": "['А. Ю. Полиновский, Л. Б. Лещинер Б. С. Иванов']",
+       "publication_date": ""
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "SU201115A1"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "PUSHING SYSTEM Known fuel pumping systems from aircraft tanks to engine pumps with throttle control do not automatically control the system. For this reason, not all of the pressure created by the pump is useful and therefore the efficiency of the pumping unit is lower than the efficiency of the pump. In the &hellip;  ",
+      "adjudicated_text_sha256": "c8632e31d58c06d9a1b0149bad7ca8ad42a1fb190e7977746a86a4c366233ee2",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "pressure",
+        "pumping",
+        "system"
+       ],
+       "distinguishing_terms_covered": [
+        "engine",
+        "pressure"
+       ],
+       "distinguishing_terms_surviving": [
+        "air",
+        "airflow",
+        "both",
+        "cac",
+        "charge",
+        "circuit",
+        "closed",
+        "condition",
+        "controlled",
+        "controller",
+        "conventional",
+        "cooled",
+        "cooler",
+        "drive",
+        "dynamically",
+        "dynamometer",
+        "emulate",
+        "frequency",
+        "loop",
+        "mode",
+        "operating",
+        "pid",
+        "replacing",
+        "setup",
+        "stationary",
+        "temperature",
+        "transient",
+        "under",
+        "variable",
+        "vehicle",
+        "vfd",
+        "water"
+       ],
+       "coverage_ratio": 0.059,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-05",
+      "representative": {
+       "patent_id": "JP2009501867A",
+       "title": "FUEL CONVEYING DEVICE, Especially FUEL CONVEYING DEVICE FOR INTERNAL COMBUSTION &hellip;",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/JP2009501867A/en",
+       "assignee": "['ローベルト ボツシユ ゲゼルシヤフト ミツト ベシユレンクテル ハフツング']",
+       "publication_date": "2009-01-22"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "JP2009501867A"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "FUEL CONVEYING DEVICE, Especially FUEL CONVEYING DEVICE FOR INTERNAL COMBUSTION &hellip; The present invention is a fuel transfer device (1), which is provided with a piston pump (6) having a working chamber (104) and an adjustable throttle device (20), and the throttle device (20) The present invention relates to a type that is arranged upstream of the work chamber (104) and that can &hellip;  本発明は、燃料搬送装置（１）であって、作業室（１０４）を備えたピストンポンプ（６）と調節可能な絞り装置（２０）とが設けられており、該絞り装置（２０）が作業室（１０４）の上流に配置されていて、絞り装置（２０）を用いて作業室（１０４）への燃料の流入が変化可能である形式のものに関する。このような形式の燃料搬送装置において本発明の構成では、絞り装置（２０）が閉鎖された状態において作業室（１０４）に漏れ量が達するようになっており、ピストンポンプ（６）が漏れポンプ装置（１１３）を有していて、該漏れポンプ装置（１１３）が漏れ量を少なくとも部分的に作業室（１０４）から、絞り装置（２０）の上流に位置する低圧領域（８）に送るようにした。 The present invention is a fuel transfer device (1), which is provided with a piston pump (6) having a working chamber (104) and an adjustable throttle device (20), and the throttle device (20) The present invention relates to a type that is arranged upstream of the work chamber (104) and that can change the flow of fuel into the work chamber (104) using the expansion device (20). In the structure of the present invention in such a type of fuel transfer device, the leakage amount reac",
+      "adjudicated_text_sha256": "12c1b2e2c9d08c57bd307905ba71d2880b8b5d05ad84fe8cbfd19c13bd7459ca",
+      "coverage": {
+       "coverage_class": "NONE",
+       "mechanism_overlap_terms": [],
+       "distinguishing_terms_covered": [],
+       "distinguishing_terms_surviving": [
+        "air",
+        "airflow",
+        "both",
+        "cac",
+        "charge",
+        "circuit",
+        "closed",
+        "condition",
+        "controlled",
+        "controller",
+        "conventional",
+        "cooled",
+        "cooler",
+        "drive",
+        "dynamically",
+        "dynamometer",
+        "emulate",
+        "engine",
+        "frequency",
+        "loop",
+        "mode",
+        "operating",
+        "pid",
+        "pressure",
+        "replacing",
+        "setup",
+        "stationary",
+        "temperature",
+        "transient",
+        "under",
+        "variable",
+        "vehicle",
+        "vfd",
+        "water"
+       ],
+       "coverage_ratio": 0.0,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-06",
+      "representative": {
+       "patent_id": "US9623179B2",
+       "title": "Safeguarding techniques for a closed-loop insulin infusion system",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/US9623179B2/en",
+       "assignee": "['Medtronic Minimed, Inc.']",
+       "publication_date": "2017-04-18"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "US9623179B2"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Safeguarding techniques for a closed-loop insulin infusion system Processor-implemented methods of controlling an insulin infusion device for a user are provided here. A first method obtains and analyzes calibration factors (and corresponding timestamp data) for a continuous glucose sensor, and regulates entry into a closed-loop operating mode of the infusion &hellip;  Processor-implemented methods of controlling an insulin infusion device for a user are provided here. A first method obtains and analyzes calibration factors (and corresponding timestamp data) for a continuous glucose sensor, and regulates entry into a closed-loop operating mode of the infusion device based on the calibration factors and timestamp data. A second method obtains a most recent sensor glucose value and a target glucose setpoint value for the user at the outset of the closed-loop mode. The second method adjusts the closed-loop insulin infusion rate over time, in response to the sensor glucose value and the setpoint value. A third method calculates an upper insulin limit that applies to the insulin infusion rate during the closed-loop mode. The insulin limit is calculated based on a fasting blood glucose v",
+      "adjudicated_text_sha256": "86f9bc845e239eea604a58a942b8c4e23f572282b90bdbfc42cd4f70315e636f",
+      "coverage": {
+       "coverage_class": "NONE",
+       "mechanism_overlap_terms": [
+        "system"
+       ],
+       "distinguishing_terms_covered": [
+        "closed",
+        "loop",
+        "mode",
+        "operating"
+       ],
+       "distinguishing_terms_surviving": [
+        "air",
+        "airflow",
+        "both",
+        "cac",
+        "charge",
+        "circuit",
+        "condition",
+        "controlled",
+        "controller",
+        "conventional",
+        "cooled",
+        "cooler",
+        "drive",
+        "dynamically",
+        "dynamometer",
+        "emulate",
+        "engine",
+        "frequency",
+        "pid",
+        "pressure",
+        "replacing",
+        "setup",
+        "stationary",
+        "temperature",
+        "transient",
+        "under",
+        "variable",
+        "vehicle",
+        "vfd",
+        "water"
+       ],
+       "coverage_ratio": 0.118,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-07",
+      "representative": {
+       "patent_id": "US12402826B2",
+       "title": "Closed-loop vagus nerve stimulation",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/US12402826B2/en",
+       "assignee": "['Setpoint Medical Corporation']",
+       "publication_date": "2025-09-02"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "US12402826B2"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Closed-loop vagus nerve stimulation Devices, systems and methods for the treatment of chronic inflammatory disorders that include an implantable microstimulator and an external charger/controller wherein the microstimulator is configured to operate using closed-loop feedback. The feedback for the microstimulator can be electrical &hellip;  ",
+      "adjudicated_text_sha256": "e5c3877b195411b06233bad566e2dc1a3e3dd27fd13306704172ac57b4f40ac2",
+      "coverage": {
+       "coverage_class": "NONE",
+       "mechanism_overlap_terms": [
+        "system"
+       ],
+       "distinguishing_terms_covered": [
+        "closed",
+        "controller",
+        "loop"
+       ],
+       "distinguishing_terms_surviving": [
+        "air",
+        "airflow",
+        "both",
+        "cac",
+        "charge",
+        "circuit",
+        "condition",
+        "controlled",
+        "conventional",
+        "cooled",
+        "cooler",
+        "drive",
+        "dynamically",
+        "dynamometer",
+        "emulate",
+        "engine",
+        "frequency",
+        "mode",
+        "operating",
+        "pid",
+        "pressure",
+        "replacing",
+        "setup",
+        "stationary",
+        "temperature",
+        "transient",
+        "under",
+        "variable",
+        "vehicle",
+        "vfd",
+        "water"
+       ],
+       "coverage_ratio": 0.088,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-08",
+      "representative": {
+       "patent_id": "CN101960135A",
+       "title": "Device for feeding fuel",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/CN101960135A/en",
+       "assignee": "['罗伯特·博世有限公司']",
+       "publication_date": "2011-01-26"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "CN101960135A"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Device for feeding fuel Devices for feeding fuel are already known which have a storage pot which can be filled by means of a suction jet pump and which has a pot base with an intake opening which opens into an intake chamber of the suction jet pump and through which the suction jet pump sucks in fuel, wherein the intake &hellip;  ",
+      "adjudicated_text_sha256": "f91fcca6fa952a59757568d48d3e186f8bf77102a6c492463b0e14c1246a27c0",
+      "coverage": {
+       "coverage_class": "NONE",
+       "mechanism_overlap_terms": [],
+       "distinguishing_terms_covered": [],
+       "distinguishing_terms_surviving": [
+        "air",
+        "airflow",
+        "both",
+        "cac",
+        "charge",
+        "circuit",
+        "closed",
+        "condition",
+        "controlled",
+        "controller",
+        "conventional",
+        "cooled",
+        "cooler",
+        "drive",
+        "dynamically",
+        "dynamometer",
+        "emulate",
+        "engine",
+        "frequency",
+        "loop",
+        "mode",
+        "operating",
+        "pid",
+        "pressure",
+        "replacing",
+        "setup",
+        "stationary",
+        "temperature",
+        "transient",
+        "under",
+        "variable",
+        "vehicle",
+        "vfd",
+        "water"
+       ],
+       "coverage_ratio": 0.0,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     }
+    ],
+    "n_families": 8,
+    "n_search_errors": 0,
+    "search_errors": [],
+    "search_execution": {
+     "mandatory_complete": true,
+     "n_errors": 0,
+     "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+    },
+    "relevance_model_version": "collision_resolution/2.0.0",
+    "determinism_contract": {
+     "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+     "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+    },
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    },
+    "surviving_differentiators": [
+     "air",
+     "airflow",
+     "both",
+     "cac",
+     "charge",
+     "circuit",
+     "closed",
+     "condition",
+     "controlled",
+     "controller",
+     "conventional",
+     "cooled",
+     "cooler",
+     "drive",
+     "dynamically",
+     "dynamometer",
+     "emulate",
+     "engine",
+     "frequency",
+     "loop",
+     "mode",
+     "operating",
+     "pid",
+     "pressure",
+     "replacing",
+     "setup",
+     "stationary",
+     "temperature",
+     "transient",
+     "under",
+     "variable",
+     "vehicle",
+     "vfd",
+     "water"
+    ]
+   },
+   "nearest": [
+    {
+     "patent_id": "CN102388208B",
+     "title": "System and process for storing an additive and injecting it into the exhaust &hellip;",
+     "url": "https://patents.google.com/patent/CN102388208B/en",
+     "family_id": "PA-FAM-01",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "flow",
+      "pump"
+     ],
+     "distinguishing_terms_covered": [
+      "pump"
+     ],
+     "distinguishing_terms_surviving": [
+      "apply",
+      "closed",
+      "commanding",
+      "controller",
+      "demand",
+      "downstream",
+      "drive",
+      "driver",
+      "duty",
+      "dynamometer",
+      "emulating",
+      "equivalently",
+      "error",
+      "fixed",
+      "frequency",
+      "fuel",
+      "governed",
+      "loop",
+      "motor",
+      "pid",
+      "pressure",
+      "pwm",
+      "rail",
+      "rather",
+      "regulated",
+      "replace",
+      "speed",
+      "temperature",
+      "track",
+      "variable",
+      "vehicle",
+      "voltage"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.03
+    },
+    {
+     "patent_id": "US20080178849A1",
+     "title": "Fuel pressure control",
+     "url": "https://patents.google.com/patent/US20080178849A1/en",
+     "family_id": "PA-FAM-02",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "fuel",
+      "pump"
+     ],
+     "distinguishing_terms_covered": [
+      "downstream",
+      "fuel",
+      "pressure",
+      "pump",
+      "rail"
+     ],
+     "distinguishing_terms_surviving": [
+      "apply",
+      "closed",
+      "commanding",
+      "controller",
+      "demand",
+      "drive",
+      "driver",
+      "duty",
+      "dynamometer",
+      "emulating",
+      "equivalently",
+      "error",
+      "fixed",
+      "frequency",
+      "governed",
+      "loop",
+      "motor",
+      "pid",
+      "pwm",
+      "rather",
+      "regulated",
+      "replace",
+      "speed",
+      "temperature",
+      "track",
+      "variable",
+      "vehicle",
+      "voltage"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.152
+    },
+    {
+     "patent_id": "JP4483974B2",
+     "title": "Fuel supply device",
+     "url": "https://patents.google.com/patent/JP4483974B2/en",
+     "family_id": "PA-FAM-03",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "fuel",
+      "pump"
+     ],
+     "distinguishing_terms_covered": [
+      "fuel",
+      "pressure",
+      "pump"
+     ],
+     "distinguishing_terms_surviving": [
+      "apply",
+      "closed",
+      "commanding",
+      "controller",
+      "demand",
+      "downstream",
+      "drive",
+      "driver",
+      "duty",
+      "dynamometer",
+      "emulating",
+      "equivalently",
+      "error",
+      "fixed",
+      "frequency",
+      "governed",
+      "loop",
+      "motor",
+      "pid",
+      "pwm",
+      "rail",
+      "rather",
+      "regulated",
+      "replace",
+      "speed",
+      "temperature",
+      "track",
+      "variable",
+      "vehicle",
+      "voltage"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.091
+    },
+    {
+     "patent_id": "SU201115A1",
+     "title": "PUSHING SYSTEM",
+     "url": "https://patents.google.com/patent/SU201115A1/en",
+     "family_id": "PA-FAM-04",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "fuel",
+      "pump"
+     ],
+     "distinguishing_terms_covered": [
+      "fuel",
+      "pressure",
+      "pump"
+     ],
+     "distinguishing_terms_surviving": [
+      "apply",
+      "closed",
+      "commanding",
+      "controller",
+      "demand",
+      "downstream",
+      "drive",
+      "driver",
+      "duty",
+      "dynamometer",
+      "emulating",
+      "equivalently",
+      "error",
+      "fixed",
+      "frequency",
+      "governed",
+      "loop",
+      "motor",
+      "pid",
+      "pwm",
+      "rail",
+      "rather",
+      "regulated",
+      "replace",
+      "speed",
+      "temperature",
+      "track",
+      "variable",
+      "vehicle",
+      "voltage"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.091
+    },
+    {
+     "patent_id": "JP2009501867A",
+     "title": "FUEL CONVEYING DEVICE, Especially FUEL CONVEYING DEVICE FOR INTERNAL COMBUSTION &hellip;",
+     "url": "https://patents.google.com/patent/JP2009501867A/en",
+     "family_id": "PA-FAM-05",
+     "family_size": 2,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "closed",
+      "flow",
+      "fuel",
+      "pump"
+     ],
+     "distinguishing_terms_covered": [
+      "closed",
+      "fuel",
+      "pressure",
+      "pump"
+     ],
+     "distinguishing_terms_surviving": [
+      "apply",
+      "commanding",
+      "controller",
+      "demand",
+      "downstream",
+      "drive",
+      "driver",
+      "duty",
+      "dynamometer",
+      "emulating",
+      "equivalently",
+      "error",
+      "fixed",
+      "frequency",
+      "governed",
+      "loop",
+      "motor",
+      "pid",
+      "pwm",
+      "rail",
+      "rather",
+      "regulated",
+      "replace",
+      "speed",
+      "temperature",
+      "track",
+      "variable",
+      "vehicle",
+      "voltage"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.121
+    },
+    {
+     "patent_id": "US9623179B2",
+     "title": "Safeguarding techniques for a closed-loop insulin infusion system",
+     "url": "https://patents.google.com/patent/US9623179B2/en",
+     "family_id": "PA-FAM-06",
+     "family_size": 2,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "closed",
+      "loop"
+     ],
+     "distinguishing_terms_covered": [
+      "apply",
+      "closed",
+      "loop"
+     ],
+     "distinguishing_terms_surviving": [
+      "commanding",
+      "controller",
+      "demand",
+      "downstream",
+      "drive",
+      "driver",
+      "duty",
+      "dynamometer",
+      "emulating",
+      "equivalently",
+      "error",
+      "fixed",
+      "frequency",
+      "fuel",
+      "governed",
+      "motor",
+      "pid",
+      "pressure",
+      "pump",
+      "pwm",
+      "rail",
+      "rather",
+      "regulated",
+      "replace",
+      "speed",
+      "temperature",
+      "track",
+      "variable",
+      "vehicle",
+      "voltage"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.091
+    },
+    {
+     "patent_id": "US12402826B2",
+     "title": "Closed-loop vagus nerve stimulation",
+     "url": "https://patents.google.com/patent/US12402826B2/en",
+     "family_id": "PA-FAM-07",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "closed",
+      "loop"
+     ],
+     "distinguishing_terms_covered": [
+      "closed",
+      "controller",
+      "loop"
+     ],
+     "distinguishing_terms_surviving": [
+      "apply",
+      "commanding",
+      "demand",
+      "downstream",
+      "drive",
+      "driver",
+      "duty",
+      "dynamometer",
+      "emulating",
+      "equivalently",
+      "error",
+      "fixed",
+      "frequency",
+      "fuel",
+      "governed",
+      "motor",
+      "pid",
+      "pressure",
+      "pump",
+      "pwm",
+      "rail",
+      "rather",
+      "regulated",
+      "replace",
+      "speed",
+      "temperature",
+      "track",
+      "variable",
+      "vehicle",
+      "voltage"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.091
+    },
+    {
+     "patent_id": "CN101960135A",
+     "title": "Device for feeding fuel",
+     "url": "https://patents.google.com/patent/CN101960135A/en",
+     "family_id": "PA-FAM-08",
+     "family_size": 2,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "fuel",
+      "pump"
+     ],
+     "distinguishing_terms_covered": [
+      "fuel",
+      "pump"
+     ],
+     "distinguishing_terms_surviving": [
+      "apply",
+      "closed",
+      "commanding",
+      "controller",
+      "demand",
+      "downstream",
+      "drive",
+      "driver",
+      "duty",
+      "dynamometer",
+      "emulating",
+      "equivalently",
+      "error",
+      "fixed",
+      "frequency",
+      "governed",
+      "loop",
+      "motor",
+      "pid",
+      "pressure",
+      "pwm",
+      "rail",
+      "rather",
+      "regulated",
+      "replace",
+      "speed",
+      "temperature",
+      "track",
+      "variable",
+      "vehicle",
+      "voltage"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.061
+    }
+   ],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "flow fuel pump system documented problem"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "flow stabilizing density pulsation dynamically controlled"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "replace voltage regulated fuel pump closed loop pid"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "flow reduction pulsation density cutting inducing"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "flow fuel pulsation density stabilizing pump"
+    }
+   ],
    "scientific": []
   },
   "epistemic_class": "COMPUTED",
@@ -85,22 +1190,463 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Retrofit the 2021 Chevrolet Equinox fuel pump feed line with a closed-loop PID-controlled variable speed drive on the fuel pump, using manifold pressure and fuel rail pressure sensors as feedback to dynamically adjust pump speed and maintain target rail pressure under transient loads (acceleration, turning).",
-   "vs_nearest_prior_art": [],
-   "surviving_differentiators": null,
+   "intervention": "Implement a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller on the engine dynamometer charge air circuit to emulate vehicle charge air cooler temperature and pressure conditions under both stationary and transient operating modes, replacing the conventional water-cooled CAC setup.",
+   "vs_nearest_prior_art": [
+    {
+     "patent_id": "CN102388208B",
+     "title": "System and process for storing an additive and injecting it into the exhaust &hellip;",
+     "family_id": "PA-FAM-01",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "NONE",
+     "coverage_ratio": 0.059,
+     "mechanism_overlap_terms": [
+      "system"
+     ],
+     "distinguishing_terms_covered": [
+      "engine",
+      "mode"
+     ],
+     "distinguishing_terms_surviving": [
+      "air",
+      "airflow",
+      "both",
+      "cac",
+      "charge",
+      "circuit",
+      "closed",
+      "condition",
+      "controlled",
+      "controller",
+      "conventional",
+      "cooled",
+      "cooler",
+      "drive",
+      "dynamically",
+      "dynamometer",
+      "emulate",
+      "frequency",
+      "loop",
+      "operating",
+      "pid",
+      "pressure",
+      "replacing",
+      "setup",
+      "stationary",
+      "temperature",
+      "transient",
+      "under",
+      "variable",
+      "vehicle",
+      "vfd",
+      "water"
+     ]
+    },
+    {
+     "patent_id": "US20080178849A1",
+     "title": "Fuel pressure control",
+     "family_id": "PA-FAM-02",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.088,
+     "mechanism_overlap_terms": [
+      "pressure",
+      "system"
+     ],
+     "distinguishing_terms_covered": [
+      "engine",
+      "operating",
+      "pressure"
+     ],
+     "distinguishing_terms_surviving": [
+      "air",
+      "airflow",
+      "both",
+      "cac",
+      "charge",
+      "circuit",
+      "closed",
+      "condition",
+      "controlled",
+      "controller",
+      "conventional",
+      "cooled",
+      "cooler",
+      "drive",
+      "dynamically",
+      "dynamometer",
+      "emulate",
+      "frequency",
+      "loop",
+      "mode",
+      "pid",
+      "replacing",
+      "setup",
+      "stationary",
+      "temperature",
+      "transient",
+      "under",
+      "variable",
+      "vehicle",
+      "vfd",
+      "water"
+     ]
+    },
+    {
+     "patent_id": "JP4483974B2",
+     "title": "Fuel supply device",
+     "family_id": "PA-FAM-03",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.059,
+     "mechanism_overlap_terms": [
+      "pressure",
+      "system"
+     ],
+     "distinguishing_terms_covered": [
+      "engine",
+      "pressure"
+     ],
+     "distinguishing_terms_surviving": [
+      "air",
+      "airflow",
+      "both",
+      "cac",
+      "charge",
+      "circuit",
+      "closed",
+      "condition",
+      "controlled",
+      "controller",
+      "conventional",
+      "cooled",
+      "cooler",
+      "drive",
+      "dynamically",
+      "dynamometer",
+      "emulate",
+      "frequency",
+      "loop",
+      "mode",
+      "operating",
+      "pid",
+      "replacing",
+      "setup",
+      "stationary",
+      "temperature",
+      "transient",
+      "under",
+      "variable",
+      "vehicle",
+      "vfd",
+      "water"
+     ]
+    },
+    {
+     "patent_id": "SU201115A1",
+     "title": "PUSHING SYSTEM",
+     "family_id": "PA-FAM-04",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.059,
+     "mechanism_overlap_terms": [
+      "pressure",
+      "pumping",
+      "system"
+     ],
+     "distinguishing_terms_covered": [
+      "engine",
+      "pressure"
+     ],
+     "distinguishing_terms_surviving": [
+      "air",
+      "airflow",
+      "both",
+      "cac",
+      "charge",
+      "circuit",
+      "closed",
+      "condition",
+      "controlled",
+      "controller",
+      "conventional",
+      "cooled",
+      "cooler",
+      "drive",
+      "dynamically",
+      "dynamometer",
+      "emulate",
+      "frequency",
+      "loop",
+      "mode",
+      "operating",
+      "pid",
+      "replacing",
+      "setup",
+      "stationary",
+      "temperature",
+      "transient",
+      "under",
+      "variable",
+      "vehicle",
+      "vfd",
+      "water"
+     ]
+    },
+    {
+     "patent_id": "JP2009501867A",
+     "title": "FUEL CONVEYING DEVICE, Especially FUEL CONVEYING DEVICE FOR INTERNAL COMBUSTION &hellip;",
+     "family_id": "PA-FAM-05",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "NONE",
+     "coverage_ratio": 0.0,
+     "mechanism_overlap_terms": [],
+     "distinguishing_terms_covered": [],
+     "distinguishing_terms_surviving": [
+      "air",
+      "airflow",
+      "both",
+      "cac",
+      "charge",
+      "circuit",
+      "closed",
+      "condition",
+      "controlled",
+      "controller",
+      "conventional",
+      "cooled",
+      "cooler",
+      "drive",
+      "dynamically",
+      "dynamometer",
+      "emulate",
+      "engine",
+      "frequency",
+      "loop",
+      "mode",
+      "operating",
+      "pid",
+      "pressure",
+      "replacing",
+      "setup",
+      "stationary",
+      "temperature",
+      "transient",
+      "under",
+      "variable",
+      "vehicle",
+      "vfd",
+      "water"
+     ]
+    },
+    {
+     "patent_id": "US9623179B2",
+     "title": "Safeguarding techniques for a closed-loop insulin infusion system",
+     "family_id": "PA-FAM-06",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "NONE",
+     "coverage_ratio": 0.118,
+     "mechanism_overlap_terms": [
+      "system"
+     ],
+     "distinguishing_terms_covered": [
+      "closed",
+      "loop",
+      "mode",
+      "operating"
+     ],
+     "distinguishing_terms_surviving": [
+      "air",
+      "airflow",
+      "both",
+      "cac",
+      "charge",
+      "circuit",
+      "condition",
+      "controlled",
+      "controller",
+      "conventional",
+      "cooled",
+      "cooler",
+      "drive",
+      "dynamically",
+      "dynamometer",
+      "emulate",
+      "engine",
+      "frequency",
+      "pid",
+      "pressure",
+      "replacing",
+      "setup",
+      "stationary",
+      "temperature",
+      "transient",
+      "under",
+      "variable",
+      "vehicle",
+      "vfd",
+      "water"
+     ]
+    },
+    {
+     "patent_id": "US12402826B2",
+     "title": "Closed-loop vagus nerve stimulation",
+     "family_id": "PA-FAM-07",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "NONE",
+     "coverage_ratio": 0.088,
+     "mechanism_overlap_terms": [
+      "system"
+     ],
+     "distinguishing_terms_covered": [
+      "closed",
+      "controller",
+      "loop"
+     ],
+     "distinguishing_terms_surviving": [
+      "air",
+      "airflow",
+      "both",
+      "cac",
+      "charge",
+      "circuit",
+      "condition",
+      "controlled",
+      "conventional",
+      "cooled",
+      "cooler",
+      "drive",
+      "dynamically",
+      "dynamometer",
+      "emulate",
+      "engine",
+      "frequency",
+      "mode",
+      "operating",
+      "pid",
+      "pressure",
+      "replacing",
+      "setup",
+      "stationary",
+      "temperature",
+      "transient",
+      "under",
+      "variable",
+      "vehicle",
+      "vfd",
+      "water"
+     ]
+    },
+    {
+     "patent_id": "CN101960135A",
+     "title": "Device for feeding fuel",
+     "family_id": "PA-FAM-08",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "NONE",
+     "coverage_ratio": 0.0,
+     "mechanism_overlap_terms": [],
+     "distinguishing_terms_covered": [],
+     "distinguishing_terms_surviving": [
+      "air",
+      "airflow",
+      "both",
+      "cac",
+      "charge",
+      "circuit",
+      "closed",
+      "condition",
+      "controlled",
+      "controller",
+      "conventional",
+      "cooled",
+      "cooler",
+      "drive",
+      "dynamically",
+      "dynamometer",
+      "emulate",
+      "engine",
+      "frequency",
+      "loop",
+      "mode",
+      "operating",
+      "pid",
+      "pressure",
+      "replacing",
+      "setup",
+      "stationary",
+      "temperature",
+      "transient",
+      "under",
+      "variable",
+      "vehicle",
+      "vfd",
+      "water"
+     ]
+    }
+   ],
+   "surviving_differentiators": [
+    "air",
+    "airflow",
+    "both",
+    "cac",
+    "charge",
+    "circuit",
+    "closed",
+    "condition",
+    "controlled",
+    "controller",
+    "conventional",
+    "cooled",
+    "cooler",
+    "drive",
+    "dynamically",
+    "dynamometer",
+    "emulate",
+    "engine",
+    "frequency",
+    "loop",
+    "mode",
+    "operating",
+    "pid",
+    "pressure",
+    "replacing",
+    "setup",
+    "stationary",
+    "temperature",
+    "transient",
+    "under",
+    "variable",
+    "vehicle",
+    "vfd",
+    "water"
+   ],
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
   "evidence_ids": [
-   "doi:10.1038/s41598-026-53715-w"
+   "doi:10.1016/j.renene.2010.04.026"
   ],
   "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
  },
  "constraints": {
   "value": {
    "stated_constraint": "investigation must apply to a 2021 Chevrolet Equinox with no active recall",
-   "failure_mode_of_device": "fuel pump flow failure causing engine stall"
+   "failure_mode_of_device": "fuel pump flow failure causing engine stall",
+   "evidence_derived": [
+    {
+     "constraint": "The A2A CAC emulation setup with VFD and closed-loop PID controller must replicate vehicle charge air temperature and pressure conditions under both stationary and transient operating modes on the engine dynamometer.",
+     "evidence_id": "doi:10.1038/s41598-026-53715-w",
+     "span": "a novel air-to-air (A2A) CAC configuration incorporating a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller was implemented on the engine dynamometer. The proposed setup enables accurate emulation of vehicle charge air temperature and pres"
+    }
+   ]
   },
   "epistemic_class": "SOURCE_FACT",
   "origin_stage": "PROBLEM",
@@ -368,7 +1914,28 @@
   "note": "custodied evidence with content hashes"
  },
  "uncertainties": {
-  "value": [],
+  "value": [
+   {
+    "unresolved_source": "flow fuel pump system documented problem",
+    "error": "HTTP 401: {\"reference\":\"e4f44ddd-6e6d-4013-b115-074213441040\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "flow stabilizing density pulsation dynamically controlled",
+    "error": "HTTP 401: {\"reference\":\"b0817387-b7ae-425b-b6a9-74964f5e32f5\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "replace voltage regulated fuel pump closed loop pid",
+    "error": "HTTP 401: {\"reference\":\"61615047-9913-4b8f-8a7a-b7fa95cde22b\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "flow reduction pulsation density cutting inducing",
+    "error": "HTTP 401: {\"reference\":\"c11c5a22-8426-401c-823d-e4493c5e75be\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "flow fuel pulsation density stabilizing pump",
+    "error": "HTTP 401: {\"reference\":\"35c64d8d-7ef5-47c1-8832-fbbd3aab5e6e\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   }
+  ],
   "epistemic_class": "COMPUTED",
   "origin_stage": "CONTRADICTION",
   "evidence_ids": [],
@@ -379,7 +1946,7 @@
    {
     "assumption": "mechanism transfers across domain context",
     "basis": "MODELLED",
-    "test": "On a chassis dynamometer, induce repeated turn-lane acceleration events while monitoring fuel rail pressure with a high-speed transducer; the intervention passes if pressure deviation from target remains within ±2% during all transients and no stall occurs across 50 trials, and fails if any stall or pressure sag greater than 5% below target is observed, compared to a baseline reproduction of the stall on the unmodified pump."
+    "test": "At the 2021 Chevrolet Equinox no-stall operating point, swapping fixed-duty pump control for closed-loop PID pump-speed control reduces peak-to-peak fuel rail pressure pulsation by at least one order of magnitude (analogous to the 10 kPa → 1.2 kPa charge-air drop observed) and lowers the coefficient of variation of metered fuel mass per stroke, which should eliminate the turn-lane stall under matched thermal and load transients."
    },
    {
     "assumption": "searched sources approximate the prior-art universe",
@@ -395,7 +1962,7 @@
  "provenance": {
   "value": {
    "run_id": "engrun:ui_fuel_pump_flow_failure_causing_engine_stal_178459:2026-09-23T15:47:40",
-   "final_envelope_hash": "18f86e95c6130b01914982d9296192e254d0149ce454d5db3298882aa4000eb9",
+   "final_envelope_hash": "cd392b253e98b321e1aa47290f098c821cbe3d0bf90466077a0af1e15c59c4c4",
    "final_status": "UNKNOWN",
    "adjudication_verdict": "CONTESTED",
    "ranking": {
@@ -423,7 +1990,7 @@
     "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
    },
    "code_commit": null,
-   "built_at": "2026-09-23T15:48:33+00:00Z"
+   "built_at": "2026-09-23T15:48:47+00:00Z"
   },
   "epistemic_class": "COMPUTED",
   "origin_stage": "INVENTION_SPEC",
@@ -1580,10 +3147,274 @@
   "verdict": "CONTESTED",
   "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
  },
- "_spec_hash": "3fcb7fb3c5e5b6b112791bcaf970f4134b986695356a8ddfdd9775e51ca1cc2a",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
-  "checked_at": "2026-09-23T15:48:33+00:00Z"
- }
+  "checked_at": "2026-09-23T15:48:47+00:00Z"
+ },
+ "_mechanism_space_candidate": {
+  "marker": "MECHANISM_SPACE_CANDIDATE",
+  "transformation_operator": "DIRECT_TRANSFER",
+  "mechanism_support_state": "PARTIALLY_SUPPORTED",
+  "support_counts": {
+   "SUPPORTS": 0,
+   "PARTIALLY_SUPPORTS": 12,
+   "CONTRADICTS": 0,
+   "IRRELEVANT": 0,
+   "NOT_ENOUGH_EVIDENCE": 1
+  },
+  "contradictions_visible": [],
+  "consequence": "the E16-H release gate holds this dossier for human review unless mechanism-level evidence support is SUPPORTED; contradictions and partial support are never converted (R401 Phase 4)"
+ },
+ "_improvement": {
+  "parent_spec_hash": "6784c1340b10220e463efbdd41939bea925c21a52775e8482caa2df78a818f6f",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:ab59afea38d3",
+   "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.574,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:d7183b0b7ba6",
+    "provider": "xkiro",
+    "model": "minimax/minimax-m3:free",
+    "prompt_hash": "5ae2b0c01a8e56c8f9f1f999b9354dfcb613f615fc960cc719abab921c799265",
+    "output_hash": "d7183b0b7ba6c2e8ec13766a7c8a26a0326e28542bea3227a56de7241a010c1f",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.1038/s41598-026-53715-w",
+     "span_verbatim_in_evidence": true,
+     "evidence_support": 0.902,
+     "evidence_support_cleared": 0.902,
+     "constraint_traceable_to_evidence": "The A2A CAC emulation setup with VFD and closed-loop PID controller must replicate vehicle charge air temperature and pr"
+    },
+    "reasons": [],
+    "validated_at": "2026-09-23T15:51:10+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "A dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller stabilizes mass flow density in the supply circuit, reducing pulsation-driven pumping variance and stabilizing commanded air-fuel ratio under transient load in the fuel rail.",
+     "after": "An air-to-air charge air cooler configuration incorporating a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller stabilizes charge air cooler delta temperature variation and air pulsation, reducing pressure drop, improving air density, stabi"
+    },
+    "intervention": {
+     "before": "Replace the fixed/voltage-regulated fuel pump driver with a variable frequency drive on the pump motor governed by a closed-loop PID controller that tracks downstream fuel rail pressure and temperature, emulating in-vehicle demand on the dynamometer under both stationary and transient operating mode",
+     "after": "Implement a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller on the engine dynamometer charge air circuit to emulate vehicle charge air cooler temperature and pressure conditions under both stationary and transient operating modes, replaci"
+    },
+    "mechanism_source_span": {
+     "before": "a novel air-to-air (A2A) CAC configuration incorporating a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller was implemented on the engine dynamometer. The proposed setup enables accurate emulation of vehicle charge air temperature and pres",
+     "after": "a novel air-to-air (A2A) CAC configuration incorporating a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller was implemented on the engine dynamometer. The proposed setup enables accurate emulation of vehicle charge air temperature and pres"
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "flow fuel pump system documented problem",
+     "flow stabilizing density pulsation dynamically controlled",
+     "replace voltage regulated fuel pump closed loop pid",
+     "flow reduction pulsation density cutting inducing",
+     "flow fuel pulsation density stabilizing pump"
+    ],
+    "collision_family_ids": [
+     "PA-FAM-01",
+     "PA-FAM-02",
+     "PA-FAM-03",
+     "PA-FAM-04",
+     "PA-FAM-05",
+     "PA-FAM-06",
+     "PA-FAM-07",
+     "PA-FAM-08"
+    ],
+    "source_errors": []
+   },
+   "parent_spec_hash": "6784c1340b10220e463efbdd41939bea925c21a52775e8482caa2df78a818f6f",
+   "child_spec_hash": null,
+   "reason": "Re-anchors the mechanism's non-generic vocabulary to verbatim terms from the custodied evidence (A2A CAC, VFD, closed-loop PID, stationary and transient operating modes) to repair the I1_MECHANISM_EVIDENCE_DERIVATION weakness.",
+   "applied_at": "2026-09-23T15:51:10+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:be9c43646f94",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.269,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:366d2b72b7cf",
+     "provider": "xkiro",
+     "model": "minimax/minimax-m3:free",
+     "prompt_hash": "dcea1ad90c96d4cd15e46387b4dd78444f248a321bbadee29c83468a856aedc1",
+     "output_hash": "366d2b72b7cf7f9029f73b895a621c24034ce72d5d80b822ccbef01686f5f1d4",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1038/s41598-026-53715-w",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 24,
+       "shared_terms": [
+        "air",
+        "airflow",
+        "both",
+        "closed",
+        "controlled",
+        "controller",
+        "drive",
+        "dynamically",
+        "dynamometer",
+        "frequency",
+        "loop",
+        "mode",
+        "operating",
+        "pid",
+        "pressure",
+        "stationary",
+        "system",
+        "temperature",
+        "transient",
+        "under"
+       ],
+       "span_terms_n": 38,
+       "ratio": 0.632,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 0.632
+     },
+     "reasons": [],
+     "validated_at": "2026-09-23T15:51:01+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Dynamically controlled actuator speed paired with closed-loop PID feedback emulates real-circuit fluid delivery conditions, stabilizing mass flow density and reducing pulsation-driven pumping variance in the supply circuit.",
+      "after": "A dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller stabilizes mass flow density in the supply circuit, reducing pulsation-driven pumping variance and stabilizing commanded air-fuel ratio under transient load in the fuel rail."
+     },
+     "intervention": {
+      "before": "Replace the fixed/voltage-regulated fuel pump driver with a variable frequency drive on the pump motor governed by a closed-loop PID controller that tracks downstream fuel rail pressure and temperature emulating in-vehicle demand on the dynamometer (and applies equivalently to in-vehicle control by ",
+      "after": "Replace the fixed/voltage-regulated fuel pump driver with a variable frequency drive on the pump motor governed by a closed-loop PID controller that tracks downstream fuel rail pressure and temperature, emulating in-vehicle demand on the dynamometer under both stationary and transient operating mode"
+     },
+     "mechanism_source_span": {
+      "before": "a novel air-to-air (A2A) CAC configuration incorporating a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller was implemented on the engine dynamometer. The proposed setup enables accurate emulation of vehicle charge air temperature and pres",
+      "after": "a novel air-to-air (A2A) CAC configuration incorporating a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller was implemented on the engine dynamometer. The proposed setup enables accurate emulation of vehicle charge air temperature and pres"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "flow fuel pump system documented problem",
+      "flow stabilizing density pulsation dynamically controlled",
+      "replace voltage regulated fuel pump closed loop pid",
+      "flow reduction pulsation density cutting inducing",
+      "flow fuel pulsation density stabilizing pump"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05",
+      "PA-FAM-06",
+      "PA-FAM-07",
+      "PA-FAM-08"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "801d537f6112952b2070e7562f2797193b398d3b9e7ff01580b0ec3c68e7b3fb",
+    "child_spec_hash": null,
+    "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness (0.269 < 0.7) by re-deriving the mechanism and intervention from a verbatim span whose own technical vocabulary (VFD, closed-loop PID, dynamically controlled, stationary and transient operating modes, pulsation/pumping loss) is reused in the mechanism and intervention, raising the span-derivation ratio above the 0.20 floor.",
+    "applied_at": "2026-09-23T15:51:01+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:ab59afea38d3",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.574,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:d7183b0b7ba6",
+     "provider": "xkiro",
+     "model": "minimax/minimax-m3:free",
+     "prompt_hash": "5ae2b0c01a8e56c8f9f1f999b9354dfcb613f615fc960cc719abab921c799265",
+     "output_hash": "d7183b0b7ba6c2e8ec13766a7c8a26a0326e28542bea3227a56de7241a010c1f",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1038/s41598-026-53715-w",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.902,
+      "evidence_support_cleared": 0.902,
+      "constraint_traceable_to_evidence": "The A2A CAC emulation setup with VFD and closed-loop PID controller must replicate vehicle charge air temperature and pr"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-23T15:51:10+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "A dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller stabilizes mass flow density in the supply circuit, reducing pulsation-driven pumping variance and stabilizing commanded air-fuel ratio under transient load in the fuel rail.",
+      "after": "An air-to-air charge air cooler configuration incorporating a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller stabilizes charge air cooler delta temperature variation and air pulsation, reducing pressure drop, improving air density, stabi"
+     },
+     "intervention": {
+      "before": "Replace the fixed/voltage-regulated fuel pump driver with a variable frequency drive on the pump motor governed by a closed-loop PID controller that tracks downstream fuel rail pressure and temperature, emulating in-vehicle demand on the dynamometer under both stationary and transient operating mode",
+      "after": "Implement a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller on the engine dynamometer charge air circuit to emulate vehicle charge air cooler temperature and pressure conditions under both stationary and transient operating modes, replaci"
+     },
+     "mechanism_source_span": {
+      "before": "a novel air-to-air (A2A) CAC configuration incorporating a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller was implemented on the engine dynamometer. The proposed setup enables accurate emulation of vehicle charge air temperature and pres",
+      "after": "a novel air-to-air (A2A) CAC configuration incorporating a dynamically controlled airflow system using a variable frequency drive (VFD) and a closed-loop PID controller was implemented on the engine dynamometer. The proposed setup enables accurate emulation of vehicle charge air temperature and pres"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "flow fuel pump system documented problem",
+      "flow stabilizing density pulsation dynamically controlled",
+      "replace voltage regulated fuel pump closed loop pid",
+      "flow reduction pulsation density cutting inducing",
+      "flow fuel pulsation density stabilizing pump"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05",
+      "PA-FAM-06",
+      "PA-FAM-07",
+      "PA-FAM-08"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "6784c1340b10220e463efbdd41939bea925c21a52775e8482caa2df78a818f6f",
+    "child_spec_hash": null,
+    "reason": "Re-anchors the mechanism's non-generic vocabulary to verbatim terms from the custodied evidence (A2A CAC, VFD, closed-loop PID, stationary and transient operating modes) to repair the I1_MECHANISM_EVIDENCE_DERIVATION weakness.",
+    "applied_at": "2026-09-23T15:51:10+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "7382942289e4656205220668f0ebfc2ce4f2af4d0a03b744191175b5c4095005"
 }
