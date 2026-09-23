@@ -458,6 +458,26 @@ def harvest_row(dest: Path, run_files, ledger_lines, idx, source_id,
         e["stage"] for e in row["stage_table"]
         if e.get("entry_class") == "EXECUTED"
         and e["stage"] not in roles]
+    # ledger-only phases: provider-call roles with NO stage_log entry
+    # (e.g. the post-rank pipeline, which runs after RANK outside the
+    # stage table). Measured via the ledger, explicitly unstaged —
+    # never folded into a stage wall, never zero.
+    staged = {e["stage"] for e in row["stage_table"]}
+    row["ledger_only_phases"] = {
+        role: led[role] for role in roles if role not in staged}
+    # run residual: run wall minus the executed stage walls
+    # (inter-stage overhead + unstaged pipelines). OFFLINE_DERIVED.
+    stage_sum = sum(e.get("wall_s") or 0 for e in row["stage_table"]
+                    if e.get("entry_class") == "EXECUTED")
+    row["run_residual_s"] = {
+        "class": "OFFLINE_DERIVED",
+        "run_wall_s": row["run_wall_s"],
+        "executed_stage_sum_s": round(stage_sum, 3),
+        "residual_s": (round(row["run_wall_s"] - stage_sum, 3)
+                       if row["run_wall_s"] is not None else None),
+        "note": "residual covers unstaged pipelines (e.g. post-rank) "
+                "plus inter-stage overhead; see ledger_only_phases",
+    }
 
     # RETRIEVE two-level + COLLISION + quality
     row["retrieve_two_level"] = _retrieve_two_level(
@@ -735,7 +755,7 @@ def harvest_arm() -> int:
                              "note": "session not on durable branch yet"})
                 print(f"#{idx} {sid}: not on durable branch yet")
                 continue
-            dest = tmp / slug
+            dest = tmp / "runs" / slug
             dest.mkdir(parents=True, exist_ok=True)
             fl = _git("ls-tree", "--name-only",
                       f"{branch}:runs/{slug}", timeout=120)
@@ -826,6 +846,14 @@ def compare(base_path, opt_path, out_path):
                 "before_fallbacks": ba.get("n_fallback_hops"),
                 "after_fallbacks": bb.get("n_fallback_hops"),
             }
+        pair["ledger_only_phases"] = {
+            "before": sorted((ra.get("ledger_only_phases") or {}).keys()),
+            "after": sorted((rb.get("ledger_only_phases") or {}).keys()),
+        }
+        pair["run_residual_s"] = {
+            "before": (ra.get("run_residual_s") or {}).get("residual_s"),
+            "after": (rb.get("run_residual_s") or {}).get("residual_s"),
+        }
         pairs.append(pair)
     agg = {}
     for tag, rows in (("before", [ar[i] for i in sorted(
