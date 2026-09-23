@@ -1,0 +1,1066 @@
+{
+ "invention_id": {
+  "value": "inv:ui_sudden_engine_stall_after_unintended_accel_146102:5b5668ddd614",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_sudden_engine_stall_after_unintended_accel_146102",
+   "device": "2020 Hyundai Elantra engine system",
+   "failure": "Documented problem 'sudden engine stall after unintended acceleration' concerning 2020 Hyundai Elantra engine system. User-submitted engineering problem (session input): \"[R521-BATTERY declared_family=thermal source=odi:11289328 battery=R521-STAGE-ATTRIBUTION-after]\n\nTL* THE CONTACT DROVE A 2020 HYUNDAI ELANTRA LOANER VEHICLE. WHILE THE CONTACT'S SON WAS DRIVING, THE VEHICLE REVVED TO APPROXIMATELY 80 MPH AND THEN SUDDENLY STALLED. THE DRIVER STATED THAT THE CHECK EN\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "sudden engine stall after unintended acceleration",
+   "constraint": "Solution must address the documented failure mode without introducing a larger one."
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:bfff89a7"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of 2020 Hyundai Elantra engine system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Cyclic variation of external parameters can extract ensemble-average energy from a chaotic, non-integrable two-degree-of-freedom system, with symmetry breaking enabling the energy decrement.",
+   "intervention": "Apply a controlled cyclic modulation of an external vehicle parameter (e.g., throttle plate position via the electronic throttle control, or alternator/voltage-setpoint cycling tied to the ETCS duty cycle) in synchrony with the idle/acceleration event window, using a calibrated cycle amplitude/frequency to bias the engine's internal energy state downward when unintended high-RPM conditions are detected.",
+   "expected_effect": "During a detected unintended-revving event, the cyclic parameter modulation lowers the ensemble-average energy delivered to the drivetrain, reducing the runaway RPM surge and forcing a controlled return to idle, thereby preventing the subsequent sudden stall rather than allowing open-loop acceleration.",
+   "mechanism_source_span": "we devise a system with two degrees of freedom whose ensemble average energy, starting with a microcanical ensemble, decreases after a cyclic variation of its",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.48550/arxiv.1903.02690"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Energy extraction of a chaotic system in a cyclic process: a Szilárd Engine perspective",
+   "mechanism": "Cyclic variation of external parameters can extract ensemble-average energy from a chaotic, non-integrable two-degree-of-freedom system, with symmetry breaking enabling the energy decrement.",
+   "intervention_site": "2020 Hyundai Elantra engine system",
+   "expected_effect": "During a detected unintended-revving event, the cyclic parameter modulation lowers the ensemble-average energy delivered to the drivetrain, reducing the runaway RPM surge and forcing a controlled return to idle, thereby preventing the subsequent sudden stall rather than allowing open-loop acceleration.",
+   "falsification_test": "On a dynamometer, repeatedly trigger the unintended-revving fault condition (disconnected pedal sensor signal, simulated) with the intervention disabled vs. enabled across ≥30 trials; record peak RPM, time-to-stall, and whether a controlled stall (RPM ramp-down to commanded idle) occurs. If the enabled-intervention trials do not show a statistically significant reduction in peak RPM and a controlled descent to idle versus the disabled trials (e.g., paired t-test p<0.05, ≥30% reduction in peak surge RPM), the mechanism is falsified for this application."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.48550/arxiv.1903.02690"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Apply a controlled cyclic modulation of an external vehicle parameter (e.g., throttle plate position via the electronic throttle control, or alternator/voltage-setpoint cycling tied to the ETCS duty cycle) in synchrony with the idle/acceleration event window, using a calibrated cycle amplitude/frequency to bias the engine's internal energy state downward when unintended high-RPM conditions are detected.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.48550/arxiv.1903.02690"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "Solution must address the documented failure mode without introducing a larger one.",
+   "failure_mode_of_device": "sudden engine stall after unintended acceleration"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:bfff89a7"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: During a detected unintended-revving event, the cyclic parameter modulation lowers the ensemble-average energy delivered to the drivetrain, reducing the runaway RPM surge and forcing a controlled retu",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-23T06:50:35.598649+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-23T06:50:35.598649+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1121/1.5067566",
+    "title": "A study on sudden unintended acceleration estimation engine sounds by vehicle type",
+    "source_uri": "https://doi.org/10.1121/1.5067566",
+    "doi": "10.1121/1.5067566",
+    "content_hash": "45bd66e6645e217e34dd21d4beb1afaaf7b442b1b1d600821e8b9987986d3ab3",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1007/s12239-020-0101-0",
+    "title": "Experimental Investigation to Analyze the Effects of Oil Dilution on Unintended Acceleration in a Diesel Engine",
+    "source_uri": "https://doi.org/10.1007/s12239-020-0101-0",
+    "doi": "10.1007/s12239-020-0101-0",
+    "content_hash": "82b7077be8bebcb8ccad1fb8883fabdf45b5501bc9166130a277591db3163751",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1115/gt2020-14409",
+    "title": "Controller Design for Acceleration and Deceleration of a Turbofan Aircraft Engine",
+    "source_uri": "https://doi.org/10.1115/gt2020-14409",
+    "doi": "10.1115/gt2020-14409",
+    "content_hash": "0d819a0bce7af93b0ab01a7ef186f0d5edcd6e14a6e8698bba69117ad11d1344",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.37099/mtu.dc.etdr/897",
+    "title": "OPTIMIZATION OF DIESEL ENGINE AND AFTER-TREATMENT SYSTEM FOR SERIES HYBRID FORKLIFT APPLICATION",
+    "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/897",
+    "doi": "10.37099/mtu.dc.etdr/897",
+    "content_hash": "58ff1ccb86b469a3cf6fec283d1084037f8e40de9f230cd78c1e3c5c1288ab80",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.22215/etd/2006-08102",
+    "title": "Design and validation of an experiment for the detection and prediction of stall and surge in a PT6/T400 turboshaft engine",
+    "source_uri": "https://doi.org/10.22215/etd/2006-08102",
+    "doi": "10.22215/etd/2006-08102",
+    "content_hash": "f69c6b75532dd1469b66eac7bae492a3b3eaf7320b7b61e13f1fdcaaef0b42d1",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.22215/etd/1977-13015",
+    "title": "A computer aided turbojet engine trimming system",
+    "source_uri": "https://doi.org/10.22215/etd/1977-13015",
+    "doi": "10.22215/etd/1977-13015",
+    "content_hash": "bfe95b42051d93ab9579419cb3b0095908936fd5ba8b370c0e0ede06e4bf8ade",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1903.02690",
+    "title": "Energy extraction of a chaotic system in a cyclic process: a Szilárd Engine perspective",
+    "source_uri": "https://doi.org/10.48550/arxiv.1903.02690",
+    "doi": "10.48550/arxiv.1903.02690",
+    "content_hash": "fa97a573c8e7458ef077d1e59f4759a2f2dea48c9ce1e007b60dc529d3d4a8bb",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2201.05326",
+    "title": "Security Orchestration, Automation, and Response Engine for Deployment of Behavioural Honeypots",
+    "source_uri": "https://doi.org/10.48550/arxiv.2201.05326",
+    "doi": "10.48550/arxiv.2201.05326",
+    "content_hash": "5030229a8074198f2fe626e87fea17375de153fe3edfabc3dd1f14b81a1cd5b6",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2606.22283",
+    "title": "Apple Neural Engine: Architecture, Programming, and Performance",
+    "source_uri": "https://doi.org/10.48550/arxiv.2606.22283",
+    "doi": "10.48550/arxiv.2606.22283",
+    "content_hash": "4581d4731adc379b4dc19e908889b7875de672a556b5f9d238ab1fa95248f93e",
+    "frozen": false
+   },
+   {
+    "id": "title:c0e31b48791b3684",
+    "title": "Alerta: Revisarán Vehículos Hyundai Elantra por falla en cinturones de seguridad",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "689eeee88aca1bad9857323acef45e397a16a046e34fc555058fdc53bed46ceb",
+    "frozen": false
+   },
+   {
+    "id": "title:6a090663bf2e9f2a",
+    "title": "Improving the efficiency of the technological process of diagnostics and repair of the gearbox of the Hyundai Elantra car",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "138106fab459ebbf895245a4f334b031c126a6f626d7e1dc43919db702ee14d4",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4271/cphy1_13myelant",
+    "title": "J1349 Certified Power Engine Data for Hyundai as used in 2013 MY Elantra, Elantra GT, Elantra Blue and Elantra Coupe - Level 1",
+    "source_uri": "https://doi.org/10.4271/cphy1_13myelant",
+    "doi": "10.4271/cphy1_13myelant",
+    "content_hash": "d8fcd661e05908f99c95028770596cbe0cf5e2c68466c5abff94a41572b8c5ee",
+    "frozen": false
+   },
+   {
+    "id": "title:4acf5c228410ccdb",
+    "title": "Automotores Gildemeister Perú llama a revisión vehículos Hyundai Elantra fabricados entre el 2008 y 2009",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "18a4b959ca378fccb4a801edcffee49eae4e7f5160eb608e9c4ca40b92754bf6",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1007/s12239-020-0101-0",
+   "doi:10.1115/gt2020-14409",
+   "doi:10.1121/1.5067566",
+   "doi:10.22215/etd/1977-13015",
+   "doi:10.22215/etd/2006-08102",
+   "doi:10.37099/mtu.dc.etdr/897",
+   "doi:10.4271/cphy1_13myelant",
+   "doi:10.48550/arxiv.1903.02690",
+   "doi:10.48550/arxiv.2201.05326",
+   "doi:10.48550/arxiv.2606.22283",
+   "title:4acf5c228410ccdb",
+   "title:6a090663bf2e9f2a",
+   "title:c0e31b48791b3684"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "On a dynamometer, repeatedly trigger the unintended-revving fault condition (disconnected pedal sensor signal, simulated) with the intervention disabled vs. enabled across ≥30 trials; record peak RPM, time-to-stall, and whether a controlled stall (RPM ramp-down to commanded idle) occurs. If the enabled-intervention trials do not show a statistically significant reduction in peak RPM and a controlled descent to idle versus the disabled trials (e.g., paired t-test p<0.05, ≥30% reduction in peak surge RPM), the mechanism is falsified for this application."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_sudden_engine_stall_after_unintended_accel_146102:2026-09-23T06:48:22",
+   "final_envelope_hash": "5b5668ddd614212c1262b9046ebd29fc48c43178541f0df8f2e230cbcdc8037a",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-23T06:50:35+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-23T06:50:35+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1121/1.5067566": {
+   "id": "doi:10.1121/1.5067566",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1121/1.5067566",
+   "source_uri": "https://doi.org/10.1121/1.5067566",
+   "title": "A study on sudden unintended acceleration estimation engine sounds by vehicle type",
+   "abstract": "",
+   "doi": "10.1121/1.5067566",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2018",
+   "retrieval_timestamp": "2026-09-23T06:49:34.326780+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "45bd66e6645e217e34dd21d4beb1afaaf7b442b1b1d600821e8b9987986d3ab3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1121/1.5067566"
+    },
+    "queries_by_source": {
+     "crossref": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1121/1.5067566",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1007/s12239-020-0101-0": {
+   "id": "doi:10.1007/s12239-020-0101-0",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1007/s12239-020-0101-0",
+   "source_uri": "https://doi.org/10.1007/s12239-020-0101-0",
+   "title": "Experimental Investigation to Analyze the Effects of Oil Dilution on Unintended Acceleration in a Diesel Engine",
+   "abstract": "",
+   "doi": "10.1007/s12239-020-0101-0",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-09-23T06:49:34.326910+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "82b7077be8bebcb8ccad1fb8883fabdf45b5501bc9166130a277591db3163751",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1007/s12239-020-0101-0"
+    },
+    "queries_by_source": {
+     "crossref": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1007/s12239-020-0101-0",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1115/gt2020-14409": {
+   "id": "doi:10.1115/gt2020-14409",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1115/gt2020-14409",
+   "source_uri": "https://doi.org/10.1115/gt2020-14409",
+   "title": "Controller Design for Acceleration and Deceleration of a Turbofan Aircraft Engine",
+   "abstract": "",
+   "doi": "10.1115/gt2020-14409",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-09-23T06:49:34.326962+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0d819a0bce7af93b0ab01a7ef186f0d5edcd6e14a6e8698bba69117ad11d1344",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1115/gt2020-14409"
+    },
+    "queries_by_source": {
+     "crossref": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1115/gt2020-14409",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.37099/mtu.dc.etdr/897": {
+   "id": "doi:10.37099/mtu.dc.etdr/897",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.37099/mtu.dc.etdr/897",
+   "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/897",
+   "title": "OPTIMIZATION OF DIESEL ENGINE AND AFTER-TREATMENT SYSTEM FOR SERIES HYBRID FORKLIFT APPLICATION",
+   "abstract": "",
+   "doi": "10.37099/mtu.dc.etdr/897",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:49:34.326999+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "58ff1ccb86b469a3cf6fec283d1084037f8e40de9f230cd78c1e3c5c1288ab80",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.37099/mtu.dc.etdr/897"
+    },
+    "queries_by_source": {
+     "crossref": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.37099/mtu.dc.etdr/897",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.22215/etd/2006-08102": {
+   "id": "doi:10.22215/etd/2006-08102",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.22215/etd/2006-08102",
+   "source_uri": "https://doi.org/10.22215/etd/2006-08102",
+   "title": "Design and validation of an experiment for the detection and prediction of stall and surge in a PT6/T400 turboshaft engine",
+   "abstract": "",
+   "doi": "10.22215/etd/2006-08102",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:49:34.327033+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f69c6b75532dd1469b66eac7bae492a3b3eaf7320b7b61e13f1fdcaaef0b42d1",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.22215/etd/2006-08102"
+    },
+    "queries_by_source": {
+     "crossref": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.22215/etd/2006-08102",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.22215/etd/1977-13015": {
+   "id": "doi:10.22215/etd/1977-13015",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.22215/etd/1977-13015",
+   "source_uri": "https://doi.org/10.22215/etd/1977-13015",
+   "title": "A computer aided turbojet engine trimming system",
+   "abstract": "",
+   "doi": "10.22215/etd/1977-13015",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:49:34.327064+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bfe95b42051d93ab9579419cb3b0095908936fd5ba8b370c0e0ede06e4bf8ade",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.22215/etd/1977-13015"
+    },
+    "queries_by_source": {
+     "crossref": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.22215/etd/1977-13015",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.1903.02690": {
+   "id": "doi:10.48550/arxiv.1903.02690",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1903.02690v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.1903.02690",
+   "title": "Energy extraction of a chaotic system in a cyclic process: a Szilárd Engine perspective",
+   "abstract": "Inspired by the available examples of Microcanonical Szilárd Engines and by the original Szilárd Engine, we devise a system with two degrees of freedom whose ensemble average energy, starting with a microcanical ensemble, decreases after a cyclic variation of its external parameters. We use the Ergodic Adiabatic Theorem to motivate our cycle and numerical simulations to check the decrement in the average energy. We then compare our system to the aforementioned Szilárd Engines, Microcanonical or not, and speculate about symmetry breaking being the cause of energy extraction in cyclic processes, even when non-integrability and chaos are present.",
+   "doi": "10.48550/arxiv.1903.02690",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:49:34.327093+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "fa97a573c8e7458ef077d1e59f4759a2f2dea48c9ce1e007b60dc529d3d4a8bb",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1903.02690v2"
+    },
+    "queries_by_source": {
+     "arxiv": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1903.02690",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/1903.02690v2",
+   "authors": [
+    "Artur Soriani",
+    "Marcus V. S. Bonança"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2201.05326": {
+   "id": "doi:10.48550/arxiv.2201.05326",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2201.05326v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2201.05326",
+   "title": "Security Orchestration, Automation, and Response Engine for Deployment of Behavioural Honeypots",
+   "abstract": "Cyber Security is a critical topic for organizations with IT/OT networks as they are always susceptible to attack, whether insider or outsider. Since the cyber landscape is an ever-evolving scenario, one must keep upgrading its security systems to enhance the security of the infrastructure. Tools like Security Information and Event Management (SIEM), Endpoint Detection and Response (EDR), Threat Intelligence Platform (TIP), Information Technology Service Management (ITSM), along with other defensive techniques like Intrusion Detection System (IDS), Intrusion Protection System (IPS), and many others enhance the cyber security posture of the infrastructure. However, the proposed protection mechanisms have their limitations, they are insufficient to ensure security, and the attacker penetrates the network. Deception technology, along with Honeypots, provides a false sense of vulnerability in the target systems to the attackers. The attacker deceived reveals threat intel about their modus operandi. We have developed a Security Orchestration, Automation, and Response (SOAR) Engine that dynamically deploys custom honeypots inside the internal network infrastructure based on the attacker's behavior. The architecture is robust enough to support multiple VLANs connected to the system and used for orchestration. The presence of botnet traffic and DDOS attacks on the honeypots in the network is detected, along with a malware collection system. After being exposed to live traffic for four days, our engine dynamically orchestrated the honeypots 40 times, detected 7823 attacks, 965 DDOS attack packets, and three malicious samples. While our experiments with static honeypots show an average attacker engagement time of 102 seconds per instance, our SOAR Engine-based dynamic honeypots engage attackers on average 3148 seconds.",
+   "doi": "10.48550/arxiv.2201.05326",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:49:34.327128+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5030229a8074198f2fe626e87fea17375de153fe3edfabc3dd1f14b81a1cd5b6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2201.05326v1"
+    },
+    "queries_by_source": {
+     "arxiv": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2201.05326",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2201.05326v1",
+   "authors": [
+    "Upendra Bartwal",
+    "Subhasis Mukhopadhyay",
+    "Rohit Negi",
+    "Sandeep Shukla"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2606.22283": {
+   "id": "doi:10.48550/arxiv.2606.22283",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2606.22283v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2606.22283",
+   "title": "Apple Neural Engine: Architecture, Programming, and Performance",
+   "abstract": "The Apple Neural Engine (ANE) is the fixed-function matrix accelerator that has shipped in Apple systems-on-chip since the A11-class iPhone and iPad chips and the M1-class Mac chips, exposed to applications only through the Core ML model framework. This guide reports a reverse-engineered account of the engine, based on direct measurement on Apple silicon and static analysis of the private runtime, compiler, kernel driver, and firmware. It documents the datapath and the roofline that bound the engine's throughput and energy, the dispatch route that reaches it below Core ML, the compiler and on-disk program format, the weight-compression scheme, and the kernel driver, firmware, and command protocol beneath them. The account covers the A11 through A18 and M1 through M5 families, with per-chip target tables and an operation-by-device matrix; the direct measurements are on the M1 and M5. Claims are labeled as measured, decompile-derived, or predicted, and the methodology and open questions are recorded. The direct route is callable from ordinary user space but remains undocumented, unsupported, and version-fragile; it is intended for measurement, research, and on-device work, not for shipping software, where Core ML remains the supported path.",
+   "doi": "10.48550/arxiv.2606.22283",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:49:34.327379+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4581d4731adc379b4dc19e908889b7875de672a556b5f9d238ab1fa95248f93e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2606.22283v1"
+    },
+    "queries_by_source": {
+     "arxiv": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2606.22283",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2606.22283v1",
+   "authors": [
+    "Spencer H. Bryngelson"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "title:c0e31b48791b3684": {
+   "id": "title:c0e31b48791b3684",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:138237577",
+   "source_uri": "",
+   "title": "Alerta: Revisarán Vehículos Hyundai Elantra por falla en cinturones de seguridad",
+   "abstract": "La empresa Automotores Gildemeister del Perú S.A. revisará 1005 vehículos de la marca Hyundai, modelos Elantra CN7 y CN7 N, 2022 y 2023, fabricados entre el 08 de diciembre de 2020 y el 14 de mayo de 2022, debido a que el pretensor del cinturón de seguridad delantero podría experimentar un mal funcionamiento, causando posibles lesiones a sus ocupantes; así lo informó el Indecopi a través de su Sistema de Alertas de Productos y Servicios Peligrosos",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:49:34.327428+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "689eeee88aca1bad9857323acef45e397a16a046e34fc555058fdc53bed46ceb",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:138237577"
+    },
+    "queries_by_source": {
+     "core": "2020 hyundai elantra engine system sudden experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:c0e31b48791b3684",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 hyundai elantra engine system sudden experimental comparison",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:6a090663bf2e9f2a": {
+   "id": "title:6a090663bf2e9f2a",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:158530423",
+   "source_uri": "",
+   "title": "Improving the efficiency of the technological process of diagnostics and repair of the gearbox of the Hyundai Elantra car",
+   "abstract": "Метою розробки кваліфікаційної роботи є підвищення ефективності технологічного процесу діагностики і ремонту коробки передач автомобіля Hyundai Elantra в умовах автотранспортного підприємства. \r\nВизначено основні проблеми, які виникають під час проведення перевірки технічного стану транспортних засобів. Запропоновано шляхи вирішення проблеми діагностики технічного стану системи живлення методом впровадження нового обладнанняThe purpose of the qualification thesis is to improve the efficiency of the technological process of diagnosing and repairing gearbox of the Hyundai Elantra car in the conditions of a motor transport enterprise.\r\nThe main problems that arise during the inspection of the technical state of vehicles have been identified. Ways to solve the problem of diagnosing the technical state of the power supply system by implementing new equipment are proposed.ВСТУП\r\n1\tЗАГАЛЬНО-ТЕХНІЧНИЙ РОЗДІЛ\r\n1.1 Загальна характеристика  ТОВ \" ТеркКоАвто Центр \r\n1.2 Аналіз існуючих конструкцій коробок передач автомобілів \r\n1.3 Організація і схема управління підрозділом з використанням ЦУВ\r\n1.4 Недоліки існуючого технологічного процесу ремонту коробки передач автомобілів та пропозиції щодо його вдосконалення\r\n1.5 Короткі відомості про автомобіль Hyundai Elantra \r\n2 ТЕХНОЛОГІЧНИЙ РОЗДІЛ\r\n2.1 Розрахунок кількості автомобілів, що обслуговуються на СТОА за рік..\r\n2.2 Визначення трудомісткості робіт \r\n2.3  Розрахунок кількості робітників \r\n2.4  Характеристика операцій які виконуються які виконуються в проектованій дільниці \r\n2.5  Розрахунок площі та обґрунтування планувальних рішень\r\n2.6 Технічна характеристика коробки передач автомобіля Hyundai Elantra \r\n2.7 Призначення, будова і принцип дії коробки передач автомобіля Hyundai Elantra \r\n2.8  Ремонт і перевірка коробки передач автомобіля Hyundai Elantra \r\n2.9  Несправності коробки передач і їх усунення \r\n2.10  Організація технологічного процесу дефектування первинного валу та складання маршрутів відновлення\r\n2.11  Обгрунтування та вибір оптимальних методів відновлення первинного валу\r\n2.12Розробка структурної послідовності технологічного процесу відновлення первинного валу\r\n3 КОНСТРУКТОРСЬКИЙ РОЗДІЛ\r\n3.1 Вибір стенду для фіксації КПП при ремонті \r\n3.2  Обгрутування вибору стенду для розбирання КПП                                                                    \r\n3.3 Розрахунок основних елементів конструкції стенду\r\n4 ОХ",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:49:34.327567+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "138106fab459ebbf895245a4f334b031c126a6f626d7e1dc43919db702ee14d4",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:158530423"
+    },
+    "queries_by_source": {
+     "core": "2020 hyundai elantra engine system sudden experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:6a090663bf2e9f2a",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 hyundai elantra engine system sudden experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Кифоренко, Владислав Вадимович",
+    "Kyforenko, Vladyslav"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.4271/cphy1_13myelant": {
+   "id": "doi:10.4271/cphy1_13myelant",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4271/cphy1_13myelant",
+   "source_uri": "https://doi.org/10.4271/cphy1_13myelant",
+   "title": "J1349 Certified Power Engine Data for Hyundai as used in 2013 MY Elantra, Elantra GT, Elantra Blue and Elantra Coupe - Level 1",
+   "abstract": "",
+   "doi": "10.4271/cphy1_13myelant",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:49:34.327608+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d8fcd661e05908f99c95028770596cbe0cf5e2c68466c5abff94a41572b8c5ee",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4271/cphy1_13myelant"
+    },
+    "queries_by_source": {
+     "crossref": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=standard"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4271/cphy1_13myelant",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 Hyundai Elantra engine system sudden engine stall after unintended acceleration",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "title:4acf5c228410ccdb": {
+   "id": "title:4acf5c228410ccdb",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:89671975",
+   "source_uri": "",
+   "title": "Automotores Gildemeister Perú llama a revisión vehículos Hyundai Elantra fabricados entre el 2008 y 2009",
+   "abstract": "Automotores Gildemeister Perú S.A., representante de la marca Hyundai en el Perú, informó al Instituto Nacional de Defensa de la Competencia y de la Protección de la Propiedad Intelectual (Indecopi) sobre el llamado a revisión de los vehículos modelo Elantra, fabricados entre el 2 de enero de 2008 y el 22 de agosto de 2009",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:49:34.327638+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "18a4b959ca378fccb4a801edcffee49eae4e7f5160eb608e9c4ca40b92754bf6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:89671975"
+    },
+    "queries_by_source": {
+     "core": "2020 hyundai elantra engine system sudden experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:4acf5c228410ccdb",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2020 hyundai elantra engine system sudden experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Gerencia de Promoción y Difusión, Indecopi"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:bfff89a7": {
+   "id": "problem:bfff89a7",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "bfff89a73e327e87001bad718c73c7bcd1b08606512d02ecffb9ffd0e0db7ae5",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "082c9a0eee233b4f23af52b31a859a1c2f1d68185d25c8bae06adfa369522ce3",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-23T06:50:35+00:00Z"
+ }
+}
