@@ -1,6 +1,6 @@
 {
  "artifact": "R521_CLEAN_REPLAY/1.0",
- "ran_at_utc": "2026-09-23T05:04:15Z",
+ "ran_at_utc": "2026-09-23T07:04:42Z",
  "checks": [
   {
    "name": "manifest_present_and_ok",
@@ -67,8 +67,59 @@
   },
   {
    "name": "after_harvest_present",
-   "ok": null,
-   "detail": "harvest not run yet (not failed)"
+   "ok": true,
+   "detail": {
+    "rows": 6
+   }
+  },
+  {
+   "name": "after_manifest_sha_matches",
+   "ok": true,
+   "detail": {
+    "harvest": "0be6d2a8357d",
+    "manifest": "0be6d2a8357d"
+   }
+  },
+  {
+   "name": "after_arm_label_consistent",
+   "ok": true,
+   "detail": {}
+  },
+  {
+   "name": "after_stage_table_discipline",
+   "ok": true,
+   "detail": {
+    "violations": []
+   }
+  },
+  {
+   "name": "after_ledger_consistency",
+   "ok": true,
+   "detail": {
+    "violations": []
+   }
+  },
+  {
+   "name": "after_retrieve_two_level_present",
+   "ok": true,
+   "detail": {
+    "durable_rows": 6,
+    "with_two_level": 6
+   }
+  },
+  {
+   "name": "after_live_span_discipline",
+   "ok": true,
+   "detail": {
+    "violations": []
+   }
+  },
+  {
+   "name": "after_funnel_typed",
+   "ok": true,
+   "detail": {
+    "violations": []
+   }
   },
   {
    "name": "secret_scan_clean",
@@ -78,9 +129,29 @@
    }
   },
   {
-   "name": "cliff_intervention_checks",
-   "ok": null,
-   "detail": "ABSENT until the single R521 behavioral change lands (not failed)"
+   "name": "before_ef_burning_shape",
+   "ok": true,
+   "detail": {
+    "envelope_states": {
+     "CHANNEL_ERROR": 4,
+     "SUMMARY_RAN": 2
+    },
+    "summary_pools": [
+     0,
+     0
+    ],
+    "note": "before arm must show the measured burn: crashed or ran-dry channels, zero pool"
+   }
+  },
+  {
+   "name": "after_ef_disabled_shape",
+   "ok": true,
+   "detail": {
+    "envelope_states": {
+     "ABSENT": 6
+    },
+    "note": "after arm must show the disabled shape: ABSENT envelope state on every scored row"
+   }
   }
  ],
  "failures": [],
