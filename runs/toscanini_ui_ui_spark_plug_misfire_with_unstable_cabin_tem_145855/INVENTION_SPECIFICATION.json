@@ -1,0 +1,1275 @@
+{
+ "invention_id": {
+  "value": "inv:ui_spark_plug_misfire_with_unstable_cabin_tem_145855:a6bf972fc8fd",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_spark_plug_misfire_with_unstable_cabin_tem_145855",
+   "device": "automotive engine, climate control, and transmission system",
+   "failure": "Documented problem 'spark-plug misfire with unstable cabin temperature and harsh transmission shifting' concerning automotive engine, climate control, and transmission system. User-submitted engineering problem (session input): \"[R521-BATTERY declared_family=thermal source=odi:11338533 battery=R521-STAGE-ATTRIBUTION-after]\n\nAFTER ONLY 350 MILES MY ENGINE STARTED SPUTTERING AND HAD TO PULL OVER. BY THE TIME WE STOPPED THE CAR THE SPUTTERING WAS VIOLENTLY SHAKING THE VEHICLE. WE HAD TO GET IT TOWED ONLY FOR THE DEALER SHIP TO\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "spark-plug misfire with unstable cabin temperature and harsh transmission shifting",
+   "constraint": "Repairs must restore durable engine combustion, cabin temperature control, and shift quality."
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:5b962f84"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of automotive engine, climate control, and transmission system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Extended State Kalman Filter (ESKF) used to accurately estimate the torque of the torsional damper during shaft resonance, with extended disturbance states enhancing model robustness against system uncertainties, enabling identification of resonance characteristics and inference of key system parameters.",
+   "intervention": "Install an ESKF-based disturbance observer on the drivetrain shaft (crankshaft to transmission input) that continuously estimates torsional-damper torque from crank-position and engine-speed signals, and feed the identified resonance frequency back to the engine control unit, HVAC blower controller, and transmission shift scheduler so combustion timing, cabin fan duty, and shift solenoid pressures are adjusted in real time to damp the resonance.",
+   "expected_effect": "Damping of the resonant torsional oscillation that is misfiring the spark plug, causing cabin temperature instability (HVAC compressor/condenser fan coupled to the same belt-driven shaft) and harsh shift events; durable restoration of stable combustion, steady cabin temperature, and smooth shift quality.",
+   "mechanism_source_span": "extended state Kalman filter (ESKF) is designed to accurately estimate the torque of the torsional damper.",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/en18112847"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Torsional Vibration Characterization of Hybrid Power Systems via Disturbance Observer and Partitioned Learning",
+   "mechanism": "Extended State Kalman Filter (ESKF) used to accurately estimate the torque of the torsional damper during shaft resonance, with extended disturbance states enhancing model robustness against system uncertainties, enabling identification of resonance characteristics and inference of key system parameters.",
+   "intervention_site": "automotive engine, climate control, and transmission system",
+   "expected_effect": "Damping of the resonant torsional oscillation that is misfiring the spark plug, causing cabin temperature instability (HVAC compressor/condenser fan coupled to the same belt-driven shaft) and harsh shift events; durable restoration of stable combustion, steady cabin temperature, and smooth shift quality.",
+   "falsification_test": "On a chassis dynamometer, induce the misfire/temperature/shift symptom at 350 mi equivalent (e.g., by running a low-fuel/low-load cold-start sweep) and verify that enabling the ESKF observer reduces peak-to-peak crankshaft torsional oscillation by at least 50%, eliminates the observed misfire count on the OBD-II counter, holds cabin-air-temperature variation within ±1 °C, and reduces transmission shift jerk measured at the output shaft below the baseline threshold; repeat on three vehicles to confirm durability."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/en18112847"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Install an ESKF-based disturbance observer on the drivetrain shaft (crankshaft to transmission input) that continuously estimates torsional-damper torque from crank-position and engine-speed signals, and feed the identified resonance frequency back to the engine control unit, HVAC blower controller, and transmission shift scheduler so combustion timing, cabin fan duty, and shift solenoid pressures are adjusted in real time to damp the resonance.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/en18112847"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "Repairs must restore durable engine combustion, cabin temperature control, and shift quality.",
+   "failure_mode_of_device": "spark-plug misfire with unstable cabin temperature and harsh transmission shifting"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:5b962f84"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Damping of the resonant torsional oscillation that is misfiring the spark plug, causing cabin temperature instability (HVAC compressor/condenser fan coupled to the same belt-driven shaft) and harsh sh",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-23T06:46:34.616829+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-23T06:46:34.616829+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.4271/970864",
+    "title": "Transmission-Torque Control for Gear Shifting with Engine Control",
+    "source_uri": "https://doi.org/10.4271/970864",
+    "doi": "10.4271/970864",
+    "content_hash": "b3e69e7e438d1ee5ba2633c9cb1aad4372d4ee88251cc147d82182b5ed5edc4a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1115/icef2010-35153",
+    "title": "Misfire Detection for Spark Ignition Engines Based Upon Cycle-by-Cycle Exhaust Temperature Sensing",
+    "source_uri": "https://doi.org/10.1115/icef2010-35153",
+    "doi": "10.1115/icef2010-35153",
+    "content_hash": "c987075174493e631603112d6e58f44ac39d22c2d6bf6aac56f02b765ae7a36b",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/5.871300",
+    "title": "Automotive engine control and hybrid systems: challenges and opportunities",
+    "source_uri": "https://doi.org/10.1109/5.871300",
+    "doi": "10.1109/5.871300",
+    "content_hash": "66f0d32d0f28dc3068bb03e14508e79964bf654ad805d4b50fb63e9c9821a74f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/87.845880",
+    "title": "Gear shifting by engine control",
+    "source_uri": "https://doi.org/10.1109/87.845880",
+    "doi": "10.1109/87.845880",
+    "content_hash": "fe7d03d13b0d39a611ece80600d871256d0210aa671f94993b705803615f4acf",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/en18112847",
+    "title": "Torsional Vibration Characterization of Hybrid Power Systems via Disturbance Observer and Partitioned Learning",
+    "source_uri": "https://doi.org/10.3390/en18112847",
+    "doi": "10.3390/en18112847",
+    "content_hash": "42e203dcbdaffc7328efb366997b61a69d23b7003844cba6c9edc02b2356e58d",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/cdc.2001.980079",
+    "title": "A Hinfinity-based control design methodology dedicated to active control of vehicle longitudinal oscillations",
+    "source_uri": "https://doi.org/10.1109/cdc.2001.980079",
+    "doi": "10.1109/cdc.2001.980079",
+    "content_hash": "d2fdfbb79d3f5773df614e96ca5643278a98a7566402eb4c2d2a4abca787ca04",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.33915/etd.9394",
+    "title": "A laser spark plug ignition system for a stationary lean-burn natural gas reciprocating engine.",
+    "source_uri": "https://doi.org/10.33915/etd.9394",
+    "doi": "10.33915/etd.9394",
+    "content_hash": "32ef6c5a95822341e59fd8960c0de40a9f2b0055841f67c0845bd6f9f97ba685",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.31390/gradschool_dissertations.4278",
+    "title": "Tribological And Dynamical Study Of An Automotive Transmission System",
+    "source_uri": "https://doi.org/10.31390/gradschool_dissertations.4278",
+    "doi": "10.31390/gradschool_dissertations.4278",
+    "content_hash": "89a6d70990d93fba64c0e61b39f061f958c9f2b8dd2cd6e09c0e8f41a64e2f10",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.70675/d1845689z0b92z4a8ez89baz07edc5e535bd",
+    "title": "Semi-passive control of torsional vibrations for automotive electric power transmission",
+    "source_uri": "https://doi.org/10.70675/d1845689z0b92z4a8ez89baz07edc5e535bd",
+    "doi": "10.70675/d1845689z0b92z4a8ez89baz07edc5e535bd",
+    "content_hash": "d4fd0939561142acd19297b14ac51cc31e43bc1d3c74c2c9689633ebaf1e07c9",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1605.03670",
+    "title": "Optimisation of power transmission systems using a discrete Tabu Search method",
+    "source_uri": "https://doi.org/10.48550/arxiv.1605.03670",
+    "doi": "10.48550/arxiv.1605.03670",
+    "content_hash": "bd52048d66bd382ab3770ff58525af5afebe1854303b41da0aa57b4fde54bfd9",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1604.04421",
+    "title": "Stabilizing Transmission Intervals for Nonlinear Delayed Networked Control Systems [Extended Version]",
+    "source_uri": "https://doi.org/10.48550/arxiv.1604.04421",
+    "doi": "10.48550/arxiv.1604.04421",
+    "content_hash": "613bf3604e3c6edf975abddf3b126365d35cfc74f0de43ad055544899bea891a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2007.11897",
+    "title": "Towards a Systems Engineering based Automotive Product Engineering Process",
+    "source_uri": "https://doi.org/10.48550/arxiv.2007.11897",
+    "doi": "10.48550/arxiv.2007.11897",
+    "content_hash": "d019dd8db4227f60595b5ca3570b4e0a532b8ba8b9f3d8844dfd72938006d11a",
+    "frozen": false
+   },
+   {
+    "id": "title:40a3b84d59f9906b",
+    "title": "Experimental studies of CAI combustion in a four-stroke GDI engine with an air-assisted injector",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "1456241bd274a419eb941fe9a0e09be2219998c2b030a842843136449cb85de9",
+    "frozen": false
+   },
+   {
+    "id": "title:adbd394ae9783428",
+    "title": "Studies on SI engine simulation and air/fuel ratio control systems design",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "2013866eb4d224f880ef97504ffb3a415748374b16b31c59528e3ecbda41c6f9",
+    "frozen": false
+   },
+   {
+    "id": "title:ac804872629344b1",
+    "title": "Experimental investigations on controlled auto-ignition combustion in a four-stroke gasoline engine",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "832ae0def933ab7abd2cc843cb06bd14fa050cd0d469c5832d3b947efae7873a",
+    "frozen": false
+   },
+   {
+    "id": "title:01c2e6787adfd23f",
+    "title": "Engine exhaust gas emissions from non-road mobile machinery",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "c86ee47c8d62dc66404990ef8c4b749f4836b4d5fdbe4bdf1dd680c06207d7e4",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1109/5.871300",
+   "doi:10.1109/87.845880",
+   "doi:10.1109/cdc.2001.980079",
+   "doi:10.1115/icef2010-35153",
+   "doi:10.31390/gradschool_dissertations.4278",
+   "doi:10.3390/en18112847",
+   "doi:10.33915/etd.9394",
+   "doi:10.4271/970864",
+   "doi:10.48550/arxiv.1604.04421",
+   "doi:10.48550/arxiv.1605.03670",
+   "doi:10.48550/arxiv.2007.11897",
+   "doi:10.70675/d1845689z0b92z4a8ez89baz07edc5e535bd",
+   "title:01c2e6787adfd23f",
+   "title:40a3b84d59f9906b",
+   "title:ac804872629344b1",
+   "title:adbd394ae9783428"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "On a chassis dynamometer, induce the misfire/temperature/shift symptom at 350 mi equivalent (e.g., by running a low-fuel/low-load cold-start sweep) and verify that enabling the ESKF observer reduces peak-to-peak crankshaft torsional oscillation by at least 50%, eliminates the observed misfire count on the OBD-II counter, holds cabin-air-temperature variation within ±1 °C, and reduces transmission shift jerk measured at the output shaft below the baseline threshold; repeat on three vehicles to confirm durability."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_spark_plug_misfire_with_unstable_cabin_tem_145855:2026-09-23T06:44:15",
+   "final_envelope_hash": "a6bf972fc8fde37470420ca7a9c8b44d2606ce52423dcd90e2fd38a5511fb685",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-23T06:46:34+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-23T06:46:34+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.4271/970864": {
+   "id": "doi:10.4271/970864",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4271/970864",
+   "source_uri": "https://doi.org/10.4271/970864",
+   "title": "Transmission-Torque Control for Gear Shifting with Engine Control",
+   "abstract": "",
+   "doi": "10.4271/970864",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "1997",
+   "retrieval_timestamp": "2026-09-23T06:45:23.381542+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b3e69e7e438d1ee5ba2633c9cb1aad4372d4ee88251cc147d82182b5ed5edc4a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4271/970864"
+    },
+    "queries_by_source": {
+     "crossref": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4271/970864",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1115/icef2010-35153": {
+   "id": "doi:10.1115/icef2010-35153",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1115/icef2010-35153",
+   "source_uri": "https://doi.org/10.1115/icef2010-35153",
+   "title": "Misfire Detection for Spark Ignition Engines Based Upon Cycle-by-Cycle Exhaust Temperature Sensing",
+   "abstract": "",
+   "doi": "10.1115/icef2010-35153",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2010",
+   "retrieval_timestamp": "2026-09-23T06:45:23.381622+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c987075174493e631603112d6e58f44ac39d22c2d6bf6aac56f02b765ae7a36b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1115/icef2010-35153"
+    },
+    "queries_by_source": {
+     "crossref": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1115/icef2010-35153",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1109/5.871300": {
+   "id": "doi:10.1109/5.871300",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:aa78b6ef38b2bac164dbfa5271367c4164f13059",
+   "source_uri": "https://doi.org/10.1109/5.871300",
+   "title": "Automotive engine control and hybrid systems: challenges and opportunities",
+   "abstract": "",
+   "doi": "10.1109/5.871300",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2000",
+   "retrieval_timestamp": "2026-09-23T06:45:23.381653+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "66f0d32d0f28dc3068bb03e14508e79964bf654ad805d4b50fb63e9c9821a74f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:aa78b6ef38b2bac164dbfa5271367c4164f13059"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.4271/970864"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "8b09407baeb131fe8676b7d6f40893c5bd8276ae88d1bd0abdf454b1cf40ccf5",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1109/5.871300",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.4271/970864",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "A. Balluchi",
+    "L. Benvenuti",
+    "M. D. Di Benedetto",
+    "C. Pinello",
+    "A. Sangiovanni-Vincentelli"
+   ],
+   "raw_record_hash": "8b09407baeb131fe8676b7d6f40893c5bd8276ae88d1bd0abdf454b1cf40ccf5",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.1109/87.845880": {
+   "id": "doi:10.1109/87.845880",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:a95bd0c4d689a9d42c61c04bc9d3c72d7ed0bdbd",
+   "source_uri": "https://doi.org/10.1109/87.845880",
+   "title": "Gear shifting by engine control",
+   "abstract": "",
+   "doi": "10.1109/87.845880",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2000",
+   "retrieval_timestamp": "2026-09-23T06:45:23.381679+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "fe7d03d13b0d39a611ece80600d871256d0210aa671f94993b705803615f4acf",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:a95bd0c4d689a9d42c61c04bc9d3c72d7ed0bdbd"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.4271/970864"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "8b09407baeb131fe8676b7d6f40893c5bd8276ae88d1bd0abdf454b1cf40ccf5",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1109/87.845880",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.4271/970864",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "M. Pettersson",
+    "Lars Nielsen"
+   ],
+   "raw_record_hash": "8b09407baeb131fe8676b7d6f40893c5bd8276ae88d1bd0abdf454b1cf40ccf5",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.3390/en18112847": {
+   "id": "doi:10.3390/en18112847",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:3e782736de87b9f004a1dc672e275a9051708f9e",
+   "source_uri": "https://doi.org/10.3390/en18112847",
+   "title": "Torsional Vibration Characterization of Hybrid Power Systems via Disturbance Observer and Partitioned Learning",
+   "abstract": "The series–parallel hybrid powertrain combines the advantages of both series and parallel configurations, offering optimal power performance and fuel efficiency. However, the presence of multiple excitation sources significantly complicates the torsional vibration behavior during engine startup. To accurately identify and analyze the torsional vibration characteristics induced by shaft resonance in this process, a torsional vibration feature identification algorithm based on disturbance observation and parameter partition learning is proposed. A simplified model of the drivetrain shaft system is first established, and an extended state Kalman filter (ESKF) is designed to accurately estimate the torque of the torsional damper. The inclusion of extended disturbance states enhances the model’s robustness against system uncertainties. Subsequently, continuous wavelet transform (CWT) is employed to identify the resonance characteristics in the torsional vibration process from the torque signal. Combined with the parameter partition learning strategy, resonance frequencies are utilized to infer key system parameters. The results demonstrate that, under a 20% perturbation of structural parameters, the observer model with fixed parameters yields a root mean square error (RMSE) of 10.16 N·m for the torsional damper torque. In contrast, incorporating the parameter self-learning algorithm reduces the RMSE to 2.36 N·m, representing an 85.2% improvement in estimation accuracy. Using the Morlet wavelet with a frequency resolution parameter (VPO) of 15 at a 50 Hz sampling rate, the identified resonance frequency was 14.698 Hz, showing a 1.1% deviation from the actual natural frequency of 14.53 Hz.",
+   "doi": "10.3390/en18112847",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-23T06:45:23.381701+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "42e203dcbdaffc7328efb366997b61a69d23b7003844cba6c9edc02b2356e58d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:3e782736de87b9f004a1dc672e275a9051708f9e"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.4271/970864"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "8b09407baeb131fe8676b7d6f40893c5bd8276ae88d1bd0abdf454b1cf40ccf5",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-23T06:45:23.225395+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.3390/en18112847",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.4271/970864",
+   "source_rank": 4,
+   "fulltext_url": "https://www.mdpi.com/1996-1073/18/11/2847/pdf?version=1748597997",
+   "authors": [
+    "Tao Zheng",
+    "Hui Xie",
+    "Boqiang Liang"
+   ],
+   "raw_record_hash": "8b09407baeb131fe8676b7d6f40893c5bd8276ae88d1bd0abdf454b1cf40ccf5",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.1109/cdc.2001.980079": {
+   "id": "doi:10.1109/cdc.2001.980079",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:39715919b7a1c06103da8176db60cbae8285b20b",
+   "source_uri": "https://doi.org/10.1109/cdc.2001.980079",
+   "title": "A Hinfinity-based control design methodology dedicated to active control of vehicle longitudinal oscillations",
+   "abstract": "",
+   "doi": "10.1109/cdc.2001.980079",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2001",
+   "retrieval_timestamp": "2026-09-23T06:45:23.381722+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d2fdfbb79d3f5773df614e96ca5643278a98a7566402eb4c2d2a4abca787ca04",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:39715919b7a1c06103da8176db60cbae8285b20b"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.4271/970864"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "8b09407baeb131fe8676b7d6f40893c5bd8276ae88d1bd0abdf454b1cf40ccf5",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle', 'Conference']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1109/cdc.2001.980079",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.4271/970864",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [
+    "D. Lefebvre",
+    "P. Chevrel",
+    "S. Richard"
+   ],
+   "raw_record_hash": "8b09407baeb131fe8676b7d6f40893c5bd8276ae88d1bd0abdf454b1cf40ccf5",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.33915/etd.9394": {
+   "id": "doi:10.33915/etd.9394",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.33915/etd.9394",
+   "source_uri": "https://doi.org/10.33915/etd.9394",
+   "title": "A laser spark plug ignition system for a stationary lean-burn natural gas reciprocating engine.",
+   "abstract": "",
+   "doi": "10.33915/etd.9394",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:45:23.381744+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "32ef6c5a95822341e59fd8960c0de40a9f2b0055841f67c0845bd6f9f97ba685",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.33915/etd.9394"
+    },
+    "queries_by_source": {
+     "crossref": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.33915/etd.9394",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.31390/gradschool_dissertations.4278": {
+   "id": "doi:10.31390/gradschool_dissertations.4278",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.31390/gradschool_dissertations.4278",
+   "source_uri": "https://doi.org/10.31390/gradschool_dissertations.4278",
+   "title": "Tribological And Dynamical Study Of An Automotive Transmission System",
+   "abstract": "",
+   "doi": "10.31390/gradschool_dissertations.4278",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:45:23.381765+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "89a6d70990d93fba64c0e61b39f061f958c9f2b8dd2cd6e09c0e8f41a64e2f10",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.31390/gradschool_dissertations.4278"
+    },
+    "queries_by_source": {
+     "crossref": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.31390/gradschool_dissertations.4278",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.70675/d1845689z0b92z4a8ez89baz07edc5e535bd": {
+   "id": "doi:10.70675/d1845689z0b92z4a8ez89baz07edc5e535bd",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70675/d1845689z0b92z4a8ez89baz07edc5e535bd",
+   "source_uri": "https://doi.org/10.70675/d1845689z0b92z4a8ez89baz07edc5e535bd",
+   "title": "Semi-passive control of torsional vibrations for automotive electric power transmission",
+   "abstract": "",
+   "doi": "10.70675/d1845689z0b92z4a8ez89baz07edc5e535bd",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:45:23.381784+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d4fd0939561142acd19297b14ac51cc31e43bc1d3c74c2c9689633ebaf1e07c9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70675/d1845689z0b92z4a8ez89baz07edc5e535bd"
+    },
+    "queries_by_source": {
+     "crossref": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70675/d1845689z0b92z4a8ez89baz07edc5e535bd",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.1605.03670": {
+   "id": "doi:10.48550/arxiv.1605.03670",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1605.03670v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1605.03670",
+   "title": "Optimisation of power transmission systems using a discrete Tabu Search method",
+   "abstract": "This paper presents a brief description of the Tabu Search method and shows how it can be applied to two different power transmission systems. Examples are presented from two transmission systems. In the first example a mechanical transmission system is considered. A four bar mechanism is synthesised in order to produce a desired output motion. The second example is a hydrostatic transmission operating under closed loop control in order to maintain a constant operating speed as the loading conditions change.",
+   "doi": "10.48550/arxiv.1605.03670",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:45:23.381804+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bd52048d66bd382ab3770ff58525af5afebe1854303b41da0aa57b4fde54bfd9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1605.03670v1"
+    },
+    "queries_by_source": {
+     "arxiv": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1605.03670",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/1605.03670v1",
+   "authors": [
+    "Andy M. Connor",
+    "Derek G. Tilley"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.1604.04421": {
+   "id": "doi:10.48550/arxiv.1604.04421",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1604.04421v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1604.04421",
+   "title": "Stabilizing Transmission Intervals for Nonlinear Delayed Networked Control Systems [Extended Version]",
+   "abstract": "In this article, we consider a nonlinear process with delayed dynamics to be controlled over a communication network in the presence of disturbances and study robustness of the resulting closed-loop system with respect to network-induced phenomena such as sampled, distorted, delayed and lossy data as well as scheduling protocols. For given plant-controller dynamics and communication network properties (e.g., propagation delays and scheduling protocols), we quantify the control performance level (in terms of Lp-gains) as the transmission interval varies. Maximally Allowable Transfer Interval (MATI) labels the greatest transmission interval for which a prescribed Lp-gain is attained. The proposed methodology combines impulsive delayed system modeling with Lyapunov-Razumikhin techniques to allow for MATIs that are smaller than the communication delays. Other salient features of our methodology are the consideration of variable delays, corrupted data and employment of model-based estimators to prolong MATIs. The present stability results are provided for the class of Uniformly Globally Exponentially Stable (UGES) scheduling protocols. The well-known Round Robin (RR) and Try-Once-Discard (TOD) protocols are examples of UGES protocols. Finally, two numerical examples are provided to demonstrate the benefits of the proposed approach.",
+   "doi": "10.48550/arxiv.1604.04421",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:45:23.381825+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "613bf3604e3c6edf975abddf3b126365d35cfc74f0de43ad055544899bea891a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1604.04421v1"
+    },
+    "queries_by_source": {
+     "arxiv": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1604.04421",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/1604.04421v1",
+   "authors": [
+    "Domagoj Tolic",
+    "Sandra Hirche"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2007.11897": {
+   "id": "doi:10.48550/arxiv.2007.11897",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2007.11897v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2007.11897",
+   "title": "Towards a Systems Engineering based Automotive Product Engineering Process",
+   "abstract": "Deficit and redundancies in existing automotive product development hinder a systems engineering based development. In this paper we discuss a methodical procedure to eliminate deficits in the current product development and in turn to enable the introduction of a new systems engineering based development methodology. As the core part of our approach, we discuss how to transform an opaque heterogeneous product development to a homogenous consistent product development taking into account existing disciplines. Our approach paves the way to achieve a process structure that is more amenable to verification and validation. We show the effectiveness of our proposed solution approach on an automotive use case.",
+   "doi": "10.48550/arxiv.2007.11897",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:45:23.381845+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d019dd8db4227f60595b5ca3570b4e0a532b8ba8b9f3d8844dfd72938006d11a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2007.11897v1"
+    },
+    "queries_by_source": {
+     "arxiv": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2007.11897",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive engine, climate control, and transmission system spark-plug misfire with unstable cabin temperature and harsh transmission shifting",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2007.11897v1",
+   "authors": [
+    "Hassan Hage",
+    "Vahid Hashemi",
+    "Frank Mantwill"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "title:40a3b84d59f9906b": {
+   "id": "title:40a3b84d59f9906b",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:367279003",
+   "source_uri": "",
+   "title": "Experimental studies of CAI combustion in a four-stroke GDI engine with an air-assisted injector",
+   "abstract": "This thesis was submitted for the degree of Doctor of Philosophy and awarded by Brunel University.CAI combustion and the factors affecting it were intensively investigated in a single cylinder, air-assisted gasoline direct injection engine. CAI was achieved by means of residual gas trapping by utilising low-lift short duration camshafts and early closing of the exhaust valves. The effects of EVC (Exhaust Valve Closure) and IVO (Inlet Valve opening) timings, spark timing, single and split injection timings, coolant temperature, compression ratio, cam lift and duration on exhaust emissions and CAI operation were investigated experimentally. Engine speed throughout the course of the experiments, was varied from 1200rpm to 2400rpm and the air/fuel ratio was altered from stoichiometric to the misfire limit. The results show that the EVC timing, compression ratio, cam lift and duration had significant influences on CAI combustion and emissions. Early EVC when combined with higher compression ratio and higher cam lift, enhance CAI combustion operation and stability. IVO timing had minor effect on CAI combustion while spark timing hardly affects CAI operation as soon as fully-developed CAI conditions were established. Coolant temperature was revealed to have substantial impact on CAI combustion when the coolant temperature was below 65oC. The results also show the importance of injection timing. Early injection gave faster and more stable combustion, less HC and CO emissions, but more prone to knocking combustion and higher NOx emissions. Furthermore, CAI operation range could considerably be extended with injection during the recompression process. Late injection led to slower and unstable combustion, higher HC and CO emissions but lower combustion noise and NOx emissions. Split injection gave even further extension of CAI range in both stoichiometric and lean mixture operations. All the above clearly suggest, that optimising injection timing and using split injection is an effective way to control and extend CAI operation in a direct injection gasoline engine",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:45:23.381866+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "1456241bd274a419eb941fe9a0e09be2219998c2b030a842843136449cb85de9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:367279003"
+    },
+    "queries_by_source": {
+     "core": "automotive engine climate control transmission spark-plug misfire unstable cabin temperature"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:40a3b84d59f9906b",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive engine climate control transmission spark-plug misfire unstable cabin temperature",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Brouzos, Nikolaos P"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:adbd394ae9783428": {
+   "id": "title:adbd394ae9783428",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:367321205",
+   "source_uri": "",
+   "title": "Studies on SI engine simulation and air/fuel ratio control systems design",
+   "abstract": "This thesis was submitted for the degree of Doctor of Philosophy and awarded by Brunel University.More stringent Euro 6 and LEV III emission standards will immediately begin execution on 2014 and 2015 respectively. Accurate air/fuel ratio control can effectively reduce vehicle emission. The simulation of engine dynamic system is a very powerful method for developing and analysing engine and engine controller. Currently, most engine air/fuel ratio control used look-up table combined with proportional and integral (PI) control and this is not robust to system uncertainty and time varying effects. This thesis first develops a simulation package for a port injection spark-ignition engine and this package include engine dynamics, vehicle dynamics as well as driving cycle selection module. The simulations results are very close to the data obtained from laboratory experiments. New controllers have been proposed to control air/fuel ratio in spark ignition engines to maximize the fuel economy while minimizing exhaust emissions. The PID control and fuzzy control methods have been combined into a fuzzy PID control and the effectiveness of this new controller has been demonstrated by simulation tests. A new neural network based predictive control is then designed for further performance improvements. It is based on the combination of inverse control and predictive control methods. The network is trained offline in which the control output is modified to compensate control errors. The simulation evaluations have shown that the new neural controller can greatly improve control air/fuel ratio performance. The test also revealed that the improved AFR control performance can effectively restrict engine harmful emissions into atmosphere, these reduce emissions are important to satisfy more stringent emission standards",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:45:23.381886+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "2013866eb4d224f880ef97504ffb3a415748374b16b31c59528e3ecbda41c6f9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:367321205"
+    },
+    "queries_by_source": {
+     "core": "automotive engine climate control transmission spark-plug misfire unstable cabin temperature"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:adbd394ae9783428",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive engine climate control transmission spark-plug misfire unstable cabin temperature",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Bai, Yang"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:ac804872629344b1": {
+   "id": "title:ac804872629344b1",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:405533761",
+   "source_uri": "",
+   "title": "Experimental investigations on controlled auto-ignition combustion in a four-stroke gasoline engine",
+   "abstract": "This thesis was submitted for the degree of Doctor of Philosophy and awarded by Brunel University.The effects of air and exhaust gas dilution on the CAI combustion of a range of fuels including three gasoline compositions, four primary reference fuels, and two alcohols  are experimentally investigated using a single cylinder research engine. Two of the three gasolines tested are manufactured from standard gasoline during engine operation by a novel fuel system, designed to improve the performance of both controlled autoignition and spark ignition engines. A series of experimental tests are performed to establish the satisfactory combined air and exhaust gas dilution regions for each fuel. Detailed in-cylinder pressure and exhaust gas speciation measurements are taken, and the fuels are compared and contrasted for their performance in terms of power output, fuel consumption, and harmful exhaust emissions. Results show that alcohol fuels are superior to hydrocarbon fuels for controlled autoignition combustion because their autoignition characteristics are less affected by the presence of exhaust gas species. Furthermore, the timing of autoignition is shown to be of minor importance for achieving efficient and stable controlled autoignition combustion, contrary to widely held beliefs. In addition, the novel fuel system is developed and commissioned for use on a single cylinder research engine operating with a spark ignition system. The two gasoline fuels produced by the system are evaluated individually for their knocking combustion characteristics over a range of compression ratios and spark advances. Results from these tests indicate that the fuel system used in conjunction with a specially modified production engine may allow the normal compression ratio of that engine to be increased by up to 1.0, increasing its efficiency.Financial support obtained from Ford Motor Company",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:45:23.381905+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "832ae0def933ab7abd2cc843cb06bd14fa050cd0d469c5832d3b947efae7873a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:405533761"
+    },
+    "queries_by_source": {
+     "core": "automotive engine, climate control, and transmission experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:ac804872629344b1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive engine, climate control, and transmission experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Oakley, Aaron John"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:01c2e6787adfd23f": {
+   "id": "title:01c2e6787adfd23f",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:4975219",
+   "source_uri": "",
+   "title": "Engine exhaust gas emissions from non-road mobile machinery",
+   "abstract": "Non-road mobile machinery is used for a range of different operations with varying engine load characteristics. Fuel consumption and emission amounts from such machinery are dependent on the operation performed. The engine load during many of the operations performed is largely transient in nature. However, the majority of fuel consumption and emission data reported in the literature are based on static measurements and engine load patterns not representative of the real use of the vehicle. Emission data derived from the average annual use of agricultural tractors, based on three different typical areas of use, were compared with emission data obtained from European and international standards. The results showed that the emission amounts obtained from the engine load cycles stipulated in European and international emissions regulations were not representative of the real use of non-road mobile machinery. Furthermore, operations can be performed using a variety of different approaches depending on factors such as vehicle characteristics and driver behaviour. An engine load simulation model was developed and the results from the simulations showed that by using different driving strategies or transmission characteristics, it was possible to affect the emissions for a specific operation without affecting the fuel consumption or duration of the operation. Changes in engine speed and torque, i.e. transients, are likely to affect the fuel consumption and formation of emissions due to periods of time lags in e.g. the fuel injection system or the boost pressure. During normal operations a decrease in the fuel efficiency due to transient loads was detected. The fuel consumption increased with up to 13% compared with the corresponding steady-state condition. In order to study the effects of transients, special transient test cycles were developed. At high transients, both in engine speed and torque, the effects on fuel consumption and emissions were substantial. For example emissions of particulate matter increased with up to twelve times. Based on these results, a mathematical model was developed that could derive transient fuel consumption and emission amounts for all types of operations using a limited amount of emission measurements",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:45:23.381922+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c86ee47c8d62dc66404990ef8c4b749f4836b4d5fdbe4bdf1dd680c06207d7e4",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:4975219"
+    },
+    "queries_by_source": {
+     "core": "automotive engine, climate control, and transmission experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:01c2e6787adfd23f",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive engine, climate control, and transmission experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Lindgren, Magnus"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:5b962f84": {
+   "id": "problem:5b962f84",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "5b962f8486c42cb2d8fe8118390cfc64fb73d21f7820d81ad2a57809bf04a65b",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "8bde382259c4d909728512ec682ec287d7f1532709937b8960b9d52cb0a76ea3",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-23T06:46:34+00:00Z"
+ }
+}

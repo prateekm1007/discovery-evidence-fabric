@@ -1,0 +1,1262 @@
+{
+ "invention_id": {
+  "value": "inv:ui_transmission_slip_causing_loss_of_accelera_145885:d1cbff73a84d",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_transmission_slip_causing_loss_of_accelera_145885",
+   "device": "dual-clutch transmission system",
+   "failure": "Documented problem 'transmission slip causing loss of acceleration' concerning dual-clutch transmission system. User-submitted engineering problem (session input): \"[R521-BATTERY declared_family=mechanical source=odi:11310831 battery=R521-STAGE-ATTRIBUTION-after]\n\n2/20/2020 - I WAS DRIVING MY NEW 2020 ELANTRA (LESS THAN 5,000 MILES ON IT) AND I NOTICED THE CAR WAS NOT ACCELERATING SMOOTHLY. THE RPM NEEDLE WAS REVVING ABNORMALLY WHENEVER I TRIED TO ACCELERATE. W\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "transmission slip causing loss of acceleration",
+   "constraint": "must diagnose and resolve without diagnostic trouble codes or warning lights"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:cbd50741"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of dual-clutch transmission system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "A longitudinal-vertical coupled dynamics model that accounts for engine harmonic torque, time-varying gear meshing stiffness, nonlinear dual-mass flywheel torsional behavior, powertrain mount deformation/torsion, tire deformation, and random road excitations to analyze DCT starting dynamics and identify sources of slow response, transmission vibration, and performance instability.",
+   "intervention": "Apply the coupled longitudinal-vertical dynamics model to characterize the specific Elantra DCT starting condition under the reported low-mileage, light-load environment; identify the dominant contributor (e.g., torsional oscillation of the dual-mass flywheel, excessive engine harmonic torque transmission, or mount/powertrain compliance) causing RPM flare without proportional acceleration; then re-tune the dual-mass flywheel stiffness/damping, revise clutch pressure ramp during launch to dampen torsional oscillations, and add a controller compensation term for engine harmonic excitation during the starting phase.",
+   "expected_effect": "Elimination of the RPM flare-and-slip symptom during acceleration by suppressing torsional oscillations and improving torque transfer consistency at the clutch interface, restoring smooth launch response without relying on diagnostic trouble codes or warning lights.",
+   "mechanism_source_span": "A longitudinal-vertical coupled dynamics model has been developed to analyse the impact of driving conditions on the dynamic characteristics of vehicles with Dual-Clutch Transmission (DCT) during starting.",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-024-79041-7"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Influence of the driving environment on the dynamic characteristics of a DCT vehicle starting considering the longitudinal and vertical coupling model.",
+   "mechanism": "A longitudinal-vertical coupled dynamics model that accounts for engine harmonic torque, time-varying gear meshing stiffness, nonlinear dual-mass flywheel torsional behavior, powertrain mount deformation/torsion, tire deformation, and random road excitations to analyze DCT starting dynamics and identify sources of slow response, transmission vibration, and performance instability.",
+   "intervention_site": "dual-clutch transmission system",
+   "expected_effect": "Elimination of the RPM flare-and-slip symptom during acceleration by suppressing torsional oscillations and improving torque transfer consistency at the clutch interface, restoring smooth launch response without relying on diagnostic trouble codes or warning lights.",
+   "falsification_test": "Instrument the vehicle with a crankshaft speed sensor, transmission input/output speed sensors, and a clutch position/pressure transducer; perform repeated cold-start and warm-start accelerations on a flat road. If clutch slippage (defined as input shaft speed exceeding output shaft speed scaled by gear ratio by more than 50 rpm for longer than 0.5 s) is eliminated and the standard deviation of the difference between engine torque demand and delivered wheel torque during launch is reduced by at least 50% relative to the pre-intervention baseline, the mechanism is supported; persistent slippage or torsional oscillation at the same magnitude falsifies the diagnosis and implicates another root cause."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-024-79041-7"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Apply the coupled longitudinal-vertical dynamics model to characterize the specific Elantra DCT starting condition under the reported low-mileage, light-load environment; identify the dominant contributor (e.g., torsional oscillation of the dual-mass flywheel, excessive engine harmonic torque transmission, or mount/powertrain compliance) causing RPM flare without proportional acceleration; then re-tune the dual-mass flywheel stiffness/damping, revise clutch pressure ramp during launch to dampen torsional oscillations, and add a controller compensation term for engine harmonic excitation during the starting phase.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-024-79041-7"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "must diagnose and resolve without diagnostic trouble codes or warning lights",
+   "failure_mode_of_device": "transmission slip causing loss of acceleration"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:cbd50741"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Elimination of the RPM flare-and-slip symptom during acceleration by suppressing torsional oscillations and improving torque transfer consistency at the clutch interface, restoring smooth launch respo",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-23T06:46:22.220837+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-23T06:46:22.220837+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1038/s41598-024-79041-7",
+    "title": "Influence of the driving environment on the dynamic characteristics of a DCT vehicle starting considering the longitudinal and vertical coupling model.",
+    "source_uri": "https://doi.org/10.1038/s41598-024-79041-7",
+    "doi": "10.1038/s41598-024-79041-7",
+    "content_hash": "af95d2be81ec077b93ec4c54ccee87c91174d4b7346aceb9b714d77551e68c80",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3901/jme.2012.24.087",
+    "title": "Slip Mode Variable Structure Coordinating Control and Real-time Optimization of Launch for Dry Dual Clutch Transmission",
+    "source_uri": "https://doi.org/10.3901/jme.2012.24.087",
+    "doi": "10.3901/jme.2012.24.087",
+    "content_hash": "36015f848b5838b87b8b959b16681143055c4aca45e6b037cef553f8c4e226b1",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1371/journal.pone.0308493",
+    "title": "Output speed control for hydro-mechanical continuously variable transmission of tractor.",
+    "source_uri": "https://doi.org/10.1371/journal.pone.0308493",
+    "doi": "10.1371/journal.pone.0308493",
+    "content_hash": "63a78b35842bb58b6401933f56782c86de01ad400fa3343718ee51a8ea9ab155",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1049/cp.2012.0576",
+    "title": "Modeling and simulation on double-clutch launching of dry dual clutch transmission",
+    "source_uri": "https://doi.org/10.1049/cp.2012.0576",
+    "doi": "10.1049/cp.2012.0576",
+    "content_hash": "9fbae3f78eaa6d642b764c85043c39efe76cbec0be49a274c3bf1ded8af35ad8",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/biomimetics10110721",
+    "title": "A Soft Exoskeleton for Hand Grip Augmentation and Fall Prevention Assistance in Tower Climbing.",
+    "source_uri": "https://doi.org/10.3390/biomimetics10110721",
+    "doi": "10.3390/biomimetics10110721",
+    "content_hash": "1530d3f15a0a6a75050b385a432aab33278cff21992fe1e0164f0b599d6da328",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/s24237447",
+    "title": "Determining Tyre Adhesion Characteristics Based on the Road Tests of Automobiles.",
+    "source_uri": "https://doi.org/10.3390/s24237447",
+    "doi": "10.3390/s24237447",
+    "content_hash": "3d87e4d492a65e128c92b1d24ed2fc2c403726e53e4109edcbbbb8d14843d711",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.18652248",
+    "title": "Galactic Dynamical Field Theory(LGRM): Spacetime Rigidity, Vorticity Stress, and the Dissipation of the Dark Matter Illusion",
+    "source_uri": "https://doi.org/10.5281/zenodo.18652248",
+    "doi": "10.5281/zenodo.18652248",
+    "content_hash": "890b2555835618abff876052cff788d5e7e3c5d5e50c246afc285cce9bdddde0",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.26083/tuprints-00028797",
+    "title": "Development of Active Vibration Control System for Gearbox Housings",
+    "source_uri": "https://doi.org/10.26083/tuprints-00028797",
+    "doi": "10.26083/tuprints-00028797",
+    "content_hash": "8a7894443bcbfccdd60fbf4d3fb2b119abb2f2359991138f9bf04e282cf6a00a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.26083/tuprints-00027365",
+    "title": "Machine Learning Based Calibration of Dual Clutch Transmissions for Optimizing the Launch Behavior of Passenger Vehicles",
+    "source_uri": "https://doi.org/10.26083/tuprints-00027365",
+    "doi": "10.26083/tuprints-00027365",
+    "content_hash": "8d21e74e770b06f240e7ce56974791b333d0742744ea8bbeecac0a3988585c52",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.2139/ssrn.5018903",
+    "title": "Improved Analytical Loss Modeling for Fast, Accurate and Automated System Analysis and Design Using a Next-Generation Hybrid Dual-Clutch Transmission",
+    "source_uri": "https://doi.org/10.2139/ssrn.5018903",
+    "doi": "10.2139/ssrn.5018903",
+    "content_hash": "74279ef947feb6d87ca393320ebe2b10b3a3b018e99ad0df105351ecb058479b",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2003.14172",
+    "title": "A novel Algorithm for Hydrostatic-mechanical Mobile Machines with a Dual-Clutch Transmission",
+    "source_uri": "https://doi.org/10.48550/arxiv.2003.14172",
+    "doi": "10.48550/arxiv.2003.14172",
+    "content_hash": "291eae442dc3a8b2208fbdf9c5524a9df3cc066771d5588aef457834c74df6bf",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1605.03670",
+    "title": "Optimisation of power transmission systems using a discrete Tabu Search method",
+    "source_uri": "https://doi.org/10.48550/arxiv.1605.03670",
+    "doi": "10.48550/arxiv.1605.03670",
+    "content_hash": "bd52048d66bd382ab3770ff58525af5afebe1854303b41da0aa57b4fde54bfd9",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.16578/j.issn.1004.2539.2015.08.007",
+    "title": "Intelligent Control of the RAFNC Launch for Dual Clutch Automatic Transmission",
+    "source_uri": "https://doi.org/10.16578/j.issn.1004.2539.2015.08.007",
+    "doi": "10.16578/j.issn.1004.2539.2015.08.007",
+    "content_hash": "4d0ec0a044f038857192182481bcbc85353526bd5ba281a81043ac416d2e14d1",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.51202/9783181023815-159",
+    "title": "TREMEC Hybrid Dual Clutch Transmission (HDCT) – Electrification of TREMEC’s high performance dual clutch transmission",
+    "source_uri": "https://doi.org/10.51202/9783181023815-159",
+    "doi": "10.51202/9783181023815-159",
+    "content_hash": "344bb800c649c4be72c77ac071d3928404c9efdfd3e1474b468e35ffd9e51b6f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1007/978-3-642-33744-4_39",
+    "title": "Clutch Transmissible Torque Estimation for Dry Dual Clutch Transmission Control",
+    "source_uri": "https://doi.org/10.1007/978-3-642-33744-4_39",
+    "doi": "10.1007/978-3-642-33744-4_39",
+    "content_hash": "dea3ba0c6e8d3e864870d38673c3d8aa58a97b4f3116eccbe9eed8a91211f6be",
+    "frozen": false
+   },
+   {
+    "id": "title:4d3e401ce76e9ad1",
+    "title": "Kansas Electric Transmission Authority 2011 Annual Report to the Governor and the Legislature",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "9bf6db052a59df83d0edcd8a885b019146d662a512ae80362682b649abc4b1df",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1007/978-3-642-33744-4_39",
+   "doi:10.1038/s41598-024-79041-7",
+   "doi:10.1049/cp.2012.0576",
+   "doi:10.1371/journal.pone.0308493",
+   "doi:10.16578/j.issn.1004.2539.2015.08.007",
+   "doi:10.2139/ssrn.5018903",
+   "doi:10.26083/tuprints-00027365",
+   "doi:10.26083/tuprints-00028797",
+   "doi:10.3390/biomimetics10110721",
+   "doi:10.3390/s24237447",
+   "doi:10.3901/jme.2012.24.087",
+   "doi:10.48550/arxiv.1605.03670",
+   "doi:10.48550/arxiv.2003.14172",
+   "doi:10.51202/9783181023815-159",
+   "doi:10.5281/zenodo.18652248",
+   "title:4d3e401ce76e9ad1"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Instrument the vehicle with a crankshaft speed sensor, transmission input/output speed sensors, and a clutch position/pressure transducer; perform repeated cold-start and warm-start accelerations on a flat road. If clutch slippage (defined as input shaft speed exceeding output shaft speed scaled by gear ratio by more than 50 rpm for longer than 0.5 s) is eliminated and the standard deviation of the difference between engine torque demand and delivered wheel torque during launch is reduced by at least 50% relative to the pre-intervention baseline, the mechanism is supported; persistent slippage or torsional oscillation at the same magnitude falsifies the diagnosis and implicates another root cause."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_transmission_slip_causing_loss_of_accelera_145885:2026-09-23T06:44:45",
+   "final_envelope_hash": "d1cbff73a84dded3e98f510bc6b554945eedec7751dfe6163968d4db99de5424",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-23T06:46:22+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-23T06:46:22+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1038/s41598-024-79041-7": {
+   "id": "doi:10.1038/s41598-024-79041-7",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:39613814",
+   "source_uri": "https://doi.org/10.1038/s41598-024-79041-7",
+   "title": "Influence of the driving environment on the dynamic characteristics of a DCT vehicle starting considering the longitudinal and vertical coupling model.",
+   "abstract": "The most significant external excitation affecting the dynamic characteristics of a vehicle is its driving environment. This type of excitation leads to issues such as slow initial response during starting, significant vibrations in the transmission system, and overall performance instability. A longitudinal-vertical coupled dynamics model has been developed to analyse the impact of driving conditions on the dynamic characteristics of vehicles with Dual-Clutch Transmission (DCT) during starting. This model takes into account factors such as the engine's harmonic torque, the time-varying meshing stiffness of the gear system, the nonlinear torsional behaviour of the dual-mass flywheel, the deformation and torsion of the powertrain mounts, tire deformation, and random road excitations. Utilizing the established coupled model for DCT vehicle transmission systems, the impact of varying road roughness, adhesion coefficients, and road slope on the dynamic performance of DCT vehicles. To verify the accuracy of the simulation results of the influence of the driving environment on the dynamic characteristics of the DCT vehicle starting process, the experimental and simulation results of the influence of the driving environment on the vehicle dynamic characteristics of flat road surfaces, B-level uneven road surfaces, wet road surfaces, and 10% road slopes were compared. The overall trend of the simulation results of the clutch master and slave end speeds, vehicle longitudinal and vertical impact degrees, etc., was in good agreement with the experimental results, confirming the accuracy of the established DCT vehicle transmission system coupling dynamic model.",
+   "doi": "10.1038/s41598-024-79041-7",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024-11-29",
+   "retrieval_timestamp": "2026-09-23T06:45:54.854190+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "af95d2be81ec077b93ec4c54ccee87c91174d4b7346aceb9b714d77551e68c80",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:39613814"
+    },
+    "queries_by_source": {
+     "europepmc": "dual-clutch transmission system transmission slip causing experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-024-79041-7",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch transmission system transmission slip causing experimental comparison",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.3901/jme.2012.24.087": {
+   "id": "doi:10.3901/jme.2012.24.087",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.3901/jme.2012.24.087",
+   "source_uri": "https://doi.org/10.3901/jme.2012.24.087",
+   "title": "Slip Mode Variable Structure Coordinating Control and Real-time Optimization of Launch for Dry Dual Clutch Transmission",
+   "abstract": "",
+   "doi": "10.3901/jme.2012.24.087",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2012",
+   "retrieval_timestamp": "2026-09-23T06:45:54.854279+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "36015f848b5838b87b8b959b16681143055c4aca45e6b037cef553f8c4e226b1",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.3901/jme.2012.24.087"
+    },
+    "queries_by_source": {
+     "crossref": "dual-clutch transmission system transmission slip causing loss of acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.3901/jme.2012.24.087",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch transmission system transmission slip causing loss of acceleration",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1371/journal.pone.0308493": {
+   "id": "doi:10.1371/journal.pone.0308493",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:39316593",
+   "source_uri": "https://doi.org/10.1371/journal.pone.0308493",
+   "title": "Output speed control for hydro-mechanical continuously variable transmission of tractor.",
+   "abstract": "In order to improve the speed stability of tractors equipped with hydro-mechanical continuously variable transmission (HMCVT) during field operations, the speed regulation characteristics, torque characteristics, and power diversion characteristics of HMCVT are analyzed. And a comprehensive control strategy for HMCVT output speed is proposed by analyzing the factors affecting the fluctuation of output speed, which combines engine speed control and displacement ratio control of hydraulic speed control system. This strategy adopts fuzzy control to regulate the engine speed to maintain the stability of engine operation. Moreover, adopting feed forward compensation control for speed compensation enhances the anti-interference ability of the hydraulic speed control system. And combined with model predictive control, adjust the swash plate swing angle of the variable pump to reduce the fluctuation of HMCVT output speed. By establishing joint simulation model, the effectiveness of the control strategy was verified using tractor acceleration mode and step load disturbance mode. The results show that the strategy can reduce the fluctuation rate of engine speed and impact degree, shorten the adjustment time, and improve the stability of tractor operating speed.",
+   "doi": "10.1371/journal.pone.0308493",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024-09-24",
+   "retrieval_timestamp": "2026-09-23T06:45:54.854310+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "63a78b35842bb58b6401933f56782c86de01ad400fa3343718ee51a8ea9ab155",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:39316593"
+    },
+    "queries_by_source": {
+     "europepmc": "dual-clutch transmission system transmission slip causing experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1371/journal.pone.0308493",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch transmission system transmission slip causing experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1049/cp.2012.0576": {
+   "id": "doi:10.1049/cp.2012.0576",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1049/cp.2012.0576",
+   "source_uri": "https://doi.org/10.1049/cp.2012.0576",
+   "title": "Modeling and simulation on double-clutch launching of dry dual clutch transmission",
+   "abstract": "",
+   "doi": "10.1049/cp.2012.0576",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2012",
+   "retrieval_timestamp": "2026-09-23T06:45:54.854331+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9fbae3f78eaa6d642b764c85043c39efe76cbec0be49a274c3bf1ded8af35ad8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1049/cp.2012.0576"
+    },
+    "queries_by_source": {
+     "crossref": "dual-clutch transmission system transmission slip causing loss of acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1049/cp.2012.0576",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch transmission system transmission slip causing loss of acceleration",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.3390/biomimetics10110721": {
+   "id": "doi:10.3390/biomimetics10110721",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41294393",
+   "source_uri": "https://doi.org/10.3390/biomimetics10110721",
+   "title": "A Soft Exoskeleton for Hand Grip Augmentation and Fall Prevention Assistance in Tower Climbing.",
+   "abstract": "This study presents a soft exoskeleton system designed to enhance the safety of electrical maintenance personnel during tower climbing by augmenting the hand grip and providing fall prevention assistance. Inspired by biological principles, a compact, stroke-amplified, and fast-response actuator based on a spring energy storage-release mechanism was developed and evaluated through tensile and speed tests, demonstrating sufficient locking force and a fast response time of 37.5 ms. A dual-sensing module integrating pressure and flexible bending sensors was designed to detect grasping states in real time. System effectiveness was further validated through functional electrical stimulation (FES) and simulated climbing experiments. FES tests confirmed the system's ability to maintain grasp posture under involuntary hand extension, while climbing experiments verified consistent and reliable transitions between locking and unlocking during movement. Although preliminary, these results suggest that integrating soft exoskeletons with rapid-response actuators offers a promising solution for improving grip stability and operational safety in high-risk vertical environments.",
+   "doi": "10.3390/biomimetics10110721",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-10-29",
+   "retrieval_timestamp": "2026-09-23T06:45:54.854349+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "1530d3f15a0a6a75050b385a432aab33278cff21992fe1e0164f0b599d6da328",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41294393"
+    },
+    "queries_by_source": {
+     "europepmc": "dual-clutch transmission system transmission slip causing experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/biomimetics10110721",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch transmission system transmission slip causing experimental comparison",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.3390/s24237447": {
+   "id": "doi:10.3390/s24237447",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:39685984",
+   "source_uri": "https://doi.org/10.3390/s24237447",
+   "title": "Determining Tyre Adhesion Characteristics Based on the Road Tests of Automobiles.",
+   "abstract": "The motion of automobiles significantly depends on the conditions of interaction between a tyre and a road surface. One of the most frequently used ways of presenting the conditions of cooperation between a tyre and a road surface is a characteristic showing a longitudinal adhesion coefficient as a function of a longitudinal slip of a tyre. One of the methods for determining tyre-to-road adhesion characteristics is to use a special trailer combined with a towing vehicle. This type of method is commonly used to determine adhesion characteristics for a braked wheel. This article presents a method for determining adhesion characteristics for a driven wheel based on the road tests of automobiles. For this purpose, vehicle wheel velocity signals from a vehicle CAN network and a vehicle velocity signal from a GPS receiver were used. The signals from the CAN network were recorded using a special measurement card and an application developed in LabVIEW environment. The application developed in LabVIEW also allowed for simultaneous recording of automobile velocity from the GPS receiver. In this paper, the courses of a wheel velocity, longitudinal acceleration of automobile, longitudinal slip of the front wheels in time domain, as well as the coefficient of tyre-to-road longitudinal adhesion as a function of the longitudinal slip of the wheel are presented.",
+   "doi": "10.3390/s24237447",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024-11-22",
+   "retrieval_timestamp": "2026-09-23T06:45:54.854367+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3d87e4d492a65e128c92b1d24ed2fc2c403726e53e4109edcbbbb8d14843d711",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:39685984"
+    },
+    "queries_by_source": {
+     "europepmc": "dual-clutch transmission system transmission slip causing loss of acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s24237447",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch transmission system transmission slip causing loss of acceleration",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.5281/zenodo.18652248": {
+   "id": "doi:10.5281/zenodo.18652248",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.18652248",
+   "source_uri": "https://doi.org/10.5281/zenodo.18652248",
+   "title": "Galactic Dynamical Field Theory(LGRM): Spacetime Rigidity, Vorticity Stress, and the Dissipation of the Dark Matter Illusion",
+   "abstract": "Galactic Dynamics Field Theory (LGRM): Spacetime Rigidity, Eddy Stress, and the Dissipation of Dark Matter Illusion\n\nsummary\n\nThis paper introduces the LGRM v5 architecture, marking a theoretical step towards a substantial spacetime dynamics field theory. We demonstrate that the flattening of the galactic rotation curve is not due to an anomaly of \"dark matter,\" but rather a manifestation of the redistribution of internal angular momentum through a rigid spacetime medium. By introducing the spacetime rigid stress tensor ($\\mathcal{S}_{\\mu\\nu}$), we quantify how baryonic matter acts as a mechanical anchor, coupling local motion with the spacetime continuum. Through the whiplash effect, gravitational potential energy in the galactic core is converted into torsional stress and transmitted to the periphery, treating galactic dynamics as a self-contained mechanical equilibrium.\n\n1. Introduction: Dynamics of Internal Stress Equilibrium\n\nLGRM v5 establishes a self-sufficient \"internal stress equilibrium\" galactic dynamics model. Within this framework, the galaxy is defined as a self-sustaining rigid engine, governed by the intrinsic mechanical properties of the spacetime continuum. The observed dynamic equilibrium is maintained by the redistribution of energy through the rigid interior of spacetime, with the medium itself acting as a mechanical conductor of angular momentum. By treating the galactic disk as a coupled mechanical system, LGRM addresses rotation anomalies through the internal stress-energy flux of the vast spacetime field.\n\n1.1 Extended Field Equations\n\nThe fundamental interaction is reformulated by directly incorporating the spacetime rigid stress tensor ($\\mathcal{S}_{\\mu\\nu}$) into Einstein's field equations:\n\n\n\n$$G_{\\mu\\nu} + \\mathcal{S}_{\\mu\\nu} = 8\\pi G T_{\\mu\\nu}$$\n\n\nHere, $G_{\\mu\\nu}$ represents geometric deformation, $T_{\\mu\\nu}$ is standard baryon stress-energy, and $\\mathcal{S}_{\\mu\\nu}$ represents the structural restoring force (rigidity) of the spacetime medium itself.\n\n1.2 The \"whiplash effect\" (spacetime masterspring mechanism) and conduction limit of baryon anchoring\n\nIn the LRM framework, the coupling between matter and spacetime operates in a \"saturated state,\" with baryon currents (matter rotation) driving stress transmission in spacetime to the maximum extent.\n\nPeripheral compensation (whipping effect): The torsional torque accumul",
+   "doi": "10.5281/zenodo.18652248",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-23T06:45:54.854388+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "890b2555835618abff876052cff788d5e7e3c5d5e50c246afc285cce9bdddde0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite",
+     "openaire"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.18652248",
+     "openaire": "openaire:doi_dedup___::72505f1604a37771c99fd8e1148ba5c2"
+    },
+    "queries_by_source": {
+     "datacite": "dual-clutch transmission system transmission slip causing loss of acceleration",
+     "openaire": "dual-clutch transmission system transmission slip causing loss of acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Preprint",
+     "instancetypes=['Preprint', 'Preprint', 'Preprint']; refereed=nonPeerReviewed"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.18652248",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch transmission system transmission slip causing loss of acceleration",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "CHIANG, W C"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)",
+    "Document-type labels are read post-hoc from record instancetype (the API exposes no type filter — measured 2026-09-05)",
+    "Aggregated repository metadata quality varies by repository; instancetype is repository-declared"
+   ]
+  },
+  "doi:10.26083/tuprints-00028797": {
+   "id": "doi:10.26083/tuprints-00028797",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.26083/tuprints-00028797",
+   "source_uri": "https://doi.org/10.26083/tuprints-00028797",
+   "title": "Development of Active Vibration Control System for Gearbox Housings",
+   "abstract": "This thesis presents a systematic approach to developing an active vibration control system for lightweight transmissions by placing piezoelectric inertial mass actuators on the gearbox housing. The main objective is to minimise the structure-borne vibrations caused by gear whine at the mounting points of the gearbox where it is connected to the car body. These vibrations, particularly in the frequency range of 1000 - 5000Hz, can be amplified into audible noise in the passenger compartment, reducing comfort. The development process begins with studying the system’s dynamics through two gearbox housing models. The first model is a simplified version of a dual-clutch transmission with a non-rotating load, analysed using ANSYS to determine actuator requirements. The second model is a hybridized version of a fully operational dual-clutch gearbox, modelled with Romax to simulate dynamic behaviour under realistic excitation, helping establish actuator force requirements, placement, and control strategies. Macro-Fibre Composites (MFCs) are chosen as sensors for their low cost and wide operating bandwidth in the desired frequency range. They are calibrated for use in place of piezoelectric accelerometers. A real-time system is constructed with a microcontroller development board for high-speed data acquisition from the MFCs and closed-loop control implementation with the actuators. Optimal actuator placement is determined using Frequency Response Functions (FRFs) from an experimentally correlated model of the gearbox and actuator. The optimization considers spatial and modal controllability in the frequency domain. The thesis discusses single and paired actuator positioning. Multi-point control approaches based on the FxLMS algorithm are developed to minimize vibrations at the mounting points within the computational constraints of a microcontroller. Three variations—single input multi-output, mixed error, and switched error algorithms—are studied and compared. Mixed and switched error algorithms reduced the computational time of multi-point control by almost half compared to single input multi-output approach. The active vibration control system is demonstrated on an operational gearbox, achieving vibration attenuation of 4 - 14dB can be achieved with both switched and mixed error approaches at 2500Hz. The mixed error algorithm proved to be most feasible to impleme",
+   "doi": "10.26083/tuprints-00028797",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-23T06:45:54.854408+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8a7894443bcbfccdd60fbf4d3fb2b119abb2f2359991138f9bf04e282cf6a00a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.26083/tuprints-00028797"
+    },
+    "queries_by_source": {
+     "datacite": "dual-clutch dual die"
+    },
+    "query_variant_derivation": "DOMAIN_NARROW",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Dissertation; resource_type=Ph.D. Thesis"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.26083/tuprints-00028797",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch dual die",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Nampally, Sneha Rupa"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.26083/tuprints-00027365": {
+   "id": "doi:10.26083/tuprints-00027365",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.26083/tuprints-00027365",
+   "source_uri": "https://doi.org/10.26083/tuprints-00027365",
+   "title": "Machine Learning Based Calibration of Dual Clutch Transmissions for Optimizing the Launch Behavior of Passenger Vehicles",
+   "abstract": "The drivability of a vehicle is strongly affected by its transmission. Especially dual clutch transmissions (DCT) offer the chance of a comfortable drivability through its ability of blending the torque during gear shifts from one clutch to the other (jerkless shifting). Another advantage is the higher efficiency compared to torque converters. These advantages come with the drawback of a high control effort for the clutch engagement of the two clutches. The control effort is handled with software functions (developed using model-based programming languages) deployed on the transmission control unit (TCU) with adjustable control parameters (calibration parameters). With these control parameters e.g., the driving behavior is adjustable for different vehicle, engine combinations. Calibration engineers set these parameters at different ambient conditions to comply with customer requirements in an iterative time-consuming process on costly test trips. Therefore, costs are increasing with increasing control opportunities. An approach for decreasing these costs is to automate the optimization of the calibration parameters. Several approaches have already been introduced but some suffer from lack of stability or time efficiency. Hence, to optimize these parameters the target state optimization (TSO) algorithm is illustrated where a target state is approached with a hybrid solution of reinforcement learning (RL) and supervised learning (SL) to overcome existing drawbacks. Since particularly at low speeds the transmission behavior must meet the intention of the driver (drivers tend to be more perceptive at low speeds) the control of the launch behavior is crucial and is therefore investigated in this study. The algorithm is applied in different environments e.g., in a software in the loop (SiL) environment as well as in different test vehicles to optimize the launch behavior and to verify if a deployment in existing development processes is possible. Further the application in different environments such as in different test vehicles proves the ability of the TSO algorithm to generalize.",
+   "doi": "10.26083/tuprints-00027365",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-23T06:45:54.854425+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8d21e74e770b06f240e7ce56974791b333d0742744ea8bbeecac0a3988585c52",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.26083/tuprints-00027365"
+    },
+    "queries_by_source": {
+     "datacite": "dual-clutch dual die"
+    },
+    "query_variant_derivation": "DOMAIN_NARROW",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Dissertation; resource_type=Ph.D. Thesis"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.26083/tuprints-00027365",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch dual die",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Schmiedt, Marius"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.2139/ssrn.5018903": {
+   "id": "doi:10.2139/ssrn.5018903",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2139/ssrn.5018903",
+   "source_uri": "https://doi.org/10.2139/ssrn.5018903",
+   "title": "Improved Analytical Loss Modeling for Fast, Accurate and Automated System Analysis and Design Using a Next-Generation Hybrid Dual-Clutch Transmission",
+   "abstract": "",
+   "doi": "10.2139/ssrn.5018903",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-23T06:45:54.854443+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "74279ef947feb6d87ca393320ebe2b10b3a3b018e99ad0df105351ecb058479b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2139/ssrn.5018903"
+    },
+    "queries_by_source": {
+     "crossref": "dual-clutch transmission system transmission slip causing loss of acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2139/ssrn.5018903",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch transmission system transmission slip causing loss of acceleration",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2003.14172": {
+   "id": "doi:10.48550/arxiv.2003.14172",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2003.14172v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.2003.14172",
+   "title": "A novel Algorithm for Hydrostatic-mechanical Mobile Machines with a Dual-Clutch Transmission",
+   "abstract": "Mobile machines using a hydrostatic transmission is highly efficient under lower working-speed condition but less capable at higher transport velocities. To enhance overall efficiency, we have improved the powertrain design by combining a hydrostatic transmission with a dual-clutch transmission (DCT). Compared with other mechanical gearboxes, the DCT avoids the interruption of torque transmission in the process of shifting without sacrificing more transmission efficiency. However, there are some problems of unstable torque transmission during the shifting process, and an excessive torque drop occurring at the end of the gear shift, which result in a poor drive comfort. To enhance the performance of the novel structural possibility of powertrain design, we designed a novel control strategy for the motor torque and the clutch torques during the shifting process. The controller's task is tracking the target drive torque and completing the gear shift as quickly as possible with acceptable smoothness requirements. In the process of the controller design, a specific control algorithm is firstly designed for a 10 ton wheel loader. The model-based simulation has validated the control effect. As a result, the control strategy employing clutch and motor torque control to achieve a smooth shifting process is feasible since drive torque is well tracked, and highly dynamical actuators are not required. Furthermore, only two calibration parameters are designed to adjust the control performance systematically. The novel control strategy is generalized for other mobile machines with different sizes.",
+   "doi": "10.48550/arxiv.2003.14172",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:45:54.854460+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "291eae442dc3a8b2208fbdf9c5524a9df3cc066771d5588aef457834c74df6bf",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2003.14172v2"
+    },
+    "queries_by_source": {
+     "arxiv": "dual-clutch transmission system transmission slip causing loss of acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2003.14172",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch transmission system transmission slip causing loss of acceleration",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2003.14172v2",
+   "authors": [
+    "Yusheng Xiang",
+    "Ruoyu Li",
+    "Christine Brach",
+    "Xiaole Liu",
+    "Marcus Geimer"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.1605.03670": {
+   "id": "doi:10.48550/arxiv.1605.03670",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1605.03670v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1605.03670",
+   "title": "Optimisation of power transmission systems using a discrete Tabu Search method",
+   "abstract": "This paper presents a brief description of the Tabu Search method and shows how it can be applied to two different power transmission systems. Examples are presented from two transmission systems. In the first example a mechanical transmission system is considered. A four bar mechanism is synthesised in order to produce a desired output motion. The second example is a hydrostatic transmission operating under closed loop control in order to maintain a constant operating speed as the loading conditions change.",
+   "doi": "10.48550/arxiv.1605.03670",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:45:54.854479+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bd52048d66bd382ab3770ff58525af5afebe1854303b41da0aa57b4fde54bfd9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1605.03670v1"
+    },
+    "queries_by_source": {
+     "arxiv": "dual-clutch transmission system transmission slip causing loss of acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1605.03670",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch transmission system transmission slip causing loss of acceleration",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/1605.03670v1",
+   "authors": [
+    "Andy M. Connor",
+    "Derek G. Tilley"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.16578/j.issn.1004.2539.2015.08.007": {
+   "id": "doi:10.16578/j.issn.1004.2539.2015.08.007",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:142091246",
+   "source_uri": "https://doi.org/10.16578/j.issn.1004.2539.2015.08.007",
+   "title": "Intelligent Control of the RAFNC Launch for Dual Clutch Automatic Transmission",
+   "abstract": "Aiming at the complexity of the dynamics characteristic of launch working condition and the vehicle itself,a robust adaptive fuzzy neural controller is designed for the slip- friction phase of launch performance of vehicle with dual clutch transmission（ DCT）. In the control system framework of dual clutch automatic transmission,the designed controller is middle layer controller. By tracking the target engine speed and the vehicle target launch velocity deduced by the target impact degree,the target torque of engine and the target transmit torque of clutch are obtained. The simulation result on the Matlab / Simulink platform shows that RAFNC for launch has a better tracking effect when compared with PID controller",
+   "doi": "10.16578/j.issn.1004.2539.2015.08.007",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:45:54.854496+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4d0ec0a044f038857192182481bcbc85353526bd5ba281a81043ac416d2e14d1",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:142091246"
+    },
+    "queries_by_source": {
+     "core": "dual-clutch transmission system transmission slip causing experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.16578/j.issn.1004.2539.2015.08.007",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch transmission system transmission slip causing experimental comparison",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Wu Guangqiang",
+    "Hu Junhua"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.51202/9783181023815-159": {
+   "id": "doi:10.51202/9783181023815-159",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.51202/9783181023815-159",
+   "source_uri": "https://doi.org/10.51202/9783181023815-159",
+   "title": "TREMEC Hybrid Dual Clutch Transmission (HDCT) – Electrification of TREMEC’s high performance dual clutch transmission",
+   "abstract": "",
+   "doi": "10.51202/9783181023815-159",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2021",
+   "retrieval_timestamp": "2026-09-23T06:45:54.854514+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "344bb800c649c4be72c77ac071d3928404c9efdfd3e1474b468e35ffd9e51b6f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.51202/9783181023815-159"
+    },
+    "queries_by_source": {
+     "crossref": "dual-clutch transmission system transmission slip causing loss of acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=book-chapter"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.51202/9783181023815-159",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch transmission system transmission slip causing loss of acceleration",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1007/978-3-642-33744-4_39": {
+   "id": "doi:10.1007/978-3-642-33744-4_39",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1007/978-3-642-33744-4_39",
+   "source_uri": "https://doi.org/10.1007/978-3-642-33744-4_39",
+   "title": "Clutch Transmissible Torque Estimation for Dry Dual Clutch Transmission Control",
+   "abstract": "",
+   "doi": "10.1007/978-3-642-33744-4_39",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2012",
+   "retrieval_timestamp": "2026-09-23T06:45:54.854532+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "dea3ba0c6e8d3e864870d38673c3d8aa58a97b4f3116eccbe9eed8a91211f6be",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1007/978-3-642-33744-4_39"
+    },
+    "queries_by_source": {
+     "crossref": "dual-clutch transmission system transmission slip causing loss of acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=book-chapter"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1007/978-3-642-33744-4_39",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch transmission system transmission slip causing loss of acceleration",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "title:4d3e401ce76e9ad1": {
+   "id": "title:4d3e401ce76e9ad1",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:375977060",
+   "source_uri": "",
+   "title": "Kansas Electric Transmission Authority 2011 Annual Report to the Governor and the Legislature",
+   "abstract": "February 29, 2012KETA was created in 2005 by enactment of HB 2263. Our mission is to ensure reliable operation of the electrical transmission system, diversify and expand the Kansas economy and facilitate consumption of Kansas energy through improvements in the state's electric transmission infrastructure. The Board of the Kansas Electric Transmission Authority is proud to submit this report of the Authority's first year of activities. The Board has accomplished a great deal since its first meeting after confirmation of the Governor's appointees early this year. The outgrowth of our efforts in concert with those of many organizations and individuals who are dedicated to a robust and secure energy transmission infrastructure will be construction of sorely needed transmission lines in central and western Kansas in the very near future",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T06:45:54.854549+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9bf6db052a59df83d0edcd8a885b019146d662a512ae80362682b649abc4b1df",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:375977060"
+    },
+    "queries_by_source": {
+     "core": "dual-clutch transmission system transmission slip causing experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:4d3e401ce76e9ad1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "dual-clutch transmission system transmission slip causing experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Kansas Electric Transmission Authority"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:cbd50741": {
+   "id": "problem:cbd50741",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "cbd507414b850d5d15ec3624988b5485b2d986ead268749d74654311dfe2d6ae",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "d4d2d0f8833fcc5e0922dd0898921d60f09943f6e38f81a38538903e309afe9e",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-23T06:46:22+00:00Z"
+ }
+}

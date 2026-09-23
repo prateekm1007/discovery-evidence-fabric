@@ -1,0 +1,33 @@
+{
+ "gen": 1,
+ "invention_id": "inv:de2b4fb50a:gen1",
+ "parent_id": null,
+ "lineage": [
+  "inv:de2b4fb50a:gen1"
+ ],
+ "origin": "BASELINE_SYNTHESIS",
+ "architecture": {
+  "mechanism": "Extended State Kalman Filter (ESKF) used to accurately estimate the torque of the torsional damper during shaft resonance, with extended disturbance states enhancing model robustness against system uncertainties, enabling identification of resonance characteristics and inference of key system parameters.",
+  "intervention": "Install an ESKF-based disturbance observer on the drivetrain shaft (crankshaft to transmission input) that continuously estimates torsional-damper torque from crank-position and engine-speed signals, and feed the identified resonance frequency back to the engine control unit, HVAC blower controller, and transmission shift scheduler so combustion timing, cabin fan duty, and shift solenoid pressures are adjusted in real time to damp the resonance.",
+  "expected_effect": "Damping of the resonant torsional oscillation that is misfiring the spark plug, causing cabin temperature instability (HVAC compressor/condenser fan coupled to the same belt-driven shaft) and harsh shift events; durable restoration of stable combustion, steady cabin temperature, and smooth shift quality.",
+  "falsification_test": "On a chassis dynamometer, induce the misfire/temperature/shift symptom at 350 mi equivalent (e.g., by running a low-fuel/low-load cold-start sweep) and verify that enabling the ESKF observer reduces peak-to-peak crankshaft torsional oscillation by at least 50%, eliminates the observed misfire count on the OBD-II counter, holds cabin-air-temperature variation within ±1 °C, and reduces transmission shift jerk measured at the output shaft below the baseline threshold; repeat on three vehicles to confirm durability."
+ },
+ "state": "INVENTION_SURVIVED",
+ "maturity": "GENERATED",
+ "challenge": {
+  "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+  "attack_overall": null,
+  "evidence_verified": true,
+  "killed": false,
+  "failure_class": null,
+  "kill_reason": "the mechanism-space distinctness adjudication counts 0 materially distinct mechanism(s) (< 2, mechanism_distinctness/2.0.0) — the run generated nothing worth attacking (Art. LXXXIV, R514)",
+  "final_status": "MECHANISM_STARVED"
+ },
+ "causal_delta": null,
+ "change_delta": null,
+ "reason_for_change": null,
+ "fresh_evidence": null,
+ "model": null,
+ "artifacts": {},
+ "evidence_verified": true
+}
