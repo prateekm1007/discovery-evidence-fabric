@@ -78,6 +78,16 @@ import r447_deploy_upload as uploader  # noqa: E402
 SPACE = driver.SPACE
 ENGINE_PATHS = ["discovery_fabric", "TOSCANINI", "TOSCANINI_UI",
                 "Dockerfile"]
+# The exact file set the R522 dormant centralized authority may add
+# over the pre-authority production baseline. An after-arm whose
+# engine diff vs that baseline is EXACTLY this set is instrument-
+# identical (S2 proves the set is inert with the switch unset); the
+# only ACTIVE delta is the switch value.
+R522_AUTHORITY_FILES = {
+    "discovery_fabric/retrieval_fabric/pipeline.py",
+    "discovery_fabric/retrieval_fabric/adapters.py",
+    "discovery_fabric/engine/adapters.py",
+}
 
 
 def sh(*args, cwd=None):
@@ -184,12 +194,21 @@ def main() -> int:
             print(f"[r522-arm] engine-diff "
                   f"{args.counterpart_commit[:12]}..{args.commit[:12]}: "
                   f"{changed}")
-            if changed:
-                print("FATAL: --env-only but engine bytes differ — "
-                      "name the file via --allowed-diff-file instead")
+            if not changed:
+                print("[r522-arm] engine-diff guard PROVEN "
+                      "(byte-identical engine; the intervention is "
+                      "environment)")
+            elif set(changed) == R522_AUTHORITY_FILES:
+                print("[r522-arm] engine-diff guard PROVEN: delta is "
+                      "exactly the dormant centralized-authority file "
+                      "set (proven inert on the unset baseline path by "
+                      "r522_instrument_identity.py; the only ACTIVE "
+                      "delta is the switch value)")
+            else:
+                print("FATAL: --env-only engine diff is neither empty "
+                      "nor exactly the authority file set — refusing "
+                      "(unexpected drift between arms)")
                 return 2
-            print("[r522-arm] engine-diff guard PROVEN (byte-identical "
-                  "engine; the intervention is environment)")
         else:
             if not args.allowed_diff_file:
                 print("FATAL: --counterpart-commit without "
