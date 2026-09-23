@@ -264,6 +264,21 @@ class A2RetrievalAdapter(BaseAdapter):
                     "records_in_custody": len(
                         ef_report.get("records", [])),
                     "report_persisted": "EVIDENCE_FABRIC_REPORT.json",
+                    # R521 observability-only: compact per-channel
+                    # timing (the full report may be pruned from
+                    # snapshots by size; this compact list rides the
+                    # envelope which is always snapshotted). Read-only
+                    # aggregation — no behavior change.
+                    "channel_latencies": [
+                        {"source_id": c.get("source_id"),
+                         "state": c.get("state"),
+                         "attempted_as": c.get("attempted_as"),
+                         "latency_s": c.get("latency_s"),
+                         "records": c.get("records")}
+                        for c in ef_report.get("channels", [])],
+                    "channel_latency_sum_s": ef_report.get(
+                        "channel_latency_sum_s"),
+                    "pacing_s": ef_report.get("pacing_s"),
                 }
         except Exception as _ef_exc:  # noqa: BLE001 — infra, not verdict
             ef_provenance = {

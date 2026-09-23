@@ -266,6 +266,16 @@ def _retrieve_two_level(ret_env, run_dir_files):
         if f.endswith("EVIDENCE_FABRIC_REPORT.json"):
             ef_report = f
             break
+    # R521 phase accounting (present on instrumented builds; absent on
+    # pre-instrumentation runs — UNKNOWN then, never zero).
+    phases = att.get("phase_s") or {}
+    phase_table = {k: v for k, v in phases.items()
+                   if k != "phase_accounting_note"}
+    # evidence-fabric compact per-channel timing (rides the envelope
+    # since R521 instrumentation; absent before).
+    ef_channels = ef.get("channel_latencies") or []
+    ef_timed = [c for c in ef_channels
+                if isinstance(c.get("latency_s"), (int, float))]
     out = {
         "class": "OBSERVED_IN_STAGE",
         "fanout": fanout,
@@ -293,20 +303,28 @@ def _retrieve_two_level(ret_env, run_dir_files):
             "records_in_custody": ef.get("records_in_custody"),
             "production_sources": ef.get("production_sources"),
             "report_file": ef_report,
+            "channel_latencies": ef_channels or None,
+            "channel_latency_sum_s": ef.get("channel_latency_sum_s"),
+            "pacing_s": ef.get("pacing_s"),
             "per_channel_timing": {
-                "class": "UNKNOWN",
-                "note": "evidence-fabric channels run sequentially with "
-                        "pacing and carry state but no per-channel "
-                        "latency in the persisted report — channel "
-                        "time unmeasured (Art. XXV)",
-            } if ef_report is None else {
-                "class": "see EVIDENCE_FABRIC_REPORT.json",
-                "note": "per-channel states harvested from the "
-                        "persisted report; timing fields recorded "
-                        "only where present",
+                "class": ("OBSERVED_IN_STAGE" if ef_timed
+                          else "UNKNOWN"),
+                "n_timed": len(ef_timed),
+                "n_channels": len(ef_channels),
+                "note": ("compact per-channel timing rides the "
+                         "envelope (R521 instrumentation)"
+                         if ef_timed else
+                         "no per-channel latency in the envelope — "
+                         "channel time unmeasured (Art. XXV)"),
             },
         },
+        "phase_s": phase_table or None,
+        "phase_accounting_note": phases.get("phase_accounting_note"),
     }
+    # connector-visibility verdict (the RETRIEVE-specific rule gate)
+    logical_visible = bool(jobs)
+    connector_visible = all(
+        j.get("connector_attempts_visible") for j in jobs) if jobs else False
     # connector-visibility verdict (the RETRIEVE-specific rule gate)
     logical_visible = bool(jobs)
     connector_visible = all(
@@ -314,15 +332,24 @@ def _retrieve_two_level(ret_env, run_dir_files):
     out["connector_visibility_verdict"] = {
         "logical_job_level": "OBSERVED_IN_STAGE" if logical_visible
         else "UNKNOWN",
-        "connector_http_attempt_level": (
+        "evidence_fabric_channel_level": (
+            "OBSERVED_IN_STAGE — compact per-channel latency rides "
+            "the envelope (R521 instrumentation)" if ef_timed else
+            "UNKNOWN — pre-instrumentation run; channel time "
+            "unmeasured (Art. XXV)"),
+        "v2_connector_sub_attempt_level": (
             "OBSERVED_IN_STAGE — per-variant attempt records present "
             "on every job" if (logical_visible and connector_visible)
-            else "UNKNOWN — connector internals (bounded retries in "
-            "patent-claim/page fetch adapters, evidence-fabric "
-            "channels) carry no per-attempt timing; retry waste "
-            "below the logical job level is unmeasured (Art. XXV)"),
+            else "UNKNOWN — V2 connector internals below the variant "
+            "level carry no per-attempt timing (Art. XXV)"),
         "retry_waste_claim_permitted": bool(logical_visible
-                                            and connector_visible),
+                                            and connector_visible
+                                            and ef_timed),
+        "retry_waste_claim_note": (
+            "retry waste may be claimed ONLY for levels observed: "
+            "fanout jobs (attempt/retry/fallback per job) + "
+            "evidence-fabric channels (latency/state/attempts per "
+            "channel). V2 connector sub-attempt waste stays UNKNOWN."),
     }
     return out
 

@@ -630,6 +630,13 @@ def retrieve_fabric(problem: Dict[str, Any],
     lane_caps = {**DEFAULT_LANE_CAPS, **(lane_caps or {})}
     lane_states: List[LaneRunState] = []
     canonicalizer = Canonicalizer()
+    # R521 sub-phase timing (observability only): perf_counter brackets
+    # around pipeline phases, recorded into retrieval_attribution
+    # phase_s. No behavior change: no ordering, retry, timeout,
+    # routing, prompt, budget, or threshold is touched — timing is
+    # recorded, never acted upon.
+    _phase_s: Dict[str, float] = {}
+    _phase_t0 = time.perf_counter()
 
     # ---- 1-2. query derivation + expansion (Art. XLIII) -------------
     primary = mechanism_query(problem)
@@ -637,6 +644,7 @@ def retrieve_fabric(problem: Dict[str, Any],
     from discovery_fabric.retrieval_fabric.query_expansion import llm_expand
     llm_variants = llm_expand(primary, llm_generate)
     all_variants = variants + llm_variants
+    _phase_s["query_derivation"] = time.perf_counter() - _phase_t0
 
     # ---- 3. lane fan-out (each source through the 7-step chain) -----
     # R512 latency cliff: independent (source_id, query_variant) jobs
@@ -657,6 +665,7 @@ def retrieve_fabric(problem: Dict[str, Any],
         len(canonicalizer.canonical_records()) - _canon_before)
     _retrieval_attribution["canonical_merges"] = (
         len(canonicalizer.merge_events) - _merges_before)
+    _phase_s["fanout"] = _retrieval_attribution.get("fanout_wall_s")
 
     # ---- PATENT lane: claim-level fetch for top hits ------------------
     # (enrichment AFTER source retrieval; timed for attribution —
@@ -772,6 +781,11 @@ def retrieve_fabric(problem: Dict[str, Any],
     _enrich_s["unpaywall"] = time.perf_counter() - _enrich_t0
     _retrieval_attribution["enrichment_s"] = {
         k: round(v, 3) for k, v in _enrich_s.items()}
+    _phase_s["enrichment"] = round(sum(_enrich_s.values()), 3)
+    _phase_s["patent_claims"] = round(_enrich_s.get("patent_claims", 0), 3)
+    _phase_s["reciprocal"] = round(_enrich_s.get("reciprocal", 0), 3)
+    _phase_s["unpaywall"] = round(_enrich_s.get("unpaywall", 0), 3)
+    _phase_t0 = time.perf_counter()
     canonical_records = canonicalizer.canonical_records()
     record_sources: Dict[str, List[str]] = {
         r.canonical_id: r.indexing_sources for r in canonical_records}
@@ -779,6 +793,9 @@ def retrieve_fabric(problem: Dict[str, Any],
         [r.to_dict() for r in canonical_records], record_sources)
     stats = run_stats(lane_states)
     blind_spots = blind_spot_analysis(diversity)
+    _phase_s["canonicalization_diversity_stats"] = round(
+        time.perf_counter() - _phase_t0, 3)
+    _phase_t0 = time.perf_counter()
 
     # ---- per-lane relevance ranking (deterministic, same instrument
     # the discovery pipeline uses; lanes ranked SEPARATELY so a highly
@@ -872,7 +889,18 @@ def retrieve_fabric(problem: Dict[str, Any],
         for rank, rec in enumerate(pool[:cap]):
             items.append(_to_engine_item(rec, rank, lane))
             lane_item_counts[lane] = lane_item_counts.get(lane, 0) + 1
+    _phase_s["ranking_item_assembly"] = round(
+        time.perf_counter() - _phase_t0, 3)
+    _phase_s["phase_accounting_note"] = (
+        "R521 observability-only brackets (perf_counter; no behavior "
+        "change): query_derivation + fanout + enrichment sub-phases + "
+        "canonicalization_diversity_stats + ranking_item_assembly. "
+        "The evidence-fabric channel (additive, in the engine adapter) "
+        "is timed separately per channel (latency_s).")
 
+    _retrieval_attribution["phase_s"] = {
+        k: (round(v, 3) if isinstance(v, float) else v)
+        for k, v in _phase_s.items()}
     fabric_report = {
         "fabric_version": FABRIC_VERSION_STRING,
         "fabric_name": "RETRIEVAL_FABRIC_V2",

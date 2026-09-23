@@ -123,7 +123,11 @@ def search_rows(dataset_id: str, config: str, split: str, query: str,
     url = f"{BASE}/search?{params}"
     attempts = []
     for attempt in range(index_retries + 1):
+        # R521 observability-only: per-attempt latency (no behavior
+        # change — recorded, never acted upon).
+        _att_t0 = time.perf_counter()
         body, err = _get_json(url, timeout=timeout)
+        _att_lat = round(time.perf_counter() - _att_t0, 3)
         if err is None and not _body_says_index_loading(body):
             rows = body.get("rows") if isinstance(body, dict) else None
             if rows is None:
@@ -131,16 +135,19 @@ def search_rows(dataset_id: str, config: str, split: str, query: str,
                 # not a zero-match claim — UNKNOWN, retried once
                 total = body.get("num_rows_total") if isinstance(body, dict) else None
                 if total == 0:
-                    attempts.append({"attempt": attempt, "state": "SUCCESS"})
+                    attempts.append({"attempt": attempt, "state": "SUCCESS",
+                                     "latency_s": _att_lat})
                     return [], {"state": "EMPTY_RESULT",
                                 "num_rows_total": 0,
                                 "endpoint": "search",
                                 "attempts": attempts}
                 attempts.append({"attempt": attempt,
-                                 "state": "PARSE_ERROR:rows-missing"})
+                                 "state": "PARSE_ERROR:rows-missing",
+                                 "latency_s": _att_lat})
                 continue
             total = body.get("num_rows_total")
-            attempts.append({"attempt": attempt, "state": "SUCCESS"})
+            attempts.append({"attempt": attempt, "state": "SUCCESS",
+                             "latency_s": _att_lat})
             state = "SUCCESS" if rows else "EMPTY_RESULT"
             return rows, {"state": state, "num_rows_total": total,
                           "endpoint": "search", "attempts": attempts,
@@ -149,7 +156,8 @@ def search_rows(dataset_id: str, config: str, split: str, query: str,
         err_tok = err or "INDEX_LOADING"
         if _body_says_index_loading(body):
             err_tok = "INDEX_LOADING"
-        attempts.append({"attempt": attempt, "state": err_tok})
+        attempts.append({"attempt": attempt, "state": err_tok,
+                         "latency_s": _att_lat})
         if _is_index_loading(err_tok) and attempt < index_retries:
             time.sleep(retry_backoff_s)
             continue

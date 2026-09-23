@@ -284,7 +284,23 @@ def _query_source(source: Dict[str, Any], query: str,
                   ) -> Tuple[Optional[List[EvidenceRecord]],
                              Dict[str, Any]]:
     """Query ONE production source federated; normalize rows to
-    EvidenceRecords. Returns (records_or_None, channel_meta)."""
+    EvidenceRecords. Returns (records_or_None, channel_meta).
+
+    R521 observability-only: channel_meta carries latency_s
+    (perf_counter around the inner query; recorded, never acted
+    upon — no behavior change)."""
+    _qs_t0 = time.perf_counter()
+    recs, meta = _query_source_inner(
+        source, query, problem=problem, limit=limit)
+    meta["latency_s"] = round(time.perf_counter() - _qs_t0, 3)
+    return recs, meta
+
+
+def _query_source_inner(source: Dict[str, Any], query: str,
+                        problem: Optional[Dict[str, Any]] = None,
+                        limit: int = DEFAULT_PER_SOURCE_LIMIT
+                        ) -> Tuple[Optional[List[EvidenceRecord]],
+                                   Dict[str, Any]]:
     ds = source["dataset_id"]
     config = source.get("config") or "default"
     split = source.get("split") or "train"
@@ -417,6 +433,11 @@ def retrieve_evidence(problem: Dict[str, Any],
                  "by_state": {}},
         "coverage_limitations": [],
         "source_failures": [],
+        "timing_note": ("R521 observability-only: each channel dict "
+                        "carries latency_s (perf_counter around the "
+                        "channel query); pacing_s totals the "
+                        "inter-channel pacing sleeps. Recorded, never "
+                        "acted upon — no behavior change."),
     }
     try:
         sources = production_sources()
@@ -427,16 +448,20 @@ def retrieve_evidence(problem: Dict[str, Any],
     ladder = substitution_ladder()
     records_all: List[EvidenceRecord] = []
     _channel_count = 0
+    # R521 observability-only: per-channel latency + pacing accounting
+    # (no behavior change — recorded, never acted upon).
+    _pacing_s = 0.0
 
     def _run_source(src: Dict[str, Any], q: str,
                     why: str) -> None:
-        nonlocal _channel_count
+        nonlocal _channel_count, _pacing_s
         _channel_count += 1
         if _channel_count > 1:
             # pacing: the datasets-server enforces request quotas
             # (measured live this round: RATE_LIMITED bursts when
             # channels fire back-to-back)
             time.sleep(_CHANNEL_PACING_S)
+            _pacing_s += _CHANNEL_PACING_S
         recs, ch = _query_source(src, q, problem=problem,
                                  limit=per_source_limit)
         ch["attempted_as"] = why
@@ -595,6 +620,10 @@ def retrieve_evidence(problem: Dict[str, Any],
     pool = admissible[:pool_cap]
     report["pool"]["items"] = len(pool)
     report["pool"]["by_state"] = by_state
+    report["pacing_s"] = round(_pacing_s, 3)
+    report["channel_latency_sum_s"] = round(sum(
+        float(c.get("latency_s") or 0)
+        for c in report["channels"]), 3)
     engine_items = [r.to_engine_item() for r in pool]
     report["pool"]["evidence_ids"] = [i["id"] for i in engine_items]
     report["completed_at"] = utc_now()
