@@ -257,6 +257,10 @@ STATUS_TO_FABRIC_HEALTH = {
     "GRAMMAR_MISMATCH": "DEGRADED",
     "NO_QUERY_FORMED": "NOT_RUN",
     "NOT_RUN": "NOT_RUN",
+    # R522: a centrally excluded source was never queried. This is an
+    # operational routing state, never a provider health verdict
+    # (Art. XXI.3 / LXI) — it maps to itself, not TEMPORARILY_UNAVAILABLE.
+    "EXCLUDED": "EXCLUDED",
 }
 
 
@@ -269,8 +273,16 @@ def run_stats(lane_states: List[LaneRunState]) -> Dict[str, Any]:
     succeeded/failed/rate_limited + queries_per_source +
     result_counts_per_source. 'No relevant result found' is epistemically
     distinct from 'the source could not be queried' — this record keeps
-    them distinct."""
-    attempted = [s for s in lane_states if s.status not in ("NOT_RUN",)]
+    them distinct.
+
+    R522: an EXCLUDED source was never queried (centralized routing
+    authority), so it is not 'attempted', not 'failed', not 'empty', and
+    never contributes a result count — it is tracked in sources_excluded
+    separately. Converting a routing decision into a provider outcome
+    would manufacture a state that never happened (Art. XXI.3 / LXI)."""
+    excluded_states = [s for s in lane_states if s.status == "EXCLUDED"]
+    queried = [s for s in lane_states if s.status != "EXCLUDED"]
+    attempted = [s for s in queried if s.status not in ("NOT_RUN",)]
     succeeded = [s for s in attempted if s.status in ("OK", "EMPTY")]
     failed = [s for s in attempted
               if s.status not in ("OK", "EMPTY", "RATE_LIMITED")]
@@ -280,11 +292,12 @@ def run_stats(lane_states: List[LaneRunState]) -> Dict[str, Any]:
         "sources_succeeded": sorted({s.source_id for s in succeeded}),
         "sources_failed": sorted({s.source_id for s in failed}),
         "sources_rate_limited": sorted({s.source_id for s in rate_limited}),
-        "sources_empty": sorted({s.source_id for s in lane_states
+        "sources_empty": sorted({s.source_id for s in queried
                                  if s.status == "EMPTY"}),
+        "sources_excluded": sorted({s.source_id for s in excluded_states}),
         "queries_per_source": {
-            s.source_id: len(s.queries) for s in lane_states if s.queries},
+            s.source_id: len(s.queries) for s in queried if s.queries},
         "result_counts_per_source": {
-            s.source_id: s.record_count for s in lane_states},
+            s.source_id: s.record_count for s in queried},
         "lane_states": [s.to_dict() for s in lane_states],
     }

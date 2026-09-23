@@ -341,6 +341,14 @@ class A2RetrievalAdapter(BaseAdapter):
                                     "sources_failed", []),
                                 "sources_rate_limited": stats.get(
                                     "sources_rate_limited", []),
+                                # R522: centralized source exclusion is a
+                                # routing state, never a provider outcome
+                                # — it rides the durable envelope so an
+                                # after-arm run is byte-distinguishable
+                                # from a baseline run at the envelope
+                                # level (Art. XXI.3 / LXI / LXII).
+                                "sources_excluded": stats.get(
+                                    "sources_excluded", []),
                                 "unique_source_families": diversity.get(
                                     "unique_source_families", []),
                                 "independent_source_families": diversity.get(

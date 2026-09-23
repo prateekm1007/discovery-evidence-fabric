@@ -118,6 +118,19 @@ RETRIEVE_FANOUT_DEFAULT_MAX_WORKERS = 5
 RETRIEVE_FANOUT_MAX_WORKERS_CEILING = 16
 
 
+#: R522 centralized source-exclusion authority (single choke point).
+#: ENGINE_RETRIEVE_EXCLUDE_SOURCES is a comma-separated source_id list
+#: (default empty = no exclusion). The planner consults ONLY
+#: excluded_sources(); no per-source branches exist anywhere else in
+#: the retrieval path. Excluded sources produce an explicit EXCLUDED
+#: lane state (recorded, deterministic plan position) — never silent
+#: absence, never a fabricated failure. The resolved set is recorded
+#: verbatim in the attribution record.
+def excluded_sources() -> List[str]:
+    raw = (os.environ.get("ENGINE_RETRIEVE_EXCLUDE_SOURCES", "") or "")
+    return sorted({s.strip().lower() for s in raw.split(",") if s.strip()})
+
+
 def _fanout_policy() -> Dict[str, Any]:
     """Resolve the lane fan-out execution policy (recorded verbatim in
     the retrieval attribution record).
@@ -238,6 +251,7 @@ def _plan_fanout_jobs(
     """
     plan: List[Dict[str, Any]] = []
     job_index = 0
+    _excluded = excluded_sources()
     for lane, source_ids in LANE_SOURCE_MAP.items():
         for source_id in source_ids:
             fabric_src = get_fabric_source(source_id)
@@ -255,6 +269,25 @@ def _plan_fanout_jobs(
                            if v["derivation_class"] == "CROSS_DOMAIN_TERM"][:1]
                           or chosen)
             if not chosen:
+                continue
+            if source_id in _excluded:
+                # R522: centrally excluded — explicit lane state at the
+                # deterministic plan position. No connector is
+                # instantiated (no network, no custody entries); the
+                # queries it WOULD have issued ride the state for
+                # auditability. Assembly passes lane states through
+                # verbatim (same path as NOT_IMPLEMENTED).
+                plan.append({
+                    "kind": "lane_state",
+                    "state": LaneRunState(
+                        lane=lane, source_id=source_id,
+                        queries=[v["query"] for v in chosen],
+                        status="EXCLUDED",
+                        fabric_health="EXCLUDED",
+                        error=("excluded by "
+                               "ENGINE_RETRIEVE_EXCLUDE_SOURCES (central "
+                               "R522 authority; no query issued)")),
+                })
                 continue
             conn = _connector_for(source_id, scoped)
             if conn is None:
@@ -548,6 +581,7 @@ def _drive_fanout(
         "max_workers_effective": effective_workers,
         "peak_concurrency_observed": peak["max"],
         "n_jobs": len(jobs),
+        "excluded_sources": excluded_sources(),
         "fanout_wall_s": round(wall_s, 3),
         "total_search_call_s": round(total_search_call_s, 3),
         "max_job_wall_s": round(max_job_wall_s, 3),
