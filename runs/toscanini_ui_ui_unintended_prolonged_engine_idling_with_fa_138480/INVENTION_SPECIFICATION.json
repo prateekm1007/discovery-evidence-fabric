@@ -1,0 +1,1596 @@
+{
+ "invention_id": {
+  "value": "inv:ui_unintended_prolonged_engine_idling_with_fa_138480:db50ea7302ac",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_unintended_prolonged_engine_idling_with_fa_138480",
+   "device": "engine start-stop and remote start control system",
+   "failure": "Documented problem 'unintended prolonged engine idling with failure to shut off' concerning engine start-stop and remote start control system. User-submitted engineering problem (session input): \"[R521-BATTERY declared_family=mechanical source=odi:11457634 battery=R521-STAGE-ATTRIBUTION-before]\n\nI walked outside my house yesterday morning to find my 2021 Outback XT idling in the driveway. I may have failed to turn the engine off, or it may have started itself. Nonetheless, I calculate that i\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "unintended prolonged engine idling with failure to shut off",
+   "constraint": "The system must retain normal start-stop and remote-start functionality while preventing unattended engine operation beyond a bounded timeout (e.g., one hour), addressing fire, carbon-monoxide, and theft hazards."
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:1be9a0df"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of engine start-stop and remote start control system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Multilingual natural-language interface integrated with a standardized control stack to allow interactive exploration of parameter trade-offs and enforce bounded operational envelopes via automated control.",
+   "intervention": "Add a watchdog layer to the engine start-stop and remote-start control stack that uses a rule-based control policy (analogous to an EPICS/Bluesky-style structured control interface) to monitor ignition duration, automatically issue an engine shutdown command when a configurable timeout (e.g., one hour) is reached, and only release control for normal user-initiated start-stop or remote-start commands when safe conditions are confirmed.",
+   "expected_effect": "Unattended engine operation is capped at the bounded timeout, preventing prolonged idling, while preserving normal user-driven start-stop and remote-start functionality, thereby mitigating fire, carbon-monoxide, and theft hazards.",
+   "mechanism_source_span": "integrates a Monte Carlo ray-tracing engine, a standard Experimental Physics",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1107/s1600577526006788"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Virtual commissioning of the Korea Light Source Hard X-ray Nanoprobe beamline with multilingual natural language control.",
+   "mechanism": "Multilingual natural-language interface integrated with a standardized control stack to allow interactive exploration of parameter trade-offs and enforce bounded operational envelopes via automated control.",
+   "intervention_site": "engine start-stop and remote start control system",
+   "expected_effect": "Unattended engine operation is capped at the bounded timeout, preventing prolonged idling, while preserving normal user-driven start-stop and remote-start functionality, thereby mitigating fire, carbon-monoxide, and theft hazards.",
+   "falsification_test": "In a vehicle or hardware-in-the-loop simulation, trigger an unattended remote-start idle and verify that (a) the engine shuts off within the configured timeout without user input, (b) a subsequent user-initiated remote-start command still starts the engine normally, and (c) normal key-on start-stop cycles (e.g., at traffic lights) are unaffected and do not trigger premature shutdown."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1107/s1600577526006788"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Add a watchdog layer to the engine start-stop and remote-start control stack that uses a rule-based control policy (analogous to an EPICS/Bluesky-style structured control interface) to monitor ignition duration, automatically issue an engine shutdown command when a configurable timeout (e.g., one hour) is reached, and only release control for normal user-initiated start-stop or remote-start commands when safe conditions are confirmed.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1107/s1600577526006788"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "The system must retain normal start-stop and remote-start functionality while preventing unattended engine operation beyond a bounded timeout (e.g., one hour), addressing fire, carbon-monoxide, and theft hazards.",
+   "failure_mode_of_device": "unintended prolonged engine idling with failure to shut off"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:1be9a0df"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.36311062455030463,
+   "eig_per_cost": 0.36311062455030463,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Unattended engine operation is capped at the bounded timeout, preventing prolonged idling, while preserving normal user-driven start-stop and remote-start functionality, thereby mitigating fire, carbo",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-23T04:46:52.878027+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-23T04:46:52.878027+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.36311062455030463,
+     "eig_per_cost": 0.36311062455030463,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1299/jsmemag.115.1123_404",
+    "title": "Shut off the Engine : Idling Stop Technology \"i-stop\"",
+    "source_uri": "https://doi.org/10.1299/jsmemag.115.1123_404",
+    "doi": "10.1299/jsmemag.115.1123_404",
+    "content_hash": "900a4261ecc4c2e2dd3a7ee1ca06becc45fcff8f76eaedb6b992fd067742bdfb",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/icccr49711.2021.9349380",
+    "title": "Research on Control of Engine Start and Stop in P2.5 Hybrid System",
+    "source_uri": "https://doi.org/10.1109/icccr49711.2021.9349380",
+    "doi": "10.1109/icccr49711.2021.9349380",
+    "content_hash": "a26cf079384a011f50136e515c517959ad25d3da8d44ede2bb60753d606ec70c",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1107/s1600577526006788",
+    "title": "Virtual commissioning of the Korea Light Source Hard X-ray Nanoprobe beamline with multilingual natural language control.",
+    "source_uri": "https://doi.org/10.1107/s1600577526006788",
+    "doi": "10.1107/s1600577526006788",
+    "content_hash": "667d5a401a12161d75b3edf127596f89c1ab484b28eaff65b8cf57d3a32e5487",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1049/ic.2010.0364",
+    "title": "Control of automated engine stop/start for vehicles with an automatic transmission",
+    "source_uri": "https://doi.org/10.1049/ic.2010.0364",
+    "doi": "10.1049/ic.2010.0364",
+    "content_hash": "9fe6f057d0f55e4af94beb0bdc0c13a5a123915b9f5658bfb5422d471975b313",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.mex.2026.103864",
+    "title": "A modular PLC simulation method for virtual replication of a cost-effective industrial automation laboratory.",
+    "source_uri": "https://doi.org/10.1016/j.mex.2026.103864",
+    "doi": "10.1016/j.mex.2026.103864",
+    "content_hash": "2e1216bdb8289c91b4168782d6dc469ad5457affcc99729c071682be4a4bcbe1",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/s26092840",
+    "title": "Digital Twin of Coal Mine Rescue Robot-Research on Intelligence and Visualization.",
+    "source_uri": "https://doi.org/10.3390/s26092840",
+    "doi": "10.3390/s26092840",
+    "content_hash": "d1c7c3d81302f9b0d19dd58c550144d091231f88c4fd2de4e417e4834a30d9f2",
+    "frozen": false
+   },
+   {
+    "id": "patent:JP2022029749A",
+    "title": "Engine control device",
+    "source_uri": "https://patents.google.com/patent/JP2022029749A/en",
+    "doi": null,
+    "content_hash": "722384979f0aaa7669fad6873dde788b944d700c5265becbff7407c9cabc1ece",
+    "frozen": false
+   },
+   {
+    "id": "patent:JPH11324749A",
+    "title": "Fuel supply control system for engine",
+    "source_uri": "https://patents.google.com/patent/JPH11324749A/en",
+    "doi": null,
+    "content_hash": "5acf7162e2a2c5e36526678bd6465a1dce2900d2cedbf473c78bb576d4dfebcb",
+    "frozen": false
+   },
+   {
+    "id": "patent:JPH07116994B2",
+    "title": "Gas engine starter",
+    "source_uri": "https://patents.google.com/patent/JPH07116994B2/en",
+    "doi": null,
+    "content_hash": "0c65267f27a2f325a6b4c9c69c8146a87505e8f8dc2af8b841a04c7d6635bcae",
+    "frozen": false
+   },
+   {
+    "id": "patent:JP3019592B2",
+    "title": "Idle speed control device for internal combustion engine",
+    "source_uri": "https://patents.google.com/patent/JP3019592B2/en",
+    "doi": null,
+    "content_hash": "430da89f03c6165d1c9828fad9c77690d0784d48f7ffe6dd9944ff7bac10a33b",
+    "frozen": false
+   },
+   {
+    "id": "patent:US7093426B2",
+    "title": "Starting apparatus, starting method, control method and exhaust filtration &hellip;",
+    "source_uri": "https://patents.google.com/patent/US7093426B2/en",
+    "doi": null,
+    "content_hash": "caabf9e2fcaa1603b28b64d2188bc551a57888d0b3a1e3bfe9fa8ce8e8f51919",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.37099/mtu.dc.etdr/1994",
+    "title": "METHOD FOR ASSESSING GASOLINE POWERED INTERNAL COMBUSTION ENGINE EXHAUST ACCUMULATION WHEN IDLING IN ENCLOSED SPACE BY AUTOMATIC SHUT OFF",
+    "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/1994",
+    "doi": "10.37099/mtu.dc.etdr/1994",
+    "content_hash": "227774ee58ad92b18491d6b29842eb1ac4e971e5bf40a4fd2fe1074bb5f1cca7",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.37099/mtu.dc.etdr/990",
+    "title": "ENERGY CONSUMPTION AND SAVINGS ANALYSIS OF A PHEV IN REAL WORLD DRIVING THROUGH VEHICLE CONNECTIVITY USING VEHICLE PLATOONING, BLENDED MODE OPERATION AND ENGINE START-STOP OPTIMIZERS",
+    "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/990",
+    "doi": "10.37099/mtu.dc.etdr/990",
+    "content_hash": "0dabaf6df7a659e136e6449177bd3eb0115cf2cc48ea3a619ac21d1c5f3347cf",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+    "title": "Battery voltage stabilization system for automotive Stop-Start function : a linear power electronic solution",
+    "source_uri": "https://doi.org/10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+    "doi": "10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+    "content_hash": "26f5fd71f83769e69e3f2047fcb5dd5cbbaafa50f6412298ccc6d288fef5cc38",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2203.16126",
+    "title": "Optimal Energy Management of Series Hybrid Electric Vehicles with Engine Start-Stop System",
+    "source_uri": "https://doi.org/10.48550/arxiv.2203.16126",
+    "doi": "10.48550/arxiv.2203.16126",
+    "content_hash": "3506daf3638327dedd7dd0981c205da0f8938f6afb58029754adff18762f3260",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2606.22283",
+    "title": "Apple Neural Engine: Architecture, Programming, and Performance",
+    "source_uri": "https://doi.org/10.48550/arxiv.2606.22283",
+    "doi": "10.48550/arxiv.2606.22283",
+    "content_hash": "4581d4731adc379b4dc19e908889b7875de672a556b5f9d238ab1fa95248f93e",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1907.07747",
+    "title": "Cylinder-Specific Model-Based Control of Combustion Phasing for Multiple-Cylinder Diesel Engines Operating with High Dilution and Boost Levels",
+    "source_uri": "https://doi.org/10.48550/arxiv.1907.07747",
+    "doi": "10.48550/arxiv.1907.07747",
+    "content_hash": "680ab62a811ccae9f57ae5b366d32e03bedb57860a6de9b73de78c0e3fdc777c",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/machines9070138",
+    "title": "A Low-Cost System for Remote Access and Control of Automation Equipment",
+    "source_uri": "https://doi.org/10.3390/machines9070138",
+    "doi": "10.3390/machines9070138",
+    "content_hash": "cb5e3a9efa15ac54e31d23929c652125c440d96182823c16521de06c9ac317c6",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/en16247988",
+    "title": "AI-Driven Urban Energy Solutions—From Individuals to Society: A Review",
+    "source_uri": "https://doi.org/10.3390/en16247988",
+    "doi": "10.3390/en16247988",
+    "content_hash": "f49786888e7d822fd070334f8bcf71b0005cb6a4088d83aa0c2a46e7a6c8ca17",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5089/9781451953718.022.a020",
+    "title": "Straight Talk: Start This Engine",
+    "source_uri": "https://doi.org/10.5089/9781451953718.022.a020",
+    "doi": "10.5089/9781451953718.022.a020",
+    "content_hash": "7079fd16af217491b599932882127b1dce72a463523a3a9c52e3bdf8e0802769",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.7551/mitpress/14050.001.0001",
+    "title": "Discriminating Data",
+    "source_uri": "https://doi.org/10.7551/mitpress/14050.001.0001",
+    "doi": "10.7551/mitpress/14050.001.0001",
+    "content_hash": "17a0eabf7f5e358e9504c612686176d63b1e379d4251a9457752ca0280138133",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1016/j.mex.2026.103864",
+   "doi:10.1049/ic.2010.0364",
+   "doi:10.1107/s1600577526006788",
+   "doi:10.1109/icccr49711.2021.9349380",
+   "doi:10.1299/jsmemag.115.1123_404",
+   "doi:10.3390/en16247988",
+   "doi:10.3390/machines9070138",
+   "doi:10.3390/s26092840",
+   "doi:10.37099/mtu.dc.etdr/1994",
+   "doi:10.37099/mtu.dc.etdr/990",
+   "doi:10.48550/arxiv.1907.07747",
+   "doi:10.48550/arxiv.2203.16126",
+   "doi:10.48550/arxiv.2606.22283",
+   "doi:10.5089/9781451953718.022.a020",
+   "doi:10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+   "doi:10.7551/mitpress/14050.001.0001",
+   "patent:JP2022029749A",
+   "patent:JP3019592B2",
+   "patent:JPH07116994B2",
+   "patent:JPH11324749A",
+   "patent:US7093426B2"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:evidence:doi:10.1107/s1600577526006788",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['automated', 'control', 'language', 'natural', 'not', 'operational'] in: 'We identify this 30.9 percentage-point ga]",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:evidence:patent:JPH07116994B2",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['driven', 'engine', 'not', 'operation', 'start', 'state', 'system', 'while'] in: 'When starting a gas engine, the s]",
+    "severity": "HIGH"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "In a vehicle or hardware-in-the-loop simulation, trigger an unattended remote-start idle and verify that (a) the engine shuts off within the configured timeout without user input, (b) a subsequent user-initiated remote-start command still starts the engine normally, and (c) normal key-on start-stop cycles (e.g., at traffic lights) are unaffected and do not trigger premature shutdown."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_unintended_prolonged_engine_idling_with_fa_138480:2026-09-23T04:41:20",
+   "final_envelope_hash": "db50ea7302ac83cdf657c1f6bf266722aa085ef5fb2dbd32f3c39f40096c1107",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.36311062455030463
+    },
+    "score": 0.2526,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-23T04:46:53+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-23T04:46:53+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1299/jsmemag.115.1123_404": {
+   "id": "doi:10.1299/jsmemag.115.1123_404",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1299/jsmemag.115.1123_404",
+   "source_uri": "https://doi.org/10.1299/jsmemag.115.1123_404",
+   "title": "Shut off the Engine : Idling Stop Technology \"i-stop\"",
+   "abstract": "",
+   "doi": "10.1299/jsmemag.115.1123_404",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2012",
+   "retrieval_timestamp": "2026-09-23T04:41:51.320266+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "900a4261ecc4c2e2dd3a7ee1ca06becc45fcff8f76eaedb6b992fd067742bdfb",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1299/jsmemag.115.1123_404"
+    },
+    "queries_by_source": {
+     "crossref": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1299/jsmemag.115.1123_404",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1109/icccr49711.2021.9349380": {
+   "id": "doi:10.1109/icccr49711.2021.9349380",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/icccr49711.2021.9349380",
+   "source_uri": "https://doi.org/10.1109/icccr49711.2021.9349380",
+   "title": "Research on Control of Engine Start and Stop in P2.5 Hybrid System",
+   "abstract": "",
+   "doi": "10.1109/icccr49711.2021.9349380",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2021",
+   "retrieval_timestamp": "2026-09-23T04:41:51.320354+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a26cf079384a011f50136e515c517959ad25d3da8d44ede2bb60753d606ec70c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/icccr49711.2021.9349380"
+    },
+    "queries_by_source": {
+     "crossref": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/icccr49711.2021.9349380",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1107/s1600577526006788": {
+   "id": "doi:10.1107/s1600577526006788",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42545792",
+   "source_uri": "https://doi.org/10.1107/s1600577526006788",
+   "title": "Virtual commissioning of the Korea Light Source Hard X-ray Nanoprobe beamline with multilingual natural language control.",
+   "abstract": "Commissioning of a synchrotron hard X-ray nanoprobe beamline traditionally requires months of iterative alignment after hardware installation, during which operational knowledge accumulates but remains inaccessible to non-specialist users. To address this, we present a browser-based virtual commissioning platform for the Korea Light Source ID10 Hard X-ray Nanoprobe beamline (first light 2029) that allows beamline scientists to design, test and refine alignment procedures, scan plans and experimental workflows years before the first photon arrives. Specifically, the platform integrates a Monte Carlo ray-tracing engine, a standard Experimental Physics and Industrial Control System (EPICS)/Bluesky control stack, and a multilingual natural-language interface within a single deployable package, which we name HANBIT (Hybrid Agent-driven Natural-language Beamline Interactive Toolkit). Users can interactively explore parameter trade-offs, such as the effect of the secondary source aperture on beam size versus photon flux. The Monte Carlo engine reproduces the overall Shadow4 beam-profile shape and is validated against SPECTRA undulator spectra, source size and divergence. The natural language processing (NLP) agent achieves 98.2% automated action-identification accuracy across 228 test cases in Korean, English and Japanese, whereas expert review of the same responses yields an acceptance rate of 67.3%. We identify this 30.9 percentage-point gap as a central finding: automated accuracy does not guarantee operational acceptability, and closing it is the key challenge for deployment-grade natural-language beamline control. We further validate the zero-change hardware transition strategy that the beamline pursues on three real hardware subsystems, confirming that at the validated device layers the control code and scan plans operate unchanged on the real devices; the integration of the remaining parts, such as high-rate area detectors, which awaits the detector hardware, is also discussed.",
+   "doi": "10.1107/s1600577526006788",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-07-31",
+   "retrieval_timestamp": "2026-09-23T04:41:51.320383+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "667d5a401a12161d75b3edf127596f89c1ab484b28eaff65b8cf57d3a32e5487",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42545792"
+    },
+    "queries_by_source": {
+     "europepmc": "engine start-stop and remote start control experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-23T04:41:51.279383+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1107/s1600577526006788",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": "https://doi.org/10.1107/s1600577526006788",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1049/ic.2010.0364": {
+   "id": "doi:10.1049/ic.2010.0364",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1049/ic.2010.0364",
+   "source_uri": "https://doi.org/10.1049/ic.2010.0364",
+   "title": "Control of automated engine stop/start for vehicles with an automatic transmission",
+   "abstract": "",
+   "doi": "10.1049/ic.2010.0364",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2010",
+   "retrieval_timestamp": "2026-09-23T04:41:51.320405+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9fe6f057d0f55e4af94beb0bdc0c13a5a123915b9f5658bfb5422d471975b313",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1049/ic.2010.0364"
+    },
+    "queries_by_source": {
+     "crossref": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1049/ic.2010.0364",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1016/j.mex.2026.103864": {
+   "id": "doi:10.1016/j.mex.2026.103864",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41908903",
+   "source_uri": "https://doi.org/10.1016/j.mex.2026.103864",
+   "title": "A modular PLC simulation method for virtual replication of a cost-effective industrial automation laboratory.",
+   "abstract": "Access to hands-on PLC training is often limited by the cost and complexity of physical automation laboratories, while existing simulation tools typically lack alignment with real hardware configurations, reducing their effectiveness for education. To address this, we present a modular PLC simulation method that enables accurate virtual replication of a cost-effective, scalable industrial automation laboratory used for traffic light control, elevator operation, and automated filling systems. Built in Unity, the method integrates a custom ladder logic execution engine with interactive 3D models that mirror the exact input/output structure and operational behavior of the physical laboratory. Users can program, test, and debug logic in a realistic environment and receive immediate visual feedback-without requiring hardware. The method was validated by comparing its outputs against the physical system across 4 representative automation tasks; in every case, the virtual and physical setups produced I/O sequences matching within ±10ms and control outcomes, confirming functional equivalence.•Introduces a modular simulation framework that faithfully replicates the application scope of a physical low-cost PLC training laboratory.•Combines a custom ladder logic interpreter with real-time 3D visualization in Unity to enable program testing and debugging.•Validates functional equivalence through direct behavioral comparison with physical hardware across 4 standard automation tasks.",
+   "doi": "10.1016/j.mex.2026.103864",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-03-14",
+   "retrieval_timestamp": "2026-09-23T04:41:51.320425+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "2e1216bdb8289c91b4168782d6dc469ad5457affcc99729c071682be4a4bcbe1",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41908903"
+    },
+    "queries_by_source": {
+     "europepmc": "engine start-stop and remote start control experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1016/j.mex.2026.103864",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control experimental comparison",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.3390/s26092840": {
+   "id": "doi:10.3390/s26092840",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42122561",
+   "source_uri": "https://doi.org/10.3390/s26092840",
+   "title": "Digital Twin of Coal Mine Rescue Robot-Research on Intelligence and Visualization.",
+   "abstract": "Mine disasters require urgent lifeline setup in confined tunnels, but manual rescue in unstable accident zones carries huge safety risks. Coal mine rescue robots (CMRRs) have become key equipment to replace manual rescue. However, traditional remote-controlled CMRRs suffer from low autonomy and weak environmental perception capability, which have become critical bottlenecks for field application. As an emerging technology in the mining field, digital twin enables high-precision virtual-real mapping and on-site operation guidance, providing a novel solution to the above problems. To realize autonomous navigation and digital twin visualization of the CMRR, this paper first carries out targeted hardware retrofits on the CMRR platform, upgrades environmental perception, communication transmission and motion control modules, and lays a solid hardware foundation for subsequent algorithm design and system implementation. Aiming at the complex post-disaster underground environment, a digital twin-integrated CMRR system is constructed. For intelligent autonomous navigation, this study investigates a 3D point cloud-based autonomous navigation framework and proposes a slope-fitting method as well as a maximum arrival probability obstacle avoidance method based on Bézier curve trajectories. For environmental visualization, a digital twin interactive interface is built to monitor gas and other environmental parameters in real time, and accurately reconstruct underground roadway structures based on point cloud data. This design not only ensures the robot's autonomous obstacle avoidance but also helps rescuers grasp underground conditions in advance. Field tests in a simulated post-disaster mine with complex terrain show that the system can stably complete autonomous navigation tasks, maintain stable motion control under dynamic interference, and provide accurate and reliable environmental data for rescue decisions, verifying its feasibility and effectiveness in harsh mine rescue scenarios.",
+   "doi": "10.3390/s26092840",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-05-01",
+   "retrieval_timestamp": "2026-09-23T04:41:51.320443+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d1c7c3d81302f9b0d19dd58c550144d091231f88c4fd2de4e417e4834a30d9f2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42122561"
+    },
+    "queries_by_source": {
+     "europepmc": "engine start-stop and remote start control experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s26092840",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control experimental comparison",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "patent:JP2022029749A": {
+   "id": "patent:JP2022029749A",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:JP2022029749A",
+   "source_uri": "https://patents.google.com/patent/JP2022029749A/en",
+   "title": "Engine control device",
+   "abstract": "An object of the present invention is to stop idling for ISC learning when learning of idle rotation speed control (ISC) is not necessary. [Solution] During idling, a second deviation threshold is set in which the absolute value DLN of the deviation between the actual value and the target value of &hellip;",
+   "doi": null,
+   "patent_number": "JP2022029749A",
+   "publication_number": "JP2022029749A",
+   "publication_date": "2022-02-18",
+   "retrieval_timestamp": "2026-09-23T04:41:51.320463+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "722384979f0aaa7669fad6873dde788b944d700c5265becbff7407c9cabc1ece",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:JP2022029749A"
+    },
+    "queries_by_source": {
+     "google_patents": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "30c1b7c33f43a8782e2c1f265c5299cd3d7ed97be2559c90e995747e66e2ac03",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:JP2022029749A",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "30c1b7c33f43a8782e2c1f265c5299cd3d7ed97be2559c90e995747e66e2ac03",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:JPH11324749A": {
+   "id": "patent:JPH11324749A",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:JPH11324749A",
+   "source_uri": "https://patents.google.com/patent/JPH11324749A/en",
+   "title": "Fuel supply control system for engine",
+   "abstract": "PROBLEM TO BE SOLVED: To improve the starting performance of an engine that uses a gasoline fuel and a gaseous fuel, dispense with its adjustments for an idle air-fuel ratio, and improve its fuel economy, driveability, output power and emission. SOLUTION: When a starter switch 21 is closed for a &hellip;",
+   "doi": null,
+   "patent_number": "JPH11324749A",
+   "publication_number": "JPH11324749A",
+   "publication_date": "1999-11-26",
+   "retrieval_timestamp": "2026-09-23T04:41:51.320483+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5acf7162e2a2c5e36526678bd6465a1dce2900d2cedbf473c78bb576d4dfebcb",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:JPH11324749A"
+    },
+    "queries_by_source": {
+     "google_patents": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "e0e91e69614b8232bcb71087e76002cafb4b128d61647fe93eed43d0aebd2073",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:JPH11324749A",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "e0e91e69614b8232bcb71087e76002cafb4b128d61647fe93eed43d0aebd2073",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:JPH07116994B2": {
+   "id": "patent:JPH07116994B2",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:JPH07116994B2",
+   "source_uri": "https://patents.google.com/patent/JPH07116994B2/en",
+   "title": "Gas engine starter",
+   "abstract": "[Claims] 1. When starting a gas engine, the starting state of the engine is monitored, and when the engine does not start completely, the fuel supply system and the ignition system are stopped from operation, while the starting system is driven to maintain the remaining flammable flammability. A &hellip;",
+   "doi": null,
+   "patent_number": "JPH07116994B2",
+   "publication_number": "JPH07116994B2",
+   "publication_date": "1995-12-18",
+   "retrieval_timestamp": "2026-09-23T04:41:51.320498+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0c65267f27a2f325a6b4c9c69c8146a87505e8f8dc2af8b841a04c7d6635bcae",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:JPH07116994B2"
+    },
+    "queries_by_source": {
+     "google_patents": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "ff21bcaad2d32b059c16b53b668a608f6303ab652170b04fc5aa42085f5e16c7",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:JPH07116994B2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "ff21bcaad2d32b059c16b53b668a608f6303ab652170b04fc5aa42085f5e16c7",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:JP3019592B2": {
+   "id": "patent:JP3019592B2",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:JP3019592B2",
+   "source_uri": "https://patents.google.com/patent/JP3019592B2/en",
+   "title": "Idle speed control device for internal combustion engine",
+   "abstract": "(57) [Claims] An end of a rotatably provided throttle lever is disposed so as to be in contact with or separated from an idle switch at the tip of a drive motor, and the other end is disposed in such a manner as to be contacted or separated from a fully closed stopper portion. When the idle switch &hellip;",
+   "doi": null,
+   "patent_number": "JP3019592B2",
+   "publication_number": "JP3019592B2",
+   "publication_date": "2000-03-13",
+   "retrieval_timestamp": "2026-09-23T04:41:51.320513+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "430da89f03c6165d1c9828fad9c77690d0784d48f7ffe6dd9944ff7bac10a33b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:JP3019592B2"
+    },
+    "queries_by_source": {
+     "google_patents": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "1bf9f2eaa85bfe0dcfac16da463717c1d894cac52314fe93a90964073e0dd9ac",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:JP3019592B2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "1bf9f2eaa85bfe0dcfac16da463717c1d894cac52314fe93a90964073e0dd9ac",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:US7093426B2": {
+   "id": "patent:US7093426B2",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:US7093426B2",
+   "source_uri": "https://patents.google.com/patent/US7093426B2/en",
+   "title": "Starting apparatus, starting method, control method and exhaust filtration &hellip;",
+   "abstract": "To improve startability and reduce the amount of HC emission at start-up with the aid of a construction where vaporized fuel is supplied to the bypass passage that bypasses the main passage. The main air control valve 16 is installed near the intake port 10 of the main air passage 3, and the main &hellip;",
+   "doi": null,
+   "patent_number": "US7093426B2",
+   "publication_number": "US7093426B2",
+   "publication_date": "2006-08-22",
+   "retrieval_timestamp": "2026-09-23T04:41:51.320530+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "caabf9e2fcaa1603b28b64d2188bc551a57888d0b3a1e3bfe9fa8ce8e8f51919",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:US7093426B2"
+    },
+    "queries_by_source": {
+     "google_patents": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "8afe6c9561cc34a79a35226a164af6bf4c4986d540afe55f23ab190433bfbdb3",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:US7093426B2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "8afe6c9561cc34a79a35226a164af6bf4c4986d540afe55f23ab190433bfbdb3",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "doi:10.37099/mtu.dc.etdr/1994": {
+   "id": "doi:10.37099/mtu.dc.etdr/1994",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.37099/mtu.dc.etdr/1994",
+   "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/1994",
+   "title": "METHOD FOR ASSESSING GASOLINE POWERED INTERNAL COMBUSTION ENGINE EXHAUST ACCUMULATION WHEN IDLING IN ENCLOSED SPACE BY AUTOMATIC SHUT OFF",
+   "abstract": "",
+   "doi": "10.37099/mtu.dc.etdr/1994",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T04:41:51.320548+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "227774ee58ad92b18491d6b29842eb1ac4e971e5bf40a4fd2fe1074bb5f1cca7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.37099/mtu.dc.etdr/1994"
+    },
+    "queries_by_source": {
+     "crossref": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.37099/mtu.dc.etdr/1994",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.37099/mtu.dc.etdr/990": {
+   "id": "doi:10.37099/mtu.dc.etdr/990",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.37099/mtu.dc.etdr/990",
+   "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/990",
+   "title": "ENERGY CONSUMPTION AND SAVINGS ANALYSIS OF A PHEV IN REAL WORLD DRIVING THROUGH VEHICLE CONNECTIVITY USING VEHICLE PLATOONING, BLENDED MODE OPERATION AND ENGINE START-STOP OPTIMIZERS",
+   "abstract": "",
+   "doi": "10.37099/mtu.dc.etdr/990",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T04:41:51.320565+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0dabaf6df7a659e136e6449177bd3eb0115cf2cc48ea3a619ac21d1c5f3347cf",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.37099/mtu.dc.etdr/990"
+    },
+    "queries_by_source": {
+     "crossref": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.37099/mtu.dc.etdr/990",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.70675/2557860bzc1f3z4619z9112z8c292c37ac86": {
+   "id": "doi:10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+   "source_uri": "https://doi.org/10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+   "title": "Battery voltage stabilization system for automotive Stop-Start function : a linear power electronic solution",
+   "abstract": "",
+   "doi": "10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T04:41:51.320582+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "26f5fd71f83769e69e3f2047fcb5dd5cbbaafa50f6412298ccc6d288fef5cc38",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70675/2557860bzc1f3z4619z9112z8c292c37ac86"
+    },
+    "queries_by_source": {
+     "crossref": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2203.16126": {
+   "id": "doi:10.48550/arxiv.2203.16126",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2203.16126v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2203.16126",
+   "title": "Optimal Energy Management of Series Hybrid Electric Vehicles with Engine Start-Stop System",
+   "abstract": "This paper develops energy management (EM) control for series hybrid electric vehicles (HEVs) that include an engine start-stop system (SSS). The objective of the control is to optimally split the energy between the sources of the powertrain and achieve fuel consumption minimization. In contrast to existing works, a fuel penalty is used to characterize more realistically SSS engine restarts, to enable more realistic design and testing of control algorithms. The paper first derives two important analytic results: a) analytic EM optimal solutions of fundamental and commonly used series HEV frameworks, and b) proof of optimality of charge sustaining operation in series HEVs. It then proposes a novel heuristic control strategy, the hysteresis power threshold strategy (HPTS), by amalgamating simple and effective control rules extracted from the suite of derived analytic EM optimal solutions. The decision parameters of the control strategy are small in number and freely tunable. The overall control performance can be fully optimized for different HEV parameters and driving cycles by a systematic tuning process, while also targeting charge sustaining operation. The performance of HPTS is evaluated and benchmarked against existing methodologies, including dynamic programming (DP) and a recently proposed state-of-the-art heuristic strategy. The results show the effectiveness and robustness of the HPTS and also indicate its potential to be used as the benchmark strategy for high fidelity HEV models, where DP is no longer applicable due to computational complexity.",
+   "doi": "10.48550/arxiv.2203.16126",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T04:41:51.320598+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3506daf3638327dedd7dd0981c205da0f8938f6afb58029754adff18762f3260",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2203.16126v1"
+    },
+    "queries_by_source": {
+     "arxiv": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2203.16126",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2203.16126v1",
+   "authors": [
+    "Boli Chen",
+    "Xiao Pan",
+    "Simos A. Evangelou"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2606.22283": {
+   "id": "doi:10.48550/arxiv.2606.22283",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2606.22283v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2606.22283",
+   "title": "Apple Neural Engine: Architecture, Programming, and Performance",
+   "abstract": "The Apple Neural Engine (ANE) is the fixed-function matrix accelerator that has shipped in Apple systems-on-chip since the A11-class iPhone and iPad chips and the M1-class Mac chips, exposed to applications only through the Core ML model framework. This guide reports a reverse-engineered account of the engine, based on direct measurement on Apple silicon and static analysis of the private runtime, compiler, kernel driver, and firmware. It documents the datapath and the roofline that bound the engine's throughput and energy, the dispatch route that reaches it below Core ML, the compiler and on-disk program format, the weight-compression scheme, and the kernel driver, firmware, and command protocol beneath them. The account covers the A11 through A18 and M1 through M5 families, with per-chip target tables and an operation-by-device matrix; the direct measurements are on the M1 and M5. Claims are labeled as measured, decompile-derived, or predicted, and the methodology and open questions are recorded. The direct route is callable from ordinary user space but remains undocumented, unsupported, and version-fragile; it is intended for measurement, research, and on-device work, not for shipping software, where Core ML remains the supported path.",
+   "doi": "10.48550/arxiv.2606.22283",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T04:41:51.320614+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4581d4731adc379b4dc19e908889b7875de672a556b5f9d238ab1fa95248f93e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2606.22283v1"
+    },
+    "queries_by_source": {
+     "arxiv": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2606.22283",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2606.22283v1",
+   "authors": [
+    "Spencer H. Bryngelson"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.1907.07747": {
+   "id": "doi:10.48550/arxiv.1907.07747",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1907.07747v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1907.07747",
+   "title": "Cylinder-Specific Model-Based Control of Combustion Phasing for Multiple-Cylinder Diesel Engines Operating with High Dilution and Boost Levels",
+   "abstract": "Accurate control of combustion phasing is indispensable for diesel engines due to the strong impact of combustion timing on efficiency. In this work, a non-linear combustion phasing model is developed and integrated with a cylinder-specific model of intake gas. The combustion phasing model uses a knock integral model, a burn duration model and a Wiebe function to predict CA50 (the crank angle at which 50% of the mass of fuel has burned). Meanwhile, the intake gas property model predicts the EGR fraction and the in-cylinder pressure and temperature at intake valve closing (IVC) for different cylinders. As such, cylinder-to-cylinder variation of the pressure and temperature at intake valves closing is also considered in this model. This combined model is simplified for controller design and validated. Based on these models, two combustion phasing control strategies are explored. The first is an adaptive controller that is designed for closed-loop control and the second is a feedforward model-based control strategy for open-loop control. These two control approaches were tested in simulations for all six cylinders and the results demonstrate that the CA50 can reach steady state conditions within 10 cycles. In addition, the steady state errors are less than +/-0.1 crank angle degree (CAD) with the adaptive control approach, and less than +/-1.3 CAD with feedforward model-based control. The impact of errors on the control algorithms is also discussed in the paper.",
+   "doi": "10.48550/arxiv.1907.07747",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T04:41:51.320630+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "680ab62a811ccae9f57ae5b366d32e03bedb57860a6de9b73de78c0e3fdc777c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1907.07747v1"
+    },
+    "queries_by_source": {
+     "arxiv": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1907.07747",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/1907.07747v1",
+   "authors": [
+    "Wenbo Sui",
+    "Carrie M. Hall",
+    "Gina Kapadia"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.3390/machines9070138": {
+   "id": "doi:10.3390/machines9070138",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:7a8630b327bcdcc44645aaa34d6381fe742c5313",
+   "source_uri": "https://doi.org/10.3390/machines9070138",
+   "title": "A Low-Cost System for Remote Access and Control of Automation Equipment",
+   "abstract": "The shift towards remote access and control of equipment has become more prominent, especially due to COVID-19 lockdowns. Access to physical/real equipment for practical learning remains important for engineering studies. Thus, this paper presents an approach for remotely accessing and controlling automation equipment for engineering practical activities. Specifically, it addresses the issue of accessing and controlling machines for programmable logic controller (PLC) programming tasks. The combination of a scheduler, remote desktop access, graphical user interface, and a micro-controller allows students to work remotely on practical equipment. The lab computer can be accessed via a remote computer to select one of multiple equipment for practical activities. A prototype system was constructed as proof of concept. The prototype system functions as required.",
+   "doi": "10.3390/machines9070138",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2021",
+   "retrieval_timestamp": "2026-09-23T04:41:51.320647+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "cb5e3a9efa15ac54e31d23929c652125c440d96182823c16521de06c9ac317c6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:7a8630b327bcdcc44645aaa34d6381fe742c5313"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1016/j.mex.2026.103864"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "c528ac49bc51bd9a128fbf701ba792cd5e5efc6756989362e6d24afd793668e5",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.3390/machines9070138",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1016/j.mex.2026.103864",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "P. Chand",
+    "Mohammad Al-Rawi",
+    "S. James",
+    "J. Antony",
+    "Jobin Jose"
+   ],
+   "raw_record_hash": "c528ac49bc51bd9a128fbf701ba792cd5e5efc6756989362e6d24afd793668e5",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  },
+  "doi:10.3390/en16247988": {
+   "id": "doi:10.3390/en16247988",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W4389543523",
+   "source_uri": "https://doi.org/10.3390/en16247988",
+   "title": "AI-Driven Urban Energy Solutions—From Individuals to Society: A Review",
+   "abstract": "This paper provides a comprehensive review of solutions based on artificial intelligence (AI) in the urban energy sector, with a focus on their applications and impacts. The study employed a literature review methodology to analyze recent research on AI’s role in energy-related solutions, covering the years 2019 to 2023. The authors classified publications according to their main focus, resulting in two key areas of AI implementation: residential and individual user applications, and urban infrastructure integration for society. The objectives of this review of the literature are the following: O1: to identify trends, emerging technologies, and applications using AI in the energy field; O2: to provide up-to-date insights into the use of AI in energy-related applications; O3: to gain a comprehensive understanding of the current state of AI-driven urban energy solutions; O4: to explore future directions, emerging trends, and challenges in the field of AI-driven energy solutions. This paper contributes to a deeper understanding of the transformative potential of AI in urban energy management, providing valuable insights and directions for researchers and practitioners in the field. Based on the results, it can be claimed that AI connected to energy at homes is used in the following areas: heating and cooling, lighting, windows and blinds, home devices, and energy management systems. AI is integrating into urban infrastructure through the following solutions: enhancement of electric vehicle charging infrastructure, reduction in vehicle emissions, development of smart grids, and efficient energy storage. What is more, the latest challenges associated with the implementation of AI-driven energy solutions include the need to balance resident comfort with energy efficiency in smart homes, ensuring compatibility and cooperation among various devices, preventing unintended energy consumption increases due to constant connectivity, the management of renewable energy sources, and the coordination of energy consumption.",
+   "doi": "10.3390/en16247988",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T04:41:51.320664+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f49786888e7d822fd070334f8bcf71b0005cb6a4088d83aa0c2a46e7a6c8ca17",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W4389543523"
+    },
+    "queries_by_source": {
+     "openalex": "engine start-stop remote start control unintended prolonged engine idling failure"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-23T04:41:51.240696+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.3390/en16247988",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop remote start control unintended prolonged engine idling failure",
+   "source_rank": 1,
+   "fulltext_url": "https://www.mdpi.com/1996-1073/16/24/7988/pdf?version=1702280649",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "doi:10.5089/9781451953718.022.a020": {
+   "id": "doi:10.5089/9781451953718.022.a020",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5089/9781451953718.022.a020",
+   "source_uri": "https://doi.org/10.5089/9781451953718.022.a020",
+   "title": "Straight Talk: Start This Engine",
+   "abstract": "",
+   "doi": "10.5089/9781451953718.022.a020",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T04:41:51.320682+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "7079fd16af217491b599932882127b1dce72a463523a3a9c52e3bdf8e0802769",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5089/9781451953718.022.a020"
+    },
+    "queries_by_source": {
+     "crossref": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=component"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5089/9781451953718.022.a020",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop and remote start control system unintended prolonged engine idling with failure to shut off",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.7551/mitpress/14050.001.0001": {
+   "id": "doi:10.7551/mitpress/14050.001.0001",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W3208914105",
+   "source_uri": "https://doi.org/10.7551/mitpress/14050.001.0001",
+   "title": "Discriminating Data",
+   "abstract": "How big data and machine learning encode discrimination and create agitated clusters of comforting rage. In Discriminating Data, Wendy Hui Kyong Chun reveals how polarization is a goal—not an error—within big data and machine learning. These methods, she argues, encode segregation, eugenics, and identity politics through their default assumptions and conditions. Correlation, which grounds big data's predictive potential, stems from twentieth-century eugenic attempts to “breed” a better future. Recommender systems foster angry clusters of sameness through homophily. Users are “trained” to become authentically predictable via a politics and technology of recognition. Machine learning and data analytics thus seek to disrupt the future by making disruption impossible. Chun, who has a background in systems design engineering as well as media studies and cultural theory, explains that although machine learning algorithms may not officially include race as a category, they embed whiteness as a default. Facial recognition technology, for example, relies on the faces of Hollywood celebrities and university undergraduates—groups not famous for their diversity. Homophily emerged as a concept to describe white U.S. resident attitudes to living in biracial yet segregated public housing. Predictive policing technology deploys models trained on studies of predominantly underserved neighborhoods. Trained on selected and often discriminatory or dirty data, these algorithms are only validated if they mirror this data. How can we release ourselves from the vice-like grip of discriminatory data? Chun calls for alternative algorithms, defaults, and interdisciplinary coalitions in order to desegregate networks and foster a more democratic big data.",
+   "doi": "10.7551/mitpress/14050.001.0001",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T04:41:51.320697+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "17a0eabf7f5e358e9504c612686176d63b1e379d4251a9457752ca0280138133",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W3208914105"
+    },
+    "queries_by_source": {
+     "openalex": "engine start-stop remote start control unintended prolonged engine idling failure"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.7551/mitpress/14050.001.0001",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine start-stop remote start control unintended prolonged engine idling failure",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "problem:1be9a0df": {
+   "id": "problem:1be9a0df",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "1be9a0df4eac299cab089b9267aaaeed4c4cb971b266eaebbfb3639712f6faa4",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "3c606566f8b08e85a0d6fc3d81591df140730a5eb07baaf88c24856debc729fa",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-23T04:46:53+00:00Z"
+ }
+}
