@@ -1,0 +1,33 @@
+{
+ "gen": 1,
+ "invention_id": "inv:f4c0ee71dc:gen1",
+ "parent_id": null,
+ "lineage": [
+  "inv:f4c0ee71dc:gen1"
+ ],
+ "origin": "BASELINE_SYNTHESIS",
+ "architecture": {
+  "mechanism": "Bidirectional transformation via event sourcing applied to migration case data, enabling state reconstruction from an event log to verify and restore consistent system state.",
+  "intervention": "Apply bidirectional event-sourcing traceability to the 2020 Hyundai Elantra ECU: log all sensor and CAN-bus events (throttle position, RPM, fuel trim, battery voltage, check-engine DTCs) to a persistent event store, then use a bidirectional transformation to reconcile the recorded event stream against the expected powertrain state model whenever a stall is reported, flagging the earliest event that violates state-consistency.",
+  "expected_effect": "Intermittent power loss and sudden stalling become diagnosable post-hoc from stored DTCs and event logs, isolating the root-cause component (e.g., throttle body, crank/cam sensor, fuel pump, or battery voltage sag) without a physical teardown.",
+  "falsification_test": "Replay the captured event stream of a stalling incident through the bidirectional transformation; if the reconstructed state matches the dealer-reported symptom timeline and the identified root-cause component is independently confirmed by a bench test or oscilloscope trace, the mechanism is supported — if reconstruction diverges or no consistent violating event is found, the mechanism is falsified for that incident."
+ },
+ "state": "INVENTION_SURVIVED",
+ "maturity": "GENERATED",
+ "challenge": {
+  "physics_lifecycle": "BEATS_BASELINE",
+  "attack_overall": null,
+  "evidence_verified": true,
+  "killed": false,
+  "failure_class": null,
+  "kill_reason": "the mechanism-space distinctness adjudication counts 0 materially distinct mechanism(s) (< 2, mechanism_distinctness/2.0.0) — the run generated nothing worth attacking (Art. LXXXIV, R514)",
+  "final_status": "MECHANISM_STARVED"
+ },
+ "causal_delta": null,
+ "change_delta": null,
+ "reason_for_change": null,
+ "fresh_evidence": null,
+ "model": null,
+ "artifacts": {},
+ "evidence_verified": true
+}
