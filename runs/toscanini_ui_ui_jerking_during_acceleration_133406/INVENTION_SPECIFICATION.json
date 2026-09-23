@@ -1,0 +1,892 @@
+{
+ "invention_id": {
+  "value": "inv:ui_jerking_during_acceleration_133406:2736066a38a4",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_jerking_during_acceleration_133406",
+   "device": "2021 Toyota RAV4 powertrain acceleration system",
+   "failure": "Documented problem 'jerking during acceleration' concerning 2021 Toyota RAV4 powertrain acceleration system. User-submitted engineering problem (session input): \"[R520-BATTERY declared_family=mechanical source=odi:11403677 battery=R520-MS-AB-optimized]\n\nTL* THE CONTACT RECEIVED A 2021 TOYOTA RAV4 AS A LOANER VEHICLE FROM SERRA TOYOTA (1300 CENTER POINT PKWY, BIRMINGHAM, AL 35215) AS HIS PERSONAL VEHICLE WAS AWAITING REMEDY REPAIRS FOR NHTSA CAMPAIGN NUMBER: \".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "jerking during acceleration",
+   "constraint": "must eliminate acceleration jerking while maintaining normal powertrain performance and emissions compliance"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:ef518afb"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of 2021 Toyota RAV4 powertrain acceleration system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Axle torque rate limits and filters applied in a hybrid control strategy to manage acceleration and jerk, keeping jerk contributions of the hybrid powertrain below a defined tolerable limit.",
+   "intervention": "Add axle torque rate-limit and filtering logic to the 2021 Toyota RAV4 powertrain control module so that commanded propulsion torque during accelerator pedal changes is slew-rate limited and low-pass filtered before being sent to the engine/transmission torque actuators, coordinated with battery SOC management to preserve normal performance and emissions.",
+   "expected_effect": "Jerking during acceleration is reduced by smoothing torque transitions at the wheels, while overall powertrain performance and emissions compliance are maintained because the filtering only modifies transient torque requests, not steady-state operating points.",
+   "mechanism_source_span": "Vehicle drive quality with the hybrid control strategy is analyzed, with acceleration and jerk managed through axle torque rate limits and filters.",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "title:4c288d6c4d52aa79"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Development of a Parallel Hybrid Energy Management Strategy with Consideration of Drive Quality and State of Charge Dynamics",
+   "mechanism": "Axle torque rate limits and filters applied in a hybrid control strategy to manage acceleration and jerk, keeping jerk contributions of the hybrid powertrain below a defined tolerable limit.",
+   "intervention_site": "2021 Toyota RAV4 powertrain acceleration system",
+   "expected_effect": "Jerking during acceleration is reduced by smoothing torque transitions at the wheels, while overall powertrain performance and emissions compliance are maintained because the filtering only modifies transient torque requests, not steady-state operating points.",
+   "falsification_test": "Instrument the vehicle with a wheel-speed sensor and longitudinal accelerometer; perform repeated tip-in/tip-out accelerations on a flat road at 20–80 km/h and measure resulting axle torque derivative and vehicle jerk; compare against the stock ECU and a calibrated threshold (e.g., 10 m/s^3). If mean and peak jerk are not statistically reduced versus stock without degrading 0–60 km/h time or tailpipe emissions on the FTP/US06 cycles, the mechanism is falsified."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "title:4c288d6c4d52aa79"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Add axle torque rate-limit and filtering logic to the 2021 Toyota RAV4 powertrain control module so that commanded propulsion torque during accelerator pedal changes is slew-rate limited and low-pass filtered before being sent to the engine/transmission torque actuators, coordinated with battery SOC management to preserve normal performance and emissions.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "title:4c288d6c4d52aa79"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "must eliminate acceleration jerking while maintaining normal powertrain performance and emissions compliance",
+   "failure_mode_of_device": "jerking during acceleration"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:ef518afb"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.3911112714439877,
+   "eig_per_cost": 0.3911112714439877,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Jerking during acceleration is reduced by smoothing torque transitions at the wheels, while overall powertrain performance and emissions compliance are maintained because the filtering only modifies t",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-23T03:21:13.955055+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-23T03:21:13.955055+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.3911112714439877,
+     "eig_per_cost": 0.3911112714439877,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1016/0890-4332(90)90018-f",
+    "title": "4844026 Spark ignition timing control system for internal combustion engine with feature of suppression of jerking during engine acceleration",
+    "source_uri": "https://doi.org/10.1016/0890-4332(90)90018-f",
+    "doi": "10.1016/0890-4332(90)90018-f",
+    "content_hash": "4c6cc8cdcc1dac0e9f48b063ca43fecb73ecdc6607f9822585237bc8ac03ad6b",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5604/12314005.1138251",
+    "title": "LOAD ANALYSIS OF PROPULSION ENGINE DURING SHIP’S SPEED ACCELERATION",
+    "source_uri": "https://doi.org/10.5604/12314005.1138251",
+    "doi": "10.5604/12314005.1138251",
+    "content_hash": "65b8e4fcbdaafa65d53b71cb57061c8007e2c052596af2f1c622e1375c294dd3",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.14264/158150",
+    "title": "Hardware Acceleration of Security Application Using Reconfigurable System-on-Chip",
+    "source_uri": "https://doi.org/10.14264/158150",
+    "doi": "10.14264/158150",
+    "content_hash": "56ee158e2aec1ea4922593b97e2630e554343605aeba70162dfef0003e90c3a9",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.25148/etd.fi13042902",
+    "title": "System-on-a-Chip (SoC) based Hardware Acceleration in Register Transfer Level (RTL) Design",
+    "source_uri": "https://doi.org/10.25148/etd.fi13042902",
+    "doi": "10.25148/etd.fi13042902",
+    "content_hash": "135ae0ac4c9b0fba9b633db98c2b5ca30ee43020c59bb4a4eff0923057e390f9",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.17918/00006331",
+    "title": "An investigation of the apparent negative velocities of cerebral blood flow during exposure to +g_z acceleration",
+    "source_uri": "https://doi.org/10.17918/00006331",
+    "doi": "10.17918/00006331",
+    "content_hash": "cad52a36d4238858ce96665ac80975f353038543c3c1c8e31c35010658f659db",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.31224/3289",
+    "title": "Toyota RAV4 Loss of Control and Collision Study",
+    "source_uri": "https://doi.org/10.31224/3289",
+    "doi": "10.31224/3289",
+    "content_hash": "28f920e3ac80a2b69e57be20f08cbad750cdce8f5404de5310cda4a8a6f34ffc",
+    "frozen": false
+   },
+   {
+    "id": "title:4c288d6c4d52aa79",
+    "title": "Development of a Parallel Hybrid Energy Management Strategy with Consideration of Drive Quality and State of Charge Dynamics",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "a6136951dd2e9ab265cca6280d6cc86371577e23dc6fc117a551c4c277ea0d13",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2402.17043",
+    "title": "Traffic Control via Connected and Automated Vehicles: An Open-Road Field Experiment with 100 CAVs",
+    "source_uri": "https://doi.org/10.48550/arxiv.2402.17043",
+    "doi": "10.48550/arxiv.2402.17043",
+    "content_hash": "a11020319562c756caa95f41357f58c094bfa46cb96e40b59d9e66b7eb96d3b8",
+    "frozen": false
+   },
+   {
+    "id": "title:b285de725b92aa26",
+    "title": "Solar flare particle acceleration in collapsing magnetic traps",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "bb534bf7b2b593d31bc3134b8a794728135c5a73acbbde8c0507b811aff4275d",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/mcs.2024.3498552",
+    "title": "Traffic Control via Connected and Automated Vehicles (CAVs): An Open-Road Field Experiment with 100 CAVs",
+    "source_uri": "https://doi.org/10.1109/mcs.2024.3498552",
+    "doi": "10.1109/mcs.2024.3498552",
+    "content_hash": "38827d897dac862b321ae8e9074098be389dabd3a9c8c3758f08a84169bfcd2e",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1016/0890-4332(90)90018-f",
+   "doi:10.1109/mcs.2024.3498552",
+   "doi:10.14264/158150",
+   "doi:10.17918/00006331",
+   "doi:10.25148/etd.fi13042902",
+   "doi:10.31224/3289",
+   "doi:10.48550/arxiv.2402.17043",
+   "doi:10.5604/12314005.1138251",
+   "title:4c288d6c4d52aa79",
+   "title:b285de725b92aa26"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:evidence:title:b285de725b92aa26",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['acceleration', 'because', 'model', 'not'] in: 'It is found that the addition of a guide field does not change the ]",
+    "severity": "HIGH"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Instrument the vehicle with a wheel-speed sensor and longitudinal accelerometer; perform repeated tip-in/tip-out accelerations on a flat road at 20–80 km/h and measure resulting axle torque derivative and vehicle jerk; compare against the stock ECU and a calibrated threshold (e.g., 10 m/s^3). If mean and peak jerk are not statistically reduced versus stock without degrading 0–60 km/h time or tailpipe emissions on the FTP/US06 cycles, the mechanism is falsified."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_jerking_during_acceleration_133406:2026-09-23T03:16:46",
+   "final_envelope_hash": "2736066a38a4e5f76f695a6c6846c73b8f2f0f52bafa21d61cd081c06e7209c5",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.3911112714439877
+    },
+    "score": 0.2582,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-23T03:21:14+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-23T03:21:14+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1016/0890-4332(90)90018-f": {
+   "id": "doi:10.1016/0890-4332(90)90018-f",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1016/0890-4332(90)90018-f",
+   "source_uri": "https://doi.org/10.1016/0890-4332(90)90018-f",
+   "title": "4844026 Spark ignition timing control system for internal combustion engine with feature of suppression of jerking during engine acceleration",
+   "abstract": "",
+   "doi": "10.1016/0890-4332(90)90018-f",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "1990",
+   "retrieval_timestamp": "2026-09-23T03:17:18.934917+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4c6cc8cdcc1dac0e9f48b063ca43fecb73ecdc6607f9822585237bc8ac03ad6b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1016/0890-4332(90)90018-f"
+    },
+    "queries_by_source": {
+     "crossref": "2021 Toyota RAV4 powertrain acceleration system jerking during acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1016/0890-4332(90)90018-f",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2021 Toyota RAV4 powertrain acceleration system jerking during acceleration",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.5604/12314005.1138251": {
+   "id": "doi:10.5604/12314005.1138251",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5604/12314005.1138251",
+   "source_uri": "https://doi.org/10.5604/12314005.1138251",
+   "title": "LOAD ANALYSIS OF PROPULSION ENGINE DURING SHIP’S SPEED ACCELERATION",
+   "abstract": "",
+   "doi": "10.5604/12314005.1138251",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2015",
+   "retrieval_timestamp": "2026-09-23T03:17:18.934998+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "65b8e4fcbdaafa65d53b71cb57061c8007e2c052596af2f1c622e1375c294dd3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5604/12314005.1138251"
+    },
+    "queries_by_source": {
+     "crossref": "2021 Toyota RAV4 powertrain acceleration system jerking during acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5604/12314005.1138251",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2021 Toyota RAV4 powertrain acceleration system jerking during acceleration",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.14264/158150": {
+   "id": "doi:10.14264/158150",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.14264/158150",
+   "source_uri": "https://doi.org/10.14264/158150",
+   "title": "Hardware Acceleration of Security Application Using Reconfigurable System-on-Chip",
+   "abstract": "",
+   "doi": "10.14264/158150",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T03:17:18.935041+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "56ee158e2aec1ea4922593b97e2630e554343605aeba70162dfef0003e90c3a9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.14264/158150"
+    },
+    "queries_by_source": {
+     "crossref": "2021 Toyota RAV4 powertrain acceleration system jerking during acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.14264/158150",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2021 Toyota RAV4 powertrain acceleration system jerking during acceleration",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.25148/etd.fi13042902": {
+   "id": "doi:10.25148/etd.fi13042902",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.25148/etd.fi13042902",
+   "source_uri": "https://doi.org/10.25148/etd.fi13042902",
+   "title": "System-on-a-Chip (SoC) based Hardware Acceleration in Register Transfer Level (RTL) Design",
+   "abstract": "",
+   "doi": "10.25148/etd.fi13042902",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T03:17:18.935072+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "135ae0ac4c9b0fba9b633db98c2b5ca30ee43020c59bb4a4eff0923057e390f9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.25148/etd.fi13042902"
+    },
+    "queries_by_source": {
+     "crossref": "2021 Toyota RAV4 powertrain acceleration system jerking during acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.25148/etd.fi13042902",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2021 Toyota RAV4 powertrain acceleration system jerking during acceleration",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.17918/00006331": {
+   "id": "doi:10.17918/00006331",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.17918/00006331",
+   "source_uri": "https://doi.org/10.17918/00006331",
+   "title": "An investigation of the apparent negative velocities of cerebral blood flow during exposure to +g_z acceleration",
+   "abstract": "",
+   "doi": "10.17918/00006331",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T03:17:18.935092+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "cad52a36d4238858ce96665ac80975f353038543c3c1c8e31c35010658f659db",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.17918/00006331"
+    },
+    "queries_by_source": {
+     "crossref": "2021 Toyota RAV4 powertrain acceleration system jerking during acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.17918/00006331",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2021 Toyota RAV4 powertrain acceleration system jerking during acceleration",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.31224/3289": {
+   "id": "doi:10.31224/3289",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.31224/3289",
+   "source_uri": "https://doi.org/10.31224/3289",
+   "title": "Toyota RAV4 Loss of Control and Collision Study",
+   "abstract": "",
+   "doi": "10.31224/3289",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2023",
+   "retrieval_timestamp": "2026-09-23T03:17:18.935110+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "28f920e3ac80a2b69e57be20f08cbad750cdce8f5404de5310cda4a8a6f34ffc",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.31224/3289"
+    },
+    "queries_by_source": {
+     "crossref": "2021 Toyota RAV4 powertrain acceleration system jerking during acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.31224/3289",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2021 Toyota RAV4 powertrain acceleration system jerking during acceleration",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "title:4c288d6c4d52aa79": {
+   "id": "title:4c288d6c4d52aa79",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W3163813690",
+   "source_uri": "",
+   "title": "Development of a Parallel Hybrid Energy Management Strategy with Consideration of Drive Quality and State of Charge Dynamics",
+   "abstract": "The development of a rule-based hybrid energy management strategy for a parallel P4 full hybrid without access to a functional prototype is presented. A simulation model is developed using component bench data and validated using EPA-reported fuel economy test data, including a proposal for complete criteria for valid test results using EPA speed error and SAE J2951 parameters. A combined Willans line model is proposed for the engine and transmission, with control modes based on efficiency-derived power thresholds. Algorithms are proposed for battery state of charge (SOC) management including engine loading and one pedal strategies. Vehicle drive quality with the hybrid control strategy is analyzed, with acceleration and jerk managed through axle torque rate limits and filters. The simulated control strategy for the hybrid vehicle has an energy consumption reduction of 20% for the Hot 505, 3.6% for the HWFET, and 12% for the US06 compared to the stock vehicle. For standard drive cycles, battery SOC is maintained within 20% to 80% safe limits, with charge balanced behavior achieved. Jerk contributions of the hybrid powertrain are generally kept below a 10 m/s3 tolerable limit, with peaks of 15 m/s3 tuned for vehicle launch drive quality. The complete energy management strategy proposed improves fuel economy compared to baseline data while maintaining vehicle drive quality and is considered well-rounded and ready for in-vehicle testing and implementation.",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T03:17:18.935128+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a6136951dd2e9ab265cca6280d6cc86371577e23dc6fc117a551c4c277ea0d13",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W3163813690"
+    },
+    "queries_by_source": {
+     "openalex": "2021 Toyota RAV4 powertrain acceleration jerking during acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "title:4c288d6c4d52aa79",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2021 Toyota RAV4 powertrain acceleration jerking during acceleration",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "doi:10.48550/arxiv.2402.17043": {
+   "id": "doi:10.48550/arxiv.2402.17043",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W4392270805",
+   "source_uri": "https://doi.org/10.48550/arxiv.2402.17043",
+   "title": "Traffic Control via Connected and Automated Vehicles: An Open-Road Field Experiment with 100 CAVs",
+   "abstract": "The CIRCLES project aims to reduce instabilities in traffic flow, which are naturally occurring phenomena due to human driving behavior. These \"phantom jams\" or \"stop-and-go waves,\"are a significant source of wasted energy. Toward this goal, the CIRCLES project designed a control system referred to as the MegaController by the CIRCLES team, that could be deployed in real traffic. Our field experiment leveraged a heterogeneous fleet of 100 longitudinally-controlled vehicles as Lagrangian traffic actuators, each of which ran a controller with the architecture described in this paper. The MegaController is a hierarchical control architecture, which consists of two main layers. The upper layer is called Speed Planner, and is a centralized optimal control algorithm. It assigns speed targets to the vehicles, conveyed through the LTE cellular network. The lower layer is a control layer, running on each vehicle. It performs local actuation by overriding the stock adaptive cruise controller, using the stock on-board sensors. The Speed Planner ingests live data feeds provided by third parties, as well as data from our own control vehicles, and uses both to perform the speed assignment. The architecture of the speed planner allows for modular use of standard control techniques, such as optimal control, model predictive control, kernel methods and others, including Deep RL, model predictive control and explicit controllers. Depending on the vehicle architecture, all onboard sensing data can be accessed by the local controllers, or only some. Control inputs vary across different automakers, with inputs ranging from torque or acceleration requests for some cars, and electronic selection of ACC set points in others. The proposed architecture allows for the combination of all possible settings proposed above. Most configurations were tested throughout the ramp up to the MegaVandertest.",
+   "doi": "10.48550/arxiv.2402.17043",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T03:17:18.935144+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a11020319562c756caa95f41357f58c094bfa46cb96e40b59d9e66b7eb96d3b8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W4392270805"
+    },
+    "queries_by_source": {
+     "openalex": "2021 Toyota RAV4 powertrain acceleration jerking during acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.48550/arxiv.2402.17043",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2021 Toyota RAV4 powertrain acceleration jerking during acceleration",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "title:b285de725b92aa26": {
+   "id": "title:b285de725b92aa26",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:388305688",
+   "source_uri": "",
+   "title": "Solar flare particle acceleration in collapsing magnetic traps",
+   "abstract": "Electronic redacted version excludes material for which permission has not been granted by the rights holderThe topic of this thesis is a detailed investigation of different aspects of the particle acceleration mechanisms operating in Collapsing Magnetic Traps (CMTs), which have been suggested as one possible mechanism for particle acceleration during solar flares.\r\nThe acceleration processes in CMTs are investigated using guiding centre test particle calculations.\r\nResults including terms of different orders in the guiding centre approximation are compared to help identify which of the terms are important for the acceleration of particles. For a basic 2D CMT model the effects of different initial conditions (position, kinetic energy and pitch angle) of particles are investigated in detail. The main result is that the particles that gain most energy are those with initial pitch angles close to 90° and start in weak field regions in the centre of the CMT. The dominant acceleration mechanism for these particles is betatron acceleration, but other\r\nparticles also show signatures of Fermi acceleration.\r\nThe basic CMT model is then extended by (a) including a magnetic field component in the invariant direction and (b) by making it asymmetric. It is found that the addition of a guide field does not change the characteristics of particle acceleration very much, but for the asymmetric models the associated energy gain is found to be much smaller than in symmetric models, because the\r\nparticles can no longer remain very close to the trap centre throughout their orbit.\r\nThe test particle method is then also applied to a CMT model from the literature which contains a magnetic X-line and open and closed field lines and the results are compared with the previous results and the findings in the literature.\r\nFinally, the theoretical framework of CMT models is extended to 2.5D models with shear flow and to fully 3D models, allowing the construction of more realistic CMT models in the future",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T03:17:18.935160+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bb534bf7b2b593d31bc3134b8a794728135c5a73acbbde8c0507b811aff4275d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:388305688"
+    },
+    "queries_by_source": {
+     "core": "2021 Toyota RAV4 powertrain acceleration jerking during acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:b285de725b92aa26",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2021 Toyota RAV4 powertrain acceleration jerking during acceleration",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Grady, Keith J."
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1109/mcs.2024.3498552": {
+   "id": "doi:10.1109/mcs.2024.3498552",
+   "source_type": "scientific_paper",
+   "source": "openalex",
+   "source_id": "openalex:openalex:W4406982901",
+   "source_uri": "https://doi.org/10.1109/mcs.2024.3498552",
+   "title": "Traffic Control via Connected and Automated Vehicles (CAVs): An Open-Road Field Experiment with 100 CAVs",
+   "abstract": "The CIRCLES project aims to reduce instabilities in traffic flow, which are naturally occurring phenomena due to human driving behavior. Also called “phantom jams” or “stop-and-go waves,” these instabilities are a significant source of wasted energy. Toward this goal, the CIRCLES project designed a control system, referred to as the MegaController by the CIRCLES team, that could be deployed in real traffic. Our field experiment, the MegaVanderTest (MVT), leveraged a heterogeneous fleet of 100 longitudinally controlled vehicles as Lagrangian traffic actuators, each of which ran a controller with the architecture described in this article. The MegaController is a hierarchical control architecture that consists of two main layers. The upper layer is called theSpeed Plannerand is a centralized optimal control algorithm. It assigns speed targets to the vehicles, conveyed through the LTE cellular network. The lower layer is a control layer, running on each vehicle. It performs local actuation by overriding the stock adaptive cruise controller, using the stock onboard sensors. The Speed Planner ingests live data feeds provided by third parties as well as data from our own control vehicles and uses both to perform the speed assignment. The architecture of the Speed Planner allows for the modular use of standard control techniques, such as optimal control, model predictive control (MPC), kernel methods, and others. The architecture of the local controller allows for the flexible implementation of local controllers. Corresponding techniques include deep reinforcement learning (RL), MPC, and explicit controllers. Depending on the vehicle architecture, all onboard sensing data can be accessed by the local controllers or only some. Likewise, control inputs vary across different automakers, with inputs ranging from torque or acceleration requests for some cars to electronic selection of adaptive cruise control (ACC) setpoints in others. The proposed architecture technically allows for the combination of all possible settings proposed previously, that is {Speed Planner algorithms} × {local Vehicle Controller algorithms} × {full or partial sensing} × {torque or speed control}. Most configurations were tested throughout the ramp up to the MegaVandertest (MVT).",
+   "doi": "10.1109/mcs.2024.3498552",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-23T03:17:18.935186+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "38827d897dac862b321ae8e9074098be389dabd3a9c8c3758f08a84169bfcd2e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openalex",
+    "indexing_sources": [
+     "openalex"
+    ],
+    "record_ids_by_source": {
+     "openalex": "openalex:W4406982901"
+    },
+    "queries_by_source": {
+     "openalex": "2021 Toyota RAV4 powertrain acceleration jerking during acceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_index_openalex",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-23T03:17:18.817516+00:00",
+     "is_oa": true,
+     "oa_status": "green",
+     "host_type": "repository",
+     "repository_institution": "California Digital Library"
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_index_openalex",
+   "canonical_id": "doi:10.1109/mcs.2024.3498552",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "2021 Toyota RAV4 powertrain acceleration jerking during acceleration",
+   "source_rank": 3,
+   "fulltext_url": "https://escholarship.org/content/qt6nb5z5c9/qt6nb5z5c9.pdf",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstracts are inverted-index reconstructions",
+    "Credit-budget model: 429 'Insufficient budget' measured this session — availability resets per provider policy"
+   ]
+  },
+  "problem:ef518afb": {
+   "id": "problem:ef518afb",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "ef518afb8ef947cc11bb5ef6aae47fdaf27b6d0e2f7ec2a1551d6873ba362cc0",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "b501de88326d4e3cfaf10aa565963a519996b9e9347ee6ed6697c4d7b5e124c2",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-23T03:21:14+00:00Z"
+ }
+}
