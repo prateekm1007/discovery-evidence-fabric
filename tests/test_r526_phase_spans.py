@@ -1,0 +1,153 @@
+"""tests/test_r526_phase_spans.py — R526 Q-B contract.
+
+Post-rank phase spans (model_routing.record_phase_span) ride the
+proven model_routing ledger channel as line_class=PHASE_SPAN lines.
+Proves:
+  A. phase lines are well-formed (identity, phase, event, candidate,
+     wall, detail) and never raise
+  B. availability statistics skip phase lines (a None-ok phase line
+     must not count as failure telemetry)
+  C. the gauntlet loop wires per-candidate enter/exit (source pin)
+  D. the improvement/tech/kill passes wire phase enter/exit
+  E. improve_stage wires per-target enter/exit with parent identity
+  F. provider-call aggregation inputs exclude phase lines
+"""
+from __future__ import annotations
+
+import json
+import sys
+import unittest
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+
+from discovery_fabric.engine import model_routing as mr          # noqa: E402
+
+
+def _temp_ledger(monkeypatch_cls):
+    import tempfile
+    td = tempfile.mkdtemp(prefix="r526_phase_")
+    inst = mr.RoutingLedger(path=Path(td) / "ledger.jsonl")
+    return inst, Path(td) / "ledger.jsonl"
+
+
+class TestPhaseSpanLines(unittest.TestCase):
+
+    def test_a_phase_line_well_formed_and_never_raises(self):
+        import pytest
+        m = pytest.MonkeyPatch()
+        inst, path = _temp_ledger(m)
+        m.setattr(mr, "LEDGER", inst)
+        try:
+            mr.record_phase_span(
+                session_id="ts_test", run_id="run_test",
+                engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
+                event="candidate_enter", candidate_id="cand:1",
+                candidate_key="k1")
+            mr.record_phase_span(
+                session_id="ts_test", run_id="run_test",
+                engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
+                event="candidate_exit", candidate_id="cand:1",
+                candidate_key="k1", wall_s=12.5,
+                detail={"outcome": "SURVIVED_GAUNTLET"})
+            lines = [json.loads(ln) for ln in
+                     path.read_text(encoding="utf-8").splitlines()]
+            self.assertEqual(len(lines), 2)
+            for ln in lines:
+                self.assertEqual(ln["line_class"], "PHASE_SPAN")
+                self.assertEqual(ln["session_id"], "ts_test")
+                self.assertEqual(ln["phase"], "GAUNTLET")
+            self.assertEqual(lines[0]["event"], "candidate_enter")
+            self.assertEqual(lines[1]["event"], "candidate_exit")
+            self.assertEqual(lines[1]["wall_s"], 12.5)
+            self.assertEqual(lines[1]["candidate_id"], "cand:1")
+            self.assertIsNone(lines[0]["ok"])
+            self.assertIsNone(lines[0]["provider"])
+        finally:
+            m.undo()
+
+    def test_b_availability_skips_phase_lines(self):
+        import pytest
+        m = pytest.MonkeyPatch()
+        inst, path = _temp_ledger(m)
+        m.setattr(mr, "LEDGER", inst)
+        try:
+            # a ledger holding ONLY a phase line must contribute zero
+            # telemetry weight: ok=None is falsy and would otherwise
+            # count as a failure observation.
+            mr.record_phase_span(
+                session_id="s", run_id="r",
+                engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
+                event="exit", wall_s=100.0)
+            rep = mr.availability_report(provider="zai")
+            self.assertEqual(rep["decayed_failure_weight"], 0.0)
+            self.assertEqual(rep["decayed_success_weight"], 0.0)
+            self.assertEqual(rep["decayed_observation_weight"], 0.0)
+            self.assertIsNone(rep["recent_success_rate"])
+            rep_all = mr.availability_report()
+            self.assertEqual(rep_all["decayed_observation_weight"], 0.0)
+        finally:
+            m.undo()
+
+
+class TestPhaseWiringPins(unittest.TestCase):
+    """C/D/E — the exact instrumented call sites (repo precedent:
+    R519/R525 source-pin tests)."""
+
+    def _run_src(self):
+        return (REPO_ROOT / "discovery_fabric" / "engine" / "run.py"
+                ).read_text(encoding="utf-8")
+
+    def test_c_gauntlet_candidate_wiring(self):
+        src = self._run_src()
+        self.assertIn("event=\"candidate_enter\"", src)
+        self.assertIn("event=\"candidate_exit\"", src)
+        # exit reuses the _crow wall measurement (never redefined)
+        self.assertIn('wall_s=round(_crow["wall_s"], 6)', src)
+
+    def test_d_pass_phase_wiring(self):
+        import re
+        src = self._run_src()
+        flat = re.sub(r"\s+", " ", src)
+        for phase in ("GAUNTLET", "KILL_IMPROVE", "IMPROVEMENT_PASS",
+                      "TECHNICAL_IMPROVEMENT_PASS"):
+            self.assertIn(f'phase="{phase}", event="enter"', flat)
+            self.assertIn(f'phase="{phase}", event="exit"', flat)
+
+    def test_e_improve_target_wiring(self):
+        src = (REPO_ROOT / "discovery_fabric" / "engine" /
+               "improve_stage.py").read_text(encoding="utf-8")
+        self.assertIn('event="target_enter"', src)
+        self.assertIn('event="target_exit"', src)
+        self.assertIn("dead_e.get(\"candidate_id\")", src)
+
+    def test_f_aggregation_inputs_exclude_phase_lines(self):
+        # the harvester contract: provider-call aggregation must
+        # filter line_class == PHASE_SPAN (checked here as the rule
+        # statement; the R526 harvester implements it).
+        import pytest
+        m = pytest.MonkeyPatch()
+        inst, path = _temp_ledger(m)
+        m.setattr(mr, "LEDGER", inst)
+        try:
+            mr.record_call_outcome(
+                "xkiro", "m", ok=True, latency_ms=5000,
+                session_id="s", engine_stage="SYNTHESIZE",
+                call_class="RUN_OWNED", run_id="r")
+            mr.record_phase_span(
+                session_id="s", run_id="r",
+                engine_stage="SYNTHESIZE", phase="SYNTH",
+                event="exit", wall_s=9.9)
+            attempt_lines = [
+                json.loads(ln) for ln in
+                path.read_text(encoding="utf-8").splitlines()
+                if json.loads(ln).get("line_class") != "PHASE_SPAN"]
+            self.assertEqual(len(attempt_lines), 1)
+            self.assertEqual(attempt_lines[0]["provider"], "xkiro")
+        finally:
+            m.undo()
+
+
+if __name__ == "__main__":  # pragma: no cover
+    unittest.main()

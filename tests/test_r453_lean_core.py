@@ -574,7 +574,34 @@ class TestDeletionAccounting(unittest.TestCase):
                     # -> post_support_assembly: label hygiene on the
                     # same measured span, durations byte-identical)
                     "discovery_fabric/engine/"
-                    "mechanism_attribution.py"),
+                    "mechanism_attribution.py",
+                    # R525 AMENDMENT (disclosed): the SYNTHESIZE wall
+                    # decomposition requires read-only span timers
+                    # where the wall actually accrues
+                    # (a2/synthesize.py — synth_spans/1.0 record on the
+                    # durable candidate; no prompt/budget/retry/gate/
+                    # parse/repair/assembly logic touched; neutrality
+                    # proven by tests/test_r525_synth_span_neutrality.py;
+                    # R525 directive Question A).
+                    "discovery_fabric/a2/synthesize.py",
+                    # R526 AMENDMENT (disclosed): the generate()-level
+                    # routing-gap decomposition (Question A) and the
+                    # post-rank phase-wall reconciliation (Question B)
+                    # require read-only span timers where those walls
+                    # accrue (engine/llm_registry.py — gen_spans/1.0 per
+                    # ledger line; engine/model_routing.py — additive
+                    # generate_spans key + PHASE_SPAN line class with an
+                    # explicit availability-statistics guard;
+                    # engine/improve_stage.py — per-target phase lines
+                    # with parent identity) plus the run.py post-rank
+                    # phase enter/exit lines (already-allowed file).
+                    # No routing, retry, budget, gate, probe, admission,
+                    # or transport logic touched; neutrality proven by
+                    # tests/test_r526_generate_spans.py and
+                    # tests/test_r526_phase_spans.py plus unchanged
+                    # suite pass/fail sets.
+                    "discovery_fabric/engine/model_routing.py",
+                    "discovery_fabric/engine/improve_stage.py"),
                 f"the mandate's file list is exhaustive: {f} is outside "
                 "run.py/stage_entry.py/adapters.py/llm_registry.py")
 

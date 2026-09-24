@@ -1626,6 +1626,15 @@ class EngineRun:
             evaluated: List[Dict[str, Any]] = []
             _cctx.set_stage("POST_RANK_GAUNTLET")
             _pra_start("GAUNTLET")
+            # R526 Q-B (behavior-neutral phase spans): gauntlet phase
+            # entry, durably recorded on the proven model_routing ledger
+            # channel (run-dir sidecars are demonstrably absent
+            # branch-wide even on runs with proven post-rank work).
+            # Pure telemetry appends; never raise, never branch logic.
+            from .model_routing import record_phase_span as _rps
+            _rps(session_id=self.session_id, run_id=self.run_id,
+                 engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
+                 event="enter")
             for c in pool:
                 key = c["key"]
                 _ct0 = _ptime.perf_counter()
@@ -1635,11 +1644,30 @@ class EngineRun:
                     "origin": c.get("origin"),
                     "phase_s": {},
                     "outcome": None}
+                # R526 Q-B: per-candidate gauntlet entry (candidate
+                # identity preserved durably; the exit rides
+                # _crow_finish below so every path is covered).
+                _rps(session_id=self.session_id, run_id=self.run_id,
+                     engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
+                     event="candidate_enter",
+                     candidate_id=c.get("candidate_id"),
+                     candidate_key=key)
 
                 def _crow_finish(_outcome: str) -> None:
                     _crow["outcome"] = _outcome
                     _crow["wall_s"] = _ptime.perf_counter() - _ct0
                     _pra["candidates"].append(_crow)
+                    # R526 Q-B: per-candidate gauntlet exit (same
+                    # identity as the entry above; wall reuses the
+                    # _crow measurement, never redefined).
+                    _rps(session_id=self.session_id,
+                         run_id=self.run_id,
+                         engine_stage="POST_RANK_GAUNTLET",
+                         phase="GAUNTLET", event="candidate_exit",
+                         candidate_id=_crow.get("candidate_id"),
+                         candidate_key=_crow.get("key"),
+                         wall_s=round(_crow["wall_s"], 6),
+                         detail={"outcome": _outcome})
                 # R401 resume-robustness (the R399 W2.5 class): a
                 # candidate whose terminal KILL record was already
                 # persisted in a previous (interrupted) execution of
@@ -1987,6 +2015,13 @@ class EngineRun:
                 _crow_finish("SURVIVED_GAUNTLET")
 
             _pra_stop("GAUNTLET")
+            # R526 Q-B: gauntlet phase exit (pairs with the entry at
+            # loop start; wall reuses the _pra measurement).
+            _rps(session_id=self.session_id, run_id=self.run_id,
+                 engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
+                 event="exit",
+                 wall_s=round(_pra["phase_s"].get("GAUNTLET", 0.0), 6),
+                 detail={"n_evaluated": len(evaluated)})
             _cctx.set_stage("POST_RANK")
 
             # ---------- R481 P0-1: the IMPROVE stage (kill point) ------
@@ -2157,6 +2192,13 @@ class EngineRun:
                         "ENGINE_IMPROVE_MAX_CHILDREN", "3"))}
                 _cctx.set_stage("POST_RANK_IMPROVE")
                 _pra_start("KILL_IMPROVE")
+                # R526 Q-B: kill-point improve phase entry (per-target
+                # lines live in improve_stage.run_improve with parent
+                # identity; this line bounds the whole phase).
+                _rps(session_id=self.session_id, run_id=self.run_id,
+                     engine_stage="POST_RANK_IMPROVE",
+                     phase="KILL_IMPROVE", event="enter",
+                     detail={"n_dead_targets": len(dead)})
                 _imp_children = 0
                 try:
                     from .adapters import ADAPTERS as _AD
@@ -2187,6 +2229,13 @@ class EngineRun:
                 _pra_stop("KILL_IMPROVE")
                 _pra["mutations"]["kill_point_children_admitted"] = (
                     _imp_children)
+                # R526 Q-B: kill-point improve phase exit.
+                _rps(session_id=self.session_id, run_id=self.run_id,
+                     engine_stage="POST_RANK_IMPROVE",
+                     phase="KILL_IMPROVE", event="exit",
+                     wall_s=round(
+                         _pra["phase_s"].get("KILL_IMPROVE", 0.0), 6),
+                     detail={"children_admitted": _imp_children})
                 _cctx.set_stage("POST_RANK")
 
             # ---------- E15-H: select the strongest survivor ---------------
@@ -2253,8 +2302,22 @@ class EngineRun:
             # infrastructure is not a research verdict, Art. XXV).
             _cctx.set_stage("POST_RANK_IMPROVEMENT")
             _pra_start("IMPROVEMENT_PASS")
+            # R526 Q-B: improvement-pass phase entry (single chosen
+            # candidate; per-call provider walls ride the ledger).
+            _rps(session_id=self.session_id, run_id=self.run_id,
+                 engine_stage="POST_RANK_IMPROVEMENT",
+                 phase="IMPROVEMENT_PASS", event="enter",
+                 candidate_id=(chosen or {}).get("candidate_id"))
             improvement = self._improvement_pass(chosen, spec_rel, run_ctx)
             _pra_stop("IMPROVEMENT_PASS")
+            # R526 Q-B: improvement-pass phase exit.
+            _rps(session_id=self.session_id, run_id=self.run_id,
+                 engine_stage="POST_RANK_IMPROVEMENT",
+                 phase="IMPROVEMENT_PASS", event="exit",
+                 candidate_id=(chosen or {}).get("candidate_id"),
+                 wall_s=round(
+                     _pra["phase_s"].get("IMPROVEMENT_PASS", 0.0), 6),
+                 detail={"outcome": (improvement or {}).get("outcome")})
             _cctx.set_stage("POST_RANK")
             if improvement is not None:
                 if improvement["outcome"] == "IMPROVED":
@@ -2309,9 +2372,23 @@ class EngineRun:
             # research verdict).
             _cctx.set_stage("POST_RANK_TECH_IMPROVEMENT")
             _pra_start("TECHNICAL_IMPROVEMENT_PASS")
+            # R526 Q-B: technical-pass phase entry (single chosen
+            # candidate; per-call provider walls ride the ledger).
+            _rps(session_id=self.session_id, run_id=self.run_id,
+                 engine_stage="POST_RANK_TECH_IMPROVEMENT",
+                 phase="TECHNICAL_IMPROVEMENT_PASS", event="enter",
+                 candidate_id=(chosen or {}).get("candidate_id"))
             technical = self._technical_improvement_pass(
                 chosen, spec_rel, run_ctx)
             _pra_stop("TECHNICAL_IMPROVEMENT_PASS")
+            # R526 Q-B: technical-pass phase exit.
+            _rps(session_id=self.session_id, run_id=self.run_id,
+                 engine_stage="POST_RANK_TECH_IMPROVEMENT",
+                 phase="TECHNICAL_IMPROVEMENT_PASS", event="exit",
+                 candidate_id=(chosen or {}).get("candidate_id"),
+                 wall_s=round(_pra["phase_s"].get(
+                     "TECHNICAL_IMPROVEMENT_PASS", 0.0), 6),
+                 detail={"outcome": (technical or {}).get("outcome")})
             _cctx.set_stage("POST_RANK")
             if technical is not None:
                 if technical["outcome"] == "TECHNICALLY_IMPROVED":

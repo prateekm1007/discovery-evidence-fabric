@@ -1652,6 +1652,78 @@ def generate(prompt: str, system: str = "",
     from . import runtime_admission as _ra
     call_prov = _cctx.effective(run_id)
 
+    # R526 Q-A (behavior-neutral per-attempt span instrumentation):
+    # read-only perf_counter/utc timestamps around the phases that
+    # actually exist in generate(). No routing, retry, budget, gate,
+    # probe, admission, or transport logic is touched — the record
+    # rides every durable ledger line of this call so the harvester
+    # can split llm_chat_total_s from provider-call wall without
+    # inventing sub-phases. Anything unmeasured stays UNATTRIBUTED
+    # downstream (never force-fit). Audit rule per call:
+    #   generate_total_s = measured_subspans + unattributed_remainder
+    _gen_t0 = time.perf_counter()
+    _gen_spans = {
+        "instrument": "gen_spans/1.0",
+        "purpose": None,
+        "generate_total_s": None,
+        "selection_ordering_s": None,
+        "ladder_before_filtering": [],
+        "retirement_removed": [],
+        "cost_refusals": [],
+        "chain_source": None,
+        "rungs": [],
+    }
+    # R526 Q-A: one stable identity for every durable ledger line of
+    # THIS generate() call (grouping without time-window inference) +
+    # the wall-clock start for the call-total audit rule. Precedent:
+    # dry_run already reuses request_id per run; nothing assumes
+    # per-line uniqueness (verified).
+    import uuid as _uuid
+    _gen_call_id = f"gen_{_uuid.uuid4().hex[:12]}"
+    _gen_start_epoch = time.time()
+    _t_sel0 = time.perf_counter()
+
+    def _gen_span_snapshot(final: bool = False) -> Dict[str, Any]:
+        """R526 Q-A: self-contained span snapshot for one durable ledger
+        line. Rung/attempt dicts are serialized by the ledger writer at
+        call time, so later mutations cannot rewrite history. On
+        terminal lines (a return follows immediately) the snapshot
+        carries generate_total_s; elsewhere the total stays None and
+        the harvester treats it as UNATTRIBUTED for the call total."""
+        snap = {"instrument": _gen_spans["instrument"],
+                "purpose": _gen_spans["purpose"],
+                "generate_call_id": _gen_call_id,
+                "generate_start_epoch": _gen_start_epoch,
+                "generate_total_s": (
+                    round(time.perf_counter() - _gen_t0, 6)
+                    if final else None),
+                "generate_elapsed_s": round(
+                    time.perf_counter() - _gen_t0, 6),
+                "selection_ordering_s": _gen_spans[
+                    "selection_ordering_s"],
+                "ladder_before_filtering": [
+                    list(x) for x in
+                    _gen_spans["ladder_before_filtering"]],
+                "retirement_removed": list(
+                    _gen_spans["retirement_removed"]),
+                "cost_refusals": list(_gen_spans["cost_refusals"]),
+                "chain_source": _gen_spans["chain_source"],
+                "rungs": [{k: (list(v) if k == "attempts" else v)
+                           for k, v in _hop.items() if not k.startswith(
+                               "_")}
+                          for _hop in _gen_spans["rungs"]],
+                "post_success_sleep_s": None,
+                "post_success_sleep_note": (
+                    "no fixed post-success sleep in generate(); the "
+                    "0.5 s sleep lives in a2/synthesize.llm_chat and "
+                    "rides inside llm_chat_total_s"),
+                "response_normalization_s": None,
+                "response_normalization_note": (
+                    "no response-normalization step exists in "
+                    "generate(); provider content flows straight to "
+                    "the result record")}
+        return snap
+
     reconcile_runtime_classifications()  # R483: the re-point class authority
     matrix = availability_matrix()
     avail_ids = [m["provider_id"] for m in matrix
@@ -1780,6 +1852,11 @@ def generate(prompt: str, system: str = "",
         available_providers=avail_ids,
         purpose=purpose_tag)
     rungs = [(r["provider"], r["model"], r) for r in ladder["rungs"]]
+    # R526 Q-A: the candidate ladder BEFORE cost/retirement filtering
+    # (durable per attempt — same list rides every ledger line of the
+    # call; small by construction).
+    _gen_spans["ladder_before_filtering"] = [
+        [p, m] for p, m, _r in rungs]
     # R451: policy-filter the rungs (the ladder's LAST_RESORT band may
     # add providers the policy chain never asked for — paid models are
     # refused here too, with each refusal recorded on the ladder)
@@ -1815,6 +1892,18 @@ def generate(prompt: str, system: str = "",
     _allowed_set = set(_allowed_providers)
     rungs = [x for x in rungs if x[0] in _allowed_set]
     ladder["retirement_events"] = list(retirement_events)
+    # R526 Q-A: retirement removals + cost refusals as durable
+    # per-call facts (the ladder's full retirement_events already
+    # carry the per-removal records; these lists are the compact
+    # per-attempt view).
+    _gen_spans["retirement_removed"] = sorted({
+        e.get("provider") for e in retirement_events
+        if e.get("retirement_state") == "RETIRED_ROUTE_BLOCKED"
+        and e.get("provider")})
+    _gen_spans["cost_refusals"] = sorted({
+        r.get("provider") for r in (policy_refusals + _rung_refusals)
+        if r.get("provider")})
+    _gen_spans["chain_source"] = chain_source
     # the ladder may add last-resort providers beyond the policy chain
     # (the directive's LAST-RESORT rung); bound the walk:
     # 1 + max_provider_fallbacks + 2 model hops
@@ -1855,6 +1944,14 @@ def generate(prompt: str, system: str = "",
     # evidence is persisted — read-only snapshot BEFORE any probing)
     ladder["capability_evidence"] = _ra.ladder_capability_evidence(
         [{"provider": p, "model": m} for p, m, _meta in rungs])
+    # R526 Q-A: close the selection/ordering span here (covers matrix,
+    # chain assembly, cost filter, ladder build, rung filter,
+    # retirement, capability evidence, message assembly — the whole
+    # pre-walk setup; sub-splits are not durably separated, so one
+    # honest span, never force-fit).
+    _gen_spans["selection_ordering_s"] = round(
+        time.perf_counter() - _t_sel0, 6)
+    _gen_spans["purpose"] = purpose_tag
 
     wanted_head = rungs[0][0]
 
@@ -1918,7 +2015,21 @@ def generate(prompt: str, system: str = "",
 
     for hop_idx, (provider_id, model_id, rung_meta) in enumerate(rungs):
         spec = _SPEC_BY_ID.get(provider_id)
+        # R526 Q-A: per-rung span record, appended immediately so even
+        # skipped rungs (spec-None/GONE/no-credential/not-admitted
+        # continues below) ride the next durable ledger line of this
+        # call — mutated in place along the path, serialized at write.
+        _hop = {"rung_index": hop_idx, "provider": provider_id,
+                "model": model_id, "purpose": purpose_tag,
+                "admission": {"admitted": None},
+                "attempts": [], "post_provider_local_s": None,
+                "note": None}
+        _gen_spans["rungs"].append(_hop)
+        # R526 Q-A: transition links attempts WITHIN a rung only;
+        # rung-to-rung gaps ride the unattributed remainder.
+        _prev_att, _prev_end, _prev_sleep = None, None, 0.0
         if spec is None:
+            _hop["note"] = "spec absent — rung skipped, no attempt"
             continue
         next_rung = rungs[hop_idx + 1] if hop_idx + 1 < len(rungs) \
             else None
@@ -1927,6 +2038,7 @@ def generate(prompt: str, system: str = "",
         # a rung whose model is recorded GONE is skipped (known-dead from
         # the provider's own 410 — a recorded fact, not a heuristic)
         if mr.is_model_gone(provider_id, model_id):
+            _hop["note"] = "model GONE — rung skipped, no attempt"
             continue
         # -- R451-C1.3-1: RUNTIME ADMISSION — a route requires a CURRENT
         # measured successful capability probe; credential presence is
@@ -1981,7 +2093,15 @@ def generate(prompt: str, system: str = "",
             last_err = (f"provider {provider_id} unkeyed — no probe, "
                         "no call (empty credential)")
             last_failure_type = "NO_CREDENTIAL"
+            _hop["admission"] = {"admitted": False,
+                                 "reason": "NO_CREDENTIAL"}
+            _hop["note"] = "no credential — rung skipped, no attempt"
             continue
+        # R526 Q-A: probe + admission wall, measured where performed.
+        # The probe transient-retry sleeps are cooldown-class waiting
+        # (measured separately, never folded into the probe wall).
+        _t_adm0 = time.perf_counter()
+        _probe_retry_sleep_s = 0.0
         if _ra.requires_probe(provider_id, model_id):
             _ra.probe_capability(provider_id, model_id,
                                  timeout_s=min(timeout, 30))
@@ -1989,12 +2109,22 @@ def generate(prompt: str, system: str = "",
             while (_tries < max_retries
                    and _ra.probe_failure_is_transient(
                        provider_id, model_id)):
+                _t_ps0 = time.perf_counter()
                 time.sleep(2 * (_tries + 1))
+                _probe_retry_sleep_s += time.perf_counter() - _t_ps0
                 _ra.probe_capability(provider_id, model_id,
                                      timeout_s=min(timeout, 30))
                 _tries += 1
         _adm, _adm_note, _adm_ev = _ra.runtime_admission(
             provider_id, model_id)
+        _hop["admission"] = {
+            "admitted": bool(_adm),
+            "probe_admission_s": round(
+                time.perf_counter() - _t_adm0, 6),
+            "probe_retry_sleep_s": round(_probe_retry_sleep_s, 6),
+            "capability_state": (_adm_ev or {}).get("state"),
+            "note": (None if _adm else str(_adm_note)[:200]),
+        }
         if not _adm:
             # the probe's own typed failure class (when the state is
             # PROBE_FAILED) rides the hop — the route stays fully
@@ -2033,6 +2163,13 @@ def generate(prompt: str, system: str = "",
         attempt_budget = max_tokens
         retry_notes: List[str] = []
         hop_t0 = time.time()
+        # R526 Q-A: per-attempt span records for this rung (appended to
+        # _hop["attempts"]; the rung dict rides every durable ledger
+        # line of this call). Transition overhead between consecutive
+        # attempts is measured, not inferred.
+        _prev_att = None
+        _prev_end = None
+        _prev_sleep = 0.0
         # R469: the attempt budget is EXTENDED by the credential ring —
         # a KEY ROTATION is not a same-model retry (a different
         # credential is a different request path: it neither consumes
@@ -2046,6 +2183,19 @@ def generate(prompt: str, system: str = "",
         attempt = 0
         while attempt < max_attempts:
             t0 = time.time()
+            # R526 Q-A: attempt record opens here (budget = the cap THIS
+            # attempt actually uses; escalations re-record per attempt).
+            _t_att0 = time.perf_counter()
+            _att = {"attempt_index": attempt + 1,
+                    "attempt_budget": attempt_budget,
+                    "start_utc": utc_now(),
+                    "dispatch_s": None, "retry_sleep_s": 0.0,
+                    "transition_to_next_s": None,
+                    "outcome": None, "failure_type": None,
+                    "end_utc": None}
+            if _prev_att is not None:
+                _prev_att["transition_to_next_s"] = round(
+                    time.perf_counter() - _prev_end - _prev_sleep, 6)
             try:
                 if spec.flavor == "anthropic":
                     content = _call_anthropic_flavor(
@@ -2056,23 +2206,23 @@ def generate(prompt: str, system: str = "",
                         spec, messages, timeout, attempt_budget,
                         model_override=model_id)
                 latency_ms = int((time.time() - t0) * 1000)
+                # R526 Q-A: attempt dispatch wall (existing measurement,
+                # copied, never redefined). Post-provider local work
+                # (health/route/capability writes + result assembly)
+                # completes BEFORE the durable ledger write below, so
+                # the written span snapshot is terminal-complete; the
+                # ledger file-append itself (~ms) rides the unattributed
+                # remainder by rule (documented, never estimated). Write
+                # order vs local ops shifted by microseconds only — same
+                # values, same calls, same failure classes.
+                _att["dispatch_s"] = round(latency_ms / 1000.0, 3)
+                _t_loc0 = time.perf_counter()
                 # R469: the serving hop records WHICH ring slot answered
                 _ok_slot = active_key_slot(spec)
                 HEALTH.record_success(
                     spec.provider_id, latency_ms,
                     purpose=purpose_tag,
                     model=model_id)
-                mr.record_call_outcome(
-                    provider_id, model_id, ok=True,
-                    latency_ms=latency_ms, task=task, stage=purpose_tag,
-                    run_id=call_prov["run_id"], attempt=attempt + 1,
-                    cost_class=spec.cost_basis, selected=True,
-                    session_id=call_prov["session_id"],
-                    engine_stage=call_prov["engine_stage"],
-                    call_class=call_prov["call_class"],
-                    account_domain=spec.account_domain,
-                    task_degradation=degradation,
-                    capability_state="PROBE_OK")
                 # R451 §6: the SUCCESSFUL hop is part of the route too —
                 # the in-result route must reconstruct the exact path
                 # (every failure first, then the selected provider),
@@ -2111,6 +2261,26 @@ def generate(prompt: str, system: str = "",
                         latency_ms=latency_ms, source="real_call")
                 except Exception:  # noqa: BLE001 — telemetry best-effort
                     pass
+                _hop["post_provider_local_s"] = round(
+                    time.perf_counter() - _t_loc0, 6)
+                _att["outcome"] = "OK"
+                _att["end_utc"] = utc_now()
+                _hop["attempts"].append(_att)
+                _prev_att, _prev_end, _prev_sleep = (
+                    _att, time.perf_counter(), 0.0)
+                mr.record_call_outcome(
+                    provider_id, model_id, ok=True,
+                    latency_ms=latency_ms, task=task, stage=purpose_tag,
+                    run_id=call_prov["run_id"], attempt=attempt + 1,
+                    cost_class=spec.cost_basis, selected=True,
+                    session_id=call_prov["session_id"],
+                    engine_stage=call_prov["engine_stage"],
+                    call_class=call_prov["call_class"],
+                    account_domain=spec.account_domain,
+                    task_degradation=degradation,
+                    capability_state="PROBE_OK",
+                    request_id=_gen_call_id,
+                    generate_spans=_gen_span_snapshot(final=True))
                 # success after a failed hop is OK ONLY with the route
                 # disclosing every failure that preceded it (never a
                 # silent failover — directive §8)
@@ -2142,6 +2312,12 @@ def generate(prompt: str, system: str = "",
             except EmptyContentWithFinish as exc:
                 last_err = f"{type(exc).__name__}: {exc}"
                 ftype = classify_failure(exc)
+                # R526 Q-A: the failed dispatch wall ends here (the
+                # transport raised); the attempt record closes at this
+                # point — sleeps below are retry-transition walls.
+                _att["dispatch_s"] = round(time.time() - t0, 3)
+                _att["end_utc"] = utc_now()
+                _att["failure_type"] = ftype
                 # reasoning-token exhaustion: SAME provider/model, larger
                 # cap (recorded in retry_notes — never a silent change)
                 _ceiling = int(getattr(spec, "reasoning_retry_ceiling",
@@ -2156,7 +2332,15 @@ def generate(prompt: str, system: str = "",
                     if retries_used < max_retries:
                         retries_used += 1
                         attempt += 1
+                        _t_rsl0 = time.perf_counter()
                         time.sleep(2 * retries_used)
+                        _att["retry_sleep_s"] = round(
+                            time.perf_counter() - _t_rsl0, 6)
+                        _att["outcome"] = "RETRIED_ESCALATED"
+                        _hop["attempts"].append(_att)
+                        _prev_att, _prev_end, _prev_sleep = (
+                            _att, time.perf_counter(),
+                            _att["retry_sleep_s"])
                         continue
                 else:
                     # R514: at-ceiling empty content — the identical
@@ -2177,9 +2361,22 @@ def generate(prompt: str, system: str = "",
                         f"budget (max_tokens={attempt_budget}) — "
                         "identical same-model retry skipped, cascade "
                         "advances (R514)")
+                # R526 Q-A: fall-through (R514 at-ceiling or retries
+                # exhausted — the escalate path continued above, so
+                # reaching here means the attempt failed); the hop
+                # recording below closes the rung.
+                _att["outcome"] = "FAILED"
+                _hop["attempts"].append(_att)
+                _prev_att, _prev_end, _prev_sleep = (
+                    _att, time.perf_counter(), 0.0)
             except Exception as exc:  # noqa: BLE001 — recorded, retried
                 last_err = f"{type(exc).__name__}: {exc}"
                 ftype = classify_failure(exc)
+                # R526 Q-A: failed dispatch wall ends here (same rule as
+                # the empty-content path above).
+                _att["dispatch_s"] = round(time.time() - t0, 3)
+                _att["end_utc"] = utc_now()
+                _att["failure_type"] = ftype
                 # GONE (410) / MODEL_NOT_FOUND (404 or the provider's
                 # own model_not_found body — R451-C1.2): the identifier
                 # is known-dead on this route — retrying the SAME dead
@@ -2268,9 +2465,21 @@ def generate(prompt: str, system: str = "",
                                     f"{ftype} on ring slot {_slot_from} "
                                     f"-> KEY_ROTATED to slot {_slot_to} "
                                     "(same provider/model, next "
-                                    "credential)"))
+                                    "credential)"),
+                                request_id=_gen_call_id,
+                                generate_spans=_gen_span_snapshot())
                         except Exception:  # noqa: BLE001 — best-effort
                             pass
+                        # R526 Q-A: rotation carries no backoff sleep (new
+                        # credential by rule); the attempt record closes
+                        # here with the rotation outcome.
+                        _att["outcome"] = "ROTATED"
+                        _att["key_slot_from"] = _slot_from
+                        _att["key_slot_to"] = _slot_to
+                        _att["end_utc"] = utc_now()
+                        _hop["attempts"].append(_att)
+                        _prev_att, _prev_end, _prev_sleep = (
+                            _att, time.perf_counter(), 0.0)
                         attempt += 1
                         continue  # next key — no backoff (new credential)
                 if ftype not in ("GONE", "MODEL_NOT_FOUND",
@@ -2278,32 +2487,41 @@ def generate(prompt: str, system: str = "",
                         and retries_used < max_retries:
                     retries_used += 1
                     attempt += 1
+                    # R526 Q-A: retry-transition sleep, measured where
+                    # taken (cooldown-class waiting, never folded into
+                    # the dispatch wall).
+                    _t_rsl0 = time.perf_counter()
                     time.sleep(2 * retries_used)
+                    _att["retry_sleep_s"] = round(
+                        time.perf_counter() - _t_rsl0, 6)
+                    _att["outcome"] = "RETRIED"
+                    _att["end_utc"] = utc_now()
+                    _hop["attempts"].append(_att)
+                    _prev_att, _prev_end, _prev_sleep = (
+                        _att, time.perf_counter(), _att["retry_sleep_s"])
                     continue
+            # R526 Q-A: fall-through (dead identifier or retries
+            # exhausted) — the attempt failed; the hop recording below
+            # closes the rung.
+            if _att.get("outcome") is None:
+                _att["outcome"] = "FAILED"
+                _att["end_utc"] = utc_now()
+                _hop["attempts"].append(_att)
+                _prev_att, _prev_end, _prev_sleep = (
+                    _att, time.perf_counter(), 0.0)
             # this attempt exhausted the same-model budget -> record
-            # the hop honestly and move to the next rung
+            # the hop honestly and move to the next rung.
+            # R526 Q-A: post-provider local wall (failure bookkeeping +
+            # route assembly) closes BEFORE the durable write, so the
+            # written span snapshot is terminal-complete for this rung;
+            # the ledger file-append itself (~ms) rides the unattributed
+            # remainder by rule. Write order vs local ops shifted by
+            # microseconds only — same values, same calls, same classes.
+            _t_loc0 = time.perf_counter()
             HEALTH.record_failure(
                 spec.provider_id, ftype,
                 purpose=purpose_tag,
                 model=model_id, error=str(last_err))
-            mr.record_call_outcome(
-                provider_id, model_id, ok=False,
-                latency_ms=int((time.time() - hop_t0) * 1000),
-                failure_type=ftype, task=task, stage=purpose_tag,
-                run_id=call_prov["run_id"], attempt=attempt + 1,
-                session_id=call_prov["session_id"],
-                engine_stage=call_prov["engine_stage"],
-                call_class=call_prov["call_class"],
-                account_domain=spec.account_domain,
-                task_degradation=degradation,
-                capability_state="PROBE_OK",
-                fallback_from=(provider_id if next_provider else None),
-                fallback_to=next_provider,
-                error=str(last_err),
-                cost_class=spec.cost_basis, selected=False,
-                fallback_reason=(
-                    f"{ftype}: {str(last_err)[:160]} -> fallback to "
-                    f"{next_provider or 'none (last rung)'}"))
             # a real-call transport failure invalidates the capability
             # record so the NEXT admission re-probes instead of trusting
             # the stale probe success (the R415 clear_probe_cache
@@ -2339,6 +2557,29 @@ def generate(prompt: str, system: str = "",
                 "task_degradation": degradation,
                 "capability_state": "PROBE_OK",
             })
+            _hop["post_provider_local_s"] = round(
+                time.perf_counter() - _t_loc0, 6)
+            mr.record_call_outcome(
+                provider_id, model_id, ok=False,
+                latency_ms=int((time.time() - hop_t0) * 1000),
+                failure_type=ftype, task=task, stage=purpose_tag,
+                run_id=call_prov["run_id"], attempt=attempt + 1,
+                session_id=call_prov["session_id"],
+                engine_stage=call_prov["engine_stage"],
+                call_class=call_prov["call_class"],
+                account_domain=spec.account_domain,
+                task_degradation=degradation,
+                capability_state="PROBE_OK",
+                fallback_from=(provider_id if next_provider else None),
+                fallback_to=next_provider,
+                error=str(last_err),
+                cost_class=spec.cost_basis, selected=False,
+                fallback_reason=(
+                    f"{ftype}: {str(last_err)[:160]} -> fallback to "
+                    f"{next_provider or 'none (last rung)'}"),
+                request_id=_gen_call_id,
+                generate_spans=_gen_span_snapshot(
+                    final=(next_provider is None)))
             last_failure_type = ftype
             break
 

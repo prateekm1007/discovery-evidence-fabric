@@ -842,6 +842,11 @@ def availability_report(provider: Optional[str] = None,
     latency_ema_num = 0.0
     latency_ema_den = 0.0
     for e in LEDGER.tail():
+        # R526 Q-B: phase-span lines are orchestration timing, not
+        # provider telemetry — they must never enter availability
+        # statistics (their ok=None would otherwise count as failure).
+        if isinstance(e, dict) and e.get("line_class") == "PHASE_SPAN":
+            continue
         if provider is not None and e.get("provider") != provider:
             continue
         if model is not None and e.get("model") != model:
@@ -1339,7 +1344,15 @@ def record_call_outcome(provider: str, model: str, ok: bool,
                         call_class: str = "STANDALONE",
                         account_domain: Optional[str] = None,
                         task_degradation: Optional[Dict[str, Any]] = None,
-                        capability_state: Optional[str] = None) -> None:
+                        capability_state: Optional[str] = None,
+                        # R526 Q-A: behavior-neutral per-attempt span
+                        # record from llm_registry.generate() (gen_spans
+                        # instrument). Additive only: existing consumers
+                        # read fixed keys and ignore this one; the
+                        # harvester splits provider-call wall from
+                        # selection/routing/sleep walls from it.
+                        generate_spans: Optional[Dict[str, Any]] = None
+                        ) -> None:
     """One ledger line per attempt. Updates model_health /
     provider_health / task_health (all derived from this same ledger —
     one authority, Art. X) and invalidates the probe cache on failure
@@ -1385,6 +1398,7 @@ def record_call_outcome(provider: str, model: str, ok: bool,
         "task_degradation": task_degradation,
         "capability_state": capability_state,
         "error": str(error)[:240],
+        "generate_spans": generate_spans,
     })
     if not ok:
         clear_probe_cache(provider, model)
@@ -1407,6 +1421,70 @@ def record_call_outcome(provider: str, model: str, ok: bool,
         probe_cache_put(provider, model, {
             "status": "HEALTHY", "latency_ms": int(latency_ms or 0),
             "ok": True})
+
+
+def record_phase_span(session_id: Optional[str],
+                      run_id: Optional[str],
+                      engine_stage: Optional[str],
+                      phase: str,
+                      event: str,
+                      candidate_id: Optional[str] = None,
+                      candidate_key: Optional[str] = None,
+                      wall_s: Optional[float] = None,
+                      detail: Optional[Dict[str, Any]] = None) -> None:
+    """R526 Q-B: one durable orchestration-timing line per post-rank
+    phase entry/exit (and candidate-loop iterations where available).
+
+    Written to the SAME append-only model_routing ledger (the proven
+    durable channel — run-dir sidecars are demonstrably absent
+    branch-wide even on runs with proven post-rank work) with
+    line_class=PHASE_SPAN so every consumer can separate orchestration
+    timing from provider telemetry:
+      - decayed availability statistics skip PHASE_SPAN lines,
+      - provider-call aggregations filter them (R526 harvester),
+      - run isolation (ledger_for_run) keeps them (same run_id).
+    Behavior-neutral: pure telemetry append; never raises (best
+    effort, disclosed via last_error like every ledger write).
+    """
+    import uuid
+    try:
+        LEDGER.record({
+            "line_class": "PHASE_SPAN",
+            "request_id": f"ph_{uuid.uuid4().hex[:12]}",
+            "run_id": run_id,
+            "session_id": session_id,
+            "engine_stage": engine_stage,
+            "call_class": "PHASE_SPAN",
+            "stage": phase,
+            "task": None,
+            "provider": None,
+            "model": None,
+            "attempt": None,
+            "ok": None,
+            "status": "PHASE_SPAN",
+            "failure_class": None,
+            "latency_ms": 0,
+            "latency": 0,
+            "tokens": None,
+            "estimated_cost": None,
+            "cost_class": None,
+            "account_domain": None,
+            "selected": None,
+            "fallback_from": None,
+            "fallback_to": None,
+            "fallback_reason": "",
+            "task_degradation": None,
+            "capability_state": None,
+            "error": "",
+            "phase": phase,
+            "event": event,
+            "candidate_id": candidate_id,
+            "candidate_key": candidate_key,
+            "wall_s": wall_s,
+            "detail": detail or {},
+        })
+    except Exception:  # noqa: BLE001 — telemetry never fails the run
+        pass
 
 
 def ledger_for_run(run_id: str, tail: Optional[int] = None) \
