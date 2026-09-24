@@ -1,0 +1,1580 @@
+{
+ "invention_id": {
+  "value": "inv:ui_unintended_acceleration_during_deceleratio_254295:4cfcc8ed7bc2",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_unintended_acceleration_during_deceleratio_254295",
+   "device": "engine throttle control system",
+   "failure": "Documented problem 'unintended acceleration during deceleration approach' concerning engine throttle control system. User-submitted engineering problem (session input): \"[R526-BATTERY declared_family=mechanical source=odi:11342491 battery=R526-CURRENT-PRODUCTION-ATTRIBUTION-current]\n\nTL* THE CONTACT OWNS A 2020 SUBARU FORESTER. THE CONTACT STATED THAT WHILE DRIVING AND APPROACHING A STOP, THE VEHICLE INDEPENDENTLY ACCELERATED AND VIBRATED FOR APPROXIMATELY 3 SECONDS\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "unintended acceleration during deceleration approach",
+   "constraint": "engine must not independently accelerate when the accelerator pedal is released during deceleration"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:222d3155"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of engine throttle control system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Ndot control with anti-windup design and bumpless transfer",
+   "intervention": "Implement an Ndot-based throttle controller with cascaded filters and anti-windup logic to prevent fuel command overshoot when the accelerator pedal is released during deceleration.",
+   "expected_effect": "Consistent deceleration without unintended acceleration or vibration during throttle release transitions.",
+   "mechanism_source_span": "The Ndot control is widely used in modern aircraft engine that can produce",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1115/gt2020-14409"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Controller Design for Acceleration and Deceleration of a Turbofan Aircraft Engine",
+   "mechanism": "Ndot control with anti-windup design and bumpless transfer",
+   "intervention_site": "engine throttle control system",
+   "expected_effect": "Consistent deceleration without unintended acceleration or vibration during throttle release transitions.",
+   "falsification_test": "Simulate rapid pedal release during deceleration on a 2020 Subaru Forester engine model with deteriorated sensor conditions; verify that engine RPM decreases monotonically without transient spikes exceeding 5% of idle speed."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1115/gt2020-14409"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Implement an Ndot-based throttle controller with cascaded filters and anti-windup logic to prevent fuel command overshoot when the accelerator pedal is released during deceleration.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1115/gt2020-14409"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "engine must not independently accelerate when the accelerator pedal is released during deceleration",
+   "failure_mode_of_device": "unintended acceleration during deceleration approach"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:222d3155"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Consistent deceleration without unintended acceleration or vibration during throttle release transitions.",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-24T12:52:28.095109+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-24T12:52:28.095109+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1115/gt2020-14409",
+    "title": "Controller Design for Acceleration and Deceleration of a Turbofan Aircraft Engine",
+    "source_uri": "https://doi.org/10.1115/gt2020-14409",
+    "doi": "10.1115/gt2020-14409",
+    "content_hash": "0d819a0bce7af93b0ab01a7ef186f0d5edcd6e14a6e8698bba69117ad11d1344",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/s100301918",
+    "title": "Position error compensation via a variable reluctance sensor applied to a Hybrid Vehicle Electric machine.",
+    "source_uri": "https://doi.org/10.3390/s100301918",
+    "doi": "10.3390/s100301918",
+    "content_hash": "10838dbc09e57f90a651f2d76e2b2251ce0c77146dddfddc537472c4811222a3",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1038/sdata.2017.110",
+    "title": "A multimodal dataset for various forms of distracted driving.",
+    "source_uri": "https://doi.org/10.1038/sdata.2017.110",
+    "doi": "10.1038/sdata.2017.110",
+    "content_hash": "49e7b5e7c67c31f0689286d4349ca31320ae2d91025645e927372a4d04e673c0",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/s16060848",
+    "title": "A Novel Multi-Sensor Environmental Perception Method Using Low-Rank Representation and a Particle Filter for Vehicle Reversing Safety.",
+    "source_uri": "https://doi.org/10.3390/s16060848",
+    "doi": "10.3390/s16060848",
+    "content_hash": "c4a38815d6ffdcafc96104e2fb98895512596ce674d737001d79ed0070e29371",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1038/s41598-025-21416-5",
+    "title": "Advancing real-time validation of automotive software systems via continuous integration and intelligent failure analysis.",
+    "source_uri": "https://doi.org/10.1038/s41598-025-21416-5",
+    "doi": "10.1038/s41598-025-21416-5",
+    "content_hash": "5835cafe0d2d005eb54f87595c5093aef75bbad6bb27406f12e6c8fc8c62cf5f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/s23187883",
+    "title": "Electric Bus Pedal Misapplication Detection Based on Phase Space Reconstruction Method.",
+    "source_uri": "https://doi.org/10.3390/s23187883",
+    "doi": "10.3390/s23187883",
+    "content_hash": "70770bfa9368c572483803e0b594c03150b1b2d67c67506c26555c0e0617aba6",
+    "frozen": false
+   },
+   {
+    "id": "patent:US8833345B2",
+    "title": "Engine control apparatus and a method for transitioning between an all cylinder &hellip;",
+    "source_uri": "https://patents.google.com/patent/US8833345B2/en",
+    "doi": null,
+    "content_hash": "81633ab11e25a3ea0562bab1e6427907d9620ee93c1a928b59af884ee3260bfc",
+    "frozen": false
+   },
+   {
+    "id": "patent:JP2020019386A",
+    "title": "Vehicle control method and vehicle system",
+    "source_uri": "https://patents.google.com/patent/JP2020019386A/en",
+    "doi": null,
+    "content_hash": "67206602721b72b34545918381fbbbb637a277be037fb5b97978c1f7a0d8aaec",
+    "frozen": false
+   },
+   {
+    "id": "patent:US20200254983A1",
+    "title": "Brake force control system for vehicle",
+    "source_uri": "https://patents.google.com/patent/US20200254983A1/en",
+    "doi": null,
+    "content_hash": "4ed9129a601c22393a1a4f48b6085f0d89115dce8f283cdd8d7c5126396fe24b",
+    "frozen": false
+   },
+   {
+    "id": "patent:WO2018062824A1",
+    "title": "Cruise control apparatus that is convenient for speed adjustment, and control &hellip;",
+    "source_uri": "https://patents.google.com/patent/WO2018062824A1/en",
+    "doi": null,
+    "content_hash": "21fa96e35ff898f8f447cdc0b8b85dadd525eda0306cc0e58e8b612a55394ec0",
+    "frozen": false
+   },
+   {
+    "id": "patent:JP2008232054A",
+    "title": "Automatic starter for internal combustion engine",
+    "source_uri": "https://patents.google.com/patent/JP2008232054A/en",
+    "doi": null,
+    "content_hash": "57f4df0dc52543603e52a9e847be606edfafa9a4c0b3c19d7a8e769151f39452",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.14264/345549",
+    "title": "Modelling of the UQ Formula SAE vehicle during Longitudinal Acceleration to optimise Launch and Traction control and gear change timing",
+    "source_uri": "https://doi.org/10.14264/345549",
+    "doi": "10.14264/345549",
+    "content_hash": "e73a28d2a6df034b00c42fb37d08ccc1845c866813c086ac3eb2333129c01298",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.31390/gradschool_disstheses.3731",
+    "title": "The Effect of Feedback Sensitivity on Learned Heart Rate Acceleration and Deceleration.",
+    "source_uri": "https://doi.org/10.31390/gradschool_disstheses.3731",
+    "doi": "10.31390/gradschool_disstheses.3731",
+    "content_hash": "d91b97883bfcd95243b4431410438eaf7459f7b06cc2b1dfcf7f7b9a5e28bc5f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.37099/mtu.dc.etds/342",
+    "title": "Analyzing the effects of vertical acceleration and deceleration in multi-phase, debris-flow sediment-column experiments / by Christine Marie Williams.",
+    "source_uri": "https://doi.org/10.37099/mtu.dc.etds/342",
+    "doi": "10.37099/mtu.dc.etds/342",
+    "content_hash": "79826183bcfbe28fb0c73d78178fa8fe477a0491d60de0634316b745eb041052",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.2139/ssrn.5915208",
+    "title": "Age-related adaptations in acceleration and deceleration control during gait",
+    "source_uri": "https://doi.org/10.2139/ssrn.5915208",
+    "doi": "10.2139/ssrn.5915208",
+    "content_hash": "76fb6d5904da8ea1249d24dd9ccf1f75f5a11569beb3fecd0cdf97c1da61fad3",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2301.04943",
+    "title": "Robust Nonlinear Optimal Control via System Level Synthesis",
+    "source_uri": "https://doi.org/10.48550/arxiv.2301.04943",
+    "doi": "10.48550/arxiv.2301.04943",
+    "content_hash": "fa38bcc6012921ad2067176652b5be52678bc590220a9c8483ad5169b2bb14e2",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2011.11355",
+    "title": "Data-Driven Control of Nonlinear Systems: Beyond Polynomial Dynamics",
+    "source_uri": "https://doi.org/10.48550/arxiv.2011.11355",
+    "doi": "10.48550/arxiv.2011.11355",
+    "content_hash": "759752c1134228d96644781aa144feffbfece29de7f8431a7c4942203d8d27ec",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1051/epjconf/201716201066",
+    "title": "ASIL determination for motorbike’s Electronics Throttle Control System (ETCS) mulfunction",
+    "source_uri": "https://doi.org/10.1051/epjconf/201716201066",
+    "doi": "10.1051/epjconf/201716201066",
+    "content_hash": "a4a02fd22c1ec2266502f54c3b1bccd84e40f640ecf204088a3c739cb9efbb8e",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/en15041311",
+    "title": "Internal Combustion Engine Starting and Torque Boosting Control System Design with Vibration Active Damping Features for a P0 Mild Hybrid Vehicle Configuration",
+    "source_uri": "https://doi.org/10.3390/en15041311",
+    "doi": "10.3390/en15041311",
+    "content_hash": "df17d67f607b1f7ed52c6235e5c3ddfecc852abdc69f99f3287e1b8ff4275a73",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.24042/ijecs.v5i1.27629",
+    "title": "Performance Evaluation of Electronic Control System in Series-Parallel Hybrid Vehicle: A Simulation Study",
+    "source_uri": "https://doi.org/10.24042/ijecs.v5i1.27629",
+    "doi": "10.24042/ijecs.v5i1.27629",
+    "content_hash": "c7cf38b20d829bbd26738209e87b35872ca7d9a626d23cd836753e77d0cfbf7c",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4271/2023-01-0548",
+    "title": "Mitigating Unintended Acceleration and Deceleration Hazards by Defining Drive Torque Command Tolerance Criteria for Commercial Truck Electric Motor Propulsion Control Systems",
+    "source_uri": "https://doi.org/10.4271/2023-01-0548",
+    "doi": "10.4271/2023-01-0548",
+    "content_hash": "157a7d169135e9498730e2c6f46fcb6981a378b738ec8af34e24fd4c1141ed71",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-025-21416-5",
+   "doi:10.1038/sdata.2017.110",
+   "doi:10.1051/epjconf/201716201066",
+   "doi:10.1115/gt2020-14409",
+   "doi:10.14264/345549",
+   "doi:10.2139/ssrn.5915208",
+   "doi:10.24042/ijecs.v5i1.27629",
+   "doi:10.31390/gradschool_disstheses.3731",
+   "doi:10.3390/en15041311",
+   "doi:10.3390/s100301918",
+   "doi:10.3390/s16060848",
+   "doi:10.3390/s23187883",
+   "doi:10.37099/mtu.dc.etds/342",
+   "doi:10.4271/2023-01-0548",
+   "doi:10.48550/arxiv.2011.11355",
+   "doi:10.48550/arxiv.2301.04943",
+   "patent:JP2008232054A",
+   "patent:JP2020019386A",
+   "patent:US20200254983A1",
+   "patent:US8833345B2",
+   "patent:WO2018062824A1"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Simulate rapid pedal release during deceleration on a 2020 Subaru Forester engine model with deteriorated sensor conditions; verify that engine RPM decreases monotonically without transient spikes exceeding 5% of idle speed."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_unintended_acceleration_during_deceleratio_254295:2026-09-24T12:51:35",
+   "final_envelope_hash": "4cfcc8ed7bc2f8e8c778b492b9741a141e16b47334b9fbd931c2bc0b4c6aca2e",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-24T12:52:28+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-24T12:52:28+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1115/gt2020-14409": {
+   "id": "doi:10.1115/gt2020-14409",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:16cb2b742ff424d67c948b37cd2245a4cbab8208",
+   "source_uri": "https://doi.org/10.1115/gt2020-14409",
+   "title": "Controller Design for Acceleration and Deceleration of a Turbofan Aircraft Engine",
+   "abstract": "\n Controls for transient operation of aircraft engine are highly important due to the fact that the transient performance depends on how the engine responds to throttle command via the control system. The Ndot control is widely used in modern aircraft engine that can produce a consistent acceleration/deceleration throughout the complicated engine conditions.\n Two different forms of Ndot controllers are designed for a commercial turbofan engine, which are proposed in this paper. One controller is based on PI controller in tandem with an integrator. And the other is an integral controller associated with feedforward structure. The control structure also contains two cascaded 1-order filters in the feedback loop and a lead compensator on the forward path to improve transient response. The anti-windup design is highlighted in this paper, and a bumpless transfer can be expected during the entire MAX/MIN fuel selection process. The controller design procedure and parameter tuning are fully demonstrated to make the engineering approach more straightforward.\n Those two control schemes are further evaluated and compared under engine nominal condition and deteriorated conditions via digital simulation. The simulation results are satisfactory and implicates that both of the controllers can meet the design requirements. The control accuracy of the one with feedforward structure is a little better than the other of PI with integrator. However, the latter design demonstrates better robustness and provides more consistent performance for all engine conditions.",
+   "doi": "10.1115/gt2020-14409",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439321+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0d819a0bce7af93b0ab01a7ef186f0d5edcd6e14a6e8698bba69117ad11d1344",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "crossref",
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:16cb2b742ff424d67c948b37cd2245a4cbab8208",
+     "crossref": "doi:10.1115/gt2020-14409"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "engine throttle control system unintended acceleration during deceleration approach",
+     "crossref": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1115/gt2020-14409",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Unauthenticated tier is burst-limited (429 measured); reliable use requires an API key (not provisioned)",
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.3390/s100301918": {
+   "id": "doi:10.3390/s100301918",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:22294906",
+   "source_uri": "https://doi.org/10.3390/s100301918",
+   "title": "Position error compensation via a variable reluctance sensor applied to a Hybrid Vehicle Electric machine.",
+   "abstract": "In the automotive industry, electromagnetic variable reluctance (VR) sensors have been extensively used to measure engine position and speed through a toothed wheel mounted on the crankshaft. In this work, an application that already uses the VR sensing unit for engine and/or transmission has been chosen to infer, this time, the indirect position of the electric machine in a parallel Hybrid Electric Vehicle (HEV) system. A VR sensor has been chosen to correct the position of the electric machine, mainly because it may still become critical in the operation of HEVs to avoid possible vehicle failures during the start-up and on-the-road, especially when the machine is used with an internal combustion engine. The proposed method uses Chi-square test and is adaptive in a sense that it derives the compensation factors during the shaft operation and updates them in a timely fashion.",
+   "doi": "10.3390/s100301918",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2010-03-09",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439396+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "10838dbc09e57f90a651f2d76e2b2251ce0c77146dddfddc537472c4811222a3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:22294906"
+    },
+    "queries_by_source": {
+     "europepmc": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s100301918",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1038/sdata.2017.110": {
+   "id": "doi:10.1038/sdata.2017.110",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:28809848",
+   "source_uri": "https://doi.org/10.1038/sdata.2017.110",
+   "title": "A multimodal dataset for various forms of distracted driving.",
+   "abstract": "We describe a multimodal dataset acquired in a controlled experiment on a driving simulator. The set includes data for n=68 volunteers that drove the same highway under four different conditions: No distraction, cognitive distraction, emotional distraction, and sensorimotor distraction. The experiment closed with a special driving session, where all subjects experienced a startle stimulus in the form of unintended acceleration-half of them under a mixed distraction, and the other half in the absence of a distraction. During the experimental drives key response variables and several explanatory variables were continuously recorded. The response variables included speed, acceleration, brake force, steering, and lane position signals, while the explanatory variables included perinasal electrodermal activity (EDA), palm EDA, heart rate, breathing rate, and facial expression signals; biographical and psychometric covariates as well as eye tracking data were also obtained. This dataset enables research into driving behaviors under neatly abstracted distracting stressors, which account for many car crashes. The set can also be used in physiological channel benchmarking and multispectral face recognition.",
+   "doi": "10.1038/sdata.2017.110",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2017-08-15",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439424+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "49e7b5e7c67c31f0689286d4349ca31320ae2d91025645e927372a4d04e673c0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:28809848"
+    },
+    "queries_by_source": {
+     "europepmc": "engine throttle control system unintended acceleration experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/sdata.2017.110",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.3390/s16060848": {
+   "id": "doi:10.3390/s16060848",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:27294931",
+   "source_uri": "https://doi.org/10.3390/s16060848",
+   "title": "A Novel Multi-Sensor Environmental Perception Method Using Low-Rank Representation and a Particle Filter for Vehicle Reversing Safety.",
+   "abstract": "Environmental perception and information processing are two key steps of active safety for vehicle reversing. Single-sensor environmental perception cannot meet the need for vehicle reversing safety due to its low reliability. In this paper, we present a novel multi-sensor environmental perception method using low-rank representation and a particle filter for vehicle reversing safety. The proposed system consists of four main steps, namely multi-sensor environmental perception, information fusion, target recognition and tracking using low-rank representation and a particle filter, and vehicle reversing speed control modules. First of all, the multi-sensor environmental perception module, based on a binocular-camera system and ultrasonic range finders, obtains the distance data for obstacles behind the vehicle when the vehicle is reversing. Secondly, the information fusion algorithm using an adaptive Kalman filter is used to process the data obtained with the multi-sensor environmental perception module, which greatly improves the robustness of the sensors. Then the framework of a particle filter and low-rank representation is used to track the main obstacles. The low-rank representation is used to optimize an objective particle template that has the smallest L-1 norm. Finally, the electronic throttle opening and automatic braking is under control of the proposed vehicle reversing control strategy prior to any potential collisions, making the reversing control safer and more reliable. The final system simulation and practical testing results demonstrate the validity of the proposed multi-sensor environmental perception method using low-rank representation and a particle filter for vehicle reversing safety.",
+   "doi": "10.3390/s16060848",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2016-06-09",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439443+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c4a38815d6ffdcafc96104e2fb98895512596ce674d737001d79ed0070e29371",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:27294931"
+    },
+    "queries_by_source": {
+     "europepmc": "engine throttle control system unintended acceleration experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-24T12:52:05.404147+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s16060848",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": "https://www.mdpi.com/1424-8220/16/6/848/pdf?version=1465469150",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1038/s41598-025-21416-5": {
+   "id": "doi:10.1038/s41598-025-21416-5",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:40999042",
+   "source_uri": "https://doi.org/10.1038/s41598-025-21416-5",
+   "title": "Advancing real-time validation of automotive software systems via continuous integration and intelligent failure analysis.",
+   "abstract": "In the automotive industry, a rigorous testing process based on ISO 26,262 is carried out at various stages of the V-model to ensure the quality of software systems. Conventional validation of embedded electronic control units (ECUs) using hardware-in- the-loop (HIL) testing is performed in the late stages using the big bang integration style, resulting in delayed feedback, lack of scalability, and insufficient fault diagnosis. Furthermore, test recording analysis is performed manually based on expert knowledge to identify the nature of the failure occurring. This, in turn, resulted in higher development costs and effort, delays fault detection, and hinders agile collaboration. To address these gaps, this article proposes a novel continuous integration (CI)-enabled HIL testing framework to facilitate continuous software development through iterative cycles. Furthermore, based on a representative critical faults dataset, intelligent data-driven ML-assisted Fault Detection and Diagnosis (FDD) models are developed, including LSTM and K-means for the diagnosis of known and unknown sensor-related faults as classification and clustering problems, respectively. The novel aspect of the robust models lies in the integration of a denoising autoencoder (DAE) for the extraction of representative features before the classification and clustering process, considering the noise conditions. The evaluation outcomes illustrate the superiority of the proposed model for known faults classification in comparison to other state-of-the-art methods, with an average F1-score of 91.85%. Furthermore, the integration of DAE with k-means exhibited a high clustering performance against noise with a low mean squared error (MSE) and Davies-Bouldin index (DBI), i.e., 0.044 and 0.68, respectively. It has been demonstrated that the proposed methodology facilitates more efficient, automated, and accurate fault analysis within the framework of automotive software validation workflows. Consequently, this approach enhances both safety and efficiency in comparison to conventional methodologies.",
+   "doi": "10.1038/s41598-025-21416-5",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-09-25",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439462+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5835cafe0d2d005eb54f87595c5093aef75bbad6bb27406f12e6c8fc8c62cf5f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:40999042"
+    },
+    "queries_by_source": {
+     "europepmc": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-24T12:52:05.323953+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-025-21416-5",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 4,
+   "fulltext_url": "https://www.nature.com/articles/s41598-025-21416-5.pdf",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.3390/s23187883": {
+   "id": "doi:10.3390/s23187883",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:37765939",
+   "source_uri": "https://doi.org/10.3390/s23187883",
+   "title": "Electric Bus Pedal Misapplication Detection Based on Phase Space Reconstruction Method.",
+   "abstract": "Due to the environmental protection of electric buses, they are gradually replacing traditional fuel buses. Several previous studies have found that accidents related to electric vehicles are linked to Unintended Acceleration (UA), which is mostly caused by the driver pressing the wrong pedal. Therefore, this study proposed a Model for Detecting Pedal Misapplication in Electric Buses (MDPMEB). In this work, natural driving experiments for urban electric buses and pedal misapplication simulation experiments were carried out in a closed field; furthermore, a phase space reconstruction method was introduced, based on chaos theory, to map sequence data to a high-dimensional space in order to produce normal braking and pedal misapplication image datasets. Based on these findings, a modified Swin Transformer network was built. To prevent the model from overfitting when considering small sample data and to improve the generalization ability of the model, it was pre-trained using a publicly available dataset; moreover, the weights of the prior knowledge model were loaded into the model for training. The proposed model was also compared to machine learning and Convolutional Neural Networks (CNN) algorithms. This study showed that this model was able to detect normal braking and pedal misapplication behavior accurately and quickly, and the accuracy rate on the test dataset is 97.58%, which is 9.17% and 4.5% higher than the machine learning algorithm and CNN algorithm, respectively.",
+   "doi": "10.3390/s23187883",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2023-09-14",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439479+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "70770bfa9368c572483803e0b594c03150b1b2d67c67506c26555c0e0617aba6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:37765939"
+    },
+    "queries_by_source": {
+     "europepmc": "engine throttle control system unintended acceleration experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s23187883",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration experimental comparison",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "patent:US8833345B2": {
+   "id": "patent:US8833345B2",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:US8833345B2",
+   "source_uri": "https://patents.google.com/patent/US8833345B2/en",
+   "title": "Engine control apparatus and a method for transitioning between an all cylinder &hellip;",
+   "abstract": "Engine control apparatus includes, but is not limited to a determining device for determining whether or not the engine is operated under predetermined deceleration operating conditions or predetermined acceleration operating conditions and for individually deactivating two or more cylinders in a &hellip;",
+   "doi": null,
+   "patent_number": "US8833345B2",
+   "publication_number": "US8833345B2",
+   "publication_date": "2014-09-16",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439497+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "81633ab11e25a3ea0562bab1e6427907d9620ee93c1a928b59af884ee3260bfc",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:US8833345B2"
+    },
+    "queries_by_source": {
+     "google_patents": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "20025605f2fe06abe179790a54163530c6628ea5797b27f44d3ef4cb5463cd3c",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:US8833345B2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "20025605f2fe06abe179790a54163530c6628ea5797b27f44d3ef4cb5463cd3c",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:JP2020019386A": {
+   "id": "patent:JP2020019386A",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:JP2020019386A",
+   "source_uri": "https://patents.google.com/patent/JP2020019386A/en",
+   "title": "Vehicle control method and vehicle system",
+   "abstract": "To perform appropriate vehicle attitude control regardless of states of a rotary electric machine and the like, in a method for controlling a vehicle that includes an engine and a rotary electric machine and performs vehicle attitude control, and a vehicle system.SOLUTION: A method for controlling &hellip;",
+   "doi": null,
+   "patent_number": "JP2020019386A",
+   "publication_number": "JP2020019386A",
+   "publication_date": "2020-02-06",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439516+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "67206602721b72b34545918381fbbbb637a277be037fb5b97978c1f7a0d8aaec",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:JP2020019386A"
+    },
+    "queries_by_source": {
+     "google_patents": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "eddb2e4b719e7a0c95e61b3656653f9a05f6f88ddc91c476d204cfae687a151f",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:JP2020019386A",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "eddb2e4b719e7a0c95e61b3656653f9a05f6f88ddc91c476d204cfae687a151f",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:US20200254983A1": {
+   "id": "patent:US20200254983A1",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:US20200254983A1",
+   "source_uri": "https://patents.google.com/patent/US20200254983A1/en",
+   "title": "Brake force control system for vehicle",
+   "abstract": "A brake force control system configured to allow a driver to control brake force finely only by operating an accelerator pedal, and to decelerate a vehicle to a target speed only by operating the accelerator pedal. The control system calculates a target deceleration to travel through a target site &hellip;",
+   "doi": null,
+   "patent_number": "US20200254983A1",
+   "publication_number": "US20200254983A1",
+   "publication_date": "2020-08-13",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439533+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4ed9129a601c22393a1a4f48b6085f0d89115dce8f283cdd8d7c5126396fe24b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:US20200254983A1"
+    },
+    "queries_by_source": {
+     "google_patents": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "e598b1041f8951693d2c2c1e85f94d40a2e1d84b3aeef27e53fa4e2021113574",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:US20200254983A1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "e598b1041f8951693d2c2c1e85f94d40a2e1d84b3aeef27e53fa4e2021113574",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:WO2018062824A1": {
+   "id": "patent:WO2018062824A1",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:WO2018062824A1",
+   "source_uri": "https://patents.google.com/patent/WO2018062824A1/en",
+   "title": "Cruise control apparatus that is convenient for speed adjustment, and control &hellip;",
+   "abstract": "A cruise control apparatus is provided that allows easy adjustment of the speed of a vehicle when driving the vehicle using cruise control. The cruise control apparatus adjusts acceleration or deceleration of the vehicle by rotating a cruise dial mounted on a steering wheel of the vehicle.",
+   "doi": null,
+   "patent_number": "WO2018062824A1",
+   "publication_number": "WO2018062824A1",
+   "publication_date": "2018-04-05",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439558+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "21fa96e35ff898f8f447cdc0b8b85dadd525eda0306cc0e58e8b612a55394ec0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:WO2018062824A1"
+    },
+    "queries_by_source": {
+     "google_patents": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "5225dfd4ba7f7963b58f954371736b876b78c91951eb91624fe1528dd0a77da8",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:WO2018062824A1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "5225dfd4ba7f7963b58f954371736b876b78c91951eb91624fe1528dd0a77da8",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:JP2008232054A": {
+   "id": "patent:JP2008232054A",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:JP2008232054A",
+   "source_uri": "https://patents.google.com/patent/JP2008232054A/en",
+   "title": "Automatic starter for internal combustion engine",
+   "abstract": "In an idle stop system, it is possible to sufficiently suppress engine rotation blowing and vehicle vibration during automatic start. An accumulator tank is connected to a surge tank via a communication pipe having an electromagnetic valve, and the electromagnetic valve is opened during fuel cut &hellip;",
+   "doi": null,
+   "patent_number": "JP2008232054A",
+   "publication_number": "JP2008232054A",
+   "publication_date": "2008-10-02",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439585+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "57f4df0dc52543603e52a9e847be606edfafa9a4c0b3c19d7a8e769151f39452",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:JP2008232054A"
+    },
+    "queries_by_source": {
+     "google_patents": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "0829551b357cdabcca7b54e3e20747240495337324de0a0556974975b9f8051f",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:JP2008232054A",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "0829551b357cdabcca7b54e3e20747240495337324de0a0556974975b9f8051f",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "doi:10.14264/345549": {
+   "id": "doi:10.14264/345549",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.14264/345549",
+   "source_uri": "https://doi.org/10.14264/345549",
+   "title": "Modelling of the UQ Formula SAE vehicle during Longitudinal Acceleration to optimise Launch and Traction control and gear change timing",
+   "abstract": "",
+   "doi": "10.14264/345549",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T12:52:05.439607+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e73a28d2a6df034b00c42fb37d08ccc1845c866813c086ac3eb2333129c01298",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.14264/345549"
+    },
+    "queries_by_source": {
+     "crossref": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.14264/345549",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.31390/gradschool_disstheses.3731": {
+   "id": "doi:10.31390/gradschool_disstheses.3731",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.31390/gradschool_disstheses.3731",
+   "source_uri": "https://doi.org/10.31390/gradschool_disstheses.3731",
+   "title": "The Effect of Feedback Sensitivity on Learned Heart Rate Acceleration and Deceleration.",
+   "abstract": "",
+   "doi": "10.31390/gradschool_disstheses.3731",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T12:52:05.439626+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d91b97883bfcd95243b4431410438eaf7459f7b06cc2b1dfcf7f7b9a5e28bc5f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.31390/gradschool_disstheses.3731"
+    },
+    "queries_by_source": {
+     "crossref": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.31390/gradschool_disstheses.3731",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.37099/mtu.dc.etds/342": {
+   "id": "doi:10.37099/mtu.dc.etds/342",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.37099/mtu.dc.etds/342",
+   "source_uri": "https://doi.org/10.37099/mtu.dc.etds/342",
+   "title": "Analyzing the effects of vertical acceleration and deceleration in multi-phase, debris-flow sediment-column experiments / by Christine Marie Williams.",
+   "abstract": "",
+   "doi": "10.37099/mtu.dc.etds/342",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T12:52:05.439641+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "79826183bcfbe28fb0c73d78178fa8fe477a0491d60de0634316b745eb041052",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.37099/mtu.dc.etds/342"
+    },
+    "queries_by_source": {
+     "crossref": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.37099/mtu.dc.etds/342",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.2139/ssrn.5915208": {
+   "id": "doi:10.2139/ssrn.5915208",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2139/ssrn.5915208",
+   "source_uri": "https://doi.org/10.2139/ssrn.5915208",
+   "title": "Age-related adaptations in acceleration and deceleration control during gait",
+   "abstract": "",
+   "doi": "10.2139/ssrn.5915208",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439657+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "76fb6d5904da8ea1249d24dd9ccf1f75f5a11569beb3fecd0cdf97c1da61fad3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2139/ssrn.5915208"
+    },
+    "queries_by_source": {
+     "crossref": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2139/ssrn.5915208",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2301.04943": {
+   "id": "doi:10.48550/arxiv.2301.04943",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2301.04943v3",
+   "source_uri": "https://doi.org/10.48550/arxiv.2301.04943",
+   "title": "Robust Nonlinear Optimal Control via System Level Synthesis",
+   "abstract": "This paper addresses the problem of finite horizon constrained robust optimal control for nonlinear systems subject to norm-bounded disturbances. To this end, the underlying uncertain nonlinear system is decomposed based on a first-order Taylor series expansion into a nominal system and an error (deviation) described as an uncertain linear time-varying system. This decomposition allows us to leverage system level synthesis to jointly optimize an affine error feedback, a nominal nonlinear trajectory, and, most importantly, a dynamic linearization error over-bound used to ensure robust constraint satisfaction for the nonlinear system. The proposed approach thereby results in less conservative planning compared with state-of-the-art techniques. We demonstrate the benefits of the proposed approach to control the rotational motion of a rigid body subject to state and input constraints.",
+   "doi": "10.48550/arxiv.2301.04943",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T12:52:05.439673+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "fa38bcc6012921ad2067176652b5be52678bc590220a9c8483ad5169b2bb14e2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2301.04943v3"
+    },
+    "queries_by_source": {
+     "arxiv": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2301.04943",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2301.04943v3",
+   "authors": [
+    "Antoine P. Leeman",
+    "Johannes Köhler",
+    "Andrea Zanelli",
+    "Samir Bennani",
+    "Melanie N. Zeilinger"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2011.11355": {
+   "id": "doi:10.48550/arxiv.2011.11355",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2011.11355v3",
+   "source_uri": "https://doi.org/10.48550/arxiv.2011.11355",
+   "title": "Data-Driven Control of Nonlinear Systems: Beyond Polynomial Dynamics",
+   "abstract": "In this paper, we present a data-driven controller design method for continuous-time nonlinear systems, using no model knowledge but only measured data affected by noise. While most existing approaches focus on systems with polynomial dynamics, our approach allows to design controllers for unknown systems with rational or general non-polynomial dynamics. We first derive a data-driven parametrization of unknown nonlinear systems with rational dynamics. By applying robust control techniques to this parametrization, we obtain sum-of-squares based criteria for designing controllers with closed-loop robust stability and performance guarantees for all systems which are consistent with the measured data and the assumed noise bound. We then apply this approach to control systems whose dynamics are linear in general non-polynomial basis functions by transforming them into polynomial systems. Finally, we apply the developed approaches to numerical examples.",
+   "doi": "10.48550/arxiv.2011.11355",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T12:52:05.439688+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "759752c1134228d96644781aa144feffbfece29de7f8431a7c4942203d8d27ec",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2011.11355v3"
+    },
+    "queries_by_source": {
+     "arxiv": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2011.11355",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2011.11355v3",
+   "authors": [
+    "Robin Strässer",
+    "Julian Berberich",
+    "Frank Allgöwer"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.1051/epjconf/201716201066": {
+   "id": "doi:10.1051/epjconf/201716201066",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:53809e13466c41648f14800d9e60c0226d988c38",
+   "source_uri": "https://doi.org/10.1051/epjconf/201716201066",
+   "title": "ASIL determination for motorbike’s Electronics Throttle Control System (ETCS) mulfunction",
+   "abstract": "Electronics Throttle Control System (ETCS) is the principal electronic unit in all fuel injection engine motorbike, augmenting the engine performance efficiency in comparison to the conventional carburetor based engine. ETCS is regarded as a safety-critical component, whereby ETCS malfunction can cause unintended acceleration or deceleration event, which can be hazardous to riders. In this study, Hazard Analysis and Risk Assessment, an ISO26262 functional safety standard analysis has been applied on motorbike’s ETCS to determine the required automotive safety integrity level. Based on the analysis, the established automotive safety integrity level can help to derive technical and functional safety measures for ETCS development.",
+   "doi": "10.1051/epjconf/201716201066",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2017",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439708+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a4a02fd22c1ec2266502f54c3b1bccd84e40f640ecf204088a3c739cb9efbb8e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:53809e13466c41648f14800d9e60c0226d988c38"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1051/epjconf/201716201066",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Unauthenticated tier is burst-limited (429 measured); reliable use requires an API key (not provisioned)"
+   ]
+  },
+  "doi:10.3390/en15041311": {
+   "id": "doi:10.3390/en15041311",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:603d579b0b8b58ff591d37547e0582209449e13f",
+   "source_uri": "https://doi.org/10.3390/en15041311",
+   "title": "Internal Combustion Engine Starting and Torque Boosting Control System Design with Vibration Active Damping Features for a P0 Mild Hybrid Vehicle Configuration",
+   "abstract": "In order to meet the increasingly stricter emissions’ regulations, road vehicles require additional technologies aimed at the reduction of emissions from the internal combustion engine (ICE). A favorable solution from the standpoint of costs and simplicity of integration is a 48-V electrical architecture utilizing a low-voltage/high-power induction machine, which operates as the so-called engine belt starter generator (BSG) coupled via a timing belt with the ICE crankshaft within a P0 mild hybrid power train and used for starting up and boosting of the ICE power output, as well as for recuperating kinetic energy during vehicle deceleration. The aim of this work was to design a vibration damping system for the belt transmission within the so-called front end accessory drive (FEAD), which couples the BSG with the ICE crankshaft and to test the control system by means of simulations for realistic operating regimes of the P0 mild hybrid power train in order to show the functionality of the proposed approach in terms of mild hybrid vehicle performance improvement. Simulation results have pointed out effective attenuation of belt compliance-related vibrations using the proposed active damping control, with vibration magnitude reduced between three and five times compared to the default case during engine start-up phase. They have indicated the realistic belt slippage effects during engine start-up phase and have illustrated the effectiveness of the FEAD torque boosting capability with 30% gain in acceleration during vehicle launch.",
+   "doi": "10.3390/en15041311",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2022",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439732+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "df17d67f607b1f7ed52c6235e5c3ddfecc852abdc69f99f3287e1b8ff4275a73",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:603d579b0b8b58ff591d37547e0582209449e13f"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.3390/en15041311",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Unauthenticated tier is burst-limited (429 measured); reliable use requires an API key (not provisioned)"
+   ]
+  },
+  "doi:10.24042/ijecs.v5i1.27629": {
+   "id": "doi:10.24042/ijecs.v5i1.27629",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:fdc12a4eff85ab67115ac9a85eb4059b40ce3389",
+   "source_uri": "https://doi.org/10.24042/ijecs.v5i1.27629",
+   "title": "Performance Evaluation of Electronic Control System in Series-Parallel Hybrid Vehicle: A Simulation Study",
+   "abstract": "The increasing contribution of the transportation sector to global emissions has driven the development of hybrid electric vehicles (HEVs) as a practical solution to reduce environmental impact. The effectiveness of HEVs is highly dependent on electronic control systems that regulate power distribution between the internal combustion engine (ICE), electric motor, generator, and battery in real time under various operating conditions. This study aims to evaluate the performance of the electronic control system implemented using Stateflow in a simulated series-parallel hybrid electric vehicle. The research methodology involves simulating the vehicle model in MATLAB/Simulink, which integrates Stateflow to design and manage the logic and operational mode transitions. A continuous closed-loop feedback structure is used to facilitate real-time control decisions, guided by input variables such as throttle position, vehicle speed, and battery State of Charge (SoC). Various driving scenarios are simulated, including acceleration, steady cruising, deceleration, and energy recovery during braking. Simulation results show that the designed electronic control system can maintain operational stability with engine efficiency reaching 92%, battery power utilization up to 65%, and electronic transitions between modes (EV, HEV, regenerative) in less than 0.2 seconds, demonstrating a 40% improvement in response compared to conventional electronic control models. These findings confirm the potential of Stateflow-based electronic control approaches in creating more responsive and efficient hybrid vehicle propulsion systems, while supporting the development of low-emission transportation technology",
+   "doi": "10.24042/ijecs.v5i1.27629",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439754+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c7cf38b20d829bbd26738209e87b35872ca7d9a626d23cd836753e77d0cfbf7c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:fdc12a4eff85ab67115ac9a85eb4059b40ce3389"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.24042/ijecs.v5i1.27629",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Unauthenticated tier is burst-limited (429 measured); reliable use requires an API key (not provisioned)"
+   ]
+  },
+  "doi:10.4271/2023-01-0548": {
+   "id": "doi:10.4271/2023-01-0548",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:7560b0fe826ce3586dad31dd1d1101eaef199cc3",
+   "source_uri": "https://doi.org/10.4271/2023-01-0548",
+   "title": "Mitigating Unintended Acceleration and Deceleration Hazards by Defining Drive Torque Command Tolerance Criteria for Commercial Truck Electric Motor Propulsion Control Systems",
+   "abstract": "A commercial truck electric motor propulsion control system may require hundreds of inputs to optimize the drive torque command. As a safety-related signal, the drive torque command requires protections ensuring its integrity. Similarly, the inputs used by the control system to determine the drive torque command also require protections. To define these protections, the ISO 26262:2018 series of standards prescribe the development of safety requirements and associated Automotive Safety Integrity Levels (ASILs). Safety requirements ensure safe system output, in part, by protecting system inputs. Satisfying these safety requirements to their ASILs adds complexity and cost to commercial truck electric motor propulsion control systems. The greater the safety-related signal count, the greater the complexity and cost added.This paper introduces a standardized 5-step approach to defining tolerances for the drive torque command within which drive torque causes neither unintended acceleration nor unintended deceleration hazards. First, derive a simplified drive torque calculation (SDTC) as the basis for the tolerance. The SDTC utilizes only a small subset of the inputs used to determine the optimized drive torque command (ODTC). Second, determine the maximum difference between optimized and simplified drive torque during un-faulted truck operation using model-in-the-loop (MIL) simulations. Third, determine the ODTC error required for the onset of unintended acceleration and unintended deceleration hazards using vehicle-level simulations. Fourth, express the drive torque command tolerance formulaically using results from steps 1 through 3. Fifth and finally, validate the drive torque command tolerance by determining truck acceleration and deceleration during vehicle-level fault insertion testing. Using the simplified drive torque calculation as the basis for drive torque command tolerance supports ISO 26262 compliance while reducing the number of safety-related input signals. Thereby, this standardized method reduces the complexity and cost for implementing safe commercial truck electric motor propulsion control systems.",
+   "doi": "10.4271/2023-01-0548",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2023",
+   "retrieval_timestamp": "2026-09-24T12:52:05.439776+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "157a7d169135e9498730e2c6f46fcb6981a378b738ec8af34e24fd4c1141ed71",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:7560b0fe826ce3586dad31dd1d1101eaef199cc3"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "engine throttle control system unintended acceleration during deceleration approach"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-24T12:52:05.296695+00:00",
+     "is_oa": false,
+     "oa_status": "closed",
+     "host_type": null,
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.4271/2023-01-0548",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "engine throttle control system unintended acceleration during deceleration approach",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Unauthenticated tier is burst-limited (429 measured); reliable use requires an API key (not provisioned)"
+   ]
+  },
+  "problem:222d3155": {
+   "id": "problem:222d3155",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "222d31550f31f4bf7e0ee4cd4e23d7da9e0b5c91f028f0a2ceb66f8190b6bf9b",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "0f069e4e7a15901fbf2e89bdc5c8b9616e8cd82b7d9976f38b53f6ab181afa8e",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-24T12:52:28+00:00Z"
+ }
+}
