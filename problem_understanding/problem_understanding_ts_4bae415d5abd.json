@@ -1,0 +1,130 @@
+{
+ "schema": "CODER1_PROBLEM_UNDERSTANDING/1.0.0",
+ "session_id": "ts_4bae415d5abd",
+ "problem_statement": {
+  "value": "[R526-BATTERY declared_family=mechanical source=odi:11385700 battery=R526-CURRENT-PRODUCTION-ATTRIBUTION-after]\n\nCAR WAS IDLING AND PARKED. WARNING CODE SHOWED UP ON DASHBOARD ESC, ELECTRONIC STABILITY CONTROL, REDUCED ENGINE POWER. VEHICLE THEN DISPLAYED TRANSMISSION DISRUPTION, WARNING LIGHT DISPLAYED AS WELL. I WAS ABLE TO DRIVE IT TO THE DEALERSHIP BUT THE PERFORMANCE OF THE VEHICLE WAS LIMITED BY THE REDUCED ENGINE POWER. TRANSMISSION WAS HESITATING AND CLUNKY DURING GEAR CHANGES.  MY SIERRA HAS 5,000 MILES ON IT AND THE TRANSMISSION WAS ALREADY REPLACED AT 2,000 MILES. GMC HAS A SERIOUS PROBLEM WITH THIS MAKE AND MODEL. UNSURE WHAT THE RESOLUTION WILL BE, BUT I AM NO LONGER CONFIDENT IN THE PRODUCT GMC IS SELLING.",
+  "origin": "USER_STATED",
+  "basis": "the user's message, verbatim",
+  "confidence": null
+ },
+ "desired_outcome": {
+  "value": [
+   "reduced engine power",
+   "reduced engine power"
+  ],
+  "origin": "USER_STATED",
+  "basis": "outcome-verb phrase found verbatim in the user's message",
+  "confidence": null
+ },
+ "observed_failure": {
+  "value": null,
+  "origin": "UNKNOWN",
+  "basis": "no failure noun phrase found — the problem may be opportunity-shaped rather than failure-shaped",
+  "confidence": null
+ },
+ "constraints": {
+  "value": [
+   "Solution must address the stated objective without introducing a larger failure mode"
+  ],
+  "origin": "INFERRED_MODEL",
+  "basis": "default engineering constraint applied when the user stated none (the engine's standing problem contract)",
+  "confidence": null
+ },
+ "context": {
+  "value": {
+   "message_length_chars": 729,
+   "interrogative_form": false,
+   "stated_domain_words": []
+  },
+  "origin": "INFERRED_MODEL",
+  "basis": "deterministic surface features of the message",
+  "confidence": null
+ },
+ "domain_hypothesis": {
+  "value": "automotive",
+  "origin": "INFERRED_MODEL",
+  "basis": "keyword score 3 (hits: vehicle, engine, car); full ranking recorded in domain_scores",
+  "confidence": 0.6
+ },
+ "domain_scores": [
+  {
+   "domain_hypothesis": "automotive",
+   "keyword_hits": [
+    "vehicle",
+    "engine",
+    "car"
+   ],
+   "score": 3
+  },
+  {
+   "domain_hypothesis": "electronics",
+   "keyword_hits": [
+    "electronic",
+    "model"
+   ],
+   "score": 2
+  },
+  {
+   "domain_hypothesis": "energy",
+   "keyword_hits": [
+    "battery",
+    "power"
+   ],
+   "score": 2
+  }
+ ],
+ "physical_system": {
+  "value": "reduced engine",
+  "origin": "INFERRED_MODEL",
+  "basis": "system noun phrase matched in the user's message",
+  "confidence": null
+ },
+ "target_variable": {
+  "value": [
+   "current",
+   "power",
+   "engine power"
+  ],
+  "origin": "INFERRED_MODEL",
+  "basis": "quantity word matched in the message (outcome-object phrases included as fallback candidates)",
+  "confidence": null
+ },
+ "unknowns": [
+  {
+   "field": "observed_failure",
+   "why_unknown": "no failure noun phrase found — the problem may be opportunity-shaped rather than failure-shaped",
+   "what_would_resolve": "one user sentence naming the observed failure"
+  }
+ ],
+ "assumptions": [
+  {
+   "assumption": "the message describes ONE engineering problem",
+   "origin": "INFERRED_MODEL",
+   "basis": "single problem_statement supplied",
+   "falsified_by": "a second unrelated objective in the text"
+  }
+ ],
+ "success_condition": {
+  "value": "reduced current relative to the un-invented baseline, without violating the stated constraints",
+  "origin": "INFERRED_MODEL",
+  "basis": "composed from the stated outcome and the identified target variable",
+  "confidence": null
+ },
+ "failure_condition": {
+  "value": "the mechanism does not materially change the target variable, introduces a larger failure mode, or is contradicted by admissible evidence",
+  "origin": "INFERRED_MODEL",
+  "basis": "the engine's standing falsification contract (Art. XX/LII)",
+  "confidence": null
+ },
+ "built_at": "2026-09-24T18:56:06Z",
+ "construction": {
+  "deterministic": true,
+  "llm_fields_merged": 0,
+  "origin_vocabulary": [
+   "USER_STATED",
+   "INFERRED_MODEL",
+   "MODEL_DERIVED_LLM",
+   "UNKNOWN"
+  ]
+ }
+}
