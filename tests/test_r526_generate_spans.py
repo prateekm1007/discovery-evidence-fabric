@@ -20,6 +20,20 @@ timers (gen_spans/1.0) on every durable ledger line. Proves:
   J. instrumentation failure cannot alter engine semantics (A4.10:
      the ledger write is best-effort; a failing write never changes
      the routing outcome)
+  K. (S4) retry-path transition is non-negative (the pre-sleep end
+     capture prevents double-subtracting the retry sleep)
+  L. (S4) real Q-A arithmetic across a multi-rung failed-then-success
+     call (all components non-negative, terminal total present,
+     measured + remainder ~ total)
+  M. (S5) a non-zero mocked runtime_admission() wall is included in
+     admission_exclusive_s (the timer opens BEFORE the call, not
+     after) and the full decomposition still closes
+  N. (S5) extended multi-retry arithmetic: provider A -> admission
+     delay -> transport failure -> retry sleep -> next attempt ->
+     provider B success, with all components non-negative, retry
+     sleep NOT counted as transition, transition NOT double-
+     subtracted, admission wall NOT lost, terminal total present,
+     measured + remainder ~ total
 
 Neutrality beyond these structural proofs rests on suite parity: the
 R519/R520/R522/R523/R525 + attacker suites must show byte-identical
@@ -648,6 +662,215 @@ class TestGenerateSpans(unittest.TestCase):
                                     "indicates a double-counted or "
                                     "lost component, not a valid "
                                     "measurement")
+        finally:
+            m.undo()
+
+    # ----------------------------------------------------------------
+    # S5 PART 3: direct runtime_admission wall timing contract
+    # ----------------------------------------------------------------
+
+    def test_m_runtime_admission_wall_included_in_admission_exclusive(
+            self):
+        """S5 PART 3: the runtime_admission() wall must be included in
+        admission_exclusive_s, not the unattributed remainder.
+
+        The S4 defect: the timer opened AFTER runtime_admission()
+        returned, so a non-zero admission wall was never captured and
+        rode the remainder. The S5 correction opens the timer
+        IMMEDIATELY BEFORE the call. This test injects a deterministic
+        non-zero delay into the mocked runtime_admission() and proves:
+          - admission_exclusive_s > the injected delay (the wall is
+            actually measured, not lost)
+          - the full decomposition still closes:
+              total = selection + admission_exclusive
+                     + probe_retry_sleep + dispatch + retry_sleep
+                     + transition + post_provider_local
+                     + remainder, with remainder >= -0.05 s.
+        """
+        import time as _time
+        import pytest
+        m = pytest.MonkeyPatch()
+        _hermetic(m)
+        m.setenv("ZAI_API_KEY", "zai_k")
+        m.setattr(lr, "_call_openai_flavor",
+                   lambda *a, **k: "FIELD_MECHANISM: test")
+        m.setattr(lr, "_call_anthropic_flavor",
+                   lambda *a, **k: "FIELD_MECHANISM: test")
+        lines = self._lines_for(m)
+        # inject a deterministic 0.15 s admission wall: the hermetic
+        # runtime_admission is replaced with a delayed version.
+        m.setattr(ra, "runtime_admission",
+                   lambda *a, **k: (
+                       _time.sleep(0.15),
+                       (True, "PROBE_OK", {"state": "PROBE_OK"}))[1])
+        try:
+            res = lr.generate("p", policy=_policy("zai"),
+                              max_retries=0)
+            self.assertTrue(res.ok)
+            sp = lines[-1]["generate_spans"]
+            rung = sp["rungs"][0]
+            adm = rung["admission"]
+            adm_excl = adm.get("probe_admission_s") or 0.0
+            # the injected 0.15 s admission wall MUST be represented in
+            # admission_exclusive_s (with slack for the no-probe prep
+            # interval + the call itself); NOT lost in the remainder.
+            self.assertGreater(
+                adm_excl, 0.15,
+                "S5 PART 3: admission_exclusive_s must exceed the "
+                "injected 0.15 s runtime_admission wall (the timer "
+                "opens BEFORE the call); a value <= 0.15 means the "
+                "admission wall was not captured and rode the "
+                "remainder (the S4 defect)")
+            # the full decomposition closes
+            total = sp["generate_total_s"]
+            self.assertIsNotNone(total)
+            measured = (sp.get("selection_ordering_s") or 0.0)
+            for r in sp["rungs"]:
+                a = r.get("admission") or {}
+                measured += max((a.get("probe_admission_s") or 0.0)
+                                - (a.get("probe_retry_sleep_s") or 0.0),
+                                0.0)
+                measured += max(a.get("probe_retry_sleep_s") or 0.0, 0.0)
+                for att in r.get("attempts") or []:
+                    measured += max(att.get("dispatch_s") or 0.0, 0.0)
+                    measured += max(att.get("retry_sleep_s") or 0.0, 0.0)
+                    measured += max(
+                        att.get("transition_to_next_s") or 0.0, 0.0)
+                measured += (r.get("post_provider_local_s") or 0.0)
+            remainder = round(total - measured, 6)
+            self.assertGreaterEqual(
+                remainder, -0.05,
+                "S5 PART 3: the full decomposition must close "
+                "(remainder >= -0.05 s); a large negative remainder "
+                "means the admission wall was double-counted or a "
+                "component was lost")
+        finally:
+            m.undo()
+
+    # ----------------------------------------------------------------
+    # S5 PART 4: extended multi-retry arithmetic (admission delay +
+    # transport failure + retry sleep + next provider)
+    # ----------------------------------------------------------------
+
+    def test_n_extended_multi_retry_admission_and_retry(
+            self):
+        """S5 PART 4: the extended arithmetic case
+        provider A -> admission delay -> transport failure -> retry
+        sleep -> next attempt -> provider B success.
+
+        Proves, on the ACTUAL instrumentation path:
+          - all components are non-negative (no clamping);
+          - retry sleep is NOT counted as transition (the transition
+            is the pure bookkeeping gap, >= -0.05 s);
+          - transition is NOT double-subtracted (>= -0.05 s);
+          - the admission wall is NOT lost (admission_exclusive_s > 0
+            when a delay is injected);
+          - the terminal generate_total_s exists;
+          - measured + remainder ~ total within -0.05 s.
+        """
+        import time as _time
+        import pytest
+        m = pytest.MonkeyPatch()
+        _hermetic(m)
+        m.setenv("ZAI_API_KEY", "zai_k")
+        m.setenv("XKIRO_API_KEY", "xkiro_k")
+        lines = self._lines_for(m)
+
+        # deterministic admission delay on provider A (zai)
+        m.setattr(ra, "runtime_admission",
+                   lambda *a, **k: (
+                       _time.sleep(0.15),
+                       (True, "PROBE_OK", {"state": "PROBE_OK"}))[1])
+
+        zai_calls = {"n": 0}
+
+        def fake_call(spec, messages, timeout, max_tokens,
+                      model_override=None):
+            if spec.provider_id == "zai":
+                zai_calls["n"] += 1
+                # the FIRST zai attempt (index 0) fails on transport,
+                # forcing a retry sleep + second attempt; the second
+                # zai attempt also fails, advancing to provider B.
+                if zai_calls["n"] <= 2:
+                    raise RuntimeError("zai transport failure")
+                return "FIELD_MECHANISM: test"
+            return "FIELD_MECHANISM: test"
+        m.setattr(lr, "_call_openai_flavor", fake_call)
+        m.setattr(lr, "_call_anthropic_flavor", fake_call)
+        try:
+            # max_retries=1 lets one retry sleep happen on zai before
+            # the rung exhausts and advances to xkiro.
+            res = lr.generate("p", policy=_policy("zai", "xkiro"),
+                              max_retries=1)
+            self.assertTrue(res.ok)
+            self.assertEqual(res.provider_id, "xkiro")
+            sp = lines[-1]["generate_spans"]
+            total = sp.get("generate_total_s")
+            # the terminal total exists on the final (xkiro success)
+            # line
+            self.assertIsNotNone(
+                total, "S5 PART 4: terminal generate_total_s must "
+                "exist on the successful final line")
+            zai_rung = sp["rungs"][0]
+            xkiro_rung = sp["rungs"][1]
+            # 1) all components non-negative (no clamping)
+            for r in sp["rungs"]:
+                a = r.get("admission") or {}
+                self.assertGreaterEqual(
+                    a.get("probe_admission_s") or 0.0, 0.0)
+                self.assertGreaterEqual(
+                    a.get("probe_retry_sleep_s") or 0.0, 0.0)
+                for att in r.get("attempts") or []:
+                    self.assertGreaterEqual(
+                        att.get("dispatch_s") or 0.0, 0.0,
+                        "S5 PART 4: dispatch must be non-negative")
+                    self.assertGreaterEqual(
+                        att.get("retry_sleep_s") or 0.0, 0.0,
+                        "S5 PART 4: retry sleep must be non-negative")
+                    self.assertGreaterEqual(
+                        att.get("transition_to_next_s") or 0.0,
+                        -0.05,
+                        "S5 PART 4: transition must be >= -0.05 s "
+                        "(not double-subtracted, not counting the "
+                        "retry sleep)")
+                self.assertGreaterEqual(
+                    r.get("post_provider_local_s") or 0.0, 0.0)
+            # 2) the zai rung's admission wall is NOT lost (the
+            # injected 0.15 s delay must be represented)
+            self.assertGreater(
+                (zai_rung.get("admission") or {}).get(
+                    "probe_admission_s") or 0.0, 0.15,
+                "S5 PART 4: the zai admission wall (injected 0.15 s "
+                "delay) must be captured in admission_exclusive_s, "
+                "not lost in the remainder")
+            # 3) the zai rung actually carried a retry sleep (the
+            # transport failure path was exercised)
+            self.assertGreater(
+                sum(att.get("retry_sleep_s") or 0.0
+                    for att in zai_rung.get("attempts") or []), 0.0,
+                "S5 PART 4: a retry sleep must be recorded on the "
+                "failing zai rung")
+            # 4) measured + remainder ~ total (full decomposition)
+            measured = (sp.get("selection_ordering_s") or 0.0)
+            for r in sp["rungs"]:
+                a = r.get("admission") or {}
+                measured += max((a.get("probe_admission_s") or 0.0)
+                                - (a.get("probe_retry_sleep_s") or 0.0),
+                                0.0)
+                measured += max(a.get("probe_retry_sleep_s") or 0.0, 0.0)
+                for att in r.get("attempts") or []:
+                    measured += max(att.get("dispatch_s") or 0.0, 0.0)
+                    measured += max(att.get("retry_sleep_s") or 0.0, 0.0)
+                    measured += max(
+                        att.get("transition_to_next_s") or 0.0, 0.0)
+                measured += (r.get("post_provider_local_s") or 0.0)
+            remainder = round(total - measured, 6)
+            self.assertGreaterEqual(
+                remainder, -0.05,
+                "S5 PART 4: measured + remainder must close to the "
+                "total within the documented -0.05 s tolerance; a "
+                "larger negative remainder means a component was "
+                "double-counted or lost")
         finally:
             m.undo()
 

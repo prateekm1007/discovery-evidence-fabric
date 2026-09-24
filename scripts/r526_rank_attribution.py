@@ -310,6 +310,21 @@ def main() -> int:
               "negative_violations": len(neg_viol),
               "negative_component_violations": len(neg_component_hits),
               "negative_component_hits": neg_component_hits,
+              # S5 PART 6: the mixed-purposes aggregate above is
+              # instrumentation evidence ONLY. The SYNTHESIZE-purpose
+              # sub-aggregate is reported separately so it is never
+              # mistaken for a SYNTHESIZE-stage bottleneck proof.
+              # dispatch_s is the provider-call wall, NOT routing
+              # waste (the provider inference time is the dominant
+              # component; no new evidence establishes it as waste).
+              "mixed_aggregate_note": (
+                  "the 30-call Q-A aggregate mixes every generate() "
+                  "purpose (SYNTHESIZE, ATTACK, MECHANISM_SPACE, "
+                  "POST_RANK_*). It is instrumentation evidence, not "
+                  "a SYNTHESIZE-only performance measurement. Use the "
+                  "SYNTHESIZE-purpose sub-aggregate below for "
+                  "stage-level claims."),
+              "by_purpose": {},
               "subphase_means": subphase_agg,
               "per_call": [
                   {"problem_index": g["problem_index"],
@@ -325,6 +340,37 @@ def main() -> int:
                                                     or {}).get(
                        "all_components_non_negative")}
                   for g in gen_calls]}
+    # S5 PART 6: per-purpose sub-aggregates (SYNTHESIZE separated from
+    # all other generate() purposes). Each purpose carries its own
+    # subphase means + the unattributed remainder, so a SYNTHESIZE
+    # stage report never borrows numbers from ATTACK / POST_RANK
+    # calls.
+    _purposes = {}
+    for g in gen_calls:
+        _p = g.get("purpose") or "UNKNOWN"
+        _purposes.setdefault(_p, []).append(g)
+    h_rank["by_purpose"] = {
+        _p: {
+            "n_calls": len(_gs),
+            "n_audited": sum(1 for g in _gs
+                             if (g.get("audit") or {}).get(
+                                 "class") == "AUDITED"),
+            "subphase_means": {
+                _k: _agg([gg.get("subphases", {}).get(_k)
+                         for gg in _gs
+                         if isinstance(gg.get("subphases"), dict)
+                         and gg["subphases"].get(_k) is not None])
+                for _k in ("selection_ordering_s", "admission_s",
+                           "probe_retry_sleep_s", "dispatch_s",
+                           "retry_sleep_s", "transition_s",
+                           "post_provider_local_s")},
+            "total_s": _agg([(g.get("audit") or {}).get(
+                "total_s") for g in _gs]),
+            "remainder_s": _agg([(g.get("audit") or {}).get(
+                "remainder_s") for g in _gs]),
+        }
+        for _p, _gs in sorted(_purposes.items(),
+                              key=lambda kv: -len(kv[1]))}
 
     # I. run-wall reconciliation (R526 Q-B B1/B2): run wall vs
     # executed linear stage walls vs TOP-LEVEL post-rank phase walls

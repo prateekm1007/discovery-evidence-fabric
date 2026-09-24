@@ -443,18 +443,20 @@ def _generate_calls_block(lines):
                     len(_neg_components) == 0),
                 "remainder_rule": ("generate_total_s (instrument "
                                    "terminal) = measured_subspans + "
-                                   "unattributed_remainder_s; remainder "
-                                   "may be positive (loop overhead, "
-                                   "dict building, degradation records, "
-                                   "ledger I/O, result construction — "
-                                   "all sub-ms local work by "
-                                   "inspection); a small negative value "
-                                   "beyond clock tolerance -0.05 s is "
-                                   "an instrumentation violation, "
-                                   "flagged never hidden; the "
-                                   "remainder must NOT be used to "
-                                   "conceal negative components "
-                                   "(PART 6)"),
+                                   "unattributed_remainder_s; the "
+                                   "remainder is UNATTRIBUTED_REMAINDER "
+                                   "until a fresh measurement proves its "
+                                   "contents — it is NOT assumed to be "
+                                   "loop overhead, dict building, ledger "
+                                   "I/O, or result construction "
+                                   "(S5 PART 5: unknown remains "
+                                   "unknown, never estimated or "
+                                   "distributed); a small negative "
+                                   "value beyond clock tolerance -0.05 s "
+                                   "is an instrumentation violation, "
+                                   "flagged never hidden; the remainder "
+                                   "must NOT be used to conceal "
+                                   "negative components (PART 6)"),
                 "note": ("total from the instrument's terminal "
                          "generate_total_s; the ledger-epoch "
                          "reconstruction is provenance only and is "
@@ -1172,6 +1174,16 @@ def _write_merged(header_extra, new_rows):
         if prev is not None and _is_placeholder(r) and not _is_placeholder(prev):
             continue
         rows[sid] = r
+    # S5: the harvest records the manifest-stamped measured engine SHA
+    # so the round-record amendment can verify a FRESH corrected-build
+    # execution (a re-harvest of old run records cannot masquerade as
+    # the corrected execution).
+    _man_engine = ""
+    try:
+        _m = json.loads(MANIFEST.read_text(encoding="utf-8"))
+        _man_engine = _m.get("measured_engine_sha") or ""
+    except Exception:
+        _man_engine = ""
     out = {
         "artifact_type": "R526_ATTRIBUTION_HARVEST",
         "battery": "R526-CURRENT-PRODUCTION-ATTRIBUTION",
@@ -1180,6 +1192,7 @@ def _write_merged(header_extra, new_rows):
         "ms_module": "scripts/r516_harvest_attribution.py (frozen import)",
         "manifest_sha256": hashlib.sha256(
             MANIFEST.read_bytes()).hexdigest(),
+        "measured_engine_sha": _man_engine,
         "harvested_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                            time.gmtime()),
         "n_rows": len(rows),

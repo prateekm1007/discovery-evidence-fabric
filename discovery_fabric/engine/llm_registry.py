@@ -2149,20 +2149,23 @@ def generate(prompt: str, system: str = "",
                     time.perf_counter() - _t_adm0)
                 _tries += 1
         else:
-            _t_adm0 = time.perf_counter()
-            # the no-probe path still has a measured (near-zero)
-            # admission-prep interval; accumulated like the probe
-            # path so the accounting is uniform.
-            _probe_admission_exclusive_s = (
-                time.perf_counter() - _t_adm0)
+            # R526 Q-A (S5): the no-probe path has no separate prep
+            # interval to measure (the timer that would bracket an
+            # empty block reads ~0 and was not durable evidence). The
+            # runtime_admission() call below is the ONLY measured
+            # admission wall on this path, and it is accumulated into
+            # _probe_admission_exclusive_s via _t_admchk0 below —
+            # never a near-zero interval that masks the real wall.
+            _probe_admission_exclusive_s = 0.0
+        # R526 Q-A (S5): the runtime_admission() call itself is the
+        # measured admission-check wall — the timer opens IMMEDIATELY
+        # BEFORE the call and closes immediately after, so the wall is
+        # included in the exclusive total (S4 defect: the timer was
+        # opened AFTER the call returned, so the admission wall was
+        # never captured and rode the unattributed remainder).
+        _t_admchk0 = time.perf_counter()
         _adm, _adm_note, _adm_ev = _ra.runtime_admission(
             provider_id, model_id)
-        # R526 Q-A (S4): the admission check is its own exclusive
-        # segment (opened just before the check; the check is the
-        # admission decision, not a sleep). Accumulated into the
-        # same exclusive total so admission_exclusive + probe_retry
-        # sleep accounts for ALL probe/admission time exactly once.
-        _t_admchk0 = time.perf_counter()
         _probe_admission_exclusive_s += (
             time.perf_counter() - _t_admchk0)
         _hop["admission"] = {
