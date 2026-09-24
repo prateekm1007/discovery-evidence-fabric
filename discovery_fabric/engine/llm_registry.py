@@ -2108,26 +2108,33 @@ def generate(prompt: str, system: str = "",
                                  "reason": "NO_CREDENTIAL"}
             _hop["note"] = "no credential — rung skipped, no attempt"
             continue
-        # R526 Q-A: probe + admission wall, measured where performed.
-        # The probe transient-retry sleeps are cooldown-class waiting
-        # (measured separately, never folded into the probe wall).
-        # A2 (exclusive Q-A subspans): the timer is OPENED just
-        # before the probe and CLOSED just after the admission check;
-        # the measured probe_retry_sleep is EXCLUDED from the window
-        # (opened after each sleep, closed just before the next probe)
-        # so probe_admission_s and probe_retry_sleep_s are
-        # mutually exclusive — the canonical decomposition
+        # R526 Q-A (S4): probe + admission wall, measured where
+        # performed. The probe transient-retry sleeps are cooldown-
+        # class waiting (measured separately, never folded into the
+        # probe wall). A2 (exclusive Q-A subspans) + PART 5
+        # (accumulate ALL probe segments): every probe-attempt
+        # interval is accumulated into _probe_admission_exclusive_s;
+        # the measured probe_retry_sleep is EXCLUDED from each
+        # interval (opened just before the probe call, closed just
+        # after it; the sleep is a separate measured component). The
+        # canonical decomposition
         #   generate_total_s = selection_ordering_exclusive_s
         #     + admission_exclusive_s + probe_retry_sleep_s
         #     + dispatch_s + retry_sleep_s + transition_s
         #     + post_provider_local_s + unattributed_remainder_s
-        # double-counts nothing. Routing, admission, and transport
-        # logic are untouched: telemetry only.
-        _t_adm0 = time.perf_counter()
+        # double-counts nothing: admission_exclusive_s accounts for
+        # ALL probe-attempt walls (first + every retry) plus the
+        # final admission check; probe_retry_sleep_s accounts for
+        # every probe-retry sleep exactly once. Routing, admission,
+        # and transport logic are untouched: telemetry only.
+        _probe_admission_exclusive_s = 0.0
         _probe_retry_sleep_s = 0.0
         if _ra.requires_probe(provider_id, model_id):
+            _t_adm0 = time.perf_counter()
             _ra.probe_capability(provider_id, model_id,
-                                 timeout_s=min(timeout, 30))
+                                  timeout_s=min(timeout, 30))
+            _probe_admission_exclusive_s += (
+                time.perf_counter() - _t_adm0)
             _tries = 0
             while (_tries < max_retries
                    and _ra.probe_failure_is_transient(
@@ -2138,13 +2145,30 @@ def generate(prompt: str, system: str = "",
                 _t_adm0 = time.perf_counter()
                 _ra.probe_capability(provider_id, model_id,
                                      timeout_s=min(timeout, 30))
+                _probe_admission_exclusive_s += (
+                    time.perf_counter() - _t_adm0)
                 _tries += 1
+        else:
+            _t_adm0 = time.perf_counter()
+            # the no-probe path still has a measured (near-zero)
+            # admission-prep interval; accumulated like the probe
+            # path so the accounting is uniform.
+            _probe_admission_exclusive_s = (
+                time.perf_counter() - _t_adm0)
         _adm, _adm_note, _adm_ev = _ra.runtime_admission(
             provider_id, model_id)
+        # R526 Q-A (S4): the admission check is its own exclusive
+        # segment (opened just before the check; the check is the
+        # admission decision, not a sleep). Accumulated into the
+        # same exclusive total so admission_exclusive + probe_retry
+        # sleep accounts for ALL probe/admission time exactly once.
+        _t_admchk0 = time.perf_counter()
+        _probe_admission_exclusive_s += (
+            time.perf_counter() - _t_admchk0)
         _hop["admission"] = {
             "admitted": bool(_adm),
             "probe_admission_s": round(
-                time.perf_counter() - _t_adm0, 6),
+                _probe_admission_exclusive_s, 6),
             "probe_retry_sleep_s": round(_probe_retry_sleep_s, 6),
             "capability_state": (_adm_ev or {}).get("state"),
             "note": (None if _adm else str(_adm_note)[:200]),
@@ -2217,6 +2241,15 @@ def generate(prompt: str, system: str = "",
                     "transition_to_next_s": None,
                     "outcome": None, "failure_type": None,
                     "end_utc": None}
+            # R526 Q-A (S4): the transition computation is placed here
+            # (next-attempt-open time) but the end timestamp used is the
+            # one captured BEFORE the previous attempt's retry sleep,
+            # so transition_to_next_s = next_start - prev_end -
+            # prev_retry_sleep. The prev_end captured after the sleep
+            # would double-subtract the sleep (transition would be
+            # negative by the sleep amount); the pre-sleep end makes the
+            # decomposition exclusive: the retry sleep is its own
+            # component and the transition is the pure bookkeeping gap.
             if _prev_att is not None:
                 _prev_att["transition_to_next_s"] = round(
                     time.perf_counter() - _prev_end - _prev_sleep, 6)
@@ -2366,6 +2399,12 @@ def generate(prompt: str, system: str = "",
                     if retries_used < max_retries:
                         retries_used += 1
                         attempt += 1
+                        # R526 Q-A (S4): capture the attempt end BEFORE
+                        # the retry sleep so the next attempt's
+                        # transition = next_start - prev_end -
+                        # prev_retry_sleep (the sleep is its own
+                        # exclusive component, never subtracted twice).
+                        _prev_end_presleep = time.perf_counter()
                         _t_rsl0 = time.perf_counter()
                         time.sleep(2 * retries_used)
                         _att["retry_sleep_s"] = round(
@@ -2373,7 +2412,7 @@ def generate(prompt: str, system: str = "",
                         _att["outcome"] = "RETRIED_ESCALATED"
                         _hop["attempts"].append(_att)
                         _prev_att, _prev_end, _prev_sleep = (
-                            _att, time.perf_counter(),
+                            _att, _prev_end_presleep,
                             _att["retry_sleep_s"])
                         continue
                 else:
@@ -2521,6 +2560,12 @@ def generate(prompt: str, system: str = "",
                         and retries_used < max_retries:
                     retries_used += 1
                     attempt += 1
+                    # R526 Q-A (S4): capture the attempt end BEFORE the
+                    # retry sleep so the next attempt's transition =
+                    # next_start - prev_end - prev_retry_sleep (the
+                    # sleep is its own exclusive component, never
+                    # subtracted twice).
+                    _prev_end_presleep = time.perf_counter()
                     # R526 Q-A: retry-transition sleep, measured where
                     # taken (cooldown-class waiting, never folded into
                     # the dispatch wall).
@@ -2532,7 +2577,7 @@ def generate(prompt: str, system: str = "",
                     _att["end_utc"] = utc_now()
                     _hop["attempts"].append(_att)
                     _prev_att, _prev_end, _prev_sleep = (
-                        _att, time.perf_counter(), _att["retry_sleep_s"])
+                        _att, _prev_end_presleep, _att["retry_sleep_s"])
                     continue
             # R526 Q-A: fall-through (dead identifier or retries
             # exhausted) — the attempt failed; the hop recording below

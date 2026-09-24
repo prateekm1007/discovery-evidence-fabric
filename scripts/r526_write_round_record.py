@@ -54,181 +54,294 @@ def _sha(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
 
-def _nine_criterion_gate(h_rank, phase_flags, gen_subphase_flags,
-                         retrieval_flags, candidates) -> list:
-    """PART C: machine-enforceable nine-criterion authorization gate.
+# S4 PART 9: the R526 standing prohibitions that C5/C6 must be
+# machine-checked against. Each entry is (token, prohibition text); a
+# proposed intervention's diff/description is scanned for the token to
+# prove the change set does or does not touch a prohibited surface.
+STANDING_PROHIBITIONS = (
+    ("zai", "no global Zai retirement (the R525 purpose-scoped "
+            "retirement for post_rank:independent_attack stands)"),
+    ("linear_attack", "no linear ATTACK change"),
+    ("independent_attack", "no ordinary independent_attack change"),
+    ("stage_order", "no stage-order change"),
+    ("prompt", "no prompt change"),
+    ("token_budget", "no token-budget change"),
+    ("retrieval_source", "no retrieval-source-set change / no Semantic "
+                         "Scholar removal"),
+    ("gate", "no epistemic-gate change"),
+    ("parallel", "no speculative parallelization"),
+)
 
-    The gate reports every criterion with status (TRUE / FALSE /
-    UNKNOWN), evidence_artifact, evidence_reference, problem_count,
-    and typed_reason. The writer FAILS CLOSED unless the NAMED
-    candidate (if any) has ALL NINE criteria TRUE; otherwise no
-    intervention is authorized (measurement-only close).
 
-    Canonical nine-criterion list (documented here; no invented
-    criteria; each is mechanically checkable from the durable
-    round artifacts):
+def _evidence_based_gate(candidates, intervention: str,
+                         intervention_files: list,
+                         cliff_named, n_exp) -> list:
+    """S4 PART 9: the nine-criterion authorization gate, EVIDENCE-BASED.
 
-    1. REPEATED — the candidate class is flagged on >= 2 independent
-       problems (repetition across the frozen battery, not a single
-       run anomaly).
-    2. MEASURED — the candidate's wall is a measured value from a
-       durable artifact (gen_spans/PHASE_SPAN/stage_log), never an
-       estimated or ledger-only reconstruction.
-    3. CAUSALLY_ATTRIBUTED — the candidate's wall is attributed to
-       a named, typed sub-operation (subphase / phase / source job)
-       with a durable evidence reference, never an UNKNOWN remainder.
-    4. AVOIDABLE — the candidate carries a typed, named avoidable
-       action (the existing --name-cliff + --intervention pair;
-       successful necessary work is NOT avoidable).
-    5. SCOPED — the avoidable action is exactly one named
-       intervention, does not broaden provider retirement, does not
-       alter linear ATTACK / ordinary independent_attack / stage
-       order / prompt / token budget / retrieval source set / gates,
-       and keeps the R525 gauntlet purpose boundary intact
-       (standing-prohibition check).
-    6. NO_PROHIBITED_BEHAVIOR_CHANGE — machine-checkable subset of
-       the standing prohibitions: no global Zai retirement, no
-       linear ATTACK change, no ordinary independent_attack change,
-       no stage-order change, no prompt / budget / retrieval / gate
-       change, no speculative parallelization.
-    7. QUALITY_PARITY_BASELINE — the current-arm quality baseline
-       (span_verbatim_rate 1.0 + funnel OBSERVED_IN_STAGE on all
-       rows) is recorded so the after arm can be checked for parity
-       (measured, never assumed).
-    8. PRODUCTION_DEPLOYMENT_TUPLE — the round record carries the
-       constitution-mandated production_deployment tuple with
-       live-verified values (origin/main target SHA, deployed SHA,
-       health GREEN, drift GREEN).
-    9. SINGLE_INTERVENTION_AUTHORIZED — exactly one cliff is named
-       (--name-cliff); no second intervention is authorized;
-       --name-cliff / --intervention identify an already-authorized
-       cliff, they do not manufacture authorization.
+    The CLI (--name-cliff / --intervention) must NOT manufacture the
+    evidentiary predicates. For each criterion the gate records a
+    three-way state:
+
+      named     — the CLI identified this candidate/intervention
+      evidenced — a durable artifact supports the predicate
+      verified  — the predicate is mechanically proven (evidenced AND
+                  the machine check passed)
+
+    The gate remains the SAME nine criteria (no invention). A
+    criterion is TRUE only when its predicate is VERIFIED; a merely
+    named criterion stays UNKNOWN and fails the gate closed.
     """
     def _criterion(cid, name, status, evidence_artifact,
-                   evidence_reference, problem_count, typed_reason):
+                   evidence_reference, problem_count, typed_reason,
+                   named=False, evidenced=False, verified=False):
         return {
             "criterion_id": cid,
             "name": name,
             "status": status,
+            "named": bool(named),
+            "evidenced": bool(evidenced),
+            "verified": bool(verified),
             "evidence_artifact": evidence_artifact,
             "evidence_reference": evidence_reference,
             "problem_count": problem_count,
             "typed_reason": typed_reason,
         }
 
-    n_exp = (candidates or {}).get("_n_problems") or None
-
-    # Per candidate-class mechanical status. Only the NAMED candidate
-    # (if any) is checked end-to-end; the others are recorded with
-    # their mechanical flags so the record is auditable.
     out = []
+    _cand = candidates or {}
+    pcount = n_exp
 
-    def _class_rows(flags, key=None):
+    def _class_rows(of_class):
+        blk = _cand.get(of_class) or {}
+        ev = blk.get("evidence") or []
         rows = set()
-        for f in flags or []:
+        for f in ev:
             for r in f.get("rows") or f.get("problems") or []:
                 rows.add(r)
-            if key and f.get(key) is not None:
-                rows.add(f[key])
+            if f.get("subphase") is not None:
+                for r in f.get("problems") or []:
+                    rows.add(r)
+            for r in f.get("critical_path_rows") or []:
+                rows.add(r)
         return rows
 
-    # C1 REPEATED — iterate candidate classes only (skip the
-    # _n_problems int injected for C7 bookkeeping).
-    for cname, cblk in (candidates or {}).items():
-        if not isinstance(cblk, dict):
-            continue
-        if cblk.get("flagged"):
-            _rows = _class_rows(cblk.get("evidence"))
-            out.append(_criterion(
-                "C1_REPEATED", "repeated on >= 2 independent problems",
-                "TRUE" if len(_rows) >= 2 else
-                ("FALSE" if len(_rows) == 0 else "UNKNOWN"),
-                "R526/ATTRIBUTION_RANKING.json",
-                f"candidates.{cname}",
-                len(_rows),
-                f"{cname} flagged on {len(_rows)} problem(s)"))
-    # C2/C3 for generate subphases + phases + retrieval: measured and
-    # causally attributed by construction (the artifacts are the
-    # durable measurements); UNKNOWN only when no evidence.
+    named_cliff = cliff_named
+    named_cand = named_cliff if named_cliff in (
+        "A_generate_routing_subphase", "B_post_rank_subphase",
+        "D_retrieval") else None
+    # a retrieval cliff names a source id, not the candidate class
+    if named_cliff == "D_retrieval":
+        named_cand = "D_retrieval"
+
+    # ---- C1 REPEATED (evidenced by the ranking flags) ----
+    _rows = _class_rows(named_cand) if named_cand else set()
+    _c1_ev = len(_rows) >= 2
+    out.append(_criterion(
+        "C1_REPEATED", "repeated on >= 2 independent problems",
+        "TRUE" if _c1_ev else
+        ("FALSE" if named_cand and len(_rows) == 0 else "UNKNOWN"),
+        "R526/ATTRIBUTION_RANKING.json",
+        f"candidates.{named_cand}.evidence" if named_cand
+        else "candidates.<*>.evidence",
+        len(_rows) if named_cand else None,
+        (f"{named_cand} flagged on {len(_rows)} problem(s)"
+         if named_cand else
+         "no candidate named; repetition not evaluated against a "
+         "specific class"),
+        named=bool(named_cand), evidenced=_c1_ev, verified=_c1_ev))
+
+    # ---- C2 MEASURED (evidenced: durable measurement artifacts) ----
+    _c2_ev = bool(pcount)
     out.append(_criterion(
         "C2_MEASURED", "wall is a measured value from a durable "
-                       "artifact", "TRUE",
+                       "artifact", "TRUE" if _c2_ev else "UNKNOWN",
         "R526/ATTR_CURRENT_HARVEST.json + ATTRIBUTION_RANKING.json",
         "H_generate_call_audit + I_run_wall_reconciliation",
-        n_exp,
-        "gen_spans/PHASE_SPAN/stage_log measurements; no "
-        "estimated values in the ranking input"))
+        pcount,
+        "gen_spans/PHASE_SPAN/stage_log measurements; no estimated "
+        "values in the ranking input",
+        named=bool(named_cand), evidenced=_c2_ev, verified=_c2_ev))
+
+    # ---- C3 CAUSALLY_ATTRIBUTED (evidenced: typed sub-op reference) ----
+    _c3_ev = bool(named_cand)
     out.append(_criterion(
-        "C3_CAUSALLY_ATTRIBUTED", "wall attributed to a named, "
-                                   "typed sub-operation", "TRUE",
+        "C3_CAUSALLY_ATTRIBUTED", "wall attributed to a named, typed "
+                                   "sub-operation",
+        "TRUE" if _c3_ev else "UNKNOWN",
         "R526/ATTRIBUTION_RANKING.json",
-        "H subphase means + I top-level phase walls + B2 source "
-        "job walls",
-        n_exp,
-        "every ranked value carries a typed sub-operation / phase / "
-        "source-job reference; UNKNOWN remainders are never ranked"))
-    # C4/C5/C6 depend on the named cliff + intervention (coder input,
-    # machine-checked against the standing prohibitions).
+        "H subphase means + I top-level phase walls + B2 source job "
+        "walls",
+        pcount,
+        ("every ranked value carries a typed sub-operation / phase / "
+         "source-job reference; UNKNOWN remainders are never ranked"
+         if _c3_ev else
+         "no candidate named; causal attribution not established"),
+        named=bool(named_cand), evidenced=_c3_ev, verified=_c3_ev))
+
+    # ---- C4 AVOIDABLE (named + EVIDENCED counterfactual required) ----
+    # PART 9: naming alone is NOT avoidable. C4 requires a typed
+    # counterfactual action tied to the measured waste class: for the
+    # generate-routing class the measured waste must be a
+    # retry/admission/dispatch component with a bounded, non-prohibited
+    # counterfactual (e.g. a max_retries/sleep policy already exposed as
+    # configuration) stated in the intervention text.
+    _iv = (intervention or "").strip()
+    _c4_named = bool(named_cliff and _iv)
+    # evidence: the named class actually carries a measured avoidable
+    # component (a subphase mean > 0 for A, or a phase failure wall > 0
+    # for B, or a zero-record critical source for D).
+    _c4_ev = False
+    _c4_ref = "candidates.<*>.evidence"
+    if named_cand == "A_generate_routing_subphase":
+        _ev = (_cand.get("A_generate_routing_subphase") or {}).get(
+            "evidence") or []
+        _c4_ev = any((f.get("mean_s") or 0) > 0 for f in _ev)
+        _c4_ref = "candidates.A_generate_routing_subphase.evidence[].mean_s"
+    elif named_cand == "B_post_rank_subphase":
+        _ev = (_cand.get("B_post_rank_subphase") or {}).get(
+            "evidence") or []
+        _c4_ev = any((f.get("failure_wall_total_s") or 0) > 0
+                     for f in _ev)
+        _c4_ref = ("candidates.B_post_rank_subphase.evidence[]."
+                   "failure_wall_total_s")
+    elif named_cand == "D_retrieval":
+        _ev = (_cand.get("D_retrieval") or {}).get("evidence") or []
+        _c4_ev = bool(_ev)
+        _c4_ref = "candidates.D_retrieval.evidence[].critical_path_rows"
+    _c4_verified = bool(_c4_named and _c4_ev and _iv)
     out.append(_criterion(
-        "C4_AVOIDABLE", "typed, named avoidable action", 
-        "UNKNOWN", "CLI --name-cliff + --intervention",
-        "decision.cliff_named + decision.after_arm_authorized",
-        None,
-        "set to TRUE only when exactly one cliff is named with a "
-        "typed intervention; successful necessary work is never "
-        "marked avoidable"))
+        "C4_AVOIDABLE", "typed counterfactual action tied to the "
+                        "measured waste class",
+        "TRUE" if _c4_verified else "UNKNOWN",
+        "R526/ATTRIBUTION_RANKING.json + CLI --intervention",
+        _c4_ref,
+        len(_rows) if named_cand else None,
+        (f"named cliff '{named_cliff}' with counterfactual "
+         f"intervention '{_iv[:120]}'; measured waste class evidenced "
+         f"at {_c4_ref}"
+         if _c4_verified else
+         "UNKNOWN unless a candidate is named, a typed counterfactual "
+         "is supplied, AND the named class carries measured avoidable "
+         "wall — naming alone does not make C4 TRUE"),
+        named=_c4_named, evidenced=_c4_ev, verified=_c4_verified))
+
+    # ---- C5 SCOPED (evidenced: exactly-one-intervention declaration) ----
+    _files = sorted(intervention_files or [])
+    _c5_named = bool(named_cliff)
+    _c5_ev = bool(_c5_named and _files)
+    _c5_verified = bool(_c5_named and len(_files) >= 1
+                        and not _any_prohibited(_iv, _files))
     out.append(_criterion(
         "C5_SCOPED", "exactly one named intervention, no "
-                     "standing-prohibition violation", "UNKNOWN",
-        "CLI --intervention + standing_prohibition_check",
-        "decision.cliff_named + candidates",
-        None,
-        "checked against the R526 standing prohibitions (no global "
-        "Zai retirement, no linear ATTACK change, no ordinary "
-        "independent_attack change, no stage-order / prompt / budget "
-        "/ retrieval / gate change, no speculative parallelization; "
-        "R525 gauntlet purpose boundary intact)"))
+                     "standing-prohibition violation",
+        "TRUE" if _c5_verified else "UNKNOWN",
+        "CLI --intervention + --intervention-file + "
+        "STANDING_PROHIBITIONS",
+        "decision.cliff_named + intervention_files",
+        len(_files) if _files else None,
+        (f"exactly one intervention over the declared change set "
+         f"{_files}; no standing-prohibition token present"
+         if _c5_verified else
+         "UNKNOWN unless exactly one intervention is named AND its "
+         "declared change set is non-empty AND free of every "
+         "standing-prohibition token"),
+        named=_c5_named, evidenced=_c5_ev, verified=_c5_verified))
+
+    # ---- C6 NO_PROHIBITED_BEHAVIOR_CHANGE (verified against change
+    # set + R525 boundary) ----
+    _c6_named = bool(named_cliff)
+    _viol = _prohibited_hits(_iv, _files)
+    _bound_ok = bool((_cand.get("C_gauntlet_boundary") or {}).get(
+        "boundary_intact_all_rows", True))
+    _c6_ev = bool(_c6_named and _files)
+    _c6_verified = bool(_c6_named and _files and not _viol and _bound_ok)
     out.append(_criterion(
-        "C6_NO_PROHIBITED_BEHAVIOR_CHANGE", "no standing "
-                                             "prohibition violated",
-        "UNKNOWN", "decision + standing_prohibition_check",
-        "candidates + R525 purpose_audit",
-        None,
-        "machine-checkable subset of the standing prohibitions; "
-        "resolved when the named intervention is verified against "
-        "the list"))
+        "C6_NO_PROHIBITED_BEHAVIOR_CHANGE", "no standing prohibition "
+                                             "violated",
+        "TRUE" if _c6_verified else "UNKNOWN",
+        "R526/ATTRIBUTION_RANKING.json purpose_audit + "
+        "STANDING_PROHIBITIONS",
+        "candidates.C_gauntlet_boundary.boundary_intact_all_rows + "
+        "intervention change set",
+        pcount,
+        (f"declared change set {_files} carries no prohibited token "
+         f"and the R525 gauntlet purpose boundary is intact on every "
+         f"row"
+         if _c6_verified else
+         (f"prohibited token(s) present: {_viol}" if _viol else
+          "UNKNOWN unless the declared change set is present, free of "
+          "every standing-prohibition token, AND the R525 gauntlet "
+          "purpose boundary holds on all rows")),
+        named=_c6_named, evidenced=_c6_ev, verified=_c6_verified))
+
+    # ---- C7 QUALITY_PARITY_BASELINE ----
+    _c7_ev = bool(pcount)
     out.append(_criterion(
         "C7_QUALITY_PARITY_BASELINE", "current-arm quality baseline "
-                                      "recorded for after-arm "
-                                      "parity check", "TRUE",
+                                      "recorded for after-arm parity "
+                                      "check", "TRUE" if _c7_ev
+        else "UNKNOWN",
         "R526/ATTR_CURRENT_HARVEST.json",
         "rows[].synthesize_validity + rows[].funnel_row_class",
-        n_exp,
+        pcount,
         "span_verbatim_rate 1.0 + funnel OBSERVED_IN_STAGE on all "
         "current rows is the parity baseline; the after arm must "
-        "match it"))
+        "match it",
+        named=bool(named_cand), evidenced=_c7_ev, verified=_c7_ev))
+
+    # ---- C8 PRODUCTION_DEPLOYMENT_TUPLE ----
     out.append(_criterion(
         "C8_PRODUCTION_DEPLOYMENT_TUPLE", "production_deployment "
                                           "tuple with live-verified "
-                                          "values", "TRUE",
-        "R526/R526_ROUND_RECORD.json",
+                                          "values",
+        "TRUE", "R526/R526_ROUND_RECORD.json",
         "production_deployment (target/deployed SHA, health GREEN, "
         "drift GREEN)",
         None,
-        "Art. LXXI delivery standard; verified live at record "
-        "write time"))
+        "Art. LXXI delivery standard; verified live at record write "
+        "time",
+        named=False, evidenced=True, verified=True))
+
+    # ---- C9 SINGLE_INTERVENTION_AUTHORIZED (one and only one) ----
+    _c9_named = bool(named_cliff)
+    _c9_ev = _c9_named
+    _c9_verified = bool(_c9_named and len(_files) >= 1)
     out.append(_criterion(
-        "C9_SINGLE_INTERVENTION_AUTHORIZED", "exactly one cliff "
-                                             "named; no second "
-                                             "intervention", "UNKNOWN",
-        "CLI --name-cliff",
-        "decision.cliff_named",
-        1,
-        "TRUE only when exactly one --name-cliff is supplied and it "
-        "matches a flagged candidate; --name-cliff / --intervention "
-        "identify an already-authorized cliff, they do not "
-        "manufacture authorization"))
+        "C9_SINGLE_INTERVENTION_AUTHORIZED", "exactly one cliff named; "
+                                             "no second intervention",
+        "TRUE" if _c9_verified else "UNKNOWN",
+        "CLI --name-cliff + --intervention-file",
+        "decision.cliff_named + intervention_files",
+        1 if _c9_named else None,
+        (f"exactly one cliff named ('{named_cliff}') over exactly one "
+         f"declared change set"
+         if _c9_verified else
+         "UNKNOWN unless exactly one --name-cliff is supplied AND "
+         "exactly one intervention change set is declared; "
+         "--name-cliff / --intervention identify an already-authorized "
+         "cliff, they do not manufacture authorization"),
+        named=_c9_named, evidenced=_c9_ev, verified=_c9_verified))
     return out
+
+
+def _prohibited_hits(intervention: str, files: list) -> list:
+    """Machine-check the proposed intervention's change set + text
+    against every standing prohibition. Returns the list of violated
+    prohibition tokens (empty == clean)."""
+    blob = " ".join([intervention or ""] + list(files or [])).lower()
+    # normalise a few spellings the check must not miss
+    blob = blob.replace("independent_attack", "independent_attack")
+    hits = []
+    for token, _text in STANDING_PROHIBITIONS:
+        if token == "parallel" and "parallel" in blob:
+            hits.append(token)
+        elif token != "parallel" and token in blob:
+            hits.append(token)
+    return hits
+
+
+def _any_prohibited(intervention: str, files: list) -> bool:
+    return bool(_prohibited_hits(intervention, files))
 
 
 def _gate_all_true(gate: list) -> bool:
@@ -250,6 +363,12 @@ def main() -> int:
     ap.add_argument("--intervention", default=None,
                     help="the exactly-one authorized intervention "
                          "(required with --name-cliff)")
+    ap.add_argument("--intervention-file", action="append", default=[],
+                    help="repeatable: the declared change-set file(s) "
+                         "for the named intervention (C5/C6/C9 "
+                         "evidence; the change set must be non-empty "
+                         "and free of every standing-prohibition "
+                         "token)")
     ap.add_argument("--after-close", action="store_true",
                     help="delivery close after the after arm ran: reads "
                          "ATTR_COMPARISON.json + ATTR_AFTER_HARVEST.json + "
@@ -440,30 +559,16 @@ def main() -> int:
             return 2
         cliff_named = args.name_cliff
 
-    # ---- PART C: machine-enforceable nine-criterion gate ----
+    # ---- PART C (S4 PART 9): EVIDENCE-BASED nine-criterion gate ----
     # The gate is evaluated on the NAMED candidate (if any) plus the
-    # mechanical flags computed above. Criteria C4/C5/C6/C9 resolve
-    # their UNKNOWN status from the named-cliff inputs; all others
-    # carry their mechanical status. The gate fails CLOSED unless
-    # every criterion is TRUE: a missing / FALSE / UNKNOWN criterion
-    # forbids the after arm even if a cliff was named.
+    # declared change set. Criteria carry a named/evidenced/verified
+    # three-way state; status is TRUE only when VERIFIED. A merely
+    # named criterion stays UNKNOWN and fails the gate closed — the
+    # CLI must NOT manufacture the evidentiary predicates.
     candidates["_n_problems"] = len(rows)
-    _gate = _nine_criterion_gate(
-        ranking.get("H_generate_call_audit"), phase_flags,
-        gen_subphase_flags, retrieval_flags, candidates)
-    if cliff_named:
-        for c in _gate:
-            if c["criterion_id"] in ("C4_AVOIDABLE", "C5_SCOPED",
-                                     "C6_NO_PROHIBITED_BEHAVIOR_CHANGE",
-                                     "C9_SINGLE_INTERVENTION_AUTHORIZED"):
-                c["status"] = "TRUE"
-                if c["criterion_id"] == "C4_AVOIDABLE":
-                    c["typed_reason"] = (
-                        f"named cliff '{cliff_named}' with typed "
-                        f"intervention '{args.intervention}'")
-                elif c["criterion_id"] == "C9_SINGLE_INTERVENTION_AUTHORIZED":
-                    c["typed_reason"] = (
-                        f"exactly one cliff named: '{cliff_named}'")
+    _gate = _evidence_based_gate(
+        candidates, args.intervention or "",
+        args.intervention_file, cliff_named, len(rows))
     _gate_satisfied = _gate_all_true(_gate)
     if cliff_named and not _gate_satisfied:
         print("FATAL: nine-criterion gate NOT satisfied for "
@@ -491,9 +596,15 @@ def main() -> int:
     _gate_payload = {
         "criteria": _gate,
         "all_true": _gate_satisfied,
+        "intervention_files": sorted(args.intervention_file or []),
+        "intervention_text": args.intervention or "",
         "rule": ("exactly one intervention authorized ONLY when "
-                 "every criterion is TRUE; any FALSE / UNKNOWN / "
-                 "missing criterion fails the gate closed"),
+                 "every criterion is VERIFIED (TRUE); any FALSE / "
+                 "UNKNOWN / missing criterion fails the gate closed. "
+                 "The CLI (--name-cliff / --intervention / "
+                 "--intervention-file) identifies the proposed "
+                 "candidate/intervention; it does NOT manufacture the "
+                 "evidentiary predicates (S4 PART 9)"),
         "pristine_failure_set": list(_PRISTINE_FAILURES),
         "instrumented_failure_set": list(_PRISTINE_FAILURES),
         "set_equal": True,

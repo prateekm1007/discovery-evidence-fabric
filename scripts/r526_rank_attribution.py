@@ -277,7 +277,23 @@ def main() -> int:
     audited = [g for g in gen_calls
                if (g.get("audit") or {}).get("class") == "AUDITED"]
     remainders = [g["audit"]["remainder_s"] for g in audited
-                  if g["audit"].get("remainder_s") is not None]
+                   if g["audit"].get("remainder_s") is not None]
+    # PART 6: negative_components must NOT be hidden. Count calls that
+    # carry at least one negative subcomponent (a Q-A instrumentation
+    # violation). This is a PER-COMPONENT check, not an aggregate.
+    neg_calls = [g for g in audited
+                 if (g.get("audit") or {}).get("negative_components")]
+    neg_component_hits = []
+    for g in neg_calls:
+        for nc in (g.get("audit") or {}).get("negative_components") or []:
+            neg_component_hits.append(
+                {"problem_index": g.get("problem_index"),
+                 "request_id": g.get("request_id"),
+                 "component": nc})
+    # remainder violations: a negative remainder beyond the documented
+    # -0.05 s clock tolerance is an instrumentation violation (this is
+    # a SEPARATE check from negative components; it detects the
+    # total-vs-measured mismatch, not individual subspan negativity).
     neg_viol = [g for g in audited
                 if (g["audit"].get("remainder_s") or 0) < -0.05]
     # directive §11 item ranking input: per-subphase means across
@@ -292,6 +308,8 @@ def main() -> int:
               "n_audited": len(audited),
               "remainder_s": _agg(remainders),
               "negative_violations": len(neg_viol),
+              "negative_component_violations": len(neg_component_hits),
+              "negative_component_hits": neg_component_hits,
               "subphase_means": subphase_agg,
               "per_call": [
                   {"problem_index": g["problem_index"],
@@ -302,7 +320,10 @@ def main() -> int:
                    "measured_s": (g.get("audit") or {}).get(
                        "measured_s"),
                    "remainder_s": (g.get("audit") or {}).get(
-                       "remainder_s")}
+                       "remainder_s"),
+                   "all_components_non_negative": (g.get("audit")
+                                                    or {}).get(
+                       "all_components_non_negative")}
                   for g in gen_calls]}
 
     # I. run-wall reconciliation (R526 Q-B B1/B2): run wall vs

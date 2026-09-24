@@ -11,6 +11,14 @@ Proves:
   D. the improvement/tech/kill passes wire phase enter/exit
   E. improve_stage wires per-target enter/exit with parent identity
   F. provider-call aggregation inputs exclude phase lines
+  G. the scope=top vs child structural distinction (the directive B2
+     example: 190 s whole + 70/50/30 s candidates must contribute
+     190 s, not 340 s, to run-wall reconciliation)
+  H. (S4 PART 2) the harvester tuple ordering regression: the
+     top-enter/top-exit + child-enter/child-exit example pairs
+     correctly, top_wall_sum_s == top phase wall, child walls are
+     reported separately and NOT included in top_wall_sum_s,
+     unmatched == 0 for the correctly-formed example.
 """
 from __future__ import annotations
 
@@ -226,6 +234,83 @@ class TestPhaseWiringPins(unittest.TestCase):
             self.assertEqual(child_wall_sum, 150.0)
             self.assertNotEqual(top_wall_sum + child_wall_sum,
                                 top_wall_sum)
+        finally:
+            m.undo()
+
+    def test_h_harvester_tuple_ordering_regression(self):
+        """S4 PART 2: the exact regression test that would have
+        caught the tuple-unpacking-order bug in _phase_spans_block.
+
+        The harvester pairs lines by (phase, scope, candidate_key,
+        candidate_id). A correctly-formed sequence:
+          top enter
+          top exit
+          child enter
+          child exit
+        for ONE phase must yield:
+          top_wall_sum_s == top phase wall (the top exit's wall)
+          the child wall is reported separately under children
+          the child wall is NOT included in top_wall_sum_s
+          unmatched == 0
+        """
+        import pytest
+        m = pytest.MonkeyPatch()
+        inst, path = _temp_ledger(m)
+        m.setattr(mr, "LEDGER", inst)
+        try:
+            # top enter, top exit, child enter, child exit — one
+            # phase (GAUNTLET), top wall = 190 s, child wall = 45 s.
+            mr.record_phase_span(
+                session_id="s", run_id="r",
+                engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
+                event="enter", scope="top")
+            mr.record_phase_span(
+                session_id="s", run_id="r",
+                engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
+                event="exit", scope="top", wall_s=190.0)
+            mr.record_phase_span(
+                session_id="s", run_id="r",
+                engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
+                event="candidate_enter", scope="child",
+                candidate_id="cand:1", candidate_key="k1")
+            mr.record_phase_span(
+                session_id="s", run_id="r",
+                engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
+                event="candidate_exit", scope="child",
+                candidate_id="cand:1", candidate_key="k1",
+                wall_s=45.0)
+            lines = [json.loads(ln) for ln in
+                     path.read_text(encoding="utf-8").splitlines()]
+            # run the harvester's phase-pairing on these lines. The
+            # harvester module exits at import without R526_ARM, so
+            # set the arm env before importing (test-only, never
+            # touches production).
+            import os
+            _saved_arm = os.environ.get("R526_ARM")
+            os.environ["R526_ARM"] = "current"
+            try:
+                sys.path.insert(0, str(REPO_ROOT / "scripts"))
+                import r526_harvest_attribution as rh
+                block = rh._phase_spans_block(lines)
+            finally:
+                if _saved_arm is None:
+                    os.environ.pop("R526_ARM", None)
+                else:
+                    os.environ["R526_ARM"] = _saved_arm
+            self.assertEqual(block["class"], "OBSERVED_IN_STAGE")
+            ph = block["phases"]["GAUNTLET"]
+            # top_wall_sum_s == the top phase wall (190 s)
+            self.assertEqual(ph["top_wall_sum_s"], 190.0)
+            # the child wall is reported separately under children
+            self.assertIn("k1", ph["children"])
+            self.assertEqual(ph["children"]["k1"]["wall_sum_s"], 45.0)
+            # the child wall is NOT included in top_wall_sum_s
+            self.assertNotEqual(ph["top_wall_sum_s"], 45.0)
+            # top_wall_sum_s must equal ONLY the top exit wall
+            self.assertEqual(ph["top_wall_sum_s"], 190.0)
+            # unmatched == 0 for the correctly-formed example
+            self.assertEqual(ph["n_unmatched"], 0)
+            self.assertEqual(block["unmatched"], [])
         finally:
             m.undo()
 

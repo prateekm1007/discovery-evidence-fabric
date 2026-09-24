@@ -1453,6 +1453,20 @@ def record_phase_span(session_id: Optional[str],
     that may enter the run-wall reconciliation), "child" marks a
     per-candidate / per-target span nested INSIDE a top-level phase
     (attribution detail; NEVER added on top of the parent wall).
+
+    B3 parent/child identity: the durable join key is the smallest
+    explicit identity already available on the line —
+    (phase, scope, candidate_key, candidate_id). For a top-scope
+    line candidate_key/candidate_id are None (the whole phase has no
+    per-candidate identity); for a child-scope line they carry the
+    candidate/target key. The phase name is shared by the parent
+    and its children (a child's phase = its enclosing top-scope
+    phase), so (phase, scope, candidate_key, candidate_id) uniquely
+    identifies each span and deterministically joins children to
+    their parent WITHOUT time-window matching. No separate
+    parent_phase field is emitted: the enclosing top-scope phase is
+    the line's own `phase` when scope=child (documented invariant,
+    enforced by the caller passing the enclosing phase name).
     """
     import uuid
     try:
@@ -1487,13 +1501,6 @@ def record_phase_span(session_id: Optional[str],
             "phase": phase,
             "event": event,
             "scope": scope,
-            # B3: explicit parent identity (never inferred from
-            # timestamps; None when no explicit parent exists).
-            # For child spans, parent_phase = the enclosing top-scope
-            # phase name (the caller supplies it durably). For
-            # top-scope lines, parent_phase is None (top is the
-            # outermost boundary; no enclosing phase).
-            "parent_phase": (phase if scope == "child" else None),
             "candidate_id": candidate_id,
             "candidate_key": candidate_key,
             "wall_s": wall_s,

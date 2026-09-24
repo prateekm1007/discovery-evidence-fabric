@@ -493,6 +493,164 @@ class TestGenerateSpans(unittest.TestCase):
         finally:
             m.undo()
 
+    # ----------------------------------------------------------------
+    # S4 PART 4: retry-path transition contract (transition >= 0)
+    # ----------------------------------------------------------------
+
+    def test_k_retry_path_transition_non_negative(self):
+        """S4 PART 4: the retry-path transition must be >= 0.
+
+        The intended calculation:
+            transition_to_next_s = next_start - prev_end - prev_sleep
+        where prev_end is captured BEFORE the retry sleep. This test
+        exercises the multi-attempt retry path (attempt 1 fails,
+        retry sleep taken, attempt 2 succeeds) and proves the
+        transition recorded on attempt 1 is non-negative within the
+        documented -0.05 s clock tolerance. A pre-S4 build that
+        captured prev_end AFTER the sleep would have produced a
+        negative transition of roughly -sleep (the sleep subtracted
+        twice); this test catches exactly that defect."""
+        import pytest
+        m = pytest.MonkeyPatch()
+        _hermetic(m)
+        m.setenv("ZAI_API_KEY", "zai_k")
+        calls = []
+
+        def fake_call(spec, messages, timeout, max_tokens,
+                      model_override=None):
+            calls.append(max_tokens)
+            if len(calls) == 1:
+                raise RuntimeError("first call fails (transport)")
+            return "FIELD_MECHANISM: test"
+        m.setattr(lr, "_call_openai_flavor", fake_call)
+        m.setattr(lr, "_call_anthropic_flavor", fake_call)
+        lines = self._lines_for(m)
+        try:
+            res = lr.generate("p", policy=_policy("zai"),
+                              max_retries=1)
+            self.assertTrue(res.ok)
+            # the rung carries two attempts: attempt 1 FAILED
+            # (with a retry sleep), attempt 2 OK.
+            sp = lines[-1]["generate_spans"]
+            rung = sp["rungs"][0]
+            atts = rung["attempts"]
+            self.assertEqual(len(atts), 2)
+            self.assertEqual(atts[0]["outcome"], "RETRIED")
+            self.assertEqual(atts[1]["outcome"], "OK")
+            self.assertGreaterEqual(atts[0]["retry_sleep_s"], 0.0)
+            # PART 4: transition_to_next_s on attempt 1 must be >= 0
+            # within the documented -0.05 s clock tolerance.
+            self.assertIsNotNone(atts[0]["transition_to_next_s"])
+            self.assertGreaterEqual(
+                atts[0]["transition_to_next_s"], -0.05,
+                "S4 PART 4 violation: transition_to_next_s must be "
+                ">= 0 within the documented -0.05 s clock tolerance "
+                "(a pre-S4 build captured the attempt end AFTER the "
+                "retry sleep and double-subtracted it, producing a "
+                "negative transition of roughly -retry_sleep)")
+        finally:
+            m.undo()
+
+    # ----------------------------------------------------------------
+    # S4 PART 8: real Q-A arithmetic test (multi-rung, failed
+    # provider, retry sleep, second provider, successful terminal)
+    # ----------------------------------------------------------------
+
+    def test_l_qa_arithmetic_multi_rung_retry(self):
+        """S4 PART 8: one contract case with multiple rungs, a failed
+        provider, a retry sleep, a second provider, and a successful
+        terminal call. The test independently computes
+
+            measured = selection
+                     + admission_exclusive
+                     + probe_retry_sleep
+                     + dispatch
+                     + retry_sleep
+                     + transition
+                     + post_provider_local
+
+        and compares to the instrument's terminal generate_total_s
+        within the documented -0.05 s clock tolerance. It detects
+        double-counting, lost probe time, negative transition, and
+        a missing terminal total.
+        """
+        import pytest
+        m = pytest.MonkeyPatch()
+        _hermetic(m)
+        m.setenv("ZAI_API_KEY", "zai_k")
+        m.setenv("XKIRO_API_KEY", "xkiro_k")
+
+        def fake_call(spec, messages, timeout, max_tokens,
+                      model_override=None):
+            if spec.provider_id == "zai":
+                raise RuntimeError("zai transport failure")
+            return "FIELD_MECHANISM: test"
+        m.setattr(lr, "_call_openai_flavor", fake_call)
+        m.setattr(lr, "_call_anthropic_flavor", fake_call)
+        lines = self._lines_for(m)
+        try:
+            res = lr.generate("p", policy=_policy("zai", "xkiro"),
+                              max_retries=0)
+            self.assertTrue(res.ok)
+            self.assertEqual(res.provider_id, "xkiro")
+            self.assertEqual(len(lines), 2)
+            # the terminal line (xkiro success) carries the total
+            sp = lines[-1]["generate_spans"]
+            self.assertIsNotNone(sp.get("generate_total_s"),
+                                 "PART 8: terminal total must be "
+                                 "present on the successful final "
+                                 "line")
+            total = sp["generate_total_s"]
+            # independent measured sum (exclusive components only)
+            measured = (sp.get("selection_ordering_s") or 0.0)
+            for rung in sp["rungs"]:
+                adm = rung.get("admission") or {}
+                probe_wall = adm.get("probe_admission_s") or 0.0
+                probe_sleep = adm.get("probe_retry_sleep_s") or 0.0
+                measured += max(probe_wall - probe_sleep, 0.0)
+                measured += max(probe_sleep, 0.0)
+                for a in rung.get("attempts") or []:
+                    measured += max(a.get("dispatch_s") or 0.0, 0.0)
+                    measured += max(a.get("retry_sleep_s") or 0.0, 0.0)
+                    measured += (max(a.get("transition_to_next_s") or 0.0,
+                                    0.0))
+                measured += (rung.get("post_provider_local_s")
+                             or 0.0)
+            remainder = round(total - measured, 6)
+            # PART 6: every component is non-negative
+            self.assertGreaterEqual(total, 0.0)
+            for rung in sp["rungs"]:
+                adm = rung.get("admission") or {}
+                probe_wall = adm.get("probe_admission_s") or 0.0
+                probe_sleep = adm.get("probe_retry_sleep_s") or 0.0
+                self.assertGreaterEqual(probe_wall, 0.0)
+                self.assertGreaterEqual(probe_sleep, 0.0)
+                self.assertGreaterEqual(probe_wall - probe_sleep, -0.05)
+                for a in rung.get("attempts") or []:
+                    self.assertGreaterEqual(
+                        a.get("dispatch_s") or 0.0, -0.05)
+                    self.assertGreaterEqual(
+                        a.get("retry_sleep_s") or 0.0, -0.05)
+                    self.assertGreaterEqual(
+                        a.get("transition_to_next_s") or 0.0, -0.05)
+                    self.assertGreaterEqual(
+                        a.get("retry_sleep_s") or 0.0, 0.0)
+                self.assertGreaterEqual(
+                    rung.get("post_provider_local_s") or 0.0, 0.0)
+            # the audit invariant: total = measured + remainder, with
+            # remainder >= -0.05 s (documented clock tolerance) and
+            # measured >= 0 (no negative components)
+            self.assertGreaterEqual(measured, 0.0)
+            self.assertGreaterEqual(remainder, -0.05,
+                                    "S4 PART 8: the remainder is "
+                                    "negative beyond the documented "
+                                    "-0.05 s clock tolerance — "
+                                    "indicates a double-counted or "
+                                    "lost component, not a valid "
+                                    "measurement")
+        finally:
+            m.undo()
+
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()

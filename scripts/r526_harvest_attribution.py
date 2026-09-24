@@ -191,16 +191,20 @@ def _phase_spans_block(lines):
     TECHNICAL_IMPROVEMENT_PASS) — the ONLY walls that may enter the
     run-wall reconciliation; "child" lines are per-candidate /
     per-target spans nested inside a top-level phase (attribution
-    detail, never added on top of the parent wall). B3: child lines
-    carry parent_phase durably (record_phase_span sets it to the
-    enclosing phase name for scope=child); the harvester joins
-    children to their parent by (parent_phase, candidate_key,
-    candidate_id) — NEVER by time-window matching. Lines without a
-    scope field (older instrumented data) fall back to event-name
-    derivation: candidate_*/target_* => "child", everything else =>
-    "top" (documented fallback, never inferred from timestamps).
-    Unmatched events are listed explicitly (never force-paired,
-    never zero-filled)."""
+    detail, never added on top of the parent wall). B3: the durable
+    join key is (phase, scope, candidate_key, candidate_id) — the
+    smallest explicit identity already on the line. A child span's
+    `phase` is the enclosing top-scope phase name (documented
+    invariant enforced by the caller), so (phase, scope,
+    candidate_key, candidate_id) uniquely identifies each span and
+    deterministically joins children to their parent WITHOUT
+    time-window matching and WITHOUT a separate parent_phase field
+    (PART 3: parent_phase is not on the durable schema). Lines
+    without a scope field (older instrumented data) fall back to
+    event-name derivation: candidate_*/target_* => "child",
+    everything else => "top" (documented fallback, never inferred
+    from timestamps). Unmatched events are listed explicitly (never
+    force-paired, never zero-filled)."""
     by_key = {}
     for ln in sorted(lines,
                      key=lambda l: (l.get("recorded_at_epoch") or 0)):
@@ -211,27 +215,24 @@ def _phase_spans_block(lines):
                       if (_evt.startswith("candidate_")
                           or _evt.startswith("target_"))
                       else "top")
-        # B3: join child lines to their parent by explicit identity
-        # (parent_phase rides the durable line; never time-window).
-        _pph = ln.get("parent_phase")
         key = (ln.get("phase"), _scope, ln.get("candidate_key"),
-               ln.get("candidate_id"), _pph)
+               ln.get("candidate_id"))
         by_key.setdefault(key, []).append(ln)
     phases = {}
     unmatched = []
-    for (phase, ckey, cid, scope, pph), evs in sorted(
+    for (phase, scope, ckey, cid), evs in sorted(
             by_key.items(), key=lambda kv: str(kv[0])):
         if phase is None:
             unmatched.append({"reason": "phase-name-absent",
                               "scope": scope,
-                              "parent_phase": pph,
                               "n_lines": len(evs)})
             continue
         enters = [e for e in evs
                   if str(e.get("event") or "") == "enter"
                   or str(e.get("event") or "").endswith("_enter")]
         exits = [e for e in evs
-                 if str(e.get("event") or "").endswith("_exit")]
+                 if str(e.get("event") or "") == "exit"
+                 or str(e.get("event") or "").endswith("_exit")]
         rec = phases.setdefault(
             phase, {"walls_s": [], "top_wall_sum_s": 0.0,
                     "children": {}, "n_unmatched": 0})
@@ -250,10 +251,9 @@ def _phase_spans_block(lines):
                 if scope == "top":
                     rec["top_wall_sum_s"] = round(
                         rec["top_wall_sum_s"] + (w or 0.0), 3)
-                if ident is not None:
+                if scope == "child" and ident is not None:
                     cr = rec["children"].setdefault(
                         str(ident), {"scope": scope,
-                                     "parent_phase": pph,
                                      "walls_s": [],
                                      "outcomes": []})
                     if w is not None:
@@ -265,13 +265,11 @@ def _phase_spans_block(lines):
                 rec["n_unmatched"] += 1
                 unmatched.append({"phase": phase, "scope": scope,
                                   "candidate": ident,
-                                  "parent_phase": pph,
                                   "reason": "exit-without-enter"})
         for _en in enters[len(exits):]:
             rec["n_unmatched"] += 1
             unmatched.append({"phase": phase, "scope": scope,
                               "candidate": ident,
-                              "parent_phase": pph,
                               "reason": "enter-without-exit"})
     for rec in phases.values():
         rec["wall_sum_s"] = round(sum(rec["walls_s"]), 3)
@@ -291,9 +289,11 @@ def _phase_spans_block(lines):
                                     "detail, never added on top of the "
                                     "parent phase wall; B3: child "
                                     "spans join to their parent by "
-                                    "explicit (parent_phase, "
+                                    "explicit (phase, scope, "
                                     "candidate_key, candidate_id) "
-                                    "identity, never time-window "
+                                    "identity (the smallest durable "
+                                    "identity; no separate parent_"
+                                    "phase field), never time-window "
                                     "matching; unmatched events are "
                                     "reported explicitly, never "
                                     "force-paired or zero-filled"),
@@ -319,37 +319,80 @@ def _generate_calls_block(lines):
                           "audit": {"class": "UNKNOWN",
                                     "note": "uninstrumented build"}})
             continue
-        # R526 Q-A: per-call subphase sums from the COMPLETE spans
-        # block (last line by epoch carries the full rung history).
-        # These feed the directive §11 generate-subphase ranking.
-        # A1 (exclusive subspans): admission_exclusive = probe_admission
-        # - probe_retry_sleep (the instrument closes the admission
-        # timer after each probe-retry sleep; the two are mutually
-        # exclusive and NO component is counted twice).
+        # R526 Q-A (S4): per-call subphase sums from the COMPLETE
+        # spans block (last line by epoch carries the full rung
+        # history). These feed the directive §11 generate-subphase
+        # ranking.
+        # PART 5 (accumulate all probe segments): probe_admission_s
+        # already accumulates every probe-attempt wall + the final
+        # admission check (the instrument now accumulates, not
+        # overwrites); probe_retry_sleep_s accumulates every probe-
+        # retry sleep. admission_exclusive = probe_admission -
+        # probe_retry_sleep is therefore the exclusive non-sleep
+        # admission work. The two are mutually exclusive and NO
+        # component is counted twice.
+        # PART 6 (per-component non-negativity): every component is
+        # clamped to >= 0 at the source (the instrument measures
+        # perf_counter deltas, never negative); any negative value
+        # in the ledger is an instrumentation violation and is
+        # flagged per-component in the audit (never silently
+        # clamped in the harvester, never concealed by a positive
+        # remainder).
         sub = {"selection_ordering_s": (sp.get("selection_ordering_s")
                                         or 0.0),
                "admission_s": 0.0, "probe_retry_sleep_s": 0.0,
                "dispatch_s": 0.0, "retry_sleep_s": 0.0,
                "transition_s": 0.0, "post_provider_local_s": 0.0}
+        _neg_components = []
         for rung in sp.get("rungs") or []:
             adm = rung.get("admission") or {}
             _probe_wall = adm.get("probe_admission_s") or 0.0
             _probe_sleep = adm.get("probe_retry_sleep_s") or 0.0
-            _exclusive = max(_probe_wall - _probe_sleep, 0.0)
-            sub["admission_s"] += _exclusive
-            sub["probe_retry_sleep_s"] += _probe_sleep
+            _exclusive = _probe_wall - _probe_sleep
+            if _exclusive < 0:
+                _neg_components.append(
+                    f"admission_exclusive({rung.get('provider')}):"
+                    f"{_exclusive}")
+            sub["admission_s"] += max(_exclusive, 0.0)
+            sub["probe_retry_sleep_s"] += max(_probe_sleep, 0.0)
             for a in rung.get("attempts") or []:
-                sub["dispatch_s"] += a.get("dispatch_s") or 0.0
-                sub["retry_sleep_s"] += a.get("retry_sleep_s") or 0.0
-                sub["transition_s"] += a.get("transition_to_next_s") \
-                    or 0.0
-            sub["post_provider_local_s"] += rung.get(
-                "post_provider_local_s") or 0.0
+                _disp = a.get("dispatch_s")
+                if _disp is not None and _disp < 0:
+                    _neg_components.append(
+                        f"dispatch({rung.get('provider')},"
+                        f"att{a.get('attempt_index')}):{_disp}")
+                sub["dispatch_s"] += (
+                    max(_disp, 0.0) if _disp is not None else 0.0)
+                _rs = a.get("retry_sleep_s") or 0.0
+                if _rs < 0:
+                    _neg_components.append(
+                        f"retry_sleep({rung.get('provider')},"
+                        f"att{a.get('attempt_index')}):{_rs}")
+                sub["retry_sleep_s"] += max(_rs, 0.0)
+                _tr = a.get("transition_to_next_s")
+                if _tr is not None and _tr < 0:
+                    _neg_components.append(
+                        f"transition({rung.get('provider')},"
+                        f"att{a.get('attempt_index')}):{_tr}")
+                sub["transition_s"] += (
+                    max(_tr, 0.0) if _tr is not None else 0.0)
+            _pl = rung.get("post_provider_local_s")
+            if _pl is not None and _pl < 0:
+                _neg_components.append(
+                    f"post_provider_local({rung.get('provider')}):{_pl}")
+            sub["post_provider_local_s"] += (
+                max(_pl, 0.0) if _pl is not None else 0.0)
+        _sel = sp.get("selection_ordering_s") or 0.0
+        if _sel < 0:
+            _neg_components.append(f"selection_ordering:{_sel}")
+        sub["selection_ordering_s"] = max(_sel, 0.0)
         sub = {k: round(v, 3) for k, v in sub.items()}
         sub["admission_s_inclusive_note"] = (
-            "admission_exclusive = probe_admission_inclusive - "
-            "probe_retry_sleep; the raw inclusive probe wall is not "
-            "reported separately (exclusive form is the canonical one)")
+            "admission_exclusive = probe_admission_accumulated - "
+            "probe_retry_sleep; the instrument accumulates every "
+            "probe-attempt wall + the final admission check (PART 5); "
+            "the raw inclusive probe wall is not reported separately "
+            "(exclusive form is the canonical one)")
         measured = round(
             sub["selection_ordering_s"] + sub["admission_s"]
             + sub["probe_retry_sleep_s"] + sub["dispatch_s"]
@@ -359,7 +402,8 @@ def _generate_calls_block(lines):
         # generate_total_s (final=True snapshot on the last durable
         # line of the call). Ledger-timestamp reconstruction is kept
         # only as audit provenance (ordering check), never silently
-        # substituted for the measured total.
+        # substituted for the measured total (PART 7: the terminal
+        # instrument total remains canonical).
         terms = [((l.get("generate_spans") or {}).get(
             "generate_total_s")) for l in ls
             if isinstance(l.get("generate_spans"), dict)]
@@ -391,6 +435,12 @@ def _generate_calls_block(lines):
                                 if total is not None else None),
                 "generate_total_s_terminal": total,
                 "total_ledger_provenance_s": total_ledger_provenance,
+                # PART 6: per-component non-negativity is mechanically
+                # proven; any negative component is flagged explicitly
+                # (never concealed by the remainder).
+                "negative_components": _neg_components,
+                "all_components_non_negative": (
+                    len(_neg_components) == 0),
                 "remainder_rule": ("generate_total_s (instrument "
                                    "terminal) = measured_subspans + "
                                    "unattributed_remainder_s; remainder "
@@ -401,11 +451,14 @@ def _generate_calls_block(lines):
                                    "inspection); a small negative value "
                                    "beyond clock tolerance -0.05 s is "
                                    "an instrumentation violation, "
-                                   "flagged never hidden"),
+                                   "flagged never hidden; the "
+                                   "remainder must NOT be used to "
+                                   "conceal negative components "
+                                   "(PART 6)"),
                 "note": ("total from the instrument's terminal "
                          "generate_total_s; the ledger-epoch "
                          "reconstruction is provenance only and is "
-                         "never silently substituted"),
+                         "never silently substituted (PART 7)"),
             },
         })
     return {"class": ("OBSERVED_IN_STAGE" if calls else "UNKNOWN"),
