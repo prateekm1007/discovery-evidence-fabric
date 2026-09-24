@@ -181,20 +181,26 @@ def main() -> int:
 
         # ---- R525 build identity, fail-closed, in the STAGED bytes ----
         # Behavior-neutral timers ONLY: the synth_spans/1.0 record must
-        # be present, and the timer code must be provider-blind (no
-        # provider literal) and logic-free (no prompt/budget/retry
-        # strings beyond the existing ones).
+        # be present, and the ADDED timer lines must be provider-blind
+        # (the pre-existing R518 preferred-provider list legitimately
+        # names providers; the proof constrains the ADDED lines only).
         syn_bytes = stage / "discovery_fabric" / "a2" / "synthesize.py"
         syn_text = syn_bytes.read_text(errors="replace") \
             if syn_bytes.is_file() else ""
         assert "synthesis_span_timings" in syn_text, \
             "staged tree lacks the R525 synth_spans/1.0 record"
-        assert 'instrument": "synth_spans/1.0"' in syn_text or \
-            '"synth_spans/1.0"' in syn_text, \
+        assert '"synth_spans/1.0"' in syn_text, \
             "staged tree lacks the synth_spans/1.0 instrument tag"
-        for _pid in ("zai", "atria", "xkiro", "openrouter", "unorouter"):
-            assert f'"{_pid}"' not in syn_text, \
-                ("a provider literal was introduced into synthesize.py "
+        _dd = sh("git", "diff", args.counterpart_commit, args.commit,
+                 "--", "discovery_fabric/a2/synthesize.py")
+        _added = [ln[1:] for ln in _dd.stdout.splitlines()
+                  if ln.startswith("+") and not ln.startswith("+++")]
+        assert any("synthesis_span_timings" in ln for ln in _added), \
+            "the span record was not added by this build"
+        for _pid in ("zai", "atria", "xkiro", "openrouter", "unorouter",
+                     "deepseek", "nvidia", "gemini", "anthropic", "qwen"):
+            assert not any(f'"{_pid}"' in ln for ln in _added), \
+                ("a provider literal was introduced by the timer lines "
                  f"({_pid})")
         print("[R525-arm] R525 instrumentation PROVEN in staged bytes "
               "(span timers only; provider-blind)")
