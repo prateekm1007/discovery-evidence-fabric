@@ -922,7 +922,7 @@ def _synth_spans(syn_env, stage_entry, ledger_block):
             "llm_chat_total_s", "n_llm_chat_calls",
             "rotation_backoff_sleep_s", "parse_total_s",
             "span_repair_check_s", "candidate_assembly_s",
-            "synthesize_total_s")},
+            "post_success_sleep_s", "synthesize_total_s")},
         "ledger_provider_call_wall_s": round(led_wall, 3),
         "ledger_n_calls": led.get("n_calls"),
         "ledger_n_ok": led.get("n_ok"),
