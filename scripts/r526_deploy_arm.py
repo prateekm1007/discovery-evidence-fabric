@@ -1,29 +1,38 @@
 #!/usr/bin/env python3
 """R526 — deploy the INSTRUMENTED measurement build (behavior-neutral
-SYNTHESIZE span timers ONLY) to the canonical production Space.
+per-attempt generate() spans + PHASE_SPAN ledger lines + post-rank
+phase/target timers ONLY) to the canonical production Space.
 
 R526 is measurement-first: no behavioral production change is
-authorized in S1/S2. The R526 battery must run on a build that carries
-the synth_spans/1.0 timers (read-only perf_counter deltas in
-discovery_fabric/a2/synthesize.py; no prompt/budget/retry/gate/parse/
-repair/assembly logic touched — proven neutral by
-tests/test_R526_synth_span_neutrality.py) so Question A
-(SYNTHESIZE decomposition) can be answered from implementation spans
-rather than invented sub-phases.
+authorized in S1/S2. The R526 battery must run on a build that carries:
+  - gen_spans/1.0 per-attempt records on every durable ledger line
+    (llm_registry.generate; read-only timestamps; no routing, retry,
+    budget, gate, probe, admission, or transport logic touched —
+    proven neutral by tests/test_r526_generate_spans.py);
+  - PHASE_SPAN orchestration-timing lines on the proven ledger
+    channel (model_routing.record_phase_span) + post-rank phase and
+    per-target timers in run.py / improve_stage.py (telemetry
+    appends only — proven neutral by
+    tests/test_r526_phase_spans.py);
+  - the retained synth_spans/1.0 instrument (R525).
+so Questions A (generate-level routing decomposition) and B
+(run-wall residual reconciliation) can be answered from
+implementation spans rather than invented sub-phases.
 
-Same machinery as r523_deploy_arm (git-archive staging, prune,
+Same machinery as r525_deploy_arm (git-archive staging, prune,
 frontmatter, Dockerfile RENDER_GIT_COMMIT identity, standing vars,
 secrets, restart) — re-driven per-round, never mutating historical
 round scripts (Art. LXIV/LXXIV).
 
 Fail-closed proofs (all must hold or the deploy aborts):
   1. The build commit is an ancestor of origin/main (Art. LXXXV).
-  2. Build identity in the STAGED bytes: discovery_fabric/a2/
-     synthesize.py MUST contain the synth_spans/1.0 record marker
-     (`synthesis_span_timings`) and MUST NOT contain a provider
-     literal in the timer code (timers are provider-blind).
-  3. Engine-diff guard vs the production counterpart (5d28cfd4): the
-     engine diff MUST be exactly discovery_fabric/a2/synthesize.py
+  2. Build identity in the STAGED bytes: the CLI-supplied
+     intervention marker is present in its file AND was added by
+     this build (diff vs counterpart); the R525 synth_spans
+     instrument is retained; no per-provider branch scattered into
+     the ADDED lines of the allowed diff set.
+  3. Engine-diff guard vs the production counterpart (e919a664): the
+     engine diff MUST EQUAL the CLI-supplied allowed set exactly
      (timers only — Art. XLVII).
 
 Standing production configuration is re-applied verbatim:
@@ -31,10 +40,13 @@ ENGINE_EVIDENCE_FABRIC=0 and ENGINE_RETRIEVE_EXCLUDE_SOURCES=openalex
 (held identical; read back after deploy).
 
 Usage:
-  HF_TOKEN=... GITHUB_PAT=... python scripts/R526_deploy_arm.py
+  HF_TOKEN=... GITHUB_PAT=... python scripts/r526_deploy_arm.py
       --arm instrumented --commit <40-hex>
       --record R526/INSTRUMENT_DEPLOY_RECORD.json
       --message "..." --counterpart-commit <40-hex>
+      --intervention-marker <token> --intervention-file <path>
+      --allowed-diff-file <f> [--allowed-diff-file <f> ...]
+      --intervention-desc <text>
 """
 from __future__ import annotations
 
@@ -72,11 +84,19 @@ import r447_deploy_upload as uploader  # noqa: E402
 SPACE = driver.SPACE
 ENGINE_PATHS = ["discovery_fabric", "TOSCANINI", "TOSCANINI_UI",
                 "Dockerfile"]
-# The single file the R526 instrumentation may change over production
-# 5d28cfd4 (Art. XLVII instrument identity; CLI-supplied, recorded).
-R526_ALLOWED_DIFF_FILE = "discovery_fabric/a2/synthesize.py"
-# the R526 resolver branch marker (staged-bytes identity proof)
-R526_MARKER = "synthesis_span_timings"
+# The R526 instrumentation may touch exactly these engine files over
+# production e919a664 (Art. XLVII instrument identity; CLI-supplied,
+# recorded): per-attempt generate() spans, PHASE_SPAN ledger support,
+# post-rank phase/target timers. No behavioral change.
+R526_ALLOWED_DIFF_FILES = {
+    "discovery_fabric/engine/llm_registry.py",
+    "discovery_fabric/engine/model_routing.py",
+    "discovery_fabric/engine/run.py",
+    "discovery_fabric/engine/improve_stage.py",
+}
+# R526 instrument markers (staged-bytes identity proof; at least one
+# must have been added by this build — enforced per marker below).
+R526_MARKERS = ("gen_spans/1.0", "PHASE_SPAN")
 
 
 def sh(*args, cwd=None):
@@ -215,6 +235,8 @@ def main() -> int:
                        if ln.startswith("+") and not ln.startswith("+++")]
         assert any(args.intervention_marker in ln for ln in _added), \
             "the intervention marker was not added by this build"
+        assert any(mk in ln for mk in R526_MARKERS for ln in _added), \
+            "no R526 instrument marker added by this build"
         for _ln in _added:
             _s = _ln.strip()
             assert not (_s.startswith("if provider") or
