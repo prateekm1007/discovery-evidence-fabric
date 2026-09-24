@@ -1,0 +1,123 @@
+{
+ "schema": "CODER1_PROBLEM_UNDERSTANDING/1.0.0",
+ "session_id": "ts_f9985fdf3a51",
+ "problem_statement": {
+  "value": "[R525-BATTERY declared_family=mechanical source=odi:11375605 battery=R525-CURRENT-PRODUCTION-ATTRIBUTION-after]\n\n2020 TOYOTA TACOMA TRD OFF ROAD HAS SEVERE HESITATION ISSUES DURING WARM STARTUP. TRUCK CRANKS OVER FINE BUT DRAGS FOR AN EXTENDED PERIOD OF TIME BEFORE FIRING. THERE IS A NOTICEABLE SMELL OF GASOLINE WHEN THIS HAPPENS. SOMETIMES THE STARTER SEEMS TO STICK AND MAKES A LOUD GRINDING NOISE. OTHER TIMES THERE IS AN AUDIBLE SINGLE CLICK/POP NOISE IMMEDIATELY AFTER PUSHING THE START BUTTON BUT THE TRUCK STILL STARTS. AFTER THE TRUCK IS STARTED IT WILL OCCASIONALLY IDLE ROUGH AND THE TACHOMETER WILL DIP LOW AND THE TRUCK WILL SHAKE SLIGHTLY AS IF THE TRUCK IS GOING TO STALL. TOYOTA CONTINUES TO DENY ANYTHING IS AMISS DESPITE ME PROVIDING VIDEO EVIDENCE AND DUPLICATING THE ISSUE IN FRONT OF THEM MYSELF. THEY CONTINUE TO REFUSE TO DO ANY REASONABLE AMOUNT OF WORK TO FIX MY VEHICLE UNDER WARRANTY. HERE IS A LINK TO VIDEOS OF THE ISSUE FOR REFERENCE OF THE SEVERITY: HTTPS://YOUTU.BE/Z-W-FD8GZIU",
+  "origin": "USER_STATED",
+  "basis": "the user's message, verbatim",
+  "confidence": null
+ },
+ "desired_outcome": {
+  "value": [
+   "extended period of time before firing"
+  ],
+  "origin": "USER_STATED",
+  "basis": "outcome-verb phrase found verbatim in the user's message",
+  "confidence": null
+ },
+ "observed_failure": {
+  "value": null,
+  "origin": "UNKNOWN",
+  "basis": "no failure noun phrase found — the problem may be opportunity-shaped rather than failure-shaped",
+  "confidence": null
+ },
+ "constraints": {
+  "value": [
+   "Solution must address the stated objective without introducing a larger failure mode"
+  ],
+  "origin": "INFERRED_MODEL",
+  "basis": "default engineering constraint applied when the user stated none (the engine's standing problem contract)",
+  "confidence": null
+ },
+ "context": {
+  "value": {
+   "message_length_chars": 1010,
+   "interrogative_form": false,
+   "stated_domain_words": []
+  },
+  "origin": "INFERRED_MODEL",
+  "basis": "deterministic surface features of the message",
+  "confidence": null
+ },
+ "domain_hypothesis": {
+  "value": "automotive",
+  "origin": "INFERRED_MODEL",
+  "basis": "keyword score 2 (hits: vehicle, truck); full ranking recorded in domain_scores",
+  "confidence": 0.6
+ },
+ "domain_scores": [
+  {
+   "domain_hypothesis": "automotive",
+   "keyword_hits": [
+    "vehicle",
+    "truck"
+   ],
+   "score": 2
+  },
+  {
+   "domain_hypothesis": "energy",
+   "keyword_hits": [
+    "battery"
+   ],
+   "score": 1
+  }
+ ],
+ "physical_system": {
+  "value": null,
+  "origin": "UNKNOWN",
+  "basis": "no system noun phrase matched — physical system not yet identified from the text",
+  "confidence": null
+ },
+ "target_variable": {
+  "value": [
+   "current",
+   "noise"
+  ],
+  "origin": "INFERRED_MODEL",
+  "basis": "quantity word matched in the message (outcome-object phrases included as fallback candidates)",
+  "confidence": null
+ },
+ "unknowns": [
+  {
+   "field": "observed_failure",
+   "why_unknown": "no failure noun phrase found — the problem may be opportunity-shaped rather than failure-shaped",
+   "what_would_resolve": "one user sentence naming the observed failure"
+  },
+  {
+   "field": "physical_system",
+   "why_unknown": "no system noun phrase matched — physical system not yet identified from the text",
+   "what_would_resolve": "one user sentence naming the physical system"
+  }
+ ],
+ "assumptions": [
+  {
+   "assumption": "the message describes ONE engineering problem",
+   "origin": "INFERRED_MODEL",
+   "basis": "single problem_statement supplied",
+   "falsified_by": "a second unrelated objective in the text"
+  }
+ ],
+ "success_condition": {
+  "value": "extended current relative to the un-invented baseline, without violating the stated constraints",
+  "origin": "INFERRED_MODEL",
+  "basis": "composed from the stated outcome and the identified target variable",
+  "confidence": null
+ },
+ "failure_condition": {
+  "value": "the mechanism does not materially change the target variable, introduces a larger failure mode, or is contradicted by admissible evidence",
+  "origin": "INFERRED_MODEL",
+  "basis": "the engine's standing falsification contract (Art. XX/LII)",
+  "confidence": null
+ },
+ "built_at": "2026-09-24T03:09:07Z",
+ "construction": {
+  "deterministic": true,
+  "llm_fields_merged": 0,
+  "origin_vocabulary": [
+   "USER_STATED",
+   "INFERRED_MODEL",
+   "MODEL_DERIVED_LLM",
+   "UNKNOWN"
+  ]
+ }
+}
