@@ -249,21 +249,22 @@ def llm_chat(prompt, system="", max_retries=2, timeout=240,
     _LAST_PROVIDER_META = res.to_meta()
     _LAST_PROVIDER_META["selection_ledger"] = res.selection_ledger
     if res.ok:
-        # R527 Q1 (INSTRUMENTATION, not the optimization): the former
-        # fixed 0.5 s post-success sleep is now MEASURED — the wall is
-        # accumulated into _spans["post_success_sleep_s"] so the after-
-        # arm measurement can prove the delta was actually in the
-        # sleep, not provider inference or a remainder. The value is
-        # still the fixed 0.5 s until the authorized intervention
-        # changes it (Q2); the timing measurement is behavior-neutral
-        # telemetry only and does NOT alter the sleep, prompt, model,
-        # provider order, token budget, max_retries, admission,
-        # routing, retrieval, mechanism-space, evidence gates,
-        # parsing, candidate assembly, or funnel logic. The rotation
-        # backoff sleeps (0/8/20 s, failure-class response) are a
-        # separate mechanism and are NOT touched here.
+        # R527 Q3 (AFTER ARM): the fixed 0.5 s post-success sleep is
+        # REMOVED. This is the single authorized intervention for R527
+        # — it does not alter prompt, model, provider order, token
+        # budget, max_retries, admission, routing, retrieval,
+        # mechanism-space, evidence gates, parsing, candidate assembly,
+        # or funnel logic. The wall measured in Q2
+        # (_spans['post_success_sleep_s'], baseline ~0.5 s) becomes
+        # 0.0 in the after arm, proving the delta was in the sleep,
+        # not in provider inference. The rotation backoff sleeps
+        # (0/8/20 s, failure-class response) are a separate mechanism
+        # and are NOT touched here.
         _t_sleep = time.perf_counter()
-        time.sleep(0.5)
+        # Q3: time.sleep(0.5) removed — the measured post-success
+        # sleep wall is now ~0 s. The perf_counter bracket is kept
+        # (telemetry: the value records how much sleep actually
+        # happened in this arm; on the after arm it is ~0).
         _spans["post_success_sleep_s"] = round(
             time.perf_counter() - _t_sleep, 6)
         return res.content
