@@ -678,6 +678,14 @@ _DEFAULT_PROVIDER_PIN = ""
 # distinguished by purpose, so retirement keys on the purpose token.
 PURPOSE_POST_RANK_IMPROVEMENT = "post_rank:improvement_mutation_proposal"
 PURPOSE_POST_RANK_TECHNICAL = "post_rank:technical_mutation_proposal"
+# R525: the post-rank GAUNTLET attack route scope. The gauntlet shares
+# the canonical independent_attack() implementation with the linear,
+# evolution, and improve-child attack consumers, but routes under the
+# dedicated purpose post_rank:independent_attack (see independent_attack
+# .POST_RANK_ATTACK_PURPOSE) — so retirement keys on that purpose token
+# and touches NO other attack consumer. The linear ATTACK stage routes
+# under purpose "attack" (a2/adversarial), which resolves nothing here.
+PURPOSE_POST_RANK_GAUNTLET_ATTACK = "post_rank:gauntlet_attack"
 # R520: the MECHANISM_SPACE operator-instantiation route scope. The MS
 # stage's LLM traffic is the operator-instantiation call (adapters lean
 # path + mechanism_space full path + recorded corrective retries), all
@@ -703,8 +711,16 @@ RETIRED_ROUTE_PROVIDERS: Dict[str, set] = {
     # operator-instantiation route (R519 battery: MS 86.0→122.28s mean,
     # zai 5/6). SYNTHESIZE/ATTACK/extraction/post-rank routing unchanged
     # — the scope below resolves ONLY operator_* instantiation purposes.
+    # R525: zai is additionally retired from the post-rank GAUNTLET
+    # attack route (R525 battery: 3/12 runs, 564.4 s empty-content
+    # MODEL_FAILURE wall, 0 OK). The scope resolves ONLY the dedicated
+    # post_rank:independent_attack purpose — the general
+    # independent_attack purpose (evolution/improve-child consumers),
+    # the linear attack purpose ("attack"), and all other routing stay
+    # allowed (R519 contract pinned by tests).
     "zai": {PURPOSE_POST_RANK_IMPROVEMENT, PURPOSE_POST_RANK_TECHNICAL,
-            PURPOSE_MS_OPERATOR_INSTANTIATION},
+            PURPOSE_MS_OPERATOR_INSTANTIATION,
+            PURPOSE_POST_RANK_GAUNTLET_ATTACK},
 }
 
 
@@ -741,6 +757,15 @@ def retirement_scopes_for_purpose(purpose: Optional[str]) -> set:
     # (R519 §6).
     if p.startswith("technical_"):
         scopes.add(PURPOSE_POST_RANK_TECHNICAL)
+    # R525 (measured, R525 S3: POST_RANK_GAUNTLET zai empty-content
+    # MODEL_FAILURE, 3/12 rows, 564.4 s failure wall, 0 OK): the
+    # gauntlet's dedicated purpose resolves the gauntlet-attack scope.
+    # ONLY post_rank:-prefixed independent-attack purposes resolve here
+    # — the general independent_attack purpose (linear/evolution/
+    # improve-child consumers) and the linear attack purpose ("attack")
+    # resolve nothing (R519 contract pinned by tests).
+    if "independent_attack" in p and p.startswith("post_rank:"):
+        scopes.add(PURPOSE_POST_RANK_GAUNTLET_ATTACK)
     if p.startswith("operator_"):
         scopes.add(PURPOSE_MS_OPERATOR_INSTANTIATION)
     return scopes

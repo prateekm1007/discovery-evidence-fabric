@@ -155,6 +155,14 @@ import re
 from typing import Any, Dict, List, Optional, Tuple
 
 ATTACK_VERSION = "independent_attack/3.0.0"
+# R525: the post-rank gauntlet's dedicated routing purpose. The gauntlet
+# shares this module's ONE canonical attacker implementation with the
+# linear, evolution, and improve-child attack consumers — no duplicate
+# implementation (Art. X/LXIV). The purpose is a routing-only input:
+# the central retirement authority (provider_health) scopes provider
+# policy to the gauntlet without touching any other attack consumer.
+# Default attacker routing purpose stays "independent_attack".
+POST_RANK_ATTACK_PURPOSE = "post_rank:independent_attack"
 ATTACK_CLASSES = (
     "MECHANISM_FAILURE", "BOUNDARY_CONDITION_FAILURE",
     "EVIDENCE_CONTRADICTION", "BASELINE_EQUIVALENCE",
@@ -728,6 +736,7 @@ def independent_attack(candidate: Dict[str, Any],
                        evidence: List[Dict[str, Any]],
                        generator_provider: Optional[str],
                        require_provider: Optional[str] = None,
+                       attack_purpose: str = "independent_attack",
                        ) -> Dict[str, Any]:
     """Run the independent adversarial attack on one candidate.
 
@@ -735,6 +744,15 @@ def independent_attack(candidate: Dict[str, Any],
     preferred; if none is credentialed, the same provider is used in a
     separate reasoning context (disclosed). The independence mode and
     both provider ids are recorded on the attack record.
+
+    attack_purpose (R525): routing-only input selecting the provider
+    policy for this call. The default "independent_attack" preserves
+    every existing consumer (linear, evolution, improve-child). The
+    post-rank gauntlet passes POST_RANK_ATTACK_PURPOSE so the central
+    retirement authority can scope the gauntlet without touching any
+    other path. Prompt, budget, retries, gates, and verdict semantics
+    are identical under every purpose (Art. VII/XLVII: routing input
+    only, never a semantic change).
 
     R491: require_provider HARD-PINS the attacker's ring for the
     sealed-corpus calibration measurement (no fallback; the call FAILS
@@ -775,7 +793,7 @@ def independent_attack(candidate: Dict[str, Any],
                "concrete basis and bind it (GROUNDED_IN: evidence id, "
                "quoted record span, the numbers, or the violated "
                "boundary clause).",
-        purpose="independent_attack",
+        purpose=attack_purpose,
         exclude_providers=[generator_provider]
         if generator_provider else None,
         # v2: the output contract grew (six lines each carrying the
@@ -806,6 +824,7 @@ def independent_attack(candidate: Dict[str, Any],
             "transport-invalid for measurement purposes")
     record: Dict[str, Any] = {
         "attack_version": ATTACK_VERSION,
+        "attack_purpose": attack_purpose,
         "candidate_id": candidate.get("candidate_id"),
         "generator_provider": generator_provider,
         "attacker_provider": meta.get("provider"),

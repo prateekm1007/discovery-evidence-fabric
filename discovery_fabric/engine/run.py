@@ -1837,7 +1837,8 @@ class EngineRun:
                     if indep_attack is None:
                         try:
                             from .independent_attack import \
-                                independent_attack
+                                independent_attack, \
+                                POST_RANK_ATTACK_PURPOSE
                             generator_provider = (
                                 ((c.get("mechanism_space_candidate")
                                   or {}).get("derivation_trace")
@@ -1870,7 +1871,14 @@ class EngineRun:
                                     "constraint_set": {}},
                                 self.problem,
                                 self.env.evidence or [],
-                                generator_provider)
+                                generator_provider,
+                                # R525: the post-rank gauntlet routes the
+                                # canonical attacker under its dedicated
+                                # purpose (central retirement scopes zai
+                                # for this purpose only; linear,
+                                # evolution, and improve-child consumers
+                                # keep the default purpose).
+                                attack_purpose=POST_RANK_ATTACK_PURPOSE)
                             self._persist(
                                 f"INDEPENDENT_ATTACK_{key}.json",
                                 indep_attack)
