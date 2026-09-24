@@ -1,6 +1,6 @@
 {
  "invention_id": {
-  "value": "inv:ui_power_loss_while_driving_208985:d21325fdeada",
+  "value": "inv:ui_power_loss_while_driving_208985:a5b87e258fd6",
   "epistemic_class": "COMPUTED",
   "origin_stage": "INVENTION_SPEC",
   "evidence_ids": [],
@@ -30,11 +30,34 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Performance optimization control strategy based on constant speed cruise that adjusts engine throttle and hydraulic pump/motor displacement to maintain optimal efficiency.",
-   "intervention": "Implement a real-time control algorithm in the CVT transmission control unit that continuously calculates the required engine power and preset pulley speed ratio to determine the optimal hydraulic pressure and belt clamping force, thereby preventing slippage and power loss during highway cruising.",
-   "expected_effect": "Sustained drive power at highway speeds by eliminating belt slippage through optimized hydraulic clamping forces, ensuring the system exceeds the 70,000-mile service life constraint by reducing wear from inefficient operating points.",
-   "mechanism_source_span": "a performance optimization control strategy (POCS) based on constant speed cruise(CSC) is designed",
-   "span_derivation": null
+   "mechanism": "Power transmission efficiency determined by the analysis on geometry and power transmission efficiency of a toroidal CVT.",
+   "intervention": "Optimize the geometry of the toroidal discs to maximize power transmission efficiency as defined by the analysis on geometry and power transmission efficiency, rather than arbitrarily scaling dimensions.",
+   "expected_effect": "Elimination of power loss at highway speeds by ensuring the toroidal geometry operates within the peak efficiency range identified in the analysis on geometry and power transmission efficiency.",
+   "mechanism_source_span": "Analysis on geometry and power transmission efficiency of a toroidal CVT",
+   "span_derivation": {
+    "n_shared": 7,
+    "shared_terms": [
+     "analysi",
+     "cvt",
+     "efficiency",
+     "geometry",
+     "power",
+     "toroidal",
+     "transmission"
+    ],
+    "span_terms_n": 7,
+    "ratio": 1.0,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "Measure power transmission efficiency across varying toroidal geometries; if the optimized geometry does not show higher efficiency than the baseline geometry under load, the intervention fails.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.1299/jsmempt.2004.296",
+     "source_span": "Analysis on geometry and power transmission efficiency of a toroidal CVT"
+    }
+   }
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
@@ -45,11 +68,11 @@
  },
  "causal_chain": {
   "value": {
-   "source_observation": "Research into performance optimization control strategy of a hydrostatic drive bulldozer based on the constant speed cruise.",
-   "mechanism": "Performance optimization control strategy based on constant speed cruise that adjusts engine throttle and hydraulic pump/motor displacement to maintain optimal efficiency.",
+   "source_observation": "UNKNOWN",
+   "mechanism": "Friction-based power transmission between rotating toroidal discs and adjustable traction rollers via a lubricant traction film.",
    "intervention_site": "CVT transmission system",
-   "expected_effect": "Sustained drive power at highway speeds by eliminating belt slippage through optimized hydraulic clamping forces, ensuring the system exceeds the 70,000-mile service life constraint by reducing wear from inefficient operating points.",
-   "falsification_test": "Operate the modified 2021 Nissan Altima on a dynamometer at constant highway speeds (65 mph) under varying load conditions; if the measured output shaft torque drops below the input torque multiplied by the gear ratio minus friction losses, or if belt slip is detected via speed sensor differential, the mechanism has failed."
+   "expected_effect": "Reduction in slip-induced power loss at highway speeds due to decreased relative creep velocity within the traction contact patch.",
+   "falsification_test": "Measured transmission efficiency will increase by at least 3% at 70 mph under 50 Nm load compared to the baseline geometry after 10,000 miles of operation."
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
@@ -60,9 +83,10 @@
  },
  "novelty_hypothesis": {
   "value": {
-   "collision_novelty_risk": null,
-   "prior_art_status": null,
-   "multi_source_directions": {}
+   "collision_novelty_risk": "ADJACENT_COLLISION_CANDIDATES",
+   "prior_art_status": "RESOLVED_DIFFERENTIATED",
+   "multi_source_directions": {},
+   "differentiation_resolution_state": "RESOLVED_DIFFERENTIATED"
   },
   "epistemic_class": "COMPUTED",
   "origin_stage": "COLLISION",
@@ -71,11 +95,1237 @@
  },
  "prior_art": {
   "value": {
-   "status": "",
+   "status": "RESOLVED_DIFFERENTIATED",
    "legacy_status": "",
-   "differentiation_resolution": {},
-   "nearest": [],
-   "queries": [],
+   "differentiation_resolution": {
+    "state": "RESOLVED_DIFFERENTIATED",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "CLAIMS:0 ABSTRACT:14 TITLE:0",
+    "per_family": [
+     {
+      "family_id": "PA-FAM-01",
+      "representative": {
+       "patent_id": "JP2021041798A",
+       "title": "Hybrid vehicle system",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/JP2021041798A/en",
+       "assignee": "['株式会社Ｓｕｂａｒｕ']",
+       "publication_date": "2021-03-18"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "JP2021041798A"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Hybrid vehicle system PROBLEM TO BE SOLVED: To provide a hybrid vehicle system capable of efficiently performing power running drive and regenerative drive by using one motor. SOLUTION: A first clutch mechanism 61 capable of switching whether or not power transmission is possible between a transmission mechanism 30 and &hellip;  【課題】１つのモータを用いて力行駆動及び回生駆動を効率的に行うことができる、ハイブリッド車両システムを提供する。【解決手段】変速機構３０と駆動輪７５の間の動力伝達の可否を切替可能な第１のクラッチ機構６１と、第１のクラッチ機構６１と駆動輪７０の間の動力伝達経路に接続されたモータジェネレータ２０と、モータジェネレータ２０と駆動輪７０の間の動力伝達の可否を切替可能な第２のクラッチ機構６３と、エンジン１０と変速機構３０の間の動力伝達経路に接続された前後進切替機構４０を備え、前後進切替機構４０は、第１のクラッチ機構６１と駆動輪７０の間の動力伝達経路に接続されたカウンタ軸５７に接続され、エンジン側と駆動輪側を直結して車両が前進する方向のトルクを伝達する前進直結状態と、エンジン側と駆動輪側を直結して車両が後進する方向のトルクを伝達する後進直結状態と、エンジン側と駆動輪側を切り離した中立状態に切替える。【選択図】図１ PROBLEM TO BE SOLVED: To provide a hybrid vehicle system capable of efficiently performing power running drive and regenerative drive by using one motor. SOLUTION: A first clutch mechanism 61 capable of switching whether or not power transmission is possible between a transmission mechanism 30 and a drive wheel 75 is connected to a power transmission path between the first clutch mechanism 61 and the drive wheel 70. The motor generator 20, the second clutch ",
+      "adjudicated_text_sha256": "a5429fed2102059b007f467519245bfa5449cf98003e04630e0b53eb29077eba",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_covered": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_surviving": [
+        "analysi",
+        "arbitrarily",
+        "defined",
+        "dimension",
+        "disc",
+        "efficiency",
+        "geometry",
+        "maximize",
+        "rather",
+        "scaling",
+        "toroidal"
+       ],
+       "coverage_ratio": 0.154,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-02",
+      "representative": {
+       "patent_id": "JP2015227697A",
+       "title": "Control device for vehicle transmission",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/JP2015227697A/en",
+       "assignee": "['トヨタ自動車株式会社']",
+       "publication_date": "2015-12-17"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "JP2015227697A"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Control device for vehicle transmission PROBLEM TO BE SOLVED: To provide a vehicle transmission including a continuously variable transmission mechanism and a driving mechanism provided in parallel between an input rotation member and an output rotation member, capable of improving fuel economy and power performance by appropriately &hellip;  PROBLEM TO BE SOLVED: To provide a vehicle transmission including a continuously variable transmission mechanism and a driving mechanism provided in parallel between an input rotation member and an output rotation member, capable of improving fuel economy and power performance by appropriately controlling the continuously variable transmission mechanism during idle running.SOLUTION: If a line pressure Pl is dominated (determined) by at least one hydraulic pressure out of a primary pressure Pin and a second pressure Pout during idle running of a continuously variable transmission 24, a fuel economy improvement effect is obtained by reducing a hydraulic pressure acting on a pulley on which the hydraulic pressure higher than a clutch pressure Pc1 acts. On the other hand, if the line pressure Pl is dominated by the clutch pressure Pc1 during the i",
+      "adjudicated_text_sha256": "ea40d751b8f0697e9b3c20b0fd6a0eb370d38f9de53fabd94382101248fb1608",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_covered": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_surviving": [
+        "analysi",
+        "arbitrarily",
+        "defined",
+        "dimension",
+        "disc",
+        "efficiency",
+        "geometry",
+        "maximize",
+        "rather",
+        "scaling",
+        "toroidal"
+       ],
+       "coverage_ratio": 0.154,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-03",
+      "representative": {
+       "patent_id": "JP4872697B2",
+       "title": "Power transmission system",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/JP4872697B2/en",
+       "assignee": "['株式会社豊田中央研究所']",
+       "publication_date": "2012-02-08"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "JP4872697B2"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Power transmission system &lt;P&gt;PROBLEM TO BE SOLVED: To reduce the capacity of a transmission and to increase maximum output when driving a load using the horsepower of a power source other than an engine. &lt;P&gt;SOLUTION: While clutches C1, C2, C3 are engaged, an ECU 42 controls the torque of a starter generator 16 and the &hellip;  &lt;P&gt;PROBLEM TO BE SOLVED: To reduce the capacity of a transmission and to increase maximum output when driving a load using the horsepower of a power source other than an engine. &lt;P&gt;SOLUTION: While clutches C1, C2, C3 are engaged, an ECU 42 controls the torque of a starter generator 16 and the torque of a motor generator 22 to execute horsepower distribution control for controlling the distribution of horsepower transmitted to a transmission 14 and horsepower transmitted to a planetary gear mechanism 20. With the clutches C1, C2 released and the clutch C3 engaged, the ECU 42 executes power transmission control for controlling horsepower transmitted among the starter generator 16, the motor generator 22, and driving wheels 40. &lt;P&gt;COPYRIGHT: (C)2008,JPO&amp;amp;INPIT",
+      "adjudicated_text_sha256": "6af47229b605c81dfee4c028b3ba909d27eb6a35e0fbeb53724f0620016e948e",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_covered": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_surviving": [
+        "analysi",
+        "arbitrarily",
+        "defined",
+        "dimension",
+        "disc",
+        "efficiency",
+        "geometry",
+        "maximize",
+        "rather",
+        "scaling",
+        "toroidal"
+       ],
+       "coverage_ratio": 0.154,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-04",
+      "representative": {
+       "patent_id": "JP4717833B2",
+       "title": "Modular transmission unit, especially multi-stage transmission",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/JP4717833B2/en",
+       "assignee": "['ディーター・グレックラー']",
+       "publication_date": "2011-07-06"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "JP4717833B2"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Modular transmission unit, especially multi-stage transmission The invention relates to a transmission unit, in particular a multi-stage transmission, each with the features described in the superordinate concept of claim 1. Transmission devices in the form of power branch transmissions in the form of override transmissions are known in many embodiments.  ",
+      "adjudicated_text_sha256": "6dcead853c94413da1743537ec3a83808336c8d8bbf9de65124841fddbf9c8e7",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_covered": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_surviving": [
+        "analysi",
+        "arbitrarily",
+        "defined",
+        "dimension",
+        "disc",
+        "efficiency",
+        "geometry",
+        "maximize",
+        "rather",
+        "scaling",
+        "toroidal"
+       ],
+       "coverage_ratio": 0.154,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-05",
+      "representative": {
+       "patent_id": "JP6165716B2",
+       "title": "Rotation transmission element, power on / off transmission device, transmission &hellip;",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/JP6165716B2/en",
+       "assignee": "['Ｓｋマシナリー株式会社']",
+       "publication_date": "2017-07-19"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "JP6165716B2"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Rotation transmission element, power on / off transmission device, transmission &hellip; A transmission wheel, a transmission shaft, The transmission wheel and the transmission shaft may be rotated in the same direction only in one direction, or rotation may not be transmitted between the transmission wheel and the transmission shaft, and may be interposed between the inner periphery &hellip;  ",
+      "adjudicated_text_sha256": "07025e1dbd5767422fd184d4ac8b957481d4693e8ce1f2869cb27626fc9b6f15",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_covered": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_surviving": [
+        "analysi",
+        "arbitrarily",
+        "defined",
+        "dimension",
+        "disc",
+        "efficiency",
+        "geometry",
+        "maximize",
+        "rather",
+        "scaling",
+        "toroidal"
+       ],
+       "coverage_ratio": 0.154,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-06",
+      "representative": {
+       "patent_id": "EP2085653A2",
+       "title": "Continuous variable transmission device with low shift transmission pulley &hellip;",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/EP2085653A2/en",
+       "assignee": "['Tai-Her Yang']",
+       "publication_date": "2009-08-05"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "EP2085653A2"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Continuous variable transmission device with low shift transmission pulley &hellip; The invented continuously variable transmission device with low shift transmission pulley train is innovatingly disclosed by that a low shift transmission pulley train and attached unidirectional transmission device in the same rotating direction are installed between the input shaft and output &hellip;  The invented continuously variable transmission device with low shift transmission pulley train is innovatingly disclosed by that a low shift transmission pulley train and attached unidirectional transmission device in the same rotating direction are installed between the input shaft and output shaft of a continuously variable transmission device, wherein during high load operation, when rotating speed of the driving pulley of low shift transmission pulley train is lower than that of the input shaft in the same revolving direction, the revolving kinetic energy of the input shaft is transmitted through the unidirectional transmission device and the low shift transmission pulley train to drive the output shaft and further to drive the load.",
+      "adjudicated_text_sha256": "9c4f056b6b22c8885c375e96fff122ea1cb0438a69342437fd1ac668bf7a4821",
+      "coverage": {
+       "coverage_class": "NONE",
+       "mechanism_overlap_terms": [
+        "transmission"
+       ],
+       "distinguishing_terms_covered": [
+        "transmission"
+       ],
+       "distinguishing_terms_surviving": [
+        "analysi",
+        "arbitrarily",
+        "defined",
+        "dimension",
+        "disc",
+        "efficiency",
+        "geometry",
+        "maximize",
+        "power",
+        "rather",
+        "scaling",
+        "toroidal"
+       ],
+       "coverage_ratio": 0.077,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-07",
+      "representative": {
+       "patent_id": "WO2017145178A1",
+       "title": "Continuously variable transmission system using differential and brake",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/WO2017145178A1/en",
+       "assignee": "['B R Girish']",
+       "publication_date": "2017-08-31"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "WO2017145178A1"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Continuously variable transmission system using differential and brake The present invention relates to a continuously variable transmission CVT system using a braking unit to convert an input rotational force into a continuously variable output by varying the load on to an intermediate shaft. The CVT system reduces the effort required to maneuver the speed of the &hellip;  The present invention relates to a continuously variable transmission CVT system using a braking unit to convert an input rotational force into a continuously variable output by varying the load on to an intermediate shaft. The CVT system reduces the effort required to maneuver the speed of the intermediate shaft, and the output delivered to the output shaft is varied by altering the extent of braking applied to the intermediate shaft.",
+      "adjudicated_text_sha256": "4289b4acaa1485b5f407fb6ccf916579890cef30bf47befdcb257f0ff5383d3e",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "cvt",
+        "transmission"
+       ],
+       "distinguishing_terms_covered": [
+        "transmission"
+       ],
+       "distinguishing_terms_surviving": [
+        "analysi",
+        "arbitrarily",
+        "defined",
+        "dimension",
+        "disc",
+        "efficiency",
+        "geometry",
+        "maximize",
+        "power",
+        "rather",
+        "scaling",
+        "toroidal"
+       ],
+       "coverage_ratio": 0.077,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-08",
+      "representative": {
+       "patent_id": "CN209943450U",
+       "title": "Stepless speed variator",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/CN209943450U/en",
+       "assignee": "['曹瑞']",
+       "publication_date": "2020-01-14"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "CN209943450U"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Stepless speed variator The utility model discloses a continuously variable transmission. It includes a transmission body, the transmission body includes a power input assembly, a power output assembly and a transmission assembly, the power input assembly is connected with the transmission assembly through a first &hellip;  本实用新型公开了一种无级变速器。其包括变速器本体，变速器本体包括动力输入组件、动力输出组件以及传动组件，动力输入组件通过第一传动绳与传动组件连接，动力输出组件通过第二传动绳与传动组件连接，动力输入组件包括输入轴以及输入锥形轮，动力输出组件包括输出轴以及输出锥形轮，传动组件包括中间轴以及设置在中间轴上的第一传动锥形轮和第二传动锥形轮，通过同步调节第一传动绳在输入锥形轮以及第二传动绳在输出锥形轮上的轴向位置来实现无级变速。本实用新型的传动绳与对应的圆锥形工作面接触线较长，包角较大，且圆锥形工作面受传动绳的压力在各个方向均等，圆锥形工作面的工作轴没有径向受力，从而传动力矩增大，传动功率大，传动效率高。 The utility model discloses a continuously variable transmission. It includes a transmission body, the transmission body includes a power input assembly, a power output assembly and a transmission assembly, the power input assembly is connected with the transmission assembly through a first transmission rope, the power output assembly is connected with the transmission assembly through a second transmission rope, and the power input assembly includes an input The shaft and the input conical wheel, the power output assembly includes the output shaft and the output co",
+      "adjudicated_text_sha256": "771985d5302a8a26b4997747c37b3fbf03917ab6151c6fa8eb8904eab2a99dd9",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_covered": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_surviving": [
+        "analysi",
+        "arbitrarily",
+        "defined",
+        "dimension",
+        "disc",
+        "efficiency",
+        "geometry",
+        "maximize",
+        "rather",
+        "scaling",
+        "toroidal"
+       ],
+       "coverage_ratio": 0.154,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-09",
+      "representative": {
+       "patent_id": "CN212124769U",
+       "title": "Six-drive transmission device of rail dual-purpose traction locomotive",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/CN212124769U/en",
+       "assignee": "['山东岳华能源集团有限公司']",
+       "publication_date": "2020-12-11"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "CN212124769U"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Six-drive transmission device of rail dual-purpose traction locomotive The utility model discloses a six-drive transmission device of a rail and road dual-purpose traction locomotive, which relates to the technical field of rail and road dual-purpose traction locomotives and comprises an engine, a torque converter, a front transmission shaft, a rear transmission &hellip;  The utility model discloses a six-drive transmission device of a rail and road dual-purpose traction locomotive, which relates to the technical field of rail and road dual-purpose traction locomotives and comprises an engine, a torque converter, a front transmission shaft, a rear transmission shaft, a transfer device, a half shaft, a differential mechanism, a front wheel, a middle wheel and a rear wheel, wherein the transfer device consists of a transfer device I and a transfer device II; the second transfer device is arranged between the first transfer device and the middle wheel, the input shaft of the second transfer device is a rear transmission shaft, and the output shaft of the second transfer device is a third transmission shaft and a fourth transmission shaft. The utility model discloses be applied to dual",
+      "adjudicated_text_sha256": "27632f461fe5f2b1c8e1890d408d96e8fb1e43fbdececdd9ec9db544eeb59fab",
+      "coverage": {
+       "coverage_class": "NONE",
+       "mechanism_overlap_terms": [
+        "transmission"
+       ],
+       "distinguishing_terms_covered": [
+        "transmission"
+       ],
+       "distinguishing_terms_surviving": [
+        "analysi",
+        "arbitrarily",
+        "defined",
+        "dimension",
+        "disc",
+        "efficiency",
+        "geometry",
+        "maximize",
+        "power",
+        "rather",
+        "scaling",
+        "toroidal"
+       ],
+       "coverage_ratio": 0.077,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-10",
+      "representative": {
+       "patent_id": "US20050087380A1",
+       "title": "Variator in a four wheel drive",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/US20050087380A1/en",
+       "assignee": "['Todd Brown']",
+       "publication_date": "2005-04-28"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "US20050087380A1"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Variator in a four wheel drive A power transmission system and drive train for a vehicle and more particularly an all-wheel-drive (AWD) power transmission system which directly transmits drive power to both a first and second set of drive wheels of the vehicle via a continuously variable coupling accommodating the speed &hellip;  A power transmission system and drive train for a vehicle and more particularly an all-wheel-drive (AWD) power transmission system which directly transmits drive power to both a first and second set of drive wheels of the vehicle via a continuously variable coupling accommodating the speed difference between the first and second set of drive wheels and also relating to an alternative power take off path from a transmission PTU side shaft to power the rear drive train.",
+      "adjudicated_text_sha256": "68c13f9e8d9a20fbc5c01a7cba7fc0fb516e1c1c4723b1145b3994be2c8f45e2",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_covered": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_surviving": [
+        "analysi",
+        "arbitrarily",
+        "defined",
+        "dimension",
+        "disc",
+        "efficiency",
+        "geometry",
+        "maximize",
+        "rather",
+        "scaling",
+        "toroidal"
+       ],
+       "coverage_ratio": 0.154,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-11",
+      "representative": {
+       "patent_id": "JP6247808B2",
+       "title": "System for propulsion of vehicle having CVT and manufacturing method thereof",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/JP6247808B2/en",
+       "assignee": "['ゼネラル・エレクトリック・カンパニイ']",
+       "publication_date": "2017-12-13"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "JP6247808B2"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "System for propulsion of vehicle having CVT and manufacturing method thereof An electrical machine (EM) (16, 88) configured to generate an unconditioned output; Continuously variable transmission (CVT) (14, 90) having an input side (20, 98) and an output side (22, 106), wherein the input side (20, 98) is relative to EM (16, 88) A continuously variable transmission (CVT) ( &hellip;  ",
+      "adjudicated_text_sha256": "21502bb93989e52bdf489a90bc55e03a545f5296355cb9d070418a1880c8d512",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "cvt",
+        "transmission"
+       ],
+       "distinguishing_terms_covered": [
+        "transmission"
+       ],
+       "distinguishing_terms_surviving": [
+        "analysi",
+        "arbitrarily",
+        "defined",
+        "dimension",
+        "disc",
+        "efficiency",
+        "geometry",
+        "maximize",
+        "power",
+        "rather",
+        "scaling",
+        "toroidal"
+       ],
+       "coverage_ratio": 0.077,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-12",
+      "representative": {
+       "patent_id": "CN102398512B",
+       "title": "Vehicle Power Transmission",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/CN102398512B/en",
+       "assignee": "['株式会社日本自动车部品综合研究所']",
+       "publication_date": "2015-11-25"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "CN102398512B"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Vehicle Power Transmission The invention provides a power transmission apparatus for a vehicle, which is equipped with a power split device and a transmission. The power transmission device is designed to set a speed ratio of a rotational speed of an output of the power source to a rotational speed of the driven wheel to be &hellip;  The invention provides a power transmission apparatus for a vehicle, which is equipped with a power split device and a transmission. The power transmission device is designed to set a speed ratio of a rotational speed of an output of the power source to a rotational speed of the driven wheel to be in one of a positive range in which a sign of the speed ratio is positive and a negative range in which the sign of the speed ratio is negative. This results in a reduction in the degree to which torque is applied to the transmission, such as a continuously variable transmission, thereby allowing the required durability of the transmission to be reduced.",
+      "adjudicated_text_sha256": "1e61e3c56d90e5f0477cd29406597705e54cdb4e7b0006ea4c99544d9371d15f",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_covered": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_surviving": [
+        "analysi",
+        "arbitrarily",
+        "defined",
+        "dimension",
+        "disc",
+        "efficiency",
+        "geometry",
+        "maximize",
+        "rather",
+        "scaling",
+        "toroidal"
+       ],
+       "coverage_ratio": 0.154,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-13",
+      "representative": {
+       "patent_id": "US7195573B2",
+       "title": "Power transmission device with at least two planetary gear trains",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/US7195573B2/en",
+       "assignee": "['Peugeot Citroen Automobiles Sa']",
+       "publication_date": "2007-03-27"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "US7195573B2"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Power transmission device with at least two planetary gear trains The invention concerns a power transmission device between a heat engine ( 1 ) and the wheels ( 2 ) of a motor vehicle, said device comprising two independent electric machines (3, 4), at least two planetary gear trains ( 5, 15, 25, 35; 6, 16, 26, 36 ) connecting the heat engine and the electric &hellip;  The invention concerns a power transmission device between a heat engine ( 1 ) and the wheels ( 2 ) of a motor vehicle, said device comprising two independent electric machines (3, 4), at least two planetary gear trains ( 5, 15, 25, 35; 6, 16, 26, 36 ) connecting the heat engine and the electric machines with one another and to the vehicle wheels, a mechanical switching device ( 7 ) shifting the transmission device from one operating mode to another, each transmission mode corresponding to a different range of transmission ratios, the switching device enabling to connect one of the electric machines directly to the vehicle wheels and a control device monitoring the heat engine ( 1 ), the two electric machines ( 3,4 ) and the mechanical switching device ( 7 ), so that the operating points of the heat engine and of th",
+      "adjudicated_text_sha256": "3b744b4bc68e9d893743b507ecac7e2c0fbcc75ef8942bf5a16df786798e95eb",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_covered": [
+        "power",
+        "transmission"
+       ],
+       "distinguishing_terms_surviving": [
+        "analysi",
+        "arbitrarily",
+        "defined",
+        "dimension",
+        "disc",
+        "efficiency",
+        "geometry",
+        "maximize",
+        "rather",
+        "scaling",
+        "toroidal"
+       ],
+       "coverage_ratio": 0.154,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-14",
+      "representative": {
+       "patent_id": "EP2282907B1",
+       "title": "Vehicle driveline comprising an energy recovery system",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/EP2282907B1/en",
+       "assignee": "['Allison Transmission, Inc.']",
+       "publication_date": "2020-02-26"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "EP2282907B1"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Vehicle driveline comprising an energy recovery system A vehicle driveline comprising a vehicle transmission (14, 16) configured to transmit drive between an engine (10) and vehicle wheels; and a kinetic energy recovery system (22) having an input (30) which is coupled to the driveline between the engine (10) and the vehicle transmission (14, 16), the &hellip;  ",
+      "adjudicated_text_sha256": "688436152d4bb437f03f5e6715c9595f8dd4cdd20a7ef981eb2fa3dada436be7",
+      "coverage": {
+       "coverage_class": "NONE",
+       "mechanism_overlap_terms": [
+        "transmission"
+       ],
+       "distinguishing_terms_covered": [
+        "transmission"
+       ],
+       "distinguishing_terms_surviving": [
+        "analysi",
+        "arbitrarily",
+        "defined",
+        "dimension",
+        "disc",
+        "efficiency",
+        "geometry",
+        "maximize",
+        "power",
+        "rather",
+        "scaling",
+        "toroidal"
+       ],
+       "coverage_ratio": 0.077,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     }
+    ],
+    "n_families": 14,
+    "n_search_errors": 0,
+    "search_errors": [],
+    "search_execution": {
+     "mandatory_complete": true,
+     "n_errors": 0,
+     "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+    },
+    "relevance_model_version": "collision_resolution/2.0.0",
+    "determinism_contract": {
+     "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+     "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+    },
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    },
+    "surviving_differentiators": [
+     "analysi",
+     "arbitrarily",
+     "defined",
+     "dimension",
+     "disc",
+     "efficiency",
+     "geometry",
+     "maximize",
+     "power",
+     "rather",
+     "scaling",
+     "toroidal"
+    ]
+   },
+   "nearest": [
+    {
+     "patent_id": "JP2021041798A",
+     "title": "Hybrid vehicle system",
+     "url": "https://patents.google.com/patent/JP2021041798A/en",
+     "family_id": "PA-FAM-01",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "between",
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [],
+     "distinguishing_terms_surviving": [
+      "contact",
+      "diameter",
+      "disc",
+      "effective",
+      "increase",
+      "input",
+      "limit",
+      "output",
+      "proportionally",
+      "radiu",
+      "roller",
+      "scaling",
+      "stress",
+      "toroidal"
+     ],
+     "coverage_class": "MECHANISM_ONLY",
+     "coverage_ratio": 0.0
+    },
+    {
+     "patent_id": "JP2015227697A",
+     "title": "Control device for vehicle transmission",
+     "url": "https://patents.google.com/patent/JP2015227697A/en",
+     "family_id": "PA-FAM-02",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "between",
+      "input",
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "input",
+      "output"
+     ],
+     "distinguishing_terms_surviving": [
+      "contact",
+      "diameter",
+      "disc",
+      "effective",
+      "increase",
+      "limit",
+      "proportionally",
+      "radiu",
+      "roller",
+      "scaling",
+      "stress",
+      "toroidal"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.143
+    },
+    {
+     "patent_id": "JP4872697B2",
+     "title": "Power transmission system",
+     "url": "https://patents.google.com/patent/JP4872697B2/en",
+     "family_id": "PA-FAM-03",
+     "family_size": 4,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "increase",
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "increase",
+      "output"
+     ],
+     "distinguishing_terms_surviving": [
+      "contact",
+      "diameter",
+      "disc",
+      "effective",
+      "input",
+      "limit",
+      "proportionally",
+      "radiu",
+      "roller",
+      "scaling",
+      "stress",
+      "toroidal"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.143
+    },
+    {
+     "patent_id": "JP4717833B2",
+     "title": "Modular transmission unit, especially multi-stage transmission",
+     "url": "https://patents.google.com/patent/JP4717833B2/en",
+     "family_id": "PA-FAM-04",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [],
+     "distinguishing_terms_surviving": [
+      "contact",
+      "diameter",
+      "disc",
+      "effective",
+      "increase",
+      "input",
+      "limit",
+      "output",
+      "proportionally",
+      "radiu",
+      "roller",
+      "scaling",
+      "stress",
+      "toroidal"
+     ],
+     "coverage_class": "MECHANISM_ONLY",
+     "coverage_ratio": 0.0
+    },
+    {
+     "patent_id": "JP6165716B2",
+     "title": "Rotation transmission element, power on / off transmission device, transmission &hellip;",
+     "url": "https://patents.google.com/patent/JP6165716B2/en",
+     "family_id": "PA-FAM-05",
+     "family_size": 2,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "between",
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [],
+     "distinguishing_terms_surviving": [
+      "contact",
+      "diameter",
+      "disc",
+      "effective",
+      "increase",
+      "input",
+      "limit",
+      "output",
+      "proportionally",
+      "radiu",
+      "roller",
+      "scaling",
+      "stress",
+      "toroidal"
+     ],
+     "coverage_class": "MECHANISM_ONLY",
+     "coverage_ratio": 0.0
+    },
+    {
+     "patent_id": "EP2085653A2",
+     "title": "Continuous variable transmission device with low shift transmission pulley &hellip;",
+     "url": "https://patents.google.com/patent/EP2085653A2/en",
+     "family_id": "PA-FAM-06",
+     "family_size": 3,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "between",
+      "input",
+      "rotating",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "input",
+      "output"
+     ],
+     "distinguishing_terms_surviving": [
+      "contact",
+      "diameter",
+      "disc",
+      "effective",
+      "increase",
+      "limit",
+      "proportionally",
+      "radiu",
+      "roller",
+      "scaling",
+      "stress",
+      "toroidal"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.143
+    },
+    {
+     "patent_id": "WO2017145178A1",
+     "title": "Continuously variable transmission system using differential and brake",
+     "url": "https://patents.google.com/patent/WO2017145178A1/en",
+     "family_id": "PA-FAM-07",
+     "family_size": 4,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "input",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "input",
+      "output"
+     ],
+     "distinguishing_terms_surviving": [
+      "contact",
+      "diameter",
+      "disc",
+      "effective",
+      "increase",
+      "limit",
+      "proportionally",
+      "radiu",
+      "roller",
+      "scaling",
+      "stress",
+      "toroidal"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.143
+    },
+    {
+     "patent_id": "CN209943450U",
+     "title": "Stepless speed variator",
+     "url": "https://patents.google.com/patent/CN209943450U/en",
+     "family_id": "PA-FAM-08",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "contact",
+      "input",
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "contact",
+      "input",
+      "output"
+     ],
+     "distinguishing_terms_surviving": [
+      "diameter",
+      "disc",
+      "effective",
+      "increase",
+      "limit",
+      "proportionally",
+      "radiu",
+      "roller",
+      "scaling",
+      "stress",
+      "toroidal"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.214
+    },
+    {
+     "patent_id": "CN212124769U",
+     "title": "Six-drive transmission device of rail dual-purpose traction locomotive",
+     "url": "https://patents.google.com/patent/CN212124769U/en",
+     "family_id": "PA-FAM-09",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "between",
+      "input",
+      "traction",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "input",
+      "output"
+     ],
+     "distinguishing_terms_surviving": [
+      "contact",
+      "diameter",
+      "disc",
+      "effective",
+      "increase",
+      "limit",
+      "proportionally",
+      "radiu",
+      "roller",
+      "scaling",
+      "stress",
+      "toroidal"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.143
+    },
+    {
+     "patent_id": "US20050087380A1",
+     "title": "Variator in a four wheel drive",
+     "url": "https://patents.google.com/patent/US20050087380A1/en",
+     "family_id": "PA-FAM-10",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "between",
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [],
+     "distinguishing_terms_surviving": [
+      "contact",
+      "diameter",
+      "disc",
+      "effective",
+      "increase",
+      "input",
+      "limit",
+      "output",
+      "proportionally",
+      "radiu",
+      "roller",
+      "scaling",
+      "stress",
+      "toroidal"
+     ],
+     "coverage_class": "MECHANISM_ONLY",
+     "coverage_ratio": 0.0
+    },
+    {
+     "patent_id": "JP6247808B2",
+     "title": "System for propulsion of vehicle having CVT and manufacturing method thereof",
+     "url": "https://patents.google.com/patent/JP6247808B2/en",
+     "family_id": "PA-FAM-11",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "input",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "input",
+      "output"
+     ],
+     "distinguishing_terms_surviving": [
+      "contact",
+      "diameter",
+      "disc",
+      "effective",
+      "increase",
+      "limit",
+      "proportionally",
+      "radiu",
+      "roller",
+      "scaling",
+      "stress",
+      "toroidal"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.143
+    },
+    {
+     "patent_id": "CN102398512B",
+     "title": "Vehicle Power Transmission",
+     "url": "https://patents.google.com/patent/CN102398512B/en",
+     "family_id": "PA-FAM-12",
+     "family_size": 2,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "output"
+     ],
+     "distinguishing_terms_surviving": [
+      "contact",
+      "diameter",
+      "disc",
+      "effective",
+      "increase",
+      "input",
+      "limit",
+      "proportionally",
+      "radiu",
+      "roller",
+      "scaling",
+      "stress",
+      "toroidal"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.071
+    },
+    {
+     "patent_id": "US7195573B2",
+     "title": "Power transmission device with at least two planetary gear trains",
+     "url": "https://patents.google.com/patent/US7195573B2/en",
+     "family_id": "PA-FAM-13",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "between",
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [],
+     "distinguishing_terms_surviving": [
+      "contact",
+      "diameter",
+      "disc",
+      "effective",
+      "increase",
+      "input",
+      "limit",
+      "output",
+      "proportionally",
+      "radiu",
+      "roller",
+      "scaling",
+      "stress",
+      "toroidal"
+     ],
+     "coverage_class": "MECHANISM_ONLY",
+     "coverage_ratio": 0.0
+    },
+    {
+     "patent_id": "EP2282907B1",
+     "title": "Vehicle driveline comprising an energy recovery system",
+     "url": "https://patents.google.com/patent/EP2282907B1/en",
+     "family_id": "PA-FAM-14",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "between",
+      "input",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "input"
+     ],
+     "distinguishing_terms_surviving": [
+      "contact",
+      "diameter",
+      "disc",
+      "effective",
+      "increase",
+      "limit",
+      "output",
+      "proportionally",
+      "radiu",
+      "roller",
+      "scaling",
+      "stress",
+      "toroidal"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.071
+    }
+   ],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "transmission power cvt system documented problem"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "transmission power traction friction between rotating"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "toroidal discs roller contact input increase effective proportionally"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "transmission reduction velocity traction scaling driving"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "transmission power traction cvt system loss"
+    }
+   ],
    "scientific": []
   },
   "epistemic_class": "COMPUTED",
@@ -85,9 +1335,440 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Implement a real-time control algorithm in the CVT transmission control unit that continuously calculates the required engine power and preset pulley speed ratio to determine the optimal hydraulic pressure and belt clamping force, thereby preventing slippage and power loss during highway cruising.",
-   "vs_nearest_prior_art": [],
-   "surviving_differentiators": null,
+   "intervention": "Optimize the geometry of the toroidal discs to maximize power transmission efficiency as defined by the analysis on geometry and power transmission efficiency, rather than arbitrarily scaling dimensions.",
+   "vs_nearest_prior_art": [
+    {
+     "patent_id": "JP2021041798A",
+     "title": "Hybrid vehicle system",
+     "family_id": "PA-FAM-01",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.154,
+     "mechanism_overlap_terms": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_surviving": [
+      "analysi",
+      "arbitrarily",
+      "defined",
+      "dimension",
+      "disc",
+      "efficiency",
+      "geometry",
+      "maximize",
+      "rather",
+      "scaling",
+      "toroidal"
+     ]
+    },
+    {
+     "patent_id": "JP2015227697A",
+     "title": "Control device for vehicle transmission",
+     "family_id": "PA-FAM-02",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.154,
+     "mechanism_overlap_terms": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_surviving": [
+      "analysi",
+      "arbitrarily",
+      "defined",
+      "dimension",
+      "disc",
+      "efficiency",
+      "geometry",
+      "maximize",
+      "rather",
+      "scaling",
+      "toroidal"
+     ]
+    },
+    {
+     "patent_id": "JP4872697B2",
+     "title": "Power transmission system",
+     "family_id": "PA-FAM-03",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.154,
+     "mechanism_overlap_terms": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_surviving": [
+      "analysi",
+      "arbitrarily",
+      "defined",
+      "dimension",
+      "disc",
+      "efficiency",
+      "geometry",
+      "maximize",
+      "rather",
+      "scaling",
+      "toroidal"
+     ]
+    },
+    {
+     "patent_id": "JP4717833B2",
+     "title": "Modular transmission unit, especially multi-stage transmission",
+     "family_id": "PA-FAM-04",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.154,
+     "mechanism_overlap_terms": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_surviving": [
+      "analysi",
+      "arbitrarily",
+      "defined",
+      "dimension",
+      "disc",
+      "efficiency",
+      "geometry",
+      "maximize",
+      "rather",
+      "scaling",
+      "toroidal"
+     ]
+    },
+    {
+     "patent_id": "JP6165716B2",
+     "title": "Rotation transmission element, power on / off transmission device, transmission &hellip;",
+     "family_id": "PA-FAM-05",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.154,
+     "mechanism_overlap_terms": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_surviving": [
+      "analysi",
+      "arbitrarily",
+      "defined",
+      "dimension",
+      "disc",
+      "efficiency",
+      "geometry",
+      "maximize",
+      "rather",
+      "scaling",
+      "toroidal"
+     ]
+    },
+    {
+     "patent_id": "EP2085653A2",
+     "title": "Continuous variable transmission device with low shift transmission pulley &hellip;",
+     "family_id": "PA-FAM-06",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "NONE",
+     "coverage_ratio": 0.077,
+     "mechanism_overlap_terms": [
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "transmission"
+     ],
+     "distinguishing_terms_surviving": [
+      "analysi",
+      "arbitrarily",
+      "defined",
+      "dimension",
+      "disc",
+      "efficiency",
+      "geometry",
+      "maximize",
+      "power",
+      "rather",
+      "scaling",
+      "toroidal"
+     ]
+    },
+    {
+     "patent_id": "WO2017145178A1",
+     "title": "Continuously variable transmission system using differential and brake",
+     "family_id": "PA-FAM-07",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.077,
+     "mechanism_overlap_terms": [
+      "cvt",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "transmission"
+     ],
+     "distinguishing_terms_surviving": [
+      "analysi",
+      "arbitrarily",
+      "defined",
+      "dimension",
+      "disc",
+      "efficiency",
+      "geometry",
+      "maximize",
+      "power",
+      "rather",
+      "scaling",
+      "toroidal"
+     ]
+    },
+    {
+     "patent_id": "CN209943450U",
+     "title": "Stepless speed variator",
+     "family_id": "PA-FAM-08",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.154,
+     "mechanism_overlap_terms": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_surviving": [
+      "analysi",
+      "arbitrarily",
+      "defined",
+      "dimension",
+      "disc",
+      "efficiency",
+      "geometry",
+      "maximize",
+      "rather",
+      "scaling",
+      "toroidal"
+     ]
+    },
+    {
+     "patent_id": "CN212124769U",
+     "title": "Six-drive transmission device of rail dual-purpose traction locomotive",
+     "family_id": "PA-FAM-09",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "NONE",
+     "coverage_ratio": 0.077,
+     "mechanism_overlap_terms": [
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "transmission"
+     ],
+     "distinguishing_terms_surviving": [
+      "analysi",
+      "arbitrarily",
+      "defined",
+      "dimension",
+      "disc",
+      "efficiency",
+      "geometry",
+      "maximize",
+      "power",
+      "rather",
+      "scaling",
+      "toroidal"
+     ]
+    },
+    {
+     "patent_id": "US20050087380A1",
+     "title": "Variator in a four wheel drive",
+     "family_id": "PA-FAM-10",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.154,
+     "mechanism_overlap_terms": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_surviving": [
+      "analysi",
+      "arbitrarily",
+      "defined",
+      "dimension",
+      "disc",
+      "efficiency",
+      "geometry",
+      "maximize",
+      "rather",
+      "scaling",
+      "toroidal"
+     ]
+    },
+    {
+     "patent_id": "JP6247808B2",
+     "title": "System for propulsion of vehicle having CVT and manufacturing method thereof",
+     "family_id": "PA-FAM-11",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.077,
+     "mechanism_overlap_terms": [
+      "cvt",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "transmission"
+     ],
+     "distinguishing_terms_surviving": [
+      "analysi",
+      "arbitrarily",
+      "defined",
+      "dimension",
+      "disc",
+      "efficiency",
+      "geometry",
+      "maximize",
+      "power",
+      "rather",
+      "scaling",
+      "toroidal"
+     ]
+    },
+    {
+     "patent_id": "CN102398512B",
+     "title": "Vehicle Power Transmission",
+     "family_id": "PA-FAM-12",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.154,
+     "mechanism_overlap_terms": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_surviving": [
+      "analysi",
+      "arbitrarily",
+      "defined",
+      "dimension",
+      "disc",
+      "efficiency",
+      "geometry",
+      "maximize",
+      "rather",
+      "scaling",
+      "toroidal"
+     ]
+    },
+    {
+     "patent_id": "US7195573B2",
+     "title": "Power transmission device with at least two planetary gear trains",
+     "family_id": "PA-FAM-13",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.154,
+     "mechanism_overlap_terms": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "power",
+      "transmission"
+     ],
+     "distinguishing_terms_surviving": [
+      "analysi",
+      "arbitrarily",
+      "defined",
+      "dimension",
+      "disc",
+      "efficiency",
+      "geometry",
+      "maximize",
+      "rather",
+      "scaling",
+      "toroidal"
+     ]
+    },
+    {
+     "patent_id": "EP2282907B1",
+     "title": "Vehicle driveline comprising an energy recovery system",
+     "family_id": "PA-FAM-14",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "NONE",
+     "coverage_ratio": 0.077,
+     "mechanism_overlap_terms": [
+      "transmission"
+     ],
+     "distinguishing_terms_covered": [
+      "transmission"
+     ],
+     "distinguishing_terms_surviving": [
+      "analysi",
+      "arbitrarily",
+      "defined",
+      "dimension",
+      "disc",
+      "efficiency",
+      "geometry",
+      "maximize",
+      "power",
+      "rather",
+      "scaling",
+      "toroidal"
+     ]
+    }
+   ],
+   "surviving_differentiators": [
+    "analysi",
+    "arbitrarily",
+    "defined",
+    "dimension",
+    "disc",
+    "efficiency",
+    "geometry",
+    "maximize",
+    "power",
+    "rather",
+    "scaling",
+    "toroidal"
+   ],
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
   },
   "epistemic_class": "MODELLED",
@@ -100,7 +1781,19 @@
  "constraints": {
   "value": {
    "stated_constraint": "must maintain drive power at highway speeds and exceed 70,000-mile service life",
-   "failure_mode_of_device": "power loss while driving"
+   "failure_mode_of_device": "power loss while driving",
+   "evidence_derived": [
+    {
+     "constraint": "The toroidal disc geometry must be configured to align with the specific geometric parameters that yield maximum power transmission efficiency as established in the cited analysis.",
+     "evidence_id": "doi:10.1299/jsmempt.2004.296",
+     "span": "Analysis on geometry and power transmission efficiency of a toroidal CVT"
+    },
+    {
+     "constraint": "The optimization of toroidal disc geometry must be derived directly from the analysis on geometry and power transmission efficiency of a toroidal CVT rather than arbitrary dimensional scaling.",
+     "evidence_id": "doi:10.1299/jsmempt.2004.296",
+     "span": "Analysis on geometry and power transmission efficiency of a toroidal CVT"
+    }
+   ]
   },
   "epistemic_class": "SOURCE_FACT",
   "origin_stage": "PROBLEM",
@@ -371,6 +2064,26 @@
     "contradiction_id": "con:evidence:doi:10.1371/journal.pone.0342496",
     "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['after', 'optimal', 'power', 'speed', 'strategy', 'that'] in: 'Finally, strategies such as filling functions and si]",
     "severity": "HIGH"
+   },
+   {
+    "unresolved_source": "transmission power cvt system documented problem",
+    "error": "HTTP 401: {\"reference\":\"1228d540-c6b4-4800-9e6a-844abe1f6bb2\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "transmission power traction friction between rotating",
+    "error": "HTTP 401: {\"reference\":\"5b5a868b-b16b-4129-ae77-43efdf136e9e\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "toroidal discs roller contact input increase effective proportionally",
+    "error": "HTTP 401: {\"reference\":\"1440fce5-93d4-47dc-a796-2aa87e0827e8\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "transmission reduction velocity traction scaling driving",
+    "error": "HTTP 401: {\"reference\":\"162d32e1-ffd8-4cdb-a0d0-273b7c06f3b7\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "transmission power traction cvt system loss",
+    "error": "HTTP 401: {\"reference\":\"899bb688-6137-4dfb-b13b-bf6905424d18\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
    }
   ],
   "epistemic_class": "COMPUTED",
@@ -383,7 +2096,7 @@
    {
     "assumption": "mechanism transfers across domain context",
     "basis": "MODELLED",
-    "test": "Operate the modified 2021 Nissan Altima on a dynamometer at constant highway speeds (65 mph) under varying load conditions; if the measured output shaft torque drops below the input torque multiplied by the gear ratio minus friction losses, or if belt slip is detected via speed sensor differential, the mechanism has failed."
+    "test": "Measured transmission efficiency will increase by at least 3% at 70 mph under 50 Nm load compared to the baseline geometry after 10,000 miles of operation."
    },
    {
     "assumption": "searched sources approximate the prior-art universe",
@@ -399,7 +2112,7 @@
  "provenance": {
   "value": {
    "run_id": "engrun:ui_power_loss_while_driving_208985:2026-09-24T00:16:25",
-   "final_envelope_hash": "d21325fdeada30d774c37ff66b047fc57ffe96876c254ec0cbf92936fca3548f",
+   "final_envelope_hash": "a5b87e258fd684f21037c687ed6450839bd468e472fadac5bd99e8bfedbcc1ca",
    "final_status": "UNKNOWN",
    "adjudication_verdict": "CONTESTED",
    "ranking": {
@@ -427,7 +2140,7 @@
     "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
    },
    "code_commit": null,
-   "built_at": "2026-09-24T00:17:17+00:00Z"
+   "built_at": "2026-09-24T00:17:32+00:00Z"
   },
   "epistemic_class": "COMPUTED",
   "origin_stage": "INVENTION_SPEC",
@@ -1536,10 +3249,266 @@
   "verdict": "CONTESTED",
   "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
  },
- "_spec_hash": "d5f564e9ed1cd9e3f02b07af8ac6c728331e80f6d1f68871e3741f3aaa2f4a5f",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
-  "checked_at": "2026-09-24T00:17:17+00:00Z"
- }
+  "checked_at": "2026-09-24T00:17:32+00:00Z"
+ },
+ "_mechanism_space_candidate": {
+  "marker": "MECHANISM_SPACE_CANDIDATE",
+  "transformation_operator": "GEOMETRIC_TRANSFORMATION",
+  "mechanism_support_state": "PARTIALLY_SUPPORTED",
+  "support_counts": {
+   "SUPPORTS": 0,
+   "PARTIALLY_SUPPORTS": 14,
+   "CONTRADICTS": 0,
+   "IRRELEVANT": 0,
+   "NOT_ENOUGH_EVIDENCE": 0
+  },
+  "contradictions_visible": [],
+  "consequence": "the E16-H release gate holds this dossier for human review unless mechanism-level evidence support is SUPPORTED; contradictions and partial support are never converted (R401 Phase 4)"
+ },
+ "_improvement": {
+  "parent_spec_hash": "9a47737bd7159325eb4fdbca316809b87a28973ea0d8cf1ef4a71118cd392a31",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:8e9c4a00a660",
+   "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.316,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:5f70c7ec71b1",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free",
+    "prompt_hash": "5c96a699829c7df6104dce70f2750889c57cb7bebf3cc78947fae9b3a9411aea",
+    "output_hash": "5f70c7ec71b10722ee3809f105457d7976d4570c127fe47795b4ae8415d1fcb1",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.1299/jsmempt.2004.296",
+     "span_verbatim_in_evidence": true,
+     "evidence_support": 0.375,
+     "evidence_support_cleared": 0.375,
+     "constraint_traceable_to_evidence": "The optimization of toroidal disc geometry must be derived directly from the analysis on geometry and power transmission"
+    },
+    "reasons": [],
+    "validated_at": "2026-09-24T00:20:59+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "Power transmission efficiency determined by the geometry of toroidal discs and traction contact conditions.",
+     "after": "Power transmission efficiency determined by the analysis on geometry and power transmission efficiency of a toroidal CVT."
+    },
+    "intervention": {
+     "before": "Optimize the geometry of the toroidal discs to maximize power transmission efficiency as defined by the contact analysis, rather than arbitrarily scaling dimensions.",
+     "after": "Optimize the geometry of the toroidal discs to maximize power transmission efficiency as defined by the analysis on geometry and power transmission efficiency, rather than arbitrarily scaling dimensions."
+    },
+    "mechanism_source_span": {
+     "before": "Analysis on geometry and power transmission efficiency of a toroidal CVT",
+     "after": "Analysis on geometry and power transmission efficiency of a toroidal CVT"
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "con:evidence:doi:10.1371/journal.pone.0342496",
+     "transmission power cvt system documented problem",
+     "transmission power traction friction between rotating",
+     "toroidal discs roller contact input increase effective proportionally",
+     "transmission reduction velocity traction scaling driving",
+     "transmission power traction cvt system loss"
+    ],
+    "collision_family_ids": [
+     "PA-FAM-01",
+     "PA-FAM-02",
+     "PA-FAM-03",
+     "PA-FAM-04",
+     "PA-FAM-05",
+     "PA-FAM-06",
+     "PA-FAM-07",
+     "PA-FAM-08",
+     "PA-FAM-09",
+     "PA-FAM-10",
+     "PA-FAM-11",
+     "PA-FAM-12",
+     "PA-FAM-13",
+     "PA-FAM-14"
+    ],
+    "source_errors": []
+   },
+   "parent_spec_hash": "9a47737bd7159325eb4fdbca316809b87a28973ea0d8cf1ef4a71118cd392a31",
+   "child_spec_hash": null,
+   "reason": "This mutation repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring the mechanism and intervention vocabulary verbatim to the title span of evidence doi:10.1299/jsmempt.2004.296.",
+   "applied_at": "2026-09-24T00:20:59+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:a1ef74ab03b4",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.2,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:c5fd2c500bd7",
+     "provider": "xkiro",
+     "model": "qwen/qwen3.5-plus:free",
+     "prompt_hash": "ff028e4b6210134546ed8db9a6b0acf49729665351397c8a286b701249876d48",
+     "output_hash": "c5fd2c500bd7dd210107dc834dde2676c5002efda146c9036b6f6c1161a7c3a5",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1299/jsmempt.2004.296",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.316,
+      "evidence_support_cleared": 0.316,
+      "constraint_traceable_to_evidence": "The toroidal disc geometry must be configured to align with the specific geometric parameters that yield maximum power t"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-24T00:20:47+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Friction-based power transmission between rotating toroidal discs and adjustable traction rollers via a lubricant traction film.",
+      "after": "Power transmission efficiency determined by the geometry of toroidal discs and traction contact conditions."
+     },
+     "intervention": {
+      "before": "Increase the effective contact radius of the input and output toroidal discs by 15% while proportionally scaling roller diameter to maintain contact stress limits.",
+      "after": "Optimize the geometry of the toroidal discs to maximize power transmission efficiency as defined by the contact analysis, rather than arbitrarily scaling dimensions."
+     },
+     "mechanism_source_span": {
+      "before": "Analysis on geometry and power transmission efficiency of a toroidal CVT.",
+      "after": "Analysis on geometry and power transmission efficiency of a toroidal CVT"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.1371/journal.pone.0342496",
+      "transmission power cvt system documented problem",
+      "transmission power traction friction between rotating",
+      "toroidal discs roller contact input increase effective proportionally",
+      "transmission reduction velocity traction scaling driving",
+      "transmission power traction cvt system loss"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05",
+      "PA-FAM-06",
+      "PA-FAM-07",
+      "PA-FAM-08",
+      "PA-FAM-09",
+      "PA-FAM-10",
+      "PA-FAM-11",
+      "PA-FAM-12",
+      "PA-FAM-13",
+      "PA-FAM-14"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "b81958b4fc86e7be474a0d7ae0bb347f872f75a8a02f5bfbe7a2265b37accf95",
+    "child_spec_hash": null,
+    "reason": "This mutation repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring the mechanism description and intervention directly to the technical vocabulary and physical phenomenon (geometry and efficiency) explicitly stated in the source evidence title.",
+    "applied_at": "2026-09-24T00:20:47+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:8e9c4a00a660",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.316,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:5f70c7ec71b1",
+     "provider": "xkiro",
+     "model": "qwen/qwen3.5-plus:free",
+     "prompt_hash": "5c96a699829c7df6104dce70f2750889c57cb7bebf3cc78947fae9b3a9411aea",
+     "output_hash": "5f70c7ec71b10722ee3809f105457d7976d4570c127fe47795b4ae8415d1fcb1",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1299/jsmempt.2004.296",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.375,
+      "evidence_support_cleared": 0.375,
+      "constraint_traceable_to_evidence": "The optimization of toroidal disc geometry must be derived directly from the analysis on geometry and power transmission"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-24T00:20:59+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Power transmission efficiency determined by the geometry of toroidal discs and traction contact conditions.",
+      "after": "Power transmission efficiency determined by the analysis on geometry and power transmission efficiency of a toroidal CVT."
+     },
+     "intervention": {
+      "before": "Optimize the geometry of the toroidal discs to maximize power transmission efficiency as defined by the contact analysis, rather than arbitrarily scaling dimensions.",
+      "after": "Optimize the geometry of the toroidal discs to maximize power transmission efficiency as defined by the analysis on geometry and power transmission efficiency, rather than arbitrarily scaling dimensions."
+     },
+     "mechanism_source_span": {
+      "before": "Analysis on geometry and power transmission efficiency of a toroidal CVT",
+      "after": "Analysis on geometry and power transmission efficiency of a toroidal CVT"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.1371/journal.pone.0342496",
+      "transmission power cvt system documented problem",
+      "transmission power traction friction between rotating",
+      "toroidal discs roller contact input increase effective proportionally",
+      "transmission reduction velocity traction scaling driving",
+      "transmission power traction cvt system loss"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05",
+      "PA-FAM-06",
+      "PA-FAM-07",
+      "PA-FAM-08",
+      "PA-FAM-09",
+      "PA-FAM-10",
+      "PA-FAM-11",
+      "PA-FAM-12",
+      "PA-FAM-13",
+      "PA-FAM-14"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "9a47737bd7159325eb4fdbca316809b87a28973ea0d8cf1ef4a71118cd392a31",
+    "child_spec_hash": null,
+    "reason": "This mutation repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring the mechanism and intervention vocabulary verbatim to the title span of evidence doi:10.1299/jsmempt.2004.296.",
+    "applied_at": "2026-09-24T00:20:59+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "e779ce87b6d5effff391fd9b667b14720330052811bf4f801c9d0e5a8f0cdcde"
 }
