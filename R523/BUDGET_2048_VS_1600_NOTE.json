@@ -1,0 +1,36 @@
+{
+  "artifact": "R523_BUDGET_DISCREPANCY_NOTE/1.0",
+  "question": "independent_attack.py passes max_tokens=1600, but the durable R523 gauntlet failure records say finish_reason=length, max_tokens=2048. Which budget was actually used?",
+  "verdict": "BOTH numbers are true. They describe different attempts of the SAME generate() call. The durable record reports the ESCALATED budget, not the call-site budget.",
+  "mechanism": {
+    "call_site": "discovery_fabric/engine/independent_attack.py:784 passes max_tokens=1600 into mechanism_space.llm_generate(purpose='independent_attack')",
+    "escalation": "discovery_fabric/engine/llm_registry.py:2142-2160 (EmptyContentWithFinish rescue): below-ceiling empty content retries the SAME provider/model with attempt_budget = min(reasoning_retry_ceiling, attempt_budget*4)",
+    "zai_ceiling": "zai reasoning_retry_ceiling = 2048 (dataclass default; verified from _SPEC_BY_ID at 5d28cfd4)",
+    "arithmetic": "min(2048, 1600*4=6400) = 2048",
+    "sequence": [
+      "attempt 1 (zai, max_tokens=1600): empty content at finish_reason=length -> rescue escalation, NOT durably recorded (retry_notes only, ephemeral)",
+      "attempt 2 (zai, max_tokens=2048): empty content at finish_reason=length -> at-ceiling, R514 skips identical retry, cascade advances",
+      "ONE durable hop line records the exhausted rung: attempt=2, error text carries max_tokens=2048"
+    ]
+  },
+  "wall_attribution_consequence": {
+    "recorded_hop_wall": "llm_registry.py:2291 records latency_ms from hop_t0, which is set BEFORE the attempt loop (line 2035) - so the durable ~170-285 s gauntlet walls aggregate BOTH the unrecorded 1600 attempt AND the recorded 2048 attempt, plus the 2 s backoff sleep",
+    "per_attempt_split": "UNKNOWN - not durably recorded. The durable bytes cannot separate the 1600-attempt wall from the 2048-attempt wall.",
+    "same_pattern": "POST_RANK_TECH_IMPROVEMENT zai failures at max_tokens=3000 had ceiling 3000? No - technical_state passes 3000 > ceiling 2048, so NO escalation occurred there: both zai attempts ran at the call-site 3000 (at-ceiling from the start, R514 cascade). The 257.8 s and 817.5 s walls are clean single-attempt walls."
+  },
+  "ruling": [
+    "Do NOT use '2048 token cap' as an optimization fact or causal variable - the failing gauntlet call BEGAN at 1600 and the durable record cannot split the two attempts' walls.",
+    "Do NOT change token budget in R524 - budget is a second hypothesis and would destroy the one-intervention discipline.",
+    "A budget experiment, if ever authorized, must FIRST durably instrument per-attempt walls (a measurement-layer change, recorded), and only then vary the budget."
+  ],
+  "code_refs": [
+    "discovery_fabric/engine/independent_attack.py:771-784",
+    "discovery_fabric/engine/mechanism_space.py:100-101,181,273",
+    "discovery_fabric/engine/llm_registry.py:125 (ceiling default 2048)",
+    "discovery_fabric/engine/llm_registry.py:2033-2048 (attempt_budget, hop_t0)",
+    "discovery_fabric/engine/llm_registry.py:2142-2180 (EmptyContentWithFinish rescue + R514 at-ceiling skip)",
+    "discovery_fabric/engine/llm_registry.py:2283-2306 (exhausted-rung hop recording: attempt=attempt+1, last_err, hop_t0 latency)"
+  ],
+  "context": "production transport for provider 'zai' is the ZAI_BASE_URL operator override (api.atria-asi.ai, model Atria-Dawn-Preview) - the served model is the override, not the spec default. Ledger model identity (Atria-Dawn-Preview) is consistent with this.",
+  "reviewer_provenance": "AI_REVIEW"
+}

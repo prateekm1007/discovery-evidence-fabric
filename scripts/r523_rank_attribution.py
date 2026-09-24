@@ -69,7 +69,11 @@ def main() -> int:
         [{"sub_operation": k, **_agg(vs)} for k, vs in subops.items()],
         key=lambda d: -(d["mean"] or 0))
 
-    # B2. every V2 source job wall, with the avoidable-candidate flag
+    # B2. every V2 source job wall, with the avoidable-candidate flag.
+    # R523 audit hygiene: records_returned=None (unmeasured) is
+    # preserved as UNKNOWN — never coalesced to 0 (Art. XXV). An
+    # avoidable_candidate requires zero KNOWN records, at least one
+    # failure-typed state, AND zero unknown jobs.
     src = {}
     for r in rows:
         for j in (r.get("source_job_walls") or {}).get("jobs") or []:
@@ -77,9 +81,14 @@ def main() -> int:
             if sid is None:
                 continue
             rec = src.setdefault(sid, {"walls": [], "records": [],
+                                       "unknown_records": 0,
                                        "states": [], "n": 0})
             rec["walls"].append(j.get("job_wall_s"))
-            rec["records"].append(j.get("records_returned") or 0)
+            rr = j.get("records_returned")
+            if rr is None:
+                rec["unknown_records"] += 1
+            else:
+                rec["records"].append(rr)
             rec["states"].append(j.get("transport_state"))
             rec["n"] += 1
     source_rank = []
@@ -90,9 +99,10 @@ def main() -> int:
             "source_id": sid, **a,
             "total_records_returned": total_recs,
             "zero_record_jobs": sum(1 for x in rec["records"] if x == 0),
+            "unknown_record_jobs": rec["unknown_records"],
             "states": sorted(set(rec["states"])),
             "avoidable_candidate": (
-                total_recs == 0 and any(
+                rec["unknown_records"] == 0 and total_recs == 0 and any(
                     s in ("unavailable", "timeout", "other_typed_failure")
                     for s in rec["states"])),
         })
