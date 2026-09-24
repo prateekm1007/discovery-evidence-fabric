@@ -730,6 +730,17 @@ def retirement_scopes_for_purpose(purpose: Optional[str]) -> set:
         if "improvement" in p or ("mutation_proposal" in p
                                   and "technical" not in p):
             scopes.add(PURPOSE_POST_RANK_IMPROVEMENT)
+    # R523 (measured, fcdb3e13): the post-rank technical pass also
+    # extracts under the technical_-prefixed family — purpose
+    # TECHNICAL_STATE_EXTRACTION burned a 1075.3 s zai empty-content
+    # MODEL_FAILURE wall on the R523 current arm because this resolver
+    # (keyed on mutation_proposal/improvement shapes only) never mapped
+    # it, and the technical_state.py call site names zai first in its
+    # preferred tuple. Same scoped POST_RANK_TECHNICAL token, resolved
+    # through THIS one authority — never a call-site provider branch
+    # (R519 §6).
+    if p.startswith("technical_"):
+        scopes.add(PURPOSE_POST_RANK_TECHNICAL)
     if p.startswith("operator_"):
         scopes.add(PURPOSE_MS_OPERATOR_INSTANTIATION)
     return scopes
