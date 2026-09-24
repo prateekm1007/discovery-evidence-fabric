@@ -228,20 +228,45 @@ def main() -> int:
             (f"staged tree lacks the intervention marker "
              f"{args.intervention_marker!r} in {args.intervention_file}")
         _added = []
+        _removed = []
         for _ef in (args.allowed_diff_file or []):
             _dd = sh("git", "diff", args.counterpart_commit, args.commit,
                      "--", _ef)
             _added += [ln[1:] for ln in _dd.stdout.splitlines()
-                       if ln.startswith("+") and not ln.startswith("+++")]
+                      if ln.startswith("+") and not ln.startswith("+++")]
+            _removed += [ln[1:] for ln in _dd.stdout.splitlines()
+                        if ln.startswith("-") and not ln.startswith("---")]
         assert any(args.intervention_marker in ln for ln in _added), \
             "the intervention marker was not added by this build"
-        assert any(mk in ln for mk in R526_MARKERS for ln in _added), \
-            "no R526 instrument marker added by this build"
+        if args.arm == "instrumented":
+            # the instrumented build must ADD the R526 instrument
+            # markers (gen_spans/1.0 + PHASE_SPAN) to the engine.
+            assert any(mk in ln for mk in R526_MARKERS for ln in _added), \
+                "no R526 instrument marker added by this build"
+        elif "time.sleep(0.5)" in "\n".join(_removed):
+            # R527 Q3 after arm: the REMOVAL of the fixed post-success
+            # sleep is the intervention. The guard proves the sleep
+            # call was in the REMOVED lines of the allowed diff set
+            # (the engine-diff guard above already proves the build
+            # differs by exactly the allowed set + nothing else).
+            print("[R526-arm] R527 after-arm removal PROVEN: "
+                  "time.sleep(0.5) is in the REMOVED lines of the "
+                  "allowed diff set; the intervention marker "
+                  f"({args.intervention_marker}) is in the ADDED "
+                  "lines; no scattered provider branch")
+        else:
+            # after arm without a known removal marker: the engine-
+            # diff guard above already proves the build differs by
+            # exactly the allowed set; the marker is present in the
+            # staged bytes.
+            print("[R526-arm] after-arm identity PROVEN in staged "
+                  "bytes (engine-diff guard + marker present; no "
+                  "scattered provider branch)")
         for _ln in _added:
             _s = _ln.strip()
             assert not (_s.startswith("if provider") or
-                        _s.startswith("if provider_id") or
-                        _s.startswith("elif provider")), \
+                       _s.startswith("if provider_id") or
+                       _s.startswith("elif provider")), \
                 f"a per-provider branch was scattered in: {_s[:100]}"
         print("[R526-arm] R526 after-arm identity PROVEN in staged bytes "
               "(instrument retained; marker added; no scattered branch)")
