@@ -86,7 +86,7 @@ def sh(*args, cwd=None):
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--arm", required=True, choices=("instrumented",))
+    ap.add_argument("--arm", required=True, choices=("instrumented", "after"))
     ap.add_argument("--commit", required=True,
                     help="full 40-hex tree commit to deploy")
     ap.add_argument("--record", required=True,
@@ -100,9 +100,15 @@ def main() -> int:
                     help="token that MUST appear in the staged tree")
     ap.add_argument("--intervention-file", required=True,
                     help="repo-relative file searched for the marker")
-    ap.add_argument("--allowed-diff-file", required=True,
-                    help="the single engine file permitted to differ "
-                         "between the production and after commits")
+    ap.add_argument("--allowed-diff-file", action="append", default=[],
+                    help="repeatable: engine files permitted to differ "
+                         "between the counterpart and after commits; "
+                         "the diff must EQUAL this set exactly (the one "
+                         "intervention and nothing else — Art. XLVII)")
+    ap.add_argument("--intervention-desc", default="",
+                    help="recorded description of the intervention (the "
+                         "one named change); defaults to the "
+                         "measurement-instrument text")
     args = ap.parse_args()
     from huggingface_hub import HfApi
 
@@ -142,19 +148,22 @@ def main() -> int:
     print(f"[R525-arm] arm={args.arm} commit={args.commit} "
           f"(reachable from origin/main: PROVEN)")
 
-    # engine-diff guard vs the production counterpart
+    # engine-diff guard vs the production counterpart: the engine diff
+    # must EQUAL the allowed set exactly (the one intervention —
+    # possibly spanning the authority + the canonical implementation +
+    # its single call-site wiring — and nothing else, Art. XLVII).
     d = sh("git", "diff", "--name-only", args.counterpart_commit,
            args.commit, "--", *ENGINE_PATHS)
     changed = sorted(d.stdout.split())
+    allowed = sorted(args.allowed_diff_file or [])
     print(f"[R525-arm] engine-diff "
           f"{args.counterpart_commit[:12]}..{args.commit[:12]}: {changed}")
-    if changed != [args.allowed_diff_file]:
-        print(f"FATAL: engine diff is not exactly "
-              f"{args.allowed_diff_file} — arms differ by more than the "
-              f"one named intervention (Art. XLVII)")
+    if not allowed or changed != allowed:
+        print(f"FATAL: engine diff is not exactly {allowed} — the "
+              f"build differs by more than the one named intervention "
+              f"(Art. XLVII)")
         return 2
-    print(f"[R525-arm] engine-diff guard PROVEN "
-          f"({args.allowed_diff_file} only)")
+    print(f"[R525-arm] engine-diff guard PROVEN ({', '.join(allowed)})")
 
     try:
         before = r491.space_get("/api/version", hf_token)
@@ -180,30 +189,40 @@ def main() -> int:
               f"({mb_full:.0f} MB) from {args.commit[:12]}")
 
         # ---- R525 build identity, fail-closed, in the STAGED bytes ----
-        # Behavior-neutral timers ONLY: the synth_spans/1.0 record must
-        # be present, and the ADDED timer lines must be provider-blind
-        # (the pre-existing R518 preferred-provider list legitimately
-        # names providers; the proof constrains the ADDED lines only).
+        # (a) the synth_spans/1.0 measurement instrument is retained
+        # (Art. XLVII: identical instrument on both arms);
+        # (b) the CLI-supplied intervention marker is present in its
+        # file; (c) no per-provider branch was scattered into the
+        # ADDED lines of the allowed diff set (retirement stays data,
+        # R519 §6 — comments may name providers in prose; branches
+        # may not).
         syn_bytes = stage / "discovery_fabric" / "a2" / "synthesize.py"
         syn_text = syn_bytes.read_text(errors="replace") \
             if syn_bytes.is_file() else ""
         assert "synthesis_span_timings" in syn_text, \
-            "staged tree lacks the R525 synth_spans/1.0 record"
-        assert '"synth_spans/1.0"' in syn_text, \
-            "staged tree lacks the synth_spans/1.0 instrument tag"
-        _dd = sh("git", "diff", args.counterpart_commit, args.commit,
-                 "--", "discovery_fabric/a2/synthesize.py")
-        _added = [ln[1:] for ln in _dd.stdout.splitlines()
-                  if ln.startswith("+") and not ln.startswith("+++")]
-        assert any("synthesis_span_timings" in ln for ln in _added), \
-            "the span record was not added by this build"
-        for _pid in ("zai", "atria", "xkiro", "openrouter", "unorouter",
-                     "deepseek", "nvidia", "gemini", "anthropic", "qwen"):
-            assert not any(f'"{_pid}"' in ln for ln in _added), \
-                ("a provider literal was introduced by the timer lines "
-                 f"({_pid})")
-        print("[R525-arm] R525 instrumentation PROVEN in staged bytes "
-              "(span timers only; provider-blind)")
+            "staged tree lost the R525 synth_spans/1.0 instrument"
+        marker_file = stage / args.intervention_file
+        marker_text = marker_file.read_text(errors="replace") \
+            if marker_file.is_file() else ""
+        assert args.intervention_marker in marker_text, \
+            (f"staged tree lacks the intervention marker "
+             f"{args.intervention_marker!r} in {args.intervention_file}")
+        _added = []
+        for _ef in (args.allowed_diff_file or []):
+            _dd = sh("git", "diff", args.counterpart_commit, args.commit,
+                     "--", _ef)
+            _added += [ln[1:] for ln in _dd.stdout.splitlines()
+                       if ln.startswith("+") and not ln.startswith("+++")]
+        assert any(args.intervention_marker in ln for ln in _added), \
+            "the intervention marker was not added by this build"
+        for _ln in _added:
+            _s = _ln.strip()
+            assert not (_s.startswith("if provider") or
+                        _s.startswith("if provider_id") or
+                        _s.startswith("elif provider")), \
+                f"a per-provider branch was scattered in: {_s[:100]}"
+        print("[R525-arm] R525 after-arm identity PROVEN in staged bytes "
+              "(instrument retained; marker added; no scattered branch)")
 
         accounting = r456._prune_round_trees(stage)
         n_pruned = sum(1 for _ in stage.rglob("*") if _.is_file())
@@ -303,19 +322,20 @@ def main() -> int:
             "intervention_file": args.intervention_file,
             "marker_present_in_staged_bytes": True,
         },
-        "engine_diff_guard": f"{args.allowed_diff_file} only",
+        "engine_diff_guard": f"{sorted(args.allowed_diff_file or [])} only",
         "variable_delta": None,
         "variable_readback": readback,
         "standing_configuration": {
             "ENGINE_EVIDENCE_FABRIC": "0",
             "ENGINE_RETRIEVE_EXCLUDE_SOURCES": "openalex",
         },
-        "intervention": "none (measurement-instrument build): "
-                        "behavior-neutral SYNTHESIZE span timers "
-                        "(synth_spans/1.0, read-only perf_counter deltas; "
-                        "no prompt/budget/retry/gate/parse/repair/assembly "
-                        "logic touched; neutrality proven by "
-                        "tests/test_r525_synth_span_neutrality.py)",
+        "intervention": (args.intervention_desc or
+                         "none (measurement-instrument build): "
+                         "behavior-neutral SYNTHESIZE span timers "
+                         "(synth_spans/1.0, read-only perf_counter deltas; "
+                         "no prompt/budget/retry/gate/parse/repair/assembly "
+                         "logic touched; neutrality proven by "
+                         "tests/test_r525_synth_span_neutrality.py)"),
         "instrumentation_neutrality": (
             "tests/test_r525_synth_span_neutrality.py + unchanged "
             "R422/R483 synthesis suites (3 pre-existing R422 failures "
