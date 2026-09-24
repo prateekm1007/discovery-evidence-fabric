@@ -128,7 +128,7 @@ def _evidence_based_gate(candidates, intervention: str,
     named_cliff = cliff_named
     named_cand = named_cliff if named_cliff in (
         "A_generate_routing_subphase", "B_post_rank_subphase",
-        "D_retrieval") else None
+        "D_retrieval", "SYNTHESIZE_POST_SUCCESS_SLEEP") else None
     # a retrieval cliff names a source id, not the candidate class
     if named_cliff == "D_retrieval":
         named_cand = "D_retrieval"
@@ -208,6 +208,12 @@ def _evidence_based_gate(candidates, intervention: str,
         _ev = (_cand.get("D_retrieval") or {}).get("evidence") or []
         _c4_ev = bool(_ev)
         _c4_ref = "candidates.D_retrieval.evidence[].critical_path_rows"
+    elif named_cand == "SYNTHESIZE_POST_SUCCESS_SLEEP":
+        _ev = (_cand.get("SYNTHESIZE_POST_SUCCESS_SLEEP") or {})
+        _c4_ev = bool((_ev.get("mean_s") or 0) > 0
+                      and (_ev.get("n_problems_with_sleep") or 0) >= 2)
+        _c4_ref = ("candidates.SYNTHESIZE_POST_SUCCESS_SLEEP."
+                   "evidence[0].mean_s")
     _c4_verified = bool(_c4_named and _c4_ev and _iv)
     out.append(_criterion(
         "C4_AVOIDABLE", "typed counterfactual action tied to the "
@@ -527,11 +533,27 @@ def main() -> int:
                 {"source_id": s["source_id"],
                  "critical_path_rows": held})
 
+    # ---- R527 Q2: SYNTHESIZE_POST_SUCCESS_SLEEP candidate class.
+    # The fixed post-success sleep in a2/synthesize.llm_chat is a
+    # typed, measured sub-operation (G aggregate post_success_sleep_s),
+    # distinct from the generate() routing subphases (A) and the
+    # post-rank subphases (B). It is flagged when the measured sleep
+    # is > 0 on >= 2 independent SYNTHESIZE-executed rows (repeated +
+    # causally attributed to the named code line). The avoidable
+    # counterfactual (remove the fixed sleep) is NOT pre-identified
+    # — naming requires the coder to state it via --intervention.
+    _synth_sleep = (synth_agg.get("post_success_sleep_s") or {})
+    _synth_sleep_problems = sorted(
+        {s["problem_index"] for s in synth_rows
+         if isinstance(s.get("spans"), dict)
+         and s["spans"].get("post_success_sleep_s") is not None})
+    synth_sleep_candidate = (
+        (_synth_sleep.get("mean") or 0) > 0 and len(_synth_sleep_problems) >= 2)
     candidates = {
         "A_generate_routing_subphase": {
             "flagged": bool(gen_subphase_flags),
             "evidence": gen_subphase_flags,
-            "note": ("top-3 generate() subphases by mean wall, each "
+            "note": ("top-3 generate() routing subphases by mean wall, each "
                      "present on >= 2 independent problems; an "
                      "avoidable action is NOT pre-identified — naming "
                      "requires the coder to state the counterfactual Z"),
@@ -551,7 +573,7 @@ def main() -> int:
                 f"{sorted(g_classes)}"),
             "note": ("the R525 purpose boundary must hold; a repeated "
                      "gauntlet failure under the intact boundary is a "
-                     "Maior observation for the B_post_rank_subphase "
+                     "Major observation for the B_post_rank_subphase "
                      "class, never a license to broaden retirement"),
         },
         "D_retrieval": {
@@ -563,6 +585,26 @@ def main() -> int:
             "note": ("stages are never named from maximum latency "
                      "alone (Final R526 rule); recorded in section A "
                      "of the ranking"),
+        },
+        "SYNTHESIZE_POST_SUCCESS_SLEEP": {
+            "flagged": bool(synth_sleep_candidate),
+            "mean_s": _synth_sleep.get("mean"),
+            "problems": _synth_sleep_problems,
+            "n_problems_with_sleep": len(_synth_sleep_problems),
+            "evidence": [
+                {"subphase": "post_success_sleep_s",
+                 "mean_s": _synth_sleep.get("mean"),
+                 "problems": _synth_sleep_problems}],
+            "note": ("the fixed post-success sleep in "
+                     "a2/synthesize.llm_chat is a typed, measured "
+                     "sub-operation (G aggregate post_success_sleep_s), "
+                     "distinct from the generate() routing subphases "
+                     "(A) and the post-rank subphases (B). Flagged "
+                     "when the measured sleep is > 0 on >= 2 "
+                     "independent SYNTHESIZE-executed rows. The "
+                     "avoidable counterfactual (remove the fixed "
+                     "sleep) is NOT pre-identified — naming requires "
+                     "the coder to state it via --intervention."),
         },
     }
     flagged = [k for k, v in candidates.items() if v["flagged"]]

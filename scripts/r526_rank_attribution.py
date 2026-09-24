@@ -250,7 +250,8 @@ def main() -> int:
     key_spans = ("synthesize_total_s", "llm_chat_total_s",
                  "rotation_backoff_sleep_s", "prompt_construction_total_s",
                  "parse_total_s", "span_repair_check_s",
-                 "candidate_assembly_s", "abstract_gate_s")
+                 "candidate_assembly_s", "abstract_gate_s",
+                 "post_success_sleep_s")
     synth_agg = {}
     for k in key_spans:
         vs = [s["spans"].get(k) for s in synth_rows

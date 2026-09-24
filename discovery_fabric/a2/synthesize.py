@@ -249,7 +249,23 @@ def llm_chat(prompt, system="", max_retries=2, timeout=240,
     _LAST_PROVIDER_META = res.to_meta()
     _LAST_PROVIDER_META["selection_ledger"] = res.selection_ledger
     if res.ok:
+        # R527 Q1 (INSTRUMENTATION, not the optimization): the former
+        # fixed 0.5 s post-success sleep is now MEASURED — the wall is
+        # accumulated into _spans["post_success_sleep_s"] so the after-
+        # arm measurement can prove the delta was actually in the
+        # sleep, not provider inference or a remainder. The value is
+        # still the fixed 0.5 s until the authorized intervention
+        # changes it (Q2); the timing measurement is behavior-neutral
+        # telemetry only and does NOT alter the sleep, prompt, model,
+        # provider order, token budget, max_retries, admission,
+        # routing, retrieval, mechanism-space, evidence gates,
+        # parsing, candidate assembly, or funnel logic. The rotation
+        # backoff sleeps (0/8/20 s, failure-class response) are a
+        # separate mechanism and are NOT touched here.
+        _t_sleep = time.perf_counter()
         time.sleep(0.5)
+        _spans["post_success_sleep_s"] = round(
+            time.perf_counter() - _t_sleep, 6)
         return res.content
     print(f"  [synthesize] LLM transport status: {res.status}"
           f"{(' — ' + res.error[:160]) if res.error else ''}")
@@ -291,7 +307,8 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
     _spans = {"abstract_gate_s": 0.0, "prompt_construction_total_s": 0.0,
               "llm_chat_total_s": 0.0, "n_llm_chat_calls": 0,
               "rotation_backoff_sleep_s": 0.0, "parse_total_s": 0.0,
-              "span_repair_check_s": 0.0, "candidate_assembly_s": 0.0}
+              "span_repair_check_s": 0.0, "candidate_assembly_s": 0.0,
+              "post_success_sleep_s": 0.0}
 
     def _timed_chat(_prompt, system="", max_tokens=512):
         _t0 = time.perf_counter()
