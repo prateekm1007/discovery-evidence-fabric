@@ -1487,6 +1487,13 @@ def record_phase_span(session_id: Optional[str],
             "phase": phase,
             "event": event,
             "scope": scope,
+            # B3: explicit parent identity (never inferred from
+            # timestamps; None when no explicit parent exists).
+            # For child spans, parent_phase = the enclosing top-scope
+            # phase name (the caller supplies it durably). For
+            # top-scope lines, parent_phase is None (top is the
+            # outermost boundary; no enclosing phase).
+            "parent_phase": (phase if scope == "child" else None),
             "candidate_id": candidate_id,
             "candidate_key": candidate_key,
             "wall_s": wall_s,

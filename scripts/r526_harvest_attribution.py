@@ -191,13 +191,16 @@ def _phase_spans_block(lines):
     TECHNICAL_IMPROVEMENT_PASS) — the ONLY walls that may enter the
     run-wall reconciliation; "child" lines are per-candidate /
     per-target spans nested inside a top-level phase (attribution
-    detail, never added on top of the parent wall). Lines without a
+    detail, never added on top of the parent wall). B3: child lines
+    carry parent_phase durably (record_phase_span sets it to the
+    enclosing phase name for scope=child); the harvester joins
+    children to their parent by (parent_phase, candidate_key,
+    candidate_id) — NEVER by time-window matching. Lines without a
     scope field (older instrumented data) fall back to event-name
     derivation: candidate_*/target_* => "child", everything else =>
     "top" (documented fallback, never inferred from timestamps).
     Unmatched events are listed explicitly (never force-paired,
-    never zero-filled; B3 identity preserved by the key fields, no
-    time-window matching)."""
+    never zero-filled)."""
     by_key = {}
     for ln in sorted(lines,
                      key=lambda l: (l.get("recorded_at_epoch") or 0)):
@@ -208,16 +211,21 @@ def _phase_spans_block(lines):
                       if (_evt.startswith("candidate_")
                           or _evt.startswith("target_"))
                       else "top")
+        # B3: join child lines to their parent by explicit identity
+        # (parent_phase rides the durable line; never time-window).
+        _pph = ln.get("parent_phase")
         key = (ln.get("phase"), _scope, ln.get("candidate_key"),
-               ln.get("candidate_id"))
+               ln.get("candidate_id"), _pph)
         by_key.setdefault(key, []).append(ln)
     phases = {}
     unmatched = []
-    for (phase, ckey, cid, scope), evs in sorted(
+    for (phase, ckey, cid, scope, pph), evs in sorted(
             by_key.items(), key=lambda kv: str(kv[0])):
         if phase is None:
             unmatched.append({"reason": "phase-name-absent",
-                              "scope": scope, "n_lines": len(evs)})
+                              "scope": scope,
+                              "parent_phase": pph,
+                              "n_lines": len(evs)})
             continue
         enters = [e for e in evs
                   if str(e.get("event") or "") == "enter"
@@ -244,7 +252,9 @@ def _phase_spans_block(lines):
                         rec["top_wall_sum_s"] + (w or 0.0), 3)
                 if ident is not None:
                     cr = rec["children"].setdefault(
-                        str(ident), {"scope": scope, "walls_s": [],
+                        str(ident), {"scope": scope,
+                                     "parent_phase": pph,
+                                     "walls_s": [],
                                      "outcomes": []})
                     if w is not None:
                         cr["walls_s"].append(w)
@@ -255,11 +265,13 @@ def _phase_spans_block(lines):
                 rec["n_unmatched"] += 1
                 unmatched.append({"phase": phase, "scope": scope,
                                   "candidate": ident,
+                                  "parent_phase": pph,
                                   "reason": "exit-without-enter"})
         for _en in enters[len(exits):]:
             rec["n_unmatched"] += 1
             unmatched.append({"phase": phase, "scope": scope,
                               "candidate": ident,
+                              "parent_phase": pph,
                               "reason": "enter-without-exit"})
     for rec in phases.values():
         rec["wall_sum_s"] = round(sum(rec["walls_s"]), 3)
@@ -277,7 +289,15 @@ def _phase_spans_block(lines):
                                     "wall + UNKNOWN_remainder; child "
                                     "spans (scope=child) are attribution "
                                     "detail, never added on top of the "
-                                    "parent phase wall")}
+                                    "parent phase wall; B3: child "
+                                    "spans join to their parent by "
+                                    "explicit (parent_phase, "
+                                    "candidate_key, candidate_id) "
+                                    "identity, never time-window "
+                                    "matching; unmatched events are "
+                                    "reported explicitly, never "
+                                    "force-paired or zero-filled"),
+            }
 
 
 def _generate_calls_block(lines):

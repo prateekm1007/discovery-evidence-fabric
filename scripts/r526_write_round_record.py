@@ -132,8 +132,11 @@ def _nine_criterion_gate(h_rank, phase_flags, gen_subphase_flags,
                 rows.add(f[key])
         return rows
 
-    # C1 REPEATED
+    # C1 REPEATED — iterate candidate classes only (skip the
+    # _n_problems int injected for C7 bookkeeping).
     for cname, cblk in (candidates or {}).items():
+        if not isinstance(cblk, dict):
+            continue
         if cblk.get("flagged"):
             _rows = _class_rows(cblk.get("evidence"))
             out.append(_criterion(
@@ -334,6 +337,12 @@ def main() -> int:
                  "failure_wall_total_s": round(
                      sum(v or 0 for v in _fails), 3),
                  "failure_classes": sorted(_cls)})
+    # C1 REPEATED mechanical check for generate subphases: a subphase
+    # is "repeated" when it carries non-zero mean wall on >= 2 rows.
+    gen_subphase_flags_c1 = [
+        {"subphase": _k, "mean_s": _m,
+         "problems": _subprobs.get(_k, [])}
+        for _k, _m in _ranked_subs if len(_subprobs.get(_k, [])) >= 2]
     # ---- C. gauntlet purpose boundary status (Question C): intact on
     # every row with gauntlet lines, else a violation to record.
     _bound_ok, _bound_viol_rows = True, []
