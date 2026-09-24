@@ -1,0 +1,1291 @@
+{
+ "invention_id": {
+  "value": "inv:ui_unintended_acceleration_and_vibration_duri_288798:99ca04e7fbfc",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_unintended_acceleration_and_vibration_duri_288798",
+   "device": "vehicle powertrain management system",
+   "failure": "Documented problem 'unintended acceleration and vibration during deceleration' concerning vehicle powertrain management system. User-submitted engineering problem (session input): \"[R526-BATTERY declared_family=mechanical source=odi:11342491 battery=R526-CURRENT-PRODUCTION-ATTRIBUTION-after]\n\nTL* THE CONTACT OWNS A 2020 SUBARU FORESTER. THE CONTACT STATED THAT WHILE DRIVING AND APPROACHING A STOP, THE VEHICLE INDEPENDENTLY ACCELERATED AND VIBRATED FOR APPROXIMATELY 3 SECONDS B\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "unintended acceleration and vibration during deceleration",
+   "constraint": "vehicle must decelerate smoothly without spontaneous acceleration when approaching a stop"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:09a29a67"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of vehicle powertrain management system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Hazard and operability study (HAZOP)-based identification of failure modes and influences of main components, followed by architecture optimization using redundant design to reduce failure frequency and unavailability.",
+   "intervention": "Apply HAZOP to the powertrain management system to identify the component failure modes (e.g., torque-request signal faults, deceleration logic errors) behind the unintended acceleration and vibration during deceleration, then implement a redundant powertrain-control architecture (dual torque-request channels with cross-monitoring and fail-safe torque limiting) so a single-point fault cannot command spontaneous acceleration on lift-off.",
+   "expected_effect": "The optimized powertrain architecture lowers the failure frequency and unavailability of the unintended-acceleration hazard, so the vehicle decelerates smoothly with no spontaneous acceleration or vibration when approaching a stop.",
+   "mechanism_source_span": "The failure modes and influences of the main components of the fuel cell system were determined via hazard and operability studies.",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1016/j.heliyon.2024.e41410"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Functional safety-oriented hazard analysis and risk assessment for vehicular fuel cell systems.",
+   "mechanism": "Hazard and operability study (HAZOP)-based identification of failure modes and influences of main components, followed by architecture optimization using redundant design to reduce failure frequency and unavailability.",
+   "intervention_site": "vehicle powertrain management system",
+   "expected_effect": "The optimized powertrain architecture lowers the failure frequency and unavailability of the unintended-acceleration hazard, so the vehicle decelerates smoothly with no spontaneous acceleration or vibration when approaching a stop.",
+   "falsification_test": "Instrument the vehicle to log throttle position, motor/torque request, and wheel speed; inject single-point faults (open/short circuits, stale torque-request values, task timing failures) into the torque path during deceleration-to-stop maneuvers; if any injected fault produces spontaneous acceleration or 3-second vibration bursts, the redundant design fails and must be revised."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1016/j.heliyon.2024.e41410"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Apply HAZOP to the powertrain management system to identify the component failure modes (e.g., torque-request signal faults, deceleration logic errors) behind the unintended acceleration and vibration during deceleration, then implement a redundant powertrain-control architecture (dual torque-request channels with cross-monitoring and fail-safe torque limiting) so a single-point fault cannot command spontaneous acceleration on lift-off.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1016/j.heliyon.2024.e41410"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "vehicle must decelerate smoothly without spontaneous acceleration when approaching a stop",
+   "failure_mode_of_device": "unintended acceleration and vibration during deceleration"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:09a29a67"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.4012018032600525,
+   "eig_per_cost": 0.4012018032600525,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: The optimized powertrain architecture lowers the failure frequency and unavailability of the unintended-acceleration hazard, so the vehicle decelerates smoothly with no spontaneous acceleration or vib",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-24T22:29:29.095094+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-24T22:29:29.095094+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.4012018032600525,
+     "eig_per_cost": 0.4012018032600525,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1177/16878132241263936",
+    "title": "Nonlinear modeling and torsional vibration analysis of heavy-duty vehicle powertrain system during acceleration",
+    "source_uri": "https://doi.org/10.1177/16878132241263936",
+    "doi": "10.1177/16878132241263936",
+    "content_hash": "ee63c3b403b08a6273f8decf4e9f3639e1b1030727c257ce542e0532deedd51e",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/acc.2007.4282642",
+    "title": "Low Vibration Vehicle Traction Control to Solve Fastest Acceleration/Deceleration Problems Via Second Order Sliding Modes",
+    "source_uri": "https://doi.org/10.1109/acc.2007.4282642",
+    "doi": "10.1109/acc.2007.4282642",
+    "content_hash": "d3b5cf1e5c774bcfb2090180834cce0b94cb0207c2c4e6606787c80af8f41ee0",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.heliyon.2024.e41410",
+    "title": "Functional safety-oriented hazard analysis and risk assessment for vehicular fuel cell systems.",
+    "source_uri": "https://doi.org/10.1016/j.heliyon.2024.e41410",
+    "doi": "10.1016/j.heliyon.2024.e41410",
+    "content_hash": "4940d127414340f9f6df32b3b3b943017264abce98ec40a2c69bed2d3e7106a0",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1098/rsta.2016.0361",
+    "title": "Industry 1.61803: the transition to an industry with reduced material demand fit for a low carbon future.",
+    "source_uri": "https://doi.org/10.1098/rsta.2016.0361",
+    "doi": "10.1098/rsta.2016.0361",
+    "content_hash": "41ff1df7f0d250876c57ad18ab41ada23a795495273368c166cb6659c2dadf7e",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/logistics9030105",
+    "title": "Material Flow Analysis for Demand Forecasting and Lifetime-Based Inflow in Indonesia’s Plastic Bag Supply Chain",
+    "source_uri": "https://doi.org/10.3390/logistics9030105",
+    "doi": "10.3390/logistics9030105",
+    "content_hash": "13ac596aa3851d67962f9b62730c6e6569316accde0855e797042ae3f31cab28",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.34133/research.1175",
+    "title": "Probabilistic Carbon Analysis of Pakistan’s Bridges Unveils the Urgent Needs of Overdesign Optimization and Policy Transformation",
+    "source_uri": "https://doi.org/10.34133/research.1175",
+    "doi": "10.34133/research.1175",
+    "content_hash": "fc2e6a75457ad2b3f672140fcda6b189dbaa2452c0e236e9138209f64b025055",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.70675/8ae5a4c4z7eb0z4df4za003z64117eeb1706",
+    "title": "Analysis and valorization of new thermal management systems for a vehicle powertrain application",
+    "source_uri": "https://doi.org/10.70675/8ae5a4c4z7eb0z4df4za003z64117eeb1706",
+    "doi": "10.70675/8ae5a4c4z7eb0z4df4za003z64117eeb1706",
+    "content_hash": "fb07a7bfaa970f6011790c30871acaaaf45e1086ba08fb81c23a2a6da305483a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.37099/mtu.dc.etd-restricted/61",
+    "title": "Predictive control of hybrid vehicle powertrain for intelligent energy management",
+    "source_uri": "https://doi.org/10.37099/mtu.dc.etd-restricted/61",
+    "doi": "10.37099/mtu.dc.etd-restricted/61",
+    "content_hash": "2105d85cfac8a3c483b3457d7db7db248da4ffeb1047429d8436488af11bc7f7",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.37099/mtu.dc.etdr/83",
+    "title": "INCORPORATING DRIVER’S BEHAVIOR INTO PREDICTIVE POWERTRAIN ENERGY MANAGEMENT FOR A POWER-SPLIT HYBRID ELECTRIC VEHICLE",
+    "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/83",
+    "doi": "10.37099/mtu.dc.etdr/83",
+    "content_hash": "ba9a33a63df5ef7858de806a5a238dd90dbfd8c94f104d1534e0a5f80c374332",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2001.05165",
+    "title": "Terrain estimation via vehicle vibration measurement and cubature Kalman filtering",
+    "source_uri": "https://doi.org/10.48550/arxiv.2001.05165",
+    "doi": "10.48550/arxiv.2001.05165",
+    "content_hash": "ea03db935f8ad46dc50eba99f33a94e203e655cf2bf2905c87a24dc28b2255d6",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2412.14984",
+    "title": "Co-optimization of Vehicle Dynamics and Powertrain Management for Connected and Automated Electric Vehicles",
+    "source_uri": "https://doi.org/10.48550/arxiv.2412.14984",
+    "doi": "10.48550/arxiv.2412.14984",
+    "content_hash": "65e45f3a4aee332da04cbde4d127561b892989d3abb9fbec847c086a2c9b2584",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2606.23236",
+    "title": "A Hybrid Intrusion Detection System for Electric Vehicle Charging Infrastructure",
+    "source_uri": "https://doi.org/10.48550/arxiv.2606.23236",
+    "doi": "10.48550/arxiv.2606.23236",
+    "content_hash": "96ff832ae39be83beea657cd3b753507e5d32524c3c805d7091c9ebe9fffe8ca",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1504/ijvsmt.2009.029177",
+    "title": "A classical control approach to the power management of an all-electric hybrid\r\nvehicle.",
+    "source_uri": "https://doi.org/10.1504/ijvsmt.2009.029177",
+    "doi": "10.1504/ijvsmt.2009.029177",
+    "content_hash": "c5408359cb3e88b0109019d7da366cb5b7353fedc6eebb2668d724d698e8d1d7",
+    "frozen": false
+   },
+   {
+    "id": "title:9f2fd9c5dcdcd0a1",
+    "title": "Computational and experimental study of air hybrid engine concepts",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "f5d084239aa553af60bd5a83e293dd403a5764ecfc0f6868bda0915732ea0178",
+    "frozen": false
+   },
+   {
+    "id": "title:2d2bbb5745cbfb7f",
+    "title": "Torsional vibration analysis of automotive drivelines",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "99f34b5819e1cf4817e5fd18733461888755639494dc80896ab289069d5d7fdd",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/en6105507",
+    "title": "An Optimization Framework for Comparative Analysis of Multiple Vehicle Powertrains",
+    "source_uri": "https://doi.org/10.3390/en6105507",
+    "doi": "10.3390/en6105507",
+    "content_hash": "28893cacbc513087cee351604183f337460aee9c12f8eebaa110fb80768a6886",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1016/j.heliyon.2024.e41410",
+   "doi:10.1098/rsta.2016.0361",
+   "doi:10.1109/acc.2007.4282642",
+   "doi:10.1177/16878132241263936",
+   "doi:10.1504/ijvsmt.2009.029177",
+   "doi:10.3390/en6105507",
+   "doi:10.3390/logistics9030105",
+   "doi:10.34133/research.1175",
+   "doi:10.37099/mtu.dc.etd-restricted/61",
+   "doi:10.37099/mtu.dc.etdr/83",
+   "doi:10.48550/arxiv.2001.05165",
+   "doi:10.48550/arxiv.2412.14984",
+   "doi:10.48550/arxiv.2606.23236",
+   "doi:10.70675/8ae5a4c4z7eb0z4df4za003z64117eeb1706",
+   "title:2d2bbb5745cbfb7f",
+   "title:9f2fd9c5dcdcd0a1"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:evidence:doi:10.3390/logistics9030105",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['management'] in: 'Material Flow Analysis for Demand Forecasting and Lifetime-Based Inflow in Indonesia’s Plastic B]",
+    "severity": "HIGH"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Instrument the vehicle to log throttle position, motor/torque request, and wheel speed; inject single-point faults (open/short circuits, stale torque-request values, task timing failures) into the torque path during deceleration-to-stop maneuvers; if any injected fault produces spontaneous acceleration or 3-second vibration bursts, the redundant design fails and must be revised."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_unintended_acceleration_and_vibration_duri_288798:2026-09-24T22:26:38",
+   "final_envelope_hash": "99ca04e7fbfcef2891b3073ffcea2766d834daf72a2561bf3070662f107bbde5",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.4012018032600525
+    },
+    "score": 0.2602,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-24T22:29:29+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-24T22:29:29+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1177/16878132241263936": {
+   "id": "doi:10.1177/16878132241263936",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1177/16878132241263936",
+   "source_uri": "https://doi.org/10.1177/16878132241263936",
+   "title": "Nonlinear modeling and torsional vibration analysis of heavy-duty vehicle powertrain system during acceleration",
+   "abstract": "",
+   "doi": "10.1177/16878132241263936",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-24T22:27:01.696252+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ee63c3b403b08a6273f8decf4e9f3639e1b1030727c257ce542e0532deedd51e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1177/16878132241263936"
+    },
+    "queries_by_source": {
+     "crossref": "vehicle powertrain management system unintended acceleration and vibration during deceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1177/16878132241263936",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle powertrain management system unintended acceleration and vibration during deceleration",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1109/acc.2007.4282642": {
+   "id": "doi:10.1109/acc.2007.4282642",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/acc.2007.4282642",
+   "source_uri": "https://doi.org/10.1109/acc.2007.4282642",
+   "title": "Low Vibration Vehicle Traction Control to Solve Fastest Acceleration/Deceleration Problems Via Second Order Sliding Modes",
+   "abstract": "",
+   "doi": "10.1109/acc.2007.4282642",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2007",
+   "retrieval_timestamp": "2026-09-24T22:27:01.696347+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d3b5cf1e5c774bcfb2090180834cce0b94cb0207c2c4e6606787c80af8f41ee0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/acc.2007.4282642"
+    },
+    "queries_by_source": {
+     "crossref": "vehicle powertrain management system unintended acceleration and vibration during deceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/acc.2007.4282642",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle powertrain management system unintended acceleration and vibration during deceleration",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1016/j.heliyon.2024.e41410": {
+   "id": "doi:10.1016/j.heliyon.2024.e41410",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:39834409",
+   "source_uri": "https://doi.org/10.1016/j.heliyon.2024.e41410",
+   "title": "Functional safety-oriented hazard analysis and risk assessment for vehicular fuel cell systems.",
+   "abstract": "Functional safety is an emerging trend for safety design in the automobile industry. This study is an innovative exploration of a hazard analysis and quantitative risk assessment (QRA) methodology based on the functional safety of vehicular fuel cell systems. In this study, the potential hazards that fuel cell vehicles may encounter during operation were identified using the automobile generic hazard list. The failure modes and influences of the main components of the fuel cell system were determined via hazard and operability studies. Furthermore, the risks and consequences of the fuel cell system were explored using the QRA method. The failure frequency and unavailability of the fuel-cell system were calculated, and the architecture was optimized using a redundant design with a focus on hydrogen safety. The results showed that the optimized system architecture could effectively reduce the hazard of hydrogen leakage, and the unavailability and failure frequency of hydrogen leakage risk were reduced by 94.4 % and 36.8 %, respectively. Thus, this study provides powerful insights for future research and improvement of vehicular fuel cell systems.",
+   "doi": "10.1016/j.heliyon.2024.e41410",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024-12-23",
+   "retrieval_timestamp": "2026-09-24T22:27:01.696378+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4940d127414340f9f6df32b3b3b943017264abce98ec40a2c69bed2d3e7106a0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:39834409"
+    },
+    "queries_by_source": {
+     "europepmc": "vehicle powertrain management system unintended acceleration experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1016/j.heliyon.2024.e41410",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle powertrain management system unintended acceleration experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1098/rsta.2016.0361": {
+   "id": "doi:10.1098/rsta.2016.0361",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:28461426",
+   "source_uri": "https://doi.org/10.1098/rsta.2016.0361",
+   "title": "Industry 1.61803: the transition to an industry with reduced material demand fit for a low carbon future.",
+   "abstract": "Arising from a discussion meeting in September 2016, this editorial introduces a special issue on the transition to a future industrial system with greatly reduced demand for material production and attempts to synthesize the main findings. The motivation for such a transition is to reduce industrial greenhouse gas emissions, but unlike previous industrial transformations, there are no major stakeholders who will pursue the change for their own immediate benefit. The special issue, therefore, explores the means by which such a transition could be brought about. The editorial presents an overview of the opportunities identified in the papers of the volume, presents examples of actions that can be taken today to begin the process of change and concludes with an agenda for research that might support a rapid acceleration in the rate of change.This article is part of the themed issue 'Material demand reduction'.",
+   "doi": "10.1098/rsta.2016.0361",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2017-06-01",
+   "retrieval_timestamp": "2026-09-24T22:27:01.696398+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "41ff1df7f0d250876c57ad18ab41ada23a795495273368c166cb6659c2dadf7e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:28461426"
+    },
+    "queries_by_source": {
+     "europepmc": "vehicle powertrain management system unintended acceleration experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1098/rsta.2016.0361",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle powertrain management system unintended acceleration experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.3390/logistics9030105": {
+   "id": "doi:10.3390/logistics9030105",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:d593ca8865144b8895e067aa302d43efc143d73f",
+   "source_uri": "https://doi.org/10.3390/logistics9030105",
+   "title": "Material Flow Analysis for Demand Forecasting and Lifetime-Based Inflow in Indonesia’s Plastic Bag Supply Chain",
+   "abstract": "Background: this research presents an integrated approach to enhancing the sustainability of plastic bag supply chains in Indonesia by addressing critical issues related to ineffective post-consumer waste management and low recycling rates. The objective of this study is to develop a combined framework of material flow analysis (MFA) and sustainable supply chain planning to improve demand forecasting and inflow management across the plastic bag lifecycle. Method: the research adopts a quantitative method using the XGBoost algorithm for forecasting and is supported by a polymer-based MFA framework that maps material flows from production to end-of-life stages. Result: the findings indicate that while production processes achieve high efficiency with a yield of 89%, more than 60% of plastic bag waste remains unmanaged after use. Moreover, scenario analysis demonstrates that single interventions are insufficient to achieve circularity targets, whereas integrated strategies (e.g., reducing export volumes, enhancing waste collection, and improving recycling performance) are more effective in increasing recycling rates beyond 35%. Additionally, the study reveals that increasing domestic recycling capacity and minimizing dependency on exports can significantly reduce environmental leakage and strengthen local waste management systems. Conclusions: the study’s novelty lies in demonstrating how machine learning and material flow data can be synergized to inform circular supply chain decisions and regulatory planning.",
+   "doi": "10.3390/logistics9030105",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-24T22:27:01.696422+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "13ac596aa3851d67962f9b62730c6e6569316accde0855e797042ae3f31cab28",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:d593ca8865144b8895e067aa302d43efc143d73f"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1098/rsta.2016.0361"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "66cd1dd083ca19f53fbe087264893d8a1e017937bcf93921c8333fe39d611297",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-24T22:27:01.591370+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.3390/logistics9030105",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1098/rsta.2016.0361",
+   "source_rank": 4,
+   "fulltext_url": "https://www.mdpi.com/2305-6290/9/3/105/pdf?version=1754376807",
+   "authors": [
+    "Erin Octaviani",
+    "I. Masudin",
+    "Amelia Khoidir",
+    "D. P. Restuputri"
+   ],
+   "raw_record_hash": "66cd1dd083ca19f53fbe087264893d8a1e017937bcf93921c8333fe39d611297",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.34133/research.1175": {
+   "id": "doi:10.34133/research.1175",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:dfe1153645d84a0a2aaeda3b9b4edc2327813c07",
+   "source_uri": "https://doi.org/10.34133/research.1175",
+   "title": "Probabilistic Carbon Analysis of Pakistan’s Bridges Unveils the Urgent Needs of Overdesign Optimization and Policy Transformation",
+   "abstract": "Rapid infrastructure expansion in emerging economies is increasing construction-related carbon emissions. Using a probabilistic assessment of 52 planned bridges on Pakistan’s M-13 Motorway, the average carbon emission intensity (CEI) is 1,430 kg CO2eq per square meter, 1.15 to 1.50 times higher per m2 of deck area than international benchmarks. The raw material (extraction and production) phase dominates the footprint (94.4%), with reinforcement (48.9%) and concrete (39.4%) as the principal material contributors; both display high variability (coefficients of variation 67% to 130%), signaling substantial uncertainty. Evidence points to systemic inefficiencies, including conservative overdesign, reliance on foreign codes, and the absence of standardized local emission data. Targeted measures, structural optimization using digital tools, wider adoption of recycling and low-carbon mixes, and development of context-specific emission factor databases offer a scalable pathway to lower-carbon bridge infrastructure in Pakistan and comparable settings.",
+   "doi": "10.34133/research.1175",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-24T22:27:01.696445+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "fc2e6a75457ad2b3f672140fcda6b189dbaa2452c0e236e9138209f64b025055",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:dfe1153645d84a0a2aaeda3b9b4edc2327813c07"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1098/rsta.2016.0361"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "66cd1dd083ca19f53fbe087264893d8a1e017937bcf93921c8333fe39d611297",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.34133/research.1175",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1098/rsta.2016.0361",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [
+    "Hazib Hafiz Muhammad",
+    "Shabbir Imran",
+    "Khalid Hafiz Humza",
+    "Limao Zhang",
+    "Jian-Jun Qin",
+    "Yue Pan"
+   ],
+   "raw_record_hash": "66cd1dd083ca19f53fbe087264893d8a1e017937bcf93921c8333fe39d611297",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.70675/8ae5a4c4z7eb0z4df4za003z64117eeb1706": {
+   "id": "doi:10.70675/8ae5a4c4z7eb0z4df4za003z64117eeb1706",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70675/8ae5a4c4z7eb0z4df4za003z64117eeb1706",
+   "source_uri": "https://doi.org/10.70675/8ae5a4c4z7eb0z4df4za003z64117eeb1706",
+   "title": "Analysis and valorization of new thermal management systems for a vehicle powertrain application",
+   "abstract": "",
+   "doi": "10.70675/8ae5a4c4z7eb0z4df4za003z64117eeb1706",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T22:27:01.696468+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "fb07a7bfaa970f6011790c30871acaaaf45e1086ba08fb81c23a2a6da305483a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70675/8ae5a4c4z7eb0z4df4za003z64117eeb1706"
+    },
+    "queries_by_source": {
+     "crossref": "vehicle powertrain management system unintended acceleration and vibration during deceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70675/8ae5a4c4z7eb0z4df4za003z64117eeb1706",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle powertrain management system unintended acceleration and vibration during deceleration",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.37099/mtu.dc.etd-restricted/61": {
+   "id": "doi:10.37099/mtu.dc.etd-restricted/61",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.37099/mtu.dc.etd-restricted/61",
+   "source_uri": "https://doi.org/10.37099/mtu.dc.etd-restricted/61",
+   "title": "Predictive control of hybrid vehicle powertrain for intelligent energy management",
+   "abstract": "",
+   "doi": "10.37099/mtu.dc.etd-restricted/61",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T22:27:01.696488+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "2105d85cfac8a3c483b3457d7db7db248da4ffeb1047429d8436488af11bc7f7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.37099/mtu.dc.etd-restricted/61"
+    },
+    "queries_by_source": {
+     "crossref": "vehicle powertrain management system unintended acceleration and vibration during deceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.37099/mtu.dc.etd-restricted/61",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle powertrain management system unintended acceleration and vibration during deceleration",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.37099/mtu.dc.etdr/83": {
+   "id": "doi:10.37099/mtu.dc.etdr/83",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.37099/mtu.dc.etdr/83",
+   "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/83",
+   "title": "INCORPORATING DRIVER’S BEHAVIOR INTO PREDICTIVE POWERTRAIN ENERGY MANAGEMENT FOR A POWER-SPLIT HYBRID ELECTRIC VEHICLE",
+   "abstract": "",
+   "doi": "10.37099/mtu.dc.etdr/83",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T22:27:01.696508+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ba9a33a63df5ef7858de806a5a238dd90dbfd8c94f104d1534e0a5f80c374332",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.37099/mtu.dc.etdr/83"
+    },
+    "queries_by_source": {
+     "crossref": "vehicle powertrain management system unintended acceleration and vibration during deceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.37099/mtu.dc.etdr/83",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle powertrain management system unintended acceleration and vibration during deceleration",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2001.05165": {
+   "id": "doi:10.48550/arxiv.2001.05165",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2001.05165v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2001.05165",
+   "title": "Terrain estimation via vehicle vibration measurement and cubature Kalman filtering",
+   "abstract": "The extent of vibrations experienced by a vehicle driving over natural terrain defines its ride quality. Generally, surface irregularities, ranging from single discontinuities to random variations of the elevation profile, act as a major source of excitation that induces vibrations in the vehicle body through the tire-soil interaction and suspension system. Therefore, the ride response of off-road vehicles is tightly connected with the ground properties. The objective of this research is to develop a model-based observer that estimates automatically terrain parameters using available onboard sensors. Two acceleration signals, one coming from the vehicle body and one from the wheel suspension, are fed into a dynamic vehicle model that takes into account tire/terrain interaction to estimate ground properties. To solve the resulting nonlinear simultaneous state and parameter estimation problem, the cubature Kalman filter is used, which is shown to outperform the standard extended Kalman filter in terms of accuracy and stability. An extensive set of simulation tests is presented to assess the performance of the proposed estimator under various surface roughness and deformability conditions. Results show the potential of the proposed observer to estimate automatically terrain properties during operations that could be implemented onboard of a general family of intelligent vehicles, ranging from off-road high-speed passenger cars to lightweight and low-speed planetary rovers.",
+   "doi": "10.48550/arxiv.2001.05165",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T22:27:01.696526+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ea03db935f8ad46dc50eba99f33a94e203e655cf2bf2905c87a24dc28b2255d6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2001.05165v1"
+    },
+    "queries_by_source": {
+     "arxiv": "vehicle powertrain management system unintended acceleration and vibration during deceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2001.05165",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle powertrain management system unintended acceleration and vibration during deceleration",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2001.05165v1",
+   "authors": [
+    "Giulio Reina",
+    "Antonio Leanza",
+    "Arcangelo Messina"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2412.14984": {
+   "id": "doi:10.48550/arxiv.2412.14984",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2412.14984v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2412.14984",
+   "title": "Co-optimization of Vehicle Dynamics and Powertrain Management for Connected and Automated Electric Vehicles",
+   "abstract": "Connected and automated vehicles (CAVs) represent the future of transportation, utilizing detailed traffic information to enhance control and decision-making. Eco-driving of CAVs has the potential to significantly improve energy efficiency, and the benefits are maximized when both vehicle speed and powertrain operation are optimized. In this paper, we studied the co-optimization of vehicle speed and powertrain management for energy savings in a dual-motor electric vehicle. Control-oriented vehicle dynamics and electric powertrain models were developed to transform the problem into an optimal control problem specifically designed to facilitate real-time computation. Simulation validation was conducted using real-world data calibrated traffic simulation scenarios in Chattanooga, TN. Evaluation results demonstrated a 12.80-24.52% reduction in the vehicle's power consumption under ideal predicted traffic conditions, while maintaining benefits with various prediction uncertainties, such as Gaussian process uncertainties on acceleration and time-shift effects on predicted speed. The energy savings of the proposed eco-driving strategy are achieved through effective speed control and optimized torque allocation. The proposed model can be extended to various CAV and electric vehicle applications, with potential adaptability to diverse traffic scenarios.",
+   "doi": "10.48550/arxiv.2412.14984",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T22:27:01.696543+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "65e45f3a4aee332da04cbde4d127561b892989d3abb9fbec847c086a2c9b2584",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2412.14984v1"
+    },
+    "queries_by_source": {
+     "arxiv": "vehicle powertrain management system unintended acceleration and vibration during deceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2412.14984",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle powertrain management system unintended acceleration and vibration during deceleration",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2412.14984v1",
+   "authors": [
+    "Zongtan Li",
+    "Yunli Shao"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2606.23236": {
+   "id": "doi:10.48550/arxiv.2606.23236",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2606.23236v3",
+   "source_uri": "https://doi.org/10.48550/arxiv.2606.23236",
+   "title": "A Hybrid Intrusion Detection System for Electric Vehicle Charging Infrastructure",
+   "abstract": "The integration of Electric Vehicle Charging Stations (EVCSs) into the smart grid necessitates sophisticated digital infrastructure for their management and coordination, which expands the attack surface and makes both the power grid and EVCSs vulnerable to cyberattacks. This research addresses critical gaps in existing EVCS Intrusion Detection Systems (IDS) by proposing a hybrid IDS that integrates attack detection on both the cyber and physical layer of the EVCS ecosystem. The proposed hybrid IDS utilizes a dual-layer integration method, which combines network-based IDS (NIDS) and host-based IDS (HIDS). This approach facilitates for comprehensive monitoring of both network traffic through the NIDS and host-level activities via the HIDS, effectively addressing the unique challenges posed by the interconnected nature of EVCS ecosystems. Utilizing the recent CICEVSE2024 dataset, the IDS presented in this work performs multiclass classification across various attack types, including False Data Injection Attacks (FDIAs), reconnaissance, denial of service, backdoor, and cryptojacking attacks. Experimental results demonstrate that our approach achieves excellent detection accuracy, with the NIDS component reaching 99.99% accuracy for network-based attacks and the HIDS component achieving 83.47% accuracy on FDIA, cryptojacking, backdoor, all DoS, all Recon except Slowloris Scan attacks. This dual-layer detection significantly outperforms single-source detection approaches previously presented in literature.",
+   "doi": "10.48550/arxiv.2606.23236",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T22:27:01.696560+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "96ff832ae39be83beea657cd3b753507e5d32524c3c805d7091c9ebe9fffe8ca",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2606.23236v3"
+    },
+    "queries_by_source": {
+     "arxiv": "vehicle powertrain management system unintended acceleration and vibration during deceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2606.23236",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle powertrain management system unintended acceleration and vibration during deceleration",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2606.23236v3",
+   "authors": [
+    "Charukeshi Joglekar",
+    "Chijioke Eze",
+    "Danni Xiang",
+    "Antonello Monti"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.1504/ijvsmt.2009.029177": {
+   "id": "doi:10.1504/ijvsmt.2009.029177",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:367783",
+   "source_uri": "https://doi.org/10.1504/ijvsmt.2009.029177",
+   "title": "A classical control approach to the power management of an all-electric hybrid\r\nvehicle.",
+   "abstract": "Modern hybrid electric vehicles (HEVs) often employ all-electric powertrains\r\nthat utilise hybrid sources of power and energy; such as batteries, fuel cells\r\nand ultracapacitors. This paper describes the design, simulation and\r\nexperimental verification of a power management control system that manages a\r\nhigh voltage battery, a DC-DC boost converter and an ultracapacitor within a\r\nfront-wheel drive HEV in which the motive power for the vehicle comes from two\r\nelectrical machines. As part of this study, consideration is given to the\r\ncomplete control system design life-cycle including plant model development,\r\nalgorithm design and software implementation on the target electronic control\r\nunit (ECU). Off-line simulation and initial experimental results are presented\r\nshowing the vehicle operating on a powertrain dynamometer as one means of\r\ndemonstrating the ability of the ultracapacitor to limit the transient demands\r\nplaced on the battery during periods of vehicle acceleration and regenerative\r\nbraking",
+   "doi": "10.1504/ijvsmt.2009.029177",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T22:27:01.696584+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c5408359cb3e88b0109019d7da366cb5b7353fedc6eebb2668d724d698e8d1d7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:367783"
+    },
+    "queries_by_source": {
+     "core": "vehicle powertrain management unintended acceleration vibration during deceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1504/ijvsmt.2009.029177",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle powertrain management unintended acceleration vibration during deceleration",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Marco, James",
+    "Vaughan, Nicholas D."
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:9f2fd9c5dcdcd0a1": {
+   "id": "title:9f2fd9c5dcdcd0a1",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:386052960",
+   "source_uri": "",
+   "title": "Computational and experimental study of air hybrid engine concepts",
+   "abstract": "This thesis was submitted for the degree of Doctor of Philosophy and awarded by Brunel UniversityThe air hybrid engine absorbs the vehicle kinetic energy during braking, stores it in an air tank in the form of compressed air, and reuses it to start the engine and to propel a vehicle during cruising and acceleration. Capturing, storing and reusing this braking energy to achieve stop-start operation and to give additional power can therefore improve fuel economy, particularly in cities and urban areas where the traffic conditions involve many stops and starts. In order to reuse the residual kinetic energy, the vehicle operation consists of 3 basic modes, i.e. Compression Mode (CM), Expander Mode (EM) and normal firing mode, as well as stop-start operation through an air starter. A four-cylinder 2 litre diesel engine has been modelled to operate in four air hybrid engine configurations so that the braking and motoring performance of each configuration could be studied. These air hybrid systems can be constructed with production technologies and incur minimum changes to the existing engine design. The regenerative engine braking and starting capability is realised through the employment of an innovative simple one-way intake system and a production cam profile switching (CPS) mechanism. The hybrid systems will allow the engine to be cranked by the compressed air at moderate pressure without using addition starters or dedicated valves in the cylinder head. Therefore, the\r\nproposed air hybrid engine systems can be considered as a cost-effective regenerative hybrid powertrain and can be implemented in vehicles using existing production technologies. A novel cost-effective pneumatic regenerative stop-start hybrid system, Regenerative Engine Braking Device (RegenEBD), for buses and commercial vehicles is presented. RegenEBD is capable of converting kinetic energy into pneumatic energy in the compressed air saved in an air tank using a production engine braking device and other production type automotive components and a proprietary intake system design. The compressed air is then used to drive an air starter to achieve regenerative stop-start operations. The proposed hybrid system can work with the existing vehicle transmission system and can be implemented with the retro-fitted valve actuation device and a sandwich block mounted between the cylinder head and the pro",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T22:27:01.696603+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f5d084239aa553af60bd5a83e293dd403a5764ecfc0f6868bda0915732ea0178",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:386052960"
+    },
+    "queries_by_source": {
+     "core": "vehicle powertrain management system unintended acceleration experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:9f2fd9c5dcdcd0a1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle powertrain management system unintended acceleration experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Lee, Cho-Yu"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:2d2bbb5745cbfb7f": {
+   "id": "title:2d2bbb5745cbfb7f",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:346791212",
+   "source_uri": "",
+   "title": "Torsional vibration analysis of automotive drivelines",
+   "abstract": "One of the most important source of noise and vibrations associated with vehicles is the vibration of driveline systems. Such phenomena are subjectively associated with\n\ncustomer complaints. In this study the torsional vibrations of driveline systems were investigated using discretised and lumped mass models of the system.\n\n\n\nIn the literature, many of the problems associated with torsional vibrations and refinement in drivelines have been tackled through relatively simple, lumped mass models combinedw ith experimentalm easurements. However, some problems remain particularly where instabilities occur or complex coupling with other vehicle vibration modes exists. The review of previous work showed that although it is important to understand the dynamic behaviour of the individual driveline components; for example, engine, clutch, gearbox, etc., the whole system must be analysed together because of all the coupling which occurs.\n\n\n\nThe main source of excitation for torsional vibration of the driveline system is the engine fluctuating torque. A computer program using MATLAB subroutines was developed to obtain this fluctuation torque for different engine parameters for subsequent use in the modelling.\n\n\n\nA substructure approach, using stiffness coupling technique with combined use of residual flexibility and modal synthesis, was used to analyse free and forced vibrations\n\nof the system, as a linear system. A computer program using MATLAB subroutines was designed to facilitate application of this technique. Good agreement between results for the overall system model and substructure model was found even for a few considered modes. This substructure technique offers significant computational advantages over other methods.\n\n\n\nThe effect of non-linear sources in the driveline system such as backlash, non-linear spring stifffiess, Hooke's joint and angularity of the propeller shaft on the system\n\ntorsional vibrations was investigated. The effect of backlash in the driveline system was significant and, as expected, vibration levels increased as backlash increased.\n\n\n\nHooke's joints caused an additional complex source of excitation but their significance is dictated by the details of the particular driveline design.\n\n\n\nThe modelling showed that instabilities commonly referred to a shunt or shuffle could occur during clutch engagement. The stick slip frictional properti",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T22:27:01.696619+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "99f34b5819e1cf4817e5fd18733461888755639494dc80896ab289069d5d7fdd",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:346791212"
+    },
+    "queries_by_source": {
+     "core": "vehicle powertrain management unintended acceleration vibration during deceleration"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:2d2bbb5745cbfb7f",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle powertrain management unintended acceleration vibration during deceleration",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Rabeih, El-Adl Mohammed Aly"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.3390/en6105507": {
+   "id": "doi:10.3390/en6105507",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:7329081",
+   "source_uri": "https://doi.org/10.3390/en6105507",
+   "title": "An Optimization Framework for Comparative Analysis of Multiple Vehicle Powertrains",
+   "abstract": "With a myriad of alternative vehicle powertrain architectures emerging in the industry, such as electric vehicles and hybrid electric vehicles, it is beneficial that the most appropriate system is chosen for the desired vehicle class and duty cycle, and to minimize a given cost function. This paper investigates this issue, by proposing a novel framework that evaluates different types of powertrain architectures under a unified modular powertrain structure. This framework provides a systematic and objective approach to comparing different types of powertrain architectures simultaneously, and will highlight the benefits that can be achieved from each architecture, thus making it possible to develop the reasoning for manufacturers to implement such systems, and potentially accelerate customer take-up of alternative powertrain technology. The results from this investigation have indicated that such analysis is indeed possible, by way of identifying the “cross-over point” between powertrain architectures, where one powertrain architecture transitions into a different architecture with increments in the required travel range",
+   "doi": "10.3390/en6105507",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-24T22:27:01.696635+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "28893cacbc513087cee351604183f337460aee9c12f8eebaa110fb80768a6886",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:7329081"
+    },
+    "queries_by_source": {
+     "core": "vehicle powertrain management system unintended acceleration experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.3390/en6105507",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "vehicle powertrain management system unintended acceleration experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Francis Assadian",
+    "Stefano Longo",
+    "Mohan, Ganesh",
+    "Assadian, Francis",
+    "Longo, Stefano",
+    "Ganesh Mohan"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:09a29a67": {
+   "id": "problem:09a29a67",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "09a29a67e110e4393b0b95499645bfefa02533483656a3f20ee3ed9a9a4b76dc",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "080ddf6bca9ca68cc164a8ccd767c52308dbadfea4141e487fea6f8cf4a51d56",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-24T22:29:29+00:00Z"
+ }
+}
