@@ -2,7 +2,7 @@
  "arm": "current",
  "artifact_type": "R526_ATTRIBUTION_HARVEST",
  "battery": "R526-CURRENT-PRODUCTION-ATTRIBUTION",
- "harvested_at_utc": "2026-09-24T13:13:06Z",
+ "harvested_at_utc": "2026-09-24T14:43:08Z",
  "instrument": "r506_discovery_yield/1.1.0",
  "manifest_sha256": "560eb61da0226afac434441db581e1cb8344c5b038362e703b8b57c3401ea20c",
  "ms_module": "scripts/r516_harvest_attribution.py (frozen import)",
@@ -223,11 +223,15 @@
     "calls": [
      {
       "audit": {
+       "all_components_non_negative": false,
        "class": "AUDITED",
        "generate_total_s_terminal": 32.596634,
        "measured_s": 22.92,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [
+        "admission_exclusive(unorouter):-2.1589410000000004"
+       ],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 9.677,
        "total_ledger_provenance_s": 32.597,
        "total_s": 32.596634
@@ -243,7 +247,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 13.522,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 6.0,
@@ -254,11 +258,15 @@
      },
      {
       "audit": {
+       "all_components_non_negative": false,
        "class": "AUDITED",
        "generate_total_s_terminal": 18.238625,
        "measured_s": 14.384,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [
+        "admission_exclusive(unorouter):-5.687844"
+       ],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 3.855,
        "total_ledger_provenance_s": 18.239,
        "total_s": 18.238625
@@ -274,7 +282,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 6.529,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 6.0,
@@ -285,11 +293,13 @@
      },
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 13.739061,
        "measured_s": 13.737,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.002,
        "total_ledger_provenance_s": 13.739,
        "total_s": 13.739061
@@ -305,7 +315,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 11.901,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 0.0,
@@ -316,12 +326,16 @@
      },
      {
       "audit": {
+       "all_components_non_negative": false,
        "class": "AUDITED",
        "generate_total_s_terminal": 45.281824,
-       "measured_s": 43.278,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
-       "remainder_s": 2.004,
+       "measured_s": 45.278,
+       "negative_components": [
+        "transition(apinex,att1):-2.000031"
+       ],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
+       "remainder_s": 0.004,
        "total_ledger_provenance_s": 45.282,
        "total_s": 45.281824
       },
@@ -339,22 +353,24 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 3.358,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 37.856,
        "post_provider_local_s": 0.003,
        "probe_retry_sleep_s": 0.0,
        "retry_sleep_s": 2.0,
        "selection_ordering_s": 2.061,
-       "transition_s": -2.0
+       "transition_s": 0.0
       }
      },
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 12.847397,
        "measured_s": 12.846,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.001,
        "total_ledger_provenance_s": 12.847,
        "total_s": 12.847397
@@ -370,7 +386,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 10.941,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 0.0,
@@ -381,11 +397,15 @@
      },
      {
       "audit": {
+       "all_components_non_negative": false,
        "class": "AUDITED",
        "generate_total_s_terminal": 39.578861,
        "measured_s": 22.723,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [
+        "admission_exclusive(unorouter):-4.659259"
+       ],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 16.856,
        "total_ledger_provenance_s": 39.579,
        "total_s": 39.578861
@@ -401,7 +421,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 14.952,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 6.0,
@@ -412,11 +432,13 @@
      },
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 10.076946,
        "measured_s": 10.076,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.001,
        "total_ledger_provenance_s": 10.077,
        "total_s": 10.076946
@@ -432,7 +454,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.001,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 8.206,
        "post_provider_local_s": 0.004,
        "probe_retry_sleep_s": 0.0,
@@ -649,64 +671,46 @@
     "phases": {
      "GAUNTLET": {
       "children": {
-       "child": {
+       "mech-DIRECT_TRANSFER-1": {
         "outcomes": [
          "SURVIVED_GAUNTLET"
         ],
-        "parent_phase": null,
-        "scope": "cand:MS:DIRECT_TRANSFER:f8c986a92451",
+        "scope": "child",
         "wall_sum_s": 45.364,
         "walls_s": [
          45.36358
         ]
        }
       },
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 45.364,
+      "n_unmatched": 0,
+      "top_wall_sum_s": 45.364,
+      "wall_sum_s": 90.728,
       "walls_s": [
-       45.36358
+       45.36358,
+       45.363946
       ]
      },
      "IMPROVEMENT_PASS": {
       "children": {},
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "n_unmatched": 0,
+      "top_wall_sum_s": 98.815,
+      "wall_sum_s": 98.815,
+      "walls_s": [
+       98.815103
+      ]
      },
      "KILL_IMPROVE": {
       "children": {},
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "n_unmatched": 0,
+      "top_wall_sum_s": 0.017,
+      "wall_sum_s": 0.017,
+      "walls_s": [
+       0.016672
+      ]
      }
     },
-    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (parent_phase, candidate_key, candidate_id) identity, never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
-    "unmatched": [
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "GAUNTLET",
-      "reason": "enter-without-exit",
-      "scope": null
-     },
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "IMPROVEMENT_PASS",
-      "reason": "enter-without-exit",
-      "scope": "cand:MS:DIRECT_TRANSFER:f8c986a92451"
-     },
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "KILL_IMPROVE",
-      "reason": "enter-without-exit",
-      "scope": null
-     }
-    ]
+    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (phase, scope, candidate_key, candidate_id) identity (the smallest durable identity; no separate parent_phase field), never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
+    "unmatched": []
    },
    "problem_index": 6,
    "purpose_audit": {
@@ -2968,11 +2972,15 @@
     "calls": [
      {
       "audit": {
+       "all_components_non_negative": false,
        "class": "AUDITED",
        "generate_total_s_terminal": 38.652623,
        "measured_s": 14.334,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [
+        "admission_exclusive(unorouter):-2.0851530000000005"
+       ],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 24.319,
        "total_ledger_provenance_s": 38.653,
        "total_s": 38.652623
@@ -2988,7 +2996,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 6.582,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 6.0,
@@ -3070,36 +3078,25 @@
     "phases": {
      "GAUNTLET": {
       "children": {},
-      "n_unmatched": 1,
+      "n_unmatched": 0,
       "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "wall_sum_s": 0.0,
+      "walls_s": [
+       0.000123
+      ]
      },
      "KILL_IMPROVE": {
       "children": {},
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "n_unmatched": 0,
+      "top_wall_sum_s": 0.006,
+      "wall_sum_s": 0.006,
+      "walls_s": [
+       0.006388
+      ]
      }
     },
-    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (parent_phase, candidate_key, candidate_id) identity, never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
-    "unmatched": [
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "GAUNTLET",
-      "reason": "enter-without-exit",
-      "scope": null
-     },
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "KILL_IMPROVE",
-      "reason": "enter-without-exit",
-      "scope": null
-     }
-    ]
+    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (phase, scope, candidate_key, candidate_id) identity (the smallest durable identity; no separate parent_phase field), never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
+    "unmatched": []
    },
    "problem_index": 4,
    "purpose_audit": {
@@ -5357,11 +5354,13 @@
     "calls": [
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 12.83729,
        "measured_s": 12.836,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.001,
        "total_ledger_provenance_s": 12.837,
        "total_s": 12.83729
@@ -5377,7 +5376,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.001,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 10.348,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 0.0,
@@ -5388,11 +5387,13 @@
      },
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 60.47626,
        "measured_s": 29.519,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 30.957,
        "total_ledger_provenance_s": 60.476,
        "total_s": 60.47626
@@ -5408,7 +5409,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 14.728,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 6.35,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 6.0,
@@ -5512,36 +5513,25 @@
     "phases": {
      "GAUNTLET": {
       "children": {},
-      "n_unmatched": 1,
+      "n_unmatched": 0,
       "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "wall_sum_s": 0.0,
+      "walls_s": [
+       0.000118
+      ]
      },
      "KILL_IMPROVE": {
       "children": {},
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "n_unmatched": 0,
+      "top_wall_sum_s": 0.009,
+      "wall_sum_s": 0.009,
+      "walls_s": [
+       0.008614
+      ]
      }
     },
-    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (parent_phase, candidate_key, candidate_id) identity, never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
-    "unmatched": [
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "GAUNTLET",
-      "reason": "enter-without-exit",
-      "scope": null
-     },
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "KILL_IMPROVE",
-      "reason": "enter-without-exit",
-      "scope": null
-     }
-    ]
+    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (phase, scope, candidate_key, candidate_id) identity (the smallest durable identity; no separate parent_phase field), never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
+    "unmatched": []
    },
    "problem_index": 5,
    "purpose_audit": {
@@ -7805,11 +7795,13 @@
     "calls": [
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 37.00963,
        "measured_s": 18.407,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 18.603,
        "total_ledger_provenance_s": 37.01,
        "total_s": 37.00963
@@ -7825,7 +7817,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 4.446,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 6.05,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 6.0,
@@ -7907,36 +7899,25 @@
     "phases": {
      "GAUNTLET": {
       "children": {},
-      "n_unmatched": 1,
+      "n_unmatched": 0,
       "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "wall_sum_s": 0.0,
+      "walls_s": [
+       0.000151
+      ]
      },
      "KILL_IMPROVE": {
       "children": {},
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "n_unmatched": 0,
+      "top_wall_sum_s": 0.007,
+      "wall_sum_s": 0.007,
+      "walls_s": [
+       0.006916
+      ]
      }
     },
-    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (parent_phase, candidate_key, candidate_id) identity, never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
-    "unmatched": [
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "GAUNTLET",
-      "reason": "enter-without-exit",
-      "scope": null
-     },
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "KILL_IMPROVE",
-      "reason": "enter-without-exit",
-      "scope": null
-     }
-    ]
+    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (phase, scope, candidate_key, candidate_id) identity (the smallest durable identity; no separate parent_phase field), never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
+    "unmatched": []
    },
    "problem_index": 9,
    "purpose_audit": {
@@ -10195,11 +10176,13 @@
     "calls": [
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 12.833359,
        "measured_s": 12.831,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.002,
        "total_ledger_provenance_s": 12.833,
        "total_s": 12.833359
@@ -10215,7 +10198,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 2.185,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 7.915,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 0.0,
@@ -10226,12 +10209,19 @@
      },
      {
       "audit": {
+       "all_components_non_negative": false,
        "class": "AUDITED",
        "generate_total_s_terminal": 85.643528,
-       "measured_s": 43.658,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
-       "remainder_s": 41.986,
+       "measured_s": 51.658,
+       "negative_components": [
+        "transition(unorouter,att1):-2.000036",
+        "transition(unorouter,att2):-4.000041",
+        "transition(apinex,att1):-2.000036",
+        "admission_exclusive(bynara):-1.4210729999999998"
+       ],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
+       "remainder_s": 33.986,
        "total_ledger_provenance_s": 85.644,
        "total_s": 85.643528
       },
@@ -10249,22 +10239,24 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 3.886,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 33.68,
        "post_provider_local_s": 0.004,
        "probe_retry_sleep_s": 4.0,
        "retry_sleep_s": 8.0,
        "selection_ordering_s": 2.088,
-       "transition_s": -8.0
+       "transition_s": 0.0
       }
      },
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 16.125966,
        "measured_s": 16.124,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.002,
        "total_ledger_provenance_s": 16.126,
        "total_s": 16.125966
@@ -10279,7 +10271,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 13.906,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 0.0,
@@ -10290,11 +10282,13 @@
      },
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 12.789593,
        "measured_s": 12.788,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.002,
        "total_ledger_provenance_s": 12.79,
        "total_s": 12.789593
@@ -10309,7 +10303,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 10.861,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 0.0,
@@ -10320,12 +10314,19 @@
      },
      {
       "audit": {
+       "all_components_non_negative": false,
        "class": "AUDITED",
        "generate_total_s_terminal": 128.460373,
-       "measured_s": 116.459,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
-       "remainder_s": 12.001,
+       "measured_s": 128.459,
+       "negative_components": [
+        "transition(unorouter,att1):-2.000036",
+        "transition(unorouter,att2):-4.000038",
+        "transition(xkiro,att1):-2.000015",
+        "transition(xkiro,att2):-4.000036"
+       ],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
+       "remainder_s": 0.001,
        "total_ledger_provenance_s": 128.46,
        "total_s": 128.460373
       },
@@ -10341,22 +10342,24 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 13.319,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 99.766,
        "post_provider_local_s": 0.004,
        "probe_retry_sleep_s": 0.0,
        "retry_sleep_s": 12.0,
        "selection_ordering_s": 3.37,
-       "transition_s": -12.0
+       "transition_s": 0.0
       }
      },
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 13.352457,
        "measured_s": 13.351,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.001,
        "total_ledger_provenance_s": 13.352,
        "total_s": 13.352457
@@ -10372,7 +10375,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 11.602,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 0.0,
@@ -10383,11 +10386,13 @@
      },
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 8.365339,
        "measured_s": 8.364,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.001,
        "total_ledger_provenance_s": 8.365,
        "total_s": 8.365339
@@ -10403,7 +10408,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 6.787,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 0.0,
@@ -10414,11 +10419,13 @@
      },
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 12.208011,
        "measured_s": 12.207,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.001,
        "total_ledger_provenance_s": 12.208,
        "total_s": 12.208011
@@ -10433,7 +10440,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 10.024,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 0.0,
@@ -10751,78 +10758,55 @@
     "phases": {
      "GAUNTLET": {
       "children": {
-       "child": {
+       "mech-DIRECT_TRANSFER-1": {
         "outcomes": [
          "SURVIVED_GAUNTLET"
         ],
-        "parent_phase": null,
-        "scope": "cand:MS:DIRECT_TRANSFER:0b2fbc5c2b8d",
+        "scope": "child",
         "wall_sum_s": 85.717,
         "walls_s": [
          85.716793
         ]
        }
       },
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 85.717,
+      "n_unmatched": 0,
+      "top_wall_sum_s": 85.717,
+      "wall_sum_s": 171.434,
       "walls_s": [
-       85.716793
+       85.716793,
+       85.717185
       ]
      },
      "IMPROVEMENT_PASS": {
       "children": {},
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "n_unmatched": 0,
+      "top_wall_sum_s": 41.228,
+      "wall_sum_s": 41.228,
+      "walls_s": [
+       41.22822
+      ]
      },
      "KILL_IMPROVE": {
       "children": {},
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "n_unmatched": 0,
+      "top_wall_sum_s": 0.009,
+      "wall_sum_s": 0.009,
+      "walls_s": [
+       0.009172
+      ]
      },
      "TECHNICAL_IMPROVEMENT_PASS": {
       "children": {},
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "n_unmatched": 0,
+      "top_wall_sum_s": 141.332,
+      "wall_sum_s": 141.332,
+      "walls_s": [
+       141.332354
+      ]
      }
     },
-    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (parent_phase, candidate_key, candidate_id) identity, never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
-    "unmatched": [
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "GAUNTLET",
-      "reason": "enter-without-exit",
-      "scope": null
-     },
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "IMPROVEMENT_PASS",
-      "reason": "enter-without-exit",
-      "scope": "cand:MS:DIRECT_TRANSFER:0b2fbc5c2b8d"
-     },
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "KILL_IMPROVE",
-      "reason": "enter-without-exit",
-      "scope": null
-     },
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "TECHNICAL_IMPROVEMENT_PASS",
-      "reason": "enter-without-exit",
-      "scope": "cand:MS:DIRECT_TRANSFER:0b2fbc5c2b8d+mut:f8ab99a233b4"
-     }
-    ]
+    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (phase, scope, candidate_key, candidate_id) identity (the smallest durable identity; no separate parent_phase field), never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
+    "unmatched": []
    },
    "problem_index": 1,
    "purpose_audit": {
@@ -13080,11 +13064,13 @@
     "calls": [
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 10.897966,
        "measured_s": 10.896,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.002,
        "total_ledger_provenance_s": 10.898,
        "total_s": 10.897966
@@ -13100,7 +13086,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 9.288,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 0.0,
@@ -13111,11 +13097,15 @@
      },
      {
       "audit": {
+       "all_components_non_negative": false,
        "class": "AUDITED",
        "generate_total_s_terminal": 19.30479,
        "measured_s": 18.336,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [
+        "admission_exclusive(unorouter):-5.681336"
+       ],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.969,
        "total_ledger_provenance_s": 19.305,
        "total_s": 19.30479
@@ -13131,7 +13121,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 4.348,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 6.0,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 6.0,
@@ -13235,36 +13225,25 @@
     "phases": {
      "GAUNTLET": {
       "children": {},
-      "n_unmatched": 1,
+      "n_unmatched": 0,
       "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "wall_sum_s": 0.0,
+      "walls_s": [
+       0.000127
+      ]
      },
      "KILL_IMPROVE": {
       "children": {},
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "n_unmatched": 0,
+      "top_wall_sum_s": 0.008,
+      "wall_sum_s": 0.008,
+      "walls_s": [
+       0.008251
+      ]
      }
     },
-    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (parent_phase, candidate_key, candidate_id) identity, never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
-    "unmatched": [
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "GAUNTLET",
-      "reason": "enter-without-exit",
-      "scope": null
-     },
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "KILL_IMPROVE",
-      "reason": "enter-without-exit",
-      "scope": null
-     }
-    ]
+    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (phase, scope, candidate_key, candidate_id) identity (the smallest durable identity; no separate parent_phase field), never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
+    "unmatched": []
    },
    "problem_index": 3,
    "purpose_audit": {
@@ -15612,11 +15591,13 @@
     "calls": [
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 9.552631,
        "measured_s": 9.55,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.003,
        "total_ledger_provenance_s": 9.553,
        "total_s": 9.552631
@@ -15632,7 +15613,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 7.642,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 0.0,
@@ -15643,11 +15624,15 @@
      },
      {
       "audit": {
+       "all_components_non_negative": false,
        "class": "AUDITED",
        "generate_total_s_terminal": 43.969843,
        "measured_s": 13.479,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [
+        "admission_exclusive(unorouter):-5.693753"
+       ],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 30.491,
        "total_ledger_provenance_s": 43.97,
        "total_s": 43.969843
@@ -15663,7 +15648,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 5.84,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 6.0,
@@ -15674,11 +15659,13 @@
      },
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 9.200964,
        "measured_s": 9.199,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.002,
        "total_ledger_provenance_s": 9.201,
        "total_s": 9.200964
@@ -15694,7 +15681,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 7.349,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 0.0,
@@ -15798,36 +15785,25 @@
     "phases": {
      "GAUNTLET": {
       "children": {},
-      "n_unmatched": 1,
+      "n_unmatched": 0,
       "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "wall_sum_s": 0.0,
+      "walls_s": [
+       0.000119
+      ]
      },
      "KILL_IMPROVE": {
       "children": {},
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "n_unmatched": 0,
+      "top_wall_sum_s": 0.012,
+      "wall_sum_s": 0.012,
+      "walls_s": [
+       0.012373
+      ]
      }
     },
-    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (parent_phase, candidate_key, candidate_id) identity, never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
-    "unmatched": [
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "GAUNTLET",
-      "reason": "enter-without-exit",
-      "scope": null
-     },
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "KILL_IMPROVE",
-      "reason": "enter-without-exit",
-      "scope": null
-     }
-    ]
+    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (phase, scope, candidate_key, candidate_id) identity (the smallest durable identity; no separate parent_phase field), never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
+    "unmatched": []
    },
    "problem_index": 2,
    "purpose_audit": {
@@ -18175,11 +18151,13 @@
     "calls": [
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 11.436799,
        "measured_s": 11.435,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.002,
        "total_ledger_provenance_s": 11.437,
        "total_s": 11.436799
@@ -18195,7 +18173,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 9.33,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 0.0,
@@ -18206,11 +18184,15 @@
      },
      {
       "audit": {
+       "all_components_non_negative": false,
        "class": "AUDITED",
        "generate_total_s_terminal": 20.501525,
        "measured_s": 13.847,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [
+        "admission_exclusive(unorouter):-4.731127"
+       ],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 6.655,
        "total_ledger_provenance_s": 20.502,
        "total_s": 20.501525
@@ -18226,7 +18208,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 5.151,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 6.0,
@@ -18330,36 +18312,25 @@
     "phases": {
      "GAUNTLET": {
       "children": {},
-      "n_unmatched": 1,
+      "n_unmatched": 0,
       "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "wall_sum_s": 0.0,
+      "walls_s": [
+       0.000118
+      ]
      },
      "KILL_IMPROVE": {
       "children": {},
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "n_unmatched": 0,
+      "top_wall_sum_s": 0.007,
+      "wall_sum_s": 0.007,
+      "walls_s": [
+       0.00711
+      ]
      }
     },
-    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (parent_phase, candidate_key, candidate_id) identity, never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
-    "unmatched": [
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "GAUNTLET",
-      "reason": "enter-without-exit",
-      "scope": null
-     },
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "KILL_IMPROVE",
-      "reason": "enter-without-exit",
-      "scope": null
-     }
-    ]
+    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (phase, scope, candidate_key, candidate_id) identity (the smallest durable identity; no separate parent_phase field), never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
+    "unmatched": []
    },
    "problem_index": 8,
    "purpose_audit": {
@@ -20619,11 +20590,15 @@
     "calls": [
      {
       "audit": {
+       "all_components_non_negative": false,
        "class": "AUDITED",
        "generate_total_s_terminal": 50.34236,
        "measured_s": 49.759,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [
+        "admission_exclusive(unorouter):-5.867081"
+       ],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.583,
        "total_ledger_provenance_s": 50.342,
        "total_s": 50.34236
@@ -20641,7 +20616,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 25.829,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 15.914,
        "post_provider_local_s": 0.002,
        "probe_retry_sleep_s": 6.0,
@@ -20652,12 +20627,18 @@
      },
      {
       "audit": {
+       "all_components_non_negative": false,
        "class": "AUDITED",
        "generate_total_s_terminal": 21.600795,
-       "measured_s": 13.598,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
-       "remainder_s": 8.003,
+       "measured_s": 21.598,
+       "negative_components": [
+        "transition(unorouter,att1):-2.000038",
+        "transition(unorouter,att2):-4.000032",
+        "transition(apinex,att1):-2.000044"
+       ],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
+       "remainder_s": 0.003,
        "total_ledger_provenance_s": 21.601,
        "total_s": 21.600795
       },
@@ -20673,13 +20654,13 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 5.385,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 6.501,
        "post_provider_local_s": 0.002,
        "probe_retry_sleep_s": 0.0,
        "retry_sleep_s": 8.0,
        "selection_ordering_s": 1.71,
-       "transition_s": -8.0
+       "transition_s": 0.0
       }
      }
     ],
@@ -20798,36 +20779,25 @@
     "phases": {
      "GAUNTLET": {
       "children": {},
-      "n_unmatched": 1,
+      "n_unmatched": 0,
       "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "wall_sum_s": 0.0,
+      "walls_s": [
+       0.000181
+      ]
      },
      "KILL_IMPROVE": {
       "children": {},
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "n_unmatched": 0,
+      "top_wall_sum_s": 0.013,
+      "wall_sum_s": 0.013,
+      "walls_s": [
+       0.013259
+      ]
      }
     },
-    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (parent_phase, candidate_key, candidate_id) identity, never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
-    "unmatched": [
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "GAUNTLET",
-      "reason": "enter-without-exit",
-      "scope": null
-     },
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "KILL_IMPROVE",
-      "reason": "enter-without-exit",
-      "scope": null
-     }
-    ]
+    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (phase, scope, candidate_key, candidate_id) identity (the smallest durable identity; no separate parent_phase field), never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
+    "unmatched": []
    },
    "problem_index": 7,
    "purpose_audit": {
@@ -23088,11 +23058,15 @@
     "calls": [
      {
       "audit": {
+       "all_components_non_negative": false,
        "class": "AUDITED",
        "generate_total_s_terminal": 19.896731,
        "measured_s": 14.532,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [
+        "admission_exclusive(unorouter):-4.517438"
+       ],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 5.365,
        "total_ledger_provenance_s": 19.897,
        "total_s": 19.896731
@@ -23108,7 +23082,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.0,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 6.468,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 6.0,
@@ -23119,11 +23093,13 @@
      },
      {
       "audit": {
+       "all_components_non_negative": true,
        "class": "AUDITED",
        "generate_total_s_terminal": 11.533025,
        "measured_s": 11.531,
-       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted",
-       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden",
+       "negative_components": [],
+       "note": "total from the instrument's terminal generate_total_s; the ledger-epoch reconstruction is provenance only and is never silently substituted (PART 7)",
+       "remainder_rule": "generate_total_s (instrument terminal) = measured_subspans + unattributed_remainder_s; remainder may be positive (loop overhead, dict building, degradation records, ledger I/O, result construction — all sub-ms local work by inspection); a small negative value beyond clock tolerance -0.05 s is an instrumentation violation, flagged never hidden; the remainder must NOT be used to conceal negative components (PART 6)",
        "remainder_s": 0.002,
        "total_ledger_provenance_s": 11.533,
        "total_s": 11.533025
@@ -23139,7 +23115,7 @@
       "spans_present": true,
       "subphases": {
        "admission_s": 0.001,
-       "admission_s_inclusive_note": "admission_exclusive = probe_admission_inclusive - probe_retry_sleep; the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
+       "admission_s_inclusive_note": "admission_exclusive = probe_admission_accumulated - probe_retry_sleep; the instrument accumulates every probe-attempt wall + the final admission check (PART 5); the raw inclusive probe wall is not reported separately (exclusive form is the canonical one)",
        "dispatch_s": 9.57,
        "post_provider_local_s": 0.001,
        "probe_retry_sleep_s": 0.0,
@@ -23243,36 +23219,25 @@
     "phases": {
      "GAUNTLET": {
       "children": {},
-      "n_unmatched": 1,
+      "n_unmatched": 0,
       "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "wall_sum_s": 0.0,
+      "walls_s": [
+       0.000187
+      ]
      },
      "KILL_IMPROVE": {
       "children": {},
-      "n_unmatched": 1,
-      "top_wall_sum_s": 0.0,
-      "wall_sum_s": 0,
-      "walls_s": []
+      "n_unmatched": 0,
+      "top_wall_sum_s": 0.011,
+      "wall_sum_s": 0.011,
+      "walls_s": [
+       0.011346
+      ]
      }
     },
-    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (parent_phase, candidate_key, candidate_id) identity, never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
-    "unmatched": [
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "GAUNTLET",
-      "reason": "enter-without-exit",
-      "scope": null
-     },
-     {
-      "candidate": "top",
-      "parent_phase": null,
-      "phase": "KILL_IMPROVE",
-      "reason": "enter-without-exit",
-      "scope": null
-     }
-    ]
+    "reconciliation_rule": "run_wall = executed_linear_stage_wall + top_level_post_rank_phase_wall (top_wall_sum_s, scope=top ONLY) + explicit_external_or_orchestration_wall + UNKNOWN_remainder; child spans (scope=child) are attribution detail, never added on top of the parent phase wall; B3: child spans join to their parent by explicit (phase, scope, candidate_key, candidate_id) identity (the smallest durable identity; no separate parent_phase field), never time-window matching; unmatched events are reported explicitly, never force-paired or zero-filled",
+    "unmatched": []
    },
    "problem_index": 10,
    "purpose_audit": {

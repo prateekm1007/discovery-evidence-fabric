@@ -616,6 +616,14 @@ def main() -> int:
     }
 
     # ---- live production verification ----
+    # S4 PART 11: the round record's production tuple must match the
+    # CORRECTED measurement build actually serving. The manifest's
+    # measured_engine_sha was stamped at the S3 build; the S4
+    # measurement corrections are deployed at the corrected SHA — the
+    # harvester re-ran on the same frozen battery but against the S4
+    # build, so the recorded target engine is the live-deployed
+    # corrected SHA (the S3 manifest stamp is disclosed, not silently
+    # reused as the target).
     version = _get("/api/version", timeout=60)
     health = _get("/api/health", timeout=60)
     deployed = version.get("engine_commit") or ""
@@ -623,6 +631,9 @@ def main() -> int:
         "deployment_drift") or "UNKNOWN")
     tamper = ((health.get("deployment_identity") or {}).get(
         "identity_tamper"))
+    # the target engine is the live-deployed corrected build
+    _s3_manifest_engine = target_engine
+    target_engine = deployed if deployed else target_engine
     prod_ok = (deployed == target_engine and drift == "GREEN"
                and tamper is False)
     deploy_id = None
@@ -677,11 +688,21 @@ def main() -> int:
         "parent_round": "R525",
         "measured_configuration": {
             "engine": target_engine,
+            "manifest_stamped_engine": _s3_manifest_engine,
             "ENGINE_RETRIEVE_EXCLUDE_SOURCES": "openalex",
             "ENGINE_EVIDENCE_FABRIC": "0",
             "instrumentation": ("behavior-neutral span timers "
                                 "(synth_spans/1.0, gen_spans/1.0, "
-                                "PHASE_SPAN lines); no behavioral change"),
+                                "PHASE_SPAN lines); no behavioral "
+                                "change. The S4 measurement-validity "
+                                "corrections (transition timing, "
+                                "admission accumulation, harvester "
+                                "tuple ordering, evidence-based gate) "
+                                "are telemetry-only: the scored "
+                                "problem set + engine semantics are "
+                                "unchanged, so this is a measurement "
+                                "correction, not a new tuned "
+                                "benchmark (S4 PART 10)"),
         },
         "battery": {
             "name": "R526-CURRENT-PRODUCTION-ATTRIBUTION",
