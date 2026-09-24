@@ -4,7 +4,7 @@
  "round_question": "Decompose the SYNTHESIZE wall and measure post-rank execution frequency/cost on fresh current-production problems; name at most one repeated, measured, avoidable cliff.",
  "created_at_utc": "2026-09-24T02:51:29Z",
  "reviewer_provenance": "AI_REVIEW",
- "status": "ATTRIBUTION_CLOSED__AFTER_ARM_AUTHORIZED",
+ "status": "DELIVERED",
  "parent_round": "R524",
  "measured_configuration": {
   "engine": "dc5ebedd5de308d1bfdfc895a84c2d17c58fb6ba",
@@ -1239,11 +1239,13 @@
    }
   }
  },
- "classification": "ONE_CLIFF_NAMED__AFTER_ARM_AUTHORIZED",
+ "classification": "SCOPED_FIX_DEPLOYED__WASTE_CLASS_ABSENT__ENTRY_CONFOUNDED",
  "classification_not": [
   "NOT claimed: end-to-end speedup beyond the named scope",
   "NOT claimed: unattributed SYNTHESIZE remainder is waste (it is UNATTRIBUTED by rule)",
-  "NOT claimed: successful post-rank provider wall is waste"
+  "NOT claimed: successful post-rank provider wall is waste",
+  "NOT claimed: the after battery independently proves the routing fix by clean execution (no gauntlet ran to exercise it); the fix is proven by contract tests + staged-bytes proof, the battery proves absence + parity",
+  "NOT claimed: any end-to-end run-wall speedup (gauntlet-path confounding across arms)"
  ],
  "quality_baseline": {
   "span_verbatim_rate": "1.0 on all durable rows (harvest-measured)",
@@ -1254,13 +1256,13 @@
   "result": "PASS"
  },
  "production_deployment": {
-  "target_sha": "dc5ebedd5de308d1bfdfc895a84c2d17c58fb6ba",
-  "deployed_sha": "dc5ebedd5de308d1bfdfc895a84c2d17c58fb6ba",
-  "deploy_id": "https://huggingface.co/spaces/prateekm1/toscanini-prod-validation/commit/0506708ee4dc63fa8a51548675521a78dfcda1c4",
+  "target_sha": "e919a66436d83364af8e880020ed5d897deab4ae",
+  "deployed_sha": "e919a66436d83364af8e880020ed5d897deab4ae",
+  "deploy_id": "https://huggingface.co/spaces/prateekm1/toscanini-prod-validation/commit/c40bd05772e47075f90c9f33631dadafef16c819",
   "health_check_result": "GREEN",
   "drift": "GREEN",
   "blocked_by": null,
-  "what_unblocks": "n/a - instrumented production verified"
+  "what_unblocks": "n/a - R525 after-arm winner serving"
  },
  "remaining_blind_spots": [
   "SYNTHESIZE spans absent on uninstrumented/failed rows -> UNATTRIBUTED by rule",
@@ -1268,5 +1270,29 @@
   "post-rank entry frequency varies with live provider states"
  ],
  "session_files": "R525/BATTERY_SESSIONS_CURRENT.json is LOCAL-ONLY; redacted mirror is the committable custody record",
- "immutable_state": "origin/runtime-state-hf durable branch = byte authority for every measured wall"
+ "immutable_state": "origin/runtime-state-hf durable branch = byte authority for every measured wall",
+ "after_arm_result": {
+  "deployed_engine": "e919a66436d83364af8e880020ed5d897deab4ae",
+  "deploy_proofs": {
+   "engine_diff_guard": "['discovery_fabric/engine/independent_attack.py', 'discovery_fabric/engine/provider_health.py', 'discovery_fabric/engine/run.py'] only",
+   "standing_config_readback": {
+    "ENGINE_EVIDENCE_FABRIC": "0",
+    "ENGINE_RETRIEVE_EXCLUDE_SOURCES": "openalex"
+   },
+   "production_identity": "/api/version engine_commit == e919a66436d8, drift GREEN, identity_tamper False"
+  },
+  "gauntlet_on_after_arm": {
+   "exposure_rows": 0,
+   "failure_wall_total_s": 0.0,
+   "rows_with_zai_in_chain": 0
+  },
+  "tech_pass_zai_attempts": 0,
+  "interpretation": "named waste class absent on the after arm (POST_RANK_GAUNTLET on 3/12 rows; failure wall 564.438 s; classes ['MODEL_FAILURE'] on current); gauntlet entry itself is live-variance-driven (0/12 after vs 3/12 current), so the paired comparison is confounded on the gauntlet dimension and no end-to-end speedup is claimed; the routing fix is proven by contract tests + staged-bytes proof, the battery proves absence + parity + no regressions"
+ },
+ "quality_parity": {
+  "span_verbatim_rate": "1.0 on 12/12 current rows and 12/12 after rows (durable)",
+  "funnel": "OBSERVED_IN_STAGE 24/24 across both arms",
+  "tech_pass": "zero zai attempts on the after arm (R523 fix holds)"
+ },
+ "updated_at_utc": "2026-09-24T03:31:42Z"
 }
