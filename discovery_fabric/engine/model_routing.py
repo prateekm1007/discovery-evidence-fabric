@@ -1431,7 +1431,8 @@ def record_phase_span(session_id: Optional[str],
                       candidate_id: Optional[str] = None,
                       candidate_key: Optional[str] = None,
                       wall_s: Optional[float] = None,
-                      detail: Optional[Dict[str, Any]] = None) -> None:
+                      detail: Optional[Dict[str, Any]] = None,
+                      scope: str = "top") -> None:
     """R526 Q-B: one durable orchestration-timing line per post-rank
     phase entry/exit (and candidate-loop iterations where available).
 
@@ -1445,6 +1446,13 @@ def record_phase_span(session_id: Optional[str],
       - run isolation (ledger_for_run) keeps them (same run_id).
     Behavior-neutral: pure telemetry append; never raises (best
     effort, disclosed via last_error like every ledger write).
+
+    scope (R526 Q-B parent/child discriminator): "top" marks a
+    top-level phase wall (whole GAUNTLET / KILL_IMPROVE /
+    IMPROVEMENT_PASS / TECHNICAL_IMPROVEMENT_PASS — the ONLY walls
+    that may enter the run-wall reconciliation), "child" marks a
+    per-candidate / per-target span nested INSIDE a top-level phase
+    (attribution detail; NEVER added on top of the parent wall).
     """
     import uuid
     try:
@@ -1478,6 +1486,7 @@ def record_phase_span(session_id: Optional[str],
             "error": "",
             "phase": phase,
             "event": event,
+            "scope": scope,
             "candidate_id": candidate_id,
             "candidate_key": candidate_key,
             "wall_s": wall_s,

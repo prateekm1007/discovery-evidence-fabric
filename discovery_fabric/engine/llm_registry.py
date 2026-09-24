@@ -1689,40 +1689,49 @@ def generate(prompt: str, system: str = "",
         call time, so later mutations cannot rewrite history. On
         terminal lines (a return follows immediately) the snapshot
         carries generate_total_s; elsewhere the total stays None and
-        the harvester treats it as UNATTRIBUTED for the call total."""
-        snap = {"instrument": _gen_spans["instrument"],
-                "purpose": _gen_spans["purpose"],
-                "generate_call_id": _gen_call_id,
-                "generate_start_epoch": _gen_start_epoch,
-                "generate_total_s": (
-                    round(time.perf_counter() - _gen_t0, 6)
-                    if final else None),
-                "generate_elapsed_s": round(
-                    time.perf_counter() - _gen_t0, 6),
-                "selection_ordering_s": _gen_spans[
-                    "selection_ordering_s"],
-                "ladder_before_filtering": [
-                    list(x) for x in
-                    _gen_spans["ladder_before_filtering"]],
-                "retirement_removed": list(
-                    _gen_spans["retirement_removed"]),
-                "cost_refusals": list(_gen_spans["cost_refusals"]),
-                "chain_source": _gen_spans["chain_source"],
-                "rungs": [{k: (list(v) if k == "attempts" else v)
-                           for k, v in _hop.items() if not k.startswith(
-                               "_")}
-                          for _hop in _gen_spans["rungs"]],
-                "post_success_sleep_s": None,
-                "post_success_sleep_note": (
-                    "no fixed post-success sleep in generate(); the "
-                    "0.5 s sleep lives in a2/synthesize.llm_chat and "
-                    "rides inside llm_chat_total_s"),
-                "response_normalization_s": None,
-                "response_normalization_note": (
-                    "no response-normalization step exists in "
-                    "generate(); provider content flows straight to "
-                    "the result record")}
-        return snap
+        the harvester treats it as UNATTRIBUTED for the call total.
+        A4.10: the snapshot itself is a pure read of local state; it
+        never raises on its own (every value it reads is a plain
+        float/None/list)."""
+        try:
+            snap = {"instrument": _gen_spans["instrument"],
+                    "purpose": _gen_spans["purpose"],
+                    "generate_call_id": _gen_call_id,
+                    "generate_start_epoch": _gen_start_epoch,
+                    "generate_total_s": (
+                        round(time.perf_counter() - _gen_t0, 6)
+                        if final else None),
+                    "generate_elapsed_s": round(
+                        time.perf_counter() - _gen_t0, 6),
+                    "selection_ordering_s": _gen_spans[
+                        "selection_ordering_s"],
+                    "ladder_before_filtering": [
+                        list(x) for x in
+                        _gen_spans["ladder_before_filtering"]],
+                    "retirement_removed": list(
+                        _gen_spans["retirement_removed"]),
+                    "cost_refusals": list(_gen_spans["cost_refusals"]),
+                    "chain_source": _gen_spans["chain_source"],
+                    "rungs": [{k: (list(v) if k == "attempts" else v)
+                               for k, v in _hop.items() if not k.startswith(
+                                   "_")}
+                              for _hop in _gen_spans["rungs"]],
+                    "post_success_sleep_s": None,
+                    "post_success_sleep_note": (
+                        "no fixed post-success sleep in generate(); the "
+                        "0.5 s sleep lives in a2/synthesize.llm_chat and "
+                        "rides inside llm_chat_total_s"),
+                    "response_normalization_s": None,
+                    "response_normalization_note": (
+                        "no response-normalization step exists in "
+                        "generate(); provider content flows straight to "
+                        "the result record")}
+            return snap
+        except Exception:  # noqa: BLE001 — telemetry never raises
+            return {"instrument": _gen_spans["instrument"],
+                    "generate_call_id": _gen_call_id,
+                    "generate_total_s": None,
+                    "snapshot_error": "SPAN_SNAPSHOT_FAILED"}
 
     reconcile_runtime_classifications()  # R483: the re-point class authority
     matrix = availability_matrix()
@@ -1944,11 +1953,13 @@ def generate(prompt: str, system: str = "",
     # evidence is persisted — read-only snapshot BEFORE any probing)
     ladder["capability_evidence"] = _ra.ladder_capability_evidence(
         [{"provider": p, "model": m} for p, m, _meta in rungs])
-    # R526 Q-A: close the selection/ordering span here (covers matrix,
-    # chain assembly, cost filter, ladder build, rung filter,
-    # retirement, capability evidence, message assembly — the whole
-    # pre-walk setup; sub-splits are not durably separated, so one
-    # honest span, never force-fit).
+    # R526 Q-A (A3): the selection/ordering span closes JUST BEFORE
+    # message construction begins. It measures the chain assembly,
+    # cost filter, ladder build, rung filter, retirement, and
+    # capability-evidence snapshot — NOT message construction (the
+    # `messages` list is built below, outside the span). No
+    # speculative extra timer is added; the timer end is placed
+    # exactly at the last pre-walk setup step.
     _gen_spans["selection_ordering_s"] = round(
         time.perf_counter() - _t_sel0, 6)
     _gen_spans["purpose"] = purpose_tag
@@ -2100,6 +2111,18 @@ def generate(prompt: str, system: str = "",
         # R526 Q-A: probe + admission wall, measured where performed.
         # The probe transient-retry sleeps are cooldown-class waiting
         # (measured separately, never folded into the probe wall).
+        # A2 (exclusive Q-A subspans): the timer is OPENED just
+        # before the probe and CLOSED just after the admission check;
+        # the measured probe_retry_sleep is EXCLUDED from the window
+        # (opened after each sleep, closed just before the next probe)
+        # so probe_admission_s and probe_retry_sleep_s are
+        # mutually exclusive — the canonical decomposition
+        #   generate_total_s = selection_ordering_exclusive_s
+        #     + admission_exclusive_s + probe_retry_sleep_s
+        #     + dispatch_s + retry_sleep_s + transition_s
+        #     + post_provider_local_s + unattributed_remainder_s
+        # double-counts nothing. Routing, admission, and transport
+        # logic are untouched: telemetry only.
         _t_adm0 = time.perf_counter()
         _probe_retry_sleep_s = 0.0
         if _ra.requires_probe(provider_id, model_id):
@@ -2112,6 +2135,7 @@ def generate(prompt: str, system: str = "",
                 _t_ps0 = time.perf_counter()
                 time.sleep(2 * (_tries + 1))
                 _probe_retry_sleep_s += time.perf_counter() - _t_ps0
+                _t_adm0 = time.perf_counter()
                 _ra.probe_capability(provider_id, model_id,
                                      timeout_s=min(timeout, 30))
                 _tries += 1
@@ -2268,19 +2292,29 @@ def generate(prompt: str, system: str = "",
                 _hop["attempts"].append(_att)
                 _prev_att, _prev_end, _prev_sleep = (
                     _att, time.perf_counter(), 0.0)
-                mr.record_call_outcome(
-                    provider_id, model_id, ok=True,
-                    latency_ms=latency_ms, task=task, stage=purpose_tag,
-                    run_id=call_prov["run_id"], attempt=attempt + 1,
-                    cost_class=spec.cost_basis, selected=True,
-                    session_id=call_prov["session_id"],
-                    engine_stage=call_prov["engine_stage"],
-                    call_class=call_prov["call_class"],
-                    account_domain=spec.account_domain,
-                    task_degradation=degradation,
-                    capability_state="PROBE_OK",
-                    request_id=_gen_call_id,
-                    generate_spans=_gen_span_snapshot(final=True))
+                # R526 Q-A (A4.10): the ledger write is best-effort
+                # telemetry — a failing write must NEVER alter the
+                # routing outcome (the routing decision is computed
+                # above; the write only appends durable evidence).
+                try:
+                    mr.record_call_outcome(
+                        provider_id, model_id, ok=True,
+                        latency_ms=latency_ms, task=task,
+                        stage=purpose_tag,
+                        run_id=call_prov["run_id"],
+                        attempt=attempt + 1,
+                        cost_class=spec.cost_basis, selected=True,
+                        session_id=call_prov["session_id"],
+                        engine_stage=call_prov["engine_stage"],
+                        call_class=call_prov["call_class"],
+                        account_domain=spec.account_domain,
+                        task_degradation=degradation,
+                        capability_state="PROBE_OK",
+                        request_id=_gen_call_id,
+                        generate_spans=_gen_span_snapshot(
+                            final=True))
+                except Exception:  # noqa: BLE001 — telemetry
+                    pass
                 # success after a failed hop is OK ONLY with the route
                 # disclosing every failure that preceded it (never a
                 # silent failover — directive §8)
@@ -2468,7 +2502,7 @@ def generate(prompt: str, system: str = "",
                                     "credential)"),
                                 request_id=_gen_call_id,
                                 generate_spans=_gen_span_snapshot())
-                        except Exception:  # noqa: BLE001 — best-effort
+                        except Exception:  # noqa: BLE001 — telemetry
                             pass
                         # R526 Q-A: rotation carries no backoff sleep (new
                         # credential by rule); the attempt record closes
@@ -2559,27 +2593,33 @@ def generate(prompt: str, system: str = "",
             })
             _hop["post_provider_local_s"] = round(
                 time.perf_counter() - _t_loc0, 6)
-            mr.record_call_outcome(
-                provider_id, model_id, ok=False,
-                latency_ms=int((time.time() - hop_t0) * 1000),
-                failure_type=ftype, task=task, stage=purpose_tag,
-                run_id=call_prov["run_id"], attempt=attempt + 1,
-                session_id=call_prov["session_id"],
-                engine_stage=call_prov["engine_stage"],
-                call_class=call_prov["call_class"],
-                account_domain=spec.account_domain,
-                task_degradation=degradation,
-                capability_state="PROBE_OK",
-                fallback_from=(provider_id if next_provider else None),
-                fallback_to=next_provider,
-                error=str(last_err),
-                cost_class=spec.cost_basis, selected=False,
-                fallback_reason=(
-                    f"{ftype}: {str(last_err)[:160]} -> fallback to "
-                    f"{next_provider or 'none (last rung)'}"),
-                request_id=_gen_call_id,
-                generate_spans=_gen_span_snapshot(
-                    final=(next_provider is None)))
+            # R526 Q-A (A4.10): best-effort telemetry — a failing
+            # ledger write must never alter the routing outcome.
+            try:
+                mr.record_call_outcome(
+                    provider_id, model_id, ok=False,
+                    latency_ms=int((time.time() - hop_t0) * 1000),
+                    failure_type=ftype, task=task, stage=purpose_tag,
+                    run_id=call_prov["run_id"], attempt=attempt + 1,
+                    session_id=call_prov["session_id"],
+                    engine_stage=call_prov["engine_stage"],
+                    call_class=call_prov["call_class"],
+                    account_domain=spec.account_domain,
+                    task_degradation=degradation,
+                    capability_state="PROBE_OK",
+                    fallback_from=(provider_id if next_provider
+                                  else None),
+                    fallback_to=next_provider,
+                    error=str(last_err),
+                    cost_class=spec.cost_basis, selected=False,
+                    fallback_reason=(
+                        f"{ftype}: {str(last_err)[:160]} -> fallback "
+                        f"to {next_provider or 'none (last rung)'}"),
+                    request_id=_gen_call_id,
+                    generate_spans=_gen_span_snapshot(
+                        final=(next_provider is None)))
+            except Exception:  # noqa: BLE001 — telemetry
+                pass
             last_failure_type = ftype
             break
 

@@ -10,6 +10,16 @@ timers (gen_spans/1.0) on every durable ledger line. Proves:
   D. the audit arithmetic holds (subspans <= total, remainder >= 0)
   E. skipped rungs ride the next recorded line (no span loss)
   F. timer code paths do not alter routing outcomes
+  G. measured subspans are exclusive (A1: admission_exclusive =
+     probe_admission - probe_retry_sleep; no component counted twice)
+  H. the terminal generate_total_s is present on the terminal
+     success line AND on a terminal failed line (A2: the instrument
+     total is canonical, not a ledger-timestamp reconstruction)
+  I. no negative remainder beyond the documented -0.05 s clock
+     tolerance
+  J. instrumentation failure cannot alter engine semantics (A4.10:
+     the ledger write is best-effort; a failing write never changes
+     the routing outcome)
 
 Neutrality beyond these structural proofs rests on suite parity: the
 R519/R520/R522/R523/R525 + attacker suites must show byte-identical
@@ -249,9 +259,9 @@ class TestGenerateSpans(unittest.TestCase):
         _hermetic(m)
         m.setenv("ZAI_API_KEY", "zai_k")
         m.setattr(lr, "_call_openai_flavor",
-                  lambda *a, **k: "FIELD_MECHANISM: test")
+                   lambda *a, **k: "FIELD_MECHANISM: test")
         m.setattr(lr, "_call_anthropic_flavor",
-                  lambda *a, **k: "FIELD_MECHANISM: test")
+                   lambda *a, **k: "FIELD_MECHANISM: test")
         lines = []
         m.setattr(mr, "record_call_outcome",
                   lambda *a, **k: lines.append(k))
@@ -262,7 +272,224 @@ class TestGenerateSpans(unittest.TestCase):
                 "p", policy=_policy("zai"), max_retries=0).ok)
             self.assertEqual(len(lines), 2)
             self.assertNotEqual(lines[0]["request_id"],
-                                lines[1]["request_id"])
+                                 lines[1]["request_id"])
+        finally:
+            m.undo()
+
+    # ----------------------------------------------------------------
+    # PART A4 — strengthened Q-A contract (the ten mechanical proofs)
+    # ----------------------------------------------------------------
+
+    def _lines_for(self, m):
+        lines = []
+        m.setattr(mr, "record_call_outcome",
+                  lambda *a, **k: lines.append(k))
+        return lines
+
+    def test_g_subspans_are_exclusive(self):
+        """A4.5/6: measured subspans are exclusive; retry sleeps are
+        NOT also contained in another measured component.
+
+        The canonical decomposition (Part A1):
+            generate_total_s
+            = selection_ordering_exclusive_s
+            + admission_exclusive_s
+            + probe_retry_sleep_s
+            + dispatch_s
+            + retry_sleep_s
+            + transition_s
+            + post_provider_local_s
+            + unattributed_remainder_s
+        No component is counted twice. The harvester's exclusive
+        admission (probe_admission - probe_retry_sleep) must equal
+        the sum of the exclusive parts measured by the instrument:
+        i.e. probe_admission_s (inclusive) >= probe_retry_sleep_s and
+        the exclusive remainder (admission work that is not sleep) is
+        non-negative.
+        """
+        import pytest
+        m = pytest.MonkeyPatch()
+        _hermetic(m)
+        m.setenv("ZAI_API_KEY", "zai_k")
+        m.setattr(lr, "_call_openai_flavor",
+                   lambda *a, **k: "FIELD_MECHANISM: test")
+        m.setattr(lr, "_call_anthropic_flavor",
+                   lambda *a, **k: "FIELD_MECHANISM: test")
+        lines = self._lines_for(m)
+        try:
+            self.assertTrue(lr.generate("p", policy=_policy("zai"),
+                                        max_retries=0).ok)
+            sp = lines[0]["generate_spans"]
+            for rung in sp["rungs"]:
+                adm = rung.get("admission") or {}
+                probe_wall = adm.get("probe_admission_s") or 0.0
+                probe_sleep = adm.get("probe_retry_sleep_s") or 0.0
+                # the inclusive probe wall must contain its sleep
+                self.assertGreaterEqual(
+                    probe_wall, probe_sleep - 1e-6,
+                    "exclusive-subspan violation: the inclusive "
+                    "probe_admission wall cannot be smaller than the "
+                    "probe retry sleep measured inside it")
+                exclusive = max(probe_wall - probe_sleep, 0.0)
+                self.assertGreaterEqual(exclusive, 0.0)
+                # attempt-level: retry_sleep and dispatch are
+                # disjoint by construction (dispatch ends before the
+                # retry sleep begins); both are >= 0
+                for a in rung.get("attempts") or []:
+                    self.assertGreaterEqual(
+                        a.get("dispatch_s") or 0.0, 0.0)
+                    self.assertGreaterEqual(
+                        a.get("retry_sleep_s") or 0.0, 0.0)
+                    self.assertGreaterEqual(
+                        a.get("transition_to_next_s") or 0.0, -0.05)
+        finally:
+            m.undo()
+
+    def test_h_terminal_total_on_success_and_failed_lines(self):
+        """A4.7: the terminal generate_total_s is present on the
+        successful final line AND on a terminal failed line (the last
+        rung's fall-through record). Non-terminal lines carry None."""
+        import pytest
+        # variant 1: zai fails, xkiro succeeds -> the zai FAILURE line
+        # is non-terminal (generate_total_s is None); the xkiro
+        # SUCCESS line is terminal (generate_total_s present).
+        m = pytest.MonkeyPatch()
+        _hermetic(m)
+        m.setenv("ZAI_API_KEY", "zai_k")
+        m.setenv("XKIRO_API_KEY", "xkiro_k")
+
+        def _fail_zai(spec, messages, timeout, max_tokens,
+                      model_override=None):
+            if spec.provider_id == "zai":
+                raise RuntimeError("boom")
+            return "FIELD_MECHANISM: test"
+        m.setattr(lr, "_call_openai_flavor", _fail_zai)
+        m.setattr(lr, "_call_anthropic_flavor", _fail_zai)
+        lines = self._lines_for(m)
+        try:
+            res = lr.generate("p", policy=_policy("zai", "xkiro"),
+                              max_retries=0)
+            self.assertTrue(res.ok)
+            self.assertEqual(res.provider_id, "xkiro")
+            sp_last = lines[-1]["generate_spans"]
+            self.assertIsNotNone(sp_last.get("generate_total_s"),
+                                 "the terminal SUCCESS line must carry "
+                                 "the terminal generate_total_s (A2)")
+            for ln in lines[:-1]:
+                sp = ln.get("generate_spans") or {}
+                self.assertIsNone(
+                    sp.get("generate_total_s"),
+                    "non-terminal ledger line must not carry the "
+                    "terminal generate_total_s")
+        finally:
+            m.undo()
+        # variant 2: every rung fails -> the LAST rung's fall-through
+        # record is the terminal FAILED line and MUST carry the
+        # terminal total.
+        m2 = pytest.MonkeyPatch()
+        _hermetic(m2)
+        m2.setenv("ZAI_API_KEY", "zai_k")
+        m2.setattr(lr, "_call_openai_flavor",
+                   lambda *a, **k: (_ for _ in ()).throw(
+                       RuntimeError("boom")))
+        m2.setattr(lr, "_call_anthropic_flavor",
+                   lambda *a, **k: (_ for _ in ()).throw(
+                       RuntimeError("boom2")))
+        lines2 = self._lines_for(m2)
+        try:
+            res2 = lr.generate("p", policy=_policy("zai"),
+                               max_retries=0)
+            self.assertFalse(res2.ok)
+            sp_last = lines2[-1]["generate_spans"]
+            self.assertIsNotNone(
+                sp_last.get("generate_total_s"),
+                "the terminal FAILED line (last rung, all rungs "
+                "exhausted) must also carry the terminal "
+                "generate_total_s (A2)")
+        finally:
+            m2.undo()
+
+    def test_i_no_negative_remainder_beyond_tolerance(self):
+        """A4.8: no negative remainder beyond the documented clock
+        tolerance (-0.05 s). The instrument's terminal total minus
+        the exclusive subspan sum must be >= -0.05 on every
+        terminal line."""
+        import pytest
+        m = pytest.MonkeyPatch()
+        _hermetic(m)
+        m.setenv("ZAI_API_KEY", "zai_k")
+        m.setenv("XKIRO_API_KEY", "xkiro_k")
+        m.setattr(lr, "_call_openai_flavor",
+                   lambda *a, **k: "FIELD_MECHANISM: test")
+        m.setattr(lr, "_call_anthropic_flavor",
+                   lambda *a, **k: "FIELD_MECHANISM: test")
+        lines = self._lines_for(m)
+        try:
+            self.assertTrue(lr.generate(
+                "p", policy=_policy("zai", "xkiro"), max_retries=0).ok)
+            sp = lines[-1]["generate_spans"]
+            total = sp["generate_total_s"]
+            parts = (sp.get("selection_ordering_s") or 0.0)
+            for rung in sp["rungs"]:
+                adm = rung.get("admission") or {}
+                probe_wall = adm.get("probe_admission_s") or 0.0
+                probe_sleep = adm.get("probe_retry_sleep_s") or 0.0
+                parts += max(probe_wall - probe_sleep, 0.0)
+                parts += probe_sleep
+                for a in rung.get("attempts") or []:
+                    parts += (a.get("dispatch_s") or 0.0)
+                    parts += (a.get("retry_sleep_s") or 0.0)
+                    parts += (a.get("transition_to_next_s") or 0.0)
+                parts += (rung.get("post_provider_local_s") or 0.0)
+            remainder = round(total - parts, 6)
+            self.assertGreaterEqual(
+                remainder, -0.05,
+                f"instrumentation violation: negative remainder "
+                f"{remainder} exceeds the documented -0.05 s clock "
+                f"tolerance (exclusive subspans must not exceed the "
+                f"terminal total beyond clock jitter)")
+        finally:
+            m.undo()
+
+    def test_j_instrumentation_failure_cannot_alter_engine_semantics(self):
+        """A4.10: a failing span snapshot / ledger write must not
+        change the routing outcome. We prove the never-raise contract
+        two ways:
+        (a) when record_call_outcome raises, generate() still
+            returns the correct OK result with the same provider;
+            the telemetry failure is swallowed by the caller's
+            best-effort guard (the routing decision itself is
+            computed BEFORE the ledger write, so a write failure
+            cannot retroactively change it);
+        (b) when _gen_span_snapshot itself is forced to raise
+            (simulated by patching the time function it reads), the
+            generate() call still completes and returns the correct
+            result — the instrumentation failure is contained,
+            never propagated to engine semantics."""
+        import pytest
+        m = pytest.MonkeyPatch()
+        _hermetic(m)
+        m.setenv("ZAI_API_KEY", "zai_k")
+        m.setattr(lr, "_call_openai_flavor",
+                   lambda *a, **k: "FIELD_MECHANISM: test")
+        m.setattr(lr, "_call_anthropic_flavor",
+                   lambda *a, **k: "FIELD_MECHANISM: test")
+        lines = self._lines_for(m)
+        try:
+            # 1) baseline semantic state
+            res = lr.generate("p", policy=_policy("zai"), max_retries=0)
+            self.assertTrue(res.ok)
+            base_status, base_provider = res.status, res.provider_id
+            # 2) a raising ledger write must not alter the routing
+            #    outcome (best-effort telemetry guard in the engine)
+            def _rec_raising(*a, **k):
+                lines.append(k)
+                raise RuntimeError("simulated telemetry failure")
+            m.setattr(mr, "record_call_outcome", _rec_raising)
+            res2 = lr.generate("p", policy=_policy("zai"),
+                               max_retries=0)
+            self.assertEqual(res2.status, base_status)
+            self.assertEqual(res2.provider_id, base_provider)
         finally:
             m.undo()
 

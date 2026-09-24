@@ -183,30 +183,50 @@ def _stage_table(manifest, envs):
 
 # ---------------------------------------------------------------- ledger
 def _phase_spans_block(lines):
-    """R526 Q-B: pair phase enter/exit lines by (phase, candidate_key,
-    candidate_id), in epoch order. Unmatched events are listed
-    explicitly (never force-paired, never zero-filled)."""
+    """R526 Q-B: pair phase enter/exit lines by (phase, scope,
+    candidate_key, candidate_id), in epoch order.
+
+    Scope discriminator (B1/B2): "top" lines are top-level phase walls
+    (whole GAUNTLET / KILL_IMPROVE / IMPROVEMENT_PASS /
+    TECHNICAL_IMPROVEMENT_PASS) — the ONLY walls that may enter the
+    run-wall reconciliation; "child" lines are per-candidate /
+    per-target spans nested inside a top-level phase (attribution
+    detail, never added on top of the parent wall). Lines without a
+    scope field (older instrumented data) fall back to event-name
+    derivation: candidate_*/target_* => "child", everything else =>
+    "top" (documented fallback, never inferred from timestamps).
+    Unmatched events are listed explicitly (never force-paired,
+    never zero-filled; B3 identity preserved by the key fields, no
+    time-window matching)."""
     by_key = {}
     for ln in sorted(lines,
                      key=lambda l: (l.get("recorded_at_epoch") or 0)):
-        key = (ln.get("phase"), ln.get("candidate_key"),
+        _evt = str(ln.get("event") or "")
+        _scope = ln.get("scope")
+        if _scope not in ("top", "child"):
+            _scope = ("child"
+                      if (_evt.startswith("candidate_")
+                          or _evt.startswith("target_"))
+                      else "top")
+        key = (ln.get("phase"), _scope, ln.get("candidate_key"),
                ln.get("candidate_id"))
         by_key.setdefault(key, []).append(ln)
     phases = {}
     unmatched = []
-    for (phase, ckey, cid), evs in sorted(
+    for (phase, ckey, cid, scope), evs in sorted(
             by_key.items(), key=lambda kv: str(kv[0])):
         if phase is None:
             unmatched.append({"reason": "phase-name-absent",
-                              "n_lines": len(evs)})
+                              "scope": scope, "n_lines": len(evs)})
             continue
         enters = [e for e in evs
-                  if str(e.get("event") or "").endswith("enter")]
+                  if str(e.get("event") or "") == "enter"
+                  or str(e.get("event") or "").endswith("_enter")]
         exits = [e for e in evs
-                 if str(e.get("event") or "").endswith("exit")]
+                 if str(e.get("event") or "").endswith("_exit")]
         rec = phases.setdefault(
-            phase, {"walls_s": [], "candidates": {},
-                    "n_unmatched": 0})
+            phase, {"walls_s": [], "top_wall_sum_s": 0.0,
+                    "children": {}, "n_unmatched": 0})
         ident = ckey or cid
         for i, ex in enumerate(exits):
             if i < len(enters):
@@ -219,9 +239,13 @@ def _phase_spans_block(lines):
                          if te and tx else None)
                 if w is not None:
                     rec["walls_s"].append(w)
+                if scope == "top":
+                    rec["top_wall_sum_s"] = round(
+                        rec["top_wall_sum_s"] + (w or 0.0), 3)
                 if ident is not None:
-                    cr = rec["candidates"].setdefault(
-                        str(ident), {"walls_s": [], "outcomes": []})
+                    cr = rec["children"].setdefault(
+                        str(ident), {"scope": scope, "walls_s": [],
+                                     "outcomes": []})
                     if w is not None:
                         cr["walls_s"].append(w)
                     det = ex.get("detail") or {}
@@ -229,20 +253,31 @@ def _phase_spans_block(lines):
                         cr["outcomes"].append(det["outcome"])
             else:
                 rec["n_unmatched"] += 1
-                unmatched.append({"phase": phase, "candidate": ident,
+                unmatched.append({"phase": phase, "scope": scope,
+                                  "candidate": ident,
                                   "reason": "exit-without-enter"})
         for _en in enters[len(exits):]:
             rec["n_unmatched"] += 1
-            unmatched.append({"phase": phase, "candidate": ident,
+            unmatched.append({"phase": phase, "scope": scope,
+                              "candidate": ident,
                               "reason": "enter-without-exit"})
     for rec in phases.values():
         rec["wall_sum_s"] = round(sum(rec["walls_s"]), 3)
-        for cr in rec["candidates"].values():
+        for cr in rec["children"].values():
             cr["wall_sum_s"] = round(sum(cr["walls_s"]), 3)
     return {"class": ("OBSERVED_IN_STAGE" if phases else "UNKNOWN"),
             "n_phase_lines": len(lines),
             "phases": phases,
-            "unmatched": unmatched}
+            "unmatched": unmatched,
+            "reconciliation_rule": ("run_wall = "
+                                    "executed_linear_stage_wall + "
+                                    "top_level_post_rank_phase_wall "
+                                    "(top_wall_sum_s, scope=top ONLY) + "
+                                    "explicit_external_or_orchestration_"
+                                    "wall + UNKNOWN_remainder; child "
+                                    "spans (scope=child) are attribution "
+                                    "detail, never added on top of the "
+                                    "parent phase wall")}
 
 
 def _generate_calls_block(lines):
@@ -267,6 +302,10 @@ def _generate_calls_block(lines):
         # R526 Q-A: per-call subphase sums from the COMPLETE spans
         # block (last line by epoch carries the full rung history).
         # These feed the directive §11 generate-subphase ranking.
+        # A1 (exclusive subspans): admission_exclusive = probe_admission
+        # - probe_retry_sleep (the instrument closes the admission
+        # timer after each probe-retry sleep; the two are mutually
+        # exclusive and NO component is counted twice).
         sub = {"selection_ordering_s": (sp.get("selection_ordering_s")
                                         or 0.0),
                "admission_s": 0.0, "probe_retry_sleep_s": 0.0,
@@ -274,9 +313,11 @@ def _generate_calls_block(lines):
                "transition_s": 0.0, "post_provider_local_s": 0.0}
         for rung in sp.get("rungs") or []:
             adm = rung.get("admission") or {}
-            sub["admission_s"] += adm.get("probe_admission_s") or 0.0
-            sub["probe_retry_sleep_s"] += adm.get(
-                "probe_retry_sleep_s") or 0.0
+            _probe_wall = adm.get("probe_admission_s") or 0.0
+            _probe_sleep = adm.get("probe_retry_sleep_s") or 0.0
+            _exclusive = max(_probe_wall - _probe_sleep, 0.0)
+            sub["admission_s"] += _exclusive
+            sub["probe_retry_sleep_s"] += _probe_sleep
             for a in rung.get("attempts") or []:
                 sub["dispatch_s"] += a.get("dispatch_s") or 0.0
                 sub["retry_sleep_s"] += a.get("retry_sleep_s") or 0.0
@@ -285,20 +326,30 @@ def _generate_calls_block(lines):
             sub["post_provider_local_s"] += rung.get(
                 "post_provider_local_s") or 0.0
         sub = {k: round(v, 3) for k, v in sub.items()}
+        sub["admission_s_inclusive_note"] = (
+            "admission_exclusive = probe_admission_inclusive - "
+            "probe_retry_sleep; the raw inclusive probe wall is not "
+            "reported separately (exclusive form is the canonical one)")
         measured = round(
             sub["selection_ordering_s"] + sub["admission_s"]
             + sub["probe_retry_sleep_s"] + sub["dispatch_s"]
             + sub["retry_sleep_s"] + sub["transition_s"]
             + sub["post_provider_local_s"], 3)
-        epochs = [l.get("recorded_at_epoch") for l in ls
-                  if l.get("recorded_at_epoch")]
-        start = sp.get("generate_start_epoch")
-        total = (round(max(epochs) - start, 3)
-                 if epochs and start else None)
+        # A2: the canonical Q-A total is the instrument's terminal
+        # generate_total_s (final=True snapshot on the last durable
+        # line of the call). Ledger-timestamp reconstruction is kept
+        # only as audit provenance (ordering check), never silently
+        # substituted for the measured total.
         terms = [((l.get("generate_spans") or {}).get(
             "generate_total_s")) for l in ls
             if isinstance(l.get("generate_spans"), dict)]
         terms = [t for t in terms if t is not None]
+        total = terms[-1] if terms else None
+        epochs = [l.get("recorded_at_epoch") for l in ls
+                  if l.get("recorded_at_epoch")]
+        start = sp.get("generate_start_epoch")
+        total_ledger_provenance = (round(max(epochs) - start, 3)
+                                   if epochs and start else None)
         calls.append({
             "request_id": cid,
             "spans_present": True,
@@ -318,13 +369,23 @@ def _generate_calls_block(lines):
                 "measured_s": measured,
                 "remainder_s": (round(total - measured, 3)
                                 if total is not None else None),
-                "generate_total_s_terminal": terms[-1] if terms
-                else None,
-                "note": ("total from last-line epoch minus durable "
-                         "start epoch; remainder covers loop overhead, "
-                         "dict building, degradation records, ledger "
-                         "I/O, and result construction (all sub-ms "
-                         "local work by inspection)"),
+                "generate_total_s_terminal": total,
+                "total_ledger_provenance_s": total_ledger_provenance,
+                "remainder_rule": ("generate_total_s (instrument "
+                                   "terminal) = measured_subspans + "
+                                   "unattributed_remainder_s; remainder "
+                                   "may be positive (loop overhead, "
+                                   "dict building, degradation records, "
+                                   "ledger I/O, result construction — "
+                                   "all sub-ms local work by "
+                                   "inspection); a small negative value "
+                                   "beyond clock tolerance -0.05 s is "
+                                   "an instrumentation violation, "
+                                   "flagged never hidden"),
+                "note": ("total from the instrument's terminal "
+                         "generate_total_s; the ledger-epoch "
+                         "reconstruction is provenance only and is "
+                         "never silently substituted"),
             },
         })
     return {"class": ("OBSERVED_IN_STAGE" if calls else "UNKNOWN"),

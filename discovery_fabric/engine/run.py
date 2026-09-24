@@ -1634,7 +1634,7 @@ class EngineRun:
             from .model_routing import record_phase_span as _rps
             _rps(session_id=self.session_id, run_id=self.run_id,
                  engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
-                 event="enter")
+                 event="enter", scope="top")
             for c in pool:
                 key = c["key"]
                 _ct0 = _ptime.perf_counter()
@@ -1649,7 +1649,7 @@ class EngineRun:
                 # _crow_finish below so every path is covered).
                 _rps(session_id=self.session_id, run_id=self.run_id,
                      engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
-                     event="candidate_enter",
+                     event="candidate_enter", scope="child",
                      candidate_id=c.get("candidate_id"),
                      candidate_key=key)
 
@@ -1664,6 +1664,7 @@ class EngineRun:
                          run_id=self.run_id,
                          engine_stage="POST_RANK_GAUNTLET",
                          phase="GAUNTLET", event="candidate_exit",
+                         scope="child",
                          candidate_id=_crow.get("candidate_id"),
                          candidate_key=_crow.get("key"),
                          wall_s=round(_crow["wall_s"], 6),
@@ -2016,10 +2017,12 @@ class EngineRun:
 
             _pra_stop("GAUNTLET")
             # R526 Q-B: gauntlet phase exit (pairs with the entry at
-            # loop start; wall reuses the _pra measurement).
+            # loop start; wall reuses the _pra measurement; scope=top
+            # marks the whole-phase wall — B2 reconciliation uses only
+            # top-scope walls).
             _rps(session_id=self.session_id, run_id=self.run_id,
                  engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
-                 event="exit",
+                 event="exit", scope="top",
                  wall_s=round(_pra["phase_s"].get("GAUNTLET", 0.0), 6),
                  detail={"n_evaluated": len(evaluated)})
             _cctx.set_stage("POST_RANK")
@@ -2197,7 +2200,7 @@ class EngineRun:
                 # identity; this line bounds the whole phase).
                 _rps(session_id=self.session_id, run_id=self.run_id,
                      engine_stage="POST_RANK_IMPROVE",
-                     phase="KILL_IMPROVE", event="enter",
+                     phase="KILL_IMPROVE", event="enter", scope="top",
                      detail={"n_dead_targets": len(dead)})
                 _imp_children = 0
                 try:
@@ -2232,7 +2235,7 @@ class EngineRun:
                 # R526 Q-B: kill-point improve phase exit.
                 _rps(session_id=self.session_id, run_id=self.run_id,
                      engine_stage="POST_RANK_IMPROVE",
-                     phase="KILL_IMPROVE", event="exit",
+                     phase="KILL_IMPROVE", event="exit", scope="top",
                      wall_s=round(
                          _pra["phase_s"].get("KILL_IMPROVE", 0.0), 6),
                      detail={"children_admitted": _imp_children})
@@ -2303,10 +2306,13 @@ class EngineRun:
             _cctx.set_stage("POST_RANK_IMPROVEMENT")
             _pra_start("IMPROVEMENT_PASS")
             # R526 Q-B: improvement-pass phase entry (single chosen
-            # candidate; per-call provider walls ride the ledger).
+            # candidate; per-call provider walls ride the ledger;
+            # scope=top marks the whole-phase wall — B1/B2
+            # reconciliation uses only top-scope walls).
             _rps(session_id=self.session_id, run_id=self.run_id,
                  engine_stage="POST_RANK_IMPROVEMENT",
                  phase="IMPROVEMENT_PASS", event="enter",
+                 scope="top",
                  candidate_id=(chosen or {}).get("candidate_id"))
             improvement = self._improvement_pass(chosen, spec_rel, run_ctx)
             _pra_stop("IMPROVEMENT_PASS")
@@ -2314,6 +2320,7 @@ class EngineRun:
             _rps(session_id=self.session_id, run_id=self.run_id,
                  engine_stage="POST_RANK_IMPROVEMENT",
                  phase="IMPROVEMENT_PASS", event="exit",
+                 scope="top",
                  candidate_id=(chosen or {}).get("candidate_id"),
                  wall_s=round(
                      _pra["phase_s"].get("IMPROVEMENT_PASS", 0.0), 6),
@@ -2373,10 +2380,12 @@ class EngineRun:
             _cctx.set_stage("POST_RANK_TECH_IMPROVEMENT")
             _pra_start("TECHNICAL_IMPROVEMENT_PASS")
             # R526 Q-B: technical-pass phase entry (single chosen
-            # candidate; per-call provider walls ride the ledger).
+            # candidate; per-call provider walls ride the ledger;
+            # scope=top marks the whole-phase wall).
             _rps(session_id=self.session_id, run_id=self.run_id,
                  engine_stage="POST_RANK_TECH_IMPROVEMENT",
                  phase="TECHNICAL_IMPROVEMENT_PASS", event="enter",
+                 scope="top",
                  candidate_id=(chosen or {}).get("candidate_id"))
             technical = self._technical_improvement_pass(
                 chosen, spec_rel, run_ctx)
@@ -2385,6 +2394,7 @@ class EngineRun:
             _rps(session_id=self.session_id, run_id=self.run_id,
                  engine_stage="POST_RANK_TECH_IMPROVEMENT",
                  phase="TECHNICAL_IMPROVEMENT_PASS", event="exit",
+                 scope="top",
                  candidate_id=(chosen or {}).get("candidate_id"),
                  wall_s=round(_pra["phase_s"].get(
                      "TECHNICAL_IMPROVEMENT_PASS", 0.0), 6),

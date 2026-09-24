@@ -305,30 +305,46 @@ def main() -> int:
                        "remainder_s")}
                   for g in gen_calls]}
 
-    # I. run-wall reconciliation (R526 Q-B): run wall vs executed
-    # stage walls vs post-rank phase walls vs explicit remainder.
-    # Phase walls come from durable PHASE_SPAN lines; anything else
-    # stays in the remainder (never distributed).
+    # I. run-wall reconciliation (R526 Q-B B1/B2): run wall vs
+    # executed linear stage walls vs TOP-LEVEL post-rank phase walls
+    # (scope=top ONLY — child candidate/target spans are attribution
+    # detail and are NEVER added on top of the parent phase wall)
+    # vs explicit remainder. Phase walls come from durable PHASE_SPAN
+    # lines; anything else stays in the remainder (never
+    # distributed). Unmatched phase events are carried explicitly.
     recon = []
     for r in rows:
         rr = r.get("run_residual_s") or {}
         ph = (r.get("phase_spans") or {}).get("phases") or {}
-        phase_sum = round(sum(
-            (v.get("wall_sum_s") or 0.0) for v in ph.values()), 3)
+        top_sum = round(sum(
+            (v.get("top_wall_sum_s") or 0.0) for v in ph.values()), 3)
+        child_detail = {
+            k: {"top_wall_sum_s": v.get("top_wall_sum_s"),
+                "all_wall_sum_s": v.get("wall_sum_s"),
+                "children": {ck: cv.get("wall_sum_s")
+                             for ck, cv in
+                             (v.get("children") or {}).items()}}
+            for k, v in ph.items()}
+        unmatched = (r.get("phase_spans") or {}).get("unmatched") or []
         stage_sum = rr.get("executed_stage_sum_s")
         run_w = rr.get("run_wall_s")
-        remainder = (round(run_w - (stage_sum or 0) - phase_sum, 3)
+        remainder = (round(run_w - (stage_sum or 0) - top_sum, 3)
                      if run_w is not None and stage_sum is not None
                      else None)
         recon.append({
             "problem_index": r.get("problem_index"),
             "run_wall_s": run_w,
             "executed_stage_sum_s": stage_sum,
-            "post_rank_phase_sum_s": phase_sum,
-            "phase_detail": {k: v.get("wall_sum_s") for k, v in
-                             ph.items()},
+            "top_level_post_rank_phase_sum_s": top_sum,
+            "child_candidate_span_detail": child_detail,
+            "unmatched_phase_events": unmatched,
             "reconciled_remainder_s": remainder,
             "phase_lines_present": bool(ph),
+            "rule": ("run_wall = executed_linear_stage_wall + "
+                     "top_level_post_rank_phase_wall + "
+                     "explicit_external_or_orchestration_wall + "
+                     "UNKNOWN_remainder; child spans are attribution "
+                     "detail, never subtracted from the parent"),
         })
 
     out = {

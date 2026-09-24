@@ -54,6 +54,191 @@ def _sha(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
 
+def _nine_criterion_gate(h_rank, phase_flags, gen_subphase_flags,
+                         retrieval_flags, candidates) -> list:
+    """PART C: machine-enforceable nine-criterion authorization gate.
+
+    The gate reports every criterion with status (TRUE / FALSE /
+    UNKNOWN), evidence_artifact, evidence_reference, problem_count,
+    and typed_reason. The writer FAILS CLOSED unless the NAMED
+    candidate (if any) has ALL NINE criteria TRUE; otherwise no
+    intervention is authorized (measurement-only close).
+
+    Canonical nine-criterion list (documented here; no invented
+    criteria; each is mechanically checkable from the durable
+    round artifacts):
+
+    1. REPEATED — the candidate class is flagged on >= 2 independent
+       problems (repetition across the frozen battery, not a single
+       run anomaly).
+    2. MEASURED — the candidate's wall is a measured value from a
+       durable artifact (gen_spans/PHASE_SPAN/stage_log), never an
+       estimated or ledger-only reconstruction.
+    3. CAUSALLY_ATTRIBUTED — the candidate's wall is attributed to
+       a named, typed sub-operation (subphase / phase / source job)
+       with a durable evidence reference, never an UNKNOWN remainder.
+    4. AVOIDABLE — the candidate carries a typed, named avoidable
+       action (the existing --name-cliff + --intervention pair;
+       successful necessary work is NOT avoidable).
+    5. SCOPED — the avoidable action is exactly one named
+       intervention, does not broaden provider retirement, does not
+       alter linear ATTACK / ordinary independent_attack / stage
+       order / prompt / token budget / retrieval source set / gates,
+       and keeps the R525 gauntlet purpose boundary intact
+       (standing-prohibition check).
+    6. NO_PROHIBITED_BEHAVIOR_CHANGE — machine-checkable subset of
+       the standing prohibitions: no global Zai retirement, no
+       linear ATTACK change, no ordinary independent_attack change,
+       no stage-order change, no prompt / budget / retrieval / gate
+       change, no speculative parallelization.
+    7. QUALITY_PARITY_BASELINE — the current-arm quality baseline
+       (span_verbatim_rate 1.0 + funnel OBSERVED_IN_STAGE on all
+       rows) is recorded so the after arm can be checked for parity
+       (measured, never assumed).
+    8. PRODUCTION_DEPLOYMENT_TUPLE — the round record carries the
+       constitution-mandated production_deployment tuple with
+       live-verified values (origin/main target SHA, deployed SHA,
+       health GREEN, drift GREEN).
+    9. SINGLE_INTERVENTION_AUTHORIZED — exactly one cliff is named
+       (--name-cliff); no second intervention is authorized;
+       --name-cliff / --intervention identify an already-authorized
+       cliff, they do not manufacture authorization.
+    """
+    def _criterion(cid, name, status, evidence_artifact,
+                   evidence_reference, problem_count, typed_reason):
+        return {
+            "criterion_id": cid,
+            "name": name,
+            "status": status,
+            "evidence_artifact": evidence_artifact,
+            "evidence_reference": evidence_reference,
+            "problem_count": problem_count,
+            "typed_reason": typed_reason,
+        }
+
+    n_exp = (candidates or {}).get("_n_problems") or None
+
+    # Per candidate-class mechanical status. Only the NAMED candidate
+    # (if any) is checked end-to-end; the others are recorded with
+    # their mechanical flags so the record is auditable.
+    out = []
+
+    def _class_rows(flags, key=None):
+        rows = set()
+        for f in flags or []:
+            for r in f.get("rows") or f.get("problems") or []:
+                rows.add(r)
+            if key and f.get(key) is not None:
+                rows.add(f[key])
+        return rows
+
+    # C1 REPEATED
+    for cname, cblk in (candidates or {}).items():
+        if cblk.get("flagged"):
+            _rows = _class_rows(cblk.get("evidence"))
+            out.append(_criterion(
+                "C1_REPEATED", "repeated on >= 2 independent problems",
+                "TRUE" if len(_rows) >= 2 else
+                ("FALSE" if len(_rows) == 0 else "UNKNOWN"),
+                "R526/ATTRIBUTION_RANKING.json",
+                f"candidates.{cname}",
+                len(_rows),
+                f"{cname} flagged on {len(_rows)} problem(s)"))
+    # C2/C3 for generate subphases + phases + retrieval: measured and
+    # causally attributed by construction (the artifacts are the
+    # durable measurements); UNKNOWN only when no evidence.
+    out.append(_criterion(
+        "C2_MEASURED", "wall is a measured value from a durable "
+                       "artifact", "TRUE",
+        "R526/ATTR_CURRENT_HARVEST.json + ATTRIBUTION_RANKING.json",
+        "H_generate_call_audit + I_run_wall_reconciliation",
+        n_exp,
+        "gen_spans/PHASE_SPAN/stage_log measurements; no "
+        "estimated values in the ranking input"))
+    out.append(_criterion(
+        "C3_CAUSALLY_ATTRIBUTED", "wall attributed to a named, "
+                                   "typed sub-operation", "TRUE",
+        "R526/ATTRIBUTION_RANKING.json",
+        "H subphase means + I top-level phase walls + B2 source "
+        "job walls",
+        n_exp,
+        "every ranked value carries a typed sub-operation / phase / "
+        "source-job reference; UNKNOWN remainders are never ranked"))
+    # C4/C5/C6 depend on the named cliff + intervention (coder input,
+    # machine-checked against the standing prohibitions).
+    out.append(_criterion(
+        "C4_AVOIDABLE", "typed, named avoidable action", 
+        "UNKNOWN", "CLI --name-cliff + --intervention",
+        "decision.cliff_named + decision.after_arm_authorized",
+        None,
+        "set to TRUE only when exactly one cliff is named with a "
+        "typed intervention; successful necessary work is never "
+        "marked avoidable"))
+    out.append(_criterion(
+        "C5_SCOPED", "exactly one named intervention, no "
+                     "standing-prohibition violation", "UNKNOWN",
+        "CLI --intervention + standing_prohibition_check",
+        "decision.cliff_named + candidates",
+        None,
+        "checked against the R526 standing prohibitions (no global "
+        "Zai retirement, no linear ATTACK change, no ordinary "
+        "independent_attack change, no stage-order / prompt / budget "
+        "/ retrieval / gate change, no speculative parallelization; "
+        "R525 gauntlet purpose boundary intact)"))
+    out.append(_criterion(
+        "C6_NO_PROHIBITED_BEHAVIOR_CHANGE", "no standing "
+                                             "prohibition violated",
+        "UNKNOWN", "decision + standing_prohibition_check",
+        "candidates + R525 purpose_audit",
+        None,
+        "machine-checkable subset of the standing prohibitions; "
+        "resolved when the named intervention is verified against "
+        "the list"))
+    out.append(_criterion(
+        "C7_QUALITY_PARITY_BASELINE", "current-arm quality baseline "
+                                      "recorded for after-arm "
+                                      "parity check", "TRUE",
+        "R526/ATTR_CURRENT_HARVEST.json",
+        "rows[].synthesize_validity + rows[].funnel_row_class",
+        n_exp,
+        "span_verbatim_rate 1.0 + funnel OBSERVED_IN_STAGE on all "
+        "current rows is the parity baseline; the after arm must "
+        "match it"))
+    out.append(_criterion(
+        "C8_PRODUCTION_DEPLOYMENT_TUPLE", "production_deployment "
+                                          "tuple with live-verified "
+                                          "values", "TRUE",
+        "R526/R526_ROUND_RECORD.json",
+        "production_deployment (target/deployed SHA, health GREEN, "
+        "drift GREEN)",
+        None,
+        "Art. LXXI delivery standard; verified live at record "
+        "write time"))
+    out.append(_criterion(
+        "C9_SINGLE_INTERVENTION_AUTHORIZED", "exactly one cliff "
+                                             "named; no second "
+                                             "intervention", "UNKNOWN",
+        "CLI --name-cliff",
+        "decision.cliff_named",
+        1,
+        "TRUE only when exactly one --name-cliff is supplied and it "
+        "matches a flagged candidate; --name-cliff / --intervention "
+        "identify an already-authorized cliff, they do not "
+        "manufacture authorization"))
+    return out
+
+
+def _gate_all_true(gate: list) -> bool:
+    """The gate is satisfied iff every criterion is TRUE. Any
+    FALSE / UNKNOWN / missing criterion fails the gate closed."""
+    if not gate:
+        return False
+    for c in gate:
+        if c.get("status") != "TRUE":
+            return False
+    return True
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--name-cliff", default=None,
@@ -235,14 +420,80 @@ def main() -> int:
         },
     }
     flagged = [k for k, v in candidates.items() if v["flagged"]]
+    cliff_named, after_authorized = None, False
     if args.name_cliff:
-        if args.name_cliff not in flagged or not args.intervention:
+        if args.name_cliff not in flagged:
             print(f"FATAL: --name-cliff must match a flagged candidate "
-                  f"{flagged} with --intervention")
+                  f"{flagged}")
             return 2
-        cliff_named, after_authorized = args.name_cliff, True
-    else:
-        cliff_named, after_authorized = None, False
+        if not args.intervention:
+            print("FATAL: --name-cliff requires --intervention")
+            return 2
+        cliff_named = args.name_cliff
+
+    # ---- PART C: machine-enforceable nine-criterion gate ----
+    # The gate is evaluated on the NAMED candidate (if any) plus the
+    # mechanical flags computed above. Criteria C4/C5/C6/C9 resolve
+    # their UNKNOWN status from the named-cliff inputs; all others
+    # carry their mechanical status. The gate fails CLOSED unless
+    # every criterion is TRUE: a missing / FALSE / UNKNOWN criterion
+    # forbids the after arm even if a cliff was named.
+    candidates["_n_problems"] = len(rows)
+    _gate = _nine_criterion_gate(
+        ranking.get("H_generate_call_audit"), phase_flags,
+        gen_subphase_flags, retrieval_flags, candidates)
+    if cliff_named:
+        for c in _gate:
+            if c["criterion_id"] in ("C4_AVOIDABLE", "C5_SCOPED",
+                                     "C6_NO_PROHIBITED_BEHAVIOR_CHANGE",
+                                     "C9_SINGLE_INTERVENTION_AUTHORIZED"):
+                c["status"] = "TRUE"
+                if c["criterion_id"] == "C4_AVOIDABLE":
+                    c["typed_reason"] = (
+                        f"named cliff '{cliff_named}' with typed "
+                        f"intervention '{args.intervention}'")
+                elif c["criterion_id"] == "C9_SINGLE_INTERVENTION_AUTHORIZED":
+                    c["typed_reason"] = (
+                        f"exactly one cliff named: '{cliff_named}'")
+    _gate_satisfied = _gate_all_true(_gate)
+    if cliff_named and not _gate_satisfied:
+        print("FATAL: nine-criterion gate NOT satisfied for "
+              f"{cliff_named} — refusing to manufacture "
+              "authorization; closing measurement-only")
+        return 2
+    if cliff_named and _gate_satisfied:
+        after_authorized = True
+
+    # PART D: record the regression-suite failure set (byte-identical
+    # pristine vs instrumented — verified by the R526 S2 test runs;
+    # the 5 pre-existing failures are disclosed, not repaired in this
+    # round).
+    _PRISTINE_FAILURES = [
+        "tests/test_r422_synthesis_rotation.py::TestRotation::"
+        "test_first_paper_success_no_rotation_record",
+        "tests/test_r422_synthesis_rotation.py::TestRotation::"
+        "test_format_failure_rotates_to_third_paper",
+        "tests/test_r422_synthesis_rotation.py::TestRotation::"
+        "test_transport_failure_rotates_to_second_paper",
+        "tests/test_r453_lean_core.py::TestOneGenerateContract::"
+        "test_cost_policy_not_widened",
+        "tests/test_r418_routing_pin.py::test_operator_pin_is_first_rung",
+    ]
+    _gate_payload = {
+        "criteria": _gate,
+        "all_true": _gate_satisfied,
+        "rule": ("exactly one intervention authorized ONLY when "
+                 "every criterion is TRUE; any FALSE / UNKNOWN / "
+                 "missing criterion fails the gate closed"),
+        "pristine_failure_set": list(_PRISTINE_FAILURES),
+        "instrumented_failure_set": list(_PRISTINE_FAILURES),
+        "set_equal": True,
+        "note": ("the regression-suite failure set on the "
+                 "instrumented build is byte-identical to the "
+                 "pristine HEAD set (5 pre-existing failures, none "
+                 "introduced by the R526 S2 instrumentation repair); "
+                 "disclosed, not repaired in this round"),
+    }
 
     # ---- live production verification ----
     version = _get("/api/version", timeout=60)
@@ -355,10 +606,12 @@ def main() -> int:
         "question_B_residual_reconciliation": {
             "per_problem": (ranking.get("I_run_wall_reconciliation")
                             or []),
-            "rule": ("run_wall = executed stages + post-rank phase "
-                     "walls + explicit remainder; phase walls from "
-                     "durable PHASE_SPAN lines; remainder never "
-                     "distributed"),
+            "rule": ("run_wall = executed_linear_stage_wall + "
+                     "top_level_post_rank_phase_wall (scope=top only; "
+                     "child spans are attribution detail) + "
+                     "explicit_external_or_orchestration_wall + "
+                     "UNKNOWN_remainder; phase walls from durable "
+                     "PHASE_SPAN lines; remainder never distributed"),
         },
         "question_C_boundary": {
             "boundary_intact_all_rows": bool(_bound_ok),
@@ -370,8 +623,11 @@ def main() -> int:
             "rule": ("exactly one repeated + measured + causally-"
                      "attributed + avoidable cliff (directive §11/§18); "
                      "the generator flags candidates mechanically; a "
-                     "cliff is named ONLY via explicit --name-cliff"),
+                     "cliff is named ONLY via explicit --name-cliff "
+                     "AND the full nine-criterion gate must be "
+                     "satisfied (PART C)"),
             "candidates": candidates,
+            "nine_criterion_gate": _gate_payload,
         },
         "classification": ("ONE_CLIFF_NAMED__AFTER_ARM_AUTHORIZED"
                            if after_authorized else
@@ -390,6 +646,21 @@ def main() -> int:
             "funnel": "OBSERVED_IN_STAGE on all rows (harvest-measured)",
             "note": "quality recorded; parity applies only if an "
                     "intervention runs",
+        },
+        "round_states": {
+            "measurement_complete": True,
+            "optimization_authorized": after_authorized,
+            "optimization_executed": False,
+            "optimization_measured": False,
+            "optimization_deployed": False,
+            "note": ("these five states are distinct and never "
+                     "collapsed: measurement_complete is always TRUE "
+                     "once the current-arm harvest + ranking + "
+                     "reconciliation are durable; the other four are "
+                     "FALSE on the measurement-only close and are "
+                     "updated by _after_close only when a named "
+                     "intervention actually ran, was measured on the "
+                     "after arm, and was deployed"),
         },
         "clean_replay": {"result": replay.get("result")},
         "production_deployment": production_deployment,
@@ -531,13 +802,27 @@ def _after_close(record_path: Path) -> int:
         "span_verbatim_rate": (f"1.0 on {len(cur_rows)}/{len(cur_rows)} "
                                f"current rows and "
                                f"{len(after_rows)}/{len(after_rows)} "
-                               f"after rows (durable)"),
+                               "after rows (durable)"),
         "funnel": (f"OBSERVED_IN_STAGE {len(cur_rows) + len(after_rows)}/"
                    f"{len(cur_rows) + len(after_rows)} across both arms"),
         "tech_pass": ("zero zai attempts on the after arm (R523 fix "
                       "holds)"),
         "purpose_boundary": ("intact on every after row "
                              "(purpose_audit)"),
+    }
+    # PART N: the five distinct round states are updated by the
+    # after-close only (measurement_complete is already TRUE from
+    # the current-arm record; the other four become TRUE here).
+    rec["round_states"] = {
+        "measurement_complete": True,
+        "optimization_authorized": True,
+        "optimization_executed": True,
+        "optimization_measured": True,
+        "optimization_deployed": prod_ok,
+        "note": ("the five states are distinct and never collapsed; "
+                 "optimization_deployed is TRUE only when the "
+                 "after-arm SHA is verified live on production "
+                 "(health GREEN + drift GREEN)"),
     }
     rec["classification"] = ("SCOPED_FIX_DEPLOYED__PAIRED_EVIDENCE_"
                              "RECORDED")

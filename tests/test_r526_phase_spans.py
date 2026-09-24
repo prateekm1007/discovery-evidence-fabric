@@ -33,7 +33,6 @@ def _temp_ledger(monkeypatch_cls):
 
 
 class TestPhaseSpanLines(unittest.TestCase):
-
     def test_a_phase_line_well_formed_and_never_raises(self):
         import pytest
         m = pytest.MonkeyPatch()
@@ -43,30 +42,48 @@ class TestPhaseSpanLines(unittest.TestCase):
             mr.record_phase_span(
                 session_id="ts_test", run_id="run_test",
                 engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
-                event="candidate_enter", candidate_id="cand:1",
+                event="enter")
+            mr.record_phase_span(
+                session_id="ts_test", run_id="run_test",
+                engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
+                event="candidate_enter", scope="child",
+                candidate_id="cand:1",
                 candidate_key="k1")
             mr.record_phase_span(
                 session_id="ts_test", run_id="run_test",
                 engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
-                event="candidate_exit", candidate_id="cand:1",
+                event="candidate_exit", scope="child",
+                candidate_id="cand:1",
                 candidate_key="k1", wall_s=12.5,
                 detail={"outcome": "SURVIVED_GAUNTLET"})
+            mr.record_phase_span(
+                session_id="ts_test", run_id="run_test",
+                engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
+                event="exit", scope="top",
+                wall_s=190.0,
+                detail={"outcome": "GAUNTLET_DONE"})
             lines = [json.loads(ln) for ln in
                      path.read_text(encoding="utf-8").splitlines()]
-            self.assertEqual(len(lines), 2)
+            self.assertEqual(len(lines), 4)
             for ln in lines:
                 self.assertEqual(ln["line_class"], "PHASE_SPAN")
                 self.assertEqual(ln["session_id"], "ts_test")
                 self.assertEqual(ln["phase"], "GAUNTLET")
-            self.assertEqual(lines[0]["event"], "candidate_enter")
-            self.assertEqual(lines[1]["event"], "candidate_exit")
-            self.assertEqual(lines[1]["wall_s"], 12.5)
-            self.assertEqual(lines[1]["candidate_id"], "cand:1")
+            self.assertEqual(lines[0]["event"], "enter")
+            self.assertEqual(lines[0]["scope"], "top")
+            self.assertEqual(lines[1]["event"], "candidate_enter")
+            self.assertEqual(lines[1]["scope"], "child")
+            self.assertEqual(lines[2]["event"], "candidate_exit")
+            self.assertEqual(lines[2]["scope"], "child")
+            self.assertEqual(lines[2]["wall_s"], 12.5)
+            self.assertEqual(lines[2]["candidate_id"], "cand:1")
+            self.assertEqual(lines[3]["event"], "exit")
+            self.assertEqual(lines[3]["scope"], "top")
+            self.assertEqual(lines[3]["wall_s"], 190.0)
             self.assertIsNone(lines[0]["ok"])
             self.assertIsNone(lines[0]["provider"])
         finally:
             m.undo()
-
     def test_b_availability_skips_phase_lines(self):
         import pytest
         m = pytest.MonkeyPatch()
@@ -138,13 +155,77 @@ class TestPhaseWiringPins(unittest.TestCase):
             mr.record_phase_span(
                 session_id="s", run_id="r",
                 engine_stage="SYNTHESIZE", phase="SYNTH",
-                event="exit", wall_s=9.9)
+                event="exit", wall_s=9.9, scope="top")
             attempt_lines = [
                 json.loads(ln) for ln in
                 path.read_text(encoding="utf-8").splitlines()
                 if json.loads(ln).get("line_class") != "PHASE_SPAN"]
             self.assertEqual(len(attempt_lines), 1)
             self.assertEqual(attempt_lines[0]["provider"], "xkiro")
+        finally:
+            m.undo()
+
+    def test_g_scope_discriminator_top_vs_child(self):
+        """B1: top-level and child spans are structurally distinguished
+        by the scope field; a whole-phase exit (scope=top, no
+        candidate) never pairs with a candidate exit (scope=child).
+        The run-wall reconciliation (B2) must use ONLY scope=top
+        walls: child walls are attribution detail, never added on top
+        of the parent phase wall."""
+        import pytest
+        m = pytest.MonkeyPatch()
+        inst, path = _temp_ledger(m)
+        m.setattr(mr, "LEDGER", inst)
+        try:
+            # whole GAUNTLET = 190 s; candidate A = 70 s, B = 50 s,
+            # C = 30 s (the directive B2 example).
+            mr.record_phase_span(
+                session_id="s", run_id="r",
+                engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
+                event="enter", scope="top")
+            for cand, key, wall in (("cand:A", "kA", 70.0),
+                                    ("cand:B", "kB", 50.0),
+                                    ("cand:C", "kC", 30.0)):
+                mr.record_phase_span(
+                    session_id="s", run_id="r",
+                    engine_stage="POST_RANK_GAUNTLET",
+                    phase="GAUNTLET",
+                    event="candidate_enter", scope="child",
+                    candidate_id=cand, candidate_key=key)
+                mr.record_phase_span(
+                    session_id="s", run_id="r",
+                    engine_stage="POST_RANK_GAUNTLET",
+                    phase="GAUNTLET",
+                    event="candidate_exit", scope="child",
+                    candidate_id=cand, candidate_key=key,
+                    wall_s=wall)
+            mr.record_phase_span(
+                session_id="s", run_id="r",
+                engine_stage="POST_RANK_GAUNTLET", phase="GAUNTLET",
+                event="exit", scope="top", wall_s=190.0)
+            lines = [json.loads(ln) for ln in
+                     path.read_text(encoding="utf-8").splitlines()]
+            # structural distinction: the whole-phase enter/exit lines
+            # have NO candidate identity (top scope); the candidate
+            # lines carry it (child scope). A time-window join cannot
+            # accidentally merge them because the key includes scope.
+            top = [ln for ln in lines if ln.get("scope") == "top"]
+            child = [ln for ln in lines if ln.get("scope") == "child"]
+            self.assertEqual(len(top), 2)
+            self.assertEqual(len(child), 6)
+            self.assertIsNone(top[0].get("candidate_key"))
+            self.assertIsNone(top[1].get("candidate_key"))
+            self.assertEqual(top[1]["wall_s"], 190.0)
+            # B2: the reconciliation sum uses top walls only (190 s),
+            # NOT 190 + 70 + 50 + 30 = 340 s.
+            top_wall_sum = sum(ln.get("wall_s") or 0.0 for ln in top
+                               if ln.get("event") == "exit")
+            self.assertEqual(top_wall_sum, 190.0)
+            child_wall_sum = sum(ln.get("wall_s") or 0.0 for ln in child
+                                 if ln.get("event") == "candidate_exit")
+            self.assertEqual(child_wall_sum, 150.0)
+            self.assertNotEqual(top_wall_sum + child_wall_sum,
+                                top_wall_sum)
         finally:
             m.undo()
 

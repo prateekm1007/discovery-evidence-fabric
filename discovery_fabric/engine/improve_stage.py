@@ -453,10 +453,13 @@ def run_improve(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     # R526 Q-B: improve-phase entry (whole run_improve invocation;
     # per-target lines below carry parent identity; exit lines ride
-    # both return paths).
+    # both return paths; scope=top marks the whole-phase wall —
+    # child target lines use scope=child, never added on top of the
+    # parent in the run-wall reconciliation).
     _rps_phase_t0 = time.perf_counter()
     _rps(session_id=_rps_session, run_id=run_id,
          engine_stage="IMPROVE", phase="IMPROVE", event="enter",
+         scope="top",
          detail={"n_targets": len(targets)})
 
     for _dead_idx, dead_e in enumerate(targets, 1):
@@ -465,7 +468,7 @@ def run_improve(payload: Dict[str, Any]) -> Dict[str, Any]:
         _tgt_t0 = time.perf_counter()
         _rps(session_id=_rps_session, run_id=run_id,
              engine_stage="IMPROVE", phase="IMPROVE",
-             event="target_enter",
+             event="target_enter", scope="child",
              candidate_id=dead_e.get("candidate_id"),
              candidate_key=dead_e.get("key"))
         prompt = MUTATION_PROMPT.format(
@@ -488,13 +491,13 @@ def run_improve(payload: Dict[str, Any]) -> Dict[str, Any]:
         except Exception as exc:  # noqa: BLE001 — typed, never silent
             transport_block = {"error": f"{type(exc).__name__}: {exc}"[:300]}
             # R526 Q-B: per-target exit on transport exception.
-            _rps(session_id=_rps_session, run_id=run_id,
-                 engine_stage="IMPROVE", phase="IMPROVE",
-                 event="target_exit",
-                 candidate_id=dead_e.get("candidate_id"),
-                 candidate_key=dead_e.get("key"),
-                 wall_s=round(time.perf_counter() - _tgt_t0, 6),
-                 detail={"outcome": "TRANSPORT_EXCEPTION"})
+             _rps(session_id=_rps_session, run_id=run_id,
+                  engine_stage="IMPROVE", phase="IMPROVE",
+                  event="target_exit", scope="child",
+                  candidate_id=dead_e.get("candidate_id"),
+                  candidate_key=dead_e.get("key"),
+                  wall_s=round(time.perf_counter() - _tgt_t0, 6),
+                  detail={"outcome": "TRANSPORT_EXCEPTION"})
             break
         if getattr(res, "status", None) != "OK":
             transport_block = {"status": getattr(res, "status", ""),
@@ -504,7 +507,7 @@ def run_improve(payload: Dict[str, Any]) -> Dict[str, Any]:
             # R526 Q-B: per-target exit on transport failure.
             _rps(session_id=_rps_session, run_id=run_id,
                  engine_stage="IMPROVE", phase="IMPROVE",
-                 event="target_exit",
+                 event="target_exit", scope="child",
                  candidate_id=dead_e.get("candidate_id"),
                  candidate_key=dead_e.get("key"),
                  wall_s=round(time.perf_counter() - _tgt_t0, 6),
@@ -525,13 +528,13 @@ def run_improve(payload: Dict[str, Any]) -> Dict[str, Any]:
                         "— Art. XXXVII) — never salvaged"})
             _progress(_dead_idx)
             # R526 Q-B: per-target exit on unparseable mutation.
-            _rps(session_id=_rps_session, run_id=run_id,
-                 engine_stage="IMPROVE", phase="IMPROVE",
-                 event="target_exit",
-                 candidate_id=dead_e.get("candidate_id"),
-                 candidate_key=dead_e.get("key"),
-                 wall_s=round(time.perf_counter() - _tgt_t0, 6),
-                 detail={"outcome": "SKIPPED_UNPARSABLE"})
+        _rps(session_id=_rps_session, run_id=run_id,
+             engine_stage="IMPROVE", phase="IMPROVE",
+             event="target_exit", scope="child",
+             candidate_id=dead_e.get("candidate_id"),
+             candidate_key=dead_e.get("key"),
+             wall_s=round(time.perf_counter() - _tgt_t0, 6),
+             detail={"outcome": "SKIPPED_UNPARSABLE"})
             continue
         child_ms = build_child_ms_candidate(parent, dead_e, mutation, gen)
         child_ms["mutation_provider"] = provider
@@ -552,7 +555,7 @@ def run_improve(payload: Dict[str, Any]) -> Dict[str, Any]:
         # re-killed; wall reuses the loop's own timing basis).
         _rps(session_id=_rps_session, run_id=run_id,
              engine_stage="IMPROVE", phase="IMPROVE",
-             event="target_exit",
+             event="target_exit", scope="child",
              candidate_id=dead_e.get("candidate_id"),
              candidate_key=dead_e.get("key"),
              wall_s=round(time.perf_counter() - _tgt_t0, 6),
@@ -579,6 +582,7 @@ def run_improve(payload: Dict[str, Any]) -> Dict[str, Any]:
         # R526 Q-B: improve-phase exit (transport-blocked path).
         _rps(session_id=_rps_session, run_id=run_id,
              engine_stage="IMPROVE", phase="IMPROVE", event="exit",
+             scope="top",
              wall_s=round(time.perf_counter() - _rps_phase_t0, 6),
              detail={"status": "IMPROVEMENT_BLOCKED_TRANSPORT"})
         return {"_engine_result": True, "apply_to": {},
@@ -612,6 +616,7 @@ def run_improve(payload: Dict[str, Any]) -> Dict[str, Any]:
     # R526 Q-B: improve-phase exit (normal path).
     _rps(session_id=_rps_session, run_id=run_id,
          engine_stage="IMPROVE", phase="IMPROVE", event="exit",
+         scope="top",
          wall_s=round(time.perf_counter() - _rps_phase_t0, 6),
          detail={"status": status,
                  "children_admitted": len(admitted),
