@@ -1,0 +1,154 @@
+{
+ "artifact": "R524_ROUND_RECORD/1.0",
+ "round": "R524",
+ "round_question": "Does the fresh current-production baseline reproduce the R523 post-rank gauntlet cliff, and if so what is the single largest measured avoidable sink?",
+ "created_at_utc": "2026-09-24T01:32:01Z",
+ "reviewer_provenance": "AI_REVIEW",
+ "status": "BASELINE_ATTRIBUTION_CLOSED__NO_ACTIONABLE_CLIFF",
+ "parent_round": "R523",
+ "baseline_configuration": {
+  "engine": "5d28cfd478b42a65c127e0a55afc3721b6a3a4ea",
+  "ENGINE_RETRIEVE_EXCLUDE_SOURCES": "openalex",
+  "ENGINE_EVIDENCE_FABRIC": "0",
+  "verified_live": "preflight + record-write /api/version + /api/health: engine 5d28cfd4, drift GREEN"
+ },
+ "battery": {
+  "name": "R524-CURRENT-PRODUCTION-ATTRIBUTION",
+  "manifest": "R524/BATTERY_PROBLEMS.json",
+  "manifest_sha256": "0f11a12445a095c07f893953b105b252e152c5a44d165262c35d26b3d562a974",
+  "n_problems": 6,
+  "n_families": 2,
+  "declared_families": [
+   "mechanical",
+   "thermal"
+  ],
+  "freshness": "52 unique prior scored ODI IDs excluded mechanically; 8-gram corpus check; single-shot, fixed configuration, no tuning",
+  "session_ids": [
+   "ts_04094cf119d6",
+   "ts_2cbb220b9eb4",
+   "ts_3e3f5958aa37",
+   "ts_81e8c270ed72",
+   "ts_847c479a53e2",
+   "ts_9dec9444c7ba"
+  ]
+ },
+ "attribution": {
+  "stage_rank_mean_s": {
+   "SYNTHESIZE": 30.188,
+   "RETRIEVE": 28.096,
+   "ATTACK": 14.478,
+   "COLLISION": 13.673,
+   "MECHANISM_SPACE": 7.33
+  },
+  "role_rank": [
+   {
+    "role": "IMPROVE",
+    "provider_call_wall_mean_s": 105.983,
+    "failure_wall_mean_s": 0.0
+   },
+   {
+    "role": "POST_RANK_IMPROVEMENT",
+    "provider_call_wall_mean_s": 44.407,
+    "failure_wall_mean_s": 0.0
+   },
+   {
+    "role": "ATTACK",
+    "provider_call_wall_mean_s": 9.728,
+    "failure_wall_mean_s": 0.0
+   },
+   {
+    "role": "MECHANISM_SPACE",
+    "provider_call_wall_mean_s": 8.462,
+    "failure_wall_mean_s": 0.0
+   },
+   {
+    "role": "SYNTHESIZE",
+    "provider_call_wall_mean_s": 6.119,
+    "failure_wall_mean_s": 0.0
+   }
+  ],
+  "run_residuals": [
+   {
+    "problem_index": 1,
+    "run_wall_s": 82.0,
+    "residual_s": 1.852,
+    "ledger_only_phases": []
+   },
+   {
+    "problem_index": 4,
+    "run_wall_s": 54.0,
+    "residual_s": 2.614,
+    "ledger_only_phases": []
+   },
+   {
+    "problem_index": 5,
+    "run_wall_s": 37.0,
+    "residual_s": 3.209,
+    "ledger_only_phases": []
+   },
+   {
+    "problem_index": 6,
+    "run_wall_s": 81.0,
+    "residual_s": 3.379,
+    "ledger_only_phases": []
+   },
+   {
+    "problem_index": 2,
+    "run_wall_s": 87.0,
+    "residual_s": 2.685,
+    "ledger_only_phases": []
+   },
+   {
+    "problem_index": 3,
+    "run_wall_s": 351.0,
+    "residual_s": 255.289,
+    "ledger_only_phases": [
+     "IMPROVE",
+     "POST_RANK_IMPROVEMENT"
+    ]
+   }
+  ],
+  "gauntlet_exposure_rows": [],
+  "gauntlet_failure_wall_total_s": 0.0,
+  "total_provider_failure_wall_s": 0.0
+ },
+ "decision": {
+  "reproduced": false,
+  "after_arm_authorized": false,
+  "rule": "gauntlet cliff REPRODUCED iff POST_RANK_GAUNTLET exposure with provider-failure wall > 0 on the fresh baseline; else no after arm (Case B)",
+  "evidence": "POST_RANK_GAUNTLET on 0/6 rows; gauntlet failure wall 0.0 s; total provider failure wall 0.0 s across all roles"
+ },
+ "classification": "NO_ACTIONABLE_CLIFF__MEASUREMENT_ONLY",
+ "classification_not": [
+  "NOT claimed: any end-to-end speedup (no intervention ran)",
+  "NOT claimed: the R523 gauntlet observation was wrong (it was measured on its battery; it did not reproduce on this fresh battery under live provider variance)",
+  "NOT claimed: SYNTHESIZE/COLLISION/ATTACK/IMPROVE are waste - their largest components are single-run, unattributed or successful-work observations, not valid cliffs"
+ ],
+ "quality_baseline": {
+  "span_verbatim_rate": "1.0 on 6/6 durable rows",
+  "funnel": "OBSERVED_IN_STAGE 6/6",
+  "note": "quality recorded; no intervention ran so no parity claim is needed"
+ },
+ "clean_replay": {
+  "result": "PASS",
+  "note": "current arm only; after-arm notes expected until an after arm exists"
+ },
+ "production_deployment": {
+  "target_sha": "5d28cfd478b42a65c127e0a55afc3721b6a3a4ea",
+  "deployed_sha": "5d28cfd478b42a65c127e0a55afc3721b6a3a4ea",
+  "deploy_id": "standing R523 winner; no R524 deployment performed (measurement-only round)",
+  "health_check_result": "GREEN",
+  "drift": "GREEN",
+  "blocked_by": null,
+  "what_unblocks": "n/a - standing production verified serving"
+ },
+ "remaining_blind_spots": [
+  "row-3 SYNTHESIZE 49.67 s stage wall vs 6.8 s provider wall: ~43 s unattributed deterministic/stage work, n=1, no causal split - recorded, not a cliff",
+  "row-3 residual ~105 s unattributed after ledger-only phases (IMPROVE 106 s + POST_RANK_IMPROVEMENT 44.4 s all-OK) - recorded, not a cliff",
+  "row-3 MECHANISM_SPACE 0.01 s with COLLISION/ATTACK executed: funnel lost_at=mechanisms_found with grid-advanced candidates - accounting asymmetry noted, not interpreted",
+  "semantic_scholar 0/6 records (~9.4 s mean job wall): avoidable-candidate flag true with zero unknowns, but critical-path incidence 1/6 - not promoted without a measured large counterfactual",
+  "POST_RANK_GAUNTLET non-reproduction is a live-variance observation (which runs reach post-rank work varies); a future battery may re-measure it"
+ ],
+ "session_files": "R524/BATTERY_SESSIONS_CURRENT.json is LOCAL-ONLY; redacted mirror is the committable custody record",
+ "immutable_state": "origin/runtime-state-hf durable branch = byte authority for every measured wall"
+}
