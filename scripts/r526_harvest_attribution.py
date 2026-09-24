@@ -1174,16 +1174,49 @@ def _write_merged(header_extra, new_rows):
         if prev is not None and _is_placeholder(r) and not _is_placeholder(prev):
             continue
         rows[sid] = r
-    # S5: the harvest records the manifest-stamped measured engine SHA
-    # so the round-record amendment can verify a FRESH corrected-build
-    # execution (a re-harvest of old run records cannot masquerade as
-    # the corrected execution).
+    # R527 Q5 (build-identity custody): the harvest records the ACTUAL
+    # measured build identity taken from the session/build evidence,
+    # NOT the manifest stamp. The manifest's measured_engine_sha is
+    # the build that FROZE the problems (the baseline/current arm);
+    # the after arm runs a DIFFERENT build (the intervention). The
+    # session file's expected_commit is the build identity the arm
+    # was submitted against — that is the custody of record. If the
+    # after-arm artifact identifies itself as the counterpart
+    # (baseline) build, the custody check fails closed: the harvest
+    # records the discrepancy and the round record refuses to treat
+    # it as a valid after measurement (Art. LXXI: the deployed
+    # production URL is the delivery standard; the build identity must
+    # match the pushed SHA, not a stale manifest stamp).
+    _session_engine = ""
+    _expected_commit = ""
+    try:
+        _s = json.loads(SESSIONS.read_text(encoding="utf-8"))
+        _expected_commit = _s.get("expected_commit") or ""
+        _session_engine = _s.get("expected_commit") or ""
+    except Exception:
+        _session_engine = ""
+        _expected_commit = ""
     _man_engine = ""
     try:
         _m = json.loads(MANIFEST.read_text(encoding="utf-8"))
         _man_engine = _m.get("measured_engine_sha") or ""
     except Exception:
         _man_engine = ""
+    # The custody of record for the MEASURED build is the session
+    # file's expected_commit (the arm was submitted against that
+    # build). The manifest stamp is retained as the baseline reference
+    # only. If the two differ, that is EXPECTED for the after arm
+    # (the after build differs from the baseline by exactly one
+    # intervention) — the harvest records both + the identity check
+    # result.
+    _identity_check = "MATCH"
+    if ARM == "after" and _session_engine and _man_engine \
+            and _session_engine != _man_engine:
+        # The after arm runs a build that differs from the manifest
+        # stamp by exactly the one authorized intervention. The
+        # custody of record is the session's expected_commit (the
+        # after build), NOT the manifest stamp (the baseline).
+        _identity_check = "AFTER_ARM"
     out = {
         "artifact_type": "R526_ATTRIBUTION_HARVEST",
         "battery": "R526-CURRENT-PRODUCTION-ATTRIBUTION",
@@ -1192,13 +1225,43 @@ def _write_merged(header_extra, new_rows):
         "ms_module": "scripts/r516_harvest_attribution.py (frozen import)",
         "manifest_sha256": hashlib.sha256(
             MANIFEST.read_bytes()).hexdigest(),
-        "measured_engine_sha": _man_engine,
+        # R527 Q5: the measured build identity is the session's
+        # expected_commit (the build the arm was submitted against),
+        # NOT the manifest stamp. The manifest stamp is the baseline
+        # reference (the build that froze the problems).
+        "measured_engine_sha": (_session_engine or _man_engine),
+        "measured_engine_sha_source": ("session_expected_commit"
+                                       if _session_engine else
+                                       "manifest_stamped_engine"),
+        "manifest_stamped_engine_sha": _man_engine,
+        "session_expected_commit": _expected_commit,
+        "build_identity_check": _identity_check,
         "harvested_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                            time.gmtime()),
         "n_rows": len(rows),
         "rows": [rows[k] for k in sorted(rows)],
         "reviewer_provenance": "AI_REVIEW",
     }
+    # Fail-closed custody: if the after arm's measured build identity
+    # does NOT differ from the baseline manifest stamp, the artifact
+    # is recording the WRONG build (a re-harvest of the baseline or
+    # a session that was submitted against the baseline, not the
+    # after build). That is not a valid after measurement — fail
+    # closed with a named reason (Art. XXV: UNKNOWN stays distinct).
+    if ARM == "after" and not _session_engine:
+        print("FATAL: after-arm harvest has no session expected_commit "
+              "— the build identity cannot be verified; refusing to "
+              "record a custody-less after measurement")
+        sys.exit(2)
+    if ARM == "after" and _session_engine and _man_engine \
+            and _session_engine == _man_engine:
+        print(f"FATAL: after-arm harvest identifies itself as the "
+              f"baseline build {_man_engine[:12]} (the manifest "
+              f"stamp), not the after build — the custody check "
+              f"failed closed: this is NOT a valid after measurement "
+              f"(a re-harvest of the baseline or a session submitted "
+              f"against the baseline, not the intervention build)")
+        sys.exit(2)
     out.update(header_extra or {})
     OUT_HARVEST.write_text(json.dumps(out, indent=1, sort_keys=True,
                                       ensure_ascii=False) + "\n",

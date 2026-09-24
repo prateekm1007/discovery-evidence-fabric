@@ -253,20 +253,23 @@ def llm_chat(prompt, system="", max_retries=2, timeout=240,
         # REMOVED. This is the single authorized intervention for R527
         # — it does not alter prompt, model, provider order, token
         # budget, max_retries, admission, routing, retrieval,
-        # mechanism-space, evidence gates, parsing, candidate assembly,
-        # or funnel logic. The wall measured in Q2
-        # (_spans['post_success_sleep_s'], baseline ~0.5 s) becomes
-        # 0.0 in the after arm, proving the delta was in the sleep,
-        # not in provider inference. The rotation backoff sleeps
+        # mechanism-space, evidence gates, parsing, candidate
+        # assembly, or funnel logic. The rotation backoff sleeps
         # (0/8/20 s, failure-class response) are a separate mechanism
         # and are NOT touched here.
+        #
+        # R527 Q5 (measurement-scope repair): the post-success sleep
+        # wall is measured here (the llm_chat success path) and
+        # returned via _LAST_PROVIDER_META (module-level), then
+        # recorded by the synthesize() caller into _spans (the only
+        # scope that owns _spans). On the after arm this is ~0 s
+        # (the sleep was removed); on the baseline it was ~0.5 s.
+        # No module-level _spans reference — that was the R527 Q3
+        # scoping defect that produced the NameError on every after-
+        # arm success path.
         _t_sleep = time.perf_counter()
-        # Q3: time.sleep(0.5) removed — the measured post-success
-        # sleep wall is now ~0 s. The perf_counter bracket is kept
-        # (telemetry: the value records how much sleep actually
-        # happened in this arm; on the after arm it is ~0).
-        _spans["post_success_sleep_s"] = round(
-            time.perf_counter() - _t_sleep, 6)
+        _post_success_sleep_s = round(time.perf_counter() - _t_sleep, 6)
+        _LAST_PROVIDER_META["post_success_sleep_s"] = _post_success_sleep_s
         return res.content
     print(f"  [synthesize] LLM transport status: {res.status}"
           f"{(' — ' + res.error[:160]) if res.error else ''}")
@@ -440,6 +443,18 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
         if not resp:
             print("  [synthesize] LLM failed on this paper")
             continue
+        # R527 Q5 (measurement-scope repair): the post-success sleep
+        # wall is measured in llm_chat() and returned via
+        # _LAST_PROVIDER_META (module-level), then recorded HERE in
+        # the synthesize() scope where _spans is owned. On the after
+        # arm (sleep removed) this is ~0 s; on the baseline it was
+        # ~0.5 s. This is the behavior-neutral telemetry that makes
+        # the Q2/Q3 delta mechanically readable without a module-
+        # level _spans reference (the R527 Q3 scoping defect that
+        # produced the NameError on every after-arm success path).
+        _pss = _LAST_PROVIDER_META.get("post_success_sleep_s")
+        if _pss is not None:
+            _spans["post_success_sleep_s"] = round(_pss, 6)
         _t0 = time.perf_counter()
         parsed = _parse_fields(resp)
         _spans["parse_total_s"] += time.perf_counter() - _t0

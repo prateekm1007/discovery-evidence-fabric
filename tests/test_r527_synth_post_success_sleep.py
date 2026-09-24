@@ -1,4 +1,4 @@
-"""tests/test_r527_synth_post_success_sleep.py — R527 Q2 contract.
+"""tests/test_r527_synth_post_success_sleep.py — R527 Q2/Q5 contract.
 
 Proves the SYNTHESIZE_POST_SUCCESS_SLEEP candidate class is
 represented as a measured, typed candidate in the R526 round-record
@@ -14,6 +14,13 @@ writer's gate machinery, WITHOUT altering engine behavior:
      still calls time.sleep(0.5) in the baseline (the instrumentation
      records the wall; it does not remove the sleep) — the removal
      is the after-arm intervention, applied only after the gate.
+  E. (Q5) the successful llm_chat() path actually EXECUTES without a
+     NameError: a mocked successful provider response flows through
+     the real llm_chat() success branch, and the measured
+     post_success_sleep_s wall is present in _LAST_PROVIDER_META.
+     This is a RUNTIME integration test, not a source-level
+     assertion — it catches the R527 Q3 scoping defect (a module-
+     level function referencing a synthesize()-local _spans).
 """
 from __future__ import annotations
 
@@ -159,14 +166,101 @@ class TestSynthPostSuccessSleepCandidate(unittest.TestCase):
                 "baseline (Q2): the fixed sleep is still called — "
                 "removal is the after-arm intervention (Q3)")
         else:
-            # Q3 after arm: the sleep is removed; verify the perf_
-            # counter bracket is retained so the delta is measurable.
+            # Q3/Q5 after arm: the sleep is removed; the perf_counter
+            # bracket is retained in llm_chat() and the measured wall
+            # is returned via the module-level _LAST_PROVIDER_META
+            # (NOT via a synthesize()-local _spans reference — that
+            # was the R527 Q3 scoping defect). The synthesize()
+            # caller folds _LAST_PROVIDER_META["post_success_sleep_s"]
+            # into _spans. Verify the module-level provenance key is
+            # present in llm_chat's success path.
             self.assertIn(
-                "_spans[\"post_success_sleep_s\"]", src,
-                "Q3 after arm: the sleep call is removed but the "
-                "perf_counter bracket + the _spans key are kept "
-                "so the measured delta (baseline 0.5 s -> after "
-                "~0 s) is mechanically readable")
+                '_LAST_PROVIDER_META["post_success_sleep_s"]', src,
+                "Q3/Q5 after arm: the measured post-success sleep "
+                "wall must be returned via the module-level "
+                "_LAST_PROVIDER_META (the Q5 measurement-scope "
+                "repair), not a module-level _spans reference "
+                "(the R527 Q3 NameError)")
+
+    def test_e_runtime_success_path_no_nameerror(self):
+        """Q5: the successful llm_chat() path actually EXECUTES
+        without a NameError. The R527 Q3 scoping defect had
+        llm_chat() (a module-level function) reference _spans (a
+        synthesize()-local dict), producing a NameError on every
+        after-arm success. This test mocks a successful provider
+        response and runs the REAL llm_chat() success branch:
+
+        successful provider response
+            -> success-path sleep instrumentation
+            -> no NameError
+            -> measured post_success_sleep_s in _LAST_PROVIDER_META
+
+        The test is a runtime integration, not a source-level
+        assertion — it catches exactly the defect that test_d's
+        inspect.getsource() check missed.
+        """
+        import unittest.mock as mock
+        # Reset the module-level provenance dict to a clean state.
+        saved_meta = dict(syn._LAST_PROVIDER_META)
+        syn._LAST_PROVIDER_META = {"status": "NEVER_CALLED"}
+        try:
+            # A mocked successful provider result: reg.generate returns
+            # an object with .ok True, .content, .to_meta(), .selection_
+            # ledger. The llm_chat() success branch reads res.ok,
+            # res.to_meta(), res.selection_ledger, and (after the Q5
+            # fix) measures the post-success sleep wall into
+            # _LAST_PROVIDER_META["post_success_sleep_s"].
+            class _FakeRes:
+                ok = True
+                content = "MECHANISM: test response"
+                status = "OK"
+                selection_ledger = []
+                def to_meta(self):
+                    return {"provider": "mock", "model": "mock-model",
+                            "status": "OK"}
+            with mock.patch(
+                    "discovery_fabric.engine.llm_registry.generate",
+                    return_value=_FakeRes()) as _gen:
+                # The module imports llm_registry lazily inside
+                # llm_chat; patch the real registry module attribute so
+                # the lazy import sees the mock.
+                from discovery_fabric.engine import llm_registry as _reg
+                _orig_gen = _reg.generate
+                _reg.generate = _gen
+                try:
+                    resp = syn.llm_chat(
+                        "prompt", system="You are a medical device engineer.")
+                finally:
+                    _reg.generate = _orig_gen
+            # The success path returned the content (not None).
+            self.assertEqual(resp, "MECHANISM: test response",
+                             "the successful llm_chat() path must "
+                             "return the provider content")
+            # No NameError was raised (the test would have failed
+            # with a traceback otherwise).
+            # The measured post-success sleep wall is present in the
+            # module-level provenance dict.
+            meta = syn._LAST_PROVIDER_META
+            self.assertIn("post_success_sleep_s", meta,
+                          "the Q5 fix must record the post-success "
+                          "sleep wall in _LAST_PROVIDER_META (the "
+                          "module-level provenance dict) so the "
+                          "synthesize() caller can fold it into "
+                          "_spans without a module-level _spans "
+                          "reference (the R527 Q3 NameError)")
+            self.assertIsInstance(meta["post_success_sleep_s"],
+                                  (int, float),
+                                  "post_success_sleep_s must be a "
+                                  "measured wall value, not None")
+            # On the after arm (sleep removed) the wall is ~0 s.
+            self.assertLess(meta["post_success_sleep_s"], 0.1,
+                            "after arm: the post-success sleep wall "
+                            "must be ~0 s (the sleep was removed); "
+                            "a large value means the sleep is still "
+                            "present or another wall is being "
+                            "misattributed")
+        finally:
+            syn._LAST_PROVIDER_META = saved_meta
 
 
 if __name__ == "__main__":  # pragma: no cover
