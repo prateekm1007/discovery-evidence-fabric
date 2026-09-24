@@ -280,6 +280,28 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
         print("  [synthesize] no evidence, cannot synthesize")
         return None
 
+    # R525 Q-A (behavior-neutral span instrumentation): read-only
+    # perf_counter deltas around the phases that actually exist in this
+    # implementation. No prompt, budget, retry, gate, parse, repair, or
+    # assembly logic is touched — the record rides the candidate into
+    # the durable envelope so the harvester can split stage wall from
+    # provider wall without inventing sub-phases. Anything unmeasured
+    # stays UNATTRIBUTED downstream (never force-fit).
+    _t_entry = time.perf_counter()
+    _spans = {"abstract_gate_s": 0.0, "prompt_construction_total_s": 0.0,
+              "llm_chat_total_s": 0.0, "n_llm_chat_calls": 0,
+              "rotation_backoff_sleep_s": 0.0, "parse_total_s": 0.0,
+              "span_repair_check_s": 0.0, "candidate_assembly_s": 0.0}
+
+    def _timed_chat(_prompt, system="", max_tokens=512):
+        _t0 = time.perf_counter()
+        try:
+            return llm_chat(_prompt, system=system,
+                            max_tokens=max_tokens)
+        finally:
+            _spans["llm_chat_total_s"] += time.perf_counter() - _t0
+            _spans["n_llm_chat_calls"] += 1
+
     fields = ["MECHANISM", "INTERVENTION", "EXPECTED_EFFECT", "FALSIFICATION_TEST", "MECHANISM_SOURCE_SPAN"]
     _ROTATION_PAPERS = 3          # operational bound, disclosed here
     _ROTATION_BACKOFF_S = (0, 8, 20)  # MODEL_DERIVED operational bound:
@@ -306,6 +328,7 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
         return len(str(paper.get("abstract") or "").strip()) >= \
             _SPAN_ABSTRACT_MIN_CHARS
 
+    _t0 = time.perf_counter()
     _papers_skipped = [
         {"id": p.get("id"), "title": str(p.get("title"))[:120],
          "abstract_chars": len(str(p.get("abstract") or "").strip()),
@@ -314,12 +337,15 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                     "chars; the verbatim span contract is structurally "
                     "unsatisfiable against it (R483 gate)")}
         for p in (evidence or []) if not _paper_abstract_ok(p)]
+    _spans["abstract_gate_s"] += time.perf_counter() - _t0
     if _papers_skipped:
         print(f"  [synthesize] R483 abstract gate: {len(_papers_skipped)} "
               f"record(s) skipped (no quotable abstract) of "
               f"{len(evidence)} retrieved")
+    _t0 = time.perf_counter()
     _rotation_set = [p for p in evidence if _paper_abstract_ok(p)
                      ][:_ROTATION_PAPERS]
+    _spans["abstract_gate_s"] += time.perf_counter() - _t0
     if not _rotation_set:
         print("  [synthesize] no abstract-bearing paper in the frozen "
               "evidence — the span contract cannot be served by ANY "
@@ -372,7 +398,10 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
             print(f"  [synthesize] rotation attempt {attempt + 1} after "
                   f"{backoff} s backoff (paper {attempt + 1} of "
                   f"{min(len(evidence), _ROTATION_PAPERS)})")
+            _t0 = time.perf_counter()
             time.sleep(backoff)
+            _spans["rotation_backoff_sleep_s"] += \
+                time.perf_counter() - _t0
         papers_tried.append(paper.get("id"))
         # the engineer's pass-2 F1: the verdict fields reset EVERY
         # candidate iteration — a stale violation from an earlier paper
@@ -381,17 +410,21 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                             "repair_attempted": False,
                             "repair_succeeded": None,
                             "violation_final": False})
+        _t0 = time.perf_counter()
         prompt = SYNTHESIS_PROMPT.format(
             device=problem["device"], failure=problem["failure"], constraint=problem["constraint"],
             title=paper["title"], abstract=paper["abstract"][:1200],
             span_instruction=SPAN_INSTRUCTION + _dir_block)
+        _spans["prompt_construction_total_s"] += time.perf_counter() - _t0
         print(f"  [synthesize] calling LLM (paper {attempt + 1}: "
               f"{str(paper.get('title'))[:60]})...")
-        resp = llm_chat(prompt, system="You are a medical device engineer.")
+        resp = _timed_chat(prompt, system="You are a medical device engineer.")
         if not resp:
             print("  [synthesize] LLM failed on this paper")
             continue
+        _t0 = time.perf_counter()
         parsed = _parse_fields(resp)
+        _spans["parse_total_s"] += time.perf_counter() - _t0
         # E15 recorded same-provider retry: the MECHANISM_SOURCE_SPAN is the
         # LAST field line and fast endpoints occasionally spend the token cap
         # before emitting it. One retry with a larger budget ON THE SAME
@@ -403,10 +436,12 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                           "MECHANISM_SOURCE_SPAN missing from the first "
                           "response (token-cap truncation suspected)")
             print("  [synthesize] recorded retry: " + retry_note)
-            resp2 = llm_chat(prompt, system="You are a medical device engineer.",
-                             max_tokens=1024)
+            resp2 = _timed_chat(prompt, system="You are a medical device engineer.",
+                                max_tokens=1024)
             if resp2:
+                _t0 = time.perf_counter()
                 parsed2 = _parse_fields(resp2)
+                _spans["parse_total_s"] += time.perf_counter() - _t0
                 if (parsed2.get("intervention")
                         and parsed2.get("mechanism_source_span")):
                     resp = resp2
@@ -448,13 +483,17 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                 "output_hash": _hash(text),
                 "synthesis_timestamp": datetime.now(timezone.utc).isoformat(),
             }
+        _t0 = time.perf_counter()
         candidate = _candidate_from(resp, parsed)
+        _spans["candidate_assembly_s"] += time.perf_counter() - _t0
         # R469 evidence-span contract: the mechanical claimant-side
         # repair — the promoted span is the abstract's own characters
         # and verify.py re-checks it byte-exactly (the gate is never
         # loosened; the repair never fires on an already-verbatim span,
         # and provenance records every repair).
+        _t0 = time.perf_counter()
         repair_mechanism_span(candidate, paper["abstract"])
+        _spans["span_repair_check_s"] += time.perf_counter() - _t0
 
         # R483 span-format hardening (the second measured failure
         # class, distinct from the empty-abstract gate): the proposer
@@ -478,9 +517,13 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
             return _n(s) in _n(abstract)
 
         _span_corr_record = None
-        if parsed.get("mechanism_source_span") and \
-                not _span_in_abstract(candidate.get("mechanism_source_span"),
-                                      paper["abstract"]):
+        _span_src = parsed.get("mechanism_source_span")
+        _t0 = time.perf_counter()
+        _span_ok = _span_in_abstract(
+            candidate.get("mechanism_source_span"),
+            paper["abstract"]) if _span_src else True
+        _spans["span_repair_check_s"] += time.perf_counter() - _t0
+        if _span_src and not _span_ok:
             _corr_note = (
                 "R483 span corrective retry: the emitted "
                 "MECHANISM_SOURCE_SPAN was not a verbatim substring of "
@@ -488,6 +531,7 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                 "window was promotable); one recorded same-provider "
                 "retry with the defect stated")
             print("  [synthesize] " + _corr_note)
+            _t0 = time.perf_counter()
             _corr_prompt = (
                 prompt + "\n\nCORRECT YOUR PREVIOUS ATTEMPT — its "
                 "MECHANISM_SOURCE_SPAN (\"" +
@@ -498,18 +542,33 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                 "MECHANISM_SOURCE_SPAN copied character-for-character "
                 "from the ABSTRACT text above (8+ consecutive words "
                 "exactly as written; never from the Title line).")
-            _corr_resp = llm_chat(
+            _spans["prompt_construction_total_s"] += \
+                time.perf_counter() - _t0
+            _corr_resp = _timed_chat(
                 _corr_prompt, system="You are a medical device engineer.",
                 max_tokens=1024)
+            _t0 = time.perf_counter()
             _corr_parsed = _parse_fields(_corr_resp) if _corr_resp else {}
+            _spans["parse_total_s"] += time.perf_counter() - _t0
             _corr_ok = bool(
                 _corr_parsed.get("intervention")
                 and _corr_parsed.get("mechanism_source_span"))
             if _corr_ok:
+                _t0 = time.perf_counter()
                 _cand2 = _candidate_from(_corr_resp, _corr_parsed)
+                _spans["candidate_assembly_s"] += \
+                    time.perf_counter() - _t0
+                _t0 = time.perf_counter()
                 repair_mechanism_span(_cand2, paper["abstract"])
-                if _span_in_abstract(_cand2.get("mechanism_source_span"),
-                                     paper["abstract"]):
+                _spans["span_repair_check_s"] += \
+                    time.perf_counter() - _t0
+                _t0 = time.perf_counter()
+                _cand2_span_ok = _span_in_abstract(
+                    _cand2.get("mechanism_source_span"),
+                    paper["abstract"])
+                _spans["span_repair_check_s"] += \
+                    time.perf_counter() - _t0
+                if _cand2_span_ok:
                     _cand2["span_corrective_retry"] = {
                         "attempted": True, "succeeded": True,
                         "note": _corr_note,
@@ -544,11 +603,13 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                 print("  [synthesize] WARNING: directive constraint "
                       "active with ZERO forbidden terms — the "
                       "mechanical check cannot fire (record states it)")
+            _t0 = time.perf_counter()
             _tv = _territory_violation(
                 candidate.get("mechanism", ""), _terms,
                 _dir_constraint.get("threshold")
                 if isinstance(_dir_constraint.get("threshold"),
                               (int, float)) else 0.5)
+            _spans["candidate_assembly_s"] += time.perf_counter() - _t0
             _dir_record["overlap_ratio"] = _tv["overlap_ratio"]
             _dir_record["overlapping_terms"] = _tv["overlapping_terms"]
             if _tv["violation"]:
@@ -557,6 +618,7 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                 print("  [synthesize] directive violation (overlap "
                       f"{_tv['overlap_ratio']}) — one recorded repair "
                       "retry")
+                _t0 = time.perf_counter()
                 _rej = (
                     prompt + "\n\nCOMPLIANCE REJECTION: your MECHANISM "
                     "restated the explicitly excluded mechanism (\""
@@ -565,28 +627,41 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                     "Answer again in the SAME format; the MECHANISM line "
                     "must be a genuinely different mechanism from THIS "
                     "abstract.")
-                _resp2 = llm_chat(_rej,
-                                  system="You are a medical device engineer.")
+                _spans["prompt_construction_total_s"] += \
+                    time.perf_counter() - _t0
+                _resp2 = _timed_chat(_rej,
+                                     system="You are a medical device engineer.")
+                _t0 = time.perf_counter()
                 _parsed2 = _parse_fields(_resp2) if _resp2 else {}
+                _spans["parse_total_s"] += time.perf_counter() - _t0
                 if _parsed2.get("mechanism"):
                     # the engineer's pass-2 F3: the compliance judgment
                     # gates on the MECHANISM (the thing the directive
                     # excludes), not the intervention line — a retry
                     # with a different mechanism is judged on it
+                    _t0 = time.perf_counter()
                     _tv2 = _territory_violation(
                         _parsed2.get("mechanism", ""),
                         _dir_constraint.get("forbidden_terms") or [],
                         _dir_constraint.get("threshold")
                         if isinstance(_dir_constraint.get("threshold"),
                                       (int, float)) else 0.5)
+                    _spans["candidate_assembly_s"] += \
+                        time.perf_counter() - _t0
                     _dir_record["repaired_overlap_ratio"] = _tv2[
                         "overlap_ratio"]
                     if not _tv2["violation"]:
                         if _parsed2.get("intervention"):
                             _dir_record["repair_succeeded"] = True
+                            _t0 = time.perf_counter()
                             candidate = _candidate_from(_resp2, _parsed2)
+                            _spans["candidate_assembly_s"] += \
+                                time.perf_counter() - _t0
+                            _t0 = time.perf_counter()
                             repair_mechanism_span(candidate,
                                                   paper["abstract"])
+                            _spans["span_repair_check_s"] += \
+                                time.perf_counter() - _t0
                         else:
                             # a compliant mechanism in an unusable
                             # answer: the ORIGINAL (violating)
@@ -630,6 +705,13 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                          "records skipped by the R483 gate"),
             }
         print(f"  [synthesize] intervention: {candidate['intervention'][:60]}")
+        _spans["synthesize_total_s"] = round(
+            time.perf_counter() - _t_entry, 6)
+        candidate["synthesis_span_timings"] = {
+            "instrument": "synth_spans/1.0",
+            **{k: (v if k == "n_llm_chat_calls" else round(v, 6))
+               for k, v in _spans.items()},
+        }
         return candidate
     return None
 
