@@ -1,0 +1,39 @@
+{
+ "gen": 1,
+ "invention_id": "inv:82617b78e0:gen1",
+ "parent_id": null,
+ "lineage": [
+  "inv:82617b78e0:gen1"
+ ],
+ "origin": "BASELINE_FALLBACK_GENERATION",
+ "architecture": {
+  "mechanism": "A fully discharged 12 V lead-acid battery cannot deliver the 200–600 A cold-crank burst because its terminal voltage collapses below the ~9–10 V needed by the starter solenoid and ECU boot loads; the architecture exploits a partitioned energy reserve — quiescent/parasitic loads are confined to the main battery while a high-power-density reserve (supercapacitor bank) is charged only when the alternator runs and then held in isolation, so it retains cranking capability even when the main battery is fully flat.",
+  "intervention": "Add an isolated 12 V supercapacitor reserve module (≈500–1000 F, 16 V rating) wired through a threshold-controlled isolator: charge it from the alternator bus only above 13.5 V, disconnect it from the main bus when main voltage sags below 10.8 V, and on a key-on/crank request switch it directly onto the starter solenoid input, bypassing the depleted main battery; pair this with a low-voltage disconnect (≈11.5 V) for non-essential quiescent loads so the main battery is never drained past recovery by keyless-entry/immobilizer/keep-alive draws.",
+  "expected_effect": "With the main battery discharged to ≤10.0 V, the engine still cranks and starts within 1–3 s; the factory 12 V bus is supported during cranking by the reserve; the reserve retains ≥80 % of its cold-crank capability after 30 days of vehicle inactivity at 25 °C, and the factory alternator and wiring remain the primary energy path with no change to OEM starting behavior.",
+  "falsification_test": "Cheapest kill test: bench-measure the reserve bank's self-discharge over 30 days (leakage current vs. temperature), then compute retained energy against the engine's cold-crank energy requirement; if retained energy at −18 °C after 30 days is below the 0.5–3 s cranking demand, or if a full main-battery discharge to 10.0 V fails to produce a start, the architecture is falsified."
+ },
+ "state": "INVENTION_GENERATED",
+ "maturity": "GENERATED",
+ "challenge": {
+  "killed": false,
+  "not_yet_challenged": true,
+  "note": "the fallback architecture has not faced the challenge gauntlet yet — the evolution loop challenges it in generation 2's evaluation path"
+ },
+ "causal_delta": null,
+ "change_delta": null,
+ "reason_for_change": null,
+ "fresh_evidence": null,
+ "model": null,
+ "artifacts": {},
+ "generated_by": {
+  "provider": "zai",
+  "model": "Atria-Dawn-Preview",
+  "status": "OK",
+  "prompt_hash": "fa3d6e63906a8fde",
+  "output_hash": "00ae4be4a19e9986",
+  "template_echo_rejected": [],
+  "provenance": "AI_PROPOSED",
+  "maturity_at_generation": "GENERATED",
+  "honesty": "generated architecture — no verified evidence binding; the evidence-bound synthesis failed (recorded); claims are hypotheses pending verification (Art. LX: HYPOTHESIZED)"
+ }
+}
