@@ -415,6 +415,88 @@ def main() -> int:
                      "detail, never subtracted from the parent"),
         })
 
+    # J. MECHANISM_SPACE subphase decomposition (R528): per-problem
+    # subphase means from the mechanism_attribution/1.0.0 instrument
+    # (runtime_attribution on the durable MECHANISM_SPACE envelope).
+    # The 12 subphases (mechanism_attribution.SUBPHASES) are the
+    # decomposition; provider_call_split_offline is an explicit
+    # unmeasured marker (duration_s=None) — never a fabricated zero
+    # (Art. XXV). The provider-call wall vs routing-overhead SPLIT
+    # is derived OFFLINE by joining the routing ledger on the llm
+    # join keys; it is NOT fabricated in-stage.
+    ms_rows = []
+    for r in rows:
+        ms = r.get("mechanism_space_spans") or {}
+        if ms.get("class") != "OBSERVED_IN_STAGE":
+            ms_rows.append({
+                "problem_index": r.get("problem_index"),
+                "class": ms.get("class", "UNKNOWN"),
+                "note": ms.get("note"),
+                "spans": {}, "total_s": None,
+                "terminal_state": None,
+                "llm": None,
+                "ledger_provider_call_wall_s": None,
+                "adapter_and_stage_overhead_s": None,
+            })
+            continue
+        ms_rows.append({
+            "problem_index": r.get("problem_index"),
+            "class": ms.get("class"),
+            "note": ms.get("note"),
+            "spans": ms.get("spans") or {},
+            "total_s": ms.get("total_s"),
+            "stage_wall_s": ms.get("stage_wall_s"),
+            "terminal_state": ms.get("terminal_state"),
+            "llm": ms.get("llm"),
+            "funnel": ms.get("funnel"),
+            "subphase_detail": ms.get("subphase_detail"),
+            "ledger_provider_call_wall_s":
+                ms.get("ledger_provider_call_wall_s"),
+            "adapter_and_stage_overhead_s":
+                ms.get("adapter_and_stage_overhead_s"),
+        })
+    # per-subphase means across OBSERVED_IN_STAGE rows
+    _ms_keys = [
+        "entry_setup", "verified_evidence_collection",
+        "evidence_item_construction", "operator_selection",
+        "llm_instantiation_wall", "provider_call_split_offline",
+        "candidate_parsing", "semantic_validation",
+        "cemetery_consultation", "distinctness_dedup",
+        "mechanism_support_verification", "post_support_assembly"]
+    ms_agg = {}
+    for _k in _ms_keys:
+        _vs = [m["spans"].get(_k) for m in ms_rows
+               if m.get("class") == "OBSERVED_IN_STAGE"
+               and m["spans"].get(_k) is not None]
+        ms_agg[_k] = _agg(_vs)
+    # terminal-state distribution
+    _ms_states = {}
+    for m in ms_rows:
+        ts = m.get("terminal_state") or "UNKNOWN"
+        _ms_states[ts] = _ms_states.get(ts, 0) + 1
+    # LLM-call detail aggregate (provider/model/status distribution)
+    _ms_llm_providers = {}
+    for m in ms_rows:
+        ll = m.get("llm") or {}
+        prov = (ll.get("provider") or "UNKNOWN")
+        _ms_llm_providers[prov] = _ms_llm_providers.get(prov, 0) + 1
+    # funnel counts (mechanism-space internal funnel)
+    _ms_funnel = {}
+    for m in ms_rows:
+        fn = m.get("funnel") or {}
+        for _fk, _fv in fn.items():
+            if isinstance(_fv, (int, float)):
+                _ms_funnel[_fk] = _ms_funnel.get(_fk, 0.0) + _fv
+    ms_rank = {
+        "per_problem": ms_rows,
+        "aggregate": {
+            "subphase_means": ms_agg,
+            "terminal_state_distribution": _ms_states,
+            "llm_provider_distribution": _ms_llm_providers,
+            "funnel_counts": _ms_funnel,
+        },
+    }
+
     out = {
         "artifact": "R526_ATTRIBUTION_RANKING/1.0",
         "harvest": "R526/ATTR_CURRENT_HARVEST.json",
@@ -437,6 +519,7 @@ def main() -> int:
         },
         "H_generate_call_audit": h_rank,
         "I_run_wall_reconciliation": recon,
+        "J_mechanism_space_subphase_decomposition": ms_rank,
         "reviewer_provenance": "AI_REVIEW",
     }
     OUT.write_text(json.dumps(out, indent=1, sort_keys=True,
@@ -453,6 +536,10 @@ def main() -> int:
                           d["failure_wall_s"]["mean"],
                           d["n_calls_total"], d["n_ok_total"])
                          for d in role_rank[:6]])
+    print("J MECHANISM_SPACE subphase means:",
+          {k: (v["mean"] if v.get("n") else None)
+           for k, v in ms_agg.items() if v.get("n")})
+    print("J MECHANISM_SPACE terminal states:", _ms_states)
     return 0
 
 

@@ -128,7 +128,8 @@ def _evidence_based_gate(candidates, intervention: str,
     named_cliff = cliff_named
     named_cand = named_cliff if named_cliff in (
         "A_generate_routing_subphase", "B_post_rank_subphase",
-        "D_retrieval", "SYNTHESIZE_POST_SUCCESS_SLEEP") else None
+        "D_retrieval", "SYNTHESIZE_POST_SUCCESS_SLEEP",
+        "J_mechanism_space_subphase") else None
     # a retrieval cliff names a source id, not the candidate class
     if named_cliff == "D_retrieval":
         named_cand = "D_retrieval"
@@ -214,6 +215,12 @@ def _evidence_based_gate(candidates, intervention: str,
                       and (_ev.get("n_problems_with_sleep") or 0) >= 2)
         _c4_ref = ("candidates.SYNTHESIZE_POST_SUCCESS_SLEEP."
                    "evidence[0].mean_s")
+    elif named_cand == "J_mechanism_space_subphase":
+        _ev = (_cand.get("J_mechanism_space_subphase") or {})
+        _flags = _ev.get("top_subphases") or []
+        _c4_ev = any((f.get("mean_s") or 0) > 0 for f in _flags)
+        _c4_ref = ("candidates.J_mechanism_space_subphase."
+                   "top_subphases[].mean_s")
     _c4_verified = bool(_c4_named and _c4_ev and _iv)
     out.append(_criterion(
         "C4_AVOIDABLE", "typed counterfactual action tied to the "
@@ -533,15 +540,39 @@ def main() -> int:
                 {"source_id": s["source_id"],
                  "critical_path_rows": held})
 
-    # ---- R527 Q2: SYNTHESIZE_POST_SUCCESS_SLEEP candidate class.
-    # The fixed post-success sleep in a2/synthesize.llm_chat is a
-    # typed, measured sub-operation (G aggregate post_success_sleep_s),
-    # distinct from the generate() routing subphases (A) and the
-    # post-rank subphases (B). It is flagged when the measured sleep
-    # is > 0 on >= 2 independent SYNTHESIZE-executed rows (repeated +
-    # causally attributed to the named code line). The avoidable
-    # counterfactual (remove the fixed sleep) is NOT pre-identified
-    # — naming requires the coder to state it via --intervention.
+    # ---- R528: MECHANISM_SPACE subphase candidate class.
+    # The lean mechanism-space subphases (mechanism_attribution/1.0.0)
+    # are typed, measured sub-operations. The candidate is flagged
+    # when the top subphase by mean wall is > 0 on >= 2 independent
+    # MECHANISM_SPACE-executed rows AND the stage carries a
+    # non-zero total. The avoidable counterfactual is NOT
+    # pre-identified — naming requires the coder to state it via
+    # --intervention (a large provider wall is NOT automatically
+    # waste; a low candidate count is NOT automatically a reason to
+    # add more LLM calls).
+    _ms_rank = ranking.get("J_mechanism_space_subphase_decomposition") \
+        or {}
+    _ms_agg = _ms_rank.get("aggregate") or {}
+    _ms_subphase_means = _ms_agg.get("subphase_means") or {}
+    _ms_problems = sorted(
+        m.get("problem_index") for m in
+        (_ms_rank.get("per_problem") or [])
+        if m.get("class") == "OBSERVED_IN_STAGE")
+    _ms_ranked_subs = sorted(
+        ((_k, _v.get("mean") or 0.0) for _k, _v in
+         _ms_subphase_means.items()
+         if _v.get("n") and _v.get("mean") is not None
+         and _k != "provider_call_split_offline"),
+        key=lambda kv: -kv[1])[:3]
+    _ms_flags = [
+        {"subphase": _k, "mean_s": round(_m, 3),
+         "problems": _ms_problems}
+        for _k, _m in _ms_ranked_subs if _m > 0
+        and len(_ms_problems) >= 2]
+    _ms_terminal = _ms_agg.get("terminal_state_distribution") or {}
+    _ms_starved = _ms_terminal.get("NO_CANDIDATES", 0) + \
+        _ms_terminal.get("MECHANISM_STARVED", 0)
+    ms_candidate = bool(_ms_flags and len(_ms_problems) >= 2)
     _synth_sleep = (synth_agg.get("post_success_sleep_s") or {})
     _synth_sleep_problems = sorted(
         {s["problem_index"] for s in synth_rows
@@ -605,6 +636,25 @@ def main() -> int:
                      "avoidable counterfactual (remove the fixed "
                      "sleep) is NOT pre-identified — naming requires "
                      "the coder to state it via --intervention."),
+        },
+        "J_mechanism_space_subphase": {
+            "flagged": ms_candidate,
+            "top_subphases": _ms_flags,
+            "terminal_state_distribution": _ms_terminal,
+            "n_starved_or_no_candidate": _ms_starved,
+            "n_problems_observed": len(_ms_problems),
+            "evidence": _ms_flags,
+            "note": ("the lean mechanism-space subphases "
+                     "(mechanism_attribution/1.0.0) are typed, "
+                     "measured sub-operations; a subphase is flagged "
+                     "when its mean wall > 0 on >= 2 independent "
+                     "MECHANISM_SPACE-executed rows. A large provider "
+                     "wall is NOT automatically waste; a low "
+                     "candidate count is NOT automatically a reason "
+                     "to add more LLM calls. The avoidable "
+                     "counterfactual is NOT pre-identified — naming "
+                     "requires the coder to state it via "
+                     "--intervention."),
         },
     }
     flagged = [k for k, v in candidates.items() if v["flagged"]]

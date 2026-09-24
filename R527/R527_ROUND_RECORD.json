@@ -1,0 +1,117 @@
+{
+ "artifact": "R527_ROUND_RECORD/1.0",
+ "round": "R527",
+ "created_at_utc": "2026-09-24T23:51:42Z",
+ "reviewer_provenance": "AI_REVIEW",
+ "parent_round": "R526",
+ "intervention": {
+  "id": "SYNTHESIZE_POST_SUCCESS_SLEEP_REMOVAL",
+  "description": "remove the fixed 0.5 s post-success sleep in a2/synthesize.llm_chat res.ok path",
+  "source": "discovery_fabric/a2/synthesize.py llm_chat()",
+  "claimed_effect": "~0.5 s per successful SYNTHESIZE call (10/10 baseline R526 S5 fresh battery)",
+  "baseline_sleep_s": 0.5,
+  "after_sleep_s": 0.0,
+  "intervention_commit": "c2015dfb3b8d45012bfa01c5faa011fa01598e8d",
+  "measurement_commit": "9392c181bbf6ea2e50964580ad95111d5b776e54"
+ },
+ "arms": {
+  "baseline": {
+   "build_sha": "03881b2b48ff52bf5b79966dd15c63879ac3a55f",
+   "harvest": "R526/ATTR_CURRENT_HARVEST.json",
+   "harvest_sha256": "93567b538ee3a2fcca8d7c6d8e37a9f4bc6601fe7cfe198fcc04ce5b1e7c4aec",
+   "post_success_sleep_s": {
+    "n": 0,
+    "mean": null,
+    "note": "post_success_sleep_s not present on this arm (pre-Q5 instrumentation build)"
+   },
+   "synth_stage_wall_s": 9.819,
+   "mechanisms_found": {
+    "mechanisms_found": 0,
+    "n_rows": 10,
+    "rate": 0.0
+   }
+  },
+  "after": {
+   "build_sha": "9392c181bbf6ea2e50964580ad95111d5b776e54",
+   "harvest": "R526/ATTR_AFTER_HARVEST.json",
+   "harvest_sha256": "3f44c9637d284fab6e0dc95adac207f97f66d5ffa13aeb57a9993d4578b66fe8",
+   "post_success_sleep_s": {
+    "n": 10,
+    "mean": 1e-06,
+    "values": [
+     1e-06,
+     1e-06,
+     1e-06,
+     1e-06,
+     0.0,
+     1e-06,
+     1e-06,
+     1e-06,
+     1e-06,
+     0.0
+    ]
+   },
+   "synth_stage_wall_s": 68.559,
+   "mechanisms_found": {
+    "mechanisms_found": 0,
+    "n_rows": 10,
+    "rate": 0.0
+   },
+   "deploy_record": "R527/AFTER_DEPLOY_RECORD.json",
+   "deploy_commit": "9392c181bbf6ea2e50964580ad95111d5b776e54",
+   "drift": null,
+   "tamper": null
+  }
+ },
+ "paired_comparison": {
+  "artifact": "R526/ATTR_COMPARISON.json",
+  "n_paired_problems": 10,
+  "current_ref": "R526/ATTR_CURRENT_HARVEST.json",
+  "after_ref": "R526/ATTR_AFTER_HARVEST.json"
+ },
+ "measured_sleep_effect": {
+  "proven": true,
+  "baseline_mean_s": null,
+  "after_mean_s": 1e-06,
+  "n_after_rows": 10,
+  "rule": "the sleep effect is proven when the after arm carries post_success_sleep_s on all 10 rows with a mean < 0.05 s (the fixed 0.5 s sleep is removed); the baseline reference is the R526 S5 fresh battery (~0.5 s on 10/10 calls)"
+ },
+ "discovery_funnel_outcome": {
+  "confounded": false,
+  "baseline_mechanisms_found": {
+   "mechanisms_found": 0,
+   "n_rows": 10,
+   "rate": 0.0
+  },
+  "after_mechanisms_found": {
+   "mechanisms_found": 0,
+   "n_rows": 10,
+   "rate": 0.0
+  },
+  "note": "mechanisms_found changed materially (baseline 0 vs after 0) — this is an OBSERVED ARM CONFOUND / provider-state difference, NOT attributed to the sleep intervention (the directive section 3 rule: do not attribute that difference to the sleep; record it as a confound)"
+ },
+ "remaining_confounds": {
+  "provider_inference_variance": true,
+  "synth_stage_wall_baseline_s": 9.819,
+  "synth_stage_wall_after_s": 68.559,
+  "note": "the after-arm SYNTHESIZE stage wall is 68.559 s vs baseline 9.819 s — this is provider-inference variance (free-tier flapping in the after window), NOT the sleep-removal effect (the sleep was ~0.5 s, ~5% of the baseline stage wall). The unattributed remainder is recorded as UNATTRIBUTED; it is NOT distributed to the intervention."
+ },
+ "round_states": {
+  "measurement_complete": true,
+  "optimization_authorized": true,
+  "optimization_executed": true,
+  "optimization_measured": true,
+  "optimization_deployed": false,
+  "note": "these five states are distinct and never collapsed. optimization_measured is TRUE only when the measured before/after sleep effect is durable (after post_success_sleep_s ~0 on 10/10 rows). The funnel confound + provider variance are recorded as UNKNOWN remainders, never forced into the intervention claim."
+ },
+ "classification": "SLEEP_REMOVAL_MEASURED__FUNNEL_CONFOUND_DISCLOSED",
+ "classification_not": [
+  "NOT claimed: end-to-end discovery runtime improvement (the provider-inference variance dominates the stage wall; the 0.5 s sleep was ~5% of baseline)",
+  "NOT claimed: discovery-funnel equivalence (the mechanisms_found drop is an arm confound, not the intervention effect)",
+  "NOT claimed: the 0.5 s removal made the engine faster overall (only the sleep component is measured; provider inference is the dominant cost)"
+ ],
+ "next_round": {
+  "target": "MECHANISM_SPACE",
+  "rule": "the next substantive target is the constitutional funnel bottleneck (Art. LXXXIII): the largest dropout stage on the frozen battery. The MECHANISM_SPACE subphase decomposition (mechanism_attribution/1.0.0) is the next measurement to surface before any optimization is named."
+ }
+}

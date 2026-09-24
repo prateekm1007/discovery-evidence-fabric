@@ -941,6 +941,96 @@ def _synth_spans(syn_env, stage_entry, ledger_block):
     return out
 
 
+def _mechanism_space_spans(ms_env, stage_entry, ledger_block):
+    """R528: MECHANISM_SPACE subphase decomposition from the existing
+    mechanism_attribution/1.0.0 instrument (runtime_attribution on
+    the durable MECHANISM_SPACE envelope). Behavior-neutral: the
+    instrument already exists in adapters._lean_mechanism_space; this
+    harvest step only EXTRACTS it into the row (no second
+    attribution framework).
+
+    Reads, all from durable bytes:
+      stage wall ......... stage_log MECHANISM_SPACE duration_monotonic_s
+      span record ........ envelope_MECHANISM_SPACE.json
+                          $.mechanism_space.runtime_attribution
+                          (mechanism_attribution/1.0.0; absent on
+                          uninstrumented builds or skipped stages ->
+                          UNATTRIBUTED)
+      provider-call wall . durable model_routing ledger MECHANISM_SPACE
+                          role
+    Derives (labeled, never force-fit):
+      adapter_and_stage_overhead_s = stage wall - total_s
+    The 12 subphases (mechanism_attribution.SUBPHASES) are the
+    decomposition; provider_call_split_offline is an explicit
+    unmeasured marker (duration_s=None) — never a fabricated zero
+    (Art. XXV).
+    """
+    out = {"class": "UNKNOWN", "note": None}
+    st_wall = None
+    try:
+        for e in ((ms_env or {}).get("stage_log") or []):
+            if isinstance(e, dict) and e.get("stage") == "MECHANISM_SPACE":
+                st_wall = e.get("duration_monotonic_s")
+                out["stage_started_at"] = e.get("started_at")
+                out["stage_finished_at"] = e.get("finished_at")
+                break
+    except Exception:
+        st_wall = None
+    if st_wall is None and isinstance(stage_entry, dict):
+        st_wall = stage_entry.get("wall_s")
+    out["stage_wall_s"] = st_wall
+    space = (ms_env or {}).get("mechanism_space") or {}
+    attr = space.get("runtime_attribution") if isinstance(space, dict) \
+        else None
+    if not isinstance(attr, dict) or attr.get(
+            "attribution_version") is None:
+        out["note"] = ("no mechanism_attribution/1.0.0 record on the "
+                       "durable MECHANISM_SPACE envelope "
+                       "(uninstrumented build or skipped stage) - "
+                       "decomposition UNATTRIBUTED")
+        return out
+    led = ledger_block or {}
+    led_wall = led.get("provider_call_wall_s") or 0.0
+    total = attr.get("total_s")
+    subphases = attr.get("subphases") or []
+    out.update({
+        "class": "OBSERVED_IN_STAGE",
+        "attribution_version": attr.get("attribution_version"),
+        "terminal_state": attr.get("terminal_state"),
+        "total_s": total,
+        "spans": {s.get("subphase"): s.get("duration_s")
+                  for s in subphases
+                  if isinstance(s, dict)},
+        "subphase_detail": [
+            {k: v for k, v in s.items()
+             if k in ("subphase", "duration_s", "n_verified_items_examined",
+                      "n_structured_items", "n_contracts_evaluated",
+                      "n_satisfied", "selected_operator", "provider",
+                      "model", "transport_status", "n_fields_nonempty",
+                      "semantic_verdict", "candidate_state",
+                      "n_consulted", "n_blocked", "n_distinct",
+                      "n_indeterminate", "n_retained",
+                      "support_states", "derivation")}
+            for s in subphases if isinstance(s, dict)],
+        "funnel": attr.get("funnel"),
+        "llm": attr.get("llm"),
+        "ledger_provider_call_wall_s": round(led_wall, 3),
+        "ledger_n_calls": led.get("n_calls"),
+        "ledger_n_ok": led.get("n_ok"),
+        "ledger_failures": list(led.get("failures") or []),
+        "adapter_and_stage_overhead_s": (
+            round(st_wall - total, 3)
+            if isinstance(st_wall, (int, float))
+            and isinstance(total, (int, float)) else None),
+        "evidence": ("envelope_MECHANISM_SPACE.json $.stage_log "
+                      "[MECHANISM_SPACE].duration_monotonic_s + "
+                      "$.mechanism_space.runtime_attribution "
+                      "(mechanism_attribution/1.0.0) + durable "
+                      "model_routing ledger MECHANISM_SPACE role"),
+    })
+    return out
+
+
 # ---------------------------------------------------------------- durable row
 def harvest_row(dest: Path, run_files, ledger_lines, idx, source_id,
                 family, sid, slug, manifest):
@@ -1088,6 +1178,15 @@ def harvest_row(dest: Path, run_files, ledger_lines, idx, source_id,
     row["synthesize_spans"] = _synth_spans(
         envs.get("SYNTHESIZE"), by_stage.get("SYNTHESIZE"),
         led.get("SYNTHESIZE"))
+    # R528: MECHANISM_SPACE subphase decomposition from the existing
+    # mechanism_attribution/1.0.0 instrument (runtime_attribution on
+    # the durable MECHANISM_SPACE envelope). Behavior-neutral: the
+    # instrument already exists in adapters._lean_mechanism_space; this
+    # harvest step only EXTRACTS it into the row (no second
+    # attribution framework).
+    row["mechanism_space_spans"] = _mechanism_space_spans(
+        envs.get("MECHANISM_SPACE"), by_stage.get("MECHANISM_SPACE"),
+        led.get("MECHANISM_SPACE"))
     atk_env = envs.get("ATTACK") or {}
     ar = atk_env.get("attack_results") or {}
     row["attack"] = {

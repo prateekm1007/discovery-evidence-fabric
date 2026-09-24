@@ -3,7 +3,7 @@
  "artifact_type": "R526_ATTRIBUTION_HARVEST",
  "battery": "R526-CURRENT-PRODUCTION-ATTRIBUTION",
  "build_identity_check": "MATCH",
- "harvested_at_utc": "2026-09-24T23:05:47Z",
+ "harvested_at_utc": "2026-09-24T23:48:14Z",
  "instrument": "r506_discovery_yield/1.1.0",
  "manifest_sha256": "d7dfdae975aaf6e7075905cf4c14eee805f816908ed0e811adaadec058381de6",
  "manifest_stamped_engine_sha": "03881b2b48ff52bf5b79966dd15c63879ac3a55f",
@@ -362,6 +362,157 @@
     "MECHANISM_SPACE",
     "SYNTHESIZE"
    ],
+   "mechanism_space_spans": {
+    "adapter_and_stage_overhead_s": 0.01,
+    "attribution_version": "mechanism_attribution/1.0.0 (R516)",
+    "class": "OBSERVED_IN_STAGE",
+    "evidence": "envelope_MECHANISM_SPACE.json $.stage_log [MECHANISM_SPACE].duration_monotonic_s + $.mechanism_space.runtime_attribution (mechanism_attribution/1.0.0) + durable model_routing ledger MECHANISM_SPACE role",
+    "funnel": {
+     "applicable_operator_contracts": {
+      "n_evaluated": 70,
+      "n_satisfied": 4
+     },
+     "distinctness": {
+      "n_distinct": 0,
+      "n_indeterminate": 0
+     },
+     "llm_outcome": "OK",
+     "llm_output_empty": false,
+     "n_assembled": 1,
+     "n_retained": 0,
+     "selected_operator": "DIRECT_TRANSFER",
+     "semantic_verdicts": [
+      "SEMANTICALLY_VALID"
+     ],
+     "terminal_reason": "NO_CANDIDATES",
+     "verified_evidence_items": 14
+    },
+    "ledger_failures": [],
+    "ledger_n_calls": 1,
+    "ledger_n_ok": 1,
+    "ledger_provider_call_wall_s": 9.109,
+    "llm": {
+     "failure_type": null,
+     "fallback_occurred": true,
+     "join_keys": {
+      "model": "qwen/qwen3.5-plus:free",
+      "output_hash": "892917f3d086e838b1837bfb55966cd9ee73add022b4dfbf2f982a366ad787bf",
+      "prompt_hash": "ca2156e4900330eb16fe9f628d1ea075f667d8582c80cc7d2d81950dff8f61a8",
+      "provider": "xkiro"
+     },
+     "llm_retries": 0,
+     "model": "qwen/qwen3.5-plus:free",
+     "n_llm_calls": 1,
+     "n_route_hops": 2,
+     "output_empty": false,
+     "path_taken": true,
+     "provider": "xkiro",
+     "provider_vs_overhead_split": "OFFLINE_VIA_ROUTING_LEDGER (in-stage wall only; join the routing ledger on prompt_hash/output_hash for per-hop latencies — Art. XXV)",
+     "retry_basis": "one call is one call on the lean path (R453-LEAN; no corrective retry)",
+     "routed_hops": [
+      {
+       "failure_type": "AUTH_FAILURE",
+       "fallback_provider": "xkiro",
+       "provider": "unorouter"
+      },
+      {
+       "failure_type": null,
+       "fallback_provider": null,
+       "provider": "xkiro"
+      }
+     ],
+     "transport_error": null,
+     "transport_status": "OK"
+    },
+    "note": null,
+    "spans": {
+     "candidate_parsing": 0.0,
+     "cemetery_consultation": 0.005,
+     "distinctness_dedup": 0.0,
+     "entry_setup": 0.0,
+     "evidence_item_construction": 0.0,
+     "llm_instantiation_wall": 11.179,
+     "mechanism_support_verification": 0.0,
+     "operator_selection": 0.011,
+     "post_support_assembly": 0.0,
+     "provider_call_split_offline": null,
+     "semantic_validation": 0.003,
+     "verified_evidence_collection": 0.0
+    },
+    "stage_finished_at": "2026-09-24T15:56:44+00:00Z",
+    "stage_started_at": "2026-09-24T15:56:32+00:00Z",
+    "stage_wall_s": 11.207822103984654,
+    "subphase_detail": [
+     {
+      "duration_s": 0.0,
+      "subphase": "entry_setup"
+     },
+     {
+      "duration_s": 0.0,
+      "n_verified_items_examined": 14,
+      "subphase": "verified_evidence_collection"
+     },
+     {
+      "duration_s": 0.0,
+      "n_structured_items": 14,
+      "subphase": "evidence_item_construction"
+     },
+     {
+      "duration_s": 0.011,
+      "n_contracts_evaluated": 70,
+      "n_satisfied": 4,
+      "selected_operator": "DIRECT_TRANSFER",
+      "subphase": "operator_selection"
+     },
+     {
+      "duration_s": 11.179,
+      "model": "qwen/qwen3.5-plus:free",
+      "provider": "xkiro",
+      "subphase": "llm_instantiation_wall",
+      "transport_status": "OK"
+     },
+     {
+      "derivation": "OFFLINE_VIA_ROUTING_LEDGER — not measurable in-stage; join routing-ledger per-hop latencies on the llm.join_keys (Art. XXV: unmeasured stays unmeasured, never zero)",
+      "duration_s": null,
+      "subphase": "provider_call_split_offline"
+     },
+     {
+      "duration_s": 0.0,
+      "n_fields_nonempty": 8,
+      "subphase": "candidate_parsing"
+     },
+     {
+      "candidate_state": "CANDIDATE",
+      "duration_s": 0.003,
+      "semantic_verdict": "SEMANTICALLY_VALID",
+      "subphase": "semantic_validation"
+     },
+     {
+      "duration_s": 0.005,
+      "n_blocked": 1,
+      "n_consulted": 1,
+      "subphase": "cemetery_consultation"
+     },
+     {
+      "duration_s": 0.0,
+      "n_distinct": 0,
+      "n_indeterminate": 0,
+      "n_retained": 0,
+      "subphase": "distinctness_dedup"
+     },
+     {
+      "duration_s": 0.0,
+      "subphase": "mechanism_support_verification",
+      "support_states": []
+     },
+     {
+      "duration_s": 0.0,
+      "subphase": "post_support_assembly"
+     }
+    ],
+    "terminal_state": "NO_CANDIDATES",
+    "total_s": 11.198
+   },
    "observation_source": "DURABLE_BRANCH",
    "openalex": {
     "canonical_admitted_contribution": {
@@ -3134,6 +3285,159 @@
     "POST_RANK_IMPROVEMENT",
     "SYNTHESIZE"
    ],
+   "mechanism_space_spans": {
+    "adapter_and_stage_overhead_s": 0.027,
+    "attribution_version": "mechanism_attribution/1.0.0 (R516)",
+    "class": "OBSERVED_IN_STAGE",
+    "evidence": "envelope_MECHANISM_SPACE.json $.stage_log [MECHANISM_SPACE].duration_monotonic_s + $.mechanism_space.runtime_attribution (mechanism_attribution/1.0.0) + durable model_routing ledger MECHANISM_SPACE role",
+    "funnel": {
+     "applicable_operator_contracts": {
+      "n_evaluated": 25,
+      "n_satisfied": 1
+     },
+     "distinctness": {
+      "n_distinct": 1,
+      "n_indeterminate": 0
+     },
+     "llm_outcome": "OK",
+     "llm_output_empty": false,
+     "n_assembled": 1,
+     "n_retained": 1,
+     "selected_operator": "DIRECT_TRANSFER",
+     "semantic_verdicts": [
+      "TEXTUAL_REWRITE"
+     ],
+     "terminal_reason": "BUILT",
+     "verified_evidence_items": 5
+    },
+    "ledger_failures": [],
+    "ledger_n_calls": 1,
+    "ledger_n_ok": 1,
+    "ledger_provider_call_wall_s": 6.071,
+    "llm": {
+     "failure_type": null,
+     "fallback_occurred": true,
+     "join_keys": {
+      "model": "qwen/qwen3.5-plus:free",
+      "output_hash": "4f0648460bbfafd609d5c71cb198a076a287ac97bfd3f37bbb283aae92605e0b",
+      "prompt_hash": "e03c35b0a8bc5cbb12bc64b621db932038e0caa01e8725c3202f9eff02d58e79",
+      "provider": "xkiro"
+     },
+     "llm_retries": 0,
+     "model": "qwen/qwen3.5-plus:free",
+     "n_llm_calls": 1,
+     "n_route_hops": 2,
+     "output_empty": false,
+     "path_taken": true,
+     "provider": "xkiro",
+     "provider_vs_overhead_split": "OFFLINE_VIA_ROUTING_LEDGER (in-stage wall only; join the routing ledger on prompt_hash/output_hash for per-hop latencies — Art. XXV)",
+     "retry_basis": "one call is one call on the lean path (R453-LEAN; no corrective retry)",
+     "routed_hops": [
+      {
+       "failure_type": "AUTH_FAILURE",
+       "fallback_provider": "xkiro",
+       "provider": "unorouter"
+      },
+      {
+       "failure_type": null,
+       "fallback_provider": null,
+       "provider": "xkiro"
+      }
+     ],
+     "transport_error": null,
+     "transport_status": "OK"
+    },
+    "note": null,
+    "spans": {
+     "candidate_parsing": 0.0,
+     "cemetery_consultation": 0.007,
+     "distinctness_dedup": 0.0,
+     "entry_setup": 0.0,
+     "evidence_item_construction": 0.0,
+     "llm_instantiation_wall": 7.881,
+     "mechanism_support_verification": 0.002,
+     "operator_selection": 0.003,
+     "post_support_assembly": 0.002,
+     "provider_call_split_offline": null,
+     "semantic_validation": 0.002,
+     "verified_evidence_collection": 0.0
+    },
+    "stage_finished_at": "2026-09-24T15:42:52+00:00Z",
+    "stage_started_at": "2026-09-24T15:42:44+00:00Z",
+    "stage_wall_s": 7.923767322092317,
+    "subphase_detail": [
+     {
+      "duration_s": 0.0,
+      "subphase": "entry_setup"
+     },
+     {
+      "duration_s": 0.0,
+      "n_verified_items_examined": 5,
+      "subphase": "verified_evidence_collection"
+     },
+     {
+      "duration_s": 0.0,
+      "n_structured_items": 5,
+      "subphase": "evidence_item_construction"
+     },
+     {
+      "duration_s": 0.003,
+      "n_contracts_evaluated": 25,
+      "n_satisfied": 1,
+      "selected_operator": "DIRECT_TRANSFER",
+      "subphase": "operator_selection"
+     },
+     {
+      "duration_s": 7.881,
+      "model": "qwen/qwen3.5-plus:free",
+      "provider": "xkiro",
+      "subphase": "llm_instantiation_wall",
+      "transport_status": "OK"
+     },
+     {
+      "derivation": "OFFLINE_VIA_ROUTING_LEDGER — not measurable in-stage; join routing-ledger per-hop latencies on the llm.join_keys (Art. XXV: unmeasured stays unmeasured, never zero)",
+      "duration_s": null,
+      "subphase": "provider_call_split_offline"
+     },
+     {
+      "duration_s": 0.0,
+      "n_fields_nonempty": 8,
+      "subphase": "candidate_parsing"
+     },
+     {
+      "candidate_state": "CANDIDATE",
+      "duration_s": 0.002,
+      "semantic_verdict": "TEXTUAL_REWRITE",
+      "subphase": "semantic_validation"
+     },
+     {
+      "duration_s": 0.007,
+      "n_blocked": 0,
+      "n_consulted": 1,
+      "subphase": "cemetery_consultation"
+     },
+     {
+      "duration_s": 0.0,
+      "n_distinct": 1,
+      "n_indeterminate": 0,
+      "n_retained": 1,
+      "subphase": "distinctness_dedup"
+     },
+     {
+      "duration_s": 0.002,
+      "subphase": "mechanism_support_verification",
+      "support_states": [
+       "PARTIALLY_SUPPORTED"
+      ]
+     },
+     {
+      "duration_s": 0.002,
+      "subphase": "post_support_assembly"
+     }
+    ],
+    "terminal_state": "BUILT",
+    "total_s": 7.897
+   },
    "observation_source": "DURABLE_BRANCH",
    "openalex": {
     "canonical_admitted_contribution": {
@@ -5539,6 +5843,108 @@
    "ledger_roles_present": [
     "SYNTHESIZE"
    ],
+   "mechanism_space_spans": {
+    "adapter_and_stage_overhead_s": 0.008,
+    "attribution_version": "mechanism_attribution/1.0.0 (R516)",
+    "class": "OBSERVED_IN_STAGE",
+    "evidence": "envelope_MECHANISM_SPACE.json $.stage_log [MECHANISM_SPACE].duration_monotonic_s + $.mechanism_space.runtime_attribution (mechanism_attribution/1.0.0) + durable model_routing ledger MECHANISM_SPACE role",
+    "funnel": {
+     "applicable_operator_contracts": {
+      "n_evaluated": 70,
+      "n_satisfied": 0
+     },
+     "distinctness": {
+      "n_distinct": 0,
+      "n_indeterminate": 0
+     },
+     "llm_outcome": "NO_APPLICABLE_EVIDENCE",
+     "llm_output_empty": null,
+     "n_assembled": 0,
+     "n_retained": 0,
+     "selected_operator": "NONE",
+     "semantic_verdicts": [],
+     "terminal_reason": "NO_CANDIDATES",
+     "verified_evidence_items": 14
+    },
+    "ledger_failures": [],
+    "ledger_n_calls": null,
+    "ledger_n_ok": null,
+    "ledger_provider_call_wall_s": 0.0,
+    "llm": {
+     "llm_retries": 0,
+     "n_llm_calls": 0,
+     "path_taken": false,
+     "reason": "no LLM path taken on this execution",
+     "retry_basis": "one call is one call on the lean path (R453-LEAN; no corrective retry)"
+    },
+    "note": null,
+    "spans": {
+     "cemetery_consultation": 0.002,
+     "distinctness_dedup": 0.0,
+     "entry_setup": 0.0,
+     "evidence_item_construction": 0.0,
+     "mechanism_support_verification": 0.0,
+     "operator_selection": 0.011,
+     "post_support_assembly": 0.0,
+     "provider_call_split_offline": null,
+     "verified_evidence_collection": 0.0
+    },
+    "stage_finished_at": "2026-09-24T15:51:18+00:00Z",
+    "stage_started_at": "2026-09-24T15:51:18+00:00Z",
+    "stage_wall_s": 0.020609593018889427,
+    "subphase_detail": [
+     {
+      "duration_s": 0.0,
+      "subphase": "entry_setup"
+     },
+     {
+      "duration_s": 0.0,
+      "n_verified_items_examined": 14,
+      "subphase": "verified_evidence_collection"
+     },
+     {
+      "duration_s": 0.0,
+      "n_structured_items": 14,
+      "subphase": "evidence_item_construction"
+     },
+     {
+      "duration_s": 0.011,
+      "n_contracts_evaluated": 70,
+      "n_satisfied": 0,
+      "selected_operator": "NONE",
+      "subphase": "operator_selection"
+     },
+     {
+      "duration_s": 0.002,
+      "n_blocked": 0,
+      "n_consulted": 0,
+      "subphase": "cemetery_consultation"
+     },
+     {
+      "duration_s": 0.0,
+      "n_distinct": 0,
+      "n_indeterminate": 0,
+      "n_retained": 0,
+      "subphase": "distinctness_dedup"
+     },
+     {
+      "duration_s": 0.0,
+      "subphase": "mechanism_support_verification",
+      "support_states": []
+     },
+     {
+      "duration_s": 0.0,
+      "subphase": "post_support_assembly"
+     },
+     {
+      "derivation": "OFFLINE_VIA_ROUTING_LEDGER — not measurable in-stage; join routing-ledger per-hop latencies on the llm.join_keys (Art. XXV: unmeasured stays unmeasured, never zero)",
+      "duration_s": null,
+      "subphase": "provider_call_split_offline"
+     }
+    ],
+    "terminal_state": "NO_CANDIDATES",
+    "total_s": 0.013
+   },
    "observation_source": "DURABLE_BRANCH",
    "openalex": {
     "canonical_admitted_contribution": {
@@ -7977,6 +8383,157 @@
     "MECHANISM_SPACE",
     "SYNTHESIZE"
    ],
+   "mechanism_space_spans": {
+    "adapter_and_stage_overhead_s": 0.009,
+    "attribution_version": "mechanism_attribution/1.0.0 (R516)",
+    "class": "OBSERVED_IN_STAGE",
+    "evidence": "envelope_MECHANISM_SPACE.json $.stage_log [MECHANISM_SPACE].duration_monotonic_s + $.mechanism_space.runtime_attribution (mechanism_attribution/1.0.0) + durable model_routing ledger MECHANISM_SPACE role",
+    "funnel": {
+     "applicable_operator_contracts": {
+      "n_evaluated": 45,
+      "n_satisfied": 4
+     },
+     "distinctness": {
+      "n_distinct": 0,
+      "n_indeterminate": 0
+     },
+     "llm_outcome": "OK",
+     "llm_output_empty": false,
+     "n_assembled": 1,
+     "n_retained": 0,
+     "selected_operator": "GEOMETRIC_TRANSFORMATION",
+     "semantic_verdicts": [
+      "SEMANTICALLY_VALID"
+     ],
+     "terminal_reason": "NO_CANDIDATES",
+     "verified_evidence_items": 9
+    },
+    "ledger_failures": [],
+    "ledger_n_calls": 1,
+    "ledger_n_ok": 1,
+    "ledger_provider_call_wall_s": 8.453,
+    "llm": {
+     "failure_type": null,
+     "fallback_occurred": true,
+     "join_keys": {
+      "model": "qwen/qwen3.5-plus:free",
+      "output_hash": "33093d9b33547a6b2b426032c76aadd40eb9c314ad041ab62b99b5fcbbce41b1",
+      "prompt_hash": "53bf780c0b2d880723e157dc7e462b18d23246ccb8f7bb19450fb4089946508c",
+      "provider": "xkiro"
+     },
+     "llm_retries": 0,
+     "model": "qwen/qwen3.5-plus:free",
+     "n_llm_calls": 1,
+     "n_route_hops": 2,
+     "output_empty": false,
+     "path_taken": true,
+     "provider": "xkiro",
+     "provider_vs_overhead_split": "OFFLINE_VIA_ROUTING_LEDGER (in-stage wall only; join the routing ledger on prompt_hash/output_hash for per-hop latencies — Art. XXV)",
+     "retry_basis": "one call is one call on the lean path (R453-LEAN; no corrective retry)",
+     "routed_hops": [
+      {
+       "failure_type": "AUTH_FAILURE",
+       "fallback_provider": "xkiro",
+       "provider": "unorouter"
+      },
+      {
+       "failure_type": null,
+       "fallback_provider": null,
+       "provider": "xkiro"
+      }
+     ],
+     "transport_error": null,
+     "transport_status": "OK"
+    },
+    "note": null,
+    "spans": {
+     "candidate_parsing": 0.0,
+     "cemetery_consultation": 0.006,
+     "distinctness_dedup": 0.0,
+     "entry_setup": 0.0,
+     "evidence_item_construction": 0.0,
+     "llm_instantiation_wall": 10.808,
+     "mechanism_support_verification": 0.0,
+     "operator_selection": 0.005,
+     "post_support_assembly": 0.0,
+     "provider_call_split_offline": null,
+     "semantic_validation": 0.002,
+     "verified_evidence_collection": 0.0
+    },
+    "stage_finished_at": "2026-09-24T15:46:52+00:00Z",
+    "stage_started_at": "2026-09-24T15:46:41+00:00Z",
+    "stage_wall_s": 10.831976905930787,
+    "subphase_detail": [
+     {
+      "duration_s": 0.0,
+      "subphase": "entry_setup"
+     },
+     {
+      "duration_s": 0.0,
+      "n_verified_items_examined": 9,
+      "subphase": "verified_evidence_collection"
+     },
+     {
+      "duration_s": 0.0,
+      "n_structured_items": 9,
+      "subphase": "evidence_item_construction"
+     },
+     {
+      "duration_s": 0.005,
+      "n_contracts_evaluated": 45,
+      "n_satisfied": 4,
+      "selected_operator": "GEOMETRIC_TRANSFORMATION",
+      "subphase": "operator_selection"
+     },
+     {
+      "duration_s": 10.808,
+      "model": "qwen/qwen3.5-plus:free",
+      "provider": "xkiro",
+      "subphase": "llm_instantiation_wall",
+      "transport_status": "OK"
+     },
+     {
+      "derivation": "OFFLINE_VIA_ROUTING_LEDGER — not measurable in-stage; join routing-ledger per-hop latencies on the llm.join_keys (Art. XXV: unmeasured stays unmeasured, never zero)",
+      "duration_s": null,
+      "subphase": "provider_call_split_offline"
+     },
+     {
+      "duration_s": 0.0,
+      "n_fields_nonempty": 8,
+      "subphase": "candidate_parsing"
+     },
+     {
+      "candidate_state": "CANDIDATE",
+      "duration_s": 0.002,
+      "semantic_verdict": "SEMANTICALLY_VALID",
+      "subphase": "semantic_validation"
+     },
+     {
+      "duration_s": 0.006,
+      "n_blocked": 1,
+      "n_consulted": 1,
+      "subphase": "cemetery_consultation"
+     },
+     {
+      "duration_s": 0.0,
+      "n_distinct": 0,
+      "n_indeterminate": 0,
+      "n_retained": 0,
+      "subphase": "distinctness_dedup"
+     },
+     {
+      "duration_s": 0.0,
+      "subphase": "mechanism_support_verification",
+      "support_states": []
+     },
+     {
+      "duration_s": 0.0,
+      "subphase": "post_support_assembly"
+     }
+    ],
+    "terminal_state": "NO_CANDIDATES",
+    "total_s": 10.823
+   },
    "observation_source": "DURABLE_BRANCH",
    "openalex": {
     "canonical_admitted_contribution": {
@@ -10503,6 +11060,157 @@
     "MECHANISM_SPACE",
     "SYNTHESIZE"
    ],
+   "mechanism_space_spans": {
+    "adapter_and_stage_overhead_s": 0.007,
+    "attribution_version": "mechanism_attribution/1.0.0 (R516)",
+    "class": "OBSERVED_IN_STAGE",
+    "evidence": "envelope_MECHANISM_SPACE.json $.stage_log [MECHANISM_SPACE].duration_monotonic_s + $.mechanism_space.runtime_attribution (mechanism_attribution/1.0.0) + durable model_routing ledger MECHANISM_SPACE role",
+    "funnel": {
+     "applicable_operator_contracts": {
+      "n_evaluated": 35,
+      "n_satisfied": 5
+     },
+     "distinctness": {
+      "n_distinct": 0,
+      "n_indeterminate": 0
+     },
+     "llm_outcome": "OK",
+     "llm_output_empty": false,
+     "n_assembled": 1,
+     "n_retained": 0,
+     "selected_operator": "DIRECT_TRANSFER",
+     "semantic_verdicts": [
+      "SEMANTICALLY_VALID"
+     ],
+     "terminal_reason": "NO_CANDIDATES",
+     "verified_evidence_items": 7
+    },
+    "ledger_failures": [],
+    "ledger_n_calls": 1,
+    "ledger_n_ok": 1,
+    "ledger_provider_call_wall_s": 10.045,
+    "llm": {
+     "failure_type": null,
+     "fallback_occurred": true,
+     "join_keys": {
+      "model": "qwen/qwen3.5-plus:free",
+      "output_hash": "1ad18a4b8edb37955c2922d3419afbbed4e0a16f23f1df7d110ea43b761123f2",
+      "prompt_hash": "075434d12c756046a0a4e0d0e573f49727e5ed2a991a44148791915c0aecfc0e",
+      "provider": "xkiro"
+     },
+     "llm_retries": 0,
+     "model": "qwen/qwen3.5-plus:free",
+     "n_llm_calls": 1,
+     "n_route_hops": 2,
+     "output_empty": false,
+     "path_taken": true,
+     "provider": "xkiro",
+     "provider_vs_overhead_split": "OFFLINE_VIA_ROUTING_LEDGER (in-stage wall only; join the routing ledger on prompt_hash/output_hash for per-hop latencies — Art. XXV)",
+     "retry_basis": "one call is one call on the lean path (R453-LEAN; no corrective retry)",
+     "routed_hops": [
+      {
+       "failure_type": "AUTH_FAILURE",
+       "fallback_provider": "xkiro",
+       "provider": "unorouter"
+      },
+      {
+       "failure_type": null,
+       "fallback_provider": null,
+       "provider": "xkiro"
+      }
+     ],
+     "transport_error": null,
+     "transport_status": "OK"
+    },
+    "note": null,
+    "spans": {
+     "candidate_parsing": 0.0,
+     "cemetery_consultation": 0.004,
+     "distinctness_dedup": 0.0,
+     "entry_setup": 0.0,
+     "evidence_item_construction": 0.0,
+     "llm_instantiation_wall": 12.202,
+     "mechanism_support_verification": 0.0,
+     "operator_selection": 0.005,
+     "post_support_assembly": 0.0,
+     "provider_call_split_offline": null,
+     "semantic_validation": 0.003,
+     "verified_evidence_collection": 0.0
+    },
+    "stage_finished_at": "2026-09-24T15:49:27+00:00Z",
+    "stage_started_at": "2026-09-24T15:49:15+00:00Z",
+    "stage_wall_s": 12.22171999688726,
+    "subphase_detail": [
+     {
+      "duration_s": 0.0,
+      "subphase": "entry_setup"
+     },
+     {
+      "duration_s": 0.0,
+      "n_verified_items_examined": 7,
+      "subphase": "verified_evidence_collection"
+     },
+     {
+      "duration_s": 0.0,
+      "n_structured_items": 7,
+      "subphase": "evidence_item_construction"
+     },
+     {
+      "duration_s": 0.005,
+      "n_contracts_evaluated": 35,
+      "n_satisfied": 5,
+      "selected_operator": "DIRECT_TRANSFER",
+      "subphase": "operator_selection"
+     },
+     {
+      "duration_s": 12.202,
+      "model": "qwen/qwen3.5-plus:free",
+      "provider": "xkiro",
+      "subphase": "llm_instantiation_wall",
+      "transport_status": "OK"
+     },
+     {
+      "derivation": "OFFLINE_VIA_ROUTING_LEDGER — not measurable in-stage; join routing-ledger per-hop latencies on the llm.join_keys (Art. XXV: unmeasured stays unmeasured, never zero)",
+      "duration_s": null,
+      "subphase": "provider_call_split_offline"
+     },
+     {
+      "duration_s": 0.0,
+      "n_fields_nonempty": 8,
+      "subphase": "candidate_parsing"
+     },
+     {
+      "candidate_state": "CANDIDATE",
+      "duration_s": 0.003,
+      "semantic_verdict": "SEMANTICALLY_VALID",
+      "subphase": "semantic_validation"
+     },
+     {
+      "duration_s": 0.004,
+      "n_blocked": 1,
+      "n_consulted": 1,
+      "subphase": "cemetery_consultation"
+     },
+     {
+      "duration_s": 0.0,
+      "n_distinct": 0,
+      "n_indeterminate": 0,
+      "n_retained": 0,
+      "subphase": "distinctness_dedup"
+     },
+     {
+      "duration_s": 0.0,
+      "subphase": "mechanism_support_verification",
+      "support_states": []
+     },
+     {
+      "duration_s": 0.0,
+      "subphase": "post_support_assembly"
+     }
+    ],
+    "terminal_state": "NO_CANDIDATES",
+    "total_s": 12.215
+   },
    "observation_source": "DURABLE_BRANCH",
    "openalex": {
     "canonical_admitted_contribution": {
@@ -12942,6 +13650,157 @@
     "MECHANISM_SPACE",
     "SYNTHESIZE"
    ],
+   "mechanism_space_spans": {
+    "adapter_and_stage_overhead_s": 0.007,
+    "attribution_version": "mechanism_attribution/1.0.0 (R516)",
+    "class": "OBSERVED_IN_STAGE",
+    "evidence": "envelope_MECHANISM_SPACE.json $.stage_log [MECHANISM_SPACE].duration_monotonic_s + $.mechanism_space.runtime_attribution (mechanism_attribution/1.0.0) + durable model_routing ledger MECHANISM_SPACE role",
+    "funnel": {
+     "applicable_operator_contracts": {
+      "n_evaluated": 65,
+      "n_satisfied": 8
+     },
+     "distinctness": {
+      "n_distinct": 0,
+      "n_indeterminate": 0
+     },
+     "llm_outcome": "OK",
+     "llm_output_empty": false,
+     "n_assembled": 1,
+     "n_retained": 0,
+     "selected_operator": "DIRECT_TRANSFER",
+     "semantic_verdicts": [
+      "SEMANTICALLY_VALID"
+     ],
+     "terminal_reason": "NO_CANDIDATES",
+     "verified_evidence_items": 13
+    },
+    "ledger_failures": [],
+    "ledger_n_calls": 1,
+    "ledger_n_ok": 1,
+    "ledger_provider_call_wall_s": 9.115,
+    "llm": {
+     "failure_type": null,
+     "fallback_occurred": true,
+     "join_keys": {
+      "model": "qwen/qwen3.5-plus:free",
+      "output_hash": "d34349a4bee3146a50236082e6b75ac203275e72c2b4564cc56fd57f7dc2a219",
+      "prompt_hash": "82e7ebb831d00eb1a543a6fb6228569c9bce0d43bbe8ea0d5e693d367fedc862",
+      "provider": "xkiro"
+     },
+     "llm_retries": 0,
+     "model": "qwen/qwen3.5-plus:free",
+     "n_llm_calls": 1,
+     "n_route_hops": 2,
+     "output_empty": false,
+     "path_taken": true,
+     "provider": "xkiro",
+     "provider_vs_overhead_split": "OFFLINE_VIA_ROUTING_LEDGER (in-stage wall only; join the routing ledger on prompt_hash/output_hash for per-hop latencies — Art. XXV)",
+     "retry_basis": "one call is one call on the lean path (R453-LEAN; no corrective retry)",
+     "routed_hops": [
+      {
+       "failure_type": "AUTH_FAILURE",
+       "fallback_provider": "xkiro",
+       "provider": "unorouter"
+      },
+      {
+       "failure_type": null,
+       "fallback_provider": null,
+       "provider": "xkiro"
+      }
+     ],
+     "transport_error": null,
+     "transport_status": "OK"
+    },
+    "note": null,
+    "spans": {
+     "candidate_parsing": 0.0,
+     "cemetery_consultation": 0.005,
+     "distinctness_dedup": 0.0,
+     "entry_setup": 0.0,
+     "evidence_item_construction": 0.0,
+     "llm_instantiation_wall": 11.224,
+     "mechanism_support_verification": 0.0,
+     "operator_selection": 0.008,
+     "post_support_assembly": 0.0,
+     "provider_call_split_offline": null,
+     "semantic_validation": 0.002,
+     "verified_evidence_collection": 0.0
+    },
+    "stage_finished_at": "2026-09-24T15:50:40+00:00Z",
+    "stage_started_at": "2026-09-24T15:50:29+00:00Z",
+    "stage_wall_s": 11.246400745003484,
+    "subphase_detail": [
+     {
+      "duration_s": 0.0,
+      "subphase": "entry_setup"
+     },
+     {
+      "duration_s": 0.0,
+      "n_verified_items_examined": 13,
+      "subphase": "verified_evidence_collection"
+     },
+     {
+      "duration_s": 0.0,
+      "n_structured_items": 13,
+      "subphase": "evidence_item_construction"
+     },
+     {
+      "duration_s": 0.008,
+      "n_contracts_evaluated": 65,
+      "n_satisfied": 8,
+      "selected_operator": "DIRECT_TRANSFER",
+      "subphase": "operator_selection"
+     },
+     {
+      "duration_s": 11.224,
+      "model": "qwen/qwen3.5-plus:free",
+      "provider": "xkiro",
+      "subphase": "llm_instantiation_wall",
+      "transport_status": "OK"
+     },
+     {
+      "derivation": "OFFLINE_VIA_ROUTING_LEDGER — not measurable in-stage; join routing-ledger per-hop latencies on the llm.join_keys (Art. XXV: unmeasured stays unmeasured, never zero)",
+      "duration_s": null,
+      "subphase": "provider_call_split_offline"
+     },
+     {
+      "duration_s": 0.0,
+      "n_fields_nonempty": 8,
+      "subphase": "candidate_parsing"
+     },
+     {
+      "candidate_state": "CANDIDATE",
+      "duration_s": 0.002,
+      "semantic_verdict": "SEMANTICALLY_VALID",
+      "subphase": "semantic_validation"
+     },
+     {
+      "duration_s": 0.005,
+      "n_blocked": 1,
+      "n_consulted": 1,
+      "subphase": "cemetery_consultation"
+     },
+     {
+      "duration_s": 0.0,
+      "n_distinct": 0,
+      "n_indeterminate": 0,
+      "n_retained": 0,
+      "subphase": "distinctness_dedup"
+     },
+     {
+      "duration_s": 0.0,
+      "subphase": "mechanism_support_verification",
+      "support_states": []
+     },
+     {
+      "duration_s": 0.0,
+      "subphase": "post_support_assembly"
+     }
+    ],
+    "terminal_state": "NO_CANDIDATES",
+    "total_s": 11.239
+   },
    "observation_source": "DURABLE_BRANCH",
    "openalex": {
     "canonical_admitted_contribution": {
@@ -15675,6 +16534,159 @@
     "POST_RANK_IMPROVEMENT",
     "SYNTHESIZE"
    ],
+   "mechanism_space_spans": {
+    "adapter_and_stage_overhead_s": 0.007,
+    "attribution_version": "mechanism_attribution/1.0.0 (R516)",
+    "class": "OBSERVED_IN_STAGE",
+    "evidence": "envelope_MECHANISM_SPACE.json $.stage_log [MECHANISM_SPACE].duration_monotonic_s + $.mechanism_space.runtime_attribution (mechanism_attribution/1.0.0) + durable model_routing ledger MECHANISM_SPACE role",
+    "funnel": {
+     "applicable_operator_contracts": {
+      "n_evaluated": 35,
+      "n_satisfied": 6
+     },
+     "distinctness": {
+      "n_distinct": 1,
+      "n_indeterminate": 0
+     },
+     "llm_outcome": "OK",
+     "llm_output_empty": false,
+     "n_assembled": 1,
+     "n_retained": 1,
+     "selected_operator": "DIRECT_TRANSFER",
+     "semantic_verdicts": [
+      "SEMANTICALLY_VALID"
+     ],
+     "terminal_reason": "BUILT",
+     "verified_evidence_items": 7
+    },
+    "ledger_failures": [],
+    "ledger_n_calls": 1,
+    "ledger_n_ok": 1,
+    "ledger_provider_call_wall_s": 8.481,
+    "llm": {
+     "failure_type": null,
+     "fallback_occurred": true,
+     "join_keys": {
+      "model": "qwen/qwen3.5-plus:free",
+      "output_hash": "933342073b6afd5540b40e5eb2481bd1deef926cda67c6ab09f0c1fbc479595a",
+      "prompt_hash": "ef6c4b537b14417d3068f758df538ea0387409e3a6d76f727097dce3e5020507",
+      "provider": "xkiro"
+     },
+     "llm_retries": 0,
+     "model": "qwen/qwen3.5-plus:free",
+     "n_llm_calls": 1,
+     "n_route_hops": 2,
+     "output_empty": false,
+     "path_taken": true,
+     "provider": "xkiro",
+     "provider_vs_overhead_split": "OFFLINE_VIA_ROUTING_LEDGER (in-stage wall only; join the routing ledger on prompt_hash/output_hash for per-hop latencies — Art. XXV)",
+     "retry_basis": "one call is one call on the lean path (R453-LEAN; no corrective retry)",
+     "routed_hops": [
+      {
+       "failure_type": "AUTH_FAILURE",
+       "fallback_provider": "xkiro",
+       "provider": "unorouter"
+      },
+      {
+       "failure_type": null,
+       "fallback_provider": null,
+       "provider": "xkiro"
+      }
+     ],
+     "transport_error": null,
+     "transport_status": "OK"
+    },
+    "note": null,
+    "spans": {
+     "candidate_parsing": 0.0,
+     "cemetery_consultation": 0.005,
+     "distinctness_dedup": 0.0,
+     "entry_setup": 0.0,
+     "evidence_item_construction": 0.0,
+     "llm_instantiation_wall": 10.51,
+     "mechanism_support_verification": 0.004,
+     "operator_selection": 0.004,
+     "post_support_assembly": 0.0,
+     "provider_call_split_offline": null,
+     "semantic_validation": 0.001,
+     "verified_evidence_collection": 0.0
+    },
+    "stage_finished_at": "2026-09-24T15:45:32+00:00Z",
+    "stage_started_at": "2026-09-24T15:45:21+00:00Z",
+    "stage_wall_s": 10.532273962977342,
+    "subphase_detail": [
+     {
+      "duration_s": 0.0,
+      "subphase": "entry_setup"
+     },
+     {
+      "duration_s": 0.0,
+      "n_verified_items_examined": 7,
+      "subphase": "verified_evidence_collection"
+     },
+     {
+      "duration_s": 0.0,
+      "n_structured_items": 7,
+      "subphase": "evidence_item_construction"
+     },
+     {
+      "duration_s": 0.004,
+      "n_contracts_evaluated": 35,
+      "n_satisfied": 6,
+      "selected_operator": "DIRECT_TRANSFER",
+      "subphase": "operator_selection"
+     },
+     {
+      "duration_s": 10.51,
+      "model": "qwen/qwen3.5-plus:free",
+      "provider": "xkiro",
+      "subphase": "llm_instantiation_wall",
+      "transport_status": "OK"
+     },
+     {
+      "derivation": "OFFLINE_VIA_ROUTING_LEDGER — not measurable in-stage; join routing-ledger per-hop latencies on the llm.join_keys (Art. XXV: unmeasured stays unmeasured, never zero)",
+      "duration_s": null,
+      "subphase": "provider_call_split_offline"
+     },
+     {
+      "duration_s": 0.0,
+      "n_fields_nonempty": 8,
+      "subphase": "candidate_parsing"
+     },
+     {
+      "candidate_state": "CANDIDATE",
+      "duration_s": 0.001,
+      "semantic_verdict": "SEMANTICALLY_VALID",
+      "subphase": "semantic_validation"
+     },
+     {
+      "duration_s": 0.005,
+      "n_blocked": 0,
+      "n_consulted": 1,
+      "subphase": "cemetery_consultation"
+     },
+     {
+      "duration_s": 0.0,
+      "n_distinct": 1,
+      "n_indeterminate": 0,
+      "n_retained": 1,
+      "subphase": "distinctness_dedup"
+     },
+     {
+      "duration_s": 0.004,
+      "subphase": "mechanism_support_verification",
+      "support_states": [
+       "PARTIALLY_SUPPORTED"
+      ]
+     },
+     {
+      "duration_s": 0.0,
+      "subphase": "post_support_assembly"
+     }
+    ],
+    "terminal_state": "BUILT",
+    "total_s": 10.525
+   },
    "observation_source": "DURABLE_BRANCH",
    "openalex": {
     "canonical_admitted_contribution": {
@@ -18135,6 +19147,157 @@
     "MECHANISM_SPACE",
     "SYNTHESIZE"
    ],
+   "mechanism_space_spans": {
+    "adapter_and_stage_overhead_s": 0.008,
+    "attribution_version": "mechanism_attribution/1.0.0 (R516)",
+    "class": "OBSERVED_IN_STAGE",
+    "evidence": "envelope_MECHANISM_SPACE.json $.stage_log [MECHANISM_SPACE].duration_monotonic_s + $.mechanism_space.runtime_attribution (mechanism_attribution/1.0.0) + durable model_routing ledger MECHANISM_SPACE role",
+    "funnel": {
+     "applicable_operator_contracts": {
+      "n_evaluated": 65,
+      "n_satisfied": 6
+     },
+     "distinctness": {
+      "n_distinct": 0,
+      "n_indeterminate": 0
+     },
+     "llm_outcome": "OK",
+     "llm_output_empty": false,
+     "n_assembled": 1,
+     "n_retained": 0,
+     "selected_operator": "DIRECT_TRANSFER",
+     "semantic_verdicts": [
+      "SEMANTICALLY_VALID"
+     ],
+     "terminal_reason": "NO_CANDIDATES",
+     "verified_evidence_items": 13
+    },
+    "ledger_failures": [],
+    "ledger_n_calls": 1,
+    "ledger_n_ok": 1,
+    "ledger_provider_call_wall_s": 9.109,
+    "llm": {
+     "failure_type": null,
+     "fallback_occurred": true,
+     "join_keys": {
+      "model": "qwen/qwen3.5-plus:free",
+      "output_hash": "9b289ba60cd54220c92d135115ad90fac410749e19987ab26ad5daf8b964bbb9",
+      "prompt_hash": "9012a1a873d4450c02b641af51f547f107a2756851528e21bddd75f833bcc42a",
+      "provider": "xkiro"
+     },
+     "llm_retries": 0,
+     "model": "qwen/qwen3.5-plus:free",
+     "n_llm_calls": 1,
+     "n_route_hops": 2,
+     "output_empty": false,
+     "path_taken": true,
+     "provider": "xkiro",
+     "provider_vs_overhead_split": "OFFLINE_VIA_ROUTING_LEDGER (in-stage wall only; join the routing ledger on prompt_hash/output_hash for per-hop latencies — Art. XXV)",
+     "retry_basis": "one call is one call on the lean path (R453-LEAN; no corrective retry)",
+     "routed_hops": [
+      {
+       "failure_type": "AUTH_FAILURE",
+       "fallback_provider": "xkiro",
+       "provider": "unorouter"
+      },
+      {
+       "failure_type": null,
+       "fallback_provider": null,
+       "provider": "xkiro"
+      }
+     ],
+     "transport_error": null,
+     "transport_status": "OK"
+    },
+    "note": null,
+    "spans": {
+     "candidate_parsing": 0.0,
+     "cemetery_consultation": 0.004,
+     "distinctness_dedup": 0.0,
+     "entry_setup": 0.0,
+     "evidence_item_construction": 0.0,
+     "llm_instantiation_wall": 11.191,
+     "mechanism_support_verification": 0.0,
+     "operator_selection": 0.007,
+     "post_support_assembly": 0.0,
+     "provider_call_split_offline": null,
+     "semantic_validation": 0.002,
+     "verified_evidence_collection": 0.0
+    },
+    "stage_finished_at": "2026-09-24T15:53:44+00:00Z",
+    "stage_started_at": "2026-09-24T15:53:33+00:00Z",
+    "stage_wall_s": 11.211967646027915,
+    "subphase_detail": [
+     {
+      "duration_s": 0.0,
+      "subphase": "entry_setup"
+     },
+     {
+      "duration_s": 0.0,
+      "n_verified_items_examined": 13,
+      "subphase": "verified_evidence_collection"
+     },
+     {
+      "duration_s": 0.0,
+      "n_structured_items": 13,
+      "subphase": "evidence_item_construction"
+     },
+     {
+      "duration_s": 0.007,
+      "n_contracts_evaluated": 65,
+      "n_satisfied": 6,
+      "selected_operator": "DIRECT_TRANSFER",
+      "subphase": "operator_selection"
+     },
+     {
+      "duration_s": 11.191,
+      "model": "qwen/qwen3.5-plus:free",
+      "provider": "xkiro",
+      "subphase": "llm_instantiation_wall",
+      "transport_status": "OK"
+     },
+     {
+      "derivation": "OFFLINE_VIA_ROUTING_LEDGER — not measurable in-stage; join routing-ledger per-hop latencies on the llm.join_keys (Art. XXV: unmeasured stays unmeasured, never zero)",
+      "duration_s": null,
+      "subphase": "provider_call_split_offline"
+     },
+     {
+      "duration_s": 0.0,
+      "n_fields_nonempty": 8,
+      "subphase": "candidate_parsing"
+     },
+     {
+      "candidate_state": "CANDIDATE",
+      "duration_s": 0.002,
+      "semantic_verdict": "SEMANTICALLY_VALID",
+      "subphase": "semantic_validation"
+     },
+     {
+      "duration_s": 0.004,
+      "n_blocked": 1,
+      "n_consulted": 1,
+      "subphase": "cemetery_consultation"
+     },
+     {
+      "duration_s": 0.0,
+      "n_distinct": 0,
+      "n_indeterminate": 0,
+      "n_retained": 0,
+      "subphase": "distinctness_dedup"
+     },
+     {
+      "duration_s": 0.0,
+      "subphase": "mechanism_support_verification",
+      "support_states": []
+     },
+     {
+      "duration_s": 0.0,
+      "subphase": "post_support_assembly"
+     }
+    ],
+    "terminal_state": "NO_CANDIDATES",
+    "total_s": 11.204
+   },
    "observation_source": "DURABLE_BRANCH",
    "openalex": {
     "canonical_admitted_contribution": {
@@ -20903,6 +22066,159 @@
     "POST_RANK_TECH_IMPROVEMENT",
     "SYNTHESIZE"
    ],
+   "mechanism_space_spans": {
+    "adapter_and_stage_overhead_s": 0.009,
+    "attribution_version": "mechanism_attribution/1.0.0 (R516)",
+    "class": "OBSERVED_IN_STAGE",
+    "evidence": "envelope_MECHANISM_SPACE.json $.stage_log [MECHANISM_SPACE].duration_monotonic_s + $.mechanism_space.runtime_attribution (mechanism_attribution/1.0.0) + durable model_routing ledger MECHANISM_SPACE role",
+    "funnel": {
+     "applicable_operator_contracts": {
+      "n_evaluated": 60,
+      "n_satisfied": 3
+     },
+     "distinctness": {
+      "n_distinct": 1,
+      "n_indeterminate": 0
+     },
+     "llm_outcome": "OK",
+     "llm_output_empty": false,
+     "n_assembled": 1,
+     "n_retained": 1,
+     "selected_operator": "DIRECT_TRANSFER",
+     "semantic_verdicts": [
+      "SEMANTICALLY_VALID"
+     ],
+     "terminal_reason": "BUILT",
+     "verified_evidence_items": 12
+    },
+    "ledger_failures": [],
+    "ledger_n_calls": 1,
+    "ledger_n_ok": 1,
+    "ledger_provider_call_wall_s": 10.222,
+    "llm": {
+     "failure_type": null,
+     "fallback_occurred": true,
+     "join_keys": {
+      "model": "qwen/qwen3.5-plus:free",
+      "output_hash": "0f6fdc117d87ca4f5de28104ac88f9ac14141edc447654c016822473157cf05e",
+      "prompt_hash": "c61bf5bf431765f731eb58212cd65d70c3cd001368269b505f50aee35e15a455",
+      "provider": "xkiro"
+     },
+     "llm_retries": 0,
+     "model": "qwen/qwen3.5-plus:free",
+     "n_llm_calls": 1,
+     "n_route_hops": 2,
+     "output_empty": false,
+     "path_taken": true,
+     "provider": "xkiro",
+     "provider_vs_overhead_split": "OFFLINE_VIA_ROUTING_LEDGER (in-stage wall only; join the routing ledger on prompt_hash/output_hash for per-hop latencies — Art. XXV)",
+     "retry_basis": "one call is one call on the lean path (R453-LEAN; no corrective retry)",
+     "routed_hops": [
+      {
+       "failure_type": "AUTH_FAILURE",
+       "fallback_provider": "xkiro",
+       "provider": "unorouter"
+      },
+      {
+       "failure_type": null,
+       "fallback_provider": null,
+       "provider": "xkiro"
+      }
+     ],
+     "transport_error": null,
+     "transport_status": "OK"
+    },
+    "note": null,
+    "spans": {
+     "candidate_parsing": 0.0,
+     "cemetery_consultation": 0.004,
+     "distinctness_dedup": 0.0,
+     "entry_setup": 0.0,
+     "evidence_item_construction": 0.0,
+     "llm_instantiation_wall": 12.662,
+     "mechanism_support_verification": 0.013,
+     "operator_selection": 0.009,
+     "post_support_assembly": 0.001,
+     "provider_call_split_offline": null,
+     "semantic_validation": 0.002,
+     "verified_evidence_collection": 0.0
+    },
+    "stage_finished_at": "2026-09-24T15:47:51+00:00Z",
+    "stage_started_at": "2026-09-24T15:47:38+00:00Z",
+    "stage_wall_s": 12.699997612042353,
+    "subphase_detail": [
+     {
+      "duration_s": 0.0,
+      "subphase": "entry_setup"
+     },
+     {
+      "duration_s": 0.0,
+      "n_verified_items_examined": 12,
+      "subphase": "verified_evidence_collection"
+     },
+     {
+      "duration_s": 0.0,
+      "n_structured_items": 12,
+      "subphase": "evidence_item_construction"
+     },
+     {
+      "duration_s": 0.009,
+      "n_contracts_evaluated": 60,
+      "n_satisfied": 3,
+      "selected_operator": "DIRECT_TRANSFER",
+      "subphase": "operator_selection"
+     },
+     {
+      "duration_s": 12.662,
+      "model": "qwen/qwen3.5-plus:free",
+      "provider": "xkiro",
+      "subphase": "llm_instantiation_wall",
+      "transport_status": "OK"
+     },
+     {
+      "derivation": "OFFLINE_VIA_ROUTING_LEDGER — not measurable in-stage; join routing-ledger per-hop latencies on the llm.join_keys (Art. XXV: unmeasured stays unmeasured, never zero)",
+      "duration_s": null,
+      "subphase": "provider_call_split_offline"
+     },
+     {
+      "duration_s": 0.0,
+      "n_fields_nonempty": 8,
+      "subphase": "candidate_parsing"
+     },
+     {
+      "candidate_state": "CANDIDATE",
+      "duration_s": 0.002,
+      "semantic_verdict": "SEMANTICALLY_VALID",
+      "subphase": "semantic_validation"
+     },
+     {
+      "duration_s": 0.004,
+      "n_blocked": 0,
+      "n_consulted": 1,
+      "subphase": "cemetery_consultation"
+     },
+     {
+      "duration_s": 0.0,
+      "n_distinct": 1,
+      "n_indeterminate": 0,
+      "n_retained": 1,
+      "subphase": "distinctness_dedup"
+     },
+     {
+      "duration_s": 0.013,
+      "subphase": "mechanism_support_verification",
+      "support_states": [
+       "PARTIALLY_SUPPORTED"
+      ]
+     },
+     {
+      "duration_s": 0.001,
+      "subphase": "post_support_assembly"
+     }
+    ],
+    "terminal_state": "BUILT",
+    "total_s": 12.691
+   },
    "observation_source": "DURABLE_BRANCH",
    "openalex": {
     "canonical_admitted_contribution": {
@@ -23459,6 +24775,159 @@
     "MECHANISM_SPACE",
     "SYNTHESIZE"
    ],
+   "mechanism_space_spans": {
+    "adapter_and_stage_overhead_s": 0.007,
+    "attribution_version": "mechanism_attribution/1.0.0 (R516)",
+    "class": "OBSERVED_IN_STAGE",
+    "evidence": "envelope_MECHANISM_SPACE.json $.stage_log [MECHANISM_SPACE].duration_monotonic_s + $.mechanism_space.runtime_attribution (mechanism_attribution/1.0.0) + durable model_routing ledger MECHANISM_SPACE role",
+    "funnel": {
+     "applicable_operator_contracts": {
+      "n_evaluated": 35,
+      "n_satisfied": 2
+     },
+     "distinctness": {
+      "n_distinct": 1,
+      "n_indeterminate": 0
+     },
+     "llm_outcome": "OK",
+     "llm_output_empty": false,
+     "n_assembled": 1,
+     "n_retained": 1,
+     "selected_operator": "DIRECT_TRANSFER",
+     "semantic_verdicts": [
+      "SEMANTICALLY_VALID"
+     ],
+     "terminal_reason": "BUILT",
+     "verified_evidence_items": 7
+    },
+    "ledger_failures": [],
+    "ledger_n_calls": 1,
+    "ledger_n_ok": 1,
+    "ledger_provider_call_wall_s": 8.454,
+    "llm": {
+     "failure_type": null,
+     "fallback_occurred": true,
+     "join_keys": {
+      "model": "qwen/qwen3.5-plus:free",
+      "output_hash": "3245f64d97f2671a5fa2a9ca7cf459b377d81aaa1ff0c99e66ea7dc39b4d2cc6",
+      "prompt_hash": "fc2abebd9d642ec200c598d2c43cb7db6566d35155c9b9f460cd54a477b6dc3c",
+      "provider": "xkiro"
+     },
+     "llm_retries": 0,
+     "model": "qwen/qwen3.5-plus:free",
+     "n_llm_calls": 1,
+     "n_route_hops": 2,
+     "output_empty": false,
+     "path_taken": true,
+     "provider": "xkiro",
+     "provider_vs_overhead_split": "OFFLINE_VIA_ROUTING_LEDGER (in-stage wall only; join the routing ledger on prompt_hash/output_hash for per-hop latencies — Art. XXV)",
+     "retry_basis": "one call is one call on the lean path (R453-LEAN; no corrective retry)",
+     "routed_hops": [
+      {
+       "failure_type": "AUTH_FAILURE",
+       "fallback_provider": "xkiro",
+       "provider": "unorouter"
+      },
+      {
+       "failure_type": null,
+       "fallback_provider": null,
+       "provider": "xkiro"
+      }
+     ],
+     "transport_error": null,
+     "transport_status": "OK"
+    },
+    "note": null,
+    "spans": {
+     "candidate_parsing": 0.0,
+     "cemetery_consultation": 0.004,
+     "distinctness_dedup": 0.0,
+     "entry_setup": 0.0,
+     "evidence_item_construction": 0.0,
+     "llm_instantiation_wall": 10.567,
+     "mechanism_support_verification": 0.004,
+     "operator_selection": 0.004,
+     "post_support_assembly": 0.0,
+     "provider_call_split_offline": null,
+     "semantic_validation": 0.002,
+     "verified_evidence_collection": 0.0
+    },
+    "stage_finished_at": "2026-09-24T15:53:28+00:00Z",
+    "stage_started_at": "2026-09-24T15:53:17+00:00Z",
+    "stage_wall_s": 10.588096103048883,
+    "subphase_detail": [
+     {
+      "duration_s": 0.0,
+      "subphase": "entry_setup"
+     },
+     {
+      "duration_s": 0.0,
+      "n_verified_items_examined": 7,
+      "subphase": "verified_evidence_collection"
+     },
+     {
+      "duration_s": 0.0,
+      "n_structured_items": 7,
+      "subphase": "evidence_item_construction"
+     },
+     {
+      "duration_s": 0.004,
+      "n_contracts_evaluated": 35,
+      "n_satisfied": 2,
+      "selected_operator": "DIRECT_TRANSFER",
+      "subphase": "operator_selection"
+     },
+     {
+      "duration_s": 10.567,
+      "model": "qwen/qwen3.5-plus:free",
+      "provider": "xkiro",
+      "subphase": "llm_instantiation_wall",
+      "transport_status": "OK"
+     },
+     {
+      "derivation": "OFFLINE_VIA_ROUTING_LEDGER — not measurable in-stage; join routing-ledger per-hop latencies on the llm.join_keys (Art. XXV: unmeasured stays unmeasured, never zero)",
+      "duration_s": null,
+      "subphase": "provider_call_split_offline"
+     },
+     {
+      "duration_s": 0.0,
+      "n_fields_nonempty": 8,
+      "subphase": "candidate_parsing"
+     },
+     {
+      "candidate_state": "CANDIDATE",
+      "duration_s": 0.002,
+      "semantic_verdict": "SEMANTICALLY_VALID",
+      "subphase": "semantic_validation"
+     },
+     {
+      "duration_s": 0.004,
+      "n_blocked": 0,
+      "n_consulted": 1,
+      "subphase": "cemetery_consultation"
+     },
+     {
+      "duration_s": 0.0,
+      "n_distinct": 1,
+      "n_indeterminate": 0,
+      "n_retained": 1,
+      "subphase": "distinctness_dedup"
+     },
+     {
+      "duration_s": 0.004,
+      "subphase": "mechanism_support_verification",
+      "support_states": [
+       "PARTIALLY_SUPPORTED"
+      ]
+     },
+     {
+      "duration_s": 0.0,
+      "subphase": "post_support_assembly"
+     }
+    ],
+    "terminal_state": "BUILT",
+    "total_s": 10.581
+   },
    "observation_source": "DURABLE_BRANCH",
    "openalex": {
     "canonical_admitted_contribution": {
