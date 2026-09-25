@@ -1,0 +1,1006 @@
+{
+ "artifact": "R529_MECHANISM_SPACE_PROVIDER_JOIN/1.0",
+ "harvest": "R526/ATTR_CURRENT_HARVEST.json",
+ "harvest_sha256": "93567b538ee3a2fcca8d7c6d8e37a9f4bc6601fe7cfe198fcc04ce5b1e7c4aec",
+ "n_rows": 10,
+ "n_observed": 10,
+ "per_row": [
+  {
+   "problem_index": 1,
+   "session_id": "ts_be76a44924e1",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "BUILT",
+   "partition": {
+    "A_provider_inference_s": {
+     "value": 8.481,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "B_failed_first_hop_s": {
+     "value": 0.000149,
+     "class": "PROVIDER_FAILURE_OR_RETRY",
+     "n_failed_hops": 1,
+     "hops": [
+      {
+       "provider": "unorouter",
+       "capability_state": "PROBE_FAILED",
+       "note": "PROBE_FAILED (failure_class=AUTH_FAILURE)",
+       "probe_admission_s": 0.000149,
+       "ledger_line_present": false
+      }
+     ],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "C_fallback_routing_overhead_s": {
+     "value": 2.022,
+     "class": "IMPLEMENTATION_WAIT",
+     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
+     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    },
+    "D_retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "E_local_orchestration_s": {
+     "value": 0.001,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.001,
+     "transition_s": 0.0,
+     "adapter_and_stage_overhead_s": 0.007,
+     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+    },
+    "F_unattributed_remainder_s": {
+     "value": 0.003,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 10.51,
+    "generate_total_s": 10.506644,
+    "stage_wall_s": 10.532273962977342
+   },
+   "funnel": {
+    "mechanisms_found": 1,
+    "terminal_state": "BUILT",
+    "n_distinct": 1,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free",
+    "fallback_occurred": true,
+    "routed_hops": [
+     {
+      "failure_type": "AUTH_FAILURE",
+      "fallback_provider": "xkiro",
+      "provider": "unorouter"
+     },
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "BUILT"
+   },
+   "join_keys": {
+    "session_id": "ts_be76a44924e1",
+    "request_id": "gen_2c0d6bd40f06",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free"
+   }
+  },
+  {
+   "problem_index": 2,
+   "session_id": "ts_7eb04c6a903a",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "A_provider_inference_s": {
+     "value": 8.453,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "B_failed_first_hop_s": {
+     "value": 0.000127,
+     "class": "PROVIDER_FAILURE_OR_RETRY",
+     "n_failed_hops": 1,
+     "hops": [
+      {
+       "provider": "unorouter",
+       "capability_state": "PROBE_FAILED",
+       "note": "PROBE_FAILED (failure_class=AUTH_FAILURE)",
+       "probe_admission_s": 0.000127,
+       "ledger_line_present": false
+      }
+     ],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "C_fallback_routing_overhead_s": {
+     "value": 2.348,
+     "class": "IMPLEMENTATION_WAIT",
+     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
+     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    },
+    "D_retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "E_local_orchestration_s": {
+     "value": 0.002,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.002,
+     "transition_s": 0.0,
+     "adapter_and_stage_overhead_s": 0.009,
+     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+    },
+    "F_unattributed_remainder_s": {
+     "value": 0.002,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 10.808,
+    "generate_total_s": 10.804875,
+    "stage_wall_s": 10.831976905930787
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free",
+    "fallback_occurred": true,
+    "routed_hops": [
+     {
+      "failure_type": "AUTH_FAILURE",
+      "fallback_provider": "xkiro",
+      "provider": "unorouter"
+     },
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_7eb04c6a903a",
+    "request_id": "gen_0235ac0b31cc",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free"
+   }
+  },
+  {
+   "problem_index": 3,
+   "session_id": "ts_d80420b5257f",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "BUILT",
+   "partition": {
+    "A_provider_inference_s": {
+     "value": 10.222,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "B_failed_first_hop_s": {
+     "value": 0.411522,
+     "class": "PROVIDER_FAILURE_OR_RETRY",
+     "n_failed_hops": 1,
+     "hops": [
+      {
+       "provider": "unorouter",
+       "capability_state": "PROBE_FAILED",
+       "note": "PROBE_FAILED (failure_class=AUTH_FAILURE)",
+       "probe_admission_s": 0.411522,
+       "ledger_line_present": false
+      }
+     ],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "C_fallback_routing_overhead_s": {
+     "value": 2.022,
+     "class": "IMPLEMENTATION_WAIT",
+     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
+     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    },
+    "D_retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "E_local_orchestration_s": {
+     "value": 0.001,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.001,
+     "transition_s": 0.0,
+     "adapter_and_stage_overhead_s": 0.009,
+     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+    },
+    "F_unattributed_remainder_s": {
+     "value": 0.001,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 12.662,
+    "generate_total_s": 12.658488,
+    "stage_wall_s": 12.699997612042353
+   },
+   "funnel": {
+    "mechanisms_found": 1,
+    "terminal_state": "BUILT",
+    "n_distinct": 1,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free",
+    "fallback_occurred": true,
+    "routed_hops": [
+     {
+      "failure_type": "AUTH_FAILURE",
+      "fallback_provider": "xkiro",
+      "provider": "unorouter"
+     },
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "BUILT"
+   },
+   "join_keys": {
+    "session_id": "ts_d80420b5257f",
+    "request_id": "gen_115d3b90ac06",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free"
+   }
+  },
+  {
+   "problem_index": 4,
+   "session_id": "ts_920fb7890f37",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "A_provider_inference_s": {
+     "value": 10.045,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "B_failed_first_hop_s": {
+     "value": 0.000181,
+     "class": "PROVIDER_FAILURE_OR_RETRY",
+     "n_failed_hops": 1,
+     "hops": [
+      {
+       "provider": "unorouter",
+       "capability_state": "PROBE_FAILED",
+       "note": "PROBE_FAILED (failure_class=AUTH_FAILURE)",
+       "probe_admission_s": 0.000181,
+       "ledger_line_present": false
+      }
+     ],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "C_fallback_routing_overhead_s": {
+     "value": 2.151,
+     "class": "IMPLEMENTATION_WAIT",
+     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
+     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    },
+    "D_retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "E_local_orchestration_s": {
+     "value": 0.001,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.001,
+     "transition_s": 0.0,
+     "adapter_and_stage_overhead_s": 0.007,
+     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+    },
+    "F_unattributed_remainder_s": {
+     "value": 0.002,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 12.202,
+    "generate_total_s": 12.199198,
+    "stage_wall_s": 12.22171999688726
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free",
+    "fallback_occurred": true,
+    "routed_hops": [
+     {
+      "failure_type": "AUTH_FAILURE",
+      "fallback_provider": "xkiro",
+      "provider": "unorouter"
+     },
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_920fb7890f37",
+    "request_id": "gen_d9e4d0c4eda8",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free"
+   }
+  },
+  {
+   "problem_index": 5,
+   "session_id": "ts_95184085cacb",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "A_provider_inference_s": {
+     "value": 9.115,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "B_failed_first_hop_s": {
+     "value": 0.000168,
+     "class": "PROVIDER_FAILURE_OR_RETRY",
+     "n_failed_hops": 1,
+     "hops": [
+      {
+       "provider": "unorouter",
+       "capability_state": "PROBE_FAILED",
+       "note": "PROBE_FAILED (failure_class=AUTH_FAILURE)",
+       "probe_admission_s": 0.000168,
+       "ledger_line_present": false
+      }
+     ],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "C_fallback_routing_overhead_s": {
+     "value": 2.102,
+     "class": "IMPLEMENTATION_WAIT",
+     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
+     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    },
+    "D_retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "E_local_orchestration_s": {
+     "value": 0.001,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.001,
+     "transition_s": 0.0,
+     "adapter_and_stage_overhead_s": 0.007,
+     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+    },
+    "F_unattributed_remainder_s": {
+     "value": 0.003,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 11.224,
+    "generate_total_s": 11.220549,
+    "stage_wall_s": 11.246400745003484
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free",
+    "fallback_occurred": true,
+    "routed_hops": [
+     {
+      "failure_type": "AUTH_FAILURE",
+      "fallback_provider": "xkiro",
+      "provider": "unorouter"
+     },
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_95184085cacb",
+    "request_id": "gen_b96c45893118",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free"
+   }
+  },
+  {
+   "problem_index": 6,
+   "session_id": "ts_4cd3c123cf40",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "A_provider_inference_s": {
+     "value": 0.0,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "B_failed_first_hop_s": {
+     "value": 0,
+     "class": null,
+     "n_failed_hops": 0,
+     "hops": [],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "C_fallback_routing_overhead_s": {
+     "value": 0.0,
+     "class": "IMPLEMENTATION_WAIT",
+     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
+     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    },
+    "D_retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "E_local_orchestration_s": {
+     "value": 0.0,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.0,
+     "transition_s": 0.0,
+     "adapter_and_stage_overhead_s": 0.008,
+     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+    },
+    "F_unattributed_remainder_s": {
+     "value": null,
+     "class": "UNKNOWN",
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": null,
+    "generate_total_s": null,
+    "stage_wall_s": 0.020609593018889427
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "NO_APPLICABLE_EVIDENCE",
+    "provider": null,
+    "model": null,
+    "fallback_occurred": null,
+    "routed_hops": null,
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_4cd3c123cf40",
+    "request_id": null,
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": null,
+    "model": null
+   }
+  },
+  {
+   "problem_index": 7,
+   "session_id": "ts_49ff60d57c4c",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "BUILT",
+   "partition": {
+    "A_provider_inference_s": {
+     "value": 6.071,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "B_failed_first_hop_s": {
+     "value": 0.000105,
+     "class": "PROVIDER_FAILURE_OR_RETRY",
+     "n_failed_hops": 1,
+     "hops": [
+      {
+       "provider": "unorouter",
+       "capability_state": "PROBE_FAILED",
+       "note": "PROBE_FAILED (failure_class=AUTH_FAILURE)",
+       "probe_admission_s": 0.000105,
+       "ledger_line_present": false
+      }
+     ],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "C_fallback_routing_overhead_s": {
+     "value": 1.805,
+     "class": "IMPLEMENTATION_WAIT",
+     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
+     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    },
+    "D_retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "E_local_orchestration_s": {
+     "value": 0.001,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.001,
+     "transition_s": 0.0,
+     "adapter_and_stage_overhead_s": 0.027,
+     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+    },
+    "F_unattributed_remainder_s": {
+     "value": 0.001,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 7.881,
+    "generate_total_s": 7.878295,
+    "stage_wall_s": 7.923767322092317
+   },
+   "funnel": {
+    "mechanisms_found": 1,
+    "terminal_state": "BUILT",
+    "n_distinct": 1,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free",
+    "fallback_occurred": true,
+    "routed_hops": [
+     {
+      "failure_type": "AUTH_FAILURE",
+      "fallback_provider": "xkiro",
+      "provider": "unorouter"
+     },
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "BUILT"
+   },
+   "join_keys": {
+    "session_id": "ts_49ff60d57c4c",
+    "request_id": "gen_4036e23be48d",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free"
+   }
+  },
+  {
+   "problem_index": 8,
+   "session_id": "ts_da08dca287bc",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "BUILT",
+   "partition": {
+    "A_provider_inference_s": {
+     "value": 8.454,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "B_failed_first_hop_s": {
+     "value": 0.0001,
+     "class": "PROVIDER_FAILURE_OR_RETRY",
+     "n_failed_hops": 1,
+     "hops": [
+      {
+       "provider": "unorouter",
+       "capability_state": "PROBE_FAILED",
+       "note": "PROBE_FAILED (failure_class=AUTH_FAILURE)",
+       "probe_admission_s": 0.0001,
+       "ledger_line_present": false
+      }
+     ],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "C_fallback_routing_overhead_s": {
+     "value": 2.106,
+     "class": "IMPLEMENTATION_WAIT",
+     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
+     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    },
+    "D_retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "E_local_orchestration_s": {
+     "value": 0.001,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.001,
+     "transition_s": 0.0,
+     "adapter_and_stage_overhead_s": 0.007,
+     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+    },
+    "F_unattributed_remainder_s": {
+     "value": 0.002,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 10.567,
+    "generate_total_s": 10.563288,
+    "stage_wall_s": 10.588096103048883
+   },
+   "funnel": {
+    "mechanisms_found": 1,
+    "terminal_state": "BUILT",
+    "n_distinct": 1,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free",
+    "fallback_occurred": true,
+    "routed_hops": [
+     {
+      "failure_type": "AUTH_FAILURE",
+      "fallback_provider": "xkiro",
+      "provider": "unorouter"
+     },
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "BUILT"
+   },
+   "join_keys": {
+    "session_id": "ts_da08dca287bc",
+    "request_id": "gen_30d154c0e495",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free"
+   }
+  },
+  {
+   "problem_index": 9,
+   "session_id": "ts_d5930607a247",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "A_provider_inference_s": {
+     "value": 9.109,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "B_failed_first_hop_s": {
+     "value": 0.00011,
+     "class": "PROVIDER_FAILURE_OR_RETRY",
+     "n_failed_hops": 1,
+     "hops": [
+      {
+       "provider": "unorouter",
+       "capability_state": "PROBE_FAILED",
+       "note": "PROBE_FAILED (failure_class=AUTH_FAILURE)",
+       "probe_admission_s": 0.00011,
+       "ledger_line_present": false
+      }
+     ],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "C_fallback_routing_overhead_s": {
+     "value": 2.075,
+     "class": "IMPLEMENTATION_WAIT",
+     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
+     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    },
+    "D_retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "E_local_orchestration_s": {
+     "value": 0.001,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.001,
+     "transition_s": 0.0,
+     "adapter_and_stage_overhead_s": 0.008,
+     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+    },
+    "F_unattributed_remainder_s": {
+     "value": 0.003,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 11.191,
+    "generate_total_s": 11.187669,
+    "stage_wall_s": 11.211967646027915
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free",
+    "fallback_occurred": true,
+    "routed_hops": [
+     {
+      "failure_type": "AUTH_FAILURE",
+      "fallback_provider": "xkiro",
+      "provider": "unorouter"
+     },
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_d5930607a247",
+    "request_id": "gen_fe35c1eed608",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free"
+   }
+  },
+  {
+   "problem_index": 10,
+   "session_id": "ts_06e3c0e30553",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "A_provider_inference_s": {
+     "value": 9.109,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "B_failed_first_hop_s": {
+     "value": 9.1e-05,
+     "class": "PROVIDER_FAILURE_OR_RETRY",
+     "n_failed_hops": 1,
+     "hops": [
+      {
+       "provider": "unorouter",
+       "capability_state": "PROBE_FAILED",
+       "note": "PROBE_FAILED (failure_class=AUTH_FAILURE)",
+       "probe_admission_s": 9.1e-05,
+       "ledger_line_present": false
+      }
+     ],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "C_fallback_routing_overhead_s": {
+     "value": 2.063,
+     "class": "IMPLEMENTATION_WAIT",
+     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
+     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    },
+    "D_retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "E_local_orchestration_s": {
+     "value": 0.001,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.001,
+     "transition_s": 0.0,
+     "adapter_and_stage_overhead_s": 0.01,
+     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+    },
+    "F_unattributed_remainder_s": {
+     "value": 0.003,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 11.179,
+    "generate_total_s": 11.175869,
+    "stage_wall_s": 11.207822103984654
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free",
+    "fallback_occurred": true,
+    "routed_hops": [
+     {
+      "failure_type": "AUTH_FAILURE",
+      "fallback_provider": "xkiro",
+      "provider": "unorouter"
+     },
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_06e3c0e30553",
+    "request_id": "gen_1c75e82aaa15",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3.5-plus:free"
+   }
+  }
+ ],
+ "aggregate": {
+  "A_provider_inference_s": {
+   "n": 10,
+   "mean": 7.906,
+   "median": 8.795,
+   "min": 0.0,
+   "max": 10.222,
+   "p95": 10.222,
+   "values": [
+    8.481,
+    8.453,
+    10.222,
+    10.045,
+    9.115,
+    0.0,
+    6.071,
+    8.454,
+    9.109,
+    9.109
+   ]
+  },
+  "B_failed_first_hop_s": {
+   "n": 10,
+   "mean": 0.041,
+   "median": 0.0,
+   "min": 0,
+   "max": 0.412,
+   "p95": 0.412,
+   "values": [
+    0.0,
+    0.0,
+    0.412,
+    0.0,
+    0.0,
+    0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "C_fallback_routing_overhead_s": {
+   "n": 10,
+   "mean": 1.869,
+   "median": 2.069,
+   "min": 0.0,
+   "max": 2.348,
+   "p95": 2.348,
+   "values": [
+    2.022,
+    2.348,
+    2.022,
+    2.151,
+    2.102,
+    0.0,
+    1.805,
+    2.106,
+    2.075,
+    2.063
+   ]
+  },
+  "D_retry_backoff_s": {
+   "n": 10,
+   "mean": 0.0,
+   "median": 0.0,
+   "min": 0.0,
+   "max": 0.0,
+   "p95": 0.0,
+   "values": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "E_local_orchestration_s": {
+   "n": 10,
+   "mean": 0.001,
+   "median": 0.001,
+   "min": 0.0,
+   "max": 0.002,
+   "p95": 0.002,
+   "values": [
+    0.001,
+    0.002,
+    0.001,
+    0.001,
+    0.001,
+    0.0,
+    0.001,
+    0.001,
+    0.001,
+    0.001
+   ]
+  },
+  "in_stage_llm_wall_s": {
+   "n": 9,
+   "mean": 10.914,
+   "median": 11.179,
+   "min": 7.881,
+   "max": 12.662,
+   "p95": 12.662,
+   "values": [
+    10.51,
+    10.808,
+    12.662,
+    12.202,
+    11.224,
+    7.881,
+    10.567,
+    11.191,
+    11.179
+   ]
+  }
+ },
+ "fallback_auth_failure": {
+  "n_calls_with_failed_first_hop": 9,
+  "failed_hop_providers": [
+   "unorouter"
+  ],
+  "failed_hop_states": [
+   "PROBE_FAILED"
+  ]
+ },
+ "funnel_parity": {
+  "mechanisms_found": 4,
+  "n_observed": 10,
+  "terminal_states": {
+   "BUILT": 4,
+   "NO_CANDIDATES": 6
+  },
+  "fallback_occurred_rows": 9
+ },
+ "classification": {
+  "verdict": "AVOIDABLE_COMPONENT_UNDER_REVIEW",
+  "rule": "the avoidable implementation portion is >=5% of the measured wall OR the join is incomplete; a single causal intervention may be named only after the component is proven avoidable without changing scientific behavior",
+  "avoidable_fraction": 0.1946
+ },
+ "reviewer_provenance": "AI_REVIEW",
+ "created_at_utc": "2026-09-25T00:10:43Z"
+}

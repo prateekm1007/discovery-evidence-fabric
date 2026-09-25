@@ -104,19 +104,63 @@ def _synth_sleep(h: dict, arm: str) -> dict:
 
 
 def _mechanisms_found(h: dict) -> dict:
-    """The discovery-funnel mechanisms_found count per row."""
+    """The discovery-funnel mechanisms_found outcome per row.
+
+    R529 §2.1 repair: the canonical harvested schema is a STRUCTURED
+    object, not a numeric scalar:
+      funnel_row["mechanisms_found"] = {
+        "n_candidates_generated": int,
+        "reached": bool,
+        "state": "BUILT" | "NO_CANDIDATES" | ...,
+        "typed_drop_reason": str | None,
+        "evidence": {"file": ..., "pointer": ...},
+      }
+    (evidence file = envelope_MECHANISM_SPACE.json when the stage
+    executed with a durable mechanism_space block, else
+    envelope_RANK.json $.stage_log[MECHANISM_SPACE].result_meta.)
+
+    A row counts as mechanisms-found when reached is True (the
+    canonical boolean) OR n_candidates_generated > 0 (the canonical
+    count). No invented or estimated values: a row whose block is
+    absent or unparseable is recorded as UNKNOWN, never as zero.
+    The per-row detail (problem_index, reached, n, state) is
+    preserved so the arm difference is auditable row-by-row.
+    """
     found = 0
     total = 0
+    unknown = 0
+    per_row = []
     for r in h.get("rows", []):
         if "stage_table" not in r:
             continue
         total += 1
         fr = r.get("funnel_row") or {}
         mf = fr.get("mechanisms_found")
-        if isinstance(mf, (int, float)) and mf > 0:
+        pi = r.get("problem_index")
+        if not isinstance(mf, dict):
+            # absent or non-canonical block: UNKNOWN, never zero
+            unknown += 1
+            per_row.append({"problem_index": pi, "reached": None,
+                            "n_candidates_generated": None,
+                            "state": "UNKNOWN",
+                            "note": "mechanisms_found block absent or "
+                                    "non-canonical (Art. XXV)"})
+            continue
+        reached = mf.get("reached") is True
+        n = mf.get("n_candidates_generated")
+        if reached or (isinstance(n, (int, float)) and n > 0):
             found += 1
+        per_row.append({
+            "problem_index": pi,
+            "reached": bool(reached),
+            "n_candidates_generated": n,
+            "state": mf.get("state"),
+            "typed_drop_reason": mf.get("typed_drop_reason"),
+        })
     return {"mechanisms_found": found, "n_rows": total,
-            "rate": (round(found / total, 3) if total else None)}
+            "n_unknown": unknown,
+            "rate": (round(found / total, 3) if total else None),
+            "per_row": per_row}
 
 
 def main() -> int:
@@ -172,18 +216,65 @@ def main() -> int:
         (cur_synth_wall is not None and aft_synth_wall is not None)
         and aft_synth_wall > cur_synth_wall * 3)
 
-    # ---- production identity (live, from the deploy record + the
-    # harvest's build-identity custody) ----
-    # The deploy record carries the commit + drift read-back at deploy
-    # time. The after-arm harvest carries the measured_engine_sha
-    # (the session expected_commit) + build_identity_check. The
-    # production identity is the deployed SHA + the drift read-back
-    # recorded in the deploy record's variable_readback.
-    drift_green = (dep.get("variable_readback") or {}).get(
-        "ENGINE_EVIDENCE_FABRIC") == "0" or \
-        (dep.get("production_identity") or {}).get(
-            "deployment_drift") == "GREEN"
-    deploy_sha_match = dep.get("commit") == args.deploy_sha
+    # ---- production identity (LIVE, the directive §2.2 chain) ----
+    # R529 §2.2 repair: the round may only become deployed/closed
+    # when the constitutional identity chain is EXPLICIT:
+    #   target_sha -> deployed_sha -> production deployment
+    #   identity -> health -> drift
+    # Do NOT infer deployment from the existence of a commit or from
+    # a config read-back (ENGINE_EVIDENCE_FABRIC=="0" is a standing-
+    # config check, not a drift check). Query the LIVE production
+    # endpoints and record each link of the chain from durable
+    # evidence: the deploy record's commit (deployed_sha claim), the
+    # after-harvest's measured_engine_sha (build-identity custody),
+    # and the live /api/version + /api/health read-back.
+    import urllib.request as _urlreq
+    _PROD_BASE = "https://prateekm1-toscanini-prod-validation.hf.space"
+
+    def _live_get(path: str, timeout: int = 60) -> dict:
+        try:
+            with _urlreq.urlopen(_PROD_BASE + path,
+                                 timeout=timeout) as _r:
+                return json.loads(_r.read().decode())
+        except Exception as _e:
+            return {"probe_error": f"{type(_e).__name__}: "
+                                   f"{str(_e)[:120]}"}
+
+    _live_version = _live_get("/api/version")
+    _live_health = _live_get("/api/health")
+    _live_engine = _live_version.get("engine_commit") or ""
+    _live_drift = ((_live_health.get("deployment_identity") or {})
+                   .get("deployment_drift") or "UNKNOWN")
+    _live_tamper = ((_live_health.get("deployment_identity") or {})
+                    .get("identity_tamper"))
+    _live_health_ok = _live_health.get("ok", _live_health.get(
+        "status") in (None, "ok", "healthy", "GREEN"))
+    _aft_measured = (aft.get("measured_engine_sha") or "")
+    _deploy_commit = dep.get("commit") or ""
+    # link 1: target_sha == the after-arm build the round intended
+    # link 2: deployed_sha == the commit the deploy record claims
+    # link 3: custody == the after-harvest's measured build identity
+    # link 4: live == what production actually serves right now
+    # link 5: drift == the deployment_drift read-back
+    _chain = {
+        "target_sha": args.deploy_sha,
+        "deploy_record_commit": _deploy_commit,
+        "harvest_measured_engine_sha": _aft_measured,
+        "live_engine_commit": _live_engine,
+        "live_drift": _live_drift,
+        "live_tamper": _live_tamper,
+    }
+    _link_target_deploy = (_deploy_commit == args.deploy_sha)
+    _link_deploy_custody = (_deploy_commit == _aft_measured)
+    _link_live_deploy = (_live_engine == _deploy_commit)
+    _link_drift_green = (_live_drift == "GREEN" and _live_tamper is False)
+    _production_identity_chain_ok = (
+        _link_target_deploy and _link_deploy_custody
+        and _link_live_deploy and _link_drift_green)
+    # legacy proxies (kept for record continuity, now each backed by
+    # an explicit chain link rather than a config coincidence):
+    drift_green = _link_drift_green
+    deploy_sha_match = _link_target_deploy and _link_live_deploy
 
     # ---- round states (explicit, never collapsed) ----
     measurement_complete = (comp.get("n_paired_problems") is not None
@@ -223,10 +314,20 @@ def main() -> int:
                 "mechanisms_found": aft_mf,
                 "deploy_record": "R527/AFTER_DEPLOY_RECORD.json",
                 "deploy_commit": dep.get("commit"),
-                "drift_readback": (
-                    (dep.get("variable_readback") or {}).get(
-                        "ENGINE_EVIDENCE_FABRIC")
-                    or "UNKNOWN"),
+                "harvest_measured_engine_sha": _aft_measured,
+                "production_identity_chain": {
+                    **_chain,
+                    "link_target_deploy": _link_target_deploy,
+                    "link_deploy_custody": _link_deploy_custody,
+                    "link_live_deploy": _link_live_deploy,
+                    "link_drift_green": _link_drift_green,
+                    "chain_ok": _production_identity_chain_ok,
+                    "rule": ("target_sha == deploy-record commit == "
+                             "harvest measured_engine_sha == live "
+                             "production engine_commit, AND live drift "
+                             "GREEN AND tamper false. Deployment is "
+                             "NOT inferred from a commit's existence."),
+                },
             },
         },
         "paired_comparison": {
