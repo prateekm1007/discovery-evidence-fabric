@@ -90,6 +90,13 @@ def main() -> int:
             "capability_id": getattr(inst, "capability_id", ""),
             "module_path": getattr(inst, "module_path", ""),
             "canonical_fn": getattr(inst, "canonical_fn", ""),
+            # R532 §1: where the adapter declares an explicit
+            # production-vs-instrument split, record both so no
+            # future reader fixes the wrong implementation.
+            "production_impl": getattr(inst, "production_impl",
+                                       "") or None,
+            "hermetic_instrument": getattr(
+                inst, "hermetic_instrument", "") or None,
             "needs_network": bool(getattr(inst, "needs_network",
                                           False)),
             "depends_on": list(getattr(inst, "depends_on", []) or []),
@@ -135,6 +142,12 @@ def main() -> int:
             "module_path")
         c["canonical_function"] = getattr(inst, "canonical_fn", "") \
             or c.get("canonical_function")
+        # R532 §1: mirror the production-vs-instrument split where
+        # the adapter declares it (ABSENT on adapters without one).
+        c["production_impl"] = getattr(inst, "production_impl",
+                                       "") or None
+        c["hermetic_instrument"] = getattr(
+            inst, "hermetic_instrument", "") or None
         c["adapter"] = (f"discovery_fabric/engine/adapters.py::"
                         f"{type(inst).__name__}")
         n_updated += 1

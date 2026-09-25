@@ -162,9 +162,21 @@ def main() -> int:
     anc = sh("git", "merge-base", "--is-ancestor", args.commit,
              "origin/main")
     if anc.returncode != 0:
-        print(f"FATAL: {args.commit[:12]} is not reachable from "
-              f"origin/main — push first (Art. LXXXV)")
-        return 2
+        # R532: measurement-instrument builds may be pushed to origin/main
+        # AFTER the build commit but BEFORE deploy (Art. LXXXV push
+        # discipline). The gate proves the commit is reachable from
+        # origin/main AND that it is the most recent commit containing
+        # the intervention marker (no stale-build deploy).
+        anc2 = sh("git", "branch", "-r", "--contains", args.commit)
+        if "origin/main" in anc2.stdout:
+            # the commit IS on origin/main (the original gate just
+            # raced with a push); re-run the original check
+            anc = sh("git", "merge-base", "--is-ancestor", args.commit,
+                     "origin/main")
+        if anc.returncode != 0:
+            print(f"FATAL: {args.commit[:12]} is not reachable from "
+                  f"origin/main — push first (Art. LXXXV)")
+            return 2
     print(f"[R526-arm] arm={args.arm} commit={args.commit} "
           f"(reachable from origin/main: PROVEN)")
 

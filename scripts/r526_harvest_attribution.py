@@ -998,10 +998,27 @@ def _mechanism_space_spans(ms_env, stage_entry, ledger_block):
                        "(uninstrumented build or skipped stage) - "
                        "decomposition UNATTRIBUTED")
         return out
+    # R532 §5: envelope contents alone (stage_log empty, no
+    # stage-table wall) cannot be attributed to THIS run — stale
+    # or prior-run spans must not masquerade as fresh execution
+    # (Art. XXV: UNKNOWN stays UNKNOWN).
+    if st_wall is None:
+        out["note"] = ("mechanism_attribution/1.0.0 record present "
+                       "but no stage wall observed for this run "
+                       "(stale/prior-run envelope contents) - "
+                       "spans UNATTRIBUTED to this execution")
+        return out
     led = ledger_block or {}
     led_wall = led.get("provider_call_wall_s") or 0.0
     total = attr.get("total_s")
     subphases = attr.get("subphases") or []
+    # R532 §3: typed instantiation attempts (from the funnel dict
+    # and/or the space record — same object, read verbatim, never
+    # reinterpreted). Absent on pre-R532 builds → UNKNOWN.
+    _ms_attempts = None
+    _fn = attr.get("funnel") or {}
+    if isinstance(_fn.get("instantiation_attempts"), list):
+        _ms_attempts = _fn.get("instantiation_attempts")
     out.update({
         "class": "OBSERVED_IN_STAGE",
         "attribution_version": attr.get("attribution_version"),
@@ -1023,6 +1040,7 @@ def _mechanism_space_spans(ms_env, stage_entry, ledger_block):
             for s in subphases if isinstance(s, dict)],
         "funnel": attr.get("funnel"),
         "llm": attr.get("llm"),
+        "instantiation_attempts": _ms_attempts,
         "ledger_provider_call_wall_s": round(led_wall, 3),
         "ledger_n_calls": led.get("n_calls"),
         "ledger_n_ok": led.get("n_ok"),

@@ -162,8 +162,11 @@ class BaseAdapter:
     # namespace — the SAME namespace as STAGE_ORDER. The v1 values used
     # capability IDs (A2_RETRIEVAL, SYNTHESIS, EVIDENCE_VERIFY, ...) which
     # resolve to NO stage: 12 of 16 stages' declared dependencies were
-    # unresolvable and any consumer of the declared graph (introspection
-    # tooling, auditors, future orchestrators) got a false picture.
+    # unresolvable at the time of the R402 audit (HISTORICAL count —
+    # the live chain is 15 linear stages + IMPROVE as post-rank
+    # kill-point per R515; see STAGE_ORDER below) and any consumer of
+    # the declared graph (introspection tooling, auditors, future
+    # orchestrators) got a false picture.
     # Contract (pinned by test): every entry resolves to a stage in
     # STAGE_ORDER. capability_id remains the CAPABILITY namespace —
     # the two vocabularies never mix in depends_on.
@@ -819,9 +822,27 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                  "n_evaluated": 0, "n_satisfied": 0},
              "selected_operator": "NONE",
              "llm_outcome": "NOT_ATTEMPTED",
-             "terminal_reason": "NO_EVIDENCE"},
+             "terminal_reason": "NO_EVIDENCE",
+             # R532 §3: the not-attempted shape carries the same
+             # typed-attempt schema (uniform harvest) — classified
+             # by the shared classifier, never hand-typed.
+             "instantiation_attempts": [
+                 {**_ms_attempt_outcome(
+                     False, "NO_EVIDENCE", None, None, None,
+                     None, None, None, False, None, False, None),
+                  "attempt_index": 1,
+                  "attempted": False,
+                  "provider": None,
+                  "model": None,
+                  "operator": "NONE",
+                  "terminal_reason": "NO_EVIDENCE"}]},
             _mattr.llm_call_detail(0, None),
             "NO_EVIDENCE")
+        # the not-attempted attempt rides the space record too
+        # (uniform schema with the executed path).
+        space["instantiation_attempts"] = (
+            space["runtime_attribution"]["funnel"].get(
+                "instantiation_attempts") or [])
         return space
     space["structured_evidence"] = {
         "state": "BUILT", "n_items": len(items),
@@ -846,6 +867,17 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     op = sel["operator"]
     item = sel["item"] if sel["item"] is not None else items[0]
     _llm_meta = None
+    # R532 §3: the instantiation wall (None when no LLM call is
+    # attempted — the typed attempt record reads it, never steers).
+    _llm_wall = None
+    # R532 §3: parse-level locals for the typed attempt record
+    # (empty defaults when the LLM path failed or was never taken
+    # — the classifier reads them, never steers). Initialized HERE
+    # (all paths) so the no-contract path cannot NameError below.
+    fields: Dict[str, Any] = {}
+    _n_fields_nonempty: Optional[int] = None
+    cand: Optional[Dict[str, Any]] = None
+    sem: Optional[Dict[str, Any]] = None
     contract = sel["contract"]
     sel_id = op["operator_id"] if op else "NONE"
     space["operator_ids"] = [sel_id] if op else []
@@ -910,10 +942,13 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             purpose=f"operator_{sel_id}",
             max_tokens=_ms.OPERATOR_INSTANTIATION_MAX_TOKENS)
         _llm_meta = meta
-        _clk.mark("llm_instantiation_wall",
-                  {"provider": meta.get("provider"),
-                   "model": meta.get("model"),
-                   "transport_status": meta.get("status")})
+        # R532 §3: capture the instantiation wall for the typed
+        # attempt record (mark() returns the span duration; the
+        # span itself is unchanged).
+        _llm_wall = _clk.mark("llm_instantiation_wall",
+                              {"provider": meta.get("provider"),
+                               "model": meta.get("model"),
+                               "transport_status": meta.get("status")})
         if not meta.get("ok"):
             operator_result.update({
                 "state": "OPERATOR_INSTANTIATION_FAILED",
@@ -922,9 +957,12 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             })
         else:
             fields = _ms._parse_candidate_fields(meta["content"] or "")
+            # R532 §3: capture the parsed-field count for the typed
+            # attempt record (same value the mark below records).
+            _n_fields_nonempty = sum(
+                1 for v in fields.values() if str(v or ""))
             _clk.mark("candidate_parsing",
-                      {"n_fields_nonempty": sum(
-                          1 for v in fields.values() if str(v or ""))})
+                      {"n_fields_nonempty": _n_fields_nonempty})
             cand = _ms.assemble_candidate(op, item, fields, problem, meta)
             sem = _ms.operator_semantic_check(
                 sel_id, item, cand, problem)
@@ -1000,6 +1038,67 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     # old "serialization_persistence" label did not measure
     # persistence. Durations byte-identical; positional mapping pinned.
     _clk.mark("post_support_assembly")
+    # R532 §3: typed instantiation-attempt record (observational
+    # only — every value below was already computed; the
+    # classifier in _ms_attempt_outcome reads, never steers). The
+    # lean path attempts at most one instantiation; the list schema
+    # is forward-compatible, never implying retries exist.
+    _att_cand_id = (cand or {}).get("candidate_id")
+    _att_blocked_ids = {
+        str(b.get("candidate_id"))
+        for b in ((space.get("cemetery_consumption") or {}).get(
+            "blocked") or [])
+        if isinstance(b, dict)}
+    _att_retained_ids = {
+        str(c.get("candidate_id")) for c in retained
+        if isinstance(c, dict)}
+    _att_dd = (_dd_by_id.get(str(_att_cand_id)) or {}) if _att_cand_id \
+        else {}
+    _att_sup = (cand or {}).get("mechanism_support") or {}
+    _att_outcome = _ms_attempt_outcome(
+        bool(contract.get("satisfied")),
+        operator_result.get("state"),
+        _llm_meta,
+        _n_fields_nonempty,
+        (fields or {}).get("intervention"),
+        (fields or {}).get("mechanism"),
+        (cand or {}).get("candidate_state"),
+        ((sem or {}).get("semantic_verdict")),
+        (str(_att_cand_id) in _att_blocked_ids
+         if _att_cand_id else False),
+        _att_dd.get("verdict"),
+        (str(_att_cand_id) in _att_retained_ids
+         if _att_cand_id else False),
+        _att_sup.get("mechanism_support_state"),
+    )
+    _att_entry = {
+        "attempt_index": 1,
+        "attempted": bool(_llm_meta is not None),
+        "provider": (_llm_meta or {}).get("provider"),
+        "model": (_llm_meta.get("model")
+                  if _llm_meta is not None else None),
+        "operator": sel_id,
+        "selected_item_id": (item.get("item_id")
+                             if contract.get("satisfied") else None),
+        "contract_satisfied": bool(contract.get("satisfied")),
+        "provider_wall_s": (round(_llm_wall, 6)
+                            if isinstance(_llm_wall,
+                                          (int, float)) else None),
+        "mechanism_space_wall_s": round(_clk.total_s(), 3),
+        "output_nonempty_fields": _n_fields_nonempty,
+        "semantic_verdict": ((sem or {}).get("semantic_verdict")),
+        "candidate_state": (cand or {}).get("candidate_state"),
+        "candidate_id": _att_cand_id,
+        "cemetery_blocked": (str(_att_cand_id) in _att_blocked_ids
+                             if _att_cand_id else False),
+        "distinctness_verdict": _att_dd.get("verdict"),
+        "support_state": _att_sup.get("mechanism_support_state"),
+        "typed_outcome": _att_outcome.get("outcome"),
+        "outcome_detail": {k: v for k, v in _att_outcome.items()
+                           if k != "outcome"},
+        "terminal_reason": space.get("state"),
+    }
+    space["instantiation_attempts"] = [_att_entry]
     # R516 Part A: the candidate funnel + LLM detail, all counts and
     # states from the existing typed vocabulary (no new epistemic
     # states; unexecuted steps read as absent/None with the
@@ -1030,11 +1129,117 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
              "n_distinct": dedup.get("n_distinct"),
              "n_indeterminate": dedup.get("n_indeterminate")},
          "n_retained": len(retained),
-         "terminal_reason": space["state"]},
+         "terminal_reason": space["state"],
+         # R532 §3: the typed instantiation attempts ride the
+         # funnel dict (free-form) so the existing harvester
+         # extracts them with no second framework.
+         "instantiation_attempts": space.get(
+             "instantiation_attempts") or []},
         _mattr.llm_call_detail(
             0 if _llm_meta is None else 1, _llm_meta),
         space["state"])
     return space
+
+
+# R532 §3: the typed instantiation-outcome taxonomy. Provenance:
+# the outcome NAMES come from the R532 directive §3; each
+# assignment rule below reads ONLY already-computed lean-path
+# values (no recomputation, no new gates, no steering). Pure
+# function — same inputs always yield the same outcome
+# (Art. IX: observational). Precedence = earliest pipeline loss
+# wins; later unexecuted steps read as None.
+_SEMANTIC_REJECT_VERDICTS = frozenset({
+    "TEXTUAL_REWRITE", "SEMANTIC_INVARIANT_BROKEN"})
+_SEMANTIC_REJECT_STATES = frozenset({
+    "NOT_A_CANDIDATE_TEXTUAL_REWRITE",
+    "NOT_A_CANDIDATE_OPERATOR_INVARIANT_BROKEN",
+    "NOT_A_CANDIDATE_SPAN_NOT_VERBATIM"})
+# support states that mark weak/evidentially-insufficient backing
+# (mechanism_space.verify_mechanism_support vocabulary).
+_WEAK_SUPPORT_STATES = frozenset({
+    "CONTESTED", "NOT_ENOUGH_EVIDENCE"})
+
+
+def _ms_attempt_outcome(
+    contract_satisfied: bool,
+    prior_state: Optional[str],
+    llm_meta: Optional[Dict[str, Any]],
+    n_fields_nonempty: Optional[int],
+    intervention: Optional[str],
+    mechanism: Optional[str],
+    candidate_state: Optional[str],
+    semantic_verdict: Optional[str],
+    cemetery_blocked: Optional[bool],
+    distinctness_verdict: Optional[str],
+    retained: Optional[bool],
+    support_state: Optional[str],
+) -> Dict[str, Any]:
+    """Classify one operator-instantiation attempt into the R532 §3
+    typed outcome. Every branch reads pre-computed values; None
+    means the step never executed (earlier loss wins)."""
+    if not contract_satisfied:
+        return {"outcome": "NOT_ATTEMPTED",
+                "prior_state": prior_state,
+                "note": ("no (item, operator) pair satisfied any "
+                         "admission contract — the existing state "
+                         "stands, nothing fabricated")}
+    if not llm_meta or not llm_meta.get("ok"):
+        return {"outcome": "OPERATOR_INSTANTIATION_FAILED",
+                "llm_status": ((llm_meta or {}).get("status")),
+                "llm_error": str((llm_meta or {}).get("error") or "")[
+                    :200]}
+    if not (llm_meta.get("content") or ""):
+        return {"outcome": "EMPTY_OUTPUT"}
+    if (n_fields_nonempty or 0) == 0:
+        return {"outcome": "PARSE_FAILURE",
+                "n_fields_nonempty": 0}
+    if not (intervention or "") and not (mechanism or ""):
+        return {"outcome": "REQUIRED_FIELDS_MISSING",
+                "n_fields_nonempty": n_fields_nonempty,
+                "note": ("response parsed but carries no mechanism "
+                         "content (mechanism + intervention both "
+                         "empty)")}
+
+    if (candidate_state or "") != "CANDIDATE" and \
+            (semantic_verdict not in _SEMANTIC_REJECT_VERDICTS
+             and (candidate_state or "")
+             not in _SEMANTIC_REJECT_STATES):
+        return {"outcome": "ASSEMBLY_INVALID",
+                "candidate_state": candidate_state}
+    if (semantic_verdict in _SEMANTIC_REJECT_VERDICTS
+            or (candidate_state or "") in _SEMANTIC_REJECT_STATES):
+        return {"outcome": "SEMANTIC_REJECT",
+                "semantic_verdict": semantic_verdict,
+                "candidate_state": candidate_state}
+    if cemetery_blocked:
+        return {"outcome": "CEMETERY_BLOCK"}
+    if (distinctness_verdict or "") not in (
+            "DISTINCT", "INDETERMINATE", None, "") \
+            and not retained:
+        return {"outcome": "DISTINCTNESS_DROP",
+                "distinctness_verdict": distinctness_verdict}
+    if (support_state in _WEAK_SUPPORT_STATES) and not retained \
+            and not cemetery_blocked and (
+                distinctness_verdict or "") in (
+                    "DISTINCT", "INDETERMINATE", None, ""):
+        # Safety net (documents a support-shaped loss the current
+        # gates do not explain): on the present lean path support
+        # is advisory (retained = dedup kept_ids), so this branch
+        # is unreachable today — if it ever fires, that firing is
+        # itself a finding (a gate drops on support without a
+        # recorded cemetery/distinctness reason).
+        return {"outcome": "MECHANISM_SUPPORT_DROP",
+                "support_state": support_state}
+    if retained:
+        return {"outcome": "CANDIDATE_ACCEPTED",
+                "support_state": support_state}
+    return {"outcome": "UNKNOWN",
+            "note": ("no taxonomy branch claimed this attempt — "
+                     "recorded values preserved below, never "
+                     "force-fit (Art. XXV)"),
+            "candidate_state": candidate_state,
+            "distinctness_verdict": distinctness_verdict,
+            "support_state": support_state}
 
 
 class MechanismSpaceAdapter(BaseAdapter):
@@ -1070,10 +1275,28 @@ class MechanismSpaceAdapter(BaseAdapter):
     build_mechanism_space() remains the hermetic instrument its test
     battery exercises; the production role moved here (Art. LXIV:
     KEPT_BECAUSE test-covered instrument — the superseding production
-    path is this adapter, disclosed in the space record)."""
+    path is this adapter, disclosed in the space record).
+    R532 (§2 audit): to prevent a future coder from "fixing" the
+    wrong implementation — module_path/canonical_fn below name the
+    CAPABILITY namespace (the hermetic instrument); production_impl
+    names the code that actually serves live runs."""
     capability_id = "MECHANISM_SPACE"
     module_path = "discovery_fabric/engine/mechanism_space.py"
     canonical_fn = "build_mechanism_space(problem, evidence)"
+    # R532 §2: explicit production-vs-instrument split. Live runs
+    # execute production_impl (the lean path); the hermetic battery
+    # exercises canonical_fn (the full expansion instrument). A
+    # measurement or fix targeting live MECHANISM_SPACE behavior
+    # belongs in production_impl, never in the instrument.
+    production_impl = ("discovery_fabric/engine/adapters.py::"
+                       "_lean_mechanism_space (R453 lean path: "
+                       "FREEZE/VERIFY fact reuse, deterministic "
+                       "items, deterministic operator selection, "
+                       "at most ONE operator-instantiation LLM call, "
+                       "deterministic validation tail)")
+    hermetic_instrument = ("discovery_fabric/engine/mechanism_space.py::"
+                           "build_mechanism_space (full expansion; "
+                           "test-only, no production callers)")
     needs_network = True
     depends_on = ["RETRIEVE", "SYNTHESIZE"]
 
@@ -1873,11 +2096,14 @@ ADAPTERS = {
 # simulation, the four failure modes, the baseline comparison, and
 # lifecycle verdicts that gate the candidate (consultant finding:
 # "the physics solver is validated code but not part of the live run
-# chain"). The D8 chain is 16 stages.
+# chain"). The D8 chain is 16 stages. [HISTORICAL — R397 era; see
+# R532 note below for the current 15-stage canonical statement.]
+# R394 section 6: PREMISE_GATE is a FIRST-CLASS stage between FREEZE and The D8 chain is 16 stages.
 # R401: MECHANISM_SPACE is a FIRST-CLASS stage between VERIFY and
 # COLLISION — the structured mechanism space (structured
 # evidence -> five transformation operators -> distinctness ->
-# mechanism-level verification). The chain is 16 stages. Deliberate,
+# mechanism-level verification). The chain is 16 stages. [HISTORICAL
+# — R401 era.] Deliberate,
 # documented contract change (same pattern as R394 PREMISE_GATE and
 # R397 PHYSICS); pinned tests updated with the new arithmetic.
 # R481 (external-audit P0-1): IMPROVE was a FIRST-CLASS stage between
@@ -1890,6 +2116,12 @@ ADAPTERS = {
 # kill-evidence point (post-rank, kill evidence present) invokes the
 # same ImproveAdapter through the same env.run_stage protocol; pinned
 # tests updated with the new arithmetic.
+# R532 doc-entropy repair (CANONICAL current statement — the "16
+# stages" notes at R394/R397/R401 above are historical: they were
+# true when written, while IMPROVE rode the linear chain):
+#   15 linear live stages; IMPROVE = post-rank kill point;
+#   ADAPTERS = STAGE_ORDER ∪ {IMPROVE} (intentional asymmetry,
+#   recorded + tested contract per R402 W7).
 STAGE_ORDER = ["RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
                "VERIFY", "MECHANISM_SPACE",
                "COLLISION", "PHYSICS",
