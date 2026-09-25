@@ -601,7 +601,18 @@ class TestDeletionAccounting(unittest.TestCase):
                     # tests/test_r526_phase_spans.py plus unchanged
                     # suite pass/fail sets.
                     "discovery_fabric/engine/model_routing.py",
-                    "discovery_fabric/engine/improve_stage.py"),
+                    "discovery_fabric/engine/improve_stage.py",
+                    # R536 AMENDMENT (disclosed): the cemetery domain-
+                    # identity prerequisite (Cliff 2) requires the
+                    # candidate's mechanism-graph terms to reach the
+                    # orchestrator layer as the structural same-domain
+                    # signal — engine/ensemble.py (the post-rank
+                    # synthesis surface) carries the
+                    # span_instruction crash repair that the cemetery
+                    # fix makes reachable.  Read-only observability +
+                    # the crash fix; no routing, retry, budget, gate,
+                    # probe, admission, or transport logic touched.
+                    "discovery_fabric/engine/ensemble.py"),
                 f"the mandate's file list is exhaustive: {f} is outside "
                 "run.py/stage_entry.py/adapters.py/llm_registry.py")
 

@@ -22,6 +22,7 @@ import importlib
 import importlib.util
 import json
 import os
+import time as _time
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -227,7 +228,9 @@ class A2RetrievalAdapter(BaseAdapter):
                 retrieval_fabric_version="V1")
         # V2 (default): the multi-source fabric
         fabric = _import_with_env("discovery_fabric.retrieval_fabric")
+        _t0 = _time.monotonic()
         items, report = fabric.retrieve(env.problem)
+        _t_fabric = _time.monotonic() - _t0
         stats = report.get("retrieval_stats", {})
         diversity = report.get("retrieval_diversity", {})
         # R449: the EVIDENCE-FABRIC channel — ADDITIVE federated evidence
@@ -380,8 +383,14 @@ class EvidenceFreezeAdapter(BaseAdapter):
 
     def execute(self, env, run_ctx):
         ec = importlib.import_module("orchestrator.evidence_custody")
+        input_count = len(env.evidence or [])
         records = []
+        promotion_attempts = 0
+        failed_custody = 0
+        hash_pass = 0
+        hash_fail = 0
         for it in env.evidence:
+            promotion_attempts += 1
             rec = ec.promote_to_evidence(
                 record={"record_id": it.get("id", ""),
                         "raw_content": it.get("abstract", ""),
@@ -395,7 +404,16 @@ class EvidenceFreezeAdapter(BaseAdapter):
                 proposition_binding="candidate_mechanism_input")
             if rec is not None:
                 records.append(rec)
-        ok = all(r.verify() for r in records) if records else False
+            else:
+                failed_custody += 1
+        verified = []
+        for r in records:
+            if r.verify():
+                verified.append(r)
+                hash_pass += 1
+            else:
+                hash_fail += 1
+        ok = bool(records) and (hash_fail == 0)
         snapshot = {
             "run_id": run_ctx["run_id"],
             "problem_id": env.problem_id,
@@ -403,6 +421,24 @@ class EvidenceFreezeAdapter(BaseAdapter):
             "evidence_count": len(env.evidence),
             "custody_records": [asdict(r) for r in records],
             "hash_verification_all_pass": ok,
+            # R536 §5: observational custody cardinality (input ->
+            # promotion -> verified -> final frozen), with source
+            # lineage.  Purely additive telemetry; the admission
+            # semantics (custody_records / hash_ok) are UNCHANGED.
+            "freeze_observational": {
+                "input_evidence_count": input_count,
+                "promotion_attempts": promotion_attempts,
+                "custody_promoted_count": len(records),
+                "custody_failed_count": failed_custody,
+                "hash_verification_pass_count": hash_pass,
+                "hash_verification_fail_count": hash_fail,
+                "final_frozen_evidence_count": len(verified),
+                "lineage": [
+                    {"source": it.get("source", "UNKNOWN"),
+                     "id": it.get("id", ""),
+                     "content_hash": it.get("content_hash", "")}
+                    for it in (env.evidence or [])],
+            },
         }
         snapshot["snapshot_hash"] = sha256_obj(snapshot)
         return _engine_result(
@@ -1200,6 +1236,18 @@ def _ms_attempt_outcome(
                          "content (mechanism + intervention both "
                          "empty)")}
 
+    # R536 Cliff 1 (audit CB-classifier): the cemetery check MUST
+    # precede the candidate_state check, independently of it.  A
+    # cemetery hard-block overwrites candidate_state to
+    # NOT_A_CANDIDATE_CEMETERY_PROVEN_INVARIANT — so when
+    # cemetery_blocked is True the state is NOT an assembly failure
+    # but the block itself.  Reading the state first (the R532
+    # order) mislabels every cemetery block as ASSEMBLY_INVALID;
+    # the raw cemetery_blocked boolean was the only record that told
+    # the truth (the R535 4/5 NO_CANDIDATES rows).
+    if cemetery_blocked:
+        return {"outcome": "CEMETERY_BLOCK",
+                "candidate_state": candidate_state}
     if (candidate_state or "") != "CANDIDATE" and \
             (semantic_verdict not in _SEMANTIC_REJECT_VERDICTS
              and (candidate_state or "")
@@ -1211,8 +1259,6 @@ def _ms_attempt_outcome(
         return {"outcome": "SEMANTIC_REJECT",
                 "semantic_verdict": semantic_verdict,
                 "candidate_state": candidate_state}
-    if cemetery_blocked:
-        return {"outcome": "CEMETERY_BLOCK"}
     if (distinctness_verdict or "") not in (
             "DISTINCT", "INDETERMINATE", None, "") \
             and not retained:
@@ -2045,7 +2091,27 @@ class _CemeterySubCheck:
             mm = env.mechanism_map
             desc = " ".join([mm.get("intervention", ""),
                              mm.get("mechanism", "")])[:2000]
-            res = mc.check_candidate_against_cemetery(desc)
+            # R536 Cliff 2: pass the candidate's mechanism-graph terms
+            # as the structural domain-identity signal (the same
+            # graph the distinctness instrument compares).  Without a
+            # graph (legacy / no-candidate state) the cemetery falls
+            # back to the lexical signal only — never a fabricated
+            # structural match.
+            _cand = mm.get("raw_candidate") or {}
+            _graph_terms: set = set()
+            for _node in (_cand.get("mechanism_graph") or {}).get(
+                    "nodes", {}).values():
+                _graph_terms.update(_node.get("terms") or [])
+            _cand_tokens = {w for w in (
+                _graph_terms | {t.lower() for t in (
+                    mm.get("intervention", "") + " " +
+                    mm.get("mechanism", "")).split()
+                    if len(t) >= 4 and t.isalpha()})
+                if len(w) >= 4 and str(w).isalpha()}
+            res = mc.check_candidate_against_cemetery(
+                desc,
+                candidate_terms=_cand_tokens or None,
+                problem_terms=_cand_tokens or None)
             return {"verdict": res.get("verdict"),
                     "hard_blocks": len(res.get("hard_blocks", [])),
                     "warnings": len(res.get("warnings", [])),

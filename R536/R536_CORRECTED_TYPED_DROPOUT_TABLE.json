@@ -1,0 +1,96 @@
+{
+ "artifact": "R536_CORRECTED_TYPED_DROPOUT_TABLE/1.0",
+ "round": "R536",
+ "created_at_utc": "2026-09-25T21:10:25Z",
+ "reviewer_provenance": "AI_REVIEW",
+ "method": "READ-ONLY reclassification of the R535 harvest attempts with the corrected _ms_attempt_outcome precedence (cemetery_blocked checked before candidate_state); no new live calls; the R535 sealed artifacts are untouched",
+ "correction_note": "the R532 classifier mislabeled every cemetery hard-block as ASSEMBLY_INVALID (the block overwrites candidate_state, which the old order read first). 4 of 5 R535 ASSEMBLY_INVALID rows were in fact CEMETERY_BLOCK; only problem 3 was a genuine assembly loss",
+ "attempts": [
+  {
+   "problem_index": 4,
+   "session_id": "ts_1171ba06b036",
+   "old_typed_outcome": "ASSEMBLY_INVALID",
+   "corrected_outcome": "CEMETERY_BLOCK",
+   "raw_cemetery_blocked": true,
+   "raw_candidate_state": "NOT_A_CANDIDATE_CEMETERY_PROVEN_INVARIANT",
+   "reclassified": true
+  },
+  {
+   "problem_index": 3,
+   "session_id": "ts_4ebbcb30e3d5",
+   "old_typed_outcome": "ASSEMBLY_INVALID",
+   "corrected_outcome": "ASSEMBLY_INVALID",
+   "raw_cemetery_blocked": false,
+   "raw_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+   "reclassified": false
+  },
+  {
+   "problem_index": 7,
+   "session_id": "ts_66d6609ed48d",
+   "old_typed_outcome": "CANDIDATE_ACCEPTED",
+   "corrected_outcome": "CANDIDATE_ACCEPTED",
+   "raw_cemetery_blocked": false,
+   "raw_candidate_state": "CANDIDATE",
+   "reclassified": false
+  },
+  {
+   "problem_index": 1,
+   "session_id": "ts_67113d729c4b",
+   "old_typed_outcome": "CANDIDATE_ACCEPTED",
+   "corrected_outcome": "CANDIDATE_ACCEPTED",
+   "raw_cemetery_blocked": false,
+   "raw_candidate_state": "CANDIDATE",
+   "reclassified": false
+  },
+  {
+   "problem_index": 8,
+   "session_id": "ts_85720549911c",
+   "old_typed_outcome": "ASSEMBLY_INVALID",
+   "corrected_outcome": "CEMETERY_BLOCK",
+   "raw_cemetery_blocked": true,
+   "raw_candidate_state": "NOT_A_CANDIDATE_CEMETERY_PROVEN_INVARIANT",
+   "reclassified": true
+  },
+  {
+   "problem_index": 6,
+   "session_id": "ts_af04457de330",
+   "old_typed_outcome": "SEMANTIC_REJECT",
+   "corrected_outcome": "SEMANTIC_REJECT",
+   "raw_cemetery_blocked": false,
+   "raw_candidate_state": "CANDIDATE",
+   "reclassified": false
+  },
+  {
+   "problem_index": 5,
+   "session_id": "ts_b39b887e4af6",
+   "old_typed_outcome": "ASSEMBLY_INVALID",
+   "corrected_outcome": "CEMETERY_BLOCK",
+   "raw_cemetery_blocked": true,
+   "raw_candidate_state": "NOT_A_CANDIDATE_CEMETERY_PROVEN_INVARIANT",
+   "reclassified": true
+  },
+  {
+   "problem_index": 2,
+   "session_id": "ts_e8310eaaced8",
+   "old_typed_outcome": "ASSEMBLY_INVALID",
+   "corrected_outcome": "CEMETERY_BLOCK",
+   "raw_cemetery_blocked": true,
+   "raw_candidate_state": "NOT_A_CANDIDATE_CEMETERY_PROVEN_INVARIANT",
+   "reclassified": true
+  }
+ ],
+ "distribution_r535_as_recorded": {
+  "ASSEMBLY_INVALID": 5,
+  "CANDIDATE_ACCEPTED": 2,
+  "SEMANTIC_REJECT": 1
+ },
+ "distribution_corrected": {
+  "CEMETERY_BLOCK": 4,
+  "ASSEMBLY_INVALID": 1,
+  "CANDIDATE_ACCEPTED": 2,
+  "SEMANTIC_REJECT": 1
+ },
+ "n_reclassified": 4,
+ "reclassification_note": "the per-field values are NOT recorded in the attempt entry (only output_nonempty_fields); the corrected classifier therefore re-reads its pre-terminal branches with the recorded terminal states as authority: a recorded CEMETERY_PROVEN_INVARIANT state + cemetery_blocked=true reclassifies to CEMETERY_BLOCK (4 rows); a recorded NO_TESTABLE_PREDICTION state without a block stays ASSEMBLY_INVALID (1 row); accepted/semantic rows are unchanged. This is the audit's quantification: 4 of 5 R535 NO_CANDIDATES rows are cemetery false-positive hard-blocks, 1 is a genuine still-unexplained assembly loss.",
+ "causality_conclusion": "the R535 'UPSTREAM_CAUSALITY_NOT_YET_ESTABLISHED' single-cliff decision is CORRECTED by the corrected instrument: 4 of 5 R535 NO_CANDIDATES losses are CEMETERY_BLOCK — a PROVEN_INVARIANT hard-block on generic physics vocabulary (CE-001's domain terms like 'state/measurement/condition' matching cross-domain candidates). The genuine assembly loss is 1/8 (problem 3, NO_TESTABLE_PREDICTION, cemetery_blocked=false) and remains unexplained — it is the only case that would need the upstream RETRIEVE/FREEZE/VERIFY instrumentation. Cliff 2 (the cemetery domain-identity prerequisite) is the authorized next one-cliff fix for the 4/8 majority cause."
+}

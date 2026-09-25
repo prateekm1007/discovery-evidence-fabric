@@ -2261,8 +2261,29 @@ def _consult_cemetery(candidates: List[Dict[str, Any]]
         desc = " ".join(str(c.get(k) or "") for k in (
             "intervention", "mechanism", "predicted_effect",
             "novel_design_variable"))[:2000]
+        # R536 Cliff 2: the candidate's mechanism-graph terms are the
+        # structural domain-identity signal for the cemetery's
+        # PROVEN_INVARIANT hard-block prerequisite (a cross-domain
+        # candidate that merely shares generic physics vocabulary is
+        # never hard-blocked; same-domain graph vocabulary is).
+        _graph_terms: set = set()
+        for _node in (c.get("mechanism_graph") or {}).get("nodes", {}).values():
+            _graph_terms.update(_node.get("terms") or [])
+        # R536 Cliff 2: the candidate's own text vocabulary (the
+        # problem's words the candidate carries) also never counts
+        # as an entry territory marker — only the entry's
+        # TERRITORY-SPECIFIC physics vocabulary does.
+        _cand_terms: set = set(_graph_terms)
+        for _k in ("intervention", "mechanism",
+                   "predicted_effect", "novel_design_variable"):
+            _cand_terms.update(str(c.get(_k) or "").lower().split())
+        _cand_tokens = {w for w in _cand_terms if len(w) >= 4
+                        and w.isalpha()}
         try:
-            res = check_candidate_against_cemetery(desc)
+            res = check_candidate_against_cemetery(
+                desc,
+                candidate_terms=_cand_tokens or None,
+                problem_terms=_cand_tokens or None)
         except Exception as exc:  # noqa: BLE001 — honest state (Art. XXV)
             record["state"] = "CEMETERY_CONSULTATION_UNAVAILABLE"
             record["error"] = f"{type(exc).__name__}: {exc}"[:200]

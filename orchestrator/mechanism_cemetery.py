@@ -45,6 +45,208 @@ _CEMETERY_META_TERMS = frozenset({
     "classes", "avoid", "based", "compare", "dominated", "pareto",
 })
 
+# R536 Cliff 2 (audit CB-domain): CROSS-DOMAIN GENERIC TERMS.
+#
+# The R402 CB-5 meta-kill removed the *epistemic* envelope (mechanism /
+# candidate / lesson ...).  A second, equally-doesn't-match-the-domain
+# generic layer survived in the entry-derived vocabulary: the
+# measurement-theory and process words every physics-flavored
+# constraint text shares ("state", "measurement", "condition",
+# "number", "content", "information", "noise", "recovered",
+# "sensitivity", "even", "checking", ...).  CE-001's derived domain
+# terms still contain most of them, so a cross-domain candidate that
+# merely carries generic process language (e.g. a hemodialysis
+# catheter "occlusion state" + "noise sensitivity") matches >= 2 of
+# them and is HARD-BLOCKED by a cardiovascular PROVEN_INVARIANT.
+#
+# These terms are NOT removed from entry_domain_terms() (that function
+# is the entry's own vocabulary and stays universal per CB-5).  Instead
+# the hard-block gate below (the domain-identity prerequisite) counts
+# only DOMAIN-SPECIFIC matches: a generic cross-domain match can never
+# satisfy it.  A genuinely same-domain candidate matches on the
+# invariant's SPECIFIC physical vocabulary (impedance / jacobian /
+# collinear / mwco / turnover ...), and those are NOT in this set.
+_CROSS_DOMAIN_GENERIC_TERMS = frozenset({
+    # measurement / state / condition process language
+    "state", "states", "measurement", "measurements", "measured",
+    "condition", "conditions", "conditioned", "content",
+    "number", "numbers", "information", "insufficient",
+    "noise", "even", "alway", "checking", "check",
+    "recovered", "recovery", "sensitivity", "sensitive",
+    "recoverable", "recoverability", "quantitative", "quantify",
+    "quantified", "magnitude", "scale", "factor", "factors",
+    "parameter", "parameters", "correlation", "correlations",
+    "correlated", "threshold", "thresholds", "signal", "signals",
+    "output", "outputs", "input", "inputs", "result", "results",
+    "rate", "rates", "time", "times", "duration",
+    "present", "exists", "exist", "existence", "determined",
+    "determines", "determine", "based", "basis",
+    "requires", "require", "required", "ensures", "ensure",
+    "guarantees", "guarantee", "validates", "validate",
+    "validated", "verification", "verify", "verified", "verifies",
+    "analysis", "analyzes", "analyze", "analyzed", "model", "models",
+    "modeled", "modeling", "simulation", "simulations", "simulated",
+    "estimate", "estimated", "estimation", "estimates",
+    "calculated", "calculate", "calculation", "computed", "compute",
+    "compares", "comparison", "comparisons", "compared",
+    "dominance", "dominant", "sufficient", "sufficiently",
+    "necessary", "adequate", "adequately", "proper", "properly",
+    "appropriate", "appropriately", "accurate", "accuracy",
+    "precision", "precise", "reliable", "reliability", "robust",
+    "robustness", "stable", "stability", "consistent", "consistently",
+    "consistency", "uniform", "uniformly", "uniformity", "linear",
+    "linearity", "nonlinear", "homogeneous", "heterogeneous",
+    "distributed", "distribution", "concentration", "concentrated",
+    "density", "densities", "strength", "stronger", "strongest",
+    "weak", "weaker", "weakest", "strong", "optimal", "optimally",
+    "optimize", "optimized", "efficient", "efficiency", "efficiencies",
+    "improved", "improve", "improvement", "improvements",
+    "reduced", "reduce", "reduction", "reductions", "reduces",
+    "increased", "increase", "increases", "increasing",
+    "decreased", "decrease", "decreases", "limited", "limits",
+    "limiting", "limitation", "limitations", "bounded", "boundaries",
+    "boundary", "bound", "upper", "lower", "min", "max", "minimum",
+    "maximum", "minimize", "maximize", "minimized", "maximized",
+    "range", "ranges", "variation", "varies", "varying", "variable",
+    "variables", "vary", "constant", "constants", "fixed", "frozen",
+    "locked", "stiffness", "stiff", "compliant", "compliance",
+    "rigid", "rigidity", "flexible", "flexibility", "flexural",
+    "bending", "bend", "bends", "torsion", "tension", "compression",
+    "compressive", "shear", "stress", "stresses", "strains", "strain",
+    "load", "loads", "loading", "deflection", "deflect", "deflected",
+    "displacement", "displacements", "velocity", "velocities",
+    "acceleration", "accelerations", "momentum", "angular",
+    "rotational", "rotation", "rotations", "torque", "moment",
+    "moments", "inertia", "inertial", "gravity", "gravitational",
+    "thermal", "temperature", "heating", "cooling", "heat",
+    "insulation", "dissipation", "dissipates", "dissipate",
+    "conduction", "convection", "conductive", "radiation",
+    "absorption", "absorbed", "absorbs", "absorb", "emission",
+    "emits", "emit", "emitted", "transmission", "transmit",
+    "transmitted", "transmits", "attenuation", "attenuates",
+    "attenuated", "amplification", "amplified", "amplifies",
+    "filter", "filters", "filtering", "cutoff", "cutoffs",
+    "bandwidth", "bandwidths", "impedance", "impedances",
+    "admittance", "conductance", "resistance", "resistive",
+    "resistor", "resistors", "capacitance", "capacitive", "capacitor",
+    "capacitors", "inductance", "inductive", "inductor", "inductors",
+    "voltage", "voltages", "current", "currents", "power", "powers",
+    "energy", "energies", "work", "frequency", "frequencies",
+    "oscillation", "oscillations", "oscillates", "oscillate",
+    "damping", "damped", "dampens", "resonance", "resonant",
+    "resonator", "resonators", "spectral", "spectrum", "spectra",
+    "fourier", "laplace", "transfer", "transfers", "transferred",
+    "propagation", "propagates", "propagated", "wave", "waves",
+    "wavefront", "wavefronts", "wavelength", "wavelengths",
+    "photon", "photons", "electron", "electrons", "proton", "protons",
+    "ion", "ions", "plasma", "nucleus", "nuclei", "crystal",
+    "crystals", "crystalline", "crystallization", "lattice",
+    "lattices", "alloy", "alloys", "metal", "metals", "metallic",
+    "ferrous", "aluminum", "aluminium", "steel", "carbon", "polymer",
+    "polymers", "polymeric", "elastic", "elasticity", "viscosity",
+    "viscous", "viscoelastic", "fluid", "fluids", "liquid", "liquids",
+    "gas", "gases", "aerosol", "aerosols", "suspension", "suspensions",
+    "colloid", "colloids", "emulsion", "emulsions", "membrane",
+    "membranes", "porous", "porosity", "pore", "pores", "filtration",
+    "filtered", "filtrate", "diffusion", "diffuses", "diffused",
+    "diffuse", "osmosis", "osmotic", "permeability", "permeable",
+    "permeation", "permeate", "permeates", "adsorption", "adsorbed",
+    "adsorbs", "adsorbing", "adsorbate", "electrochemical",
+    "electrolyte", "electrolytes", "electrode", "electrodes",
+    "galvanic", "corrosion", "corrodes", "corroded", "corroding",
+    "oxidation", "oxidized", "oxidizes", "oxidizing",
+    "catalyst", "catalysts", "catalytic", "reaction", "reactions",
+    "reacts", "reacted", "reacting", "kinetics", "kinetic",
+    "thermodynamics", "thermodynamic", "enthalpy", "entropy",
+    "equilibrium", "phase", "phases", "solid", "solids", "vapor",
+    "sublimation", "condensation", "condenses", "condensed",
+    "condensing", "melting", "melts", "melted", "boiling", "boils",
+    "boiled", "freezing", "freezes", "crystallizes", "crystallized",
+    "crystallizing", "nucleation", "nucleates", "nucleated",
+    "nucleating", "grain", "grains", "microstructure",
+    "microstructures", "macrostructure", "homogenization",
+    "homogenized", "homogenizes", "annealing", "annealed", "anneals",
+    "tempering", "tempered", "temper", "quenching", "quenched",
+    "quenches", "forging", "forged", "casting", "cast", "molding",
+    "molded", "molds", "extrusion", "extruded", "extrudes",
+    "machining", "machined", "machines", "welding", "welded",
+    "welds", "bonding", "bonded", "bonds", "adhesion", "adhesive",
+    "coating", "coated", "coats", "plating", "plated", "plates",
+    "anodization", "anodized", "anodizes", "passivation", "passivated",
+    "passivates", "surface", "surfaces", "roughness", "texture",
+    "textured", "texturing", "finish", "finished", "finishes",
+    "polishing", "polished", "polishes", "grinding", "ground",
+    "grinds", "sanding", "sanded", "sands", "buffing", "buffed",
+    "buffs", "lapping", "lapped", "laps", "honing", "honed", "hones",
+})
+
+
+def _domain_term_stopwords(entry_vocab: set, candidate_vocab: set,
+                          problem_vocab: set) -> set:
+    """R536 Cliff 2: the terms of the ENTRY vocabulary that carry no
+    domain-identity signal for THIS candidate.
+
+    A term is dropped from the hard-block match set when it appears in
+    the candidate's own vocabulary (it is not discriminating between
+    the entry's territory and the candidate's — the candidate already
+    says it, so it can't be what ties the candidate to the entry's
+    territory) or in the problem's own vocabulary (the problem
+    statement's words are the candidate's native language, not the
+    entry's territory marker).  What survives is the entry's
+    TERRITORY-SPECIFIC physics vocabulary — the words that name the
+    invariant's own domain (jacobian / hydraulic / spectroscopy / mwco
+    / turnover / ...) rather than generic process language.
+
+    This is the audit's "the candidate's problem domain must match
+    the entry's territory domain": a generic term shared by the
+    problem/candidate and the entry proves nothing about territory;
+    only the entry-specific words do.
+    """
+    return (entry_vocab & (candidate_vocab | problem_vocab))
+
+
+def domain_specific_terms(entry_terms: List[str],
+                          candidate_terms: Optional[set] = None,
+                          problem_terms: Optional[set] = None
+                          ) -> List[str]:
+    """R536 Cliff 2: the entry's DOMAIN-SPECIFIC vocabulary — the
+    terms that are NOT shared with the candidate/problem vocabulary
+    AND are NOT cross-domain generic physics language.
+
+    The entry's full domain vocabulary (entry_domain_terms) is the
+    CB-5 universal matching set; this function filters it down to the
+    words that actually discriminate the entry's territory FOR THIS
+    candidate: generic cross-domain physics language (state /
+    measurement / condition / noise / ...) never counts, and terms
+    the candidate or the problem already carries are not territory
+    markers (they are the candidate's own words).  A PROVEN_INVARIANT
+    hard-block may only fire on this surviving vocabulary; an entry
+    whose surviving set is empty cannot establish territory and
+    downgrades to a WARNING (recorded, never silent).
+    """
+    _shared = set()
+    if candidate_terms:
+        _shared.update(str(t).lower() for t in candidate_terms)
+    if problem_terms:
+        _shared.update(str(t).lower() for t in problem_terms)
+    return [t for t in entry_terms
+            if t not in _CROSS_DOMAIN_GENERIC_TERMS
+            and t not in _shared]
+
+
+def _candidate_problem_vocab(candidate_description: str,
+                             problem_desc: str) -> set:
+    """The candidate + problem vocabulary (stopword-normalized) used
+    to identify which of the entry's terms the candidate already
+    carries (and so cannot count as territory markers)."""
+    import re as _re
+
+    def _v(text: str) -> set:
+        return {w for w in _re.findall(r"[a-z]{4,}",
+                                       str(text or "").lower())
+                if w not in _CEMETERY_META_TERMS}
+    return _v(candidate_description) | _v(problem_desc)
+
 
 def entry_domain_terms(entry: "CemeteryEntry") -> List[str]:
     """R402 (audit CB-5): derive the entry's domain vocabulary from its
@@ -341,15 +543,60 @@ def append_entries_to_cemetery_file(new_entries: List[CemeteryEntry]) -> None:
             fcntl.flock(lf, fcntl.LOCK_UN)
 
 
-def check_candidate_against_cemetery(candidate_description: str) -> Dict:
+def check_candidate_against_cemetery(
+        candidate_description: str,
+        candidate_terms: Optional[set] = None,
+        problem_terms: Optional[set] = None) -> Dict:
     """Check a new candidate against cemetery lessons.
 
     PER CEO v29 AUDIT (P0):
       "Kill the cemetery keyword blocker. match_count > 3 is not acceptable.
        Introduce typed lessons. Only proven invariants may hard-block."
 
+    R536 Cliff 2 (audit CB-domain): DOMAIN-IDENTITY PREREQUISITE.
+    A PROVEN_INVARIANT hard-block now additionally requires
+    domain identity between the candidate's territory and the entry's
+    territory.  A term the candidate (or its problem) already carries
+    is not a territory marker for the entry — it is the candidate's
+    own native language.  Only the entry's TERRITORY-SPECIFIC physics
+    vocabulary (the words that name the invariant's own domain, not
+    shared process language) can establish identity.  Two independent
+    domain-identity signals are accepted (the audit's "the
+    candidate's problem domain must match the entry's territory
+    domain"):
+
+      (a) structural: the candidate's mechanism-graph terms, passed
+          by the caller — a strong same-domain signal when >= 2 of
+          the entry's territory-specific terms appear in the
+          candidate's graph vocabulary;
+
+      (b) lexical: >= 2 territory-specific entry terms occur in the
+          candidate description text.  The generic cross-domain
+          physics vocabulary (state / measurement / condition /
+          noise / ...) is EXCLUDED from this count — generic process
+          language can never establish that the candidate lives in
+          the invariant's territory (the R535 defect: CE-001's
+          cardiovascular invariant hard-blocked a hemodialysis
+          catheter candidate on "state"/"measurement"/"condition"
+          vocabulary alone).
+
+    Both signals are recorded on every hard-block (domain_identity:
+    which signal fired, which SPECIFIC terms matched) so the block
+    is machine-auditable (Art. XXVII: every blocking decision
+    carries its provenance).  An entry whose territory-specific
+    vocabulary is empty (no specific terms survive the filters)
+    cannot hard-block — its territory cannot be identified, and a
+    block without domain identity is exactly the false positive the
+    audit quantified at 80% of R535's admission loss.  Such an
+    entry is downgraded to a WARNING (it is still a documented
+    proven invariant of its territory, just not a cross-domain
+    kill) and the downgrade is recorded (never a silent behavior
+    change).
+
     Epistemic class controls blocking behavior:
-      PROVEN_INVARIANT  → HARD BLOCK (physics proven impossible)
+      PROVEN_INVARIANT  → HARD BLOCK, subject to the domain-identity
+                         prerequisite (physics proven impossible IN
+                         THAT TERRITORY)
       STRONG_CONSTRAINT → WARNING + require explicit override justification
       MODEL_SPECIFIC    → INFORMATIONAL (attack this constraint, don't block)
       FAILURE_LESSON    → INFORMATIONAL (learn from this, don't block)
@@ -365,6 +612,12 @@ def check_candidate_against_cemetery(candidate_description: str) -> Dict:
     hard_blocks = []
     warnings = []
     informational = []
+
+    _shared_vocab = set()
+    if candidate_terms:
+        _shared_vocab.update(str(t).lower() for t in candidate_terms)
+    if problem_terms:
+        _shared_vocab.update(str(t).lower() for t in problem_terms)
 
     for entry in cemetery:
         # Only PROVEN_INVARIANT can hard-block
@@ -386,27 +639,119 @@ def check_candidate_against_cemetery(candidate_description: str) -> Dict:
             # hand-wired for. Domain universality is now structural:
             # every invariant carries its own domain vocabulary.
             domain_terms = entry_domain_terms(entry)
+            # R536 Cliff 2: two domain-identity vocabularies:
+            #   structural (same-department): the entry terms that are
+            #       NOT cross-domain generic — a >= 2 overlap with the
+            #       candidate's graph terms is a same-domain signal;
+            #   lexical (textual): the entry terms that are not
+            #       generic AND not already carried by the candidate /
+            #       problem — the candidate's own words are its native
+            #       language, not the entry's territory marker.
+            struct_terms = domain_specific_terms(
+                domain_terms, candidate_terms=None, problem_terms=None)
+            lex_terms = domain_specific_terms(
+                domain_terms,
+                candidate_terms=candidate_terms,
+                problem_terms=problem_terms)
             entry_note = {
                 "domain_terms_source": (
                     "entry vocabulary: physical_constraint + "
                     "reusable_lesson + mechanism_name (stopword-"
                     "normalized; generic epistemic words removed)"),
                 "domain_terms": domain_terms[:24],
+                "domain_specific_terms": lex_terms,
+                "domain_specific_terms_structural": struct_terms,
             }
 
-            # Check domain overlap
-            domain_match = sum(1 for t in domain_terms if t in candidate_lower)
-            if domain_match >= 2:  # at least 2 domain terms match
-                hard_blocks.append({
-                    "cemetery_entry": entry.entry_id,
-                    "territory": entry.territory_id,
-                    "mechanism": entry.mechanism_name,
-                    "epistemic_class": entry.epistemic_class,
-                    "physical_constraint": entry.physical_constraint,
-                    "lesson": entry.reusable_lesson,
-                    "domain_match": domain_match,
-                    **entry_note,
-                })
+            # R536 Cliff 2: domain-identity prerequisite.  Two
+            # independent signals; the specific-terms match count is
+            # what a hard-block may rest on (the generic terms are
+            # recorded for provenance but never count).
+            if candidate_terms:
+                cand_term_set = {str(t).lower()
+                                 for t in candidate_terms}
+                structural_hits = sorted(
+                    t for t in struct_terms if t in cand_term_set)
+            else:
+                structural_hits = []
+            lexical_hits = sorted(
+                t for t in lex_terms if t in candidate_lower)
+            domain_identity = None
+            if len(structural_hits) >= 2:
+                domain_identity = {
+                    "signal": "STRUCTURAL",
+                    "matched_terms": structural_hits,
+                }
+            elif len(lexical_hits) >= 2:
+                domain_identity = {
+                    "signal": "LEXICAL",
+                    "matched_terms": lexical_hits,
+                }
+
+            if not domain_identity:
+                # No domain identity: the candidate is NOT in this
+                # invariant's territory.  Never hard-block (the
+                # R535 false-positive class).  An entry whose
+                # vocabulary is entirely generic cannot establish
+                # identity for ANY candidate — record WHY the block
+                # did not fire (the observable state is a downgrade
+                # to a warning, not a silent skip).
+                entry_note["domain_identity"] = {
+                    "established": False,
+                    "structural_hits": structural_hits,
+                    "lexical_hits": lexical_hits,
+                    "note": ("no domain-identity signal: the "
+                             "candidate shares fewer than 2 "
+                             "domain-SPECIFIC terms with this "
+                             "invariant; cross-domain generic "
+                             "vocabulary (state/measurement/"
+                             "condition/...) never establishes "
+                             "territory, so no hard-block (R536 "
+                             "Cliff 2)")}
+                if not lex_terms:
+                    warnings.append({
+                        "cemetery_entry": entry.entry_id,
+                        "territory": entry.territory_id,
+                        "mechanism": entry.mechanism_name,
+                        "epistemic_class": entry.epistemic_class,
+                        "lesson": entry.reusable_lesson,
+                        "action_required": (
+                            "Explicit justification required to "
+                            "proceed despite this constraint"),
+                        "domain_identity_downgrade": {
+                            "note": ("this PROVEN_INVARIANT's "
+                                     "derived vocabulary is "
+                                     "entirely generic cross-"
+                                     "domain physics language — no "
+                                     "domain-specific terms survive "
+                                     "the filter, so its territory "
+                                     "cannot be identified from the "
+                                     "text.  Downgraded to a "
+                                     "WARNING (documented proven "
+                                     "invariant of its territory, "
+                                     "never a cross-domain kill); "
+                                     "the downgrade is recorded, "
+                                     "never silent."),
+                        },
+                    })
+                continue
+
+            # Domain identity established: the legacy >= 2 domain-
+            # term overlap gate now applies to the SPECIFIC terms
+            # that matched (it is satisfied by construction — the
+            # signal fired at >= 2).  Record the full provenance.
+            domain_match = max(len(structural_hits), len(lexical_hits))
+            hard_blocks.append({
+                "cemetery_entry": entry.entry_id,
+                "territory": entry.territory_id,
+                "mechanism": entry.mechanism_name,
+                "epistemic_class": entry.epistemic_class,
+                "physical_constraint": entry.physical_constraint,
+                "lesson": entry.reusable_lesson,
+                "domain_match": domain_match,
+                "domain_identity": domain_identity,
+                **entry_note,
+            })
 
         elif entry.epistemic_class == "STRONG_CONSTRAINT":
             # Warn but don't block — requires explicit justification

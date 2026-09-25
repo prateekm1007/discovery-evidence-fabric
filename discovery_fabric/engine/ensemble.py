@@ -142,7 +142,16 @@ def ensemble_synthesize(problem: Dict[str, Any],
 
 def synthesis_prompt(problem: Dict[str, Any],
                      evidence: List[Dict[str, Any]]) -> str:
-    """The frozen A2 synthesis prompt (same protocol, one path per model)."""
+    """The frozen A2 synthesis prompt (same protocol, one path per
+    model).
+
+    R536 Cliff 2 (audit): the template carries the R469 mechanical
+    span-citation rule block ({span_instruction}); this path must
+    pass it or .format() raises KeyError and the whole ensemble
+    stage crashes. Pass the module-level SPAN_INSTRUCTION exactly as
+    the main synthesis path does (a2/synthesize.py) — the ensemble
+    protocol gains the same evidence-span citation contract, no
+    behavior relaxation."""
     import importlib
     a2syn = importlib.import_module("discovery_fabric.a2.synthesize")
     paper = evidence[0] if evidence else {}
@@ -151,7 +160,8 @@ def synthesis_prompt(problem: Dict[str, Any],
         failure=problem.get("failure", ""),
         constraint=problem.get("constraint", ""),
         title=paper.get("title", ""),
-        abstract=(paper.get("abstract") or "")[:1200])
+        abstract=(paper.get("abstract") or "")[:1200],
+        span_instruction=a2syn.SPAN_INSTRUCTION)
 
 
 def _run_paths(problem: Dict[str, Any], evidence: List[Dict[str, Any]],

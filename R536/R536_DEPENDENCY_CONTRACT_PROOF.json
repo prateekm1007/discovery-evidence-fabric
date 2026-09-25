@@ -1,0 +1,1278 @@
+{
+ "artifact": "R536_DEPENDENCY_CONTRACT_PROOF/1.0",
+ "round": "R536",
+ "created_at_utc": "2026-09-25T22:37:50Z",
+ "reviewer_provenance": "AI_REVIEW",
+ "constitution_ref": "Art. X (one authority, two vocabulary namespaces never mixed), Art. XXV (UNKNOWN is first-class, never fabricated success), Art. LXXXIV (starvation-skip is correct), Art. LXXVII (a mid-chain failure never yields a discovery credit)",
+ "method": "the REAL EngineRun conductor was driven for every (dependency, case) pair; the consumer behavior was read from the durable stage_log, never inferred",
+ "dependency_cases": {
+  "RETRIEVE": {
+   "ok": {
+    "dependency_stage": "RETRIEVE",
+    "case": "ok",
+    "dependency_observed_status": "FAILED_EXPLICIT",
+    "dependency_reached": true,
+    "consumers": {
+     "FREEZE": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "RETRIEVE"
+      ]
+     },
+     "SYNTHESIZE": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "RETRIEVE"
+      ]
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "RETRIEVE",
+       "SYNTHESIZE"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "admission": {
+    "dependency_stage": "RETRIEVE",
+    "case": "admission",
+    "dependency_observed_status": "OK",
+    "dependency_reached": false,
+    "consumers": {
+     "FREEZE": {
+      "behavior": "EXECUTE",
+      "declared_depends_on": [
+       "RETRIEVE"
+      ]
+     },
+     "SYNTHESIZE": {
+      "behavior": "TERMINATE_NON_DISCOVERY",
+      "declared_depends_on": [
+       "RETRIEVE"
+      ]
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "RETRIEVE",
+       "SYNTHESIZE"
+      ]
+     }
+    },
+    "run_terminal_state": "MECHANISM_GENERATION_FAILED",
+    "terminal_is_non_discovery": true
+   },
+   "failed": {
+    "dependency_stage": "RETRIEVE",
+    "case": "failed",
+    "dependency_observed_status": "FAILED_EXPLICIT",
+    "dependency_reached": true,
+    "consumers": {
+     "FREEZE": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "RETRIEVE"
+      ]
+     },
+     "SYNTHESIZE": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "RETRIEVE"
+      ]
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "RETRIEVE",
+       "SYNTHESIZE"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "absent_unknown": {
+    "dependency_stage": "RETRIEVE",
+    "case": "absent_unknown",
+    "dependency_observed_status": "OK",
+    "dependency_reached": false,
+    "consumers": {
+     "FREEZE": {
+      "behavior": "EXECUTE",
+      "declared_depends_on": [
+       "RETRIEVE"
+      ]
+     },
+     "SYNTHESIZE": {
+      "behavior": "TERMINATE_NON_DISCOVERY",
+      "declared_depends_on": [
+       "RETRIEVE"
+      ]
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "RETRIEVE",
+       "SYNTHESIZE"
+      ]
+     }
+    },
+    "run_terminal_state": "MECHANISM_GENERATION_FAILED",
+    "terminal_is_non_discovery": true
+   }
+  },
+  "SYNTHESIZE": {
+   "ok": {
+    "dependency_stage": "SYNTHESIZE",
+    "case": "ok",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "VERIFY": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE"
+      ]
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "RETRIEVE",
+       "SYNTHESIZE"
+      ]
+     },
+     "COLLISION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE"
+      ]
+     },
+     "PHYSICS": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE"
+      ]
+     },
+     "ATTACK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE",
+       "VERIFY",
+       "COLLISION"
+      ]
+     },
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "SYNTHESIZE"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "admission": {
+    "dependency_stage": "SYNTHESIZE",
+    "case": "admission",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "VERIFY": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE"
+      ]
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "RETRIEVE",
+       "SYNTHESIZE"
+      ]
+     },
+     "COLLISION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE"
+      ]
+     },
+     "PHYSICS": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE"
+      ]
+     },
+     "ATTACK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE",
+       "VERIFY",
+       "COLLISION"
+      ]
+     },
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "SYNTHESIZE"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "failed": {
+    "dependency_stage": "SYNTHESIZE",
+    "case": "failed",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "VERIFY": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE"
+      ]
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "RETRIEVE",
+       "SYNTHESIZE"
+      ]
+     },
+     "COLLISION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE"
+      ]
+     },
+     "PHYSICS": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE"
+      ]
+     },
+     "ATTACK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE",
+       "VERIFY",
+       "COLLISION"
+      ]
+     },
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "SYNTHESIZE"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "absent_unknown": {
+    "dependency_stage": "SYNTHESIZE",
+    "case": "absent_unknown",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "VERIFY": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE"
+      ]
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "RETRIEVE",
+       "SYNTHESIZE"
+      ]
+     },
+     "COLLISION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE"
+      ]
+     },
+     "PHYSICS": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE"
+      ]
+     },
+     "ATTACK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE",
+       "VERIFY",
+       "COLLISION"
+      ]
+     },
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "SYNTHESIZE"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   }
+  },
+  "VERIFY": {
+   "ok": {
+    "dependency_stage": "VERIFY",
+    "case": "ok",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE",
+       "VERIFY",
+       "COLLISION"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "admission": {
+    "dependency_stage": "VERIFY",
+    "case": "admission",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE",
+       "VERIFY",
+       "COLLISION"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "failed": {
+    "dependency_stage": "VERIFY",
+    "case": "failed",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE",
+       "VERIFY",
+       "COLLISION"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "absent_unknown": {
+    "dependency_stage": "VERIFY",
+    "case": "absent_unknown",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE",
+       "VERIFY",
+       "COLLISION"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   }
+  },
+  "COLLISION": {
+   "ok": {
+    "dependency_stage": "COLLISION",
+    "case": "ok",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE",
+       "VERIFY",
+       "COLLISION"
+      ]
+     },
+     "CONTRADICTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ATTACK",
+       "COLLISION"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "admission": {
+    "dependency_stage": "COLLISION",
+    "case": "admission",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE",
+       "VERIFY",
+       "COLLISION"
+      ]
+     },
+     "CONTRADICTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ATTACK",
+       "COLLISION"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "failed": {
+    "dependency_stage": "COLLISION",
+    "case": "failed",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE",
+       "VERIFY",
+       "COLLISION"
+      ]
+     },
+     "CONTRADICTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ATTACK",
+       "COLLISION"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "absent_unknown": {
+    "dependency_stage": "COLLISION",
+    "case": "absent_unknown",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "SYNTHESIZE",
+       "VERIFY",
+       "COLLISION"
+      ]
+     },
+     "CONTRADICTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ATTACK",
+       "COLLISION"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   }
+  },
+  "ATTACK": {
+   "ok": {
+    "dependency_stage": "ATTACK",
+    "case": "ok",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "CONTRADICTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ATTACK",
+       "COLLISION"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "admission": {
+    "dependency_stage": "ATTACK",
+    "case": "admission",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "CONTRADICTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ATTACK",
+       "COLLISION"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "failed": {
+    "dependency_stage": "ATTACK",
+    "case": "failed",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "CONTRADICTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ATTACK",
+       "COLLISION"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "absent_unknown": {
+    "dependency_stage": "ATTACK",
+    "case": "absent_unknown",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "CONTRADICTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ATTACK",
+       "COLLISION"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   }
+  },
+  "CONTRADICTION": {
+   "ok": {
+    "dependency_stage": "CONTRADICTION",
+    "case": "ok",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "SYNTHESIZE"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "KILLER_EXPERIMENT",
+       "ADJUDICATION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "admission": {
+    "dependency_stage": "CONTRADICTION",
+    "case": "admission",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "SYNTHESIZE"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "KILLER_EXPERIMENT",
+       "ADJUDICATION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "failed": {
+    "dependency_stage": "CONTRADICTION",
+    "case": "failed",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "SYNTHESIZE"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "KILLER_EXPERIMENT",
+       "ADJUDICATION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "absent_unknown": {
+    "dependency_stage": "CONTRADICTION",
+    "case": "absent_unknown",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "SYNTHESIZE"
+      ]
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "VERIFY",
+       "ATTACK",
+       "CONTRADICTION",
+       "COLLISION"
+      ]
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "KILLER_EXPERIMENT",
+       "ADJUDICATION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   }
+  },
+  "KILLER_EXPERIMENT": {
+   "ok": {
+    "dependency_stage": "KILLER_EXPERIMENT",
+    "case": "ok",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "KILLER_EXPERIMENT",
+       "ADJUDICATION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "admission": {
+    "dependency_stage": "KILLER_EXPERIMENT",
+    "case": "admission",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "KILLER_EXPERIMENT",
+       "ADJUDICATION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "failed": {
+    "dependency_stage": "KILLER_EXPERIMENT",
+    "case": "failed",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "KILLER_EXPERIMENT",
+       "ADJUDICATION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "absent_unknown": {
+    "dependency_stage": "KILLER_EXPERIMENT",
+    "case": "absent_unknown",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "KILLER_EXPERIMENT",
+       "ADJUDICATION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   }
+  },
+  "ADJUDICATION": {
+   "ok": {
+    "dependency_stage": "ADJUDICATION",
+    "case": "ok",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "CLASSIFY": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ADJUDICATION"
+      ]
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "KILLER_EXPERIMENT",
+       "ADJUDICATION"
+      ]
+     },
+     "RANK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ADJUDICATION",
+       "NEXT_BEST_ACTION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "admission": {
+    "dependency_stage": "ADJUDICATION",
+    "case": "admission",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "CLASSIFY": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ADJUDICATION"
+      ]
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "KILLER_EXPERIMENT",
+       "ADJUDICATION"
+      ]
+     },
+     "RANK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ADJUDICATION",
+       "NEXT_BEST_ACTION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "failed": {
+    "dependency_stage": "ADJUDICATION",
+    "case": "failed",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "CLASSIFY": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ADJUDICATION"
+      ]
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "KILLER_EXPERIMENT",
+       "ADJUDICATION"
+      ]
+     },
+     "RANK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ADJUDICATION",
+       "NEXT_BEST_ACTION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "absent_unknown": {
+    "dependency_stage": "ADJUDICATION",
+    "case": "absent_unknown",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "CLASSIFY": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ADJUDICATION"
+      ]
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "CONTRADICTION",
+       "KILLER_EXPERIMENT",
+       "ADJUDICATION"
+      ]
+     },
+     "RANK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ADJUDICATION",
+       "NEXT_BEST_ACTION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   }
+  },
+  "NEXT_BEST_ACTION": {
+   "ok": {
+    "dependency_stage": "NEXT_BEST_ACTION",
+    "case": "ok",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "RANK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ADJUDICATION",
+       "NEXT_BEST_ACTION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "admission": {
+    "dependency_stage": "NEXT_BEST_ACTION",
+    "case": "admission",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "RANK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ADJUDICATION",
+       "NEXT_BEST_ACTION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "failed": {
+    "dependency_stage": "NEXT_BEST_ACTION",
+    "case": "failed",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "RANK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ADJUDICATION",
+       "NEXT_BEST_ACTION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   },
+   "absent_unknown": {
+    "dependency_stage": "NEXT_BEST_ACTION",
+    "case": "absent_unknown",
+    "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+    "dependency_reached": false,
+    "consumers": {
+     "RANK": {
+      "behavior": "SKIP",
+      "declared_depends_on": [
+       "ADJUDICATION",
+       "NEXT_BEST_ACTION"
+      ]
+     }
+    },
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true
+   }
+  }
+ },
+ "two_authority_divergence": {
+  "declared_depends_on": {
+   "RETRIEVE": [],
+   "FREEZE": [
+    "RETRIEVE"
+   ],
+   "PREMISE_GATE": [],
+   "SYNTHESIZE": [
+    "RETRIEVE"
+   ],
+   "VERIFY": [
+    "SYNTHESIZE"
+   ],
+   "MECHANISM_SPACE": [
+    "RETRIEVE",
+    "SYNTHESIZE"
+   ],
+   "COLLISION": [
+    "SYNTHESIZE"
+   ],
+   "PHYSICS": [
+    "SYNTHESIZE"
+   ],
+   "ATTACK": [
+    "SYNTHESIZE",
+    "VERIFY",
+    "COLLISION"
+   ],
+   "CONTRADICTION": [
+    "ATTACK",
+    "COLLISION"
+   ],
+   "KILLER_EXPERIMENT": [
+    "CONTRADICTION",
+    "SYNTHESIZE"
+   ],
+   "ADJUDICATION": [
+    "VERIFY",
+    "ATTACK",
+    "CONTRADICTION",
+    "COLLISION"
+   ],
+   "CLASSIFY": [
+    "ADJUDICATION"
+   ],
+   "NEXT_BEST_ACTION": [
+    "CONTRADICTION",
+    "KILLER_EXPERIMENT",
+    "ADJUDICATION"
+   ],
+   "RANK": [
+    "ADJUDICATION",
+    "NEXT_BEST_ACTION"
+   ]
+  },
+  "runtime_downstream_blockers": {
+   "PREMISE_GATE": [
+    "ADJUDICATION",
+    "ATTACK",
+    "CLASSIFY",
+    "COLLISION",
+    "CONTRADICTION",
+    "KILLER_EXPERIMENT",
+    "MECHANISM_SPACE",
+    "NEXT_BEST_ACTION",
+    "PHYSICS",
+    "RANK",
+    "SYNTHESIZE",
+    "VERIFY"
+   ],
+   "SYNTHESIZE": [
+    "ADJUDICATION",
+    "ATTACK",
+    "CLASSIFY",
+    "COLLISION",
+    "CONTRADICTION",
+    "KILLER_EXPERIMENT",
+    "MECHANISM_SPACE",
+    "NEXT_BEST_ACTION",
+    "PHYSICS",
+    "RANK",
+    "VERIFY"
+   ],
+   "RETRIEVE": [
+    "FREEZE",
+    "MECHANISM_SPACE",
+    "SYNTHESIZE",
+    "VERIFY"
+   ]
+  },
+  "fatal_stages": [
+   "PREMISE_GATE",
+   "SYNTHESIZE"
+  ],
+  "divergences": {
+   "VERIFY": {
+    "declared_dependents": [
+     "ATTACK",
+     "ADJUDICATION"
+    ],
+    "runtime_cascade_blockers": [],
+    "dependents_NOT_runtime_blocked": [
+     "ATTACK",
+     "ADJUDICATION"
+    ],
+    "contract": "DECLARED_DEPENDENCY_NOT_RUNTIME_CASCADE: the static depends_on names ['ATTACK', 'ADJUDICATION'], but the conductor's DOWNSTREAM_BLOCKERS does not cascade VERIFY failure to ['ATTACK', 'ADJUDICATION'].  The consumer executes and records its OWN typed state against the (possibly empty) dependency input — a typed UNKNOWN, not a fabricated success (Art. XXV).  This is the CURRENT contract, proven by the case table above; it is documented, not refactored."
+   },
+   "COLLISION": {
+    "declared_dependents": [
+     "ATTACK",
+     "CONTRADICTION",
+     "ADJUDICATION"
+    ],
+    "runtime_cascade_blockers": [],
+    "dependents_NOT_runtime_blocked": [
+     "ATTACK",
+     "CONTRADICTION",
+     "ADJUDICATION"
+    ],
+    "contract": "DECLARED_DEPENDENCY_NOT_RUNTIME_CASCADE: the static depends_on names ['ATTACK', 'CONTRADICTION', 'ADJUDICATION'], but the conductor's DOWNSTREAM_BLOCKERS does not cascade COLLISION failure to ['ATTACK', 'CONTRADICTION', 'ADJUDICATION'].  The consumer executes and records its OWN typed state against the (possibly empty) dependency input — a typed UNKNOWN, not a fabricated success (Art. XXV).  This is the CURRENT contract, proven by the case table above; it is documented, not refactored."
+   },
+   "ATTACK": {
+    "declared_dependents": [
+     "CONTRADICTION",
+     "ADJUDICATION"
+    ],
+    "runtime_cascade_blockers": [],
+    "dependents_NOT_runtime_blocked": [
+     "CONTRADICTION",
+     "ADJUDICATION"
+    ],
+    "contract": "DECLARED_DEPENDENCY_NOT_RUNTIME_CASCADE: the static depends_on names ['CONTRADICTION', 'ADJUDICATION'], but the conductor's DOWNSTREAM_BLOCKERS does not cascade ATTACK failure to ['CONTRADICTION', 'ADJUDICATION'].  The consumer executes and records its OWN typed state against the (possibly empty) dependency input — a typed UNKNOWN, not a fabricated success (Art. XXV).  This is the CURRENT contract, proven by the case table above; it is documented, not refactored."
+   },
+   "CONTRADICTION": {
+    "declared_dependents": [
+     "KILLER_EXPERIMENT",
+     "ADJUDICATION",
+     "NEXT_BEST_ACTION"
+    ],
+    "runtime_cascade_blockers": [],
+    "dependents_NOT_runtime_blocked": [
+     "KILLER_EXPERIMENT",
+     "ADJUDICATION",
+     "NEXT_BEST_ACTION"
+    ],
+    "contract": "DECLARED_DEPENDENCY_NOT_RUNTIME_CASCADE: the static depends_on names ['KILLER_EXPERIMENT', 'ADJUDICATION', 'NEXT_BEST_ACTION'], but the conductor's DOWNSTREAM_BLOCKERS does not cascade CONTRADICTION failure to ['KILLER_EXPERIMENT', 'ADJUDICATION', 'NEXT_BEST_ACTION'].  The consumer executes and records its OWN typed state against the (possibly empty) dependency input — a typed UNKNOWN, not a fabricated success (Art. XXV).  This is the CURRENT contract, proven by the case table above; it is documented, not refactored."
+   },
+   "KILLER_EXPERIMENT": {
+    "declared_dependents": [
+     "NEXT_BEST_ACTION"
+    ],
+    "runtime_cascade_blockers": [],
+    "dependents_NOT_runtime_blocked": [
+     "NEXT_BEST_ACTION"
+    ],
+    "contract": "DECLARED_DEPENDENCY_NOT_RUNTIME_CASCADE: the static depends_on names ['NEXT_BEST_ACTION'], but the conductor's DOWNSTREAM_BLOCKERS does not cascade KILLER_EXPERIMENT failure to ['NEXT_BEST_ACTION'].  The consumer executes and records its OWN typed state against the (possibly empty) dependency input — a typed UNKNOWN, not a fabricated success (Art. XXV).  This is the CURRENT contract, proven by the case table above; it is documented, not refactored."
+   },
+   "ADJUDICATION": {
+    "declared_dependents": [
+     "CLASSIFY",
+     "NEXT_BEST_ACTION",
+     "RANK"
+    ],
+    "runtime_cascade_blockers": [],
+    "dependents_NOT_runtime_blocked": [
+     "CLASSIFY",
+     "NEXT_BEST_ACTION",
+     "RANK"
+    ],
+    "contract": "DECLARED_DEPENDENCY_NOT_RUNTIME_CASCADE: the static depends_on names ['CLASSIFY', 'NEXT_BEST_ACTION', 'RANK'], but the conductor's DOWNSTREAM_BLOCKERS does not cascade ADJUDICATION failure to ['CLASSIFY', 'NEXT_BEST_ACTION', 'RANK'].  The consumer executes and records its OWN typed state against the (possibly empty) dependency input — a typed UNKNOWN, not a fabricated success (Art. XXV).  This is the CURRENT contract, proven by the case table above; it is documented, not refactored."
+   },
+   "NEXT_BEST_ACTION": {
+    "declared_dependents": [
+     "RANK"
+    ],
+    "runtime_cascade_blockers": [],
+    "dependents_NOT_runtime_blocked": [
+     "RANK"
+    ],
+    "contract": "DECLARED_DEPENDENCY_NOT_RUNTIME_CASCADE: the static depends_on names ['RANK'], but the conductor's DOWNSTREAM_BLOCKERS does not cascade NEXT_BEST_ACTION failure to ['RANK'].  The consumer executes and records its OWN typed state against the (possibly empty) dependency input — a typed UNKNOWN, not a fabricated success (Art. XXV).  This is the CURRENT contract, proven by the case table above; it is documented, not refactored."
+   }
+  },
+  "note": "R536 §3: the static declaration and the runtime cascade are TWO authorities.  Where they diverge, the divergence is DOCUMENTED (not a defect to silently fix) — the consumer's typed state against a skipped dependency is the operative contract.  No refactor is performed in R536; the proof + disclosure is the deliverable."
+ },
+ "contract_violations_found": [],
+ "all_consumers_obey_contract": true
+}
