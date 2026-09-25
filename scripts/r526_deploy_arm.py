@@ -129,6 +129,13 @@ def main() -> int:
                     help="recorded description of the intervention (the "
                          "one named change); defaults to the "
                          "measurement-instrument text")
+    # R533 audit §7: round-parameterized so the next round cannot
+    # inherit R526's identity. The record's `round` field reflects
+    # the round that drove THIS deploy, not the round the deploy
+    # machinery was written for.
+    ap.add_argument("--round", required=True,
+                    help="the driving round id (e.g. R532); recorded "
+                         "verbatim in the deploy record's `round` field")
     args = ap.parse_args()
     from huggingface_hub import HfApi
 
@@ -372,7 +379,7 @@ def main() -> int:
     print("[R526-arm] Space restarted — poll /api/version for identity")
 
     rec = {
-        "round": "R526", "arm": args.arm, "space": SPACE,
+        "round": args.round, "arm": args.arm, "space": SPACE,
         "commit": args.commit, "hf_revision": str(rev),
         "counterpart_commit": args.counterpart_commit or None,
         "adapter": "r519/r522_space_deploy machinery re-driven per-arm",

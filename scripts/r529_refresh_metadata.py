@@ -71,10 +71,28 @@ def _head() -> str:
 
 
 def main() -> int:
+    import argparse
+    ap = argparse.ArgumentParser(
+        description="machine-refresh the architecture metadata")
+    # R533 audit §6: the source commit must be explicit. The default
+    # (HEAD) is correct for a same-commit refresh, but a post-hoc
+    # correction must regenerate from the commit whose adapter bytes
+    # were ACTUALLY inspected (not HEAD, which may have moved past
+    # the inspected tree).
+    ap.add_argument("--source-commit", default=None,
+                    help="40-hex commit to stamp as generated_from_commit; "
+                         "defaults to HEAD")
+    args = ap.parse_args()
+
     from discovery_fabric.engine import adapters as ad
 
     head = _head()
     assert len(head) == 40, f"bad HEAD: {head!r}"
+    source_commit = args.source_commit or head
+    if source_commit:
+        assert len(source_commit) == 40, \
+            f"bad source commit: {source_commit!r}"
+    head = source_commit
 
     # ---- executable chain from ADAPTERS + STAGE_ORDER ----
     chain = []
