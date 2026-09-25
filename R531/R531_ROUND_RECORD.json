@@ -1,0 +1,209 @@
+{
+ "artifact": "R531_ROUND_RECORD/1.0",
+ "round": "R531",
+ "created_at_utc": "2026-09-25T03:54:27Z",
+ "reviewer_provenance": "AI_REVIEW",
+ "parent_round": "R530",
+ "intervention": {
+  "id": "INVOCATION_LOCAL_AVAILABILITY_SCORE_REUSE",
+  "description": "memoize availability_score() within one generate() selection, keyed (provider, model, task, avoid_provider, latency_class, now) + ledger file identity guard; thread-local table, begin/end tied to the selection span",
+  "change_set": [
+   "discovery_fabric/engine/model_routing.py",
+   "discovery_fabric/engine/llm_registry.py"
+  ],
+  "not_changed": [
+   "provider policy/order/retirement",
+   "model",
+   "prompt",
+   "retry/backoff",
+   "retrieval",
+   "evidence selection",
+   "operator selection",
+   "mechanism-space semantics",
+   "diversity/collision/attack gates",
+   "discovery thresholds"
+  ]
+ },
+ "behavioral_identity": {
+  "harness": "tests/test_r531_memoization_identity.py",
+  "tests": {
+   "A_determinism": 2,
+   "B_wrapper_equivalence": 2,
+   "C_adversarial": 10,
+   "D_behavior": 1,
+   "E_production_memo": 2,
+   "total": 17,
+   "passed": 17
+  },
+  "verdict": "IDENTITY_PROVEN"
+ },
+ "paired_measurement": {
+  "baseline": {
+   "build_sha": "7141083827844a6d0d365453346d6e901a49735e",
+   "join": "R530/MECHANISM_SPACE_PROVIDER_JOIN_R530.json",
+   "G_scoring_s": 4.04,
+   "E_ladder_s": 4.063,
+   "scans_per_call": 168
+  },
+  "counterfactual": {
+   "build_sha": "96e2d03652d330156da7e0818bc386447c2ad8df",
+   "join": "R531/MECHANISM_SPACE_PROVIDER_JOIN_COUNTERFACTUAL.json",
+   "G_scoring_s": 1.702,
+   "E_ladder_s": 1.725,
+   "scans_per_call": 62.625
+  },
+  "delta": {
+   "G_scoring_s": -2.338,
+   "G_fraction": 0.5787,
+   "scans_fraction": 0.6272
+  }
+ },
+ "routing_equivalence": {
+  "providers_models_rungs": "identical inspection sets (8 providers, 16-17 models, 8 rungs) on both arms",
+  "serving_provider": "xkiro/qwen3-max:free on all LLM paths both arms; p10 baseline unorouter vs counterfactual xkiro is cross-window provider-state, harness-proven memo-independent"
+ },
+ "funnel": {
+  "baseline": {
+   "mechanisms_found": 1,
+   "n_rows": 10,
+   "problems": [
+    4
+   ],
+   "per_row": {
+    "9": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "4": {
+     "reached": true,
+     "n": 1,
+     "state": "BUILT"
+    },
+    "10": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "7": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "2": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "6": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "5": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "8": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "1": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "3": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    }
+   }
+  },
+  "counterfactual": {
+   "mechanisms_found": 0,
+   "n_rows": 10,
+   "problems": [],
+   "per_row": {
+    "3": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "8": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "5": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "6": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "9": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "7": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "10": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "1": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "2": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    },
+    "4": {
+     "reached": false,
+     "n": 0,
+     "state": "NO_CANDIDATES"
+    }
+   }
+  },
+  "confound": "problem 4: baseline 3 verified items / 15 contracts / 1 satisfied -> BUILT; counterfactual 1 item / 5 contracts / 0 satisfied -> NO_APPLICABLE_EVIDENCE (pre-LLM, retrieval variance; the memo cannot influence evidence retrieval or operator-contract evaluation)"
+ },
+ "production_identity_chain": {
+  "target_sha": "96e2d03652d330156da7e0818bc386447c2ad8df",
+  "origin_main": "96e2d03652d330156da7e0818bc386447c2ad8df",
+  "deploy_commit": "96e2d03652d330156da7e0818bc386447c2ad8df",
+  "note": "live version/health/drift read at close; see R531/CLOSEOUT_PROOF.json"
+ },
+ "independent_certification": {
+  "status": "NOT_GREEN",
+  "cause": "UNKNOWN — classifier-job failure reason not exposed (Art. XXVI; workflow not suppressed, local pytest not substituted)"
+ },
+ "round_states": {
+  "measurement_complete": true,
+  "optimization_authorized": true,
+  "optimization_executed": true,
+  "optimization_measured": true,
+  "optimization_deployed": true,
+  "note": "all five hold: identity proven (17-test harness), intervention executed + deployed (96e2d0365, GREEN), paired measurement complete (G -58%, scans -63%), funnel confound disclosed exactly"
+ },
+ "classification": "OPTIMIZATION_MEASURED",
+ "classification_not": [
+  "NOT claimed: end-to-end stage speedup (the MECHANISM_SPACE wall is provider-dominated; the 2.3 s local improvement is real but small vs provider noise)",
+  "NOT claimed: discovery improvement (1/10 vs 0/10 with root-caused upstream confound)",
+  "NOT claimed: independent certification green",
+  "NOT claimed: any stage is removable"
+ ]
+}
