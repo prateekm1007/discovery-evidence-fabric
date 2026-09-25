@@ -1,0 +1,1013 @@
+{
+ "invention_id": {
+  "value": "inv:ui_gear_shift_hesitation_and_clunking_297843:5a38e10e192c",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_gear_shift_hesitation_and_clunking_297843",
+   "device": "automatic transmission system",
+   "failure": "Documented problem 'gear shift hesitation and clunking' concerning automatic transmission system. User-submitted engineering problem (session input): \"[R526-BATTERY declared_family=mechanical source=odi:11385700 battery=R530-SELECTION-SUBSPAN-MEASUREMENT]\n\nCAR WAS IDLING AND PARKED. WARNING CODE SHOWED UP ON DASHBOARD ESC, ELECTRONIC STABILITY CONTROL, REDUCED ENGINE POWER. VEHICLE THEN DISPLAYED TRANSMISSION DISRUPTION, WARNING LIGHT DISPLAYED AS\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "gear shift hesitation and clunking",
+   "constraint": "must eliminate transmission disruption without triggering ESC or reduced engine power warnings"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:36da2c11"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of automatic transmission system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Multi-domain confidence evaluation using a contribution matrix to quantify how much information each component contributes to the overall system result, identifying and isolating sources of variability that degrade decision-making.",
+   "intervention": "Implement a real-time transmission control module diagnostic algorithm modeled on the CINeMA contribution matrix framework. The algorithm continuously quantifies the percentage contribution of each sensor input (wheel speed, throttle position, gear selector) and actuator state to the commanded gear shift event. When the contribution matrix detects imprecision or incoherence exceeding defined thresholds in specific sensor nodes, the controller applies targeted signal filtering or default-state substitution for those specific nodes only, rather than triggering a global transmission disruption or limp mode. This prevents the cascade fault that activates ESC and reduced engine power warnings.",
+   "expected_effect": "Gear shift hesitation and clunking are eliminated through precise identification and compensation of degraded sensor contributions, while maintaining nominal torque delivery and stability control communication so that ESC and reduced engine power warnings are not triggered.",
+   "mechanism_source_span": "percentage contribution matrix, which shows how much information each study contributes to the results",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1371/journal.pmed.1003082"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "CINeMA: An approach for assessing confidence in the results of a network meta-analysis",
+   "mechanism": "Multi-domain confidence evaluation using a contribution matrix to quantify how much information each component contributes to the overall system result, identifying and isolating sources of variability that degrade decision-making.",
+   "intervention_site": "automatic transmission system",
+   "expected_effect": "Gear shift hesitation and clunking are eliminated through precise identification and compensation of degraded sensor contributions, while maintaining nominal torque delivery and stability control communication so that ESC and reduced engine power warnings are not triggered.",
+   "falsification_test": "Conduct a hardware-in-the-loop simulation injecting 20% noise into the output shaft speed sensor during a 2-3 upshift. Measure shift completion time and jerk magnitude. Verify via CAN bus logging that no ESC intervention or reduced engine power diagnostic trouble codes are set during 100 consecutive shift cycles with injected faults."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1371/journal.pmed.1003082"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Implement a real-time transmission control module diagnostic algorithm modeled on the CINeMA contribution matrix framework. The algorithm continuously quantifies the percentage contribution of each sensor input (wheel speed, throttle position, gear selector) and actuator state to the commanded gear shift event. When the contribution matrix detects imprecision or incoherence exceeding defined thresholds in specific sensor nodes, the controller applies targeted signal filtering or default-state substitution for those specific nodes only, rather than triggering a global transmission disruption or limp mode. This prevents the cascade fault that activates ESC and reduced engine power warnings.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1371/journal.pmed.1003082"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "must eliminate transmission disruption without triggering ESC or reduced engine power warnings",
+   "failure_mode_of_device": "gear shift hesitation and clunking"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:36da2c11"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Gear shift hesitation and clunking are eliminated through precise identification and compensation of degraded sensor contributions, while maintaining nominal torque delivery and stability control comm",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-25T00:58:12.877312+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-25T00:58:12.877312+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1088/1757-899x/394/4/042074",
+    "title": "Research on hydraulic control system of shift gear clutch of hydro mechanical automatic transmission",
+    "source_uri": "https://doi.org/10.1088/1757-899x/394/4/042074",
+    "doi": "10.1088/1757-899x/394/4/042074",
+    "content_hash": "6fd2476964244a07059a40084a19508bfbf3370c48c1df342b5ab1ff63b52ad6",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4271/2019-01-1553",
+    "title": "Dual Clutch Transmission Vibrations during Gear Shift: A Simulation-Based Approach for Clunking Noise Assessment",
+    "source_uri": "https://doi.org/10.4271/2019-01-1553",
+    "doi": "10.4271/2019-01-1553",
+    "content_hash": "de016e65177a5bdc602bf73a80c7896f74864f1ce055841cfa4f21ead25bc51a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.53078/20778481_2013_1_46",
+    "title": "SYNTHESIS OF AN AUTOMATIC GEAR SHIFT ALGORITHM FOR VEHICLES WITH HYDROMECHANICAL TRANSMISSION",
+    "source_uri": "https://doi.org/10.53078/20778481_2013_1_46",
+    "doi": "10.53078/20778481_2013_1_46",
+    "content_hash": "eae3d63a4bc110a1073a585205bccfcc5312059ee12e75a3e4e3712104999ae8",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/wcse.2009.198",
+    "title": "Simulation of Gear-shift Algorithm for Automatic Transmission Based on MATLAB",
+    "source_uri": "https://doi.org/10.1109/wcse.2009.198",
+    "doi": "10.1109/wcse.2009.198",
+    "content_hash": "53d31f1bf1456eec9204a91de5a33ceb0c042bc221ef902e0a403884b910578f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/s1474-6670(17)40010-3",
+    "title": "Simulation of Gear Shift Operations in Automatic Transmission",
+    "source_uri": "https://doi.org/10.1016/s1474-6670(17)40010-3",
+    "doi": "10.1016/s1474-6670(17)40010-3",
+    "content_hash": "dd93faddd9ede8f0249a599d32f6502eb7c9667bf010d7f73050c2c7ff96a52f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1371/journal.pmed.1003082",
+    "title": "CINeMA: An approach for assessing confidence in the results of a network meta-analysis",
+    "source_uri": "https://doi.org/10.1371/journal.pmed.1003082",
+    "doi": "10.1371/journal.pmed.1003082",
+    "content_hash": "90f3e69ea26fbb60c76310bd24880dca449cf617b4e794030784317cbe6c02c9",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+    "title": "Influence of gear transmission oils degradation on tribological performance and gearbox efficiency",
+    "source_uri": "https://doi.org/10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+    "doi": "10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+    "content_hash": "7ab85e197d2190288a321026968ae7f09cdc7ec9efeb54827cd0e6385e310d10",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.23860/thesis-paquin-gregory-2014",
+    "title": "AUTOMATIC OR STANDARD: CAN WE SHIFT IMPLICIT RACIAL ATTITUDES?",
+    "source_uri": "https://doi.org/10.23860/thesis-paquin-gregory-2014",
+    "doi": "10.23860/thesis-paquin-gregory-2014",
+    "content_hash": "cd81fd82c3277acfcc32a725ecbd21b7068bc66660469b9f675ce4744cbd328f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.70675/ec26b921z019ez4079zaddfz1116863d1a31",
+    "title": "A transmission-error-based gear dynamic model : Applications to single- and multi-mesh transmissions",
+    "source_uri": "https://doi.org/10.70675/ec26b921z019ez4079zaddfz1116863d1a31",
+    "doi": "10.70675/ec26b921z019ez4079zaddfz1116863d1a31",
+    "content_hash": "ac1ace9869c9a7f37834481e3185411f0275d5ebffa2597338a5a64d28ef466a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2108.11247",
+    "title": "Effect of Lubricants on the Rotational Transmission between Solid-State Gears",
+    "source_uri": "https://doi.org/10.48550/arxiv.2108.11247",
+    "doi": "10.48550/arxiv.2108.11247",
+    "content_hash": "57c4391246128d6ee2afcdd532645a06f22f6ca115ece063537e0cfc7bd9c4e3",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.0503320",
+    "title": "Transmission and Conversion of Energy by Coupled Soft Gears",
+    "source_uri": "https://doi.org/10.48550/arxiv.0503320",
+    "doi": "10.48550/arxiv.0503320",
+    "content_hash": "6489913a9edfef41b1297dcca62aef5a0305b7e70966cb2f2b0a49cb70ef6007",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.0612226",
+    "title": "Effect of an original gear mesh modelling on the modal behaviour of gear transmission",
+    "source_uri": "https://doi.org/10.48550/arxiv.0612226",
+    "doi": "10.48550/arxiv.0612226",
+    "content_hash": "20de3b41ed0bd9e5b275472ca3d72cd91b3251532fedc03b8d667b50174411a6",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1016/s1474-6670(17)40010-3",
+   "doi:10.1088/1757-899x/394/4/042074",
+   "doi:10.1109/wcse.2009.198",
+   "doi:10.1371/journal.pmed.1003082",
+   "doi:10.23860/thesis-paquin-gregory-2014",
+   "doi:10.4271/2019-01-1553",
+   "doi:10.48550/arxiv.0503320",
+   "doi:10.48550/arxiv.0612226",
+   "doi:10.48550/arxiv.2108.11247",
+   "doi:10.53078/20778481_2013_1_46",
+   "doi:10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+   "doi:10.70675/ec26b921z019ez4079zaddfz1116863d1a31"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Conduct a hardware-in-the-loop simulation injecting 20% noise into the output shaft speed sensor during a 2-3 upshift. Measure shift completion time and jerk magnitude. Verify via CAN bus logging that no ESC intervention or reduced engine power diagnostic trouble codes are set during 100 consecutive shift cycles with injected faults."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_gear_shift_hesitation_and_clunking_297843:2026-09-25T00:57:23",
+   "final_envelope_hash": "5a38e10e192cff6516542deafc768ce26b1a4d70dabaec928a940fbded07d7eb",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-25T00:58:13+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-25T00:58:13+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1088/1757-899x/394/4/042074": {
+   "id": "doi:10.1088/1757-899x/394/4/042074",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1088/1757-899x/394/4/042074",
+   "source_uri": "https://doi.org/10.1088/1757-899x/394/4/042074",
+   "title": "Research on hydraulic control system of shift gear clutch of hydro mechanical automatic transmission",
+   "abstract": "",
+   "doi": "10.1088/1757-899x/394/4/042074",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2018",
+   "retrieval_timestamp": "2026-09-25T00:57:48.789218+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6fd2476964244a07059a40084a19508bfbf3370c48c1df342b5ab1ff63b52ad6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1088/1757-899x/394/4/042074"
+    },
+    "queries_by_source": {
+     "crossref": "automatic transmission system gear shift hesitation and clunking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1088/1757-899x/394/4/042074",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission system gear shift hesitation and clunking",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.4271/2019-01-1553": {
+   "id": "doi:10.4271/2019-01-1553",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4271/2019-01-1553",
+   "source_uri": "https://doi.org/10.4271/2019-01-1553",
+   "title": "Dual Clutch Transmission Vibrations during Gear Shift: A Simulation-Based Approach for Clunking Noise Assessment",
+   "abstract": "",
+   "doi": "10.4271/2019-01-1553",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2019",
+   "retrieval_timestamp": "2026-09-25T00:57:48.789312+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "de016e65177a5bdc602bf73a80c7896f74864f1ce055841cfa4f21ead25bc51a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4271/2019-01-1553"
+    },
+    "queries_by_source": {
+     "crossref": "automatic transmission system gear shift hesitation and clunking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4271/2019-01-1553",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission system gear shift hesitation and clunking",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.53078/20778481_2013_1_46": {
+   "id": "doi:10.53078/20778481_2013_1_46",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.53078/20778481_2013_1_46",
+   "source_uri": "https://doi.org/10.53078/20778481_2013_1_46",
+   "title": "SYNTHESIS OF AN AUTOMATIC GEAR SHIFT ALGORITHM FOR VEHICLES WITH HYDROMECHANICAL TRANSMISSION",
+   "abstract": "",
+   "doi": "10.53078/20778481_2013_1_46",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2013",
+   "retrieval_timestamp": "2026-09-25T00:57:48.789354+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "eae3d63a4bc110a1073a585205bccfcc5312059ee12e75a3e4e3712104999ae8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.53078/20778481_2013_1_46"
+    },
+    "queries_by_source": {
+     "crossref": "automatic transmission system gear shift hesitation and clunking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.53078/20778481_2013_1_46",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission system gear shift hesitation and clunking",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1109/wcse.2009.198": {
+   "id": "doi:10.1109/wcse.2009.198",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/wcse.2009.198",
+   "source_uri": "https://doi.org/10.1109/wcse.2009.198",
+   "title": "Simulation of Gear-shift Algorithm for Automatic Transmission Based on MATLAB",
+   "abstract": "",
+   "doi": "10.1109/wcse.2009.198",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2009",
+   "retrieval_timestamp": "2026-09-25T00:57:48.789385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "53d31f1bf1456eec9204a91de5a33ceb0c042bc221ef902e0a403884b910578f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/wcse.2009.198"
+    },
+    "queries_by_source": {
+     "crossref": "automatic transmission system gear shift hesitation and clunking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/wcse.2009.198",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission system gear shift hesitation and clunking",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1016/s1474-6670(17)40010-3": {
+   "id": "doi:10.1016/s1474-6670(17)40010-3",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1016/s1474-6670(17)40010-3",
+   "source_uri": "https://doi.org/10.1016/s1474-6670(17)40010-3",
+   "title": "Simulation of Gear Shift Operations in Automatic Transmission",
+   "abstract": "",
+   "doi": "10.1016/s1474-6670(17)40010-3",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "1998",
+   "retrieval_timestamp": "2026-09-25T00:57:48.789417+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "dd93faddd9ede8f0249a599d32f6502eb7c9667bf010d7f73050c2c7ff96a52f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1016/s1474-6670(17)40010-3"
+    },
+    "queries_by_source": {
+     "crossref": "automatic transmission system gear shift hesitation and clunking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1016/s1474-6670(17)40010-3",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission system gear shift hesitation and clunking",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1371/journal.pmed.1003082": {
+   "id": "doi:10.1371/journal.pmed.1003082",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:35bd793fad0fbf74d7f784a8052d834bc4e80f96",
+   "source_uri": "https://doi.org/10.1371/journal.pmed.1003082",
+   "title": "CINeMA: An approach for assessing confidence in the results of a network meta-analysis",
+   "abstract": "Background The evaluation of the credibility of results from a meta-analysis has become an important part of the evidence synthesis process. We present a methodological framework to evaluate confidence in the results from network meta-analyses, Confidence in Network Meta-Analysis (CINeMA), when multiple interventions are compared. Methodology CINeMA considers 6 domains: (i) within-study bias, (ii) reporting bias, (iii) indirectness, (iv) imprecision, (v) heterogeneity, and (vi) incoherence. Key to judgments about within-study bias and indirectness is the percentage contribution matrix, which shows how much information each study contributes to the results from network meta-analysis. The contribution matrix can easily be computed using a freely available web application. In evaluating imprecision, heterogeneity, and incoherence, we consider the impact of these components of variability in forming clinical decisions. Conclusions Via 3 examples, we show that CINeMA improves transparency and avoids the selective use of evidence when forming judgments, thus limiting subjectivity in the process. CINeMA is easy to apply even in large and complicated networks.",
+   "doi": "10.1371/journal.pmed.1003082",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-09-25T00:57:48.789445+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "90f3e69ea26fbb60c76310bd24880dca449cf617b4e794030784317cbe6c02c9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:35bd793fad0fbf74d7f784a8052d834bc4e80f96"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1007/s00464-022-09772-z"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "34d68c7cc743b329c2e5075ebc6739148566a8df7358417a80d95dbca1db3483",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1371/journal.pmed.1003082",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1007/s00464-022-09772-z",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [
+    "Adriani Nikolakopoulou",
+    "J. Higgins",
+    "Theodoros Papakonstantinou",
+    "A. Chaimani",
+    "C. Del Giovane",
+    "M. Egger",
+    "G. Salanti"
+   ],
+   "raw_record_hash": "34d68c7cc743b329c2e5075ebc6739148566a8df7358417a80d95dbca1db3483",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  },
+  "doi:10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf": {
+   "id": "doi:10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+   "source_uri": "https://doi.org/10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+   "title": "Influence of gear transmission oils degradation on tribological performance and gearbox efficiency",
+   "abstract": "",
+   "doi": "10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-25T00:57:48.789478+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "7ab85e197d2190288a321026968ae7f09cdc7ec9efeb54827cd0e6385e310d10",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf"
+    },
+    "queries_by_source": {
+     "crossref": "automatic transmission system gear shift hesitation and clunking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70675/da63208fzc447z4317z8254z5b2ec0aeaacf",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission system gear shift hesitation and clunking",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.23860/thesis-paquin-gregory-2014": {
+   "id": "doi:10.23860/thesis-paquin-gregory-2014",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.23860/thesis-paquin-gregory-2014",
+   "source_uri": "https://doi.org/10.23860/thesis-paquin-gregory-2014",
+   "title": "AUTOMATIC OR STANDARD: CAN WE SHIFT IMPLICIT RACIAL ATTITUDES?",
+   "abstract": "",
+   "doi": "10.23860/thesis-paquin-gregory-2014",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-25T00:57:48.789499+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "cd81fd82c3277acfcc32a725ecbd21b7068bc66660469b9f675ce4744cbd328f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.23860/thesis-paquin-gregory-2014"
+    },
+    "queries_by_source": {
+     "crossref": "automatic transmission system gear shift hesitation and clunking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.23860/thesis-paquin-gregory-2014",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission system gear shift hesitation and clunking",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.70675/ec26b921z019ez4079zaddfz1116863d1a31": {
+   "id": "doi:10.70675/ec26b921z019ez4079zaddfz1116863d1a31",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70675/ec26b921z019ez4079zaddfz1116863d1a31",
+   "source_uri": "https://doi.org/10.70675/ec26b921z019ez4079zaddfz1116863d1a31",
+   "title": "A transmission-error-based gear dynamic model : Applications to single- and multi-mesh transmissions",
+   "abstract": "",
+   "doi": "10.70675/ec26b921z019ez4079zaddfz1116863d1a31",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-25T00:57:48.789515+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ac1ace9869c9a7f37834481e3185411f0275d5ebffa2597338a5a64d28ef466a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70675/ec26b921z019ez4079zaddfz1116863d1a31"
+    },
+    "queries_by_source": {
+     "crossref": "automatic transmission system gear shift hesitation and clunking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70675/ec26b921z019ez4079zaddfz1116863d1a31",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission system gear shift hesitation and clunking",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2108.11247": {
+   "id": "doi:10.48550/arxiv.2108.11247",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2108.11247v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2108.11247",
+   "title": "Effect of Lubricants on the Rotational Transmission between Solid-State Gears",
+   "abstract": "Lubricants are widely used in macroscopic mechanical systems to reduce friction and wear. However, on the microscopic scale, it is not clear to what extent lubricants are beneficial. Therefore, in this study, we consider two diamond solid-state gears at the nanoscale immersed in different lubricant molecules and perform classical MD simulations to investigate the rotational transmission of motion. We find that lubricants can help to synchronize the rotational transmission between gears regardless of the molecular species and the center-of-mass distance. Moreover, the influence of the angular velocity of the driving gear is investigated and shown to be related to the bond formation process between gears.",
+   "doi": "10.48550/arxiv.2108.11247",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-25T00:57:48.789531+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "57c4391246128d6ee2afcdd532645a06f22f6ca115ece063537e0cfc7bd9c4e3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2108.11247v1"
+    },
+    "queries_by_source": {
+     "arxiv": "automatic transmission system gear shift hesitation and clunking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2108.11247",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission system gear shift hesitation and clunking",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2108.11247v1",
+   "authors": [
+    "Huang-Hsiang Lin",
+    "Jonathan Heinze",
+    "Alexander Croy",
+    "Rafael Gutiérrez",
+    "Gianaurelio Cuniberti"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.0503320": {
+   "id": "doi:10.48550/arxiv.0503320",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:0503320v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.0503320",
+   "title": "Transmission and Conversion of Energy by Coupled Soft Gears",
+   "abstract": "Dynamical aspects of coupled deformable gears are investigated to clarify the differences of mechanical properties between the machines consist of hard materials and those of soft materials. In particular, the performances of two functions, the transmission and the conversion of the energy, are compared between the hard and soft gears systems. First, the responses of the coupled gears against a constant torque working on one of gears are focused for two types of couplings; P) a pair gears are coupled, and T) three gears are coupled with forming a regular triangle. In systems with the coupling P), we obtain trivial results that the rotational energy can be transmitted to other gear only if these gears are hard enough. On the other hand, in systems with the coupling T), the transmission of the rotational energy to one of the other gears appears only if these gears are soft enough. Second, we show the responses of this system in which one of gears have contact with a high temperature heat bath and the other gears have contact with a 0 temperature heat bath. With the coupling T), the directional rotations appear in two gears having contact with 0 temperature heat bath. Here, the direction of these rotations change depending on the noise strength.",
+   "doi": "10.48550/arxiv.0503320",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-25T00:57:48.789550+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6489913a9edfef41b1297dcca62aef5a0305b7e70966cb2f2b0a49cb70ef6007",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:0503320v2"
+    },
+    "queries_by_source": {
+     "arxiv": "automatic transmission system gear shift hesitation and clunking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.0503320",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission system gear shift hesitation and clunking",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/cond-mat/0503320v2",
+   "authors": [
+    "Akinori Awazu"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.0612226": {
+   "id": "doi:10.48550/arxiv.0612226",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:0612226v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.0612226",
+   "title": "Effect of an original gear mesh modelling on the modal behaviour of gear transmission",
+   "abstract": "Prediction of the vibroacoustic behaviour of geared transmissions is generally based on determining the excitation sources, the overall modelling of the transmission, the modal analysis and the solving of the parametric equations of the motion generated by these models. On the building process of such large degrees of freedom models, the elastic coupling induced by the gear mesh is generally described by the meshing stiffness. Nevertheless, when the contact is established along the tooth width, the resulting moment can constrain the rotational angles associated to wheel tilting and flexural deformation of shafts. The scope of this study is to introduce the coupling terms between wheels associated to this phenomenum. One shows also on the basis of some examples in what manner they can influence the modal behaviour and the vibroacoustic response of the transmission.",
+   "doi": "10.48550/arxiv.0612226",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-25T00:57:48.789571+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "20de3b41ed0bd9e5b275472ca3d72cd91b3251532fedc03b8d667b50174411a6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:0612226v1"
+    },
+    "queries_by_source": {
+     "arxiv": "automatic transmission system gear shift hesitation and clunking"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.0612226",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automatic transmission system gear shift hesitation and clunking",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/physics/0612226v1",
+   "authors": [
+    "Emmanuel Rigaud",
+    "Joël Perret-Liaudet",
+    "Mohamed-Salah Mecibah"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "problem:36da2c11": {
+   "id": "problem:36da2c11",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "36da2c1149fb50b3e2c9b912c7006b1495e157148a267c254c710b0ff3aaae6f",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "467cacd4a695faf5fc3c240a3f3989cf733c9bed40de1332d512431ea0922e97",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-25T00:58:13+00:00Z"
+ }
+}

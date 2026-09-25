@@ -1,0 +1,33 @@
+{
+ "gen": 1,
+ "invention_id": "inv:d7271cc226:gen1",
+ "parent_id": null,
+ "lineage": [
+  "inv:d7271cc226:gen1"
+ ],
+ "origin": "BASELINE_SYNTHESIS",
+ "architecture": {
+  "mechanism": "Multi-domain confidence evaluation using a contribution matrix to quantify how much information each component contributes to the overall system result, identifying and isolating sources of variability that degrade decision-making.",
+  "intervention": "Implement a real-time transmission control module diagnostic algorithm modeled on the CINeMA contribution matrix framework. The algorithm continuously quantifies the percentage contribution of each sensor input (wheel speed, throttle position, gear selector) and actuator state to the commanded gear shift event. When the contribution matrix detects imprecision or incoherence exceeding defined thresholds in specific sensor nodes, the controller applies targeted signal filtering or default-state substitution for those specific nodes only, rather than triggering a global transmission disruption or limp mode. This prevents the cascade fault that activates ESC and reduced engine power warnings.",
+  "expected_effect": "Gear shift hesitation and clunking are eliminated through precise identification and compensation of degraded sensor contributions, while maintaining nominal torque delivery and stability control communication so that ESC and reduced engine power warnings are not triggered.",
+  "falsification_test": "Conduct a hardware-in-the-loop simulation injecting 20% noise into the output shaft speed sensor during a 2-3 upshift. Measure shift completion time and jerk magnitude. Verify via CAN bus logging that no ESC intervention or reduced engine power diagnostic trouble codes are set during 100 consecutive shift cycles with injected faults."
+ },
+ "state": "INVENTION_SURVIVED",
+ "maturity": "GENERATED",
+ "challenge": {
+  "physics_lifecycle": "MECHANISM_NOT_SIMULATABLE",
+  "attack_overall": null,
+  "evidence_verified": true,
+  "killed": false,
+  "failure_class": null,
+  "kill_reason": "the mechanism-space distinctness adjudication counts 0 materially distinct mechanism(s) (< 2, mechanism_distinctness/2.0.0) — the run generated nothing worth attacking (Art. LXXXIV, R514)",
+  "final_status": "MECHANISM_STARVED"
+ },
+ "causal_delta": null,
+ "change_delta": null,
+ "reason_for_change": null,
+ "fresh_evidence": null,
+ "model": null,
+ "artifacts": {},
+ "evidence_verified": true
+}
