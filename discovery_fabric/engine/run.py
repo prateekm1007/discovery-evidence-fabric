@@ -64,7 +64,7 @@ DOWNSTREAM_BLOCKERS = {
     # R401: MECHANISM_SPACE consumes the frozen evidence � a retrieval
     # failure leaves it nothing to structure (SKIPPED_UPSTREAM_FAILURE,
     # the recorded refusal � never OK-on-empty-input)
-    "RETRIEVE": {"VERIFY", "SYNTHESIZE", "MECHANISM_SPACE"},
+    "RETRIEVE": {"FREEZE", "VERIFY", "SYNTHESIZE", "MECHANISM_SPACE"},
 
 }
 

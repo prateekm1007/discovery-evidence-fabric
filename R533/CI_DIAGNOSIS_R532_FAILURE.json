@@ -1,0 +1,50 @@
+{
+ "artifact": "R533_CI_DIAGNOSIS/1.0",
+ "round": "R533",
+ "created_at_utc": "2026-09-25T07:59:47Z",
+ "reviewer_provenance": "AI_REVIEW",
+ "diagnosis_scope": "independent infrastructure triage — does NOT fix, supress, or substitute for CI",
+ "workflow_file": "epistemic_certification.yml",
+ "workflow_trigger_paths": [
+  "s fast-check job: secret scan + the frozen\n#                benchmark + the release-gate suites (the epistemic\n#                core; engine changes always get FULL anyway).\n#   RELEASE      workflow_dispatch (commit_sha input) — the complete\n#                certification; the EXTERNAL ACCEPTANCE protocol (P1-P7\n#                probes against the deployed host) remains operator-side\n#                by design (CI is not acceptance — R396 Phase C).\n#\n# The workflow is DETERMINISTIC: same commit → same capsule hash.\n# The CEO can independently reproduce the certification by:\n#   1. Cloning the repo at the exact commit\n#   2. Running: python -m epistemic_integrity.post_scrub_certification_capsule\n#   3. Comparing the capsule_hash to the one uploaded as an artifact\n#\n# The workflow also creates a GitHub status check on the commit, so the\n# CEO can query the GitHub combined-status endpoint to verify that an\n# external CI system emitted the certification result.\n\nname: Epistemic Certification\n\non:\n  push:\n    branches: [main]\n    # R399 W4 LIGHTWEIGHT tier: a push whose EVERY changed file is\n    # docs/evidence (markdown, worklog, R-round records) does not run\n    # the full certification — the lightweight workflow handles it.\n    # Any code-path file in the push re-enables this workflow (GitHub\n    # paths-ignore semantics: skip only when ALL files match).\n    paths-ignore:\n      - \"worklog.md\"\n      - \"**.md\"\n      - \"R3[0-9][0-9]/**\"\n      - \"ARCHIVE_MANIFEST.json\"\n  workflow_dispatch:\n    inputs:\n      commit_sha:\n        description: ",
+  "\n\npermissions:\n  contents: read\n  statuses: write\n  actions: write\n\njobs:\n  # R399 W4 FAST vs FULL split: engine-relevant paths get the unchanged\n  # full certification; other code paths (scripts/UI) get the\n  # fast-check job. Certification substance is never reduced — the\n  # full path runs for exactly the paths it guards.\n  classify:\n    name: Classify changed paths (R399 W4 tier)\n    runs-on: ubuntu-latest\n    outputs:\n      engine_paths: ${{ steps.filter.outputs.engine_paths }}\n    steps:\n      - name: Checkout repository\n        uses: actions/checkout@v4\n        with:\n          fetch-depth: 0\n          ref: ${{ github.event.inputs.commit_sha || github.ref }}\n      - name: Path filter (engine-relevant vs other code)\n        id: filter\n        uses: dorny/paths-filter@v3\n        with:\n          filters: |\n            engine_paths:\n              - ",
+  "\n\n  certify:\n    name: Run 14-Gate Detached Certification\n    needs: classify\n    if: ${{ needs.classify.outputs.engine_paths == ",
+  "\n          import cadquery as cq\n          import tempfile, pathlib\n          # A REAL parametric build through the OCCT kernel (the same\n          # kernel class the engine",
+  " >> $GITHUB_STEP_SUMMARY\n          echo \"Compare the capsule_hash to: \\`${{ steps.capsule.outputs.capsule_hash }}\\`\" >> $GITHUB_STEP_SUMMARY\n\n  # R399 W4 FAST tier: non-engine code-path pushes (scripts/, UI).\n  # The epistemic core still runs (the frozen benchmark + the\n  # release-gate suites + the secret scan); the 14-gate detached\n  # certification is reserved for engine-relevant paths — which is\n  # exactly what it certifies. A fast-check pass is NOT a\n  # certification claim (Art. XXVI: the check name says so).\n  fast-check:\n    name: Fast check (non-engine code path, R399 W4)\n    needs: classify\n    if: ${{ needs.classify.outputs.engine_paths == "
+ ],
+ "r532_engine_files_changed": [
+  "discovery_fabric/engine/adapters.py"
+ ],
+ "known_failure_class": {
+  "type": "PATH_CLASSIFICATION_FAILURE",
+  "description": "The CI failure is in the 'Classify changed paths (R399 W4 tier)' job (dorny/paths-filter@v3 action), NOT in the 14-gate certification itself. The downstream 'Run 14-Gate Detached Certification' job is SKIPPED because classify failed. The filter action evaluates engine_paths against the changed files; a failure here means the filter action itself errored (possibly due to the 'paths-ignore' semantics: the R532 push included engine files (adapters.py) which SHOULD re-enable the workflow, but the classify job is failing before engine_paths can be output, so the certification job never runs). This is an infrastructure failure in the tier-classification action, not in the certification content. Art. LXI: infrastructure failure is never a scientific verdict.",
+  "classification": "INCOMPLETE_INFRASTRUCTURE_FAILURE",
+  "failing_job": "Classify changed paths (R399 W4 tier)",
+  "skipped_jobs": [
+   "Fast check (non-engine code path, R399 W4)",
+   "Run 14-Gate Detached Certification"
+  ],
+  "constitution_ref": "Art. LXI: infrastructure failure is never a scientific verdict; Art. XXVI: local pytest does not substitute for the external certification workflow; the classify job must be fixed as a separate infrastructure task, not folded into a performance round"
+ },
+ "r532_context": {
+  "round": "R532",
+  "classification": "MEASUREMENT_COMPLETE__MECHANISM_SPACE_FAILURE_DISTRIBUTION",
+  "engine_files_touched": [
+   "discovery_fabric/engine/adapters.py"
+  ],
+  "behavioral_change": "instrumentation only (adapters.py typed-outcome classifier + instantiation_attempts records; behavior-neutral per tests/test_r532_skipped_stage_envelopes.py)",
+  "known_ci_state_at_r532": "NOT_GREEN (classifier-job failure, cause not exposed; Art. XXVI — never substituted)"
+ },
+ "next_diagnostic_steps": [
+  "1. Run `gh run list --workflow=epistemic_certification   --limit=5` to get the most recent 5 run SHAs and   their result states",
+  "2. Run `gh run view <SHA> --log-failed` on the most   recent failing run to get the machine-readable   failure reason from the CI system",
+  "3. Classify: is the failure in the workflow definition   (YAML syntax / missing dependency), the CI runner   environment (Python version, missing package), the   test suite (which test, which assertion), or the   certification capsule (which gate fails)",
+  "4. Record the diagnosis in this JSON; do NOT fix   the workflow in this round — separate infrastructure   triage task, Art. XXXIV: stop coding when the   bottleneck is reality (the CI system), not code"
+ ],
+ "not_claimed": [
+  "NOT claimed: CI GREEN",
+  "NOT claimed: local pytest substitutes for external certification (Art. XXVI)",
+  "NOT claimed: the classifier-job failure cause is known",
+  "NOT claimed: the R532 instrumentation caused the CI failure (instrumentation was behavior-neutral; the failure predates R532)"
+ ]
+}

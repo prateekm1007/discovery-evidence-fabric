@@ -207,3 +207,63 @@ Credential state changed 2026-08-27: CEO provisioned NVIDIA + Mistral keys
 `deepseek-ai/deepseek-v4-flash-0731` (verified live, ~150 s/call); the
 legacy NVIDIA default llama-3.1-8b-instruct is retired (HTTP 410). The
 first REAL end-to-end autonomous run is no longer credential-blocked.
+
+---
+
+## R533 PROVENANCE CORRECTION ADDENDUM (APPEND-ONLY, Art. XI)
+
+Generated: 2026-09-25T07:50:20Z
+Source commit: b1c9a831596a8952a305cec353873f561a877da8
+Adapters file blob: discovery_fabric/engine/adapters.py @ b1c9a831596a
+
+### Architecture authority
+
+The executable stage order is defined by `STAGE_ORDER` in
+`discovery_fabric/engine/adapters.py` (the single executable authority;
+all other stage-order claims in historical docs are superseded):
+
+```
+STAGE_ORDER = [
+    "RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE", "VERIFY",
+    "MECHANISM_SPACE", "COLLISION", "PHYSICS",
+    "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT",
+    "ADJUDICATION", "CLASSIFY", "NEXT_BEST_ACTION", "RANK"
+]
+```
+
+**15 linear stages + IMPROVE post-rank kill point.**
+
+`ADAPTERS = STAGE_ORDER ∪ {"IMPROVE"}`. IMPROVE is deliberately
+absent from `STAGE_ORDER` (post-rank Directive-1 kill-evidence
+operation; `run.py` kill point; never in the linear D8 chain).
+`MULTI_SOURCE_DISCOVERY` was removed in R513.
+
+### Constitution authority
+
+Current live constitution: **v2.10.1**
+SHA256: `2CE42426662D6493F672CF5FD7256BF5C2B9C8412E369EE9032B253B80B6FC56`
+
+Historical references in this file to "v1.8.0" are accurate for the
+original writing date (August 2026) and are preserved unchanged per
+Art. XI.
+
+### Stale language in original blueprint (disclosed, not rewritten)
+
+Line 15 (original): `│  13 stages: RETRIEVE→…→RANK`
+  Correction: the diagram predates R394/R397/R401/R507 first-class
+  stages (PREMISE_GATE, MECHANISM_SPACE, PHYSICS, KILLER_EXPERIMENT,
+  CLASSIFY, NEXT_BEST_ACTION, ADJUDICATION, COLLISION, ATTACK,
+  CONTRADICTION). The 15-stage chain above is current.
+
+Line 108 (original): "without altering the exact D8 13-stage order"
+  Correction: the post-RANK engineering pipeline (E1–E14) runs after
+  RANK (the 15th linear stage). `IMPROVE` is the post-rank kill point
+  that may also execute in the post-rank pipeline; it is not a 16th
+  linear stage.
+
+### Metadata provenance link
+
+`ACTIVE_DISCOVERY_GRAPH.json` `generated_from_commit = b1c9a831596a8952a305cec353873f561a877da8`
+`RUNTIME_CAPABILITY_REGISTRY.json` `generated_from_commit = b1c9a831596a8952a305cec353873f561a877da8`
+`adapter_blob_sha` field records the exact blob SHA of
+`discovery_fabric/engine/adapters.py` inspected.
