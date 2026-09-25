@@ -1,0 +1,76 @@
+{
+ "artifact": "R530_ROUND_RECORD/1.0",
+ "round": "R530",
+ "created_at_utc": "2026-09-25T02:19:20Z",
+ "reviewer_provenance": "AI_REVIEW",
+ "parent_round": "R529",
+ "question": "what exactly is inside the current MECHANISM_SPACE selection-ordering wall?",
+ "measurement": {
+  "build_sha": "7141083827844a6d0d365453346d6e901a49735e",
+  "battery": "R530/BATTERY_PROBLEMS.json (frozen R526 problems, byte-identical; R526 canonical state untouched)",
+  "harvest": "R530/ATTR_MEASURE_HARVEST.json",
+  "harvest_sha256": "b89b7c70818dbf552025e3116f2717fd123a4aa7ae848b622ebf18ea48cdb41a",
+  "join": "R530/MECHANISM_SPACE_PROVIDER_JOIN_R530.json",
+  "join_sha256": "e4c077cafc13b5cc026e80f3c86e0da10dd0b8cb4576935c72b3f45eddd81dfa",
+  "n_observed": 10,
+  "selection_subspan_means": {
+   "A_availability_matrix_s": 0.002,
+   "B_chain_construction_s": 0.0,
+   "C_route_retirement_s": 0.0,
+   "D_cost_policy_s": 0.0,
+   "E_build_ladder_s": 4.063,
+   "F_catalog_detail_s": 0.011,
+   "G_scoring_detail_s": 4.04,
+   "H_capability_evidence_s": 0.001,
+   "I_selection_remainder_s": 0.0
+  },
+  "selection_diag_means": {
+   "n_providers_inspected": 8,
+   "n_models_inspected": 17,
+   "n_ladder_rungs_emitted": 8,
+   "n_availability_score_calls": 56,
+   "n_availability_report_scans": 168,
+   "n_eligible_models_calls": 8,
+   "n_eligible_models_returned": 19,
+   "n_discover_catalog_calls": 32,
+   "n_discover_catalog_cache_hits": 32,
+   "n_span_failed_recently_calls": 0
+  }
+ },
+ "answer": {
+  "dominant_component": "G_scoring_detail_s",
+  "dominant_mean_s": 4.04,
+  "parent_wall_mean_s": 4.063,
+  "dominant_fraction_of_parent": 0.9943,
+  "mechanism": "56 availability_score() calls x 3 availability_report() full-ledger scans = 168 ledger-file reads per generate() call (sort comparisons + emit + LAST_RESORT re-sort)",
+  "n_audited_calls": 7
+ },
+ "case_assessment": {
+  "case_A_candidate": true,
+  "case_A_counterfactual": "per-call reuse of already-computed ledger-scan results within the same ladder construction (no cross-call cache, no TTL, no stale-health semantic change)",
+  "behavioral_identity_proven": false,
+  "verdict": "CASE_A_CANDIDATE_IDENTIFIED__PROOF_PENDING",
+  "rule": "a repeated deterministic computation with identical inputs during one generate() invocation is PROVEN at the scan-count level; the behavioral-identity checks (same inputs, same scores, same ordering, same rung, same fallback, same provenance) must pass BEFORE the intervention may be named (directive §6)"
+ },
+ "funnel_parity": {
+  "mechanisms_found": "1/10 (problem 4 BUILT)",
+  "baseline_reference": "S5 4/10; R527-after 1/10",
+  "note": "measurement arm only — no optimization arm ran, so no parity gate applies; the 1/10 outcome is recorded as the provider-state observation for this window, not as an intervention effect"
+ },
+ "round_states": {
+  "measurement_complete": true,
+  "optimization_authorized": false,
+  "optimization_executed": false,
+  "optimization_measured": false,
+  "optimization_deployed": false,
+  "note": "R530 is a measurement round: the selection subspan decomposition is durable on production calls. Case A is a CANDIDATE, not an authorization — the behavioral-identity proof is the next round's entry gate."
+ },
+ "classification": "MEASUREMENT_COMPLETE__CASE_A_CANDIDATE",
+ "classification_not": [
+  "NOT claimed: an authorized optimization (the behavioral-identity checks have not run)",
+  "NOT claimed: a 19.5% avoidable fraction (withdrawn in R529 v1.1; selection is pre-call orchestration)",
+  "NOT claimed: any end-to-end speedup",
+  "NOT claimed: any stage is removable",
+  "NOT claimed: independent certification green"
+ ]
+}

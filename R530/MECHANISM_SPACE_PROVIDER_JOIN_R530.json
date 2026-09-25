@@ -1,0 +1,1553 @@
+{
+ "artifact": "R529_MECHANISM_SPACE_PROVIDER_JOIN/1.1",
+ "harvest": "R530/ATTR_MEASURE_HARVEST.json",
+ "harvest_sha256": "b89b7c70818dbf552025e3116f2717fd123a4aa7ae848b622ebf18ea48cdb41a",
+ "n_rows": 10,
+ "n_observed": 10,
+ "per_row": [
+  {
+   "problem_index": 1,
+   "session_id": "ts_f1c9423c595c",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "selection_orchestration_s": {
+     "value": 3.641,
+     "class": "UNKNOWN",
+     "subspans": {
+      "A_availability_matrix_s": 0.002137,
+      "B_chain_construction_s": 1.7e-05,
+      "C_route_retirement_s": 2.7e-05,
+      "D_cost_policy_s": 4.9e-05,
+      "E_build_ladder_s": 3.637591,
+      "F_catalog_detail_s": 0.011055,
+      "G_scoring_detail_s": 3.615758,
+      "H_capability_evidence_s": 0.000861,
+      "I_selection_remainder_s": 5.1e-05,
+      "accounting": "A+B+C+D+E+H+I = selection_ordering_s; F+G are detail-of-E (inclusive), not additive; F = eligible_models wall inclusive of catalog fetches; G = availability_score wall inclusive of ledger scans",
+      "instrument": "gen_spans/1.0"
+     },
+     "selection_diag": {
+      "availability_report_s": 3.612958,
+      "availability_score_s": 3.615758,
+      "n_availability_report_scans": 168,
+      "n_availability_score_calls": 56,
+      "n_discover_catalog_cache_hits": 32,
+      "n_discover_catalog_calls": 32,
+      "n_eligible_models_calls": 8,
+      "n_eligible_models_returned": 19,
+      "n_ladder_rungs_emitted": 8,
+      "n_models_inspected": 17,
+      "n_providers_inspected": 8,
+      "n_span_failed_recently_calls": 0
+     },
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
+    },
+    "failed_hop_admission_s": {
+     "value": 0,
+     "class": null,
+     "n_failed_hops": 0,
+     "hops": [],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
+    },
+    "provider_execution_s": {
+     "value": 9.568,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "local_orchestration_s": {
+     "value": 0.001,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.001,
+     "adapter_and_stage_overhead_s": 0.01,
+     "evidence": "Q-A post_provider_local_s + stage overhead"
+    },
+    "unattributed_remainder_s": {
+     "value": 0.001,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 13.215,
+    "generate_total_s": 13.211215,
+    "stage_wall_s": 13.243825531993934,
+    "legacy_A_provider_inference_s": 9.568,
+    "legacy_B_failed_first_hop_s": 0,
+    "legacy_C_selection_s": 3.641
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free",
+    "fallback_occurred": false,
+    "routed_hops": [
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_f1c9423c595c",
+    "request_id": "gen_ac038875ef71",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free"
+   }
+  },
+  {
+   "problem_index": 2,
+   "session_id": "ts_7e8f650939ce",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "selection_orchestration_s": {
+     "value": 4.134,
+     "class": "UNKNOWN",
+     "subspans": {
+      "A_availability_matrix_s": 0.004364,
+      "B_chain_construction_s": 2.6e-05,
+      "C_route_retirement_s": 2.8e-05,
+      "D_cost_policy_s": 5.4e-05,
+      "E_build_ladder_s": 4.129476,
+      "F_catalog_detail_s": 0.011782,
+      "G_scoring_detail_s": 4.106148,
+      "H_capability_evidence_s": 0.000499,
+      "I_selection_remainder_s": 4.4e-05,
+      "accounting": "A+B+C+D+E+H+I = selection_ordering_s; F+G are detail-of-E (inclusive), not additive; F = eligible_models wall inclusive of catalog fetches; G = availability_score wall inclusive of ledger scans",
+      "instrument": "gen_spans/1.0"
+     },
+     "selection_diag": {
+      "availability_report_s": 4.103357,
+      "availability_score_s": 4.106148,
+      "n_availability_report_scans": 168,
+      "n_availability_score_calls": 56,
+      "n_discover_catalog_cache_hits": 32,
+      "n_discover_catalog_calls": 32,
+      "n_eligible_models_calls": 8,
+      "n_eligible_models_returned": 19,
+      "n_ladder_rungs_emitted": 8,
+      "n_models_inspected": 17,
+      "n_providers_inspected": 8,
+      "n_span_failed_recently_calls": 0
+     },
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
+    },
+    "failed_hop_admission_s": {
+     "value": 0.000102,
+     "class": "PROVIDER_FAILURE_OR_RETRY",
+     "n_failed_hops": 1,
+     "hops": [
+      {
+       "provider": "unorouter",
+       "capability_state": "PROBE_FAILED",
+       "note": "PROBE_FAILED (failure_class=RATE_LIMITED)",
+       "probe_admission_s": 0.000102,
+       "ledger_line_present": false
+      }
+     ],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
+    },
+    "provider_execution_s": {
+     "value": 10.96,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "local_orchestration_s": {
+     "value": 0.002,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.002,
+     "adapter_and_stage_overhead_s": 0.013,
+     "evidence": "Q-A post_provider_local_s + stage overhead"
+    },
+    "unattributed_remainder_s": {
+     "value": 0.002,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 15.104,
+    "generate_total_s": 15.097925,
+    "stage_wall_s": 15.141954639002506,
+    "legacy_A_provider_inference_s": 10.96,
+    "legacy_B_failed_first_hop_s": 0.000102,
+    "legacy_C_selection_s": 4.134
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free",
+    "fallback_occurred": true,
+    "routed_hops": [
+     {
+      "failure_type": "RATE_LIMITED",
+      "fallback_provider": "xkiro",
+      "provider": "unorouter"
+     },
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_7e8f650939ce",
+    "request_id": "gen_e309b3225b17",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free"
+   }
+  },
+  {
+   "problem_index": 3,
+   "session_id": "ts_ff3c24597caa",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "selection_orchestration_s": {
+     "value": 4.591,
+     "class": "UNKNOWN",
+     "subspans": {
+      "A_availability_matrix_s": 0.002926,
+      "B_chain_construction_s": 2.2e-05,
+      "C_route_retirement_s": 2.9e-05,
+      "D_cost_policy_s": 4.7e-05,
+      "E_build_ladder_s": 4.586951,
+      "F_catalog_detail_s": 0.012458,
+      "G_scoring_detail_s": 4.560259,
+      "H_capability_evidence_s": 0.000898,
+      "I_selection_remainder_s": 4.4e-05,
+      "accounting": "A+B+C+D+E+H+I = selection_ordering_s; F+G are detail-of-E (inclusive), not additive; F = eligible_models wall inclusive of catalog fetches; G = availability_score wall inclusive of ledger scans",
+      "instrument": "gen_spans/1.0"
+     },
+     "selection_diag": {
+      "availability_report_s": 4.557128,
+      "availability_score_s": 4.560259,
+      "n_availability_report_scans": 168,
+      "n_availability_score_calls": 56,
+      "n_discover_catalog_cache_hits": 32,
+      "n_discover_catalog_calls": 32,
+      "n_eligible_models_calls": 8,
+      "n_eligible_models_returned": 19,
+      "n_ladder_rungs_emitted": 8,
+      "n_models_inspected": 17,
+      "n_providers_inspected": 8,
+      "n_span_failed_recently_calls": 0
+     },
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
+    },
+    "failed_hop_admission_s": {
+     "value": 0.000167,
+     "class": "PROVIDER_FAILURE_OR_RETRY",
+     "n_failed_hops": 1,
+     "hops": [
+      {
+       "provider": "unorouter",
+       "capability_state": "PROBE_FAILED",
+       "note": "PROBE_FAILED (failure_class=RATE_LIMITED)",
+       "probe_admission_s": 0.000167,
+       "ledger_line_present": false
+      }
+     ],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
+    },
+    "provider_execution_s": {
+     "value": 11.479,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "local_orchestration_s": {
+     "value": 0.002,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.002,
+     "adapter_and_stage_overhead_s": 0.015,
+     "evidence": "Q-A post_provider_local_s + stage overhead"
+    },
+    "unattributed_remainder_s": {
+     "value": 0.003,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 16.079,
+    "generate_total_s": 16.07457,
+    "stage_wall_s": 16.11686985599954,
+    "legacy_A_provider_inference_s": 11.479,
+    "legacy_B_failed_first_hop_s": 0.000167,
+    "legacy_C_selection_s": 4.591
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free",
+    "fallback_occurred": true,
+    "routed_hops": [
+     {
+      "failure_type": "RATE_LIMITED",
+      "fallback_provider": "xkiro",
+      "provider": "unorouter"
+     },
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_ff3c24597caa",
+    "request_id": "gen_48d0f9977bcc",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free"
+   }
+  },
+  {
+   "problem_index": 4,
+   "session_id": "ts_32710bc695c7",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "BUILT",
+   "partition": {
+    "selection_orchestration_s": {
+     "value": 3.836,
+     "class": "UNKNOWN",
+     "subspans": {
+      "A_availability_matrix_s": 0.002053,
+      "B_chain_construction_s": 1.5e-05,
+      "C_route_retirement_s": 2.1e-05,
+      "D_cost_policy_s": 4.1e-05,
+      "E_build_ladder_s": 3.83295,
+      "F_catalog_detail_s": 0.011284,
+      "G_scoring_detail_s": 3.810044,
+      "H_capability_evidence_s": 0.00079,
+      "I_selection_remainder_s": 3.6e-05,
+      "accounting": "A+B+C+D+E+H+I = selection_ordering_s; F+G are detail-of-E (inclusive), not additive; F = eligible_models wall inclusive of catalog fetches; G = availability_score wall inclusive of ledger scans",
+      "instrument": "gen_spans/1.0"
+     },
+     "selection_diag": {
+      "availability_report_s": 3.807112,
+      "availability_score_s": 3.810044,
+      "n_availability_report_scans": 168,
+      "n_availability_score_calls": 56,
+      "n_discover_catalog_cache_hits": 32,
+      "n_discover_catalog_calls": 32,
+      "n_eligible_models_calls": 8,
+      "n_eligible_models_returned": 19,
+      "n_ladder_rungs_emitted": 8,
+      "n_models_inspected": 17,
+      "n_providers_inspected": 8,
+      "n_span_failed_recently_calls": 0
+     },
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
+    },
+    "failed_hop_admission_s": {
+     "value": 0,
+     "class": null,
+     "n_failed_hops": 0,
+     "hops": [],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
+    },
+    "provider_execution_s": {
+     "value": 9.194,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "local_orchestration_s": {
+     "value": 0.001,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.001,
+     "adapter_and_stage_overhead_s": 0.007,
+     "evidence": "Q-A post_provider_local_s + stage overhead"
+    },
+    "unattributed_remainder_s": {
+     "value": 0.001,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 13.035,
+    "generate_total_s": 13.032496,
+    "stage_wall_s": 13.052119716005109,
+    "legacy_A_provider_inference_s": 9.194,
+    "legacy_B_failed_first_hop_s": 0,
+    "legacy_C_selection_s": 3.836
+   },
+   "funnel": {
+    "mechanisms_found": 1,
+    "terminal_state": "BUILT",
+    "n_distinct": 1,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free",
+    "fallback_occurred": false,
+    "routed_hops": [
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "BUILT"
+   },
+   "join_keys": {
+    "session_id": "ts_32710bc695c7",
+    "request_id": "gen_cc52922f82c2",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free"
+   }
+  },
+  {
+   "problem_index": 5,
+   "session_id": "ts_d497f204ade3",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "selection_orchestration_s": {
+     "value": 3.585,
+     "class": "UNKNOWN",
+     "subspans": {
+      "A_availability_matrix_s": 0.001863,
+      "B_chain_construction_s": 1.4e-05,
+      "C_route_retirement_s": 2.5e-05,
+      "D_cost_policy_s": 4.1e-05,
+      "E_build_ladder_s": 3.582599,
+      "F_catalog_detail_s": 0.009236,
+      "G_scoring_detail_s": 3.562867,
+      "H_capability_evidence_s": 0.000691,
+      "I_selection_remainder_s": 3.5e-05,
+      "accounting": "A+B+C+D+E+H+I = selection_ordering_s; F+G are detail-of-E (inclusive), not additive; F = eligible_models wall inclusive of catalog fetches; G = availability_score wall inclusive of ledger scans",
+      "instrument": "gen_spans/1.0"
+     },
+     "selection_diag": {
+      "availability_report_s": 3.560129,
+      "availability_score_s": 3.562867,
+      "n_availability_report_scans": 168,
+      "n_availability_score_calls": 56,
+      "n_discover_catalog_cache_hits": 32,
+      "n_discover_catalog_calls": 32,
+      "n_eligible_models_calls": 8,
+      "n_eligible_models_returned": 19,
+      "n_ladder_rungs_emitted": 8,
+      "n_models_inspected": 17,
+      "n_providers_inspected": 8,
+      "n_span_failed_recently_calls": 0
+     },
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
+    },
+    "failed_hop_admission_s": {
+     "value": 0,
+     "class": null,
+     "n_failed_hops": 0,
+     "hops": [],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
+    },
+    "provider_execution_s": {
+     "value": 10.238,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "local_orchestration_s": {
+     "value": 0.001,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.001,
+     "adapter_and_stage_overhead_s": 0.008,
+     "evidence": "Q-A post_provider_local_s + stage overhead"
+    },
+    "unattributed_remainder_s": {
+     "value": 0.002,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 13.83,
+    "generate_total_s": 13.826161,
+    "stage_wall_s": 13.851621954003349,
+    "legacy_A_provider_inference_s": 10.238,
+    "legacy_B_failed_first_hop_s": 0,
+    "legacy_C_selection_s": 3.585
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free",
+    "fallback_occurred": false,
+    "routed_hops": [
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_d497f204ade3",
+    "request_id": "gen_51305d3961ac",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free"
+   }
+  },
+  {
+   "problem_index": 6,
+   "session_id": "ts_b7687365ba11",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "selection_orchestration_s": {
+     "value": 4.933,
+     "class": "UNKNOWN",
+     "subspans": {
+      "A_availability_matrix_s": 0.001872,
+      "B_chain_construction_s": 1.2e-05,
+      "C_route_retirement_s": 2.1e-05,
+      "D_cost_policy_s": 3.2e-05,
+      "E_build_ladder_s": 4.929974,
+      "F_catalog_detail_s": 0.010521,
+      "G_scoring_detail_s": 4.903237,
+      "H_capability_evidence_s": 0.000767,
+      "I_selection_remainder_s": 3.4e-05,
+      "accounting": "A+B+C+D+E+H+I = selection_ordering_s; F+G are detail-of-E (inclusive), not additive; F = eligible_models wall inclusive of catalog fetches; G = availability_score wall inclusive of ledger scans",
+      "instrument": "gen_spans/1.0"
+     },
+     "selection_diag": {
+      "availability_report_s": 4.899695,
+      "availability_score_s": 4.903237,
+      "n_availability_report_scans": 168,
+      "n_availability_score_calls": 56,
+      "n_discover_catalog_cache_hits": 32,
+      "n_discover_catalog_calls": 32,
+      "n_eligible_models_calls": 8,
+      "n_eligible_models_returned": 19,
+      "n_ladder_rungs_emitted": 8,
+      "n_models_inspected": 17,
+      "n_providers_inspected": 8,
+      "n_span_failed_recently_calls": 0
+     },
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
+    },
+    "failed_hop_admission_s": {
+     "value": 0.000175,
+     "class": "PROVIDER_FAILURE_OR_RETRY",
+     "n_failed_hops": 1,
+     "hops": [
+      {
+       "provider": "unorouter",
+       "capability_state": "PROBE_FAILED",
+       "note": "PROBE_FAILED (failure_class=RATE_LIMITED)",
+       "probe_admission_s": 0.000175,
+       "ledger_line_present": false
+      }
+     ],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
+    },
+    "provider_execution_s": {
+     "value": 10.592,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "local_orchestration_s": {
+     "value": 0.002,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.002,
+     "adapter_and_stage_overhead_s": 0.011,
+     "evidence": "Q-A post_provider_local_s + stage overhead"
+    },
+    "unattributed_remainder_s": {
+     "value": 0.002,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 15.533,
+    "generate_total_s": 15.528761,
+    "stage_wall_s": 15.560149530996569,
+    "legacy_A_provider_inference_s": 10.592,
+    "legacy_B_failed_first_hop_s": 0.000175,
+    "legacy_C_selection_s": 4.933
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free",
+    "fallback_occurred": true,
+    "routed_hops": [
+     {
+      "failure_type": "RATE_LIMITED",
+      "fallback_provider": "xkiro",
+      "provider": "unorouter"
+     },
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_b7687365ba11",
+    "request_id": "gen_e588b42f488a",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free"
+   }
+  },
+  {
+   "problem_index": 7,
+   "session_id": "ts_7a699ea79fe4",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "selection_orchestration_s": {
+     "value": 3.745,
+     "class": "UNKNOWN",
+     "subspans": {
+      "A_availability_matrix_s": 0.001705,
+      "B_chain_construction_s": 1.2e-05,
+      "C_route_retirement_s": 2.6e-05,
+      "D_cost_policy_s": 5e-05,
+      "E_build_ladder_s": 3.741921,
+      "F_catalog_detail_s": 0.010235,
+      "G_scoring_detail_s": 3.720709,
+      "H_capability_evidence_s": 0.000762,
+      "I_selection_remainder_s": 5.4e-05,
+      "accounting": "A+B+C+D+E+H+I = selection_ordering_s; F+G are detail-of-E (inclusive), not additive; F = eligible_models wall inclusive of catalog fetches; G = availability_score wall inclusive of ledger scans",
+      "instrument": "gen_spans/1.0"
+     },
+     "selection_diag": {
+      "availability_report_s": 3.717585,
+      "availability_score_s": 3.720709,
+      "n_availability_report_scans": 168,
+      "n_availability_score_calls": 56,
+      "n_discover_catalog_cache_hits": 32,
+      "n_discover_catalog_calls": 32,
+      "n_eligible_models_calls": 8,
+      "n_eligible_models_returned": 19,
+      "n_ladder_rungs_emitted": 8,
+      "n_models_inspected": 17,
+      "n_providers_inspected": 8,
+      "n_span_failed_recently_calls": 0
+     },
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
+    },
+    "failed_hop_admission_s": {
+     "value": 0,
+     "class": null,
+     "n_failed_hops": 0,
+     "hops": [],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
+    },
+    "provider_execution_s": {
+     "value": 10.12,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "local_orchestration_s": {
+     "value": 0.002,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.002,
+     "adapter_and_stage_overhead_s": 0.026,
+     "evidence": "Q-A post_provider_local_s + stage overhead"
+    },
+    "unattributed_remainder_s": {
+     "value": 0.001,
+     "class": null,
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 13.872,
+    "generate_total_s": 13.868352,
+    "stage_wall_s": 13.922945198995876,
+    "legacy_A_provider_inference_s": 10.12,
+    "legacy_B_failed_first_hop_s": 0,
+    "legacy_C_selection_s": 3.745
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "OK",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free",
+    "fallback_occurred": false,
+    "routed_hops": [
+     {
+      "failure_type": null,
+      "fallback_provider": null,
+      "provider": "xkiro"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_7a699ea79fe4",
+    "request_id": "gen_9c6b2fba4b66",
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free"
+   }
+  },
+  {
+   "problem_index": 8,
+   "session_id": "ts_e87d44f13e68",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "selection_orchestration_s": {
+     "value": 0.0,
+     "class": "UNKNOWN",
+     "subspans": null,
+     "selection_diag": null,
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
+    },
+    "failed_hop_admission_s": {
+     "value": 0,
+     "class": null,
+     "n_failed_hops": 0,
+     "hops": [],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
+    },
+    "provider_execution_s": {
+     "value": 0.0,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "local_orchestration_s": {
+     "value": 0.0,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.0,
+     "adapter_and_stage_overhead_s": 0.009,
+     "evidence": "Q-A post_provider_local_s + stage overhead"
+    },
+    "unattributed_remainder_s": {
+     "value": null,
+     "class": "UNKNOWN",
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": null,
+    "generate_total_s": null,
+    "stage_wall_s": 0.017661284997302573,
+    "legacy_A_provider_inference_s": 0.0,
+    "legacy_B_failed_first_hop_s": 0,
+    "legacy_C_selection_s": 0.0
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "NO_APPLICABLE_EVIDENCE",
+    "provider": null,
+    "model": null,
+    "fallback_occurred": null,
+    "routed_hops": null,
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_e87d44f13e68",
+    "request_id": null,
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": null,
+    "model": null
+   }
+  },
+  {
+   "problem_index": 9,
+   "session_id": "ts_25d95dc86769",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "selection_orchestration_s": {
+     "value": 0.0,
+     "class": "UNKNOWN",
+     "subspans": null,
+     "selection_diag": null,
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
+    },
+    "failed_hop_admission_s": {
+     "value": 0,
+     "class": null,
+     "n_failed_hops": 0,
+     "hops": [],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
+    },
+    "provider_execution_s": {
+     "value": 0.0,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "local_orchestration_s": {
+     "value": 0.0,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.0,
+     "adapter_and_stage_overhead_s": 0.006,
+     "evidence": "Q-A post_provider_local_s + stage overhead"
+    },
+    "unattributed_remainder_s": {
+     "value": null,
+     "class": "UNKNOWN",
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": null,
+    "generate_total_s": null,
+    "stage_wall_s": 0.011047093998058699,
+    "legacy_A_provider_inference_s": 0.0,
+    "legacy_B_failed_first_hop_s": 0,
+    "legacy_C_selection_s": 0.0
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "NO_APPLICABLE_EVIDENCE",
+    "provider": null,
+    "model": null,
+    "fallback_occurred": null,
+    "routed_hops": null,
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_25d95dc86769",
+    "request_id": null,
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": null,
+    "model": null
+   }
+  },
+  {
+   "problem_index": 10,
+   "session_id": "ts_37250661bb3c",
+   "class": "OBSERVED_IN_STAGE",
+   "terminal_state": "NO_CANDIDATES",
+   "partition": {
+    "selection_orchestration_s": {
+     "value": 0.0,
+     "class": "UNKNOWN",
+     "subspans": null,
+     "selection_diag": null,
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
+    },
+    "failed_hop_admission_s": {
+     "value": 0,
+     "class": null,
+     "n_failed_hops": 0,
+     "hops": [],
+     "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
+    },
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
+    },
+    "provider_execution_s": {
+     "value": 0.0,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
+     "value": 0.0,
+     "class": null,
+     "retry_sleep_s": 0.0,
+     "probe_retry_sleep_s": 0.0,
+     "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
+    },
+    "local_orchestration_s": {
+     "value": 0.0,
+     "class": "REQUIRED_SCIENTIFIC_WORK",
+     "post_provider_local_s": 0.0,
+     "adapter_and_stage_overhead_s": 0.012,
+     "evidence": "Q-A post_provider_local_s + stage overhead"
+    },
+    "unattributed_remainder_s": {
+     "value": null,
+     "class": "UNKNOWN",
+     "evidence": "Q-A remainder (generate_total - measured subspans)"
+    },
+    "in_stage_llm_wall_s": 23.798,
+    "generate_total_s": null,
+    "stage_wall_s": 23.834859817005054,
+    "legacy_A_provider_inference_s": 0.0,
+    "legacy_B_failed_first_hop_s": 0,
+    "legacy_C_selection_s": 0.0
+   },
+   "funnel": {
+    "mechanisms_found": 0,
+    "terminal_state": "NO_CANDIDATES",
+    "n_distinct": 0,
+    "llm_outcome": "CALL_FAILED",
+    "provider": "unorouter",
+    "model": "deepseek-v4-flash:free",
+    "fallback_occurred": true,
+    "routed_hops": [
+     {
+      "failure_type": "RATE_LIMITED",
+      "fallback_provider": "xkiro",
+      "provider": "unorouter"
+     },
+     {
+      "failure_type": "MODEL_FAILURE",
+      "fallback_provider": "apinex",
+      "provider": "xkiro"
+     },
+     {
+      "failure_type": "CREDIT_EXHAUSTED",
+      "fallback_provider": "bynara",
+      "provider": "apinex"
+     },
+     {
+      "failure_type": "CREDIT_EXHAUSTED",
+      "fallback_provider": "unorouter",
+      "provider": "bynara"
+     },
+     {
+      "failure_type": "RATE_LIMITED",
+      "fallback_provider": null,
+      "provider": "unorouter"
+     }
+    ],
+    "retry_occurred": false,
+    "terminal_reason": "NO_CANDIDATES"
+   },
+   "join_keys": {
+    "session_id": "ts_37250661bb3c",
+    "request_id": null,
+    "engine_stage": "MECHANISM_SPACE",
+    "provider": "unorouter",
+    "model": "deepseek-v4-flash:free"
+   }
+  }
+ ],
+ "aggregate": {
+  "selection_orchestration_s": {
+   "n": 10,
+   "mean": 2.846,
+   "median": 3.693,
+   "min": 0.0,
+   "max": 4.933,
+   "p95": 4.933,
+   "values": [
+    3.641,
+    4.134,
+    4.591,
+    3.836,
+    3.585,
+    4.933,
+    3.745,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "failed_hop_admission_s": {
+   "n": 10,
+   "mean": 0.0,
+   "median": 0.0,
+   "min": 0,
+   "max": 0.0,
+   "p95": 0.0,
+   "values": [
+    0,
+    0.0,
+    0.0,
+    0,
+    0,
+    0.0,
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "inter_rung_fallback_s": {
+   "n": 10,
+   "mean": 0.0,
+   "median": 0.0,
+   "min": 0.0,
+   "max": 0.0,
+   "p95": 0.0,
+   "values": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "provider_execution_s": {
+   "n": 10,
+   "mean": 7.215,
+   "median": 9.844,
+   "min": 0.0,
+   "max": 11.479,
+   "p95": 11.479,
+   "values": [
+    9.568,
+    10.96,
+    11.479,
+    9.194,
+    10.238,
+    10.592,
+    10.12,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "retry_backoff_s": {
+   "n": 10,
+   "mean": 0.0,
+   "median": 0.0,
+   "min": 0.0,
+   "max": 0.0,
+   "p95": 0.0,
+   "values": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "local_orchestration_s": {
+   "n": 10,
+   "mean": 0.001,
+   "median": 0.001,
+   "min": 0.0,
+   "max": 0.002,
+   "p95": 0.002,
+   "values": [
+    0.001,
+    0.002,
+    0.002,
+    0.001,
+    0.001,
+    0.002,
+    0.002,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "in_stage_llm_wall_s": {
+   "n": 8,
+   "mean": 15.558,
+   "median": 14.488,
+   "min": 13.035,
+   "max": 23.798,
+   "p95": 23.798,
+   "values": [
+    13.215,
+    15.104,
+    16.079,
+    13.035,
+    13.83,
+    15.533,
+    13.872,
+    23.798
+   ]
+  }
+ },
+ "selection_subspan_aggregate": {
+  "A_availability_matrix_s": {
+   "n": 7,
+   "mean": 0.002,
+   "median": 0.002,
+   "min": 0.002,
+   "max": 0.004,
+   "p95": 0.004,
+   "values": [
+    0.002,
+    0.004,
+    0.003,
+    0.002,
+    0.002,
+    0.002,
+    0.002
+   ]
+  },
+  "B_chain_construction_s": {
+   "n": 7,
+   "mean": 0.0,
+   "median": 0.0,
+   "min": 0.0,
+   "max": 0.0,
+   "p95": 0.0,
+   "values": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "C_route_retirement_s": {
+   "n": 7,
+   "mean": 0.0,
+   "median": 0.0,
+   "min": 0.0,
+   "max": 0.0,
+   "p95": 0.0,
+   "values": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "D_cost_policy_s": {
+   "n": 7,
+   "mean": 0.0,
+   "median": 0.0,
+   "min": 0.0,
+   "max": 0.0,
+   "p95": 0.0,
+   "values": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "E_build_ladder_s": {
+   "n": 7,
+   "mean": 4.063,
+   "median": 3.833,
+   "min": 3.583,
+   "max": 4.93,
+   "p95": 4.93,
+   "values": [
+    3.638,
+    4.129,
+    4.587,
+    3.833,
+    3.583,
+    4.93,
+    3.742
+   ]
+  },
+  "F_catalog_detail_s": {
+   "n": 7,
+   "mean": 0.011,
+   "median": 0.011,
+   "min": 0.009,
+   "max": 0.012,
+   "p95": 0.012,
+   "values": [
+    0.011,
+    0.012,
+    0.012,
+    0.011,
+    0.009,
+    0.011,
+    0.01
+   ]
+  },
+  "G_scoring_detail_s": {
+   "n": 7,
+   "mean": 4.04,
+   "median": 3.81,
+   "min": 3.563,
+   "max": 4.903,
+   "p95": 4.903,
+   "values": [
+    3.616,
+    4.106,
+    4.56,
+    3.81,
+    3.563,
+    4.903,
+    3.721
+   ]
+  },
+  "H_capability_evidence_s": {
+   "n": 7,
+   "mean": 0.001,
+   "median": 0.001,
+   "min": 0.0,
+   "max": 0.001,
+   "p95": 0.001,
+   "values": [
+    0.001,
+    0.0,
+    0.001,
+    0.001,
+    0.001,
+    0.001,
+    0.001
+   ]
+  },
+  "I_selection_remainder_s": {
+   "n": 7,
+   "mean": 0.0,
+   "median": 0.0,
+   "min": 0.0,
+   "max": 0.0,
+   "p95": 0.0,
+   "values": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "fallback_auth_failure": {
+  "n_calls_with_failed_first_hop": 3,
+  "failed_hop_providers": [
+   "unorouter"
+  ],
+  "failed_hop_states": [
+   "PROBE_FAILED"
+  ]
+ },
+ "funnel_parity": {
+  "mechanisms_found": 1,
+  "n_observed": 10,
+  "terminal_states": {
+   "NO_CANDIDATES": 9,
+   "BUILT": 1
+  },
+  "fallback_occurred_rows": 4
+ },
+ "classification": {
+  "verdict": "MECHANISM_SPACE_PROVIDER_COST_REAL",
+  "rule": "the measured post-failure wall (failed-hop admission + inter-rung fallback) is <5% of the measured MECHANISM_SPACE LLM-path wall; the dominant cost is genuine provider inference (R530 stopping rule)",
+  "avoidable_fraction": 0.0
+ },
+ "reviewer_provenance": "AI_REVIEW",
+ "created_at_utc": "2026-09-25T02:16:24Z",
+ "selection_diag_aggregate": {
+  "n_providers_inspected": {
+   "n": 7,
+   "mean": 8,
+   "median": 8,
+   "min": 8,
+   "max": 8,
+   "p95": 8,
+   "values": [
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8
+   ]
+  },
+  "n_models_inspected": {
+   "n": 7,
+   "mean": 17,
+   "median": 17,
+   "min": 17,
+   "max": 17,
+   "p95": 17,
+   "values": [
+    17,
+    17,
+    17,
+    17,
+    17,
+    17,
+    17
+   ]
+  },
+  "n_ladder_rungs_emitted": {
+   "n": 7,
+   "mean": 8,
+   "median": 8,
+   "min": 8,
+   "max": 8,
+   "p95": 8,
+   "values": [
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8
+   ]
+  },
+  "n_availability_score_calls": {
+   "n": 7,
+   "mean": 56,
+   "median": 56,
+   "min": 56,
+   "max": 56,
+   "p95": 56,
+   "values": [
+    56,
+    56,
+    56,
+    56,
+    56,
+    56,
+    56
+   ]
+  },
+  "n_availability_report_scans": {
+   "n": 7,
+   "mean": 168,
+   "median": 168,
+   "min": 168,
+   "max": 168,
+   "p95": 168,
+   "values": [
+    168,
+    168,
+    168,
+    168,
+    168,
+    168,
+    168
+   ]
+  },
+  "n_eligible_models_calls": {
+   "n": 7,
+   "mean": 8,
+   "median": 8,
+   "min": 8,
+   "max": 8,
+   "p95": 8,
+   "values": [
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8
+   ]
+  },
+  "n_eligible_models_returned": {
+   "n": 7,
+   "mean": 19,
+   "median": 19,
+   "min": 19,
+   "max": 19,
+   "p95": 19,
+   "values": [
+    19,
+    19,
+    19,
+    19,
+    19,
+    19,
+    19
+   ]
+  },
+  "n_discover_catalog_calls": {
+   "n": 7,
+   "mean": 32,
+   "median": 32,
+   "min": 32,
+   "max": 32,
+   "p95": 32,
+   "values": [
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32
+   ]
+  },
+  "n_discover_catalog_cache_hits": {
+   "n": 7,
+   "mean": 32,
+   "median": 32,
+   "min": 32,
+   "max": 32,
+   "p95": 32,
+   "values": [
+    32,
+    32,
+    32,
+    32,
+    32,
+    32,
+    32
+   ]
+  },
+  "n_span_failed_recently_calls": {
+   "n": 7,
+   "mean": 0,
+   "median": 0,
+   "min": 0,
+   "max": 0,
+   "p95": 0,
+   "values": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  }
+ }
+}

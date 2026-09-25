@@ -425,6 +425,15 @@ def _generate_calls_block(lines):
             "ledger_provider_wall_s": round(sum(
                 float(l.get("latency_ms") or 0) for l in ls) / 1000.0,
                 3),
+            # R530 §3: selection subspan decomposition + diagnostic
+            # counts, carried verbatim from the COMPLETE spans block
+            # (last line by epoch — same source as the subphases
+            # above). Absent (None) on pre-R530 builds — the
+            # aggregate selection_ordering_s is retained
+            # historically but NOT causally decomposed there
+            # (Art. XXV: unmeasured stays unmeasured).
+            "selection_subspans": sp.get("selection_subspans"),
+            "selection_diag": sp.get("selection_diag"),
             "subphases": sub,
             "audit": {
                 "class": ("AUDITED" if total is not None else
