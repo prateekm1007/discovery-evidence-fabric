@@ -8,6 +8,8 @@
    "capability_id": "A2_RETRIEVAL",
    "module_path": "discovery_fabric/retrieval_fabric/pipeline.py",
    "canonical_fn": "retrieve_fabric(problem) [V2] / retrieve(problem) [V1]",
+   "production_impl": null,
+   "hermetic_instrument": null,
    "needs_network": true,
    "depends_on": []
   },
@@ -17,6 +19,8 @@
    "capability_id": "EVIDENCE_FREEZE",
    "module_path": "orchestrator/evidence_custody.py",
    "canonical_fn": "promote_to_evidence(record, source, query, class, binding)",
+   "production_impl": null,
+   "hermetic_instrument": null,
    "needs_network": false,
    "depends_on": [
     "RETRIEVE"
@@ -28,6 +32,8 @@
    "capability_id": "PREMISE_GATE",
    "module_path": "discovery_fabric/engine/premise_gate.py",
    "canonical_fn": "check_premise(problem)",
+   "production_impl": null,
+   "hermetic_instrument": null,
    "needs_network": false,
    "depends_on": []
   },
@@ -37,6 +43,8 @@
    "capability_id": "SYNTHESIS",
    "module_path": "discovery_fabric/a2/synthesize.py",
    "canonical_fn": "synthesize(problem, evidence)",
+   "production_impl": null,
+   "hermetic_instrument": null,
    "needs_network": true,
    "depends_on": [
     "RETRIEVE"
@@ -48,6 +56,8 @@
    "capability_id": "EVIDENCE_VERIFY",
    "module_path": "discovery_fabric/a2/verify.py",
    "canonical_fn": "verify_evidence(candidate, evidence)",
+   "production_impl": null,
+   "hermetic_instrument": null,
    "needs_network": false,
    "depends_on": [
     "SYNTHESIZE"
@@ -59,6 +69,8 @@
    "capability_id": "MECHANISM_SPACE",
    "module_path": "discovery_fabric/engine/mechanism_space.py",
    "canonical_fn": "build_mechanism_space(problem, evidence)",
+   "production_impl": "discovery_fabric/engine/adapters.py::_lean_mechanism_space (R453 lean path: FREEZE/VERIFY fact reuse, deterministic items, deterministic operator selection, at most ONE operator-instantiation LLM call, deterministic validation tail)",
+   "hermetic_instrument": "discovery_fabric/engine/mechanism_space.py::build_mechanism_space (full expansion; test-only, no production callers)",
    "needs_network": true,
    "depends_on": [
     "RETRIEVE",
@@ -71,6 +83,8 @@
    "capability_id": "COLLISION_ENGINE",
    "module_path": "discovery_fabric/prior_art_v2/collision_resolution.py + discovery_fabric/a2/prior_art.py",
    "canonical_fn": "run_collision (mechanism-centered) + search_prior_art",
+   "production_impl": null,
+   "hermetic_instrument": null,
    "needs_network": true,
    "depends_on": [
     "SYNTHESIZE"
@@ -82,6 +96,8 @@
    "capability_id": "PHYSICS_GATE",
    "module_path": "discovery_fabric/engine/physics_stage.py",
    "canonical_fn": "evaluate_envelope_physics(env, run_ctx)",
+   "production_impl": null,
+   "hermetic_instrument": null,
    "needs_network": false,
    "depends_on": [
     "SYNTHESIZE"
@@ -93,6 +109,8 @@
    "capability_id": "ATTACK_ENGINE",
    "module_path": "discovery_fabric/a2/adversarial.py",
    "canonical_fn": "adversarial_challenge(candidate, evidence_verified, prior_art_state)",
+   "production_impl": null,
+   "hermetic_instrument": null,
    "needs_network": true,
    "depends_on": [
     "SYNTHESIZE",
@@ -106,6 +124,8 @@
    "capability_id": "CONTRADICTION_QUEUE",
    "module_path": "orchestrator/contradiction_queue.py",
    "canonical_fn": "ContradictionQueue.add / to_dict",
+   "production_impl": null,
+   "hermetic_instrument": null,
    "needs_network": false,
    "depends_on": [
     "ATTACK",
@@ -118,6 +138,8 @@
    "capability_id": "KILLER_EXPERIMENT",
    "module_path": "epistemic_integrity/invention_loop_engine/bayesian_eig.py",
    "canonical_fn": "BayesianEIGCalculator.rank_experiments",
+   "production_impl": null,
+   "hermetic_instrument": null,
    "needs_network": false,
    "depends_on": [
     "CONTRADICTION",
@@ -130,6 +152,8 @@
    "capability_id": "ADJUDICATION",
    "module_path": "discovery_fabric/engine/adapters.py (glue over canonical inputs)",
    "canonical_fn": "deterministic check aggregation",
+   "production_impl": null,
+   "hermetic_instrument": null,
    "needs_network": false,
    "depends_on": [
     "VERIFY",
@@ -144,6 +168,8 @@
    "capability_id": "EPISTEMIC_CLASSIFICATION",
    "module_path": "discovery_fabric/a2/classify.py",
    "canonical_fn": "classify(candidate, evidence_verification, prior_art, adversarial)",
+   "production_impl": null,
+   "hermetic_instrument": null,
    "needs_network": false,
    "depends_on": [
     "ADJUDICATION"
@@ -155,6 +181,8 @@
    "capability_id": "NEXT_BEST_ACTION",
    "module_path": "orchestrator/next_best_action.py",
    "canonical_fn": "NextBestAction.rank_actions/select_best",
+   "production_impl": null,
+   "hermetic_instrument": null,
    "needs_network": false,
    "depends_on": [
     "CONTRADICTION",
@@ -168,6 +196,8 @@
    "capability_id": "PORTFOLIO_RANKING",
    "module_path": "orchestrator/portfolio.py + deterministic score in adapter",
    "canonical_fn": "Portfolio.get_portfolio_scoreboard",
+   "production_impl": null,
+   "hermetic_instrument": null,
    "needs_network": false,
    "depends_on": [
     "ADJUDICATION",
@@ -216,7 +246,7 @@
   }
  ],
  "refreshed_by": "scripts/r529_refresh_metadata.py",
- "refreshed_at_utc": "2026-09-25T00:35:40Z",
+ "refreshed_at_utc": "2026-09-25T04:56:42Z",
  "refresh_rule": "machine-generated from discovery_fabric/engine/adapters.py (ADAPTERS registry + STAGE_ORDER) as read at generated_from_commit; per-capability attributes read from the adapter class",
- "generated_from_commit": "fa9f23e6a59169817a0122396d408264009635b3"
+ "generated_from_commit": "4eaa2be940048937a94cf8c2fd5264267f2814b3"
 }
