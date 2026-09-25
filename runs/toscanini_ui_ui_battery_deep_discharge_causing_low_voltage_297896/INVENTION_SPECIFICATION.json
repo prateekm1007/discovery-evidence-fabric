@@ -1,0 +1,1318 @@
+{
+ "invention_id": {
+  "value": "inv:ui_battery_deep_discharge_causing_low_voltage_297896:920a4ffc88db",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_battery_deep_discharge_causing_low_voltage_297896",
+   "device": "automotive battery electrical system",
+   "failure": "Documented problem 'battery deep discharge causing low voltage and loss of diagnostic trouble codes' concerning automotive battery electrical system. User-submitted engineering problem (session input): \"[R526-BATTERY declared_family=electrical source=odi:11342372 battery=R530-SELECTION-SUBSPAN-MEASUREMENT]\n\nBATTERY WAS DEAD IN THE GARAGE.   CALLED ROAD SIDE ASSISTANCE WHO JUMP-STARTED CAR.  CAR WOULD NOT GO INTO GEAR.  WE ROLLED IT OUT INTO DRIVEWAY WHERE IT SAT FOR 24 HOURS.  WHEN IT WAS LOADED FO\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "battery deep discharge causing low voltage and loss of diagnostic trouble codes",
+   "constraint": "must account for spontaneous battery drain, shift interlock failure, and code loss at low voltage"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:2394f678"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of automotive battery electrical system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Hybrid PID-FOPID control strategy coupled with an EF2 resonant DC-DC converter for voltage stabilization and reduced battery dependency",
+   "intervention": "Integrate a fuel-cell-backed EF2 resonant DC-DC converter regulated by the hybrid PID-FOPID controller to maintain minimum bus voltage during spontaneous battery drain, ensuring sufficient power to retain diagnostic trouble codes in non-volatile memory and energize the shift interlock solenoid.",
+   "expected_effect": "The converter sustains system voltage above the ECU memory retention threshold and shift interlock actuation threshold during deep discharge events, preventing loss of diagnostic trouble codes and enabling gear selection even when the primary battery is depleted.",
+   "mechanism_source_span": "Fractional-Order PID (PID-FOPID) control strategy to enhance the regulation of a PEMFC-based powertrain",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-026-69653-6"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Hybrid TSA-TLBO optimization of an EF&lt;sub&gt;2&lt;/sub&gt; resonant DC-DC converter for energy-efficient fuel cell electric vehicles with reduced battery dependency.",
+   "mechanism": "Hybrid PID-FOPID control strategy coupled with an EF2 resonant DC-DC converter for voltage stabilization and reduced battery dependency",
+   "intervention_site": "automotive battery electrical system",
+   "expected_effect": "The converter sustains system voltage above the ECU memory retention threshold and shift interlock actuation threshold during deep discharge events, preventing loss of diagnostic trouble codes and enabling gear selection even when the primary battery is depleted.",
+   "falsification_test": "Disconnect the primary battery under load and measure whether the EF2 converter maintains bus voltage above 9V; verify that diagnostic trouble codes persist in ECU memory and the shift interlock releases within 500ms of brake pedal application."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-026-69653-6"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": null,
+   "prior_art_status": null,
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "",
+   "legacy_status": "",
+   "differentiation_resolution": {},
+   "nearest": [],
+   "queries": [],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Integrate a fuel-cell-backed EF2 resonant DC-DC converter regulated by the hybrid PID-FOPID controller to maintain minimum bus voltage during spontaneous battery drain, ensuring sufficient power to retain diagnostic trouble codes in non-volatile memory and energize the shift interlock solenoid.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-026-69653-6"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "must account for spontaneous battery drain, shift interlock failure, and code loss at low voltage",
+   "failure_mode_of_device": "battery deep discharge causing low voltage and loss of diagnostic trouble codes"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:2394f678"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.40534931273485575,
+   "eig_per_cost": 0.40534931273485575,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: The converter sustains system voltage above the ECU memory retention threshold and shift interlock actuation threshold during deep discharge events, preventing loss of diagnostic trouble codes and ena",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-25T00:59:26.550623+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-25T00:59:26.550623+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.40534931273485575,
+     "eig_per_cost": 0.40534931273485575,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1088/1742-6596/2061/1/012014",
+    "title": "Charging balance management for automotive battery in low-voltage power network under low temperature conditions and at deep discharge of the automotive battery in the car",
+    "source_uri": "https://doi.org/10.1088/1742-6596/2061/1/012014",
+    "doi": "10.1088/1742-6596/2061/1/012014",
+    "content_hash": "3124d851e3c8f51e6e6645edf8d2c212111b931c68d1b438036bf6f409a33113",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1038/s41598-026-69653-6",
+    "title": "Hybrid TSA-TLBO optimization of an EF&lt;sub&gt;2&lt;/sub&gt; resonant DC-DC converter for energy-efficient fuel cell electric vehicles with reduced battery dependency.",
+    "source_uri": "https://doi.org/10.1038/s41598-026-69653-6",
+    "doi": "10.1038/s41598-026-69653-6",
+    "content_hash": "dbec2a083adb8b8a3cdd8e7a7fc36da7ab3dd963979655c89f9a13dcb4d51174",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/ma19153259",
+    "title": "Vibroacoustic Metamaterials for Low-Frequency Sound and Vibration Attenuation in Electric Vehicles: A Review.",
+    "source_uri": "https://doi.org/10.3390/ma19153259",
+    "doi": "10.3390/ma19153259",
+    "content_hash": "e53a0fe3935714c59312827b55d686e565683eddd8a8742b829cddc9ecab7b5f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1038/s41598-026-57560-9",
+    "title": "Decision-Flux Optimization-based energy management for battery-supercapacitor hybrid storage in electric vehicles: battery lifetime and efficiency enhancement.",
+    "source_uri": "https://doi.org/10.1038/s41598-026-57560-9",
+    "doi": "10.1038/s41598-026-57560-9",
+    "content_hash": "4e4cfb2224b528abed8b09c7ca750c59d26a478c5333d9a9a5e4ef5be7e35202",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1371/journal.pone.0343872",
+    "title": "An integrated method for state of charge estimation, lifetime prediction, and reliability assessment of Lithium-ion batteries under thermal and dynamic conditions.",
+    "source_uri": "https://doi.org/10.1371/journal.pone.0343872",
+    "doi": "10.1371/journal.pone.0343872",
+    "content_hash": "d3ae4b78535eca2a22e50596ac11745716427e0c2f747be93339e4a791b69212",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/s26103083",
+    "title": "Multi-Scale Spatiotemporal Attention Network for Early Warning of Lithium-Ion Battery Thermal Runaway.",
+    "source_uri": "https://doi.org/10.3390/s26103083",
+    "doi": "10.3390/s26103083",
+    "content_hash": "74a7366356db01bf65fb3035ae48505bbe63be1b67b720b82b09b6359884e8e6",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.17671138",
+    "title": "PROMETHEUS NEEDS AN OPERATING SYSTEM: Why Jeff Bezos' $6.2B Vision Requires the CollectiveOS Anti-Scarcity Stack",
+    "source_uri": "https://doi.org/10.5281/zenodo.17671138",
+    "doi": "10.5281/zenodo.17671138",
+    "content_hash": "df90f4491a926f76187816f1c83d9af02d8a44e87bb318217dd204e4d0db711b",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.26174/thesis.lboro.13060496.v1",
+    "title": "Broadband vibration energy harvesting from powertrain torsional oscillations",
+    "source_uri": "https://doi.org/10.26174/thesis.lboro.13060496.v1",
+    "doi": "10.26174/thesis.lboro.13060496.v1",
+    "content_hash": "29d5192d4a1ed59547627571a417bb6fa859fe79c55434f153e3ae4796c3e1ab",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+    "title": "Battery voltage stabilization system for automotive Stop-Start function : a linear power electronic solution",
+    "source_uri": "https://doi.org/10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+    "doi": "10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+    "content_hash": "26f5fd71f83769e69e3f2047fcb5dd5cbbaafa50f6412298ccc6d288fef5cc38",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2208.12291",
+    "title": "The Effect of Frequency Droop Damping on System Parameters and Battery Sizing During Load Change Condition",
+    "source_uri": "https://doi.org/10.48550/arxiv.2208.12291",
+    "doi": "10.48550/arxiv.2208.12291",
+    "content_hash": "8237445cedff831e78b5e98518597b35f6474efd0fef8585b473801bfa58a407",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2203.09497",
+    "title": "Quantum battery with non-Hermitian charging",
+    "source_uri": "https://doi.org/10.48550/arxiv.2203.09497",
+    "doi": "10.48550/arxiv.2203.09497",
+    "content_hash": "0be6791dd8f9da557245e33aa98ea134aedef9d0931a4ed823e5aa59f62d66f2",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1801.03813",
+    "title": "Energy Harvesting Communications Using Dual Alternating Batteries",
+    "source_uri": "https://doi.org/10.48550/arxiv.1801.03813",
+    "doi": "10.48550/arxiv.1801.03813",
+    "content_hash": "5c37baa0e49511efef591ecc3116c6c206181c3801e13ec375b86780c6cdbdf3",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/tie.2005.855664",
+    "title": "Battery choice and management for New Generation Electric Vehicles",
+    "source_uri": "https://doi.org/10.1109/tie.2005.855664",
+    "doi": "10.1109/tie.2005.855664",
+    "content_hash": "f589473234aa820c3a048e80042976160df0412a0b7659d9479dee65c6e4b1ed",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/en7095675",
+    "title": "An Acausal Li-Ion Battery Pack Model for  Automotive Applications",
+    "source_uri": "https://doi.org/10.3390/en7095675",
+    "doi": "10.3390/en7095675",
+    "content_hash": "19ad78a06c1b24152c64d8457eb6d13d3ec4d7c4f93900f1b2c0972b5abe8c0f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/vppc.2010.5729220",
+    "title": "A Multiphase Traction/Fast-Battery-Charger Drive for Electric or Plug-in Hybrid Vehicles",
+    "source_uri": "https://doi.org/10.1109/vppc.2010.5729220",
+    "doi": "10.1109/vppc.2010.5729220",
+    "content_hash": "a164c0c3c21bc68d88d1d85bb623f2153c063c987e892789c9785cc81306cae4",
+    "frozen": false
+   },
+   {
+    "id": "title:f015376fa8aebfc8",
+    "title": "Characterising Li-ion battery degradation through the identification of perturbations in electrochemical battery models",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "5224d9633a8eadef8066a66bf97ced704ef077a11767a0640b05ec084f795e8b",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-026-57560-9",
+   "doi:10.1038/s41598-026-69653-6",
+   "doi:10.1088/1742-6596/2061/1/012014",
+   "doi:10.1109/tie.2005.855664",
+   "doi:10.1109/vppc.2010.5729220",
+   "doi:10.1371/journal.pone.0343872",
+   "doi:10.26174/thesis.lboro.13060496.v1",
+   "doi:10.3390/en7095675",
+   "doi:10.3390/ma19153259",
+   "doi:10.3390/s26103083",
+   "doi:10.48550/arxiv.1801.03813",
+   "doi:10.48550/arxiv.2203.09497",
+   "doi:10.48550/arxiv.2208.12291",
+   "doi:10.5281/zenodo.17671138",
+   "doi:10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+   "title:f015376fa8aebfc8"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:evidence:doi:10.5281/zenodo.17671138",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['not', 'system'] in: 'Prometheus gave humanity the tool (fire), but he did not provide the system to manage it.']",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:evidence:doi:10.48550/arxiv.2203.09497",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['battery', 'model', 'non', 'not'] in: 'In the PT-symmetric case, although the anisotropy of the XY model does not h]",
+    "severity": "HIGH"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Disconnect the primary battery under load and measure whether the EF2 converter maintains bus voltage above 9V; verify that diagnostic trouble codes persist in ECU memory and the shift interlock releases within 500ms of brake pedal application."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_battery_deep_discharge_causing_low_voltage_297896:2026-09-25T00:58:16",
+   "final_envelope_hash": "920a4ffc88db4c6ef042a13fc54e748e38c5511c3949203d5cab5c94043b1b92",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.40534931273485575
+    },
+    "score": 0.2611,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-25T00:59:26+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-25T00:59:26+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1088/1742-6596/2061/1/012014": {
+   "id": "doi:10.1088/1742-6596/2061/1/012014",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1088/1742-6596/2061/1/012014",
+   "source_uri": "https://doi.org/10.1088/1742-6596/2061/1/012014",
+   "title": "Charging balance management for automotive battery in low-voltage power network under low temperature conditions and at deep discharge of the automotive battery in the car",
+   "abstract": "",
+   "doi": "10.1088/1742-6596/2061/1/012014",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2021",
+   "retrieval_timestamp": "2026-09-25T00:58:44.020301+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3124d851e3c8f51e6e6645edf8d2c212111b931c68d1b438036bf6f409a33113",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1088/1742-6596/2061/1/012014"
+    },
+    "queries_by_source": {
+     "crossref": "automotive battery electrical system battery deep discharge causing low voltage and loss of diagnostic trouble codes"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1088/1742-6596/2061/1/012014",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive battery electrical system battery deep discharge causing low voltage and loss of diagnostic trouble codes",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1038/s41598-026-69653-6": {
+   "id": "doi:10.1038/s41598-026-69653-6",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42736412",
+   "source_uri": "https://doi.org/10.1038/s41598-026-69653-6",
+   "title": "Hybrid TSA-TLBO optimization of an EF&lt;sub&gt;2&lt;/sub&gt; resonant DC-DC converter for energy-efficient fuel cell electric vehicles with reduced battery dependency.",
+   "abstract": "The fuel cell electric vehicles (FCEVs) with a lower battery dependency have a big problem in terms of the stability of voltage, high dynamic response and low torque ripple under different load conditions. To overcome these challenges, this paper presents a Tunicate Swarm Algorithm and Teaching-Learning-Based Optimization (TSA-TLBO) optimized hybrid Proportional-Integral-Derivative (PID) and Fractional-Order PID (PID-FOPID) control strategy to enhance the regulation of a PEMFC-based powertrain. This proposed controller operates at the converter and motor drive stage and it is coupled with an Elongation Factor 2 (EF 2 ) resonant DC-DC converter to increase voltage stabilization and power conversion efficiency. The hybrid optimization approach effectively tunes controller parameters to minimize speed and current tracking errors under dynamic operating conditions. Simulation results demonstrate that the proposed system achieves a maximum efficiency of 90.7% with an output power of 187 W. The harmonic analysis was performed at the three-phase inverter output supplying the PMSM. The measured voltage total harmonic distortion (THD) and current THD are 0.21% and 1.78%, respectively. The results also show enhanced dynamic performance and reduced torque fluctuations compared to conventional control methods. These results prove that the proposed solution enhances considerably control performance and allows working with FCEVs that have less auxiliary energy storage efficiently.",
+   "doi": "10.1038/s41598-026-69653-6",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-09-14",
+   "retrieval_timestamp": "2026-09-25T00:58:44.020397+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "dbec2a083adb8b8a3cdd8e7a7fc36da7ab3dd963979655c89f9a13dcb4d51174",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42736412"
+    },
+    "queries_by_source": {
+     "europepmc": "automotive battery electrical system battery deep experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-026-69653-6",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive battery electrical system battery deep experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.3390/ma19153259": {
+   "id": "doi:10.3390/ma19153259",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42590338",
+   "source_uri": "https://doi.org/10.3390/ma19153259",
+   "title": "Vibroacoustic Metamaterials for Low-Frequency Sound and Vibration Attenuation in Electric Vehicles: A Review.",
+   "abstract": "The transition from internal combustion engine vehicles to battery electric vehicles has changed the acoustic design problem in automotive engineering. The absence of combustion-related masking increases the perceptibility of tonal and narrowband sources, including gear whine, electric motor orders, inverter-related components, tire cavity resonances, auxiliary system noise, and lightweight-panel radiation. At the same time, mass-based acoustic treatments conflict with electric vehicle lightweighting, range, cost, and sustainability targets. Vibroacoustic metamaterials offer an alternative route by manipulating elastic and acoustic wave propagation through architected geometries, local resonances, periodicity, membranes, lattice architectures, and adaptive or topological wave-control mechanisms. This review examines vibroacoustic metamaterials for low-frequency electric vehicle noise, vibration, and harshness (EV NVH) from an engineering perspective. It covers mechanisms, EV-specific NVH problems, component applications, materials, manufacturing, modeling, validation, AI-assisted design, sustainability, and technology readiness. Particular emphasis is placed on order-targeted, path-oriented, manufacturable, and experimentally validated solutions for electric-drive (e-drive) housings, wheel arches, battery enclosures, body panels, covers, and auxiliary systems. The review concludes that vibroacoustic metamaterials are most promising when integrated into conventional NVH workflows through order analysis, transfer path ranking, robust resonator tuning, durability validation, and multi-objective design optimization.",
+   "doi": "10.3390/ma19153259",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-08-01",
+   "retrieval_timestamp": "2026-09-25T00:58:44.020427+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e53a0fe3935714c59312827b55d686e565683eddd8a8742b829cddc9ecab7b5f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42590338"
+    },
+    "queries_by_source": {
+     "europepmc": "automotive battery electrical system battery deep experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/ma19153259",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive battery electrical system battery deep experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1038/s41598-026-57560-9": {
+   "id": "doi:10.1038/s41598-026-57560-9",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42310414",
+   "source_uri": "https://doi.org/10.1038/s41598-026-57560-9",
+   "title": "Decision-Flux Optimization-based energy management for battery-supercapacitor hybrid storage in electric vehicles: battery lifetime and efficiency enhancement.",
+   "abstract": "Battery-supercapacitor hybrid energy storage systems can reduce the transient loading of lithium-ion batteries in electric vehicles, but their benefit strongly depends on the energy-management parameters used to distribute power between the two storage devices. This study proposes Decision-Flux Optimization (DFO), a simulation-driven feasible-descent framework for calibrating the parameters of a battery/supercapacitor energy management strategy under full driving-cycle constraints. DFO uses induced operational trace of a candidate decision vector which comprises of battery state of charge, supercapacitor state of charge, power limits, voltage limits and end-of-cycle recovery constraints. Constraint satisfaction is considered as an admissibility condition and not as a term in the objective function. The objective is a combination of normalized RMS battery power, normalized energy-loss indicators, and only accepted updates are feasible trace-level transitions. The optimized parameters are computed offline and then deployed in the real-time control layer. Evaluation of the method is performed on ARTEMIS driving cycle through simulation and laboratory-scale controller validation. Compared with GA, PSO, RB-EMS, MPC, SRCPO, DSCEO, and ADRL-EMS benchmarks, DFO produced the lowest RMS battery power in the reported case study and maintained feasibility across repeated runs. The aging analysis indicates a model-estimated lifetime of 3720 equivalent cycles before the 80% capacity threshold, which should be interpreted as a comparative model-based durability estimate rather than a direct long-term lifetime measurement. Results indicate that trace level feasibility gating can be used to enhance repeatability, battery stress mitigation, and energy management for efficiency.",
+   "doi": "10.1038/s41598-026-57560-9",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-06-17",
+   "retrieval_timestamp": "2026-09-25T00:58:44.020447+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4e4cfb2224b528abed8b09c7ca750c59d26a478c5333d9a9a5e4ef5be7e35202",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42310414"
+    },
+    "queries_by_source": {
+     "europepmc": "automotive battery electrical system battery deep experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-026-57560-9",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive battery electrical system battery deep experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1371/journal.pone.0343872": {
+   "id": "doi:10.1371/journal.pone.0343872",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42224246",
+   "source_uri": "https://doi.org/10.1371/journal.pone.0343872",
+   "title": "An integrated method for state of charge estimation, lifetime prediction, and reliability assessment of Lithium-ion batteries under thermal and dynamic conditions.",
+   "abstract": "Accurate estimation of the state-of-charge (SOC), remaining useful life (RUL), and reliability of lithium-ion batteries is essential for renewable energy storage and electric mobility systems. This paper proposes a unified experimental-analytical framework that systematically integrates temperature-dependent SOC estimation, degradation modeling, and probabilistic reliability assessment within a single validated pipeline. Two A123 LiFePO4 pouch cells were experimentally characterized using low-current open-circuit voltage (OCV) protocols and representative dynamic driving cycles (DST, US06, and FUDS) across multiple temperatures. A dual-estimator structure combining Coulomb counting, OCV correction, and an extended Kalman filter (EKF) was developed to enhance both steady-state accuracy and transient responsiveness under thermal variations. In parallel, temperature-aware degradation kinetics were modeled using Arrhenius-based relationships directly linked to cycle-based RUL extrapolation. To explicitly account for inter-cell variability, Weibull survival analysis was incorporated into the same computational framework, enabling probabilistic life prediction rather than purely deterministic estimation. Sensitivity analysis further quantified the propagation of parameter uncertainty into SOC and RUL predictions. Experimental results demonstrate voltage estimation errors below 0.02 V (corresponding to approximately 1-2% SOC deviation under nominal conditions), clear temperature-driven acceleration of aging, and significant life divergence between nominally identical cells (≈1000 vs. 200 cycles). The primary innovation of this work lies not merely in incremental accuracy improvement, but in the coherent integration of estimation, degradation, and reliability modeling under realistic multi-temperature dynamic operation, providing a practical decision-support architecture for real-world battery management systems.",
+   "doi": "10.1371/journal.pone.0343872",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-06-01",
+   "retrieval_timestamp": "2026-09-25T00:58:44.020466+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d3ae4b78535eca2a22e50596ac11745716427e0c2f747be93339e4a791b69212",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42224246"
+    },
+    "queries_by_source": {
+     "europepmc": "automotive battery electrical system battery deep experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1371/journal.pone.0343872",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive battery electrical system battery deep experimental comparison",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.3390/s26103083": {
+   "id": "doi:10.3390/s26103083",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42197892",
+   "source_uri": "https://doi.org/10.3390/s26103083",
+   "title": "Multi-Scale Spatiotemporal Attention Network for Early Warning of Lithium-Ion Battery Thermal Runaway.",
+   "abstract": "Lithium-ion battery thermal runaway has become a key safety hazard restricting the development of electric vehicles. Early precursor signals of thermal runaway are characterized by multi-scale features, weak signal strength and spatial coupling, posing significant challenges for traditional methods in achieving accurate early warning. To solve this problem, a multi-scale spatiotemporal attention network (MSTA-Net) is proposed for battery thermal runaway early warning. First, a systematic feature engineering process is designed, including signal denoising, normalization processing and multi-level feature construction, to fully extract discriminative information from voltage and temperature signals. Then, the MSTA-Net architecture is constructed, which includes three parallel feature extraction branches: local fine perception branch based on 1D depthwise separable convolution to capture transient anomalies, a temporal evolution modeling branch based on bidirectional gated recurrent units to learn long-term trends, and a global spatial dependence branch based on a graph attention network to model the spatial propagation of thermal runaway. Finally, an adaptive fusion gate is designed to dynamically fuse the features of each branch according to the input context. The experimental results on the self-built battery thermal runaway dataset show that the proposed MSTA-Net achieves a recall rate of 98.7%, an average early warning time of 115 s and a false alarm rate of 0 times/h. Compared with traditional machine learning and deep learning models such as Random Forest, LSTM and Transformer, the model has significant advantages in early warning accuracy, timeliness and robustness. Ablation experiments verify the effectiveness of each component of the MSTA-Net. The proposed method can provide reliable early warning of thermal runaway only by using the existing voltage and temperature sensors of the battery management system, which has important engineering application value.",
+   "doi": "10.3390/s26103083",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-05-13",
+   "retrieval_timestamp": "2026-09-25T00:58:44.020484+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "74a7366356db01bf65fb3035ae48505bbe63be1b67b720b82b09b6359884e8e6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42197892"
+    },
+    "queries_by_source": {
+     "europepmc": "automotive battery electrical system battery deep experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s26103083",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive battery electrical system battery deep experimental comparison",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.5281/zenodo.17671138": {
+   "id": "doi:10.5281/zenodo.17671138",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.17671138",
+   "source_uri": "https://doi.org/10.5281/zenodo.17671138",
+   "title": "PROMETHEUS NEEDS AN OPERATING SYSTEM: Why Jeff Bezos' $6.2B Vision Requires the CollectiveOS Anti-Scarcity Stack",
+   "abstract": " \n\nPROMETHEUS NEEDS AN OPERATING SYSTEM: Why Jeff Bezos’ $6.2B Vision Requires the CollectiveOS Anti-Scarcity Stack\n\n\n\n1. Introduction: The Limits of Promethean Thinking\n\n \n\nThe mythological Prometheus stole fire from the gods to empower humanity, an act of rebellion that catalyzed the dawn of civilization. In late 2025, Jeff Bezos, the founder of Amazon and Blue Origin, invoked this Titan’s name for his latest and perhaps most ambitious venture: Project Prometheus.1 With an initial funding commitment of $6.2 billion—one of the largest seed rounds in industrial history—and a mandate to revolutionize \"heavy industry\" through artificial intelligence, Bezos has positioned this initiative as the engine that will finally drive humanity’s industrial base off the surface of the Earth.3 It is a vision of staggering scale, aiming to transform the cosmos into a manufacturing zone so that Earth can be rezoned for \"residential and light industry,\" effectively turning the planet into a protected garden while the machinery of production migrates to the void.5\n\nHowever, the Promethean myth carries a warning that the project’s architects seem to have overlooked. Prometheus gave humanity the tool (fire), but he did not provide the system to manage it. He provided the energy source but not the governance structure, the environmental safeguards, or the regenerative loops necessary to prevent that fire from consuming its users. Bezos’ Project Prometheus suffers from an identical architectural flaw. It is a masterclass in industrial logic applied to a biological vacuum. It focuses entirely on the \"fire\"—nuclear propulsion, autonomous manufacturing, robotic assembly, and supply chain optimization—while assuming that the \"civilization\"—the water cycles, the food systems, the microbial governance, and the ethical guardrails—will largely take care of themselves, or worse, can be imported from Earth via supply chain logistics.6\n\nThis assumption is not merely optimistic; it is fatal. The transition from terrestrial industry to off-world habitation is not a linear scaling problem; it is a phase change. On Earth, industry operates within a pre-existing biosphere that provides free air, water filtration, and waste decomposition. In the vacuum of space or the desolation of the lunar surface, none of these services exist. A factory in orbit cannot simply \"emit\" waste; it must metabolize it",
+   "doi": "10.5281/zenodo.17671138",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-25T00:58:44.020508+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "df90f4491a926f76187816f1c83d9af02d8a44e87bb318217dd204e4d0db711b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.17671138"
+    },
+    "queries_by_source": {
+     "datacite": "automotive energy harvester"
+    },
+    "query_variant_derivation": "DOMAIN_NARROW",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Dataset"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.17671138",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive energy harvester",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Brewer, Mark Anthony"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.26174/thesis.lboro.13060496.v1": {
+   "id": "doi:10.26174/thesis.lboro.13060496.v1",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.26174/thesis.lboro.13060496.v1",
+   "source_uri": "https://doi.org/10.26174/thesis.lboro.13060496.v1",
+   "title": "Broadband vibration energy harvesting from powertrain torsional oscillations",
+   "abstract": "Torsional oscillations are an inherent and often undesirable feature in many rotordynamic applica?tions, such as in piston engines and reciprocating machinery. At the same time, there is a fast-growing trend in many industries to use sensors for condition monitoring and control applications. Powering these sensors poses a challenge in many cases, where access is limited, such as on rotating components in propulsion systems (powertrains). The current state of the art (e.g. batteries or slip rings) require regular maintenance which can induce costs associated with machine down time and maintenance charges. To overcome the above deficiencies, vibration energy harvesting can be used to harness the (otherwise wasted) energy of powertrain torsional oscillations and to power wireless sensors indefi?nitely, thus enabling the application of new sensor technologies.This thesis investigates methods for broadband energy harvesting from torsional speed fluctuations in rotating shafts with a focus on automotive powertrains. A review of the relevant literature is presented first, which identifies gaps in how torsional oscillations can be harvested. The first unex?plored approach involves using a Duffing type electromagnetic energy harvester and subsequently a tautochronic centrifugal pendulum harvester design is also tested.Numerical modelling of the Duffing type energy harvester revealed that there exists a condition for which the drop-down frequency can never be reached. This is found to be caused by the amplitude of oscillations increasing with shaft speed, a phenomenon hitherto undiscovered in similar devices. Several iterations of experimental testing of the Duffing type energy harvester resulted in a device capable of sustaining high amplitude oscillations for a relatively wide shaft rotational speed range. The rms power generated in the numerical model of the energy harvester agreed to within 10% of the experimental results. With the experimentally validated model, future work should focus on manu?facturing a device with an infinite drop down frequency to maximise the usable speed range of the harvester.The second approach investigated in this thesis is the use of a novel tautochronic centrifugal pendulum energy harvester. The tautochronic property means that the harvester is tuned to linear resonance irrespective of the amplitude of oscillations. This is contrary t",
+   "doi": "10.26174/thesis.lboro.13060496.v1",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-25T00:58:44.020536+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "29d5192d4a1ed59547627571a417bb6fa859fe79c55434f153e3ae4796c3e1ab",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.26174/thesis.lboro.13060496.v1"
+    },
+    "queries_by_source": {
+     "datacite": "automotive energy harvester"
+    },
+    "query_variant_derivation": "DOMAIN_NARROW",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Dissertation; resource_type=Thesis"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.26174/thesis.lboro.13060496.v1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive energy harvester",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Gunn, Ben"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.70675/2557860bzc1f3z4619z9112z8c292c37ac86": {
+   "id": "doi:10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+   "source_uri": "https://doi.org/10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+   "title": "Battery voltage stabilization system for automotive Stop-Start function : a linear power electronic solution",
+   "abstract": "",
+   "doi": "10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-25T00:58:44.020565+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "26f5fd71f83769e69e3f2047fcb5dd5cbbaafa50f6412298ccc6d288fef5cc38",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70675/2557860bzc1f3z4619z9112z8c292c37ac86"
+    },
+    "queries_by_source": {
+     "crossref": "automotive battery electrical system battery deep discharge causing low voltage and loss of diagnostic trouble codes"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70675/2557860bzc1f3z4619z9112z8c292c37ac86",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive battery electrical system battery deep discharge causing low voltage and loss of diagnostic trouble codes",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2208.12291": {
+   "id": "doi:10.48550/arxiv.2208.12291",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2208.12291v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2208.12291",
+   "title": "The Effect of Frequency Droop Damping on System Parameters and Battery Sizing During Load Change Condition",
+   "abstract": "Inverter-based resources (IBR) have been widely studied for their advantages on the current power systems. This increase in the penetration of renewable energy has raised some concerns about the stability of the existing grid. Historically, power systems are dominated by synchronous generators that can easily react to system instability due to high inertia and damping characteristics. However, with IBR, the control of the inverter plays a crucial role in contributing to the system stability and enhancing the functionality of the inverters. One of these novel control methods is droop control. Droop characteristics are used to control voltage, frequency, and active and reactive power. This paper presents the impact of frequency droop damping on system frequency, real power, and the rate of change of frequency with distributed energy resources. Also, battery sizing is suggested based on the results. The results also show the need for optimal selection for the frequency droop damping to fulfill the appropriate battery size in terms of cost and performance. The simulations are carried out in an electromagnetic transient program (EMTP)",
+   "doi": "10.48550/arxiv.2208.12291",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-25T00:58:44.020596+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8237445cedff831e78b5e98518597b35f6474efd0fef8585b473801bfa58a407",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2208.12291v1"
+    },
+    "queries_by_source": {
+     "arxiv": "automotive battery electrical system battery deep discharge causing low voltage and loss of diagnostic trouble codes"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2208.12291",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive battery electrical system battery deep discharge causing low voltage and loss of diagnostic trouble codes",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2208.12291v1",
+   "authors": [
+    "Mohammed F. Allehyani",
+    "Mohamed Abuagreb",
+    "Brian K. Johnson"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2203.09497": {
+   "id": "doi:10.48550/arxiv.2203.09497",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2203.09497v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.2203.09497",
+   "title": "Quantum battery with non-Hermitian charging",
+   "abstract": "We propose a design of a quantum battery exploiting the non-Hermitian Hamiltonian as a charger. In particular, starting with the ground or the thermal state of the interacting (non-interacting) Hamiltonian as the battery, the charging of the battery is performed via parity-time (PT)- and rotational-time (RT)-symmetric Hamiltonian to store energy. We report that such a quenching with a non-Hermitian Hamiltonian leads to an enhanced power output compared to a battery with a Hermitian charger. We identify the region in the parameter space which provides the gain in performance. We also demonstrate that the improvements persist with the increase of system size for batteries with both PT- and RT-symmetric chargers. In the PT-symmetric case, although the anisotropy of the XY model does not help in the performance, we show that the XXZ model as a battery with a non-Hermitian charger performs better than that of the XX model having certain interaction strengths. We also exhibit that the advantage of non-Hermiticity remains valid even at finite temperatures in the initial states.",
+   "doi": "10.48550/arxiv.2203.09497",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-25T00:58:44.020619+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0be6791dd8f9da557245e33aa98ea134aedef9d0931a4ed823e5aa59f62d66f2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2203.09497v2"
+    },
+    "queries_by_source": {
+     "arxiv": "automotive battery electrical system battery deep discharge causing low voltage and loss of diagnostic trouble codes"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2203.09497",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive battery electrical system battery deep discharge causing low voltage and loss of diagnostic trouble codes",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2203.09497v2",
+   "authors": [
+    "Tanoy Kanti Konar",
+    "Leela Ganesh Chandra Lakkaraju",
+    "Aditi Sen De"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.1801.03813": {
+   "id": "doi:10.48550/arxiv.1801.03813",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1801.03813v3",
+   "source_uri": "https://doi.org/10.48550/arxiv.1801.03813",
+   "title": "Energy Harvesting Communications Using Dual Alternating Batteries",
+   "abstract": "Practical energy harvesting (EH) based communication systems typically use a battery to temporarily store the harvested energy prior to its use for communication. The batteries can be damaged when they are repeatedly charged (discharged) after being partially discharged (charged), overcharged or deeply discharged. This motivates the cycle constraint which says that a battery must be charged (discharged) only after it is sufficiently discharged (charged). We also assume Bernoulli energy arrivals, and a half-duplex constraint due to which the batteries are not charged and discharged simultaneously. In this context, we study EH communication systems with: (a) a single-battery with capacity 2B units and (b) dual-batteries, each having capacity of B units. The aim is to obtain the best possible long-term average throughputs and throughput regions in point-to-point (P2P) channels and multiple access channels (MAC), respectively. For the P2P channel, we obtain an analytical optimal solution in the single-battery case, and propose optimal and sub-optimal power allocation policies for the dual-battery case. We extend these policies to obtain achievable throughput regions in MACs by jointly allocating rates and powers. From numerical simulations, we find that the optimal throughput in the dual-battery case is significantly higher than that in the single-battery case, although the total storage capacity in both cases is 2B units. Further, in the proposed policies, the largest throughput region in the single-battery case is contained within that of the dual-battery case.",
+   "doi": "10.48550/arxiv.1801.03813",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-25T00:58:44.020638+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5c37baa0e49511efef591ecc3116c6c206181c3801e13ec375b86780c6cdbdf3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1801.03813v3"
+    },
+    "queries_by_source": {
+     "arxiv": "automotive battery electrical system battery deep discharge causing low voltage and loss of diagnostic trouble codes"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1801.03813",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive battery electrical system battery deep discharge causing low voltage and loss of diagnostic trouble codes",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/1801.03813v3",
+   "authors": [
+    "Rajshekhar Vishweshwar Bhat",
+    "Mehul Motani",
+    "Chandra R Murthy",
+    "Rahul Vaze"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.1109/tie.2005.855664": {
+   "id": "doi:10.1109/tie.2005.855664",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:4802754",
+   "source_uri": "https://doi.org/10.1109/tie.2005.855664",
+   "title": "Battery choice and management for New Generation Electric Vehicles",
+   "abstract": "Different types of electric vehicles (EVs) have been recently designed with the aim of solving pollution problems caused by the emission of gasoline-powered engines. Environmental problems promote the adoption of new-generation electric vehicles for urban transportation. As it is well known, one of the weakest points of electric vehicles is the battery system. Vehicle autonomy and, therefore, accurate detection of battery state of charge (SoC) together with battery expected life, i.e., battery state of health, are among the major drawbacks that prevent the introduction of electric vehicles in the consumer market. The electric scooter may provide the most feasible opportunity among EVs. They may be a replacement product for the primary-use vehicle, especially in Europe and Asia, provided that drive performance, safety, and cost issues are similar to actual engine scooters. The battery system choice is a crucial item, and thanks to an increasing emphasis on vehicle range and performance, the Li-ion battery could become a viable candidate. This paper deals with the design of a battery pack based on Li-ion technology for a prototype electric scooter with high performance and autonomy. The adopted battery system is composed of a suitable number of cells series connected, featuring a high voltage level. Therefore, cell equalization and monitoring need to be provided. Due to manufacturing asymmetries, charge and discharge cycles lead to cell unbalancing, reducing battery capacity and, depending on cell type, causing safety troubles or strongly limiting the storage capacity of the full pack. No solution is available on the market at a cheap price, because of the required voltage level and performance, therefore, a dedicated battery management system was designed, that also includes a battery SoC monitoring. The proposed solution features a high capability of energy storing in braking conditions, charge equalization, overvoltage and undervoltage protection and, obviously, SoC information in order to optimize autonomy instead of performance or vice-versa",
+   "doi": "10.1109/tie.2005.855664",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-25T00:58:44.020656+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f589473234aa820c3a048e80042976160df0412a0b7659d9479dee65c6e4b1ed",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:4802754"
+    },
+    "queries_by_source": {
+     "core": "automotive battery electrical system battery deep experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1109/tie.2005.855664",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive battery electrical system battery deep experimental comparison",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Affanni, A.",
+    "P. Guglielmi",
+    "G. Franceschini",
+    "Guglielmi, Paolo",
+    "Franceschini, G.",
+    "BELLINI, Alberto",
+    "BELLINI A",
+    "A. BELLINI",
+    "Bellini, A.",
+    "AFFANNI A.",
+    "C. Tassoni",
+    "FRANCESCHINI G.",
+    "GUGLIELMI P.",
+    "A. Affanni",
+    "Tassoni, C.",
+    "AFFANNI, Antonio",
+    "FRANCESCHINI G",
+    "GUGLIELMI P",
+    "TASSONI C.",
+    "FRANCESCHINI, Giovanni"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.3390/en7095675": {
+   "id": "doi:10.3390/en7095675",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:17446431",
+   "source_uri": "https://doi.org/10.3390/en7095675",
+   "title": "An Acausal Li-Ion Battery Pack Model for  Automotive Applications",
+   "abstract": "In this work, a novel acausal and reconfigurable battery pack model is presented. The model structure adopted for the battery cell is based on an equivalent circuit representation. The circuit elements are modified to take account of both hysteresis and diffusion limitation. The latter is known to be a nonlinear function of large operating currents or long operating times. It is shown that the integration of a current dependent time constant within the cell model better emulates the solid diffusional dynamics of lithium intercalation into the active material under large electrical loads. The advantages of an acausal modeling approach, when scaling-up individual cell models into a complete battery system are also presented. Particular consideration is given to emulating the impact of cell to cell variations on pack performance. Using statistical analysis of battery tests, cell model parameter variations are characterized and quantified. The cell and scaled-up pack model are parameterized for a number of commercially available cell formats, energy capacities and chemistries. The new models are validated using transient, real-world, electrical data measured from an electric vehicle (EV) operating within an urban environment",
+   "doi": "10.3390/en7095675",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-25T00:58:44.020672+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "19ad78a06c1b24152c64d8457eb6d13d3ec4d7c4f93900f1b2c0972b5abe8c0f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:17446431"
+    },
+    "queries_by_source": {
+     "core": "automotive battery electrical system battery deep experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.3390/en7095675",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive battery electrical system battery deep experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Taylor, Nigel",
+    "James Marco",
+    "Christopher Lyness",
+    "Marco, James",
+    "Nigel Taylor",
+    "Alessandro Picarelli",
+    "Uddin, Kotub",
+    "Kotub Uddin",
+    "Picarelli, Alessandro",
+    "Lyness, Christopher"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1109/vppc.2010.5729220": {
+   "id": "doi:10.1109/vppc.2010.5729220",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:7076259",
+   "source_uri": "https://doi.org/10.1109/vppc.2010.5729220",
+   "title": "A Multiphase Traction/Fast-Battery-Charger Drive for Electric or Plug-in Hybrid Vehicles",
+   "abstract": "For Electric Vehicles (EV), the charger is one of the main technical and economical weaknesses. This paper focuses on an original electric drive [1]-[3] dedicated to the vehicle traction and configurable as a battery charger without need of additional components. This cheap solution can outfit either electric or plug-in hybrid automotive vehicles, without needing additional mass and volume dedicated to the charger. Moreover, it allows a high charging power, for short duration charge cycles. However, this solution needs specific cares concerning the electrical machine control. This paper deals with the control of this drive [1], focusing on traction mode. In introduction, a review is done about topologies of combined on-board chargers. Then, the studied topology is introduced; using a 3-phase brushless machine supplied with a 6-leg Voltage Source Inverter (VSI). A model for its control is defined in the generalized Concordia frame, considering the traction mode. Then, an analysis of this model is established using a multimachine theory and a graphical formalism (the Energetic Macroscopic Representation denoted EMR). Using EMR, a description of energy flows shows specific control constraints. Indeed, numerical simulations illustrate the perturbations on the currents and the torque when controlling the machine with standard control methodologies. An improved control, deduced from the previous analysis, shows good performances, strongly reducing currents and torque ripples.Fui8 funding within the SOFRACI projec",
+   "doi": "10.1109/vppc.2010.5729220",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-25T00:58:44.020689+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a164c0c3c21bc68d88d1d85bb623f2153c063c987e892789c9785cc81306cae4",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:7076259"
+    },
+    "queries_by_source": {
+     "core": "automotive battery electrical system battery deep experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1109/vppc.2010.5729220",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive battery electrical system battery deep experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "BOUCHEZ, Boris",
+    "E. Semail",
+    "DE SOUSA, Luis",
+    "A. Bruyere",
+    "KESTELYN, Xavier",
+    "P. Sandulescu",
+    "SEMAIL, Eric",
+    "SANDULESCU, Paul",
+    "B. Bouchez",
+    "X. Kestelyn",
+    "BRUYERE, Antoine",
+    "L. De Sousa"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:f015376fa8aebfc8": {
+   "id": "title:f015376fa8aebfc8",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:17451705",
+   "source_uri": "",
+   "title": "Characterising Li-ion battery degradation through the identification of perturbations in electrochemical battery models",
+   "abstract": "Lithium ion batteries undergo complex electrochemical and mechanical degradation. This complexity is pronounced in applications such as electric vehicles where highly demanding cycles of operation and varying environmental conditions lead to non-trivial interactions of ageing stress factors. This work presents the framework for an ageing diagnostic tool based on identifying the physical parameters of a fundamental electrochemistry-based battery model from non-invasive voltage/current cycling tests. Exploiting the embedded symbolic manipulation tool and global optimiser in MapleSim, computational cost is reduced, significantly facilitating rapid optimisation. The diagnostic tool is used to study the degradation of a 3Ah LiC6/LiNiCoAlO2 battery stored at 45°C at 50% State of Charge for 202 days; the results agree with expected battery degradation",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-25T00:58:44.020704+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5224d9633a8eadef8066a66bf97ced704ef077a11767a0640b05ec084f795e8b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:17451705"
+    },
+    "queries_by_source": {
+     "core": "automotive battery electrical system battery deep experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:f015376fa8aebfc8",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "automotive battery electrical system battery deep experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Widanage, Widanalage Dhammika",
+    "Marco, James",
+    "Perera, Surak",
+    "Uddin, Kotub"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:2394f678": {
+   "id": "problem:2394f678",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "2394f6784fef2ee6e98f717e1b153bbee05e9ea6a71bb762faab1a47a487569c",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "3874963aa58535bb5b1ba753b0ba6fa8de53079676c7b179440afde82d1bd561",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-25T00:59:26+00:00Z"
+ }
+}
