@@ -1027,6 +1027,21 @@ def _mechanism_space_spans(ms_env, stage_entry, ledger_block):
         "spans": {s.get("subphase"): s.get("duration_s")
                   for s in subphases
                   if isinstance(s, dict)},
+        # R535 §4: retrieval-config audit — record exactly what the
+        # production RETRIEVE actually exercised (fabric version,
+        # channels, excluded sources, evidence-fabric state, per-source
+        # latency/contribution when the envelope carries it).  This is
+        # observational: it does NOT change the running configuration.
+        "retrieval_config_audit": (
+            ((ms_env or {}).get("retrieval_config")
+             or (ms_env or {}).get("retrieval")
+             or None),
+        ),
+        "retrieval_source_level": (
+            ((ms_env or {}).get("retrieval_sources")
+             or (ms_env or {}).get("retrieval_fabric_sources")
+             or None),
+        ),
         "subphase_detail": [
             {k: v for k, v in s.items()
              if k in ("subphase", "duration_s", "n_verified_items_examined",
