@@ -59,9 +59,72 @@ def _stage_order_from_bytes(source_commit: str) -> list:
     return re.findall(r'"([A-Z_]+)"', m.group(1)) if m else []
 
 
+def _source_commit_from_metadata() -> str:
+    """R534 audit §5-D: the addendum's provenance must match the
+    metadata artifacts.  Read `generated_from_commit` from
+    ACTIVE_DISCOVERY_GRAPH.json so the addendum and the metadata
+    are consistent (the blueprint must not claim a different
+    source commit than the graph/registry)."""
+    graph = REPO / "ACTIVE_DISCOVERY_GRAPH.json"
+    if graph.exists():
+        data = json.loads(graph.read_text(encoding="utf-8"))
+        gfc = data.get("generated_from_commit")
+        if isinstance(gfc, str) and len(gfc) == 40:
+            return gfc
+    return _head()
+
+
 def main() -> int:
-    head = _head()
-    stages = _stage_order_from_bytes(head)
+    import argparse
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--source-commit", default=None,
+                    help="40-hex source commit; defaults to the "
+                         "metadata's generated_from_commit (R534 §5-D)")
+    args = ap.parse_args()
+
+    source_commit = (args.source_commit or
+                     _source_commit_from_metadata())
+    assert len(source_commit) == 40, \
+        f"bad source commit: {source_commit!r}"
+
+    stages = _stage_order_from_bytes(source_commit)
+
+    # R534 audit §5-E: use the SAME cryptographic source-byte
+    # provenance discipline as r529_refresh_metadata.py — do NOT
+    # independently trust `git show`.  The verifier checks the blob
+    # against the recorded ls-tree SHA before the bytes are used.
+    sys.path.insert(0, str(REPO / "scripts"))
+    import importlib
+    _refresh = importlib.import_module("r529_refresh_metadata")
+    _prov = _refresh._verify_adapter_blob(source_commit)
+    if not _prov["verified"]:
+        print(f"FATAL: source-byte provenance verification failed "
+              f"for {source_commit}: {_prov['reason']}")
+        return 2
+    adapter_blob_sha = _prov["blob_sha"]
+
+    # R534 audit §5-E: make the addendum idempotent — if it is
+    # already present with the same source commit, do nothing.
+    original = BP.read_text(encoding="utf-8")
+    marker = ("R533 PROVENANCE CORRECTION ADDENDUM")
+    if marker in original:
+        import re as _re
+        # Find ALL source-commit markers; idempotent only when an
+        # addendum already records THIS exact source commit.
+        _all = _re.findall(
+            r"Source commit:\s*([0-9a-f]{40})", original)
+        if source_commit in _all:
+            print(f"addendum already present for source commit "
+                  f"{source_commit[:12]} — no duplicate mutation "
+                  f"(idempotent, Art. XI append-only)")
+            return 0
+        # Stale addendum(s) present for a DIFFERENT commit: append
+        # the correction for the current commit (append-only,
+        # Art. XI — old addendum(s) preserved, not overwritten).
+        print(f"stale addendum present (source_commit="
+              f"{(_all[0][:12] if _all else '?')}) — appending "
+              f"correction for {source_commit[:12]} "
+              f"(append-only; the old addendum is preserved)")
 
     addendum = f"""
 ---
@@ -69,8 +132,12 @@ def main() -> int:
 ## R533 PROVENANCE CORRECTION ADDENDUM (APPEND-ONLY, Art. XI)
 
 Generated: {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}
-Source commit: {head}
-Adapters file blob: discovery_fabric/engine/adapters.py @ {head[:12]}
+Source commit: {source_commit}
+adapter_blob_sha (cryptographic identifier of the inspected
+bytes): {adapter_blob_sha}
+Provenance: `scripts/r529_refresh_metadata.py::_verify_adapter_blob`
+verified that `git show` bytes == `git cat-file blob` bytes for
+blob {adapter_blob_sha} at commit {source_commit[:12]}.
 
 ### Architecture authority
 
@@ -119,15 +186,20 @@ Line 108 (original): "without altering the exact D8 13-stage order"
 
 ### Metadata provenance link
 
-`ACTIVE_DISCOVERY_GRAPH.json` `generated_from_commit = {head}`
-`RUNTIME_CAPABILITY_REGISTRY.json` `generated_from_commit = {head}`
-`adapter_blob_sha` field records the exact blob SHA of
-`discovery_fabric/engine/adapters.py` inspected.
+`ACTIVE_DISCOVERY_GRAPH.json` `generated_from_commit = {source_commit}`
+`adapter_blob_sha = {adapter_blob_sha}`
+`RUNTIME_CAPABILITY_REGISTRY.json` `generated_from_commit = {source_commit}`
+`adapter_blob_sha = {adapter_blob_sha}`
+
+The commit prefix is NOT the blob identifier. The blob SHA is the
+cryptographic identity of the inspected bytes; the commit is the
+tree that contains the blob. Both are recorded and must not be
+conflated (R534 audit §5-D).
 """
 
-    original = BP.read_text(encoding="utf-8")
     BP.write_text(original + addendum, encoding="utf-8")
-    print(f"appended provenance correction addendum to {BP}")
+    print(f"appended provenance correction addendum to {BP} "
+          f"(blob={adapter_blob_sha[:12]}, idempotent)")
 
     rec = {
         "artifact": "ENGINE_BLUEPRINT_PROVENANCE_CORRECTION/1.0",
@@ -155,7 +227,8 @@ Line 108 (original): "without altering the exact D8 13-stage order"
             "constitution_version": "v2.10.1",
             "executable_authority": "discovery_fabric/engine/adapters.py::STAGE_ORDER",
         },
-        "generated_from_commit": head,
+        "generated_from_commit": source_commit,
+        "adapter_blob_sha": adapter_blob_sha,
         "original_file_sha256_before": _sha_original(original),
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)

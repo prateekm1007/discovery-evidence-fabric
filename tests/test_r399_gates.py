@@ -136,8 +136,18 @@ def test_retrieve_failure_cascades_to_rank(tmp_path, monkeypatch):
         "UNKNOWN", "MECHANISM_GENERATION_FAILED")
     log = {e["stage"]: e["status"] for e in run.env.stage_log}
     assert log["RETRIEVE"] == "FAILED_EXPLICIT"
+    # R534 audit §7-C: FREEZE declares depends_on=["RETRIEVE"];
+    # the runtime blocker set MUST skip it on a RETRIEVE failure —
+    # the R533 drift closed by adding FREEZE to
+    # DOWNSTREAM_BLOCKERS["RETRIEVE"]. This is a runtime proof of
+    # the conductor's skip-cascade (not just the data structure).
+    assert log["FREEZE"] == "SKIPPED_UPSTREAM_FAILURE", (
+        "FREEZE must record SKIPPED_UPSTREAM_FAILURE after a "
+        "RETRIEVE failure (the R533/R534 dependency repair); "
+        f"got {log.get('FREEZE')!r}")
     assert log["SYNTHESIZE"] == "SKIPPED_UPSTREAM_FAILURE"
     assert log["VERIFY"] == "SKIPPED_UPSTREAM_FAILURE"
+    assert log["MECHANISM_SPACE"] == "SKIPPED_UPSTREAM_FAILURE"
     # the R399 fix: everything downstream of the SKIP is skipped too —
     # no stage reports OK on an empty envelope
     for stage in ("COLLISION", "PHYSICS",

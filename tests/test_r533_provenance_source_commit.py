@@ -151,17 +151,50 @@ class TestProvenanceSourceCommit(unittest.TestCase):
                          f"check: {prov}")
 
     def test_e_mismatched_never_reaches_write(self):
+        """Prove the actual non-write behavior: when
+        `_verify_adapter_blob` rejects the source commit,
+        `main()` returns a failure exit code BEFORE any
+        metadata file is written.  We snapshot the target
+        bytes, invoke main() with an invalid source commit,
+        assert the return code is non-zero, and assert the
+        target bytes are byte-identical afterward."""
+        import subprocess as sp
         ref = _import_refresh()
+
+        GRAPH = REPO_ROOT / "ACTIVE_DISCOVERY_GRAPH.json"
+        REG = REPO_ROOT / "RUNTIME_CAPABILITY_REGISTRY.json"
+        graph_before = GRAPH.read_bytes()
+        reg_before = REG.read_bytes()
+
+        # `0`*40 is not a commit object → _verify_adapter_blob
+        # returns verified=False → main() must return 2 and
+        # not write any file.
         fake = "0" * 40
-        prov = ref._verify_adapter_blob(fake)
-        self.assertFalse(prov["verified"])
-        self.assertEqual(prov["reason"],
-                         "source_commit is not a commit object")
-        graph = json.loads((REPO_ROOT / "ACTIVE_DISCOVERY_GRAPH.json")
-                           .read_text(encoding="utf-8"))
-        self.assertEqual(
-            graph.get("generated_from_commit"),
-            graph.get("generated_from_commit"))
+        proc = sp.run(
+            [sys.executable, str(REPO_ROOT / "scripts" /
+                               "r529_refresh_metadata.py"),
+             "--source-commit", fake],
+            capture_output=True, text=True, cwd=str(REPO_ROOT))
+
+        # The script must exit non-zero (2 = provenance refused)
+        self.assertNotEqual(proc.returncode, 0,
+                            f"main() should refuse to write on "
+                            f"unverified source commit; got rc="
+                            f"{proc.returncode}\nstdout={proc.stdout}"
+                            f"\nstderr={proc.stderr}")
+
+        # The metadata files must be byte-identical
+        graph_after = GRAPH.read_bytes()
+        reg_after = REG.read_bytes()
+        self.assertEqual(graph_before, graph_after,
+                         "ACTIVE_DISCOVERY_GRAPH.json was modified "
+                         "even though provenance check failed — "
+                         "the write path ran without verification")
+        self.assertEqual(reg_before, reg_after,
+                         "RUNTIME_CAPABILITY_REGISTRY.json was "
+                         "modified even though provenance check "
+                         "failed — the write path ran without "
+                         "verification")
 
 
 if __name__ == "__main__":  # pragma: no cover
