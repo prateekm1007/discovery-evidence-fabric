@@ -1,5 +1,5 @@
 {
- "artifact": "R529_MECHANISM_SPACE_PROVIDER_JOIN/1.0",
+ "artifact": "R529_MECHANISM_SPACE_PROVIDER_JOIN/1.1",
  "harvest": "R526/ATTR_CURRENT_HARVEST.json",
  "harvest_sha256": "93567b538ee3a2fcca8d7c6d8e37a9f4bc6601fe7cfe198fcc04ce5b1e7c4aec",
  "n_rows": 10,
@@ -11,12 +11,14 @@
    "class": "OBSERVED_IN_STAGE",
    "terminal_state": "BUILT",
    "partition": {
-    "A_provider_inference_s": {
-     "value": 8.481,
-     "class": "PROVIDER_EXECUTION",
-     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    "selection_orchestration_s": {
+     "value": 2.022,
+     "class": "UNKNOWN",
+     "subspans": null,
+     "selection_diag": null,
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
     },
-    "B_failed_first_hop_s": {
+    "failed_hop_admission_s": {
      "value": 0.000149,
      "class": "PROVIDER_FAILURE_OR_RETRY",
      "n_failed_hops": 1,
@@ -31,35 +33,42 @@
      ],
      "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
     },
-    "C_fallback_routing_overhead_s": {
-     "value": 2.022,
-     "class": "IMPLEMENTATION_WAIT",
-     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
-     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
     },
-    "D_retry_backoff_s": {
+    "provider_execution_s": {
+     "value": 8.481,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
      "value": 0.0,
      "class": null,
      "retry_sleep_s": 0.0,
      "probe_retry_sleep_s": 0.0,
      "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
     },
-    "E_local_orchestration_s": {
+    "local_orchestration_s": {
      "value": 0.001,
      "class": "REQUIRED_SCIENTIFIC_WORK",
      "post_provider_local_s": 0.001,
-     "transition_s": 0.0,
      "adapter_and_stage_overhead_s": 0.007,
-     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+     "evidence": "Q-A post_provider_local_s + stage overhead"
     },
-    "F_unattributed_remainder_s": {
+    "unattributed_remainder_s": {
      "value": 0.003,
      "class": null,
      "evidence": "Q-A remainder (generate_total - measured subspans)"
     },
     "in_stage_llm_wall_s": 10.51,
     "generate_total_s": 10.506644,
-    "stage_wall_s": 10.532273962977342
+    "stage_wall_s": 10.532273962977342,
+    "legacy_A_provider_inference_s": 8.481,
+    "legacy_B_failed_first_hop_s": 0.000149,
+    "legacy_C_selection_s": 2.022
    },
    "funnel": {
     "mechanisms_found": 1,
@@ -98,12 +107,14 @@
    "class": "OBSERVED_IN_STAGE",
    "terminal_state": "NO_CANDIDATES",
    "partition": {
-    "A_provider_inference_s": {
-     "value": 8.453,
-     "class": "PROVIDER_EXECUTION",
-     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    "selection_orchestration_s": {
+     "value": 2.348,
+     "class": "UNKNOWN",
+     "subspans": null,
+     "selection_diag": null,
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
     },
-    "B_failed_first_hop_s": {
+    "failed_hop_admission_s": {
      "value": 0.000127,
      "class": "PROVIDER_FAILURE_OR_RETRY",
      "n_failed_hops": 1,
@@ -118,35 +129,42 @@
      ],
      "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
     },
-    "C_fallback_routing_overhead_s": {
-     "value": 2.348,
-     "class": "IMPLEMENTATION_WAIT",
-     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
-     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
     },
-    "D_retry_backoff_s": {
+    "provider_execution_s": {
+     "value": 8.453,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
      "value": 0.0,
      "class": null,
      "retry_sleep_s": 0.0,
      "probe_retry_sleep_s": 0.0,
      "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
     },
-    "E_local_orchestration_s": {
+    "local_orchestration_s": {
      "value": 0.002,
      "class": "REQUIRED_SCIENTIFIC_WORK",
      "post_provider_local_s": 0.002,
-     "transition_s": 0.0,
      "adapter_and_stage_overhead_s": 0.009,
-     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+     "evidence": "Q-A post_provider_local_s + stage overhead"
     },
-    "F_unattributed_remainder_s": {
+    "unattributed_remainder_s": {
      "value": 0.002,
      "class": null,
      "evidence": "Q-A remainder (generate_total - measured subspans)"
     },
     "in_stage_llm_wall_s": 10.808,
     "generate_total_s": 10.804875,
-    "stage_wall_s": 10.831976905930787
+    "stage_wall_s": 10.831976905930787,
+    "legacy_A_provider_inference_s": 8.453,
+    "legacy_B_failed_first_hop_s": 0.000127,
+    "legacy_C_selection_s": 2.348
    },
    "funnel": {
     "mechanisms_found": 0,
@@ -185,12 +203,14 @@
    "class": "OBSERVED_IN_STAGE",
    "terminal_state": "BUILT",
    "partition": {
-    "A_provider_inference_s": {
-     "value": 10.222,
-     "class": "PROVIDER_EXECUTION",
-     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    "selection_orchestration_s": {
+     "value": 2.022,
+     "class": "UNKNOWN",
+     "subspans": null,
+     "selection_diag": null,
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
     },
-    "B_failed_first_hop_s": {
+    "failed_hop_admission_s": {
      "value": 0.411522,
      "class": "PROVIDER_FAILURE_OR_RETRY",
      "n_failed_hops": 1,
@@ -205,35 +225,42 @@
      ],
      "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
     },
-    "C_fallback_routing_overhead_s": {
-     "value": 2.022,
-     "class": "IMPLEMENTATION_WAIT",
-     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
-     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
     },
-    "D_retry_backoff_s": {
+    "provider_execution_s": {
+     "value": 10.222,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
      "value": 0.0,
      "class": null,
      "retry_sleep_s": 0.0,
      "probe_retry_sleep_s": 0.0,
      "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
     },
-    "E_local_orchestration_s": {
+    "local_orchestration_s": {
      "value": 0.001,
      "class": "REQUIRED_SCIENTIFIC_WORK",
      "post_provider_local_s": 0.001,
-     "transition_s": 0.0,
      "adapter_and_stage_overhead_s": 0.009,
-     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+     "evidence": "Q-A post_provider_local_s + stage overhead"
     },
-    "F_unattributed_remainder_s": {
+    "unattributed_remainder_s": {
      "value": 0.001,
      "class": null,
      "evidence": "Q-A remainder (generate_total - measured subspans)"
     },
     "in_stage_llm_wall_s": 12.662,
     "generate_total_s": 12.658488,
-    "stage_wall_s": 12.699997612042353
+    "stage_wall_s": 12.699997612042353,
+    "legacy_A_provider_inference_s": 10.222,
+    "legacy_B_failed_first_hop_s": 0.411522,
+    "legacy_C_selection_s": 2.022
    },
    "funnel": {
     "mechanisms_found": 1,
@@ -272,12 +299,14 @@
    "class": "OBSERVED_IN_STAGE",
    "terminal_state": "NO_CANDIDATES",
    "partition": {
-    "A_provider_inference_s": {
-     "value": 10.045,
-     "class": "PROVIDER_EXECUTION",
-     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    "selection_orchestration_s": {
+     "value": 2.151,
+     "class": "UNKNOWN",
+     "subspans": null,
+     "selection_diag": null,
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
     },
-    "B_failed_first_hop_s": {
+    "failed_hop_admission_s": {
      "value": 0.000181,
      "class": "PROVIDER_FAILURE_OR_RETRY",
      "n_failed_hops": 1,
@@ -292,35 +321,42 @@
      ],
      "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
     },
-    "C_fallback_routing_overhead_s": {
-     "value": 2.151,
-     "class": "IMPLEMENTATION_WAIT",
-     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
-     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
     },
-    "D_retry_backoff_s": {
+    "provider_execution_s": {
+     "value": 10.045,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
      "value": 0.0,
      "class": null,
      "retry_sleep_s": 0.0,
      "probe_retry_sleep_s": 0.0,
      "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
     },
-    "E_local_orchestration_s": {
+    "local_orchestration_s": {
      "value": 0.001,
      "class": "REQUIRED_SCIENTIFIC_WORK",
      "post_provider_local_s": 0.001,
-     "transition_s": 0.0,
      "adapter_and_stage_overhead_s": 0.007,
-     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+     "evidence": "Q-A post_provider_local_s + stage overhead"
     },
-    "F_unattributed_remainder_s": {
+    "unattributed_remainder_s": {
      "value": 0.002,
      "class": null,
      "evidence": "Q-A remainder (generate_total - measured subspans)"
     },
     "in_stage_llm_wall_s": 12.202,
     "generate_total_s": 12.199198,
-    "stage_wall_s": 12.22171999688726
+    "stage_wall_s": 12.22171999688726,
+    "legacy_A_provider_inference_s": 10.045,
+    "legacy_B_failed_first_hop_s": 0.000181,
+    "legacy_C_selection_s": 2.151
    },
    "funnel": {
     "mechanisms_found": 0,
@@ -359,12 +395,14 @@
    "class": "OBSERVED_IN_STAGE",
    "terminal_state": "NO_CANDIDATES",
    "partition": {
-    "A_provider_inference_s": {
-     "value": 9.115,
-     "class": "PROVIDER_EXECUTION",
-     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    "selection_orchestration_s": {
+     "value": 2.102,
+     "class": "UNKNOWN",
+     "subspans": null,
+     "selection_diag": null,
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
     },
-    "B_failed_first_hop_s": {
+    "failed_hop_admission_s": {
      "value": 0.000168,
      "class": "PROVIDER_FAILURE_OR_RETRY",
      "n_failed_hops": 1,
@@ -379,35 +417,42 @@
      ],
      "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
     },
-    "C_fallback_routing_overhead_s": {
-     "value": 2.102,
-     "class": "IMPLEMENTATION_WAIT",
-     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
-     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
     },
-    "D_retry_backoff_s": {
+    "provider_execution_s": {
+     "value": 9.115,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
      "value": 0.0,
      "class": null,
      "retry_sleep_s": 0.0,
      "probe_retry_sleep_s": 0.0,
      "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
     },
-    "E_local_orchestration_s": {
+    "local_orchestration_s": {
      "value": 0.001,
      "class": "REQUIRED_SCIENTIFIC_WORK",
      "post_provider_local_s": 0.001,
-     "transition_s": 0.0,
      "adapter_and_stage_overhead_s": 0.007,
-     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+     "evidence": "Q-A post_provider_local_s + stage overhead"
     },
-    "F_unattributed_remainder_s": {
+    "unattributed_remainder_s": {
      "value": 0.003,
      "class": null,
      "evidence": "Q-A remainder (generate_total - measured subspans)"
     },
     "in_stage_llm_wall_s": 11.224,
     "generate_total_s": 11.220549,
-    "stage_wall_s": 11.246400745003484
+    "stage_wall_s": 11.246400745003484,
+    "legacy_A_provider_inference_s": 9.115,
+    "legacy_B_failed_first_hop_s": 0.000168,
+    "legacy_C_selection_s": 2.102
    },
    "funnel": {
     "mechanisms_found": 0,
@@ -446,47 +491,56 @@
    "class": "OBSERVED_IN_STAGE",
    "terminal_state": "NO_CANDIDATES",
    "partition": {
-    "A_provider_inference_s": {
+    "selection_orchestration_s": {
      "value": 0.0,
-     "class": "PROVIDER_EXECUTION",
-     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+     "class": "UNKNOWN",
+     "subspans": null,
+     "selection_diag": null,
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
     },
-    "B_failed_first_hop_s": {
+    "failed_hop_admission_s": {
      "value": 0,
      "class": null,
      "n_failed_hops": 0,
      "hops": [],
      "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
     },
-    "C_fallback_routing_overhead_s": {
+    "inter_rung_fallback_s": {
      "value": 0.0,
-     "class": "IMPLEMENTATION_WAIT",
-     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
-     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
     },
-    "D_retry_backoff_s": {
+    "provider_execution_s": {
+     "value": 0.0,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
      "value": 0.0,
      "class": null,
      "retry_sleep_s": 0.0,
      "probe_retry_sleep_s": 0.0,
      "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
     },
-    "E_local_orchestration_s": {
+    "local_orchestration_s": {
      "value": 0.0,
      "class": "REQUIRED_SCIENTIFIC_WORK",
      "post_provider_local_s": 0.0,
-     "transition_s": 0.0,
      "adapter_and_stage_overhead_s": 0.008,
-     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+     "evidence": "Q-A post_provider_local_s + stage overhead"
     },
-    "F_unattributed_remainder_s": {
+    "unattributed_remainder_s": {
      "value": null,
      "class": "UNKNOWN",
      "evidence": "Q-A remainder (generate_total - measured subspans)"
     },
     "in_stage_llm_wall_s": null,
     "generate_total_s": null,
-    "stage_wall_s": 0.020609593018889427
+    "stage_wall_s": 0.020609593018889427,
+    "legacy_A_provider_inference_s": 0.0,
+    "legacy_B_failed_first_hop_s": 0,
+    "legacy_C_selection_s": 0.0
    },
    "funnel": {
     "mechanisms_found": 0,
@@ -514,12 +568,14 @@
    "class": "OBSERVED_IN_STAGE",
    "terminal_state": "BUILT",
    "partition": {
-    "A_provider_inference_s": {
-     "value": 6.071,
-     "class": "PROVIDER_EXECUTION",
-     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    "selection_orchestration_s": {
+     "value": 1.805,
+     "class": "UNKNOWN",
+     "subspans": null,
+     "selection_diag": null,
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
     },
-    "B_failed_first_hop_s": {
+    "failed_hop_admission_s": {
      "value": 0.000105,
      "class": "PROVIDER_FAILURE_OR_RETRY",
      "n_failed_hops": 1,
@@ -534,35 +590,42 @@
      ],
      "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
     },
-    "C_fallback_routing_overhead_s": {
-     "value": 1.805,
-     "class": "IMPLEMENTATION_WAIT",
-     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
-     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
     },
-    "D_retry_backoff_s": {
+    "provider_execution_s": {
+     "value": 6.071,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
      "value": 0.0,
      "class": null,
      "retry_sleep_s": 0.0,
      "probe_retry_sleep_s": 0.0,
      "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
     },
-    "E_local_orchestration_s": {
+    "local_orchestration_s": {
      "value": 0.001,
      "class": "REQUIRED_SCIENTIFIC_WORK",
      "post_provider_local_s": 0.001,
-     "transition_s": 0.0,
      "adapter_and_stage_overhead_s": 0.027,
-     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+     "evidence": "Q-A post_provider_local_s + stage overhead"
     },
-    "F_unattributed_remainder_s": {
+    "unattributed_remainder_s": {
      "value": 0.001,
      "class": null,
      "evidence": "Q-A remainder (generate_total - measured subspans)"
     },
     "in_stage_llm_wall_s": 7.881,
     "generate_total_s": 7.878295,
-    "stage_wall_s": 7.923767322092317
+    "stage_wall_s": 7.923767322092317,
+    "legacy_A_provider_inference_s": 6.071,
+    "legacy_B_failed_first_hop_s": 0.000105,
+    "legacy_C_selection_s": 1.805
    },
    "funnel": {
     "mechanisms_found": 1,
@@ -601,12 +664,14 @@
    "class": "OBSERVED_IN_STAGE",
    "terminal_state": "BUILT",
    "partition": {
-    "A_provider_inference_s": {
-     "value": 8.454,
-     "class": "PROVIDER_EXECUTION",
-     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    "selection_orchestration_s": {
+     "value": 2.106,
+     "class": "UNKNOWN",
+     "subspans": null,
+     "selection_diag": null,
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
     },
-    "B_failed_first_hop_s": {
+    "failed_hop_admission_s": {
      "value": 0.0001,
      "class": "PROVIDER_FAILURE_OR_RETRY",
      "n_failed_hops": 1,
@@ -621,35 +686,42 @@
      ],
      "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
     },
-    "C_fallback_routing_overhead_s": {
-     "value": 2.106,
-     "class": "IMPLEMENTATION_WAIT",
-     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
-     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
     },
-    "D_retry_backoff_s": {
+    "provider_execution_s": {
+     "value": 8.454,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
      "value": 0.0,
      "class": null,
      "retry_sleep_s": 0.0,
      "probe_retry_sleep_s": 0.0,
      "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
     },
-    "E_local_orchestration_s": {
+    "local_orchestration_s": {
      "value": 0.001,
      "class": "REQUIRED_SCIENTIFIC_WORK",
      "post_provider_local_s": 0.001,
-     "transition_s": 0.0,
      "adapter_and_stage_overhead_s": 0.007,
-     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+     "evidence": "Q-A post_provider_local_s + stage overhead"
     },
-    "F_unattributed_remainder_s": {
+    "unattributed_remainder_s": {
      "value": 0.002,
      "class": null,
      "evidence": "Q-A remainder (generate_total - measured subspans)"
     },
     "in_stage_llm_wall_s": 10.567,
     "generate_total_s": 10.563288,
-    "stage_wall_s": 10.588096103048883
+    "stage_wall_s": 10.588096103048883,
+    "legacy_A_provider_inference_s": 8.454,
+    "legacy_B_failed_first_hop_s": 0.0001,
+    "legacy_C_selection_s": 2.106
    },
    "funnel": {
     "mechanisms_found": 1,
@@ -688,12 +760,14 @@
    "class": "OBSERVED_IN_STAGE",
    "terminal_state": "NO_CANDIDATES",
    "partition": {
-    "A_provider_inference_s": {
-     "value": 9.109,
-     "class": "PROVIDER_EXECUTION",
-     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    "selection_orchestration_s": {
+     "value": 2.075,
+     "class": "UNKNOWN",
+     "subspans": null,
+     "selection_diag": null,
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
     },
-    "B_failed_first_hop_s": {
+    "failed_hop_admission_s": {
      "value": 0.00011,
      "class": "PROVIDER_FAILURE_OR_RETRY",
      "n_failed_hops": 1,
@@ -708,35 +782,42 @@
      ],
      "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
     },
-    "C_fallback_routing_overhead_s": {
-     "value": 2.075,
-     "class": "IMPLEMENTATION_WAIT",
-     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
-     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
     },
-    "D_retry_backoff_s": {
+    "provider_execution_s": {
+     "value": 9.109,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
      "value": 0.0,
      "class": null,
      "retry_sleep_s": 0.0,
      "probe_retry_sleep_s": 0.0,
      "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
     },
-    "E_local_orchestration_s": {
+    "local_orchestration_s": {
      "value": 0.001,
      "class": "REQUIRED_SCIENTIFIC_WORK",
      "post_provider_local_s": 0.001,
-     "transition_s": 0.0,
      "adapter_and_stage_overhead_s": 0.008,
-     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+     "evidence": "Q-A post_provider_local_s + stage overhead"
     },
-    "F_unattributed_remainder_s": {
+    "unattributed_remainder_s": {
      "value": 0.003,
      "class": null,
      "evidence": "Q-A remainder (generate_total - measured subspans)"
     },
     "in_stage_llm_wall_s": 11.191,
     "generate_total_s": 11.187669,
-    "stage_wall_s": 11.211967646027915
+    "stage_wall_s": 11.211967646027915,
+    "legacy_A_provider_inference_s": 9.109,
+    "legacy_B_failed_first_hop_s": 0.00011,
+    "legacy_C_selection_s": 2.075
    },
    "funnel": {
     "mechanisms_found": 0,
@@ -775,12 +856,14 @@
    "class": "OBSERVED_IN_STAGE",
    "terminal_state": "NO_CANDIDATES",
    "partition": {
-    "A_provider_inference_s": {
-     "value": 9.109,
-     "class": "PROVIDER_EXECUTION",
-     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    "selection_orchestration_s": {
+     "value": 2.063,
+     "class": "UNKNOWN",
+     "subspans": null,
+     "selection_diag": null,
+     "evidence": "Q-A selection_ordering_s: PRE-CALL route assembly (availability snapshot, chain construction, retirement/cost filters, ladder build, capability snapshot). It closes BEFORE any rung is attempted — it is NOT fallback-routing overhead (R530 §4 correction)"
     },
-    "B_failed_first_hop_s": {
+    "failed_hop_admission_s": {
      "value": 9.1e-05,
      "class": "PROVIDER_FAILURE_OR_RETRY",
      "n_failed_hops": 1,
@@ -795,35 +878,42 @@
      ],
      "evidence": "gen_spans rung probe_admission_s; the failed hop produces NO ledger line (admission refusal, not a call)"
     },
-    "C_fallback_routing_overhead_s": {
-     "value": 2.063,
-     "class": "IMPLEMENTATION_WAIT",
-     "evidence": "Q-A selection_ordering_s (the ladder walk that evaluated + skipped the failed provider)",
-     "note": "candidate for avoidability review: the ladder re-evaluates a deterministically failing provider on every call; whether this is avoidable without changing scientific behavior is NOT yet established"
+    "inter_rung_fallback_s": {
+     "value": 0.0,
+     "class": null,
+     "transition_s": 0.0,
+     "evidence": "Q-A transition_to_next_s on RETRIED attempts: the measured gap between consecutive attempts (the ONLY post-failure fallback wall)"
     },
-    "D_retry_backoff_s": {
+    "provider_execution_s": {
+     "value": 9.109,
+     "class": "PROVIDER_EXECUTION",
+     "evidence": "Q-A dispatch_s on the OK hop (durable ledger latency_ms)"
+    },
+    "retry_backoff_s": {
      "value": 0.0,
      "class": null,
      "retry_sleep_s": 0.0,
      "probe_retry_sleep_s": 0.0,
      "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s"
     },
-    "E_local_orchestration_s": {
+    "local_orchestration_s": {
      "value": 0.001,
      "class": "REQUIRED_SCIENTIFIC_WORK",
      "post_provider_local_s": 0.001,
-     "transition_s": 0.0,
      "adapter_and_stage_overhead_s": 0.01,
-     "evidence": "Q-A post_provider_local_s + transition_s + stage overhead"
+     "evidence": "Q-A post_provider_local_s + stage overhead"
     },
-    "F_unattributed_remainder_s": {
+    "unattributed_remainder_s": {
      "value": 0.003,
      "class": null,
      "evidence": "Q-A remainder (generate_total - measured subspans)"
     },
     "in_stage_llm_wall_s": 11.179,
     "generate_total_s": 11.175869,
-    "stage_wall_s": 11.207822103984654
+    "stage_wall_s": 11.207822103984654,
+    "legacy_A_provider_inference_s": 9.109,
+    "legacy_B_failed_first_hop_s": 9.1e-05,
+    "legacy_C_selection_s": 2.063
    },
    "funnel": {
     "mechanisms_found": 0,
@@ -858,47 +948,7 @@
   }
  ],
  "aggregate": {
-  "A_provider_inference_s": {
-   "n": 10,
-   "mean": 7.906,
-   "median": 8.795,
-   "min": 0.0,
-   "max": 10.222,
-   "p95": 10.222,
-   "values": [
-    8.481,
-    8.453,
-    10.222,
-    10.045,
-    9.115,
-    0.0,
-    6.071,
-    8.454,
-    9.109,
-    9.109
-   ]
-  },
-  "B_failed_first_hop_s": {
-   "n": 10,
-   "mean": 0.041,
-   "median": 0.0,
-   "min": 0,
-   "max": 0.412,
-   "p95": 0.412,
-   "values": [
-    0.0,
-    0.0,
-    0.412,
-    0.0,
-    0.0,
-    0,
-    0.0,
-    0.0,
-    0.0,
-    0.0
-   ]
-  },
-  "C_fallback_routing_overhead_s": {
+  "selection_orchestration_s": {
    "n": 10,
    "mean": 1.869,
    "median": 2.069,
@@ -918,7 +968,27 @@
     2.063
    ]
   },
-  "D_retry_backoff_s": {
+  "failed_hop_admission_s": {
+   "n": 10,
+   "mean": 0.041,
+   "median": 0.0,
+   "min": 0,
+   "max": 0.412,
+   "p95": 0.412,
+   "values": [
+    0.0,
+    0.0,
+    0.412,
+    0.0,
+    0.0,
+    0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "inter_rung_fallback_s": {
    "n": 10,
    "mean": 0.0,
    "median": 0.0,
@@ -938,7 +1008,47 @@
     0.0
    ]
   },
-  "E_local_orchestration_s": {
+  "provider_execution_s": {
+   "n": 10,
+   "mean": 7.906,
+   "median": 8.795,
+   "min": 0.0,
+   "max": 10.222,
+   "p95": 10.222,
+   "values": [
+    8.481,
+    8.453,
+    10.222,
+    10.045,
+    9.115,
+    0.0,
+    6.071,
+    8.454,
+    9.109,
+    9.109
+   ]
+  },
+  "retry_backoff_s": {
+   "n": 10,
+   "mean": 0.0,
+   "median": 0.0,
+   "min": 0.0,
+   "max": 0.0,
+   "p95": 0.0,
+   "values": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "local_orchestration_s": {
    "n": 10,
    "mean": 0.001,
    "median": 0.001,
@@ -978,6 +1088,7 @@
    ]
   }
  },
+ "selection_subspan_aggregate": null,
  "fallback_auth_failure": {
   "n_calls_with_failed_first_hop": 9,
   "failed_hop_providers": [
@@ -997,10 +1108,10 @@
   "fallback_occurred_rows": 9
  },
  "classification": {
-  "verdict": "AVOIDABLE_COMPONENT_UNDER_REVIEW",
-  "rule": "the avoidable implementation portion is >=5% of the measured wall OR the join is incomplete; a single causal intervention may be named only after the component is proven avoidable without changing scientific behavior",
-  "avoidable_fraction": 0.1946
+  "verdict": "SELECTION_DECOMPOSITION_UNMEASURED",
+  "rule": "no R530-instrumented calls in this harvest: the selection subspan decomposition is UNMEASURED (Art. XXV). No avoidable fraction is computed; the withdrawn R529 19.5% figure must not be cited as a causal finding.",
+  "avoidable_fraction": null
  },
  "reviewer_provenance": "AI_REVIEW",
- "created_at_utc": "2026-09-25T00:10:43Z"
+ "created_at_utc": "2026-09-25T00:32:55Z"
 }

@@ -1667,6 +1667,12 @@ def generate(prompt: str, system: str = "",
         "purpose": None,
         "generate_total_s": None,
         "selection_ordering_s": None,
+        # R530 §3: selection subspan decomposition (A–I) + the
+        # selection-path diagnostic counts. Behavior-neutral
+        # telemetry: perf_counter deltas around operations that
+        # already exist; no routing, scoring, or I/O change.
+        "selection_subspans": None,
+        "selection_diag": None,
         "ladder_before_filtering": [],
         "retirement_removed": [],
         "cost_refusals": [],
@@ -1682,6 +1688,19 @@ def generate(prompt: str, system: str = "",
     _gen_call_id = f"gen_{_uuid.uuid4().hex[:12]}"
     _gen_start_epoch = time.time()
     _t_sel0 = time.perf_counter()
+    # R530 §3: selection subspan accumulators (A–H) + the diagnostic
+    # take-and-zero. Behavior-neutral: perf_counter reads + counter
+    # take only. The take() zeroes model_routing's diag counters so
+    # the close-time delta is exactly this call's selection work;
+    # abandoned early-return selections discard via take() at their
+    # return sites (same function, below).
+    mr.selection_diag_take()
+    _sA_matrix_s = 0.0
+    _sB_chain_s = 0.0
+    _sC_retirement_s = 0.0
+    _sD_costpolicy_s = 0.0
+    _sE_ladder_s = 0.0
+    _sH_capevidence_s = 0.0
 
     def _gen_span_snapshot(final: bool = False) -> Dict[str, Any]:
         """R526 Q-A: self-contained span snapshot for one durable ledger
@@ -1705,6 +1724,13 @@ def generate(prompt: str, system: str = "",
                         time.perf_counter() - _gen_t0, 6),
                     "selection_ordering_s": _gen_spans[
                         "selection_ordering_s"],
+                    # R530 §3: subspan decomposition + diag counts ride
+                    # every ledger line (None until the selection span
+                    # closes; the terminal line carries the final
+                    # values — same pattern as selection_ordering_s).
+                    "selection_subspans": _gen_spans.get(
+                        "selection_subspans"),
+                    "selection_diag": _gen_spans.get("selection_diag"),
                     "ladder_before_filtering": [
                         list(x) for x in
                         _gen_spans["ladder_before_filtering"]],
@@ -1733,6 +1759,10 @@ def generate(prompt: str, system: str = "",
                     "generate_total_s": None,
                     "snapshot_error": "SPAN_SNAPSHOT_FAILED"}
 
+    # R530 §3 subspan A: availability snapshot phase
+    # (reconcile_runtime_classifications + availability_matrix +
+    # cost-policy refusal list — pre-ladder route assembly).
+    _tA0 = time.perf_counter()
     reconcile_runtime_classifications()  # R483: the re-point class authority
     matrix = availability_matrix()
     avail_ids = [m["provider_id"] for m in matrix
@@ -1740,6 +1770,7 @@ def generate(prompt: str, system: str = "",
     policy_refusals = [
         {"provider": m["provider_id"], "reason": m["cost_policy_note"]}
         for m in matrix if m["available"] and not m["cost_policy_eligible"]]
+    _sA_matrix_s += time.perf_counter() - _tA0
     # -- the provider chain (policy order, then role ordering) -------------
     # R519 §5/§7: THE single routing-retirement authority. Every chain
     # source — ordinary preferred_providers, the role order, the cost
@@ -1758,13 +1789,21 @@ def generate(prompt: str, system: str = "",
         hard_pin_provider
         or getattr(policy, "operator_override", False))
     retirement_events: List[Dict[str, Any]] = []
+    # R530 §3 subspan B: chain construction (policy preferred list
+    # or role order + cooldown demotion). The nested
+    # apply_route_retirement call is subspan C — B accumulates the
+    # block wall EXCLUSIVE of C (record C first, subtract its delta).
+    _tB0 = time.perf_counter()
+    _cB0 = _sC_retirement_s
     if policy and policy.preferred_providers:
         chain = [pid for pid in policy.preferred_providers
                  if pid in avail_ids]
         _chain_role = role or role_for_purpose(_purpose_tag0) or ROLE_SYNTHESIS
+        _tC0 = time.perf_counter()
         chain, _rr = apply_route_retirement(
             chain, role=_chain_role, purpose=_purpose_tag0,
             explicit_override=_explicit_override)
+        _sC_retirement_s += time.perf_counter() - _tC0
         retirement_events.extend(_rr)
         chain_source = "policy.preferred_providers" + (
             " (EXPLICIT_OPERATOR_OVERRIDE)" if _explicit_override else "")
@@ -1784,13 +1823,19 @@ def generate(prompt: str, system: str = "",
         cooled = [p for p in chain if HEALTH.in_cooldown(p)]
         if cooled:
             chain = [p for p in chain if p not in cooled] + cooled
+    _sB_chain_s += (time.perf_counter() - _tB0) - (
+        _sC_retirement_s - _cB0)
     # R451 §1: the cost policy REFUSES ineligible rungs — including the
     # ones the ladder would add beyond the policy chain (LAST_RESORT
     # rungs, preferred pins pointing at paid providers). A paid route
     # is never silently fallen back to; the refusals travel in the
     # ledger (fail-closed, Art. IV/VII).
+    # R530 §3 subspan D: cost-policy filtering (filter_chain on the
+    # policy chain).
+    _tD0 = time.perf_counter()
     chain, _chain_refusals = _cost_policy.filter_chain(
         chain, _SPEC_BY_ID)
+    _sD_costpolicy_s += time.perf_counter() - _tD0
     # R451-C1.1: a preferred chain that named ONLY policy-ineligible
     # (paid) providers does not dead-end the call when an ELIGIBLE
     # zero-paid route exists — the chain is EXTENDED with the eligible
@@ -1801,17 +1846,26 @@ def generate(prompt: str, system: str = "",
     cost_policy_chain_extension = [p for p in avail_ids
                                    if p not in chain] if not chain else []
     if cost_policy_chain_extension:
+        # R530 §3: the extension block is subspan D exclusive of the
+        # nested subspan-C retirement call (same exclusive pattern
+        # as B).
+        _tD1 = time.perf_counter()
+        _cD1 = _sC_retirement_s
         # R519 §7: the cost extension also passes through the single
         # authority so an exhausted ordinary chain cannot silently
         # re-promote a retired provider. Under an explicit override the
         # retired provider is kept and the kept event is recorded.
         _chain_role = role or role_for_purpose(
             _purpose_tag0) or ROLE_SYNTHESIS
+        _tC0 = time.perf_counter()
         cost_policy_chain_extension, _rr = apply_route_retirement(
             cost_policy_chain_extension, role=_chain_role,
             purpose=_purpose_tag0, explicit_override=_explicit_override)
+        _sC_retirement_s += time.perf_counter() - _tC0
         retirement_events.extend(_rr)
         chain = list(cost_policy_chain_extension)
+        _sD_costpolicy_s += (time.perf_counter() - _tD1) - (
+            _sC_retirement_s - _cD1)
     if not chain:
         # preferred_providers exhausted or policy-refused with no
         # eligible provider: keep the historical honest semantics (no
@@ -1830,16 +1884,20 @@ def generate(prompt: str, system: str = "",
         _err = (
             f"route retirement blocked every eligible provider for "
             f"this role/purpose (R519 single retirement authority): "
-            f"{[e['provider'] for e in retirement_events if e['retirement_state'] == 'RETIRED_ROUTE_BLOCKED']} — "
-            f"DEFAULT_ROUTE_BLOCKED; an explicit operator override "
-            f"(hard_pin_provider / operator_override) remains the only "
-            f"sanctioned path to a retired provider"
-            if _retired_all else
-            (f"the active cost policy "
-             f"{_cost_policy.active_policy()} refused every "
-             f"available provider — paid routes are never silently "
-             f"used (R451 §1)" if any_avail else
-             "no provider credential available (see selection_ledger)"))
+              f"{[e['provider'] for e in retirement_events if e['retirement_state'] == 'RETIRED_ROUTE_BLOCKED']} — "
+              f"DEFAULT_ROUTE_BLOCKED; an explicit operator override "
+              f"(hard_pin_provider / operator_override) remains the only "
+              f"sanctioned path to a retired provider"
+              if _retired_all else
+              (f"the active cost policy "
+               f"{_cost_policy.active_policy()} refused every "
+               f"available provider — paid routes are never silently "
+               f"used (R451 §1)" if any_avail else
+               "no provider credential available (see selection_ledger)"))
+        # R530 §3: abandoned selection — discard this call's diag
+        # counts so they cannot pollute the next call's delta (the
+        # selection span never closes on this path).
+        mr.selection_diag_take()
         return LLMCallResult(
             status=_status, error=_err,
             prompt_hash=_sha(prompt),
@@ -1855,11 +1913,18 @@ def generate(prompt: str, system: str = "",
         or ROLE_SYNTHESIS
     task = mr.task_class_for_role(eff_role)
     purpose_tag = (policy.purpose if policy else "") or eff_role
+    # R530 §3 subspan E: build_ladder (per-provider eligible lists,
+    # score-ranked sort, round-robin + LAST_RESORT emission). E is
+    # INCLUSIVE of the catalog (F) and scoring (G) detail reported
+    # from model_routing's diag counters — F/G are detail-of-E, not
+    # additive (documented, never double-counted).
+    _tE0 = time.perf_counter()
     ladder = mr.build_ladder(
         task, role=eff_role, avoid_provider=avoid_provider,
         preferred_providers=list(chain),
         available_providers=avail_ids,
         purpose=purpose_tag)
+    _sE_ladder_s += time.perf_counter() - _tE0
     rungs = [(r["provider"], r["model"], r) for r in ladder["rungs"]]
     # R526 Q-A: the candidate ladder BEFORE cost/retirement filtering
     # (durable per attempt — same list rides every ledger line of the
@@ -1868,9 +1933,11 @@ def generate(prompt: str, system: str = "",
         [p, m] for p, m, _r in rungs]
     # R451: policy-filter the rungs (the ladder's LAST_RESORT band may
     # add providers the policy chain never asked for — paid models are
-    # refused here too, with each refusal recorded on the ladder)
+    # refused here too, with each refusal recorded on the ladder).
+    # R530 §3: the rung eligibility loop is subspan D (cost-policy).
     _rung_refusals = []
     _rungs_kept = []
+    _tD2 = time.perf_counter()
     for provider_id, model_id, r in rungs:
         spec_r = _SPEC_BY_ID.get(provider_id)
         ok_r, note_r = _cost_policy.provider_eligibility(spec_r) \
@@ -1881,6 +1948,7 @@ def generate(prompt: str, system: str = "",
             _rung_refusals.append({"provider": provider_id,
                                    "model": model_id,
                                    "reason": note_r})
+    _sD_costpolicy_s += time.perf_counter() - _tD2
     rungs = _rungs_kept
     ladder.setdefault("cost_policy", _cost_policy.active_policy())
     ladder.setdefault("cost_policy_rung_refusals", _rung_refusals)
@@ -1894,9 +1962,12 @@ def generate(prompt: str, system: str = "",
     for provider_id, _model_id, _r in rungs:
         if provider_id not in _rung_provider_order:
             _rung_provider_order.append(provider_id)
+    # R530 §3 subspan C (site 3): rung-list retirement filter.
+    _tC0 = time.perf_counter()
     _allowed_providers, _rr = apply_route_retirement(
         _rung_provider_order, role=_retire_role, purpose=purpose_tag,
         explicit_override=bool(hard_pin_provider) or _explicit_override)
+    _sC_retirement_s += time.perf_counter() - _tC0
     retirement_events.extend(_rr)
     _allowed_set = set(_allowed_providers)
     rungs = [x for x in rungs if x[0] in _allowed_set]
@@ -1924,6 +1995,8 @@ def generate(prompt: str, system: str = "",
         _pinned_rungs = [r for r in rungs
                          if r[0] == hard_pin_provider]
         if not _pinned_rungs:
+            # R530 §3: abandoned selection — discard diag counts.
+            mr.selection_diag_take()
             return LLMCallResult(
                 status=ST_PROVIDER_UNAVAILABLE,
                 error=(f"hard-pinned provider '{hard_pin_provider}' "
@@ -1939,6 +2012,8 @@ def generate(prompt: str, system: str = "",
                 call_provenance=call_prov)
         rungs = _pinned_rungs
     if not rungs:
+        # R530 §3: abandoned selection — discard diag counts.
+        mr.selection_diag_take()
         return LLMCallResult(
             status=ST_PROVIDER_UNAVAILABLE,
             error="no routing rung available for this task "
@@ -1951,8 +2026,11 @@ def generate(prompt: str, system: str = "",
     # R451-C1.3-1: persisted capability evidence for every rung of the
     # ladder the walk considered (the acceptance gate: capability
     # evidence is persisted — read-only snapshot BEFORE any probing)
+    # R530 §3 subspan H: capability-evidence snapshot.
+    _tH0 = time.perf_counter()
     ladder["capability_evidence"] = _ra.ladder_capability_evidence(
         [{"provider": p, "model": m} for p, m, _meta in rungs])
+    _sH_capevidence_s += time.perf_counter() - _tH0
     # R526 Q-A (A3): the selection/ordering span closes JUST BEFORE
     # message construction begins. It measures the chain assembly,
     # cost filter, ladder build, rung filter, retirement, and
@@ -1960,8 +2038,76 @@ def generate(prompt: str, system: str = "",
     # `messages` list is built below, outside the span). No
     # speculative extra timer is added; the timer end is placed
     # exactly at the last pre-walk setup step.
-    _gen_spans["selection_ordering_s"] = round(
-        time.perf_counter() - _t_sel0, 6)
+    # R530 §3: the subspan decomposition closes here. A–E + H are
+    # mutually exclusive walls; F (catalog) + G (scoring) are
+    # detail-of-E from model_routing's diag counters (NOT additive —
+    # they already ride inside E's wall); I is the remainder
+    # (total − A − B − C − D − E − H). A negative I beyond the
+    # documented −0.05 s clock tolerance is an instrumentation
+    # violation, recorded never hidden (same contract as the Q-A
+    # remainder).
+    _sel_total = time.perf_counter() - _t_sel0
+    _gen_spans["selection_ordering_s"] = round(_sel_total, 6)
+    _diag1 = mr.selection_diag_take()
+    _sA = round(_sA_matrix_s, 6)
+    _sB = round(_sB_chain_s, 6)
+    _sC = round(_sC_retirement_s, 6)
+    _sD = round(_sD_costpolicy_s, 6)
+    _sE = round(_sE_ladder_s, 6)
+    _sH = round(_sH_capevidence_s, 6)
+    _sF = round(_diag1.get("eligible_models_s", 0.0), 6)
+    # NOTE (R530 accounting correction): F is the INCLUSIVE
+    # eligible_models wall (it already contains its inner
+    # discover_catalog work — catalog fetches happen inside
+    # eligible_models/all_models, never beside them). Adding
+    # discover_catalog_s again would double-count the nested wall
+    # (measured live: F_double = 2.49 s > E = 1.29 s on a hermetic
+    # call — the nested catalog wall counted twice). The raw
+    # discover_catalog_s + cache-hit counts remain in
+    # selection_diag as detail, never added to F.
+    _sG = round(_diag1.get("availability_score_s", 0.0), 6)
+    _sI = round(_sel_total - (_sA + _sB + _sC + _sD + _sE + _sH), 6)
+    _gen_spans["selection_subspans"] = {
+        "instrument": "gen_spans/1.0",
+        "A_availability_matrix_s": _sA,
+        "B_chain_construction_s": _sB,
+        "C_route_retirement_s": _sC,
+        "D_cost_policy_s": _sD,
+        "E_build_ladder_s": _sE,
+        "F_catalog_detail_s": _sF,
+        "G_scoring_detail_s": _sG,
+        "H_capability_evidence_s": _sH,
+        "I_selection_remainder_s": _sI,
+        "accounting": ("A+B+C+D+E+H+I = selection_ordering_s; "
+                       "F+G are detail-of-E (inclusive), not additive; "
+                       "F = eligible_models wall inclusive of catalog "
+                       "fetches; G = availability_score wall inclusive "
+                       "of ledger scans"),
+    }
+    _gen_spans["selection_diag"] = {
+        "n_providers_inspected": _diag1.get(
+            "ladder_providers_inspected", 0),
+        "n_models_inspected": _diag1.get("ladder_models_inspected", 0),
+        "n_ladder_rungs_emitted": _diag1.get("ladder_rungs_emitted", 0),
+        "n_availability_score_calls": _diag1.get(
+            "availability_score_calls", 0),
+        "availability_score_s": round(
+            _diag1.get("availability_score_s", 0.0), 6),
+        "n_availability_report_scans": _diag1.get(
+            "availability_report_calls", 0),
+        "availability_report_s": round(
+            _diag1.get("availability_report_s", 0.0), 6),
+        "n_eligible_models_calls": _diag1.get(
+            "eligible_models_calls", 0),
+        "n_eligible_models_returned": _diag1.get(
+            "eligible_models_returned", 0),
+        "n_discover_catalog_calls": _diag1.get(
+            "discover_catalog_calls", 0),
+        "n_discover_catalog_cache_hits": _diag1.get(
+            "discover_catalog_cache_hits", 0),
+        "n_span_failed_recently_calls": _diag1.get(
+            "span_failed_recently_calls", 0),
+    }
     _gen_spans["purpose"] = purpose_tag
 
     wanted_head = rungs[0][0]

@@ -1,0 +1,90 @@
+{
+ "artifact": "R529_ROUND_RECORD/1.0",
+ "round": "R529",
+ "created_at_utc": "2026-09-25T00:36:14Z",
+ "reviewer_provenance": "AI_REVIEW",
+ "parent_round": "R528",
+ "measurement": {
+  "join_artifact": "R529/MECHANISM_SPACE_PROVIDER_JOIN.json",
+  "join_sha256": "8e994d208188d993b59f0d099324c6fd27996d109f92d0c297fd5636f6f4a6b6",
+  "join_version": "R529_MECHANISM_SPACE_PROVIDER_JOIN/1.1",
+  "harvest": "R526/ATTR_CURRENT_HARVEST.json",
+  "n_observed": 10,
+  "aggregate": {
+   "selection_orchestration_s": 1.869,
+   "failed_hop_admission_s": 0.041,
+   "inter_rung_fallback_s": 0.0,
+   "provider_execution_s": 7.906
+  },
+  "fallback_auth_failure": {
+   "n_calls_with_failed_first_hop": 9,
+   "failed_hop_providers": [
+    "unorouter"
+   ],
+   "failed_hop_states": [
+    "PROBE_FAILED"
+   ]
+  },
+  "classification": {
+   "verdict": "SELECTION_DECOMPOSITION_UNMEASURED",
+   "rule": "no R530-instrumented calls in this harvest: the selection subspan decomposition is UNMEASURED (Art. XXV). No avoidable fraction is computed; the withdrawn R529 19.5% figure must not be cited as a causal finding.",
+   "avoidable_fraction": null
+  }
+ },
+ "causal_correction": {
+  "withdrawn": "R529 v1.0 'C_fallback_routing_overhead_s = selection_ordering_s = ~1.869 s' with a 19.5% avoidable fraction",
+  "reason": "selection_ordering_s is a PRE-CALL span (closes before message construction and before any rung is attempted); it contains availability_matrix, chain construction, retirement/cost filters, ladder build, and capability snapshot — NOT post-failure fallback overhead",
+  "corrected_split": "pre-call selection/ordering cost + failed-hop admission cost + actual inter-rung fallback cost + provider execution cost + unknown remainder",
+  "status": "SELECTION_ORCHESTRATION ≠ FALLBACK_ROUTING; anything not directly measured remains UNKNOWN (Art. XXV)"
+ },
+ "r527_closure": {
+  "record": "R527/R527_ROUND_RECORD.json",
+  "classification": "SLEEP_REMOVAL_MEASURED__FUNNEL_CONFOUND_DISCLOSED",
+  "round_states": {
+   "measurement_complete": true,
+   "optimization_authorized": true,
+   "optimization_executed": true,
+   "optimization_measured": true,
+   "optimization_deployed": true,
+   "note": "these five states are distinct and never collapsed. optimization_measured is TRUE only when the measured before/after sleep effect is durable (after post_success_sleep_s ~0 on 10/10 rows). The funnel confound + provider variance are recorded as UNKNOWN remainders, never forced into the intervention claim."
+  },
+  "baseline_mechanisms_found": 4,
+  "after_mechanisms_found": 1
+ },
+ "metadata_chain": {
+  "source_commit": "fa9f23e6a59169817a0122396d408264009635b3",
+  "link_source_is_commit": true,
+  "link_source_ancestor_of_head": true,
+  "link_chain_reconstructed": true,
+  "link_production_recorded_separately": true,
+  "chain_ok": true
+ },
+ "independent_certification": {
+  "status": "NOT_GREEN",
+  "cause": "UNKNOWN — the Epistemic Certification classifier-job failure reason could not be retrieved from the available interface (runs #1105, #1106)",
+  "rule": "local gates green ≠ independent certification green (Art. XXVI). The workflow is NOT suppressed and local pytest is NOT cited as a substitute."
+ },
+ "round_states": {
+  "measurement_complete": true,
+  "optimization_authorized": false,
+  "optimization_executed": false,
+  "optimization_measured": false,
+  "optimization_deployed": false,
+  "note": "R529 is a measurement round: the corrected join + the R527 closure repair + the metadata refresh are durable. No causal avoidable component is proven (the 19.5% figure is withdrawn), so no optimization is named, executed, measured, or deployed."
+ },
+ "classification": "MEASUREMENT_ONLY__NO_OPTIMIZATION_NAMED",
+ "classification_not": [
+  "NOT claimed: a 19.5% avoidable fraction (withdrawn — the selection span is pre-call orchestration, not fallback overhead)",
+  "NOT claimed: independent certification green (the classifier-job failure cause is UNKNOWN)",
+  "NOT claimed: any end-to-end speedup",
+  "NOT claimed: any stage is removable (0 stages removable on current evidence)"
+ ],
+ "r530_handoff": {
+  "open_question": "what exactly is inside the current MECHANISM_SPACE selection-ordering wall (~1.9 s mean)?",
+  "instrument": "gen_spans/1.0 selection_subspans A–I + selection_diag counts (R530 §3)",
+  "allowed_outcomes": [
+   "REAL_REQUIRED_ROUTING_WORK",
+   "ONE_MEASURED_AVOIDABLE_LOCAL_COMPONENT"
+  ]
+ }
+}

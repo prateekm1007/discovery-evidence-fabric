@@ -156,7 +156,20 @@ def main() -> int:
                     "probe_admission_s": adm.get("probe_admission_s"),
                     "ledger_line_present": False,
                 })
-        # ---- causal partition (directive §8 A-F) ----
+        # ---- causal partition (R530 §4 corrected semantics) ----
+        # R529 ERROR CORRECTED: selection_ordering_s is a PRE-CALL
+        # span (it closes before message construction and before any
+        # provider rung is attempted). It is SELECTION_ORCHESTRATION,
+        # NOT fallback-routing overhead. The corrected 5-way split:
+        #   pre-call selection/ordering cost (selection_subspans A–I
+        #     when the R530 instrumented build served the call, else
+        #     the aggregate selection_ordering_s with class UNKNOWN)
+        #   failed-hop admission cost (rung probe_admission_s)
+        #   actual inter-rung fallback cost (transition_s on RETRIED
+        #     attempts — the measured gap between consecutive attempts)
+        #   provider execution cost (dispatch_s on the OK hop)
+        #   unknown remainder (everything else)
+        # Anything not directly measured remains UNKNOWN (Art. XXV).
         sel = sub.get("selection_ordering_s") or 0.0
         adm_e = sub.get("admission_s") or 0.0
         dispatch = sub.get("dispatch_s") or 0.0
@@ -171,14 +184,29 @@ def main() -> int:
         failed_probe_wall = round(sum(
             (fh.get("probe_admission_s") or 0.0) for fh in failed_hops),
             6)
+        # R530 selection subspans when the instrumented build served
+        # this call (ledger gen_spans carries selection_subspans);
+        # else None (pre-R530 build — the aggregate is retained
+        # historically but NOT causally decomposed).
+        sel_subs = (led.get("generate_spans") or {}).get(
+            "selection_subspans")
+        sel_diag = (led.get("generate_spans") or {}).get(
+            "selection_diag")
         partition = {
-            "A_provider_inference_s": {
-                "value": round(dispatch, 6),
-                "class": "PROVIDER_EXECUTION",
-                "evidence": "Q-A dispatch_s on the OK hop "
-                            "(durable ledger latency_ms)",
+            "selection_orchestration_s": {
+                "value": round(sel, 6),
+                "class": "UNKNOWN",
+                "subspans": sel_subs,
+                "selection_diag": sel_diag,
+                "evidence": ("Q-A selection_ordering_s: PRE-CALL "
+                             "route assembly (availability snapshot, "
+                             "chain construction, retirement/cost "
+                             "filters, ladder build, capability "
+                             "snapshot). It closes BEFORE any rung "
+                             "is attempted — it is NOT fallback-"
+                             "routing overhead (R530 §4 correction)"),
             },
-            "B_failed_first_hop_s": {
+            "failed_hop_admission_s": {
                 "value": failed_probe_wall,
                 "class": ("PROVIDER_FAILURE_OR_RETRY"
                           if failed_hops else None),
@@ -188,19 +216,23 @@ def main() -> int:
                              "the failed hop produces NO ledger "
                              "line (admission refusal, not a call)"),
             },
-            "C_fallback_routing_overhead_s": {
-                "value": round(sel, 6),
-                "class": "IMPLEMENTATION_WAIT",
-                "evidence": "Q-A selection_ordering_s (the ladder "
-                            "walk that evaluated + skipped the "
-                            "failed provider)",
-                "note": ("candidate for avoidability review: the "
-                         "ladder re-evaluates a deterministically "
-                         "failing provider on every call; whether "
-                         "this is avoidable without changing "
-                         "scientific behavior is NOT yet established"),
+            "inter_rung_fallback_s": {
+                "value": round(trans, 6),
+                "class": ("PROVIDER_FAILURE_OR_RETRY"
+                          if trans and trans > 0 else None),
+                "transition_s": trans,
+                "evidence": ("Q-A transition_to_next_s on RETRIED "
+                             "attempts: the measured gap between "
+                             "consecutive attempts (the ONLY "
+                             "post-failure fallback wall)"),
             },
-            "D_retry_backoff_s": {
+            "provider_execution_s": {
+                "value": round(dispatch, 6),
+                "class": "PROVIDER_EXECUTION",
+                "evidence": "Q-A dispatch_s on the OK hop "
+                            "(durable ledger latency_ms)",
+            },
+            "retry_backoff_s": {
                 "value": round(retry_sl + probe_sl, 6),
                 "class": ("PROVIDER_FAILURE_OR_RETRY"
                           if (retry_sl + probe_sl) > 0 else None),
@@ -208,16 +240,15 @@ def main() -> int:
                 "probe_retry_sleep_s": probe_sl,
                 "evidence": "Q-A retry_sleep_s + probe_retry_sleep_s",
             },
-            "E_local_orchestration_s": {
-                "value": round(local + (trans or 0.0), 6),
+            "local_orchestration_s": {
+                "value": round(local, 6),
                 "class": "REQUIRED_SCIENTIFIC_WORK",
                 "post_provider_local_s": local,
-                "transition_s": trans,
                 "adapter_and_stage_overhead_s": overhead,
                 "evidence": "Q-A post_provider_local_s + "
-                            "transition_s + stage overhead",
+                            "stage overhead",
             },
-            "F_unattributed_remainder_s": {
+            "unattributed_remainder_s": {
                 "value": rem,
                 "class": ("UNKNOWN" if rem is None or rem >= 0.05
                           else None),
@@ -227,6 +258,11 @@ def main() -> int:
             "in_stage_llm_wall_s": llm_wall,
             "generate_total_s": audit.get("total_s"),
             "stage_wall_s": stage_wall,
+            # legacy keys (R529 naming) retained for record
+            # continuity; the corrected keys above are canonical.
+            "legacy_A_provider_inference_s": round(dispatch, 6),
+            "legacy_B_failed_first_hop_s": failed_probe_wall,
+            "legacy_C_selection_s": round(sel, 6),
         }
         # ---- funnel parity block (directive §10) ----
         fn = ms.get("funnel") or {}
@@ -250,7 +286,7 @@ def main() -> int:
                 "routed_hops": ll.get("routed_hops"),
                 "retry_occurred": bool(
                     (ll.get("llm_retries") or 0) > 0
-                    or (partition["D_retry_backoff_s"]["value"] or 0)
+                    or (partition["retry_backoff_s"]["value"] or 0)
                     > 0),
                 "terminal_reason": fn.get("terminal_reason"),
             },
@@ -263,10 +299,10 @@ def main() -> int:
             },
         })
 
-    # ---- aggregates ----
+    # ---- aggregates (R530 §4 corrected keys) ----
     obs = [j for j in joins if j.get("partition")]
     out = {
-        "artifact": "R529_MECHANISM_SPACE_PROVIDER_JOIN/1.0",
+        "artifact": "R529_MECHANISM_SPACE_PROVIDER_JOIN/1.1",
         "harvest": args.harvest,
         "harvest_sha256": (
             __import__("hashlib").sha256(
@@ -275,38 +311,42 @@ def main() -> int:
         "n_observed": len(obs),
         "per_row": joins,
         "aggregate": {
-            "A_provider_inference_s": _agg([
-                j["partition"]["A_provider_inference_s"]["value"]
+            "selection_orchestration_s": _agg([
+                j["partition"]["selection_orchestration_s"]["value"]
                 for j in obs]),
-            "B_failed_first_hop_s": _agg([
-                j["partition"]["B_failed_first_hop_s"]["value"]
+            "failed_hop_admission_s": _agg([
+                j["partition"]["failed_hop_admission_s"]["value"]
                 for j in obs]),
-            "C_fallback_routing_overhead_s": _agg([
-                j["partition"]["C_fallback_routing_overhead_s"]
-                ["value"] for j in obs]),
-            "D_retry_backoff_s": _agg([
-                j["partition"]["D_retry_backoff_s"]["value"]
+            "inter_rung_fallback_s": _agg([
+                j["partition"]["inter_rung_fallback_s"]["value"]
                 for j in obs]),
-            "E_local_orchestration_s": _agg([
-                j["partition"]["E_local_orchestration_s"]["value"]
+            "provider_execution_s": _agg([
+                j["partition"]["provider_execution_s"]["value"]
+                for j in obs]),
+            "retry_backoff_s": _agg([
+                j["partition"]["retry_backoff_s"]["value"]
+                for j in obs]),
+            "local_orchestration_s": _agg([
+                j["partition"]["local_orchestration_s"]["value"]
                 for j in obs]),
             "in_stage_llm_wall_s": _agg([
                 j["partition"]["in_stage_llm_wall_s"] for j in obs]),
         },
+        "selection_subspan_aggregate": None,  # set below when present
         "fallback_auth_failure": {
             "n_calls_with_failed_first_hop": sum(
                 1 for j in obs
-                if j["partition"]["B_failed_first_hop_s"][
+                if j["partition"]["failed_hop_admission_s"][
                     "n_failed_hops"] > 0),
             "failed_hop_providers": sorted({
                 fh.get("provider")
                 for j in obs
-                for fh in j["partition"]["B_failed_first_hop_s"][
+                for fh in j["partition"]["failed_hop_admission_s"][
                     "hops"]}),
             "failed_hop_states": sorted({
                 fh.get("capability_state")
                 for j in obs
-                for fh in j["partition"]["B_failed_first_hop_s"][
+                for fh in j["partition"]["failed_hop_admission_s"][
                     "hops"]}),
         },
         "funnel_parity": {
@@ -326,38 +366,94 @@ def main() -> int:
                                         time.gmtime()),
     }
 
-    # ---- §12 stopping-rule evaluation (automatic, evidence-backed) ----
-    agg = out["aggregate"]
-    a_mean = (agg["A_provider_inference_s"] or {}).get("mean") or 0
-    b_mean = (agg["B_failed_first_hop_s"] or {}).get("mean") or 0
-    c_mean = (agg["C_fallback_routing_overhead_s"] or {}).get("mean") \
-        or 0
-    total_mean = a_mean + b_mean + c_mean
-    avoidable = b_mean + c_mean
-    if total_mean > 0 and avoidable / total_mean < 0.05:
+    # ---- R530 §4: selection-subspan aggregate (only when the
+    # R530 instrumented build served the calls — each per-row
+    # partition carries selection_subspans + selection_diag).
+    # Anything not directly measured remains UNKNOWN (Art. XXV).
+    _sub_rows = [
+        j["partition"]["selection_orchestration_s"].get("subspans")
+        for j in obs
+        if isinstance(j["partition"]["selection_orchestration_s"].get(
+            "subspans"), dict)]
+    _diag_rows = [
+        j["partition"]["selection_orchestration_s"].get(
+            "selection_diag")
+        for j in obs
+        if isinstance(j["partition"]["selection_orchestration_s"].get(
+            "selection_diag"), dict)]
+    if _sub_rows:
+        _sub_keys = ("A_availability_matrix_s",
+                     "B_chain_construction_s",
+                     "C_route_retirement_s", "D_cost_policy_s",
+                     "E_build_ladder_s", "F_catalog_detail_s",
+                     "G_scoring_detail_s",
+                     "H_capability_evidence_s",
+                     "I_selection_remainder_s")
+        out["selection_subspan_aggregate"] = {
+            k: _agg([s.get(k) for s in _sub_rows]) for k in _sub_keys}
+        _diag_keys = ("n_providers_inspected", "n_models_inspected",
+                      "n_ladder_rungs_emitted",
+                      "n_availability_score_calls",
+                      "n_availability_report_scans",
+                      "n_eligible_models_calls",
+                      "n_eligible_models_returned",
+                      "n_discover_catalog_calls",
+                      "n_discover_catalog_cache_hits",
+                      "n_span_failed_recently_calls")
+        out["selection_diag_aggregate"] = {
+            k: _agg([d.get(k) for d in _diag_rows
+                     if isinstance(d.get(k), (int, float))])
+            for k in _diag_keys}
+
+    # ---- classification (R530 §4 corrected: NO valid avoidable
+    # fraction exists until the selection subspan decomposition is
+    # measured). The R529 "19.5% avoidable fraction" is WITHDRAWN:
+    # selection_ordering_s is pre-call orchestration, not
+    # fallback-routing overhead, so B+C was never a causal
+    # avoidable quantity. The verdict is set from the subspan
+    # evidence when present, else UNKNOWN.
+    if not _sub_rows:
         out["classification"] = {
-            "verdict": "MECHANISM_SPACE_PROVIDER_COST_REAL",
-            "rule": ("the avoidable implementation portion "
-                     "(failed-hop wall + routing overhead) is <5% "
-                     "of the measured MECHANISM_SPACE LLM-path "
-                     "wall; the dominant cost is genuine provider "
-                     "inference and therefore not yet optimizable "
-                     "(directive §12 STOP rule)"),
-            "avoidable_fraction": (round(avoidable / total_mean, 4)
-                                   if total_mean else None),
+            "verdict": "SELECTION_DECOMPOSITION_UNMEASURED",
+            "rule": ("no R530-instrumented calls in this harvest: "
+                     "the selection subspan decomposition is "
+                     "UNMEASURED (Art. XXV). No avoidable fraction "
+                     "is computed; the withdrawn R529 19.5% figure "
+                     "must not be cited as a causal finding."),
+            "avoidable_fraction": None,
         }
     else:
-        out["classification"] = {
-            "verdict": "AVOIDABLE_COMPONENT_UNDER_REVIEW",
-            "rule": ("the avoidable implementation portion is >=5% "
-                     "of the measured wall OR the join is "
-                     "incomplete; a single causal intervention may "
-                     "be named only after the component is proven "
-                     "avoidable without changing scientific "
-                     "behavior"),
-            "avoidable_fraction": (round(avoidable / total_mean, 4)
-                                   if total_mean else None),
-        }
+        agg = out["aggregate"]
+        p_mean = (agg["provider_execution_s"] or {}).get("mean") or 0
+        f_mean = (agg["failed_hop_admission_s"] or {}).get("mean") \
+            or 0
+        t_mean = (agg["inter_rung_fallback_s"] or {}).get("mean") or 0
+        total_mean = p_mean + f_mean + t_mean
+        avoidable = f_mean + t_mean
+        if total_mean > 0 and avoidable / total_mean < 0.05:
+            out["classification"] = {
+                "verdict": "MECHANISM_SPACE_PROVIDER_COST_REAL",
+                "rule": ("the measured post-failure wall "
+                         "(failed-hop admission + inter-rung "
+                         "fallback) is <5% of the measured "
+                         "MECHANISM_SPACE LLM-path wall; the "
+                         "dominant cost is genuine provider "
+                         "inference (R530 stopping rule)"),
+                "avoidable_fraction": (round(
+                    avoidable / total_mean, 4) if total_mean else None),
+            }
+        else:
+            out["classification"] = {
+                "verdict": "AVOIDABLE_COMPONENT_UNDER_REVIEW",
+                "rule": ("the measured post-failure wall is >=5% "
+                         "of the measured wall OR the join is "
+                         "incomplete; a single causal intervention "
+                         "may be named only after the component is "
+                         "proven avoidable without changing "
+                         "scientific behavior"),
+                "avoidable_fraction": (round(
+                    avoidable / total_mean, 4) if total_mean else None),
+            }
 
     opath = Path(args.out)
     if not opath.is_absolute():
@@ -366,10 +462,17 @@ def main() -> int:
     opath.write_text(json.dumps(out, indent=1, ensure_ascii=False)
                      + "\n", encoding="utf-8")
     print(f"wrote {opath} ({len(obs)}/{len(joins)} observed)")
-    print("aggregate A(provider):", agg["A_provider_inference_s"])
-    print("aggregate B(failed-hop):", agg["B_failed_first_hop_s"])
-    print("aggregate C(routing):",
-          agg["C_fallback_routing_overhead_s"])
+    print("aggregate selection_orchestration:",
+          out["aggregate"]["selection_orchestration_s"])
+    print("aggregate failed_hop_admission:",
+          out["aggregate"]["failed_hop_admission_s"])
+    print("aggregate provider_execution:",
+          out["aggregate"]["provider_execution_s"])
+    if out.get("selection_subspan_aggregate"):
+        print("selection subspan means:",
+              {k: v.get("mean")
+               for k, v in
+               out["selection_subspan_aggregate"].items()})
     print("classification:", out["classification"])
     return 0
 

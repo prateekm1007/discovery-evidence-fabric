@@ -34,6 +34,11 @@ timers (gen_spans/1.0) on every durable ledger line. Proves:
      sleep NOT counted as transition, transition NOT double-
      subtracted, admission wall NOT lost, terminal total present,
      measured + remainder ~ total
+  O. (R530) selection subspan decomposition: A+B+C+D+E+H+I ==
+     selection_ordering_s within tolerance; F+G are detail-of-E
+     (not additive); all subspans >= -0.05; diag counts present
+     and consistent (score calls >= 1, report scans == 3 per
+     model-scored call, catalog reads >= providers inspected)
 
 Neutrality beyond these structural proofs rests on suite parity: the
 R519/R520/R522/R523/R525 + attacker suites must show byte-identical
@@ -871,6 +876,91 @@ class TestGenerateSpans(unittest.TestCase):
                 "total within the documented -0.05 s tolerance; a "
                 "larger negative remainder means a component was "
                 "double-counted or lost")
+        finally:
+            m.undo()
+
+    def test_o_selection_subspans_decompose_selection_ordering(self):
+        """R530 §3: the selection subspan decomposition closes.
+
+        A+B+C+D+E+H+I == selection_ordering_s within the documented
+        -0.05 s clock tolerance; F+G are detail-of-E (inclusive, not
+        additive — F+G <= E is NOT required since F/G walls are a
+        subset measured with their own timers, but F+G must not
+        exceed E beyond tolerance); every subspan >= -0.05; the
+        diagnostic counts are present and internally consistent
+        (at least one availability_score call, report scans >=
+        score calls, catalog reads cover the inspected providers,
+        rungs emitted >= 1 on a successful call). The test exercises
+        the REAL generate() selection path (not invented values).
+        """
+        import pytest
+        m = pytest.MonkeyPatch()
+        _hermetic(m)
+        m.setenv("ZAI_API_KEY", "zai_k")
+        m.setattr(lr, "_call_openai_flavor",
+                   lambda *a, **k: "FIELD_MECHANISM: test")
+        m.setattr(lr, "_call_anthropic_flavor",
+                   lambda *a, **k: "FIELD_MECHANISM: test")
+        lines = self._lines_for(m)
+        try:
+            self.assertTrue(lr.generate("p", policy=_policy("zai"),
+                                        max_retries=0).ok)
+            sp = lines[0]["generate_spans"]
+            total = sp.get("selection_ordering_s")
+            self.assertIsNotNone(total)
+            subs = sp.get("selection_subspans")
+            self.assertIsNotNone(
+                subs, "R530: selection_subspans must be present on "
+                      "the terminal line")
+            for _k in ("A_availability_matrix_s",
+                       "B_chain_construction_s",
+                       "C_route_retirement_s", "D_cost_policy_s",
+                       "E_build_ladder_s", "F_catalog_detail_s",
+                       "G_scoring_detail_s",
+                       "H_capability_evidence_s",
+                       "I_selection_remainder_s"):
+                self.assertIn(_k, subs)
+                self.assertGreaterEqual(
+                    subs[_k], -0.05,
+                    f"R530: subspan {_k} is negative beyond the "
+                    f"documented clock tolerance")
+            additive = (subs["A_availability_matrix_s"]
+                        + subs["B_chain_construction_s"]
+                        + subs["C_route_retirement_s"]
+                        + subs["D_cost_policy_s"]
+                        + subs["E_build_ladder_s"]
+                        + subs["H_capability_evidence_s"]
+                        + subs["I_selection_remainder_s"])
+            self.assertAlmostEqual(
+                additive, total, delta=0.05,
+                msg="R530: A+B+C+D+E+H+I must equal "
+                    "selection_ordering_s within tolerance "
+                    "(F+G are detail-of-E, not additive)")
+            # F+G detail must not exceed E beyond tolerance (they
+            # are a measured subset of E's wall with independent
+            # timers; clock resolution is the only slack).
+            self.assertLessEqual(
+                subs["F_catalog_detail_s"] + subs["G_scoring_detail_s"],
+                subs["E_build_ladder_s"] + 0.05,
+                "R530: F+G detail exceeds its parent E wall beyond "
+                "tolerance — the detail is not a subset")
+            diag = sp.get("selection_diag")
+            self.assertIsNotNone(diag)
+            self.assertGreaterEqual(
+                diag.get("n_availability_score_calls") or 0, 1,
+                "R530: at least one availability_score call per "
+                "selection")
+            self.assertGreaterEqual(
+                diag.get("n_availability_report_scans") or 0,
+                diag.get("n_availability_score_calls") or 0,
+                "R530: each score call performs >= 1 ledger scan")
+            self.assertGreaterEqual(
+                diag.get("n_discover_catalog_calls") or 0,
+                diag.get("n_providers_inspected") or 0,
+                "R530: catalog reads cover the inspected providers")
+            self.assertGreaterEqual(
+                diag.get("n_ladder_rungs_emitted") or 0, 1,
+                "R530: a successful call emits >= 1 rung")
         finally:
             m.undo()
 

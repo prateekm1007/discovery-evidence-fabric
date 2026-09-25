@@ -438,8 +438,13 @@ def discover_catalog(provider_id: str,
     deterministic: 404 -> mark dead -> fresh catalog lists the model ->
     mark cleared -> the model is eligible again. A TTL cache hit does
     NOT clear marks (only a fresh fetch is evidence of relisting)."""
+    # R530 §3: behavior-neutral diagnostic (counter + wall + hit flag).
+    _dc0 = time.perf_counter()
     base = _provider_base_url(provider_id)
     if not base:
+        _SELECTION_DIAG["discover_catalog_calls"] += 1
+        _SELECTION_DIAG["discover_catalog_s"] += (
+            time.perf_counter() - _dc0)
         return {"provider": provider_id, "status": "NO_BASE_URL",
                 "models": []}
     cache = CATALOG_DIR / f"{provider_id}.json"
@@ -448,6 +453,10 @@ def discover_catalog(provider_id: str,
             data = json.loads(cache.read_text())
             age = time.time() - float(data.get("fetched_at_epoch") or 0)
             if age < CATALOG_TTL_S:
+                _SELECTION_DIAG["discover_catalog_calls"] += 1
+                _SELECTION_DIAG["discover_catalog_s"] += (
+                    time.perf_counter() - _dc0)
+                _SELECTION_DIAG["discover_catalog_cache_hits"] += 1
                 return data
         except Exception:  # noqa: BLE001 — stale cache falls through
             pass
@@ -517,6 +526,10 @@ def discover_catalog(provider_id: str,
         cache.write_text(json.dumps(out, indent=1, sort_keys=True))
     except Exception:  # noqa: BLE001 — cache is best-effort
         pass
+    # R530 §3: behavior-neutral diagnostic (counter + wall only; a
+    # fresh fetch / UNDISCOVERED path is not a cache hit).
+    _SELECTION_DIAG["discover_catalog_calls"] += 1
+    _SELECTION_DIAG["discover_catalog_s"] += time.perf_counter() - _dc0
     return out
 
 
@@ -721,15 +734,25 @@ def span_failed_recently(provider: str, model: str,
     measured failure demotes; a later success on the same rung restores
     it — the tail's newest entry for the rung decides)."""
     now = now if now is not None else time.time()
+    # R530 §3: behavior-neutral diagnostic (counter + wall only).
+    _df0 = time.perf_counter()
+    _dres: Optional[bool] = None
     for e in reversed((_load_state().get("span_outcomes") or [])):
         if not isinstance(e, dict):
             continue
         if e.get("provider") != provider or e.get("model") != model:
             continue
         if now - float(e.get("ts") or 0) > SPAN_FAIL_DEMOTE_WINDOW_S:
-            return False  # the rung's newest outcome is stale either way
-        return not bool(e.get("ok"))
-    return False
+            _dres = False  # the rung's newest outcome is stale either way
+            break
+        _dres = not bool(e.get("ok"))
+        break
+    if _dres is None:
+        _dres = False
+    _SELECTION_DIAG["span_failed_recently_calls"] += 1
+    _SELECTION_DIAG["span_failed_recently_s"] += (
+        time.perf_counter() - _df0)
+    return _dres
 
 
 def clear_span_outcomes() -> None:
@@ -826,6 +849,50 @@ def _decay_weight(at_epoch: float, now: float) -> float:
     return math.pow(0.5, max(0.0, now - at_epoch) / DECAY_HALF_LIFE_S)
 
 
+# R530 §3: selection-path diagnostic counters (behavior-neutral
+# telemetry for the gen_spans/1.0 selection_subspans decomposition).
+# Walls are perf_counter deltas accumulated at the measured call
+# sites; counts are plain increments. Read via
+# selection_diag_take() (take-and-zero). Never steers routing.
+_SELECTION_DIAG: Dict[str, Any] = {
+    "availability_score_calls": 0,
+    "availability_score_s": 0.0,
+    "availability_report_calls": 0,
+    "availability_report_s": 0.0,
+    "eligible_models_calls": 0,
+    "eligible_models_s": 0.0,
+    "eligible_models_returned": 0,
+    "discover_catalog_calls": 0,
+    "discover_catalog_s": 0.0,
+    "discover_catalog_cache_hits": 0,
+    "span_failed_recently_calls": 0,
+    "span_failed_recently_s": 0.0,
+    "ladder_providers_inspected": 0,
+    "ladder_models_inspected": 0,
+    "ladder_rungs_emitted": 0,
+}
+
+
+def selection_diag_take() -> Dict[str, Any]:
+    """R530 §3: take-and-zero the selection-path diagnostic counters.
+
+    llm_registry.generate() takes a snapshot when its selection span
+    opens and again when it closes; the delta is that call's
+    diagnostic counts (availability_score calls, availability_report
+    ledger scans, eligible_models/catalog calls, span-failure checks,
+    providers/models inspected, rungs emitted). Pure counter reads +
+    zeroing — no routing, scoring, or I/O behavior changes (Art. IX:
+    observational). Single-threaded engine: no nesting of generate()
+    calls, so take/open/close pairing is exact; abandoned
+    early-return selections discard via take() at their return sites.
+    """
+    snap = dict(_SELECTION_DIAG)
+    for _k in _SELECTION_DIAG:
+        _SELECTION_DIAG[_k] = 0 if isinstance(
+            _SELECTION_DIAG[_k], int) else 0.0
+    return snap
+
+
 def availability_report(provider: Optional[str] = None,
                         model: Optional[str] = None,
                         task: Optional[str] = None,
@@ -837,6 +904,8 @@ def availability_report(provider: Optional[str] = None,
     insufficient evidence is not a 0.0 rate), and the last-observation
     recency factor."""
     now = now if now is not None else time.time()
+    # R530 §3: behavior-neutral diagnostic (counter + wall only).
+    _dr0 = time.perf_counter()
     succ_w = fail_w = 0.0
     last_obs_at: Optional[float] = None
     latency_ema_num = 0.0
@@ -867,7 +936,7 @@ def availability_report(provider: Optional[str] = None,
         if last_obs_at is None or at > last_obs_at:
             last_obs_at = at
     total = succ_w + fail_w
-    return {
+    _drep = {
         "provider": provider, "model": model, "task": task,
         "decayed_success_weight": round(succ_w, 4),
         "decayed_failure_weight": round(fail_w, 4),
@@ -878,6 +947,11 @@ def availability_report(provider: Optional[str] = None,
         "latency_ema_ms": (round(latency_ema_num / latency_ema_den, 1)
                            if latency_ema_den > 1e-6 else None),
     }
+    # R530 §3: behavior-neutral diagnostic (counter + wall only).
+    _SELECTION_DIAG["availability_report_calls"] += 1
+    _SELECTION_DIAG["availability_report_s"] += (
+        time.perf_counter() - _dr0)
+    return _drep
 
 
 def health_recency_factor(report: Dict[str, Any],
@@ -913,6 +987,8 @@ def availability_score(provider: str, model: Optional[str] = None,
     fabricated 1.0 or 0.0 — Art. XXV). Ordering-only (Art. V): a low
     score demotes, never removes."""
     now = now if now is not None else time.time()
+    # R530 §3: behavior-neutral diagnostic (counter + wall only).
+    _ds0 = time.perf_counter()
     # task_compatibility: 1.0 when the model is compatible with the
     # task (checked by the caller when building the ladder); here the
     # factor covers provider-level task affinity from telemetry.
@@ -941,9 +1017,13 @@ def availability_score(provider: str, model: Optional[str] = None,
     # different provider from the generator ranks higher on attack
     # tasks — recorded policy input, ordering-only.
     separation = 1.25 if (task == TASK_FAST and avoid_provider
-                          and provider != avoid_provider) else 1.0
-    return round(max(0.0, min(2.0, recent_rate * recency * provider_health
-                              * task_compat * latency_suit * separation)), 6)
+                           and provider != avoid_provider) else 1.0
+    _sres = round(max(0.0, min(2.0, recent_rate * recency * provider_health
+                               * task_compat * latency_suit * separation)), 6)
+    # R530 §3: behavior-neutral diagnostic (counter + wall only).
+    _SELECTION_DIAG["availability_score_calls"] += 1
+    _SELECTION_DIAG["availability_score_s"] += time.perf_counter() - _ds0
+    return _sres
 
 
 # ---------------------------------------------------------------------------
@@ -1057,6 +1137,8 @@ def eligible_models(provider_id: str, task: str,
     marked PINNED_DEFAULT). The old behavior — catalog discovered but
     pinned stale models retained — is REMOVED (the directive's named
     defect)."""
+    # R530 §3: behavior-neutral diagnostic (counter + wall only).
+    _de0 = time.perf_counter()
     pinned = _operator_pinned_model(provider_id)
     if catalog:
         cat_state = discover_catalog(provider_id).get("status")
@@ -1090,7 +1172,12 @@ def eligible_models(provider_id: str, task: str,
             cost_class=1, latency_class=2, context_limit=128000,
             source="OPERATOR_PINNED")
         recs = [pinned_rec] + [r for r in recs if r.model != pinned]
-    return [r for r in recs if task in r.task_capabilities] or recs
+    _eres = [r for r in recs if task in r.task_capabilities] or recs
+    # R530 §3: behavior-neutral diagnostic (counter + wall + count).
+    _SELECTION_DIAG["eligible_models_calls"] += 1
+    _SELECTION_DIAG["eligible_models_s"] += time.perf_counter() - _de0
+    _SELECTION_DIAG["eligible_models_returned"] += len(_eres)
+    return _eres
 
 
 def all_models(provider_id: str) -> List[ModelRecord]:
@@ -1263,6 +1350,14 @@ def build_ladder(task: str, role: Optional[str] = None,
     rungs = rungs[:max_rungs]
     # R483: the demotion is RECORDED, never silent (Art. IV/XXVII) —
     # which rungs carried the span-failure penalty in this build
+    # R530 §3: behavior-neutral diagnostic (inspection counts only).
+    # providers/models considered across the per-provider eligible
+    # lists (F detail) and final rungs emitted (after LAST_RESORT +
+    # truncation). Counts only — no timing, no behavior change.
+    _SELECTION_DIAG["ladder_providers_inspected"] += len(provs)
+    _SELECTION_DIAG["ladder_models_inspected"] += sum(
+        len(_recs) for _, _recs in per_provider)
+    _SELECTION_DIAG["ladder_rungs_emitted"] += len(rungs)
     span_demoted = sorted({(r["provider"], r["model"])
                            for r in rungs
                            if purpose == "synthesis"
