@@ -870,6 +870,10 @@ _SELECTION_DIAG: Dict[str, Any] = {
     "ladder_providers_inspected": 0,
     "ladder_models_inspected": 0,
     "ladder_rungs_emitted": 0,
+    # R531 §6: memo hits (reuse without recomputation). The
+    # availability_score_calls counter counts RECOMPUTES only;
+    # hits + recomputes = the unmemoized call count.
+    "selection_memo_hits": 0,
 }
 
 
@@ -891,6 +895,48 @@ def selection_diag_take() -> Dict[str, Any]:
         _SELECTION_DIAG[_k] = 0 if isinstance(
             _SELECTION_DIAG[_k], int) else 0.0
     return snap
+
+
+# R531 §6: invocation-local availability-score memo table.
+# Thread-local storage: each thread owns its table, so concurrent
+# generate() calls can never observe each other's entries (the key
+# carries `now`, which already separates invocations, but isolation
+# is structural, not coincidental). Lifecycle: selection_memo_begin()
+# (fresh table) at generate()'s selection-span open,
+# selection_memo_end() (cleared) at span close + early-return
+# discard sites. If an exception escapes mid-selection, the stale
+# table persists — but the NEXT call's begin() replaces it before
+# any read, so no entry is ever shared across invocations. The
+# table holds (value, ledger_identity) pairs; a hit requires the
+# stored identity to equal the CURRENT file identity (Design 2 —
+# identical to the R531 §4/§5 harness-tested wrapper: stale
+# entries are overwritten, never returned).
+_selection_memo_local = threading.local()
+
+
+def selection_memo_begin() -> None:
+    """R531 §6: open a fresh invocation-local score memo table."""
+    _selection_memo_local.table = {}
+
+
+def selection_memo_end() -> None:
+    """R531 §6: close (clear) the invocation-local score memo table."""
+    _selection_memo_local.table = None
+
+
+def _selection_memo_table() -> Optional[Dict[str, Any]]:
+    return getattr(_selection_memo_local, "table", None)
+
+
+def _ledger_identity() -> Optional[Any]:
+    """(mtime_ns, size) of the routing ledger file, or None when
+    unreadable. The ledger is append-only jsonl: any append changes
+    size (and mtime), so equal identity means equal bytes."""
+    try:
+        _st = LEDGER._path.stat()
+        return (_st.st_mtime_ns, _st.st_size)
+    except Exception:  # noqa: BLE001 — no identity available
+        return None
 
 
 def availability_report(provider: Optional[str] = None,
@@ -987,6 +1033,28 @@ def availability_score(provider: str, model: Optional[str] = None,
     fabricated 1.0 or 0.0 — Art. XXV). Ordering-only (Art. V): a low
     score demotes, never removes."""
     now = now if now is not None else time.time()
+    # R531 §6: invocation-local score reuse (the Case-A
+    # intervention). Memo key = the FULL score input tuple
+    # (provider, model, task, avoid_provider, latency_class, now);
+    # a hit ALSO requires the stored ledger identity to equal the
+    # current file identity (Design 2 — identical to the
+    # harness-tested wrapper). availability_score is a pure
+    # function of (inputs, now, ledger bytes): same key + same
+    # bytes -> same value, bit-for-bit. On identity mismatch the
+    # entry is recomputed and overwritten (invalidation), never
+    # returned stale. No memo table open (-> None) means normal
+    # computation (all non-selection callers unaffected).
+    _mtable = _selection_memo_table()
+    _mkey = None
+    _mident = None
+    if _mtable is not None:
+        _mident = _ledger_identity()
+        _mkey = (provider, model, task, avoid_provider,
+                 latency_class, now)
+        _mhit = _mtable.get(_mkey)
+        if _mhit is not None and _mhit[1] == _mident:
+            _SELECTION_DIAG["selection_memo_hits"] += 1
+            return _mhit[0]
     # R530 §3: behavior-neutral diagnostic (counter + wall only).
     _ds0 = time.perf_counter()
     # task_compatibility: 1.0 when the model is compatible with the
@@ -1023,6 +1091,10 @@ def availability_score(provider: str, model: Optional[str] = None,
     # R530 §3: behavior-neutral diagnostic (counter + wall only).
     _SELECTION_DIAG["availability_score_calls"] += 1
     _SELECTION_DIAG["availability_score_s"] += time.perf_counter() - _ds0
+    # R531 §6: store under the invocation-local memo (Design 2:
+    # value + ledger identity; a later hit revalidates identity).
+    if _mtable is not None and _mkey is not None:
+        _mtable[_mkey] = (_sres, _mident)
     return _sres
 
 

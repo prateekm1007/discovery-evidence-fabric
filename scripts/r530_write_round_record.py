@@ -74,17 +74,20 @@ def main() -> int:
     e_mean = _mean(sub_agg, "E_build_ladder_s")
     n_sub = (sub_agg.get("G_scoring_detail_s") or {}).get("n")
 
-    # §6 Case A assessment (evidence-backed, no intervention named):
-    # repeated deterministic computation with identical inputs
-    # during one generate() invocation: 56 availability_score calls
-    # x 3 availability_report scans = 168 full ledger-file reads
-    # per call, same file, same (provider, model, task) filter
-    # triples re-scored across sort comparisons + emit + LAST_RESORT.
-    # Ledger bytes are static DURING one call's selection span (this
-    # call writes nothing until its first attempt completes);
-    # concurrent-container appends are possible, so per-call reuse
-    # needs the behavioral-identity proof before authorization.
-    case_a_proven = bool(
+    # R531 §2 audit repair (Art. XXVII — thresholds require
+    # provenance): the former `case_a_proven` predicate used
+    # `(g_mean / e_mean) > 0.9` and `n_sub >= 2`, which have NO
+    # constitutional or directive provenance — they were
+    # coder-invented values, and the name `proven` implied the
+    # threshold itself constitutes authorization. It does not.
+    # Renamed to an OBSERVATIONAL candidate signal: it reports
+    # what this battery measured (G≈99.4% of E on N=7 audited
+    # calls) with no authorization implication. The values 0.9
+    # and 2 below are descriptive readout points of THIS
+    # measurement, not gates; the intervention gate is the
+    # behavioral-identity proof (R531 §4–§6), which has not run.
+    # Do not invent provenance retroactively.
+    case_a_signal = bool(
         g_mean is not None and e_mean is not None and e_mean > 0
         and (g_mean / e_mean) > 0.9 and n_sub is not None
         and n_sub >= 2)
@@ -131,7 +134,14 @@ def main() -> int:
             "n_audited_calls": n_sub,
         },
         "case_assessment": {
-            "case_A_candidate": case_a_proven,
+            "case_A_signal": case_a_signal,
+            "case_A_signal_provenance": ("observational readout of "
+                                         "this battery only (G fraction "
+                                         "of E, N audited calls); the "
+                                         "0.9/2 values are descriptive, "
+                                         "not authorization thresholds "
+                                         "(Art. XXVII — no provenance "
+                                         "invented)"),
             "case_A_counterfactual": ("per-call reuse of already-"
                                       "computed ledger-scan results "
                                       "within the same ladder "
@@ -140,14 +150,14 @@ def main() -> int:
                                       "semantic change)"),
             "behavioral_identity_proven": behavior_proven,
             "verdict": ("CASE_A_CANDIDATE_IDENTIFIED__PROOF_PENDING"
-                        if case_a_proven else "UNKNOWN"),
-            "rule": ("a repeated deterministic computation with "
-                     "identical inputs during one generate() "
-                     "invocation is PROVEN at the scan-count level; "
-                     "the behavioral-identity checks (same inputs, "
-                     "same scores, same ordering, same rung, same "
-                     "fallback, same provenance) must pass BEFORE "
-                     "the intervention may be named (directive §6)"),
+                        if case_a_signal else "UNKNOWN"),
+            "rule": ("repeated ledger scanning is OBSERVED at the "
+                     "scan-count level (56 score calls x 168 scans "
+                     "per call); the behavioral-identity checks "
+                     "(same inputs, same scores, same ordering, "
+                     "same rung, same fallback, same provenance) "
+                     "must pass BEFORE the intervention may be "
+                     "named (directive §6)"),
         },
         "funnel_parity": {
             "mechanisms_found": "1/10 (problem 4 BUILT)",

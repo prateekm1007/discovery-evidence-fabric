@@ -1695,6 +1695,9 @@ def generate(prompt: str, system: str = "",
     # abandoned early-return selections discard via take() at their
     # return sites (same function, below).
     mr.selection_diag_take()
+    # R531 §6: open the invocation-local score memo table (fresh;
+    # closed at span close + early-return discard sites).
+    mr.selection_memo_begin()
     _sA_matrix_s = 0.0
     _sB_chain_s = 0.0
     _sC_retirement_s = 0.0
@@ -1896,8 +1899,10 @@ def generate(prompt: str, system: str = "",
                "no provider credential available (see selection_ledger)"))
         # R530 §3: abandoned selection — discard this call's diag
         # counts so they cannot pollute the next call's delta (the
-        # selection span never closes on this path).
+        # selection span never closes on this path). R531 §6: also
+        # close the memo table.
         mr.selection_diag_take()
+        mr.selection_memo_end()
         return LLMCallResult(
             status=_status, error=_err,
             prompt_hash=_sha(prompt),
@@ -1996,7 +2001,9 @@ def generate(prompt: str, system: str = "",
                          if r[0] == hard_pin_provider]
         if not _pinned_rungs:
             # R530 §3: abandoned selection — discard diag counts.
+            # R531 §6: also close the memo table.
             mr.selection_diag_take()
+            mr.selection_memo_end()
             return LLMCallResult(
                 status=ST_PROVIDER_UNAVAILABLE,
                 error=(f"hard-pinned provider '{hard_pin_provider}' "
@@ -2013,7 +2020,9 @@ def generate(prompt: str, system: str = "",
         rungs = _pinned_rungs
     if not rungs:
         # R530 §3: abandoned selection — discard diag counts.
+        # R531 §6: also close the memo table.
         mr.selection_diag_take()
+        mr.selection_memo_end()
         return LLMCallResult(
             status=ST_PROVIDER_UNAVAILABLE,
             error="no routing rung available for this task "
@@ -2093,6 +2102,10 @@ def generate(prompt: str, system: str = "",
             "availability_score_calls", 0),
         "availability_score_s": round(
             _diag1.get("availability_score_s", 0.0), 6),
+        # R531 §6: memo hits (reuse without recomputation).
+        # recomputes + hits = the unmemoized call count.
+        "n_selection_memo_hits": _diag1.get(
+            "selection_memo_hits", 0),
         "n_availability_report_scans": _diag1.get(
             "availability_report_calls", 0),
         "availability_report_s": round(
@@ -2108,6 +2121,10 @@ def generate(prompt: str, system: str = "",
         "n_span_failed_recently_calls": _diag1.get(
             "span_failed_recently_calls", 0),
     }
+    # R531 §6: close the invocation-local score memo table (the
+    # next call's begin() would replace it anyway; explicit close
+    # keeps the lifecycle exact).
+    mr.selection_memo_end()
     _gen_spans["purpose"] = purpose_tag
 
     wanted_head = rungs[0][0]
