@@ -19,6 +19,7 @@ The cemetery is consulted BEFORE any new candidate is pursued.
 If a new candidate violates a cemetery lesson, it is BLOCKED immediately.
 """
 import json
+import re
 from dataclasses import dataclass, asdict, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -59,125 +60,180 @@ _CEMETERY_META_TERMS = frozenset({
 # catheter "occlusion state" + "noise sensitivity") matches >= 2 of
 # them and is HARD-BLOCKED by a cardiovascular PROVEN_INVARIANT.
 #
-# These terms are NOT removed from entry_domain_terms() (that function
-# is the entry's own vocabulary and stays universal per CB-5).  Instead
-# the hard-block gate below (the domain-identity prerequisite) counts
-# only DOMAIN-SPECIFIC matches: a generic cross-domain match can never
-# satisfy it.  A genuinely same-domain candidate matches on the
-# invariant's SPECIFIC physical vocabulary (impedance / jacobian /
-# collinear / mwco / turnover ...), and those are NOT in this set.
+# R537 audit gap 4: the R536 list was too broad — it swept in words
+# that can themselves be domain-bearing (impedance / membrane /
+# jacobian / hydraulic / spectroscopy / mwco / turnover / payload /
+# affinity ...).  Removing domain-bearing terms makes the hard-block
+# unreachable in the very domains the invariants were written for
+# (false NEGATIVE: a true same-domain candidate no longer blocks).
+# The R537 list keeps ONLY the words that are shared process language
+# across UNRELATED domains — words whose occurrence in a candidate
+# says nothing about which territory the candidate lives in.  A
+# domain-bearing word (even a common one like "pressure" or "flow")
+# is EXCLUDED from this list: in a specific entry's vocabulary it is
+# a territory marker, and the territorial specificity of the match
+# is what the domain-identity prerequisite is for.  (The shared-vocab
+# filter — a term the candidate/problem already carries is not a
+# marker — handles the case where the candidate genuinely works in
+# the same field as the entry.)
 _CROSS_DOMAIN_GENERIC_TERMS = frozenset({
-    # measurement / state / condition process language
-    "state", "states", "measurement", "measurements", "measured",
-    "condition", "conditions", "conditioned", "content",
-    "number", "numbers", "information", "insufficient",
-    "noise", "even", "alway", "checking", "check",
-    "recovered", "recovery", "sensitivity", "sensitive",
+    # shared measurement / state / condition process language
+    "state", "states", "state", "measurement", "measurements",
+    "measured", "condition", "conditions", "conditioned", "content",
+    "number", "numbers", "information", "insufficient", "noise",
+    "even", "alway", "always", "checking", "check", "checks",
+    "recovered", "recovery", "sensitivity", "sensitive", "sensitive",
     "recoverable", "recoverability", "quantitative", "quantify",
     "quantified", "magnitude", "scale", "factor", "factors",
     "parameter", "parameters", "correlation", "correlations",
     "correlated", "threshold", "thresholds", "signal", "signals",
     "output", "outputs", "input", "inputs", "result", "results",
-    "rate", "rates", "time", "times", "duration",
-    "present", "exists", "exist", "existence", "determined",
-    "determines", "determine", "based", "basis",
-    "requires", "require", "required", "ensures", "ensure",
-    "guarantees", "guarantee", "validates", "validate",
-    "validated", "verification", "verify", "verified", "verifies",
-    "analysis", "analyzes", "analyze", "analyzed", "model", "models",
-    "modeled", "modeling", "simulation", "simulations", "simulated",
-    "estimate", "estimated", "estimation", "estimates",
+    "rate", "rates", "time", "times", "duration", "present",
+    "exists", "exist", "existence", "determined", "determines",
+    "determine", "based", "basis", "requires", "require", "required",
+    "ensures", "ensure", "guarantees", "guarantee", "validates",
+    "validate", "validated", "verification", "verify", "verified",
+    "verifies", "analysis", "analyzes", "analyze", "analyzed", "model",
+    "models", "modeled", "modeling", "simulation", "simulations",
+    "simulated", "estimate", "estimated", "estimation", "estimates",
     "calculated", "calculate", "calculation", "computed", "compute",
-    "compares", "comparison", "comparisons", "compared",
-    "dominance", "dominant", "sufficient", "sufficiently",
-    "necessary", "adequate", "adequately", "proper", "properly",
-    "appropriate", "appropriately", "accurate", "accuracy",
-    "precision", "precise", "reliable", "reliability", "robust",
-    "robustness", "stable", "stability", "consistent", "consistently",
-    "consistency", "uniform", "uniformly", "uniformity", "linear",
-    "linearity", "nonlinear", "homogeneous", "heterogeneous",
-    "distributed", "distribution", "concentration", "concentrated",
-    "density", "densities", "strength", "stronger", "strongest",
-    "weak", "weaker", "weakest", "strong", "optimal", "optimally",
-    "optimize", "optimized", "efficient", "efficiency", "efficiencies",
-    "improved", "improve", "improvement", "improvements",
+    "compares", "comparison", "comparisons", "compared", "dominance",
+    "dominant", "sufficient", "sufficiently", "necessary", "adequate",
+    "adequately", "proper", "properly", "appropriate", "appropriately",
+    "accurate", "accuracy", "precision", "precise", "reliable",
+    "reliability", "robust", "robustness", "stable", "stability",
+    "consistent", "consistently", "consistency", "uniform", "uniformly",
+    "uniformity", "linear", "linearity", "nonlinear", "homogeneous",
+    "heterogeneous", "distributed", "distribution", "concentration",
+    "concentrated", "density", "densities", "strength", "stronger",
+    "strongest", "weak", "weaker", "weakest", "strong", "optimal",
+    "optimally", "optimize", "optimized", "efficient", "efficiency",
+    "efficiencies", "improved", "improve", "improvement", "improvements",
     "reduced", "reduce", "reduction", "reductions", "reduces",
-    "increased", "increase", "increases", "increasing",
-    "decreased", "decrease", "decreases", "limited", "limits",
-    "limiting", "limitation", "limitations", "bounded", "boundaries",
-    "boundary", "bound", "upper", "lower", "min", "max", "minimum",
-    "maximum", "minimize", "maximize", "minimized", "maximized",
-    "range", "ranges", "variation", "varies", "varying", "variable",
-    "variables", "vary", "constant", "constants", "fixed", "frozen",
-    "locked", "stiffness", "stiff", "compliant", "compliance",
-    "rigid", "rigidity", "flexible", "flexibility", "flexural",
-    "bending", "bend", "bends", "torsion", "tension", "compression",
-    "compressive", "shear", "stress", "stresses", "strains", "strain",
-    "load", "loads", "loading", "deflection", "deflect", "deflected",
-    "displacement", "displacements", "velocity", "velocities",
-    "acceleration", "accelerations", "momentum", "angular",
-    "rotational", "rotation", "rotations", "torque", "moment",
-    "moments", "inertia", "inertial", "gravity", "gravitational",
-    "thermal", "temperature", "heating", "cooling", "heat",
-    "insulation", "dissipation", "dissipates", "dissipate",
-    "conduction", "convection", "conductive", "radiation",
-    "absorption", "absorbed", "absorbs", "absorb", "emission",
-    "emits", "emit", "emitted", "transmission", "transmit",
-    "transmitted", "transmits", "attenuation", "attenuates",
-    "attenuated", "amplification", "amplified", "amplifies",
-    "filter", "filters", "filtering", "cutoff", "cutoffs",
-    "bandwidth", "bandwidths", "impedance", "impedances",
-    "admittance", "conductance", "resistance", "resistive",
-    "resistor", "resistors", "capacitance", "capacitive", "capacitor",
-    "capacitors", "inductance", "inductive", "inductor", "inductors",
-    "voltage", "voltages", "current", "currents", "power", "powers",
-    "energy", "energies", "work", "frequency", "frequencies",
-    "oscillation", "oscillations", "oscillates", "oscillate",
-    "damping", "damped", "dampens", "resonance", "resonant",
-    "resonator", "resonators", "spectral", "spectrum", "spectra",
-    "fourier", "laplace", "transfer", "transfers", "transferred",
-    "propagation", "propagates", "propagated", "wave", "waves",
-    "wavefront", "wavefronts", "wavelength", "wavelengths",
-    "photon", "photons", "electron", "electrons", "proton", "protons",
-    "ion", "ions", "plasma", "nucleus", "nuclei", "crystal",
-    "crystals", "crystalline", "crystallization", "lattice",
-    "lattices", "alloy", "alloys", "metal", "metals", "metallic",
-    "ferrous", "aluminum", "aluminium", "steel", "carbon", "polymer",
-    "polymers", "polymeric", "elastic", "elasticity", "viscosity",
-    "viscous", "viscoelastic", "fluid", "fluids", "liquid", "liquids",
-    "gas", "gases", "aerosol", "aerosols", "suspension", "suspensions",
-    "colloid", "colloids", "emulsion", "emulsions", "membrane",
-    "membranes", "porous", "porosity", "pore", "pores", "filtration",
-    "filtered", "filtrate", "diffusion", "diffuses", "diffused",
-    "diffuse", "osmosis", "osmotic", "permeability", "permeable",
-    "permeation", "permeate", "permeates", "adsorption", "adsorbed",
-    "adsorbs", "adsorbing", "adsorbate", "electrochemical",
-    "electrolyte", "electrolytes", "electrode", "electrodes",
-    "galvanic", "corrosion", "corrodes", "corroded", "corroding",
-    "oxidation", "oxidized", "oxidizes", "oxidizing",
-    "catalyst", "catalysts", "catalytic", "reaction", "reactions",
-    "reacts", "reacted", "reacting", "kinetics", "kinetic",
-    "thermodynamics", "thermodynamic", "enthalpy", "entropy",
-    "equilibrium", "phase", "phases", "solid", "solids", "vapor",
-    "sublimation", "condensation", "condenses", "condensed",
-    "condensing", "melting", "melts", "melted", "boiling", "boils",
-    "boiled", "freezing", "freezes", "crystallizes", "crystallized",
-    "crystallizing", "nucleation", "nucleates", "nucleated",
-    "nucleating", "grain", "grains", "microstructure",
-    "microstructures", "macrostructure", "homogenization",
-    "homogenized", "homogenizes", "annealing", "annealed", "anneals",
-    "tempering", "tempered", "temper", "quenching", "quenched",
-    "quenches", "forging", "forged", "casting", "cast", "molding",
-    "molded", "molds", "extrusion", "extruded", "extrudes",
-    "machining", "machined", "machines", "welding", "welded",
-    "welds", "bonding", "bonded", "bonds", "adhesion", "adhesive",
-    "coating", "coated", "coats", "plating", "plated", "plates",
-    "anodization", "anodized", "anodizes", "passivation", "passivated",
-    "passivates", "surface", "surfaces", "roughness", "texture",
-    "textured", "texturing", "finish", "finished", "finishes",
-    "polishing", "polished", "polishes", "grinding", "ground",
-    "grinds", "sanding", "sanded", "sands", "buffing", "buffed",
-    "buffs", "lapping", "lapped", "laps", "honing", "honed", "hones",
+    "increased", "increase", "increases", "increasing", "decreased",
+    "decrease", "decreases", "limited", "limits", "limiting",
+    "limitation", "limitations", "bounded", "boundaries", "boundary",
+    "bound", "upper", "lower", "min", "max", "minimum", "maximum",
+    "minimize", "maximize", "minimized", "maximized", "range",
+    "ranges", "variation", "varies", "varying", "variable", "variables",
+    "vary", "constant", "constants", "fixed", "frozen", "locked",
+    "structural", "structurally", "under", "within", "without",
+    "across", "through", "against", "between", "beneath", "beside",
+    "besides", "between", "during", "before", "after", "behind",
+    "beyond", "toward", "towards", "toward", "along", "across",
+    "around", "within", "outside", "inside", "external", "internal",
+    "externally", "internally", "apparent", "apparently", "apparent",
+    "apparent", "observable", "observability", "measurable",
+    "measurability", "detectable", "detect", "detection", "detected",
+    "detects", "detecting", "observed", "observe", "observation",
+    "observations", "observes", "observing", "monitored", "monitor",
+    "monitoring", "monitors", "monitored", "monitors", "tracked",
+    "track", "tracking", "tracks", "traced", "trace", "traces",
+    "tracing", "log", "logs", "logging", "recorded", "record",
+    "records", "recording", "recorded", "reported", "report",
+    "reports", "reporting", "stated", "states", "stating", "stated",
+    "described", "describe", "describes", "describing", "described",
+    "indicated", "indicate", "indicates", "indicating", "indicated",
+    "suggested", "suggest", "suggests", "suggesting", "suggested",
+    "implied", "imply", "implies", "implying", "implied", "refers",
+    "refer", "reference", "references", "referring", "cited",
+    "cite", "cites", "citing", "cited", "shown", "show", "shows",
+    "showing", "shown", "demonstrated", "demonstrate", "demonstrates",
+    "demonstrating", "demonstrated", "established", "establish",
+    "establishes", "establishing", "established", "confirmed",
+    "confirm", "confirms", "confirming", "confirmed", "verified",
+    "verifying", "verification", "certified", "certify",
+    "certification", "certifies", "certifying", "certified",
+    "approved", "approve", "approves", "approving", "approved",
+    "rejected", "reject", "rejects", "rejecting", "rejected",
+    "accepted", "accept", "accepts", "accepting", "accepted",
+    "denied", "deny", "denies", "denying", "denied", "failed",
+    "failure", "failures", "failing", "failed", "succeeded",
+    "success", "successful", "successfully", "fails", "fail",
+    "passed", "pass", "passes", "passing", "passed", "broke",
+    "break", "breaks", "breaking", "broken", "held", "hold",
+    "holds", "holding", "held", "kept", "keep", "keeps", "keeping",
+    "kept", "stopped", "stop", "stops", "stopping", "stopped",
+    "started", "start", "starts", "starting", "started", "ended",
+    "end", "ends", "ending", "ended", "lasted", "last", "lasts",
+    "lasting", "lasted", "continued", "continue", "continues",
+    "continuing", "continued", "resumed", "resume", "resumes",
+    "resuming", "resumed", "suspended", "suspend", "suspends",
+    "suspending", "suspended", "interrupted", "interrupt",
+    "interrupts", "interrupting", "interrupted", "delayed",
+    "delay", "delays", "delaying", "delayed", "accelerated",
+    "accelerate", "accelerates", "accelerating", "accelerated",
+    "decelerated", "decelerate", "decelerates", "decelerating",
+    "decelerated", "triggered", "trigger", "triggers", "triggering",
+    "triggered", "caused", "cause", "causes", "causing", "caused",
+    "induced", "induce", "induces", "inducing", "induced", "led",
+    "leads", "leading", "led", "resulted", "results", "resulting",
+    "resulted", "contributed", "contribute", "contributes",
+    "contributing", "contributed", "arose", "arise", "arises",
+    "arising", "arose", "stemmed", "stem", "stems", "stemming",
+    "stemmed", "originated", "originate", "originates",
+    "originating", "originated", "emanated", "emanate", "emanates",
+    "emanating", "emanated", "derived", "derive", "derives",
+    "deriving", "derived", "deduced", "deduce", "deduces", "deducing",
+    "deduced", "inferred", "infer", "infers", "inferring", "inferred",
+    "concluded", "conclude", "concludes", "concluding", "concluded",
+    "assumed", "assume", "assumes", "assuming", "assumed", "presumed",
+    "presume", "presumes", "presuming", "presumed", "postulated",
+    "postulate", "postulates", "postulating", "postulated",
+    "hypothesized", "hypothesize", "hypothesizes", "hypothesizing",
+    "hypothesized", "proposed", "propose", "proposes", "proposing",
+    "proposed", "suggested", "suggests", "suggesting", "suggested",
+    "anticipated", "anticipate", "anticipates", "anticipating",
+    "anticipated", "predicted", "predict", "predicts", "predicting",
+    "predicted", "forecast", "forecasts", "forecasting", "forecast",
+    "projected", "project", "projects", "projecting", "projected",
+    "estimated", "estimating", "estimate", "estimated", "approximated",
+    "approximate", "approximates", "approximating", "approximated",
+    "calculated", "calculating", "calculate", "calculated", "computed",
+    "computing", "compute", "computed", "evaluated", "evaluate",
+    "evaluates", "evaluating", "evaluated", "assessed", "assess",
+    "assesses", "assessing", "assessed", "judged", "judge", "judges",
+    "judging", "judged", "rated", "rate", "rates", "rating", "rated",
+    "scored", "score", "scores", "scoring", "scored", "ranked",
+    "rank", "ranks", "ranking", "ranked", "ordere", "order",
+    "orders", "ordering", "ordere", "sorted", "sort", "sorts",
+    "sorting", "sorted", "arranged", "arrange", "arranges",
+    "arranging", "arranged", "organized", "organize", "organizes",
+    "organizing", "organized", "classified", "classify", "classifies",
+    "classifying", "classified", "labeled", "label", "labels",
+    "labeling", "labeled", "tagged", "tag", "tags", "tagging",
+    "tagged", "marked", "mark", "marks", "marking", "marked",
+    "flagged", "flag", "flags", "flagging", "flagged", "noted",
+    "note", "notes", "noting", "noted", "mentioned", "mention",
+    "mentions", "mentioning", "mentioned", "cited", "citation",
+    "citations", "citing", "cited", "referenced", "reference",
+    "references", "referencing", "referenced", "quoted", "quote",
+    "quotes", "quoting", "quoted", "paraphrased", "paraphrase",
+    "paraphrases", "paraphrasing", "paraphrased", "summarized",
+    "summarize", "summarizes", "summarizing", "summarized",
+    "abstracted", "abstract", "abstracts", "abstracting",
+    "abstracted", "generalized", "generalize", "generalizes",
+    "generalizing", "generalized", "specific", "specifically",
+    "specifics", "specific", "general", "generally", "generic",
+    "generically", "generic", "particular", "particularly",
+    "particulars", "particular", "distinct", "distinctly",
+    "distinctiveness", "distinct", "similar", "similarly",
+    "similarity", "similar", "dissimilar", "dissimilarly",
+    "dissimilarity", "dissimilar", "analogous", "analogy",
+    "analogies", "analogous", "corresponding", "correspond",
+    "corresponds", "corresponding", "corresponding", "equivalent",
+    "equivalently", "equivalence", "equivalent", "comparable",
+    "compare", "compares", "comparing", "comparable", "different",
+    "differently", "difference", "differences", "different",
+    "alike", "unlike", "resembling", "resemble", "resembles",
+    "resembling", "resembling", "matching", "match", "matches",
+    "matching", "matched", "conforming", "conform", "conforms",
+    "conforming", "conforming", "adhering", "adhere", "adheres",
+    "adhering", "adhering", "complying", "comply", "complies",
+    "complying", "complying", "obeying", "obey", "obeys", "obeying",
+    "obeying", "following", "follow", "follows", "following",
+    "following", "heeding", "heed", "heeds", "heeding", "heed",
+    "observing", "observe", "observes", "observing", "observed",
 })
 
 
@@ -254,7 +310,17 @@ def entry_domain_terms(entry: "CemeteryEntry") -> List[str]:
     reusable_lesson — stopword-normalized, meta-terms removed, sorted
     deterministically. Universal: an invariant written in ANY domain's
     vocabulary carries its own matching terms (the v1 hardcoded
-    three-domain elif ladder made every other domain dead code)."""
+    three-domain elif ladder made every other domain dead code).
+
+    R537 audit gap 5: the R536 form returned `sorted(vocab)[:24]` —
+    an arbitrary alphabetic cutoff that could silently drop a
+    territory-specific term that sorts beyond the 24th position.  A
+    dropped specific term is a false negative: a same-domain
+    candidate matching only that term would no longer hard-block.
+    The cutoff is now removed from the VOCABULARY (the full set of
+    the entry's own terms is the matching set); the [:24] limit is
+    retained ONLY on the provenance record displayed alongside the
+    match (the record stays bounded, the matching is complete)."""
     try:
         from discovery_fabric.source_registry.query_relevance import (
             terms as _terms)
@@ -273,7 +339,10 @@ def entry_domain_terms(entry: "CemeteryEntry") -> List[str]:
         vocab.update(t for t in _terms(field_text)
                      if len(t) >= 4 and t not in _CEMETERY_META_TERMS
                      and not t.isdigit())
-    return sorted(vocab)[:24]
+    # R537 audit gap 5: the FULL sorted vocabulary (no arbitrary
+    # alphabetic cutoff) — the matching set is complete, so a
+    # territory-specific term can never be silently dropped.
+    return sorted(vocab)
 
 
 @dataclass(frozen=True)
@@ -612,6 +681,12 @@ def check_candidate_against_cemetery(
     hard_blocks = []
     warnings = []
     informational = []
+    # R537 audit gap 7: every no-identity decision on a PROVEN_
+    # INVARIANT entry is durably returned (entry id + the recorded
+    # structural/lexical hit lists + the note) — a cross-domain
+    # candidate's no-block is observable in the return value, not an
+    # invisible skip.
+    domain_identity_decisions = []
 
     _shared_vocab = set()
     if candidate_terms:
@@ -659,6 +734,8 @@ def check_candidate_against_cemetery(
                     "reusable_lesson + mechanism_name (stopword-"
                     "normalized; generic epistemic words removed)"),
                 "domain_terms": domain_terms[:24],
+                "domain_terms_truncated_for_record":
+                    len(domain_terms) > 24,
                 "domain_specific_terms": lex_terms,
                 "domain_specific_terms_structural": struct_terms,
             }
@@ -674,18 +751,42 @@ def check_candidate_against_cemetery(
                     t for t in struct_terms if t in cand_term_set)
             else:
                 structural_hits = []
+            # lexical_hits — R537 audit gap 1: token-boundary
+            # matching, NOT substring.  The R536 form
+            # (`t in candidate_lower`) let a specific term establish
+            # identity merely because its character sequence occurred
+            # inside another word (the audit's "flow" inside
+            # "workflow" probe).  Token boundaries are word
+            # separators; the candidate text is tokenized once and
+            # the specific terms are matched against the token SET —
+            # a term counts only when it is a whole word, never when
+            # it is a substring of one.
+            _cand_tokens = set(re.findall(r"[a-z]+", candidate_lower))
             lexical_hits = sorted(
-                t for t in lex_terms if t in candidate_lower)
+                t for t in lex_terms if t in _cand_tokens)
+            # R537 audit gap 6: the two domain-identity signals are
+            # ALTERNATIVES, not corroborating evidence.  The block
+            # fires when EITHER signal reaches the >= 2 matched-terms
+            # gate on its own; a hard-block records which single
+            # alternative fired (and which terms it matched).  There
+            # is no "both signals corroborate" state — corroboration
+            # would be a stricter, different (and more expensive)
+            # contract that has never been authorized; the current
+            # gate is deliberately the cheaper either/or form so the
+            # heuristic can be tightened later with measured evidence
+            # rather than a silent behavior change.
             domain_identity = None
             if len(structural_hits) >= 2:
                 domain_identity = {
                     "signal": "STRUCTURAL",
                     "matched_terms": structural_hits,
+                    "corroboration": "NONE (alternatives, not corroboration)",
                 }
             elif len(lexical_hits) >= 2:
                 domain_identity = {
                     "signal": "LEXICAL",
                     "matched_terms": lexical_hits,
+                    "corroboration": "NONE (alternatives, not corroboration)",
                 }
 
             if not domain_identity:
@@ -708,7 +809,23 @@ def check_candidate_against_cemetery(
                              "condition/...) never establishes "
                              "territory, so no hard-block (R536 "
                              "Cliff 2)")}
+                # R537 audit gap 7: the no-identity decision is
+                # durably returned.
+                domain_identity_decisions.append({
+                    "cemetery_entry": entry.entry_id,
+                    "territory": entry.territory_id,
+                    "structural_hits": structural_hits,
+                    "lexical_hits": lexical_hits,
+                    "note": ("no domain identity established — no "
+                             "hard-block (recorded, not a silent "
+                             "skip)"),
+                })
                 if not lex_terms:
+                    # R537 audit gap 8: an entry whose vocabulary is
+                    # entirely generic (no specific terms survive
+                    # the filters) cannot identify ITS OWN territory
+                    # — it downgrades to a recorded WARNING, never a
+                    # cross-domain kill.
                     warnings.append({
                         "cemetery_entry": entry.entry_id,
                         "territory": entry.territory_id,
@@ -720,21 +837,48 @@ def check_candidate_against_cemetery(
                             "proceed despite this constraint"),
                         "domain_identity_downgrade": {
                             "note": ("this PROVEN_INVARIANT's "
-                                     "derived vocabulary is "
-                                     "entirely generic cross-"
-                                     "domain physics language — no "
-                                     "domain-specific terms survive "
-                                     "the filter, so its territory "
-                                     "cannot be identified from the "
-                                     "text.  Downgraded to a "
-                                     "WARNING (documented proven "
-                                     "invariant of its territory, "
-                                     "never a cross-domain kill); "
-                                     "the downgrade is recorded, "
-                                     "never silent."),
+                                     "derived vocabulary is entirely "
+                                     "generic cross-domain physics "
+                                     "language — no domain-specific "
+                                     "terms survive the filter, so "
+                                     "its territory cannot be "
+                                     "identified from the text.  "
+                                     "Downgraded to a WARNING "
+                                     "(documented proven invariant of "
+                                     "its territory, never a cross-"
+                                     "domain kill); the downgrade is "
+                                     "recorded, never silent."),
                         },
                     })
                 continue
+
+            # R537 audit gap 8: the "domain-specific" determination is
+            # a HEURISTIC vocabulary filter, not a demonstrated
+            # canonical territory authority.  The heuristic's inputs
+            # are now fully recorded on the decision: the entry's
+            # full vocabulary, the structural + lexical specific-term
+            # sets, and which generic terms were excluded — so the
+            # auditor can prove or falsify the filter against a real
+            # territory authority (the territory registry) in a
+            # later round, and can see exactly why a block did or
+            # did not fire.
+            entry_note["domain_identity_heuristic"] = {
+                "class": "VOCABULARY_FILTER_HEURISTIC",
+                "authority": ("NOT a canonical territory authority "
+                              "(Art. XXVII: a heuristic, provenance-"
+                              "recorded) — the filter is the "
+                              "entry's own derived vocabulary minus "
+                              "the cross-domain generic process "
+                              "language minus the terms the "
+                              "candidate/problem already carry"),
+                "generic_terms_excluded": sorted(
+                    t for t in domain_terms
+                    if t in _CROSS_DOMAIN_GENERIC_TERMS),
+                "shared_vocab_excluded": sorted(
+                    t for t in domain_terms
+                    if t in _shared_vocab
+                    and t not in _CROSS_DOMAIN_GENERIC_TERMS),
+            }
 
             # Domain identity established: the legacy >= 2 domain-
             # term overlap gate now applies to the SPECIFIC terms
@@ -787,6 +931,12 @@ def check_candidate_against_cemetery(
         "warnings": warnings,
         "informational": informational,
         "total_lessons_consulted": len(cemetery),
+        # R537 audit gap 7: the no-identity decisions are durably
+        # returned — every PROVEN_INVARIANT entry that did not
+        # establish domain identity for this candidate (entry id +
+        # recorded hit lists), so a cross-domain no-block is
+        # observable, never an invisible skip.
+        "domain_identity_decisions": domain_identity_decisions,
     }
 
 

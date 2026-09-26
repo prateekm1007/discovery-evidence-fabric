@@ -110,6 +110,18 @@ jobs:
                   raise SystemExit(f"{p}: INVALID JSON — {e}")
           PY
 
+      # R537 §F: the artifact-namespace rule is machine-enforced in CI
+      # (the directive: no human reviewer is the enforcement
+      # mechanism).  The validator classifies the push's changed
+      # files against the current round; a HISTORICAL_SEALED_MUTATION
+      # (an in-place edit / delete / rewrite of an earlier round's
+      # sealed evidence, or a new mutable harvest placed in an old
+      # round's directory) BLOCKS the push.
+      - name: Artifact-namespace validator (R537 §F)
+        run: |
+          python scripts/validate_artifact_namespace.py --commit
+          echo "artifact-namespace validator: run on the push's changed files"
+
       - name: Summary
         if: always()
         run: |

@@ -129,6 +129,17 @@ jobs:
           pip install -r requirements.txt
           pip install pytest
 
+      # R537 §F: the artifact-namespace rule is machine-enforced in
+      # CI (the directive: no human reviewer is the enforcement
+      # mechanism).  The validator classifies the commit's changed
+      # files against the current round; a HISTORICAL_SEALED_MUTATION
+      # BLOCKS the certification.  This runs on every certification
+      # path (engine-relevant + dispatch), so a sealed-evidence
+      # mutation can never reach a certified commit.
+      - name: Artifact-namespace validator (R537 §F)
+        run: |
+          python scripts/validate_artifact_namespace.py --commit
+
       - name: CAD executability proof (build + validate + export)
         run: |
           python - <<'PY'

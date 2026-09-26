@@ -1,0 +1,45 @@
+{
+ "artifact": "R537_ATTACK_CALIBRATION_PROOF/1.0",
+ "round": "R537",
+ "created_at_utc": "2026-09-26T02:54:27Z",
+ "reviewer_provenance": "AI_REVIEW",
+ "sealed_calibration": {
+  "corpus": "R412/CALIBRATION/r412_attacker_calibration_corpus.json",
+  "seal": "R412/CALIBRATION/r412_calibration_seal.json",
+  "corpus_sha256_actual": "1ac70952821135c21484882761f4d158ac96a7397fdfb288cb36a6048c0ac91e",
+  "corpus_sha256_sealed": "1ac70952821135c21484882761f4d158ac96a7397fdfb288cb36a6048c0ac91e",
+  "corpus_byte_identical_to_seal": true,
+  "pre_registered_thresholds": {
+   "note": "registered BEFORE measurement; never tuned to results (Art. XXVII)",
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "ensemble": "NONE (single-attacker calibration only; majority-vote ensembles are deferred by the R412 directive)"
+  }
+ },
+ "live_measurement": {
+  "live_run_attempted": false,
+  "live_run_driver": "scripts/r487_attacker_v3_measurement.py (the deployed Space's /api/ops/calibration-attack — the production instrument code path)",
+  "fpr_measured": null,
+  "tpr_measured": null,
+  "fpr_within_sealed_bar": false,
+  "tpr_within_sealed_bar": false
+ },
+ "gate_verdict": {
+  "state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "attacker_ring": {
+   "provider": "zai",
+   "model": "zai-org/GLM-5.3",
+   "ring_pin": "zai",
+   "serving": "22 cases; per-provider {\"zai\": 22}",
+   "pin_violations": [],
+   "note": "R491: the calibration is (rules x ring) — the R488 measured lesson; the gate binds terminal kill authority to THIS ring at consumption"
+  },
+  "authority": "attacker_calibration.resolve_state — the committed measurement record + the sealed thresholds; this script derives the verdict, never asserts it (Art. XXVII)"
+ },
+ "terminal_kill_gated": true,
+ "note": "if FPR > 0.30 (or the gate state is not CALIBRATED on the measured ring), NO terminal KILL is admissible — a KILL served by the attacker is escalated to ESCALATED_OBJECTION at consumption (apply_at_consumption), never executed.  The old calibration state is not reused indefinitely: the gate reads the committed measurement for the current instrument version, and a missing / unreadable record is UNKNOWN_NOT_CALIBRATED (fail-closed).",
+ "optimization_authorized": false
+}

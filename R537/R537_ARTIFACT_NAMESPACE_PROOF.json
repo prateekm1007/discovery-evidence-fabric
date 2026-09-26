@@ -1,0 +1,24 @@
+{
+ "artifact": "R537_ARTIFACT_NAMESPACE_PROOF/1.0",
+ "round": "R537",
+ "created_at_utc": "2026-09-26T02:19:03Z",
+ "reviewer_provenance": "AI_REVIEW",
+ "method": "MACHINE validator (scripts/validate_artifact_namespace.py) — the changed-file set was classified against the current round; a HISTORICAL_SEALED_MUTATION (an in-place edit / delete / rewrite of an earlier round's sealed evidence, or a new mutable harvest placed in an old round's directory) is a BREACH; an append-only correction artifact and the current round's own paths are ALLOWED.  No human reviewer is the enforcement mechanism.",
+ "current_round": 537,
+ "mode": "worktree",
+ "files_checked": 11,
+ "breaches": [],
+ "allowed_count": 11,
+ "ok": true,
+ "enforcement_wiring": {
+  "pre_commit": "scripts/validate_artifact_namespace.py (git pre-commit hook)",
+  "ci": ".github/workflows (certification job runs the validator against the push's changed files)",
+  "round_validation": "the round-record generator invokes the validator before sealing"
+ },
+ "rule": {
+  "historical_sealed_evidence": "immutable: an earlier round's sealed evidence is never mutated in place (breach)",
+  "append_only_correction": "a NEW *_CORRECTION.json under the current round is allowed; an in-place edit of the sealed original is a breach",
+  "current_mutable_harvest": "the current round's own directory (breach if placed in an old round's directory)",
+  "derived_measurement": "current round"
+ }
+}

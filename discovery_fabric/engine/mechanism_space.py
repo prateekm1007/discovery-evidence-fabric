@@ -2216,7 +2216,8 @@ def build_structured_evidence(problem: Dict[str, Any],
     }
 
 
-def _consult_cemetery(candidates: List[Dict[str, Any]]
+def _consult_cemetery(candidates: List[Dict[str, Any]],
+                      problem: Optional[Dict[str, Any]] = None
                       ) -> Dict[str, Any]:
     """Art. LI (audit CB-5) — the mechanism space CONSUMES the cemetery.
 
@@ -2240,7 +2241,9 @@ def _consult_cemetery(candidates: List[Dict[str, Any]]
         "n_candidates_consulted": 0,
         "n_blocked": 0,
         "n_warned": 0,
+        "n_no_identity_decisions": 0,
         "blocked": [],
+        "no_identity_decisions": [],
     }
     try:
         from orchestrator.mechanism_cemetery import \
@@ -2253,6 +2256,7 @@ def _consult_cemetery(candidates: List[Dict[str, Any]]
                           "verdict; no candidate was blocked or "
                           "cleared by this (Art. XXV)")
         return record
+    problem = problem or {}
     total_lessons: Optional[int] = None
     for c in candidates:
         if c.get("candidate_state") != "CANDIDATE":
@@ -2279,17 +2283,45 @@ def _consult_cemetery(candidates: List[Dict[str, Any]]
             _cand_terms.update(str(c.get(_k) or "").lower().split())
         _cand_tokens = {w for w in _cand_terms if len(w) >= 4
                         and w.isalpha()}
+        # R537 (audit gap 2): the candidate and the problem carry
+        # INDEPENDENT vocabularies — the candidate's own words (graph
+        # terms + its mechanism/intervention/predicted-effect text)
+        # are the STRUCTURAL signal; the problem's device/failure/
+        # constraint words are the LEXICAL-signal context.  The R536
+        # form passed one set as both, silently collapsing the
+        # claimed independent problem-domain signal; the two filters
+        # are now genuinely two.
+        _prob_tokens = {w for w in " ".join(
+            str(problem.get(k) or "")
+            for k in ("device", "failure", "constraint", "context")
+        ).lower().split() if len(w) >= 4 and w.isalpha()}
         try:
             res = check_candidate_against_cemetery(
                 desc,
                 candidate_terms=_cand_tokens or None,
-                problem_terms=_cand_tokens or None)
+                problem_terms=_prob_tokens or None)
         except Exception as exc:  # noqa: BLE001 — honest state (Art. XXV)
             record["state"] = "CEMETERY_CONSULTATION_UNAVAILABLE"
             record["error"] = f"{type(exc).__name__}: {exc}"[:200]
             return record
         total_lessons = res.get("total_lessons_consulted", 0)
         hard = res.get("hard_blocks") or []
+        # R537 audit gap 7: the no-identity decisions are durably
+        # returned — every PROVEN_INVARIANT entry that did NOT
+        # establish domain identity for this candidate is recorded
+        # (entry id + the recorded structural/lexical hit lists), so
+        # a cross-domain candidate's no-block is observable in the
+        # durable record, not an invisible skip.
+        _no_identity = (res.get("domain_identity_decisions") or [])
+        for _d in _no_identity:
+            record["no_identity_decisions"].append({
+                "candidate_id": c.get("candidate_id"),
+                "cemetery_entry": _d.get("cemetery_entry"),
+                "structural_hits": _d.get("structural_hits"),
+                "lexical_hits": _d.get("lexical_hits"),
+                "note": _d.get("note"),
+            })
+        record["n_no_identity_decisions"] += len(_no_identity)
         if hard:
             c["candidate_state"] = \
                 "NOT_A_CANDIDATE_CEMETERY_PROVEN_INVARIANT"
@@ -2299,6 +2331,11 @@ def _consult_cemetery(candidates: List[Dict[str, Any]]
                 "candidate_id": c.get("candidate_id"),
                 "entries": [b.get("cemetery_entry") for b in hard],
                 "domain_match": [b.get("domain_match") for b in hard],
+                # R537 audit gap 7: the block's provenance records
+                # WHICH alternative signal established identity and
+                # which specific terms matched (Art. XXVII).
+                "domain_identity": [b.get("domain_identity")
+                                    for b in hard],
             })
         elif res.get("warnings"):
             c["cemetery_warnings"] = res["warnings"]
@@ -2396,7 +2433,11 @@ def build_mechanism_space(problem: Dict[str, Any],
     # and the matched domain terms); STRONG_CONSTRAINT warnings ride
     # the candidate downstream. The v1 space had ZERO references to
     # the cemetery — failures were archived, never learned.
-    cemetery_consumption = _consult_cemetery(all_candidates)
+    # R537 audit gap 2: the problem's own vocabulary is passed as the
+    # INDEPENDENT lexical-context signal (the candidate's words and
+    # the problem's words are now two separate filters, not one set
+    # passed as both).
+    cemetery_consumption = _consult_cemetery(all_candidates, problem)
     space["cemetery_consumption"] = cemetery_consumption
     # distinctness
     dedup = deduplicate_candidates(all_candidates)

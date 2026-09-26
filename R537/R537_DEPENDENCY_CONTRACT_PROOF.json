@@ -1,0 +1,1861 @@
+{
+ "artifact": "R537_DEPENDENCY_CONTRACT_PROOF/1.0",
+ "round": "R537",
+ "created_at_utc": "2026-09-26T01:57:19Z",
+ "reviewer_provenance": "AI_REVIEW",
+ "constitution_ref": "Art. X (one authority, two vocabulary namespaces never mixed), Art. XXV (UNKNOWN is first-class, never fabricated success), Art. LXXXIV (starvation-skip is correct), Art. LXXVII (a mid-chain failure never yields a discovery credit)",
+ "method": "the REAL EngineRun conductor was driven for every (dependency, case) pair; the consumer behavior was read from the durable stage_log — a MISSING log entry is classified NOT_REACHED, never execution; each case has an explicit expected set and an observed classification, and every (dependency, case, consumer) triple is asserted against its expected set",
+ "behavior_vocabulary": [
+  "EXECUTED_WITH_TYPED_INPUT",
+  "SKIPPED",
+  "TERMINATED_NON_DISCOVERY",
+  "NOT_REACHED"
+ ],
+ "case_semantics": {
+  "ok": "the dependency executed OK; consumers may execute with typed input or skip",
+  "admission": "the dependency recorded SKIPPED_ADMISSION (a typed skip, not a failure); consumers may execute against the typed-UNKNOWN input, skip, or never have been scheduled",
+  "failed": "the dependency recorded FAILED_EXPLICIT; consumers MUST skip or terminate non-discovery, never execute OK",
+  "absent": "the dependency was never scheduled (the run terminated before its turn); consumers can only skip / not-reach / terminate non-discovery"
+ },
+ "dependency_cases": {
+  "RETRIEVE": {
+   "ok": {
+    "dependency_stage": "RETRIEVE",
+    "case": "ok",
+    "dependency_is_cascade_authority": true,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "FREEZE": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "SYNTHESIZE": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     }
+    }
+   },
+   "admission": {
+    "dependency_stage": "RETRIEVE",
+    "case": "admission",
+    "dependency_is_cascade_authority": true,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "FREEZE": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "SYNTHESIZE": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     }
+    }
+   },
+   "failed": {
+    "dependency_stage": "RETRIEVE",
+    "case": "failed",
+    "dependency_is_cascade_authority": true,
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "FREEZE": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "SYNTHESIZE": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     }
+    }
+   },
+   "absent": {
+    "dependency_stage": "RETRIEVE",
+    "case": "absent",
+    "dependency_is_cascade_authority": true,
+    "run_terminal_state": "MALFORMED_OR_FALSE_PREMISE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "FREEZE": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": false
+     },
+     "SYNTHESIZE": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     }
+    }
+   }
+  },
+  "SYNTHESIZE": {
+   "ok": {
+    "dependency_stage": "SYNTHESIZE",
+    "case": "ok",
+    "dependency_is_cascade_authority": true,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "VERIFY": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "COLLISION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "PHYSICS": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "ATTACK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     }
+    }
+   },
+   "admission": {
+    "dependency_stage": "SYNTHESIZE",
+    "case": "admission",
+    "dependency_is_cascade_authority": true,
+    "run_terminal_state": "MECHANISM_GENERATION_FAILED",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "VERIFY": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "COLLISION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "PHYSICS": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "ATTACK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     }
+    }
+   },
+   "failed": {
+    "dependency_stage": "SYNTHESIZE",
+    "case": "failed",
+    "dependency_is_cascade_authority": true,
+    "run_terminal_state": "MECHANISM_GENERATION_FAILED",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "VERIFY": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "COLLISION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "PHYSICS": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "ATTACK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     }
+    }
+   },
+   "absent": {
+    "dependency_stage": "SYNTHESIZE",
+    "case": "absent",
+    "dependency_is_cascade_authority": true,
+    "run_terminal_state": "MALFORMED_OR_FALSE_PREMISE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "VERIFY": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "MECHANISM_SPACE": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "COLLISION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "PHYSICS": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "ATTACK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     },
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": true,
+      "closed": true
+     }
+    }
+   }
+  },
+  "VERIFY": {
+   "ok": {
+    "dependency_stage": "VERIFY",
+    "case": "ok",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "admission": {
+    "dependency_stage": "VERIFY",
+    "case": "admission",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "failed": {
+    "dependency_stage": "VERIFY",
+    "case": "failed",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "UNKNOWN",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": true,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": false
+     }
+    }
+   },
+   "absent": {
+    "dependency_stage": "VERIFY",
+    "case": "absent",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "MALFORMED_OR_FALSE_PREMISE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   }
+  },
+  "COLLISION": {
+   "ok": {
+    "dependency_stage": "COLLISION",
+    "case": "ok",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "CONTRADICTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "admission": {
+    "dependency_stage": "COLLISION",
+    "case": "admission",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "CONTRADICTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "failed": {
+    "dependency_stage": "COLLISION",
+    "case": "failed",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "CONTRADICTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "absent": {
+    "dependency_stage": "COLLISION",
+    "case": "absent",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "MALFORMED_OR_FALSE_PREMISE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "ATTACK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "CONTRADICTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   }
+  },
+  "ATTACK": {
+   "ok": {
+    "dependency_stage": "ATTACK",
+    "case": "ok",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "CONTRADICTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "admission": {
+    "dependency_stage": "ATTACK",
+    "case": "admission",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "CONTRADICTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "failed": {
+    "dependency_stage": "ATTACK",
+    "case": "failed",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "CONTRADICTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "absent": {
+    "dependency_stage": "ATTACK",
+    "case": "absent",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "MALFORMED_OR_FALSE_PREMISE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "CONTRADICTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   }
+  },
+  "CONTRADICTION": {
+   "ok": {
+    "dependency_stage": "CONTRADICTION",
+    "case": "ok",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "admission": {
+    "dependency_stage": "CONTRADICTION",
+    "case": "admission",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "failed": {
+    "dependency_stage": "CONTRADICTION",
+    "case": "failed",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "absent": {
+    "dependency_stage": "CONTRADICTION",
+    "case": "absent",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "MALFORMED_OR_FALSE_PREMISE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "KILLER_EXPERIMENT": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "ADJUDICATION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   }
+  },
+  "KILLER_EXPERIMENT": {
+   "ok": {
+    "dependency_stage": "KILLER_EXPERIMENT",
+    "case": "ok",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "admission": {
+    "dependency_stage": "KILLER_EXPERIMENT",
+    "case": "admission",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "failed": {
+    "dependency_stage": "KILLER_EXPERIMENT",
+    "case": "failed",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "absent": {
+    "dependency_stage": "KILLER_EXPERIMENT",
+    "case": "absent",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "MALFORMED_OR_FALSE_PREMISE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   }
+  },
+  "ADJUDICATION": {
+   "ok": {
+    "dependency_stage": "ADJUDICATION",
+    "case": "ok",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "CLASSIFY": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "RANK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "admission": {
+    "dependency_stage": "ADJUDICATION",
+    "case": "admission",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "CLASSIFY": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "RANK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "OK",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "failed": {
+    "dependency_stage": "ADJUDICATION",
+    "case": "failed",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "CLASSIFY": {
+      "behavior": "EXECUTED_WITH_TYPED_INPUT",
+      "consumer_stage_status": "OK",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": true,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": false
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "RANK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "FAILED_EXPLICIT",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "absent": {
+    "dependency_stage": "ADJUDICATION",
+    "case": "absent",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "MALFORMED_OR_FALSE_PREMISE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "CLASSIFY": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "NEXT_BEST_ACTION": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     },
+     "RANK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   }
+  },
+  "NEXT_BEST_ACTION": {
+   "ok": {
+    "dependency_stage": "NEXT_BEST_ACTION",
+    "case": "ok",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "RANK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "admission": {
+    "dependency_stage": "NEXT_BEST_ACTION",
+    "case": "admission",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "RANK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "NOT_REACHED",
+       "SKIPPED"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "failed": {
+    "dependency_stage": "NEXT_BEST_ACTION",
+    "case": "failed",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "INCOMPLETE_INFERENCE_FAILURE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "RANK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_ADMISSION",
+      "dependency_observed_status": "SKIPPED_ADMISSION",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "EXECUTED_WITH_TYPED_INPUT",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   },
+   "absent": {
+    "dependency_stage": "NEXT_BEST_ACTION",
+    "case": "absent",
+    "dependency_is_cascade_authority": false,
+    "run_terminal_state": "MALFORMED_OR_FALSE_PREMISE",
+    "terminal_is_non_discovery": true,
+    "consumers": {
+     "RANK": {
+      "behavior": "SKIPPED",
+      "consumer_stage_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_observed_status": "SKIPPED_UPSTREAM_FAILURE",
+      "dependency_reached": true,
+      "false_ok_on_failed_dependency": false,
+      "expected_behavior_set": [
+       "NOT_REACHED",
+       "SKIPPED",
+       "TERMINATED_NON_DISCOVERY"
+      ],
+      "dependency_is_cascade_authority": false,
+      "closed": true
+     }
+    }
+   }
+  }
+ },
+ "two_authority_divergence": {
+  "declared_depends_on": {
+   "RETRIEVE": [],
+   "FREEZE": [
+    "RETRIEVE"
+   ],
+   "PREMISE_GATE": [],
+   "SYNTHESIZE": [
+    "RETRIEVE"
+   ],
+   "VERIFY": [
+    "SYNTHESIZE"
+   ],
+   "MECHANISM_SPACE": [
+    "RETRIEVE",
+    "SYNTHESIZE"
+   ],
+   "COLLISION": [
+    "SYNTHESIZE"
+   ],
+   "PHYSICS": [
+    "SYNTHESIZE"
+   ],
+   "ATTACK": [
+    "SYNTHESIZE",
+    "VERIFY",
+    "COLLISION"
+   ],
+   "CONTRADICTION": [
+    "ATTACK",
+    "COLLISION"
+   ],
+   "KILLER_EXPERIMENT": [
+    "CONTRADICTION",
+    "SYNTHESIZE"
+   ],
+   "ADJUDICATION": [
+    "VERIFY",
+    "ATTACK",
+    "CONTRADICTION",
+    "COLLISION"
+   ],
+   "CLASSIFY": [
+    "ADJUDICATION"
+   ],
+   "NEXT_BEST_ACTION": [
+    "CONTRADICTION",
+    "KILLER_EXPERIMENT",
+    "ADJUDICATION"
+   ],
+   "RANK": [
+    "ADJUDICATION",
+    "NEXT_BEST_ACTION"
+   ]
+  },
+  "runtime_downstream_blockers": {
+   "PREMISE_GATE": [
+    "ADJUDICATION",
+    "ATTACK",
+    "CLASSIFY",
+    "COLLISION",
+    "CONTRADICTION",
+    "KILLER_EXPERIMENT",
+    "MECHANISM_SPACE",
+    "NEXT_BEST_ACTION",
+    "PHYSICS",
+    "RANK",
+    "SYNTHESIZE",
+    "VERIFY"
+   ],
+   "SYNTHESIZE": [
+    "ADJUDICATION",
+    "ATTACK",
+    "CLASSIFY",
+    "COLLISION",
+    "CONTRADICTION",
+    "KILLER_EXPERIMENT",
+    "MECHANISM_SPACE",
+    "NEXT_BEST_ACTION",
+    "PHYSICS",
+    "RANK",
+    "VERIFY"
+   ],
+   "RETRIEVE": [
+    "FREEZE",
+    "MECHANISM_SPACE",
+    "SYNTHESIZE",
+    "VERIFY"
+   ]
+  },
+  "fatal_stages": [
+   "PREMISE_GATE",
+   "SYNTHESIZE"
+  ],
+  "divergences": {
+   "VERIFY": {
+    "declared_dependents": [
+     "ATTACK",
+     "ADJUDICATION"
+    ],
+    "runtime_cascade_blockers": [],
+    "dependents_NOT_runtime_blocked": [
+     "ATTACK",
+     "ADJUDICATION"
+    ],
+    "contract": "DECLARED_DEPENDENCY_NOT_RUNTIME_CASCADE: the static depends_on names ['ATTACK', 'ADJUDICATION'], but the conductor's DOWNSTREAM_BLOCKERS does not cascade VERIFY failure to ['ATTACK', 'ADJUDICATION'].  The consumer executes and records its OWN typed state against the (possibly empty) dependency input — a typed UNKNOWN, never a fabricated success (Art. XXV).  This is the CURRENT contract, proven by the case table; it is documented, not refactored."
+   },
+   "COLLISION": {
+    "declared_dependents": [
+     "ATTACK",
+     "CONTRADICTION",
+     "ADJUDICATION"
+    ],
+    "runtime_cascade_blockers": [],
+    "dependents_NOT_runtime_blocked": [
+     "ATTACK",
+     "CONTRADICTION",
+     "ADJUDICATION"
+    ],
+    "contract": "DECLARED_DEPENDENCY_NOT_RUNTIME_CASCADE: the static depends_on names ['ATTACK', 'CONTRADICTION', 'ADJUDICATION'], but the conductor's DOWNSTREAM_BLOCKERS does not cascade COLLISION failure to ['ATTACK', 'CONTRADICTION', 'ADJUDICATION'].  The consumer executes and records its OWN typed state against the (possibly empty) dependency input — a typed UNKNOWN, never a fabricated success (Art. XXV).  This is the CURRENT contract, proven by the case table; it is documented, not refactored."
+   },
+   "ATTACK": {
+    "declared_dependents": [
+     "CONTRADICTION",
+     "ADJUDICATION"
+    ],
+    "runtime_cascade_blockers": [],
+    "dependents_NOT_runtime_blocked": [
+     "CONTRADICTION",
+     "ADJUDICATION"
+    ],
+    "contract": "DECLARED_DEPENDENCY_NOT_RUNTIME_CASCADE: the static depends_on names ['CONTRADICTION', 'ADJUDICATION'], but the conductor's DOWNSTREAM_BLOCKERS does not cascade ATTACK failure to ['CONTRADICTION', 'ADJUDICATION'].  The consumer executes and records its OWN typed state against the (possibly empty) dependency input — a typed UNKNOWN, never a fabricated success (Art. XXV).  This is the CURRENT contract, proven by the case table; it is documented, not refactored."
+   },
+   "CONTRADICTION": {
+    "declared_dependents": [
+     "KILLER_EXPERIMENT",
+     "ADJUDICATION",
+     "NEXT_BEST_ACTION"
+    ],
+    "runtime_cascade_blockers": [],
+    "dependents_NOT_runtime_blocked": [
+     "KILLER_EXPERIMENT",
+     "ADJUDICATION",
+     "NEXT_BEST_ACTION"
+    ],
+    "contract": "DECLARED_DEPENDENCY_NOT_RUNTIME_CASCADE: the static depends_on names ['KILLER_EXPERIMENT', 'ADJUDICATION', 'NEXT_BEST_ACTION'], but the conductor's DOWNSTREAM_BLOCKERS does not cascade CONTRADICTION failure to ['KILLER_EXPERIMENT', 'ADJUDICATION', 'NEXT_BEST_ACTION'].  The consumer executes and records its OWN typed state against the (possibly empty) dependency input — a typed UNKNOWN, never a fabricated success (Art. XXV).  This is the CURRENT contract, proven by the case table; it is documented, not refactored."
+   },
+   "KILLER_EXPERIMENT": {
+    "declared_dependents": [
+     "NEXT_BEST_ACTION"
+    ],
+    "runtime_cascade_blockers": [],
+    "dependents_NOT_runtime_blocked": [
+     "NEXT_BEST_ACTION"
+    ],
+    "contract": "DECLARED_DEPENDENCY_NOT_RUNTIME_CASCADE: the static depends_on names ['NEXT_BEST_ACTION'], but the conductor's DOWNSTREAM_BLOCKERS does not cascade KILLER_EXPERIMENT failure to ['NEXT_BEST_ACTION'].  The consumer executes and records its OWN typed state against the (possibly empty) dependency input — a typed UNKNOWN, never a fabricated success (Art. XXV).  This is the CURRENT contract, proven by the case table; it is documented, not refactored."
+   },
+   "ADJUDICATION": {
+    "declared_dependents": [
+     "CLASSIFY",
+     "NEXT_BEST_ACTION",
+     "RANK"
+    ],
+    "runtime_cascade_blockers": [],
+    "dependents_NOT_runtime_blocked": [
+     "CLASSIFY",
+     "NEXT_BEST_ACTION",
+     "RANK"
+    ],
+    "contract": "DECLARED_DEPENDENCY_NOT_RUNTIME_CASCADE: the static depends_on names ['CLASSIFY', 'NEXT_BEST_ACTION', 'RANK'], but the conductor's DOWNSTREAM_BLOCKERS does not cascade ADJUDICATION failure to ['CLASSIFY', 'NEXT_BEST_ACTION', 'RANK'].  The consumer executes and records its OWN typed state against the (possibly empty) dependency input — a typed UNKNOWN, never a fabricated success (Art. XXV).  This is the CURRENT contract, proven by the case table; it is documented, not refactored."
+   },
+   "NEXT_BEST_ACTION": {
+    "declared_dependents": [
+     "RANK"
+    ],
+    "runtime_cascade_blockers": [],
+    "dependents_NOT_runtime_blocked": [
+     "RANK"
+    ],
+    "contract": "DECLARED_DEPENDENCY_NOT_RUNTIME_CASCADE: the static depends_on names ['RANK'], but the conductor's DOWNSTREAM_BLOCKERS does not cascade NEXT_BEST_ACTION failure to ['RANK'].  The consumer executes and records its OWN typed state against the (possibly empty) dependency input — a typed UNKNOWN, never a fabricated success (Art. XXV).  This is the CURRENT contract, proven by the case table; it is documented, not refactored."
+   }
+  },
+  "note": "R537 §A: the static declaration and the runtime cascade are TWO authorities.  Where they diverge, the divergence is DOCUMENTED (not a defect to silently fix) — the consumer's typed state against a skipped dependency is the operative contract.  No refactor is performed in R537; the proof + disclosure is the deliverable."
+ },
+ "contract_violations_found": [],
+ "all_consumers_obey_contract": true
+}

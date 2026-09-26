@@ -382,6 +382,13 @@ class EvidenceFreezeAdapter(BaseAdapter):
     depends_on = ["RETRIEVE"]
 
     def execute(self, env, run_ctx):
+        # R537 §E: expose the verified custody ID set to the FREEZE-
+        # observing downstream adapters (SYNTHESIZE / VERIFY) so the
+        # machine-join can prove whether the post-FREEZE pipeline
+        # consumed the frozen / custodied evidence authority.  Purely
+        # additive telemetry; the admission semantics are UNCHANGED.
+        env.evidence_freeze_snapshot = dict(
+            (env.provenance or {}).get("evidence_freeze") or {})
         ec = importlib.import_module("orchestrator.evidence_custody")
         input_count = len(env.evidence or [])
         records = []
@@ -438,9 +445,24 @@ class EvidenceFreezeAdapter(BaseAdapter):
                      "id": it.get("id", ""),
                      "content_hash": it.get("content_hash", "")}
                     for it in (env.evidence or [])],
+                # R537 §E: the verified custody ID set (the records
+                # that passed hash verification) — the machine-join
+                # input that proves whether downstream consumed the
+                # frozen authority.  Purely additive telemetry; the
+                # admission semantics are UNCHANGED.
+                "verified_custody_ids": [
+                    r.record_id for r in verified],
+                "verified_custody_hashes": [
+                    r.content_hash for r in verified],
             },
         }
         snapshot["snapshot_hash"] = sha256_obj(snapshot)
+        # R537 §E: expose the verified custody ID set to the FREEZE-
+        # observing downstream adapters (SYNTHESIZE / VERIFY) so the
+        # machine-join can prove whether the post-FREEZE pipeline
+        # consumed the frozen / custodied evidence authority.  Purely
+        # additive telemetry; the admission semantics are UNCHANGED.
+        env.evidence_freeze_snapshot = dict(snapshot)
         return _engine_result(
             {"provenance": {**env.provenance, "evidence_freeze": snapshot}},
             custody_records=len(records), hash_ok=ok)
@@ -487,6 +509,25 @@ class SynthesizeAdapter(BaseAdapter):
                 "synthesis impossible: zero evidence items retrieved (explicit)")
         mod = _import_with_env("discovery_fabric.a2.synthesize")
         cand = mod.synthesize(env.problem, env.evidence)
+        # R537 §E: the authoritative input set this stage actually
+        # consumed (ids + content-hashes) + whether it stayed inside
+        # the verified FREEZE custody set (the machine-join proof of
+        # whether the post-FREEZE pipeline consumed the frozen /
+        # custodied evidence authority).  Purely additive telemetry;
+        # the admission / synthesis semantics are UNCHANGED.
+        _synth_input_set = [
+            {"id": it.get("id", ""),
+             "content_hash": it.get("content_hash", "")}
+            for it in (env.evidence or [])]
+        _freeze_snap = getattr(env, "evidence_freeze_snapshot", None)
+        _verified_custody_ids = set(
+            _freeze_snap.get("freeze_observational", {}).get(
+                "verified_custody_ids", [])) if isinstance(
+                _freeze_snap, dict) else set()
+        _downstream_ids = [it.get("id", "") for it in (env.evidence or [])]
+        _synth_consumed_verified_custody = (
+            (not _downstream_ids)
+            or (set(_downstream_ids) <= _verified_custody_ids))
         # R453-LEAN-CORE capability fail-closed: the registry's own
         # task-degradation record for the call that ACTUALLY served the
         # synthesis. A STRONG request served by CHEAP_EMERGENCY_FALLBACK
@@ -550,6 +591,15 @@ class SynthesizeAdapter(BaseAdapter):
                  "input_hash": cand.get("input_hash"),
                  "output_hash": cand.get("output_hash"),
                  "synthesis_timestamp": cand.get("synthesis_timestamp"),
+                # R537 §E: the SYNTHESIZE input evidence set (ids +
+                # content-hashes) — the machine-join input that
+                # proves whether this stage consumed the frozen /
+                # custodied evidence authority (the verified FREEZE
+                # set).  Purely additive telemetry; the admission /
+                # synthesis semantics are UNCHANGED.
+                "synthesis_input_evidence_set": _synth_input_set,
+                "synthesis_consumed_verified_custody":
+                    _synth_consumed_verified_custody,
                  # R483 (the dropped-ledger observability defect): the
                  # routing TRUTH rides the committed record — the walk
                  # (every hop incl. SKIPPED_NOT_ADMITTED with its
@@ -586,6 +636,25 @@ class EvidenceVerifyAdapter(BaseAdapter):
     def execute(self, env, run_ctx):
         mod = importlib.import_module("discovery_fabric.a2.verify")
         raw = env.mechanism_map.get("raw_candidate") or {}
+        # R537 §E: the authoritative input set this stage actually
+        # consumed (ids + content-hashes) — the machine-join input
+        # that proves whether VERIFY consumed the frozen / custodied
+        # evidence authority.  Purely additive telemetry; the
+        # verification semantics are UNCHANGED.
+        _verify_input_set = [
+            {"id": it.get("id", ""),
+             "content_hash": it.get("content_hash", "")}
+            for it in (env.evidence or [])]
+        _freeze_snap_v = getattr(env, "evidence_freeze_snapshot", None)
+        _verified_custody_ids_v = set(
+            _freeze_snap_v.get("freeze_observational", {}).get(
+                "verified_custody_ids", [])) if isinstance(
+                _freeze_snap_v, dict) else set()
+        _downstream_ids_v = [it.get("id", "")
+                             for it in (env.evidence or [])]
+        _verify_consumed_verified_custody = (
+            (not _downstream_ids_v)
+            or (set(_downstream_ids_v) <= _verified_custody_ids_v))
         res = mod.verify_evidence(raw, env.evidence)
         # R483 span-outcome telemetry (the span-capable rung
         # preference): report the span contract's outcome for the rung
@@ -635,7 +704,20 @@ class EvidenceVerifyAdapter(BaseAdapter):
             }
         return _engine_result(
             {"adjudication": {**env.adjudication,
-                              "evidence_verification": res},
+                              "evidence_verification": res,
+                              # R537 §E: the VERIFY input evidence set
+                              # (ids + content-hashes) — the machine-
+                              # join input that proves whether VERIFY
+                              # consumed the frozen / custodied
+                              # evidence authority.  Rides the
+                              # durable `adjudication` path (an
+                              # existing Candidate attribute); purely
+                              # additive telemetry, verification
+                              # semantics UNCHANGED.
+                              "verify_input_evidence_set":
+                              _verify_input_set,
+                              "verify_consumed_verified_custody":
+                              _verify_consumed_verified_custody},
              "evidence_classification": classification},
             verified=res.get("verified"))
 
@@ -1028,7 +1110,8 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     all_candidates = [c for c in operator_result.get("candidates", [])
                       if isinstance(c, dict)
                       and c.get("candidate_state") == "CANDIDATE"]
-    space["cemetery_consumption"] = _ms._consult_cemetery(all_candidates)
+    space["cemetery_consumption"] = _ms._consult_cemetery(
+        all_candidates, problem)
     _clk.mark("cemetery_consultation",
               {"n_consulted": (space["cemetery_consumption"] or {}).get(
                   "n_candidates_consulted", 0),
@@ -1883,6 +1966,13 @@ class AdjudicationAdapter(BaseAdapter):
         ev = env.adjudication.get("evidence_verification") or {}
         attack = env.attack_results or {}
         cemetery = _CemeterySubCheck.verdict(env)
+        # R537 P0 (audit fail-open finding): the cemetery sub-check
+        # record is durably persisted under env.adjudication EVEN WHEN
+        # the council aggregation below raises — an UNRESOLVED /
+        # infrastructure-failure consultation must stay observable in
+        # the durable adjudication record (Art. XXV: never hidden,
+        # never fabricated), not only in the transient return value.
+        env.adjudication["cemetery_check"] = cemetery
         checks = [
             {"check": "evidence_span_verified", "result": bool(ev.get("verified")),
              "inputs_hash": sha256_obj(ev)},
@@ -1908,9 +1998,25 @@ class AdjudicationAdapter(BaseAdapter):
                        ("UNRESOLVED_INSUFFICIENT_EVIDENCE",),
              "inputs_hash": sha256_obj(env.collision_results.get("novelty_risk"))},
             {"check": "cemetery_not_hard_blocked",
-             "result": cemetery.get("verdict") != "BLOCKED",
-             "module_path": "orchestrator/mechanism_cemetery.py",
-             "inputs_hash": sha256_obj(cemetery.get("full", {}))},
+              # R537 P0 (audit fail-open finding): the gate is
+              # fail-CLOSED on a UNRESOLVED cemetery consultation.
+              # The old form (verdict != "BLOCKED") treated an
+              # infrastructure failure (no consultation ever
+              # completed) as a PASS — a cemetery verification
+              # failure could not become favorable adjudication
+              # merely because the result was not literally
+              # BLOCKED.  Now: a non-BLOCKED verdict passes ONLY
+              # when the consultation itself resolved; UNRESOLVED /
+              # a missing resolved flag fails the check, so the
+              # run cannot reach ESTABLISHED_PROVISIONALLY and earns
+              # no discovery credit (Art. XXV: UNKNOWN stays
+              # UNKNOWN; Art. LI: an unread cemetery is not a
+              # memory).
+              "result": (cemetery.get("verdict") != "BLOCKED"
+                         and cemetery.get(
+                             "cemetery_verdict_resolved") is True),
+              "module_path": "orchestrator/mechanism_cemetery.py",
+              "inputs_hash": sha256_obj(cemetery.get("full", {}))},
         ]
         failed = [c["check"] for c in checks if not c["result"]]
         if env.attack_results.get("overall") == "EVALUATION_FAILED":
@@ -1930,7 +2036,12 @@ class AdjudicationAdapter(BaseAdapter):
             "timestamp": utc_now(),
         }
         return _engine_result(
-            {"adjudication": {**env.adjudication, "council": payload},
+            {"adjudication": {**env.adjudication, "council": payload,
+                              # the cemetery sub-check record is on the
+                              # durable env path (set above before the
+                              # council aggregation); the return
+                              # envelope re-rides it so both paths agree
+                              "cemetery_check": cemetery},
              "cemetery_check": cemetery},
             verdict=verdict)
 
@@ -2108,17 +2219,58 @@ class _CemeterySubCheck:
                     mm.get("mechanism", "")).split()
                     if len(t) >= 4 and t.isalpha()})
                 if len(w) >= 4 and str(w).isalpha()}
+            # R537: candidate and problem vocabularies are INDEPENDENT
+            # inputs — the candidate carries the mechanism's own
+            # words; the problem carries the device/failure/constraint
+            # facts the mechanism must address.  Passing one set as
+            # both (the R536 defect) silently collapsed the claimed
+            # independent problem-domain signal; the filters below
+            # are now actually two filters.
+            _problem = getattr(env, "problem", None) or {}
+            _prob_tokens = {w.lower() for w in " ".join(str(_problem.get(k) or "")
+                                                        for k in
+                                                        ("device", "failure",
+                                                         "constraint",
+                                                         "context")).split()
+                            if len(w) >= 4 and w.isalpha()}
+            # R537: the two independent domain-identity signals are
+            # recorded accurately as ALTERNATIVES, not corroborating
+            # (audit gap 6): the STRUCTURAL signal is the
+            # candidate-terms set; the LEXICAL signal is the problem-
+            # terms set.  The block's provenance (domain_identity)
+            # names which alternative fired — never a fused
+            # "both" reading.
             res = mc.check_candidate_against_cemetery(
                 desc,
                 candidate_terms=_cand_tokens or None,
-                problem_terms=_cand_tokens or None)
+                problem_terms=_prob_tokens or None)
             return {"verdict": res.get("verdict"),
                     "hard_blocks": len(res.get("hard_blocks", [])),
                     "warnings": len(res.get("warnings", [])),
                     "lessons_consulted": res.get("total_lessons_consulted"),
-                    "full": res}
+                    "full": res,
+                    # R537 P0: the consultation SUCCEEDED — the
+                    # negative-knowledge library was read; a BLOCKED
+                    # verdict on this record is a real hard-block, and
+                    # a non-BLOCKED verdict is a genuine clearance.
+                    "cemetery_verdict_resolved": True}
         except Exception as exc:  # noqa: BLE001
-            return {"verdict": "UNRESOLVED", "error": str(exc)}
+            # R537 P0 (audit fail-open finding): a cemetery
+            # consultation failure is a UNRESOLVED negative-knowledge
+            # state — the caller MUST treat it as blocking, never as
+            # a pass.  The AdjudicationAdapter gates its favorable
+            # ESTABLISHED_PROVISIONALLY verdict on
+            # cemetery_verdict_resolved (an explicit infrastructure
+            # state, not the absence of a literal BLOCKED verdict).
+            return {"verdict": "UNRESOLVED", "error": str(exc),
+                    "cemetery_verdict_resolved": False,
+                    "note": ("cemetery consultation failed (infrastructure "
+                             "state, not a scientific verdict — Art. "
+                             "XXV): no hard-block fired, but no "
+                             "favorable adjudication may ride on an "
+                             "unconsulted negative-knowledge library "
+                             "either (Art. LI: a written-but-never-read "
+                             "cemetery is a log, not a memory)")}
 
 
 ADAPTERS = {
