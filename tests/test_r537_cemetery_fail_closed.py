@@ -145,8 +145,12 @@ def _drive_with_cemetery_failure():
                       "VERIFY", "COLLISION", "ATTACK", "CONTRADICTION",
                       "KILLER_EXPERIMENT", "PHYSICS", "CLASSIFY",
                       "NEXT_BEST_ACTION", "RANK"):
+            # R538 harness fix: patch the adapter INSTANCE (a plain
+            # function on the instance receives (env, run_ctx));
+            # patching type(adapter).execute binds the stub as a
+            # method and silently plants nothing in the envelope.
             stack.enter_context(patch.object(
-                type(ADAPTERS[stage]), "execute", _stub(stage)))
+                ADAPTERS[stage], "execute", _stub(stage)))
         stack.enter_context(patch.object(
             EngineRun, "_pre_retrieval_capability_gate",
             lambda self: {"state": "OK"}))

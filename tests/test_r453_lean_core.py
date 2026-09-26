@@ -612,7 +612,22 @@ class TestDeletionAccounting(unittest.TestCase):
                     # fix makes reachable.  Read-only observability +
                     # the crash fix; no routing, retry, budget, gate,
                     # probe, admission, or transport logic touched.
-                    "discovery_fabric/engine/ensemble.py"),
+                    "discovery_fabric/engine/ensemble.py",
+                    # R539 AMENDMENT (disclosed): the operator's
+                    # number-1-API directive (2026-09-26, agnes
+                    # router) — engine/transport_capability.py gains
+                    # the OWNER_AGNES_ACCOUNT economic domain (a
+                    # DISTINCT account: flash serves at $0 measured
+                    # balance, pro gated 403 — depletion advances
+                    # the cascade, never a bill) and engine/
+                    # provider_health.py re-pins the code-level
+                    # default route to agnes (the R518/R519 cleared-
+                    # pin state retired per Art. LXIV; ENGINE_DEFAULT_
+                    # PROVIDER env still overrides).  Routing order
+                    # only; no gate, budget, probe, or admission
+                    # semantics touched.
+                    "discovery_fabric/engine/transport_capability.py",
+                    "discovery_fabric/engine/provider_health.py"),
                 f"the mandate's file list is exhaustive: {f} is outside "
                 "run.py/stage_entry.py/adapters.py/llm_registry.py")
 
