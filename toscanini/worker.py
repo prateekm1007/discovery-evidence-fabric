@@ -590,22 +590,26 @@ def run(session_id: str) -> None:
             _run_inner(session_id, forensics)
 
 
-def _ranked_package_set(run_dir, refreshed_package: dict):
-    """R540: the ranked technology package set for the session surface.
+def _ranked_package_set(run_dir):
+    """R541: the ranked technology package set for the session surface.
 
     Reads the run dir's own RANKED_DISCOVERY_RESULTS.json (the engine's
     machine-readable ranked result set, derived from the run's persisted
-    artifacts — Art. X) and attaches the completed package record to each
-    admissible ranked survivor. This is the contract's "move from the
-    ranked result directly to the corresponding technology package"
+    artifacts — Art. X). Each entry carries the candidate's OWN
+    candidate-bound package identity (the engine compiled each
+    admissible survivor through the canonical package compiler with
+    that candidate's spec/engineering/experiment/geometry inputs —
+    RANKED_PACKAGE_RECORDS.json is the authority; the #1 package is
+    NEVER reused as candidate B's package). This is the contract's
+    "move from the ranked result directly to its technology package"
     shape: each entry carries rank, candidate, the six components, the
-    rank basis, and the package (zip + maturity + kind).
+    rank basis, and its own package (zip_name + zip_sha256 +
+    candidate-bound manifest + maturity + complete).
 
     Never invents: when the ranked record is absent or carries no
     admissible survivor, returns an empty list (the run is not a
     finished discovery — the diagnostic package, not a technology
-    package, is the deliverable). The single selected package (the
-    canonical compiler's record) is bound to the selected survivor."""
+    package, is the deliverable)."""
     import json as _json
     p = Path(run_dir) / "RANKED_DISCOVERY_RESULTS.json"
     if not p.exists():
@@ -619,15 +623,10 @@ def _ranked_package_set(run_dir, refreshed_package: dict):
         if not rr.get("admissible"):
             continue
         entry = dict(rr)
-        entry["package"] = {
-            "kind": (refreshed_package or {}).get("package_kind")
-                     or "TECHNOLOGY_PACKAGE",
-            "zip_name": (refreshed_package or {}).get("zip_name"),
-            "maturity": (refreshed_package or {}).get("maturity"),
-            "complete": bool((refreshed_package or {}).get("complete")),
-            "candidate_id": rr.get("candidate_id"),
-            "rank": rr.get("rank"),
-        }
+        # the candidate's OWN package binding (from the engine's
+        # RANKED_PACKAGE_RECORDS.json, not a shared #1 package)
+        entry["package"] = dict(rr.get("components", {}).get("package")
+                                or {})
         out.append(entry)
     # discovery completion is true only when at least one admissible
     # ranked survivor exists (the contract's DISCOVERY_COMPLETED state,
@@ -1201,40 +1200,39 @@ def _run_inner(session_id: str, forensics) -> None:
                                  "package_kind":
                                      refreshed.get("package_kind"),
                                  "complete": True})
-                    # R540: record the COMPLETE package state on the
-                    # marker (the ranked result set reads this)
-                    try:
-                        _pk = (run_dir / "package_completion.json")
-                        if _pk.exists():
-                            _pkd = json.loads(_pk.read_text())
-                            _pkd["complete"] = True
-                            _pkd["zip_emitted"] = True
-                            _pkd["zip_name"] = refreshed.get("zip_name")
-                            _pkd["maturity"] = refreshed.get("maturity")
-                            _pkd["package_kind"] = refreshed.get(
-                                "package_kind")
-                            _pk.write_text(json.dumps(
-                                _pkd, indent=1, ensure_ascii=False))
-                    except Exception:  # noqa: BLE001
-                        pass
-                    # R540: the ranked technology package set — one
-                    # complete record + package per admissible ranked
+                    # R541: the ranked technology package set — one
+                    # candidate-bound record per admissible ranked
                     # survivor (the contract's ranked-package shape).
-                    # Derived from the run dir's own RANKED_
-                    # DISCOVERY_RESULTS.json + the completed package; the
-                    # UI moves from a ranked result to its package.
-                    _ranked_pkgs = _ranked_package_set(run_dir, refreshed)
+                    # Derived from the run dir's own RANKED_DISCOVERY_
+                    # RESULTS.json: each survivor carries its OWN
+                    # candidate-bound package identity (zip + hash +
+                    # manifest + complete), never a reused #1 package.
+                    # The UI moves from a ranked result to ITS package.
+                    _ranked_pkgs = _ranked_package_set(run_dir)
                     if _ranked_pkgs:
+                        _n_complete = sum(
+                            1 for p in _ranked_pkgs
+                            if (p.get("package") or {}).get("complete"))
+                        _n_adm = len(_ranked_pkgs)
                         store.update_session(
                             session_id,
                             ranked_results=_ranked_pkgs,
                             completion_states={
                                 "PIPELINE_COMPLETED": True,
                                 "DISCOVERY_COMPLETED":
-                                    _ranked_pkgs[0].get("discovery_completed",
-                                                         True),
-                                "TECHNOLOGY_PACKAGE_COMPLETED": True,
-                                "FINISHED_DISCOVERY": True,
+                                    _ranked_pkgs[0].get(
+                                        "discovery_completed", True),
+                                # R541: TECHNOLOGY-PACKAGE completion is
+                                # per-candidate — the whole ranked set is
+                                # package-complete only when EVERY
+                                # displayed survivor has its own complete
+                                # candidate-bound package (one #1 package
+                                # does NOT complete the set).
+                                "TECHNOLOGY_PACKAGE_COMPLETED":
+                                    (_n_complete == _n_adm and _n_adm >= 1),
+                                "FINISHED_DISCOVERY":
+                                    (_n_complete == _n_adm
+                                     and _n_adm >= 1),
                             })
             except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
                 print(f"  [worker] package-field refresh failed: "

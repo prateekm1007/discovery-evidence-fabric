@@ -257,6 +257,21 @@ export function diagnosticPackageUrl(id: string): string {
   return `/api/run/${id}/diagnostic-package${key ? `?owner=${encodeURIComponent(key)}` : ""}`;
 }
 
+// R541: candidate-specific technology package download URL.
+// The "Download technology package #N" CTA resolves to THIS candidate's
+// own package (?candidate=<id>), never the shared run-level /package
+// surface that serves the #1 package for every ranked card.
+export function candidatePackageUrl(
+  id: string,
+  candidateId: string
+): string {
+  const key = storedOwnerKey();
+  const qs = new URLSearchParams();
+  qs.set("candidate", candidateId);
+  if (key) qs.set("owner", key);
+  return `/api/run/${id}/package?${qs.toString()}`;
+}
+
 export async function getRunResult(id: string): Promise<SessionDetail> {
   return json<SessionDetail>(await apiFetch(`/api/run/${id}/result`));
 }

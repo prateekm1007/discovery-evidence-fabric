@@ -759,6 +759,28 @@ export function deriveRankedPackages(
         complete: pkg.complete ?? false,
         zipName: pkg.zip_name ?? null,
         maturity: pkg.maturity ?? null,
+        // R541: the candidate-bound package identity — each survivor's
+        // OWN package (candidate_id + rank + zip + hash + manifest),
+        // never a reused #1 package.
+        candidateId: pkg.candidate_id ?? r.candidate_id ?? null,
+        rank: typeof pkg.rank === "number" ? pkg.rank : null,
+        packageId: pkg.package_id ?? null,
+        zipSha256: pkg.zip_sha256 ?? null,
+        zipSha256Matches: pkg.zip_sha256_matches ?? true,
+        // R541: the candidate-specific download route — "Download
+        // technology package #N" resolves to THIS candidate's package
+        // (?candidate=<id>), not a shared /package surface for every
+        // ranked card. Derived from the session's ranked_package_
+        // downloads record; absent when the candidate's package is not
+        // compiled (honest, never a borrowed #1 URL).
+        downloadUrl:
+          detail.ranked_package_downloads?.find(
+            (d) =>
+              d.candidate_id === (pkg.candidate_id ?? r.candidate_id)
+          )?.download_url ??
+          (pkg.complete && pkg.candidate_id
+            ? `/api/run/${detail.session_id}/package?candidate=${pkg.candidate_id}`
+            : null),
       },
       rankBasis:
         r.rank_basis != null ? JSON.stringify(r.rank_basis) : null,

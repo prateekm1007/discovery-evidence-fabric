@@ -35,6 +35,7 @@ import {
   answerClarification,
   apiPost,
   askRun,
+  candidatePackageUrl,
   createShare,
   diagnosticPackageUrl,
   attachUrl,
@@ -1408,7 +1409,14 @@ function WorkspaceInner() {
                   events={events}
                   packageAvailable={packageAvailable}
                   asks={asks}
-                  onOpenSurface={(s) => setSurface(s)}
+                    onOpenSurface={(s, candidateId) => {
+                      if (s === "package" && candidateId && detail) {
+                        window.location.href =
+                          candidatePackageUrl(detail.session_id, candidateId);
+                        return;
+                      }
+                      setSurface(s);
+                    }}
                   onAsk={handleAsk}
                   onTechnical={() => setSurface("journal")}
                   onNextAction={handleNext}

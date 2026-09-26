@@ -808,6 +808,13 @@ def build_cio(session: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 "honest state (" + str(package.get("maturity")
                 or "UNKNOWN") + "), and the buyer release gates are "
                 "untouched"),
+            # R541: per-rank candidate-bound package download routes —
+            # each ranked survivor's own package (?candidate=<id>),
+            # never the shared run-level /package surface for all.
+            # Derived from the session's own ranked_package_downloads
+            # record; absent when no ranked packages exist (honest).
+            "ranked_package_downloads": (
+                session.get("ranked_package_downloads") or []),
         },
         "experiment": {
             "decisive_experiment": dex or _unwrap((inv or {}).get(

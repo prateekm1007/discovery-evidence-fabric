@@ -1058,6 +1058,20 @@ def _download_document_count(run_dir: Path) -> Optional[int]:
         return None
 
 
+def _ranked_packages_from_session(s: Dict[str, Any]) -> Any:
+    """R541 contract #5/#8: the session-reconstruction guard.
+
+    For CURRENT runs, NO RANKED_DISCOVERY_RESULTS => NO FINISHED_
+    DISCOVERY. A completed #1 package must NOT be exposed as a
+    synthetic rank-1 admissible finished result. Only the session's
+    own recorded ranked_results (the worker's per-survivor candidate-
+    bound set) may surface as ranked_packages. A session record without
+    that field returns None (never a manufactured rank-1 result)."""
+    if s.get("ranked_results") is None:
+        return None
+    return s.get("ranked_results")
+
+
 def session_detail(session_id: str) -> Optional[Dict[str, Any]]:
     s = get_session(session_id)
     if not s:
@@ -1092,36 +1106,87 @@ def session_detail(session_id: str) -> Optional[Dict[str, Any]]:
         ranked = _read_json(run_dir / "RANKED_DISCOVERY_RESULTS.json")
         if ranked:
             detail["ranked_results"] = ranked
+        # R541: the per-rank candidate-bound package download routes —
+        # the UI's "Download technology package #N" CTA resolves to a
+        # candidate-specific route (?candidate=<id>), not one shared
+        # /package surface for every ranked card.
+        _ranked_pkgs = []
+        if s.get("ranked_results") is not None:
+            _ranked_pkgs = s.get("ranked_results") or []
+        elif ranked:
+            _ranked_pkgs = [
+                {"rank": r.get("rank"),
+                 "candidate_id": r.get("candidate_id"),
+                 "admissible": r.get("admissible"),
+                 "package": r.get("components", {})
+                            .get("package") or {}}
+                for r in ranked.get("ranked_results", [])
+                if r.get("admissible")]
+        if _ranked_pkgs:
+            detail["ranked_package_downloads"] = [
+                {
+                    "rank": p.get("rank"),
+                    "candidate_id": p.get("candidate_id"),
+                    "package_zip": p.get("package", {}).get("zip_name"),
+                    "package_sha256": p.get("package", {}).get(
+                        "zip_sha256"),
+                    "complete": bool(p.get("package", {}).get("complete")),
+                    "download_url": (
+                        f"/api/run/{session_id}/package"
+                        f"?candidate={p.get('candidate_id')}"
+                        if p.get("package", {}).get("complete")
+                        else None),
+                }
+                for p in _ranked_pkgs
+                if p.get("package", {}).get("complete")]
         cem = _read_json(run_dir / "cemetery_update.json")
         if cem:
             detail["cemetery_update"] = cem
     else:
         detail["stages"] = []
-    # R540: ranked packages + completion states ride the session record
-    # (the worker's per-survivor package set + the three distinct
-    # completion states), with a fallback that derives a single-rank
-    # result from a completed package so the UI can always move from a
-    # ranked result to its package. Computed here (not in the run-dir
+    # R541: ranked packages + completion states ride the session record
+    # (the worker's per-survivor candidate-bound package set + the three
+    # distinct completion states). Computed here (not in the run-dir
     # branch) so it also applies when the run dir is absent/pruned.
+    #
+    # CONTRACT INVARIANT (audit #5): for CURRENT runs,
+    # NO RANKED_DISCOVERY_RESULTS => NO FINISHED_DISCOVERY. The synthetic
+    # rank-1 fallback (a completed #1 package becoming a manufactured
+    # admissible rank-1 result) is REMOVED — a package is not evidence
+    # that rank=1 / admissible=true / finished_discovery=true. The
+    # ranked_packages field is set ONLY from the session's own
+    # R541-engine-recorded ranked_results (the worker's per-survivor
+    # candidate-bound set). A legacy record without that field simply
+    # has no ranked_packages and is not exposed as a current finished
+    # discovery.
     _completed = s.get("package", {}).get("complete") if s.get("package") \
         else False
-    if s.get("ranked_results") is not None:
-        detail["ranked_packages"] = s.get("ranked_results")
-    elif _completed:
-        detail["ranked_packages"] = [
-            {"rank": 1,
-             "candidate_id": s.get("invention_id"),
-             "admissible": True,
-             "package": s.get("package")}]
-    if s.get("completion_states") is not None:
-        detail["completion_states"] = s.get("completion_states")
-    elif detail.get("ranked_packages") is not None:
-        detail["completion_states"] = {
-            "PIPELINE_COMPLETED": s.get("status") == "COMPLETE",
-            "DISCOVERY_COMPLETED": bool(detail.get("ranked_packages")),
-            "TECHNOLOGY_PACKAGE_COMPLETED": bool(_completed),
-            "FINISHED_DISCOVERY":
-                bool(_completed and detail.get("ranked_packages"))}
+    # R541 contract #5/#8: the session-reconstruction guard — the
+    # ranked_packages field is set ONLY from the session's own recorded
+    # ranked_results (the worker's per-survivor candidate-bound set).
+    # A session without that field returns None (never a manufactured
+    # rank-1 result from a completed package alone).
+    _rp = _ranked_packages_from_session(s)
+    if _rp is not None:
+        detail["ranked_packages"] = _rp
+        # a legacy record may have no recorded completion_states;
+        # derive the three states from the session's own fields only —
+        # never from a synthetic rank-1 fallback
+        if s.get("completion_states") is not None:
+            detail["completion_states"] = s.get("completion_states")
+        else:
+            _n_complete = sum(
+                1 for p in _rp
+                if (p.get("package") or {}).get("complete"))
+            detail["completion_states"] = {
+                "PIPELINE_COMPLETED": s.get("status") == "COMPLETE",
+                "DISCOVERY_COMPLETED": bool(_rp),
+                "TECHNOLOGY_PACKAGE_COMPLETED":
+                    (_n_complete == len(_rp) and len(_rp) >= 1),
+                "FINISHED_DISCOVERY":
+                    (_n_complete == len(_rp) and len(_rp) >= 1)}
+    # a record without ranked_results has NO ranked_packages and is NOT
+    # a current finished discovery (the contract's invariant)
     detail.pop("evidence_pack", None)
     ep_path = STORE_DIR / f"evidence_{session_id}.json"
     ep = _read_json(ep_path)

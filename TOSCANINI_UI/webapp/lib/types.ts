@@ -130,6 +130,10 @@ export interface SessionDetail {
   // directly to its package.
   ranked_results?: RankedDiscoveryResult | null;
   ranked_packages?: RankedPackage[] | null;
+  // R541: per-rank candidate-bound package download routes — the UI's
+  // "Download technology package #N" CTA resolves to a candidate-
+  // specific route (?candidate=<id>), not one shared /package surface.
+  ranked_package_downloads?: RankedPackageDownload[] | null;
   // R540: the three distinct completion states — never collapsed into a
   // single COMPLETE word (pipeline vs discovery vs technology-package).
   completion_states?: CompletionStates | null;
@@ -743,11 +747,16 @@ export interface RankedResultComponents {
     package_id?: string;
     rank?: number;
     note?: string;
-    // the worker-bound package record (zip + maturity + kind) when the
-    // package was compiled (absent for a diagnostic-only run).
+    // R541: the candidate-bound package identity (each survivor's OWN
+    // package, never a reused #1).
     zip_name?: string | null;
     maturity?: string | null;
     complete?: boolean;
+    candidate_id?: string | null;
+    zip_sha256?: string | null;
+    zip_sha256_measured?: string | null;
+    zip_sha256_matches?: boolean;
+    manifest?: unknown;
   };
 }
 
@@ -760,7 +769,8 @@ export interface RankedResultRecord {
   selected?: boolean;
   components?: RankedResultComponents;
   rank_basis?: Record<string, unknown>;
-  // the worker attaches the completed package record here
+  // R541: the candidate-bound package record (each survivor's OWN
+  // package, never a reused #1)
   package?: {
     kind?: string;
     zip_name?: string | null;
@@ -768,6 +778,11 @@ export interface RankedResultRecord {
     complete?: boolean;
     candidate_id?: string | null;
     rank?: number;
+    package_id?: string | null;
+    zip_sha256?: string | null;
+    zip_sha256_measured?: string | null;
+    zip_sha256_matches?: boolean;
+    manifest?: unknown;
   };
   discovery_completed?: boolean;
 }
@@ -781,9 +796,21 @@ export interface RankedDiscoveryResult {
   n_admissible?: number;
   n_killed?: number;
   n_ranked?: number;
+  n_complete_packages?: number;
   completion?: CompletionStates;
   diagnostic_only?: boolean;
   derivation_error?: string;
+}
+
+// R541: a per-rank candidate-bound package download route (the UI's
+// "Download technology package #N" CTA target).
+export interface RankedPackageDownload {
+  rank?: number;
+  candidate_id?: string | null;
+  package_zip?: string | null;
+  package_sha256?: string | null;
+  complete?: boolean;
+  download_url?: string | null;
 }
 
 // R540: a ranked survivor with its attached technology package (the
@@ -804,6 +831,11 @@ export interface RankedPackage {
     complete?: boolean;
     candidate_id?: string | null;
     rank?: number;
+    package_id?: string | null;
+    zip_sha256?: string | null;
+    zip_sha256_measured?: string | null;
+    zip_sha256_matches?: boolean;
+    manifest?: unknown;
   };
   discovery_completed?: boolean;
 }

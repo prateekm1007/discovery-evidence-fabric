@@ -165,6 +165,18 @@ export interface RankedPackageView {
     complete: boolean;
     zipName: string | null;
     maturity: string | null;
+    // R541: the candidate-bound package identity — each ranked survivor
+    // carries ITS OWN package (candidate_id + rank + zip + hash +
+    // manifest), never a reused #1 package.
+    candidateId: string | null;
+    rank: number | null;
+    packageId: string | null;
+    zipSha256: string | null;
+    zipSha256Matches: boolean;
+    // R541: the candidate-specific download route ("Download technology
+    // package #N" resolves to THIS candidate's package, not a shared
+    // /package surface for every ranked card).
+    downloadUrl: string | null;
   };
   rankBasis: string | null;
 }

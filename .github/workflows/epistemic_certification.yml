@@ -79,12 +79,21 @@ jobs:
           ref: ${{ github.event.inputs.commit_sha || github.ref }}
       - name: Path filter (engine-relevant vs other code)
         id: filter
+        # R541: a workflow_dispatch with NO commit_sha pins the FULL
+        # certification path (the `certify` job's `if` treats an
+        # empty/dispatch trigger as full-path). The path filter here
+        # still runs on dispatch but its output is irrelevant to the
+        # certify job (which dispatches on `github.event_name`), so the
+        # failure below is inert — the filter is best-effort.
+        if: github.event_name == 'push'
         uses: dorny/paths-filter@v3
         with:
           filters: |
             engine_paths:
               - 'discovery_fabric/**'
               - 'toscanini/**'
+              - 'TOSCANINI/**'
+              - 'TOSCANINI_UI/**'
               - 'orchestrator/**'
               - 'epistemic_integrity/**'
               - 'archive/r455-lean/premium_package_factory/**'
@@ -183,6 +192,12 @@ jobs:
           # deploy failed LOUDLY, by design) — this step moves the
           # same check earlier: build here, fail here.
           set -e
+          # R541: the webapp is built from the webapp package — a fresh
+          # CI runner has no node_modules, so npm ci (not npm build,
+          # which assumed a populated node_modules) is the correct
+          # entry point.
+          node --version
+          npm --version
           cd TOSCANINI_UI/webapp
           npm ci --no-audit --no-fund
           NEXT_OUTPUT=export npm run build

@@ -1043,14 +1043,32 @@ class EngineRun:
         except Exception:  # noqa: BLE001 — disclosed via absence
             pass
         self._persist("candidate_envelope.json", self.env.to_dict())
-        # R540: the ranked result set — the contract's machine-readable
-        # "ranked technology packages" shape. Derived from THIS run's
-        # own persisted artifacts (the selection record, the canonical
-        # spec/experiment files, the final state); it is the authority
-        # the worker + UI surface reads to present a ranked finished
-        # discovery, and it NEVER promotes a candidate the recorded
-        # gates did not admit (a diagnostic-only run records
-        # diagnostic_only=true, not a fake finished discovery).
+        # R541: the ranked-package chain — every admissible ranked
+        # survivor gets its OWN complete candidate-bound technology
+        # package (the contract's "ranked technology packages", not one
+        # package relabeled per survivor). This compiles the candidate
+        # packages BEFORE the ranked result set is derived, so the
+        # durable RANKED_DISCOVERY_RESULTS.json carries the FINAL
+        # per-candidate package identity (the authority, Art. X — no
+        # session-only enrichment layered on a stale run artifact).
+        try:
+            self._compile_ranked_packages()
+        except Exception as exc:  # noqa: BLE001 — the ranked record is
+            self._persist("RANKED_PACKAGE_FAILED.json", {
+                "stage": "RANKED_PACKAGE_COMPILATION",
+                "error": f"{type(exc).__name__}: {exc}",
+                "consequence": ("no ranked packages compiled; the ranked "
+                                "result set records ABSENT_NOT_COMPILED "
+                                "for every survivor — the run is NOT a "
+                                "finished discovery (honest, Art. XXV)")})
+        # R540/R541: the ranked result set — the contract's
+        # machine-readable "ranked technology packages" shape. Derived
+        # from THIS run's own persisted artifacts (the selection record,
+        # the per-candidate spec trios, the candidate-bound package
+        # records, the final state). It binds each ranked survivor to
+        # its OWN package identity (PROVEN from the on-disk ZIP), never
+        # a borrowed #1 package. A diagnostic-only run records
+        # diagnostic_only=true, not a fake finished discovery.
         try:
             from . import ranked_result_set as _rrs
             _rrs.persist_ranked_result_set(self.out, manifest)
@@ -2264,6 +2282,44 @@ class EngineRun:
                     "deficient_areas": (e.get("quality") or {})
                     .get("deficient_areas", [])[:10]}
                 for e in evaluated if not e.get("killed")}
+            # R541: the authoritative ranked survivor records — the
+            # engine's OWN recorded selection/admission result (the
+            # `evaluated` gauntlet rows). The ranked result set module
+            # PROJECTS this record; it never re-derives admission (no
+            # second authority, Art. X). Each admissible row carries the
+            # candidate's pool key, so the per-candidate spec trio and
+            # package bind to the candidate, not to the selected #1.
+            _ranked_rows = [r for r in selection.get("ranked", [])
+                            if isinstance(r, dict)]
+            _eval_by_cid = {e.get("candidate_id"): e
+                            for e in evaluated if e.get("killed") is False}
+            for _r in _ranked_rows:
+                _cid = _r.get("candidate_id")
+                _ev = _eval_by_cid.get(_cid) or {}
+                _r["key"] = _ev.get("key")
+                _r["origin"] = _ev.get("origin")
+                _r["disposition"] = ("KILLED" if _r.get("killed")
+                                     else ("UNRESOLVED"
+                                           if _r.get("quality_verdict")
+                                           in (None, "FAIL")
+                                           or _r.get("span_underived")
+                                           or _r.get("physics_lifecycle")
+                                           in ("DOES_NOT_BEAT_BASELINE",
+                                               "PLAUSIBILITY_BOUND_VIOLATED")
+                                           else "SURVIVED"))
+                _r["ranked_admissible"] = bool(
+                    not _r.get("killed")
+                    and _r.get("quality_verdict") != "FAIL"
+                    and not _r.get("span_underived")
+                    and _r.get("physics_lifecycle")
+                    not in ("DOES_NOT_BEAT_BASELINE",
+                            "PLAUSIBILITY_BOUND_VIOLATED"))
+            selection["ranked_candidate_keys"] = [
+                {"rank": _i, "candidate_id": _r.get("candidate_id"),
+                 "key": _r.get("key"),
+                 "disposition": _r.get("disposition"),
+                 "ranked_admissible": _r.get("ranked_admissible")}
+                for _i, _r in enumerate(_ranked_rows, start=1)]
             self._persist("SURVIVOR_SELECTION.json", selection)
             _pra_stop("SELECTION")
             _pra["pool"]["selected"] = selection.get("selected")
@@ -2972,6 +3028,276 @@ class EngineRun:
                           "SOME_COMPONENTS_PRODUCED alone"),
             "final_status": fs,
         }
+
+    # ------------------------------------------------------------------
+    # R541: PER-CANDIDATE PACKAGE COMPILATION — the ranked-package
+    # chain. Each admissible ranked survivor is compiled through the
+    # ONE canonical package compiler (package_compiler.compile_package,
+    # the authority) using the candidate's OWN persisted spec trio
+    # (INVENTION/ENGINEERING/DECISIVE_{key}.json) staged into an
+    # isolated per-candidate work dir, so every ranked survivor gets a
+    # DISTINCT candidate-bound ZIP + manifest + hash. The selected #1's
+    # canonical package is never reused as candidate B's package (the
+    # R540 defect). The records land in RANKED_PACKAGE_RECORDS.json;
+    # the ranked result set binds each survivor to its own package.
+    #
+    # Honesty contract (Constitution Art. II/III/XXV/XXXIX):
+    #   - a candidate whose package build BLOCKS (quality gate, model
+    #     validator, or a not-yet-satisfied gate) records an honest
+    #     ABSENT_NOT_COMPILED — it is NOT fabricated as a technology
+    #     package, and it is NOT presented as a finished survivor
+    #   - the ZIP hash is the MEASURED sha256 of the on-disk bytes
+    #     (the verifier re-measures, never trusts the claimant)
+    #   - the candidate binding (ranked candidate id + key) rides every
+    #     record so the rank->candidate->package mapping is mechanically
+    #     traceable and survives session reload
+    # ------------------------------------------------------------------
+    def _compile_ranked_packages(self) -> Dict[str, Any]:
+        import shutil as _shutil
+        from . import package_compiler as _pkgc
+
+        sel = self._read_json("SURVIVOR_SELECTION.json") or {}
+        ranked = [r for r in sel.get("ranked", []) if isinstance(r, dict)]
+        if not ranked:
+            self._persist("RANKED_PACKAGE_RECORDS.json", {
+                "schema": "RANKED_PACKAGE_RECORDS/1.0.0",
+                "run_id": self.run_id,
+                "packages": {}, "by_candidate_id": {},
+                "n_compiled": 0, "n_admissible_ranked": 0,
+                "reason": "no ranked candidates",
+                "recorded_at": utc_now()})
+            return {}
+
+        inv = self._read_json("INVENTION_SPECIFICATION.json") or {}
+        eng = self._read_json("ENGINEERING_SPECIFICATION.json") or {}
+        decisive = self._read_json("DECISIVE_EXPERIMENT.json") or {}
+        final = self._read_json("final_state.json") or {}
+
+        # the run-level base state (identity, problem, evidence pack)
+        base_run_result = {
+            "run_id": self.run_id,
+            "session_id": self.session_id,
+            "problem_id": self.problem_id,
+            "user_text": (self.problem or {}).get("user_text"),
+            "title": (self.problem or {}).get("title"),
+            "domain_hint": (self.problem or {}).get("domain_hint"),
+            "final_state": final,
+        }
+
+        packages: Dict[str, Any] = {}
+        by_cid: Dict[str, Any] = {}
+        n_compiled = 0
+        # rank = 1..n in the recorded selection order
+        for _pos, r in enumerate(ranked, start=1):
+            key = r.get("key") or "primary"
+            cid = r.get("candidate_id")
+            adm = r.get("ranked_admissible")
+            if adm is None:
+                adm = (not r.get("killed")
+                       and r.get("quality_verdict") != "FAIL"
+                       and not r.get("span_underived")
+                       and r.get("physics_lifecycle")
+                       not in ("DOES_NOT_BEAT_BASELINE",
+                              "PLAUSIBILITY_BOUND_VIOLATED"))
+            r["_rank"] = _pos
+            if not adm or (r.get("disposition") or "SURVIVED") != "SURVIVED":
+                continue
+
+            if key == "primary" or key is None:
+                c_inv, c_eng, c_dec, c_key = inv, eng, decisive, "primary"
+            else:
+                c_inv = self._read_json(
+                    f"INVENTION_SPECIFICATION_{key}.json")
+                c_eng = self._read_json(
+                    f"ENGINEERING_SPECIFICATION_{key}.json")
+                c_dec = self._read_json(
+                    f"DECISIVE_EXPERIMENT_{key}.json")
+                c_key = key
+                if c_inv is None or c_eng is None:
+                    packages[str(cid)] = {
+                        "complete": False,
+                        "kind": "ABSENT_NOT_COMPILED",
+                        "candidate_id": cid,
+                        "ranked_candidate_key": c_key,
+                        "rank": _pos,
+                        "reason": "per-candidate spec trio not on disk"}
+                    by_cid[str(cid)] = packages[str(cid)]
+                    continue
+
+            # stage the candidate's OWN spec trio into an isolated work
+            # dir so the compiler's canonical-input resolution reads
+            # THIS candidate's artifacts (never a second candidate's)
+            stage_dir = Path(self.out) / "RANKED_PACKAGE_STAGING" / c_key
+            if stage_dir.exists():
+                _shutil.rmtree(str(stage_dir), ignore_errors=True)
+            stage_dir.mkdir(parents=True, exist_ok=True)
+            for _fname, _obj in (("INVENTION_SPECIFICATION.json", c_inv),
+                                  ("ENGINEERING_SPECIFICATION.json", c_eng),
+                                  ("DECISIVE_EXPERIMENT.json", c_dec),
+                                  ("final_state.json", final)):
+                (stage_dir / _fname).write_text(
+                    json.dumps(_obj, indent=2, ensure_ascii=False,
+                               default=str))
+
+            # the candidate-bound run_result (the compiler's canonical
+            # inputs, candidate-specific — the identity + the
+            # candidate's own spec/engineering/experiment)
+            crr = dict(base_run_result)
+            crr["invention_specification"] = c_inv
+            crr["engineering_specification"] = c_eng
+            crr["decisive_experiment"] = c_dec
+            crr["ranked_candidate_id"] = cid
+            crr["ranked_candidate_key"] = c_key
+
+            # candidate-bound geometry: the primary candidate's
+            # canonical geometry_out; a non-primary candidate's own
+            # honest classification (never the #1's geometry bytes —
+            # Art. XXVIII: a candidate is never presented as geometry
+            # it did not earn)
+            geometry_out = self._candidate_geometry(c_key, c_eng)
+
+            vis = geometry_out.get("visualizability") \
+                or geometry_out.get("visualizability_class")
+            try:
+                c_out = _pkgc.compile_package(
+                    crr, None, geometry_out, str(stage_dir),
+                    visualizability=vis,
+                    zip_name=f"TECHNOLOGY_TRANSFER_PACKAGE_{c_key}.zip",
+                    engine_identity=(self._engine_identity() or None),
+                    run_gate=True)
+            except Exception as exc:  # noqa: BLE001 — a crash is a BLOCK
+                c_out = {"blocked": True,
+                         "blocked_record": {
+                             "stage": "COMPILE_ERROR",
+                             "reason": f"{type(exc).__name__}: {exc}"}}
+
+            # promote the candidate-bound ZIP into the run's DOWNLOAD
+            # tree (durable + served), candidate-bound by name. The
+            # DOWNLOAD dir is created ONLY when a package is actually
+            # emitted — a rejected / not-compiled run leaves no
+            # DOWNLOAD tree (the R399 W2.1 no-package-artifacts
+            # invariant, pinned by test_r399_gates).
+            rec: Dict[str, Any] = {
+                "candidate_id": cid,
+                "ranked_candidate_key": c_key,
+                "rank": _pos,
+                "complete": False,
+                "kind": "ABSENT_NOT_COMPILED",
+            }
+            if c_out.get("zip_emitted") and c_out.get("zip_path"):
+                dl_root = Path(self.out) / "DOWNLOAD"
+                dl_root.mkdir(parents=True, exist_ok=True)
+                _dst = dl_root / f"TECHNOLOGY_TRANSFER_PACKAGE_{c_key}.zip"
+                _shutil.copy2(c_out["zip_path"], str(_dst))
+                _measured = self._sha256_file(_dst)
+                rec.update({
+                    "complete": True,
+                    "kind": "TECHNOLOGY_PACKAGE",
+                    "package_id": c_out.get("package_id") or str(cid),
+                    "zip_name": _dst.name,
+                    "zip_sha256": c_out.get("zip_sha256") or _measured,
+                    "zip_sha256_measured": _measured,
+                    "zip_bytes": c_out.get("zip_bytes"),
+                    "manifest_files": (c_out.get("manifest") or {})
+                                       .get("file_count"),
+                    "package_maturity": c_out.get("package_maturity"),
+                    "visualizability_class": c_out.get(
+                        "visualizability_class"),
+                })
+                n_compiled += 1
+            else:
+                rec["reason"] = ((c_out.get("blocked_record") or {})
+                                 .get("reason")
+                                 or (c_out.get("blocked_record") or {})
+                                 .get("stage", "PACKAGE_BUILD_BLOCKED"))
+            packages[str(cid)] = rec
+            by_cid[str(cid)] = rec
+
+        self._persist("RANKED_PACKAGE_RECORDS.json", {
+            "schema": "RANKED_PACKAGE_RECORDS/1.0.0",
+            "run_id": self.run_id,
+            "packages": packages,
+            "by_candidate_id": by_cid,
+            "n_compiled": n_compiled,
+            "n_admissible_ranked": len(ranked),
+            "recorded_at": utc_now(),
+        })
+        return packages
+
+    def _candidate_geometry(self, c_key: str,
+                           c_eng: Dict[str, Any]) -> Dict[str, Any]:
+        """R541: candidate-bound geometry for the per-candidate package.
+
+        The primary candidate uses the run's canonical geometry_out
+        (the bridge's own record, when present on disk); a non-primary
+        survivor gets its OWN honest conceptual geometry (the compiler's
+        MODEL layer requires a glb_bytes — the conceptual default; a
+        candidate is never presented as engineering geometry it did not
+        earn, Art. XXVIII). A geometry build failure degrades to an
+        honest conceptual record, never a fabricated geometry."""
+        if c_key == "primary":
+            _geo = self._read_json("GEOMETRY_OUT.json")
+            if isinstance(_geo, dict) and _geo.get("glb_bytes") is not None:
+                return _geo
+        # the honest conceptual default for a candidate-bound geometry:
+        # a single device form with no sourced engineering dimensions
+        try:
+            from .invention_bridge import conceptual_geometry as _cg
+            _site = str((c_eng.get("intervention_site")
+                         or c_eng.get("intervention") or ""))
+            _layers = [str(s) for s in
+                      ((c_eng.get("engineering_core") or {})
+                       .get("subsystems")
+                       or (c_eng.get("subsystems")) or [])][:5]
+            built = _cg.build_conceptual_device(_site, _layers or None)
+            return {
+                **built,
+                "visualizability_class": "CONCEPTUAL_3D",
+                "domain_family": (c_eng.get("canonical_family")
+                                   or "GENERIC_ARCHITECTURE"),
+                "ranked_candidate_key": c_key,
+                "note": ("candidate-bound conceptual geometry — a "
+                         "non-primary survivor is never presented as "
+                         "engineering geometry it did not earn "
+                         "(Art. XXVIII); the model layer carries the "
+                         "conceptual disclaimer"),
+            }
+        except Exception:  # noqa: BLE001 — the compiler tolerates an
+            return {"glb_bytes": b"", "visualizability_class":
+                    "CONCEPTUAL_3D", "ranked_candidate_key": c_key,
+                    "note": "conceptual geometry unavailable; empty "
+                             "model layer (honest, Art. XXV)"}
+
+    def _engine_identity(self):
+        try:
+            from . import artifact_identity as _aid
+            return _aid.resolve_engine_commit()
+        except Exception:  # noqa: BLE001 — the compiler has its own
+            return None     # honest fallback; never a fabricated commit
+
+    def _read_json(self, name: str) -> Optional[Dict[str, Any]]:
+        p = Path(self.out) / name
+        try:
+            if p.is_file():
+                return json.loads(p.read_text())
+        except Exception:  # noqa: BLE001 — a corrupt record is honest
+            return None
+        return None
+
+    # R541: the portable SHA-256 of the on-disk bytes (Art. II/III:
+    # the measured hash is the authority, never a claimed value).
+    # A module-level helper would close the class body; keep it
+    # inline as a method so the class structure stays intact.
+    def _sha256_file(self, path) -> Optional[str]:
+        try:
+            import hashlib
+            h = hashlib.sha256()
+            with open(path, "rb") as f:
+                for chunk in iter(lambda: f.read(65536), b""):
+                    h.update(chunk)
+            return h.hexdigest()
+        except OSError:
+            return None
 
     # ------------------------------------------------------------------
     def _pre_retrieval_capability_gate(self) -> Dict[str, Any]:

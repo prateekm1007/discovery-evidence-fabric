@@ -2784,11 +2784,80 @@ class Handler(BaseHTTPRequestHandler):
                 except OSError:
                     pass
 
+    def _ranked_package_for_candidate(self, run_dir, candidate_id: str):
+        """R541: the candidate-bound technology package for a ranked
+        survivor. Resolves the candidate's OWN package artifact from
+        the run's RANKED_PACKAGE_RECORDS.json (the engine's per-candidate
+        build record), verifying the on-disk ZIP exists + its hash
+        matches (Art. II/III: the measured bytes are the authority,
+        never a claimed value). Returns (zip_path, record) or (None,
+        typed_reason). A candidate whose package was never compiled, or
+        whose recorded hash no longer matches the on-disk bytes, is
+        refused (404 / 409), never a cross-candidate or borrowed #1
+        package (the contract's invariant: rank->candidate->package is
+        a single chain)."""
+        import json as _json
+        recs = _json.loads(
+            (run_dir / "RANKED_PACKAGE_RECORDS.json").read_text()
+        ) if (run_dir / "RANKED_PACKAGE_RECORDS.json").is_file() else {}
+        by_cid = recs.get("by_candidate_id") or {}
+        rec = by_cid.get(str(candidate_id))
+        if not isinstance(rec, dict):
+            return None, ("no candidate-bound package record for this "
+                         "ranked candidate")
+        if not rec.get("complete"):
+            return None, (f"this candidate's package was not compiled "
+                          f"(honest: {rec.get('reason') or rec.get('kind')})")
+        zname = rec.get("zip_name")
+        zsha = rec.get("zip_sha256")
+        zpath = run_dir / "DOWNLOAD" / zname if zname else None
+        if zpath is None or not zpath.exists():
+            # the ZIP was promoted into the DOWNLOAD tree by the engine
+            return None, "the candidate's package ZIP is not on disk"
+        # Art. II/III: re-measure the on-disk hash (the claimant — the
+        # recorded record — is never trusted; the bytes are)
+        import hashlib
+        h = hashlib.sha256()
+        with open(zpath, "rb") as _f:
+            for _chunk in iter(lambda: _f.read(65536), b""):
+                h.update(_chunk)
+        measured = h.hexdigest()
+        if zsha is not None and measured != zsha:
+            return None, ("the on-disk package bytes do not match the "
+                         "recorded SHA-256 (the artifact is not the one "
+                         "the result record claims)")
+        return zpath, rec
+
     def _package(self, sid: str):
         s = store.get_session(sid)
         if not s:
             return self._json(404, {"error": "not found"})
         run_dir = Path(s["run_dir"]) if s.get("run_dir") else None
+        # R541: a ?candidate=<id> query serves THAT ranked survivor's own
+        # candidate-bound package (the contract's "move from the ranked
+        # result to its package" — two CTA buttons resolve to two
+        # different, candidate-bound artifacts). Without the param the
+        # canonical #1 / buyer release path below is unchanged.
+        _qs = urllib.parse.parse_qs(self.path.split("?", 1)[1]
+                                    if "?" in self.path else "")
+        _cand = (_qs.get("candidate") or [""])[0].strip()
+        if _cand and run_dir and run_dir.exists():
+            zpath, rec_or_reason = self._ranked_package_for_candidate(
+                run_dir, _cand)
+            if zpath is None:
+                _err = (rec_or_reason if isinstance(rec_or_reason, str)
+                        else "the candidate's package is not on disk")
+                return self._json(404, {"error": _err, "candidate": _cand})
+            _rec = rec_or_reason if isinstance(rec_or_reason, dict) else {}
+            _extra = []
+            if _rec.get("zip_sha256"):
+                _extra.append(
+                    ("X-Ranked-Package-SHA256", _rec["zip_sha256"]))
+            _extra.append(("X-Ranked-Package-Candidate", _cand))
+            return self._serve_file(
+                zpath, "application/zip",
+                download_name=str(zpath.name),
+                extra_headers=_extra)
         info = store.package_info(run_dir) if run_dir and run_dir.exists() else None
         zp = None
         if info and info.get("zip") and Path(info["zip"]).exists():

@@ -214,10 +214,8 @@ function Candidates({
 // a component (Art. X/XXVIII).
 function Ranked({
   m,
-  onOpenSurface,
 }: {
   m: Extract<Msg, { kind: "ranked" }>;
-  onOpenSurface: (s: SurfaceId) => void;
 }) {
   const dispositionLabel: Record<string, string> = {
     SURVIVED: "survived the adversarial challenge",
@@ -314,17 +312,21 @@ function Ranked({
             </div>
           )}
           <div className="conv-ranked-pkg">
-            {r.package.complete ? (
-              <button
-                type="button"
+            {r.package.complete && r.package.downloadUrl ? (
+              <a
                 className="btn small primary"
-                onClick={() => onOpenSurface("package")}
+                href={r.package.downloadUrl}
+                download
               >
-                Download technology package
-              </button>
+                Download technology package #{r.rank ?? "?"}
+              </a>
+            ) : r.package.kind === "ABSENT_KILLED" ? (
+              <span className="faint">
+                Killed — no technology package
+              </span>
             ) : (
               <span className="faint">
-                Package not yet compiled — diagnostic only
+                Package not yet compiled for this ranked candidate
               </span>
             )}
           </div>
@@ -387,7 +389,7 @@ export default function Conversation({
   events: ScienceEvent[];
   packageAvailable: boolean;
   asks: { question: string; response: AskResponse }[];
-  onOpenSurface: (s: SurfaceId) => void;
+  onOpenSurface: (s: SurfaceId, candidateId?: string | null) => void;
   onAsk: (q: string) => Promise<void>;
   onTechnical: () => void;
   onNextAction: (n: NextAction) => void;
@@ -737,7 +739,7 @@ export default function Conversation({
           case "ranked":
             return (
               <div className="conv-row" key={m.id}>
-                <Ranked m={m} onOpenSurface={onOpenSurface} />
+                <Ranked m={m} />
               </div>
             );
           case "attack":
@@ -821,15 +823,25 @@ export default function Conversation({
                       {it.engineering?.modelClass ? (
                         <div className="faint">Model: {it.engineering.modelClass}</div>
                       ) : null}
-                      {it.package?.complete && it.package.zipName ? (
-                        <button
-                          type="button"
-                          className="conv-open"
-                          onClick={() => onOpenSurface("package")}
-                        >
-                          Open package ({it.package.zipName}) →
-                        </button>
-                      ) : null}
+                        {it.package?.complete && it.package.zipName ? (
+                          <button
+                            type="button"
+                            className="conv-open"
+                            onClick={() => {
+                              const cid = it.package.candidateId;
+                              if (cid && it.package.downloadUrl) {
+                                window.location.href = it.package.downloadUrl;
+                                return;
+                              }
+                              onOpenSurface(
+                                "package",
+                                cid ?? it.rank?.toString()
+                              );
+                            }}
+                          >
+                            Download technology package #{it.rank} ({it.package.zipName}) →
+                          </button>
+                        ) : null}
                     </div>
                   ))}
                 </div>
