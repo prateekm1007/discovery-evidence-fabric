@@ -1043,6 +1043,19 @@ class EngineRun:
         except Exception:  # noqa: BLE001 — disclosed via absence
             pass
         self._persist("candidate_envelope.json", self.env.to_dict())
+        # R540: the ranked result set — the contract's machine-readable
+        # "ranked technology packages" shape. Derived from THIS run's
+        # own persisted artifacts (the selection record, the canonical
+        # spec/experiment files, the final state); it is the authority
+        # the worker + UI surface reads to present a ranked finished
+        # discovery, and it NEVER promotes a candidate the recorded
+        # gates did not admit (a diagnostic-only run records
+        # diagnostic_only=true, not a fake finished discovery).
+        try:
+            from . import ranked_result_set as _rrs
+            _rrs.persist_ranked_result_set(self.out, manifest)
+        except Exception:  # noqa: BLE001 — the ranked record is
+            pass            # additive; a failure never blocks the run
         # Cemetery records RESEARCH kills only. An infrastructure failure
         # (e.g. missing LLM credential) is not negative knowledge about the
         # mechanism (Art. XXV: unknown/failed-run is not a failure lesson).
@@ -2270,6 +2283,41 @@ class EngineRun:
             chosen = next(e for e in evaluated
                           if e["candidate_id"] == selection["selected"]
                           and not e.get("killed"))
+            # R540: persist the canonical spec trio for EVERY admissible
+            # ranked survivor (not just the selected #1), suffixed by the
+            # candidate's pool key, so the ranked result set can carry a
+            # complete per-candidate record + package. The selected
+            # candidate's UN-suffixed canonical files remain the
+            # package-compiler authority (R440.2 unchanged); these
+            # per-candidate files are additive provenance, never a
+            # second authority.
+            for e in evaluated:
+                _k = e.get("key")
+                if _k == "primary" or _k is None:
+                    continue
+                if e.get("killed"):
+                    continue
+                _sp = e.get("spec")
+                _en = e.get("eng")
+                if _sp is None or _en is None:
+                    continue
+                _ev = e.get("env_view")
+                self._persist(
+                    f"INVENTION_SPECIFICATION_{_k}.json",
+                    dict(_sp, ranked_candidate_key=_k,
+                         ranked_candidate_id=e.get("candidate_id"),
+                         ranked_admissible=True))
+                self._persist(
+                    f"ENGINEERING_SPECIFICATION_{_k}.json",
+                    dict(_en, ranked_candidate_key=_k,
+                         ranked_candidate_id=e.get("candidate_id"),
+                         ranked_admissible=True))
+                self._persist(
+                    f"DECISIVE_EXPERIMENT_{_k}.json",
+                    dict(select_decisive_experiment(_ev),
+                         ranked_candidate_key=_k,
+                         ranked_candidate_id=e.get("candidate_id"),
+                         ranked_admissible=True))
             spec_rel = chosen["spec"]
             eng_rel = dict(chosen["eng"], engineering_attack_summary={
                 "attack": "ENGINEERING_ATTACK (E15-F)",
@@ -2539,21 +2587,6 @@ class EngineRun:
                 pkg_number = self.package_number
             # ------------- R440.2: PACKAGE AFTER FINAL EVOLUTION -------------
             # The buyer package is NO LONGER generated here. The old
-            # in-run call (package_factory.generate_buyer_package —
-            # candidate -> package -> evolution, the stale-generation
-            # defect this round exists to remove) is RETIRED from
-            # production (Art. LXIV disposition: ARCHIVED_TO
-            # archive/r440_retired/; architectural test asserts zero
-            # production call sites). The ONE canonical package compiler
-            # (discovery_fabric/engine/package_compiler.py) runs
-            # POST-EVOLUTION from the FINAL canonical state, invoked by
-            # the bridge gate (toscanini/worker.py phase 3.5):
-            #   DISCOVERY -> CHALLENGE -> DIAGNOSIS -> EVOLUTION ->
-            #   FINAL INVENTION -> ENGINEERING -> EXPERIMENT -> PACKAGE
-            # The E15-B dossier-quality / E16-H release gates move to the
-            # compiler boundary: the compiler's own validators plus the
-            # independent package quality gate (Gates A–V) decide the
-            # release, transactionally (no partial ZIP, ever).
             self._persist("PACKAGE_DEFERRED.json", {
                 "schema": "R440_PACKAGE_DEFERRED/1.0",
                 "run_id": self.run_id,
@@ -2898,6 +2931,49 @@ class EngineRun:
         return Candidate.from_dict(d)
 
     # ------------------------------------------------------------------
+    # R540: the three distinct completion states (the contract's
+    # success-state semantics). A FINISHED DISCOVERY is an admissible
+    # ranked survivor + a complete result record + a technology package —
+    # never "the pipeline reached COMPLETE" and never "some components
+    # were produced". Each state is derived from the run's OWN recorded
+    # verdicts (Art. X: the record is the authority); none is inferred
+    # or softened.
+    _NON_SURVIVOR_STATES = (
+        "REJECTED", "MECHANISM_STARVED", "MECHANISM_GENERATION_FAILED",
+        "MALFORMED_OR_FALSE_PREMISE", "PROBLEM_EXISTENCE_UNESTABLISHED",
+        "UNKNOWN", "INVENTION_UNDER_DEVELOPMENT",
+        "INVENTION_EVOLVED_CANDIDATE_WITHOUT_EXPERIMENT",
+    )
+
+    def _completion_states(self) -> Dict[str, Any]:
+        eps = self.env.epistemic_state or {}
+        fs = eps.get("final_status")
+        # DISCOVERY_COMPLETED: the discovery verdict admits a ranked
+        # survivor (i.e. it is NOT a scientific/infrastructure
+        # non-survivor state). A premise rejection, starvation, or
+        # generation failure has no admissible survivor.
+        discovery_completed = (
+            bool(fs) and fs not in self._NON_SURVIVOR_STATES)
+        # TECHNOLOGY_PACKAGE_COMPLETED: the canonical package compiler
+        # recorded a complete package for this run (the bridge-gate
+        # outcome; the package_report is set by the compiler tail).
+        package_completed = bool(
+            self.package_report and self.package_report.get("complete"))
+        finished = discovery_completed and package_completed
+        return {
+            "PIPELINE_COMPLETED": True,
+            "DISCOVERY_COMPLETED": discovery_completed,
+            "TECHNOLOGY_PACKAGE_COMPLETED": package_completed,
+            "FINISHED_DISCOVERY": finished,
+            "invariant": ("FINISHED_DISCOVERY = "
+                          "ADMISSIBLE_RANKED_SURVIVOR + "
+                          "COMPLETE_RESULT_RECORD + TECHNOLOGY_PACKAGE; "
+                          "never EXECUTION_COMPLETED or "
+                          "SOME_COMPONENTS_PRODUCED alone"),
+            "final_status": fs,
+        }
+
+    # ------------------------------------------------------------------
     def _pre_retrieval_capability_gate(self) -> Dict[str, Any]:
         """R455-LEAN-1 §2 — NO REASONING, NO SPEND.
 
@@ -3075,6 +3151,17 @@ class EngineRun:
                                  .get("description")),
             "failed_stages": self.failed_stages,
             "final_envelope_hash": self.env.envelope_hash(),
+            # R540: the three distinct completion states — the contract's
+            # success-state semantics. PIPELINE_COMPLETED (the loop ran to
+            # the tail — this final_state record is the marker),
+            # DISCOVERY_COMPLETED (an admissible ranked survivor exists,
+            # i.e. the discovery verdict is NOT a scientific/infrastructure
+            # non-survivor state), TECHNOLOGY_PACKAGE_COMPLETED (the
+            # survivor was compiled into a complete technology package).
+            # NEVER collapsed into one COMPLETE word: a run that merely
+            # finished execution but has no admissible survivor is not a
+            # finished discovery.
+            "completion_states": self._completion_states(),
             "code_commit": _git_head(),
             "timestamp": utc_now(),
         }

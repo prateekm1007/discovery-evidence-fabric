@@ -122,6 +122,17 @@ export interface SessionDetail {
   invention_specification?: Record<string, unknown>;
   engineering_specification?: Record<string, unknown>;
   decisive_experiment?: Record<string, unknown>;
+  // R540: the ranked result set — the contract's "ranked technology
+  // packages" shape. One entry per admissible ranked survivor, each
+  // carrying the six components (evidence, mechanism + kill, adversarial
+  // disposition, engineering + model, decisive experiment, package) and a
+  // mechanically traceable rank basis. The UI moves from a ranked result
+  // directly to its package.
+  ranked_results?: RankedDiscoveryResult | null;
+  ranked_packages?: RankedPackage[] | null;
+  // R540: the three distinct completion states — never collapsed into a
+  // single COMPLETE word (pipeline vs discovery vs technology-package).
+  completion_states?: CompletionStates | null;
   evidence_pack?: { retrieval?: { source?: string; title?: string }[] };
   cemetery_update?: Record<string, unknown>;
   user_state_view?: UserStateView;
@@ -686,6 +697,127 @@ export interface CIOMaturity {
   maturity_ladder: (string | null)[];
   reality_loop_state?: string;
   maturity_basis?: Record<string, string>;
+}
+
+// R540: the ranked result set — the contract's "ranked technology
+// packages". The engine persists RANKED_DISCOVERY_RESULTS.json (the
+// authority); the UI reads it verbatim and never re-sorts, re-scores, or
+// infers a rank client-side.
+export interface RankedResultComponents {
+  evidence?: {
+    records?: { id?: string | null; source?: string | null; frozen?: boolean }[];
+    mechanism_source_span?: string;
+    evidence_status?: string;
+  };
+  mechanism?: {
+    mechanism?: string;
+    intervention?: string;
+    expected_effect?: string;
+    falsification_test?: string;
+    competing_considered?: string[];
+  };
+  adversarial?: {
+    overall?: string | null;
+    disposition?: "SURVIVED" | "KILLED" | "UNRESOLVED" | string;
+    survived?: boolean;
+    killed?: boolean;
+    unresolved?: boolean;
+    quality_verdict?: string | null;
+    deficient_areas?: number | null;
+  };
+  engineering?: {
+    geometry_present?: boolean;
+    geometry?: Record<string, unknown>;
+    engineering_core?: Record<string, unknown>;
+    model_class?: string | null;
+    limitations?: string;
+  };
+  decisive_experiment?: {
+    experiment?: string;
+    predicted_discriminator?: string;
+    decision_rule?: string;
+    execution_status?: string;
+  };
+  package?: {
+    kind?: string;
+    package_id?: string;
+    rank?: number;
+    note?: string;
+    // the worker-bound package record (zip + maturity + kind) when the
+    // package was compiled (absent for a diagnostic-only run).
+    zip_name?: string | null;
+    maturity?: string | null;
+    complete?: boolean;
+  };
+}
+
+export interface RankedResultRecord {
+  rank?: number;
+  candidate_id?: string | null;
+  key?: string | null;
+  origin?: string | null;
+  admissible?: boolean;
+  selected?: boolean;
+  components?: RankedResultComponents;
+  rank_basis?: Record<string, unknown>;
+  // the worker attaches the completed package record here
+  package?: {
+    kind?: string;
+    zip_name?: string | null;
+    maturity?: string | null;
+    complete?: boolean;
+    candidate_id?: string | null;
+    rank?: number;
+  };
+  discovery_completed?: boolean;
+}
+
+export interface RankedDiscoveryResult {
+  schema?: string;
+  run_id?: string;
+  final_status?: string | null;
+  ranked_results?: RankedResultRecord[];
+  selected_candidate?: string | null;
+  n_admissible?: number;
+  n_killed?: number;
+  n_ranked?: number;
+  completion?: CompletionStates;
+  diagnostic_only?: boolean;
+  derivation_error?: string;
+}
+
+// R540: a ranked survivor with its attached technology package (the
+// session-served shape — one entry per admissible ranked survivor).
+export interface RankedPackage {
+  rank?: number;
+  candidate_id?: string | null;
+  key?: string | null;
+  origin?: string | null;
+  admissible?: boolean;
+  selected?: boolean;
+  components?: RankedResultComponents;
+  rank_basis?: Record<string, unknown>;
+  package?: {
+    kind?: string;
+    zip_name?: string | null;
+    maturity?: string | null;
+    complete?: boolean;
+    candidate_id?: string | null;
+    rank?: number;
+  };
+  discovery_completed?: boolean;
+}
+
+// R540: the three distinct completion states — the contract's
+// success-state semantics. Never collapsed into one COMPLETE word:
+// a pipeline that ran, an admissible discovery, and a compiled package
+// are three separate, explicitly recorded states.
+export interface CompletionStates {
+  PIPELINE_COMPLETED?: boolean;
+  DISCOVERY_COMPLETED?: boolean;
+  TECHNOLOGY_PACKAGE_COMPLETED?: boolean;
+  FINISHED_DISCOVERY?: boolean;
+  invariant?: string;
 }
 
 export interface CIO {

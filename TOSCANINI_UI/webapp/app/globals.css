@@ -2322,6 +2322,66 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   gap: 6px;
   padding: 2px 0;
 }
+/* R540: the ranked result set — one card per admissible ranked survivor,
+   each carrying its six components + disposition + package link. The
+   grid is the "ranked discovery" the contract names: move from a ranked
+   result directly to its technology package. */
+.conv-rank-note {
+  font-size: 13px;
+  color: var(--ink-soft);
+  padding: 4px 0;
+}
+.conv-rank-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.conv-rank-card {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.conv-rank-card[data-selected] {
+  border-left-color: var(--ok, #4a7c59);
+  box-shadow: 0 1px 3px rgba(31, 30, 28, 0.06);
+}
+.conv-rank-h {
+  font-weight: 600;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.conv-rank-disp {
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 8px;
+  color: var(--ink-faint);
+}
+.conv-rank-disp.SURVIVED {
+  color: var(--ok, #4a7c59);
+  border-color: #cfdccf;
+  background: #f4f8f3;
+}
+.conv-rank-disp.KILLED {
+  color: var(--bad, #a3492f);
+  border-color: #e7c9c2;
+  background: #faf0ee;
+}
+.conv-rank-mech {
+  font-size: 14px;
+  color: var(--ink);
+}
 
 /* inline evidence card — the ONE structured surface the conversation
    earns (the counts are meaningful structure, not decoration) */
@@ -2376,6 +2436,42 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   border: 1px solid var(--line);
   padding: 2px 9px;
   color: var(--ink-faint);
+}
+/* R540 — the ranked result set (the contract's "ranked technology
+   packages"): one card per admissible ranked survivor, each carrying the
+   six components + rank basis + its technology-package CTA. The
+   completion-state chip distinguishes a FINISHED DISCOVERY (ranked
+   survivor + compiled package) from a pipeline-complete-but-not-finished
+   run (never collapsed into one COMPLETE word). */
+.conv-ranked { display: flex; flex-direction: column; gap: 10px; max-width: 560px; }
+.conv-ranked-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.conv-ranked-title { font-weight: 600; font-size: 13px; letter-spacing: 0.3px; }
+.conv-ranked-complete { margin-left: auto; font-size: 10.5px; border-radius: 999px; border: 1px solid var(--line); padding: 2px 9px; color: var(--ink-faint); }
+.conv-ranked-complete.ok { color: var(--ok); border-color: #cfdccf; background: #f4f8f3; }
+.conv-ranked-complete.incomplete { color: var(--warn); border-color: #e6d4bb; background: #faf5ec; }
+.conv-ranked-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.conv-ranked-card.selected { border-color: var(--accent-soft); box-shadow: 0 1px 3px rgba(31,30,28,0.06); }
+.conv-ranked-card-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.conv-ranked-num { font-weight: 700; font-size: 13px; color: var(--ink); }
+.conv-ranked-cid { font-weight: 600; font-size: 13px; overflow-wrap: anywhere; }
+.conv-ranked-disp { margin-left: auto; font-size: 10.5px; border-radius: 999px; border: 1px solid var(--line); padding: 2px 9px; color: var(--ink-faint); }
+.conv-ranked-disp.SURVIVED { color: var(--ok); border-color: #cfdccf; background: #f4f8f3; }
+.conv-ranked-disp.KILLED { color: var(--bad); border-color: #e7c9c2; background: #faf0ee; }
+.conv-ranked-disp.UNRESOLVED { color: var(--warn); border-color: #e6d4bb; background: #faf5ec; }
+.conv-ranked-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; }
+.conv-ranked-cell { font-size: 12.5px; line-height: 1.45; overflow-wrap: anywhere; }
+.conv-ranked-basis, .conv-ranked-competing { font-size: 11px; line-height: 1.4; }
+.conv-ranked-pkg { margin-top: 2px; }
+@media (max-width: 560px) {
+  .conv-ranked-grid { grid-template-columns: 1fr; }
 }
 .conv-attack.atk-survived { color: var(--ok); border-color: #cfdccf; background: #f4f8f3; }
 .conv-attack.atk-failed { color: var(--bad); border-color: #e7c9c2; background: #faf0ee; }

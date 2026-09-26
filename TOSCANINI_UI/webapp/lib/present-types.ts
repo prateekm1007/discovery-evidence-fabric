@@ -4,10 +4,12 @@
 
 import type {
   AskResponse,
+  CompletionStates,
   DossierBody,
   DossierTab,
   EventsBody,
   GauntletCard,
+  RankedPackage,
   RunStateObject,
   ScienceEvent,
   SessionDetail,
@@ -16,10 +18,12 @@ import type {
 
 export type {
   AskResponse,
+  CompletionStates,
   DossierBody,
   DossierTab,
   EventsBody,
   GauntletCard,
+  RankedPackage,
   RunStateObject,
   ScienceEvent,
   SessionDetail,
@@ -114,6 +118,57 @@ export interface CandidateView {
   rankingBasis: string | null;
 }
 
+// R540: one ranked survivor + its attached technology package (the
+// contract's "ranked technology packages"). Rendered verbatim from the
+// engine's ranked result record — no client-side re-sort, re-score, or
+// rank inference. The package CTA is the move from a ranked result to
+// its downloadable package.
+export interface RankedPackageView {
+  rank: number | null;
+  candidateId: string | null;
+  admissible: boolean;
+  selected: boolean;
+  // the six components (each honest — a missing component says so, it
+  // never fabricates a value).
+  evidence: {
+    count: number | null;
+    span: string | null;
+    status: string | null;
+  };
+  mechanism: {
+    mechanism: string | null;
+    intervention: string | null;
+    expectedEffect: string | null;
+    falsificationTest: string | null;
+    competing: string[];
+  };
+  adversarial: {
+    overall: string | null;
+    disposition: string;
+    survived: boolean;
+    killed: boolean;
+    unresolved: boolean;
+  };
+  engineering: {
+    geometryPresent: boolean;
+    modelClass: string | null;
+    limitations: string | null;
+  };
+  experiment: {
+    experiment: string | null;
+    discriminator: string | null;
+    decisionRule: string | null;
+    executionStatus: string | null;
+  };
+  package: {
+    kind: string | null;
+    complete: boolean;
+    zipName: string | null;
+    maturity: string | null;
+  };
+  rankBasis: string | null;
+}
+
 export interface NextAction {
   label: string;
   kind:
@@ -178,6 +233,18 @@ export type Msg =
       openSurface: SurfaceId;
     }
   | { kind: "candidates"; id: string; items: CandidateView[] }
+  // R540: the ranked result set — one card per admissible ranked
+  // survivor, each with its six components + rank basis + attached
+  // technology package (the contract's "ranked technology packages").
+  // Rendered verbatim from the engine record; the UI moves from a ranked
+  // result directly to its package.
+  | {
+      kind: "ranked";
+      id: string;
+      items: RankedPackageView[];
+      completion: CompletionStates | null;
+      finished: boolean;
+    }
   | {
       kind: "attack";
       id: string;

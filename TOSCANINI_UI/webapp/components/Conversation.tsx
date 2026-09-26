@@ -204,6 +204,136 @@ function Candidates({
   );
 }
 
+// R540: the ranked result set — one card per admissible ranked
+// survivor, each carrying its six components (evidence, mechanism +
+// kill, adversarial disposition, engineering + model, decisive
+// experiment, technology package) + the mechanically traceable rank
+// basis. The contract's "ranked technology packages": the user moves
+// from a ranked result directly to its package. Every field is read
+// verbatim from the engine record — the UI never re-ranks or fabricates
+// a component (Art. X/XXVIII).
+function Ranked({
+  m,
+  onOpenSurface,
+}: {
+  m: Extract<Msg, { kind: "ranked" }>;
+  onOpenSurface: (s: SurfaceId) => void;
+}) {
+  const dispositionLabel: Record<string, string> = {
+    SURVIVED: "survived the adversarial challenge",
+    KILLED: "killed by the adversarial challenge",
+    UNRESOLVED: "unresolved — not called survived or killed",
+  };
+  return (
+    <div className="conv-ranked" data-conv-ranked>
+      <div className="conv-ranked-head">
+        <span className="conv-ranked-title">Ranked discoveries</span>
+        {m.completion && (
+          <span
+            className={`conv-ranked-complete ${
+              m.finished ? "ok" : "incomplete"
+            }`}
+            data-conv-ranked-complete
+          >
+            {m.finished
+              ? "Finished discovery — ranked survivor + technology package"
+              : m.completion.TECHNOLOGY_PACKAGE_COMPLETED
+                ? "Package compiled"
+                : "Not a finished discovery yet"}
+          </span>
+        )}
+      </div>
+      {m.items.map((r, i) => (
+        <div
+          key={`${r.candidateId ?? "cand"}-${i}`}
+          className={`conv-ranked-card ${r.selected ? "selected" : ""}`}
+          data-conv-ranked-card
+        >
+          <div className="conv-ranked-card-head">
+            <span className="conv-ranked-num">#{r.rank ?? i + 1}</span>
+            <span className="conv-ranked-cid">
+              {r.mechanism.intervention || r.mechanism.mechanism ||
+                r.candidateId}
+            </span>
+            {r.admissible && (
+              <span
+                className={`conv-ranked-disp ${r.adversarial.disposition}`}
+              >
+                {dispositionLabel[r.adversarial.disposition] ??
+                  r.adversarial.disposition}
+              </span>
+            )}
+          </div>
+          <div className="conv-ranked-grid">
+            <div className="conv-ranked-cell">
+              <div className="faint">Evidence</div>
+              <div>
+                {r.evidence.count != null
+                  ? `${r.evidence.count} source record(s)`
+                  : "see evidence surface"}
+                {r.evidence.span ? " · verbatim span on record" : ""}
+              </div>
+            </div>
+            <div className="conv-ranked-cell">
+              <div className="faint">What would kill it</div>
+              <div>
+                {r.mechanism.falsificationTest ||
+                  "not recorded (honest gap)"}
+              </div>
+            </div>
+            <div className="conv-ranked-cell">
+              <div className="faint">Engineering / model</div>
+              <div>
+                {r.engineering.geometryPresent
+                  ? "geometry established · "
+                  : "conceptual / non-geometric · "}
+                {r.engineering.modelClass || "model class on record"}
+                {r.engineering.limitations ? (
+                  <span className="faint"> — {r.engineering.limitations}</span>
+                ) : null}
+              </div>
+            </div>
+            <div className="conv-ranked-cell">
+              <div className="faint">Decisive experiment</div>
+              <div>
+                {r.experiment.experiment || "not selected (honest gap)"}
+                {r.experiment.executionStatus
+                  ? ` · ${r.experiment.executionStatus.toLowerCase()}`
+                  : ""}
+              </div>
+            </div>
+          </div>
+          {r.rankBasis && (
+            <div className="conv-ranked-basis faint">
+              Rank basis: {r.rankBasis}
+            </div>
+          )}
+          {r.mechanism.competing.length > 0 && (
+            <div className="conv-ranked-competing faint">
+              Competing considered: {r.mechanism.competing.join(", ")}
+            </div>
+          )}
+          <div className="conv-ranked-pkg">
+            {r.package.complete ? (
+              <button
+                type="button"
+                className="btn small primary"
+                onClick={() => onOpenSurface("package")}
+              >
+                Download technology package
+              </button>
+            ) : (
+              <span className="faint">
+                Package not yet compiled — diagnostic only
+              </span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Outcome({
   m,
   onNext,
@@ -604,6 +734,12 @@ export default function Conversation({
                 <Candidates m={m} onQuickAction={quickAction} />
               </div>
             );
+          case "ranked":
+            return (
+              <div className="conv-row" key={m.id}>
+                <Ranked m={m} onOpenSurface={onOpenSurface} />
+              </div>
+            );
           case "attack":
             return (
               <div className="conv-row" key={m.id}>
@@ -639,6 +775,64 @@ export default function Conversation({
                   <span className="conv-live-clock done" aria-hidden="true">⏰</span>
                 </div>
                 <Outcome m={m} onNext={onNextAction} onTechnical={onTechnical} />
+              </div>
+            );
+          case "ranked":
+            return (
+              <div className="conv-row" key={m.id} data-conv-ranked>
+                <div className="conv-rank-note">
+                  <span className="conv-live-clock done" aria-hidden="true">⏰</span>{" "}
+                  {m.finished
+                    ? "Discovery complete — ranked results below."
+                    : "Ranked results below; a diagnostic record when no admissible survivor exists."}
+                </div>
+                <div className="conv-rank-grid">
+                  {m.items.map((it) => (
+                    <div
+                      key={it.candidateId ?? it.rank ?? Math.random()}
+                      className="conv-rank-card"
+                      data-selected={it.selected || undefined}
+                    >
+                      <div className="conv-rank-h">
+                        <b>#{it.rank}</b>
+                        {it.selected ? <span className="faint"> · selected</span> : null}
+                        <span className={`conv-rank-disp ${it.adversarial?.disposition ?? ""}`}>
+                          {it.adversarial?.disposition ?? "UNRESOLVED"}
+                        </span>
+                      </div>
+                      {it.mechanism?.mechanism ? (
+                        <div className="conv-rank-mech">{it.mechanism.mechanism}</div>
+                      ) : null}
+                      {it.mechanism?.falsificationTest ? (
+                        <div className="faint">
+                          Kill: {it.mechanism.falsificationTest}
+                        </div>
+                      ) : null}
+                      {it.mechanism?.competing?.length ? (
+                        <div className="faint">
+                          Competing considered: {it.mechanism.competing.length}
+                        </div>
+                      ) : null}
+                      {it.experiment?.experiment ? (
+                        <div className="faint">
+                          Decisive experiment: {it.experiment.experiment}
+                        </div>
+                      ) : null}
+                      {it.engineering?.modelClass ? (
+                        <div className="faint">Model: {it.engineering.modelClass}</div>
+                      ) : null}
+                      {it.package?.complete && it.package.zipName ? (
+                        <button
+                          type="button"
+                          className="conv-open"
+                          onClick={() => onOpenSurface("package")}
+                        >
+                          Open package ({it.package.zipName}) →
+                        </button>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
               </div>
             );
           case "queued":

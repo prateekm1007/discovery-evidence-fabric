@@ -32,10 +32,13 @@
 
 import type {
   AskResponse,
+  CompletionStates,
   DossierBody,
   DesignTabShape,
   EpistemicMeta,
   Msg,
+  RankedPackage,
+  RankedPackageView,
   RetrievalState,
   GeometryState,
   AttackState,
@@ -691,6 +694,78 @@ export function directiveDisplayText(directive: unknown): string | null {
   return directive.replace(/^\[[A-Z_]+\]\s*/, "").trim() || null;
 }
 
+export function deriveRankedPackages(
+  detail: SessionDetail
+): RankedPackageView[] {
+  // R540: the ranked result set — the contract's "ranked technology
+  // packages". Read VERBATIM from the session's ranked package set (the
+  // worker's per-survivor record) or the engine's RANKED_DISCOVERY_
+  // RESULTS projection. No client-side re-sort, re-score, or rank
+  // inference: rank, admissibility, and components are the engine's
+  // records, not the UI's guesses (Art. X/XXVIII).
+  const pkgs = detail.ranked_packages ?? null;
+  const rec = detail.ranked_results ?? null;
+  const list: RankedPackage[] =
+    pkgs && pkgs.length > 0
+      ? pkgs
+      : rec?.ranked_results?.filter((r) => r.admissible) ?? [];
+  const completion = detail.completion_states ?? rec?.completion ?? null;
+  void completion;
+  return list.map((r) => {
+    const c = r.components ?? {};
+    const ev = c.evidence ?? {};
+    const mech = c.mechanism ?? {};
+    const adv = c.adversarial ?? {};
+    const eng = c.engineering ?? {};
+    const exp = c.decisive_experiment ?? {};
+    const pkg = r.package ?? c.package ?? {};
+    return {
+      rank: typeof r.rank === "number" ? r.rank : null,
+      candidateId: r.candidate_id ?? null,
+      admissible: r.admissible ?? false,
+      selected: r.selected ?? false,
+      evidence: {
+        count: Array.isArray(ev.records) ? ev.records.length : null,
+        span: ev.mechanism_source_span ?? null,
+        status: ev.evidence_status ?? null,
+      },
+      mechanism: {
+        mechanism: mech.mechanism ?? null,
+        intervention: mech.intervention ?? null,
+        expectedEffect: mech.expected_effect ?? null,
+        falsificationTest: mech.falsification_test ?? null,
+        competing: mech.competing_considered ?? [],
+      },
+      adversarial: {
+        overall: adv.overall ?? null,
+        disposition: adv.disposition ?? "UNRESOLVED",
+        survived: adv.survived ?? false,
+        killed: adv.killed ?? false,
+        unresolved: adv.unresolved ?? false,
+      },
+      engineering: {
+        geometryPresent: eng.geometry_present ?? false,
+        modelClass: eng.model_class ?? null,
+        limitations: eng.limitations ?? null,
+      },
+      experiment: {
+        experiment: exp.experiment ?? null,
+        discriminator: exp.predicted_discriminator ?? null,
+        decisionRule: exp.decision_rule ?? null,
+        executionStatus: exp.execution_status ?? null,
+      },
+      package: {
+        kind: pkg.kind ?? "TECHNOLOGY_PACKAGE",
+        complete: pkg.complete ?? false,
+        zipName: pkg.zip_name ?? null,
+        maturity: pkg.maturity ?? null,
+      },
+      rankBasis:
+        r.rank_basis != null ? JSON.stringify(r.rank_basis) : null,
+    };
+  });
+}
+
 export function deriveConversation(
   detail: SessionDetail,
   dossier: DossierBody | null | undefined,
@@ -960,6 +1035,27 @@ export function deriveConversation(
     const tone = outcomeTone(detail);
     const next = deriveNextAction(detail, dossier, packageAvailable,
                                   engineNextAction);
+    // R540: the ranked result set — when the run produced at least one
+    // admissible ranked survivor, the conversation leads with the
+    // RANKED DISCOVERIES (each carrying its six components + rank basis
+    // + attached technology package), then the completion-state
+    // summary. A diagnostic-only run (no admissible survivor) never
+    // claims a finished discovery: it stays the honest non-finished
+    // state (the diagnostic package, not a technology package).
+    const ranked = deriveRankedPackages(detail);
+    const completion = detail.completion_states ?? null;
+    const finished =
+      completion?.FINISHED_DISCOVERY === true ||
+      (ranked.length > 0 && completion?.TECHNOLOGY_PACKAGE_COMPLETED === true);
+    if (ranked.length > 0) {
+      msgs.push({
+        kind: "ranked",
+        id: mid("ranked"),
+        items: ranked,
+        completion,
+        finished,
+      });
+    }
     if (tone === "positive") {
       msgs.push({
         kind: "outcome",

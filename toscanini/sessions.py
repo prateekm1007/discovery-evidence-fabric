@@ -1083,11 +1083,45 @@ def session_detail(session_id: str) -> Optional[Dict[str, Any]]:
         surv = _read_json(run_dir / "SURVIVOR_SELECTION.json")
         if surv:
             detail["survivor_selection"] = surv
+        # R540: the ranked result set — the contract's "ranked
+        # technology packages" shape (the engine's machine-readable
+        # ranked result + per-survivor package). Served verbatim from
+        # the run's own record; absent when the run produced no
+        # admissible ranked survivor (honest, never a fake finished
+        # discovery).
+        ranked = _read_json(run_dir / "RANKED_DISCOVERY_RESULTS.json")
+        if ranked:
+            detail["ranked_results"] = ranked
         cem = _read_json(run_dir / "cemetery_update.json")
         if cem:
             detail["cemetery_update"] = cem
     else:
         detail["stages"] = []
+    # R540: ranked packages + completion states ride the session record
+    # (the worker's per-survivor package set + the three distinct
+    # completion states), with a fallback that derives a single-rank
+    # result from a completed package so the UI can always move from a
+    # ranked result to its package. Computed here (not in the run-dir
+    # branch) so it also applies when the run dir is absent/pruned.
+    _completed = s.get("package", {}).get("complete") if s.get("package") \
+        else False
+    if s.get("ranked_results") is not None:
+        detail["ranked_packages"] = s.get("ranked_results")
+    elif _completed:
+        detail["ranked_packages"] = [
+            {"rank": 1,
+             "candidate_id": s.get("invention_id"),
+             "admissible": True,
+             "package": s.get("package")}]
+    if s.get("completion_states") is not None:
+        detail["completion_states"] = s.get("completion_states")
+    elif detail.get("ranked_packages") is not None:
+        detail["completion_states"] = {
+            "PIPELINE_COMPLETED": s.get("status") == "COMPLETE",
+            "DISCOVERY_COMPLETED": bool(detail.get("ranked_packages")),
+            "TECHNOLOGY_PACKAGE_COMPLETED": bool(_completed),
+            "FINISHED_DISCOVERY":
+                bool(_completed and detail.get("ranked_packages"))}
     detail.pop("evidence_pack", None)
     ep_path = STORE_DIR / f"evidence_{session_id}.json"
     ep = _read_json(ep_path)

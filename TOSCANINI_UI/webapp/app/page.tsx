@@ -202,6 +202,18 @@ function NewDiscoveryPane({
     }
     if (submitting) return;
     if (pending.some((p) => p.state === "uploading")) return; // uploads in flight
+    const unreadImages = pending.filter(
+      (p) =>
+        p.state === "ingested" &&
+        /\.(png|jpe?g|gif|webp)$/i.test(p.label) &&
+        p.record?.ingestion?.status === "STORED"
+    );
+    if (unreadImages.length > 0) {
+      setError(
+        `Image ${unreadImages[0].label} was stored but not read. The current model does not support image input, so this attachment cannot be included in the run. Remove the image or add a text/PDF description of it.`
+      );
+      return;
+    }
     setError(null);
     setSubmitting(true);
     onStarted("busy");
@@ -368,12 +380,16 @@ function NewDiscoveryPane({
                     // a user attaching a diagram states, before sending,
                     // that its image was not read into the investigation.
                     <span
-                      className={`ask-stored-badge${ing === "STORED_TEXT_UNREADABLE" ? " hard" : ""}`}
+                      className={`ask-stored-badge${
+                        ing === "STORED_TEXT_UNREADABLE" ? " hard" : ""
+                      }`}
                       data-attachment-stored
                       title={
-                        p.record?.sha256
-                          ? `content hash ${p.record.sha256} — the file is custody-frozen on the record, but its content was not read as text`
-                          : "the file is on the record, but its content was not read as text"
+                        /\.(png|jpe?g|gif|webp)$/i.test(p.label)
+                          ? "This image was stored on the record, but the current model does not support image input — it was not read into the investigation"
+                          : p.record?.sha256
+                            ? `content hash ${p.record.sha256} — the file is custody-frozen on the record, but its content was not read as text`
+                            : "the file is on the record, but its content was not read as text"
                       }
                     >
                       <span
@@ -386,6 +402,8 @@ function NewDiscoveryPane({
                       {ing === "STORED_TEXT_UNREADABLE"
                         ? " — no text could be extracted"
                         : " — text not extracted"}
+                      {/\.(png|jpe?g|gif|webp)$/i.test(p.label) &&
+                        " (image not supported by model)"}
                     </span>
                   )}
                   {p.state === "uploading" && <span className="faint"> · fetching…</span>}

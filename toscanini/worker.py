@@ -590,6 +590,53 @@ def run(session_id: str) -> None:
             _run_inner(session_id, forensics)
 
 
+def _ranked_package_set(run_dir, refreshed_package: dict):
+    """R540: the ranked technology package set for the session surface.
+
+    Reads the run dir's own RANKED_DISCOVERY_RESULTS.json (the engine's
+    machine-readable ranked result set, derived from the run's persisted
+    artifacts — Art. X) and attaches the completed package record to each
+    admissible ranked survivor. This is the contract's "move from the
+    ranked result directly to the corresponding technology package"
+    shape: each entry carries rank, candidate, the six components, the
+    rank basis, and the package (zip + maturity + kind).
+
+    Never invents: when the ranked record is absent or carries no
+    admissible survivor, returns an empty list (the run is not a
+    finished discovery — the diagnostic package, not a technology
+    package, is the deliverable). The single selected package (the
+    canonical compiler's record) is bound to the selected survivor."""
+    import json as _json
+    p = Path(run_dir) / "RANKED_DISCOVERY_RESULTS.json"
+    if not p.exists():
+        return []
+    try:
+        rec = _json.loads(p.read_text())
+    except Exception:  # noqa: BLE001 — corrupt record is honest absent
+        return []
+    out = []
+    for rr in rec.get("ranked_results", []) or []:
+        if not rr.get("admissible"):
+            continue
+        entry = dict(rr)
+        entry["package"] = {
+            "kind": (refreshed_package or {}).get("package_kind")
+                     or "TECHNOLOGY_PACKAGE",
+            "zip_name": (refreshed_package or {}).get("zip_name"),
+            "maturity": (refreshed_package or {}).get("maturity"),
+            "complete": bool((refreshed_package or {}).get("complete")),
+            "candidate_id": rr.get("candidate_id"),
+            "rank": rr.get("rank"),
+        }
+        out.append(entry)
+    # discovery completion is true only when at least one admissible
+    # ranked survivor exists (the contract's DISCOVERY_COMPLETED state,
+    # distinct from pipeline completion and package completion).
+    if out:
+        out[0]["discovery_completed"] = True
+    return out
+
+
 def _phase4_terminal_state(run_dir, final, manifest):
     """R446-C1 Task 4: the phase-4 terminal decision, bound to the
     canonical completion marker (run_manifest.json — R445-C: the TRUE
@@ -1112,6 +1159,29 @@ def _run_inner(session_id: str, forensics) -> None:
                 session_id,
                 bridge_outcome=gate.get("outcome"),
                 bridge_case=gate.get("case"))
+            # R540: the package-completion marker — the bridge-gate
+            # compiler's honest record of whether a complete technology
+            # package was emitted. The ranked result set (derived by the
+            # engine, RANKED_DISCOVERY_RESULTS.json) reads this marker to
+            # keep TECHNOLOGY_PACKAGE_COMPLETED a state DISTINCT from
+            # DISCOVERY_COMPLETED and PIPELINE_COMPLETED (never collapsed
+            # into one COMPLETE word). Written AFTER the gate decision,
+            # so a blocked/absent package is recorded as such.
+            try:
+                _pkg_marker = {
+                    "schema": "PACKAGE_COMPLETION/1.0",
+                    "run_id": manifest.get("run_id") or session_id,
+                    "bridge_outcome": gate.get("outcome"),
+                    "bridge_case": gate.get("case"),
+                    "complete": False,
+                    "zip_emitted": False,
+                    "recorded_at": time.strftime(
+                        "%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                }
+                (run_dir / "package_completion.json").write_text(
+                    json.dumps(_pkg_marker, indent=1, ensure_ascii=False))
+            except Exception:  # noqa: BLE001 — marker is best-effort
+                pass
             # R422 (UI copy reconciliation, server-side companion): when
             # the async artifact gate lands a package on a run whose
             # completion snapshot recorded package_available=false, the
@@ -1131,6 +1201,41 @@ def _run_inner(session_id: str, forensics) -> None:
                                  "package_kind":
                                      refreshed.get("package_kind"),
                                  "complete": True})
+                    # R540: record the COMPLETE package state on the
+                    # marker (the ranked result set reads this)
+                    try:
+                        _pk = (run_dir / "package_completion.json")
+                        if _pk.exists():
+                            _pkd = json.loads(_pk.read_text())
+                            _pkd["complete"] = True
+                            _pkd["zip_emitted"] = True
+                            _pkd["zip_name"] = refreshed.get("zip_name")
+                            _pkd["maturity"] = refreshed.get("maturity")
+                            _pkd["package_kind"] = refreshed.get(
+                                "package_kind")
+                            _pk.write_text(json.dumps(
+                                _pkd, indent=1, ensure_ascii=False))
+                    except Exception:  # noqa: BLE001
+                        pass
+                    # R540: the ranked technology package set — one
+                    # complete record + package per admissible ranked
+                    # survivor (the contract's ranked-package shape).
+                    # Derived from the run dir's own RANKED_
+                    # DISCOVERY_RESULTS.json + the completed package; the
+                    # UI moves from a ranked result to its package.
+                    _ranked_pkgs = _ranked_package_set(run_dir, refreshed)
+                    if _ranked_pkgs:
+                        store.update_session(
+                            session_id,
+                            ranked_results=_ranked_pkgs,
+                            completion_states={
+                                "PIPELINE_COMPLETED": True,
+                                "DISCOVERY_COMPLETED":
+                                    _ranked_pkgs[0].get("discovery_completed",
+                                                         True),
+                                "TECHNOLOGY_PACKAGE_COMPLETED": True,
+                                "FINISHED_DISCOVERY": True,
+                            })
             except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
                 print(f"  [worker] package-field refresh failed: "
                       f"{type(exc).__name__}: {exc}", file=sys.stderr)
