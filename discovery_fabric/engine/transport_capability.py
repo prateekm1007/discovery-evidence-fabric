@@ -122,6 +122,13 @@ ACCOUNT_DOMAIN_VOCAB = (
     # balance, so depletion — when measured — is a typed cascade
     # advance, never a bill and never a guess at the remainder).
     "OWNER_ATRIA_ACCOUNT",
+    # R539: the NINTH router — agnes (apihub.agnes-ai.com). A DISTINCT
+    # economic account (the operator's 2026-09-26 number-1-API
+    # directive). Measured 2026-09-26: catalog 200 with 12 agnes-*
+    # models; flash rungs serve at $0 balance while the pro rungs
+    # answer 403 insufficient_user_quota — per-model credit gating on
+    # one account, so depletion advances the cascade, never a bill.
+    "OWNER_AGNES_ACCOUNT",
     "UNDECLARED",                 # honest unknown — never guessed
 )
 

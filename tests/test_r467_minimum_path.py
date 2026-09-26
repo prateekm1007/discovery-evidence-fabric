@@ -80,10 +80,15 @@ def test_atria_probe_budget_is_reasoning_model_aware():
     from discovery_fabric.engine import runtime_admission as ra
     spec = reg._SPEC_BY_ID["atria"]
     assert spec.probe_max_tokens == 256
-    # every other registered rung keeps the 16-token probe unless declared
+    # R539: the declared-budget contract (the R469 mechanism): a rung
+    # whose reasoning path starves content at the shared 16-token probe
+    # cap declares its measured budget on the spec (agnes-2.5-flash:
+    # empty at 16, answers at 64 — measured 2026-09-26). Every rung
+    # without such a declared, measured basis keeps the 16-token probe.
+    declared = {"atria": 256, "agnes": 64}
     for s in reg.PROVIDER_SPECS:
-        if s.provider_id != "atria":
-            assert s.probe_max_tokens == 16, s.provider_id
+        assert s.probe_max_tokens == declared.get(s.provider_id, 16), \
+            s.provider_id
     # the probe function honours the per-spec budget
     captured = {}
 

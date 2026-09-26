@@ -213,6 +213,20 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
     "atria": [
         r"^Atria-Dawn-Preview$",
     ],
+    # R539: the NINTH router — agnes (apihub.agnes-ai.com), the
+    # operator's number-1 API. The allowlist names EXACTLY the three
+    # measured text flash rungs (the xkiro/apinex premium-precedent:
+    # gated or wrong-modality ids never become rungs silently). The
+    # pro rungs are credit-gated at registration time (403
+    # insufficient_user_quota $0) and the video/image ids are
+    # wrong-modality for text tasks — catalog discovery can only
+    # route to the measured flash rungs; a topped-up account
+    # re-admits pro ids with a one-line extension, never silently.
+    "agnes": [
+        r"^agnes-3\.0-flash$",
+        r"^agnes-2\.5-flash$",
+        r"^agnes-2\.0-flash$",
+    ],
 }
 
 # Pinned DEFAULT models (the standing fallback set when the live catalog
@@ -365,6 +379,26 @@ PINNED_DEFAULT_MODELS: Dict[str, List[Dict[str, Any]]] = {
         {"model": "Atria-Dawn-Preview",
          "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
          "cost_class": 1, "latency_class": 3, "context_limit": 128000},
+    ],
+    # R539: the NINTH router — every rung below is a MEASURED answerer
+    # (2026-09-26 registration probes). agnes-3.0-flash is the STRONG
+    # rung (3/3 clean FIELD lines in 1.11 s — the engine's structured-
+    # protocol measurement); agnes-2.5-flash likewise 3/3 clean in
+    # 0.77 s (STRONG+FAST+CHEAP); agnes-2.0-flash answered the tiny
+    # probe in 0.48 s (FAST+CHEAP, no STRONG claim — unmeasured on the
+    # FIELD instrument). The pro rungs are NOT listed (403
+    # insufficient_user_quota $0 at registration — known-gated, never
+    # attempted merely because the catalog names them).
+    "agnes": [
+        {"model": "agnes-3.0-flash",
+         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+        {"model": "agnes-2.5-flash",
+         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+        {"model": "agnes-2.0-flash",
+         "task_capabilities": [TASK_FAST, TASK_CHEAP],
+         "cost_class": 1, "latency_class": 1, "context_limit": 128000},
     ],
 }
 

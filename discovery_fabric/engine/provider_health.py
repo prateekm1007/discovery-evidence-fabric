@@ -650,7 +650,17 @@ ROLE_TRANSFORM = "transform"        # simple JSON shaping (prefer no LLM)
 # R518: Atria retired from default routes per production evidence
 # (ATTACK first-hop failures, MECHANISM_SPACE high latency, SYNTHESIZE
 # high latency). Default pin cleared to prevent silent re-promotion.
-_DEFAULT_PROVIDER_PIN = ""
+# R539 (2026-09-16+2026-09-26): the operator's number-1-API directive
+# (verbatim 2026-09-26): "put this as the number 1 api, so
+# infrastucture failure doesnt happen again" — the pin now names
+# agnes (apihub.agnes-ai.com), measured live 2026-09-26 (catalog 200
+# with 12 models; flash rungs 200 OK + 3/3 FIELD-line compliant; pro
+# rungs 403-gated). Agnes is NOT in RETIRED_ROUTE_PROVIDERS, so the
+# pin holds on every role; the two standing rules still take
+# precedence (Art. XLV attack-independence, Art. V cooldown demotion).
+# ENGINE_DEFAULT_PROVIDER (env) still overrides or disables ("" = no
+# pin) — the ENGINE_* operator-override class.
+_DEFAULT_PROVIDER_PIN = "agnes"
 
 # R518/R519: THE single routing-retirement authority (Art. X: one
 # canonical state; R519 §5-6: no scattered hard-coded retirement tuples

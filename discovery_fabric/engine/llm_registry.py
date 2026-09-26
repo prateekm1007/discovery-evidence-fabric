@@ -219,6 +219,81 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "inference, no per-token billing of any kind — the ONLY basis "
             "eligible under MODEL_COST_POLICY=ZERO_PAID_COST.")),
     # ------------------------------------------------------------------
+    # R539 (2026-09-26): the NINTH router — agnes (apihub.agnes-ai.com),
+    # the operator's number-1 API (verbatim directive 2026-09-26: "put
+    # this as the number 1 api, so infrastucture failure doesnt happen
+    # again"). Probe-before-admit held the same morning (Art. III) —
+    # every fact below is measured, never catalog optimism:
+    #   catalog  GET /v1/models -> 200 with 12 agnes-* models
+    #            (agnes-2.5-pro-alpha, agnes-video-2.5-flash,
+    #            agnes-3.0-flash, agnes-image-2.1-flash, agnes-video-2.5,
+    #            agnes-2.0-flash, agnes-image-2.0-flash, agnes-2.5-flash,
+    #            agnes-2.5-pro, agnes-2.5-pro-beta, agnes-video-v2.0,
+    #            agnes-image-2.5-flash);
+    #   tiny completions (max_tokens 16-64, "Reply with exactly: READY"):
+    #            agnes-3.0-flash -> 200 OK non-empty 0.95-6.2 s;
+    #            agnes-2.5-flash -> 200 OK 0.61-1.38 s (empty content at
+    #            cap 16 — the EmptyContentWithFinish reasoning class —
+    #            non-empty at cap 64 with reasoning_tokens 13);
+    #            agnes-2.0-flash -> 200 OK 0.48 s non-empty;
+    #   gated rungs: agnes-2.5-pro / -pro-alpha / -pro-beta -> 403
+    #            "Insufficient user quota, remaining: $0.000000"
+    #            (AgnesAI_error insufficient_user_quota) — per-model
+    #            credit gating on this key (the xkiro/bai deposit-gate
+    #            precedent): classified CREDIT_EXHAUSTED, the cascade
+    #            advances, the provider stays eligible;
+    #   THE MECHANISM-STAGE INSTRUMENT: the FIELD-line protocol test —
+    #            agnes-3.0-flash 3/3 clean FIELD_MECHANISM/
+    #            FIELD_KEY_VARIABLE/FIELD_FALSIFIER lines in 1.11 s and
+    #            agnes-2.5-flash 3/3 clean in 0.77 s — FORMAT-COMPLIANT
+    #            on the engine's structured protocol (the measurement
+    #            bynara's rung honestly lacked; the basis atria's STRONG
+    #            rung carried). Default urllib User-Agent passes (no CF
+    #            block on apihub.agnes-ai.com). HONEST TIERS:
+    #            quality_tier 2 (flash class + measured FIELD compliance
+    #            above — recorded policy input, Art. XXVII);
+    #            latency_tier 2 (measured 0.48-6.2 s variance across
+    #            flash rungs). Context capacity NOT exposed by the
+    #            catalog — 128_000 is the router-family default,
+    #            recorded honest (Art. VI). probe_max_tokens=64: the
+    #            2.5-flash rung starves content at the shared 16-token
+    #            probe cap (reasoning model) and answers at 64 — the
+    #            R469 declared-budget mechanism, not a downgrade.
+    #            FREE_TIER_API under the R456-A3 operator amendment:
+    #            the flash rungs serve at $0 measured balance — eligible
+    #            under ZERO_PAID_COST; depletion stays a typed failure
+    #            that advances the cascade, never a bill.
+    # ------------------------------------------------------------------
+    ProviderSpec(
+        "agnes", "AGNES_API_KEY",
+        "https://apihub.agnes-ai.com/v1/chat/completions",
+        "agnes-3.0-flash", "openai", 128_000,
+        quality_tier=2, cost_tier=1, latency_tier=2,
+        cost_basis="FREE_TIER_API", locality="REMOTE",
+        license="provider serving terms (operator-supplied key; "
+                "flash served at $0 balance, pro gated)",
+        account_domain="OWNER_AGNES_ACCOUNT",
+        model_revision="agnes router; agnes-3.0-flash / agnes-2.5-flash "
+                       "/ agnes-2.0-flash measured live 2026-09-26 "
+                       "(tiny completions + 3/3 FIELD-line compliance); "
+                       "no per-model revision pin exposed by the router "
+                       "— recorded honest (Art. VI)",
+        probe_max_tokens=64,
+        policy_note=(
+            "R539 operator-supplied router #9 (agnes, apihub.agnes-ai."
+            "com) — the operator's number-1 API. LIVE-MEASURED at "
+            "registration (Art. III): GET /v1/models -> 200 with 12 "
+            "agnes-* models; agnes-3.0-flash tiny completion -> 200 OK "
+            "non-empty 0.95-6.2 s; agnes-2.5-flash -> 200 OK (content "
+            "starves at cap 16, answers at cap 64 — probe_max_tokens=64 "
+            "declared); agnes-2.0-flash -> 200 OK 0.48 s; the three "
+            "pro rungs -> 403 insufficient_user_quota $0.000000 "
+            "(per-model credit gate, CREDIT_EXHAUSTED, cascade "
+            "advances). FIELD-line protocol 3/3 clean on both flash "
+            "rungs (1.11 s / 0.77 s) — the STRONG-rung measurement. "
+            "Default urllib User-Agent passes (no CF block). Tiers are "
+            "recorded policy inputs (Art. XXVII).")),
+    # ------------------------------------------------------------------
     # R456-A3 (2026-09-15): the operator's free-tier router quartet —
     # the A3 capability-floor unblock. Operator directive (verbatim):
     #   "Use these to use free ai models like qwen 3.8, glm 5.3,

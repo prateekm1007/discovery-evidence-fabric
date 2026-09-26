@@ -537,10 +537,31 @@ def test_unknown_pin_is_a_noop(monkeypatch):
 
 
 def test_ordinary_synthesis_route_has_no_default_pin(monkeypatch):
-    # R519: the code-level default pin is cleared to prevent silent
-    # re-promotion of a retired provider (R518 rationale in provider_health).
+    # R539 SUPERSEDES R519: the operator's 2026-09-26 number-1-API
+    # directive ("put this as the number 1 api, so infrastucture
+    # failure doesnt happen again") re-pins the code-level default to
+    # agnes (measured live 2026-09-26: catalog 200, flash rungs 200 OK
+    # + 3/3 FIELD-line compliant). The R518/R519 cleared-pin state is
+    # retired, not left silently true (Art. LXIV).
     monkeypatch.delenv("ENGINE_DEFAULT_PROVIDER", raising=False)
-    assert ph._DEFAULT_PROVIDER_PIN == ""
+    assert ph._DEFAULT_PROVIDER_PIN == "agnes"
+
+
+def test_agnes_pin_heads_the_order_when_available(monkeypatch):
+    # R539: with the agnes credential present and no explicit operator
+    # override, agnes heads every role's ordinary order (the number-1
+    # API); the two standing rules still win (Art. XLV attack
+    # independence, Art. V cooldown demotion).
+    for pid, spec in lr._SPEC_BY_ID.items():
+        monkeypatch.delenv(spec.env_var, raising=False)
+    monkeypatch.delenv("ENGINE_DEFAULT_PROVIDER", raising=False)
+    monkeypatch.setenv("AGNES_API_KEY", "agnes_local_k")
+    monkeypatch.setenv("UNOROUTER_API_KEY", "unorouter_local_k")
+    matrix = lr.availability_matrix()
+    assert ph.order_for_role(matrix, "synthesis")[0] == "agnes"
+    assert ph.order_for_role(matrix, "extraction")[0] == "agnes"
+    atk = ph.order_for_role(matrix, "attack", avoid_provider="agnes")
+    assert atk[0] != "agnes"                         # Art. XLV wins
 
 
 def test_catalog_discovery_uses_active_ring_key(monkeypatch):
