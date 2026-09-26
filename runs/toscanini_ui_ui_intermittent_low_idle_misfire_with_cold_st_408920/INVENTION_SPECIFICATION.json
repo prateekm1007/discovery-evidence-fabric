@@ -1,0 +1,1710 @@
+{
+ "invention_id": {
+  "value": "inv:ui_intermittent_low_idle_misfire_with_cold_st_408920:d7e549e2bed3",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_intermittent_low_idle_misfire_with_cold_st_408920",
+   "device": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system",
+   "failure": "Documented problem 'intermittent low-idle misfire with cold start and long park' concerning Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system. User-submitted engineering problem (session input): \"My 2019 Honda CR-V 2.0L i-VTEC engine misfires intermittently at low idle speed, especially when cold and after a long park, with the check engine light sometimes flashing and stalling at stops. It has 148,000 km, stock plugs, a 2017 battery replaced in 2024. No other warnings. I want the root cause\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "intermittent low-idle misfire with cold start and long park",
+   "constraint": "misfire must be eliminated at low idle, cold start, and after long park without stalling or check engine light"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:f7899970"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "The mechanism leverages SI Engine Control in the Cold-Fast-Idle Period for Low HC Emissions and Fast Catalyst Light Off to manage the transient state after a long park, specifically by stabilizing the mixture to prevent rich HC misfires that cause stalling.",
+   "intervention": "Implement a control strategy that adjusts idle speed and air-fuel ratio during the cold start period to prioritize low HC emissions and fast catalyst light-off, eliminating the intermittent low-idle misfire and stalling at stops.",
+   "expected_effect": "Elimination of intermittent low-idle misfires and stalling during cold start after long park, with rapid catalyst light-off ensuring stable engine operation without triggering the check engine light.",
+   "mechanism_source_span": "SI Engine Control in the Cold-Fast-Idle Period for Low HC Emissions and Fast Catalyst Light Off",
+   "span_derivation": {
+    "n_shared": 11,
+    "shared_terms": [
+     "catalyst",
+     "cold",
+     "control",
+     "emission",
+     "engine",
+     "fast",
+     "idle",
+     "light",
+     "low",
+     "off",
+     "period"
+    ],
+    "span_terms_n": 11,
+    "ratio": 1.0,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "Measure HC emissions and catalyst light-off time during cold start after a long park; if the strategy fails to reduce HC emissions or accelerate light-off, or if misfires persist, the hypothesis is falsified.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.4271/2014-01-1366",
+     "source_span": "SI Engine Control in the Cold-Fast-Idle Period for Low HC Emissions and Fast Catalyst Light Off"
+    }
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.4271/2014-01-1366"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "SI Engine Control in the Cold-Fast-Idle Period for Low HC Emissions and Fast Catalyst Light Off",
+   "mechanism": "Fast catalyst light-off via managed cold-start fueling strategy",
+   "intervention_site": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system",
+   "expected_effect": "Elimination of intermittent low-idle misfires, stable idle without stalling, and clear check engine light during cold starts after long park",
+   "falsification_test": "Cold start engine after 24h park, monitor O2 sensor switching activity and IAC valve duty cycle; verify no misfire codes (P0300-P0399) logged within first 60 seconds and stable idle RPM"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.4271/2014-01-1366"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "legacy_status": "",
+   "differentiation_resolution": {
+    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "NO_FAMILIES",
+    "per_family": [],
+    "n_families": 0,
+    "n_search_errors": 10,
+    "search_errors": [
+     {
+      "query": "cold start light engine idle control",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "cold start light engine idle control",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"4cdd54b0-dde7-44a9-ab77-103245243a05\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "light cold start catalyst managed fueling",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "light cold start catalyst managed fueling",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"237c8341-c912-469b-9723-fd3eacdd403e\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "opening specifically transient cold start idle air misfires",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "opening specifically transient cold start idle air misfires",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"032227e5-41de-43eb-b578-676de1b350bf\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "cold elimination stalling during opening heating",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "cold elimination stalling during opening heating",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"0dd5a227-f90d-4bb8-bc7d-03a1af6ca866\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "light cold starts start engine idle",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "light cold starts start engine idle",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"cf4043af-7f51-4f80-b7da-1432b571d9b8\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     }
+    ],
+    "search_execution": {
+     "mandatory_complete": false,
+     "n_errors": 10,
+     "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+    },
+    "relevance_model_version": "collision_resolution/2.0.0",
+    "determinism_contract": {
+     "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+     "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+    },
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    }
+   },
+   "nearest": [],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "cold start light engine idle control"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "light cold start catalyst managed fueling"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "opening specifically transient cold start idle air misfires"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "cold elimination stalling during opening heating"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "light cold starts start engine idle"
+    }
+   ],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Implement a control strategy that adjusts idle speed and air-fuel ratio during the cold start period to prioritize low HC emissions and fast catalyst light-off, eliminating the intermittent low-idle misfire and stalling at stops.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.4271/2014-01-1366"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "misfire must be eliminated at low idle, cold start, and after long park without stalling or check engine light",
+   "failure_mode_of_device": "intermittent low-idle misfire with cold start and long park",
+   "evidence_derived": [
+    {
+     "constraint": "The control strategy must target the Cold-Fast-Idle Period specifically to achieve Low HC Emissions and Fast Catalyst Light Off as defined in the cited evidence.",
+     "evidence_id": "doi:10.4271/2014-01-1366",
+     "span": "SI Engine Control in the Cold-Fast-Idle Period for Low HC Emissions and Fast Catalyst Light Off"
+    }
+   ]
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:f7899970"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Stable idle speed at low RPMs and cold conditions, elimination of intermittent misfire-induced stalling, and reduced sensitivity to sensor noise or delay.",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-26T07:49:52.059183+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-26T07:49:52.059183+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.4271/2014-01-1366",
+    "title": "SI Engine Control in the Cold-Fast-Idle Period for Low HC Emissions and Fast Catalyst Light Off",
+    "source_uri": "https://doi.org/10.4271/2014-01-1366",
+    "doi": "10.4271/2014-01-1366",
+    "content_hash": "3307807e1bd00cace568cbfae83675f71c10097341b96f6839b970aee831e50b",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1115/icef2007-1717",
+    "title": "Low Cost Engine Management System (EMS) for the Cost Sensitive Two-Wheeler Application: Idle Speed and A/F Ratio Control Using PID and Fuzzy Logic Control Algorithms",
+    "source_uri": "https://doi.org/10.1115/icef2007-1717",
+    "doi": "10.1115/icef2007-1717",
+    "content_hash": "32110be8a93b79b70932d0d5d8fd08a9bb47905709768ff4da59d81ea618107a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4271/2005-01-0069",
+    "title": "Development of an Engine Stop/Start at Idle System",
+    "source_uri": "https://doi.org/10.4271/2005-01-0069",
+    "doi": "10.4271/2005-01-0069",
+    "content_hash": "48728cc2644cd98e2013bba0feba964f24649d8d8b4cb51521c1357a3c1bebe0",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.56028/aetr.15.1.541.2025",
+    "title": "Study on Cylinder-to-Cylinder Nonuniformity of Heavy-Duty Spark-Ignited Methanol Engine under Cold Start Idle Mode",
+    "source_uri": "https://doi.org/10.56028/aetr.15.1.541.2025",
+    "doi": "10.56028/aetr.15.1.541.2025",
+    "content_hash": "773b2702aca03154add17885d1d5236c9911046d1f373cf96044eb4b0dc35710",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/acc.1995.532314",
+    "title": "Engine idle speed control",
+    "source_uri": "https://doi.org/10.1109/acc.1995.532314",
+    "doi": "10.1109/acc.1995.532314",
+    "content_hash": "39aacbcf542a756f5253df975375bffe487ef04fd7a06d6766de0d26f5137746",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.engappai.2009.09.008",
+    "title": "A neural network model-based observer for idle speed control of ignition in SI engine",
+    "source_uri": "https://doi.org/10.1016/j.engappai.2009.09.008",
+    "doi": "10.1016/j.engappai.2009.09.008",
+    "content_hash": "99811cfa8b290a8e409729e17edc2b8080c503d4dd976463286abb49042ac7d5",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4995/thesis/10251/16690",
+    "title": "Combustion studies for high speed direct injection diesel engines under low temperature cold start conditions",
+    "source_uri": "https://doi.org/10.4995/thesis/10251/16690",
+    "doi": "10.4995/thesis/10251/16690",
+    "content_hash": "f71b082525df801b5f7cb911dfb32444bc122b908b50b1446f0e307357298da7",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.37099/mtu.dc.etdr/568",
+    "title": "COLD START ANALYSIS AND MODELING OF A DIRECT-INJECTION GASOLINE ENGINE",
+    "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/568",
+    "doi": "10.37099/mtu.dc.etdr/568",
+    "content_hash": "0a1c9af72c73184f8e0abf196e6475c1a3341daed35cc628a6658cc4393fe1b3",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.33915/etd.2144",
+    "title": "System identification and control of the standpipe in a cold flow circulating fluidized bed",
+    "source_uri": "https://doi.org/10.33915/etd.2144",
+    "doi": "10.33915/etd.2144",
+    "content_hash": "906866f147146c09199a301b45f605d7d16ea7d7a440f0f27e69319d319e0634",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2012.02859",
+    "title": "Idle speed control with low-complexity offset-free explicit model predictive control in presence of system delay",
+    "source_uri": "https://doi.org/10.48550/arxiv.2012.02859",
+    "doi": "10.48550/arxiv.2012.02859",
+    "content_hash": "d2e81435243ccf4b1ffe5e4d0826a86bafa9fad428f9d6f42288250600ff326a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1709.10119",
+    "title": "Distributed Join-the-Idle-Queue for Low Latency Cloud Services",
+    "source_uri": "https://doi.org/10.48550/arxiv.1709.10119",
+    "doi": "10.48550/arxiv.1709.10119",
+    "content_hash": "f9e74f400884c93bdd01a604a232eb8161d67af71615ad5f8e886e8a8f58d2bc",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2309.05127",
+    "title": "Learning Personalized User Preference from Cold Start in Multi-turn Conversations",
+    "source_uri": "https://doi.org/10.48550/arxiv.2309.05127",
+    "doi": "10.48550/arxiv.2309.05127",
+    "content_hash": "a143e14d251865bda33ecb5355066234fc2c216a374d361226f5651513a3c331",
+    "frozen": false
+   },
+   {
+    "id": "title:cb977adf0507f918",
+    "title": "Comparison Analysis Of Engine Performance Using I-Vtec System And Engine Without I-Vtec System Honda Cr-V",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "44ea167c58c5b24702a86df481f3a17f4e0603ef78ca90053c3faf9b4d85acd0",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/swc57546.2023.10448853",
+    "title": "Sustainable Hybrid Vehicle Idle Speed Control Using PID and Fuzzy Logic Controllers",
+    "source_uri": "https://doi.org/10.1109/swc57546.2023.10448853",
+    "doi": "10.1109/swc57546.2023.10448853",
+    "content_hash": "00f775708cec00d365801cbd90abe5e419ae8f25edc97d17d3cc67116705e48c",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1002/oca.2581",
+    "title": "Engine idle speed control using nonlinear multiparametric model predictive control",
+    "source_uri": "https://doi.org/10.1002/oca.2581",
+    "doi": "10.1002/oca.2581",
+    "content_hash": "92415c4c1a6b690f25828d038bd5ebce77321907a1bc6fef18705056834b4a63",
+    "frozen": false
+   },
+   {
+    "id": "title:adbd394ae9783428",
+    "title": "Studies on SI engine simulation and air/fuel ratio control systems design",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "2013866eb4d224f880ef97504ffb3a415748374b16b31c59528e3ecbda41c6f9",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1002/oca.2581",
+   "doi:10.1016/j.engappai.2009.09.008",
+   "doi:10.1109/acc.1995.532314",
+   "doi:10.1109/swc57546.2023.10448853",
+   "doi:10.1115/icef2007-1717",
+   "doi:10.33915/etd.2144",
+   "doi:10.37099/mtu.dc.etdr/568",
+   "doi:10.4271/2005-01-0069",
+   "doi:10.4271/2014-01-1366",
+   "doi:10.48550/arxiv.1709.10119",
+   "doi:10.48550/arxiv.2012.02859",
+   "doi:10.48550/arxiv.2309.05127",
+   "doi:10.4995/thesis/10251/16690",
+   "doi:10.56028/aetr.15.1.541.2025",
+   "title:adbd394ae9783428",
+   "title:cb977adf0507f918"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "unresolved_source": "cold start light engine idle control",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "cold start light engine idle control",
+    "error": "HTTP 401: {\"reference\":\"4cdd54b0-dde7-44a9-ab77-103245243a05\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "light cold start catalyst managed fueling",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "light cold start catalyst managed fueling",
+    "error": "HTTP 401: {\"reference\":\"237c8341-c912-469b-9723-fd3eacdd403e\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "opening specifically transient cold start idle air misfires",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "opening specifically transient cold start idle air misfires",
+    "error": "HTTP 401: {\"reference\":\"032227e5-41de-43eb-b578-676de1b350bf\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "cold elimination stalling during opening heating",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "cold elimination stalling during opening heating",
+    "error": "HTTP 401: {\"reference\":\"0dd5a227-f90d-4bb8-bc7d-03a1af6ca866\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "light cold starts start engine idle",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "light cold starts start engine idle",
+    "error": "HTTP 401: {\"reference\":\"cf4043af-7f51-4f80-b7da-1432b571d9b8\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Cold start engine after 24h park, monitor O2 sensor switching activity and IAC valve duty cycle; verify no misfire codes (P0300-P0399) logged within first 60 seconds and stable idle RPM"
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_intermittent_low_idle_misfire_with_cold_st_408920:2026-09-26T07:48:41",
+   "final_envelope_hash": "d7e549e2bed33cc5a91d0550001f61cc09f08a08a90b62635f00210b3eab2a2f",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-26T07:49:52+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-26T07:51:10+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.4271/2014-01-1366": {
+   "id": "doi:10.4271/2014-01-1366",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4271/2014-01-1366",
+   "source_uri": "https://doi.org/10.4271/2014-01-1366",
+   "title": "SI Engine Control in the Cold-Fast-Idle Period for Low HC Emissions and Fast Catalyst Light Off",
+   "abstract": "",
+   "doi": "10.4271/2014-01-1366",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2014",
+   "retrieval_timestamp": "2026-09-26T07:49:24.369334+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3307807e1bd00cace568cbfae83675f71c10097341b96f6839b970aee831e50b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4271/2014-01-1366"
+    },
+    "queries_by_source": {
+     "crossref": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4271/2014-01-1366",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1115/icef2007-1717": {
+   "id": "doi:10.1115/icef2007-1717",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1115/icef2007-1717",
+   "source_uri": "https://doi.org/10.1115/icef2007-1717",
+   "title": "Low Cost Engine Management System (EMS) for the Cost Sensitive Two-Wheeler Application: Idle Speed and A/F Ratio Control Using PID and Fuzzy Logic Control Algorithms",
+   "abstract": "",
+   "doi": "10.1115/icef2007-1717",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2007",
+   "retrieval_timestamp": "2026-09-26T07:49:24.369428+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "32110be8a93b79b70932d0d5d8fd08a9bb47905709768ff4da59d81ea618107a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1115/icef2007-1717"
+    },
+    "queries_by_source": {
+     "crossref": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1115/icef2007-1717",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.4271/2005-01-0069": {
+   "id": "doi:10.4271/2005-01-0069",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4271/2005-01-0069",
+   "source_uri": "https://doi.org/10.4271/2005-01-0069",
+   "title": "Development of an Engine Stop/Start at Idle System",
+   "abstract": "",
+   "doi": "10.4271/2005-01-0069",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2005",
+   "retrieval_timestamp": "2026-09-26T07:49:24.369464+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "48728cc2644cd98e2013bba0feba964f24649d8d8b4cb51521c1357a3c1bebe0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4271/2005-01-0069"
+    },
+    "queries_by_source": {
+     "crossref": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4271/2005-01-0069",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.56028/aetr.15.1.541.2025": {
+   "id": "doi:10.56028/aetr.15.1.541.2025",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.56028/aetr.15.1.541.2025",
+   "source_uri": "https://doi.org/10.56028/aetr.15.1.541.2025",
+   "title": "Study on Cylinder-to-Cylinder Nonuniformity of Heavy-Duty Spark-Ignited Methanol Engine under Cold Start Idle Mode",
+   "abstract": "",
+   "doi": "10.56028/aetr.15.1.541.2025",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-26T07:49:24.369485+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "773b2702aca03154add17885d1d5236c9911046d1f373cf96044eb4b0dc35710",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.56028/aetr.15.1.541.2025"
+    },
+    "queries_by_source": {
+     "crossref": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.56028/aetr.15.1.541.2025",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1109/acc.1995.532314": {
+   "id": "doi:10.1109/acc.1995.532314",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/acc.1995.532314",
+   "source_uri": "https://doi.org/10.1109/acc.1995.532314",
+   "title": "Engine idle speed control",
+   "abstract": "",
+   "doi": "10.1109/acc.1995.532314",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-26T07:49:24.369509+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "39aacbcf542a756f5253df975375bffe487ef04fd7a06d6766de0d26f5137746",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/acc.1995.532314"
+    },
+    "queries_by_source": {
+     "crossref": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/acc.1995.532314",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1016/j.engappai.2009.09.008": {
+   "id": "doi:10.1016/j.engappai.2009.09.008",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:27728330e6275e67fe5a538b26dd39936d8ad164",
+   "source_uri": "https://doi.org/10.1016/j.engappai.2009.09.008",
+   "title": "A neural network model-based observer for idle speed control of ignition in SI engine",
+   "abstract": "",
+   "doi": "10.1016/j.engappai.2009.09.008",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2010",
+   "retrieval_timestamp": "2026-09-26T07:49:24.369530+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "99811cfa8b290a8e409729e17edc2b8080c503d4dd976463286abb49042ac7d5",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:27728330e6275e67fe5a538b26dd39936d8ad164"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1109/acc.1995.532314"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "39f7b06059aa48f4d5dd8ea67a129b07952b6c38a0b87b65c8a34c6ed3788207",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1016/j.engappai.2009.09.008",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1109/acc.1995.532314",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [
+    "J. Czarnigowski"
+   ],
+   "raw_record_hash": "39f7b06059aa48f4d5dd8ea67a129b07952b6c38a0b87b65c8a34c6ed3788207",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.4995/thesis/10251/16690": {
+   "id": "doi:10.4995/thesis/10251/16690",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4995/thesis/10251/16690",
+   "source_uri": "https://doi.org/10.4995/thesis/10251/16690",
+   "title": "Combustion studies for high speed direct injection diesel engines under low temperature cold start conditions",
+   "abstract": "",
+   "doi": "10.4995/thesis/10251/16690",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-26T07:49:24.369553+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f71b082525df801b5f7cb911dfb32444bc122b908b50b1446f0e307357298da7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4995/thesis/10251/16690"
+    },
+    "queries_by_source": {
+     "crossref": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4995/thesis/10251/16690",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.37099/mtu.dc.etdr/568": {
+   "id": "doi:10.37099/mtu.dc.etdr/568",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.37099/mtu.dc.etdr/568",
+   "source_uri": "https://doi.org/10.37099/mtu.dc.etdr/568",
+   "title": "COLD START ANALYSIS AND MODELING OF A DIRECT-INJECTION GASOLINE ENGINE",
+   "abstract": "",
+   "doi": "10.37099/mtu.dc.etdr/568",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-26T07:49:24.369570+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0a1c9af72c73184f8e0abf196e6475c1a3341daed35cc628a6658cc4393fe1b3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.37099/mtu.dc.etdr/568"
+    },
+    "queries_by_source": {
+     "crossref": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.37099/mtu.dc.etdr/568",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.33915/etd.2144": {
+   "id": "doi:10.33915/etd.2144",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.33915/etd.2144",
+   "source_uri": "https://doi.org/10.33915/etd.2144",
+   "title": "System identification and control of the standpipe in a cold flow circulating fluidized bed",
+   "abstract": "",
+   "doi": "10.33915/etd.2144",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-26T07:49:24.369586+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "906866f147146c09199a301b45f605d7d16ea7d7a440f0f27e69319d319e0634",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.33915/etd.2144"
+    },
+    "queries_by_source": {
+     "crossref": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.33915/etd.2144",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2012.02859": {
+   "id": "doi:10.48550/arxiv.2012.02859",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2012.02859v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.2012.02859",
+   "title": "Idle speed control with low-complexity offset-free explicit model predictive control in presence of system delay",
+   "abstract": "The requirement for continual improvement of idle speed control (ISC) performance is increasing due to the stringent regulation on emission and fuel economy these days. In this regard, a low-complexity offset-free explicit model predictive control (EMPC) with constraint horizon is designed to regulate the idle speed under unmeasured disturbance in presence of system delay with rigorous formulation. Particularly, we developed a high-fidelity 4-stroke gasoline-direct injected spark-ignited engine model based on first-principles and test vehicle driving data, and designed a model predictive ISC system. To handle the delay from intake to torque production, we constructed a control-oriented model with delay augmentation. To reject the influence of torque loss, we implemented the offset-free MPC scheme with disturbance model and estimator. Moreover, to deal with the limited capacity assigned for the controller in the engine control unit and the short sampling instant of the engine system, we formulated a low-complexity multiparametric quadratic program with constraint horizon in presence of system delay in state and input variables, and obtained an explicit solution map. To demonstrate the performance of the designed controller, a series of closed-loop simulations were performed. The developed explicit controller showed proper ISC performance in presence of torque loss and system delay.",
+   "doi": "10.48550/arxiv.2012.02859",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-26T07:49:24.369603+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d2e81435243ccf4b1ffe5e4d0826a86bafa9fad428f9d6f42288250600ff326a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2012.02859v2"
+    },
+    "queries_by_source": {
+     "arxiv": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2012.02859",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2012.02859v2",
+   "authors": [
+    "Sang Hwan Son",
+    "Se-Kyu Oh",
+    "Byung Jun Park",
+    "Min Jun Song",
+    "Jong Min Lee"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.1709.10119": {
+   "id": "doi:10.48550/arxiv.1709.10119",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1709.10119v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1709.10119",
+   "title": "Distributed Join-the-Idle-Queue for Low Latency Cloud Services",
+   "abstract": "Low latency is highly desirable for cloud services. To achieve low response time, stringent timing requirements are needed for task scheduling in a large-scale server farm spanning thousands of servers. In this paper, we conduct an in-depth analysis for distributed Join-the-Idle-Queue (JIQ), a promising new approximation of an idealized task-scheduling algorithm. In particular, we derive semi-closed form expressions for the delay performance of distributed JIQ, and we propose a new variant of distributed JIQ that offers clear advantages over alternative algorithms for large systems.",
+   "doi": "10.48550/arxiv.1709.10119",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-26T07:49:24.369621+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f9e74f400884c93bdd01a604a232eb8161d67af71615ad5f8e886e8a8f58d2bc",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1709.10119v1"
+    },
+    "queries_by_source": {
+     "arxiv": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1709.10119",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/1709.10119v1",
+   "authors": [
+    "Chunpu Wang",
+    "Chen Feng",
+    "Julian Cheng"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2309.05127": {
+   "id": "doi:10.48550/arxiv.2309.05127",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2309.05127v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2309.05127",
+   "title": "Learning Personalized User Preference from Cold Start in Multi-turn Conversations",
+   "abstract": "This paper presents a novel teachable conversation interaction system that is capable of learning users preferences from cold start by gradually adapting to personal preferences. In particular, the TAI system is able to automatically identify and label user preference in live interactions, manage dialogue flows for interactive teaching sessions, and reuse learned preference for preference elicitation. We develop the TAI system by leveraging BERT encoder models to encode both dialogue and relevant context information, and build action prediction (AP), argument filling (AF) and named entity recognition (NER) models to understand the teaching session. We adopt a seeker-provider interaction loop mechanism to generate diverse dialogues from cold-start. TAI is capable of learning user preference, which achieves 0.9122 turn level accuracy on out-of-sample dataset, and has been successfully adopted in production.",
+   "doi": "10.48550/arxiv.2309.05127",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-26T07:49:24.369642+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a143e14d251865bda33ecb5355066234fc2c216a374d361226f5651513a3c331",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2309.05127v1"
+    },
+    "queries_by_source": {
+     "arxiv": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2309.05127",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Honda CR-V 2.0L i-VTEC engine idle air control and camshaft system intermittent low-idle misfire with cold start and long park",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2309.05127v1",
+   "authors": [
+    "Deguang Kong",
+    "Abhay Jha",
+    "Lei Yun"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "title:cb977adf0507f918": {
+   "id": "title:cb977adf0507f918",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:48101038",
+   "source_uri": "",
+   "title": "Comparison Analysis Of Engine Performance Using I-Vtec System And Engine Without I-Vtec System Honda Cr-V",
+   "abstract": "Vehicle manufactures develop technology which can increase of performance and the engine can have a great power and torque. One of this technology is using Intelligence Variable Timing and Lift Electronic Control (i-VTEC) that can be used to solve problem above because it can control timing valve. i-VTEC can increase engine performance that can make the gasoline engine will increase power and torque. The aim of this research is to compare power and torque on active i-VTEC and non-active i-VTEC system on Honda CRV.\n\nThis test was done by installing Honda CR-V 2.4 with active i-VTEC and non-active i-VTEC on Dynamometer. The Dynamometer presented the data of power and torque based on engine rotation.\n\nThe result from Dynamometer test showed that maximum torque from engine use active i-VTEC is 211.7 Nm at 4900 Rpm and maximum torque from engine non-active i-VTEC is 202.8 Nm at 5350 Rpm. The engine torque using active i-VTEC is 3.67% higher than non-active i-VTEC engine. The maximum power from engine use active i-VTEC system is 181.5 Hp at 6910 Rpm and maximum power from engine non-active i-VTEC system is 167.7 Hp at 7020 Rpm. The engine power using active i-VTEC is 9.33% higher than non-active i-VTEC engine. I-VTEC organizes timing of valve which can make overlapping on the machine. Overlapping make number of air fuel mixture in combustion chamber will increase which can make performance will increases",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-26T07:49:24.369671+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "44ea167c58c5b24702a86df481f3a17f4e0603ef78ca90053c3faf9b4d85acd0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:48101038"
+    },
+    "queries_by_source": {
+     "core": "Honda CR-V 2 0L i-VTEC engine idle air control camshaft"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:cb977adf0507f918",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Honda CR-V 2 0L i-VTEC engine idle air control camshaft",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    ", Ir. Sartono Putro, MT",
+    ", Nur Aklis, S.T., M.Eng",
+    "SUHARDI, JONAS"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1109/swc57546.2023.10448853": {
+   "id": "doi:10.1109/swc57546.2023.10448853",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:11cbff9af07f6b84929ea3b6faf51b94600808ed",
+   "source_uri": "https://doi.org/10.1109/swc57546.2023.10448853",
+   "title": "Sustainable Hybrid Vehicle Idle Speed Control Using PID and Fuzzy Logic Controllers",
+   "abstract": "Idle speed control is a crucial aspect of energy-efficient and sustainable engine performance, and various methods have been developed to address this problem. This study investigates the performance of two idle speed-controlling approaches based on conventional proportional-integral-derivative (PID) and fuzzy logic controllers. A four-cylinder engine has been modelled using the Record Wave package based on the Honda Civic engine specifications. The engine performance characteristics have been used to design the PID controller for various parameters and the fuzzy logic controller with three different membership functions with the objective of regulating the idle speed at 800 RPM while considering disturbances. The study finds that both the PID and fuzzy logic controllers effectively achieve the control objective. However, the fuzzy logic controller outperforms the PID controller in terms of a transient response, providing a smoother and more stable idle speed control with less overshoot and settling time. The study also highlights that the choice of control method is dependent on the specific application and system requirements, with PID controllers being suitable for simpler systems and fuzzy logic controllers being more appropriate for complex or uncertain systems.",
+   "doi": "10.1109/swc57546.2023.10448853",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2023",
+   "retrieval_timestamp": "2026-09-26T07:49:24.369699+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "00f775708cec00d365801cbd90abe5e419ae8f25edc97d17d3cc67116705e48c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:11cbff9af07f6b84929ea3b6faf51b94600808ed"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1109/acc.1995.532314"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "39f7b06059aa48f4d5dd8ea67a129b07952b6c38a0b87b65c8a34c6ed3788207",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-26T07:49:24.284863+00:00",
+     "is_oa": false,
+     "oa_status": "closed",
+     "host_type": null,
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1109/swc57546.2023.10448853",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1109/acc.1995.532314",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Masoud Azizian Fard",
+    "Mehdi Yousefi",
+    "Geetika Aggarwal"
+   ],
+   "raw_record_hash": "39f7b06059aa48f4d5dd8ea67a129b07952b6c38a0b87b65c8a34c6ed3788207",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.1002/oca.2581": {
+   "id": "doi:10.1002/oca.2581",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:813a788efeb3952b2753df67f5e1adab60f44329",
+   "source_uri": "https://doi.org/10.1002/oca.2581",
+   "title": "Engine idle speed control using nonlinear multiparametric model predictive control",
+   "abstract": "In this article, a real‐time nonlinear model predictive idle speed controller based on multiparametric programming is designed for an SI engine. Idle speed is a crucial recurring condition in urban vehicles demanding proper control to avoid stall. As will be seen, the nonlinear model predictive control (NMPC) system designed, besides complying with the predefined constraints, demonstrates a far better performance than the prevalent industrial controllers and even conventional linear MPC controllers. More importantly, a new special structure combining offline nonlinear MPC and classical controller is employed to provide both robustness and fast response. Not only is the computational burden of the controller within that of the ordinary ECU controllers, it is also able to readily damp a disturbance of 20 N·m in less than 2.5 seconds and easily deal with parameter uncertainties. The control system also regulates engine gas pedal release, and converges to the set point with a settling time of less than 3 seconds and minimum fluctuations.",
+   "doi": "10.1002/oca.2581",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-09-26T07:49:24.369716+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "92415c4c1a6b690f25828d038bd5ebce77321907a1bc6fef18705056834b4a63",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:813a788efeb3952b2753df67f5e1adab60f44329"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1109/acc.1995.532314"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "39f7b06059aa48f4d5dd8ea67a129b07952b6c38a0b87b65c8a34c6ed3788207",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-26T07:49:24.347183+00:00",
+     "is_oa": false,
+     "oa_status": "closed",
+     "host_type": null,
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1002/oca.2581",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1109/acc.1995.532314",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "A. Shamekhi",
+    "A. Taghavipour",
+    "A. Shamekhi"
+   ],
+   "raw_record_hash": "39f7b06059aa48f4d5dd8ea67a129b07952b6c38a0b87b65c8a34c6ed3788207",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "title:adbd394ae9783428": {
+   "id": "title:adbd394ae9783428",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:386050295",
+   "source_uri": "",
+   "title": "Studies on SI engine simulation and air/fuel ratio control systems design",
+   "abstract": "This thesis was submitted for the degree of Doctor of Philosophy and awarded by Brunel University.More stringent Euro 6 and LEV III emission standards will immediately begin execution on 2014 and 2015 respectively. Accurate air/fuel ratio control can effectively reduce vehicle emission. The simulation of engine dynamic system is a very powerful method for developing and analysing engine and engine controller. Currently, most engine air/fuel ratio control used look-up table combined with proportional and integral (PI) control and this is not robust to system uncertainty and time varying effects. This thesis first develops a simulation package for a port injection spark-ignition engine and this package include engine dynamics, vehicle dynamics as well as driving cycle selection module. The simulations results are very close to the data obtained from laboratory experiments. New controllers have been proposed to control air/fuel ratio in spark ignition engines to maximize the fuel economy while minimizing exhaust emissions. The PID control and fuzzy control methods have been combined into a fuzzy PID control and the effectiveness of this new controller has been demonstrated by simulation tests. A new neural network based predictive control is then designed for further performance improvements. It is based on the combination of inverse control and predictive control methods. The network is trained offline in which the control output is modified to compensate control errors. The simulation evaluations have shown that the new neural controller can greatly improve control air/fuel ratio performance. The test also revealed that the improved AFR control performance can effectively restrict engine harmful emissions into atmosphere, these reduce emissions are important to satisfy more stringent emission standards",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-26T07:49:24.369731+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "2013866eb4d224f880ef97504ffb3a415748374b16b31c59528e3ecbda41c6f9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:386050295"
+    },
+    "queries_by_source": {
+     "core": "Honda CR-V 2 0L i-VTEC engine idle air control camshaft"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:adbd394ae9783428",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "Honda CR-V 2 0L i-VTEC engine idle air control camshaft",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Bai, Yang"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:f7899970": {
+   "id": "problem:f7899970",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "f7899970b68557e8f7d1ddc3144378aa4d49620e14b9b2a0eb26a8df955cedbc",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-26T07:51:10+00:00Z"
+ },
+ "_improvement": {
+  "parent_spec_hash": "4e918ca8b0fe34688eca463f02e94b0c1371a035c93788feb8e12689a5d6b5c1",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:49f65f425105",
+   "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.297,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:2eb0f3f437c5",
+    "provider": "agnes",
+    "model": "agnes-3.0-flash",
+    "prompt_hash": "0b4e5c5cc26b6034de6cfbd3adca5e3d9ee66228226558f06630bad1f74995ba",
+    "output_hash": "2eb0f3f437c52e09e79b6c0afbef2dd6b7c40525ee5deccd1243eb2ee8feb3af",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.4271/2014-01-1366",
+     "span_verbatim_in_evidence": true,
+     "evidence_support": 0.222,
+     "evidence_support_cleared": 0.222,
+     "constraint_traceable_to_evidence": "The control strategy must target the Cold-Fast-Idle Period specifically to achieve Low HC Emissions and Fast Catalyst Li"
+    },
+    "reasons": [],
+    "validated_at": "2026-09-26T07:52:07+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "The mechanism leverages the specific engine control in the cold-fast-idle period to manage low HC emissions and achieve fast catalyst light-off, which addresses the intermittent low-idle misfire by stabilizing the transient state after a long park.",
+     "after": "The mechanism leverages SI Engine Control in the Cold-Fast-Idle Period for Low HC Emissions and Fast Catalyst Light Off to manage the transient state after a long park, specifically by stabilizing the mixture to prevent rich HC misfires that cause stalling."
+    },
+    "intervention": {
+     "before": "Implement a dedicated control strategy for the cold-fast-idle period that adjusts the idle speed and air-fuel ratio to prioritize low HC emissions and fast catalyst light-off, preventing the rich mixture misfires that cause stalling and check engine lights.",
+     "after": "Implement a control strategy that adjusts idle speed and air-fuel ratio during the cold start period to prioritize low HC emissions and fast catalyst light-off, eliminating the intermittent low-idle misfire and stalling at stops."
+    },
+    "mechanism_source_span": {
+     "before": "SI Engine Control in the Cold-Fast-Idle Period for Low HC Emissions and Fast Catalyst Light Off",
+     "after": "SI Engine Control in the Cold-Fast-Idle Period for Low HC Emissions and Fast Catalyst Light Off"
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "cold start light engine idle control",
+     "cold start light engine idle control",
+     "light cold start catalyst managed fueling",
+     "light cold start catalyst managed fueling",
+     "opening specifically transient cold start idle air misfires",
+     "opening specifically transient cold start idle air misfires",
+     "cold elimination stalling during opening heating",
+     "cold elimination stalling during opening heating",
+     "light cold starts start engine idle",
+     "light cold starts start engine idle"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "4e918ca8b0fe34688eca463f02e94b0c1371a035c93788feb8e12689a5d6b5c1",
+   "child_spec_hash": null,
+   "reason": "This repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism's vocabulary to the verbatim title span of the cited evidence, ensuring the terms 'SI Engine Control', 'Cold-Fast-Idle Period', 'Low HC Emissions', and 'Fast Catalyst Light Off' are derived from and shared with the source.",
+   "applied_at": "2026-09-26T07:52:07+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:9979a6f0aef5",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.0,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:1f66be448bdc",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "8febc7375d2ae130a6504b0617454c204cbc699b7992ff3fe7d951a094a6cd81",
+     "output_hash": "1f66be448bdc0dbfd8fb1bdb3bbe6aaa71ac8dd7c7e1fb0d07c6b52f4c644f46",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.4271/2014-01-1366",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 11,
+       "shared_terms": [
+        "catalyst",
+        "cold",
+        "control",
+        "emission",
+        "engine",
+        "fast",
+        "idle",
+        "light",
+        "low",
+        "off",
+        "period"
+       ],
+       "span_terms_n": 11,
+       "ratio": 1.0,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 1.0
+     },
+     "reasons": [],
+     "validated_at": "2026-09-26T07:51:56+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Fast catalyst light-off via managed cold-start fueling strategy",
+      "after": "The mechanism leverages the specific engine control in the cold-fast-idle period to manage low HC emissions and achieve fast catalyst light-off, which addresses the intermittent low-idle misfire by stabilizing the transient state after a long park."
+     },
+     "intervention": {
+      "before": "Retune ECM idle air control (IAC) valve opening map and fuel trim parameters specifically for the cold start/long park transient to ensure sufficient oxygen-to-fuel ratio for rapid catalytic converter heating without rich mixture misfires",
+      "after": "Implement a dedicated control strategy for the cold-fast-idle period that adjusts the idle speed and air-fuel ratio to prioritize low HC emissions and fast catalyst light-off, preventing the rich mixture misfires that cause stalling and check engine lights."
+     },
+     "mechanism_source_span": {
+      "before": "The abstract provided is empty",
+      "after": "SI Engine Control in the Cold-Fast-Idle Period for Low HC Emissions and Fast Catalyst Light Off"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "cold start light engine idle control",
+      "cold start light engine idle control",
+      "light cold start catalyst managed fueling",
+      "light cold start catalyst managed fueling",
+      "opening specifically transient cold start idle air misfires",
+      "opening specifically transient cold start idle air misfires",
+      "cold elimination stalling during opening heating",
+      "cold elimination stalling during opening heating",
+      "light cold starts start engine idle",
+      "light cold starts start engine idle"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "077b45ce4b3b660ae28e557e3ecd0927d848be2b0ea91be5457e886081d6f5d2",
+    "child_spec_hash": null,
+    "reason": "Repaired the I1_MECHANISM_EVIDENCE_DERIVATION weakness by deriving the mechanism directly from the verbatim evidence span, ensuring the technical vocabulary (cold-fast-idle, low HC, fast catalyst light-off) is shared between the evidence and the proposal.",
+    "applied_at": "2026-09-26T07:51:56+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:49f65f425105",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.297,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:2eb0f3f437c5",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "0b4e5c5cc26b6034de6cfbd3adca5e3d9ee66228226558f06630bad1f74995ba",
+     "output_hash": "2eb0f3f437c52e09e79b6c0afbef2dd6b7c40525ee5deccd1243eb2ee8feb3af",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.4271/2014-01-1366",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.222,
+      "evidence_support_cleared": 0.222,
+      "constraint_traceable_to_evidence": "The control strategy must target the Cold-Fast-Idle Period specifically to achieve Low HC Emissions and Fast Catalyst Li"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-26T07:52:07+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "The mechanism leverages the specific engine control in the cold-fast-idle period to manage low HC emissions and achieve fast catalyst light-off, which addresses the intermittent low-idle misfire by stabilizing the transient state after a long park.",
+      "after": "The mechanism leverages SI Engine Control in the Cold-Fast-Idle Period for Low HC Emissions and Fast Catalyst Light Off to manage the transient state after a long park, specifically by stabilizing the mixture to prevent rich HC misfires that cause stalling."
+     },
+     "intervention": {
+      "before": "Implement a dedicated control strategy for the cold-fast-idle period that adjusts the idle speed and air-fuel ratio to prioritize low HC emissions and fast catalyst light-off, preventing the rich mixture misfires that cause stalling and check engine lights.",
+      "after": "Implement a control strategy that adjusts idle speed and air-fuel ratio during the cold start period to prioritize low HC emissions and fast catalyst light-off, eliminating the intermittent low-idle misfire and stalling at stops."
+     },
+     "mechanism_source_span": {
+      "before": "SI Engine Control in the Cold-Fast-Idle Period for Low HC Emissions and Fast Catalyst Light Off",
+      "after": "SI Engine Control in the Cold-Fast-Idle Period for Low HC Emissions and Fast Catalyst Light Off"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "cold start light engine idle control",
+      "cold start light engine idle control",
+      "light cold start catalyst managed fueling",
+      "light cold start catalyst managed fueling",
+      "opening specifically transient cold start idle air misfires",
+      "opening specifically transient cold start idle air misfires",
+      "cold elimination stalling during opening heating",
+      "cold elimination stalling during opening heating",
+      "light cold starts start engine idle",
+      "light cold starts start engine idle"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "4e918ca8b0fe34688eca463f02e94b0c1371a035c93788feb8e12689a5d6b5c1",
+    "child_spec_hash": null,
+    "reason": "This repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism's vocabulary to the verbatim title span of the cited evidence, ensuring the terms 'SI Engine Control', 'Cold-Fast-Idle Period', 'Low HC Emissions', and 'Fast Catalyst Light Off' are derived from and shared with the source.",
+    "applied_at": "2026-09-26T07:52:07+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "4fc499407ed1c18f8894d33663f86446ee4be416c91d14e24d3462c3a3ff77d6"
+}
