@@ -586,6 +586,7 @@ export default function Conversation({
             return (
               <div className="conv-row" key={m.id} aria-live="polite">
                 <div className="conv-live" data-conv-live>
+                  <span className="conv-live-clock" aria-hidden="true">⏰</span>
                   <span className="cursor" aria-hidden="true" />
                   {m.text}
                 </div>
@@ -712,6 +713,7 @@ export default function Conversation({
           )}
           {liveSentence.loading && liveSentence.text && (
             <div className="conv-live" data-conv-active title={liveSummary ?? undefined}>
+              <span className="conv-live-clock" aria-hidden="true">⏰</span>
               <span className="cursor" aria-hidden="true" />
               {liveSentence.text}
               <span className="faint">{liveStageSuffix}</span>
