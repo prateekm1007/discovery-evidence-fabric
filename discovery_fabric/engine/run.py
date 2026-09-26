@@ -3137,7 +3137,8 @@ class EngineRun:
                                   ("final_state.json", final)):
                 (stage_dir / _fname).write_text(
                     json.dumps(_obj, indent=2, ensure_ascii=False,
-                               default=str))
+                               default=str),
+                    encoding="utf-8")
 
             # the candidate-bound run_result (the compiler's canonical
             # inputs, candidate-specific — the identity + the

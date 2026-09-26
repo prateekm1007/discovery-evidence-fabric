@@ -409,29 +409,34 @@ def assemble(
             proj, invention_label, run_result),
     }
     for fname, layer in machine.items():
-        with open(os.path.join(out_dir, fname), "w") as f:
+        with open(os.path.join(out_dir, fname), "w",
+                  encoding="utf-8") as f:
             json.dump(layer, f, indent=2, ensure_ascii=False)
 
     # ---- 02 machine layer: the REAL engineering definition (R424 §4) ------
     engineering_definition = _engineering_definition(
         proj, run_id, geometry_out, is_engineering)
-    with open(os.path.join(out_dir, "02_ENGINEERING_DEFINITION.json"), "w") as f:
+    with open(os.path.join(out_dir, "02_ENGINEERING_DEFINITION.json"),
+              "w", encoding="utf-8") as f:
         json.dump(engineering_definition, f, indent=2, ensure_ascii=False)
 
     # ---- 03/04 machine layers -----------------------------------------------
     evidence_summary = _evidence_structure(proj, run_id, run_result)
-    with open(os.path.join(out_dir, "03_EVIDENCE_SUMMARY.json"), "w") as f:
+    with open(os.path.join(out_dir, "03_EVIDENCE_SUMMARY.json"), "w",
+              encoding="utf-8") as f:
         json.dump(evidence_summary, f, indent=2, ensure_ascii=False)
     decisive_experiment = _decisive_experiment_layer(
         proj, run_id, run_result)
-    with open(os.path.join(out_dir, "04_DECISIVE_EXPERIMENT.json"), "w") as f:
+    with open(os.path.join(out_dir, "04_DECISIVE_EXPERIMENT.json"), "w",
+              encoding="utf-8") as f:
         json.dump(decisive_experiment, f, indent=2, ensure_ascii=False)
 
     # ---- 05 machine layer: the technical evaluation -------------------------
     technical_evaluation = _technical_evaluation(
         proj, run_id, package_maturity, vis_class, geometry_out,
         is_engineering, run_result)
-    with open(os.path.join(out_dir, "05_TECHNICAL_EVALUATION.json"), "w") as f:
+    with open(os.path.join(out_dir, "05_TECHNICAL_EVALUATION.json"), "w",
+              encoding="utf-8") as f:
         json.dump(technical_evaluation, f, indent=2, ensure_ascii=False)
 
     # ---- MODEL/ elite layer (R424 §9) ---------------------------------------

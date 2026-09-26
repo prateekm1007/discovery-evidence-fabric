@@ -145,12 +145,20 @@ def build_technology_package_model(
     cio = cio or {}
     inv = final_state.get("invention_specification") \
         or run_result.get("invention_specification") or {}
+    if not isinstance(inv, dict):
+        inv = {}
     eng = final_state.get("engineering_specification") \
         or run_result.get("engineering_specification") or {}
+    if not isinstance(eng, dict):
+        eng = {}
     fs = final_state.get("final_state") \
         or run_result.get("final_state") or {}
+    if not isinstance(fs, dict):
+        fs = {}
     ke = final_state.get("decisive_experiment") \
         or run_result.get("decisive_experiment") or {}
+    if not isinstance(ke, dict):
+        ke = {}
     run_id = str(run_result.get("session_id")
                  or run_result.get("run_id") or "run")
 
@@ -1054,16 +1062,18 @@ def _post_pass(pkg_dir: Path, model: Dict[str, Any],
     }
     # 1. the object model + section provenance enter the tree
     (pkg_dir / "TECHNOLOGY_PACKAGE_MODEL.json").write_text(
-        json.dumps(model, indent=2, ensure_ascii=False, default=str))
+        json.dumps(model, indent=2, ensure_ascii=False, default=str),
+        encoding="utf-8")
     (pkg_dir / "PACKAGE_SECTION_PROVENANCE.json").write_text(
         json.dumps(build_section_provenance(model), indent=2,
-                   ensure_ascii=False, default=str))
+                   ensure_ascii=False, default=str),
+        encoding="utf-8")
     # 2. every machine JSON layer is identity-stamped
     for p in sorted(pkg_dir.glob("*.json")):
         if p.name in ("PACKAGE_MANIFEST.json",):
             continue
         try:
-            data = json.loads(p.read_text())
+            data = json.loads(p.read_text(encoding="utf-8"))
         except Exception:  # noqa: BLE001
             continue
         if not isinstance(data, dict):
@@ -1092,20 +1102,22 @@ def _post_pass(pkg_dir: Path, model: Dict[str, Any],
             changed = True
         if changed:
             p.write_text(json.dumps(data, indent=2, ensure_ascii=False,
-                                    default=str))
+                                    default=str),
+                         encoding="utf-8")
     # 3. MODEL/MODEL_MANIFEST.json gets model_id (the R439
     # S-RUN-IDENTITY-MISSING defect — Art. LXII reconstruction)
     mman = pkg_dir / "MODEL" / "MODEL_MANIFEST.json"
     if mman.is_file():
         try:
-            data = json.loads(mman.read_text())
+            data = json.loads(mman.read_text(encoding="utf-8"))
             if isinstance(data, dict) and not data.get("model_id"):
                 data["model_id"] = f"model-{ident.get('package_id')}"
                 data["invention_id"] = ident.get("invention_id")
                 data["run_id"] = ident.get("run_id")
                 mman.write_text(json.dumps(data, indent=2,
                                            ensure_ascii=False,
-                                           default=str))
+                                           default=str),
+                                encoding="utf-8")
         except Exception:  # noqa: BLE001 — stamping stays honest
             pass
 
