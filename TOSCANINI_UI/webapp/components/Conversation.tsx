@@ -635,6 +635,9 @@ export default function Conversation({
           case "outcome":
             return (
               <div className="conv-row" key={m.id}>
+                <div className="conv-live-clock-row">
+                  <span className="conv-live-clock done" aria-hidden="true">⏰</span>
+                </div>
                 <Outcome m={m} onNext={onNextAction} onTechnical={onTechnical} />
               </div>
             );
@@ -708,6 +711,7 @@ export default function Conversation({
           )}
           {paused && !liveSentence.loading && pausedSentence.text && (
             <div className="conv-live paused" data-conv-paused title={pausedSummary ?? undefined}>
+              <span className="conv-live-clock" aria-hidden="true">⏰</span>
               {pausedSentence.text}
             </div>
           )}

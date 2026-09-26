@@ -2293,8 +2293,13 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   display: inline-block;
   font-size: 15px;
   line-height: 1;
+  /* running: continuous ring (the "investigating" tick) */
   transform-origin: 50% 20%;
   animation: clock-ring 2.4s ease-in-out infinite;
+}
+/* done: the small cute jump (settles after one hop, ring stops) */
+.conv-live-clock.done {
+  animation: clock-jump 0.6s ease-out;
 }
 @keyframes clock-ring {
   0%, 100% { transform: rotate(0deg); }
@@ -2303,6 +2308,19 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
   24% { transform: rotate(8deg); }
   32% { transform: rotate(-6deg); }
   40% { transform: rotate(0deg); }
+}
+@keyframes clock-jump {
+  0% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-7px) scale(1.18) rotate(-8deg); }
+  65% { transform: translateY(1px) scale(0.94) rotate(4deg); }
+  100% { transform: translateY(0) scale(1) rotate(0deg); }
+}
+/* the done-jump clock rides its own row above the outcome card */
+.conv-live-clock-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
 }
 
 /* inline evidence card — the ONE structured surface the conversation
@@ -2551,6 +2569,7 @@ details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px;
 @media (prefers-reduced-motion: reduce) {
   .cursor { animation: none; opacity: 0.5; }
   .conv-live-clock { animation: none; }
+  .conv-live-clock.done { animation: none; }
   .ws-panel .wk { transition: none; }
   * { scroll-behavior: auto; }
 }
