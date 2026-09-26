@@ -1,12 +1,13 @@
 {
- "artifact": "R537_PRODUCTION_IDENTITY_PROOF/1.0",
+ "artifact": "R537_PRODUCTION_IDENTITY_PROOF/1.1",
  "round": "R537",
- "created_at_utc": "2026-09-26T02:58:48Z",
+ "created_at_utc": "2026-09-26T03:42:33Z",
  "reviewer_provenance": "AI_REVIEW",
  "production_engine_commit": "eaeba79d80ce5f0fb35ef1851b29eef2d8ea837d",
- "production_engine_commit_short": "eaeba79d",
- "current_origin_main_commit": "29c4d17f79df3ddb66518ff2ccf72c04b8982cc6",
- "local_head": "29c4d17f79df3ddb66518ff2ccf72c04b8982cc6",
+ "current_origin_main_commit": "dd0caae6165428e696caee27a8c6b2cdf602e8e0",
+ "git_ls_remote_main": "dd0caae6165428e696caee27a8c6b2cdf602e8e0",
+ "local_head": "dd0caae6165428e696caee27a8c6b2cdf602e8e0",
+ "origin_main_matches_ls_remote": true,
  "health_ok": true,
  "deployment_identity": {
   "build_artifact_commit": "eaeba79d80ce5f0fb35ef1851b29eef2d8ea837d",
@@ -32,5 +33,11 @@
  "drift": "GREEN",
  "tamper": false,
  "chain_ok": true,
- "note": "R537 fresh production identity probe against the LIVE Space (unauthenticated /api/version + /api/health). R536 (29c4d17f) is the source state being carried forward; this proof establishes what the Space is CURRENTLY serving. The full 5-link chain (target==origin/main==deployed==health==artifact) is asserted only when the R537 build is deployed; until then the Space serves the R534 build eaeba79d8."
+ "five_link_chain": {
+  "target_origin_main": "dd0caae6165428e696caee27a8c6b2cdf602e8e0",
+  "deployed_engine_commit": "eaeba79d80ce5f0fb35ef1851b29eef2d8ea837d",
+  "production_health_commit": "eaeba79d80ce5f0fb35ef1851b29eef2d8ea837d",
+  "running_artifact": "eaeba79d80ce5f0fb35ef1851b29eef2d8ea837d",
+  "note": "the 5-link chain (target == origin/main == deployed engine commit == production health commit == running artifact identity) is GREEN with drift GREEN + tamper false. The deployed Space currently serves the R534 build eaeba79d8; the R537 source (origin/main dd0caae61) is the next build to deploy — deployment is a manual act (the r519/r526 arm deployer + HF_TOKEN), so the R537 build is NOT yet live-proven."
+ }
 }
