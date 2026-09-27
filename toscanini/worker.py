@@ -1323,6 +1323,26 @@ def _run_inner(session_id: str, forensics) -> None:
     store.update_session(
         session_id, status="COMPLETE",
         final_status=final_status)
+    # R543: the durable completion contract is the product-state
+    # authority for EVERY terminal state (a finished discovery, a
+    # typed starved/infrastructure terminal, a scientific rejection —
+    # all of them). Persist the contract's completion_states onto the
+    # session record so the API surface (user_state_view.finished)
+    # always derives the finished flag from the contract, even when
+    # the run dir is later pruned by a deploy. This runs for every
+    # completed run, not only bridge-gate runs.
+    try:
+        from discovery_fabric.engine import (
+            completion_contract as _cc543)
+        _contract543 = _cc543.load(run_dir)
+        if isinstance(_contract543, dict):
+            _states543 = _cc543.completion_states(_contract543)
+            store.update_session(
+                session_id, completion_states=_states543)
+    except Exception as _exc543:  # noqa: BLE001 — disclosed, never fatal
+        print(f"  [worker] completion-contract session refresh "
+              f"failed: {type(_exc543).__name__}: {_exc543}",
+              file=sys.stderr)
     # R467 (audit P0-5): the "what changed because of your direction"
     # record — typed comparison of the child's mechanism identity with
     # the parent's, from the runs' own records (never asserted)
