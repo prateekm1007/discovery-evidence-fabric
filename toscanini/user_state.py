@@ -330,31 +330,38 @@ def _contract_finished_flag(session: Dict[str, Any]) -> Optional[bool]:
     REJECTED, INCOMPLETE_DISCOVERY, ...). The contract is the only
     FINISHED_DISCOVERY authority: a typed terminal may remain a
     terminal STATE, but it must never be represented as a finished
-    discovery by a second Boolean."""
-    # top-level completion_states (sessions.py promotes the contract's
-    # completion_states onto the detail record)
+    discovery by a second Boolean.
+
+    Read order (the two places the contract's answer lands durably):
+      1. session['completion_states'] — the worker's run-tail refresh
+         (R543-1b: persisted onto the durable session record for every
+         terminal state; the authoritative field when present).
+      2. session['final_state']['completion_states'] — the engine's own
+         final_state.json record, written at the run tail before the
+         session index catches up; the fallback when the record field
+         is absent (run dir pruned, worker refresh not yet flushed)."""
+    # 1. the session record's own completion_states (worker refresh)
     states = session.get("completion_states")
-    if not isinstance(states, dict):
-        # raw completion_contract on the record (read verbatim from the
-        # run dir when present)
-        contract = session.get("completion_contract")
-        if isinstance(contract, dict):
-            try:
-                from discovery_fabric.engine import (
-                    completion_contract as _cc)
-                states = _cc.completion_states(contract)
-            except Exception:  # noqa: BLE001 — projection must not crash
-                states = None
-    if not isinstance(states, dict):
-        # the engine's own final_state record carries completion_states
-        # (written at the run tail before the durable contract file is
-        # pruned by the deploy). This is the same completion authority —
-        # the run's own recorded answer, not a second Boolean.
-        fs = session.get("final_state")
-        if isinstance(fs, dict):
-            states = fs.get("completion_states")
     if isinstance(states, dict) and "FINISHED_DISCOVERY" in states:
         return bool(states.get("FINISHED_DISCOVERY"))
+    # 2. the engine's final_state record (the run's own terminal truth)
+    fs = session.get("final_state")
+    if isinstance(fs, dict):
+        fs_states = fs.get("completion_states")
+        if isinstance(fs_states, dict) and "FINISHED_DISCOVERY" in fs_states:
+            return bool(fs_states.get("FINISHED_DISCOVERY"))
+    # 3. the raw completion contract (read verbatim from the run dir
+    #    when sessions.py surfaces it on the detail record)
+    contract = session.get("completion_contract")
+    if isinstance(contract, dict):
+        try:
+            from discovery_fabric.engine import (
+                completion_contract as _cc)
+            states = _cc.completion_states(contract)
+            if "FINISHED_DISCOVERY" in states:
+                return bool(states.get("FINISHED_DISCOVERY"))
+        except Exception:  # noqa: BLE001 — projection must not crash
+            pass
     return None
 
 
