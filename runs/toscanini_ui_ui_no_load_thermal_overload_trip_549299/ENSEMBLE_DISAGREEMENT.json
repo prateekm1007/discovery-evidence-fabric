@@ -1,0 +1,410 @@
+{
+ "ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
+ "version": "1.0.0",
+ "requested_models": 3,
+ "available_providers": [
+  "agnes",
+  "unorouter",
+  "xkiro",
+  "apinex",
+  "bai",
+  "bynara",
+  "atria",
+  "hf",
+  "zai",
+  "openrouter",
+  "nvidia"
+ ],
+ "members": [
+  {
+   "role": "MODEL_A",
+   "provider_id": "agnes",
+   "status": "OK",
+   "model": "agnes-3.0-flash",
+   "prompt_hash": "c2d24ec39c411a756052676e8b34a7af0f0b590b3b846397eb6056d9f7e42aca",
+   "output_hash": "c1f93ff772b6fb9f68f5fba452393606f21cca23f10a3693a2fc19ff9b4518a7",
+   "latency_ms": 1293,
+   "fields": {
+    "mechanism": "Core loss and rotor friction dominate no-load losses when stator copper loss is minimized",
+    "intervention": "Inspect and clean ventilation ducts to reduce airflow restriction, lowering operating temperature",
+    "expected_effect": "Reduced motor temperature rise, preventing thermal overload trip at no-load",
+    "falsification_test": "Verify air intake is not obstructed by measuring pressure differential across the cooling fan",
+    "mechanism_source_span": "Thermal analysis of three-phase"
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:agnes:c1f93ff772b6",
+    "mechanism": "Core loss and rotor friction dominate no-load losses when stator copper loss is minimized",
+    "intervention": "Inspect and clean ventilation ducts to reduce airflow restriction, lowering operating temperature",
+    "expected_effect": "Reduced motor temperature rise, preventing thermal overload trip at no-load",
+    "falsification_test": "Verify air intake is not obstructed by measuring pressure differential across the cooling fan",
+    "mechanism_source_span": "Thermal analysis of three-phase",
+    "source_evidence": {
+     "source_id": "doi:10.1109/sce.2011.6092137",
+     "source_hash": "386edff503c5464d9e30463d9b57ecf52b443f30ae4c8b806b228cf35c2a55fb"
+    }
+   }
+  },
+  {
+   "role": "MODEL_B",
+   "provider_id": "unorouter",
+   "status": "OK",
+   "model": "agnes-3.0-flash",
+   "prompt_hash": "c2d24ec39c411a756052676e8b34a7af0f0b590b3b846397eb6056d9f7e42aca",
+   "output_hash": "c44af0eeaca8734b2482f7e2a5d9b3957062ce95438c9b7b77cca820d73e23fe",
+   "latency_ms": 5196,
+   "fields": {
+    "mechanism": "The abstract content is missing from the provided input, preventing the extraction of a specific mechanism.",
+    "intervention": "N/A",
+    "expected_effect": "N/A",
+    "falsification_test": "N/A",
+    "mechanism_source_span": "Thermal analysis of three"
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:unorouter:c44af0eeaca8",
+    "mechanism": "The abstract content is missing from the provided input, preventing the extraction of a specific mechanism.",
+    "intervention": "N/A",
+    "expected_effect": "N/A",
+    "falsification_test": "N/A",
+    "mechanism_source_span": "Thermal analysis of three",
+    "source_evidence": {
+     "source_id": "doi:10.1109/sce.2011.6092137",
+     "source_hash": "386edff503c5464d9e30463d9b57ecf52b443f30ae4c8b806b228cf35c2a55fb"
+    }
+   }
+  },
+  {
+   "role": "MODEL_C",
+   "provider_id": "xkiro",
+   "status": "OK",
+   "model": "qwen/qwen3-max:free",
+   "prompt_hash": "c2d24ec39c411a756052676e8b34a7af0f0b590b3b846397eb6056d9f7e42aca",
+   "output_hash": "a58be6785bb27f15a80bae9b7e75b76ac25cab4e66b9a97dd69b29e969335265",
+   "latency_ms": 7631,
+   "fields": {
+    "mechanism": "Circuit-model-based thermal analysis identifies core loss and stray load loss as dominant heat sources during no-load operation, independent of winding resistance balance.",
+    "intervention": "Construct an equivalent circuit model of the motor to quantify no-load core losses and verify whether lamination degradation or excessive air-gap flux density at 400 V is generating thermal energy exceeding the overload relay rating.",
+    "expected_effect": "Identification and mitigation of excessive core losses will reduce no-load operating temperature below the thermal overload trip threshold within the 20-minute run window.",
+    "falsification_test": "Run the motor uncoupled at 400 V while measuring input power with a precision wattmeter; if total no-load input power minus calculated stator copper loss (I^2 * R) is less than the thermal dissipation capacity of the frame, the core-loss mechanism is falsified.",
+    "mechanism_source_span": ""
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:xkiro:a58be6785bb2",
+    "mechanism": "Circuit-model-based thermal analysis identifies core loss and stray load loss as dominant heat sources during no-load operation, independent of winding resistance balance.",
+    "intervention": "Construct an equivalent circuit model of the motor to quantify no-load core losses and verify whether lamination degradation or excessive air-gap flux density at 400 V is generating thermal energy exceeding the overload relay rating.",
+    "expected_effect": "Identification and mitigation of excessive core losses will reduce no-load operating temperature below the thermal overload trip threshold within the 20-minute run window.",
+    "falsification_test": "Run the motor uncoupled at 400 V while measuring input power with a precision wattmeter; if total no-load input power minus calculated stator copper loss (I^2 * R) is less than the thermal dissipation capacity of the frame, the core-loss mechanism is falsified.",
+    "mechanism_source_span": "",
+    "source_evidence": {
+     "source_id": "doi:10.1109/sce.2011.6092137",
+     "source_hash": "386edff503c5464d9e30463d9b57ecf52b443f30ae4c8b806b228cf35c2a55fb"
+    }
+   }
+  }
+ ],
+ "common_claims": [],
+ "disagreements": [
+  {
+   "disagreement_id": "DIS-001",
+   "dimension": "mechanism",
+   "role_a": "MODEL_A",
+   "claim_a": "Core loss and rotor friction dominate no-load losses when stator copper loss is minimized",
+   "role_b": "MODEL_B",
+   "claim_b": "The abstract content is missing from the provided input, preventing the extraction of a specific mechanism.",
+   "similarity": 0.0,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:49:26+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-002",
+   "dimension": "mechanism",
+   "role_a": "MODEL_A",
+   "claim_a": "Core loss and rotor friction dominate no-load losses when stator copper loss is minimized",
+   "role_b": "MODEL_C",
+   "claim_b": "Circuit-model-based thermal analysis identifies core loss and stray load loss as dominant heat sources during no-load operation, independent of winding resistance balance.",
+   "similarity": 0.115,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:49:26+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-003",
+   "dimension": "mechanism",
+   "role_a": "MODEL_B",
+   "claim_a": "The abstract content is missing from the provided input, preventing the extraction of a specific mechanism.",
+   "role_b": "MODEL_C",
+   "claim_b": "Circuit-model-based thermal analysis identifies core loss and stray load loss as dominant heat sources during no-load operation, independent of winding resistance balance.",
+   "similarity": 0.0,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:49:26+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-004",
+   "dimension": "intervention",
+   "role_a": "MODEL_A",
+   "claim_a": "Inspect and clean ventilation ducts to reduce airflow restriction, lowering operating temperature",
+   "role_b": "MODEL_B",
+   "claim_b": "N/A",
+   "similarity": 0.0,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:49:26+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-005",
+   "dimension": "intervention",
+   "role_a": "MODEL_A",
+   "claim_a": "Inspect and clean ventilation ducts to reduce airflow restriction, lowering operating temperature",
+   "role_b": "MODEL_C",
+   "claim_b": "Construct an equivalent circuit model of the motor to quantify no-load core losses and verify whether lamination degradation or excessive air-gap flux density at 400 V is generating thermal energy exceeding the overload relay rating.",
+   "similarity": 0.0,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:49:26+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-006",
+   "dimension": "intervention",
+   "role_a": "MODEL_B",
+   "claim_a": "N/A",
+   "role_b": "MODEL_C",
+   "claim_b": "Construct an equivalent circuit model of the motor to quantify no-load core losses and verify whether lamination degradation or excessive air-gap flux density at 400 V is generating thermal energy exceeding the overload relay rating.",
+   "similarity": 0.0,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:49:26+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-007",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_A",
+   "claim_a": "Reduced motor temperature rise, preventing thermal overload trip at no-load",
+   "role_b": "MODEL_B",
+   "claim_b": "N/A",
+   "similarity": 0.0,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:49:26+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-008",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_A",
+   "claim_a": "Reduced motor temperature rise, preventing thermal overload trip at no-load",
+   "role_b": "MODEL_C",
+   "claim_b": "Identification and mitigation of excessive core losses will reduce no-load operating temperature below the thermal overload trip threshold within the 20-minute run window.",
+   "similarity": 0.25,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:49:26+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-009",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_B",
+   "claim_a": "N/A",
+   "role_b": "MODEL_C",
+   "claim_b": "Identification and mitigation of excessive core losses will reduce no-load operating temperature below the thermal overload trip threshold within the 20-minute run window.",
+   "similarity": 0.0,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:49:26+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-010",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "Verify air intake is not obstructed by measuring pressure differential across the cooling fan",
+   "role_b": "MODEL_B",
+   "claim_b": "N/A",
+   "similarity": 0.0,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:49:26+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-011",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "Verify air intake is not obstructed by measuring pressure differential across the cooling fan",
+   "role_b": "MODEL_C",
+   "claim_b": "Run the motor uncoupled at 400 V while measuring input power with a precision wattmeter; if total no-load input power minus calculated stator copper loss (I^2 * R) is less than the thermal dissipation capacity of the frame, the core-loss mechanism is falsified.",
+   "similarity": 0.034,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:49:26+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-012",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_B",
+   "claim_a": "N/A",
+   "role_b": "MODEL_C",
+   "claim_b": "Run the motor uncoupled at 400 V while measuring input power with a precision wattmeter; if total no-load input power minus calculated stator copper loss (I^2 * R) is less than the thermal dissipation capacity of the frame, the core-loss mechanism is falsified.",
+   "similarity": 0.0,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:49:26+00:00Z"
+  }
+ ],
+ "unique_mechanisms": [
+  {
+   "dimension": "mechanism",
+   "role": "MODEL_A",
+   "claim": "Core loss and rotor friction dominate no-load losses when stator copper loss is minimized",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "mechanism",
+   "role": "MODEL_B",
+   "claim": "The abstract content is missing from the provided input, preventing the extraction of a specific mechanism.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "mechanism",
+   "role": "MODEL_C",
+   "claim": "Circuit-model-based thermal analysis identifies core loss and stray load loss as dominant heat sources during no-load operation, independent of winding resistance balance.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_A",
+   "claim": "Inspect and clean ventilation ducts to reduce airflow restriction, lowering operating temperature",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_B",
+   "claim": "N/A",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_C",
+   "claim": "Construct an equivalent circuit model of the motor to quantify no-load core losses and verify whether lamination degradation or excessive air-gap flux density at 400 V is generating thermal energy exceeding the overload relay rating.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_A",
+   "claim": "Reduced motor temperature rise, preventing thermal overload trip at no-load",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_B",
+   "claim": "N/A",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_C",
+   "claim": "Identification and mitigation of excessive core losses will reduce no-load operating temperature below the thermal overload trip threshold within the 20-minute run window.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_A",
+   "claim": "Verify air intake is not obstructed by measuring pressure differential across the cooling fan",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_B",
+   "claim": "N/A",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_C",
+   "claim": "Run the motor uncoupled at 400 V while measuring input power with a precision wattmeter; if total no-load input power minus calculated stator copper loss (I^2 * R) is less than the thermal dissipation capacity of the frame, the core-loss mechanism is falsified.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  }
+ ],
+ "adjudication": {
+  "adjudicator": "DETERMINISTIC (field completeness -> falsifiability -> source span)",
+  "primary_role": "MODEL_A",
+  "primary_provider": "agnes",
+  "primary_candidate_id": "cand:ENS:agnes:c1f93ff772b6",
+  "ranking": [
+   {
+    "role": "MODEL_A",
+    "provider_id": "agnes",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   },
+   {
+    "role": "MODEL_B",
+    "provider_id": "unorouter",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   },
+   {
+    "role": "MODEL_C",
+    "provider_id": "xkiro",
+    "score": [
+     4,
+     1,
+     0
+    ]
+   }
+  ],
+  "consensus_forced": false,
+  "note": "the primary candidate enters the pipeline; disagreement objects remain UNRESOLVED and travel with the artifact chain (E15-E: do not force consensus)",
+  "decided_at": "2026-09-27T22:49:26+00:00Z"
+ },
+ "built_at": "2026-09-27T22:49:00+00:00Z",
+ "status": "ENSEMBLE_RUN",
+ "paths": [
+  "agnes",
+  "unorouter",
+  "xkiro"
+ ],
+ "comparison": {
+  "method": "pairwise significant-word Jaccard over the four invention claim dimensions (deterministic, N-ary; E16-G)",
+  "thresholds": {
+   "agreement": 0.3,
+   "disagreement": 0.25
+  },
+  "roles_compared": [
+   "MODEL_A",
+   "MODEL_B",
+   "MODEL_C"
+  ],
+  "pairs_compared": 3
+ }
+}
