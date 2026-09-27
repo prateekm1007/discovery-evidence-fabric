@@ -1210,6 +1210,15 @@ def session_detail(session_id: str) -> Optional[Dict[str, Any]]:
                     (_n_complete == len(_rp) and len(_rp) >= 1),
                 "FINISHED_DISCOVERY":
                     (_n_complete == len(_rp) and len(_rp) >= 1)}
+    else:
+        # R543-1d: a record WITHOUT ranked results (a typed no-survivor
+        # terminal: MECHANISM_STARVED, REJECTED, a scientific refusal)
+        # still carries the durable completion_states the worker's
+        # run-tail refresh persisted onto the session record. Surface
+        # it unconditionally — it is the authority for the finished
+        # flag when the run dir has been pruned by a deploy.
+        if s.get("completion_states") is not None:
+            detail["completion_states"] = s.get("completion_states")
     # R542: the durable COMPLETION CONTRACT outranks every session-side
     # derivation — it is the final product-state authority (the engine
     # verified the six-part contract against the run's own artifacts at
