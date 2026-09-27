@@ -109,7 +109,7 @@ class LLMClient:
         _keys_file = _P(__file__).resolve().parents[2] / ".env.keys"
         self._api_key = ""
         if _keys_file.exists():
-            for line in _keys_file.read_text().splitlines():
+            for line in _keys_file.read_text(encoding="utf-8").splitlines():
                 if line.startswith("NVIDIA_API_KEY="):
                     self._api_key = line.split("=", 1)[1].strip()
                     break

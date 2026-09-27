@@ -484,7 +484,7 @@ def discover_catalog(provider_id: str,
     cache = CATALOG_DIR / f"{provider_id}.json"
     if not force and cache.exists():
         try:
-            data = json.loads(cache.read_text())
+            data = json.loads(cache.read_text(encoding="utf-8"))
             age = time.time() - float(data.get("fetched_at_epoch") or 0)
             if age < CATALOG_TTL_S:
                 _SELECTION_DIAG["discover_catalog_calls"] += 1
@@ -557,7 +557,7 @@ def discover_catalog(provider_id: str,
         }
     try:
         CATALOG_DIR.mkdir(parents=True, exist_ok=True)
-        cache.write_text(json.dumps(out, indent=1, sort_keys=True))
+        cache.write_text(json.dumps(out, indent=1, sort_keys=True), encoding="utf-8")
     except Exception:  # noqa: BLE001 — cache is best-effort
         pass
     # R530 §3: behavior-neutral diagnostic (counter + wall only; a
@@ -674,7 +674,7 @@ def _provider_account_domain(provider_id: str) -> str:
 def _load_state() -> Dict[str, Any]:
     try:
         if STATE_PATH.exists():
-            data = json.loads(STATE_PATH.read_text())
+            data = json.loads(STATE_PATH.read_text(encoding="utf-8"))
             if isinstance(data, dict):
                 return data
     except Exception:  # noqa: BLE001 — corrupt state degrades to empty
@@ -699,7 +699,7 @@ def mark_model_gone(provider: str, model: str,
     }
     try:
         STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
-        STATE_PATH.write_text(json.dumps(state, indent=1, sort_keys=True))
+        STATE_PATH.write_text(json.dumps(state, indent=1, sort_keys=True), encoding="utf-8")
     except Exception:  # noqa: BLE001 — best-effort, disclosed via catalog
         pass
     # a GONE model is not in the live catalog by definition — refresh it
@@ -756,7 +756,7 @@ def record_span_outcome(provider: str, model: str, ok: bool,
         })
         state["span_outcomes"] = tail[-SPAN_OUTCOME_TAIL:]
         STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
-        STATE_PATH.write_text(json.dumps(state, indent=1, sort_keys=True))
+        STATE_PATH.write_text(json.dumps(state, indent=1, sort_keys=True), encoding="utf-8")
     except Exception:  # noqa: BLE001 — telemetry best-effort, never blocks
         pass
 
@@ -795,7 +795,7 @@ def clear_span_outcomes() -> None:
     try:
         state = _load_state()
         state.pop("span_outcomes", None)
-        STATE_PATH.write_text(json.dumps(state, indent=1, sort_keys=True))
+        STATE_PATH.write_text(json.dumps(state, indent=1, sort_keys=True), encoding="utf-8")
     except Exception:  # noqa: BLE001
         pass
 
@@ -807,7 +807,7 @@ def clear_model_gone(provider: str, model: str) -> None:
         del gone[f"{provider}::{model}"]
         try:
             STATE_PATH.write_text(json.dumps(state, indent=1,
-                                             sort_keys=True))
+                                             sort_keys=True), encoding="utf-8")
         except Exception:  # noqa: BLE001
             pass
 
@@ -862,7 +862,7 @@ def _clear_known_dead_if_relisted(provider: str,
         try:
             STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
             STATE_PATH.write_text(json.dumps(state, indent=1,
-                                             sort_keys=True))
+                                             sort_keys=True), encoding="utf-8")
         except Exception:  # noqa: BLE001 — best-effort, disclosed via
             pass                  # the catalog state report
     return recovered

@@ -69,7 +69,7 @@ def _load_probe() -> Dict[str, Any]:
             f"geometry authority probe artifact missing: {PROBES_PATH} "
             "— authority may never be assumed without measurement "
             "(Art. VI)")
-    return json.loads(PROBES_PATH.read_text())
+    return json.loads(PROBES_PATH.read_text(encoding="utf-8"))
 
 
 def cadquery_measured_state() -> Dict[str, Any]:

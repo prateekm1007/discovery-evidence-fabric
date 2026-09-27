@@ -231,7 +231,7 @@ _GLB_BIN_CHUNK = b"BIN\x00"
 def _read_json(path: Path) -> Optional[Dict[str, Any]]:
     try:
         if path.is_file():
-            data = json.loads(path.read_text())
+            data = json.loads(path.read_text(encoding="utf-8"))
             return data if isinstance(data, dict) else None
     except (OSError, ValueError):
         pass

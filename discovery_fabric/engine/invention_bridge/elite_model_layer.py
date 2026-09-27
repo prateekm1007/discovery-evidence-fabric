@@ -69,7 +69,7 @@ def _emit_parametric_source(pkg_model_dir: Path, form: str,
     if file_text is None:
         return None
     path = pkg_model_dir / "PARAMETRIC_MODEL_SOURCE.py"
-    path.write_text(file_text)
+    path.write_text(file_text, encoding="utf-8")
     return str(path)
 
 
@@ -494,7 +494,7 @@ def _build_3d_evidence(ev_dir: Path, out_dir: str,
         if shipped_src.is_file() and (build_map or parameters):
             # (a) EXECUTE THE SHIPPED SOURCE — the §2 clean regeneration
             shipped_ns = {"__name__": "shipped_parametric_source"}
-            exec(compile(shipped_src.read_text(),
+            exec(compile(shipped_src.read_text(encoding="utf-8"),
                          str(shipped_src), "exec"), shipped_ns)
             regen["shipped_source_executed"] = True
         if builder and build_map and shipped_ns is not None:

@@ -722,9 +722,10 @@ export interface RankedResultComponents {
   };
   adversarial?: {
     overall?: string | null;
-    disposition?: "SURVIVED" | "KILLED" | "UNRESOLVED" | string;
+    disposition?: "SURVIVED" | "KILLED" | "EXCLUDED" | "UNRESOLVED" | string;
     survived?: boolean;
     killed?: boolean;
+    excluded?: boolean;
     unresolved?: boolean;
     quality_verdict?: string | null;
     deficient_areas?: number | null;

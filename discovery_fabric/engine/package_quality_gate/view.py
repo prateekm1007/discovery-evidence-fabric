@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import shutil
 import struct
@@ -154,17 +155,23 @@ class PackageView:
         self.manifest = self._load_json("PACKAGE_MANIFEST.json") or {}
         # normalize the two historical manifest schemas (portfolio packages
         # use {"file": ...}; the bridge/elite factory uses {"path": ...} —
-        # a split-brain artifact the canonical compiler must unify)
+        # a split-brain artifact the canonical compiler must unify), and
+        # the separator: manifest paths are posix on every platform (the
+        # goldens were built on Linux), so backslash entries from a
+        # Windows-built manifest are normalized here once
         files = self.manifest.get("files")
         if isinstance(files, list):
             for e in files:
                 if isinstance(e, dict) and not e.get("file") and e.get("path"):
                     e["file"] = e["path"]
+                if isinstance(e, dict) and e.get("file"):
+                    e["file"] = e["file"].replace(os.sep, "/")
+        self.all_files_cache: Optional[list] = None
         self.json_files: dict[str, Any] = {}
         for p in sorted(self.root.rglob("*.json")):
-            rel = str(p.relative_to(self.root))
+            rel = p.relative_to(self.root).as_posix()
             try:
-                self.json_files[rel] = json.loads(p.read_text())
+                self.json_files[rel] = json.loads(p.read_text(encoding="utf-8"))
             except Exception:
                 self.json_files[rel] = {"__parse_error__": str(p)}
         self.pdfs: dict[str, list[str]] = {}
@@ -172,7 +179,8 @@ class PackageView:
             self.pdfs[p.name] = self._pdf_pages_text(p)
         self.glb_nodes: dict[str, list[str]] = {}
         for p in sorted(self.root.rglob("*.glb")):
-            self.glb_nodes[str(p.relative_to(self.root))] = parse_glb_nodes(p.read_bytes())
+            self.glb_nodes[p.relative_to(self.root).as_posix()] = \
+                parse_glb_nodes(p.read_bytes())
 
     # ------------------------------------------------------------------ load
     def _load_json(self, rel: str) -> Optional[dict]:
@@ -180,16 +188,22 @@ class PackageView:
         if not p.exists():
             return None
         try:
-            return json.loads(p.read_text())
+            return json.loads(p.read_text(encoding="utf-8"))
         except Exception:
             return None
 
     def json(self, rel: str) -> Optional[dict]:
-        return self.json_files.get(rel)
+        # separator-neutral lookup: keys are stored as_posix so the same
+        # gate verdict holds on Windows and Linux alike
+        return self.json_files.get(rel.replace(os.sep, "/"))
 
     def all_files(self) -> list[str]:
-        return sorted(str(p.relative_to(self.root)) for p in self.root.rglob("*")
-                      if p.is_file())
+        # posix keys on every platform (manifest paths are posix — the
+        # goldens are Linux-built; a Windows-built manifest is normalized
+        # at load)
+        return sorted(
+            p.relative_to(self.root).as_posix()
+            for p in self.root.rglob("*") if p.is_file())
 
     def file_bytes(self, rel: str) -> bytes:
         return (self.root / rel).read_bytes()

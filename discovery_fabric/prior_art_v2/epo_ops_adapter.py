@@ -69,7 +69,7 @@ def _load_epo_credentials() -> Tuple[str, str]:
     """Load EPO OPS OAuth credentials from .env.keys or env vars."""
     keys_file = Path(__file__).resolve().parents[2] / ".env.keys"
     if keys_file.exists():
-        for line in keys_file.read_text().splitlines():
+        for line in keys_file.read_text(encoding="utf-8").splitlines():
             if line.startswith("EPO_OPS_CONSUMER_KEY="):
                 key = line.split("=", 1)[1].strip()
             if line.startswith("EPO_OPS_CONSUMER_SECRET="):

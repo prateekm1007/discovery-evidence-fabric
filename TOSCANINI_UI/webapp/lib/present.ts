@@ -1066,9 +1066,13 @@ export function deriveConversation(
     // state (the diagnostic package, not a technology package).
     const ranked = deriveRankedPackages(detail);
     const completion = detail.completion_states ?? null;
-    const finished =
-      completion?.FINISHED_DISCOVERY === true ||
-      (ranked.length > 0 && completion?.TECHNOLOGY_PACKAGE_COMPLETED === true);
+    // R542: FINISHED_DISCOVERY is the BACKEND completion contract's
+    // answer (the six-part contract verified against the run's own
+    // artifacts at the run tail). The UI may not upgrade a run into a
+    // finished conversation from the package state alone — a run whose
+    // experiment/evidence/engineering component is missing is not
+    // finished even when every package compiled (Art. X: one authority).
+    const finished = completion?.FINISHED_DISCOVERY === true;
     if (ranked.length > 0) {
       msgs.push({
         kind: "ranked",

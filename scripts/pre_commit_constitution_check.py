@@ -101,13 +101,13 @@ def main():
                 session="auto",
                 intended_change=change_desc,
             )
-            print("✅ Constitution auto-acknowledged by pre-commit hook")
+            print("[OK] Constitution auto-acknowledged by pre-commit hook")
             print(f"   Intended change: {change_desc}")
         else:
-            print("✅ Constitution already acknowledged")
+            print("[OK] Constitution already acknowledged")
     else:
         # Non-infrastructure commit — just verify constitution exists
-        print("✅ Constitution present (non-infrastructure commit)")
+        print("[OK] Constitution present (non-infrastructure commit)")
 
     # Always print the pre-session warning for infrastructure commits
     if touches_infra:
@@ -118,4 +118,7 @@ def main():
 
 
 if __name__ == "__main__":
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8",
+                                  errors="replace")
     sys.exit(main())

@@ -400,7 +400,7 @@ def evaluate_parameter(slot: str, param_id: str, new_value: float,
     if not src_path.exists():
         return None, {"status": "NO_PARAMETRIC_SOURCE",
                       "reason": "package carries no build program"}
-    source = src_path.read_text()
+    source = src_path.read_text(encoding="utf-8")
 
     pmap: Dict[str, Dict[str, Any]] = {}
     target = None
@@ -531,7 +531,7 @@ def reality_loop_record(slot: str) -> Optional[Dict[str, Any]]:
     candidates = []
     for p in root.rglob("LOOP_CLOSURE_RECORD.json"):
         try:
-            rec = json.loads(p.read_text())
+            rec = json.loads(p.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, ValueError):
             continue
         if rec.get("package_slot") == slot:

@@ -404,7 +404,7 @@ def verify_cad_source_provenance(model_dir: str) -> Dict[str, Any]:
         return {"verdict": "PROVENANCE_RECORD_ABSENT",
                 "model_dir": str(model_dir)}
     try:
-        record = json.loads(record_path.read_text())
+        record = json.loads(record_path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         return {"verdict": "PROVENANCE_RECORD_UNREADABLE",
                 "error": f"{type(exc).__name__}: {exc}"}

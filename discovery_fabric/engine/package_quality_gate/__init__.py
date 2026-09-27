@@ -135,7 +135,7 @@ def load_canonical(arg) -> Optional[dict]:
         return None
     p = Path(arg)
     if p.exists():
-        return json.loads(p.read_text())
+        return json.loads(p.read_text(encoding="utf-8"))
     return None
 
 
@@ -154,7 +154,7 @@ def main():  # pragma: no cover — operator/CI entry
     verdict = run_quality_gate(a.package, canonical)
     text = json.dumps(verdict, indent=2)
     if a.out:
-        Path(a.out).write_text(text)
+        Path(a.out).write_text(text, encoding="utf-8")
     if not a.quiet:
         print(text)
     else:

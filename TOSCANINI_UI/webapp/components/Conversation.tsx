@@ -220,6 +220,8 @@ function Ranked({
   const dispositionLabel: Record<string, string> = {
     SURVIVED: "survived the adversarial challenge",
     KILLED: "killed by the adversarial challenge",
+    EXCLUDED:
+      "excluded by a recorded gate (quality, span, or physics) — resolved, never a survivor",
     UNRESOLVED: "unresolved — not called survived or killed",
   };
   return (

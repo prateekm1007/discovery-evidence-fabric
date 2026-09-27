@@ -101,10 +101,10 @@ def run_a2(problem_id: str, output_dir: str = "a2_output") -> dict:
     snapshot_content = json.dumps(source_snapshot, indent=2, sort_keys=True)
     snapshot_hash = _full_hash(snapshot_content)
     source_snapshot["snapshot_hash"] = snapshot_hash
-    (out / "source_snapshot.json").write_text(json.dumps(source_snapshot, indent=2, default=str))
+    (out / "source_snapshot.json").write_text(json.dumps(source_snapshot, indent=2, default=str), encoding="utf-8")
 
     source_hashes = {e["id"]: e["content_hash"] for e in evidence}
-    (out / "source_hashes.json").write_text(json.dumps(source_hashes, indent=2))
+    (out / "source_hashes.json").write_text(json.dumps(source_hashes, indent=2), encoding="utf-8")
 
     # STEP 3: SYNTHESIZE
     print("\n[STEP 3] SYNTHESIZE")
@@ -113,11 +113,11 @@ def run_a2(problem_id: str, output_dir: str = "a2_output") -> dict:
         print("\n[RESULT] REJECTED — synthesis failed")
         final_state = {"run_id": run_id, "final_status": "REJECTED",
                        "reason": "synthesis failed", "epistemic_state": "OBSERVED"}
-        (out / "final_state.json").write_text(json.dumps(final_state, indent=2))
+        (out / "final_state.json").write_text(json.dumps(final_state, indent=2), encoding="utf-8")
         return final_state
 
     candidate["run_id"] = run_id
-    (out / "candidate.json").write_text(json.dumps(candidate, indent=2, default=str))
+    (out / "candidate.json").write_text(json.dumps(candidate, indent=2, default=str), encoding="utf-8")
 
     # Write evidence ledger
     with open(out / "evidence_ledger.jsonl", "w") as f:
@@ -133,12 +133,12 @@ def run_a2(problem_id: str, output_dir: str = "a2_output") -> dict:
     # STEP 5: PRIOR-ART SEARCH
     print("\n[STEP 5] PRIOR-ART SEARCH")
     prior_art_report = search_prior_art(candidate["intervention"], problem["device"])
-    (out / "prior_art_report.json").write_text(json.dumps(prior_art_report, indent=2, default=str))
+    (out / "prior_art_report.json").write_text(json.dumps(prior_art_report, indent=2, default=str), encoding="utf-8")
 
     # STEP 6: ADVERSARIAL CHALLENGE
     print("\n[STEP 6] ADVERSARIAL CHALLENGE")
     adversarial_report = adversarial_challenge(candidate)
-    (out / "adversarial_report.json").write_text(json.dumps(adversarial_report, indent=2, default=str))
+    (out / "adversarial_report.json").write_text(json.dumps(adversarial_report, indent=2, default=str), encoding="utf-8")
 
     # STEP 7: EPISTEMIC CLASSIFICATION
     print("\n[STEP 7] EPISTEMIC CLASSIFICATION")
@@ -159,7 +159,7 @@ def run_a2(problem_id: str, output_dir: str = "a2_output") -> dict:
         "code_commit": code_commit,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
-    (out / "final_state.json").write_text(json.dumps(final_state, indent=2, default=str))
+    (out / "final_state.json").write_text(json.dumps(final_state, indent=2, default=str), encoding="utf-8")
 
     # RUN MANIFEST
     run_manifest = {
@@ -177,7 +177,7 @@ def run_a2(problem_id: str, output_dir: str = "a2_output") -> dict:
             "adversarial_report.json", "final_state.json",
         ],
     }
-    (out / "run_manifest.json").write_text(json.dumps(run_manifest, indent=2, default=str))
+    (out / "run_manifest.json").write_text(json.dumps(run_manifest, indent=2, default=str), encoding="utf-8")
 
     print(f"\n{'='*60}")
     print(f"RESULT: {final_state['final_status']}")

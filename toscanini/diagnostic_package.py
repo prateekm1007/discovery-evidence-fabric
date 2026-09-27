@@ -36,7 +36,7 @@ from typing import Any, Dict, List, Optional
 
 def _read_json(p: Path) -> Optional[Dict[str, Any]]:
     try:
-        return json.loads(p.read_text())
+        return json.loads(p.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001 — absent stays absent, never invented
         return None
 

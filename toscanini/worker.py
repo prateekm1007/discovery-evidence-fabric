@@ -145,7 +145,7 @@ def _load_problem_understanding(session_id: str):
     authority, no second guessing of the record)."""
     path = store.STORE_DIR / f"problem_understanding_{session_id}.json"
     try:
-        raw = json.loads(path.read_text())
+        raw = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return None
     if not isinstance(raw, dict) or not raw:
@@ -165,7 +165,7 @@ def _mechanism_identity(run_dir) -> dict:
         p = Path(str(run_dir)) / "envelope_SYNTHESIZE.json"
         if not p.exists():
             return {}
-        mm = (_json.loads(p.read_text()) or {}).get("mechanism_map") or {}
+        mm = (_json.loads(p.read_text(encoding="utf-8")) or {}).get("mechanism_map") or {}
         out = {}
         for k in ("mechanism", "intervention", "expected_effect"):
             v = mm.get(k)
@@ -272,7 +272,7 @@ def record_directive_outcome(session_id: str, run_dir) -> None:
                 import json as _json
                 _cp = Path(str(run_dir)) / "DIRECTIVE_CONSTRAINT.json"
                 if _cp.exists():
-                    _loaded = _json.loads(_cp.read_text())
+                    _loaded = _json.loads(_cp.read_text(encoding="utf-8"))
                     # the engineer's pass-2 F3/F4: only a valid dict
                     # record overrides the session copy — a corrupt
                     # file never NULLS a typed derivation-failure
@@ -615,7 +615,7 @@ def _ranked_package_set(run_dir):
     if not p.exists():
         return []
     try:
-        rec = _json.loads(p.read_text())
+        rec = _json.loads(p.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001 — corrupt record is honest absent
         return []
     out = []
@@ -704,7 +704,7 @@ def _apply_directive_constraint(s, problem, run_dir, forensics) -> None:
                 run_dir.mkdir(parents=True, exist_ok=True)
                 _tmp = run_dir / "DIRECTIVE_CONSTRAINT.json.tmp"
                 _tmp.write_text(
-                    _json.dumps(_dc, indent=1, ensure_ascii=False))
+                    _json.dumps(_dc, indent=1, ensure_ascii=False), encoding="utf-8")
                 _os.replace(_tmp, run_dir / "DIRECTIVE_CONSTRAINT.json")
                 _durable = True
             except Exception as exc:  # noqa: BLE001 — copy degradation
@@ -877,7 +877,7 @@ def _run_inner(session_id: str, forensics) -> None:
             try:
                 import json as _json
                 _pu_path.write_text(_json.dumps(pu, indent=1,
-                                                ensure_ascii=False))
+                                                ensure_ascii=False), encoding="utf-8")
             except Exception:  # noqa: BLE001 — input record, fail-open
                 pass
             try:
@@ -908,7 +908,7 @@ def _run_inner(session_id: str, forensics) -> None:
             _pu_path = store.STORE_DIR / \
                 f"problem_understanding_{session_id}.json"
             _pu_path.write_text(_json.dumps(pu, indent=1,
-                                            ensure_ascii=False))
+                                            ensure_ascii=False), encoding="utf-8")
         except Exception:  # noqa: BLE001 — input record, fail-open
             pass
         # R461 (audit P0-5): the EARLIEST durable checkpoint of real
@@ -1052,7 +1052,7 @@ def _run_inner(session_id: str, forensics) -> None:
                 # persist the controller record (last-wins; it is the
                 # run's own controller trail, read by the run contract)
                 (run_dir / "NBA_CONTROLLER.json").write_text(
-                    _json.dumps(nba, indent=1, ensure_ascii=False))
+                    _json.dumps(nba, indent=1, ensure_ascii=False), encoding="utf-8")
             except Exception:  # noqa: BLE001 — controller fail-open
                 nba = None
             return stage_policy.engine_gate(stage, env, nba)
@@ -1108,7 +1108,7 @@ def _run_inner(session_id: str, forensics) -> None:
         _lineage = None
         if (run_dir / "INVENTION_LINEAGE.json").is_file():
             _lineage = _json_l.loads(
-                (run_dir / "INVENTION_LINEAGE.json").read_text())
+                (run_dir / "INVENTION_LINEAGE.json").read_text(encoding="utf-8"))
         _artifact_policy = _sp.expensive_artifact_policy(
             _env_state, _lineage)
         if _artifact_policy.get("decision") != "RUN":
@@ -1178,7 +1178,7 @@ def _run_inner(session_id: str, forensics) -> None:
                         "%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                 }
                 (run_dir / "package_completion.json").write_text(
-                    json.dumps(_pkg_marker, indent=1, ensure_ascii=False))
+                    json.dumps(_pkg_marker, indent=1, ensure_ascii=False), encoding="utf-8")
             except Exception:  # noqa: BLE001 — marker is best-effort
                 pass
             # R422 (UI copy reconciliation, server-side companion): when
@@ -1200,40 +1200,63 @@ def _run_inner(session_id: str, forensics) -> None:
                                  "package_kind":
                                      refreshed.get("package_kind"),
                                  "complete": True})
-                    # R541: the ranked technology package set — one
-                    # candidate-bound record per admissible ranked
-                    # survivor (the contract's ranked-package shape).
-                    # Derived from the run dir's own RANKED_DISCOVERY_
-                    # RESULTS.json: each survivor carries its OWN
-                    # candidate-bound package identity (zip + hash +
-                    # manifest + complete), never a reused #1 package.
-                    # The UI moves from a ranked result to ITS package.
-                    _ranked_pkgs = _ranked_package_set(run_dir)
+                # R541: the ranked technology package set — one
+                # candidate-bound record per admissible ranked survivor
+                # (the contract's ranked-package shape). Derived from
+                # the run dir's own RANKED_DISCOVERY_RESULTS.json: each
+                # survivor carries its OWN candidate-bound package
+                # identity (zip + hash + manifest + complete), never a
+                # reused #1 package. The UI moves from a ranked result
+                # to ITS package.
+                _ranked_pkgs = _ranked_package_set(run_dir)
+                # R542: the durable COMPLETION CONTRACT is the product-
+                # state authority. When the engine wrote COMPLETION_
+                # CONTRACT.json, the session record's completion_states
+                # IS the contract's answer (the six-part contract was
+                # verified against the run's own artifacts at the run
+                # tail) — never a session-side approximation of
+                # FINISHED_DISCOVERY.
+                _contract = None
+                try:
+                    from discovery_fabric.engine import (
+                        completion_contract as _cc)
+                    _contract = _cc.load(run_dir)
+                except Exception:  # noqa: BLE001 — falls back to the
+                    _contract = None   # ranked-package states below
+                if isinstance(_contract, dict):
+                    _states = _cc.completion_states(_contract)
                     if _ranked_pkgs:
-                        _n_complete = sum(
-                            1 for p in _ranked_pkgs
-                            if (p.get("package") or {}).get("complete"))
-                        _n_adm = len(_ranked_pkgs)
                         store.update_session(
                             session_id,
                             ranked_results=_ranked_pkgs,
-                            completion_states={
-                                "PIPELINE_COMPLETED": True,
-                                "DISCOVERY_COMPLETED":
-                                    _ranked_pkgs[0].get(
-                                        "discovery_completed", True),
-                                # R541: TECHNOLOGY-PACKAGE completion is
-                                # per-candidate — the whole ranked set is
-                                # package-complete only when EVERY
-                                # displayed survivor has its own complete
-                                # candidate-bound package (one #1 package
-                                # does NOT complete the set).
-                                "TECHNOLOGY_PACKAGE_COMPLETED":
-                                    (_n_complete == _n_adm and _n_adm >= 1),
-                                "FINISHED_DISCOVERY":
-                                    (_n_complete == _n_adm
-                                     and _n_adm >= 1),
-                            })
+                            completion_states=_states)
+                    else:
+                        store.update_session(
+                            session_id, completion_states=_states)
+                elif _ranked_pkgs:
+                    _n_complete = sum(
+                        1 for p in _ranked_pkgs
+                        if (p.get("package") or {}).get("complete"))
+                    _n_adm = len(_ranked_pkgs)
+                    store.update_session(
+                        session_id,
+                        ranked_results=_ranked_pkgs,
+                        completion_states={
+                            "PIPELINE_COMPLETED": True,
+                            "DISCOVERY_COMPLETED":
+                                _ranked_pkgs[0].get(
+                                    "discovery_completed", True),
+                            # R541: TECHNOLOGY-PACKAGE completion is
+                            # per-candidate — the whole ranked set is
+                            # package-complete only when EVERY
+                            # displayed survivor has its own complete
+                            # candidate-bound package (one #1 package
+                            # does NOT complete the set).
+                            "TECHNOLOGY_PACKAGE_COMPLETED":
+                                (_n_complete == _n_adm and _n_adm >= 1),
+                            "FINISHED_DISCOVERY":
+                                (_n_complete == _n_adm and _n_adm >= 1),
+                        })
             except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
                 print(f"  [worker] package-field refresh failed: "
                       f"{type(exc).__name__}: {exc}", file=sys.stderr)
@@ -1252,7 +1275,7 @@ def _run_inner(session_id: str, forensics) -> None:
     fs_path = run_dir / "final_state.json"
     if fs_path.exists():
         import json
-        final = json.loads(fs_path.read_text())
+        final = json.loads(fs_path.read_text(encoding="utf-8"))
     # R446-C1 Task 4: the canonical completion authority — the marker is
     # verified ON DISK (defense in depth: engine.run() returns the
     # manifest it persisted — this check binds the user-visible COMPLETE

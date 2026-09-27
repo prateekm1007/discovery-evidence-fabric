@@ -46,7 +46,7 @@ _REQUIRED_MARKER_FIELDS = ("finished_at", "final_status",
 def _read_json(p: Path) -> Optional[Dict[str, Any]]:
     try:
         if p.exists():
-            data = json.loads(p.read_text())
+            data = json.loads(p.read_text(encoding="utf-8"))
             return data if isinstance(data, dict) else None
     except Exception:  # noqa: BLE001 — corrupt marker = NOT marked
         return None

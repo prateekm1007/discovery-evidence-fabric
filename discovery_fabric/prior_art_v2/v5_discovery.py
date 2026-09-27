@@ -261,7 +261,7 @@ Return JSON: {"relevance": "DIRECTLY_RELEVANT|ADJACENT|TOPICAL|IRRELEVANT"}"""
     def _get_historical_ids(self, invention_id: str) -> List[str]:
         p = REPO_ROOT / "patentability" / "retrieval_v4" / invention_id / "RETRIEVAL_RESULTS.json"
         if not p.exists(): return []
-        d = json.loads(p.read_text())
+        d = json.loads(p.read_text(encoding="utf-8"))
         ids = [rp.get("patent_id") for rp in d.get("retrieved_patents",[]) if rp.get("patent_id")]
         return list(dict.fromkeys(ids))
 
@@ -269,7 +269,7 @@ Return JSON: {"relevance": "DIRECTLY_RELEVANT|ADJACENT|TOPICAL|IRRELEVANT"}"""
         """Only DIRECTLY_RELEVANT from V4. NO fallback."""
         p = REPO_ROOT / "patentability" / "retrieval_v4" / invention_id / "RETRIEVAL_RESULTS.json"
         if not p.exists(): return []
-        d = json.loads(p.read_text())
+        d = json.loads(p.read_text(encoding="utf-8"))
         ids = []
         for rp in d.get("retrieved_patents", []):
             if rp.get("relevance", {}).get("relevance_level") == "DIRECTLY_RELEVANT":

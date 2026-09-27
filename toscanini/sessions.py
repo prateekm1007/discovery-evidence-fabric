@@ -38,7 +38,7 @@ STAGES = ["RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
 def _locked_read(path: Path):
     if not path.exists():
         return {}
-    with open(path, "r") as f:
+    with open(path, "r", encoding="utf-8") as f:
         fcntl.flock(f, fcntl.LOCK_SH)
         try:
             return json.load(f)
@@ -52,7 +52,7 @@ def _locked_read(path: Path):
 
 def _locked_write(path: Path, data: Dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         fcntl.flock(f, fcntl.LOCK_EX)
         json.dump(data, f, indent=1, ensure_ascii=False)
         fcntl.flock(f, fcntl.LOCK_UN)
@@ -171,7 +171,7 @@ def _proc_stat_starttime(pid: int) -> Optional[str]:
     every control gets an attempted bypass). Returns None when the pid is
     not alive (or /proc is unavailable, e.g. non-Linux hosts)."""
     try:
-        stat = Path(f"/proc/{int(pid)}/stat").read_text()
+        stat = Path(f"/proc/{int(pid)}/stat").read_text(encoding="utf-8")
         # field 2 (comm) may contain spaces inside parens — split after ')'
         after_comm = stat.rsplit(")", 1)[1].split()
         return after_comm[19]  # fields 3.. => index 19 is field 22
@@ -287,7 +287,7 @@ def _worker_spawn_cause(session_id: str) -> Optional[Dict[str, Any]]:
                 / f"{session_id}.log")
     try:
         if log_path.exists():
-            lines = log_path.read_text(errors="replace").splitlines()[-15:]
+            lines = log_path.read_text(errors="replace", encoding="utf-8").splitlines()[-15:]
             blob = "\n".join(lines)
             for pat, label in _SPAWN_DEATH_PATTERNS:
                 if pat in blob:
@@ -479,7 +479,7 @@ def _open_slot(i: int, blocking: bool):
     import fcntl
 
     _RUN_SLOTS_DIR.mkdir(parents=True, exist_ok=True)
-    f = open(_RUN_SLOTS_DIR / f"run.{i}.lock", "w")
+    f = open(_RUN_SLOTS_DIR / f"run.{i}.lock", "w", encoding="utf-8")
     try:
         fcntl.flock(f, fcntl.LOCK_EX if blocking
                     else fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -872,7 +872,7 @@ def share_session(share_id: str) -> Optional[str]:
 
 def _read_json(p: Path):
     try:
-        return json.loads(p.read_text())
+        return json.loads(p.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001
         return None
 
@@ -1106,6 +1106,15 @@ def session_detail(session_id: str) -> Optional[Dict[str, Any]]:
         ranked = _read_json(run_dir / "RANKED_DISCOVERY_RESULTS.json")
         if ranked:
             detail["ranked_results"] = ranked
+        # R542: the COMPLETION CONTRACT — the engine's authoritative
+        # finished-discovery record (COMPLETION_CONTRACT.json, written
+        # at the run tail by completion_contract.persist_completion_
+        # contract). Served verbatim: the session/UI surface READS this
+        # record and never re-derives FINISHED_DISCOVERY (the verifier
+        # is the final product-state authority, not a UI calculation).
+        contract = _read_json(run_dir / "COMPLETION_CONTRACT.json")
+        if contract:
+            detail["completion_contract"] = contract
         # R541: the per-rank candidate-bound package download routes —
         # the UI's "Download technology package #N" CTA resolves to a
         # candidate-specific route (?candidate=<id>), not one shared
@@ -1185,6 +1194,20 @@ def session_detail(session_id: str) -> Optional[Dict[str, Any]]:
                     (_n_complete == len(_rp) and len(_rp) >= 1),
                 "FINISHED_DISCOVERY":
                     (_n_complete == len(_rp) and len(_rp) >= 1)}
+    # R542: the durable COMPLETION CONTRACT outranks every session-side
+    # derivation — it is the final product-state authority (the engine
+    # verified the six-part contract against the run's own artifacts at
+    # the run tail). When present, completion_states IS the contract's
+    # answer: FINISHED_DISCOVERY, the typed terminal state, and the
+    # exact missing components. The contract can only be finished when
+    # the durable ranked result set + candidate-bound packages exist
+    # (verify_completion_contract re-measures them), so the R541
+    # "NO RANKED_DISCOVERY_RESULTS => NO FINISHED_DISCOVERY" invariant
+    # remains enforced — never a manufactured rank-1 fallback.
+    _contract = detail.get("completion_contract")
+    if isinstance(_contract, dict):
+        from discovery_fabric.engine import completion_contract as _cc
+        detail["completion_states"] = _cc.completion_states(_contract)
     # a record without ranked_results has NO ranked_packages and is NOT
     # a current finished discovery (the contract's invariant)
     detail.pop("evidence_pack", None)

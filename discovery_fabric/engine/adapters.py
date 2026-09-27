@@ -43,7 +43,7 @@ def load_credentials(path: Optional[str] = None) -> Dict[str, str]:
     loaded: Dict[str, str] = {}
     p = Path(path) if path else REPO_ROOT / ".env.keys"
     if p.exists():
-        for line in p.read_text().splitlines():
+        for line in p.read_text(encoding="utf-8").splitlines():
             line = line.strip()
             if not line or line.startswith("#") or "=" not in line:
                 continue
@@ -304,7 +304,7 @@ class A2RetrievalAdapter(BaseAdapter):
                 _p.mkdir(parents=True, exist_ok=True)
                 (_p / "EVIDENCE_FABRIC_REPORT.json").write_text(
                     _json.dumps(ef_report, indent=1, ensure_ascii=False,
-                                default=str))
+                                default=str), encoding="utf-8")
             except Exception:  # noqa: BLE001 — best-effort persistence
                 pass
         # R512: persist the retrieval attribution record inside the run
@@ -321,7 +321,7 @@ class A2RetrievalAdapter(BaseAdapter):
                 _p2.mkdir(parents=True, exist_ok=True)
                 (_p2 / "RETRIEVAL_ATTRIBUTION.json").write_text(
                     _json2.dumps(report.get("retrieval_attribution", {}),
-                                 indent=1, ensure_ascii=False, default=str))
+                                 indent=1, ensure_ascii=False, default=str), encoding="utf-8")
         except Exception:  # noqa: BLE001 — best-effort persistence
             pass
         # R517 Phase 1: per-operation retrieval attribution is

@@ -278,11 +278,11 @@ def measure_run(run_dir: Path) -> Dict[str, Any]:
     if not spec_path.exists():
         return {"run_dir": str(run_dir), "state": "NO_SPEC",
                 "verdict": "UNMEASURABLE"}
-    spec = json.loads(spec_path.read_text())
+    spec = json.loads(spec_path.read_text(encoding="utf-8"))
     decisive = None
     if dec_path.exists():
         try:
-            decisive = json.loads(dec_path.read_text())
+            decisive = json.loads(dec_path.read_text(encoding="utf-8"))
         except Exception:  # noqa: BLE001 — disclosed per-run
             decisive = None
     dims = [

@@ -188,11 +188,11 @@ def save_attachment(owner_key: str, filename: str,
         },
         "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
-    meta_path.write_text(json.dumps(record, indent=1))
+    meta_path.write_text(json.dumps(record, indent=1), encoding="utf-8")
     # the bounded extract rides its own file so the worker reads one
     # artifact per attachment without re-parsing the blob
     if text:
-        (odir / f"{attachment_id}.txt").write_text(text)
+        (odir / f"{attachment_id}.txt").write_text(text, encoding="utf-8")
     return record
 
 
@@ -201,7 +201,7 @@ def get_attachment(attachment_id: str, owner_key: str) -> Optional[Dict[str, Any
     if not p.exists():
         return None
     try:
-        return json.loads(p.read_text())
+        return json.loads(p.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001 — a corrupt record stays absent, not wrong
         return None
 
@@ -211,7 +211,7 @@ def get_attachment_text(attachment_id: str, owner_key: str) -> str:
     if not p.exists():
         return ""
     try:
-        return p.read_text(errors="replace")
+        return p.read_text(errors="replace", encoding="utf-8")
     except Exception:  # noqa: BLE001
         return ""
 
@@ -221,7 +221,7 @@ def list_attachments(owner_key: str) -> List[Dict[str, Any]]:
     out: List[Dict[str, Any]] = []
     for p in sorted(odir.glob("att_*.json")):
         try:
-            rec = json.loads(p.read_text())
+            rec = json.loads(p.read_text(encoding="utf-8"))
             rec.pop("owner_key", None)  # never echo the capability
             out.append(rec)
         except Exception:  # noqa: BLE001
@@ -497,7 +497,7 @@ def save_url_attachment(owner_key: str, url: str,
         "fetched_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
-    meta_path.write_text(json.dumps(record, indent=1))
+    meta_path.write_text(json.dumps(record, indent=1), encoding="utf-8")
     if text:
-        (odir / f"{attachment_id}.txt").write_text(text)
+        (odir / f"{attachment_id}.txt").write_text(text, encoding="utf-8")
     return record

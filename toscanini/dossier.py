@@ -983,7 +983,7 @@ def _invention_record_validity(run_dir: Optional[Path],
     inv_path = run_dir / "INVENTION_SPECIFICATION.json" if run_dir else None
     if inv_path is not None and inv_path.is_file():
         try:
-            loaded = json.loads(inv_path.read_text())
+            loaded = json.loads(inv_path.read_text(encoding="utf-8"))
             inv = loaded if isinstance(loaded, dict) else None
             if inv is None:
                 inv_malformed = True
@@ -1632,7 +1632,7 @@ def build_dossier(session: Dict[str, Any]) -> Dict[str, Any]:
         _hr = Path(run_dir) / "MODEL" / "3D" / "HERO_RELEASE_STATE.json"
         try:
             import json as _json
-            release_state = _json.loads(_hr.read_text())
+            release_state = _json.loads(_hr.read_text(encoding="utf-8"))
         except Exception:  # noqa: BLE001 — honest absent
             release_state = None
     release_blocked = bool((release_state or {}).get("release_blocked"))

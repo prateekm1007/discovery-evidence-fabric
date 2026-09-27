@@ -151,7 +151,7 @@ def set_state_path(path: Optional[Path]) -> None:
 def _load_state() -> Dict[str, Any]:
     try:
         if _state_path().exists():
-            data = json.loads(_state_path().read_text())
+            data = json.loads(_state_path().read_text(encoding="utf-8"))
             if isinstance(data, dict):
                 return data
     except Exception:  # noqa: BLE001 — corrupt state degrades to empty
@@ -163,7 +163,7 @@ def _save_state(state: Dict[str, Any]) -> None:
     try:
         _state_path().parent.mkdir(parents=True, exist_ok=True)
         _state_path().write_text(
-            json.dumps(state, indent=1, sort_keys=True))
+            json.dumps(state, indent=1, sort_keys=True), encoding="utf-8")
     except Exception:  # noqa: BLE001 — best-effort telemetry, disclosed
         pass
 

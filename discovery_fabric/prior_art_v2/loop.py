@@ -190,7 +190,7 @@ try {{
 }}
 """
         tmp = Path(f"/tmp/llm_call_{os.getpid()}_{int(time.time()*1000)}_{self._call_count}.mjs")
-        tmp.write_text(js_code)
+        tmp.write_text(js_code, encoding="utf-8")
 
         last_error = ""
         for attempt in range(self.max_retries + 1):
@@ -902,5 +902,5 @@ if __name__ == "__main__":
     )
 
     out = Path(__file__).resolve().parents[2] / "patent_sources" / "v2" / "loop_smoke_test.json"
-    out.write_text(json.dumps(asdict(result), indent=2))
+    out.write_text(json.dumps(asdict(result), indent=2), encoding="utf-8")
     print(f"\nSmoke test result: {out}")

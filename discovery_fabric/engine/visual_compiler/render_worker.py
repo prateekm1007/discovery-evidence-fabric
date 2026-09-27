@@ -210,7 +210,7 @@ def renderer_deps_present() -> Optional[str]:
     if not pkg.is_file():
         return "RENDER_SKIPPED_NO_RENDERER_DEPS"
     try:
-        version = json.loads(pkg.read_text()).get("version")
+        version = json.loads(pkg.read_text(encoding="utf-8")).get("version")
     except Exception:  # noqa: BLE001
         return "RENDER_SKIPPED_NO_RENDERER_DEPS"
     if version != PINNED_THREE_VERSION:
@@ -223,20 +223,20 @@ def renderer_deps_present() -> Optional[str]:
 # ---------------------------------------------------------------------------
 def _cgroup_avail_mb(root: str = "/sys/fs/cgroup") -> Optional[int]:
     try:
-        limit_raw = open(f"{root}/memory.max").read().strip()
+        limit_raw = open(f"{root}/memory.max", encoding="utf-8").read().strip()
         if limit_raw and limit_raw != "max":
             limit = int(limit_raw)
-            current = int(open(f"{root}/memory.current").read().strip())
+            current = int(open(f"{root}/memory.current", encoding="utf-8").read().strip())
             if limit > 0:
                 return max(0, limit - current) // (1024 * 1024)
     except (OSError, ValueError):
         pass
     try:
         limit = int(open(
-            f"{root}/memory/memory.limit_in_bytes").read().strip())
+            f"{root}/memory/memory.limit_in_bytes", encoding="utf-8").read().strip())
         if 0 < limit < (1 << 40):
             current = int(open(
-                f"{root}/memory/memory.usage_in_bytes").read().strip())
+                f"{root}/memory/memory.usage_in_bytes", encoding="utf-8").read().strip())
             return max(0, limit - current) // (1024 * 1024)
     except (OSError, ValueError):
         pass
@@ -245,7 +245,7 @@ def _cgroup_avail_mb(root: str = "/sys/fs/cgroup") -> Optional[int]:
 
 def _host_avail_mb() -> Optional[int]:
     try:
-        with open("/proc/meminfo") as f:
+        with open("/proc/meminfo", encoding="utf-8") as f:
             for line in f:
                 if line.startswith("MemAvailable:"):
                     return int(line.split()[1]) // 1024
@@ -264,7 +264,7 @@ def _mem_available_mb() -> Optional[int]:
 
 def _thresholds() -> Dict[str, Any]:
     try:
-        return json.loads(THRESHOLD_PROVENANCE_PATH.read_text())
+        return json.loads(THRESHOLD_PROVENANCE_PATH.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001
         return {}
 
@@ -364,7 +364,7 @@ def run_renderer(spec_path: str, timeout_s: int,
     side = out_dir / "render_record.json"
     if side.is_file():
         try:
-            side_rec = json.loads(side.read_text())
+            side_rec = json.loads(side.read_text(encoding="utf-8"))
             record.update({k: v for k, v in side_rec.items()
                            if k not in ("stage", "render_pipeline")})
         except Exception:  # noqa: BLE001

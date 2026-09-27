@@ -121,7 +121,7 @@ def build_discovery_release(
         gate_path = run_dir / "RELEASE_GATE_EVALUATION.json"
         if gate_path.exists():
             try:
-                gate = json.loads(gate_path.read_text())
+                gate = json.loads(gate_path.read_text(encoding="utf-8"))
                 status = (ST_RELEASED
                           if gate.get("decision") == "RELEASED"
                           else ST_HELD_FOR_HUMAN_REVIEW)
@@ -164,5 +164,5 @@ def _git_head() -> str:
 
 def write_discovery_release(run_dir: Path, release: Dict[str, Any]) -> Path:
     p = Path(run_dir) / "DISCOVERY_RELEASE.json"
-    p.write_text(json.dumps(release, indent=2, ensure_ascii=False))
+    p.write_text(json.dumps(release, indent=2, ensure_ascii=False), encoding="utf-8")
     return p

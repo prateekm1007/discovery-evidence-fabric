@@ -78,7 +78,7 @@ def _resolved_run_state(run_result: Dict[str, Any],
             rr.get("engineering_specification"), dict):
         p = os.path.join(work_dir, "ENGINEERING_SPECIFICATION.json")
         try:
-            with open(p, "r") as f:
+            with open(p, "r", encoding="utf-8") as f:
                 eng = json.load(f)
             if isinstance(eng, dict):
                 rr["engineering_specification"] = eng
@@ -465,7 +465,7 @@ def _persist_conceptual_artifacts(work_dir: str, built: Dict[str, Any],
         built["glb_path"] = glb_path
         if spec is not None:
             with open(os.path.join(model_dir, "GEOMETRY_SPEC.json"),
-                      "w") as f:
+                      "w", encoding="utf-8") as f:
                 _json.dump(spec, f, indent=2)
         tech_id = (((run_result.get("problem") or {}).get("problem_id"))
                    or ((run_result.get("final_state") or {}).get(

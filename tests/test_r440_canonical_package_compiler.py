@@ -133,7 +133,7 @@ def _production_imports(module_name: str) -> list[tuple[str, int]]:
                     mod = node.module or ""
                     names = [mod] + [f"{mod}.{a.name}" for a in node.names]
                 if any(module_name in n for n in names):
-                    hits.append((str(py.relative_to(REPO)), node.lineno))
+                    hits.append((py.relative_to(REPO).as_posix(), node.lineno))
     return hits
 
 
@@ -182,16 +182,20 @@ def test_r440_1_exactly_one_production_import_of_the_compiler():
     hits = _production_imports("package_compiler")
     assert hits, "no production import of the canonical compiler?"
     files = {f for f, _ in hits}
-    # the RUNTIME customer-package authority is the bridge gate (the
-    # ONE production call site). R455: the E11 verification harness
-    # (smoke_e2e.py) is archived with the unreachable benchmark set; the
-    # closed importer set is now EXACTLY the bridge gate.
-    # The set is CLOSED: any new importer fails this test.
-    assert files == {"discovery_fabric/engine/invention_bridge/bridge.py"}, \
-        f"compile_package importers must be exactly the bridge gate: {files}"
-    # the engine RUN itself never imports the compiler (R440.2: the run
-    # defers; packaging is post-run only)
-    assert not any(f.endswith("engine/run.py") for f, _ in hits)
+    # The RUNTIME customer-package authority is the bridge gate (the ONE
+    # release-authority call site). R455: the E11 verification harness
+    # (smoke_e2e.py) is archived with the unreachable benchmark set.
+    # R541 extension (recorded here, closed set re-pinned): the engine
+    # run tail additionally imports the compiler for the PER-CANDIDATE
+    # ranked technology packages (run.py _compile_ranked_packages,
+    # run_gate=False — candidate-bound deliverables, NEVER a release
+    # decision; release authority stays the bridge gate's gate-S build).
+    # The set is CLOSED: any other importer fails this test.
+    assert files == {
+        "discovery_fabric/engine/invention_bridge/bridge.py",
+        "discovery_fabric/engine/run.py",
+    }, f"compile_package importers must be the bridge gate + the R541 " \
+       f"run-tail ranked compile: {files}"
 
 
 def test_r440_1_exactly_one_production_call_site_of_compile_package():
@@ -208,25 +212,39 @@ def test_r440_1_exactly_one_production_call_site_of_compile_package():
                 if isinstance(node, ast.Call) and \
                         isinstance(node.func, ast.Name) and \
                         node.func.id == "compile_package":
-                    call_sites.append((str(py.relative_to(REPO)),
+                    call_sites.append((py.relative_to(REPO).as_posix(),
                                        node.lineno))
                 if isinstance(node, ast.Call) and \
                         isinstance(node.func, ast.Attribute) and \
                         node.func.attr == "compile_package":
-                    call_sites.append((str(py.relative_to(REPO)),
+                    call_sites.append((py.relative_to(REPO).as_posix(),
                                        node.lineno))
     files = {f for f, _ in call_sites}
-    assert files == {"discovery_fabric/engine/invention_bridge/bridge.py"}, \
+    # R541 extension: the run-tail ranked compile is the second call
+    # site (run_gate=False — no quality gate on the candidate-bound
+    # deliverables; the release decision stays at the bridge gate).
+    assert files == {
+        "discovery_fabric/engine/invention_bridge/bridge.py",
+        "discovery_fabric/engine/run.py",
+    }, \
         f"production compile_package call sites: {call_sites}"
     # the RUNTIME customer-package call site is EXACTLY ONE: bridge
-    # gate step 3 — the only place a customer package is created. The
-    # serving path (toscanini/) reaches the compiler ONLY through it.
+    # gate step 3 — the only place a customer release package is
+    # created. The serving path (toscanini/) reaches the compiler ONLY
+    # through it.
     runtime = [cs for cs in call_sites if cs[0].startswith("toscanini/")]
     assert runtime == [], \
         "the serving path must reach the compiler only through the bridge"
     bridge = [cs for cs in call_sites
               if cs[0] == "discovery_fabric/engine/invention_bridge/bridge.py"]
     assert len(bridge) == 1
+    # the R541 run-tail ranked call site compiles WITHOUT the quality
+    # gate (run_gate=False) — it records candidate-bound deliverables,
+    # it never takes the release decision
+    run_sites = [cs for cs in call_sites
+                 if cs[0] == "discovery_fabric/engine/run.py"]
+    assert len(run_sites) == 1, \
+        f"the R541 ranked compile is a single run-tail call site: {run_sites}"
 
 
 def test_r440_1_premium_templates_are_not_production_authorities():

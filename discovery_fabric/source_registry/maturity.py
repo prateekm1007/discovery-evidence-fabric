@@ -211,7 +211,7 @@ FAILURE_DOMAIN: Dict[str, str] = {
 # ---------------------------------------------------------------------------
 
 def load_health() -> Dict[str, Any]:
-    return json.loads(HEALTH_REPORT_PATH.read_text())
+    return json.loads(HEALTH_REPORT_PATH.read_text(encoding="utf-8"))
 
 
 def load_retrieval_log() -> List[Dict[str, Any]]:
@@ -333,7 +333,7 @@ def load_relevance_artifact() -> Dict[str, Any]:
     if not path.exists():
         return {}
     try:
-        return json.loads(path.read_text())
+        return json.loads(path.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001
         return {}
 
@@ -743,7 +743,7 @@ def build_grades() -> Dict[str, Any]:
 def main() -> int:
     grades = build_grades()
     GRADES_OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    GRADES_OUT_PATH.write_text(json.dumps(grades, indent=1, ensure_ascii=False) + "\n")
+    GRADES_OUT_PATH.write_text(json.dumps(grades, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"wrote {GRADES_OUT_PATH}")
     live = [g for g in grades["sources"].values() if g["health_status"] == "LIVE"]
     print(f"sources graded: {len(grades['sources'])} (live {len(live)})")

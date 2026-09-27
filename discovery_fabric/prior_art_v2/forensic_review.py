@@ -248,7 +248,7 @@ class ForensicAuditor:
         # Load from CLAIM_CHART.json
         claim_chart = inv_dir / "CLAIM_CHART.json"
         if claim_chart.exists():
-            cc = json.loads(claim_chart.read_text())
+            cc = json.loads(claim_chart.read_text(encoding="utf-8"))
             claim_text = cc.get("final_claim", "")
             claim_hash = cc.get("final_claim_hash", "")
 
@@ -256,7 +256,7 @@ class ForensicAuditor:
             # Fallback: load from CLAIM_0.md
             claim_0 = inv_dir / "CLAIM_0.md"
             if claim_0.exists():
-                md = claim_0.read_text()
+                md = claim_0.read_text(encoding="utf-8")
                 # Extract claim text from code block
                 m = re.search(r'```\n(.*?)\n```', md, re.DOTALL)
                 if m:

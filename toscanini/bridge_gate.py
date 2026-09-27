@@ -170,7 +170,7 @@ def _has_model(run_dir: Path) -> bool:
 def _read_json(path: Path) -> Optional[Dict[str, Any]]:
     try:
         if path.is_file():
-            return json.loads(path.read_text())
+            return json.loads(path.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001 — corrupt record reads as absent
         return None
     return None
@@ -284,7 +284,7 @@ def _record(run_dir: Path, outcome: str, report: Dict[str, Any]) -> Dict:
         "at": _now(),
         "reviewer_provenance": "AI_REVIEW",
     } | report
-    (run_dir / "BRIDGE_REPORT.json").write_text(json.dumps(persisted, indent=2))
+    (run_dir / "BRIDGE_REPORT.json").write_text(json.dumps(persisted, indent=2), encoding="utf-8")
     return persisted
 
 
@@ -304,7 +304,7 @@ def ensure_artifacts(session_id: str) -> Dict[str, Any]:
     prior = run_dir / "BRIDGE_REPORT.json"
     if prior.exists():
         try:
-            return json.loads(prior.read_text())
+            return json.loads(prior.read_text(encoding="utf-8"))
         except Exception:  # noqa: BLE001 — corrupt record -> redo
             pass
 

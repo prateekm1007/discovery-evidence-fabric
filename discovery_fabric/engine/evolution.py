@@ -263,7 +263,7 @@ def diagnose_death_cause(run_dir: Path, failed_stages: Dict[str, str],
         try:
             p = run_dir / name
             if p.exists():
-                d = json.loads(p.read_text())
+                d = json.loads(p.read_text(encoding="utf-8"))
                 return d if isinstance(d, dict) else {}
         except Exception:  # noqa: BLE001 — absent stays absent
             pass

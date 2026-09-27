@@ -40,7 +40,7 @@ def _load_keys() -> Dict[str, str]:
     if not KEYS_FILE.exists():
         return {}
     out = {}
-    for line in KEYS_FILE.read_text().splitlines():
+    for line in KEYS_FILE.read_text(encoding="utf-8").splitlines():
         if "=" in line and not line.strip().startswith("#"):
             k, v = line.split("=", 1)
             out[k.strip()] = v.strip()
@@ -710,7 +710,7 @@ def patentbear_meter_state() -> Dict[str, Any]:
     """Read the persisted meter (remaining/quota as last reported by
     the provider). Missing file = UNKNOWN (never guessed)."""
     try:
-        return json.loads(PATENTBEAR_METER_PATH.read_text())
+        return json.loads(PATENTBEAR_METER_PATH.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001 — missing/corrupt = UNKNOWN
         return {"monthly_remaining": None, "updated_at": None,
                 "note": "no provider-reported meter state recorded yet"}
@@ -724,7 +724,7 @@ def _patentbear_update_meter(remaining: Any) -> None:
             "monthly_remaining": remaining,
             "updated_at": _now_utc(),
             "reserve_floor": PATENTBEAR_RESERVE_FLOOR,
-        }, indent=1))
+        }, indent=1), encoding="utf-8")
     except Exception:  # noqa: BLE001 — meter persistence is best-effort
         pass
 
@@ -1196,5 +1196,5 @@ if __name__ == "__main__":
                 "hits": [asdict(h) for h in r.hits],
             } for sid, r in results.items()
         },
-    }, indent=2))
+    }, indent=2), encoding="utf-8")
     print(f"\nSelf-test report: {out}")

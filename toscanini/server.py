@@ -178,7 +178,7 @@ def _constitution_version() -> Optional[str]:
     exactly as ratified (unparseable stays None — never guessed)."""
     try:
         head = (REPO_ROOT / "EPISTEMIC_CONSTITUTION.md").read_text(
-            errors="replace")[:2000]
+            errors="replace", encoding="utf-8")[:2000]
         for line in head.splitlines():
             if line.strip().startswith("**Version:**"):
                 return line.split("**Version:**", 1)[1].strip() or None
@@ -328,7 +328,7 @@ def _health_payload() -> dict:
         _shp = REPO_ROOT / "artifacts" / "source_health" / \
             "SOURCE_HEALTH_REPORT.json"
         if _shp.exists():
-            _sh = json.loads(_shp.read_text())
+            _sh = json.loads(_shp.read_text(encoding="utf-8"))
             _src_report = "measured"
             _src_report_at = _sh.get("run_timestamp")
     except Exception:  # noqa: BLE001 — absent stays absent
@@ -871,7 +871,7 @@ class Handler(BaseHTTPRequestHandler):
             log_path = (store.ENGINE_RUNS / "worker_logs"
                         / f"{sid}.log")
             try:
-                text = log_path.read_text(errors="replace")
+                text = log_path.read_text(errors="replace", encoding="utf-8")
                 tail = "\n".join(text.splitlines()[-60:])
                 log_bytes = log_path.stat().st_size
             except FileNotFoundError:
@@ -896,7 +896,7 @@ class Handler(BaseHTTPRequestHandler):
                     marker = f"{sid}:"
                     artifact_lines = [
                         ln for ln in alog.read_text(
-                            errors="replace").splitlines()[-400:]
+                            errors="replace", encoding="utf-8").splitlines()[-400:]
                         if marker in ln][-20:]
             except OSError:
                 pass
@@ -1920,7 +1920,7 @@ class Handler(BaseHTTPRequestHandler):
                 _src_pu = store.STORE_DIR / \
                     f"problem_understanding_{sid}.json"
                 if _src_pu.exists():
-                    _pu_rec = _json.loads(_src_pu.read_text())
+                    _pu_rec = _json.loads(_src_pu.read_text(encoding="utf-8"))
                     if isinstance(_pu_rec, dict) and _pu_rec:
                         _pu_rec["session_id"] = new_s["session_id"]
                         _pu_rec["inherited_from"] = {
@@ -1937,7 +1937,7 @@ class Handler(BaseHTTPRequestHandler):
                         (store.STORE_DIR / f"problem_understanding_"
                          f"{new_s['session_id']}.json").write_text(
                              _json.dumps(_pu_rec, indent=1,
-                                         ensure_ascii=False))
+                                         ensure_ascii=False), encoding="utf-8")
             except Exception:  # noqa: BLE001 — typed, never fatal
                 try:
                     from toscanini import worker_forensics as _wfx0
@@ -2668,7 +2668,7 @@ class Handler(BaseHTTPRequestHandler):
             if not p.exists():
                 return None
             try:
-                return _json.loads(p.read_text())
+                return _json.loads(p.read_text(encoding="utf-8"))
             except (OSError, ValueError):
                 return None
 
@@ -2765,13 +2765,13 @@ class Handler(BaseHTTPRequestHandler):
                 for p in sorted(run_dir.glob("envelope_*.json")):
                     try:
                         zf.writestr(p.name, _scrub_transport_text(
-                            p.read_text()))
+                            p.read_text(encoding="utf-8")))
                     except OSError:
                         continue
                 if pu_path.exists():
                     try:
                         zf.writestr(pu_path.name, _scrub_transport_text(
-                            pu_path.read_text()))
+                            pu_path.read_text(encoding="utf-8")))
                     except OSError:
                         pass
             self._serve_file(
@@ -2798,7 +2798,7 @@ class Handler(BaseHTTPRequestHandler):
         a single chain)."""
         import json as _json
         recs = _json.loads(
-            (run_dir / "RANKED_PACKAGE_RECORDS.json").read_text()
+            (run_dir / "RANKED_PACKAGE_RECORDS.json").read_text(encoding="utf-8")
         ) if (run_dir / "RANKED_PACKAGE_RECORDS.json").is_file() else {}
         by_cid = recs.get("by_candidate_id") or {}
         rec = by_cid.get(str(candidate_id))
@@ -2886,7 +2886,7 @@ class Handler(BaseHTTPRequestHandler):
         def _read_status(name):
             try:
                 import json as _json
-                return _json.loads((Path(run_dir) / name).read_text())
+                return _json.loads((Path(run_dir) / name).read_text(encoding="utf-8"))
             except Exception:  # noqa: BLE001 — absent = unknown
                 return None
         rp_json = _read_status("RELEASE_PROOF.json")
@@ -2942,7 +2942,7 @@ class Handler(BaseHTTPRequestHandler):
         p = Path(run_dir) / "MODEL" / "3D" / "HERO_RELEASE_STATE.json"
         try:
             import json as _json
-            return _json.loads(p.read_text())
+            return _json.loads(p.read_text(encoding="utf-8"))
         except Exception:  # noqa: BLE001 — absent/unreadable = unknown
             return None
 
@@ -3337,7 +3337,7 @@ def main():
             if not job_path.is_file():
                 continue
             try:
-                record = json.loads(job_path.read_text())
+                record = json.loads(job_path.read_text(encoding="utf-8"))
             except (OSError, ValueError):
                 continue
             if record.get("status") not in ("OK", "PARTIAL"):
@@ -3356,7 +3356,7 @@ def main():
                 marker["error"] = str(snap.get("error"))[:200]
             merged = dict(record)
             merged["durable_snapshots"] = snapshots + [marker]
-            job_path.write_text(json.dumps(merged, indent=2))
+            job_path.write_text(json.dumps(merged, indent=2), encoding="utf-8")
             print(f"[observer] render durable snapshot {sid}: "
                   f"ok={snap.get('ok')}", file=sys.stderr, flush=True)
 

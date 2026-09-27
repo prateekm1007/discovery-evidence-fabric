@@ -109,7 +109,7 @@ def _new_registry() -> Dict[str, Any]:
 def _load(path: Path) -> Dict[str, Any]:
     if not path.exists():
         return _new_registry()
-    d = json.loads(path.read_text())
+    d = json.loads(path.read_text(encoding="utf-8"))
     if d.get("registry") != "PACKAGE_ID_REGISTRY":
         raise ValueError(f"{path}: not a PACKAGE_ID_REGISTRY artifact")
     return d
@@ -119,7 +119,7 @@ def _atomic_write(path: Path, d: Dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=str(path.parent), suffix=".tmp")
     try:
-        with os.fdopen(fd, "w") as f:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
             json.dump(d, f, indent=2, ensure_ascii=False)
             f.flush()
             os.fsync(f.fileno())
@@ -149,7 +149,7 @@ def ensure_registry(path: Optional[str] = None) -> Path:
     if not p.exists():
         lock = p.with_suffix(p.suffix + ".lock")
         lock.parent.mkdir(parents=True, exist_ok=True)
-        with open(lock, "w") as lf:
+        with open(lock, "w", encoding="utf-8") as lf:
             flock(lf, LOCK_EX)
             try:
                 if not p.exists():
@@ -172,7 +172,7 @@ def allocate(invention_id: str, run_id: str,
     """
     p = ensure_registry(registry_path)
     lock = p.with_suffix(p.suffix + ".lock")
-    with open(lock, "w") as lf:
+    with open(lock, "w", encoding="utf-8") as lf:
         flock(lf, LOCK_EX)
         try:
             d = _load(p)
@@ -223,7 +223,7 @@ def mark_released(invention_id: str, registry_path: Optional[str] = None,
         raise ValueError(f"invalid terminal allocation status: {status!r}")
     p = ensure_registry(registry_path)
     lock = p.with_suffix(p.suffix + ".lock")
-    with open(lock, "w") as lf:
+    with open(lock, "w", encoding="utf-8") as lf:
         flock(lf, LOCK_EX)
         try:
             d = _load(p)

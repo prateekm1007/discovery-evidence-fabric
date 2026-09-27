@@ -172,7 +172,7 @@ def _generation_note(session: Dict[str, Any]) -> str:
     try:
         p = Path(rd) / "INVENTION_LINEAGE.json" if rd else None
         if p and p.exists():
-            lin = _json.loads(p.read_text())
+            lin = _json.loads(p.read_text(encoding="utf-8"))
             n = lin.get("n_generations")
             cur = lin.get("current_invention") or {}
             if n and cur:

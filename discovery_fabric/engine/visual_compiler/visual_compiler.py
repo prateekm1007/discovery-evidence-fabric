@@ -104,7 +104,7 @@ def _write_invocation_receipt(work_dir: str, record: Dict[str, Any],
             aid = Path(work_dir) / "MODEL" / "ARTIFACT_IDENTITY.json"
             if aid.is_file():
                 try:
-                    generation_id = (json.loads(aid.read_text())
+                    generation_id = (json.loads(aid.read_text(encoding="utf-8"))
                                      or {}).get("generation_id")
                 except Exception:  # noqa: BLE001 — absent stays absent
                     generation_id = None
@@ -152,7 +152,7 @@ def _write_invocation_receipt(work_dir: str, record: Dict[str, Any],
         }
         out_dir.mkdir(parents=True, exist_ok=True)
         path = out_dir / RECEIPT_FILENAME
-        path.write_text(json.dumps(receipt, indent=2))
+        path.write_text(json.dumps(receipt, indent=2), encoding="utf-8")
         return str(path)
     except Exception as exc:  # noqa: BLE001 — typed, never fatal
         try:
@@ -452,7 +452,7 @@ def _compile_visuals_inner(work_dir: str,
     # (Art. LXIV disposition: the side-record shape is superseded by
     # this merge-and-persist; no second record shape survives on disk.)
     (Path(out_dir) / "render_record.json").write_text(
-        json.dumps(record, indent=2))
+        json.dumps(record, indent=2), encoding="utf-8")
     return record
 
 
@@ -463,7 +463,7 @@ def _with_chrome(rspec_path: str) -> str:
     binary (fail-closed provenance, Art. VI)."""
     chrome = render_worker._LAST_RESOLUTION.get("accepted_chrome") \
         or render_worker.find_chrome()
-    spec = json.loads(Path(rspec_path).read_text())
+    spec = json.loads(Path(rspec_path).read_text(encoding="utf-8"))
     spec["chrome_path"] = chrome
-    Path(rspec_path).write_text(json.dumps(spec))
+    Path(rspec_path).write_text(json.dumps(spec), encoding="utf-8")
     return rspec_path

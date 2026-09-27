@@ -491,13 +491,13 @@ def run_improve(payload: Dict[str, Any]) -> Dict[str, Any]:
         except Exception as exc:  # noqa: BLE001 — typed, never silent
             transport_block = {"error": f"{type(exc).__name__}: {exc}"[:300]}
             # R526 Q-B: per-target exit on transport exception.
-             _rps(session_id=_rps_session, run_id=run_id,
-                  engine_stage="IMPROVE", phase="IMPROVE",
-                  event="target_exit", scope="child",
-                  candidate_id=dead_e.get("candidate_id"),
-                  candidate_key=dead_e.get("key"),
-                  wall_s=round(time.perf_counter() - _tgt_t0, 6),
-                  detail={"outcome": "TRANSPORT_EXCEPTION"})
+            _rps(session_id=_rps_session, run_id=run_id,
+                 engine_stage="IMPROVE", phase="IMPROVE",
+                 event="target_exit", scope="child",
+                 candidate_id=dead_e.get("candidate_id"),
+                 candidate_key=dead_e.get("key"),
+                 wall_s=round(time.perf_counter() - _tgt_t0, 6),
+                 detail={"outcome": "TRANSPORT_EXCEPTION"})
             break
         if getattr(res, "status", None) != "OK":
             transport_block = {"status": getattr(res, "status", ""),
@@ -528,13 +528,13 @@ def run_improve(payload: Dict[str, Any]) -> Dict[str, Any]:
                         "— Art. XXXVII) — never salvaged"})
             _progress(_dead_idx)
             # R526 Q-B: per-target exit on unparseable mutation.
-        _rps(session_id=_rps_session, run_id=run_id,
-             engine_stage="IMPROVE", phase="IMPROVE",
-             event="target_exit", scope="child",
-             candidate_id=dead_e.get("candidate_id"),
-             candidate_key=dead_e.get("key"),
-             wall_s=round(time.perf_counter() - _tgt_t0, 6),
-             detail={"outcome": "SKIPPED_UNPARSABLE"})
+            _rps(session_id=_rps_session, run_id=run_id,
+                 engine_stage="IMPROVE", phase="IMPROVE",
+                 event="target_exit", scope="child",
+                 candidate_id=dead_e.get("candidate_id"),
+                 candidate_key=dead_e.get("key"),
+                 wall_s=round(time.perf_counter() - _tgt_t0, 6),
+                 detail={"outcome": "SKIPPED_UNPARSABLE"})
             continue
         child_ms = build_child_ms_candidate(parent, dead_e, mutation, gen)
         child_ms["mutation_provider"] = provider

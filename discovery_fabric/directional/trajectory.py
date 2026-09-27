@@ -25,7 +25,7 @@ def load_trajectory(run_dir: Path) -> Dict[str, Any]:
     p = Path(run_dir) / TRAJECTORY_FILENAME
     if p.exists():
         try:
-            d = json.loads(p.read_text())
+            d = json.loads(p.read_text(encoding="utf-8"))
             if isinstance(d, dict):
                 return d
         except Exception:  # noqa: BLE001 — corrupt -> fresh, disclosed
@@ -54,7 +54,7 @@ def append_step(run_dir: Path, step: Dict[str, Any]) -> Dict[str, Any]:
     p = Path(run_dir) / TRAJECTORY_FILENAME
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(t, indent=1, ensure_ascii=False,
-                            default=str))
+                            default=str), encoding="utf-8")
     return t
 
 

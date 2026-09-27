@@ -94,7 +94,7 @@ _FAILURE_CLASS_RE = re.compile(
 def _read_json(p: Path) -> Optional[Dict[str, Any]]:
     try:
         if p.is_file():
-            data = __import__("json").loads(p.read_text())
+            data = __import__("json").loads(p.read_text(encoding="utf-8"))
             return data if isinstance(data, dict) else None
     except (OSError, ValueError):
         return None

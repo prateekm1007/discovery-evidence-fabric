@@ -115,7 +115,7 @@ def load_coverage_registry(path: Optional[Path] = None) -> Dict[str, Any]:
     p = path or REGISTRY_PATH
     if not p.exists():
         raise FileNotFoundError(f"coverage registry missing: {p}")
-    doc = json.loads(p.read_text())
+    doc = json.loads(p.read_text(encoding="utf-8"))
     problems = validate_coverage_registry(doc)
     if problems:
         raise ValueError("coverage registry invalid: " + "; ".join(problems))
@@ -132,7 +132,7 @@ def validate_coverage_registry(doc: Optional[Dict[str, Any]] = None
     quantified uncertainty + real solver version), the one-identity
     rule, and the pinned entry epistemic class."""
     if doc is None:
-        doc = json.loads(REGISTRY_PATH.read_text())
+        doc = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     v: List[str] = []
     entries = doc.get("entries", [])
     if not entries:

@@ -89,7 +89,7 @@ def _probe_state(solver_id: str, *probe_ids: str) -> Dict[str, Any]:
         raise FileNotFoundError(
             f"probe artifact missing: {PROBES_PATH} — availability "
             "cannot be assumed without measurement (Art. VI)")
-    doc = json.loads(PROBES_PATH.read_text())
+    doc = json.loads(PROBES_PATH.read_text(encoding="utf-8"))
     by_id = {p["solver_id"]: p for p in doc["probes"]}
     hits = [by_id[pid] for pid in probe_ids if pid in by_id]
     if not hits:

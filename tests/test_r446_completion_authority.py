@@ -318,6 +318,23 @@ class TestAttackEVisualTypedSkip:
     def _complete_run_with_typed_skip(self, run_dir):
         _write(run_dir / "final_state.json", _final_state())
         _write(run_dir / "run_manifest.json", _full_marker())
+        # R455-LEAN-1 A1: the CIO exists only when invention-side
+        # artifacts exist (final_state alone never manufactures a CIO) —
+        # the visual-axis fixture therefore stages the same honest
+        # invention artifact the Attack-D fixture uses, so this test
+        # keeps testing what it is ABOUT (the visual axis), not CIO
+        # existence.
+        _write(run_dir / "INVENTION_SPECIFICATION.json", {
+            "invention_id": {"value": "ts_attack_e"},
+            "problem": {"value": "the attack problem"},
+            "mechanism": {"value": {
+                "mechanism": "staged header-side filtration with "
+                             "dP-triggered backflush",
+                "intervention": "wedge-wire cascade",
+                "expected_effect": "clogging below 0.5 per campaign"}},
+            "killer_experiment": {"value": {
+                "selected": "campaign clogging count"}},
+        })
         _write(run_dir / "MODEL" / "3D" / "render_record.json", {
             "schema_version": "r443-render-record/1.0.0",
             "status": "SKIPPED_LOW_MEMORY",

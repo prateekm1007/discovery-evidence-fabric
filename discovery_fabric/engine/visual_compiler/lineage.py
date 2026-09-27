@@ -97,7 +97,7 @@ def _sha256_pixels(img_bytes: bytes) -> Optional[str]:
 
 def _read_json(path: Path) -> Optional[Dict[str, Any]]:
     try:
-        return json.loads(path.read_text())
+        return json.loads(path.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001
         return None
 

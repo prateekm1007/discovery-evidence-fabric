@@ -85,12 +85,12 @@ def record_action(run_dir: Optional[str], entry: Dict[str, Any]) -> None:
     if not p:
         return
     try:
-        data = json.loads(p.read_text()) if p.exists() else {"actions": []}
+        data = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {"actions": []}
         if isinstance(data, dict) and isinstance(data.get("actions"), list):
             data["actions"].append(entry)
             data["last_updated"] = time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                                  time.gmtime())
-            p.write_text(json.dumps(data, indent=1))
+            p.write_text(json.dumps(data, indent=1), encoding="utf-8")
     except Exception:  # noqa: BLE001 — disclosed via session record
         pass
 

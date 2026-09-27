@@ -144,7 +144,7 @@ def _pinned_path(shipped_name: str) -> Optional[Path]:
     if not shipped.exists():
         return None
     try:
-        pins = json.loads(SHIPPED_DIGESTS.read_text())
+        pins = json.loads(SHIPPED_DIGESTS.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return None
     expected = (pins.get("sha256") or {}).get(shipped_name)
@@ -345,7 +345,7 @@ def resolve_state(measurement_path: Optional[Path] = None,
                            "pinned-digest re-verification at read "
                            "time — fail-closed (Art. IX/L)")}
     try:
-        record = json.loads(m_path.read_text())
+        record = json.loads(m_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return {**base, "state": "UNREADABLE_NOT_CALIBRATED",
                 "terminal_kill_admissible": False,
@@ -354,7 +354,7 @@ def resolve_state(measurement_path: Optional[Path] = None,
     metrics = record.get("metrics") or {}
     thresholds = None
     try:
-        thresholds = (json.loads(s_path.read_text())
+        thresholds = (json.loads(s_path.read_text(encoding="utf-8"))
                       .get("pre_registered_thresholds"))
     except (OSError, json.JSONDecodeError):
         thresholds = None
@@ -391,7 +391,9 @@ def resolve_state(measurement_path: Optional[Path] = None,
     ring = record.get("attacker_ring") or None
     def _rel(p: Path) -> Optional[str]:
         try:
-            return str(p.relative_to(REPO))
+            # posix keys on every platform (the recorded path is compared
+            # against the committed R412/CALIBRATION/... shape)
+            return p.relative_to(REPO).as_posix()
         except ValueError:
             return str(p)
 

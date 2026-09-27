@@ -293,7 +293,7 @@ def run_benchmark(out_path: Optional[str] = None) -> Dict[str, Any]:
     if out_path:
         p = Path(out_path)
         p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(json.dumps(report, indent=2, default=str))
+        p.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
         print(f"\nbenchmark report -> {p}")
     return report
 

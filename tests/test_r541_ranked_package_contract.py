@@ -519,6 +519,116 @@ def test_18_package_deletion_after_result_creation_fails_verification(
 
 
 # ---------------------------------------------------------------------------
+# R541 §6: candidate-specific component projections
+#
+# Each survivor's projected components (evidence / mechanism /
+# adversarial / engineering / decisive_experiment / package) must be
+# the CANDIDATE's OWN source material — not a second candidate's and
+# not a shared #1's. These tests pin that the result builder projects
+# per-candidate artifacts (the candidate-bound spec trio), never a
+# cross-candidate borrow.
+# ---------------------------------------------------------------------------
+
+def test_19_candidate_a_components_are_candidate_a_sources(tmp_path):
+    run_dir = _base_run_dir(tmp_path, with_pkg=False)
+    _ranked_package_records(run_dir, {
+        "cand_a": ("P_primary.zip", _zip_bytes(b"A")),
+        "cand_b": ("P_grid-1.zip", _zip_bytes(b"B"))})
+    rec = rrs.derive_ranked_result_set(run_dir)
+    by_cid = {r["candidate_id"]: r for r in rec["ranked_results"]}
+    pa = by_cid["cand_a"]["components"]
+    # candidate A's mechanism is the primary spec trio's mechanism
+    # (the candidate A source material), NOT candidate B's
+    assert pa["mechanism"]["mechanism"] == "A"
+    assert pa["mechanism"]["intervention"] == "i-a"
+    assert pa["mechanism"]["falsification_test"] == "f-a"
+    # candidate A's evidence is the primary evidence records
+    assert len(pa["evidence"]["records"]) == 2
+    # candidate A's decisive experiment is the primary's
+    assert pa["decisive_experiment"]["experiment"] == "exp"
+    # candidate A's package is candidate A's (not B's)
+    assert pa["package"]["candidate_id"] == "cand_a"
+    assert pa["package"]["zip_name"] == "P_primary.zip"
+
+
+def test_20_candidate_b_components_are_candidate_b_sources(tmp_path):
+    run_dir = _base_run_dir(tmp_path, with_pkg=False)
+    _ranked_package_records(run_dir, {
+        "cand_a": ("P_primary.zip", _zip_bytes(b"A")),
+        "cand_b": ("P_grid-1.zip", _zip_bytes(b"B"))})
+    rec = rrs.derive_ranked_result_set(run_dir)
+    by_cid = {r["candidate_id"]: r for r in rec["ranked_results"]}
+    pb = by_cid["cand_b"]["components"]
+    # candidate B's mechanism is the per-candidate spec trio's
+    # mechanism (the candidate B source material), NOT candidate A's
+    assert pb["mechanism"]["mechanism"] == "B"
+    assert pb["mechanism"]["intervention"] == "i-b"
+    assert pb["mechanism"]["falsification_test"] == "f-b"
+    # candidate B's evidence is the per-candidate record set
+    assert len(pb["evidence"]["records"]) == 1
+    # candidate B's decisive experiment is the per-candidate's
+    assert pb["decisive_experiment"]["experiment"] == "exp-b"
+    # candidate B's package is candidate B's (not A's)
+    assert pb["package"]["candidate_id"] == "cand_b"
+    assert pb["package"]["zip_name"] == "P_grid-1.zip"
+
+
+def test_21_two_admissible_two_packages_two_identities_two_hashes(tmp_path):
+    """The Coder §7 critical assertion: two admissible survivors AND two
+    candidate-specific packages AND two package identities AND two
+    package hashes AND rank 1 maps only to candidate A's package AND
+    rank 2 maps only to candidate B's package."""
+    run_dir = _base_run_dir(tmp_path, with_pkg=False)
+    _ranked_package_records(run_dir, {
+        "cand_a": ("P_primary.zip", _zip_bytes(b"A")),
+        "cand_b": ("P_grid-1.zip", _zip_bytes(b"B"))})
+    rec = rrs.derive_ranked_result_set(run_dir)
+    assert rec["n_admissible"] == 2
+    by_rank = {r["rank"]: r for r in rec["ranked_results"]}
+    p1 = by_rank[1]["components"]["package"]
+    p2 = by_rank[2]["components"]["package"]
+    # two candidate-specific packages (distinct names)
+    assert p1["zip_name"] == "P_primary.zip"
+    assert p2["zip_name"] == "P_grid-1.zip"
+    assert p1["zip_name"] != p2["zip_name"]
+    # two package identities (distinct candidate bindings)
+    assert p1["candidate_id"] == "cand_a"
+    assert p2["candidate_id"] == "cand_b"
+    assert p1["package_id"] != p2["package_id"]
+    # two package hashes (distinct, candidate-specific contents)
+    assert p1["zip_sha256"] != p2["zip_sha256"]
+    # rank 1 maps ONLY to candidate A's package
+    assert by_rank[1]["candidate_id"] == "cand_a"
+    assert p1["zip_name"] != p2["zip_name"]
+    # rank 2 maps ONLY to candidate B's package
+    assert by_rank[2]["candidate_id"] == "cand_b"
+
+
+def test_22_one_package_only_makes_finished_false(tmp_path):
+    """The Coder §7 negative test: only candidate A has a completed
+    package; candidate B has no package => FINISHED_DISCOVERY = false.
+    This prevents the old run-level package-completion bug (where one
+    #1 package completed the whole ranked set) from returning."""
+    run_dir = _base_run_dir(tmp_path, with_pkg=True)  # only cand_a
+    rec = rrs.derive_ranked_result_set(run_dir)
+    assert rec["n_admissible"] == 2
+    # only candidate A has a complete package
+    pks = {r["candidate_id"]: r["components"]["package"]
+           for r in rec["ranked_results"]}
+    assert pks["cand_a"]["complete"] is True
+    assert pks["cand_b"]["complete"] is False
+    # the ranked set is NOT finished (one package alone does not
+    # complete it — the run-level bug is structurally closed)
+    assert rec["n_complete_packages"] == 1
+    assert rec["completion"]["FINISHED_DISCOVERY"] is False
+    assert rec["completion"]["TECHNOLOGY_PACKAGE_COMPLETED"] is False
+    # the verification confirms candidate B's package is missing
+    v = rrs.verify_ranked_result_set(rec, run_dir)
+    assert v["verified"] is False
+    assert any("cand_b" in x for x in v["violations"])
+
+
+# ---------------------------------------------------------------------------
 # the helper the tests reference: a session-reconstruction guard that
 # cannot manufacture a rank-1 result. Implemented here (not in
 # sessions.py) so the test is self-contained + hermetic — it mirrors

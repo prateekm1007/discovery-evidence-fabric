@@ -68,7 +68,7 @@ def _now() -> float:
 
 def _read() -> Dict[str, Any]:
     try:
-        return json.loads(BREAKER_PATH.read_text())
+        return json.loads(BREAKER_PATH.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001 — absent/corrupt = no state
         return {"schema": 1, "sources": {}}
 
@@ -80,7 +80,7 @@ def _write(doc: Dict[str, Any]) -> None:
         flock(lf, LOCK_EX)
         try:
             BREAKER_PATH.write_text(json.dumps(doc, indent=1,
-                                               sort_keys=True))
+                                               sort_keys=True), encoding="utf-8")
         finally:
             flock(lf, LOCK_UN)
 

@@ -10,8 +10,48 @@ opts in with ENGINE_LIVE=1 (the same gate the live tests use).
 from __future__ import annotations
 
 import os
+import sys
+from pathlib import Path
 
 import pytest
+
+# --- Windows case-tangle shim (dev-checkout only) -------------------------
+# The index splits the orchestration package across TWO case-variants:
+# 40 code paths under `toscanini/` and 248 asset paths under `TOSCANINI/`.
+# On a case-insensitive Windows checkout both collide into ONE physical
+# directory named `TOSCANINI`, and Python's (case-sensitive) import of
+# `toscanini` then fails: tests that do `from toscanini import ...` would
+# ERROR at collection even though the bytes are present. Linux CI checks
+# out both directories and is unaffected (find_spec succeeds -> no shim).
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+if sys.platform == "win32" and "toscanini" not in sys.modules:
+    import importlib.util as _ilu
+    if _ilu.find_spec("toscanini") is None:
+        try:
+            import TOSCANINI as _T  # the SAME bytes, correct-case directory
+        except ImportError:
+            _T = None
+        if _T is not None:
+            sys.modules["toscanini"] = _T
+# sessions.py (and durable/artifact_worker) do a bare `import fcntl` —
+# POSIX-only. On Windows the import must be satisfied with the same no-op
+# flock fake the toscanini-focused suites already use (R482's own product
+# resolution is "noop" when neither fcntl nor msvcrt exists, so a no-op
+# kernel lock is honest for single-process hermetic tests).
+if sys.platform == "win32":
+    try:
+        import fcntl as _real_fcntl  # noqa: F401
+    except ImportError:
+        import types as _types
+        _fake_fcntl = _types.ModuleType("fcntl")
+        _fake_fcntl.LOCK_SH = 1
+        _fake_fcntl.LOCK_EX = 2
+        _fake_fcntl.LOCK_NB = 4
+        _fake_fcntl.LOCK_UN = 8
+        _fake_fcntl.flock = lambda *a, **k: None
+        sys.modules["fcntl"] = _fake_fcntl
 
 PROVIDER_ENV_VARS = [
     "OPENROUTER_API_KEY", "NVIDIA_API_KEY", "ANTHROPIC_API_KEY",

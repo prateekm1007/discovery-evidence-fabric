@@ -1,0 +1,1385 @@
+{
+  "scenario": "b",
+  "n_admissible": 1,
+  "n_complete_packages": 1,
+  "n_ranked": 3,
+  "disposition_rows": {
+    "ranked": 3,
+    "killed": 2,
+    "excluded_by_gates": 0
+  },
+  "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+  "completion": {
+    "PIPELINE_COMPLETED": true,
+    "DISCOVERY_COMPLETED": true,
+    "TECHNOLOGY_PACKAGE_COMPLETED": true,
+    "FINISHED_DISCOVERY": true,
+    "invariant": "FINISHED_DISCOVERY = every displayed admissible ranked survivor has its own complete result record AND its own complete candidate-bound technology package; never EXECUTION_COMPLETED or SOME_COMPONENTS_PRODUCED alone, and never one package for the selected #1 standing in for the ranked set"
+  },
+  "completion_contract": {
+    "finished_discovery": true,
+    "missing_components": [],
+    "typed_terminal_state": "FINISHED_DISCOVERY"
+  },
+  "ranked_results": [
+    {
+      "rank": 1,
+      "candidate_id": "primary:r541-ranked-pkg-battery-b",
+      "key": "primary",
+      "origin": "DISCOVERY_LOOP_SURVIVOR",
+      "admissible": true,
+      "components": {
+        "evidence": {
+          "records": [
+            {
+              "id": "europepmc:FIXTURE-fluidics_hydraulic-0",
+              "source": null,
+              "frozen": false
+            }
+          ],
+          "mechanism_source_span": "porous microstructure resists fluid-path tissue ingrowth",
+          "evidence_status": "verified_against_frozen_evidence"
+        },
+        "mechanism": {
+          "mechanism": "porous microstructure resists fluid-path tissue ingrowth. The proposed intervention realizes this mechanism by placing porous titanium proximal catheter tip in the shunt lumen at the failure site identified in the problem statement, where the governing physical effect produces sustained fluid flow through the shunt valve under the stated constraint (maintain long-term lumen patency and flow); the transfer logic follows from the custodied source observation and its mechanism source span.",
+          "intervention": "porous titanium proximal catheter tip in the shunt lumen",
+          "expected_effect": "sustained fluid flow at least 30 percent above the silicone baseline at 30 days",
+          "falsification_test": "bench shunt flow loop; measure flow decay over 30 days",
+          "competing_considered": [
+            "cand:MS:AKILL:r542",
+            "cand:MS:BKILL:r542"
+          ]
+        },
+        "adversarial": {
+          "overall": "SURVIVED_WITH_UNCERTAINTIES",
+          "disposition": "SURVIVED",
+          "survived": true,
+          "killed": false,
+          "excluded": false,
+          "unresolved": false,
+          "quality_verdict": "CONDITIONAL",
+          "deficient_areas": 1
+        },
+        "engineering": {
+          "geometry_present": false,
+          "geometry": {
+            "class": "NOT_ESTABLISHED"
+          },
+          "engineering_core": {
+            "governing_model": {
+              "summary": "Fluid mechanics / hydraulics governing relations proposed for this invention; SYMBOLIC ONLY until inputs are sourced",
+              "equations": [
+                {
+                  "equation_id": "FLUID-001",
+                  "name": "Hagen-Poiseuille (laminar pipe flow)",
+                  "expression": "Q = (pi * r^4 * dP) / (8 * mu * L)",
+                  "source": {
+                    "text": "standard Newtonian laminar pipe-flow relation (any fluid-mechanics text)",
+                    "epistemic_class": "EXTERNAL_PRECEDENT",
+                    "verify_before_release": true
+                  },
+                  "applicability": {
+                    "condition": "Newtonian fluid, laminar regime, rigid circular lumen, fully developed flow",
+                    "epistemic_class": "MODEL_DERIVED",
+                    "judged_for_domain": "fluidics_hydraulic"
+                  },
+                  "assumptions": [
+                    "CSF approximated as Newtonian (valid at shunt flow rates)",
+                    "no wall compliance effects"
+                  ],
+                  "selection_rationale": {
+                    "epistemic_class": "MODEL_DERIVED",
+                    "verdict": "APPLICABLE",
+                    "reason": "invention mechanism engages the model variables: r, L",
+                    "engaged_variables": [
+                      "r",
+                      "L"
+                    ],
+                    "engagement_evidence": [
+                      {
+                        "symbol": "r",
+                        "shared_concepts": [],
+                        "matched_description_words": [
+                          "lumen"
+                        ],
+                        "grounding": "legacy description-word match (no declared concepts on this variable)"
+                      },
+                      {
+                        "symbol": "L",
+                        "shared_concepts": [],
+                        "matched_description_words": [
+                          "lumen"
+                        ],
+                        "grounding": "legacy description-word match (no declared concepts on this variable)"
+                      }
+                    ],
+                    "mechanism_asserted_concepts": {
+                      "training_data": [
+                        "observation",
+                        "baseline"
+                      ]
+                    },
+                    "assumption_check": {
+                      "assumptions": [
+                        "CSF approximated as Newtonian (valid at shunt flow rates)",
+                        "no wall compliance effects"
+                      ],
+                      "violations": [],
+                      "epistemic_class": "MODEL_DERIVED (mechanically evaluated, recorded for audit)"
+                    },
+                    "mechanism_mentions": [
+                      {
+                        "symbol": "r",
+                        "description": "lumen radius",
+                        "unit": "m",
+                        "role": "input"
+                      },
+                      {
+                        "symbol": "L",
+                        "description": "lumen length",
+                        "unit": "m",
+                        "role": "input"
+                      }
+                    ]
+                  },
+                  "model_applicability": "Newtonian fluid, laminar regime, rigid circular lumen, fully developed flow",
+                  "model_assumptions": [
+                    "CSF approximated as Newtonian (valid at shunt flow rates)",
+                    "no wall compliance effects"
+                  ],
+                  "invention_tie": {
+                    "linkage_kind": "applicability_judgment",
+                    "verdict": "APPLICABLE",
+                    "engaged_variables": [
+                      "r",
+                      "L"
+                    ],
+                    "mechanism_mention_count": 2
+                  }
+                },
+                {
+                  "equation_id": "FLUID-002",
+                  "name": "Reynolds number",
+                  "expression": "Re = (rho * v * D) / mu",
+                  "source": {
+                    "text": "standard dimensionless similarity number (any fluid-mechanics text)",
+                    "epistemic_class": "EXTERNAL_PRECEDENT",
+                    "verify_before_release": true
+                  },
+                  "applicability": {
+                    "condition": "circular section; single-phase flow",
+                    "epistemic_class": "MODEL_DERIVED",
+                    "judged_for_domain": "fluidics_hydraulic"
+                  },
+                  "assumptions": [
+                    "transition criterion Re~2300 is a MODEL_DERIVED engineering rule of thumb"
+                  ],
+                  "selection_rationale": {
+                    "epistemic_class": "MODEL_DERIVED",
+                    "verdict": "CONDITIONAL",
+                    "reason": "domain template justifies this relation for the domain, but the invention text does not yet engage its variables; applicability must be confirmed by the first characterization",
+                    "engaged_variables": [],
+                    "engagement_evidence": [],
+                    "mechanism_asserted_concepts": {
+                      "training_data": [
+                        "observation",
+                        "baseline"
+                      ]
+                    },
+                    "assumption_check": {
+                      "assumptions": [
+                        "transition criterion Re~2300 is a MODEL_DERIVED engineering rule of thumb"
+                      ],
+                      "violations": [],
+                      "epistemic_class": "MODEL_DERIVED (mechanically evaluated, recorded for audit)"
+                    },
+                    "mechanism_mentions": []
+                  },
+                  "model_applicability": "circular section; single-phase flow",
+                  "model_assumptions": [
+                    "transition criterion Re~2300 is a MODEL_DERIVED engineering rule of thumb"
+                  ],
+                  "invention_tie": {
+                    "linkage_kind": "applicability_judgment",
+                    "verdict": "CONDITIONAL",
+                    "engaged_variables": [],
+                    "mechanism_mention_count": 0
+                  }
+                },
+                {
+                  "equation_id": "FLUID-003",
+                  "name": "Orifice flow (sharp-edged restriction)",
+                  "expression": "Q = C_d * A * sqrt(2 * dP / rho)",
+                  "source": {
+                    "text": "standard orifice-equation form (any fluid-mechanics text)",
+                    "epistemic_class": "EXTERNAL_PRECEDENT",
+                    "verify_before_release": true
+                  },
+                  "applicability": {
+                    "condition": "turbulent orifice flow; C_d treated as MODEL_DERIVED until measured",
+                    "epistemic_class": "MODEL_DERIVED",
+                    "judged_for_domain": "fluidics_hydraulic"
+                  },
+                  "assumptions": [
+                    "C_d ~0.6-0.65 is an engineering prior, not a measurement"
+                  ],
+                  "selection_rationale": {
+                    "epistemic_class": "MODEL_DERIVED",
+                    "verdict": "CONDITIONAL",
+                    "reason": "domain template justifies this relation for the domain, but the invention text does not yet engage its variables; applicability must be confirmed by the first characterization",
+                    "engaged_variables": [],
+                    "engagement_evidence": [],
+                    "mechanism_asserted_concepts": {
+                      "training_data": [
+                        "observation",
+                        "baseline"
+                      ]
+                    },
+                    "assumption_check": {
+                      "assumptions": [
+                        "C_d ~0.6-0.65 is an engineering prior, not a measurement"
+                      ],
+                      "violations": [],
+                      "epistemic_class": "MODEL_DERIVED (mechanically evaluated, recorded for audit)"
+                    },
+                    "mechanism_mentions": []
+                  },
+                  "model_applicability": "turbulent orifice flow; C_d treated as MODEL_DERIVED until measured",
+                  "model_assumptions": [
+                    "C_d ~0.6-0.65 is an engineering prior, not a measurement"
+                  ],
+                  "invention_tie": {
+                    "linkage_kind": "applicability_judgment",
+                    "verdict": "CONDITIONAL",
+                    "engaged_variables": [],
+                    "mechanism_mention_count": 0
+                  }
+                }
+              ],
+              "rejected_equations": [],
+              "why_this_domain": {
+                "domain": "fluidics_hydraulic",
+                "label": "Fluid mechanics / hydraulics",
+                "canonical_family": "biomedical",
+                "canonical_family_label": "Biomedical & life-science systems",
+                "canonical_family_basis": {
+                  "canonical_family": "biomedical",
+                  "label": "Biomedical & life-science systems",
+                  "score": 59,
+                  "min_form_score": 3,
+                  "score_table": [
+                    {
+                      "family": "biomedical",
+                      "score": 59,
+                      "hits": [
+                        {
+                          "keyword": "catheter",
+                          "weight": 6,
+                          "count": 3
+                        },
+                        {
+                          "keyword": "shunt",
+                          "weight": 5,
+                          "count": 5
+                        },
+                        {
+                          "keyword": "lumen",
+                          "weight": 4,
+                          "count": 4
+                        }
+                      ]
+                    },
+                    {
+                      "family": "thermal",
+                      "score": 0,
+                      "hits": []
+                    },
+                    {
+                      "family": "fluid",
+                      "score": 11,
+                      "hits": [
+                        {
+                          "keyword": "valve",
+                          "weight": 5,
+                          "count": 1
+                        },
+                        {
+                          "keyword": "fluid",
+                          "weight": 2,
+                          "count": 3
+                        }
+                      ]
+                    },
+                    {
+                      "family": "materials",
+                      "score": 0,
+                      "hits": []
+                    },
+                    {
+                      "family": "software_ml",
+                      "score": 0,
+                      "hits": []
+                    },
+                    {
+                      "family": "mechanical",
+                      "score": 0,
+                      "hits": []
+                    },
+                    {
+                      "family": "electronic",
+                      "score": 0,
+                      "hits": []
+                    },
+                    {
+                      "family": "energy",
+                      "score": 0,
+                      "hits": []
+                    },
+                    {
+                      "family": "optical_photonic",
+                      "score": 0,
+                      "hits": []
+                    },
+                    {
+                      "family": "acoustic",
+                      "score": 0,
+                      "hits": []
+                    }
+                  ],
+                  "whole_form_basis": {
+                    "matched_form_signals": [
+                      "catheter",
+                      "shunt"
+                    ],
+                    "rule": "whole-form device identity: the problem's own device/site statement declares an implantable or medical-device form — the application family is biomedical and dominates component-mention keyword scores (the bridge whole-form precedent; deployment words are deliberately excluded: a hospital dashboard stays software_ml)",
+                    "keyword_runner_up": "biomedical"
+                  },
+                  "basis": {
+                    "derived_from": [
+                      "problem text",
+                      "intervention site",
+                      "recorded subsystem names"
+                    ],
+                    "rule": "whole-form device identity layer, then highest keyword score; ties resolve by registry order; below the form threshold the generic family is selected and labeled",
+                    "authority": "discovery_fabric/engine/domains.py::CANONICAL_DOMAIN_FAMILIES (R445 — the one canonical domain-family vocabulary)",
+                    "deterministic": true
+                  }
+                },
+                "matched_signals": [
+                  "catheter",
+                  "csf",
+                  "fluid",
+                  "lumen",
+                  "shunt",
+                  "valve"
+                ],
+                "matched_in_text": true,
+                "runner_up": null,
+                "basis": "domain selected by the PHENOMENA layer (physical quantities/effects the domain's governing equations model) matched against THIS invention's own mechanism/problem text, with keyword routing as fallback/tiebreak — CEO item 2: keywords route, never justify; the layered evidence is recorded in domain_detection",
+                "epistemic_class": "MODEL_DERIVED",
+                "note": "0 phenomena anchor(s) + 6 routing signal(s); selection basis: ROUTING_ONLY",
+                "selection_basis": "ROUTING_ONLY",
+                "why_selected": "domain fluidics_hydraulic selected by KEYWORD ROUTING ONLY — no phenomena anchor matched (catheter, csf, fluid, lumen, shunt, valve); the routing keywords are the entire evidence base and are recorded as such (weaker justification, disclosed)",
+                "applicable_models": [
+                  "Poiseuille pressure-flow relation for laminar lumen flow",
+                  "orifice/restriction pressure drop",
+                  "Reynolds regime screening"
+                ],
+                "assumptions": [
+                  "phenomena anchors are MODEL_DERIVED physics vocabulary derived from the engine's own domain registry (each domain's governing models), independently authored for the generation path",
+                  "stem anchors use substring semantics so inflections match (harvest -> harvests/harvesting); this is the word-order-brittleness fix, not fuzzy matching of meaning",
+                  "a physical quantity stated anywhere in the invention's own text (mechanism or problem statement) counts as physics evidence — the unmet constraint ('temperature rise below margin') is physics the governing equations must respect"
+                ],
+                "limitations": [
+                  "polysemous TECHNIQUE words (steer, piezoelectric, transducer) are deliberately excluded from the phenomena layer; when NO phenomena anchor matches, routing falls back to those keywords with their known ambiguity (a 'current steering' invention with no thermal/electrical phenomena anchors would still route mechanically)",
+                  "phenomena that are genuinely shared across domains (resonance: acoustic transduction AND harvesting; 'energy' alone: too generic) are excluded from every anchor list — they cannot discriminate and are recorded as routing vocabulary only",
+                  "the phenomena layer scores PRESENCE of physics vocabulary, not magnitude or dominance of the physics; a text dominated by a secondary physics family with a single incidental anchor of the governing family could still mis-route (residual risk, disclosed)"
+                ],
+                "mechanism_sensitivity": {
+                  "question": "what would change if the mechanism changed (CEO E16 audit: the difference between domain templating and engineering reasoning)",
+                  "answer": {
+                    "governing_models_at_risk": [
+                      {
+                        "equation_id": "FLUID-001",
+                        "governs_parameters": [
+                          "lumen inner diameter",
+                          "lumen length",
+                          "operating pressure head",
+                          "flow rate range",
+                          "viscosity of flowed medium"
+                        ],
+                        "what_changes": "replacing the mechanism's physical effect invalidates FLUID-001's applicability verdict, re-opens the sourcing of 5 governing parameter(s), and requires re-judgment of the applicability conditions before any downstream design output survives"
+                      }
+                    ],
+                    "rejected_models_would_return": "0 equation(s) rejected for THIS mechanism would re-enter candidate selection under a different mechanism — the rejection is mechanism-specific, not absolute",
+                    "design_outputs_dependent": [
+                      "DI-001",
+                      "DI-002",
+                      "DI-008"
+                    ],
+                    "failure_modes_that_would_vanish": [
+                      "FM-DOM-001",
+                      "FM-DOM-002",
+                      "FM-DOM-003",
+                      "FM-DOM-004",
+                      "FM-DOM-005"
+                    ],
+                    "basis": "derived mechanically from the recorded parameter-to-equation linkage, the rejected-equation register and the design graph — no new claims"
+                  },
+                  "epistemic_class": "MODEL_DERIVED"
+                },
+                "equation_applicability_summary": {
+                  "applicable": [
+                    "FLUID-001"
+                  ],
+                  "conditional": [
+                    "FLUID-002",
+                    "FLUID-003"
+                  ],
+                  "rejected": []
+                }
+              },
+              "domain_governing_models": [
+                {
+                  "model": "Poiseuille pressure-flow relation for laminar lumen flow",
+                  "registry_equation_ids": [
+                    "EQ-FLUIDICS-POISEUILLE"
+                  ],
+                  "applicability": "newtonian, incompressible, laminar",
+                  "model_assumptions": [
+                    "fluid is newtonian at operating temperature",
+                    "flow stays laminar across the operating envelope",
+                    "lumen cross-section stays circular and rigid",
+                    "flow is fully developed (entrance effects negligible)"
+                  ]
+                },
+                {
+                  "model": "orifice/restriction pressure drop",
+                  "registry_equation_ids": [
+                    "EQ-FLUIDICS-ORIFICE"
+                  ],
+                  "applicability": "discrete constrictions",
+                  "model_assumptions": [
+                    "restriction is sharp-edged and its length is small vs diameter",
+                    "discharge coefficient treated as MODEL_DERIVED until measured on the actual geometry"
+                  ]
+                },
+                {
+                  "model": "Reynolds regime screening",
+                  "registry_equation_ids": [
+                    "EQ-FLUIDICS-REYNOLDS"
+                  ],
+                  "applicability": "single-phase circular-section flow",
+                  "model_assumptions": [
+                    "single-phase flow (no gas emboli)",
+                    "transition criterion Re~2300 is an engineering rule of thumb, not a device-specific measurement"
+                  ]
+                }
+              ],
+              "assumptions": [
+                "CSF approximated as Newtonian (valid at shunt flow rates)",
+                "no wall compliance effects",
+                "transition criterion Re~2300 is a MODEL_DERIVED engineering rule of thumb",
+                "C_d ~0.6-0.65 is an engineering prior, not a measurement"
+              ],
+              "boundary_conditions": [
+                "to be established by the first bench characterization (not yet performed)"
+              ],
+              "input_variables": [
+                {
+                  "symbol": "r",
+                  "unit": "m",
+                  "epistemic_status": "UNKNOWN (no sourced value)"
+                },
+                {
+                  "symbol": "dP",
+                  "unit": "Pa",
+                  "epistemic_status": "UNKNOWN (no sourced value)"
+                },
+                {
+                  "symbol": "mu",
+                  "unit": "Pa.s",
+                  "epistemic_status": "UNKNOWN (no sourced value)"
+                },
+                {
+                  "symbol": "L",
+                  "unit": "m",
+                  "epistemic_status": "UNKNOWN (no sourced value)"
+                },
+                {
+                  "symbol": "rho",
+                  "unit": "kg/m^3",
+                  "epistemic_status": "UNKNOWN (no sourced value)"
+                },
+                {
+                  "symbol": "v",
+                  "unit": "m/s",
+                  "epistemic_status": "UNKNOWN (no sourced value)"
+                },
+                {
+                  "symbol": "D",
+                  "unit": "m",
+                  "epistemic_status": "UNKNOWN (no sourced value)"
+                },
+                {
+                  "symbol": "mu",
+                  "unit": "Pa.s",
+                  "epistemic_status": "UNKNOWN (no sourced value)"
+                },
+                {
+                  "symbol": "C_d",
+                  "unit": "-",
+                  "epistemic_status": "UNKNOWN (no sourced value)"
+                },
+                {
+                  "symbol": "A",
+                  "unit": "m^2",
+                  "epistemic_status": "UNKNOWN (no sourced value)"
+                },
+                {
+                  "symbol": "dP",
+                  "unit": "Pa",
+                  "epistemic_status": "UNKNOWN (no sourced value)"
+                },
+                {
+                  "symbol": "rho",
+                  "unit": "kg/m^3",
+                  "epistemic_status": "UNKNOWN (no sourced value)"
+                }
+              ],
+              "output_variables": [
+                {
+                  "symbol": "Q",
+                  "unit": "m^3/s",
+                  "epistemic_status": "UNKNOWN (no computed value)"
+                },
+                {
+                  "symbol": "Re",
+                  "unit": "-",
+                  "epistemic_status": "UNKNOWN (no computed value)"
+                },
+                {
+                  "symbol": "Q",
+                  "unit": "m^3/s",
+                  "epistemic_status": "UNKNOWN (no computed value)"
+                }
+              ],
+              "parameter_sensitivities": [],
+              "failure_regimes": [
+                {
+                  "regime": "OBSTRUCTION",
+                  "basis": "SOURCE_FACT (problem.json)"
+                },
+                {
+                  "regime": "proximal occlusion by tissue ingrowth",
+                  "basis": "domain registry candidate from the engineering domain registry — applicability to THIS invention recorded below"
+                },
+                {
+                  "regime": "lumen collapse under external pressure (kink)",
+                  "basis": "domain registry candidate from the engineering domain registry — applicability to THIS invention recorded below"
+                },
+                {
+                  "regime": "encrustation / mineral deposition",
+                  "basis": "domain registry candidate from the engineering domain registry — applicability to THIS invention recorded below"
+                },
+                {
+                  "regime": "regime transition to turbulence altering calibration",
+                  "basis": "domain registry candidate from the engineering domain registry — applicability to THIS invention recorded below"
+                },
+                {
+                  "regime": "check-valve seat wear opening reverse leakage",
+                  "basis": "domain registry candidate from the engineering domain registry — applicability to THIS invention recorded below"
+                }
+              ]
+            },
+            "critical_parameters": [
+              {
+                "parameter_id": "CP-001",
+                "parameter": "lumen inner diameter",
+                "name": "lumen inner diameter",
+                "symbol": "r",
+                "unit": "m",
+                "value": "UNKNOWN (no sourced value)",
+                "value_status": "UNKNOWN",
+                "source": null,
+                "source_hash": null,
+                "derivation": "VALUE_SOURCING found no legitimate source for this parameter (no problem-statement number, no mechanistic computation, no candidate declaration) — the value STAYS UNKNOWN (Art. XXVII: never invented)",
+                "assumptions": [
+                  "CSF approximated as Newtonian (valid at shunt flow rates)",
+                  "no wall compliance effects"
+                ],
+                "uncertainty": "UNKNOWN — unquantified (no measurement exists)",
+                "verification_method": "domain bench verification per verification matrix; method selection NOT ESTABLISHED until the parameter has a sourced target value",
+                "basis": "ENGINEERING_PROPOSED (domain registry candidate)",
+                "status": "ENGINEERING_PROPOSED / VALUE UNKNOWN",
+                "verification_requirement": "assign a sourced target value and verification method before any build decision",
+                "reason": "domain candidate parameter; no measurement exists",
+                "domain": "fluidics_hydraulic",
+                "linked_equation_id": "FLUID-001",
+                "invention_tie": {
+                  "linkage_kind": "equation_linkage",
+                  "linked_equation_id": "FLUID-001",
+                  "matched_tokens": [
+                    "lumen"
+                  ]
+                },
+                "principle": "domain engineering principle per the registry",
+                "sourcing_version": "value_sourcing/1.1.0"
+              },
+              {
+                "parameter_id": "CP-002",
+                "parameter": "lumen length",
+                "name": "lumen length",
+                "symbol": "r",
+                "unit": "m",
+                "value": "UNKNOWN (no sourced value)",
+                "value_status": "UNKNOWN",
+                "source": null,
+                "source_hash": null,
+                "derivation": "VALUE_SOURCING found no legitimate source for this parameter (no problem-statement number, no mechanistic computation, no candidate declaration) — the value STAYS UNKNOWN (Art. XXVII: never invented)",
+                "assumptions": [
+                  "CSF approximated as Newtonian (valid at shunt flow rates)",
+                  "no wall compliance effects"
+                ],
+                "uncertainty": "UNKNOWN — unquantified (no measurement exists)",
+                "verification_method": "domain bench verification per verification matrix; method selection NOT ESTABLISHED until the parameter has a sourced target value",
+                "basis": "ENGINEERING_PROPOSED (domain registry candidate)",
+                "status": "ENGINEERING_PROPOSED / VALUE UNKNOWN",
+                "verification_requirement": "assign a sourced target value and verification method before any build decision",
+                "reason": "domain candidate parameter; no measurement exists",
+                "domain": "fluidics_hydraulic",
+                "linked_equation_id": "FLUID-001",
+                "invention_tie": {
+                  "linkage_kind": "equation_linkage",
+                  "linked_equation_id": "FLUID-001",
+                  "matched_tokens": [
+                    "lumen"
+                  ]
+                },
+                "principle": "domain engineering principle per the registry",
+                "sourcing_version": "value_sourcing/1.1.0"
+              },
+              {
+                "parameter_id": "CP-003",
+                "parameter": "surface roughness",
+                "name": "surface roughness",
+                "symbol": "NOT_ASSIGNED",
+                "unit": "UNKNOWN",
+                "value": "UNKNOWN (no sourced value)",
+                "value_status": "UNKNOWN",
+                "source": null,
+                "source_hash": null,
+                "derivation": "VALUE_SOURCING found no legitimate source for this parameter (no problem-statement number, no mechanistic computation, no candidate declaration) — the value STAYS UNKNOWN (Art. XXVII: never invented)",
+                "assumptions": [],
+                "uncertainty": "UNKNOWN — unquantified (no measurement exists)",
+                "verification_method": "domain bench verification per verification matrix; method selection NOT ESTABLISHED until the parameter has a sourced target value",
+                "basis": "ENGINEERING_PROPOSED (domain registry candidate)",
+                "status": "ENGINEERING_PROPOSED / VALUE UNKNOWN",
+                "verification_requirement": "assign a sourced target value and verification method before any build decision",
+                "reason": "domain candidate parameter; no measurement exists",
+                "domain": "fluidics_hydraulic",
+                "linked_equation_id": null,
+                "invention_tie": {
+                  "linkage_kind": "domain_candidate",
+                  "linked_equation_id": null,
+                  "matched_tokens": []
+                },
+                "principle": "domain engineering principle per the registry",
+                "sourcing_version": "value_sourcing/1.1.0"
+              },
+              {
+                "parameter_id": "CP-004",
+                "parameter": "operating pressure head",
+                "name": "operating pressure head",
+                "symbol": "dP",
+                "unit": "Pa",
+                "value": "UNKNOWN (no sourced value)",
+                "value_status": "UNKNOWN",
+                "source": null,
+                "source_hash": null,
+                "derivation": "VALUE_SOURCING found no legitimate source for this parameter (no problem-statement number, no mechanistic computation, no candidate declaration) — the value STAYS UNKNOWN (Art. XXVII: never invented)",
+                "assumptions": [
+                  "CSF approximated as Newtonian (valid at shunt flow rates)",
+                  "no wall compliance effects"
+                ],
+                "uncertainty": "UNKNOWN — unquantified (no measurement exists)",
+                "verification_method": "bench flow-loop characterization across operating range",
+                "basis": "ENGINEERING_PROPOSED (domain registry candidate)",
+                "status": "ENGINEERING_PROPOSED / VALUE UNKNOWN",
+                "verification_requirement": "assign a sourced target value and verification method before any build decision",
+                "reason": "domain candidate parameter; no measurement exists",
+                "domain": "fluidics_hydraulic",
+                "linked_equation_id": "FLUID-001",
+                "invention_tie": {
+                  "linkage_kind": "equation_linkage",
+                  "linked_equation_id": "FLUID-001",
+                  "matched_tokens": [
+                    "pressure"
+                  ]
+                },
+                "principle": "domain engineering principle per the registry",
+                "sourcing_version": "value_sourcing/1.1.0"
+              },
+              {
+                "parameter_id": "CP-005",
+                "parameter": "flow rate range",
+                "name": "flow rate range",
+                "symbol": "Q",
+                "unit": "m^3/s",
+                "value": "UNKNOWN (no sourced value)",
+                "value_status": "UNKNOWN",
+                "source": null,
+                "source_hash": null,
+                "derivation": "VALUE_SOURCING found no legitimate source for this parameter (no problem-statement number, no mechanistic computation, no candidate declaration) — the value STAYS UNKNOWN (Art. XXVII: never invented)",
+                "assumptions": [
+                  "CSF approximated as Newtonian (valid at shunt flow rates)",
+                  "no wall compliance effects"
+                ],
+                "uncertainty": "UNKNOWN — unquantified (no measurement exists)",
+                "verification_method": "bench flow-loop characterization across operating range",
+                "basis": "ENGINEERING_PROPOSED (domain registry candidate)",
+                "status": "ENGINEERING_PROPOSED / VALUE UNKNOWN",
+                "verification_requirement": "assign a sourced target value and verification method before any build decision",
+                "reason": "domain candidate parameter; no measurement exists",
+                "domain": "fluidics_hydraulic",
+                "linked_equation_id": "FLUID-001",
+                "invention_tie": {
+                  "linkage_kind": "equation_linkage",
+                  "linked_equation_id": "FLUID-001",
+                  "matched_tokens": [
+                    "flow",
+                    "rate"
+                  ]
+                },
+                "principle": "domain engineering principle per the registry",
+                "sourcing_version": "value_sourcing/1.1.0"
+              },
+              {
+                "parameter_id": "CP-006",
+                "parameter": "viscosity of flowed medium",
+                "name": "viscosity of flowed medium",
+                "symbol": "mu",
+                "unit": "Pa.s",
+                "value": "UNKNOWN (no sourced value)",
+                "value_status": "UNKNOWN",
+                "source": null,
+                "source_hash": null,
+                "derivation": "VALUE_SOURCING found no legitimate source for this parameter (no problem-statement number, no mechanistic computation, no candidate declaration) — the value STAYS UNKNOWN (Art. XXVII: never invented)",
+                "assumptions": [
+                  "CSF approximated as Newtonian (valid at shunt flow rates)",
+                  "no wall compliance effects"
+                ],
+                "uncertainty": "UNKNOWN — unquantified (no measurement exists)",
+                "verification_method": "domain bench verification per verification matrix; method selection NOT ESTABLISHED until the parameter has a sourced target value",
+                "basis": "ENGINEERING_PROPOSED (domain registry candidate)",
+                "status": "ENGINEERING_PROPOSED / VALUE UNKNOWN",
+                "verification_requirement": "assign a sourced target value and verification method before any build decision",
+                "reason": "domain candidate parameter; no measurement exists",
+                "domain": "fluidics_hydraulic",
+                "linked_equation_id": "FLUID-001",
+                "invention_tie": {
+                  "linkage_kind": "equation_linkage",
+                  "linked_equation_id": "FLUID-001",
+                  "matched_tokens": [
+                    "viscosity"
+                  ]
+                },
+                "principle": "domain engineering principle per the registry",
+                "sourcing_version": "value_sourcing/1.1.0"
+              },
+              {
+                "parameter_id": "CP-007",
+                "parameter": "occlusion growth tolerance",
+                "name": "occlusion growth tolerance",
+                "symbol": "NOT_ASSIGNED",
+                "unit": "UNKNOWN",
+                "value": "UNKNOWN (no sourced value)",
+                "value_status": "UNKNOWN",
+                "source": null,
+                "source_hash": null,
+                "derivation": "VALUE_SOURCING found no legitimate source for this parameter (no problem-statement number, no mechanistic computation, no candidate declaration) — the value STAYS UNKNOWN (Art. XXVII: never invented)",
+                "assumptions": [],
+                "uncertainty": "UNKNOWN — unquantified (no measurement exists)",
+                "verification_method": "accelerated occlusion / fouling challenge testing",
+                "basis": "ENGINEERING_PROPOSED (domain registry candidate)",
+                "status": "ENGINEERING_PROPOSED / VALUE UNKNOWN",
+                "verification_requirement": "assign a sourced target value and verification method before any build decision",
+                "reason": "domain candidate parameter; no measurement exists",
+                "domain": "fluidics_hydraulic",
+                "linked_equation_id": null,
+                "invention_tie": {
+                  "linkage_kind": "domain_candidate",
+                  "linked_equation_id": null,
+                  "matched_tokens": []
+                },
+                "principle": "domain engineering principle per the registry",
+                "sourcing_version": "value_sourcing/1.1.0"
+              }
+            ],
+            "value_sourcing": {
+              "value_sourcing_version": "value_sourcing/1.1.0",
+              "counts": {
+                "SOURCE_FACT": 0,
+                "COMPUTED": 0,
+                "MODELLED": 0,
+                "UNKNOWN": 7
+              },
+              "n_total": 7,
+              "n_sourced": 0,
+              "geometry_reachable": false,
+              "rule": "SOURCE_FACT > COMPUTED > MODELLED; no source stays UNKNOWN — the Article XXVII <-> Article LX collision resolved explicitly: sourcing from evidence with a provenance hash is not threshold invention",
+              "artifact": "VALUE_SOURCING_REPORT",
+              "stage": "value_sourcing/1.1.0",
+              "n_parameters": 7,
+              "n_already_sourced": 0,
+              "n_unbound": 7,
+              "unit_vocabulary": [
+                "ah",
+                "atm",
+                "bar",
+                "cm",
+                "cm2",
+                "cm3",
+                "db",
+                "deg",
+                "degrees",
+                "ghz",
+                "grams",
+                "hz",
+                "inch",
+                "inches",
+                "kbps",
+                "kg",
+                "khz",
+                "kn",
+                "kpa",
+                "kv",
+                "kw",
+                "l/min",
+                "liters",
+                "litre",
+                "ma",
+                "mah",
+                "mbps",
+                "mg",
+                "mhz",
+                "ml",
+                "ml/h",
+                "ml/min",
+                "mm",
+                "mm2",
+                "mm3",
+                "mmhg",
+                "mn",
+                "mpa",
+                "ms",
+                "mv",
+                "mw",
+                "nm",
+                "n·m",
+                "pa",
+                "psi",
+                "rpm",
+                "um",
+                "v",
+                "w",
+                "wh",
+                "°c",
+                "°f",
+                "°k",
+                "µa",
+                "µg",
+                "µl",
+                "µl/min",
+                "µm",
+                "µs"
+              ],
+              "min_token_overlap_rule": "2 semantic-name tokens (1 for single-token names); exact token match in the binding sentence; antonym and range guards; records ordered by evidence id (deterministic)",
+              "model_involvement": "NONE (deterministic instrument — Art. XVIII)",
+              "bindings": [
+                {
+                  "parameter_id": "CP-001",
+                  "parameter": "lumen inner diameter",
+                  "state": "NO_BINDING"
+                },
+                {
+                  "parameter_id": "CP-002",
+                  "parameter": "lumen length",
+                  "state": "NO_BINDING"
+                },
+                {
+                  "parameter_id": "CP-003",
+                  "parameter": "surface roughness",
+                  "state": "NO_BINDING"
+                },
+                {
+                  "parameter_id": "CP-004",
+                  "parameter": "operating pressure head",
+                  "state": "NO_BINDING"
+                },
+                {
+                  "parameter_id": "CP-005",
+                  "parameter": "flow rate range",
+                  "state": "NO_BINDING"
+                },
+                {
+                  "parameter_id": "CP-006",
+                  "parameter": "viscosity of flowed medium",
+                  "state": "NO_BINDING"
+                },
+                {
+                  "parameter_id": "CP-007",
+                  "parameter": "occlusion growth tolerance",
+                  "state": "NO_BINDING"
+                }
+              ],
+              "constitutional_basis": "Article XXVII forbids inventing a value, not sourcing one with a provenance hash; parameters without a binding stay value_status=UNKNOWN (Art. XXV); every binding carries the exact span, the evidence content hash and the source uri (Art. II/XII); stage-1 bindings are never overwritten"
+            },
+            "external_precedent": "domain module Fluid mechanics / hydraulics; standards listed as candidates requiring applicability verification",
+            "proposed_design": {
+              "input": "maintain long-term lumen patency and flow",
+              "mechanism": "porous microstructure resists fluid-path tissue ingrowth. The proposed intervention realizes this mechanism by placing porous titanium proximal catheter tip in the shunt lumen at the failure site identified in the problem statement, where the governing physical effect produces sustained fluid flow through the shunt valve under the stated constraint (maintain long-term lumen patency and flow); the transfer logic follows from the custodied source observation and its mechanism source span.",
+              "transformation": "sustained fluid flow at least 30 percent above the silicone baseline at 30 days",
+              "output": "NOT ESTABLISHED (no measured output exists)",
+              "component_architecture": "flow path / lumen architecture; pressure regulation element; sensing / feedback element (if closed-loop); termination interfaces (application-context-specific: source and sink boundaries); termination interfaces (patient / reservoir)",
+              "status": "MODELLED / ENGINEERING_PROPOSED"
+            },
+            "failure_modes": [
+              {
+                "graph_id": "FM-009",
+                "failure_mode": "OBSTRUCTION",
+                "mode": "OBSTRUCTION",
+                "physical_mechanism": "the device failure that motivates the invention",
+                "trigger": "the operating condition stated in the problem (mechanism detail beyond the problem statement and trigger quantification NOT ESTABLISHED)",
+                "detectability": "domain bench verification per verification matrix; method selection NOT ESTABLISHED until the parameter has a sourced target value",
+                "severity": "UNKNOWN (no sourced severity basis)",
+                "severity_basis": "the failure motivates the invention itself (buyer consequence follows from the problem statement)",
+                "design_control": "design control NOT ESTABLISHED (requires design work)",
+                "design_feature": "NOT ESTABLISHED",
+                "verification": "VF-002",
+                "verification_test": "VF-002",
+                "validation": "NOT_PERFORMED — validation requires physical observation (Art. XXXVIII)",
+                "kill_condition": "KILL (pre-registered): if verification VF-002 demonstrates 'OBSTRUCTION' within the intended operating envelope while the recorded design controls are in place, the invention is killed in this architecture (re-open discovery — Art. V)",
+                "evidence": "SOURCE_FACT (problem.json)",
+                "mitigation": "design control NOT ESTABLISHED (requires design work)",
+                "residual_uncertainty": "UNKNOWN — untested candidate failure mode (Art. XXV)",
+                "epistemic_class": "SOURCE_FACT",
+                "domain_basis": "UNKNOWN",
+                "content_class": "PHYSICAL_MECHANISM"
+              },
+              {
+                "graph_id": "FM-DOM-001",
+                "failure_mode": "proximal occlusion by tissue ingrowth",
+                "mode": "proximal occlusion by tissue ingrowth",
+                "physical_mechanism": "cells proliferate across the lumen inlet; the growing tissue mass reduces the free flow area, so delivered flow falls as roughly the square of the open diameter fraction at constant pressure head",
+                "trigger": "chronic tissue contact with the inlet surface; inflammatory response to material or edge geometry",
+                "detectability": "delivered-flow trend below baseline in a flow-loop or animal model; pressure-head rise at constant flow",
+                "severity": "UNKNOWN (no sourced severity basis)",
+                "severity_basis": "flow loss is progressive and can reach complete obstruction silently",
+                "design_control": "inlet geometry and surface finish; anti-ingrowth surface architecture",
+                "design_feature": "NOT ESTABLISHED",
+                "verification": "VF-005",
+                "verification_test": "VF-005",
+                "validation": "NOT_PERFORMED — validation requires physical observation (Art. XXXVIII)",
+                "kill_condition": "KILL (pre-registered): if verification VF-005 demonstrates 'proximal occlusion by tissue ingrowth' within the intended operating envelope while the recorded design controls are in place, the invention is killed in this architecture (re-open discovery — Art. V)",
+                "evidence": "domain registry candidate from the engineering domain registry — applicability to THIS invention recorded below",
+                "mitigation": "inlet geometry and surface finish; anti-ingrowth surface architecture",
+                "residual_uncertainty": "UNKNOWN — untested candidate failure mode (Art. XXV)",
+                "epistemic_class": "ENGINEERING_PROPOSED",
+                "domain_basis": "Fluid mechanics / hydraulics",
+                "content_class": "PHYSICAL_MECHANISM",
+                "invention_applicability": {
+                  "verdict": "TIED",
+                  "matched_applicability_signals": [
+                    "lumen",
+                    "patency"
+                  ],
+                  "matched_invention_tokens": [
+                    "lumen",
+                    "proximal",
+                    "tissue"
+                  ],
+                  "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
+                }
+              },
+              {
+                "graph_id": "FM-DOM-002",
+                "failure_mode": "lumen collapse under external pressure (kink)",
+                "mode": "lumen collapse under external pressure (kink)",
+                "physical_mechanism": "external pressure or bending moment exceeds the lumen's collapse resistance; the thin-wall section buckles, the cross-section ovalling shuts the bore and flow stops discontinuously",
+                "trigger": "device bending, external compression, or suction beyond the wall's critical pressure",
+                "detectability": "kink/collapse test across duty cycle; flow-stoppage signature under applied load",
+                "severity": "UNKNOWN (no sourced severity basis)",
+                "severity_basis": "loss of function is sudden and complete",
+                "design_control": "wall thickness and reinforcement; minimum bend radius; support architecture",
+                "design_feature": "NOT ESTABLISHED",
+                "verification": "VF-006",
+                "verification_test": "VF-006",
+                "validation": "NOT_PERFORMED — validation requires physical observation (Art. XXXVIII)",
+                "kill_condition": "KILL (pre-registered): if verification VF-006 demonstrates 'lumen collapse under external pressure (kink)' within the intended operating envelope while the recorded design controls are in place, the invention is killed in this architecture (re-open discovery — Art. V)",
+                "evidence": "domain registry candidate from the engineering domain registry — applicability to THIS invention recorded below",
+                "mitigation": "wall thickness and reinforcement; minimum bend radius; support architecture",
+                "residual_uncertainty": "UNKNOWN — untested candidate failure mode (Art. XXV)",
+                "epistemic_class": "ENGINEERING_PROPOSED",
+                "domain_basis": "Fluid mechanics / hydraulics",
+                "content_class": "PHYSICAL_MECHANISM",
+                "invention_applicability": {
+                  "verdict": "TIED",
+                  "matched_applicability_signals": [
+                    "catheter",
+                    "lumen"
+                  ],
+                  "matched_invention_tokens": [
+                    "lumen",
+                    "under"
+                  ],
+                  "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
+                }
+              },
+              {
+                "graph_id": "FM-DOM-003",
+                "failure_mode": "encrustation / mineral deposition",
+                "mode": "encrustation / mineral deposition",
+                "physical_mechanism": "mineral species precipitate on the lumen wall where local chemistry or flow stagnation favors nucleation; deposits roughen the wall and progressively narrow the effective diameter",
+                "trigger": "supersaturated solutes in the flowed medium; stagnation zones; pH or temperature shifts at the wall",
+                "detectability": "long-duration patency soak with particulate/mineral challenge; pressure-flow drift",
+                "severity": "UNKNOWN (no sourced severity basis)",
+                "severity_basis": "calibration drifts and occlusion risk grow with implant time",
+                "design_control": "surface energy/coating selection; eliminate stagnation zones in flow-path geometry",
+                "design_feature": "NOT ESTABLISHED",
+                "verification": "VF-002",
+                "verification_test": "VF-002",
+                "validation": "NOT_PERFORMED — validation requires physical observation (Art. XXXVIII)",
+                "kill_condition": "KILL (pre-registered): if verification VF-002 demonstrates 'encrustation / mineral deposition' within the intended operating envelope while the recorded design controls are in place, the invention is killed in this architecture (re-open discovery — Art. V)",
+                "evidence": "domain registry candidate from the engineering domain registry — applicability to THIS invention recorded below",
+                "mitigation": "surface energy/coating selection; eliminate stagnation zones in flow-path geometry",
+                "residual_uncertainty": "UNKNOWN — untested candidate failure mode (Art. XXV)",
+                "epistemic_class": "ENGINEERING_PROPOSED",
+                "domain_basis": "Fluid mechanics / hydraulics",
+                "content_class": "PHYSICAL_MECHANISM",
+                "invention_applicability": {
+                  "verdict": "TIED",
+                  "matched_applicability_signals": [
+                    "patency"
+                  ],
+                  "matched_invention_tokens": [
+                    "effect",
+                    "lumen"
+                  ],
+                  "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
+                },
+                "verification_gap": {
+                  "status": "UNKNOWN",
+                  "what_is_missing": "no available verification method measures a quantity family this failure affects (chemical activity / deposit mass, temperature rise) — the failure is detected by no planned test as currently specified",
+                  "how_to_establish_it": "derive or source a measurement protocol for the affected quantity (first-principles instrument choice or standard test method), pre-register its acceptance rule, and attach it as a dedicated verification for this failure mode",
+                  "who_establishes_it": "design engineer proposes; independent reviewer confirms the quantity match; buyer/QA owns the acceptance rule",
+                  "test_method": "candidate: measure the affected quantity (chemical activity / deposit mass, temperature rise) under the failure's stated trigger conditions, before and after accelerated exposure",
+                  "acceptance_rule": "pre-register pass/fail before testing: the affected quantity must remain within its sourced operating band under the trigger condition (threshold provenance required, Art. XXVII)",
+                  "affected_families": [
+                    "chemical_activity",
+                    "temperature_thermal"
+                  ]
+                }
+              },
+              {
+                "graph_id": "FM-DOM-004",
+                "failure_mode": "regime transition to turbulence altering calibration",
+                "mode": "regime transition to turbulence altering calibration",
+                "physical_mechanism": "above the laminar-transition point the pressure-flow relation departs from the laminar model, so a flow element calibrated in one regime misestimates in the other",
+                "trigger": "operating point pushed past critical Reynolds by pressure, viscosity or geometry changes",
+                "detectability": "pressure-flow mapping across the full envelope showing regime-break curvature",
+                "severity": "UNKNOWN (no sourced severity basis)",
+                "severity_basis": "quantification errors propagate to dosing/pressure decisions",
+                "design_control": "operating-envelope definition; regime-margin verification in the flow loop",
+                "design_feature": "NOT ESTABLISHED",
+                "verification": "VF-007",
+                "verification_test": "VF-007",
+                "validation": "NOT_PERFORMED — validation requires physical observation (Art. XXXVIII)",
+                "kill_condition": "KILL (pre-registered): if verification VF-007 demonstrates 'regime transition to turbulence altering calibration' within the intended operating envelope while the recorded design controls are in place, the invention is killed in this architecture (re-open discovery — Art. V)",
+                "evidence": "domain registry candidate from the engineering domain registry — applicability to THIS invention recorded below",
+                "mitigation": "operating-envelope definition; regime-margin verification in the flow loop",
+                "residual_uncertainty": "UNKNOWN — untested candidate failure mode (Art. XXV)",
+                "epistemic_class": "ENGINEERING_PROPOSED",
+                "domain_basis": "Fluid mechanics / hydraulics",
+                "content_class": "PHYSICAL_MECHANISM",
+                "invention_applicability": {
+                  "verdict": "TIED",
+                  "matched_applicability_signals": [],
+                  "matched_invention_tokens": [
+                    "above"
+                  ],
+                  "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
+                }
+              },
+              {
+                "graph_id": "FM-DOM-005",
+                "failure_mode": "check-valve seat wear opening reverse leakage",
+                "mode": "check-valve seat wear opening reverse leakage",
+                "physical_mechanism": "repeated seating cycles erode the seat face; the closing line degrades and a leak path opens, so backflow occurs at each pressure reversal",
+                "trigger": "cyclic pressure reversals; particulate wear; material creep at the seat",
+                "detectability": "reverse-leakage rate measurement after accelerated cycling",
+                "severity": "UNKNOWN (no sourced severity basis)",
+                "severity_basis": "backflow defeats the pressure regulation function the invention depends on",
+                "design_control": "seat material and geometry; cycle-life margin; filtration of particulates",
+                "design_feature": "NOT ESTABLISHED",
+                "verification": "VF-008",
+                "verification_test": "VF-008",
+                "validation": "NOT_PERFORMED — validation requires physical observation (Art. XXXVIII)",
+                "kill_condition": "KILL (pre-registered): if verification VF-008 demonstrates 'check-valve seat wear opening reverse leakage' within the intended operating envelope while the recorded design controls are in place, the invention is killed in this architecture (re-open discovery — Art. V)",
+                "evidence": "domain registry candidate from the engineering domain registry — applicability to THIS invention recorded below",
+                "mitigation": "seat material and geometry; cycle-life margin; filtration of particulates",
+                "residual_uncertainty": "UNKNOWN — untested candidate failure mode (Art. XXV)",
+                "epistemic_class": "ENGINEERING_PROPOSED",
+                "domain_basis": "Fluid mechanics / hydraulics",
+                "content_class": "PHYSICAL_MECHANISM",
+                "invention_applicability": {
+                  "verdict": "TIED",
+                  "matched_applicability_signals": [
+                    "valve"
+                  ],
+                  "matched_invention_tokens": [
+                    "valve"
+                  ],
+                  "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
+                }
+              }
+            ],
+            "verification": [
+              {
+                "id": "VF-001",
+                "target": [
+                  "FM-009"
+                ],
+                "method": "bench shunt flow loop; measure flow decay over 30 days",
+                "result": "NOT_TESTED",
+                "basis": "MODELLED (candidate falsification test)"
+              },
+              {
+                "id": "VF-002",
+                "target": [
+                  "FM-009",
+                  "FM-001",
+                  "FM-002",
+                  "FM-003",
+                  "FM-004",
+                  "FM-005",
+                  "FM-006",
+                  "FM-007",
+                  "FM-008"
+                ],
+                "method": "run killer experiment: falsification_test_from_candidate (EIG/cost 0.44573539382492045)",
+                "result": "NOT_TESTED",
+                "basis": "COMPUTED (Bayesian EIG over MODEL_DERIVED priors)"
+              },
+              {
+                "id": "VF-003",
+                "target": [
+                  "FM-DOM-001"
+                ],
+                "method": "bench flow-loop characterization across operating range",
+                "result": "NOT_TESTED",
+                "basis": "ENGINEERING_PROPOSED (domain verification method, quantity-grounded E21-A)"
+              },
+              {
+                "id": "VF-004",
+                "target": [
+                  "FM-DOM-001",
+                  "FM-DOM-002",
+                  "FM-DOM-004",
+                  "FM-DOM-005"
+                ],
+                "method": "pressure-drop mapping vs flow (identify regime transitions)",
+                "result": "NOT_TESTED",
+                "basis": "ENGINEERING_PROPOSED (domain verification method, quantity-grounded E21-A)"
+              },
+              {
+                "id": "VF-005",
+                "target": [
+                  "FM-DOM-001"
+                ],
+                "method": "delivered-flow trend below baseline in a flow-loop or animal model; pressure-head rise at constant flow (measured quantity: forward patency / free flow area)",
+                "result": "NOT_TESTED",
+                "basis": "ENGINEERING_PROPOSED (FM-specific detectability verification, quantity-grounded E21-A)"
+              },
+              {
+                "id": "VF-006",
+                "target": [
+                  "FM-DOM-002"
+                ],
+                "method": "kink/collapse test across duty cycle; flow-stoppage signature under applied load (measured quantity: mechanical stress / fatigue endurance)",
+                "result": "NOT_TESTED",
+                "basis": "ENGINEERING_PROPOSED (FM-specific detectability verification, quantity-grounded E21-A)"
+              },
+              {
+                "id": "VF-007",
+                "target": [
+                  "FM-DOM-004"
+                ],
+                "method": "pressure-flow mapping across the full envelope showing regime-break curvature (measured quantity: pressure / pressure-drop)",
+                "result": "NOT_TESTED",
+                "basis": "ENGINEERING_PROPOSED (FM-specific detectability verification, quantity-grounded E21-A)"
+              },
+              {
+                "id": "VF-008",
+                "target": [
+                  "FM-DOM-005"
+                ],
+                "method": "reverse-leakage rate measurement after accelerated cycling (measured quantity: reverse-flow / leakage rate)",
+                "result": "NOT_TESTED",
+                "basis": "ENGINEERING_PROPOSED (FM-specific detectability verification, quantity-grounded E21-A)"
+              }
+            ],
+            "validation": [
+              {
+                "id": "VA-001",
+                "status": "NOT_POSSIBLE_YET",
+                "basis": "UNKNOWN",
+                "reason": "validation requires physical observation; no observation ledger entry exists (Art. XXXVIII)"
+              }
+            ],
+            "remaining_unknowns": [
+              {
+                "unknown": "FM_WITHOUT_QUANTITY_MATCHED_VERIFICATION:FM-DOM-003",
+                "reason": "no available verification method measures a quantity family this failure affects (E21-A quantity rule); UNKNOWN disclosure recorded on the row"
+              },
+              {
+                "unknown": "value of critical parameter lumen inner diameter [r m]",
+                "reason": "no sourced value exists (value_status UNKNOWN); required before any numeric design decision",
+                "binding": "CP-001"
+              },
+              {
+                "unknown": "value of critical parameter lumen length [r m]",
+                "reason": "no sourced value exists (value_status UNKNOWN); required before any numeric design decision",
+                "binding": "CP-002"
+              },
+              {
+                "unknown": "value of critical parameter surface roughness [NOT_ASSIGNED UNKNOWN]",
+                "reason": "no sourced value exists (value_status UNKNOWN); required before any numeric design decision",
+                "binding": "CP-003"
+              },
+              {
+                "unknown": "value of critical parameter operating pressure head [dP Pa]",
+                "reason": "no sourced value exists (value_status UNKNOWN); required before any numeric design decision",
+                "binding": "CP-004"
+              },
+              {
+                "unknown": "value of critical parameter flow rate range [Q m^3/s]",
+                "reason": "no sourced value exists (value_status UNKNOWN); required before any numeric design decision",
+                "binding": "CP-005"
+              },
+              {
+                "unknown": "value of critical parameter viscosity of flowed medium [mu Pa.s]",
+                "reason": "no sourced value exists (value_status UNKNOWN); required before any numeric design decision",
+                "binding": "CP-006"
+              },
+              {
+                "unknown": "value of critical parameter occlusion growth tolerance [NOT_ASSIGNED UNKNOWN]",
+                "reason": "no sourced value exists (value_status UNKNOWN); required before any numeric design decision",
+                "binding": "CP-007"
+              },
+              {
+                "unknown": "acceptance criterion for verification VF-001",
+                "reason": "criterion status ENGINEERING_PROPOSED: no sourced threshold exists; the numeric margin is fixed at pre-registration from the measured baseline",
+                "binding": "VF-001"
+              },
+              {
+                "unknown": "acceptance criterion for verification VF-002",
+                "reason": "criterion status ENGINEERING_PROPOSED: no sourced threshold exists; the numeric margin is fixed at pre-registration from the measured baseline",
+                "binding": "VF-002"
+              },
+              {
+                "unknown": "acceptance criterion for verification VF-003",
+                "reason": "criterion status ENGINEERING_PROPOSED: no sourced threshold exists; the numeric margin is fixed at pre-registration from the measured baseline",
+                "binding": "VF-003"
+              },
+              {
+                "unknown": "acceptance criterion for verification VF-006",
+                "reason": "criterion status ENGINEERING_PROPOSED: no sourced threshold exists; the numeric margin is fixed at pre-registration from the measured baseline",
+                "binding": "VF-006"
+              },
+              {
+                "unknown": "acceptance criterion for verification VF-008",
+                "reason": "criterion status ENGINEERING_PROPOSED: no sourced threshold exists; the numeric margin is fixed at pre-registration from the measured baseline",
+                "binding": "VF-008"
+              }
+            ]
+          },
+          "model_class": "SYSTEM_3D",
+          "model_class_source": "RANKED_PACKAGE_RECORDS.json",
+          "earned_engineering_geometry": false,
+          "limitations": "domain does not warrant physical geometry — conceptual classification, explicitly stated"
+        },
+        "decisive_experiment": {
+          "experiment": "falsification_test_from_candidate",
+          "predicted_discriminator": "expected effect holds: sustained fluid flow through the shunt valve | expected effect does not reproduce outside source context",
+          "decision_rule": "the recorded falsification test ('bench shunt flow loop; measure flow decay over 30 days') fails to show the recorded expected effect ('sustained fluid flow at least 30 percent above the silicone baseline at 30 days') — the mechanism is killed by its own test's negative outcome; the recorded failing hypothesis is 'expected effect does not reproduce outside source context'",
+          "execution_status": "SPECIFIED"
+        },
+        "package": {
+          "kind": "TECHNOLOGY_PACKAGE",
+          "package_id": "invfixturefluidics_hydraulic0cdbfd1e9b040",
+          "zip_name": "TECHNOLOGY_TRANSFER_PACKAGE_primary.zip",
+          "zip_sha256": "78f7519412f4fead569f4f2de5c042595dec964bf79d04a992f621496bab48e7",
+          "zip_sha256_measured": "78f7519412f4fead569f4f2de5c042595dec964bf79d04a992f621496bab48e7",
+          "zip_sha256_matches": true,
+          "manifest": 32,
+          "candidate_id": "primary:r541-ranked-pkg-battery-b",
+          "rank": 1,
+          "complete": true,
+          "note": "candidate-bound technology package; the ZIP hash is re-measured from the on-disk artifact (Art. II/III: the measured bytes are the authority)"
+        }
+      },
+      "rank_basis": {
+        "verdict_rank": 1,
+        "physics_rank": 0,
+        "quality_verdict": "CONDITIONAL",
+        "physics_lifecycle": "BEATS_BASELINE",
+        "deficient_count": 1,
+        "uncertain_count": 3,
+        "killed": false,
+        "span_underived": false,
+        "repaired": false,
+        "attack_overall": "SURVIVED_WITH_UNCERTAINTIES",
+        "traced_to": "SURVIVOR_SELECTION.json:ranked[]. deterministic order over recorded gate fields (E15-H + R397 physics gate); no numeric score"
+      },
+      "selected": true
+    }
+  ],
+  "per_candidate": [
+    {
+      "candidate_id": "primary:r541-ranked-pkg-battery-b",
+      "rank": 1,
+      "package_complete": true,
+      "zip_sha256": "78f7519412f4fead569f4f2de5c042595dec964bf79d04a992f621496bab48e7",
+      "zip_sha256_measured": "78f7519412f4fead569f4f2de5c042595dec964bf79d04a992f621496bab48e7",
+      "zip_sha256_matches": true,
+      "candidate_binding_ok": true
+    }
+  ],
+  "violations": [],
+  "checks": {
+    "n_admissible==1": true,
+    "n_complete_packages>=1": true,
+    "killed_by_challenge==2": true,
+    "distinct_zip_names": true,
+    "distinct_sha256": true,
+    "candidate_binding": true,
+    "zip_hash_matches_disk": true,
+    "finished_discovery_correct": true,
+    "durable_ranked_result_present": true,
+    "no_cross_candidate_package": true,
+    "verify_ranked_result_set": true,
+    "completion_contract_finished": true
+  },
+  "all_checks_pass": true,
+  "reload": {
+    "reload_mapping_ok": true,
+    "reload_verified": true,
+    "n_admissible_after_reload": 1,
+    "n_complete_packages_after_reload": 1
+  },
+  "run_id": "r541-ranked-pkg-battery-b",
+  "battery": "R541/R542 ranked-package battery scenario B",
+  "problem": "kill-path query: one survivor after the competing candidates were KILLED by the challenge",
+  "wall_s": 15.2
+}

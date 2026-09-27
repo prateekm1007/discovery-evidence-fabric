@@ -108,7 +108,7 @@ def persist(run_dir: str, doc: Dict[str, Any]) -> Optional[str]:
         raw = json.dumps(doc, indent=2, sort_keys=True).encode() + b"\n"
         path.write_bytes(raw)
         (model_dir / "ARTIFACT_IDENTITY.sha256").write_text(
-            f"{hashlib.sha256(raw).hexdigest()}  ARTIFACT_IDENTITY.json\n")
+            f"{hashlib.sha256(raw).hexdigest()}  ARTIFACT_IDENTITY.json\n", encoding="utf-8")
         return str(path)
     except OSError:
         return None
@@ -119,7 +119,7 @@ def load(run_dir: str) -> Optional[Dict[str, Any]]:
     if not path.is_file():
         return None
     try:
-        return json.loads(path.read_text())
+        return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return None
 

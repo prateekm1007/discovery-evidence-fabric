@@ -83,7 +83,7 @@ def _load_hypotheses(run_dir: Path) -> Dict[str, Any]:
     p = Path(run_dir) / HYPOTHESES_FILENAME
     if p.exists():
         try:
-            d = json.loads(p.read_text())
+            d = json.loads(p.read_text(encoding="utf-8"))
             if isinstance(d, dict):
                 return d
         except Exception:  # noqa: BLE001
@@ -98,7 +98,7 @@ def _persist_hypotheses(run_dir: Path, store: Dict[str, Any]) -> None:
     p = Path(run_dir) / HYPOTHESES_FILENAME
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(store, indent=1, ensure_ascii=False,
-                            default=str))
+                            default=str), encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------

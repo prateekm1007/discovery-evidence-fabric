@@ -47,7 +47,7 @@ KEYS_FILE = Path(__file__).resolve().parents[2] / ".env.keys"
 def _load_keys() -> Dict[str, str]:
     if not KEYS_FILE.exists(): return {}
     out = {}
-    for line in KEYS_FILE.read_text().splitlines():
+    for line in KEYS_FILE.read_text(encoding="utf-8").splitlines():
         if "=" in line and not line.strip().startswith("#"):
             k, v = line.split("=", 1)
             out[k.strip()] = v.strip()
@@ -649,5 +649,5 @@ if __name__ == "__main__":
     for pid in test_patents:
         record = fetch_patent_full(pid)
         results.append(asdict(record))
-    out.write_text(json.dumps(results, indent=2))
+    out.write_text(json.dumps(results, indent=2), encoding="utf-8")
     print(f"\nSelf-test report: {out}")

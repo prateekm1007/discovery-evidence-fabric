@@ -275,10 +275,10 @@ def _cgroup_avail_mb(root: str = "/sys/fs/cgroup") -> Optional[int]:
     branch). The honest availability is the cgroup headroom."""
     # cgroup v2
     try:
-        limit_raw = open(f"{root}/memory.max").read().strip()
+        limit_raw = open(f"{root}/memory.max", encoding="utf-8").read().strip()
         if limit_raw and limit_raw != "max":
             limit = int(limit_raw)
-            current = int(open(f"{root}/memory.current").read().strip())
+            current = int(open(f"{root}/memory.current", encoding="utf-8").read().strip())
             if limit > 0:
                 return max(0, limit - current) // (1024 * 1024)
     except (OSError, ValueError):
@@ -286,10 +286,10 @@ def _cgroup_avail_mb(root: str = "/sys/fs/cgroup") -> Optional[int]:
     # cgroup v1
     try:
         limit = int(open(
-            f"{root}/memory/memory.limit_in_bytes").read().strip())
+            f"{root}/memory/memory.limit_in_bytes", encoding="utf-8").read().strip())
         if 0 < limit < (1 << 40):  # the 'unlimited' sentinel is huge
             current = int(open(
-                f"{root}/memory/memory.usage_in_bytes").read().strip())
+                f"{root}/memory/memory.usage_in_bytes", encoding="utf-8").read().strip())
             return max(0, limit - current) // (1024 * 1024)
     except (OSError, ValueError):
         pass
@@ -298,7 +298,7 @@ def _cgroup_avail_mb(root: str = "/sys/fs/cgroup") -> Optional[int]:
 
 def _host_avail_mb() -> Optional[int]:
     try:
-        with open("/proc/meminfo") as f:
+        with open("/proc/meminfo", encoding="utf-8") as f:
             for line in f:
                 if line.startswith("MemAvailable:"):
                     return int(line.split()[1]) // 1024
@@ -525,7 +525,7 @@ def render_invention_blender_legacy(work_dir: str,
         spec["geometry_spec"] = spec_path
     elif (geometry_out or {}).get("geometry_spec"):
         try:
-            with open(spec_path, "w") as f:
+            with open(spec_path, "w", encoding="utf-8") as f:
                 json.dump(geometry_out["geometry_spec"], f, indent=2)
             spec["geometry_spec"] = spec_path
         except OSError:
@@ -533,7 +533,7 @@ def render_invention_blender_legacy(work_dir: str,
     if (geometry_out or {}).get("domain_family"):
         spec["domain_family"] = geometry_out["domain_family"]
     spec_path_arg = os.path.join(out_dir, "render_spec.json")
-    with open(spec_path_arg, "w") as f:
+    with open(spec_path_arg, "w", encoding="utf-8") as f:
         json.dump(spec, f, indent=2)
 
     # R423A Phase 7: explicit allowlist (see RENDER_ENV_ALLOWLIST) —
@@ -565,7 +565,7 @@ def render_invention_blender_legacy(work_dir: str,
     side_path = os.path.join(out_dir, "render_record.json")
     if os.path.isfile(side_path):
         try:
-            side = json.loads(Path(side_path).read_text())
+            side = json.loads(Path(side_path).read_text(encoding="utf-8"))
             record["blender"] = side
         except Exception:  # noqa: BLE001
             record["blender_record_unreadable"] = True

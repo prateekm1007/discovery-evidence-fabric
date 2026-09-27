@@ -206,7 +206,7 @@ def check_single_viewer() -> Dict[str, Any]:
     tech_stage = WEBAPP / "components" / "TechStage.tsx"
     if not tech_stage.is_file():
         return {"pass": False, "reason": "TechStage.tsx missing"}
-    src = tech_stage.read_text()
+    src = tech_stage.read_text(encoding="utf-8")
     # one imported component, rendered exactly once in the stage
     count = src.count("<ModelViewer")
     return {"pass": count == 1, "primary_surface_viewers": count}
@@ -867,5 +867,5 @@ def evaluate(out_dir: str,
 
 def write_gate(out_dir: str, gate: Dict[str, Any]) -> Path:
     p = Path(out_dir) / "visual_gate.json"
-    p.write_text(json.dumps(gate, indent=2))
+    p.write_text(json.dumps(gate, indent=2), encoding="utf-8")
     return p

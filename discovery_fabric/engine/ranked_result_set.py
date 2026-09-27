@@ -75,7 +75,7 @@ COMP_PACKAGE = "TECHNOLOGY_PACKAGE_COMPLETED"
 def _read_json(path: Path) -> Optional[Dict[str, Any]]:
     try:
         if path.is_file():
-            return json.loads(path.read_text())
+            return json.loads(path.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001 — a missing/corrupt record is honest
         return None
     return None
@@ -135,6 +135,8 @@ def _evidence_view(inv_spec: Dict[str, Any]) -> Dict[str, Any]:
              "frozen": bool(r.get("frozen", r.get("custody")))}
             for r in records if isinstance(r, dict)][:50]
     mm = inv_spec.get("mechanism") if isinstance(inv_spec, dict) else {}
+    if isinstance(mm, dict) and "value" in mm:
+        mm = mm.get("value") or {}
     span = mm.get("mechanism_source_span") if isinstance(mm, dict) else None
     return {
         "records": view,
@@ -184,9 +186,14 @@ def _package_binding(run_dir: Path,
             "note": "killed candidate — no technology package (CEO rule 9)",
         }
 
-    # the candidate-bound package record, when the engine compiled it
-    rec = (pkg_records.get("packages") or {}).get(key) \
-        or pkg_records.get("by_candidate_id", {}).get(cid)
+    # the candidate-bound package record, when the engine compiled it.
+    # Records are keyed by the candidate_id (or the ranked_candidate_key
+    # when the candidate_id itself is a per-key identity); either form
+    # resolves the same candidate-bound package.
+    rec = (pkg_records.get("packages") or {}).get(cid) \
+        or (pkg_records.get("packages") or {}).get(key) \
+        or pkg_records.get("by_candidate_id", {}).get(cid) \
+        or pkg_records.get("by_candidate_id", {}).get(key)
     if not isinstance(rec, dict) or not rec.get("complete"):
         # no complete candidate-bound package exists on disk — an
         # UNRESOLVED candidate or a not-yet-compiled package. Honest
@@ -206,12 +213,20 @@ def _package_binding(run_dir: Path,
                      "reused as this candidate's package)"),
         }
 
-    # the candidate-bound ZIP must exist on disk and its hash must match
+    # the candidate-bound ZIP must exist on disk and its hash must match.
+    # The engine promotes the candidate-bound ZIP into the run's
+    # DOWNLOAD/ tree (candidate-bound by name); fall back to the run
+    # root if it sits there instead.
     zip_name = rec.get("zip_name")
     zip_sha = rec.get("zip_sha256")
-    zip_path = run_dir / zip_name if zip_name else None
-    measured = _sha256_file(zip_path) if zip_path and zip_path.exists() \
-        else None
+    zip_path = None
+    if zip_name:
+        for _cand in (run_dir / "DOWNLOAD" / zip_name,
+                      run_dir / zip_name):
+            if _cand.exists():
+                zip_path = _cand
+                break
+    measured = _sha256_file(zip_path) if zip_path else None
     hash_matches = (zip_sha is not None) and (measured == zip_sha)
     manifest = rec.get("manifest") or rec.get("manifest_files")
 
@@ -230,6 +245,57 @@ def _package_binding(run_dir: Path,
                  "re-measured from the on-disk artifact (Art. II/III: "
                  "the measured bytes are the authority)"),
     }
+
+
+def _pkg_rec(pkg_records: Dict[str, Any],
+             cid: Optional[str], key: str) -> Dict[str, Any]:
+    """The candidate's own package record (RANKED_PACKAGE_RECORDS),
+    resolving either keying form — candidate_id or ranked key."""
+    pkgs = (pkg_records or {}).get("packages") or {}
+    by_cid = (pkg_records or {}).get("by_candidate_id") or {}
+    return pkgs.get(cid) or pkgs.get(key) or by_cid.get(cid) \
+        or by_cid.get(key) or {}
+
+
+def resolve_model_class(run_dir: Path, key: Optional[str],
+                        eng: Dict[str, Any],
+                        pkg_rec: Optional[Dict[str, Any]]
+                        ) -> Dict[str, Any]:
+    """R542: the ONE honest model-class resolution chain (Art. XXVIII).
+
+    A model class is either EARNED (the run's own geometry record:
+    ENGINEERING_SPECIFICATION.geometry or the canonical GEOMETRY_OUT)
+    or an EXPLICIT recorded classification (the spec's visualizability
+    class, else the package compiler's classification of this
+    candidate's model) or ABSENT (None — never a vague 'see package'
+    placeholder, which is not a model artifact). Shared by the ranked
+    projection and the completion contract (one authority)."""
+    geo = eng.get("geometry") if isinstance(eng, dict) else None
+    if isinstance(geo, dict) and (geo.get("class")
+                                  or geo.get("glb_sha256")):
+        return {"model_class": geo.get("class") or "ENGINEERING_3D",
+                "source": "ENGINEERING_SPECIFICATION.geometry",
+                "earned_geometry": True}
+    if key in (None, "primary"):
+        gout = _read_json(Path(run_dir) / "GEOMETRY_OUT.json")
+        if isinstance(gout, dict) and (gout.get("glb_sha256")
+                                       or gout.get("glb_bytes")):
+            return {"model_class": gout.get("visualizability_class")
+                    or "ENGINEERING_3D",
+                    "source": "GEOMETRY_OUT.json",
+                    "earned_geometry": True}
+    vis = eng.get("visualizability_class") if isinstance(eng, dict) \
+        else None
+    if isinstance(vis, str) and vis:
+        return {"model_class": vis,
+                "source": "ENGINEERING_SPECIFICATION.visualizability_class",
+                "earned_geometry": vis.startswith(("ENGINEERING", "CAD"))}
+    if isinstance(pkg_rec, dict) and pkg_rec.get("visualizability_class"):
+        vc = str(pkg_rec["visualizability_class"])
+        return {"model_class": vc,
+                "source": "RANKED_PACKAGE_RECORDS.json",
+                "earned_geometry": vc.startswith(("ENGINEERING", "CAD"))}
+    return {"model_class": None, "source": None, "earned_geometry": False}
 
 
 def _candidate_result_record(
@@ -288,6 +354,29 @@ def _candidate_result_record(
     else:
         mechanism = {"mechanism": str(mm), "intervention": "",
                      "expected_effect": "", "falsification_test": ""}
+    # R542: the recorded home of the kill condition differs by artifact
+    # era — the mechanism block (fixture/legacy), the causal chain (the
+    # engine's synthesis output: causal_chain.value.falsification_test),
+    # or the engineering kill condition (ENGINEERING_SPECIFICATION.
+    # kill_condition.falsification_test). The projection carries the
+    # FIRST recorded non-empty value; the completion contract reads
+    # THIS projection (one authority, Art. X) — a kill condition that
+    # exists on disk is never reported missing because one field is
+    # empty.
+    if not str(mechanism.get("falsification_test") or "").strip():
+        _cc = inv_spec.get("causal_chain") if isinstance(inv_spec, dict) \
+            else {}
+        if isinstance(_cc, dict) and "value" in _cc:
+            _cc = _cc.get("value") or {}
+        _kill = str(_cc.get("falsification_test") or "").strip() \
+            if isinstance(_cc, dict) else ""
+        if not _kill:
+            _kc = eng_spec.get("kill_condition") \
+                if isinstance(eng_spec, dict) else {}
+            _kill = str(_kc.get("falsification_test") or "").strip() \
+                if isinstance(_kc, dict) else ""
+        if _kill:
+            mechanism["falsification_test"] = _kill
     mechanism["competing_considered"] = [
         r.get("candidate_id") for r in selection.get("ranked", [])
         if r.get("candidate_id") != cid]
@@ -304,6 +393,7 @@ def _candidate_result_record(
         "disposition": disposition,
         "survived": disposition == "SURVIVED",
         "killed": disposition == "KILLED",
+        "excluded": disposition == "EXCLUDED",
         "unresolved": disposition == "UNRESOLVED",
         "quality_verdict": ranked_row.get("quality_verdict"),
         "deficient_areas": ranked_row.get("quality_deficient_count"),
@@ -314,13 +404,15 @@ def _candidate_result_record(
     eng_core = eng_spec.get("engineering_core") if isinstance(eng_spec, dict) \
         else {}
     geometry = eng_spec.get("geometry") if isinstance(eng_spec, dict) else {}
+    _mc = resolve_model_class(run_dir, key, eng_spec,
+                              _pkg_rec(pkg_records, cid, key))
     engineering = {
         "geometry_present": bool(geometry),
         "geometry": geometry or {"class": "NOT_ESTABLISHED"},
         "engineering_core": eng_core or {},
-        "model_class": (eng_spec.get("visualizability_class")
-                        if isinstance(eng_spec, dict) else None)
-                       or "SEE_PACKAGE_MODEL_LAYER",
+        "model_class": _mc.get("model_class"),
+        "model_class_source": _mc.get("source"),
+        "earned_engineering_geometry": bool(_mc.get("earned_geometry")),
         "limitations": ("domain does not warrant physical geometry — "
                         "conceptual classification, explicitly stated"
                         if not geometry else ""),
@@ -329,14 +421,26 @@ def _candidate_result_record(
     # component 5 — decisive experiment (selected discriminator + decision)
     decisive_rec = (decisive.get("selected")
                     if isinstance(decisive, dict) else None) or {}
+    _fc = (decisive.get("falsification_contract") or {}) \
+        if isinstance(decisive, dict) else {}
+    _hyps = [h for h in (decisive_rec.get("hypotheses") or [])
+             if isinstance(h, dict)]
     experiment = {
         "experiment": decisive_rec.get("name")
                       or decisive_rec.get("experiment") or "",
         "predicted_discriminator":
             decisive_rec.get("predicted_discriminator")
-            or decisive_rec.get("outcomes") or "",
+            or decisive_rec.get("outcomes")
+            or " | ".join(str(h.get("description") or h.get("name") or "")
+                          for h in _hyps).strip(" |"),
+        # R542: the recorded decision rule is the ARTICULATED
+        # falsification threshold (state_integrity's authority — the
+        # outcome that kills the mechanism, stated from records); the
+        # selector's own decision_rule/falsification fields are only a
+        # fallback for legacy records that carried them inline.
         "decision_rule": decisive_rec.get("decision_rule")
-                         or decisive_rec.get("falsification") or "",
+                         or decisive_rec.get("falsification")
+                         or str(_fc.get("FALSIFICATION_THRESHOLD") or ""),
         "execution_status": decisive.get("execution_status", "SPECIFIED")
         if isinstance(decisive, dict) else "SPECIFIED",
     }
@@ -418,9 +522,12 @@ def derive_ranked_result_set(
                     and row.get("physics_lifecycle")
                     not in ("DOES_NOT_BEAT_BASELINE",
                             "PLAUSIBILITY_BOUND_VIOLATED"))
-        # R541: an UNRESOLVED adversarial disposition is not a finished
-        # survivor — only a recorded SURVIVED disposition is admissible.
-        if _adm and (row.get("disposition") or "SURVIVED") == "SURVIVED":
+        # R541/R542: only a RECORDED SURVIVED disposition is admissible.
+        # A missing disposition (a row the engine never resolved) and
+        # EXCLUDED/KILLED/UNRESOLVED rows are never a finished survivor;
+        # legacy runs that predate the stamp honestly project 0
+        # admissible survivors (Art. X: the record is the authority).
+        if _adm and (row.get("disposition") or "") == "SURVIVED":
             admissible_rows.append(row)
 
     admissible_rows.sort(
@@ -510,7 +617,11 @@ def verify_ranked_result_set(record: Dict[str, Any],
         # re-measure the ZIP hash from disk when a zip is recorded
         measured = None
         if complete and zip_name:
-            measured = _sha256_file(run_dir / zip_name)
+            for _cand in (run_dir / "DOWNLOAD" / zip_name,
+                          run_dir / zip_name):
+                if _cand.exists():
+                    measured = _sha256_file(_cand)
+                    break
         hash_ok = (not complete) or (zip_sha is not None
                                      and measured == zip_sha)
         per.append({
@@ -533,6 +644,12 @@ def verify_ranked_result_set(record: Dict[str, Any],
                 f"({zip_sha}) does not match the on-disk bytes "
                 f"(measured {measured}) — the package artifact is not "
                 "the one the result record claims")
+        if not complete and pkg.get("kind") != "ABSENT_KILLED":
+            violations.append(
+                f"candidate {cid} rank {rank}: no complete candidate-"
+                "bound technology package (package_complete=False) — "
+                "the ranked set cannot be a finished discovery without "
+                "this candidate's own package")
     # FINISHED_DISCOVERY is true only when every admissible survivor has
     # a complete, candidate-bound, hash-verified package (the contract
     # invariant, never a single-#1 completion)
@@ -591,7 +708,7 @@ def persist_ranked_result_set(run_dir: Path,
     try:
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(record, indent=2,
-                                  ensure_ascii=False, default=str))
+                                  ensure_ascii=False, default=str), encoding="utf-8")
     except Exception:  # noqa: BLE001 — persistence is best-effort,
         pass           # the return value is the record
     return record

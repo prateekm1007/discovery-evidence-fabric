@@ -92,7 +92,7 @@ def improve_kill_point_resume_state(out_dir: Any) -> tuple:
     caller-visible status).
     """
     try:
-        raw = (Path(out_dir) / "stage_IMPROVE.json").read_text()
+        raw = (Path(out_dir) / "stage_IMPROVE.json").read_text(encoding="utf-8")
     except Exception:  # noqa: BLE001 — missing/unreadable: not done
         return (False, None)
     try:
@@ -243,10 +243,10 @@ class EngineRun:
         problem, disabled set and run_id come from the recorded run; the
         caller may only override transport-level options."""
         d = Path(run_dir)
-        problem = json.loads((d / "problem.json").read_text())
+        problem = json.loads((d / "problem.json").read_text(encoding="utf-8"))
         manifest = {}
         if (d / "run_manifest.json").exists():
-            manifest = json.loads((d / "run_manifest.json").read_text())
+            manifest = json.loads((d / "run_manifest.json").read_text(encoding="utf-8"))
         run_id = manifest.get("run_id") or problem.get("problem_id", "run")
         disabled = manifest.get("disabled_stages", [])
         kwargs = dict(problem=problem, out_dir=str(d), run_id=run_id,
@@ -1051,16 +1051,35 @@ class EngineRun:
         # durable RANKED_DISCOVERY_RESULTS.json carries the FINAL
         # per-candidate package identity (the authority, Art. X — no
         # session-only enrichment layered on a stale run artifact).
-        try:
-            self._compile_ranked_packages()
-        except Exception as exc:  # noqa: BLE001 — the ranked record is
-            self._persist("RANKED_PACKAGE_FAILED.json", {
-                "stage": "RANKED_PACKAGE_COMPILATION",
-                "error": f"{type(exc).__name__}: {exc}",
-                "consequence": ("no ranked packages compiled; the ranked "
-                                "result set records ABSENT_NOT_COMPILED "
-                                "for every survivor — the run is NOT a "
-                                "finished discovery (honest, Art. XXV)")})
+        #
+        # R399 W2.1 gate: a SCIENTIFICALLY REJECTED run generates NO
+        # package artifacts (no staging, no DOWNLOAD, no ZIP) — the
+        # refusal is recorded, never silent; the expensive packaging
+        # compute is reserved for non-rejected candidates, and a
+        # scientific verdict is never "recovered" into a package.
+        if (self.env.epistemic_state or {}).get("final_status") == \
+                "REJECTED":
+            self._persist(
+                "RANKED_PACKAGE_SKIPPED_SCIENTIFICALLY_REJECTED.json", {
+                    "stage": "RANKED_PACKAGE_COMPILATION",
+                    "entry_status": "SKIPPED",
+                    "prerequisite": "CANDIDATE_NOT_SCIENTIFICALLY_REJECTED",
+                    "skip_reason": (
+                        "R399 W2.1: scientifically rejected run — no "
+                        "candidate-bound ranked packages compiled "
+                        "(recorded refusal, never absence)"),
+                })
+        else:
+            try:
+                self._compile_ranked_packages()
+            except Exception as exc:  # noqa: BLE001 — the ranked record is
+                self._persist("RANKED_PACKAGE_FAILED.json", {  # recorded, never silent
+                    "stage": "RANKED_PACKAGE_COMPILATION",
+                    "error": f"{type(exc).__name__}: {exc}",
+                    "consequence": ("no ranked packages compiled; the ranked "
+                                    "result set records ABSENT_NOT_COMPILED "
+                                    "for every survivor — the run is NOT a "
+                                    "finished discovery (honest, Art. XXV)")})
         # R540/R541: the ranked result set — the contract's
         # machine-readable "ranked technology packages" shape. Derived
         # from THIS run's own persisted artifacts (the selection record,
@@ -1074,6 +1093,32 @@ class EngineRun:
             _rrs.persist_ranked_result_set(self.out, manifest)
         except Exception:  # noqa: BLE001 — the ranked record is
             pass            # additive; a failure never blocks the run
+        # R542: the COMPLETION CONTRACT — the authoritative finished-
+        # discovery verifier at the end of the real run path. It reads
+        # the durable run record and answers: is this a finished
+        # discovery? if not, exactly which contract component is
+        # missing, is it recoverable by an existing engine path, did
+        # the engine attempt that recovery, and what typed terminal
+        # state remains. A bounded automatic recovery runs here for
+        # the ONE tail-recoverable component (a survivor whose
+        # candidate-bound package failed to compile -> the engine's
+        # own package compiler retry, at most once). Mechanism /
+        # adversarial / experiment recovery happened inside the run
+        # (evolution / IMPROVE kill-point / experiment selector) and
+        # its attempt evidence is read from the artifacts already on
+        # disk. Typed constitutional blockers are never converted.
+        try:
+            from . import completion_contract as _cc
+            _cc.persist_completion_contract(
+                self.out, manifest,
+                package_retry=self._ranked_package_retry)
+        except Exception as exc:  # noqa: BLE001 — disclosed, the run's
+            self._persist("COMPLETION_CONTRACT_FAILED.json", {  # own earlier records stand
+                "stage": "COMPLETION_CONTRACT",
+                "error": f"{type(exc).__name__}: {exc}",
+                "consequence": ("no completion contract record; the run "
+                                "is NOT presented as a finished "
+                                "discovery (fail closed, Art. XXV)")})
         # Cemetery records RESEARCH kills only. An infrastructure failure
         # (e.g. missing LLM credential) is not negative knowledge about the
         # mechanism (Art. XXV: unknown/failed-run is not a failure lesson).
@@ -1111,7 +1156,7 @@ class EngineRun:
             if not p.exists():
                 continue
             try:
-                d = json.loads(p.read_text())
+                d = json.loads(p.read_text(encoding="utf-8"))
             except Exception:  # noqa: BLE001 — corrupt snapshot = redo stage
                 continue
             entries = d.get("stage_log") or []
@@ -1121,7 +1166,7 @@ class EngineRun:
                 last_ok = stage
         if last_ok is None:
             return None
-        d = json.loads((self.out / f"envelope_{last_ok}.json").read_text())
+        d = json.loads((self.out / f"envelope_{last_ok}.json").read_text(encoding="utf-8"))
         self.env = Candidate.from_dict(d)
         return last_ok
 
@@ -1557,7 +1602,7 @@ class EngineRun:
                 elif _env_file.exists():
                     try:
                         _mech_env = Candidate.from_dict(
-                            json.loads(_env_file.read_text()))
+                            json.loads(_env_file.read_text(encoding="utf-8")))
                     except Exception:  # noqa: BLE001 — corrupt record
                         _mech_env = _env_with_candidate(mech_cand)
                         self._persist(f"ENVELOPE_{_mech_key}.json",
@@ -1710,7 +1755,7 @@ class EngineRun:
                 _kill_file = self.out / f"PACKAGE_FAILED_{key}.json"
                 if _kill_file.exists():
                     try:
-                        _kill = json.loads(_kill_file.read_text())
+                        _kill = json.loads(_kill_file.read_text(encoding="utf-8"))
                     except Exception:  # noqa: BLE001 — malformed record
                         _kill = {"stage": "UNKNOWN",
                                  "reason": "kill record unreadable"}
@@ -1891,7 +1936,7 @@ class EngineRun:
                     if _indep_file.exists():
                         try:
                             indep_attack = json.loads(
-                                _indep_file.read_text())
+                                _indep_file.read_text(encoding="utf-8"))
                         except Exception:  # noqa: BLE001 — corrupt record
                             indep_attack = None
                     if indep_attack is None:
@@ -2091,7 +2136,7 @@ class EngineRun:
                                                or "RECORDED_KILL")
                         if _kill_file.exists():
                             try:
-                                _kf = json.loads(_kill_file.read_text())
+                                _kf = json.loads(_kill_file.read_text(encoding="utf-8"))
                                 _kclass = _kf.get("stage") or _kclass
                                 _basis = (_kf.get("kill_basis")
                                           or [_kf.get("reason", "")])
@@ -2291,29 +2336,42 @@ class EngineRun:
             # package bind to the candidate, not to the selected #1.
             _ranked_rows = [r for r in selection.get("ranked", [])
                             if isinstance(r, dict)]
+            # R542: EVERY investigated row keeps its pool key + origin —
+            # killed/excluded rows are part of the recorded competing
+            # set and must not project as an unkeyed/"primary" fallback
             _eval_by_cid = {e.get("candidate_id"): e
-                            for e in evaluated if e.get("killed") is False}
+                            for e in evaluated}
             for _r in _ranked_rows:
                 _cid = _r.get("candidate_id")
                 _ev = _eval_by_cid.get(_cid) or {}
                 _r["key"] = _ev.get("key")
                 _r["origin"] = _ev.get("origin")
-                _r["disposition"] = ("KILLED" if _r.get("killed")
-                                     else ("UNRESOLVED"
-                                           if _r.get("quality_verdict")
-                                           in (None, "FAIL")
-                                           or _r.get("span_underived")
-                                           or _r.get("physics_lifecycle")
-                                           in ("DOES_NOT_BEAT_BASELINE",
-                                               "PLAUSIBILITY_BOUND_VIOLATED")
-                                           else "SURVIVED"))
-                _r["ranked_admissible"] = bool(
-                    not _r.get("killed")
-                    and _r.get("quality_verdict") != "FAIL"
-                    and not _r.get("span_underived")
-                    and _r.get("physics_lifecycle")
-                    not in ("DOES_NOT_BEAT_BASELINE",
+                # R542: the disposition vocabulary is RESOLVED in all
+                # three recorded outcomes — KILLED (the challenge killed
+                # it), EXCLUDED (a deterministic gate resolved against
+                # it: quality FAIL, span underived, or physics-ineligible
+                # — a recorded exclusion, never an unresolved attack),
+                # SURVIVED. UNRESOLVED is reserved for a row the gates
+                # never resolved (quality never recorded) — an honest
+                # missing verdict that can NEVER be surfaced as a
+                # finished survivor (Art. XXV/XXIX).
+                _r["disposition"] = (
+                    "KILLED" if _r.get("killed")
+                    else "EXCLUDED" if (
+                        _r.get("quality_verdict") == "FAIL"
+                        or _r.get("span_underived")
+                        or _r.get("physics_lifecycle")
+                        in ("DOES_NOT_BEAT_BASELINE",
                             "PLAUSIBILITY_BOUND_VIOLATED"))
+                    else "UNRESOLVED"
+                    if _r.get("quality_verdict") in (None, "")
+                    else "SURVIVED")
+                # R542: the two recorded fields are EQUIVALENT BY
+                # CONSTRUCTION — admissible ⇔ a recorded SURVIVED
+                # disposition (never an independently-computed flag
+                # that could disagree with the stamped outcome)
+                _r["ranked_admissible"] = (
+                    _r.get("disposition") == "SURVIVED")
             selection["ranked_candidate_keys"] = [
                 {"rank": _i, "candidate_id": _r.get("candidate_id"),
                  "key": _r.get("key"),
@@ -2358,22 +2416,32 @@ class EngineRun:
                 if _sp is None or _en is None:
                     continue
                 _ev = e.get("env_view")
+                # R542: provenance metadata never CLAIMS admissibility
+                # the gates did not record — derived from the entry's
+                # own recorded gate outcomes (missing verdict = not
+                # admissible), consistent with the stamped rows
+                _qv = (e.get("quality") or {}).get("verdict")
+                _adm_e = (_qv not in (None, "", "FAIL")
+                          and not e.get("span_underived")
+                          and e.get("physics_lifecycle")
+                          not in ("DOES_NOT_BEAT_BASELINE",
+                                  "PLAUSIBILITY_BOUND_VIOLATED"))
                 self._persist(
                     f"INVENTION_SPECIFICATION_{_k}.json",
                     dict(_sp, ranked_candidate_key=_k,
                          ranked_candidate_id=e.get("candidate_id"),
-                         ranked_admissible=True))
+                         ranked_admissible=_adm_e))
                 self._persist(
                     f"ENGINEERING_SPECIFICATION_{_k}.json",
                     dict(_en, ranked_candidate_key=_k,
                          ranked_candidate_id=e.get("candidate_id"),
-                         ranked_admissible=True))
+                         ranked_admissible=_adm_e))
                 self._persist(
                     f"DECISIVE_EXPERIMENT_{_k}.json",
                     dict(select_decisive_experiment(_ev),
                          ranked_candidate_key=_k,
                          ranked_candidate_id=e.get("candidate_id"),
-                         ranked_admissible=True))
+                         ranked_admissible=_adm_e))
             spec_rel = chosen["spec"]
             eng_rel = dict(chosen["eng"], engineering_attack_summary={
                 "attack": "ENGINEERING_ATTACK (E15-F)",
@@ -3100,7 +3168,7 @@ class EngineRun:
                        not in ("DOES_NOT_BEAT_BASELINE",
                               "PLAUSIBILITY_BOUND_VIOLATED"))
             r["_rank"] = _pos
-            if not adm or (r.get("disposition") or "SURVIVED") != "SURVIVED":
+            if not adm or (r.get("disposition") or "") != "SURVIVED":
                 continue
 
             if key == "primary" or key is None:
@@ -3156,16 +3224,41 @@ class EngineRun:
             # Art. XXVIII: a candidate is never presented as geometry
             # it did not earn)
             geometry_out = self._candidate_geometry(c_key, c_eng)
+            # the compiler's visualizability contract is Optional[Dict]
+            # (package_compiler.py:783): never a bare class string.
+            # geometry_out carries the class on visualizability_class;
+            # wrap it so the class + domain_family + render status ride
+            # in as the dict the render/essay layers expect.
+            vis = geometry_out.get("visualizability")
+            if not isinstance(vis, dict):
+                vis = {"visualizability_class":
+                       geometry_out.get("visualizability_class"),
+                       "domain_family": geometry_out.get("domain_family"),
+                       "renders": {"status": "SKIPPED"}} \
+                    if geometry_out.get("visualizability_class") \
+                    else None
 
-            vis = geometry_out.get("visualizability") \
-                or geometry_out.get("visualizability_class")
+            # the canonical compiler (the authority) — candidate-bound
+            # inputs, candidate-bound zip name. run_gate=False: the
+            # per-candidate package is the ranked-survivor DELIVERABLE
+            # (the candidate's own technology record), not the RELEASE
+            # decision — the quality gate is the release posture,
+            # recorded separately, and never blocks the candidate-bound
+            # package from existing. A candidate that survived the
+            # gauntlet has a candidate-bound technology package, even
+            # if the release posture is not yet "pass" (Art. XXVIII:
+            # the package exists; the release gate decides the buyer
+            # posture). The ZIP's own contents are candidate-specific
+            # (the candidate's spec/engineering/experiment/model), so
+            # two candidates produce two distinct, candidate-bound ZIPs.
             try:
                 c_out = _pkgc.compile_package(
                     crr, None, geometry_out, str(stage_dir),
                     visualizability=vis,
                     zip_name=f"TECHNOLOGY_TRANSFER_PACKAGE_{c_key}.zip",
                     engine_identity=(self._engine_identity() or None),
-                    run_gate=True)
+                    run_gate=False,
+                    rehearsal=self.rehearsal)
             except Exception as exc:  # noqa: BLE001 — a crash is a BLOCK
                 c_out = {"blocked": True,
                          "blocked_record": {
@@ -3225,6 +3318,43 @@ class EngineRun:
         })
         return packages
 
+    # ------------------------------------------------------------------
+    # R542: the completion contract's BOUNDED package recovery — the
+    # ONE tail-recoverable component. A survivor whose candidate-bound
+    # package failed to compile (transient compiler error, promoted
+    # artifact missing, encoding fault) gets exactly ONE automatic
+    # re-compile through the SAME canonical compiler + the SAME
+    # admission gates (no new epistemology; recovery returns through
+    # the same path). The ranked result set is re-persisted so the
+    # durable record carries the post-recovery package identity, and
+    # the completion contract re-verifies against the on-disk bytes.
+    def _ranked_package_retry(self) -> Dict[str, Any]:
+        # R399 W2.1 defense-in-depth: a scientifically rejected run
+        # never (re-)compiles a package — the refusal is the product
+        # state, remembered here too and not only at the tail gate.
+        if (self.env.epistemic_state or {}).get("final_status") == \
+                "REJECTED":
+            return {}
+        from . import ranked_result_set as _rrs
+        packages = self._compile_ranked_packages()
+        try:
+            _rrs.persist_ranked_result_set(
+                self.out, self._read_json("run_manifest.json"))
+        except Exception:  # noqa: BLE001 — the contract re-derives
+            pass
+        self._persist("RANKED_PACKAGE_RETRY.json", {
+            "schema": "RANKED_PACKAGE_RETRY/1.0.0",
+            "run_id": self.run_id,
+            "retried_at": utc_now(),
+            "n_compiled": sum(1 for r in (packages or {}).values()
+                              if isinstance(r, dict) and r.get("complete")),
+            "reason": ("completion contract recovery: a survivor's "
+                       "candidate-bound package was missing at the run "
+                       "tail — one bounded re-compile through the "
+                       "canonical package compiler"),
+        })
+        return packages or {}
+
     def _candidate_geometry(self, c_key: str,
                            c_eng: Dict[str, Any]) -> Dict[str, Any]:
         """R541: candidate-bound geometry for the per-candidate package.
@@ -3280,7 +3410,7 @@ class EngineRun:
         p = Path(self.out) / name
         try:
             if p.is_file():
-                return json.loads(p.read_text())
+                return json.loads(p.read_text(encoding="utf-8"))
         except Exception:  # noqa: BLE001 — a corrupt record is honest
             return None
         return None
@@ -3531,7 +3661,7 @@ class EngineRun:
         lineage_path = self.out / "INVENTION_LINEAGE.json"
         if lineage_path.exists():
             try:
-                prior = json.loads(lineage_path.read_text())
+                prior = json.loads(lineage_path.read_text(encoding="utf-8"))
                 if prior.get("stop_reason") in (
                         "SURVIVOR_REACHED", "TRANSPORT_BLOCKED",
                         "INFORMATION_GAIN_ZERO", "BUDGET_EXHAUSTED",
@@ -3558,7 +3688,7 @@ class EngineRun:
         gen1_path = self.out / "EVOLUTION_GEN_1.json"
         if gen1_path.exists():
             try:
-                gen1 = json.loads(gen1_path.read_text())
+                gen1 = json.loads(gen1_path.read_text(encoding="utf-8"))
             except Exception:  # noqa: BLE001
                 gen1 = None
         else:
@@ -3629,7 +3759,7 @@ class EngineRun:
             gen_path = self.out / f"EVOLUTION_GEN_{gen_n}.json"
             if gen_path.exists():
                 try:
-                    child = json.loads(gen_path.read_text())
+                    child = json.loads(gen_path.read_text(encoding="utf-8"))
                 except Exception:  # noqa: BLE001
                     child = None
             else:
@@ -4608,7 +4738,7 @@ def main():
 
     problem: Dict[str, Any]
     if args.problem_json:
-        problem = json.loads(Path(args.problem_json).read_text())
+        problem = json.loads(Path(args.problem_json).read_text(encoding="utf-8"))
     elif args.problem_id:
         import importlib
         a2run = importlib.import_module("discovery_fabric.a2.run")

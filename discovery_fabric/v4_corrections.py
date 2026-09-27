@@ -542,7 +542,7 @@ def commit_m4_memory(round_num: int, engine: str, memory: dict, output_dir: Path
         "memory": memory,
     }
     
-    path.write_text(json.dumps(artifact, indent=2, default=str))
+    path.write_text(json.dumps(artifact, indent=2, default=str), encoding="utf-8")
     return {
         "filename": filename,
         "path": str(path),

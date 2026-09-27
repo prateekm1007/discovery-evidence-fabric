@@ -244,7 +244,7 @@ def _askpass() -> Path:
         "  *sername*) echo \"x-access-token\" ;;\n"
         "  *assword*) printf '%s\\n' \"$GITHUB_TOKEN\" ;;\n"
         "  *) echo \"\" ;;\n"
-        "esac\n")
+        "esac\n", encoding="utf-8")
     p.chmod(0o700)
     _ASKPASS_PATH = p
     return p
@@ -542,7 +542,7 @@ def _shrink_violations(repo: Path, payload: Dict[str, Path]) -> List[str]:
         if not src or not Path(src).exists():
             return None
         try:
-            return json.loads(Path(src).read_text())
+            return json.loads(Path(src).read_text(encoding="utf-8"))
         except (ValueError, OSError):
             return None
 
@@ -600,7 +600,7 @@ def _shrink_violations(repo: Path, payload: Dict[str, Path]) -> List[str]:
             src = payload.get(rel)
             if not src or not Path(src).exists():
                 continue  # not pushed this round: branch copy survives
-            new_lines = {l.strip() for l in Path(src).read_text().splitlines()
+            new_lines = {l.strip() for l in Path(src).read_text(encoding="utf-8").splitlines()
                          if l.strip()}
             lost = [l for l in old.stdout.splitlines()
                     if l.strip() and l.strip() not in new_lines]
@@ -657,7 +657,7 @@ def snapshot(reason: str) -> Dict[str, Any]:
         return dict(_LAST)
 
     ENGINE_RUNTIME.mkdir(parents=True, exist_ok=True)
-    lock = open(LOCK_PATH, "w")
+    lock = open(LOCK_PATH, "w", encoding="utf-8")
     try:
         fcntl.flock(lock, fcntl.LOCK_EX)
         # R423A Phase 4: the hot path never pays the fetch — see
@@ -742,7 +742,7 @@ def snapshot(reason: str) -> Dict[str, Any]:
         # shrink (Art. XV/XXV).
         _sg = _LAST.get("shrink_guard") or {}
         log = repo / SNAPSHOT_LOG_NAME
-        with open(log, "a") as lf:
+        with open(log, "a", encoding="utf-8") as lf:
             lf.write(json.dumps({
                 "reason": reason,
                 "at": _LAST["at"],
@@ -837,7 +837,7 @@ def restore() -> Dict[str, Any]:
         return dict(_LAST_RESTORE)
     try:
         ENGINE_RUNTIME.mkdir(parents=True, exist_ok=True)
-        lock = open(LOCK_PATH, "w")
+        lock = open(LOCK_PATH, "w", encoding="utf-8")
         try:
             fcntl.flock(lock, fcntl.LOCK_EX)
             repo = _ensure_state_repo()
@@ -846,7 +846,7 @@ def restore() -> Dict[str, Any]:
             manifest_path = repo / MANIFEST_NAME
             if manifest_path.exists():
                 try:
-                    manifest = json.loads(manifest_path.read_text())
+                    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
                     _LAST_RESTORE["manifest_sha256"] = manifest.get(
                         "tree_sha256")
                     _LAST_RESTORE["snapshot_of_record"] = {
@@ -881,7 +881,7 @@ def restore() -> Dict[str, Any]:
             merged = 0
             if remote_sessions.exists():
                 local = store._locked_read(store.SESSIONS_PATH) or {}
-                remote = json.loads(remote_sessions.read_text())
+                remote = json.loads(remote_sessions.read_text(encoding="utf-8"))
                 _LAST_RESTORE["branch_sessions"] = len(
                     remote.get("sessions", []))
                 by_id = {s["session_id"]: s
@@ -904,7 +904,7 @@ def restore() -> Dict[str, Any]:
             remote_shares = repo / "shares.json"
             if remote_shares.exists():
                 local = store._locked_read(store.SHARES_PATH) or {}
-                remote = json.loads(remote_shares.read_text())
+                remote = json.loads(remote_shares.read_text(encoding="utf-8"))
                 local.update(remote)
                 store._locked_write(store.SHARES_PATH, local)
             # --- evidence + run artifacts (copy when absent) ---
@@ -941,7 +941,7 @@ def restore() -> Dict[str, Any]:
                         # does not already contain (idempotent by event_id)
                         try:
                             local_ids = set()
-                            for line in dst.read_text().splitlines():
+                            for line in dst.read_text(encoding="utf-8").splitlines():
                                 line = line.strip()
                                 if not line:
                                     continue
@@ -951,7 +951,7 @@ def restore() -> Dict[str, Any]:
                                 except json.JSONDecodeError:
                                     continue  # torn local tail line
                             with open(dst, "a", encoding="utf-8") as out:
-                                for line in f.read_text().splitlines():
+                                for line in f.read_text(encoding="utf-8").splitlines():
                                     line = line.strip()
                                     if not line:
                                         continue
@@ -988,12 +988,12 @@ def restore() -> Dict[str, Any]:
                         _mr_dst.mkdir(parents=True, exist_ok=True)
                         shutil.copy2(ledger, dst)
                         appended = sum(1 for l in
-                                       dst.read_text().splitlines()
+                                       dst.read_text(encoding="utf-8").splitlines()
                                        if l.strip())
                     else:
                         try:
                             local_ids = set()
-                            for line in dst.read_text().splitlines():
+                            for line in dst.read_text(encoding="utf-8").splitlines():
                                 line = line.strip()
                                 if not line:
                                     continue
@@ -1003,7 +1003,7 @@ def restore() -> Dict[str, Any]:
                                 except json.JSONDecodeError:
                                     continue
                             with open(dst, "a", encoding="utf-8") as out:
-                                for line in ledger.read_text().splitlines():
+                                for line in ledger.read_text(encoding="utf-8").splitlines():
                                     line = line.strip()
                                     if not line:
                                         continue

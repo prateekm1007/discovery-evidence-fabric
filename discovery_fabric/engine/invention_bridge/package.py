@@ -451,7 +451,7 @@ def assemble(
         renders=geometry_out.get("renders"))
     if not is_engineering:
         with open(os.path.join(model_dir, "CONCEPTUAL_3D_DISCLAIMER.json"),
-                  "w") as f:
+                  "w", encoding="utf-8") as f:
             json.dump(ep.conceptual_disclaimer(vis_class), f, indent=2)
 
     # ---- render artifacts (R419 §5-6, presentation-only) --------------------
@@ -499,7 +499,7 @@ def assemble(
                 "renderer_stack": renders.get("renderer_stack"),
             }
             with open(os.path.join(render_dir,
-                                   "RENDER_DISCLOSURE.json"), "w") as f:
+                                   "RENDER_DISCLOSURE.json"), "w", encoding="utf-8") as f:
                 json.dump(presentation_note, f, indent=2)
             render_artifacts.append("MODEL/3D/RENDER_DISCLOSURE.json")
 
@@ -519,7 +519,7 @@ def assemble(
             gate_path = os.path.join(render_dir, "visual_gate.json")
             if os.path.isfile(gate_path):
                 try:
-                    gate = json.loads(Path(gate_path).read_text())
+                    gate = json.loads(Path(gate_path).read_text(encoding="utf-8"))
                 except Exception:  # noqa: BLE001 — unreadable gate = fail closed
                     gate = {"verdict": "NOT_RUN",
                             "reasons": ["visual_gate.json unreadable"]}
@@ -549,7 +549,7 @@ def assemble(
                 or not _complete_ok
                 or _record_schema_error is not None)
             with open(os.path.join(render_dir,
-                                   "HERO_RELEASE_STATE.json"), "w") as f:
+                                   "HERO_RELEASE_STATE.json"), "w", encoding="utf-8") as f:
                 json.dump({
                     "artifact": "HERO_RELEASE_STATE",
                     "article": "LXXII",
@@ -568,7 +568,7 @@ def assemble(
                         render_artifacts.remove(f"MODEL/3D/{suppressed}")
                 render_artifacts.append("MODEL/3D/HERO_SUPPRESSED.txt")
                 with open(os.path.join(render_dir,
-                                       "HERO_SUPPRESSED.txt"), "w") as f:
+                                       "HERO_SUPPRESSED.txt"), "w", encoding="utf-8") as f:
                     f.write("NO HERO — the Visual Quality Gate did not "
                             "pass; the hero is suppressed and the "
                             "package is blocked from release "
@@ -585,7 +585,7 @@ def assemble(
         # stays unknown)
         os.makedirs(render_dir, exist_ok=True)
         with open(os.path.join(render_dir, "HERO_RELEASE_STATE.json"),
-                  "w") as f:
+                  "w", encoding="utf-8") as f:
             json.dump({
                 "artifact": "HERO_RELEASE_STATE",
                 "article": "LXXII",
@@ -664,7 +664,7 @@ def assemble(
         "generated_by": ("toscanini_bridge elite package factory "
                          "(R424; canonical invention-to-package path)"),
     }
-    with open(os.path.join(out_dir, "PROVENANCE.json"), "w") as f:
+    with open(os.path.join(out_dir, "PROVENANCE.json"), "w", encoding="utf-8") as f:
         json.dump(provenance, f, indent=2, ensure_ascii=False)
 
     # ---- manifest (hash every file) --------------------------------------------
@@ -691,7 +691,7 @@ def assemble(
         "integrity_rule": "every file is sha256-hashed; verify after transfer",
     }
     # R424 §2: the elite manifest name
-    with open(os.path.join(out_dir, "PACKAGE_MANIFEST.json"), "w") as f:
+    with open(os.path.join(out_dir, "PACKAGE_MANIFEST.json"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
 
     # ---- zip (R423A: ONE canonical customer artifact) -------------------------

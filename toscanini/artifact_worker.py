@@ -209,7 +209,7 @@ def job_record_file(d: Path) -> Optional[Dict[str, Any]]:
     if not p.is_file():
         return None
     try:
-        return json.loads(p.read_text())
+        return json.loads(p.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001
         return None
 
@@ -220,7 +220,7 @@ def job_record(session_id: str) -> Optional[Dict[str, Any]]:
     if not p or not p.is_file():
         return None
     try:
-        return json.loads(p.read_text())
+        return json.loads(p.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001 — corrupt record -> re-runnable
         return None
 
@@ -230,7 +230,7 @@ def _write_job(session_id: str, record: Dict[str, Any]) -> Dict[str, Any]:
     if p is None:
         return record
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(record, indent=2))
+    p.write_text(json.dumps(record, indent=2), encoding="utf-8")
     return record
 
 
@@ -452,7 +452,7 @@ def _bridge_render_status(session: Dict[str, Any]) -> Optional[str]:
     if not br.is_file():
         return None
     try:
-        report = json.loads(br.read_text())
+        report = json.loads(br.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001
         return None
     renders = report.get("renders") or {}
@@ -621,7 +621,7 @@ def run(session_id: str) -> Dict[str, Any]:
     for cf in cio_files:
         if cf.is_file():
             try:
-                cio = json.loads(cf.read_text())
+                cio = json.loads(cf.read_text(encoding="utf-8"))
                 geo = cio.get("geometry") or {}
                 vis_class = geo.get("visualizability_class") \
                     or geo.get("class")

@@ -1273,7 +1273,7 @@ def gate_T_security(pv: PackageView, canonical: Optional[dict]) -> GateResult:
                                  ".stl", ".svg", ".html", ".js"))]
     for rel in text_files:
         try:
-            text = (pv.root / rel).read_text(errors="replace")[:2_000_000]
+            text = (pv.root / rel).read_text(errors="replace", encoding="utf-8")[:2_000_000]
         except Exception:
             continue
         for label, pat in SECRET_PATTERNS:

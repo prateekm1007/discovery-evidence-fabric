@@ -73,7 +73,7 @@ _FINAL_STATE_FILES = (
 def _read_json(path: Path) -> Optional[dict]:
     try:
         if path.is_file():
-            return json.loads(path.read_text())
+            return json.loads(path.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001 — malformed record -> honest absent
         return None
     return None
@@ -861,7 +861,7 @@ def compile_package(
                 ci["invention_specification"],
                 ci["engineering_specification"])
             (pkg_dir / "DEPTH_CONTRACT_EVALUATION.json").write_text(
-                json.dumps(depth_eval, indent=2, default=str))
+                json.dumps(depth_eval, indent=2, default=str), encoding="utf-8")
         except Exception:  # noqa: BLE001 — evaluation is transparency,
             # never a second authority (the validators + gate own the
             # verdict); a failure here must not block an otherwise
@@ -887,7 +887,7 @@ def compile_package(
             # never only from the compiler's return value)
             try:
                 (work / "PACKAGE_QUALITY_GATE_VERDICT.json").write_text(
-                    json.dumps(verdict, indent=2, default=str))
+                    json.dumps(verdict, indent=2, default=str), encoding="utf-8")
             except Exception:  # noqa: BLE001 — record best-effort
                 pass
             if verdict["package_quality"] != "PASS":
@@ -1009,7 +1009,7 @@ def _bind_release(work: Path, result: Dict[str, Any],
     record exists — e.g. pure compile workflows)."""
     rel = work / "DISCOVERY_RELEASE.json"
     try:
-        data = json.loads(rel.read_text())
+        data = json.loads(rel.read_text(encoding="utf-8"))
         if not isinstance(data, dict):
             return None
     except Exception:  # noqa: BLE001 — no release record: nothing to bind
@@ -1040,7 +1040,7 @@ def _bind_release(work: Path, result: Dict[str, Any],
     if str(data.get("status") or "") not in ("NOT_A_SURVIVOR", "RELEASED"):
         data["status"] = "HELD_FOR_HUMAN_REVIEW"
     data["r440_package_compiled"] = binding
-    rel.write_text(json.dumps(data, indent=2, default=str))
+    rel.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
     return binding
 
 
@@ -1167,7 +1167,7 @@ def _rebuild_manifest(pkg_dir: Path, label: str,
                            "final promoted tree)"),
     }
     (pkg_dir / "PACKAGE_MANIFEST.json").write_text(
-        json.dumps(manifest, indent=2))
+        json.dumps(manifest, indent=2), encoding="utf-8")
     return manifest
 
 
@@ -1242,7 +1242,7 @@ def _blocked(result: Dict[str, Any], work: Path, tmp: Path,
     })
     try:
         (work / "PACKAGE_BUILD_BLOCKED.json").write_text(
-            json.dumps(rec, indent=2, default=str))
+            json.dumps(rec, indent=2, default=str), encoding="utf-8")
     except Exception:  # noqa: BLE001 — record best-effort, block stands
         pass
     if keep_quarantine and tmp.exists():

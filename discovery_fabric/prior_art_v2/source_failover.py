@@ -132,7 +132,7 @@ def _check_lens_patent() -> SourceStatus:
     keys_file = Path(__file__).resolve().parents[2] / ".env.keys"
     token = ""
     if keys_file.exists():
-        for line in keys_file.read_text().splitlines():
+        for line in keys_file.read_text(encoding="utf-8").splitlines():
             if line.startswith("LENS_API_TOKEN="):
                 token = line.split("=", 1)[1].strip()
                 break
@@ -183,7 +183,7 @@ def _check_patsnap() -> SourceStatus:
     keys_file = Path(__file__).resolve().parents[2] / ".env.keys"
     key = ""
     if keys_file.exists():
-        for line in keys_file.read_text().splitlines():
+        for line in keys_file.read_text(encoding="utf-8").splitlines():
             if line.startswith("PATSNAP_EUREKA_API_KEY="):
                 key = line.split("=", 1)[1].strip()
                 break
@@ -234,7 +234,7 @@ def _check_patent_bear() -> SourceStatus:
     keys_file = Path(__file__).resolve().parents[2] / ".env.keys"
     key = ""
     if keys_file.exists():
-        for line in keys_file.read_text().splitlines():
+        for line in keys_file.read_text(encoding="utf-8").splitlines():
             if line.startswith("PATENT_BEAR_API_KEY="):
                 key = line.split("=", 1)[1].strip()
                 break
@@ -269,7 +269,7 @@ def patsnap_search_count(query: str) -> Optional[int]:
     keys_file = Path(__file__).resolve().parents[2] / ".env.keys"
     key = ""
     if keys_file.exists():
-        for line in keys_file.read_text().splitlines():
+        for line in keys_file.read_text(encoding="utf-8").splitlines():
             if line.startswith("PATSNAP_EUREKA_API_KEY="):
                 key = line.split("=", 1)[1].strip()
                 break

@@ -520,7 +520,7 @@ def apply_attachments(pu: Dict[str, Any],
 def persist(pu: Dict[str, Any], run_dir: Path) -> Path:
     p = Path(run_dir) / PERSIST_NAME
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(pu, indent=1, ensure_ascii=False))
+    p.write_text(json.dumps(pu, indent=1, ensure_ascii=False), encoding="utf-8")
     return p
 
 
@@ -529,7 +529,7 @@ def load(run_dir: Path) -> Optional[Dict[str, Any]]:
     if not p.is_file():
         return None
     try:
-        return json.loads(p.read_text())
+        return json.loads(p.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return None
 

@@ -124,7 +124,7 @@ def identity() -> Dict[str, Any]:
     runtime_sha = _sha256_bytes(raw)
     baked_sha = ""
     if ARTIFACT_SHA.exists():
-        baked_sha = ARTIFACT_SHA.read_text().strip().split()[0] or ""
+        baked_sha = ARTIFACT_SHA.read_text(encoding="utf-8").strip().split()[0] or ""
     if not baked_sha:
         # no build-time hash to compare against — tamper is UNKNOWN,
         # never fabricated True or False (Art. VI/XXV)

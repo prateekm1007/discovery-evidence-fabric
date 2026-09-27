@@ -21,7 +21,7 @@ def load_keys() -> Dict[str, str]:
     if not KEYS_FILE.exists():
         return {}
     out: Dict[str, str] = {}
-    for line in KEYS_FILE.read_text().splitlines():
+    for line in KEYS_FILE.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if "=" in line and not line.startswith("#"):
             k, v = line.split("=", 1)

@@ -404,7 +404,7 @@ class ProviderHealthBook:
         try:
             p = self._dir / "state.json"
             if p.exists():
-                data = json.loads(p.read_text())
+                data = json.loads(p.read_text(encoding="utf-8"))
                 if isinstance(data.get("providers"), dict):
                     self._state = data["providers"]
         except Exception as exc:  # noqa: BLE001 — disclosed, non-fatal
@@ -418,7 +418,7 @@ class ProviderHealthBook:
                 {"providers": self._state,
                  "updated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                              time.gmtime())},
-                indent=1, sort_keys=True))
+                indent=1, sort_keys=True), encoding="utf-8")
             tmp.replace(self._dir / "state.json")
             self._last_error = None
         except Exception as exc:  # noqa: BLE001

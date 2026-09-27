@@ -28,7 +28,7 @@ CONTRACT_VERSION = "CODER1_RUN_CONTRACT/1.0.0"
 def _read_json(p: Path) -> Optional[Dict[str, Any]]:
     try:
         if p.is_file():
-            data = json.loads(p.read_text())
+            data = json.loads(p.read_text(encoding="utf-8"))
             return data if isinstance(data, dict) else None
     except (OSError, ValueError):
         return None

@@ -15,8 +15,20 @@ Art. XV: the degradation is typed on the module, never silent."""
 
 from __future__ import annotations
 
+import types
+
 try:
     import fcntl as _fcntl
+    # A genuine platform fcntl.flock is a builtin. A user-supplied
+    # no-op shim (the dev/test fake-fcntl installed on Windows so the
+    # bare `import fcntl` sites import cleanly) must NOT be mistaken
+    # for the real primitive — falling through to msvcrt keeps real
+    # cross-process exclusion alive on the Windows msvcrt path.
+    if (not isinstance(getattr(_fcntl, "flock", None),
+                      types.BuiltinFunctionType)
+            or not hasattr(_fcntl, "LOCK_SH")):
+        raise ImportError("user-supplied fcntl shim is not a "
+                          "genuine POSIX primitive")
     BACKEND = "posix"
     LOCK_SH = _fcntl.LOCK_SH
     LOCK_EX = _fcntl.LOCK_EX

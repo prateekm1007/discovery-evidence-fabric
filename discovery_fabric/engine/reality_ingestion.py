@@ -151,7 +151,7 @@ def ingest_reality_event(event: Dict[str, Any], ledger_path: str) -> Dict:
     ledger: Dict[str, Any] = {"artifact_type": "REALITY_EVENT_LEDGER",
                               "entries": []}
     if os.path.exists(ledger_path):
-        with open(ledger_path) as f:
+        with open(ledger_path, encoding="utf-8") as f:
             ledger = json.load(f)
     if any(e.get("event_id") == event["event_id"]
            for e in ledger.get("entries", [])):
@@ -178,7 +178,7 @@ def ingest_reality_event(event: Dict[str, Any], ledger_path: str) -> Dict:
     ledger["real_event_count"] = sum(
         1 for e in ledger["entries"] if e["reality_class"] == "REAL")
     os.makedirs(os.path.dirname(ledger_path) or ".", exist_ok=True)
-    with open(ledger_path, "w") as f:
+    with open(ledger_path, "w", encoding="utf-8") as f:
         json.dump(ledger, f, indent=1, sort_keys=True)
     return {"ingested": True, "entry_sha256": entry["entry_sha256"],
             "ledger_entry_count": ledger["entry_count"],
@@ -189,7 +189,7 @@ def verify_ledger(ledger_path: str) -> Dict[str, Any]:
     """Recompute the hash chain. Any mutation of a past entry breaks it."""
     if not os.path.exists(ledger_path):
         return {"valid": False, "reason": "ledger not found"}
-    with open(ledger_path) as f:
+    with open(ledger_path, encoding="utf-8") as f:
         ledger = json.load(f)
     prev = "GENESIS"
     for e in ledger.get("entries", []):
@@ -768,7 +768,7 @@ class _LedgerLocked:
         self._tlock = lock
         try:
             import fcntl
-            self._fh = open(self._path, "w")
+            self._fh = open(self._path, "w", encoding="utf-8")
             fcntl.flock(self._fh, fcntl.LOCK_EX)
             self.state = "FLOCK_EXCLUSIVE+THREAD"
         except Exception:
