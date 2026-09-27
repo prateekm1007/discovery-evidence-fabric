@@ -1,0 +1,2321 @@
+{
+ "invention_id": {
+  "value": "inv:ui_no_load_overheating_548902:2287c2e108c1",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_no_load_overheating_548902",
+   "device": "3-phase induction motor",
+   "failure": "Documented problem 'no-load overheating' concerning 3-phase induction motor. User-submitted engineering problem (session input): \"My 3-phase induction motor on a conveyor drive trips the thermal overload after about 20 minutes of no-load running. The winding resistance is balanced across phases and the supply voltage is stable at 400V. I need a mechanism that explains why it still overheats on no-load, and what would disprove \".  ROUTING: fra_rail_accidents: not queried — the failure query is free text and this source answers date-floor questions only (grammar: YYYY-MM-DD date floor ($where date >= X)). ROUTING: doe_osti: routing state SUSPENDED_RELEVANCE — measured relevance instability (R375: same fusion papers relevant 3 -> 0; pooled relevant-rate 0.175 pre-fix; DETERMINISM_GAP flagged in the R394 production audit) — records poison synthesis-feeding retrieval more than they feed it until relevance is semantically adjudicated; reinstatement: the Phase P1 semantic reranker lands (semantic relevance adjudication between query and record, replacing lexical overlap); flip to ACTIVE + a measured relevance re-run + worklog entry. [fra_rail_accidents] retrieval status NOT_QUERIED_GRAMMAR (planned query is free text; source grammar is a YYYY-MM-DD date floor (R443 routing decision, not absence)) — provider outcome recorded, not treated as absence (Art. XXI.3). [doe_osti] retrieval status NOT_QUERIED_SUSPENDED_RELEVANCE (engine routing decision (R399 W3): SUSPENDED_RELEVANCE — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "no-load overheating",
+   "constraint": "400V supply stable balanced phase winding resistance"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:45ef6856"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of 3-phase induction motor",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Inter-turn short-circuit faults in induction motors might lead to overheating, torque imbalances, and eventual motor failure via negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition. [TECHNICAL MUTATION: The design variable \"Extent of electrical contact between adjacent turns\" is fixed at 0.0, ensuring that inter-turn shorts are physically prevented from forming or remaining, which directly addresses the root cause of the no-load overheating failure mode.] [TECHNICAL MUTATION: The design variable \"Extent of electrical contact between adjacent turns\" is adjusted to 0.5 to represent a controlled, reduced severity of inter-turn shorts, thereby mitigating the thermal runaway mechanism.]",
+   "intervention": "Implement a fault detection framework that integrates negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition to monitor motor health and detect early-stage inter-turn shorts. [TECHNICAL MUTATION: Implement strict insulation integrity verification processes to guarantee the design value of 0.0 for electrical contact between adjacent turns, thereby eliminating the generation of negative-sequence currents associated with inter-turn faults.] [TECHNICAL MUTATION: Implement rigorous insulation integrity verification and quality control processes to ensure the inter-turn short-circuit severity remains at or below the target value of 0.5, preventing the transition to severe contact that causes overheating.]",
+   "expected_effect": "High sensitivity to early-stage inter-turn short circuits enabling real-time condition monitoring and preventing thermal overload trips during no-load operation.",
+   "mechanism_source_span": "Inter-turn short-circuit faults in induction motors might lead to overheating, torque imbalances, and eventual motor failure. This paper presents a fault detection framework for accurately identifying ITSC faults under various operating conditions. The proposed method integrates negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition.",
+   "span_derivation": {
+    "n_shared": 28,
+    "shared_terms": [
+     "analysi",
+     "based",
+     "circuit",
+     "component",
+     "current",
+     "decomposition",
+     "detection",
+     "eventual",
+     "failure",
+     "fault",
+     "filtering",
+     "framework",
+     "imbalance",
+     "induction",
+     "integrate",
+     "inter",
+     "lead",
+     "might",
+     "motor",
+     "negative"
+    ],
+    "span_terms_n": 40,
+    "ratio": 0.7,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "If the negative-sequence current analysis does not detect significant fundamental components of negative-sequence currents indicating inter-turn faults, the mechanism of inter-turn shorts causing no-load overheating is disproved.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.3390/s25154844",
+     "source_span": "Inter-turn short-circuit faults in induction motors might lead to overheating, torque imbalances, and eventual motor failure. This paper presents a fault detection framework for accurately identifying ITSC faults under various operating conditions. The proposed method integrates negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition."
+    }
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/s25154844"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Detection of Inter-Turn Short-Circuit Faults for Inverter-Fed Induction Motors Based on Negative-Sequence Current Analysis.",
+   "mechanism": "Inter-turn short-circuit faults causing localized eddy currents and increased winding resistance leading to overheating.",
+   "intervention_site": "3-phase induction motor",
+   "expected_effect": "Early identification and isolation of inter-turn faults preventing thermal overload trips during no-load operation.",
+   "falsification_test": "If negative-sequence current magnitudes remain within the healthy threshold limits (established in the paper's index) during no-load operation at 400V, the inter-turn short hypothesis is disproven, requiring investigation into other thermal management issues."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/s25154844"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "legacy_status": "",
+   "differentiation_resolution": {
+    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "NO_FAMILIES",
+    "per_family": [],
+    "n_families": 0,
+    "n_search_errors": 10,
+    "search_errors": [
+     {
+      "query": "overheating winding resistance induction phase motor",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "overheating winding resistance induction phase motor",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"ca6eeab0-0cae-4277-a21a-edd60b88c0fd\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "winding resistance overheating inter turn circuit",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "winding resistance overheating inter turn circuit",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"a3bbacf6-ad17-4db1-bc0c-8028920d2399\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "current inter turn shorts perform negative sequence analysis",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "current inter turn shorts perform negative sequence analysis",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"525e3119-28ea-4409-b8b8-f597ef430d41\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "overheating prevention detection identification isolation preventing",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "overheating prevention detection identification isolation preventing",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"b4545fc9-00bf-4a96-99bb-554eb1ffb279\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "inter turn faults identification isolation preventing",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "inter turn faults identification isolation preventing",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"7b8d41f4-e130-4583-8e7e-7f04a1258f69\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     }
+    ],
+    "search_execution": {
+     "mandatory_complete": false,
+     "n_errors": 10,
+     "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+    },
+    "relevance_model_version": "collision_resolution/2.0.0",
+    "determinism_contract": {
+     "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+     "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+    },
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    }
+   },
+   "nearest": [],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "overheating winding resistance induction phase motor"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "winding resistance overheating inter turn circuit"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "current inter turn shorts perform negative sequence analysis"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "overheating prevention detection identification isolation preventing"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "inter turn faults identification isolation preventing"
+    }
+   ],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Implement a fault detection framework that integrates negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition to monitor motor health and detect early-stage inter-turn shorts. [TECHNICAL MUTATION: Implement strict insulation integrity verification processes to guarantee the design value of 0.0 for electrical contact between adjacent turns, thereby eliminating the generation of negative-sequence currents associated with inter-turn faults.] [TECHNICAL MUTATION: Implement rigorous insulation integrity verification and quality control processes to ensure the inter-turn short-circuit severity remains at or below the target value of 0.5, preventing the transition to severe contact that causes overheating.]",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/s25154844"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "400V supply stable balanced phase winding resistance",
+   "failure_mode_of_device": "no-load overheating",
+   "evidence_derived": [
+    {
+     "constraint": "The detection method must integrate negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition to accurately identify ITSC faults.",
+     "evidence_id": "doi:10.3390/s25154844",
+     "span": "Inter-turn short-circuit faults in induction motors might lead to overheating, torque imbalances, and eventual motor failure. This paper presents a fault detection framework for accurately identifying ITSC faults under various operating conditions. The proposed method integrates negative-sequence cu"
+    }
+   ]
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:45ef6856"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.4127645122788207,
+   "eig_per_cost": 0.4127645122788207,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Detection and isolation of the specific turn-to-turn fault, thereby eliminating the parasitic circulating currents and stopping the no-load overheating that trips the thermal overload.",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-27T22:42:24.507031+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-27T22:42:24.507031+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.4127645122788207,
+     "eig_per_cost": 0.4127645122788207,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.3390/s25154844",
+    "title": "Detection of Inter-Turn Short-Circuit Faults for Inverter-Fed Induction Motors Based on Negative-Sequence Current Analysis.",
+    "source_uri": "https://doi.org/10.3390/s25154844",
+    "doi": "10.3390/s25154844",
+    "content_hash": "2c7bf2e442d2e149b7cb78b51064224205a3d16cbe49b37b9e1ac8ed4e5ada68",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.ohx.2026.e00770",
+    "title": "Thermal-stable rotor with enhanced cooling design for efficient electric motor applications.",
+    "source_uri": "https://doi.org/10.1016/j.ohx.2026.e00770",
+    "doi": "10.1016/j.ohx.2026.e00770",
+    "content_hash": "c6f541b6a50dc988bd7518f565e2ce76eb475ba44ad7536c4f05b548683ceb96",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1371/journal.pone.0335367",
+    "title": "Machine learning based fault classification for improved induction motor performance.",
+    "source_uri": "https://doi.org/10.1371/journal.pone.0335367",
+    "doi": "10.1371/journal.pone.0335367",
+    "content_hash": "16c19776afce4ec0f005a10b79dd253cf2d1fd709ab0fc6473cbbcc61b064817",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.7763/ijet.2014.v6.716",
+    "title": "Speed Load Control of Induction Motor Using Immune Algorithm and Fuzzy Phase Plane Controller",
+    "source_uri": "https://doi.org/10.7763/ijet.2014.v6.716",
+    "doi": "10.7763/ijet.2014.v6.716",
+    "content_hash": "5eec42de7fb3ba9fe85af34a716e4d71cfe3d18758740637a9d983c4b991d78a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.23919/icems60997.2024.10921129",
+    "title": "Compatibility Determination of Single-Phase Induction Motor and Load",
+    "source_uri": "https://doi.org/10.23919/icems60997.2024.10921129",
+    "doi": "10.23919/icems60997.2024.10921129",
+    "content_hash": "a2221afabca6606ff0087fcd18d0cb376acd3e189cb974210bb8563721389a02",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.17577/ijertv9is010020",
+    "title": "Temperature Measurement of Nine Phase Induction Motor Drive Without Load and Various Load Conditions",
+    "source_uri": "https://doi.org/10.17577/ijertv9is010020",
+    "doi": "10.17577/ijertv9is010020",
+    "content_hash": "436af659fc2ffefbb4c5b76f46f1f76a15eaa8d330f2db7f8a42e909cee1632e",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.18609199",
+    "title": "Big Bang was the Phase Transition, not the Explosive Event.",
+    "source_uri": "https://doi.org/10.5281/zenodo.18609199",
+    "doi": "10.5281/zenodo.18609199",
+    "content_hash": "9952fd1effce9bab472d27cf2f2118b4387c92d0df30f5344e085b258b25b10f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.33915/etd.1530",
+    "title": "Load-based energy savings in three-phase squirrel cage induction motors",
+    "source_uri": "https://doi.org/10.33915/etd.1530",
+    "doi": "10.33915/etd.1530",
+    "content_hash": "8869289e03b06c50d599caac04784b8744865e2b3863ca20ae4da65b831ac12c",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5353/th_b3123211",
+    "title": "The design and evaluation of a microprocessor-controlled triac cycloconverter two-phase induction motor drive",
+    "source_uri": "https://doi.org/10.5353/th_b3123211",
+    "doi": "10.5353/th_b3123211",
+    "content_hash": "5178090644aee6cb6781cb899851de5cb5150268dcd4c5485f96a68da6fadef6",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2208.08825",
+    "title": "Dynamic State Estimation-Based Protection for Induction Motor Loads",
+    "source_uri": "https://doi.org/10.48550/arxiv.2208.08825",
+    "doi": "10.48550/arxiv.2208.08825",
+    "content_hash": "5594d20a42e52f4f4405b1a12009346d579cd36ed74017561a3add1a7d02a7c7",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2302.14805",
+    "title": "Optimization of a three-phase Induction Motor for Electric Vehicles Based on Hook-Jews Optimization Method",
+    "source_uri": "https://doi.org/10.48550/arxiv.2302.14805",
+    "doi": "10.48550/arxiv.2302.14805",
+    "content_hash": "a4fc4a5b77ec3302d4529a159ee49555c9b914fd6abac2c3a31fb83ddd3bf49d",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1912.07582",
+    "title": "A Nonlinear Regression Method for Composite Protection Modeling of Induction Motor Loads",
+    "source_uri": "https://doi.org/10.48550/arxiv.1912.07582",
+    "doi": "10.48550/arxiv.1912.07582",
+    "content_hash": "d805e2c73aaf6ade05abc6cd173d916b600124a367980e89563ade77071870a7",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1515/9781683922797-017",
+    "title": "Experiment 17 To Perform a Load Test on a Three-Phase Slip-Ring Induction Motor",
+    "source_uri": "https://doi.org/10.1515/9781683922797-017",
+    "doi": "10.1515/9781683922797-017",
+    "content_hash": "826b220829b990f0f47f821ba4574769031551bf54d35b82a53dd0280a714604",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1515/9781683922797-018",
+    "title": "Experiment 18 To Perform a No-Load and Blocked Rotor Test on a Three-Phase Squirrel Cage Induction Motor",
+    "source_uri": "https://doi.org/10.1515/9781683922797-018",
+    "doi": "10.1515/9781683922797-018",
+    "content_hash": "42075fcf0b0c2e2862aef0ab17dbc0bca0be060f71285af6a5b6835f98df6b7e",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5339/qfarc.2016.eesp1559",
+    "title": "Investigation Into the Effects of Non-Linear Loading of Domestic Power Network on Home Appliances",
+    "source_uri": "https://doi.org/10.5339/qfarc.2016.eesp1559",
+    "doi": "10.5339/qfarc.2016.eesp1559",
+    "content_hash": "982e6f9996d5cb877efa060f0f1c4c42db44951ddebaf980b3ca747821558bdd",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1016/j.ohx.2026.e00770",
+   "doi:10.1371/journal.pone.0335367",
+   "doi:10.1515/9781683922797-017",
+   "doi:10.1515/9781683922797-018",
+   "doi:10.17577/ijertv9is010020",
+   "doi:10.23919/icems60997.2024.10921129",
+   "doi:10.3390/s25154844",
+   "doi:10.33915/etd.1530",
+   "doi:10.48550/arxiv.1912.07582",
+   "doi:10.48550/arxiv.2208.08825",
+   "doi:10.48550/arxiv.2302.14805",
+   "doi:10.5281/zenodo.18609199",
+   "doi:10.5339/qfarc.2016.eesp1559",
+   "doi:10.5353/th_b3123211",
+   "doi:10.7763/ijet.2014.v6.716"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:evidence:doi:10.5281/zenodo.18609199",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['not', 'thi'] in: 'Ontological Result:\n\nThis means the universe did not start with \"noise\" and \"chaos\", but with \"M]",
+    "severity": "HIGH"
+   },
+   {
+    "unresolved_source": "overheating winding resistance induction phase motor",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "overheating winding resistance induction phase motor",
+    "error": "HTTP 401: {\"reference\":\"ca6eeab0-0cae-4277-a21a-edd60b88c0fd\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "winding resistance overheating inter turn circuit",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "winding resistance overheating inter turn circuit",
+    "error": "HTTP 401: {\"reference\":\"a3bbacf6-ad17-4db1-bc0c-8028920d2399\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "current inter turn shorts perform negative sequence analysis",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "current inter turn shorts perform negative sequence analysis",
+    "error": "HTTP 401: {\"reference\":\"525e3119-28ea-4409-b8b8-f597ef430d41\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "overheating prevention detection identification isolation preventing",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "overheating prevention detection identification isolation preventing",
+    "error": "HTTP 401: {\"reference\":\"b4545fc9-00bf-4a96-99bb-554eb1ffb279\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "inter turn faults identification isolation preventing",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "inter turn faults identification isolation preventing",
+    "error": "HTTP 401: {\"reference\":\"7b8d41f4-e130-4583-8e7e-7f04a1258f69\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "If negative-sequence current magnitudes remain within the healthy threshold limits (established in the paper's index) during no-load operation at 400V, the inter-turn short hypothesis is disproven, requiring investigation into other thermal management issues."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_no_load_overheating_548902:2026-09-27T22:41:43",
+   "final_envelope_hash": "2287c2e108c1ad0a10493332d5ad87c4cf8886df263f6b4ab22fb7f54b96c149",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.4127645122788207
+    },
+    "score": 0.2626,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-27T22:42:24+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-27T22:43:23+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.3390/s25154844": {
+   "id": "doi:10.3390/s25154844",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:40808009",
+   "source_uri": "https://doi.org/10.3390/s25154844",
+   "title": "Detection of Inter-Turn Short-Circuit Faults for Inverter-Fed Induction Motors Based on Negative-Sequence Current Analysis.",
+   "abstract": "Inter-turn short-circuit faults in induction motors might lead to overheating, torque imbalances, and eventual motor failure. This paper presents a fault detection framework for accurately identifying ITSC faults under various operating conditions. The proposed method integrates negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition. A fault detection index to effectively monitor motor health and detect faults is presented. Moreover, the fault location is determined by phase angles of fundamental components of negative-sequence currents. Experimental validations were carried out for an inverter-fed induction motor under variable speed and load cases. These showed that the proposed approach has high sensitivity to early-stage inter-turn short circuits. This makes the framework highly suitable for real-time condition monitoring and predictive maintenance in inverter-fed motor systems, thereby improving system reliability and minimizing unplanned downtime.",
+   "doi": "10.3390/s25154844",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-08-06",
+   "retrieval_timestamp": "2026-09-27T22:42:13.567225+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "2c7bf2e442d2e149b7cb78b51064224205a3d16cbe49b37b9e1ac8ed4e5ada68",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:40808009"
+    },
+    "queries_by_source": {
+     "europepmc": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s25154844",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1016/j.ohx.2026.e00770": {
+   "id": "doi:10.1016/j.ohx.2026.e00770",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42016707",
+   "source_uri": "https://doi.org/10.1016/j.ohx.2026.e00770",
+   "title": "Thermal-stable rotor with enhanced cooling design for efficient electric motor applications.",
+   "abstract": "This paper presents an open-source redesign of a three‑phase induction motor for poultry farm ventilation fan applications that targets thermal stability, vibration reduction, and higher efficiency. The motor maintains a rated mechanical output of approximately 2 kW, while increases the stator outer diameter (160 → 190 mm) and shortening the axial core length (190 → 110 mm) to conserve D 2 L and shorten the thermal path. The rotor/shaft were shortened accordingly to raise stiffness and the critical speed, lowering vibration. Aluminum die-cast endcaps and a finned AL6063-T5 aluminum housing (a high-conductivity alloy commonly used for motor cooling applications) raised the effective heat-transfer area and conductivity relative to cast iron. Rewinding with a larger wire gauge (0.70 mm × 2) halved phase resistance (18.63 Ω → 8.57 Ω), cutting copper loss. Under full load, input power decreased from 3,420 W to 2,632 W, a reduction of approximately 788 W (23%), and the hottest coil fell by up to 24 °C W (∼16.2%), with rear-section vibration reduced by up to 5.5 mm/s. Complete CAD files, bill of materials, and step‑by‑step build/validation instructions were released under the open-source CERN-OHL-S v2 license (a share-alike hardware license that permits reproduction, modification, and redistribution), enabling replication and adaptation. This work offers a practical template for cost‑effective, thermally robust small induction motors.",
+   "doi": "10.1016/j.ohx.2026.e00770",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-04-07",
+   "retrieval_timestamp": "2026-09-27T22:42:13.567330+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c6f541b6a50dc988bd7518f565e2ce76eb475ba44ad7536c4f05b548683ceb96",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42016707"
+    },
+    "queries_by_source": {
+     "europepmc": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1016/j.ohx.2026.e00770",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1371/journal.pone.0335367": {
+   "id": "doi:10.1371/journal.pone.0335367",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41196920",
+   "source_uri": "https://doi.org/10.1371/journal.pone.0335367",
+   "title": "Machine learning based fault classification for improved induction motor performance.",
+   "abstract": "This study explores the design of an effective fault classification algorithm for 3 phase induction motor, an integral unit in many industrial systems. It is found that traditional fault detection methods and deep learning approaches are both effective; however, current techniques can either be computationally exhaustive, or suffer from low accuracy, thus making them inapplicable in many real-world settings. To address these limitations, this study evaluates different machine learning algorithms for accurate and efficient fault detection using a dataset of triaxial vibrational data converted into current variables. A dataset of triaxial vibrational current data at 0.7 mm bearing and rotor faults at various loads (100W, 200W, and 300W) were considered. For the data preprocessing, we handled with the missing values by interpolation and handle data imbalance fault types with Synthetic Minority Over-sampling Technique (SMOTE). Through Fast Fourier Transform (FFT) techniques, the frequency domain information were extracted, which is key for current signals, adding to the feature set. In addition, dimensionality reduction with Principal Component Analysis (PCA) and feature selection was done with SelectKBest. Then, the different machine learning models such as Random Forest (RF), Decision Tree (DT), k-nearest neighbors (KNN), and eXtreme Gradient Boosting (XGBoost) was trained to optimize the hyperparameters and make them perform to its best possible. The results shows the accuracy and performance of all models, DT and RF show good performance, with 99.95% accuracy, while KNN performs well, but at a higher computational cost in testing. Generally known for its capability to handle all the complex dataset, XGBoost wasn't able to perform in this scenario as it got an accuracy of 87.13%, indicating potentially more optimization is required for the model. This work serves as the groundwork for future work with a multiplicity of fault types, motor specifications, and the incorporation of additional feature-engineering techniques to develop a more robust and intelligent framework for fault detection.",
+   "doi": "10.1371/journal.pone.0335367",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-11-06",
+   "retrieval_timestamp": "2026-09-27T22:42:13.567366+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "16c19776afce4ec0f005a10b79dd253cf2d1fd709ab0fc6473cbbcc61b064817",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41196920"
+    },
+    "queries_by_source": {
+     "europepmc": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-27T22:42:13.214148+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1371/journal.pone.0335367",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 2,
+   "fulltext_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0335367&type=printable",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.7763/ijet.2014.v6.716": {
+   "id": "doi:10.7763/ijet.2014.v6.716",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.7763/ijet.2014.v6.716",
+   "source_uri": "https://doi.org/10.7763/ijet.2014.v6.716",
+   "title": "Speed Load Control of Induction Motor Using Immune Algorithm and Fuzzy Phase Plane Controller",
+   "abstract": "",
+   "doi": "10.7763/ijet.2014.v6.716",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2014",
+   "retrieval_timestamp": "2026-09-27T22:42:13.567391+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5eec42de7fb3ba9fe85af34a716e4d71cfe3d18758740637a9d983c4b991d78a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.7763/ijet.2014.v6.716"
+    },
+    "queries_by_source": {
+     "crossref": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.7763/ijet.2014.v6.716",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.23919/icems60997.2024.10921129": {
+   "id": "doi:10.23919/icems60997.2024.10921129",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.23919/icems60997.2024.10921129",
+   "source_uri": "https://doi.org/10.23919/icems60997.2024.10921129",
+   "title": "Compatibility Determination of Single-Phase Induction Motor and Load",
+   "abstract": "",
+   "doi": "10.23919/icems60997.2024.10921129",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-27T22:42:13.567414+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a2221afabca6606ff0087fcd18d0cb376acd3e189cb974210bb8563721389a02",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.23919/icems60997.2024.10921129"
+    },
+    "queries_by_source": {
+     "crossref": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.23919/icems60997.2024.10921129",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.17577/ijertv9is010020": {
+   "id": "doi:10.17577/ijertv9is010020",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.17577/ijertv9is010020",
+   "source_uri": "https://doi.org/10.17577/ijertv9is010020",
+   "title": "Temperature Measurement of Nine Phase Induction Motor Drive Without Load and Various Load Conditions",
+   "abstract": "",
+   "doi": "10.17577/ijertv9is010020",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-09-27T22:42:13.567435+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "436af659fc2ffefbb4c5b76f46f1f76a15eaa8d330f2db7f8a42e909cee1632e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.17577/ijertv9is010020"
+    },
+    "queries_by_source": {
+     "crossref": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.17577/ijertv9is010020",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.5281/zenodo.18609199": {
+   "id": "doi:10.5281/zenodo.18609199",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.18609199",
+   "source_uri": "https://doi.org/10.5281/zenodo.18609199",
+   "title": "Big Bang was the Phase Transition, not the Explosive Event.",
+   "abstract": "Deep Tensor Analysis:\n\nThe \"Big Bang\" was not an expansion of matter into a void, but a Phase Transition of the 165D vacuum tensor. Imagine water turning into ice; it is not an explosion, but a sudden restructuring of the internal lattice.\n\n\n\n\n\nClassical View: A chaotic blast of energy.\n\n\n\n\nHamzah 165 D : A coherent \"Symmetry Breaking\" where the latent information of the previous cycle crystallized into the current 3D reality.\n\n\n\n3. Mathematical Formulation:\n\nInstead of a thermal explosion, we define the start as the moment the Omega Density exceeded the stability threshold of the Alpha Point:\n\n\n\n$$\\Delta \\Phi_{Universe} = \\oint_{M_{165}} (\\Omega_{crit} - \\Omega_{initial}) \\, d\\Sigma \\to \\text{Phase Shift}$$\n\n\n4. Ontological Result:\n\nThis means the universe did not start with \"noise\" and \"chaos\", but with \"Mathematical Order\". We did not come from a blast; we emerged from a \"Decision of the Manifold\".\n\nThe Theory of a Non-Explosive Big Bang: Phase Transition via Dimensional Tensor Mechanics of the Hamzah Equation\n\nThe Sovereign Genesis Lagrangian\n\nThe Doctrine of Phase Transition and Hamzah Coded Manifestation\n\nThis Super-Lagrangian governs the process of converting raw information from Layer 165 into the Space-Time Matrix of Layer 161:\n\n\n\n$$\\mathcal{L}_{Genesis}^{(165)} = \\oint_{\\partial \\mathcal{V}_{165}} \\left[ \\underbrace{\\mathcal{Q}_{H} \\left( \\mathbb{D}_{\\alpha\\beta}^{\\gamma} \\star \\frac{\\delta \\mathcal{I}_{165}}{\\delta \\phi_{sync}} \\right)}_{\\text{Dimensional Projection}} + \\underbrace{\\Xi_{\\mu\\nu} \\left( \\mathcal{R}^{\\mu\\nu}_{161} - \\frac{1}{2}g^{\\mu\\nu}\\mathcal{R} \\right) \\otimes \\mathcal{P}_{log}}_{\\text{Coded Rendering}} - \\underbrace{\\frac{\\hbar_{H} \\int \\nabla \\psi \\cdot \\nabla \\psi^*}{\\exp(\\mathcal{I}_{core})} }_{\\text{Entropy Suppression}} \\right] \\sqrt{-\\mathbb{G}_{165}} \\, d\\Omega$$\n\n\nAnatomy of Parameters and Post-Doctoral Encryption Analysis\n\nThis Super-Lagrangian comprises three strategic terms, each designed to nullify a pillar of classical physics:\n\n1. Dimensional Projection Term\n\n\n\n\n\nParameter $\\mathbb{D}_{\\alpha\\beta}^{\\gamma}$ (Hamzah Dimensional Tensor): This operator is responsible for \"unfolding degrees of freedom\". Unlike classical physics, which views dimensions as fixed, this tensor shifts space from a compressed state (Layer 165) to an expanded state (161) at moment $t=0$.\n\n\n\n\nParameter $\\phi_{sync}$ (Synchronisation Phase): T",
+   "doi": "10.5281/zenodo.18609199",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-27T22:42:13.567459+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9952fd1effce9bab472d27cf2f2118b4387c92d0df30f5344e085b258b25b10f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.18609199"
+    },
+    "queries_by_source": {
+     "datacite": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Text"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.18609199",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "JALALI, SEYED RASOUL"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.33915/etd.1530": {
+   "id": "doi:10.33915/etd.1530",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.33915/etd.1530",
+   "source_uri": "https://doi.org/10.33915/etd.1530",
+   "title": "Load-based energy savings in three-phase squirrel cage induction motors",
+   "abstract": "",
+   "doi": "10.33915/etd.1530",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-27T22:42:13.567479+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8869289e03b06c50d599caac04784b8744865e2b3863ca20ae4da65b831ac12c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.33915/etd.1530"
+    },
+    "queries_by_source": {
+     "crossref": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.33915/etd.1530",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.5353/th_b3123211": {
+   "id": "doi:10.5353/th_b3123211",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5353/th_b3123211",
+   "source_uri": "https://doi.org/10.5353/th_b3123211",
+   "title": "The design and evaluation of a microprocessor-controlled triac cycloconverter two-phase induction motor drive",
+   "abstract": "",
+   "doi": "10.5353/th_b3123211",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-27T22:42:13.567496+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5178090644aee6cb6781cb899851de5cb5150268dcd4c5485f96a68da6fadef6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5353/th_b3123211"
+    },
+    "queries_by_source": {
+     "crossref": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5353/th_b3123211",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2208.08825": {
+   "id": "doi:10.48550/arxiv.2208.08825",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2208.08825v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.2208.08825",
+   "title": "Dynamic State Estimation-Based Protection for Induction Motor Loads",
+   "abstract": "Ensuring protective device coordination is critical to maintain the resilience and improve the reliability of large microgrids. Inverter-interfaced generation, however, poses significant challenges when designing protection systems. Traditional time-overcurrent protective devices are unsuitable on account of the lack of fault current. Present industry practice is to force all inverters to shut down during faults, which prevents large microgrids from operating in a resilient and reliable manner. Dynamic state estimation (DSE) has been proposed for line protection, and more recently for the protection of load buses or downstream radial portions of microgrids. However, only passive loads with series resistive-inductive loads have been tested with DSE, even though the behavior of dynamic loads -- such as induction motors or power electronics -- may differ significantly during faults. This paper considers the case of applying DSE to protecting a load bus serving a three-phase induction motor.",
+   "doi": "10.48550/arxiv.2208.08825",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-27T22:42:13.567514+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5594d20a42e52f4f4405b1a12009346d579cd36ed74017561a3add1a7d02a7c7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2208.08825v2"
+    },
+    "queries_by_source": {
+     "arxiv": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2208.08825",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2208.08825v2",
+   "authors": [
+    "Arthur K. Barnes",
+    "Sarbajit Basu",
+    "Adam Mate"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2302.14805": {
+   "id": "doi:10.48550/arxiv.2302.14805",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2302.14805v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2302.14805",
+   "title": "Optimization of a three-phase Induction Motor for Electric Vehicles Based on Hook-Jews Optimization Method",
+   "abstract": "In this paper, the Hook-Jews (HJ) optimization method is used to optimize a 3-phase Squirrel-Cage Induction Motor (SCIM) as an Electric Vehicle's (EV) motor. Optimal designs with different numbers of poles, different nominal and maximum speeds, and different numbers of grooves are compared and the best one is selected. The optimization method used has advantages such as simple programming, omission of gradients, short convergence times, and the possibility of changing individual parameters. Design parameter variations for optimal designs with rated speeds for 2-pole and 4-pole motors are shown and explained. The results show that his 2-pole motor with the rectangular stator and rotor slots and a rated speed of 1800 rpm has the highest efficiency.",
+   "doi": "10.48550/arxiv.2302.14805",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-27T22:42:13.567531+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a4fc4a5b77ec3302d4529a159ee49555c9b914fd6abac2c3a31fb83ddd3bf49d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2302.14805v1"
+    },
+    "queries_by_source": {
+     "arxiv": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2302.14805",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2302.14805v1",
+   "authors": [
+    "Arash Mousaei",
+    "Sahar Aziz Mohammadabadi"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.1912.07582": {
+   "id": "doi:10.48550/arxiv.1912.07582",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1912.07582v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1912.07582",
+   "title": "A Nonlinear Regression Method for Composite Protection Modeling of Induction Motor Loads",
+   "abstract": "Protection equipment is used to prevent damage to induction motor loads by isolating them from power systems in the event of severe faults. Modeling the response of induction motor loads and their protection is vital for power system planning and operation, especially in understanding system's dynamic performance and stability after a fault occurs. Induction motors are usually equipped with several types of protection with different operation mechanisms, making it challenging to develop adequate yet not overly complex protection models and determine their parameters for aggregate induction motor models. This paper proposes an optimization-based nonlinear regression framework to determine protection model parameters for aggregate induction motor loads in commercial buildings. Using a mathematical abstraction, the task of determining a suitable set of parameters for the protection model in composite load models is formulated as a nonlinear regression problem. Numerical examples are provided to illustrate the application of the framework. Sensitivity studies are presented to demonstrate the impact of lack of available motor load information on the accuracy of the protection models.",
+   "doi": "10.48550/arxiv.1912.07582",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-27T22:42:13.567548+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d805e2c73aaf6ade05abc6cd173d916b600124a367980e89563ade77071870a7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1912.07582v1"
+    },
+    "queries_by_source": {
+     "arxiv": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1912.07582",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/1912.07582v1",
+   "authors": [
+    "Soumya Kundu",
+    "Zhigang Chu",
+    "Yuan Liu",
+    "Yingying Tang",
+    "Qiuhua Huang",
+    "Daniel James",
+    "Yu Zhang",
+    "Pavel Etingov",
+    "David P. Chassin"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.1515/9781683922797-017": {
+   "id": "doi:10.1515/9781683922797-017",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1515/9781683922797-017",
+   "source_uri": "https://doi.org/10.1515/9781683922797-017",
+   "title": "Experiment 17 To Perform a Load Test on a Three-Phase Slip-Ring Induction Motor",
+   "abstract": "",
+   "doi": "10.1515/9781683922797-017",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2017",
+   "retrieval_timestamp": "2026-09-27T22:42:13.567565+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "826b220829b990f0f47f821ba4574769031551bf54d35b82a53dd0280a714604",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1515/9781683922797-017"
+    },
+    "queries_by_source": {
+     "crossref": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=book-chapter"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1515/9781683922797-017",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1515/9781683922797-018": {
+   "id": "doi:10.1515/9781683922797-018",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1515/9781683922797-018",
+   "source_uri": "https://doi.org/10.1515/9781683922797-018",
+   "title": "Experiment 18 To Perform a No-Load and Blocked Rotor Test on a Three-Phase Squirrel Cage Induction Motor",
+   "abstract": "",
+   "doi": "10.1515/9781683922797-018",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2017",
+   "retrieval_timestamp": "2026-09-27T22:42:13.567582+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "42075fcf0b0c2e2862aef0ab17dbc0bca0be060f71285af6a5b6835f98df6b7e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1515/9781683922797-018"
+    },
+    "queries_by_source": {
+     "crossref": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=book-chapter"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1515/9781683922797-018",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.5339/qfarc.2016.eesp1559": {
+   "id": "doi:10.5339/qfarc.2016.eesp1559",
+   "source_type": "scientific_paper",
+   "source": "openaire",
+   "source_id": "openaire:openaire:doi_dedup___::c4c7a5d834d1192178d426136738db2f",
+   "source_uri": "https://doi.org/10.5339/qfarc.2016.eesp1559",
+   "title": "Investigation Into the Effects of Non-Linear Loading of Domestic Power Network on Home Appliances",
+   "abstract": "",
+   "doi": "10.5339/qfarc.2016.eesp1559",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2016",
+   "retrieval_timestamp": "2026-09-27T22:42:13.567598+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "982e6f9996d5cb877efa060f0f1c4c42db44951ddebaf980b3ca747821558bdd",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openaire",
+    "indexing_sources": [
+     "openaire"
+    ],
+    "record_ids_by_source": {
+     "openaire": "openaire:doi_dedup___::c4c7a5d834d1192178d426136738db2f"
+    },
+    "queries_by_source": {
+     "openaire": "3-phase induction motor no-load overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_openaire",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "instancetypes=['Other literature type', 'Conference object']; refereed=peerReviewed"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_openaire",
+   "canonical_id": "doi:10.5339/qfarc.2016.eesp1559",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction motor no-load overheating",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Hossain, Ajad",
+    "Zaman, Jassim",
+    "Saeed, Mahmood",
+    "Iqbal, Atif",
+    "Rahman, Syed"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Document-type labels are read post-hoc from record instancetype (the API exposes no type filter — measured 2026-09-05)",
+    "Aggregated repository metadata quality varies by repository; instancetype is repository-declared"
+   ]
+  },
+  "problem:45ef6856": {
+   "id": "problem:45ef6856",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "45ef68568941b269288679be4821f5f88813b5988b3ea12e5d69bb5855d4c528",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-27T22:43:23+00:00Z"
+ },
+ "_improvement": {
+  "parent_spec_hash": "1474966d5ee2cb19a711d1ebadb2852b5b4e21c9f29e1229516f38bfb3da7fb3",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:1bbb343a0b3c",
+   "mutation_type": "MECHANISM_STRENGTHENING",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.525,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:a67c693babe5",
+    "provider": "agnes",
+    "model": "agnes-3.0-flash",
+    "prompt_hash": "d6b55b90baab751bbb8885d171ec0a4a3fb3c378f6a685b7a860c4321f7c038b",
+    "output_hash": "a67c693babe5c5ddc6d2315b1b67ed635c832a6f712709d57c1783eb778792ec",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.3390/s25154844",
+     "span_verbatim_in_evidence": true,
+     "mutation_changes_candidate": true,
+     "span_derivation": {
+      "n_shared": 28,
+      "shared_terms": [
+       "analysi",
+       "based",
+       "circuit",
+       "component",
+       "current",
+       "decomposition",
+       "detection",
+       "eventual",
+       "failure",
+       "fault",
+       "filtering",
+       "framework",
+       "imbalance",
+       "induction",
+       "integrate",
+       "inter",
+       "lead",
+       "might",
+       "motor",
+       "negative"
+      ],
+      "span_terms_n": 40,
+      "ratio": 0.7,
+      "underived": false,
+      "state": "MEASURED",
+      "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+     },
+     "span_derivation_cleared": 0.7
+    },
+    "reasons": [],
+    "validated_at": "2026-09-27T22:44:41+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "Inter-turn short-circuit faults in induction motors leading to overheating, identified via negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition.",
+     "after": "Inter-turn short-circuit faults in induction motors might lead to overheating, torque imbalances, and eventual motor failure via negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition."
+    },
+    "intervention": {
+     "before": "Implement a fault detection framework integrating negative-sequence current analysis with wavelet-based filtering and symmetrical component decomposition to monitor motor health and detect early-stage inter-turn shorts.",
+     "after": "Implement a fault detection framework that integrates negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition to monitor motor health and detect early-stage inter-turn shorts."
+    },
+    "mechanism_source_span": {
+     "before": "Inter-turn short-circuit faults in induction motors might lead to overheating, torque imbalances, and eventual motor failure. This paper presents a fault detection framework for accurately identifying ITSC faults under various operating conditions. The proposed method integrates negative-sequence cu",
+     "after": "Inter-turn short-circuit faults in induction motors might lead to overheating, torque imbalances, and eventual motor failure. This paper presents a fault detection framework for accurately identifying ITSC faults under various operating conditions. The proposed method integrates negative-sequence cu"
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "con:evidence:doi:10.5281/zenodo.18609199",
+     "overheating winding resistance induction phase motor",
+     "overheating winding resistance induction phase motor",
+     "winding resistance overheating inter turn circuit",
+     "winding resistance overheating inter turn circuit",
+     "current inter turn shorts perform negative sequence analysis",
+     "current inter turn shorts perform negative sequence analysis",
+     "overheating prevention detection identification isolation preventing",
+     "overheating prevention detection identification isolation preventing",
+     "inter turn faults identification isolation preventing",
+     "inter turn faults identification isolation preventing"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "1474966d5ee2cb19a711d1ebadb2852b5b4e21c9f29e1229516f38bfb3da7fb3",
+   "child_spec_hash": null,
+   "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-deriving the mechanism and intervention using verbatim technical vocabulary from the cited evidence span, ensuring a span-derivation ratio >= 0.20.",
+   "applied_at": "2026-09-27T22:44:41+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:27cfbab71d1b",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.409,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:9d5c0f0dc1e8",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "9499c01de96146509fbfd6209678f20bf98c593bc816bf5744852b9d019ec85e",
+     "output_hash": "9d5c0f0dc1e8d9c10e5b7320da1a279798e9fcfe995c4930226902fde4791261",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.3390/s25154844",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.864,
+      "evidence_support_cleared": 0.864,
+      "constraint_traceable_to_evidence": "The detection method must integrate negative-sequence current analysis utilizing wavelet-based filtering and symmetrical"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-27T22:44:35+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Inter-turn short-circuit faults causing localized eddy currents and increased winding resistance leading to overheating.",
+      "after": "Inter-turn short-circuit faults in induction motors leading to overheating, identified via negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition."
+     },
+     "intervention": {
+      "before": "Perform a negative-sequence current analysis using wavelet-based filtering and symmetrical component decomposition to detect early-stage inter-turn shorts.",
+      "after": "Implement a fault detection framework integrating negative-sequence current analysis with wavelet-based filtering and symmetrical component decomposition to monitor motor health and detect early-stage inter-turn shorts."
+     },
+     "mechanism_source_span": {
+      "before": "Inter-turn short-circuit faults in induction motors might lead to",
+      "after": "Inter-turn short-circuit faults in induction motors might lead to overheating, torque imbalances, and eventual motor failure. This paper presents a fault detection framework for accurately identifying ITSC faults under various operating conditions. The proposed method integrates negative-sequence cu"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.5281/zenodo.18609199",
+      "overheating winding resistance induction phase motor",
+      "overheating winding resistance induction phase motor",
+      "winding resistance overheating inter turn circuit",
+      "winding resistance overheating inter turn circuit",
+      "current inter turn shorts perform negative sequence analysis",
+      "current inter turn shorts perform negative sequence analysis",
+      "overheating prevention detection identification isolation preventing",
+      "overheating prevention detection identification isolation preventing",
+      "inter turn faults identification isolation preventing",
+      "inter turn faults identification isolation preventing"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "d440ed6c44bbea6f37409f3587ce65bffe5723da759d1e54d57943e77f3e7332",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism and intervention vocabulary to the verbatim span of the custodied evidence, ensuring the technical terms are derived directly from the source text.",
+    "applied_at": "2026-09-27T22:44:35+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:1bbb343a0b3c",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.525,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:a67c693babe5",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "d6b55b90baab751bbb8885d171ec0a4a3fb3c378f6a685b7a860c4321f7c038b",
+     "output_hash": "a67c693babe5c5ddc6d2315b1b67ed635c832a6f712709d57c1783eb778792ec",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.3390/s25154844",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 28,
+       "shared_terms": [
+        "analysi",
+        "based",
+        "circuit",
+        "component",
+        "current",
+        "decomposition",
+        "detection",
+        "eventual",
+        "failure",
+        "fault",
+        "filtering",
+        "framework",
+        "imbalance",
+        "induction",
+        "integrate",
+        "inter",
+        "lead",
+        "might",
+        "motor",
+        "negative"
+       ],
+       "span_terms_n": 40,
+       "ratio": 0.7,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 0.7
+     },
+     "reasons": [],
+     "validated_at": "2026-09-27T22:44:41+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Inter-turn short-circuit faults in induction motors leading to overheating, identified via negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition.",
+      "after": "Inter-turn short-circuit faults in induction motors might lead to overheating, torque imbalances, and eventual motor failure via negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition."
+     },
+     "intervention": {
+      "before": "Implement a fault detection framework integrating negative-sequence current analysis with wavelet-based filtering and symmetrical component decomposition to monitor motor health and detect early-stage inter-turn shorts.",
+      "after": "Implement a fault detection framework that integrates negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition to monitor motor health and detect early-stage inter-turn shorts."
+     },
+     "mechanism_source_span": {
+      "before": "Inter-turn short-circuit faults in induction motors might lead to overheating, torque imbalances, and eventual motor failure. This paper presents a fault detection framework for accurately identifying ITSC faults under various operating conditions. The proposed method integrates negative-sequence cu",
+      "after": "Inter-turn short-circuit faults in induction motors might lead to overheating, torque imbalances, and eventual motor failure. This paper presents a fault detection framework for accurately identifying ITSC faults under various operating conditions. The proposed method integrates negative-sequence cu"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.5281/zenodo.18609199",
+      "overheating winding resistance induction phase motor",
+      "overheating winding resistance induction phase motor",
+      "winding resistance overheating inter turn circuit",
+      "winding resistance overheating inter turn circuit",
+      "current inter turn shorts perform negative sequence analysis",
+      "current inter turn shorts perform negative sequence analysis",
+      "overheating prevention detection identification isolation preventing",
+      "overheating prevention detection identification isolation preventing",
+      "inter turn faults identification isolation preventing",
+      "inter turn faults identification isolation preventing"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "1474966d5ee2cb19a711d1ebadb2852b5b4e21c9f29e1229516f38bfb3da7fb3",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-deriving the mechanism and intervention using verbatim technical vocabulary from the cited evidence span, ensuring a span-derivation ratio >= 0.20.",
+    "applied_at": "2026-09-27T22:44:41+00:00Z"
+   }
+  ]
+ },
+ "technical_state": {
+  "value": {
+   "version": "1.0.0",
+   "objects": [
+    {
+     "object_id": "obj_001",
+     "name": "Inverter-fed induction motor",
+     "role": "Primary device subject to fault detection"
+    },
+    {
+     "object_id": "obj_002",
+     "name": "Stator winding",
+     "role": "Component susceptible to inter-turn short-circuit faults"
+    },
+    {
+     "object_id": "obj_003",
+     "name": "Fault detection framework",
+     "role": "System using negative-sequence current analysis and wavelet filtering"
+    },
+    {
+     "object_id": "obj_004",
+     "name": "Negative-sequence current",
+     "role": "Signal component used for fault signature extraction"
+    },
+    {
+     "object_id": "obj_005",
+     "name": "Wavelet-based filter",
+     "role": "Preprocessing tool for signal decomposition"
+    },
+    {
+     "object_id": "obj_006",
+     "name": "Symmetrical component decomposer",
+     "role": "Algorithm module for isolating sequence components"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "p_001",
+     "name": "Supply Voltage",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "V",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "UNKNOWN",
+     "role": "Electrical input power level for the motor",
+     "is_design_variable": true
+    },
+    {
+     "param_id": "p_002",
+     "name": "Phase Winding Resistance",
+     "category": "GEOMETRY",
+     "unit": "Ω",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "UNKNOWN",
+     "role": "DC resistance of the stator phase winding",
+     "is_design_variable": true
+    },
+    {
+     "param_id": "p_003",
+     "name": "Inter-turn Short-Circuit Severity",
+     "category": "GEOMETRY",
+     "unit": null,
+     "value": 0.5,
+     "value_class": "MODELLED",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.0,
+     "range_max": 1.0,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "Extent of electrical contact between adjacent turns in the winding",
+     "is_design_variable": true,
+     "mutation_history": [
+      {
+       "from": null,
+       "to": 0.0,
+       "from_class": "UNKNOWN",
+       "to_class": "MODELLED",
+       "mutation_id": "tmut:164afda137c5"
+      },
+      {
+       "from": 0.0,
+       "to": 0.5,
+       "from_class": "MODELLED",
+       "to_class": "MODELLED",
+       "mutation_id": "tmut:05f58bb9f9ef"
+      }
+     ]
+    },
+    {
+     "param_id": "p_004",
+     "name": "Negative-Sequence Current Amplitude",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "A",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "UNKNOWN",
+     "role": "Magnitude of the negative-sequence component in the motor current",
+     "is_design_variable": true
+    },
+    {
+     "param_id": "p_005",
+     "name": "Fault Detection Index",
+     "category": "OPERATING_CONDITIONS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.0,
+     "range_max": 1.0,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "Calculated metric indicating health status and presence of ITSC",
+     "is_design_variable": true
+    },
+    {
+     "param_id": "p_006",
+     "name": "Rotor Speed",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "RPM",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.0,
+     "range_max": 3600.0,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "Operating speed of the induction motor",
+     "is_design_variable": true
+    },
+    {
+     "param_id": "p_007",
+     "name": "Load Torque",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "Nm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.0,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "range_class": "MODELLED",
+     "role": "Mechanical load applied to the motor shaft",
+     "is_design_variable": true
+    }
+   ],
+   "constraints": [],
+   "objectives": [
+    {
+     "objective_id": "o_001",
+     "target": "p_003",
+     "direction": "MINIMIZE",
+     "basis": "Minimizing inter-turn short-circuit severity prevents overheating and torque imbalance leading to failure."
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "f_001",
+     "name": "No-load overheating",
+     "problem_link": "The specific device failure mode to be prevented by early fault detection."
+    },
+    {
+     "mode_id": "f_002",
+     "name": "Inter-turn short-circuit fault",
+     "problem_link": "The underlying cause of overheating and torque imbalance in induction motors."
+    },
+    {
+     "mode_id": "f_003",
+     "name": "Torque imbalance",
+     "problem_link": "A consequence of ITSC faults that contributes to motor vibration and potential failure."
+    }
+   ],
+   "dependencies": [],
+   "extraction": {
+    "proposal_id": "tsp:3a3cd3e694a1",
+    "provider": "agnes",
+    "model": "agnes-3.0-flash",
+    "prompt_hash": "0e38b08080cf9f7be25f32ee62e9287a2170964e1fb3ab4939a0772e69243294",
+    "output_hash": "633d7e90c21e73ea30df034137650b884d3025b21d6451a9be08bc522aa4535e",
+    "llm_is_untrusted_proposer": true,
+    "validator": "technical_state_v1 (deterministic)",
+    "admitted_counts": {
+     "parameters": 7,
+     "parameters_with_value": 0,
+     "parameters_extracted": 0,
+     "parameters_modelled": 0,
+     "parameters_with_envelope": 4,
+     "constraints": 0,
+     "objectives": 1,
+     "dependencies": 0,
+     "objects": 6,
+     "failure_modes": 3
+    },
+    "dropped_pieces": [
+     {
+      "kind": "parameter_value",
+      "id": "p_001",
+      "gate": "P3",
+      "reason": "EXTRACTED value not proven by its span (span or evidence_id missing) — value demoted to UNKNOWN, parameter kept"
+     },
+     {
+      "kind": "constraint",
+      "id": "c_001",
+      "gate": "C1",
+      "reason": "bound '==' not in ('<=', '>=')"
+     },
+     {
+      "kind": "constraint",
+      "id": "c_002",
+      "gate": "C1",
+      "reason": "bound '==' not in ('<=', '>=')"
+     },
+     {
+      "kind": "dependency",
+      "id": "r_001",
+      "gate": "D2",
+      "reason": "the span does not name both endpoints — it is not evidence for THIS relationship"
+     },
+     {
+      "kind": "dependency",
+      "id": "r_002",
+      "gate": "D2",
+      "reason": "the span does not name both endpoints — it is not evidence for THIS relationship"
+     }
+    ],
+    "extracted_at": "2026-09-27T22:44:55+00:00Z"
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "TECHNICAL_STATE_EXTRACTION",
+  "evidence_ids": [],
+  "note": "structured technical state (R379): mutated design variables carry their value class; predictions are model inferences, never measurements"
+ },
+ "_technical_improvement": {
+  "parent_spec_hash": "32bd9d4e77d27774ebe4e8d5125ec7572fd846e8f9d5ce483f6249c1c70ce52a",
+  "mutation": {
+   "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+   "mutation_id": "tmut:05f58bb9f9ef",
+   "mutation_kind": "GEOMETRY_CHANGE",
+   "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+   "diagnostic_trigger": {
+    "evaluator": "analytical_monotone_v1 (deterministic)",
+    "limiting_variable": "p_003",
+    "improving_direction": "DECREASE",
+    "evaluation_computation_log": {
+     "evaluator_id": "analytical_monotone_v1",
+     "fidelity_tier": "STRUCTURED_CONSTRAINT",
+     "evidence_rank": 3,
+     "input_state_sha256": "9f508ba17686eec884b816f330bd6b9d2eff71b00329ee018370c5224a2028be",
+     "conventions": [
+      {
+       "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+       "epistemic_class": "ENGINEERING",
+       "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+       "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+      },
+      {
+       "name": "DIRECTIONAL_FAIL_CLOSED",
+       "epistemic_class": "ENGINEERING",
+       "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+       "uncertainty": "direction-level only at this tier"
+      }
+     ],
+     "steps": [
+      "resolved objective p_003 (MINIMIZE)",
+      "checked 0 constraint(s) numerically where values exist",
+      "propagated signs over 0 relation(s)",
+      "ranked 1 movable improving direction(s)"
+     ],
+     "computed_at": "2026-09-27T22:45:08+00:00Z",
+     "deterministic": true
+    }
+   },
+   "quantitative_diagnosis": {
+    "engaged": false,
+    "status": "UNQUANTIFIED",
+    "note": "no bound equation named a limiting variable"
+   },
+   "proposal_provenance": {
+    "proposal_id": "tmp:6cf7dab2cd3f",
+    "provider": "agnes",
+    "model": "agnes-3.0-flash",
+    "prompt_hash": "22a99820cfe0b44fe10a5916efbdfabb67ee99185a9bd633ee10ed571b06d8bb",
+    "output_hash": "e4ee60f2d84099384d61d1375586034f3e0f70726034ddcda53393038a330392",
+    "origin": "UNTRUSTED_LLM_PROPOSER",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "mutation_kind": "GEOMETRY_CHANGE",
+    "target_param": "p_003",
+    "checks": {
+     "mutation_kind_valid": "GEOMETRY_CHANGE",
+     "target_is_limiting_variable": "p_003",
+     "target_exists": true,
+     "target_is_design_variable": true,
+     "kind_matches_category": true,
+     "envelope_declared": [
+      0.0,
+      1.0
+     ],
+     "direction_matches_evaluator": "DECREASE",
+     "new_value_numeric": 0.5,
+     "value_inside_envelope": "[0.0, 1.0]",
+     "mutation_changes_value": true,
+     "value_class_declared": "MODELLED",
+     "spec_text_sync": "The design variable \"Extent of electrical contact between adjacent turns\" is adj | Implement rigorous insulation integrity verification and quality control process",
+     "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+    },
+    "reasons": [],
+    "validated_at": "2026-09-27T22:45:08+00:00Z"
+   },
+   "changed_variable": {
+    "param_id": "p_003",
+    "name": "Inter-turn Short-Circuit Severity",
+    "from_value": 0.0,
+    "to_value": 0.5,
+    "from_class": "MODELLED",
+    "to_class": "MODELLED",
+    "envelope": [
+     0.0,
+     1.0
+    ],
+    "envelope_class": "MODELLED"
+   },
+   "spec_text_delta": {
+    "mechanism": "The design variable \"Extent of electrical contact between adjacent turns\" is adjusted to 0.5 to represent a controlled, reduced severity of inter-turn shorts, thereby mitigating the thermal runaway mechanism.",
+    "intervention": "Implement rigorous insulation integrity verification and quality control processes to ensure the inter-turn short-circuit severity remains at or below the target value of 0.5, preventing the transition to severe contact that causes overheating."
+   },
+   "cad_rebuild": null,
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "con:evidence:doi:10.5281/zenodo.18609199",
+     "overheating winding resistance induction phase motor",
+     "overheating winding resistance induction phase motor",
+     "winding resistance overheating inter turn circuit",
+     "winding resistance overheating inter turn circuit",
+     "current inter turn shorts perform negative sequence analysis",
+     "current inter turn shorts perform negative sequence analysis",
+     "overheating prevention detection identification isolation preventing",
+     "overheating prevention detection identification isolation preventing",
+     "inter turn faults identification isolation preventing",
+     "inter turn faults identification isolation preventing"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "32bd9d4e77d27774ebe4e8d5125ec7572fd846e8f9d5ce483f6249c1c70ce52a",
+   "reason": "Reducing the modeled severity of the inter-turn short-circuit fault from its baseline level minimizes the localized heating and negative-sequence currents responsible for no-load overheating.",
+   "applied_at": "2026-09-27T22:45:08+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+    "mutation_id": "tmut:164afda137c5",
+    "mutation_kind": "GEOMETRY_CHANGE",
+    "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+    "diagnostic_trigger": {
+     "evaluator": "analytical_monotone_v1 (deterministic)",
+     "limiting_variable": "p_003",
+     "improving_direction": "DECREASE",
+     "evaluation_computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "1edec9a83ce6d63701511261fc0c4ac50fa26baae9d645bb5e85e39bb1af1c9f",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective p_003 (MINIMIZE)",
+       "checked 0 constraint(s) numerically where values exist",
+       "propagated signs over 0 relation(s)",
+       "ranked 1 movable improving direction(s)"
+      ],
+      "computed_at": "2026-09-27T22:44:59+00:00Z",
+      "deterministic": true
+     }
+    },
+    "quantitative_diagnosis": {
+     "engaged": false,
+     "status": "UNQUANTIFIED",
+     "note": "no bound equation named a limiting variable"
+    },
+    "proposal_provenance": {
+     "proposal_id": "tmp:5e6d8a9c5872",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "099c5481f706228e2a21d49f56e2e9c8f9b4960ba162532a33969abf760262ea",
+     "output_hash": "d40f9c150c8de2671dc800178b8ccd8cd8e8a27ee21b0bdc178c044d9ba310a4",
+     "origin": "UNTRUSTED_LLM_PROPOSER",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "mutation_kind": "GEOMETRY_CHANGE",
+     "target_param": "p_003",
+     "checks": {
+      "mutation_kind_valid": "GEOMETRY_CHANGE",
+      "target_is_limiting_variable": "p_003",
+      "target_exists": true,
+      "target_is_design_variable": true,
+      "kind_matches_category": true,
+      "envelope_declared": [
+       0.0,
+       1.0
+      ],
+      "direction_matches_evaluator": "DECREASE",
+      "new_value_numeric": 0.0,
+      "value_inside_envelope": "[0.0, 1.0]",
+      "mutation_changes_value": true,
+      "value_class_declared": "MODELLED",
+      "spec_text_sync": "The design variable \"Extent of electrical contact between adjacent turns\" is fix | Implement strict insulation integrity verification processes to guarantee the de",
+      "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-27T22:44:59+00:00Z"
+    },
+    "changed_variable": {
+     "param_id": "p_003",
+     "name": "Inter-turn Short-Circuit Severity",
+     "from_value": null,
+     "to_value": 0.0,
+     "from_class": "UNKNOWN",
+     "to_class": "MODELLED",
+     "envelope": [
+      0.0,
+      1.0
+     ],
+     "envelope_class": "MODELLED"
+    },
+    "spec_text_delta": {
+     "mechanism": "The design variable \"Extent of electrical contact between adjacent turns\" is fixed at 0.0, ensuring that inter-turn shorts are physically prevented from forming or remaining, which directly addresses the root cause of the no-load overheating failure mode.",
+     "intervention": "Implement strict insulation integrity verification processes to guarantee the design value of 0.0 for electrical contact between adjacent turns, thereby eliminating the generation of negative-sequence currents associated with inter-turn faults."
+    },
+    "cad_rebuild": null,
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.5281/zenodo.18609199",
+      "overheating winding resistance induction phase motor",
+      "overheating winding resistance induction phase motor",
+      "winding resistance overheating inter turn circuit",
+      "winding resistance overheating inter turn circuit",
+      "current inter turn shorts perform negative sequence analysis",
+      "current inter turn shorts perform negative sequence analysis",
+      "overheating prevention detection identification isolation preventing",
+      "overheating prevention detection identification isolation preventing",
+      "inter turn faults identification isolation preventing",
+      "inter turn faults identification isolation preventing"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "81e6b0dcd19e5c1d2853b1e161eb1f922a186acd7d5a0e2c73f937ac61817a5a",
+    "reason": "Setting the extent of electrical contact between adjacent turns to 0.0 eliminates the inter-turn short-circuit path, thereby preventing the localized eddy currents and subsequent resistive heating that cause no-load overheating.",
+    "applied_at": "2026-09-27T22:44:59+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+    "mutation_id": "tmut:05f58bb9f9ef",
+    "mutation_kind": "GEOMETRY_CHANGE",
+    "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+    "diagnostic_trigger": {
+     "evaluator": "analytical_monotone_v1 (deterministic)",
+     "limiting_variable": "p_003",
+     "improving_direction": "DECREASE",
+     "evaluation_computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "9f508ba17686eec884b816f330bd6b9d2eff71b00329ee018370c5224a2028be",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective p_003 (MINIMIZE)",
+       "checked 0 constraint(s) numerically where values exist",
+       "propagated signs over 0 relation(s)",
+       "ranked 1 movable improving direction(s)"
+      ],
+      "computed_at": "2026-09-27T22:45:08+00:00Z",
+      "deterministic": true
+     }
+    },
+    "quantitative_diagnosis": {
+     "engaged": false,
+     "status": "UNQUANTIFIED",
+     "note": "no bound equation named a limiting variable"
+    },
+    "proposal_provenance": {
+     "proposal_id": "tmp:6cf7dab2cd3f",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "22a99820cfe0b44fe10a5916efbdfabb67ee99185a9bd633ee10ed571b06d8bb",
+     "output_hash": "e4ee60f2d84099384d61d1375586034f3e0f70726034ddcda53393038a330392",
+     "origin": "UNTRUSTED_LLM_PROPOSER",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "mutation_kind": "GEOMETRY_CHANGE",
+     "target_param": "p_003",
+     "checks": {
+      "mutation_kind_valid": "GEOMETRY_CHANGE",
+      "target_is_limiting_variable": "p_003",
+      "target_exists": true,
+      "target_is_design_variable": true,
+      "kind_matches_category": true,
+      "envelope_declared": [
+       0.0,
+       1.0
+      ],
+      "direction_matches_evaluator": "DECREASE",
+      "new_value_numeric": 0.5,
+      "value_inside_envelope": "[0.0, 1.0]",
+      "mutation_changes_value": true,
+      "value_class_declared": "MODELLED",
+      "spec_text_sync": "The design variable \"Extent of electrical contact between adjacent turns\" is adj | Implement rigorous insulation integrity verification and quality control process",
+      "t10_geometry_gate": "no parametric model bound to this parameter — the state-level gates are decisive"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-27T22:45:08+00:00Z"
+    },
+    "changed_variable": {
+     "param_id": "p_003",
+     "name": "Inter-turn Short-Circuit Severity",
+     "from_value": 0.0,
+     "to_value": 0.5,
+     "from_class": "MODELLED",
+     "to_class": "MODELLED",
+     "envelope": [
+      0.0,
+      1.0
+     ],
+     "envelope_class": "MODELLED"
+    },
+    "spec_text_delta": {
+     "mechanism": "The design variable \"Extent of electrical contact between adjacent turns\" is adjusted to 0.5 to represent a controlled, reduced severity of inter-turn shorts, thereby mitigating the thermal runaway mechanism.",
+     "intervention": "Implement rigorous insulation integrity verification and quality control processes to ensure the inter-turn short-circuit severity remains at or below the target value of 0.5, preventing the transition to severe contact that causes overheating."
+    },
+    "cad_rebuild": null,
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.5281/zenodo.18609199",
+      "overheating winding resistance induction phase motor",
+      "overheating winding resistance induction phase motor",
+      "winding resistance overheating inter turn circuit",
+      "winding resistance overheating inter turn circuit",
+      "current inter turn shorts perform negative sequence analysis",
+      "current inter turn shorts perform negative sequence analysis",
+      "overheating prevention detection identification isolation preventing",
+      "overheating prevention detection identification isolation preventing",
+      "inter turn faults identification isolation preventing",
+      "inter turn faults identification isolation preventing"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "32bd9d4e77d27774ebe4e8d5125ec7572fd846e8f9d5ce483f6249c1c70ce52a",
+    "reason": "Reducing the modeled severity of the inter-turn short-circuit fault from its baseline level minimizes the localized heating and negative-sequence currents responsible for no-load overheating.",
+    "applied_at": "2026-09-27T22:45:08+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "faf51d6f8d576f405cbe2336285a6181edfa4861c702d8adb6675d891e6138f4"
+}

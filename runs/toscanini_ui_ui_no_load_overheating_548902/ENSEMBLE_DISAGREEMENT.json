@@ -1,0 +1,289 @@
+{
+ "ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
+ "version": "1.0.0",
+ "requested_models": 3,
+ "available_providers": [
+  "agnes",
+  "unorouter",
+  "xkiro",
+  "apinex",
+  "bai",
+  "bynara",
+  "atria",
+  "hf",
+  "zai",
+  "openrouter",
+  "nvidia"
+ ],
+ "members": [
+  {
+   "role": "MODEL_A",
+   "provider_id": "agnes",
+   "status": "OK",
+   "model": "agnes-3.0-flash",
+   "prompt_hash": "cea7ad0b1e0a719c1e68fc2666ecf6daff5861ce3cc7d3289f7724ae9aa2bbd7",
+   "output_hash": "558c6563c1ebf6b0350695a22e17c5a5dee718fdbf6ecff811bfc1e676b10f21",
+   "latency_ms": 4606,
+   "fields": {
+    "mechanism": "Inter-turn short-circuit faults causing localized eddy currents and increased winding resistance leading to overheating.",
+    "intervention": "Perform a negative-sequence current analysis using wavelet-based filtering and symmetrical component decomposition to detect early-stage inter-turn shorts.",
+    "expected_effect": "Early identification and isolation of inter-turn faults preventing thermal overload trips during no-load operation.",
+    "falsification_test": "If negative-sequence current magnitudes remain within the healthy threshold limits (established in the paper's index) during no-load operation at 400V, the inter-turn short hypothesis is disproven, requiring investigation into other thermal management issues.",
+    "mechanism_source_span": "Inter-turn short-circuit faults in induction motors might lead to"
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:agnes:558c6563c1eb",
+    "mechanism": "Inter-turn short-circuit faults causing localized eddy currents and increased winding resistance leading to overheating.",
+    "intervention": "Perform a negative-sequence current analysis using wavelet-based filtering and symmetrical component decomposition to detect early-stage inter-turn shorts.",
+    "expected_effect": "Early identification and isolation of inter-turn faults preventing thermal overload trips during no-load operation.",
+    "falsification_test": "If negative-sequence current magnitudes remain within the healthy threshold limits (established in the paper's index) during no-load operation at 400V, the inter-turn short hypothesis is disproven, requiring investigation into other thermal management issues.",
+    "mechanism_source_span": "Inter-turn short-circuit faults in induction motors might lead to",
+    "source_evidence": {
+     "source_id": "doi:10.3390/s25154844",
+     "source_hash": "2c7bf2e442d2e149b7cb78b51064224205a3d16cbe49b37b9e1ac8ed4e5ada68"
+    }
+   }
+  },
+  {
+   "role": "MODEL_B",
+   "provider_id": "unorouter",
+   "status": "OK",
+   "model": "agnes-3.0-flash",
+   "prompt_hash": "cea7ad0b1e0a719c1e68fc2666ecf6daff5861ce3cc7d3289f7724ae9aa2bbd7",
+   "output_hash": "ea94387d065d39f82e6acc21f80211a4f1d28a158edf518fe52c3a5b1e0fb5b5",
+   "latency_ms": 1629,
+   "fields": {
+    "mechanism": "Inter-turn short-circuit faults generate localized overheating and are identifiable through negative-sequence current analysis",
+    "intervention": "Deploy negative-sequence current monitoring with wavelet-based filtering to detect internal winding short circuits that are invisible to standard phase resistance and voltage checks",
+    "expected_effect": "Early identification and isolation of inter-turn shorts, preventing thermal overload tripping during no-load operation",
+    "falsification_test": "Run the negative-sequence analysis on the motor; if the fault index indicates no ITSC fault despite overheating, the mechanism is disproven for this specific failure mode",
+    "mechanism_source_span": "Inter-turn short-circuit faults in induction motors might lead to"
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:unorouter:ea94387d065d",
+    "mechanism": "Inter-turn short-circuit faults generate localized overheating and are identifiable through negative-sequence current analysis",
+    "intervention": "Deploy negative-sequence current monitoring with wavelet-based filtering to detect internal winding short circuits that are invisible to standard phase resistance and voltage checks",
+    "expected_effect": "Early identification and isolation of inter-turn shorts, preventing thermal overload tripping during no-load operation",
+    "falsification_test": "Run the negative-sequence analysis on the motor; if the fault index indicates no ITSC fault despite overheating, the mechanism is disproven for this specific failure mode",
+    "mechanism_source_span": "Inter-turn short-circuit faults in induction motors might lead to",
+    "source_evidence": {
+     "source_id": "doi:10.3390/s25154844",
+     "source_hash": "2c7bf2e442d2e149b7cb78b51064224205a3d16cbe49b37b9e1ac8ed4e5ada68"
+    }
+   }
+  },
+  {
+   "role": "MODEL_C",
+   "provider_id": "xkiro",
+   "status": "OK",
+   "model": "qwen/qwen3-max:free",
+   "prompt_hash": "cea7ad0b1e0a719c1e68fc2666ecf6daff5861ce3cc7d3289f7724ae9aa2bbd7",
+   "output_hash": "6ae2632d72118bef904e75722ade5671b7c16626d86e39076cb251f4fe8ecf9a",
+   "latency_ms": 7294,
+   "fields": {
+    "mechanism": "Inter-turn short-circuit faults generate localized circulating currents that produce overheating even when the motor operates under no-load conditions.",
+    "intervention": "Apply negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition to the 400V supply input of the conveyor drive motor to detect early-stage inter-turn short circuits that balanced phase winding resistance measurements fail to reveal.",
+    "expected_effect": "Identification of the specific faulted phase and location of the inter-turn short circuit, explaining the no-load overheating and enabling targeted rewinding or replacement before thermal overload trips occur.",
+    "falsification_test": "Measure the negative-sequence current magnitude using symmetrical component decomposition during the 20-minute no-load run; if the negative-sequence current remains below the detection index threshold while the motor still trips the thermal overload, the inter-turn short-circuit mechanism is disproved.",
+    "mechanism_source_span": "Inter-turn short-circuit faults in induction motors might lead to overheating, torque imbalances, and eventual motor failure."
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:xkiro:6ae2632d7211",
+    "mechanism": "Inter-turn short-circuit faults generate localized circulating currents that produce overheating even when the motor operates under no-load conditions.",
+    "intervention": "Apply negative-sequence current analysis utilizing wavelet-based filtering and symmetrical component decomposition to the 400V supply input of the conveyor drive motor to detect early-stage inter-turn short circuits that balanced phase winding resistance measurements fail to reveal.",
+    "expected_effect": "Identification of the specific faulted phase and location of the inter-turn short circuit, explaining the no-load overheating and enabling targeted rewinding or replacement before thermal overload trips occur.",
+    "falsification_test": "Measure the negative-sequence current magnitude using symmetrical component decomposition during the 20-minute no-load run; if the negative-sequence current remains below the detection index threshold while the motor still trips the thermal overload, the inter-turn short-circuit mechanism is disproved.",
+    "mechanism_source_span": "Inter-turn short-circuit faults in induction motors might lead to overheating, torque imbalances, and eventual motor failure.",
+    "source_evidence": {
+     "source_id": "doi:10.3390/s25154844",
+     "source_hash": "2c7bf2e442d2e149b7cb78b51064224205a3d16cbe49b37b9e1ac8ed4e5ada68"
+    }
+   }
+  }
+ ],
+ "common_claims": [
+  {
+   "dimension": "mechanism",
+   "supporting_roles": [
+    "MODEL_A",
+    "MODEL_B",
+    "MODEL_C"
+   ],
+   "claim": "Inter-turn short-circuit faults causing localized eddy currents and increased winding resistance leading to overheating.",
+   "epistemic_class": "COMPUTED",
+   "note": "independently produced by >= 2 paths (N-ary comparison, E16-G)"
+  },
+  {
+   "dimension": "intervention",
+   "supporting_roles": [
+    "MODEL_A",
+    "MODEL_C"
+   ],
+   "claim": "Perform a negative-sequence current analysis using wavelet-based filtering and symmetrical component decomposition to detect early-stage inter-turn shorts.",
+   "epistemic_class": "COMPUTED",
+   "note": "independently produced by >= 2 paths (N-ary comparison, E16-G)"
+  },
+  {
+   "dimension": "expected_effect",
+   "supporting_roles": [
+    "MODEL_A",
+    "MODEL_B"
+   ],
+   "claim": "Early identification and isolation of inter-turn faults preventing thermal overload trips during no-load operation.",
+   "epistemic_class": "COMPUTED",
+   "note": "independently produced by >= 2 paths (N-ary comparison, E16-G)"
+  }
+ ],
+ "disagreements": [
+  {
+   "disagreement_id": "DIS-001",
+   "dimension": "intervention",
+   "role_a": "MODEL_A",
+   "claim_a": "Perform a negative-sequence current analysis using wavelet-based filtering and symmetrical component decomposition to detect early-stage inter-turn shorts.",
+   "role_b": "MODEL_B",
+   "claim_b": "Deploy negative-sequence current monitoring with wavelet-based filtering to detect internal winding short circuits that are invisible to standard phase resistance and voltage checks",
+   "similarity": 0.214,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:42:55+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-002",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_B",
+   "claim_a": "Early identification and isolation of inter-turn shorts, preventing thermal overload tripping during no-load operation",
+   "role_b": "MODEL_C",
+   "claim_b": "Identification of the specific faulted phase and location of the inter-turn short circuit, explaining the no-load overheating and enabling targeted rewinding or replacement before thermal overload trips occur.",
+   "similarity": 0.214,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:42:55+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-003",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "If negative-sequence current magnitudes remain within the healthy threshold limits (established in the paper's index) during no-load operation at 400V, the inter-turn short hypothesis is disproven, requiring investigation into other thermal management issues.",
+   "role_b": "MODEL_B",
+   "claim_b": "Run the negative-sequence analysis on the motor; if the fault index indicates no ITSC fault despite overheating, the mechanism is disproven for this specific failure mode",
+   "similarity": 0.114,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:42:55+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-004",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_B",
+   "claim_a": "Run the negative-sequence analysis on the motor; if the fault index indicates no ITSC fault despite overheating, the mechanism is disproven for this specific failure mode",
+   "role_b": "MODEL_C",
+   "claim_b": "Measure the negative-sequence current magnitude using symmetrical component decomposition during the 20-minute no-load run; if the negative-sequence current remains below the detection index threshold while the motor still trips the thermal overload, the inter-turn short-circuit mechanism is disproved.",
+   "similarity": 0.132,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-27T22:42:55+00:00Z"
+  }
+ ],
+ "unique_mechanisms": [
+  {
+   "dimension": "intervention",
+   "role": "MODEL_B",
+   "claim": "Deploy negative-sequence current monitoring with wavelet-based filtering to detect internal winding short circuits that are invisible to standard phase resistance and voltage checks",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_C",
+   "claim": "Identification of the specific faulted phase and location of the inter-turn short circuit, explaining the no-load overheating and enabling targeted rewinding or replacement before thermal overload trips occur.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_A",
+   "claim": "If negative-sequence current magnitudes remain within the healthy threshold limits (established in the paper's index) during no-load operation at 400V, the inter-turn short hypothesis is disproven, requiring investigation into other thermal management issues.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_B",
+   "claim": "Run the negative-sequence analysis on the motor; if the fault index indicates no ITSC fault despite overheating, the mechanism is disproven for this specific failure mode",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_C",
+   "claim": "Measure the negative-sequence current magnitude using symmetrical component decomposition during the 20-minute no-load run; if the negative-sequence current remains below the detection index threshold while the motor still trips the thermal overload, the inter-turn short-circuit mechanism is disproved.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  }
+ ],
+ "adjudication": {
+  "adjudicator": "DETERMINISTIC (field completeness -> falsifiability -> source span)",
+  "primary_role": "MODEL_A",
+  "primary_provider": "agnes",
+  "primary_candidate_id": "cand:ENS:agnes:558c6563c1eb",
+  "ranking": [
+   {
+    "role": "MODEL_A",
+    "provider_id": "agnes",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   },
+   {
+    "role": "MODEL_B",
+    "provider_id": "unorouter",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   },
+   {
+    "role": "MODEL_C",
+    "provider_id": "xkiro",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   }
+  ],
+  "consensus_forced": false,
+  "note": "the primary candidate enters the pipeline; disagreement objects remain UNRESOLVED and travel with the artifact chain (E15-E: do not force consensus)",
+  "decided_at": "2026-09-27T22:42:55+00:00Z"
+ },
+ "built_at": "2026-09-27T22:42:24+00:00Z",
+ "status": "ENSEMBLE_RUN",
+ "paths": [
+  "agnes",
+  "unorouter",
+  "xkiro"
+ ],
+ "comparison": {
+  "method": "pairwise significant-word Jaccard over the four invention claim dimensions (deterministic, N-ary; E16-G)",
+  "thresholds": {
+   "agreement": 0.3,
+   "disagreement": 0.25
+  },
+  "roles_compared": [
+   "MODEL_A",
+   "MODEL_B",
+   "MODEL_C"
+  ],
+  "pairs_compared": 3
+ }
+}
