@@ -265,54 +265,84 @@ function Ranked({
             )}
           </div>
           <div className="conv-ranked-grid">
-            <div className="conv-ranked-cell">
-              <div className="faint">Evidence</div>
-              <div>
-                {r.evidence.count != null
-                  ? `${r.evidence.count} source record(s)`
-                  : "see evidence surface"}
-                {r.evidence.span ? " · verbatim span on record" : ""}
-              </div>
-            </div>
-            <div className="conv-ranked-cell">
-              <div className="faint">What would kill it</div>
-              <div>
-                {r.mechanism.falsificationTest ||
-                  "not recorded (honest gap)"}
-              </div>
-            </div>
-            <div className="conv-ranked-cell">
-              <div className="faint">Engineering / model</div>
-              <div>
-                {r.engineering.geometryPresent
-                  ? "geometry established · "
-                  : "conceptual / non-geometric · "}
-                {r.engineering.modelClass || "model class on record"}
-                {r.engineering.limitations ? (
-                  <span className="faint"> — {r.engineering.limitations}</span>
-                ) : null}
-              </div>
-            </div>
-            <div className="conv-ranked-cell">
-              <div className="faint">Decisive experiment</div>
-              <div>
-                {r.experiment.experiment || "not selected (honest gap)"}
-                {r.experiment.executionStatus
-                  ? ` · ${r.experiment.executionStatus.toLowerCase()}`
-                  : ""}
-              </div>
-            </div>
+        {/* R543-2: the evidence answer shape is the actual source
+            provenance + the supporting span, not a bare count. */}
+        <div className="conv-ranked-cell">
+          <div className="faint">Evidence — source provenance</div>
+          <div>
+            {r.evidence.sources.length > 0
+              ? (
+                <>
+                  <b>{r.evidence.sources.join(", ")}</b>
+                  {r.evidence.count != null && (
+                    <> · {r.evidence.count} record(s)</>
+                  )}
+                </>
+              )
+              : (r.evidence.count != null
+                ? `${r.evidence.count} source record(s)`
+                : "no evidence record on this survivor")}
+            {r.evidence.span
+              ? " · supporting span on record"
+              : ""}
           </div>
-          {r.rankBasis && (
-            <div className="conv-ranked-basis faint">
-              Rank basis: {r.rankBasis}
+        </div>
+        <div className="conv-ranked-cell">
+          <div className="faint">What would kill it</div>
+          <div>
+            {r.mechanism.falsificationTest ||
+              "not recorded (honest gap)"}
+          </div>
+        </div>
+        <div className="conv-ranked-cell">
+          <div className="faint">Engineering / model</div>
+          <div>
+            {r.engineering.geometryPresent
+              ? "geometry established · "
+              : "conceptual / non-geometric · "}
+            {r.engineering.modelClass || "model class on record"}
+            {r.engineering.limitations ? (
+              <span className="faint"> — {r.engineering.limitations}</span>
+            ) : null}
+          </div>
+        </div>
+        <div className="conv-ranked-cell">
+          <div className="faint">Decisive experiment</div>
+          <div>
+            {r.experiment.experiment || "not selected (honest gap)"}
+            {r.experiment.decisionRule
+              ? ` · kill: ${r.experiment.decisionRule}`
+              : ""}
+            {r.experiment.executionStatus
+              ? ` · ${r.experiment.executionStatus.toLowerCase()}`
+              : ""}
+          </div>
+        </div>
+      </div>
+      {r.rankBasis && (
+        <div className="conv-ranked-basis faint">
+          Rank basis: {r.rankBasis}
+        </div>
+      )}
+      {/* R543-2: the complete competing-mechanism answer shape — every
+          materially investigated candidate with its own mechanism +
+          what would kill it + the recorded disposition, not just a
+          list of competing IDs the user has to reconstruct. */}
+      {r.mechanism.competingCandidates.length > 0 && (
+        <div className="conv-ranked-competing">
+          <div className="faint">
+            Competing candidates considered:
+          </div>
+          {r.mechanism.competingCandidates.map((c, i) => (
+            <div key={c.candidateId ?? i} className="conv-ranked-competing-row">
+              <b>{c.candidateId}</b>
+              {c.mechanism ? ` — ${c.mechanism}` : ""}
+              {c.whatWouldKillIt ? ` · kill: ${c.whatWouldKillIt}` : ""}
+              {c.disposition ? ` · ${c.disposition.toLowerCase()}` : ""}
             </div>
-          )}
-          {r.mechanism.competing.length > 0 && (
-            <div className="conv-ranked-competing faint">
-              Competing considered: {r.mechanism.competing.join(", ")}
-            </div>
-          )}
+          ))}
+        </div>
+      )}
           <div className="conv-ranked-pkg">
             {r.package.complete && r.package.downloadUrl ? (
               <a

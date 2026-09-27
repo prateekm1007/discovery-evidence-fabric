@@ -26,10 +26,26 @@ SESSIONS_PATH = STORE_DIR / "sessions.json"
 SHARES_PATH = STORE_DIR / "shares.json"
 ENGINE_RUNS = REPO_ROOT / "ENGINE_RUNS"
 
-STAGES = ["RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
-          "VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION", "PHYSICS",
-          "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION",
-          "CLASSIFY", "NEXT_BEST_ACTION", "RANK"]
+# R543-10: the session stage vocabulary derives from the ACTIVE engine
+# authority (adapters.STAGE_ORDER), never a second hard-coded order.
+# MULTI_SOURCE_DISCOVERY was removed from the active STAGE_ORDER in R513
+# (renamed to MECHANISM_SPACE); it survives here ONLY as a marked
+# historical stage so pre-R513 run dirs remain readable — it is NOT a
+# live runtime stage and is never emitted by a new run.
+HISTORICAL_STAGES = ("MULTI_SOURCE_DISCOVERY",)
+try:
+    from discovery_fabric.engine.adapters import STAGE_ORDER
+    STAGES = [s for s in STAGE_ORDER if s not in HISTORICAL_STAGES] + \
+        list(HISTORICAL_STAGES)
+except Exception:  # noqa: BLE001 — engine authority unreachable: the
+    STAGES = ["RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
+              "VERIFY", "COLLISION", "PHYSICS", "ATTACK", "CONTRADICTION",
+              "KILLER_EXPERIMENT", "ADJUDICATION", "CLASSIFY",
+              "NEXT_BEST_ACTION", "RANK"]
+    # historical-only stage, explicitly marked, read path for old run
+    # dirs (never a live runtime stage)
+    STAGES = STAGES + list(HISTORICAL_STAGES)
+    HISTORICAL_STAGES = ("MULTI_SOURCE_DISCOVERY",)
 
 # ---------------------------------------------------------------------------
 # Run-dir derived detail (the AUTHORITY — re-read from disk every time)

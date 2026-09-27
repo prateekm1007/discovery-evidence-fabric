@@ -314,6 +314,50 @@ def _run_dir(session: Dict[str, Any]):
         return None
 
 
+def _contract_finished_flag(session: Dict[str, Any]) -> Optional[bool]:
+    """R543-1: the customer-facing finished flag when the durable
+    completion contract exists (the sole authority chain:
+    COMPLETION_CONTRACT.json -> completion_states() -> finished).
+
+    Returns None when no recorded contract/completion_states exists
+    (legacy session, or a run that never reached the run-tail verifier)
+    — the caller falls back to the state-key derivation. When recorded:
+
+      FINISHED_DISCOVERY=true  => finished=true
+      FINISHED_DISCOVERY=false => finished=false
+
+    for EVERY typed terminal (MECHANISM_STARVED, RUN_BLOCKED_*,
+    REJECTED, INCOMPLETE_DISCOVERY, ...). The contract is the only
+    FINISHED_DISCOVERY authority: a typed terminal may remain a
+    terminal STATE, but it must never be represented as a finished
+    discovery by a second Boolean."""
+    # top-level completion_states (sessions.py promotes the contract's
+    # completion_states onto the detail record)
+    states = session.get("completion_states")
+    if not isinstance(states, dict):
+        # raw completion_contract on the record (read verbatim from the
+        # run dir when present)
+        contract = session.get("completion_contract")
+        if isinstance(contract, dict):
+            try:
+                from discovery_fabric.engine import (
+                    completion_contract as _cc)
+                states = _cc.completion_states(contract)
+            except Exception:  # noqa: BLE001 — projection must not crash
+                states = None
+    if not isinstance(states, dict):
+        # the engine's own final_state record carries completion_states
+        # (written at the run tail before the durable contract file is
+        # pruned by the deploy). This is the same completion authority —
+        # the run's own recorded answer, not a second Boolean.
+        fs = session.get("final_state")
+        if isinstance(fs, dict):
+            states = fs.get("completion_states")
+    if isinstance(states, dict) and "FINISHED_DISCOVERY" in states:
+        return bool(states.get("FINISHED_DISCOVERY"))
+    return None
+
+
 def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
     """The full user-state projection for one session (label, meaning,
     decision line, finish flags) — derived from the session record's own
@@ -324,6 +368,14 @@ def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
     pkg = session.get("package") or {}
     finished = key.startswith("COMPLETED") or key.startswith("FAILED") \
         or key in ("INTERRUPTED", "BLOCKED_TRANSPORT", "UNKNOWN_STALLED")
+    # R543-1: when the durable completion contract is recorded, ITS
+    # FINISHED_DISCOVERY is the authority for the customer-facing
+    # finished flag (never a second key-prefix Boolean). FINISHED_
+    # DISCOVERY=false (starved/blocked/rejected/incomplete) forces
+    # finished=false; true only when the six-part contract verified.
+    _contract_flag = _contract_finished_flag(session)
+    if _contract_flag is not None:
+        finished = _contract_flag
     found = key in ("COMPLETED_PACKAGE", "COMPLETED_CANDIDATE",
                     "COMPLETED_EVOLVED")
     # R416: the product surface never renders a bare reject dead-end;

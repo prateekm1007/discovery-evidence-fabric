@@ -710,6 +710,9 @@ export interface CIOMaturity {
 export interface RankedResultComponents {
   evidence?: {
     records?: { id?: string | null; source?: string | null; frozen?: boolean }[];
+    // R543-2: the evidence answer shape — the actual source provenance
+    // (recorded source identities), not just a record count.
+    sources?: string[];
     mechanism_source_span?: string;
     evidence_status?: string;
   };
@@ -719,6 +722,16 @@ export interface RankedResultComponents {
     expected_effect?: string;
     falsification_test?: string;
     competing_considered?: string[];
+    // R543-2: the complete competing-candidate summaries carried on the
+    // authoritative ranked projection (candidate + mechanism + kill
+    // condition + disposition), not only the competing IDs.
+    competing_candidates?: {
+      candidate_id?: string | null;
+      mechanism?: string;
+      intervention?: string;
+      what_would_kill_it?: string;
+      disposition?: string;
+    }[];
   };
   adversarial?: {
     overall?: string | null;

@@ -3294,6 +3294,8 @@ class EngineRun:
                     "zip_bytes": c_out.get("zip_bytes"),
                     "manifest_files": (c_out.get("manifest") or {})
                                        .get("file_count"),
+                    "manifest_candidate_id": (c_out.get("manifest") or {})
+                                              .get("candidate_id"),
                     "package_maturity": c_out.get("package_maturity"),
                     "visualizability_class": c_out.get(
                         "visualizability_class"),

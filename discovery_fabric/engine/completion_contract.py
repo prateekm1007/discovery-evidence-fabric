@@ -212,24 +212,41 @@ def _model_class(run_dir: Path, key: str, eng: Dict[str, Any],
     return _rrs.resolve_model_class(run_dir, key, eng, pkg_rec)
 
 
+def _candidate_artifact(run_dir: Path, kind: str,
+                        key: str) -> Dict[str, Any]:
+    """R543-3: one candidate's OWN suffixed artifact — no primary
+    fallback. A non-primary candidate (key != primary) reads ONLY
+    <KIND>_<key>.json; an absent file is an honest empty record and
+    the missing artifact name is returned so the component can name
+    it in the missing-components report. The primary candidate's
+    canonical un-suffixed file is its own record by construction."""
+    fname = f"{kind}.json" if key in (None, "primary") \
+        else f"{kind}_{key}.json"
+    rec = _read(run_dir / fname)
+    missing = None if rec is not None else fname
+    return (rec or {}), missing
+
+
 def _evidence_component(run_dir: Path,
-                        survivors: List[Dict[str, Any]]) -> Dict[str, Any]:
+                       survivors: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Component 1 — evidence found + source provenance.
 
     Every displayed survivor's own invention specification must carry
     custodied evidence records (id + source identity + content hash)
     AND the mechanism's supporting span (the exact recorded span the
     mechanism was derived from). Missing pieces are typed, never
-    papered over (Art. XXV)."""
+    papered over (Art. XXV). R543-3: a non-primary survivor's own
+    suffixed specification is the ONLY source — a missing file is a
+    typed component gap, never the primary's content."""
     per: List[Dict[str, Any]] = []
     complete = bool(survivors)
+    missing_artifact_names: List[str] = []
     for r in survivors:
         key = r.get("key") or "primary"
-        spec = _read(run_dir / (
-            "INVENTION_SPECIFICATION.json" if key in (None, "primary")
-            else f"INVENTION_SPECIFICATION_{key}.json"))
-        if spec is None:
-            spec = _read(run_dir / "INVENTION_SPECIFICATION.json") or {}
+        spec, _missing = _candidate_artifact(run_dir,
+                                             "INVENTION_SPECIFICATION", key)
+        if _missing:
+            missing_artifact_names.append(_missing)
         ev_field = spec.get("evidence") or {}
         records = ev_field.get("value") if isinstance(ev_field, dict) \
             and "value" in ev_field else ev_field
@@ -263,8 +280,9 @@ def _evidence_component(run_dir: Path,
         complete = complete and ok
     return {
         "component": COMP_EVIDENCE,
-        "complete": bool(complete),
+        "complete": bool(complete) and not missing_artifact_names,
         "source_files": ["INVENTION_SPECIFICATION[_<key>].json"],
+        "missing_candidate_artifacts": missing_artifact_names,
         "per_survivor": per,
         "requirement": ("custodied evidence records (source identity + "
                         "content hash) + the mechanism's supporting "
@@ -411,17 +429,20 @@ def _engineering_component(run_dir: Path,
     model. Non-geometric invention -> an EXPLICIT conceptual/system 3D
     model class, labeled as such. What is prohibited is silently
     presenting a conceptual object as earned engineering CAD — and a
-    vague 'see package' placeholder is not a model artifact."""
+    vague 'see package' placeholder is not a model artifact. R543-3:
+    a non-primary survivor's own suffixed ENGINEERING_SPECIFICATION is
+    the ONLY source — a missing file is a typed component gap, never
+    the primary candidate's engineering record."""
     pkgs = (pkg_records.get("packages") or {})
     per: List[Dict[str, Any]] = []
     complete = bool(survivors)
+    missing_artifact_names: List[str] = []
     for r in survivors:
         key = r.get("key") or "primary"
-        eng = _read(run_dir / (
-            "ENGINEERING_SPECIFICATION.json" if key in (None, "primary")
-            else f"ENGINEERING_SPECIFICATION_{key}.json"))
-        if eng is None:
-            eng = _read(run_dir / "ENGINEERING_SPECIFICATION.json") or {}
+        eng, _missing = _candidate_artifact(
+            run_dir, "ENGINEERING_SPECIFICATION", key)
+        if _missing:
+            missing_artifact_names.append(_missing)
         core = eng.get("engineering_core") or {}
         arch = eng.get("system_architecture") or {}
         geo = eng.get("geometry") or {}
@@ -445,15 +466,16 @@ def _engineering_component(run_dir: Path,
         complete = complete and ok
     return {
         "component": COMP_ENGINEERING,
-        "complete": bool(complete),
+        "complete": bool(complete) and not missing_artifact_names,
+        "missing_candidate_artifacts": missing_artifact_names,
         "source_files": ["ENGINEERING_SPECIFICATION[_<key>].json",
                          "GEOMETRY_OUT.json",
                          "RANKED_PACKAGE_RECORDS.json"],
         "per_survivor": per,
         "requirement": ("engineering definition present + an explicit "
-                        "model class (earned geometry or labeled "
-                        "conceptual/system model) for every displayed "
-                        "survivor — never a 'see package' placeholder"),
+                         "model class (earned geometry or labeled "
+                         "conceptual/system model) for every displayed "
+                         "survivor — never a 'see package' placeholder"),
     }
 
 
@@ -471,13 +493,13 @@ def _experiment_component(run_dir: Path,
     from . import state_integrity as _si
     per: List[Dict[str, Any]] = []
     complete = bool(survivors)
+    missing_artifact_names: List[str] = []
     for r in survivors:
         key = r.get("key") or "primary"
-        dec = _read(run_dir / (
-            "DECISIVE_EXPERIMENT.json" if key in (None, "primary")
-            else f"DECISIVE_EXPERIMENT_{key}.json"))
-        if dec is None:
-            dec = _read(run_dir / "DECISIVE_EXPERIMENT.json") or {}
+        dec, _missing = _candidate_artifact(run_dir,
+                                            "DECISIVE_EXPERIMENT", key)
+        if _missing:
+            missing_artifact_names.append(_missing)
         sel = dec.get("selected") or {}
         name = str(sel.get("experiment") or sel.get("name") or "").strip()
         hyps = sel.get("hypotheses") or []
@@ -511,7 +533,8 @@ def _experiment_component(run_dir: Path,
         complete = complete and ok
     return {
         "component": COMP_EXPERIMENT,
-        "complete": bool(complete),
+        "complete": bool(complete) and not missing_artifact_names,
+        "missing_candidate_artifacts": missing_artifact_names,
         "source_files": ["DECISIVE_EXPERIMENT[_<key>].json"],
         "authority": ("state_integrity.falsification_contract_status "
                       "(Art. LII): complete only when an experimental "

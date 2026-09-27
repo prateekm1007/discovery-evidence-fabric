@@ -728,6 +728,12 @@ export function deriveRankedPackages(
         count: Array.isArray(ev.records) ? ev.records.length : null,
         span: ev.mechanism_source_span ?? null,
         status: ev.evidence_status ?? null,
+        // R543-2: the actual source provenance (never just a count) —
+        // the recorded source identities the evidence record carries.
+        sources: Array.isArray(ev.sources) ? ev.sources : [],
+        sourceIdentity:
+          (Array.isArray(ev.sources) && ev.sources[0]) ||
+          (ev.records?.[0]?.source ?? null),
       },
       mechanism: {
         mechanism: mech.mechanism ?? null,
@@ -735,6 +741,19 @@ export function deriveRankedPackages(
         expectedEffect: mech.expected_effect ?? null,
         falsificationTest: mech.falsification_test ?? null,
         competing: mech.competing_considered ?? [],
+        // R543-2: the complete competing-candidate summaries carried on
+        // the authoritative ranked projection (candidate + mechanism +
+        // kill condition + disposition), not only the competing IDs.
+        competingCandidates: (Array.isArray(mech.competing_candidates)
+          ? mech.competing_candidates
+          : []).map((cc: Record<string, unknown>) => ({
+            candidateId: (cc.candidate_id as string | null) ?? null,
+            mechanism: (cc.mechanism as string | null) ?? null,
+            intervention: (cc.intervention as string | null) ?? null,
+            whatWouldKillIt:
+              (cc.what_would_kill_it as string | null) ?? null,
+            disposition: (cc.disposition as string | null) ?? null,
+          })),
       },
       adversarial: {
         overall: adv.overall ?? null,

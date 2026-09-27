@@ -138,12 +138,43 @@ def _evidence_view(inv_spec: Dict[str, Any]) -> Dict[str, Any]:
     if isinstance(mm, dict) and "value" in mm:
         mm = mm.get("value") or {}
     span = mm.get("mechanism_source_span") if isinstance(mm, dict) else None
+    # R543-2: the evidence answer shape carries the ACTUAL source
+    # provenance, not just a count — the recorded source identities
+    # (deduped, in record order) so the conversation states where the
+    # evidence came from.
+    sources = sorted({str(r.get("source") or r.get("source_id")
+                        or r.get("source_uri") or "")
+                      for r in records if isinstance(r, dict)
+                      and (r.get("source") or r.get("source_id")
+                           or r.get("source_uri"))})
     return {
         "records": view,
+        "sources": sources,
         "mechanism_source_span": span or "",
         "evidence_status": "verified_against_frozen_evidence"
                           if view else "NONE_REACHED_ENVELOPE",
     }
+
+
+def _manifest_candidate_id(manifest: Any) -> Optional[str]:
+    """R543-4: the candidate identity recorded INSIDE a package's
+    manifest ( PACKAGE_MANIFEST.json / the manifest record). Any of the
+    recorded identity fields count (the engine records
+    candidate_id / ranked_candidate_id on both the manifest and the
+    package record); a manifest that records NONE carries no candidate
+    identity (an honest absence, never a silent pass)."""
+    if isinstance(manifest, dict):
+        cid = manifest.get("candidate_id") or \
+            manifest.get("ranked_candidate_id")
+        if cid is None and isinstance(manifest.get("identity"), dict):
+            cid = manifest["identity"].get("candidate_id")
+        if cid:
+            return str(cid)
+    if isinstance(manifest, (list, tuple)):
+        # file-list manifest: no candidate identity is carried by the
+        # file inventory itself — the package RECORD is the authority
+        return None
+    return None
 
 
 def _package_binding(run_dir: Path,
@@ -194,23 +225,38 @@ def _package_binding(run_dir: Path,
         or (pkg_records.get("packages") or {}).get(key) \
         or pkg_records.get("by_candidate_id", {}).get(cid) \
         or pkg_records.get("by_candidate_id", {}).get(key)
-    if not isinstance(rec, dict) or not rec.get("complete"):
-        # no complete candidate-bound package exists on disk — an
-        # UNRESOLVED candidate or a not-yet-compiled package. Honest
-        # absence; NEVER a borrowed #1 package and NEVER a claimed
-        # TECHNOLOGY_PACKAGE (the contract's #1/#5/#6 invariants).
+    # R543-4: a package record only PROVES the candidate binding when
+    # it records the candidate identity itself. The engine's package
+    # compiler sets candidate_id on every record it compiles; a record
+    # that names the candidate only by its lookup key (the
+    # candidate-id-keyed table form) carries no recorded identity of
+    # its own — an absent recorded candidate_id on a complete package
+    # is a binding FAILURE, never a silent pass.
+    has_recorded_identity = isinstance(rec, dict) and \
+        rec.get("candidate_id") is not None
+    if not isinstance(rec, dict) or not rec.get("complete") \
+            or not has_recorded_identity:
+        # no complete candidate-bound package with a recorded candidate
+        # identity on disk — an UNRESOLVED candidate, a not-yet-
+        # compiled package, or a record that cannot prove the binding.
+        # Honest absence; NEVER a borrowed #1 package and NEVER a
+        # claimed TECHNOLOGY_PACKAGE (the contract's #1/#5/#6
+        # invariants).
         return {
             "kind": "ABSENT_NOT_COMPILED",
             "package_id": None,
             "zip_name": None,
             "zip_sha256": None,
             "manifest": None,
-            "candidate_id": cid,
+            "candidate_id": rec.get("candidate_id")
+            if isinstance(rec, dict) else cid,
             "rank": rank,
+            "candidate_identity_bound": False,
             "complete": False,
-            "note": ("no complete candidate-bound package on disk for "
-                     "this ranked candidate (the #1 package is NOT "
-                     "reused as this candidate's package)"),
+            "note": ("no complete candidate-bound package with a "
+                     "recorded candidate identity on disk for this "
+                     "ranked candidate (the #1 package is NOT reused "
+                     "as this candidate's package)"),
         }
 
     # the candidate-bound ZIP must exist on disk and its hash must match.
@@ -230,6 +276,34 @@ def _package_binding(run_dir: Path,
     hash_matches = (zip_sha is not None) and (measured == zip_sha)
     manifest = rec.get("manifest") or rec.get("manifest_files")
 
+    # R543-4: candidate-identity binding — a complete package PROVES
+    # the binding only when the recorded identity (the package record's
+    # own candidate_id, set by the engine's package compiler, plus the
+    # manifest's recorded candidate identity when present) matches
+    # this ranked row's candidate. A manifest that names a DIFFERENT
+    # candidate is a cross-candidate package — a binding failure,
+    # never a silent pass. The manifest is consulted ONLY when the
+    # record itself did not already record its own candidate identity:
+    # the engine writes the manifest's candidate_id FROM the record, so
+    # when both are recorded and agree, the record is the authority;
+    # when only the manifest records an identity (the record is
+    # identity-less), a mismatched manifest is a cross-candidate
+    # package.
+    rec_cid = rec.get("candidate_id")
+    manifest_cid = _manifest_candidate_id(manifest)
+    if rec_cid is not None:
+        # the record records its own identity: it must equal the row.
+        identity_bound = (str(rec_cid) == str(cid)
+                          and (manifest_cid is None
+                               or manifest_cid == str(cid)))
+    else:
+        # the record is identity-less: the manifest is the only
+        # candidate-identity evidence; a mismatched manifest (naming a
+        # different candidate) is a cross-candidate package, and an
+        # identity-less manifest cannot PROVE the binding either.
+        identity_bound = (manifest_cid is not None
+                          and manifest_cid == str(cid))
+
     return {
         "kind": "TECHNOLOGY_PACKAGE",
         "package_id": rec.get("package_id") or str(cid),
@@ -238,12 +312,17 @@ def _package_binding(run_dir: Path,
         "zip_sha256_measured": measured,
         "zip_sha256_matches": bool(hash_matches),
         "manifest": manifest,
-        "candidate_id": rec.get("candidate_id") or cid,
+        "manifest_candidate_id": manifest_cid,
+        "candidate_id": rec_cid if rec_cid is not None else cid,
         "rank": rank,
-        "complete": bool(rec.get("complete") and hash_matches),
+        "candidate_identity_bound": bool(identity_bound),
+        "complete": bool(rec.get("complete") and hash_matches
+                         and identity_bound),
         "note": ("candidate-bound technology package; the ZIP hash is "
-                 "re-measured from the on-disk artifact (Art. II/III: "
-                 "the measured bytes are the authority)"),
+                 "re-measured from the on-disk artifact and the "
+                 "recorded candidate identity is re-checked against "
+                 "the ranked row (Art. II/III/X: the measured bytes + "
+                 "recorded candidate identity are the authority)"),
     }
 
 
@@ -316,20 +395,42 @@ def _candidate_result_record(
     cid = ranked_row.get("candidate_id")
     key = ranked_row.get("key") or "primary"
 
-    # per-candidate canonical trio (R541): the suffixed files hold the
-    # candidate's own record; the primary candidate's canonical
-    # un-suffixed files are the same record. Read the candidate's own
-    # artifacts when present, else fall back to the canonical files
-    # (the selected #1) — never a second, invented authority.
+    # per-candidate canonical trio (R541; R543-3 strictened): a
+    # NON-PRIMARY candidate resolves ONLY its OWN suffixed artifacts.
+    # Missing suffixed artifact = a typed component gap on THIS
+    # candidate (it drives the completion contract's missing
+    # components and blocks FINISHED_DISCOVERY) — it is NEVER
+    # substituted by the primary candidate's canonical artifact,
+    # because that would silently present candidate A's evidence /
+    # mechanism / engineering / experiment / geometry as candidate
+    # B's. The primary candidate keeps its canonical un-suffixed
+    # files (the same record by construction).
+    missing_artifacts: List[str] = []
     if key != "primary":
-        _per = {
-            "inv": _read_json(run_dir / f"INVENTION_SPECIFICATION_{key}.json"),
-            "eng": _read_json(run_dir / f"ENGINEERING_SPECIFICATION_{key}.json"),
-            "dec": _read_json(run_dir / f"DECISIVE_EXPERIMENT_{key}.json"),
-        }
-        inv_spec = _per["inv"] or inv_spec
-        eng_spec = _per["eng"] or eng_spec
-        decisive = _per["dec"] or decisive
+        _per_inv = _read_json(
+            run_dir / f"INVENTION_SPECIFICATION_{key}.json")
+        _per_eng = _read_json(
+            run_dir / f"ENGINEERING_SPECIFICATION_{key}.json")
+        _per_dec = _read_json(
+            run_dir / f"DECISIVE_EXPERIMENT_{key}.json")
+        if _per_inv is None:
+            missing_artifacts.append(
+                f"INVENTION_SPECIFICATION_{key}.json")
+            inv_spec = {}
+        else:
+            inv_spec = _per_inv
+        if _per_eng is None:
+            missing_artifacts.append(
+                f"ENGINEERING_SPECIFICATION_{key}.json")
+            eng_spec = {}
+        else:
+            eng_spec = _per_eng
+        if _per_dec is None:
+            missing_artifacts.append(
+                f"DECISIVE_EXPERIMENT_{key}.json")
+            decisive = {}
+        else:
+            decisive = _per_dec
 
     # component 1 — evidence + source attribution
     evidence = _evidence_view(inv_spec)
@@ -380,6 +481,46 @@ def _candidate_result_record(
     mechanism["competing_considered"] = [
         r.get("candidate_id") for r in selection.get("ranked", [])
         if r.get("candidate_id") != cid]
+    # R543-2: the authoritative ranked projection carries the COMPLETE
+    # competing-candidate summaries, not only IDs. Every materially
+    # investigated candidate (including kills and gate exclusions)
+    # rides its own candidate / mechanism / kill condition /
+    # disposition on the record — the conversation must not be left
+    # to reconstruct this from unrelated stage records.
+    competing_summaries: List[Dict[str, Any]] = []
+    for r in selection.get("ranked", []) or []:
+        if not isinstance(r, dict) or r.get("candidate_id") == cid:
+            continue
+        comp_key = r.get("key") or "primary"
+        comp_cid = r.get("candidate_id")
+        comp_mech: Dict[str, Any] = {}
+        comp_kill: str = ""
+        if comp_key in (None, "primary"):
+            _cs = inv_spec if key in (None, "primary") else {}
+        else:
+            _cs = _read_json(
+                run_dir / f"INVENTION_SPECIFICATION_{comp_key}.json") or {}
+        _cm = _cs.get("mechanism") if isinstance(_cs, dict) else {}
+        if isinstance(_cm, dict) and "value" in _cm:
+            _cm = _cm.get("value") or {}
+        if isinstance(_cm, dict):
+            comp_mech = {
+                "mechanism": _cm.get("mechanism") or "",
+                "intervention": _cm.get("intervention") or "",
+            }
+            comp_kill = (str(_cm.get("falsification_test") or "").strip())
+        if not comp_kill:
+            comp_kill = str(
+                (r.get("kill_condition")
+                 or r.get("falsification_test") or "")).strip()
+        competing_summaries.append({
+            "candidate_id": comp_cid,
+            "mechanism": comp_mech.get("mechanism") or "",
+            "intervention": comp_mech.get("intervention") or "",
+            "what_would_kill_it": comp_kill,
+            "disposition": r.get("disposition") or "UNRESOLVED",
+        })
+    mechanism["competing_candidates"] = competing_summaries
 
     # component 3 — adversarial disposition. R541: the disposition is
     # the AUTHORITATIVE value recorded on the SURVIVOR_SELECTION row
@@ -465,6 +606,17 @@ def _candidate_result_record(
               not in ("DOES_NOT_BEAT_BASELINE",
                       "PLAUSIBILITY_BOUND_VIOLATED")))
     admissible = admissible and disposition == "SURVIVED"
+
+    # R543-3: a non-primary candidate with a missing own-artifact trio
+    # carries the typed gap on its record — the completion contract
+    # (mechanisms / adversarial / experiment components) reads THESE
+    # empty records and reports the missing component by name, and
+    # FINISHED_DISCOVERY is blocked. Never a silent substitution of
+    # the primary candidate's content.
+    if missing_artifacts:
+        mechanism["own_artifact_missing"] = missing_artifacts
+        engineering["own_artifact_missing"] = missing_artifacts
+        experiment["own_artifact_missing"] = missing_artifacts
 
     return {
         "rank": rank,
@@ -609,11 +761,18 @@ def verify_ranked_result_set(record: Dict[str, Any],
         complete = bool(pkg.get("complete"))
         zip_sha = pkg.get("zip_sha256")
         zip_name = pkg.get("zip_name")
-        # the candidate binding: the package's candidate_id must equal
-        # the ranked row's candidate_id (no cross-candidate package)
-        pkg_cid = pkg.get("candidate_id")
-        binding_ok = (pkg_cid is None) or (pkg_cid == cid) or (
-            pkg.get("kind") in ("ABSENT_KILLED", "ABSENT_NOT_COMPILED"))
+        # R543-4: a complete candidate-bound package proves binding only
+        # when its recorded candidate identity is EXPLICIT and equals
+        # the ranked row's candidate_id (and the manifest, when it
+        # carries a candidate identity, names that same candidate). An
+        # absent candidate_id on a complete package is a binding
+        # FAILURE, never a pass.
+        binding_ok = (complete
+                      and bool(pkg.get("candidate_identity_bound"))
+                      and bool(pkg.get("candidate_id"))) \
+            or (not complete
+                and pkg.get("kind") in ("ABSENT_KILLED",
+                                        "ABSENT_NOT_COMPILED"))
         # re-measure the ZIP hash from disk when a zip is recorded
         measured = None
         if complete and zip_name:
@@ -634,10 +793,20 @@ def verify_ranked_result_set(record: Dict[str, Any],
             "candidate_binding_ok": bool(binding_ok),
         })
         if not binding_ok:
-            violations.append(
-                f"candidate {cid} rank {rank}: the package's recorded "
-                f"candidate_id ({pkg_cid}) does not equal the ranked "
-                "row's candidate_id — cross-candidate package binding")
+            if complete:
+                violations.append(
+                    f"candidate {cid} rank {rank}: complete "
+                    "candidate-bound package without a verified "
+                    "candidate identity (recorded candidate_id "
+                    f"{pkg.get('candidate_id')!r} must equal the "
+                    "ranked row and the manifest's candidate identity) "
+                    "— binding unproven")
+            else:
+                violations.append(
+                    f"candidate {cid} rank {rank}: the package's "
+                    "recorded candidate_id does not equal the ranked "
+                    "row's candidate_id — cross-candidate package "
+                    "binding")
         if complete and not hash_ok:
             violations.append(
                 f"candidate {cid} rank {rank}: recorded ZIP SHA-256 "

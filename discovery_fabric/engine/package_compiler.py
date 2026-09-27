@@ -234,6 +234,15 @@ def build_technology_package_model(
             "domain_family": domain_family,
             "problem_domain_family": problem_domain,
             "final_invention_hash": fi_hash,
+            # R543-4: the candidate-bound identity — when the compiler is
+            # invoked for a specific ranked candidate (the engine's
+            # candidate-bound package path sets these on run_result),
+            # the package's manifest carries the candidate it was built
+            # from; the ranked-result verifier re-checks this against
+            # the ranked row (a complete package with a missing or
+            # mismatched candidate identity is not a binding success).
+            "ranked_candidate_id": run_result.get("ranked_candidate_id"),
+            "ranked_candidate_key": run_result.get("ranked_candidate_key"),
         },
         "problem": {
             "user_problem": run_result.get("user_text")
@@ -1152,6 +1161,14 @@ def _rebuild_manifest(pkg_dir: Path, label: str,
         or render_out.get("invention_label"),
         "technology_name": ident.get("technology_name"),
         "run_id": ident.get("run_id"),
+        # R543-4: the package's candidate identity is EXPLICIT in its own
+        # manifest — the ranked-result verifier re-checks this against
+        # the ranked row (a candidate-bound ZIP must name its own
+        # candidate; a missing identity can never count as a binding
+        # success for a complete package).
+        "candidate_id": ident.get("ranked_candidate_id")
+        or ident.get("candidate_id"),
+        "ranked_candidate_key": ident.get("ranked_candidate_key"),
         "file_count": len(files),
         "files": files,
         "package_maturity": render_out.get("package_maturity"),

@@ -123,6 +123,19 @@ export interface CandidateView {
 // engine's ranked result record — no client-side re-sort, re-score, or
 // rank inference. The package CTA is the move from a ranked result to
 // its downloadable package.
+// R543-2: one materially investigated competing candidate — its own
+// candidate, mechanism, what would kill it, and the recorded
+// disposition. Carried on the ranked projection so the conversation
+// exposes the competing-mechanism answer shape literally, not just a
+// list of competing candidate IDs the user has to reconstruct.
+export interface CompetingCandidateView {
+  candidateId: string | null;
+  mechanism: string | null;
+  intervention: string | null;
+  whatWouldKillIt: string | null;
+  disposition: string | null;
+}
+
 export interface RankedPackageView {
   rank: number | null;
   candidateId: string | null;
@@ -134,6 +147,11 @@ export interface RankedPackageView {
     count: number | null;
     span: string | null;
     status: string | null;
+    // R543-2: the evidence answer shape is the actual source
+    // provenance, not just a count — the supporting recorded span plus
+    // the source identity / provenance the record carries.
+    sources: string[];
+    sourceIdentity: string | null;
   };
   mechanism: {
     mechanism: string | null;
@@ -141,6 +159,9 @@ export interface RankedPackageView {
     expectedEffect: string | null;
     falsificationTest: string | null;
     competing: string[];
+    // R543-2: the complete competing-candidate summaries (candidate +
+    // mechanism + kill condition + disposition), never only IDs.
+    competingCandidates: CompetingCandidateView[];
   };
   adversarial: {
     overall: string | null;

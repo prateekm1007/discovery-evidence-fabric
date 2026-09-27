@@ -779,3 +779,159 @@ def test_23_scientifically_rejected_run_terminal_no_recovery(tmp_path):
     assert persisted["recovery"] == []
     assert persisted["recovery_attempts"] == []
     assert persisted["typed_terminal_state"] == "REJECTED"
+
+
+# ---------------------------------------------------------------------------
+# R543-3: a non-primary candidate NEVER borrows the primary candidate's
+# canonical artifact — a missing own artifact is a typed component gap,
+# FINISHED_DISCOVERY=false, and the missing file is named.
+# ---------------------------------------------------------------------------
+def _two_survivor_run_dir_without_b_artifact(tmp_path: Path,
+                                              kind: str) -> Path:
+    run_dir = _run_dir(tmp_path, two_survivors=True)
+    key = "grid-1"
+    fname = {"inv": "INVENTION_SPECIFICATION_grid-1.json",
+             "eng": "ENGINEERING_SPECIFICATION_grid-1.json",
+             "dec": "DECISIVE_EXPERIMENT_grid-1.json"}[kind]
+    p = run_dir / fname
+    if p.exists():
+        p.unlink()
+    return run_dir
+
+
+def test_r543_24_missing_invention_specification_b_not_fallback(tmp_path):
+    """A missing INVENTION_SPECIFICATION_<key> for the non-primary
+    survivor must NOT fall back to the primary candidate's record —
+    the evidence/mechanism components go incomplete, FINISHED is
+    false, and the missing artifact is named."""
+    run_dir = _two_survivor_run_dir_without_b_artifact(tmp_path, "inv")
+    rec = _verify(run_dir)
+    assert rec["finished_discovery"] is False
+    missing = [str(m) for m in rec["missing_components"]]
+    assert any("INVENTION_SPECIFICATION" in m for m in missing) or \
+        cc.COMP_EVIDENCE in rec["missing_components"]
+    ev = rec["components"][cc.COMP_EVIDENCE]
+    assert ev["complete"] is False
+    assert "INVENTION_SPECIFICATION_grid-1.json" in \
+        (ev.get("missing_candidate_artifacts") or [])
+    mech = rec["components"][cc.COMP_MECHANISMS]
+    assert mech["complete"] is False
+
+
+def test_r543_25_missing_engineering_specification_b_not_fallback(
+        tmp_path):
+    """A missing ENGINEERING_SPECIFICATION_<key> for the non-primary
+    survivor blocks the engineering component — the primary's
+    geometry must not be presented as candidate B's model."""
+    run_dir = _two_survivor_run_dir_without_b_artifact(tmp_path, "eng")
+    rec = _verify(run_dir)
+    assert rec["finished_discovery"] is False
+    eng = rec["components"][cc.COMP_ENGINEERING]
+    assert eng["complete"] is False
+    assert "ENGINEERING_SPECIFICATION_grid-1.json" in \
+        (eng.get("missing_candidate_artifacts") or [])
+
+
+def test_r543_26_missing_decisive_experiment_b_not_fallback(tmp_path):
+    """A missing DECISIVE_EXPERIMENT_<key> for the non-primary
+    survivor blocks the experiment component (no decision rule) —
+    never the primary candidate's experiment."""
+    run_dir = _two_survivor_run_dir_without_b_artifact(tmp_path, "dec")
+    rec = _verify(run_dir)
+    assert rec["finished_discovery"] is False
+    exp = rec["components"][cc.COMP_EXPERIMENT]
+    assert exp["complete"] is False
+    assert "DECISIVE_EXPERIMENT_grid-1.json" in \
+        (exp.get("missing_candidate_artifacts") or [])
+
+
+# ---------------------------------------------------------------------------
+# R543-4: the package binding is PROVEN by candidate identity, not just
+# filename/hash — a complete package without a matching candidate
+# identity is not a binding success; a mismatched manifest is a
+# cross-candidate package.
+# ---------------------------------------------------------------------------
+def test_r543_27_complete_package_without_candidate_identity_not_bound(
+        tmp_path):
+    """A complete candidate-bound package whose record + manifest carry
+    no candidate identity must NOT count as a verified binding."""
+    run_dir = _run_dir(tmp_path, two_survivors=True)
+    pkgs = json.loads((run_dir / "RANKED_PACKAGE_RECORDS.json")
+                      .read_text(encoding="utf-8"))
+    # strip EVERY candidate-identity field the record / table carries:
+    # the packages table must key candidates by their own id (the
+    # lookup-key form) with no recorded candidate_id / ranked_candidate_
+    # key / manifest identity — the record alone cannot prove the
+    # binding.
+    vals = list(pkgs["packages"].values())
+    pkgs["packages"] = {
+        str(f.get("candidate_id") or f"grid-{i}"):
+        {k: v for k, v in f.items()
+         if k not in ("candidate_id", "ranked_candidate_key")}
+        for i, f in enumerate(vals)
+    }
+    pkgs["by_candidate_id"] = {k: v for k, v in
+                               pkgs.get("by_candidate_id", {}).items()
+                               if k in pkgs["packages"]}
+    _write(run_dir, "RANKED_PACKAGE_RECORDS.json", pkgs)
+    # re-derive: the package binding must fail candidate-identity
+    ranked = rrs.derive_ranked_result_set(run_dir)
+    for r in ranked["ranked_results"]:
+        pkg = r["components"]["package"]
+        assert pkg["complete"] is False, (
+            "a complete package without a recorded candidate identity "
+            "is NOT a binding success")
+    v = rrs.verify_ranked_result_set(ranked, run_dir)
+    assert v["verified"] is False
+    assert v["violations"], (
+        "an unbound complete package must produce a typed violation, "
+        "never a silent finished pass")
+
+
+def test_r543_28_manifest_mismatched_candidate_id_cross_package(tmp_path):
+    """A complete candidate-bound package whose manifest names a
+    DIFFERENT candidate than the ranked row it is bound to is a
+    cross-candidate package — a binding failure, typed (it also makes
+    the package incomplete and the finished discovery impossible)."""
+    run_dir = _run_dir(tmp_path, two_survivors=True)
+    pkgs = json.loads((run_dir / "RANKED_PACKAGE_RECORDS.json")
+                      .read_text(encoding="utf-8"))
+    a_zip = next(f["zip_name"] for f in pkgs["packages"].values()
+                 if f.get("candidate_id") == "cand_a")
+    b_zip = next(f["zip_name"] for f in pkgs["packages"].values()
+                 if f.get("candidate_id") == "cand_b")
+    # rebuild the record table with BOTH candidate identities explicitly
+    # recorded (the engine's own package-compiler record form)
+    pkgs["packages"] = {
+        "primary": {"complete": True, "kind": "TECHNOLOGY_PACKAGE",
+                    "candidate_id": "cand_a",
+                    "ranked_candidate_key": "primary",
+                    "zip_name": a_zip, "package_id": "p_a",
+                    "manifest": {"candidate_id": "cand_a",
+                                 "file_count": 1}},
+        "grid-1": {"complete": True, "kind": "TECHNOLOGY_PACKAGE",
+                   "candidate_id": "cand_b",
+                   "ranked_candidate_key": "grid-1",
+                   "zip_name": b_zip, "package_id": "p_b",
+                   "manifest": {"candidate_id": "cand_a",
+                                "file_count": 1}},
+    }
+    pkgs["by_candidate_id"] = {"cand_a": pkgs["packages"]["primary"],
+                               "cand_b": pkgs["packages"]["grid-1"]}
+    _write(run_dir, "RANKED_PACKAGE_RECORDS.json", pkgs)
+    ranked = rrs.derive_ranked_result_set(run_dir)
+    b_pkg = next(r for r in ranked["ranked_results"]
+                 if r["candidate_id"] == "cand_b")["components"][
+                     "package"]
+    assert b_pkg["complete"] is False, (
+        "a complete record whose manifest names a DIFFERENT candidate "
+        "than the record's own candidate is a cross-candidate package "
+        "— not a complete binding for that row")
+    v = rrs.verify_ranked_result_set(ranked, run_dir)
+    b_row = next(p for p in v["per_candidate"]
+                 if p["candidate_id"] == "cand_b")
+    assert b_row["candidate_binding_ok"] is False, (
+        f"the cross-candidate manifest must flag the binding "
+        f"failure; per_candidate={v['per_candidate']}")
+    assert v["verified"] is False
+    assert v["violations"]
