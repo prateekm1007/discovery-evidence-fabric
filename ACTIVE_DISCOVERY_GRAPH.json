@@ -1,260 +1,260 @@
 {
- "artifact_id": "ACTIVE_DISCOVERY_GRAPH",
- "entry_point": "discovery_fabric/engine/run.py::EngineRun.run()",
- "executable_chain": [
-  {
-   "order": 1,
-   "stage": "RETRIEVE",
-   "capability_id": "A2_RETRIEVAL",
-   "module_path": "discovery_fabric/retrieval_fabric/pipeline.py",
-   "canonical_fn": "retrieve_fabric(problem) [V2] / retrieve(problem) [V1]",
-   "production_impl": null,
-   "hermetic_instrument": null,
-   "needs_network": true,
-   "depends_on": []
-  },
-  {
-   "order": 2,
-   "stage": "FREEZE",
-   "capability_id": "EVIDENCE_FREEZE",
-   "module_path": "orchestrator/evidence_custody.py",
-   "canonical_fn": "promote_to_evidence(record, source, query, class, binding)",
-   "production_impl": null,
-   "hermetic_instrument": null,
-   "needs_network": false,
-   "depends_on": [
-    "RETRIEVE"
-   ]
-  },
-  {
-   "order": 3,
-   "stage": "PREMISE_GATE",
-   "capability_id": "PREMISE_GATE",
-   "module_path": "discovery_fabric/engine/premise_gate.py",
-   "canonical_fn": "check_premise(problem)",
-   "production_impl": null,
-   "hermetic_instrument": null,
-   "needs_network": false,
-   "depends_on": []
-  },
-  {
-   "order": 4,
-   "stage": "SYNTHESIZE",
-   "capability_id": "SYNTHESIS",
-   "module_path": "discovery_fabric/a2/synthesize.py",
-   "canonical_fn": "synthesize(problem, evidence)",
-   "production_impl": null,
-   "hermetic_instrument": null,
-   "needs_network": true,
-   "depends_on": [
-    "RETRIEVE"
-   ]
-  },
-  {
-   "order": 5,
-   "stage": "VERIFY",
-   "capability_id": "EVIDENCE_VERIFY",
-   "module_path": "discovery_fabric/a2/verify.py",
-   "canonical_fn": "verify_evidence(candidate, evidence)",
-   "production_impl": null,
-   "hermetic_instrument": null,
-   "needs_network": false,
-   "depends_on": [
-    "SYNTHESIZE"
-   ]
-  },
-  {
-   "order": 6,
-   "stage": "MECHANISM_SPACE",
-   "capability_id": "MECHANISM_SPACE",
-   "module_path": "discovery_fabric/engine/mechanism_space.py",
-   "canonical_fn": "build_mechanism_space(problem, evidence)",
-   "production_impl": "discovery_fabric/engine/adapters.py::_lean_mechanism_space (R453 lean path: FREEZE/VERIFY fact reuse, deterministic items, deterministic operator selection, at most ONE operator-instantiation LLM call, deterministic validation tail)",
-   "hermetic_instrument": "discovery_fabric/engine/mechanism_space.py::build_mechanism_space (full expansion; test-only, no production callers)",
-   "needs_network": true,
-   "depends_on": [
-    "RETRIEVE",
-    "SYNTHESIZE"
-   ]
-  },
-  {
-   "order": 7,
-   "stage": "COLLISION",
-   "capability_id": "COLLISION_ENGINE",
-   "module_path": "discovery_fabric/prior_art_v2/collision_resolution.py + discovery_fabric/a2/prior_art.py",
-   "canonical_fn": "run_collision (mechanism-centered) + search_prior_art",
-   "production_impl": null,
-   "hermetic_instrument": null,
-   "needs_network": true,
-   "depends_on": [
-    "SYNTHESIZE"
-   ]
-  },
-  {
-   "order": 8,
-   "stage": "PHYSICS",
-   "capability_id": "PHYSICS_GATE",
-   "module_path": "discovery_fabric/engine/physics_stage.py",
-   "canonical_fn": "evaluate_envelope_physics(env, run_ctx)",
-   "production_impl": null,
-   "hermetic_instrument": null,
-   "needs_network": false,
-   "depends_on": [
-    "SYNTHESIZE"
-   ]
-  },
-  {
-   "order": 9,
-   "stage": "ATTACK",
-   "capability_id": "ATTACK_ENGINE",
-   "module_path": "discovery_fabric/a2/adversarial.py",
-   "canonical_fn": "adversarial_challenge(candidate, evidence_verified, prior_art_state)",
-   "production_impl": null,
-   "hermetic_instrument": null,
-   "needs_network": true,
-   "depends_on": [
-    "SYNTHESIZE",
-    "VERIFY",
-    "COLLISION"
-   ]
-  },
-  {
-   "order": 10,
-   "stage": "CONTRADICTION",
-   "capability_id": "CONTRADICTION_QUEUE",
-   "module_path": "orchestrator/contradiction_queue.py",
-   "canonical_fn": "ContradictionQueue.add / to_dict",
-   "production_impl": null,
-   "hermetic_instrument": null,
-   "needs_network": false,
-   "depends_on": [
-    "ATTACK",
-    "COLLISION"
-   ]
-  },
-  {
-   "order": 11,
-   "stage": "KILLER_EXPERIMENT",
-   "capability_id": "KILLER_EXPERIMENT",
-   "module_path": "epistemic_integrity/invention_loop_engine/bayesian_eig.py",
-   "canonical_fn": "BayesianEIGCalculator.rank_experiments",
-   "production_impl": null,
-   "hermetic_instrument": null,
-   "needs_network": false,
-   "depends_on": [
-    "CONTRADICTION",
-    "SYNTHESIZE"
-   ]
-  },
-  {
-   "order": 12,
-   "stage": "ADJUDICATION",
-   "capability_id": "ADJUDICATION",
-   "module_path": "discovery_fabric/engine/adapters.py (glue over canonical inputs)",
-   "canonical_fn": "deterministic check aggregation",
-   "production_impl": null,
-   "hermetic_instrument": null,
-   "needs_network": false,
-   "depends_on": [
-    "VERIFY",
-    "ATTACK",
-    "CONTRADICTION",
-    "COLLISION"
-   ]
-  },
-  {
-   "order": 13,
-   "stage": "CLASSIFY",
-   "capability_id": "EPISTEMIC_CLASSIFICATION",
-   "module_path": "discovery_fabric/a2/classify.py",
-   "canonical_fn": "classify(candidate, evidence_verification, prior_art, adversarial)",
-   "production_impl": null,
-   "hermetic_instrument": null,
-   "needs_network": false,
-   "depends_on": [
-    "ADJUDICATION"
-   ]
-  },
-  {
-   "order": 14,
-   "stage": "NEXT_BEST_ACTION",
-   "capability_id": "NEXT_BEST_ACTION",
-   "module_path": "orchestrator/next_best_action.py",
-   "canonical_fn": "NextBestAction.rank_actions/select_best",
-   "production_impl": null,
-   "hermetic_instrument": null,
-   "needs_network": false,
-   "depends_on": [
-    "CONTRADICTION",
-    "KILLER_EXPERIMENT",
-    "ADJUDICATION"
-   ]
-  },
-  {
-   "order": 15,
-   "stage": "RANK",
-   "capability_id": "PORTFOLIO_RANKING",
-   "module_path": "orchestrator/portfolio.py + deterministic score in adapter",
-   "canonical_fn": "Portfolio.get_portfolio_scoreboard",
-   "production_impl": null,
-   "hermetic_instrument": null,
-   "needs_network": false,
-   "depends_on": [
-    "ADJUDICATION",
-    "NEXT_BEST_ACTION"
-   ]
+  "artifact_id": "ACTIVE_DISCOVERY_GRAPH",
+  "entry_point": "discovery_fabric/engine/run.py::EngineRun.run()",
+  "executable_chain": [
+    {
+      "order": 1,
+      "stage": "RETRIEVE",
+      "capability_id": "A2_RETRIEVAL",
+      "module_path": "discovery_fabric/retrieval_fabric/pipeline.py",
+      "canonical_fn": "retrieve_fabric(problem) [V2] / retrieve(problem) [V1]",
+      "production_impl": null,
+      "hermetic_instrument": null,
+      "needs_network": true,
+      "depends_on": []
+    },
+    {
+      "order": 2,
+      "stage": "FREEZE",
+      "capability_id": "EVIDENCE_FREEZE",
+      "module_path": "orchestrator/evidence_custody.py",
+      "canonical_fn": "promote_to_evidence(record, source, query, class, binding)",
+      "production_impl": null,
+      "hermetic_instrument": null,
+      "needs_network": false,
+      "depends_on": [
+        "RETRIEVE"
+      ]
+    },
+    {
+      "order": 3,
+      "stage": "PREMISE_GATE",
+      "capability_id": "PREMISE_GATE",
+      "module_path": "discovery_fabric/engine/premise_gate.py",
+      "canonical_fn": "check_premise(problem)",
+      "production_impl": null,
+      "hermetic_instrument": null,
+      "needs_network": false,
+      "depends_on": []
+    },
+    {
+      "order": 4,
+      "stage": "SYNTHESIZE",
+      "capability_id": "SYNTHESIS",
+      "module_path": "discovery_fabric/a2/synthesize.py",
+      "canonical_fn": "synthesize(problem, evidence)",
+      "production_impl": null,
+      "hermetic_instrument": null,
+      "needs_network": true,
+      "depends_on": [
+        "RETRIEVE"
+      ]
+    },
+    {
+      "order": 5,
+      "stage": "VERIFY",
+      "capability_id": "EVIDENCE_VERIFY",
+      "module_path": "discovery_fabric/a2/verify.py",
+      "canonical_fn": "verify_evidence(candidate, evidence)",
+      "production_impl": null,
+      "hermetic_instrument": null,
+      "needs_network": false,
+      "depends_on": [
+        "SYNTHESIZE"
+      ]
+    },
+    {
+      "order": 6,
+      "stage": "MECHANISM_SPACE",
+      "capability_id": "MECHANISM_SPACE",
+      "module_path": "discovery_fabric/engine/mechanism_space.py",
+      "canonical_fn": "build_mechanism_space(problem, evidence)",
+      "production_impl": "discovery_fabric/engine/adapters.py::_lean_mechanism_space (R453 lean path: FREEZE/VERIFY fact reuse, deterministic items, deterministic operator selection, at most ONE operator-instantiation LLM call, deterministic validation tail)",
+      "hermetic_instrument": "discovery_fabric/engine/mechanism_space.py::build_mechanism_space (full expansion; test-only, no production callers)",
+      "needs_network": true,
+      "depends_on": [
+        "RETRIEVE",
+        "SYNTHESIZE"
+      ]
+    },
+    {
+      "order": 7,
+      "stage": "COLLISION",
+      "capability_id": "COLLISION_ENGINE",
+      "module_path": "discovery_fabric/prior_art_v2/collision_resolution.py + discovery_fabric/a2/prior_art.py",
+      "canonical_fn": "run_collision (mechanism-centered) + search_prior_art",
+      "production_impl": null,
+      "hermetic_instrument": null,
+      "needs_network": true,
+      "depends_on": [
+        "SYNTHESIZE"
+      ]
+    },
+    {
+      "order": 8,
+      "stage": "PHYSICS",
+      "capability_id": "PHYSICS_GATE",
+      "module_path": "discovery_fabric/engine/physics_stage.py",
+      "canonical_fn": "evaluate_envelope_physics(env, run_ctx)",
+      "production_impl": null,
+      "hermetic_instrument": null,
+      "needs_network": false,
+      "depends_on": [
+        "SYNTHESIZE"
+      ]
+    },
+    {
+      "order": 9,
+      "stage": "ATTACK",
+      "capability_id": "ATTACK_ENGINE",
+      "module_path": "discovery_fabric/a2/adversarial.py",
+      "canonical_fn": "adversarial_challenge(candidate, evidence_verified, prior_art_state)",
+      "production_impl": null,
+      "hermetic_instrument": null,
+      "needs_network": true,
+      "depends_on": [
+        "SYNTHESIZE",
+        "VERIFY",
+        "COLLISION"
+      ]
+    },
+    {
+      "order": 10,
+      "stage": "CONTRADICTION",
+      "capability_id": "CONTRADICTION_QUEUE",
+      "module_path": "orchestrator/contradiction_queue.py",
+      "canonical_fn": "ContradictionQueue.add / to_dict",
+      "production_impl": null,
+      "hermetic_instrument": null,
+      "needs_network": false,
+      "depends_on": [
+        "ATTACK",
+        "COLLISION"
+      ]
+    },
+    {
+      "order": 11,
+      "stage": "KILLER_EXPERIMENT",
+      "capability_id": "KILLER_EXPERIMENT",
+      "module_path": "epistemic_integrity/invention_loop_engine/bayesian_eig.py",
+      "canonical_fn": "BayesianEIGCalculator.rank_experiments",
+      "production_impl": null,
+      "hermetic_instrument": null,
+      "needs_network": false,
+      "depends_on": [
+        "CONTRADICTION",
+        "SYNTHESIZE"
+      ]
+    },
+    {
+      "order": 12,
+      "stage": "ADJUDICATION",
+      "capability_id": "ADJUDICATION",
+      "module_path": "discovery_fabric/engine/adapters.py (glue over canonical inputs)",
+      "canonical_fn": "deterministic check aggregation",
+      "production_impl": null,
+      "hermetic_instrument": null,
+      "needs_network": false,
+      "depends_on": [
+        "VERIFY",
+        "ATTACK",
+        "CONTRADICTION",
+        "COLLISION"
+      ]
+    },
+    {
+      "order": 13,
+      "stage": "CLASSIFY",
+      "capability_id": "EPISTEMIC_CLASSIFICATION",
+      "module_path": "discovery_fabric/a2/classify.py",
+      "canonical_fn": "classify(candidate, evidence_verification, prior_art, adversarial)",
+      "production_impl": null,
+      "hermetic_instrument": null,
+      "needs_network": false,
+      "depends_on": [
+        "ADJUDICATION"
+      ]
+    },
+    {
+      "order": 14,
+      "stage": "NEXT_BEST_ACTION",
+      "capability_id": "NEXT_BEST_ACTION",
+      "module_path": "orchestrator/next_best_action.py",
+      "canonical_fn": "NextBestAction.rank_actions/select_best",
+      "production_impl": null,
+      "hermetic_instrument": null,
+      "needs_network": false,
+      "depends_on": [
+        "CONTRADICTION",
+        "KILLER_EXPERIMENT",
+        "ADJUDICATION"
+      ]
+    },
+    {
+      "order": 15,
+      "stage": "RANK",
+      "capability_id": "PORTFOLIO_RANKING",
+      "module_path": "orchestrator/portfolio.py + deterministic score in adapter",
+      "canonical_fn": "Portfolio.get_portfolio_scoreboard",
+      "production_impl": null,
+      "hermetic_instrument": null,
+      "needs_network": false,
+      "depends_on": [
+        "ADJUDICATION",
+        "NEXT_BEST_ACTION"
+      ]
+    }
+  ],
+  "conductor_side_effects": [
+    {
+      "trigger": "final REJECTED (research kill only)",
+      "action": "MECHANISM_CEMETERY append-only update",
+      "module_path": "orchestrator/mechanism_cemetery.py"
+    }
+  ],
+  "quarantined_not_in_graph": [
+    "KNOWLEDGE_GRAPH",
+    "SIMULATION",
+    "TEE_MECHANISM_EXTRACTION",
+    "TEE_MECHANISM_ABSTRACTION",
+    "TEE_CROSS_DOMAIN_TRANSFER",
+    "INVENTION_CORPUS_GENERATION"
+  ],
+  "credential_blocked_stages": [
+    "SYNTHESIZE (OPENROUTER_API_KEY)",
+    "ATTACK (NVIDIA_API_KEY or OPENROUTER_API_KEY)",
+    "PRIOR_ART_V2_ELITE_STACK (.env.keys)"
+  ],
+  "registry": "RUNTIME_CAPABILITY_REGISTRY.json",
+  "post_rank_operations": [
+    {
+      "operation": "IMPROVE",
+      "capability_id": "IMPROVE",
+      "module_path": "discovery_fabric/engine/improve_stage.py",
+      "canonical_fn": "improve_stage.run_improve",
+      "invocation": "post-rank Directive-1 kill-evidence point ONLY (run.py kill point, improve_payload present); never in the linear D8 chain since R515",
+      "needs_network": true,
+      "typed_outcomes": [
+        "CHILDREN_ADMITTED",
+        "NO_CHILD_ADMITTED",
+        "NO_KILL_EVIDENCE",
+        "IMPROVEMENT_BLOCKED_TRANSPORT",
+        "DISABLED_BY_OPERATOR",
+        "DEFERRED_TO_KILL_POINT"
+      ],
+      "record": "R515 (auditor directive Part A/B): the linear placeholder removed; the canonical mutation implementation unchanged and reachable exactly once, at the kill point"
+    }
+  ],
+  "refreshed_by": "R542 round (manual refresh; the r529 script rebuilds the executable chain from the adapters.py blob at the recorded commit)",
+  "refreshed_at_utc": "2026-09-27T18:49:18Z",
+  "refresh_rule": "machine-generated from discovery_fabric/engine/adapters.py (ADAPTERS registry + STAGE_ORDER) as read at generated_from_commit; per-capability attributes read from the adapter class",
+  "generated_from_commit": "2188b31aeeb810db151ec576326d3000913d0466",
+  "adapter_blob_sha": "6332e84c858fa21763a7893a9c413702182026f0",
+  "provenance_check": {
+    "verified": true,
+    "sha_from_show": "f259f2fe7b3b80eb0d53f02c15b15daf5b20b8755423fb064531416928f1d4bd",
+    "sha_from_blob": "f259f2fe7b3b80eb0d53f02c15b15daf5b20b8755423fb064531416928f1d4bd",
+    "n_stages_in_bytes": 15,
+    "has_adapters": true
   }
- ],
- "conductor_side_effects": [
-  {
-   "trigger": "final REJECTED (research kill only)",
-   "action": "MECHANISM_CEMETERY append-only update",
-   "module_path": "orchestrator/mechanism_cemetery.py"
-  }
- ],
- "quarantined_not_in_graph": [
-  "KNOWLEDGE_GRAPH",
-  "SIMULATION",
-  "TEE_MECHANISM_EXTRACTION",
-  "TEE_MECHANISM_ABSTRACTION",
-  "TEE_CROSS_DOMAIN_TRANSFER",
-  "INVENTION_CORPUS_GENERATION"
- ],
- "credential_blocked_stages": [
-  "SYNTHESIZE (OPENROUTER_API_KEY)",
-  "ATTACK (NVIDIA_API_KEY or OPENROUTER_API_KEY)",
-  "PRIOR_ART_V2_ELITE_STACK (.env.keys)"
- ],
- "registry": "RUNTIME_CAPABILITY_REGISTRY.json",
- "post_rank_operations": [
-  {
-   "operation": "IMPROVE",
-   "capability_id": "IMPROVE",
-   "module_path": "discovery_fabric/engine/improve_stage.py",
-   "canonical_fn": "improve_stage.run_improve",
-   "invocation": "post-rank Directive-1 kill-evidence point ONLY (run.py kill point, improve_payload present); never in the linear D8 chain since R515",
-   "needs_network": true,
-   "typed_outcomes": [
-    "CHILDREN_ADMITTED",
-    "NO_CHILD_ADMITTED",
-    "NO_KILL_EVIDENCE",
-    "IMPROVEMENT_BLOCKED_TRANSPORT",
-    "DISABLED_BY_OPERATOR",
-    "DEFERRED_TO_KILL_POINT"
-   ],
-   "record": "R515 (auditor directive Part A/B): the linear placeholder removed; the canonical mutation implementation unchanged and reachable exactly once, at the kill point"
-  }
- ],
- "refreshed_by": "scripts/r529_refresh_metadata.py",
- "refreshed_at_utc": "2026-09-25T07:48:02Z",
- "refresh_rule": "machine-generated from discovery_fabric/engine/adapters.py (ADAPTERS registry + STAGE_ORDER) as read at generated_from_commit; per-capability attributes read from the adapter class",
- "generated_from_commit": "62c560989556b126d00c7156bc199852ca1664e2",
- "adapter_blob_sha": "6332e84c858fa21763a7893a9c413702182026f0",
- "provenance_check": {
-  "verified": true,
-  "sha_from_show": "f259f2fe7b3b80eb0d53f02c15b15daf5b20b8755423fb064531416928f1d4bd",
-  "sha_from_blob": "f259f2fe7b3b80eb0d53f02c15b15daf5b20b8755423fb064531416928f1d4bd",
-  "n_stages_in_bytes": 15,
-  "has_adapters": true
- }
 }
