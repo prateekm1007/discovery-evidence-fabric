@@ -81,7 +81,7 @@ def main():
 
     # Check 1: Constitution must be present
     if not state.constitution_present:
-        print("❌ EPISTIC CONSTITUTION CHECK FAILED")
+        print("[FAIL] EPISTIC CONSTITUTION CHECK FAILED")
         print(f"   Constitution file missing: {CONSTITUTION_PATH}")
         print("   The repository cannot operate without the constitution.")
         print("   Restore EPISTEMIC_CONSTITUTION.md before committing.")
