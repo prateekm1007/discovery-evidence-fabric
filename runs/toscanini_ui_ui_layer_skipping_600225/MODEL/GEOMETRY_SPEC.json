@@ -1,0 +1,223 @@
+{
+  "spec_version": "1.1.0",
+  "canonical_family": "fluid",
+  "canonical_family_label": "Fluid systems",
+  "canonical_family_basis": {
+    "canonical_family": "fluid",
+    "label": "Fluid systems",
+    "basis": {
+      "source": "engineering_specification.why_this_domain.canonical_family (the upstream R445 authority \u2014 consumed, never re-derived)",
+      "ladder_step": 1,
+      "upstream_record": true
+    },
+    "archetype": "FLUID_DEVICE",
+    "archetype_basis": "registry routing: canonical family 'fluid' -> archetype 'FLUID_DEVICE'"
+  },
+  "technology_class": "FLUID_DEVICE",
+  "technology_class_role": "bridge geometry archetype (presentation routing, R445)",
+  "dimension_class": "ABSTRACT_PRESENTATION_UNITS",
+  "measurement_basis": "TOPOLOGY_ONLY",
+  "intervention_site": "3D printer",
+  "selection_basis": {
+    "family": "MEDICAL_DEVICE",
+    "label": "medical device architecture",
+    "score": 5,
+    "min_form_score": 3,
+    "score_table": [
+      {
+        "family": "VEHICLE",
+        "score": 3,
+        "hits": [
+          {
+            "keyword": "car",
+            "weight": 3,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "family": "MEDICAL_DEVICE",
+        "score": 5,
+        "hits": [
+          {
+            "keyword": "lumen",
+            "weight": 4,
+            "count": 1
+          },
+          {
+            "keyword": "patient",
+            "weight": 1,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "family": "FLUID_DEVICE",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "THERMAL_SYSTEM",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "MECHANICAL_COMPONENT",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "ELECTRONIC_SYSTEM",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "ENERGY_STORAGE",
+        "score": 0,
+        "hits": []
+      }
+    ],
+    "basis": {
+      "derived_from": [
+        "problem text",
+        "intervention site",
+        "recorded subsystem names"
+      ],
+      "rule": "highest keyword score wins; ties resolve by registry order; below the form threshold the generic architecture family is selected and labeled",
+      "deterministic": true
+    }
+  },
+  "components": [
+    {
+      "component_id": "device_body",
+      "label": "device body",
+      "form": "body",
+      "material_class": "polymer",
+      "mapped_from": null,
+      "structural": true,
+      "role": "fluid device body (structural presentation element)",
+      "recorded_aliases": []
+    },
+    {
+      "component_id": "flow_channel",
+      "label": "main flow channel",
+      "form": "channel",
+      "material_class": "conduit_power",
+      "mapped_from": null,
+      "structural": true,
+      "role": "main flow path (structural presentation element)",
+      "recorded_aliases": []
+    },
+    {
+      "component_id": "inlet_port",
+      "label": "inlet port",
+      "form": "port",
+      "material_class": "polymer",
+      "mapped_from": "termination interfaces (application-context-specific: source and sink boundaries)",
+      "structural": true,
+      "role": "inlet port (family-definitional presentation element of the fluid-device acceptance case; mapped subsystem recorded as alias)",
+      "recorded_aliases": [
+        "termination interfaces (application-context-specific: source and sink boundaries)"
+      ]
+    },
+    {
+      "component_id": "outlet_port",
+      "label": "outlet port",
+      "form": "port",
+      "material_class": "polymer",
+      "mapped_from": null,
+      "structural": true,
+      "role": "outlet port (family-definitional presentation element of the fluid-device acceptance case; mapped subsystem recorded as alias)",
+      "recorded_aliases": []
+    },
+    {
+      "component_id": "valve_stage",
+      "label": "flow-control valve stage",
+      "form": "valve",
+      "material_class": "machined_metal",
+      "mapped_from": null,
+      "structural": true,
+      "role": "flow-control stage (family-definitional presentation element of the fluid-device acceptance case; mapped subsystem recorded as alias)",
+      "recorded_aliases": []
+    },
+    {
+      "component_id": "chamber",
+      "label": "flow chamber",
+      "form": "slot",
+      "material_class": "polymer",
+      "mapped_from": "termination interfaces (patient / reservoir)",
+      "structural": false,
+      "role": "recorded subsystem 'termination interfaces (patient / reservoir)' mapped onto the flow chamber slot",
+      "recorded_aliases": []
+    },
+    {
+      "component_id": "module_01",
+      "label": "module: flow path / lumen architecture",
+      "form": "module",
+      "material_class": "polymer",
+      "mapped_from": "flow path / lumen architecture",
+      "structural": false,
+      "role": "recorded subsystem 'flow path / lumen architecture' (no canonical slot in the fluid device architecture; mounted as a labeled module)"
+    },
+    {
+      "component_id": "module_02",
+      "label": "module: pressure regulation element",
+      "form": "module",
+      "material_class": "polymer",
+      "mapped_from": "pressure regulation element",
+      "structural": false,
+      "role": "recorded subsystem 'pressure regulation element' (no canonical slot in the fluid device architecture; mounted as a labeled module)"
+    },
+    {
+      "component_id": "module_03",
+      "label": "module: sensing / feedback element (if closed-loop)",
+      "form": "module",
+      "material_class": "polymer",
+      "mapped_from": "sensing / feedback element (if closed-loop)",
+      "structural": false,
+      "role": "recorded subsystem 'sensing / feedback element (if closed-loop)' (no canonical slot in the fluid device architecture; mounted as a labeled module)"
+    }
+  ],
+  "interfaces": [
+    {
+      "interface_id": "flow_inlet_chamber",
+      "from": "inlet_port",
+      "to": "chamber",
+      "kind": "flow",
+      "material_class": "conduit_power",
+      "form": "conduit"
+    },
+    {
+      "interface_id": "flow_chamber_outlet",
+      "from": "chamber",
+      "to": "outlet_port",
+      "kind": "flow",
+      "material_class": "conduit_power",
+      "form": "conduit"
+    }
+  ],
+  "fidelity": {
+    "recorded_subsystems": [
+      "flow path / lumen architecture",
+      "pressure regulation element",
+      "sensing / feedback element (if closed-loop)",
+      "termination interfaces (application-context-specific: source and sink boundaries)",
+      "termination interfaces (patient / reservoir)"
+    ],
+    "mapped": [
+      "chamber",
+      "module_01",
+      "module_02",
+      "module_03"
+    ],
+    "structural_form_components": [
+      "device_body",
+      "flow_channel",
+      "inlet_port",
+      "outlet_port",
+      "valve_stage"
+    ],
+    "unmapped_note": "every recorded subsystem appears as a canonical slot, an alias, or a labeled module \u2014 the fidelity contract of the conceptual layer"
+  },
+  "spec_sha256": "d9c4fbc9639be3bb478978f5b82fe7171c702412898383bb300f23f3ef7693e3"
+}
