@@ -174,6 +174,18 @@ export interface RankedPackageView {
     geometryPresent: boolean;
     modelClass: string | null;
     limitations: string | null;
+    // R544: the engineering definition (the proposed-design
+    // statement from the candidate's own spec, verbatim) and the
+    // critical parameters (name/value/unit — honestly UNKNOWN when
+    // unsourced, never invented). Both ride the ranked record so
+    // the thread shows them without re-reading stage files.
+    definition: string | null;
+    parameters: Array<{
+      name: string;
+      value: string;
+      unit: string;
+      valueStatus: string;
+    }>;
   };
   experiment: {
     experiment: string | null;
@@ -198,6 +210,16 @@ export interface RankedPackageView {
     // package #N" resolves to THIS candidate's package, not a shared
     // /package surface for every ranked card).
     downloadUrl: string | null;
+    // R544: the independent package-quality gate posture, recorded by
+    // the engine on the package record (the gate runs on the promoted
+    // ZIP bytes). COMPLETE_CANDIDATE_PACKAGE (compiled + bound +
+    // hash-verified) is NOT the same claim as a quality-verified
+    // package; the buyer release is a separate bridge decision. The
+    // card renders this posture distinctly and never presents a
+    // candidate package as a buyer release unless the release path
+    // passed.
+    qualityVerified: "PASS" | "BLOCK" | "GATE_ERROR" | null;
+    qualityFailedGates: string[];
   };
   rankBasis: string | null;
 }

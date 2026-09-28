@@ -749,6 +749,16 @@ export interface RankedResultComponents {
     engineering_core?: Record<string, unknown>;
     model_class?: string | null;
     limitations?: string;
+    // R544: the engineering definition (the proposed-design statement
+    // from the candidate's own spec) and the critical parameters
+    // (name/value/unit — honestly UNKNOWN when unsourced).
+    definition?: string;
+    parameters?: {
+      name?: string;
+      value?: string;
+      unit?: string;
+      value_status?: string;
+    }[];
   };
   decisive_experiment?: {
     experiment?: string;
@@ -771,6 +781,11 @@ export interface RankedResultComponents {
     zip_sha256_measured?: string | null;
     zip_sha256_matches?: boolean;
     manifest?: unknown;
+    // R544: the independent package-quality gate posture (the engine
+    // runs the gate on the promoted ZIP bytes — never a recorded
+    // verdict read from a stale record).
+    quality_verified?: string | null;
+    quality_failed_gates?: string[];
   };
 }
 
@@ -850,6 +865,9 @@ export interface RankedPackage {
     zip_sha256_measured?: string | null;
     zip_sha256_matches?: boolean;
     manifest?: unknown;
+    // R544: the independent quality-gate posture (engine-recorded).
+    quality_verified?: string | null;
+    quality_failed_gates?: string[];
   };
   discovery_completed?: boolean;
 }

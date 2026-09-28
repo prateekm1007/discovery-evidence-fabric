@@ -766,6 +766,29 @@ export function deriveRankedPackages(
         geometryPresent: eng.geometry_present ?? false,
         modelClass: eng.model_class ?? null,
         limitations: eng.limitations ?? null,
+        // R544: definition + parameters, read verbatim from the
+        // ranked record (the engine projects them from the
+        // candidate's own spec — never derived client-side).
+        definition:
+          typeof eng.definition === "string" && eng.definition
+            ? eng.definition
+            : null,
+        parameters: (Array.isArray(eng.parameters)
+          ? eng.parameters
+          : []
+        )
+          .filter(
+            (p): p is Record<string, unknown> =>
+              !!p && typeof p === "object"
+          )
+          .map((p) => ({
+            name: typeof p.name === "string" ? p.name : "",
+            value: typeof p.value === "string" ? p.value : "",
+            unit: typeof p.unit === "string" ? p.unit : "",
+            valueStatus:
+              typeof p.value_status === "string" ? p.value_status : "",
+          }))
+          .filter((p) => p.name !== ""),
       },
       experiment: {
         experiment: exp.experiment ?? null,
@@ -800,6 +823,20 @@ export function deriveRankedPackages(
           (pkg.complete && pkg.candidate_id
             ? `/api/run/${detail.session_id}/package?candidate=${pkg.candidate_id}`
             : null),
+        // R544: the independent quality-gate posture rides the card
+        // verbatim from the engine's package record (never derived
+        // client-side). A candidate package is a deliverable; buyer
+        // release is a separate bridge decision.
+        qualityVerified:
+          pkg.quality_verified === "PASS" ||
+          pkg.quality_verified === "BLOCK" ||
+          pkg.quality_verified === "GATE_ERROR"
+            ? pkg.quality_verified
+            : null,
+        qualityFailedGates: Array.isArray(pkg.quality_failed_gates)
+          ? pkg.quality_failed_gates.filter(
+              (g): g is string => typeof g === "string")
+          : [],
       },
       rankBasis:
         r.rank_basis != null ? JSON.stringify(r.rank_basis) : null,

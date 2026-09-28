@@ -306,6 +306,32 @@ function Ranked({
             ) : null}
           </div>
         </div>
+        {/* R544: the engineering definition (the proposed-design
+            statement, verbatim from the candidate's own spec) and
+            the critical parameters (honestly UNKNOWN when
+            unsourced) — both ride the thread, never re-derived. */}
+        <div className="conv-ranked-cell">
+          <div className="faint">Engineering definition</div>
+          <div>
+            {r.engineering.definition || "not recorded (honest gap)"}
+          </div>
+        </div>
+        <div className="conv-ranked-cell">
+          <div className="faint">Parameters</div>
+          <div>
+            {r.engineering.parameters.length > 0 ? (
+              r.engineering.parameters.map((p, i) => (
+                <span key={i}>
+                  {i > 0 ? " · " : ""}
+                  {p.name}: {p.value}
+                  {p.unit ? ` ${p.unit}` : ""}
+                </span>
+              ))
+            ) : (
+              "not recorded (honest gap)"
+            )}
+          </div>
+        </div>
         <div className="conv-ranked-cell">
           <div className="faint">Decisive experiment</div>
           <div>
@@ -345,13 +371,31 @@ function Ranked({
       )}
           <div className="conv-ranked-pkg">
             {r.package.complete && r.package.downloadUrl ? (
-              <a
-                className="btn small primary"
-                href={r.package.downloadUrl}
-                download
-              >
-                Download technology package #{r.rank ?? "?"}
-              </a>
+              <>
+                <a
+                  className="btn small primary"
+                  href={r.package.downloadUrl}
+                  download
+                >
+                  Download technology package #{r.rank ?? "?"}
+                </a>
+                {/* R544: the independent quality-gate posture, read
+                    verbatim from the engine record. A candidate
+                    package is the candidate's deliverable; buyer
+                    release is a separate bridge decision — the card
+                    never presents one as the other. */}
+                <div className="faint" data-conv-pkg-posture>
+                  {r.package.qualityVerified === "PASS"
+                    ? "candidate package · independently quality-verified"
+                    : r.package.qualityVerified === "BLOCK"
+                      ? `candidate package · quality verification blocked${
+                          r.package.qualityFailedGates.length > 0
+                            ? ` (${r.package.qualityFailedGates.join(", ")})`
+                            : ""
+                        } — not a buyer release`
+                      : "candidate package · quality posture not yet recorded — not a buyer release"}
+                </div>
+              </>
             ) : r.package.kind === "ABSENT_KILLED" ? (
               <span className="faint">
                 Killed — no technology package
