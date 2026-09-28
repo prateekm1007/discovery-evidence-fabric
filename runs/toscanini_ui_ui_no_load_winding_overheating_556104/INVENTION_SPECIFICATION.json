@@ -1,0 +1,3344 @@
+{
+ "invention_id": {
+  "value": "inv:ui_no_load_winding_overheating_556104:f9c54d32bb64",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_no_load_winding_overheating_556104",
+   "device": "3-phase induction conveyor drive motor",
+   "failure": "Documented problem 'no-load winding overheating' concerning 3-phase induction conveyor drive motor. User-submitted engineering problem (session input): \"My 3-phase induction motor on a conveyor drive trips the thermal overload after about 20 minutes of no-load running. The winding resistance is balanced across phases and the supply voltage is stable at 400V. I need a mechanism that explains why it still overheats on no-load, and what would disprove \".  ROUTING: fra_rail_accidents: not queried — the failure query is free text and this source answers date-floor questions only (grammar: YYYY-MM-DD date floor ($where date >= X)). ROUTING: doe_osti: routing state SUSPENDED_RELEVANCE — measured relevance instability (R375: same fusion papers relevant 3 -> 0; pooled relevant-rate 0.175 pre-fix; DETERMINISM_GAP flagged in the R394 production audit) — records poison synthesis-feeding retrieval more than they feed it until relevance is semantically adjudicated; reinstatement: the Phase P1 semantic reranker lands (semantic relevance adjudication between query and record, replacing lexical overlap); flip to ACTIVE + a measured relevance re-run + worklog entry. [fra_rail_accidents] retrieval status NOT_QUERIED_GRAMMAR (planned query is free text; source grammar is a YYYY-MM-DD date floor (R443 routing decision, not absence)) — provider outcome recorded, not treated as absence (Art. XXI.3). [doe_osti] retrieval status NOT_QUERIED_SUSPENDED_RELEVANCE (engine routing decision (R399 W3): SUSPENDED_RELEVANCE — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "no-load winding overheating",
+   "constraint": "explanation must hold with balanced winding resistance and a stable 400V supply, and be falsifiable by a specified test"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:127273e4"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of 3-phase induction conveyor drive motor",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "A deviation between the observed and measured load torques, indicating room for further refinement of the electric drive digital twin observer controller, causes the 3-phase induction conveyor drive motor to draw excessive magnetizing reactive power during no-load operation, generating heat in the stator windings despite balanced phase resistance and a stable 400V supply.",
+   "intervention": "Integrate an observer controller into the 3-phase induction motor control loop to enable compensation of the disturbance variable acting load torque, thereby eliminating the deviation between the observed and measured load torques and reducing the no-load winding overheating.",
+   "expected_effect": "Magnetizing current decreases to the nameplate no-load value, core losses normalize, and winding temperature remains below the thermal overload trip threshold during extended no-load operation.",
+   "mechanism_source_span": "The results of the DT implementation recorded on the test bench demonstrate an effective disturbance compensation of the acting load torque by the observer controller. However, the results still show a deviation between the observed and measured load torques, indicating room for further refinement.",
+   "span_derivation": {
+    "n_shared": 15,
+    "shared_terms": [
+     "acting",
+     "between",
+     "compensation",
+     "controller",
+     "deviation",
+     "disturbance",
+     "further",
+     "indicating",
+     "load",
+     "measured",
+     "observed",
+     "observer",
+     "refinement",
+     "room",
+     "torque"
+    ],
+    "span_terms_n": 25,
+    "ratio": 0.6,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "Run the motor at no-load for 30 minutes while recording winding temperature; if the temperature exceeds the thermal overload trip threshold despite confirmed uniform air gap clearance and absence of any deviation between the observed and measured load torques, the mechanism is falsified.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.48550/arxiv.2607.05877",
+     "source_span": "The results of the DT implementation recorded on the test bench demonstrate an effective disturbance compensation of the acting load torque by the observer controller. However, the results still show a deviation between the observed and measured load torques, indicating room for further refinement."
+    }
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.23960/elc.v18n2.2587"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Power Analysis of 3 Phase Induction Motor Drive Conveyor 06 at PT. Mitrabara Adiperdana",
+   "mechanism": "Excessive no-load current caused by an air gap length deviation or rotor eccentricity increases core losses and magnetizing reactive power, generating heat in the stator windings despite balanced phase resistance and stable supply voltage.",
+   "intervention_site": "3-phase induction conveyor drive motor",
+   "expected_effect": "Magnetizing current decreases to the nameplate no-load value, core losses normalize, and winding temperature remains below the thermal overload trip threshold during extended no-load operation.",
+   "falsification_test": "Clamp a true-RMS ammeter on each supply phase during no-load running; if the measured no-load current is less than 40 percent of the full-load rated current and the motor does not trip after 30 minutes, the mechanism is disproven."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.23960/elc.v18n2.2587"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": "ADJACENT_COLLISION_CANDIDATES",
+   "prior_art_status": "RESOLVED_DIFFERENTIATED",
+   "multi_source_directions": {},
+   "differentiation_resolution_state": "RESOLVED_DIFFERENTIATED"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "RESOLVED_DIFFERENTIATED",
+   "legacy_status": "",
+   "differentiation_resolution": {
+    "state": "RESOLVED_DIFFERENTIATED",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "CLAIMS:0 ABSTRACT:10 TITLE:0",
+    "per_family": [
+     {
+      "family_id": "PA-FAM-01",
+      "representative": {
+       "patent_id": "US10804812B1",
+       "title": "Three phase AC/DC power converter with interleaved LLC converters",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/US10804812B1/en",
+       "assignee": "['Enersys Delaware Inc.']",
+       "publication_date": "2020-10-13"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "US10804812B1"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Three phase AC/DC power converter with interleaved LLC converters An AC/DC power converter includes an input port configured to receive an AC power signal, a first transformer coupled to the input port, the first transformer comprising first and second primary windings and at least a first secondary winding, and a second transformer coupled to the input port, &hellip;  An AC/DC power converter includes an input port configured to receive an AC power signal, a first transformer coupled to the input port, the first transformer comprising first and second primary windings and at least a first secondary winding, and a second transformer coupled to the input port, the second transformer comprising third and fourth primary windings and at least a second secondary winding. The first primary winding of the first transformer is coupled in series with the third primary winding of the second transformer, the second primary winding of the first transformer is coupled in series with the fourth primary winding of the second transformer, and the first secondary winding and the second secondary winding are coupled in parallel.",
+      "adjudicated_text_sha256": "bfc06a591e2e357476e09179baaae2abea453bb7a17ffb34e4e5186530978fc5",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "phase",
+        "winding"
+       ],
+       "distinguishing_terms_covered": [
+        "phase",
+        "winding"
+       ],
+       "distinguishing_terms_surviving": [
+        "acting",
+        "between",
+        "compensation",
+        "controller",
+        "deviation",
+        "disturbance",
+        "eliminating",
+        "induction",
+        "integrate",
+        "load",
+        "loop",
+        "measured",
+        "motor",
+        "observed",
+        "observer",
+        "overheating",
+        "thereby",
+        "torque",
+        "variable"
+       ],
+       "coverage_ratio": 0.095,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-02",
+      "representative": {
+       "patent_id": "US8981705B2",
+       "title": "PM brushless motor drive circuit topology and control",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/US8981705B2/en",
+       "assignee": "['Regal Beloit America, Inc.']",
+       "publication_date": "2015-03-17"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "US8981705B2"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "PM brushless motor drive circuit topology and control An inverter for a permanent magnet brushless dc machine, having a permanent magnet rotor and a set of stator windings, applies the full dc voltage provided to the inverter to each phase of the machine.  An inverter for a permanent magnet brushless dc machine, having a permanent magnet rotor and a set of stator windings, applies the full dc voltage provided to the inverter to each phase of the machine.",
+      "adjudicated_text_sha256": "1c25212b7e7a23d9a27f73cf20f2cfc91a4f5eb6f51c49af87c828cace33a88f",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "drive",
+        "motor",
+        "phase",
+        "winding"
+       ],
+       "distinguishing_terms_covered": [
+        "motor",
+        "phase",
+        "winding"
+       ],
+       "distinguishing_terms_surviving": [
+        "acting",
+        "between",
+        "compensation",
+        "controller",
+        "deviation",
+        "disturbance",
+        "eliminating",
+        "induction",
+        "integrate",
+        "load",
+        "loop",
+        "measured",
+        "observed",
+        "observer",
+        "overheating",
+        "thereby",
+        "torque",
+        "variable"
+       ],
+       "coverage_ratio": 0.143,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-03",
+      "representative": {
+       "patent_id": "CN107565865B",
+       "title": "A fault-tolerant dual vector predictive control method and device for a six- &hellip;",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/CN107565865B/en",
+       "assignee": "['华中科技大学']",
+       "publication_date": "2019-07-23"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "CN107565865B"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "A fault-tolerant dual vector predictive control method and device for a six- &hellip; The invention discloses a fault-tolerant dual vector predictive control method and device for a six-phase permanent magnet motor, comprising: acquiring the rotor position, speed and phase current of the six-phase motor; The fault opposite potential is obtained from the axis position of the faulty &hellip;  本发明公开了一种六相永磁电机的容错双矢量预测控制方法及装置，包括：获取六相电机的转子位置、转速及相电流；根据转子位置、转速、转子上的永磁体磁链及故障相轴线位置求得故障相反电势，并考虑故障相反电势建立电机变频器模型；根据故障相所在位置建立降阶电机数学模型；建立故障后的六相电机的开关表，得到各开关矢量对应的相电压，带入降阶电机数学模型，确定各开关矢量作用一个采样周期后的相电流预测值；评估各开关矢量对应的相电流预测值与相电流指令值之间的误差，选取产生最小误差的开关矢量作为最优开关矢量；将最优开关矢量与零矢量在采样周期内进行调制，确定最优开关矢量的占空比。本发明可有效抑制故障电机的电流谐波。 The invention discloses a fault-tolerant dual vector predictive control method and device for a six-phase permanent magnet motor, comprising: acquiring the rotor position, speed and phase current of the six-phase motor; The fault opposite potential is obtained from the axis position of the faulty phase, and the motor inverter model is established considering the fault opposite potential; the mathematical model of the reduced-order motor is established according to the position of the faulted phase; the sw",
+      "adjudicated_text_sha256": "f833c2e5302ba305e2a1494efca4b56860e4cba78ecb4b78976ec7ff9db7d5c6",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "motor",
+        "phase"
+       ],
+       "distinguishing_terms_covered": [
+        "motor",
+        "phase"
+       ],
+       "distinguishing_terms_surviving": [
+        "acting",
+        "between",
+        "compensation",
+        "controller",
+        "deviation",
+        "disturbance",
+        "eliminating",
+        "induction",
+        "integrate",
+        "load",
+        "loop",
+        "measured",
+        "observed",
+        "observer",
+        "overheating",
+        "thereby",
+        "torque",
+        "variable",
+        "winding"
+       ],
+       "coverage_ratio": 0.095,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-04",
+      "representative": {
+       "patent_id": "US4792740A",
+       "title": "Three-phase induction motor with single phase power supply",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/US4792740A/en",
+       "assignee": "['Smith Otto J M']",
+       "publication_date": "1988-12-20"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "US4792740A"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Three-phase induction motor with single phase power supply A three-phase induction motor is efficiently driven by a single phase power supply by, in one embodiment, splitting the three windings into six, connecting them in two symmetrical motors, with two of the winding pairs connected to each other. The resulting 4-terminal motor is placed across the &hellip;  A three-phase induction motor is efficiently driven by a single phase power supply by, in one embodiment, splitting the three windings into six, connecting them in two symmetrical motors, with two of the winding pairs connected to each other. The resulting 4-terminal motor is placed across the single phase supply with appropriate capacitors providing balanced currents. For better efficiency, feedback control, along with transformers, may be used. A similar feedback, transformer technique, may be used on a standard three terminal three-phase motor. Lastly, for such a motor, the foregoing techniques may be applied to a three wire residential power supply.",
+      "adjudicated_text_sha256": "11a5f27500a55de48f162263e062050bf84121588985afbd8e029a67076b489b",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "induction",
+        "motor",
+        "phase",
+        "winding"
+       ],
+       "distinguishing_terms_covered": [
+        "induction",
+        "motor",
+        "phase",
+        "winding"
+       ],
+       "distinguishing_terms_surviving": [
+        "acting",
+        "between",
+        "compensation",
+        "controller",
+        "deviation",
+        "disturbance",
+        "eliminating",
+        "integrate",
+        "load",
+        "loop",
+        "measured",
+        "observed",
+        "observer",
+        "overheating",
+        "thereby",
+        "torque",
+        "variable"
+       ],
+       "coverage_ratio": 0.19,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-05",
+      "representative": {
+       "patent_id": "SU279753A1",
+       "title": "POWER COEFFICIENT SENSOR",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/SU279753A1/en",
+       "assignee": "",
+       "publication_date": ""
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "SU279753A1"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "POWER COEFFICIENT SENSOR Known power factor sensors, containing a comparison unit, made on two rectifying bridges, each of which is connected to the windings of the executive relay, are not sufficiently reliable. In the proposed sensor, to increase reliability, a phase rotation unit is inserted, the input of which is &hellip;  ",
+      "adjudicated_text_sha256": "cc5b39b571a4a49cea74d513d0dfe0b241137e925217c5dfed28aebbb9ef3e6d",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "phase",
+        "winding"
+       ],
+       "distinguishing_terms_covered": [
+        "phase",
+        "winding"
+       ],
+       "distinguishing_terms_surviving": [
+        "acting",
+        "between",
+        "compensation",
+        "controller",
+        "deviation",
+        "disturbance",
+        "eliminating",
+        "induction",
+        "integrate",
+        "load",
+        "loop",
+        "measured",
+        "motor",
+        "observed",
+        "observer",
+        "overheating",
+        "thereby",
+        "torque",
+        "variable"
+       ],
+       "coverage_ratio": 0.095,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-06",
+      "representative": {
+       "patent_id": "US9252645B2",
+       "title": "Dc electrical machines",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/US9252645B2/en",
+       "assignee": "['Ge Energy Power Conversion Technology Ltd.']",
+       "publication_date": "2016-02-02"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "US9252645B2"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Dc electrical machines A dc electrical machine with a large number of phases. The machine includes a rotor and a stator assembly. The rotor has Np rotating field poles. The stator has Ns winding slots, where Ns/Np is a non-integer ratio. A stator winding includes a plurality of coils received in the winding slots and &hellip;  A dc electrical machine with a large number of phases. The machine includes a rotor and a stator assembly. The rotor has Np rotating field poles. The stator has Ns winding slots, where Ns/Np is a non-integer ratio. A stator winding includes a plurality of coils received in the winding slots and defines a plurality of stator phases. A power electronic switching assembly includes first and second dc load terminals that can be connected to external equipment and a plurality of switching modules. Each switching module includes power electronic devices and is connected to a respective stator coil. A first proportion of the switching modules are connected together in series between the first and second dc load terminals and a second proportion of the switching modules are connected together in series between the first and second dc load terminals to define two para",
+      "adjudicated_text_sha256": "dd17cbf2718048488d6b4ed61a9618df01cac6b51302e4be235d8a64f7101cf9",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "between",
+        "load",
+        "phase",
+        "winding"
+       ],
+       "distinguishing_terms_covered": [
+        "between",
+        "load",
+        "phase",
+        "winding"
+       ],
+       "distinguishing_terms_surviving": [
+        "acting",
+        "compensation",
+        "controller",
+        "deviation",
+        "disturbance",
+        "eliminating",
+        "induction",
+        "integrate",
+        "loop",
+        "measured",
+        "motor",
+        "observed",
+        "observer",
+        "overheating",
+        "thereby",
+        "torque",
+        "variable"
+       ],
+       "coverage_ratio": 0.19,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-07",
+      "representative": {
+       "patent_id": "JP3431506B2",
+       "title": "Multiple inverter device",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/JP3431506B2/en",
+       "assignee": "['株式会社東芝']",
+       "publication_date": "2003-07-28"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "JP3431506B2"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Multiple inverter device (57) [Claims] 1. An input transformer having a plurality of secondary windings and a plurality of unit inverter cells connected in series in n stages (n is a natural number) to form each phase, and combined with the input transformer. In a multiple inverter device that supplies power to a phase &hellip;  ",
+      "adjudicated_text_sha256": "9eaa70f1c2832504367f63a8e29bacbe557291671d4d5bd477acc5f37b63f6b6",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "phase",
+        "winding"
+       ],
+       "distinguishing_terms_covered": [
+        "phase",
+        "winding"
+       ],
+       "distinguishing_terms_surviving": [
+        "acting",
+        "between",
+        "compensation",
+        "controller",
+        "deviation",
+        "disturbance",
+        "eliminating",
+        "induction",
+        "integrate",
+        "load",
+        "loop",
+        "measured",
+        "motor",
+        "observed",
+        "observer",
+        "overheating",
+        "thereby",
+        "torque",
+        "variable"
+       ],
+       "coverage_ratio": 0.095,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-08",
+      "representative": {
+       "patent_id": "WO2013084531A1",
+       "title": "Magnetizing inrush current suppression device",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/WO2013084531A1/en",
+       "assignee": "['株式会社興電舎']",
+       "publication_date": "2013-06-13"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "WO2013084531A1"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Magnetizing inrush current suppression device Provided is a magnetizing inrush current suppression device that is capable of accurately computing residual fluxes of a three-phase transformer and suppressing a magnetizing inrush current. The magnetizing inrush current suppression device (10) is equipped with: a voltage measurement unit (1) for &hellip;  Provided is a magnetizing inrush current suppression device that is capable of accurately computing residual fluxes of a three-phase transformer and suppressing a magnetizing inrush current. The magnetizing inrush current suppression device (10) is equipped with: a voltage measurement unit (1) for measuring respective phase voltages of the transformer (23) and system voltages of the respective phases; an effective opening timing computation unit (2) for computing effective opening timing at which instantaneous values of the phase voltages of the three phases all converge to a value of zero; a core flux computation unit (3) for computing fluxes of the respective phases of the core of the transformer (23) by means of integration of the respective phase voltages; an effective residual flux computation unit (4) that takes, among the flux",
+      "adjudicated_text_sha256": "bb6134d63e408035a5219144229175e336fed4b69a2765e3d2e4bce69da0e61d",
+      "coverage": {
+       "coverage_class": "NONE",
+       "mechanism_overlap_terms": [
+        "phase"
+       ],
+       "distinguishing_terms_covered": [
+        "phase"
+       ],
+       "distinguishing_terms_surviving": [
+        "acting",
+        "between",
+        "compensation",
+        "controller",
+        "deviation",
+        "disturbance",
+        "eliminating",
+        "induction",
+        "integrate",
+        "load",
+        "loop",
+        "measured",
+        "motor",
+        "observed",
+        "observer",
+        "overheating",
+        "thereby",
+        "torque",
+        "variable",
+        "winding"
+       ],
+       "coverage_ratio": 0.048,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-09",
+      "representative": {
+       "patent_id": "CA3012838C",
+       "title": "Systems and methods for detecting turn-to-turn faults in windings",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/CA3012838C/en",
+       "assignee": "['General Electric Company']",
+       "publication_date": "2024-05-28"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "CA3012838C"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Systems and methods for detecting turn-to-turn faults in windings Embodiments of the disclosure relate to detecting turn-to-turn faults in one or more windings of various objects. In one implementation, a fault detector uses a differential protection algorithm to detect a turn-to-turn fault in a winding of a three-phase shunt reactor. Various voltage and current &hellip;  Embodiments of the disclosure relate to detecting turn-to-turn faults in one or more windings of various objects. In one implementation, a fault detector uses a differential protection algorithm to detect a turn-to-turn fault in a winding of a three-phase shunt reactor. Various voltage and current measurements carried out upon the three-phase shunt reactor are used to calculate a difference value between a voltage-based parameter and a current-based parameter. The voltage-based parameter is indicative of a normalized negative voltage imbalance and the current-based parameter is indicative of a normalized negative current imbalance. A turn-to-turn winding fault is declared when the difference value is not equal to zero.",
+      "adjudicated_text_sha256": "bb59d87681962927fb35b958407a4c7760560463124a92e23c0fdcec74a87c11",
+      "coverage": {
+       "coverage_class": "PARTIAL_COVER",
+       "mechanism_overlap_terms": [
+        "between",
+        "phase",
+        "winding"
+       ],
+       "distinguishing_terms_covered": [
+        "between",
+        "phase",
+        "winding"
+       ],
+       "distinguishing_terms_surviving": [
+        "acting",
+        "compensation",
+        "controller",
+        "deviation",
+        "disturbance",
+        "eliminating",
+        "induction",
+        "integrate",
+        "load",
+        "loop",
+        "measured",
+        "motor",
+        "observed",
+        "observer",
+        "overheating",
+        "thereby",
+        "torque",
+        "variable"
+       ],
+       "coverage_ratio": 0.143,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     },
+     {
+      "family_id": "PA-FAM-10",
+      "representative": {
+       "patent_id": "CN113364181B",
+       "title": "Reverse salient pole less rare earth permanent magnet synchronous motor rotor &hellip;",
+       "source_id": "google_patents",
+       "source_url": "https://patents.google.com/patent/CN113364181B/en",
+       "assignee": "['广东工业大学']",
+       "publication_date": "2022-08-23"
+      },
+      "family_size": 1,
+      "member_patent_ids": [
+       "CN113364181B"
+      ],
+      "evidence_tier": "ABSTRACT",
+      "claims_fetch_status": "CACHED (adjudicated text of record)",
+      "claims_fetch_path": "replay_cache",
+      "adjudicated_text_excerpt": "Reverse salient pole less rare earth permanent magnet synchronous motor rotor &hellip; The invention relates to the technical field of motor rotor structures, and more particularly, to an anti-salient rare-earth permanent magnet synchronous motor rotor and a motor thereof, including a rotor, and a plurality of permanent magnet groups and air slot groups are arranged on the rotor.  本发明涉及电机转子结构技术领域，更具体地，涉及一种反凸极少稀土永磁同步电机转子及其电机，包括转子，所述转子上设有多个永磁体组和空气槽组，所述永磁体组与空气槽组在所述转子上呈轮辐状交替设置；所述永磁体组包括设于所述转子外层的第一永磁体组和设于所述转子内层的第二永磁体组，所述第一永磁体组的充磁方向沿所述转子的径向延伸，所述第二永磁体组的充磁方向均与转子的圆周切向平行。本发明能够在提升或保持电机的电磁性能的同时缓解永磁电机对稀土材料的依赖性；还能够在弱磁控制策略下避免少稀土永磁电机中的非稀土永磁材料退磁的出现。 The invention relates to the technical field of motor rotor structures, and more particularly, to an anti-salient rare-earth permanent magnet synchronous motor rotor and a motor thereof, including a rotor, and a plurality of permanent magnet groups and air slot groups are arranged on the rotor. The permanent magnet group and the air slot group are alternately arranged in a spoke shape on the rotor; the permanent magnet group includes a first permanent magnet group arranged on the outer layer of the rotor and a second permanent magnet group arranged on th",
+      "adjudicated_text_sha256": "129f057df8f982bc09e56596bb34ae7ef8f597fbaf9c72df4248f63feb32e475",
+      "coverage": {
+       "coverage_class": "NONE",
+       "mechanism_overlap_terms": [
+        "motor"
+       ],
+       "distinguishing_terms_covered": [
+        "motor"
+       ],
+       "distinguishing_terms_surviving": [
+        "acting",
+        "between",
+        "compensation",
+        "controller",
+        "deviation",
+        "disturbance",
+        "eliminating",
+        "induction",
+        "integrate",
+        "load",
+        "loop",
+        "measured",
+        "observed",
+        "observer",
+        "overheating",
+        "phase",
+        "thereby",
+        "torque",
+        "variable",
+        "winding"
+       ],
+       "coverage_ratio": 0.048,
+       "thresholds_applied": {
+        "min_mechanism_overlap": 2,
+        "anticipation_coverage_ratio": 0.8
+       }
+      }
+     }
+    ],
+    "n_families": 10,
+    "n_search_errors": 0,
+    "search_errors": [],
+    "search_execution": {
+     "mandatory_complete": true,
+     "n_errors": 0,
+     "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+    },
+    "relevance_model_version": "collision_resolution/2.0.0",
+    "determinism_contract": {
+     "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+     "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+    },
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    },
+    "surviving_differentiators": [
+     "acting",
+     "between",
+     "compensation",
+     "controller",
+     "deviation",
+     "disturbance",
+     "eliminating",
+     "induction",
+     "integrate",
+     "load",
+     "loop",
+     "measured",
+     "motor",
+     "observed",
+     "observer",
+     "overheating",
+     "phase",
+     "thereby",
+     "torque",
+     "variable",
+     "winding"
+    ]
+   },
+   "nearest": [
+    {
+     "patent_id": "US10804812B1",
+     "title": "Three phase AC/DC power converter with interleaved LLC converters",
+     "url": "https://patents.google.com/patent/US10804812B1/en",
+     "family_id": "PA-FAM-01",
+     "family_size": 2,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_covered": [],
+     "distinguishing_terms_surviving": [
+      "air",
+      "bearing",
+      "blocked",
+      "circumferential",
+      "clearance",
+      "concentricity",
+      "feeler",
+      "gap",
+      "gauge",
+      "housing",
+      "length",
+      "machine",
+      "nominal",
+      "physical",
+      "point",
+      "restore",
+      "rotor",
+      "shim",
+      "uniform"
+     ],
+     "coverage_class": "MECHANISM_ONLY",
+     "coverage_ratio": 0.0
+    },
+    {
+     "patent_id": "US8981705B2",
+     "title": "PM brushless motor drive circuit topology and control",
+     "url": "https://patents.google.com/patent/US8981705B2/en",
+     "family_id": "PA-FAM-02",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "phase",
+      "rotor",
+      "voltage",
+      "winding"
+     ],
+     "distinguishing_terms_covered": [
+      "machine",
+      "rotor"
+     ],
+     "distinguishing_terms_surviving": [
+      "air",
+      "bearing",
+      "blocked",
+      "circumferential",
+      "clearance",
+      "concentricity",
+      "feeler",
+      "gap",
+      "gauge",
+      "housing",
+      "length",
+      "nominal",
+      "physical",
+      "point",
+      "restore",
+      "shim",
+      "uniform"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.105
+    },
+    {
+     "patent_id": "CN107565865B",
+     "title": "A fault-tolerant dual vector predictive control method and device for a six- &hellip;",
+     "url": "https://patents.google.com/patent/CN107565865B/en",
+     "family_id": "PA-FAM-03",
+     "family_size": 2,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "phase",
+      "rotor",
+      "voltage"
+     ],
+     "distinguishing_terms_covered": [
+      "rotor"
+     ],
+     "distinguishing_terms_surviving": [
+      "air",
+      "bearing",
+      "blocked",
+      "circumferential",
+      "clearance",
+      "concentricity",
+      "feeler",
+      "gap",
+      "gauge",
+      "housing",
+      "length",
+      "machine",
+      "nominal",
+      "physical",
+      "point",
+      "restore",
+      "shim",
+      "uniform"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.053
+    },
+    {
+     "patent_id": "US4792740A",
+     "title": "Three-phase induction motor with single phase power supply",
+     "url": "https://patents.google.com/patent/US4792740A/en",
+     "family_id": "PA-FAM-04",
+     "family_size": 2,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "balanced",
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_covered": [],
+     "distinguishing_terms_surviving": [
+      "air",
+      "bearing",
+      "blocked",
+      "circumferential",
+      "clearance",
+      "concentricity",
+      "feeler",
+      "gap",
+      "gauge",
+      "housing",
+      "length",
+      "machine",
+      "nominal",
+      "physical",
+      "point",
+      "restore",
+      "rotor",
+      "shim",
+      "uniform"
+     ],
+     "coverage_class": "MECHANISM_ONLY",
+     "coverage_ratio": 0.0
+    },
+    {
+     "patent_id": "SU279753A1",
+     "title": "POWER COEFFICIENT SENSOR",
+     "url": "https://patents.google.com/patent/SU279753A1/en",
+     "family_id": "PA-FAM-05",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_covered": [],
+     "distinguishing_terms_surviving": [
+      "air",
+      "bearing",
+      "blocked",
+      "circumferential",
+      "clearance",
+      "concentricity",
+      "feeler",
+      "gap",
+      "gauge",
+      "housing",
+      "length",
+      "machine",
+      "nominal",
+      "physical",
+      "point",
+      "restore",
+      "rotor",
+      "shim",
+      "uniform"
+     ],
+     "coverage_class": "MECHANISM_ONLY",
+     "coverage_ratio": 0.0
+    },
+    {
+     "patent_id": "US9252645B2",
+     "title": "Dc electrical machines",
+     "url": "https://patents.google.com/patent/US9252645B2/en",
+     "family_id": "PA-FAM-06",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "load",
+      "phase",
+      "rotor",
+      "winding"
+     ],
+     "distinguishing_terms_covered": [
+      "machine",
+      "rotor"
+     ],
+     "distinguishing_terms_surviving": [
+      "air",
+      "bearing",
+      "blocked",
+      "circumferential",
+      "clearance",
+      "concentricity",
+      "feeler",
+      "gap",
+      "gauge",
+      "housing",
+      "length",
+      "nominal",
+      "physical",
+      "point",
+      "restore",
+      "shim",
+      "uniform"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.105
+    },
+    {
+     "patent_id": "JP3431506B2",
+     "title": "Multiple inverter device",
+     "url": "https://patents.google.com/patent/JP3431506B2/en",
+     "family_id": "PA-FAM-07",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_covered": [],
+     "distinguishing_terms_surviving": [
+      "air",
+      "bearing",
+      "blocked",
+      "circumferential",
+      "clearance",
+      "concentricity",
+      "feeler",
+      "gap",
+      "gauge",
+      "housing",
+      "length",
+      "machine",
+      "nominal",
+      "physical",
+      "point",
+      "restore",
+      "rotor",
+      "shim",
+      "uniform"
+     ],
+     "coverage_class": "MECHANISM_ONLY",
+     "coverage_ratio": 0.0
+    },
+    {
+     "patent_id": "WO2013084531A1",
+     "title": "Magnetizing inrush current suppression device",
+     "url": "https://patents.google.com/patent/WO2013084531A1/en",
+     "family_id": "PA-FAM-08",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "phase",
+      "voltage"
+     ],
+     "distinguishing_terms_covered": [
+      "point"
+     ],
+     "distinguishing_terms_surviving": [
+      "air",
+      "bearing",
+      "blocked",
+      "circumferential",
+      "clearance",
+      "concentricity",
+      "feeler",
+      "gap",
+      "gauge",
+      "housing",
+      "length",
+      "machine",
+      "nominal",
+      "physical",
+      "restore",
+      "rotor",
+      "shim",
+      "uniform"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.053
+    },
+    {
+     "patent_id": "CA3012838C",
+     "title": "Systems and methods for detecting turn-to-turn faults in windings",
+     "url": "https://patents.google.com/patent/CA3012838C/en",
+     "family_id": "PA-FAM-09",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "phase",
+      "voltage",
+      "winding"
+     ],
+     "distinguishing_terms_covered": [],
+     "distinguishing_terms_surviving": [
+      "air",
+      "bearing",
+      "blocked",
+      "circumferential",
+      "clearance",
+      "concentricity",
+      "feeler",
+      "gap",
+      "gauge",
+      "housing",
+      "length",
+      "machine",
+      "nominal",
+      "physical",
+      "point",
+      "restore",
+      "rotor",
+      "shim",
+      "uniform"
+     ],
+     "coverage_class": "MECHANISM_ONLY",
+     "coverage_ratio": 0.0
+    },
+    {
+     "patent_id": "CN113364181B",
+     "title": "Reverse salient pole less rare earth permanent magnet synchronous motor rotor &hellip;",
+     "url": "https://patents.google.com/patent/CN113364181B/en",
+     "family_id": "PA-FAM-10",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "mechanism_overlap_terms": [
+      "air",
+      "rotor"
+     ],
+     "distinguishing_terms_covered": [
+      "air",
+      "circumferential",
+      "rotor"
+     ],
+     "distinguishing_terms_surviving": [
+      "bearing",
+      "blocked",
+      "clearance",
+      "concentricity",
+      "feeler",
+      "gap",
+      "gauge",
+      "housing",
+      "length",
+      "machine",
+      "nominal",
+      "physical",
+      "point",
+      "restore",
+      "shim",
+      "uniform"
+     ],
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.158
+    }
+   ],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "phase winding phases load resistance balanced"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "windings phase load balanced resistance voltage"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "gap air rotor length physical clearance"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "phase measurement magnetizing winding during operation"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "magnetizing current core losses decreases nameplate"
+    }
+   ],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Integrate an observer controller into the 3-phase induction motor control loop to enable compensation of the disturbance variable acting load torque, thereby eliminating the deviation between the observed and measured load torques and reducing the no-load winding overheating.",
+   "vs_nearest_prior_art": [
+    {
+     "patent_id": "US10804812B1",
+     "title": "Three phase AC/DC power converter with interleaved LLC converters",
+     "family_id": "PA-FAM-01",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.095,
+     "mechanism_overlap_terms": [
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_covered": [
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_surviving": [
+      "acting",
+      "between",
+      "compensation",
+      "controller",
+      "deviation",
+      "disturbance",
+      "eliminating",
+      "induction",
+      "integrate",
+      "load",
+      "loop",
+      "measured",
+      "motor",
+      "observed",
+      "observer",
+      "overheating",
+      "thereby",
+      "torque",
+      "variable"
+     ]
+    },
+    {
+     "patent_id": "US8981705B2",
+     "title": "PM brushless motor drive circuit topology and control",
+     "family_id": "PA-FAM-02",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.143,
+     "mechanism_overlap_terms": [
+      "drive",
+      "motor",
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_covered": [
+      "motor",
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_surviving": [
+      "acting",
+      "between",
+      "compensation",
+      "controller",
+      "deviation",
+      "disturbance",
+      "eliminating",
+      "induction",
+      "integrate",
+      "load",
+      "loop",
+      "measured",
+      "observed",
+      "observer",
+      "overheating",
+      "thereby",
+      "torque",
+      "variable"
+     ]
+    },
+    {
+     "patent_id": "CN107565865B",
+     "title": "A fault-tolerant dual vector predictive control method and device for a six- &hellip;",
+     "family_id": "PA-FAM-03",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.095,
+     "mechanism_overlap_terms": [
+      "motor",
+      "phase"
+     ],
+     "distinguishing_terms_covered": [
+      "motor",
+      "phase"
+     ],
+     "distinguishing_terms_surviving": [
+      "acting",
+      "between",
+      "compensation",
+      "controller",
+      "deviation",
+      "disturbance",
+      "eliminating",
+      "induction",
+      "integrate",
+      "load",
+      "loop",
+      "measured",
+      "observed",
+      "observer",
+      "overheating",
+      "thereby",
+      "torque",
+      "variable",
+      "winding"
+     ]
+    },
+    {
+     "patent_id": "US4792740A",
+     "title": "Three-phase induction motor with single phase power supply",
+     "family_id": "PA-FAM-04",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.19,
+     "mechanism_overlap_terms": [
+      "induction",
+      "motor",
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_covered": [
+      "induction",
+      "motor",
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_surviving": [
+      "acting",
+      "between",
+      "compensation",
+      "controller",
+      "deviation",
+      "disturbance",
+      "eliminating",
+      "integrate",
+      "load",
+      "loop",
+      "measured",
+      "observed",
+      "observer",
+      "overheating",
+      "thereby",
+      "torque",
+      "variable"
+     ]
+    },
+    {
+     "patent_id": "SU279753A1",
+     "title": "POWER COEFFICIENT SENSOR",
+     "family_id": "PA-FAM-05",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.095,
+     "mechanism_overlap_terms": [
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_covered": [
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_surviving": [
+      "acting",
+      "between",
+      "compensation",
+      "controller",
+      "deviation",
+      "disturbance",
+      "eliminating",
+      "induction",
+      "integrate",
+      "load",
+      "loop",
+      "measured",
+      "motor",
+      "observed",
+      "observer",
+      "overheating",
+      "thereby",
+      "torque",
+      "variable"
+     ]
+    },
+    {
+     "patent_id": "US9252645B2",
+     "title": "Dc electrical machines",
+     "family_id": "PA-FAM-06",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.19,
+     "mechanism_overlap_terms": [
+      "between",
+      "load",
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_covered": [
+      "between",
+      "load",
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_surviving": [
+      "acting",
+      "compensation",
+      "controller",
+      "deviation",
+      "disturbance",
+      "eliminating",
+      "induction",
+      "integrate",
+      "loop",
+      "measured",
+      "motor",
+      "observed",
+      "observer",
+      "overheating",
+      "thereby",
+      "torque",
+      "variable"
+     ]
+    },
+    {
+     "patent_id": "JP3431506B2",
+     "title": "Multiple inverter device",
+     "family_id": "PA-FAM-07",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.095,
+     "mechanism_overlap_terms": [
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_covered": [
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_surviving": [
+      "acting",
+      "between",
+      "compensation",
+      "controller",
+      "deviation",
+      "disturbance",
+      "eliminating",
+      "induction",
+      "integrate",
+      "load",
+      "loop",
+      "measured",
+      "motor",
+      "observed",
+      "observer",
+      "overheating",
+      "thereby",
+      "torque",
+      "variable"
+     ]
+    },
+    {
+     "patent_id": "WO2013084531A1",
+     "title": "Magnetizing inrush current suppression device",
+     "family_id": "PA-FAM-08",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "NONE",
+     "coverage_ratio": 0.048,
+     "mechanism_overlap_terms": [
+      "phase"
+     ],
+     "distinguishing_terms_covered": [
+      "phase"
+     ],
+     "distinguishing_terms_surviving": [
+      "acting",
+      "between",
+      "compensation",
+      "controller",
+      "deviation",
+      "disturbance",
+      "eliminating",
+      "induction",
+      "integrate",
+      "load",
+      "loop",
+      "measured",
+      "motor",
+      "observed",
+      "observer",
+      "overheating",
+      "thereby",
+      "torque",
+      "variable",
+      "winding"
+     ]
+    },
+    {
+     "patent_id": "CA3012838C",
+     "title": "Systems and methods for detecting turn-to-turn faults in windings",
+     "family_id": "PA-FAM-09",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "PARTIAL_COVER",
+     "coverage_ratio": 0.143,
+     "mechanism_overlap_terms": [
+      "between",
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_covered": [
+      "between",
+      "phase",
+      "winding"
+     ],
+     "distinguishing_terms_surviving": [
+      "acting",
+      "compensation",
+      "controller",
+      "deviation",
+      "disturbance",
+      "eliminating",
+      "induction",
+      "integrate",
+      "load",
+      "loop",
+      "measured",
+      "motor",
+      "observed",
+      "observer",
+      "overheating",
+      "thereby",
+      "torque",
+      "variable"
+     ]
+    },
+    {
+     "patent_id": "CN113364181B",
+     "title": "Reverse salient pole less rare earth permanent magnet synchronous motor rotor &hellip;",
+     "family_id": "PA-FAM-10",
+     "family_size": 1,
+     "evidence_tier": "ABSTRACT",
+     "coverage_class": "NONE",
+     "coverage_ratio": 0.048,
+     "mechanism_overlap_terms": [
+      "motor"
+     ],
+     "distinguishing_terms_covered": [
+      "motor"
+     ],
+     "distinguishing_terms_surviving": [
+      "acting",
+      "between",
+      "compensation",
+      "controller",
+      "deviation",
+      "disturbance",
+      "eliminating",
+      "induction",
+      "integrate",
+      "load",
+      "loop",
+      "measured",
+      "observed",
+      "observer",
+      "overheating",
+      "phase",
+      "thereby",
+      "torque",
+      "variable",
+      "winding"
+     ]
+    }
+   ],
+   "surviving_differentiators": [
+    "acting",
+    "between",
+    "compensation",
+    "controller",
+    "deviation",
+    "disturbance",
+    "eliminating",
+    "induction",
+    "integrate",
+    "load",
+    "loop",
+    "measured",
+    "motor",
+    "observed",
+    "observer",
+    "overheating",
+    "phase",
+    "thereby",
+    "torque",
+    "variable",
+    "winding"
+   ],
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.23960/elc.v18n2.2587"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "explanation must hold with balanced winding resistance and a stable 400V supply, and be falsifiable by a specified test",
+   "failure_mode_of_device": "no-load winding overheating",
+   "evidence_derived": [
+    {
+     "constraint": "The mechanism must account for a deviation between the observed and measured load torques, indicating room for further refinement of mechanical alignment, as the source of excess no-load heating.",
+     "evidence_id": "doi:10.48550/arxiv.2607.05877",
+     "span": "However, the results still show a deviation between the observed and measured load torques, indicating room for further refinement."
+    },
+    {
+     "constraint": "The mechanism must account for the deviation between the observed and measured load torques as reported by the electric drive digital twin test bench implementation (doi:10.48550/arxiv.2607.05877).",
+     "evidence_id": "doi:10.48550/arxiv.2607.05877",
+     "span": "The results of the DT implementation recorded on the test bench demonstrate an effective disturbance compensation of the acting load torque by the observer controller. However, the results still show a deviation between the observed and measured load torques, indicating room for further refinement."
+    }
+   ]
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:127273e4"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: The digital twin will pinpoint the root cause of the no-load overheating by comparing acquired operational data against the idealized digital model, allowing targeted correction of the identified faul",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-28T00:43:10.396035+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-28T00:43:10.396035+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.23960/elc.v18n2.2587",
+    "title": "Power Analysis of 3 Phase Induction Motor Drive Conveyor 06 at PT. Mitrabara Adiperdana",
+    "source_uri": "https://doi.org/10.23960/elc.v18n2.2587",
+    "doi": "10.23960/elc.v18n2.2587",
+    "content_hash": "d6efa7e04b8b4c65ae249522cfe2d60b5522786712e5838daf88b4dab8179876",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/s25082625",
+    "title": "Research and Prospects of Digital Twin-Based Fault Diagnosis of Electric Machines.",
+    "source_uri": "https://doi.org/10.3390/s25082625",
+    "doi": "10.3390/s25082625",
+    "content_hash": "c23a61a266d3e13821d330bcc4e2fcc1774dffc1e396ed66e09af71af5fecc4b",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/s26154789",
+    "title": "A Self-Tuning Minimal-Rule Fuzzy Logic Controller for High-Performance Induction Motor Drives.",
+    "source_uri": "https://doi.org/10.3390/s26154789",
+    "doi": "10.3390/s26154789",
+    "content_hash": "792ee850da055b416a22de569113be57e55f65458a2e01031ec98bbf38b4e27b",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2607.05877",
+    "title": "Implementation of an Electric Drive Digital Twin in a Networked Test Lab Environment",
+    "source_uri": "https://doi.org/10.48550/arxiv.2607.05877",
+    "doi": "10.48550/arxiv.2607.05877",
+    "content_hash": "ae2b05ad5a0445178c03014f0df7d3bf37030eaca53a024e6a766a477ed2addd",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1038/s41598-025-97549-4",
+    "title": "High precision experimentally validated adaptive neuro fuzzy inference system controller for DC motor drive system.",
+    "source_uri": "https://doi.org/10.1038/s41598-025-97549-4",
+    "doi": "10.1038/s41598-025-97549-4",
+    "content_hash": "36a81ae3ef6dc9091986e365323adbe3142dcf986e31e57ebb5825958901615f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1038/s41598-025-16818-4",
+    "title": "Optimizing switching sequences in AC-AC converters for enhanced safety and performance in conveyor systems.",
+    "source_uri": "https://doi.org/10.1038/s41598-025-16818-4",
+    "doi": "10.1038/s41598-025-16818-4",
+    "content_hash": "d18947b425ff59b9485149aa15eea5cbc347a72fe95cb6b89780a510195bf8ed",
+    "frozen": false
+   },
+   {
+    "id": "patent:PL226639B1",
+    "title": "Electric motor rotor with permanent magnets",
+    "source_uri": "https://patents.google.com/patent/PL226639B1/en",
+    "doi": null,
+    "content_hash": "c9f05bdba8ed16f8a1fae06782ca04b51c668ae29d9d64f0f9f670a3f29e459c",
+    "frozen": false
+   },
+   {
+    "id": "patent:US20200096988A1",
+    "title": "Systems and methods utilizing noise analysis to determine conveyor performance",
+    "source_uri": "https://patents.google.com/patent/US20200096988A1/en",
+    "doi": null,
+    "content_hash": "8f923edc196d0907ca8c1396d049848aa780987d66403ef6e1709bc48db606c6",
+    "frozen": false
+   },
+   {
+    "id": "patent:US20250013853A1",
+    "title": "System, methods and apparatus for modifying a data collection trajectory for &hellip;",
+    "source_uri": "https://patents.google.com/patent/US20250013853A1/en",
+    "doi": null,
+    "content_hash": "4687d06ed87fbe428e05626c474c53b8fb16277790429138e79df29b2a270258",
+    "frozen": false
+   },
+   {
+    "id": "patent:CN105589348B",
+    "title": "Monopole list current carrying path switching system and method",
+    "source_uri": "https://patents.google.com/patent/CN105589348B/en",
+    "doi": null,
+    "content_hash": "a6c1454be41a5d5741d3b24b62c368ace236dc19a74ed3b4cfaf59c43ad4191f",
+    "frozen": false
+   },
+   {
+    "id": "patent:US12003147B2",
+    "title": "Electric motor/generator",
+    "source_uri": "https://patents.google.com/patent/US12003147B2/en",
+    "doi": null,
+    "content_hash": "62f7558b93b200e287116b316e610fe91ff811a91d90eac75cb11b21ca1eb4c6",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5353/th_b3123211",
+    "title": "The design and evaluation of a microprocessor-controlled triac cycloconverter two-phase induction motor drive",
+    "source_uri": "https://doi.org/10.5353/th_b3123211",
+    "doi": "10.5353/th_b3123211",
+    "content_hash": "5178090644aee6cb6781cb899851de5cb5150268dcd4c5485f96a68da6fadef6",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5353/th_b3862873",
+    "title": "A new polygonal-winding permanent magnet brushless DC motor drive for electric vehicles",
+    "source_uri": "https://doi.org/10.5353/th_b3862873",
+    "doi": "10.5353/th_b3862873",
+    "content_hash": "cba439744bb487e0d4b085d40388a024c97c3b506dcf6a02300e2deb69c2a41a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5204/thesis.eprints.199908",
+    "title": "Slip control for trains using induction motor drive",
+    "source_uri": "https://doi.org/10.5204/thesis.eprints.199908",
+    "doi": "10.5204/thesis.eprints.199908",
+    "content_hash": "0168e6b48be1caefbae752dd4d1c4ccff8f917202a0243132b29ae4b2aa33897",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2311.00720",
+    "title": "Harmonic content analysis of a soft starting variable frequency motor drive based on FPGA",
+    "source_uri": "https://doi.org/10.48550/arxiv.2311.00720",
+    "doi": "10.48550/arxiv.2311.00720",
+    "content_hash": "2ff068cc98eeeb326fe344774bf79e814e71de9eb878caa557968a24bae08d29",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2110.07437",
+    "title": "Non-Invasive Fault Detection of Stator Windings of Induction Motors",
+    "source_uri": "https://doi.org/10.48550/arxiv.2110.07437",
+    "doi": "10.48550/arxiv.2110.07437",
+    "content_hash": "682d08a9febe1c6445adf920511843b883312794d3da56f81c232e8f875639ee",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.1410.6574",
+    "title": "Bifurcation and control of chaos in Induction motor drives",
+    "source_uri": "https://doi.org/10.48550/arxiv.1410.6574",
+    "doi": "10.48550/arxiv.1410.6574",
+    "content_hash": "13d9b22782906f554c035de8e184915c827ba2ec1fd7448976e2eea53a8e757d",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/tia.2005.858281",
+    "title": "Direct torque control for dual three-phase induction motor drives",
+    "source_uri": "https://doi.org/10.1109/tia.2005.858281",
+    "doi": "10.1109/tia.2005.858281",
+    "content_hash": "48528009936b9a879dd5445abb730fb0c5e36a6815428e79e948ea17a3e4040a",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/tec.2004.842396",
+    "title": "Analysis and design of a two-speed single-phase induction motor with 2 and 18 pole special windings",
+    "source_uri": "https://doi.org/10.1109/tec.2004.842396",
+    "doi": "10.1109/tec.2004.842396",
+    "content_hash": "58c4c4348479763d272abdf03e45740965879af05c456e6e7179371b24eaa158",
+    "frozen": false
+   },
+   {
+    "id": "title:73bdcb16cece10d6",
+    "title": "Energy Optimisation of Sensorless Induction Motor Drives Using a Novel Robust-Adaptive Flux Simulator",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "554ceedbe3f03dadbc60aae4c98e017a77d32860c5437ffa87734ab86b128698",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1049/iet-epa:20060342",
+    "title": "Multiphase induction motor drives - a technology status review",
+    "source_uri": "https://doi.org/10.1049/iet-epa:20060342",
+    "doi": "10.1049/iet-epa:20060342",
+    "content_hash": "3c2d778c47387fa6949909416d7e8bdeb2dbbc5d572f47161c49068098d3ad14",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1038/s41598-025-16818-4",
+   "doi:10.1038/s41598-025-97549-4",
+   "doi:10.1049/iet-epa:20060342",
+   "doi:10.1109/tec.2004.842396",
+   "doi:10.1109/tia.2005.858281",
+   "doi:10.23960/elc.v18n2.2587",
+   "doi:10.3390/s25082625",
+   "doi:10.3390/s26154789",
+   "doi:10.48550/arxiv.1410.6574",
+   "doi:10.48550/arxiv.2110.07437",
+   "doi:10.48550/arxiv.2311.00720",
+   "doi:10.48550/arxiv.2607.05877",
+   "doi:10.5204/thesis.eprints.199908",
+   "doi:10.5353/th_b3123211",
+   "doi:10.5353/th_b3862873",
+   "patent:CN105589348B",
+   "patent:PL226639B1",
+   "patent:US12003147B2",
+   "patent:US20200096988A1",
+   "patent:US20250013853A1",
+   "title:73bdcb16cece10d6"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "unresolved_source": "phase winding phases load resistance balanced",
+    "error": "HTTP 401: {\"reference\":\"f1922ce7-62ef-4bf7-8c12-ea0351bd6be0\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "windings phase load balanced resistance voltage",
+    "error": "HTTP 401: {\"reference\":\"4dba9040-048e-455b-95a8-d3f8d153eb13\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "gap air rotor length physical clearance",
+    "error": "HTTP 401: {\"reference\":\"c7dae8d6-1907-410c-b763-6cc0281480f0\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "phase measurement magnetizing winding during operation",
+    "error": "HTTP 401: {\"reference\":\"61748387-f02b-45f9-aaf1-c2fa6e9fd553\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "magnetizing current core losses decreases nameplate",
+    "error": "HTTP 401: {\"reference\":\"bbdad648-a711-489b-979b-f3f72bafc3f4\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Clamp a true-RMS ammeter on each supply phase during no-load running; if the measured no-load current is less than 40 percent of the full-load rated current and the motor does not trip after 30 minutes, the mechanism is disproven."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_no_load_winding_overheating_556104:2026-09-28T00:41:45",
+   "final_envelope_hash": "f9c54d32bb642deac0297b2653df29f018c3f79fadd1e1101122b9cc975ab19c",
+   "final_status": "UNKNOWN",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-28T00:43:10+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "UNKNOWN",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-28T00:44:25+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.23960/elc.v18n2.2587": {
+   "id": "doi:10.23960/elc.v18n2.2587",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.23960/elc.v18n2.2587",
+   "source_uri": "https://doi.org/10.23960/elc.v18n2.2587",
+   "title": "Power Analysis of 3 Phase Induction Motor Drive Conveyor 06 at PT. Mitrabara Adiperdana",
+   "abstract": "",
+   "doi": "10.23960/elc.v18n2.2587",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-28T00:42:32.068666+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d6efa7e04b8b4c65ae249522cfe2d60b5522786712e5838daf88b4dab8179876",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.23960/elc.v18n2.2587"
+    },
+    "queries_by_source": {
+     "crossref": "3-phase induction conveyor drive motor no-load winding overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.23960/elc.v18n2.2587",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load winding overheating",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.3390/s25082625": {
+   "id": "doi:10.3390/s25082625",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:40285313",
+   "source_uri": "https://doi.org/10.3390/s25082625",
+   "title": "Research and Prospects of Digital Twin-Based Fault Diagnosis of Electric Machines.",
+   "abstract": "This paper focuses on the application of digital twins in the field of electric motor fault diagnosis. Firstly, it explains the origin, concept, key technology and application areas of digital twins, compares and analyzes the advantages and disadvantages of digital twin technology and traditional methods in the application of electric motor fault diagnosis, discusses in depth the key technology of digital twins in electric motor fault diagnosis, including data acquisition and processing, digital modeling, data analysis and mining, visualization technology, etc., and enumerates digital twin application examples in the fields of induction motors, permanent magnet synchronous motors, wind turbines and other motor fields. A concept of multi-phase synchronous generator fault diagnosis based on digital twins is given, and challenges and future development directions are discussed.",
+   "doi": "10.3390/s25082625",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-04-21",
+   "retrieval_timestamp": "2026-09-28T00:42:32.068772+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c23a61a266d3e13821d330bcc4e2fcc1774dffc1e396ed66e09af71af5fecc4b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:40285313"
+    },
+    "queries_by_source": {
+     "europepmc": "3-phase induction conveyor drive motor no-load experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s25082625",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.3390/s26154789": {
+   "id": "doi:10.3390/s26154789",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42590566",
+   "source_uri": "https://doi.org/10.3390/s26154789",
+   "title": "A Self-Tuning Minimal-Rule Fuzzy Logic Controller for High-Performance Induction Motor Drives.",
+   "abstract": "This paper presents a self-tuning minimal-rule fuzzy logic controller for high-performance induction motor drives operating under field-oriented control. Unlike conventional full-rule fuzzy controllers and reduced-rule designs with fixed post-design scaling, the proposed method combines a fixed nine-rule Mamdani inference structure with a bounded online output gain adaptation mechanism. The nominal gain and adaptation sensitivity are determined offline using Particle Swarm Optimization, thereby retaining operating-condition responsiveness without requiring online optimization, rule reconstruction, or membership-function retuning. The closed-loop behavior is analyzed using a discrete-time Lyapunov framework derived from the induction motor mechanical dynamics under bounded disturbances. The controller is evaluated through fixed-step simulations incorporating measurement noise, 12-bit signal quantization, and a one-sample computational delay. Comparative results against a conventional PI controller and a classical 49-rule fuzzy controller show that the proposed scheme achieves a rise time of 0.15 s, a settling time of 0.26 s, a post-transient mean absolute tracking error of 4 RPM, negligible overshoot, and a torque ripple of approximately 0.44 Nm. Relative to the classical 49-rule FLC, the proposed design reduces the maximum number of fuzzy-rule evaluations per control update from 49 to 9, corresponding to an 81.6% reduction in structural fuzzy-inference complexity. The results indicate a favorable simulation-level trade-off between dynamic performance, disturbance rejection, and structural algorithmic simplicity. Generated-code SIL, Hardware-in-the-Loop testing, target-processor timing measurements, and experimental implementation remain necessary to establish practical embedded feasibility.",
+   "doi": "10.3390/s26154789",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-07-28",
+   "retrieval_timestamp": "2026-09-28T00:42:32.068814+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "792ee850da055b416a22de569113be57e55f65458a2e01031ec98bbf38b4e27b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42590566"
+    },
+    "queries_by_source": {
+     "europepmc": "3-phase induction conveyor drive motor no-load experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s26154789",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.48550/arxiv.2607.05877": {
+   "id": "doi:10.48550/arxiv.2607.05877",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:2b14552dce1c3999543173af1293df017b23dc28",
+   "source_uri": "https://doi.org/10.48550/arxiv.2607.05877",
+   "title": "Implementation of an Electric Drive Digital Twin in a Networked Test Lab Environment",
+   "abstract": "The concept of Digital Twin (DT) consists of a physical asset, a digital asset, and their bidirectional data exchange, differing the DT from concepts with lower level of integration. Availability of the bidirectional interconnection not only enables monitoring of system states but also allows automated control of the system. Leveraging the DT concept, this paper presents a practical implementation of an electric drive DT by means of a permanent magnet synchronous machine (PMSM) in a test lab environment. The approach aims to virtually sense the disturbance variable, here the acting load torque. By integrating an observer controller into the PMSM control loop, the DT enables compensation of the disturbance variable, which is not measurable in many applications. The results of the DT implementation recorded on the test bench demonstrate an effective disturbance compensation of the acting load torque by the observer controller. However, the results still show a deviation between the observed and measured load torques, indicating room for further refinement. This work serves as a first step towards further practical applications of the DT in the electric drive testing environment.",
+   "doi": "10.48550/arxiv.2607.05877",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-28T00:42:32.068844+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ae2b05ad5a0445178c03014f0df7d3bf37030eaca53a024e6a766a477ed2addd",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:2b14552dce1c3999543173af1293df017b23dc28"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.3390/s25082625"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "8865487257c754c2639134d8f54cd15413841f120fc7604ed59af1ea05767531",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.48550/arxiv.2607.05877",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.3390/s25082625",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Franz Liebich",
+    "Sebastian Pahnke",
+    "M. Stamann",
+    "Roberto Leidhold",
+    "Andreas Scholz"
+   ],
+   "raw_record_hash": "8865487257c754c2639134d8f54cd15413841f120fc7604ed59af1ea05767531",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  "doi:10.1038/s41598-025-97549-4": {
+   "id": "doi:10.1038/s41598-025-97549-4",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:40280982",
+   "source_uri": "https://doi.org/10.1038/s41598-025-97549-4",
+   "title": "High precision experimentally validated adaptive neuro fuzzy inference system controller for DC motor drive system.",
+   "abstract": "The control of a dc motor drive system is performed using two Proportional-Integral (PI) controllers, mostly comprising the outer (speed) and inner (torque) loops. However, the tuning of the PI controllers is challenging, because of the significant overshoot and substantial settling time. The overshoot cannot be absolutely removed without sacrificing the speediness. In this paper, an experimental implementation of Adaptive Neuro-Fuzzy Inference System (ANFIS) based high-precision controllers for a dc motor drive system is presented for eliminating the overshoot contemporaneously improving the settling time. In this regard, for fair comparison, Bode Plot method is used for obtaining most satisfactory values of K p and K i of both the controllers and the performance of the proposed ANFIS controllers is compared with the tuned PI controllers. For the sake of validation, an experimental setup, a 2-quadrant dc motor drive based on DS1104 R&D controller board from dSPACE is used. The designed ANFIS controllers are implemented and also authenticated using simulations. The obtained simulation as well as experimental results indicated that the ANFIS controller successfully eliminates the overshoot and significantly improves settling time. Thereby, outclass the tuned PI controllers by giving experimental results as 0% overshoot and just 0.18 s settling time.",
+   "doi": "10.1038/s41598-025-97549-4",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-04-25",
+   "retrieval_timestamp": "2026-09-28T00:42:32.068873+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "36a81ae3ef6dc9091986e365323adbe3142dcf986e31e57ebb5825958901615f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:40280982"
+    },
+    "queries_by_source": {
+     "europepmc": "3-phase induction conveyor drive motor no-load experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-025-97549-4",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load experimental comparison",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1038/s41598-025-16818-4": {
+   "id": "doi:10.1038/s41598-025-16818-4",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:40841831",
+   "source_uri": "https://doi.org/10.1038/s41598-025-16818-4",
+   "title": "Optimizing switching sequences in AC-AC converters for enhanced safety and performance in conveyor systems.",
+   "abstract": "This study investigates switching sequences in AC-AC converters for conveyor systems. The research explores commutation techniques, power quality concerns, and system performance. It aims to understand control strategies that impact power factor and stability. Safe commutation is crucial for industrial applications to ensure efficient operations. Various converter technologies are analyzed to optimize energy efficiency and reliability. The study focuses on minimizing harmonic distortion through effective switching approaches. Fault scenarios are evaluated to assess the converter response under fluctuating conditions. Protection mechanisms are also discussed for improving system safety and voltage stability. The findings contribute to enhancing the performance of industrial conveyor applications. Harmonic disturbances significantly affect power quality in AC-AC conversion systems. Proper switching techniques must be implemented to reduce electrical interference issues. The research highlights the importance of reliable commutation for operational continuity. Industrial systems require optimized control to maintain efficiency under variable loads. Fault conditions influence power stability and overall system functionality. Robust switching schemes are essential to minimizing operational risks and failures. The study findings provide insights into future advancements in AC-AC converters. It supports engineers in developing more effective industrial power management solutions. The research emphasizes innovative strategies for improving safety and efficiency. Ensuring stable power transmission is critical for the reliability of conveyor systems. The study provides contribution to advancing industrial power electronics and control methodologies.",
+   "doi": "10.1038/s41598-025-16818-4",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-08-21",
+   "retrieval_timestamp": "2026-09-28T00:42:32.068901+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d18947b425ff59b9485149aa15eea5cbc347a72fe95cb6b89780a510195bf8ed",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:40841831"
+    },
+    "queries_by_source": {
+     "europepmc": "3-phase induction conveyor drive motor no-load experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-025-16818-4",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load experimental comparison",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "patent:PL226639B1": {
+   "id": "patent:PL226639B1",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:PL226639B1",
+   "source_uri": "https://patents.google.com/patent/PL226639B1/en",
+   "title": "Electric motor rotor with permanent magnets",
+   "abstract": "1. Rotor of an electric motor with permanent magnets placed in slots in the rotor&#39;s yoke and with a starting winding located in slots on the circumference of the rotor, characterized in that the rotor winding (4) is three-phase made of insulated copper wire and is connected in a star or a triangle &hellip;",
+   "doi": null,
+   "patent_number": "PL226639B1",
+   "publication_number": "PL226639B1",
+   "publication_date": "2017-08-31",
+   "retrieval_timestamp": "2026-09-28T00:42:32.068932+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c9f05bdba8ed16f8a1fae06782ca04b51c668ae29d9d64f0f9f670a3f29e459c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:PL226639B1"
+    },
+    "queries_by_source": {
+     "google_patents": "3-phase induction conveyor drive motor no-load winding overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "f28c5cf51c8a2f7c81e5ba6ef5cf0746c5b71c55519c95c602538bb183c2c628",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:PL226639B1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load winding overheating",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "f28c5cf51c8a2f7c81e5ba6ef5cf0746c5b71c55519c95c602538bb183c2c628",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:US20200096988A1": {
+   "id": "patent:US20200096988A1",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:US20200096988A1",
+   "source_uri": "https://patents.google.com/patent/US20200096988A1/en",
+   "title": "Systems and methods utilizing noise analysis to determine conveyor performance",
+   "abstract": "Systems and methods utilizing noise analysis to analyze conveyor performance are disclosed. An example system for monitoring a plurality of components of a conveyor in an industrial environment may include a data acquisition circuit to interpret a plurality of detection values, each detection &hellip;",
+   "doi": null,
+   "patent_number": "US20200096988A1",
+   "publication_number": "US20200096988A1",
+   "publication_date": "2020-03-26",
+   "retrieval_timestamp": "2026-09-28T00:42:32.068963+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8f923edc196d0907ca8c1396d049848aa780987d66403ef6e1709bc48db606c6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:US20200096988A1"
+    },
+    "queries_by_source": {
+     "google_patents": "3-phase induction conveyor drive motor no-load winding overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "c8493aed298ae7c49c2ab23d9deafb636797f541e772dfb231831816a56c70fb",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:US20200096988A1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load winding overheating",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "c8493aed298ae7c49c2ab23d9deafb636797f541e772dfb231831816a56c70fb",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:US20250013853A1": {
+   "id": "patent:US20250013853A1",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:US20250013853A1",
+   "source_uri": "https://patents.google.com/patent/US20250013853A1/en",
+   "title": "System, methods and apparatus for modifying a data collection trajectory for &hellip;",
+   "abstract": "Systems, methods and apparatus for modifying a data collection trajectory for conveyors are described. An example system may include a data acquisition circuit to interpret a plurality of detection values, each corresponding to at least one of a plurality of input sensors communicatively coupled &hellip;",
+   "doi": null,
+   "patent_number": "US20250013853A1",
+   "publication_number": "US20250013853A1",
+   "publication_date": "2025-01-09",
+   "retrieval_timestamp": "2026-09-28T00:42:32.068990+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4687d06ed87fbe428e05626c474c53b8fb16277790429138e79df29b2a270258",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:US20250013853A1"
+    },
+    "queries_by_source": {
+     "google_patents": "3-phase induction conveyor drive motor no-load winding overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "be4ba2aa4847d256824c4667626649b8885bc8f4e574e04d58100fef2811e003",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:US20250013853A1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load winding overheating",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "be4ba2aa4847d256824c4667626649b8885bc8f4e574e04d58100fef2811e003",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:CN105589348B": {
+   "id": "patent:CN105589348B",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:CN105589348B",
+   "source_uri": "https://patents.google.com/patent/CN105589348B/en",
+   "title": "Monopole list current carrying path switching system and method",
+   "abstract": "A kind of embodiment describes a kind of three-phase electromechanical switching device, including：Three single-phase switch devices, be connected in parallel to each other machinery coupling and electric coupling.Each in single-phase switch device includes：Direct solenoid operator receives DC &hellip;",
+   "doi": null,
+   "patent_number": "CN105589348B",
+   "publication_number": "CN105589348B",
+   "publication_date": "2018-06-29",
+   "retrieval_timestamp": "2026-09-28T00:42:32.069017+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a6c1454be41a5d5741d3b24b62c368ace236dc19a74ed3b4cfaf59c43ad4191f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:CN105589348B"
+    },
+    "queries_by_source": {
+     "google_patents": "3-phase induction conveyor drive motor no-load winding overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "b7344740c12d839e8a15a639365ac10956f466068f7bc83f7fb06468ff6a4cf9",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:CN105589348B",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load winding overheating",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "b7344740c12d839e8a15a639365ac10956f466068f7bc83f7fb06468ff6a4cf9",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:US12003147B2": {
+   "id": "patent:US12003147B2",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:US12003147B2",
+   "source_uri": "https://patents.google.com/patent/US12003147B2/en",
+   "title": "Electric motor/generator",
+   "abstract": "Certain embodiments are directed to devices, methods, and/or systems that use electrical machines. For example, certain embodiments are directed to an electrical machine comprising: at least one stator at least one module, the at least one module comprising at least one electromagnetic coil and at &hellip;",
+   "doi": null,
+   "patent_number": "US12003147B2",
+   "publication_number": "US12003147B2",
+   "publication_date": "2024-06-04",
+   "retrieval_timestamp": "2026-09-28T00:42:32.069043+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "62f7558b93b200e287116b316e610fe91ff811a91d90eac75cb11b21ca1eb4c6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:US12003147B2"
+    },
+    "queries_by_source": {
+     "google_patents": "3-phase induction conveyor drive motor no-load winding overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "51039ab2456a6f1dc2fd8d80e0528d9faf51cbe43f6bed6ae8c17983616b14a7",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:US12003147B2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load winding overheating",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "51039ab2456a6f1dc2fd8d80e0528d9faf51cbe43f6bed6ae8c17983616b14a7",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "doi:10.5353/th_b3123211": {
+   "id": "doi:10.5353/th_b3123211",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5353/th_b3123211",
+   "source_uri": "https://doi.org/10.5353/th_b3123211",
+   "title": "The design and evaluation of a microprocessor-controlled triac cycloconverter two-phase induction motor drive",
+   "abstract": "",
+   "doi": "10.5353/th_b3123211",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-28T00:42:32.069072+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5178090644aee6cb6781cb899851de5cb5150268dcd4c5485f96a68da6fadef6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5353/th_b3123211"
+    },
+    "queries_by_source": {
+     "crossref": "3-phase induction conveyor drive motor no-load winding overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5353/th_b3123211",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load winding overheating",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.5353/th_b3862873": {
+   "id": "doi:10.5353/th_b3862873",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5353/th_b3862873",
+   "source_uri": "https://doi.org/10.5353/th_b3862873",
+   "title": "A new polygonal-winding permanent magnet brushless DC motor drive for electric vehicles",
+   "abstract": "",
+   "doi": "10.5353/th_b3862873",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-28T00:42:32.069099+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "cba439744bb487e0d4b085d40388a024c97c3b506dcf6a02300e2deb69c2a41a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5353/th_b3862873"
+    },
+    "queries_by_source": {
+     "crossref": "3-phase induction conveyor drive motor no-load winding overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5353/th_b3862873",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load winding overheating",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.5204/thesis.eprints.199908": {
+   "id": "doi:10.5204/thesis.eprints.199908",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.5204/thesis.eprints.199908",
+   "source_uri": "https://doi.org/10.5204/thesis.eprints.199908",
+   "title": "Slip control for trains using induction motor drive",
+   "abstract": "",
+   "doi": "10.5204/thesis.eprints.199908",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-28T00:42:32.069126+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0168e6b48be1caefbae752dd4d1c4ccff8f917202a0243132b29ae4b2aa33897",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.5204/thesis.eprints.199908"
+    },
+    "queries_by_source": {
+     "crossref": "3-phase induction conveyor drive motor no-load winding overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.5204/thesis.eprints.199908",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load winding overheating",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2311.00720": {
+   "id": "doi:10.48550/arxiv.2311.00720",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2311.00720v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2311.00720",
+   "title": "Harmonic content analysis of a soft starting variable frequency motor drive based on FPGA",
+   "abstract": "As the demands for electric vehicles, electric aircrafts, unmanned aircraft systems, and other motor-driven systems increase, high-performance motor drives employing variable frequency control with higher efficiency and reliability are becoming increasingly important parts of the ever-changing technological landscape. This study proposes a Field Programmable Gate Array (FPGA)-based variable frequency soft-starting motor drive for a three-phase induction motor. The inverter output voltage and the load currents are analyzed for the harmonic contents using MATLAB. In the experimental realization, a four-pole squirrel cage delta-connected induction motor is utilized with a switching frequency of 4 kHz. The current and voltage characteristics of the induction motor are studied under different operating conditions to study harmonic contents and the effect of changing soft-start duration. The findings demonstrate a low-cost, flexible control of the induction motor with improved harmonic performance.",
+   "doi": "10.48550/arxiv.2311.00720",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-28T00:42:32.069153+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "2ff068cc98eeeb326fe344774bf79e814e71de9eb878caa557968a24bae08d29",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2311.00720v1"
+    },
+    "queries_by_source": {
+     "arxiv": "3-phase induction conveyor drive motor no-load winding overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2311.00720",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load winding overheating",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2311.00720v1",
+   "authors": [
+    "Yogesh Sapkota",
+    "Suman Devkota",
+    "Vamsi Borra",
+    "Pedro Cortes",
+    "Frank Li",
+    "Srikanth Itapu"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2110.07437": {
+   "id": "doi:10.48550/arxiv.2110.07437",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2110.07437v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2110.07437",
+   "title": "Non-Invasive Fault Detection of Stator Windings of Induction Motors",
+   "abstract": "Condition monitoring of induction motor has been widely researched over recent years due to its ability to monitor operating characteristics and the health status of induction motor. Various methods have been used to monitor induction motors such as thermal monitoring and vibration analysis. This paper introduces an alternative method which is to use an inductive coupling method to extract in-circuit impedance of induction motor. This method allows for an online measurement of the system under test (SUT) preventing any unnecessary shutdowns. These unnecessary shutdowns may incur a loss of revenue for relevant industries that depends heavily on induction motor operations. Two sets of experiments were conducted in this paper, the first experiment was to examine the accuracy of the proposed method by simulating various SUT using simulated resistor, inductor, and capacitor (RLC) network. The next experiment was to detect incipient stator faults such as turn to turn faults in an induction motor. This proposed method measures the impedance of the stator winding of an induction motor to identify abnormalities. In addition, this method allows for an accurate in-circuit impedance measurement without the influence of motor load and frequency changes as well as faults such as bearing and rotor faults.",
+   "doi": "10.48550/arxiv.2110.07437",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-28T00:42:32.069181+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "682d08a9febe1c6445adf920511843b883312794d3da56f81c232e8f875639ee",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2110.07437v1"
+    },
+    "queries_by_source": {
+     "arxiv": "3-phase induction conveyor drive motor no-load winding overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2110.07437",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load winding overheating",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2110.07437v1",
+   "authors": [
+    "Rayyan Bin Fairuz"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.1410.6574": {
+   "id": "doi:10.48550/arxiv.1410.6574",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1410.6574v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1410.6574",
+   "title": "Bifurcation and control of chaos in Induction motor drives",
+   "abstract": "The induction motor controlled by Indirect Field Oriented Control (IFOC) is known to have high performance and better stability. This paper reports the dynamical behavior of an indirect field oriented control (IFOC) induction motor drive in the light of bifurcation theory. The speed of high performance induction motor drive is controlled by IFOC method. The knowledge of qualitative change of the behavior of the motor such as equilibrium points, limit cycles and chaos with the change of motor parameters and load torque are essential for proper control of the motor. This paper provides a numerical approach to understand better the dynamical behavior of an indirect field oriented control of a current-fed induction motor. The focus is on bifurcation analysis of the IFOC motor, with a particular emphasis on the change that affects the dynamics and stability under small variations of Proportional Integral controller (PI) parameters, load torque and k, the ratio of the rotor time constant and its estimate etc. Bifurcation diagrams are computed. This paper also attempts to discuss various types of the transition to chaos in the induction motor. The results of the obtained bifurcation simulations give useful guidelines for adjusting both motor model and PI controller parameters. It is also important to ensure desired operation of the motor when the motor shows chaotic behavior. Infinite numbers of unstable periodic orbits are embedded in a chaotic attractor. Any unstable periodic orbit can be stabilized by proper control algorithm. The delayed feedback control method to control chaos has been implemented in this system.",
+   "doi": "10.48550/arxiv.1410.6574",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-28T00:42:32.069207+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "13d9b22782906f554c035de8e184915c827ba2ec1fd7448976e2eea53a8e757d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1410.6574v1"
+    },
+    "queries_by_source": {
+     "arxiv": "3-phase induction conveyor drive motor no-load winding overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1410.6574",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load winding overheating",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/1410.6574v1",
+   "authors": [
+    "Krishnendu Chakrabarty",
+    "Urmila Kar"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.1109/tia.2005.858281": {
+   "id": "doi:10.1109/tia.2005.858281",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:4790666",
+   "source_uri": "https://doi.org/10.1109/tia.2005.858281",
+   "title": "Direct torque control for dual three-phase induction motor drives",
+   "abstract": "A direct torque control (DTC) strategy for dual three-phase induction motor drives is discussed in this paper. The induction machine has two sets of stator three-phase windings spatially shifted by 30 electrical degrees. The DTC strategy is based on a predictive algorithm and is implemented in a synchronous reference frame aligned with the machine stator flux vector. The advantages of the discussed control strategy are constant inverter switching frequency, good transient and steady-state performance, and low distortion of machine currents with respect to direct self-control (DSC) and other DTC schemes with variable switching frequency. Experimental results are presented for a 10-kW DTC dual three-phase induction motor drive prototype",
+   "doi": "10.1109/tia.2005.858281",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-28T00:42:32.069236+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "48528009936b9a879dd5445abb730fb0c5e36a6815428e79e948ea17a3e4040a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:4790666"
+    },
+    "queries_by_source": {
+     "core": "3-phase induction conveyor drive motor no-load experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1109/tia.2005.858281",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load experimental comparison",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Profumo, Francesco",
+    "R. Bojoi",
+    "Farina, Francesco",
+    "BOJOI, IUSTIN RADU",
+    "Bojoi, R.",
+    "Tenconi, Alberto",
+    "A. Tenconi",
+    "Griva, Giovanni Battista",
+    "G. Griva",
+    "F. Profumo",
+    "F. Farina"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1109/tec.2004.842396": {
+   "id": "doi:10.1109/tec.2004.842396",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:407396",
+   "source_uri": "https://doi.org/10.1109/tec.2004.842396",
+   "title": "Analysis and design of a two-speed single-phase induction motor with 2 and 18 pole special windings",
+   "abstract": "The motor presented employs multiple independent windings for operation with two very different pole numbers. The 18-pole field is produced with a symmetrical three-phase winding connected in a Steinmetz arrangement to a single-phase supply. A unified analysis method has been developed and used to demonstrate the equivalence of a Steinmetz delta or star connection with a main and auxiliary winding of a single-phase motor. The method has been experimentally validated and also included are some specific motor design considerations",
+   "doi": "10.1109/tec.2004.842396",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-28T00:42:32.069261+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "58c4c4348479763d272abdf03e45740965879af05c456e6e7179371b24eaa158",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:407396"
+    },
+    "queries_by_source": {
+     "core": "3-phase induction conveyor drive motor no-load winding overheating"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1109/tec.2004.842396",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load winding overheating",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Dellinger, S.J.",
+    "McGilp, M.I.",
+    "Miller, T.J.E.",
+    "Ionel, D.M.",
+    "Popescu, M."
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:73bdcb16cece10d6": {
+   "id": "title:73bdcb16cece10d6",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:371298041",
+   "source_uri": "",
+   "title": "Energy Optimisation of Sensorless Induction Motor Drives Using a Novel Robust-Adaptive Flux Simulator",
+   "abstract": "Modern drive systems should have improved reliability and one solution is the reduction or elimination of the number of speed sensors while maximizing the efficiency of motor and drive systems. The paper presents the development of a novel robust-adaptive-flux simulator which is used for the energy optimisation of sensorless induction motor drives. The closed loop system contains a predictive current controller and an observer which is robust against parameters variation. The estimated values of the rotor magnetic flux are used to determine the motor core losses by the robust-adaptive observer. Particle Swarm Optimisation (PSO) algorithm is used for the optimization of rotor speed so the motor losses are minimized and so the motor efficiency is increased. The simulated results show that the proposed sensorless control strategy ensures that the drive system has high dynamic performance for a wide range of rotor speeds and leads to a significant energy saving under different load operating conditions",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-28T00:42:32.069288+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "554ceedbe3f03dadbc60aae4c98e017a77d32860c5437ffa87734ab86b128698",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:371298041"
+    },
+    "queries_by_source": {
+     "core": "3-phase induction conveyor drive motor no-load experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:73bdcb16cece10d6",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Pislaru, Crinela",
+    "Ball, Andrew",
+    "Ashari, Djoni"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1049/iet-epa:20060342": {
+   "id": "doi:10.1049/iet-epa:20060342",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:4806862",
+   "source_uri": "https://doi.org/10.1049/iet-epa:20060342",
+   "title": "Multiphase induction motor drives - a technology status review",
+   "abstract": "The area of multiphase variable-speed motor drives in general and multiphase induction motor drives in particular has experienced a substantial growth since the beginning of this century. Research has been conducted worldwide and numerous interesting developments have been reported in the literature. An attempt is made to provide a detailed overview of the current state-of-the-art in this area. The elaborated aspects include advantages of multiphase induction machines, modelling of multiphase induction machines, basic vector control and direct torque control schemes and PWM control of multiphase voltage source inverters. The authors also provide a detailed survey of the control strategies for five-phase and asymmetrical six-phase induction motor drives, as well as an overview of the approaches to the design of fault tolerant strategies for post-fault drive operation, and a discussion of multiphase multi-motor drives with single inverter supply. Experimental results, collected from various multiphase induction motor drive laboratory rigs, are also included to facilitate the understanding of the drive operatio",
+   "doi": "10.1049/iet-epa:20060342",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-28T00:42:32.069313+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3c2d778c47387fa6949909416d7e8bdeb2dbbc5d572f47161c49068098d3ad14",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:4806862"
+    },
+    "queries_by_source": {
+     "core": "3-phase induction conveyor drive motor no-load experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1049/iet-epa:20060342",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3-phase induction conveyor drive motor no-load experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Williamson, S",
+    "H. A. TOLIYAT",
+    "S. WILLIAMSON",
+    "Levi, E",
+    "Bojoi, R",
+    "Toliyat, H.A.",
+    "Toliyat, HA",
+    "Levi, E.",
+    "Williamson, S.",
+    "Profumo, Francesco",
+    "E. LEVI",
+    "Profumo, F",
+    "Bojoi, Iustin Radu"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:127273e4": {
+   "id": "problem:127273e4",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "127273e43c73ab9dfd2e0abfa3bbcba3a85502f3290f31a08a29c000d52e5706",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "UNKNOWN",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-28T00:44:25+00:00Z"
+ },
+ "_improvement": {
+  "parent_spec_hash": "ae17a178da877ce8dcbaa0c4ceff240b0faec637128d7f819d68e542a8b3d072",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:a761da0669b2",
+   "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.347,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:d5e95a13e75b",
+    "provider": "xkiro",
+    "model": "qwen/qwen3-max:free",
+    "prompt_hash": "c2f963c9a18860a0e5a58e9c831a53a3f53034ff6b593a58b3152ec45cde9166",
+    "output_hash": "d5e95a13e75b648024e341652b3193c9a3ec5e23311c6834af1239707164cd13",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.48550/arxiv.2607.05877",
+     "span_verbatim_in_evidence": true,
+     "evidence_support": 0.449,
+     "evidence_support_cleared": 0.449,
+     "constraint_traceable_to_evidence": "The mechanism must account for the deviation between the observed and measured load torques as reported by the electric "
+    },
+    "reasons": [],
+    "validated_at": "2026-09-28T00:46:08+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "Excessive no-load current caused by a deviation between the observed and measured load torques, indicating room for further refinement of the air gap or rotor concentricity, increases core losses and magnetizing reactive power, generating heat in the stator windings despite balanced phase resistance",
+     "after": "A deviation between the observed and measured load torques, indicating room for further refinement of the electric drive digital twin observer controller, causes the 3-phase induction conveyor drive motor to draw excessive magnetizing reactive power during no-load operation, generating heat in the s"
+    },
+    "intervention": {
+     "before": "Measure the physical air gap clearance at multiple circumferential points using a feeler gauge with the rotor blocked to eliminate the deviation between the observed and measured load torques, then re-shim or re-machine the bearing housings to restore uniform concentricity and nominal air gap length",
+     "after": "Integrate an observer controller into the 3-phase induction motor control loop to enable compensation of the disturbance variable acting load torque, thereby eliminating the deviation between the observed and measured load torques and reducing the no-load winding overheating."
+    },
+    "mechanism_source_span": {
+     "before": "However, the results still show a deviation between the observed and measured load torques, indicating room for further refinement.",
+     "after": "The results of the DT implementation recorded on the test bench demonstrate an effective disturbance compensation of the acting load torque by the observer controller. However, the results still show a deviation between the observed and measured load torques, indicating room for further refinement."
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "phase winding phases load resistance balanced",
+     "windings phase load balanced resistance voltage",
+     "gap air rotor length physical clearance",
+     "phase measurement magnetizing winding during operation",
+     "magnetizing current core losses decreases nameplate"
+    ],
+    "collision_family_ids": [
+     "PA-FAM-01",
+     "PA-FAM-02",
+     "PA-FAM-03",
+     "PA-FAM-04",
+     "PA-FAM-05",
+     "PA-FAM-06",
+     "PA-FAM-07",
+     "PA-FAM-08",
+     "PA-FAM-09",
+     "PA-FAM-10"
+    ],
+    "source_errors": []
+   },
+   "parent_spec_hash": "ae17a178da877ce8dcbaa0c4ceff240b0faec637128d7f819d68e542a8b3d072",
+   "child_spec_hash": null,
+   "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness (measured 0.347) by re-anchoring the mechanism vocabulary in verbatim terms from the cited evidence span and adding an evidence-derived constraint.",
+   "applied_at": "2026-09-28T00:46:08+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:d9489a341cf5",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.171,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:530e55b6b494",
+     "provider": "xkiro",
+     "model": "qwen/qwen3-max:free",
+     "prompt_hash": "b077b9af0c5f50373bf89cf685865973c697a78c98ade8357d9af053ba696c5a",
+     "output_hash": "530e55b6b4942f388deaf7ab0ecd312b3ee1a974faddc2894019604cff58d6e7",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.48550/arxiv.2607.05877",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.245,
+      "evidence_support_cleared": 0.245,
+      "constraint_traceable_to_evidence": "The mechanism must account for a deviation between the observed and measured load torques, indicating room for further r"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-28T00:45:37+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Excessive no-load current caused by an air gap length deviation or rotor eccentricity increases core losses and magnetizing reactive power, generating heat in the stator windings despite balanced phase resistance and stable supply voltage.",
+      "after": "Excessive no-load current caused by a deviation between the observed and measured load torques, indicating room for further refinement of the air gap or rotor concentricity, increases core losses and magnetizing reactive power, generating heat in the stator windings despite balanced phase resistance"
+     },
+     "intervention": {
+      "before": "Measure the physical air gap clearance at multiple circumferential points using a feeler gauge with the rotor blocked, then re-shim or re-machine the bearing housings to restore uniform concentricity and nominal air gap length.",
+      "after": "Measure the physical air gap clearance at multiple circumferential points using a feeler gauge with the rotor blocked to eliminate the deviation between the observed and measured load torques, then re-shim or re-machine the bearing housings to restore uniform concentricity and nominal air gap length"
+     },
+     "mechanism_source_span": {
+      "before": "",
+      "after": "However, the results still show a deviation between the observed and measured load torques, indicating room for further refinement."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "phase winding phases load resistance balanced",
+      "windings phase load balanced resistance voltage",
+      "gap air rotor length physical clearance",
+      "phase measurement magnetizing winding during operation",
+      "magnetizing current core losses decreases nameplate"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05",
+      "PA-FAM-06",
+      "PA-FAM-07",
+      "PA-FAM-08",
+      "PA-FAM-09",
+      "PA-FAM-10"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "ea0d1f5e0dc5b1d985d82f0c778e057dde76fb6c67797806e7dd09749c969552",
+    "child_spec_hash": null,
+    "reason": "This repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness (measured 0.171) by anchoring the mechanism vocabulary directly in the verbatim span from the custodied evidence, ensuring the required non-generic terms are shared.",
+    "applied_at": "2026-09-28T00:45:37+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:a761da0669b2",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.347,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:d5e95a13e75b",
+     "provider": "xkiro",
+     "model": "qwen/qwen3-max:free",
+     "prompt_hash": "c2f963c9a18860a0e5a58e9c831a53a3f53034ff6b593a58b3152ec45cde9166",
+     "output_hash": "d5e95a13e75b648024e341652b3193c9a3ec5e23311c6834af1239707164cd13",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.48550/arxiv.2607.05877",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.449,
+      "evidence_support_cleared": 0.449,
+      "constraint_traceable_to_evidence": "The mechanism must account for the deviation between the observed and measured load torques as reported by the electric "
+     },
+     "reasons": [],
+     "validated_at": "2026-09-28T00:46:08+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Excessive no-load current caused by a deviation between the observed and measured load torques, indicating room for further refinement of the air gap or rotor concentricity, increases core losses and magnetizing reactive power, generating heat in the stator windings despite balanced phase resistance",
+      "after": "A deviation between the observed and measured load torques, indicating room for further refinement of the electric drive digital twin observer controller, causes the 3-phase induction conveyor drive motor to draw excessive magnetizing reactive power during no-load operation, generating heat in the s"
+     },
+     "intervention": {
+      "before": "Measure the physical air gap clearance at multiple circumferential points using a feeler gauge with the rotor blocked to eliminate the deviation between the observed and measured load torques, then re-shim or re-machine the bearing housings to restore uniform concentricity and nominal air gap length",
+      "after": "Integrate an observer controller into the 3-phase induction motor control loop to enable compensation of the disturbance variable acting load torque, thereby eliminating the deviation between the observed and measured load torques and reducing the no-load winding overheating."
+     },
+     "mechanism_source_span": {
+      "before": "However, the results still show a deviation between the observed and measured load torques, indicating room for further refinement.",
+      "after": "The results of the DT implementation recorded on the test bench demonstrate an effective disturbance compensation of the acting load torque by the observer controller. However, the results still show a deviation between the observed and measured load torques, indicating room for further refinement."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "phase winding phases load resistance balanced",
+      "windings phase load balanced resistance voltage",
+      "gap air rotor length physical clearance",
+      "phase measurement magnetizing winding during operation",
+      "magnetizing current core losses decreases nameplate"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05",
+      "PA-FAM-06",
+      "PA-FAM-07",
+      "PA-FAM-08",
+      "PA-FAM-09",
+      "PA-FAM-10"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "ae17a178da877ce8dcbaa0c4ceff240b0faec637128d7f819d68e542a8b3d072",
+    "child_spec_hash": null,
+    "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness (measured 0.347) by re-anchoring the mechanism vocabulary in verbatim terms from the cited evidence span and adding an evidence-derived constraint.",
+    "applied_at": "2026-09-28T00:46:08+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "55cd0535be8a369040233b399dc784fb3451396a101336c0010f5371b1e21545"
+}
