@@ -510,6 +510,7 @@ def _health_payload() -> dict:
                         "deterministic router + one wired solver)",
             },
             "reality_loop_ready": _reality_ok,
+            "reality_loop_modules": _reality_loop_modules,
             "showcase_ready": portfolio_ready,
         },
         "durable": _durable_state(),
