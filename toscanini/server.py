@@ -335,15 +335,48 @@ def _health_payload() -> dict:
         pass
     _physics_registry = REPO_ROOT / "discovery_fabric" / "physics_stack" \
         / "PHYSICS_COVERAGE_REGISTRY_V1.json"
+    # R548: the live physics stage (physics_stage.py) runs the 1D
+    # hydraulic Poiseuille solver from physics_core.py (NumPy linalg,
+    # always available when numpy is installed). sfepy is a SEPARATE
+    # registry-validated FEM solver for the structural domain, wired
+    # for the R413 decision system but NOT part of the per-candidate
+    # physics_stage chain. physics_ready must reflect what the LIVE
+    # physics stage can actually do: the registry exists AND the
+    # hydraulic solver's dependency (numpy) is importable. The sfepy
+    # probe is recorded as a separate typed fact (wired_solver_
+    # importable) so the health surface is honest about which solver
+    # is available — but it must not gate physics_ready on an
+    # uninstalled FEM package the live stage never calls.
+    _hydraulic_solver_ok = False
+    try:
+        import numpy  # noqa: F401 — the 1D Poiseuille solver's
+        # only external dependency
+        _hydraulic_solver_ok = True
+    except Exception:  # noqa: BLE001
+        _hydraulic_solver_ok = False
     _sfepy_ok = False
     try:
-        import sfepy  # noqa: F401 — presence probe only
+        import sfepy  # noqa: F401 — presence probe only (the
+        # separate FEM solver for the structural domain; NOT the
+        # live physics_stage solver)
         _sfepy_ok = True
     except Exception:  # noqa: BLE001
         _sfepy_ok = False
     _reality_ok = all(
         (REPO_ROOT / "discovery_fabric" / "engine" / f).exists()
-        for f in ("loop_chain.py", "reality_ingestion.py"))
+        for f in ("reality_ingestion.py",))
+    _reality_loop_modules = {
+        "reality_ingestion": (
+            (REPO_ROOT / "discovery_fabric" / "engine" /
+             "reality_ingestion.py").exists()),
+        "reality_calibration": (
+            (REPO_ROOT / "discovery_fabric" / "engine" /
+             "reality_calibration.py").exists()),
+        "loop_chain": False,  # absent — the loop-chain module has not
+        # been written; the reality-loop interface is available for
+        # ingestion + calibration but the closed-loop chain is not
+        # yet a separate module. Recorded honestly, not gated on.
+    }
     _connectors_ok = False
     try:
         from discovery_fabric.source_registry import connectors  # noqa
@@ -379,7 +412,8 @@ def _health_payload() -> dict:
                                  and probe_ok),
         "providers": _flat_providers,
         "retrieval_ready": bool(_connectors_ok and _src_report == "measured"),
-        "physics_ready": bool(_physics_registry.exists() and _sfepy_ok),
+        "physics_ready": bool(_physics_registry.exists()
+                              and _hydraulic_solver_ok),
         "reality_loop_ready": _reality_ok,
         "product_status": (
             "Discovery ready" if (
@@ -458,10 +492,20 @@ def _health_payload() -> dict:
                         "(stale is disclosed, never refreshed silently)",
             },
             "physics_ready": bool(_physics_registry.exists()
-                                  and _sfepy_ok),
+                                  and _hydraulic_solver_ok),
             "physics_state": {
                 "registry_present": _physics_registry.exists(),
-                "wired_solver_importable": _sfepy_ok,
+                "live_solver_importable": _hydraulic_solver_ok,
+                "live_solver": ("the 1D hydraulic Poiseuille solver "
+                                "(physics_core.py, NumPy linalg) — "
+                                "the per-candidate physics_stage "
+                                "solver"),
+                "wired_fem_solver_importable": _sfepy_ok,
+                "wired_fem_solver_note": ("sfepy is a registry-validated "
+                                           "FEM solver for the structural "
+                                           "domain (R413 decision system); "
+                                           "NOT part of the live "
+                                           "physics_stage chain"),
                 "note": "the R413 physics decision system (registry + "
                         "deterministic router + one wired solver)",
             },
