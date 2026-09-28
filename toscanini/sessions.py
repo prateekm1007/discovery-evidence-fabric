@@ -1279,13 +1279,36 @@ def refresh_user_state_view(record: Dict[str, Any]) -> Dict[str, Any]:
     # recompute on the live bytes: final_state.json (the engine's
     # re-persisted completion projection) and COMPLETION_CONTRACT.json
     # (the authority itself — read-through, never a second source).
-    # When the run dir is pruned (the post-deploy shape), the stored
-    # fields are the only durable source and are used as-is.
+    #
+    # R547 second occurrence: when the run dir is pruned, the session
+    # record's STORED final_state is the only durable source — but it
+    # can itself be a STALE snapshot (the worker's run-tail refresh
+    # captured it BEFORE the engine re-persisted the contract's
+    # completion projection into final_state.json; the stored copy
+    # therefore lacks the nested completion_states). The recompute
+    # MUST treat the stored final_state's nested completion_states as
+    # the authoritative answer when present — it is the engine's own
+    # re-persisted projection, verbatim. The refresh below surfaces
+    # it onto the recomputed record; the view's rule 3 is the branch
+    # that reads it, and a stored final_state WITHOUT a nested
+    # completion_states must not fall through to a manufactured
+    # COMPLETED_* key-prefix True on a typed non-completion terminal.
     if run_dir:
         fs_fresh = _read_json(Path(run_dir) / "final_state.json")
         if fs_fresh is not None:
             rec["final_state"] = fs_fresh
-        contract_fresh = _read_json(Path(run_dir) / "COMPLETION_CONTRACT.json")
+            # R547 BS-042: also reconcile the TOP-LEVEL stored
+            # completion_states from the run dir's OWN nested answer.
+            # A stale stored completion_states (written by the worker
+            # at an earlier refresh, or by an older tree) must never
+            # win over the run dir's re-persisted contract projection
+            # (Art. X: the run dir is the authority; Art. XXII: never
+            # let a stored summary outrank the underlying record).
+            nested = fs_fresh.get("completion_states")
+            if isinstance(nested, dict) and "FINISHED_DISCOVERY" in nested:
+                rec["completion_states"] = nested
+        contract_fresh = _read_json(
+            Path(run_dir) / "COMPLETION_CONTRACT.json")
         if contract_fresh is not None:
             rec["completion_contract"] = contract_fresh
     from toscanini import user_state as _us

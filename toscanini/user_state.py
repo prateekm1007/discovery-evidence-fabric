@@ -438,7 +438,35 @@ def _contract_finished_flag(session: Dict[str, Any]) -> Optional[bool]:
             pass
     # 2. the session record's own completion_states (worker refresh —
     #    the contract's projection, persisted at the run tail)
+    #
+    #    R547 (BS-042): read the RECORDED completion answers TOGETHER,
+    #    not in stale-priority order. The session record's top-level
+    #    completion_states (the worker's run-tail refresh) and the
+    #    engine's own final_state.completion_states (the contract's
+    #    projection re-persisted post-contract, the run dir's authority
+    #    when present) can DISAGREE when the stored top-level snapshot
+    #    was written by an older tree or an earlier refresh that the
+    #    contract verifier later corrected (measured on the deployed
+    #    Space: a stale FINISHED_DISCOVERY=true sitting at the top
+    #    level while the nested answer is false). When both carry a
+    #    FINISHED_DISCOVERY answer, the RECORDED answer is the engine's
+    #    own verbatim projection (the more recent, contract-derived
+    #    one); a stale top-level snapshot must never override it.
+    #    When only one is present, that one governs (the pre-R547
+    #    behavior, preserved).
+    fs = session.get("final_state")
+    fs_states = (fs.get("completion_states") if isinstance(fs, dict)
+                 else None)
     states = session.get("completion_states")
+    if (isinstance(fs_states, dict) and "FINISHED_DISCOVERY" in fs_states
+            and isinstance(states, dict)
+            and "FINISHED_DISCOVERY" in states
+            and bool(fs_states.get("FINISHED_DISCOVERY"))
+            != bool(states.get("FINISHED_DISCOVERY"))):
+        # disagreement between the two recorded answers: the engine's
+        # own re-persisted projection (final_state, the run dir's
+        # authority, Art. X) wins — the top-level snapshot is stale.
+        states = fs_states
     if isinstance(states, dict) and "FINISHED_DISCOVERY" in states:
         return bool(states.get("FINISHED_DISCOVERY"))
     # 3. the engine's final_state record (the contract's projection
@@ -456,10 +484,9 @@ def _contract_finished_flag(session: Dict[str, Any]) -> Optional[bool]:
     #    final_status=MECHANISM_STARVED + top-level completion_states
     #    absent + final_state.completion_states.FINISHED_DISCOVERY=
     #    false -> finished=False).
-    fs = session.get("final_state")
     if isinstance(fs, dict):
-        fs_states = fs.get("completion_states")
-        if isinstance(fs_states, dict) and "FINISHED_DISCOVERY" in fs_states:
+        if isinstance(fs_states, dict) and \
+                "FINISHED_DISCOVERY" in fs_states:
             return bool(fs_states.get("FINISHED_DISCOVERY"))
     final_status = str(session.get("final_status") or "").strip()
     status = str(session.get("status") or "")

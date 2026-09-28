@@ -211,6 +211,17 @@ def test_01b_new_finished_terminal_finished_true(tmp_path):
             "package": {"complete": True, "zip_name": "p.zip",
                         "zip_sha256": "ab" * 32,
                         "candidate_id": "cand_a"}}]))
+    # R547: align the run dir's final_state.json with this record's
+    # positive terminal (the helper writes the starved shape by
+    # default; here the top-level completion_states says FINISHED_
+    # DISCOVERY=true, and when the run dir exists the refresh
+    # reconciles the top-level answer from the run dir's nested
+    # answer, so the two recorded answers must AGREE — a disagreement
+    # is the separate BS-042 pin owned by the R546 test suite).
+    fs_path = _sessions._read_json(
+        _sessions.Path(run_dir) / "final_state.json")
+    fs_path["completion_states"] = dict(FINISHED_STATES)
+    _write(_sessions.Path(run_dir) / "final_state.json", fs_path)
     view = _projection_chain(detail)["user_state_view"]
     assert view["finished"] is True
 

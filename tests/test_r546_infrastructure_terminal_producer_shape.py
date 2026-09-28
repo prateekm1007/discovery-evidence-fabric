@@ -448,6 +448,58 @@ def test_refresh_user_state_view_is_a_recompute_not_a_stale_snapshot():
     out = _ss.refresh_user_state_view(rec)
     assert rec == snapshot  # the original record is untouched
     assert out["user_state_view"]["finished"] is False
+
+
+# ---------------------------------------------------------------------------
+# R547 BS-042: the stale top-level completion_states vs the engine's own
+# nested final_state.completion_states answer. When the two DISAGREE,
+# the engine's re-persisted projection (the run dir's authority,
+# Art. X) must win; a stale worker-snapshot FINISHED_DISCOVERY=true at
+# the top level must never override a recorded nested false.
+# ---------------------------------------------------------------------------
+def test_stale_top_level_completion_answer_loses_to_nested_answer():
+    """The measured deployed-Space shape: a stored top-level
+    completion_states carrying FINISHED_DISCOVERY=true (written by an
+    older tree / an earlier refresh) while the engine's own
+    re-persisted nested final_state.completion_states says
+    FINISHED_DISCOVERY=false. The nested engine answer is the
+    contract's own projection (Art. X: the run dir is the authority);
+    the stale top-level snapshot must not override it."""
+    rec = {
+        "session_id": "ts_r547stale",
+        "status": "COMPLETE",
+        "final_status": "MECHANISM_STARVED",
+        "run_dir": None,
+        "completion_states": {"FINISHED_DISCOVERY": True},
+        "final_state": {
+            "final_status": "MECHANISM_STARVED",
+            "completion_states": {"FINISHED_DISCOVERY": False}},
+    }
+    assert _us._contract_finished_flag(rec) is False, (
+        "a stale top-level FINISHED_DISCOVERY=true must lose to the "
+        "engine's own recorded nested FINISHED_DISCOVERY=false")
+    assert _us.user_state_view(rec)["finished"] is False
+    # the inverse: a stale top-level false loses to a recorded nested
+    # true (the engine's answer governs in both directions)
+    rec2 = dict(rec)
+    rec2["completion_states"] = {"FINISHED_DISCOVERY": False}
+    rec2["final_state"] = {
+        "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+        "completion_states": {"FINISHED_DISCOVERY": True}}
+    assert _us._contract_finished_flag(rec2) is True
+    # agreement (both say the same thing) is preserved: the recorded
+    # answer stands, no disagreement branch fires
+    rec3 = dict(rec)
+    rec3["completion_states"] = {"FINISHED_DISCOVERY": False}
+    assert _us._contract_finished_flag(rec3) is False
+    # only the top-level present (no nested answer): the top-level
+    # governs (pre-R547 behavior, unchanged)
+    rec4 = {
+        "session_id": "ts_r547top", "status": "COMPLETE",
+        "final_status": "MECHANISM_STARVED", "run_dir": None,
+        "completion_states": {"FINISHED_DISCOVERY": True},
+    }
+    assert _us._contract_finished_flag(rec4) is True
 def test_run_blocked_capability_projection_full_shape():
     """Every field the directive item 3 names, on both producer
     shapes, plus the pruned-record extreme. No second execution
