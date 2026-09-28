@@ -1,0 +1,38 @@
+{
+ "schema": "R545_LIVE_PRODUCTION_RECORD/1.0.0",
+ "round": "R545",
+ "production_sha": "3bfc4bdd831fe99bd1021881250f2b5ad76473ae",
+ "space": "prateekm1-toscanini-prod-validation",
+ "api_version_engine_commit": "3bfc4bdd831fe99bd1021881250f2b5ad76473ae",
+ "exact_sha_match": true,
+ "health": {
+  "ok": true,
+  "discovery_ready": true,
+  "showcase_ready": true,
+  "engine_ready": null,
+  "llm_ready": null,
+  "llm_transport_ready": null,
+  "transport": "https://api.atria-asi.ai/v1/chat/completions",
+  "selected_provider": null,
+  "note": "the health surface reports ok/discovery_ready; the engine_ready/llm_* fields are null on this surface (the readiness is carried by discovery_ready + provider HEALTHY states). agnes/xkiro/zai HEALTHY; the atriа transport is the standing EXTERNAL-mode route."
+ },
+ "fresh_run": {
+  "session_id": "ts_581ddde8cb78",
+  "problem": "Toyota Corolla 2018: intermittent stall at idle stop-start with a misfire only under cold conditions. NHTSA complaint ODI. What mechanism could explain the cold-only misfire that triggers the stall, and what experiment would settle it?",
+  "status_reached": "AWAITING_CLARIFICATION",
+  "clarification_field": "target_variable",
+  "durable_snapshot": {"reason": "created:ts_581ddde8cb78", "files": 11899, "pushed": true, "commit": "0b56d6cedbf538f25797af555f34b8ffe410eb2c"},
+  "note": "The live engine on the deployed SHA executed a genuine discovery run and reached a typed AWAITING_CLARIFICATION pause (a normal product state, not a failure). The owner-scoped answer route (/api/run/{id}/answer) returned 404 on this Space — a live infrastructure/owner-scoping condition, recorded as such, never converted into a scientific verdict."
+ },
+ "r545_rule_proven_by": [
+  "tests/test_r545_typed_terminal_finished.py (19/19; on a clean checkout of 5402c3114 it FAILED 6/19, pinning the exact old defect shape)",
+  "toscanini/user_state.py _contract_finished_flag rule 4 (the production file, byte-present in commit 3bfc4bdd8)",
+  "the deployed SHA 3bfc4bdd8 serves the fixed tree (api/version engine_commit match)"
+ ],
+ "infrastructure_status": {
+  "typed_failure": "owner-scoped session route 404 on this HF Space (the session is durably snapshotted but the owner-scoped GET/POST does not resolve without the serving cookie the UI holds)",
+  "is_discovery_failure": false,
+  "discovery_verdict": null,
+  "note": "An infrastructure condition is recorded as an infrastructure condition. It is not a finished/unfinished discovery verdict; the R545 rule (typed terminal answers its own finished flag) is proven by the pinned suite + exact-SHA deploy, independent of this live route quirk."
+ }
+}
