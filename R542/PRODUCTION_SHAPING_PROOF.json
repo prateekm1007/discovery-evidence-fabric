@@ -1,0 +1,45 @@
+{
+  "schema": "R542_PRODUCTION_SHAPING_PROOF/1.0.0",
+  "generated_at": "2026-09-27T16:48:55Z",
+  "deployment": {
+    "engine_commit": "2188b31aeeb810db151ec576326d3000913d0466",
+    "expected_sha": "2188b31aeeb810db151ec576326d3000913d0466",
+    "exact_identity": true,
+    "web_build_hash": "8fb3a9af847ad0c0a796149b1bd97cf441517c2615da14d7f7ba6c84bbffc918",
+    "health_ok": true,
+    "discovery_ready": true,
+    "provider_agnes": "HEALTHY"
+  },
+  "production_run": {
+    "session_id": "ts_c1521212b87a",
+    "problem": "R526 battery problem 1 (subaru forester 2020 NHTSA ODI mechanical)",
+    "clarification_answered_with_own_verbatim": true,
+    "final_status": "MECHANISM_STARVED",
+    "completion_states": {
+      "PIPELINE_COMPLETED": true,
+      "DISCOVERY_COMPLETED": false,
+      "TECHNOLOGY_PACKAGE_COMPLETED": false,
+      "FINISHED_DISCOVERY": false,
+      "invariant": "FINISHED_DISCOVERY = ADMISSIBLE_RANKED_SURVIVOR + COMPLETE_RESULT_RECORD + TECHNOLOGY_PACKAGE; never EXECUTION_COMPLETED or SOME_COMPONENTS_PRODUCED alone",
+      "final_status": "UNKNOWN"
+    },
+    "FINISHED_DISCOVERY": false,
+    "PIPELINE_COMPLETED": true,
+    "user_state_view": {
+      "user_state": "COMPLETED_UNKNOWN",
+      "label": "Completed — outcome unknown",
+      "decision": "outcome not established",
+      "finished": true,
+      "found_something": false,
+      "rejected": false,
+      "outcome": "RUN_BLOCKED",
+      "outcome_label": "Run blocked — infrastructure, not a verdict"
+    },
+    "typed_terminal_is_constitutional": true,
+    "FINISHED_DISCOVERY_honest_when_starved": true
+  },
+  "findings": [
+    "The R542 backend completion contract ran in production: completion_states.FINISHED_DISCOVERY=false is recorded for the MECHANISM_STARVED run (the honest typed terminal), never fabricated as a finished discovery.",
+    "GAP-1 (disclosed, not yet wired): user_state_view.finished=true coexists with FINISHED_DISCOVERY=false / outcome=RUN_BLOCKED. The product-surface finished flag (conversation reached a terminal) is NOT yet derived from the R542 backend contract. The typed terminal itself (MECHANISM_STARVED, RUN_BLOCKED) is constitutional; the finished-flag reconciliation is the remaining product-surface wiring."
+  ]
+}
