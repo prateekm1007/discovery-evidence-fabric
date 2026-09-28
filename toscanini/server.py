@@ -693,11 +693,15 @@ class Handler(BaseHTTPRequestHandler):
         header (the R447 embedded-context transport — same opaque
         capability, carried where third-party cookie policy cannot strip
         it), else a fresh key (recorded so the response can set the
-        cookie)."""
+        cookie). Records the resolution source in _owner_key_source
+        (cookie / header / issued) for the R546 owner-capability
+        diagnostic — the source is typed evidence, never the value."""
+        self._owner_key_source = "issued"
         cookie = self.headers.get("Cookie") or ""
         for part in cookie.split(";"):
             k, _, v = part.strip().partition("=")
             if k == OWNER_COOKIE and v:
+                self._owner_key_source = "cookie"
                 return v[:64]
         hdr = self.headers.get(OWNER_HEADER) or ""
         if hdr and _VALID_OWNER_KEY.match(hdr.strip()):
@@ -705,6 +709,7 @@ class Handler(BaseHTTPRequestHandler):
             # so first-party contexts (where cookies DO work) stay in
             # sync with the client-persisted one
             self._pending_owner_cookie = hdr.strip()
+            self._owner_key_source = "header"
             return hdr.strip()
         new_key = uuid.uuid4().hex
         self._pending_owner_cookie = new_key
@@ -1431,7 +1436,17 @@ class Handler(BaseHTTPRequestHandler):
         parts = [x for x in p.path.split("/") if x]
         # R394 s15: owner capability is resolved for POSTs too (run
         # creation binds ownership; ask/share/retry are owner-scoped).
+        # R546: the `owner` query-param transport (the EventSource /
+        # direct-download precedent) is honored for POSTs too — the
+        # same validated override do_GET already applies, so a
+        # capability carried in the URL is never silently dropped.
+        self._owner_key_source = "issued"
         self._owner_key_cached = self._owner_key()
+        q_owner = (urllib.parse.parse_qs(p.query).get("owner")
+                   or [""])[0].strip()
+        if q_owner and _VALID_OWNER_KEY.match(q_owner):
+            self._owner_key_cached = q_owner
+            self._owner_key_source = "query"
 
         # R389 Phase 7: /api/run is the CEO's canonical job API name for
         # the SAME discovery start path (one production loop, one worker).
@@ -2242,6 +2257,58 @@ class Handler(BaseHTTPRequestHandler):
             answer = str(body.get("answer") or "").strip()
             if not answer:
                 return self._json(400, {"error": "answer required"})
+            # R546 owner-capability diagnostic: typed, non-secret
+            # evidence of which owner-capability link resolved (or
+            # failed) on this route. Never emits the token itself —
+            # only presence/absence, SHA-256 fingerprint, length,
+            # source, and the match boolean (Art. LXXVI / BS-021).
+            _diag_route = f"{parts[0]}/{parts[1]}/{sid}/answer"
+            _diag_caller = self._owner_key_cached
+            _diag_session = store.get_session(sid)
+            _diag_session_owner = (
+                _diag_session.get("owner_key")
+                if _diag_session else None)
+            _diag_fp = lambda v: (
+                __import__("hashlib").sha256(
+                    str(v).encode()).hexdigest()[:16]
+                if v else None)
+            _diag_cause = None
+            if _diag_session is None:
+                _diag_cause = "SESSION_NOT_FOUND"
+            elif (self._access(sid) == "DENY"):
+                if _diag_session_owner is None:
+                    _diag_cause = "SESSION_NOT_FOUND"
+                elif not _diag_caller:
+                    _diag_cause = "HEADER_NOT_SENT"
+                else:
+                    _diag_cause = "SESSION_OWNER_MISMATCH"
+            import json as _json
+            try:
+                from toscanini import worker_forensics as _wfx
+                _fxq = _wfx.attach_session(
+                    sid, durable_root=_wfx.durable_root())
+                _fxq.event("OWNER_CAPABILITY_DIAG",
+                            origin="api", route=_diag_route,
+                            caller_fp=_diag_fp(_diag_caller),
+                            caller_len=len(_diag_caller)
+                            if _diag_caller else 0,
+                            caller_source=self._owner_key_source,
+                            session_owner_fp=_diag_fp(
+                                _diag_session_owner),
+                            match=bool(
+                                _diag_session_owner
+                                and _diag_caller
+                                and _diag_session_owner
+                                == _diag_caller),
+                            cause=_diag_cause or "OK",
+                            http_status=(404
+                                        if _diag_cause
+                                        in ("SESSION_NOT_FOUND",
+                                           "SESSION_OWNER_MISMATCH",
+                                           "HEADER_NOT_SENT")
+                                        else None))
+            except Exception:  # noqa: BLE001 — diagnostic, never blocks
+                pass
             if self._access(sid) == "DENY":
                 return self._denied()
             s = store.get_session(sid)

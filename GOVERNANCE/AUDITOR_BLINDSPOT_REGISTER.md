@@ -334,6 +334,16 @@ This register records places where previous audits were empirically blindsided. 
 
 **BS-039 reminder (permanent memory):** commit-message claims do not prove that the named production bytes were actually committed — verify the blob, re-run the suite from the clean committed tree, and prove the deployed SHA serves the fixed bytes.
 
+## BS-041 — A 404 alone does not identify which owner-capability link failed
+
+**Observed:** The fresh production run's `POST /api/run/{id}/answer` returned 404. The initial narrative attributed it to "the serving cookie name differs from the stored owner_key" without tracing the actual capability lineage: the owner key is issued at run creation, returned in the API response, persisted in the browser's `localStorage["tosca_owner_key"]`, attached to fetch requests as the `X-Tosca-Owner` header (REST) or baked into the `?owner=` query param (SSE / direct downloads), resolved server-side by `_owner_key()` (cookie → header → issued), and matched against the session's stored `owner_key` by strict equality in `session_access()`. The 404 could have come from any of: the header not being sent (browser cleared localStorage), the header not reaching the server (proxy stripping it), the cookie-only path being selected instead of the header path, the session owner_key being absent or mismatched, or the route itself not being registered.
+
+**Failure mode:** "A 404 means ownership is broken" substitutes for the actual causal chain. Without instrumenting each link with typed, non-secret evidence (fingerprint, presence/absence, source, match boolean), the diagnosis is a guess, and the fix may target the wrong link.
+
+**Principle:** Capability transport must be traced from issuance → persistence → transport → server resolution → authorization → worker continuation; a 404 alone does not identify which link failed. Every link is instrumented with typed, non-secret evidence (SHA-256 fingerprint, length, source class, match boolean — never the token value, Art. LXXVI / BS-021).
+
+**Required check:** For every owner-scoping 404: (1) verify the session record's `owner_key` is present (fingerprint); (2) verify the API response returned the `owner_key` to the client; (3) verify the client persists it (localStorage key name); (4) verify the transport (REST header vs SSE query param) carries it; (5) verify the server's `_owner_key()` resolution source (cookie / header / query / issued); (6) verify the strict-equality match; (7) classify the 404 into exactly one cause from the typed vocabulary (`HEADER_NOT_SENT`, `COOKIE_AND_HEADER_DISAGREE`, `SESSION_OWNER_MISMATCH`, `ROUTE_NOT_REGISTERED`, etc.).
+
 ## Audit-trigger rule
 
 When a future audit encounters a new failure mode that is not covered here, the auditor must:
