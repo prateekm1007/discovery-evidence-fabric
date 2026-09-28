@@ -220,15 +220,16 @@ def test_01b_new_finished_terminal_finished_true(tmp_path):
 # ---------------------------------------------------------------------------
 def test_02_bare_legacy_record_has_no_contract_authority(tmp_path):
     """A bare legacy record (no completion_states, no final_state, no
-    contract, run dir gone) carries NO contract answer: the flag helper
-    returns None and the view follows the legacy key rule. This is the
-    explicitly labeled compatibility projection — Step 5 backfill (or
-    its fail-closed unresolved class) is what removes such records
-    from the fleet, never a guessed finished value."""
+    contract, run dir gone) whose TERMINAL ANSWER IS RECORDED
+    (final_status present, typed non-completion) answers from its own
+    recorded terminal: finished=false, never the key-prefix COMPLETED_*
+    fallback guessing true. This is the R545 typed-terminal rule: the
+    record's own honest terminal is authority for itself even when no
+    contract was persisted."""
     record = _record(None, session_id="ts_legacy")
-    assert _us._contract_finished_flag(record) is None
+    assert _us._contract_finished_flag(record) is False
     view = _us.user_state_view(record)
-    assert view["finished"] is True  # legacy COMPLETED_UNKNOWN rule
+    assert view["finished"] is False  # typed terminal answers itself
     assert view["user_state"] == "COMPLETED_UNKNOWN"
 
 

@@ -1,0 +1,91 @@
+{
+  "schema": "R543_FINISHED_STATE_DIAGNOSTIC/1.0.0",
+  "session_id": "ts_d07a006dde9c",
+  "production_probe_reference": "R542/R543_PROD_FINISHED_FLAG_PROOF_503de62.json: record_completion_states=null, final_state.completion_states.FINISHED_DISCOVERY=false, user_state_view.finished=true",
+  "cases": [
+    {
+      "variant": "run-dir-present",
+      "engine_sha": "8a6f71bb1e8b36d3b9ccd02ae64f45b1b03702a7",
+      "request_paths": {
+        "path_a_rest": "/api/sessions/{id}, /api/run/{id}/result, history, ask, action, retry",
+        "path_b_sse": "SSE terminal 'final' event"
+      },
+      "run_dir_value": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\r543_diag_37f2g2ub\\ENGINE_RUNS\\ts_d07a006dde9c",
+      "run_dir_exists": true,
+      "final_state_file_exists": true,
+      "final_state_parse_ok": true,
+      "final_state_completion_states": {
+        "PIPELINE_COMPLETED": true,
+        "DISCOVERY_COMPLETED": false,
+        "TECHNOLOGY_PACKAGE_COMPLETED": false,
+        "FINISHED_DISCOVERY": false,
+        "invariant": "FINISHED_DISCOVERY = ADMISSIBLE_RANKED_SURVIVOR + COMPLETE_RESULT_RECORD + TECHNOLOGY_PACKAGE; never EXECUTION_COMPLETED or SOME_COMPONENTS_PRODUCED alone",
+        "final_status": "UNKNOWN"
+      },
+      "session_completion_states": null,
+      "completion_contract_present": false,
+      "contract_finished_flag_result": false,
+      "user_state_key": "COMPLETED_UNKNOWN",
+      "user_state_view_finished_path_a_rest": false,
+      "user_state_view_finished_path_b_sse": false,
+      "expected_finished": false,
+      "path_a_consistent": true,
+      "path_b_consistent": true
+    },
+    {
+      "variant": "pruned",
+      "engine_sha": "8a6f71bb1e8b36d3b9ccd02ae64f45b1b03702a7",
+      "request_paths": {
+        "path_a_rest": "/api/sessions/{id}, /api/run/{id}/result, history, ask, action, retry",
+        "path_b_sse": "SSE terminal 'final' event"
+      },
+      "run_dir_value": null,
+      "run_dir_exists": false,
+      "final_state_file_exists": false,
+      "final_state_parse_ok": false,
+      "final_state_completion_states": null,
+      "session_completion_states": null,
+      "completion_contract_present": false,
+      "contract_finished_flag_result": false,
+      "user_state_key": "COMPLETED_UNKNOWN",
+      "user_state_view_finished_path_a_rest": false,
+      "user_state_view_finished_path_b_sse": false,
+      "expected_finished": false,
+      "path_a_consistent": true,
+      "path_b_consistent": true
+    },
+    {
+      "variant": "pruned-stored-final-state",
+      "engine_sha": "8a6f71bb1e8b36d3b9ccd02ae64f45b1b03702a7",
+      "request_paths": {
+        "path_a_rest": "/api/sessions/{id}, /api/run/{id}/result, history, ask, action, retry",
+        "path_b_sse": "SSE terminal 'final' event"
+      },
+      "run_dir_value": null,
+      "run_dir_exists": false,
+      "final_state_file_exists": false,
+      "final_state_parse_ok": false,
+      "final_state_completion_states": {
+        "PIPELINE_COMPLETED": true,
+        "DISCOVERY_COMPLETED": false,
+        "TECHNOLOGY_PACKAGE_COMPLETED": false,
+        "FINISHED_DISCOVERY": false,
+        "invariant": "FINISHED_DISCOVERY = ADMISSIBLE_RANKED_SURVIVOR + COMPLETE_RESULT_RECORD + TECHNOLOGY_PACKAGE; never EXECUTION_COMPLETED or SOME_COMPONENTS_PRODUCED alone",
+        "final_status": "UNKNOWN"
+      },
+      "session_completion_states": null,
+      "completion_contract_present": false,
+      "contract_finished_flag_result": false,
+      "user_state_key": "COMPLETED_UNKNOWN",
+      "user_state_view_finished_path_a_rest": false,
+      "user_state_view_finished_path_b_sse": false,
+      "expected_finished": false,
+      "path_a_consistent": true,
+      "path_b_consistent": true
+    }
+  ],
+  "reproduced_in_tree": false,
+  "mechanism": [
+    "not reproduced in-tree: every response-construction path returns finished=false for the reconstructed production shape; the live true predates the in-tree authority chain or came through an undeployed code path — see mechanism notes in the round record"
+  ]
+}
