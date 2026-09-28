@@ -322,6 +322,18 @@ This register records places where previous audits were empirically blindsided. 
 
 **Required check:** For every round claiming a production fix: (1) `git show <commit> -- <named production file>` shows the change; (2) the suite is re-run from a clean checkout of that exact commit; (3) the deployed `/api/version` SHA matches the tested commit; (4) a fresh production request demonstrates the defect is gone.
 
+## BS-040 — Regression test exercises a semantically similar terminal shape while missing the actual production terminal shape
+
+**Observed:** The R545 typed-terminal regression pinned `status=COMPLETE, final_status=RUN_BLOCKED_TRANSPORT` — an equivalent-looking fixture. The actual worker's transport-exhausted branch writes the typed terminal into `status` only (`store.update_session(session_id, status="RUN_BLOCKED_TRANSPORT", error=...)` — no `final_status` is recorded on that branch, and no run-dir artifacts exist pre-pipeline). The R545 rule keyed its typed-terminal answer on `final_status + status in (<tuple>)`, so the real producer shape fell through to the legacy key-prefix derivation and the customer-facing finished flag came out True on an infrastructure terminal (the pre-retrieval capability branch's `RUN_BLOCKED_CAPABILITY` shape — status AND final_status — was also outside the rule's status tuple).
+
+**Failure mode:** "The regression test passes on the shape I constructed" was treated as closure proof for "the production shape is handled." The test and the producer diverged on which field carries the typed state, and both directions (the bare transport shape; the capability shape with a status outside the tuple) silently regressed to finished=True on an infrastructure terminal.
+
+**Principle:** Test the EXACT producer shape emitted by the production state machine, not merely an equivalent-looking fixture. A terminal-shape regression must be constructed from the state machine's own write site (the worker's `update_session` fields for each terminal branch), and the tested status/vocabulary must be DERIVED from the canonical execution-state mapping (e.g. `execution_states.py`), never re-invented in the test. The producer-shape test suite (R546) pins: bare `status=RUN_BLOCKED_TRANSPORT` with no final_status, the `RUN_BLOCKED_CAPABILITY` branch (status + final_status), and the full terminal-state matrix including the opposite direction (a recorded authoritative false outranks a positive-looking COMPLETED_* key).
+
+**Required check:** For every terminal-shape regression: (1) read the worker's terminal write site and mirror its exact fields; (2) derive the tested classes from the canonical status→execution-state mapping; (3) measure the three projections (state key, flag helper, view finished) on the mirrored record; (4) include both directions — the infrastructure terminal must not become a completed discovery, AND a positive-looking key with a recorded authoritative false must not regain finished=True.
+
+**BS-039 reminder (permanent memory):** commit-message claims do not prove that the named production bytes were actually committed — verify the blob, re-run the suite from the clean committed tree, and prove the deployed SHA serves the fixed bytes.
+
 ## Audit-trigger rule
 
 When a future audit encounters a new failure mode that is not covered here, the auditor must:

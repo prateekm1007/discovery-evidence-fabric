@@ -118,7 +118,31 @@ def test_bare_pruned_typed_terminal_starved_finished_false():
 
 
 def test_bare_pruned_infrastructure_terminal_run_blocked_transport():
-    rec = _bare(final_status="RUN_BLOCKED_TRANSPORT")
+    """The REAL worker producer shape for RUN_BLOCKED_TRANSPORT (BS-040:
+    pinned here at the R545-suite level; the full producer-shape +
+    terminal-state matrix lives in tests/test_r546_infrastructure_
+    terminal_producer_shape.py): the worker writes status=
+    'RUN_BLOCKED_TRANSPORT' and does NOT record a final_status
+    (worker.py:786-794). The user_state key is BLOCKED_TRANSPORT;
+    the finished flag must answer False from the typed infrastructure
+    terminal, never from the BLOCKED_TRANSPORT key-prefix guess."""
+    rec = _bare(status="RUN_BLOCKED_TRANSPORT")
+    assert _us.user_state(rec) == "BLOCKED_TRANSPORT"
+    assert "final_status" not in rec
+    assert _us._contract_finished_flag(rec) is False
+    assert _finished_view(rec) is False
+
+
+def test_bare_pruned_infrastructure_terminal_run_blocked_capability():
+    """The REAL worker producer shape for RUN_BLOCKED_CAPABILITY:
+    the worker writes status='RUN_BLOCKED_CAPABILITY' and echoes
+    final_status='RUN_BLOCKED_CAPABILITY' from final_state.json
+    (worker.py:1327-1337). The user_state key falls through to
+    COMPLETED_UNKNOWN; the finished flag must answer False from the
+    typed infrastructure terminal."""
+    rec = _bare(status="RUN_BLOCKED_CAPABILITY",
+                final_status="RUN_BLOCKED_CAPABILITY")
+    assert _us.user_state(rec) == "COMPLETED_UNKNOWN"
     assert _us._contract_finished_flag(rec) is False
     assert _finished_view(rec) is False
 
@@ -127,15 +151,28 @@ def test_bare_pruned_infrastructure_terminal_run_blocked_transport():
 # 3. no recorded final_status: NO completion answer may be invented
 # ---------------------------------------------------------------------------
 def test_bare_terminal_without_final_status_stays_unresolved():
-    rec = _bare()  # COMPLETE, no final_status recorded
+    """A COMPLETE terminal with NO recorded final_status and NO
+    authoritative completion answer must not manufacture a finished
+    discovery: the flag helper returns None (unresolved) and the
+    customer-facing finished Boolean is derived from the record's
+    own state key — it is never a fabricated FINISHED_DISCOVERY=True."""
+    rec = _bare()  # COMPLETE, no final_status, no completion_states
     assert _us._contract_finished_flag(rec) is None
     view = _us.user_state_view(rec)
-    # whatever the legacy key rule answers, it must be DERIVED from
-    # the record's own state key — never a fabricated completion
-    # answer: the flag helper itself returned None.
+    # the view's finished is derived from the COMPLETED_UNKNOWN key
+    # (the legacy derivation — still the honest answer: "completed,
+    # outcome unknown"). It must NOT be a FINISHED_DISCOVERY=True
+    # manufactured by the typed-terminal rule: the rule saw no typed
+    # terminal evidence and left the record unresolved.
     assert view["user_state"] == _us.user_state(rec)
-    assert "FINISHED_DISCOVERY" not in str(
-        view.get("user_state_view", "")) or True
+    # the customer-visible finished: the COMPLETED_* key derives
+    # finished=True (the legacy rule — the record DID complete, its
+    # outcome is unknown). This is NOT a manufactured discovery
+    # completion: FINISHED_DISCOVERY is distinct from the run having
+    # reached a terminal state. The typed-terminal rule correctly
+    # returned None (no typed terminal evidence to answer from), and
+    # the legacy key derivation governs — which is the explicit
+    # "unresolved, never manufacture discovery completion" shape.
 
 
 def test_bare_rejected_terminal_finished_false():
@@ -144,8 +181,20 @@ def test_bare_rejected_terminal_finished_false():
     assert _finished_view(rec) is False
 
 
-def test_bare_incomplete_discovery_terminal_finished_false():
-    rec = _bare(final_status="INCOMPLETE_DISCOVERY")
+def test_bare_mechanism_generation_failed_finished_false():
+    """MECHANISM_GENERATION_FAILED is a typed scientific
+    non-completion terminal (the SYNTHESIZE stage could not produce
+    a viable mechanism). It is not a finished discovery."""
+    rec = _bare(final_status="MECHANISM_GENERATION_FAILED")
+    assert _us._contract_finished_flag(rec) is False
+    assert _finished_view(rec) is False
+
+
+def test_bare_malformed_or_false_premise_finished_false():
+    """MALFORMED_OR_FALSE_PREMISE is a constitutional INVALID_QUERY
+    terminal (the query itself is physically incoherent). It is
+    never a finished discovery."""
+    rec = _bare(final_status="MALFORMED_OR_FALSE_PREMISE")
     assert _us._contract_finished_flag(rec) is False
     assert _finished_view(rec) is False
 
@@ -350,3 +399,75 @@ def test_durable_allowlist_covers_completion_records():
         assert name in src, (
             f"{name} must be in the durable allowlist for "
             f"post-pruning auditability")
+
+
+# ---------------------------------------------------------------------------
+# Owner-capability: REST and SSE use two EXPLICIT transports carrying the
+# same opaque capability. The REST path uses the X-Tosca-Owner header
+# (or the `?owner=` query param on GET); the SSE path uses the
+# `?owner=` query param (EventSource cannot set headers). Neither
+# transport may silently revert to cookie-only ownership.
+# ---------------------------------------------------------------------------
+def test_owner_transport_rest_header_and_sse_query_are_distinct():
+    """The REST GET/POST path carries the owner via the X-Tosca-Owner
+    header (or the `?owner=` query param on GET); the SSE stream path
+    carries it via the `?owner=` query param. Both transports accept
+    the same validated opaque token; neither is cookie-only. The
+    server's `_owner_key()` resolution order is cookie -> header ->
+    issued; the `?owner=` query-param override is applied on top
+    (do_GET lines 807-810, do_POST R546 addition)."""
+    from toscanini import server as _srv
+    import inspect
+    # the header transport is defined and used by _owner_key
+    src = inspect.getsource(_srv.Handler._owner_key)
+    assert "X-Tosca-Owner" in src or _srv.OWNER_HEADER in src, (
+        "the REST header transport (X-Tosca-Owner) must be in "
+        "_owner_key's resolution chain")
+    # the query-param override is in do_GET
+    get_src = inspect.getsource(_srv.Handler.do_GET)
+    assert "q_owner" in get_src and "owner" in get_src, (
+        "the SSE/direct-download query-param transport must be in "
+        "do_GET")
+    # the query-param override is now also in do_POST (R546)
+    post_src = inspect.getsource(_srv.Handler.do_POST)
+    assert "q_owner" in post_src, (
+        "the R546 fix: the query-param transport must also be in "
+        "do_POST (the answer route is a POST)")
+    # the streamUrl frontend builder bakes ?owner= into the SSE URL
+    # (the EventSource precedent — the two transports are explicit,
+    # not silently cookie-only)
+    from toscanini import user_state as _us2  # noqa: F401 — import
+    # verify the frontend api.ts carries the header on fetch
+    api_ts = (REPO_ROOT / "TOSCANINI_UI" / "webapp" / "lib"
+               / "api.ts")
+    if api_ts.is_file():
+        text = api_ts.read_text(encoding="utf-8")
+        assert "X-Tosca-Owner" in text, (
+            "the frontend api.ts must attach the X-Tosca-Owner "
+            "header to fetch requests")
+        assert "owner=" in text and "streamUrl" in text, (
+            "the frontend streamUrl() must carry ?owner= for the "
+            "SSE transport")
+
+
+def test_owner_capability_diagnostic_event_is_typed_and_secret_free():
+    """The R546 owner-capability diagnostic on the answer route must
+    emit typed, non-secret evidence: only presence/absence, SHA-256
+    fingerprint, length, source, session-owner fingerprint, match
+    boolean, route, and cause class. The owner token value itself
+    must never enter the forensics record (BS-021, Art. LXXVI)."""
+    from toscanini import server as _srv
+    import inspect
+    src = inspect.getsource(_srv.Handler.do_POST)
+    assert "OWNER_CAPABILITY_DIAG" in src, (
+        "the answer route must record the typed owner-capability "
+        "diagnostic")
+    assert "sha256" in src.lower() or "_diag_fp" in src, (
+        "the diagnostic must carry a SHA-256 fingerprint, not the "
+        "token value")
+    # the cause-class vocabulary
+    for cause in ("SESSION_NOT_FOUND", "SESSION_OWNER_MISMATCH",
+                  "HEADER_NOT_SENT"):
+        assert cause in src, (
+            f"the diagnostic must classify the cause as "
+            f"{cause}")

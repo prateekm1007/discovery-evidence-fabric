@@ -350,24 +350,29 @@ def _contract_finished_flag(session: Dict[str, Any]) -> Optional[bool]:
       3. session['final_state']['completion_states'] — the engine's
          own final_state.json record (the contract's projection
          since R544, re-persisted post-contract).
-      4. typed terminal final_status (R545): a terminal record whose
-         recorded final_status is a typed non-completion outcome gets
-         finished=false from its own honest answer — no six-part
-         contract exists for it and no admissible survivor set, so
-         the COMPLETED_* key-prefix inference is retired for this
-         record and may never guess True. The rule reuses the
-         engine's own completion-like vocabulary (never a second
-         parallel taxonomy): completion-like values are governed by
-         the canonical completion authority (rules 1-3) and fall
-         through to the record's own state key; every other recorded
-         terminal outcome is a typed non-completion answer. A
-         terminal record with NO recorded final_status stays
-         unresolved: the helper returns None and no completion
-         answer is manufactured.
+       4. typed terminal (R545/R546): the record's OWN typed terminal
+          evidence answers its finished flag — read in producer
+          shape (status first: the real worker's infrastructure
+          terminals write the typed state into status and often
+          record NO final_status at all; final_status second: the
+          engine's typed scientific terminals):
+          * a WAITING_EXTERNAL terminal status (RUN_BLOCKED_* —
+            execution_states.py's infrastructure class) answers
+            finished=False: the run is infrastructure-blocked and
+            resumable, never a completed discovery;
+          * a recorded final_status that is a typed non-completion
+            outcome (MECHANISM_STARVED, REJECTED, ...) with no
+            completion answer recorded answers finished=False;
+          * completion-like values are governed by the canonical
+            completion authority (rules 1-3) and fall through
+            unchanged; a terminal record with no typed terminal
+            evidence stays unresolved (None, no manufactured
+            answer).
+            answer).
 
     Scope (R543 Step 6 POS pin): the contract governs TERMINAL records
     only. A non-terminal status (PENDING / BUILDING_PROBLEM / RUNNING /
-    AWAITING_CLARIFICATION) is an explicitly represented transient
+    #    AWAITING_CLARIFICATION) is an explicitly represented
     state — the run has not ended, so a lingering contract answer can
     only describe a PREVIOUS terminal state of a reused record, never
     the live run. Honoring it would be the stale-snapshot error, so
@@ -401,19 +406,41 @@ def _contract_finished_flag(session: Dict[str, Any]) -> Optional[bool]:
         fs_states = fs.get("completion_states")
         if isinstance(fs_states, dict) and "FINISHED_DISCOVERY" in fs_states:
             return bool(fs_states.get("FINISHED_DISCOVERY"))
-    # 4. R545: a typed terminal final_status is its OWN honest answer.
-    # A terminal record that ended in a non-completion outcome has no
-    # six-part contract and no admissible survivor set: finished is
-    # False, and the COMPLETED_* key-prefix inference is retired for
-    # this record (it may never guess True). Completion-like values
-    # are governed by the canonical completion authority (rules 1-3
-    # above; the recorded contract/completion_states/final_state
-    # answer, or the record's own state key when none was recorded)
-    # and fall through here unchanged — no second parallel taxonomy.
-    # A terminal record with NO recorded final_status stays
-    # unresolved: return None, never manufacture a completion answer.
     final_status = str(session.get("final_status") or "").strip()
     status = str(session.get("status") or "")
+    # 4. R545/R546: the typed terminal's OWN honest answer (status
+    # FIRST, final_status SECOND — the real worker's infrastructure
+    # final_status SECOND — the real worker's infrastructure terminals
+    # write the typed state into status and often record NO
+    # final_status at all; the R545 form read final_status first and
+    # missed exactly that shape):
+    #
+    #   4a. status is a typed infrastructure terminal
+    #       (RUN_BLOCKED_* — the execution_states.py §2 WAITING_
+    #       EXTERNAL class) -> finished=False. The record answers
+    #       itself: infrastructure blocked, resumable, never a
+    #       completed discovery; the BLOCKED_TRANSPORT / COMPLETED_*
+    #       key-prefix inference may not turn it into True.
+    #   4b. final_status is a typed scientific non-completion
+    #       terminal (MECHANISM_STARVED, REJECTED, ...) with no
+    #       completion answer recorded -> finished=False from its own
+    #       honest terminal (the R545 rule, unchanged).
+    #   4c. no typed terminal evidence at all -> None: the legacy key
+    #       derivation governs; no completion answer is manufactured.
+    from . import execution_states as _es
+    if _es.mapping(status) is _es.ExecutionState.WAITING_EXTERNAL:
+        # The WAITING_EXTERNAL terminal class (the canonical
+        # execution_states.py §2 mapping — no second taxonomy):
+        #   * the transient pre-clarification state was already
+        #     answered None by rule 0 above;
+        #   * the worker's RUN_BLOCKED_* terminal branches (the
+        #     transport-exhausted and pre-retrieval capability
+        #     refusals) ended the run in the resumable infrastructure
+        #     class (Art. LXI: infrastructure state, never a
+        #     scientific verdict) — the record answers finished=False
+        #     from its own typed terminal; the BLOCKED_TRANSPORT /
+        #     COMPLETED_* key-prefix inference may not promote it.
+        return False
     if final_status and status in (
             "COMPLETE", "ERROR_CANCELED", "ERROR_STARVED",
             "ERROR_BLOCKED", "ERROR_STUCK", "INTERRUPTED"):
