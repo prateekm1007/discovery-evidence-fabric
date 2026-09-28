@@ -1,0 +1,410 @@
+{
+ "ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
+ "version": "1.0.0",
+ "requested_models": 3,
+ "available_providers": [
+  "agnes",
+  "unorouter",
+  "xkiro",
+  "apinex",
+  "bai",
+  "bynara",
+  "atria",
+  "hf",
+  "zai",
+  "openrouter",
+  "nvidia"
+ ],
+ "members": [
+  {
+   "role": "MODEL_A",
+   "provider_id": "agnes",
+   "status": "OK",
+   "model": "agnes-3.0-flash",
+   "prompt_hash": "30117ee31a8d00a74b83bb8a465cc6881a4938771cba48319adfdcfaf74bcb5f",
+   "output_hash": "135ecb707c6e6f6301ccb027452a10181a1728ff705938734f68fbd2117fe387",
+   "latency_ms": 9013,
+   "fields": {
+    "mechanism": "Temperature-dependent degradation of lithium inventory at the negative electrode due to graphite phase separation dynamics during fast charging.",
+    "intervention": "Implement a diagnostic routine that applies a controlled high-rate charge pulse to the cold battery and monitors for an immediate, transient voltage sag or internal resistance spike that clears only upon full thermal recovery, confirming graphite phase separation as the root cause of the intermittent sensor fault.",
+    "expected_effect": "The battery warning light will flash during the cold idle charge pulse and remain illuminated or behave erratically, whereas it will clear completely once the battery temperature exceeds the phase separation threshold (or after driving), validating the cold-idle-only fault mechanism.",
+    "falsification_test": "If applying the diagnostic charge pulse in sub-zero conditions does not produce an immediate anomaly in internal impedance or voltage, or if the anomaly persists even after the battery is fully warmed to 25°C, the graphite phase separation hypothesis is falsified.",
+    "mechanism_source_span": "irreversibly reduce lithium inventory, closely linked"
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:agnes:135ecb707c6e",
+    "mechanism": "Temperature-dependent degradation of lithium inventory at the negative electrode due to graphite phase separation dynamics during fast charging.",
+    "intervention": "Implement a diagnostic routine that applies a controlled high-rate charge pulse to the cold battery and monitors for an immediate, transient voltage sag or internal resistance spike that clears only upon full thermal recovery, confirming graphite phase separation as the root cause of the intermittent sensor fault.",
+    "expected_effect": "The battery warning light will flash during the cold idle charge pulse and remain illuminated or behave erratically, whereas it will clear completely once the battery temperature exceeds the phase separation threshold (or after driving), validating the cold-idle-only fault mechanism.",
+    "falsification_test": "If applying the diagnostic charge pulse in sub-zero conditions does not produce an immediate anomaly in internal impedance or voltage, or if the anomaly persists even after the battery is fully warmed to 25°C, the graphite phase separation hypothesis is falsified.",
+    "mechanism_source_span": "irreversibly reduce lithium inventory, closely linked",
+    "source_evidence": {
+     "source_id": "doi:10.1002/advs.75306",
+     "source_hash": "4debd5e481631cf49c42145111eee8027a971b2db8fd4c3c84ce71a963ff7129"
+    }
+   }
+  },
+  {
+   "role": "MODEL_B",
+   "provider_id": "unorouter",
+   "status": "OK",
+   "model": "agnes-3.0-flash",
+   "prompt_hash": "30117ee31a8d00a74b83bb8a465cc6881a4938771cba48319adfdcfaf74bcb5f",
+   "output_hash": "de9d44d5467c6bbe133d420ccebf4e577bef9ed4b2002cdd84a6665d031f1e4e",
+   "latency_ms": 27399,
+   "fields": {
+    "mechanism": "Temperature-dependent changes in internal battery impedance and voltage drop under load, particularly related to phase separation dynamics affecting charging efficiency and cell balance.",
+    "intervention": "Measure the DC resistance and internal impedance of the battery and charging system at room temperature and below 0C, comparing state-of-charge and state-of-health to identify thermal threshold faults.",
+    "expected_effect": "Identification of increased internal resistance at low temperatures causing transient voltage sags that trigger the warning light, resolving the intermittent cold-idle fault.",
+    "falsification_test": "Connect a clamp meter and multimeter to the battery and alternator B+ while idling in sub-zero conditions; if impedance remains low and voltage sag is minimal, the cold-idle warning is unrelated to internal resistance.",
+    "mechanism_source_span": "closely linked to graphite phase separation dynamics"
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:unorouter:de9d44d5467c",
+    "mechanism": "Temperature-dependent changes in internal battery impedance and voltage drop under load, particularly related to phase separation dynamics affecting charging efficiency and cell balance.",
+    "intervention": "Measure the DC resistance and internal impedance of the battery and charging system at room temperature and below 0C, comparing state-of-charge and state-of-health to identify thermal threshold faults.",
+    "expected_effect": "Identification of increased internal resistance at low temperatures causing transient voltage sags that trigger the warning light, resolving the intermittent cold-idle fault.",
+    "falsification_test": "Connect a clamp meter and multimeter to the battery and alternator B+ while idling in sub-zero conditions; if impedance remains low and voltage sag is minimal, the cold-idle warning is unrelated to internal resistance.",
+    "mechanism_source_span": "closely linked to graphite phase separation dynamics",
+    "source_evidence": {
+     "source_id": "doi:10.1002/advs.75306",
+     "source_hash": "4debd5e481631cf49c42145111eee8027a971b2db8fd4c3c84ce71a963ff7129"
+    }
+   }
+  },
+  {
+   "role": "MODEL_C",
+   "provider_id": "xkiro",
+   "status": "OK",
+   "model": "qwen/qwen3-max:free",
+   "prompt_hash": "30117ee31a8d00a74b83bb8a465cc6881a4938771cba48319adfdcfaf74bcb5f",
+   "output_hash": "2797bc4ed8b4df3cc1b451774644b441b9cb4dcb8a584d1a6c060eac9e4580ff",
+   "latency_ms": 7576,
+   "fields": {
+    "mechanism": "Model-informed control exploiting internal cell physics to manage charge rate based on electrochemical state",
+    "intervention": "Implement a temperature-compensated idle-speed and alternator field-duty-cycle control algorithm that increases engine RPM and regulator output below 0C to maintain minimum charging voltage, mirroring the paper's physics-based protocol adjustment.",
+    "expected_effect": "Eliminates intermittent battery warning light at cold idle by ensuring alternator output exceeds battery voltage threshold through active model-informed regulation rather than passive fixed-parameter control.",
+    "falsification_test": "Log alternator output voltage and battery terminal voltage simultaneously at idle below 0C with the updated control software; if the warning light still triggers while measured alternator output remains above 13.5V, the mechanism is falsified.",
+    "mechanism_source_span": "exploiting internal cell physics through model-informed control can unlock high-rate charging without hardware modification"
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:xkiro:2797bc4ed8b4",
+    "mechanism": "Model-informed control exploiting internal cell physics to manage charge rate based on electrochemical state",
+    "intervention": "Implement a temperature-compensated idle-speed and alternator field-duty-cycle control algorithm that increases engine RPM and regulator output below 0C to maintain minimum charging voltage, mirroring the paper's physics-based protocol adjustment.",
+    "expected_effect": "Eliminates intermittent battery warning light at cold idle by ensuring alternator output exceeds battery voltage threshold through active model-informed regulation rather than passive fixed-parameter control.",
+    "falsification_test": "Log alternator output voltage and battery terminal voltage simultaneously at idle below 0C with the updated control software; if the warning light still triggers while measured alternator output remains above 13.5V, the mechanism is falsified.",
+    "mechanism_source_span": "exploiting internal cell physics through model-informed control can unlock high-rate charging without hardware modification",
+    "source_evidence": {
+     "source_id": "doi:10.1002/advs.75306",
+     "source_hash": "4debd5e481631cf49c42145111eee8027a971b2db8fd4c3c84ce71a963ff7129"
+    }
+   }
+  }
+ ],
+ "common_claims": [],
+ "disagreements": [
+  {
+   "disagreement_id": "DIS-001",
+   "dimension": "mechanism",
+   "role_a": "MODEL_A",
+   "claim_a": "Temperature-dependent degradation of lithium inventory at the negative electrode due to graphite phase separation dynamics during fast charging.",
+   "role_b": "MODEL_B",
+   "claim_b": "Temperature-dependent changes in internal battery impedance and voltage drop under load, particularly related to phase separation dynamics affecting charging efficiency and cell balance.",
+   "similarity": 0.214,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T12:15:45+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-002",
+   "dimension": "mechanism",
+   "role_a": "MODEL_A",
+   "claim_a": "Temperature-dependent degradation of lithium inventory at the negative electrode due to graphite phase separation dynamics during fast charging.",
+   "role_b": "MODEL_C",
+   "claim_b": "Model-informed control exploiting internal cell physics to manage charge rate based on electrochemical state",
+   "similarity": 0.0,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T12:15:45+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-003",
+   "dimension": "mechanism",
+   "role_a": "MODEL_B",
+   "claim_a": "Temperature-dependent changes in internal battery impedance and voltage drop under load, particularly related to phase separation dynamics affecting charging efficiency and cell balance.",
+   "role_b": "MODEL_C",
+   "claim_b": "Model-informed control exploiting internal cell physics to manage charge rate based on electrochemical state",
+   "similarity": 0.067,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T12:15:45+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-004",
+   "dimension": "intervention",
+   "role_a": "MODEL_A",
+   "claim_a": "Implement a diagnostic routine that applies a controlled high-rate charge pulse to the cold battery and monitors for an immediate, transient voltage sag or internal resistance spike that clears only upon full thermal recovery, confirming graphite phase separation as the root cause of the intermittent sensor fault.",
+   "role_b": "MODEL_B",
+   "claim_b": "Measure the DC resistance and internal impedance of the battery and charging system at room temperature and below 0C, comparing state-of-charge and state-of-health to identify thermal threshold faults.",
+   "similarity": 0.111,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T12:15:45+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-005",
+   "dimension": "intervention",
+   "role_a": "MODEL_A",
+   "claim_a": "Implement a diagnostic routine that applies a controlled high-rate charge pulse to the cold battery and monitors for an immediate, transient voltage sag or internal resistance spike that clears only upon full thermal recovery, confirming graphite phase separation as the root cause of the intermittent sensor fault.",
+   "role_b": "MODEL_C",
+   "claim_b": "Implement a temperature-compensated idle-speed and alternator field-duty-cycle control algorithm that increases engine RPM and regulator output below 0C to maintain minimum charging voltage, mirroring the paper's physics-based protocol adjustment.",
+   "similarity": 0.036,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T12:15:45+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-006",
+   "dimension": "intervention",
+   "role_a": "MODEL_B",
+   "claim_a": "Measure the DC resistance and internal impedance of the battery and charging system at room temperature and below 0C, comparing state-of-charge and state-of-health to identify thermal threshold faults.",
+   "role_b": "MODEL_C",
+   "claim_b": "Implement a temperature-compensated idle-speed and alternator field-duty-cycle control algorithm that increases engine RPM and regulator output below 0C to maintain minimum charging voltage, mirroring the paper's physics-based protocol adjustment.",
+   "similarity": 0.075,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T12:15:45+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-007",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_A",
+   "claim_a": "The battery warning light will flash during the cold idle charge pulse and remain illuminated or behave erratically, whereas it will clear completely once the battery temperature exceeds the phase separation threshold (or after driving), validating the cold-idle-only fault mechanism.",
+   "role_b": "MODEL_B",
+   "claim_b": "Identification of increased internal resistance at low temperatures causing transient voltage sags that trigger the warning light, resolving the intermittent cold-idle fault.",
+   "similarity": 0.125,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T12:15:45+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-008",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_A",
+   "claim_a": "The battery warning light will flash during the cold idle charge pulse and remain illuminated or behave erratically, whereas it will clear completely once the battery temperature exceeds the phase separation threshold (or after driving), validating the cold-idle-only fault mechanism.",
+   "role_b": "MODEL_C",
+   "claim_b": "Eliminates intermittent battery warning light at cold idle by ensuring alternator output exceeds battery voltage threshold through active model-informed regulation rather than passive fixed-parameter control.",
+   "similarity": 0.159,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T12:15:45+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-009",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_B",
+   "claim_a": "Identification of increased internal resistance at low temperatures causing transient voltage sags that trigger the warning light, resolving the intermittent cold-idle fault.",
+   "role_b": "MODEL_C",
+   "claim_b": "Eliminates intermittent battery warning light at cold idle by ensuring alternator output exceeds battery voltage threshold through active model-informed regulation rather than passive fixed-parameter control.",
+   "similarity": 0.176,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T12:15:45+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-010",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "If applying the diagnostic charge pulse in sub-zero conditions does not produce an immediate anomaly in internal impedance or voltage, or if the anomaly persists even after the battery is fully warmed to 25°C, the graphite phase separation hypothesis is falsified.",
+   "role_b": "MODEL_B",
+   "claim_b": "Connect a clamp meter and multimeter to the battery and alternator B+ while idling in sub-zero conditions; if impedance remains low and voltage sag is minimal, the cold-idle warning is unrelated to internal resistance.",
+   "similarity": 0.162,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T12:15:45+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-011",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "If applying the diagnostic charge pulse in sub-zero conditions does not produce an immediate anomaly in internal impedance or voltage, or if the anomaly persists even after the battery is fully warmed to 25°C, the graphite phase separation hypothesis is falsified.",
+   "role_b": "MODEL_C",
+   "claim_b": "Log alternator output voltage and battery terminal voltage simultaneously at idle below 0C with the updated control software; if the warning light still triggers while measured alternator output remains above 13.5V, the mechanism is falsified.",
+   "similarity": 0.073,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T12:15:45+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-012",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_B",
+   "claim_a": "Connect a clamp meter and multimeter to the battery and alternator B+ while idling in sub-zero conditions; if impedance remains low and voltage sag is minimal, the cold-idle warning is unrelated to internal resistance.",
+   "role_b": "MODEL_C",
+   "claim_b": "Log alternator output voltage and battery terminal voltage simultaneously at idle below 0C with the updated control software; if the warning light still triggers while measured alternator output remains above 13.5V, the mechanism is falsified.",
+   "similarity": 0.206,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T12:15:45+00:00Z"
+  }
+ ],
+ "unique_mechanisms": [
+  {
+   "dimension": "mechanism",
+   "role": "MODEL_A",
+   "claim": "Temperature-dependent degradation of lithium inventory at the negative electrode due to graphite phase separation dynamics during fast charging.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "mechanism",
+   "role": "MODEL_B",
+   "claim": "Temperature-dependent changes in internal battery impedance and voltage drop under load, particularly related to phase separation dynamics affecting charging efficiency and cell balance.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "mechanism",
+   "role": "MODEL_C",
+   "claim": "Model-informed control exploiting internal cell physics to manage charge rate based on electrochemical state",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_A",
+   "claim": "Implement a diagnostic routine that applies a controlled high-rate charge pulse to the cold battery and monitors for an immediate, transient voltage sag or internal resistance spike that clears only upon full thermal recovery, confirming graphite phase separation as the root cause of the intermittent sensor fault.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_B",
+   "claim": "Measure the DC resistance and internal impedance of the battery and charging system at room temperature and below 0C, comparing state-of-charge and state-of-health to identify thermal threshold faults.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_C",
+   "claim": "Implement a temperature-compensated idle-speed and alternator field-duty-cycle control algorithm that increases engine RPM and regulator output below 0C to maintain minimum charging voltage, mirroring the paper's physics-based protocol adjustment.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_A",
+   "claim": "The battery warning light will flash during the cold idle charge pulse and remain illuminated or behave erratically, whereas it will clear completely once the battery temperature exceeds the phase separation threshold (or after driving), validating the cold-idle-only fault mechanism.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_B",
+   "claim": "Identification of increased internal resistance at low temperatures causing transient voltage sags that trigger the warning light, resolving the intermittent cold-idle fault.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_C",
+   "claim": "Eliminates intermittent battery warning light at cold idle by ensuring alternator output exceeds battery voltage threshold through active model-informed regulation rather than passive fixed-parameter control.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_A",
+   "claim": "If applying the diagnostic charge pulse in sub-zero conditions does not produce an immediate anomaly in internal impedance or voltage, or if the anomaly persists even after the battery is fully warmed to 25°C, the graphite phase separation hypothesis is falsified.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_B",
+   "claim": "Connect a clamp meter and multimeter to the battery and alternator B+ while idling in sub-zero conditions; if impedance remains low and voltage sag is minimal, the cold-idle warning is unrelated to internal resistance.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_C",
+   "claim": "Log alternator output voltage and battery terminal voltage simultaneously at idle below 0C with the updated control software; if the warning light still triggers while measured alternator output remains above 13.5V, the mechanism is falsified.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  }
+ ],
+ "adjudication": {
+  "adjudicator": "DETERMINISTIC (field completeness -> falsifiability -> source span)",
+  "primary_role": "MODEL_A",
+  "primary_provider": "agnes",
+  "primary_candidate_id": "cand:ENS:agnes:135ecb707c6e",
+  "ranking": [
+   {
+    "role": "MODEL_A",
+    "provider_id": "agnes",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   },
+   {
+    "role": "MODEL_B",
+    "provider_id": "unorouter",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   },
+   {
+    "role": "MODEL_C",
+    "provider_id": "xkiro",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   }
+  ],
+  "consensus_forced": false,
+  "note": "the primary candidate enters the pipeline; disagreement objects remain UNRESOLVED and travel with the artifact chain (E15-E: do not force consensus)",
+  "decided_at": "2026-09-28T12:15:45+00:00Z"
+ },
+ "built_at": "2026-09-28T12:14:43+00:00Z",
+ "status": "ENSEMBLE_RUN",
+ "paths": [
+  "agnes",
+  "unorouter",
+  "xkiro"
+ ],
+ "comparison": {
+  "method": "pairwise significant-word Jaccard over the four invention claim dimensions (deterministic, N-ary; E16-G)",
+  "thresholds": {
+   "agreement": 0.3,
+   "disagreement": 0.25
+  },
+  "roles_compared": [
+   "MODEL_A",
+   "MODEL_B",
+   "MODEL_C"
+  ],
+  "pairs_compared": 3
+ }
+}
