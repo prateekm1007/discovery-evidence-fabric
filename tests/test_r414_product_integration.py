@@ -736,7 +736,7 @@ class TestLanguageGuard:
                 "*.tsx"))
         assert files, "webapp sources not found"
         for f in files:
-            text = f.read_text().lower()
+            text = f.read_text(encoding="utf-8").lower()
             for b in banned:
                 assert b not in text, f"{f.name} carries '{b}'"
 

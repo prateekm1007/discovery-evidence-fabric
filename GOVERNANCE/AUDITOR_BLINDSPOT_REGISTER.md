@@ -304,6 +304,14 @@ This register records places where previous audits were empirically blindsided. 
 
 **Required check:** Before prescribing new work, reconstruct current mission, authoritative repositories/commits, deployment identity, current production path, settled architectural decisions, standing blockers, latest accepted directive, known rejected approaches, and last verified end-to-end behavior. Do not repeat or reverse a prior decision without new evidence.
 
+## BS-038 — Auditing only the named call sites misses parallel state-derivation paths
+
+**Observed:** Auditing that every `public_session_view(...)` call site uses the refreshed canonical state projection is not sufficient, because a terminal stream (SSE) or another customer-visible API path can call `user_state_view(...)` directly on a stale record, bypassing the one seam the audit checked.
+
+**Failure mode:** A finished/discovery-state inconsistency survives on exactly the paths the audit instrument did not enumerate; "all audited call sites are correct" is reported as proof while an un-audited sibling path still derives the flag from a retired or stale rule.
+
+**Principle:** Audit the DERIVATION POINTS of a state flag, not the call sites of one named helper. Every path that can surface the flag (sync API, SSE terminal events, background workers, read-time recompute) must resolve through the single authoritative refresh seam; a structural check (e.g., no bare `user_state_view(` surviving in the serving layer) beats a call-site inventory.
+
 ## Audit-trigger rule
 
 When a future audit encounters a new failure mode that is not covered here, the auditor must:

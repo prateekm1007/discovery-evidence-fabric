@@ -290,12 +290,104 @@ def _evidence_component(run_dir: Path,
     }
 
 
-def _mechanisms_component(selection: Dict[str, Any],
+def _unwrap_mechanism_block(mm: Any) -> Dict[str, Any]:
+    """Normalize a mechanism block (value-wrapped synthesis output or a
+    plain dict) to a plain dict. Shared by the competing-set resolver:
+    one normalization, never per-callsite unwrapping drift."""
+    if isinstance(mm, dict) and "value" in mm:
+        mm = mm.get("value") or {}
+    return mm if isinstance(mm, dict) else {}
+
+
+def _competing_record(run_dir: Path,
+                      row: Dict[str, Any]) -> Dict[str, Any]:
+    """R544: one competing candidate's mechanism + kill condition,
+    resolved from RECORDED sources only (never derived, never a
+    primary fallback):
+
+      1. the selection row's own stamped fields (the engine stamps
+         mechanism/intervention/falsification_test onto every
+         investigated row at selection time);
+      2. the candidate's OWN invention specification (suffixed file
+         for non-primary keys — rows that reached spec build);
+      3. PACKAGE_SKIPPED_CHEAP_SCREEN_<key>.json's structured
+         candidate (cheap-screen kills never built a spec);
+      4. ENVELOPE_<key>.json's mechanism_map (last resort).
+
+    A killed candidate needs no package, but it needs its mechanism
+    and kill condition: the user is shown the reasoning path that led
+    to the surviving candidate."""
+    mech = str(row.get("mechanism") or "").strip()
+    interv = str(row.get("intervention") or "").strip()
+    kill = str(row.get("falsification_test") or "").strip()
+    source = "selection_row" if (mech and kill) else ""
+    key = row.get("key") or "primary"
+    if not (mech and kill):
+        spec, _ = _candidate_artifact(run_dir,
+                                      "INVENTION_SPECIFICATION", key)
+        mm = _unwrap_mechanism_block(spec.get("mechanism"))
+        mech = mech or str(mm.get("mechanism") or "").strip()
+        interv = interv or str(mm.get("intervention") or "").strip()
+        kill = kill or str(mm.get("falsification_test") or "").strip()
+        if not kill:
+            cc_block = _unwrap_mechanism_block(
+                spec.get("causal_chain"))
+            kill = kill or str(
+                cc_block.get("falsification_test") or "").strip()
+        if not kill:
+            eng, _ = _candidate_artifact(
+                run_dir, "ENGINEERING_SPECIFICATION", key)
+            kc = eng.get("kill_condition") \
+                if isinstance(eng, dict) else {}
+            kill = kill or str((kc or {}).get("falsification_test")
+                               or "").strip()
+        if mech and kill and not source:
+            source = "candidate_specification"
+    if not (mech and kill):
+        skipped = _read(
+            run_dir / f"PACKAGE_SKIPPED_CHEAP_SCREEN_{key}.json") or {}
+        sc = skipped.get("structured_candidate") or {}
+        if not isinstance(sc, dict):
+            sc = {}
+        mech = mech or str(sc.get("mechanism") or "").strip()
+        interv = interv or str(sc.get("intervention") or "").strip()
+        kill = kill or str(sc.get("testable_prediction") or "").strip()
+        if mech and kill and not source:
+            source = "cheap_screen_record"
+    if not (mech and kill):
+        env = _read(run_dir / f"ENVELOPE_{key}.json") or {}
+        mm = env.get("mechanism_map") or {}
+        if not isinstance(mm, dict):
+            mm = {}
+        mech = mech or str(mm.get("mechanism") or "").strip()
+        interv = interv or str(mm.get("intervention") or "").strip()
+        kill = kill or str(mm.get("falsification_test") or "").strip()
+        if mech and kill and not source:
+            source = "candidate_envelope"
+    return {"candidate_id": row.get("candidate_id"),
+            "key": key,
+            "mechanism": mech[:240],
+            "intervention": interv[:240],
+            "what_would_kill_it": kill[:240],
+            "disposition": row.get("disposition") or "UNRESOLVED",
+            "mechanism_source": source or "ABSENT",
+            "mechanism_recorded": bool(mech),
+            "kill_condition_recorded": bool(kill)}
+
+
+def _mechanisms_component(run_dir: Path,
+                          selection: Dict[str, Any],
                           survivors: List[Dict[str, Any]]
                           ) -> Dict[str, Any]:
     """Component 2 — competing mechanisms + falsification / kill
     condition. The COMPETING set (everything investigated, including
-    kills) is kept distinct from the SURVIVING set."""
+    kills) is kept distinct from the SURVIVING set — AND every
+    exposed competing candidate is validated literally: candidate_id
+    + mechanism + kill condition + a RESOLVED disposition
+    (SURVIVED/KILLED/EXCLUDED). UNRESOLVED fails closed. A killed
+    candidate needs no package, but it needs its mechanism and kill
+    condition: the user is shown the reasoning path that led to the
+    surviving candidate."""
     rows = [r for r in (selection.get("ranked") or [])
             if isinstance(r, dict)]
     per: List[Dict[str, Any]] = []
@@ -314,6 +406,33 @@ def _mechanisms_component(selection: Dict[str, Any],
             "what_would_kill_it": kill[:240],
         })
         complete = complete and ok
+    # R544: the competing set is validated LITERALLY, not merely
+    # implied by the survivors. Every investigated row must carry a
+    # candidate_id, a mechanism, a kill condition, and a RESOLVED
+    # disposition — resolved from the row's own stamped fields, the
+    # candidate's own specification, the cheap-screen record, or the
+    # candidate envelope (in that order; never a primary fallback).
+    competing: List[Dict[str, Any]] = []
+    competing_ok = True
+    for r in rows:
+        rec = _competing_record(run_dir, r)
+        disp = rec["disposition"]
+        disp_ok = disp in ("SURVIVED", "KILLED", "EXCLUDED")
+        ok = bool(r.get("candidate_id")) and rec["mechanism_recorded"] \
+            and rec["kill_condition_recorded"] and disp_ok
+        rec["disposition_resolved"] = bool(disp_ok)
+        rec["complete"] = bool(ok)
+        if not ok:
+            rec["gap"] = ("; ".join(
+                p for p, good in (
+                    ("candidate_id", bool(r.get("candidate_id"))),
+                    ("mechanism", rec["mechanism_recorded"]),
+                    ("kill_condition", rec["kill_condition_recorded"]),
+                    ("resolved_disposition", disp_ok))
+                if not good) or "unknown")
+        competing.append(rec)
+        competing_ok = competing_ok and ok
+    complete = complete and competing_ok
     killed = [x for x in rows if x.get("killed")]
     excluded = [x for x in rows
                 if (x.get("disposition") or "") == "EXCLUDED"]
@@ -321,7 +440,9 @@ def _mechanisms_component(selection: Dict[str, Any],
         "component": COMP_MECHANISMS,
         "complete": bool(complete),
         "source_files": ["SURVIVOR_SELECTION.json",
-                         "INVENTION_SPECIFICATION[_<key>].json"],
+                         "INVENTION_SPECIFICATION[_<key>].json",
+                         "PACKAGE_SKIPPED_CHEAP_SCREEN_[<key>].json",
+                         "ENVELOPE_[<key>].json"],
         "n_competing_investigated": len(rows),
         "n_killed": len(killed),
         "n_excluded_by_gates": len(excluded),
@@ -340,9 +461,14 @@ def _mechanisms_component(selection: Dict[str, Any],
                      "outcomes, both exposed)"),
         },
         "per_survivor": per,
+        "competing_candidates": competing,
         "requirement": (">=1 mechanism with a stated falsification / "
-                        "kill condition per displayed survivor; the "
-                        "competing set is recorded, kills included"),
+                        "kill condition per displayed survivor, AND "
+                        "every exposed competing candidate carries "
+                        "candidate_id + mechanism + kill condition + a "
+                        "RESOLVED disposition (SURVIVED/KILLED/EXCLUDED; "
+                        "UNRESOLVED fails closed); the competing set is "
+                        "recorded, kills included"),
     }
 
 
@@ -419,20 +545,94 @@ def _adversarial_component(selection: Dict[str, Any],
     }
 
 
+#: canonical applicability context classes that WARRANT physical
+#: geometry (R443 closed vocabulary, read from the candidate's OWN
+#: engineering specification — never a UI guess). A warranted problem
+#: requires a candidate-owned 3D model artifact inside the
+#: candidate's OWN package; an explicit conceptual/system label alone
+#: does not complete the engineering component. UNKNOWN (or absent)
+#: context carries no affirmative warrant: explicit conceptual
+#: labeling suffices there (never a vague/absent class).
+GEOMETRY_WARRANTED_CONTEXTS = frozenset({
+    "MEDICAL_IN_VIVO", "MEDICAL_EX_VIVO", "INDUSTRIAL_PROCESS",
+    "LABORATORY_BENCH", "CONSUMER",
+})
+
+
+def _candidate_model_artifact(run_dir: Path,
+                              pkg_rec: Dict[str, Any]) -> Dict[str, Any]:
+    """Does the candidate's OWN package carry a 3D model artifact?
+    Opens the recorded ZIP bytes (DOWNLOAD/ first, then run root) and
+    requires MODEL/MODEL_MANIFEST.json with a model_id plus at least
+    one MODEL/*.glb. A candidate whose package has no MODEL layer —
+    or whose record points at another candidate's ZIP — has no
+    candidate-owned artifact (Art. XXVIII: never presented as
+    geometry it did not earn; never borrowed)."""
+    import zipfile as _zf
+    zip_name = (pkg_rec or {}).get("zip_name")
+    zpath = _rrs._locate_zip(run_dir, zip_name) \
+        if (pkg_rec or {}).get("complete") else None
+    if zpath is None:
+        return {"owned": False,
+                "basis": "no candidate-bound ZIP on disk"}
+    try:
+        zf = _zf.ZipFile(str(zpath))
+        names = zf.namelist()
+    except Exception as exc:  # noqa: BLE001 — unreadable bytes fail
+        return {"owned": False,
+                "basis": f"ZIP unreadable: {type(exc).__name__}"}
+    try:
+        mman_name = next(
+            (n for n in names
+             if n == "MODEL/MODEL_MANIFEST.json"
+             or n.endswith("/MODEL/MODEL_MANIFEST.json")), None)
+        mman: Dict[str, Any] = {}
+        if mman_name is not None:
+            try:
+                mman = json.loads(zf.read(mman_name).decode("utf-8"))
+            except Exception:  # noqa: BLE001 — unparseable fails
+                mman = {}
+        glbs = [n for n in names
+                if n.lower().endswith(".glb")
+                and "MODEL/" in n.replace("\\", "/").upper()]
+        owned = isinstance(mman, dict) and bool(mman.get("model_id")) \
+            and len(glbs) >= 1
+        return {"owned": bool(owned),
+                "basis": ("MODEL/MODEL_MANIFEST.json with model_id + "
+                          f"{len(glbs)} MODEL/*.glb in the candidate's "
+                          "own ZIP" if owned else
+                          "candidate's own ZIP lacks a MODEL layer "
+                          "(manifest without model_id or no MODEL/*.glb)"),
+                "model_id": (mman.get("model_id")
+                             if isinstance(mman, dict) else None),
+                "n_glb": len(glbs)}
+    finally:
+        try:
+            zf.close()
+        except Exception:  # noqa: BLE001 — result stands regardless
+            pass
+
+
 def _engineering_component(run_dir: Path,
                            survivors: List[Dict[str, Any]],
                            pkg_records: Dict[str, Any]
                            ) -> Dict[str, Any]:
     """Component 4 — engineering definition + applicable 3D model.
 
-    Physical/geometric invention -> earned engineering geometry + 3D
-    model. Non-geometric invention -> an EXPLICIT conceptual/system 3D
-    model class, labeled as such. What is prohibited is silently
-    presenting a conceptual object as earned engineering CAD — and a
-    vague 'see package' placeholder is not a model artifact. R543-3:
-    a non-primary survivor's own suffixed ENGINEERING_SPECIFICATION is
-    the ONLY source — a missing file is a typed component gap, never
-    the primary candidate's engineering record."""
+    Physical/geometric invention (per the CANONICAL applicability
+    state on the candidate's OWN engineering specification — the
+    R443 context class, never a UI guess) -> the candidate's OWN
+    package must carry a 3D model artifact (MODEL/MODEL_MANIFEST.json
+    with model_id + at least one MODEL/*.glb), AND the model class
+    must be explicit (earned engineering geometry where warranted,
+    an EXPLICIT conceptual/system label otherwise). What is
+    prohibited is a warranted problem with no candidate-owned
+    artifact, and silently presenting a conceptual object as earned
+    engineering CAD — and a vague 'see package' placeholder is not a
+    model artifact. R543-3: a non-primary survivor's own suffixed
+    ENGINEERING_SPECIFICATION is the ONLY source — a missing file is
+    a typed component gap, never the primary candidate's engineering
+    record."""
     pkgs = (pkg_records.get("packages") or {})
     per: List[Dict[str, Any]] = []
     complete = bool(survivors)
@@ -447,17 +647,45 @@ def _engineering_component(run_dir: Path,
         arch = eng.get("system_architecture") or {}
         geo = eng.get("geometry") or {}
         definition = bool(core) or bool(geo) or bool(arch)
+        # R544: the critical parameters ride the thread (name/value/
+        # unit, honestly UNKNOWN when unsourced — Art. XXVII). The
+        # list must be RECORDED on the candidate's own spec; values
+        # may be UNKNOWN, absence may not.
+        _cps = (core.get("critical_parameters")
+                if isinstance(core, dict) else []) or []
+        params_recorded = isinstance(_cps, list) and len(_cps) >= 1
         pkg_rec = pkgs.get(str(r.get("candidate_id"))) \
             or pkgs.get(str(key)) or {}
         m = _model_class(run_dir, key, eng, pkg_rec)
-        ok = definition and bool(m.get("model_class"))
+        # the canonical geometry warrant, from the candidate's OWN
+        # applicability state (R443 PROBLEM_CONTEXT_APPLICABILITY).
+        applic = eng.get("applicability") or {}
+        context = str(applic.get("context_class") or "UNKNOWN")
+        warranted = context in GEOMETRY_WARRANTED_CONTEXTS
+        artifact = _candidate_model_artifact(run_dir, pkg_rec) \
+            if warranted else {"owned": None,
+                               "basis": ("no affirmative geometry "
+                                         "warrant in the canonical "
+                                         "applicability state — "
+                                         "explicit conceptual labeling "
+                                         "suffices")}
+        ok = definition and bool(m.get("model_class")) \
+            and params_recorded \
+            and (artifact.get("owned") is not False)
         per.append({
             "candidate_id": r.get("candidate_id"),
             "engineering_definition_present": definition,
+            "parameters_recorded": bool(params_recorded),
+            "n_parameters": len(_cps) if isinstance(_cps, list) else 0,
             "model_class": m.get("model_class"),
             "model_class_source": m.get("source"),
             "earned_engineering_geometry": bool(
                 m.get("earned_geometry")),
+            "geometry_warrant": ("PHYSICAL_CONTEXT:" + context
+                                 if warranted else
+                                 "NO_AFFIRMATIVE_WARRANT:" + context),
+            "model_artifact_owned": artifact.get("owned"),
+            "model_artifact_basis": artifact.get("basis"),
             "labeling": ("earned engineering geometry + 3D model"
                          if m.get("earned_geometry") else
                          "explicit conceptual/system 3D model class "
@@ -472,10 +700,14 @@ def _engineering_component(run_dir: Path,
                          "GEOMETRY_OUT.json",
                          "RANKED_PACKAGE_RECORDS.json"],
         "per_survivor": per,
-        "requirement": ("engineering definition present + an explicit "
-                         "model class (earned geometry or labeled "
-                         "conceptual/system model) for every displayed "
-                         "survivor — never a 'see package' placeholder"),
+        "requirement": ("engineering definition present + critical "
+                        "parameters recorded (values may be honestly "
+                        "UNKNOWN) + an explicit model class for every "
+                        "displayed survivor (never a 'see package' "
+                        "placeholder) + for canonically "
+                        "geometry-warranted problems, a candidate-owned "
+                        "3D model artifact inside the candidate's OWN "
+                        "package"),
     }
 
 
@@ -549,7 +781,28 @@ def _experiment_component(run_dir: Path,
 def _package_component(run_dir: Path,
                        ranked_record: Dict[str, Any]) -> Dict[str, Any]:
     """Component 6 — the downloadable candidate-bound technology
-    package (hash re-measured from disk by ranked_result_set)."""
+    package. R544 preferred contract, mechanically enforced per
+    admissible survivor (Art. II/III/X — every check re-measures the
+    artifact, never trusts a record field):
+
+        candidate package compiled (record complete + ZIP on disk)
+        + candidate package independently quality-verified (the SAME
+          independent package-quality gate the bridge release path
+          runs, re-run HERE on the ZIP bytes — a recorded PASS for
+          different bytes is never accepted)
+        + candidate package identity/hash verified (binding + hash
+          re-measured)
+        + candidate package contents verified (the actual ZIP is
+          opened: manifest, identity, evidence, mechanism + kill
+          condition, disposition, engineering, model + GLB,
+          parameters, experiment + decision rule)
+        = technology_package_complete
+
+    COMPLETE_CANDIDATE_PACKAGE (this component) is NOT
+    BUYER_RELEASED_PACKAGE (the bridge release authority): a
+    candidate package exists as the candidate's deliverable, but the
+    UI never presents it as a buyer release unless the release path
+    passed. FINISHED_DISCOVERY requires this component complete."""
     # R399 W2.1: a scientifically rejected run NEVER has a package —
     # the packaging refusal is a recorded constitutional state
     # (PACKAGE_SKIPPED_SCIENTIFICALLY_REJECTED.json), not a compile
@@ -560,8 +813,78 @@ def _package_component(run_dir: Path,
     verify = _rrs.verify_ranked_result_set(ranked_record, run_dir)
     n_adm = ranked_record.get("n_admissible") or 0
     n_pk = ranked_record.get("n_complete_packages") or 0
+    pkg_records = _read(run_dir / "RANKED_PACKAGE_RECORDS.json") or {}
+    selection = _read(run_dir / "SURVIVOR_SELECTION.json") or {}
+    sel_rows = {r.get("candidate_id"): r
+                for r in (selection.get("ranked") or [])
+                if isinstance(r, dict)}
+    content_checks: List[Dict[str, Any]] = []
+    quality_checks: List[Dict[str, Any]] = []
+    content_ok_all = True
+    quality_ok_all = True
+    for rr in (ranked_record.get("ranked_results") or []):
+        if not isinstance(rr, dict) or not rr.get("admissible"):
+            continue
+        cid = rr.get("candidate_id")
+        pkg = (rr.get("components") or {}).get("package") or {}
+        row = sel_rows.get(cid) or {}
+        prec = _rrs._pkg_rec(pkg_records, cid,
+                             rr.get("key") or "primary")
+        key = rr.get("key") or "primary"
+        spec, _ = _candidate_artifact(run_dir,
+                                      "INVENTION_SPECIFICATION", key)
+        _iid = spec.get("invention_id")
+        invention_id = (_iid.get("value") if isinstance(_iid, dict)
+                        else _iid)
+        if invention_id is not None:
+            invention_id = str(invention_id)
+        zpath = _rrs._locate_zip(
+            run_dir, pkg.get("zip_name")) if pkg.get("complete") \
+            else None
+        # (a) contents — the actual ZIP bytes, opened here
+        if zpath is None:
+            cres = {"ok": False, "checks": {"zip_present": False},
+                    "missing": ["zip_present: the recorded ZIP is not "
+                                "on disk (DOWNLOAD/ nor run root)"],
+                    "identity": {}}
+        else:
+            cres = _rrs.verify_package_contents(
+                zpath, cid, prec.get("package_id") or pkg.get(
+                    "package_id"),
+                invention_id, row.get("disposition"))
+        cres["candidate_id"] = cid
+        content_checks.append(cres)
+        if not cres.get("ok"):
+            content_ok_all = False
+        # (b) independent quality gate — re-run HERE on the ZIP bytes
+        # (the bridge release path runs this same gate; the contract
+        # accepts no recorded verdict in its place)
+        if zpath is None:
+            qres = {"candidate_id": cid, "verdict": "NOT_RUN",
+                    "failed_gates": [],
+                    "reason": "no ZIP bytes to verify"}
+            quality_ok_all = False
+        else:
+            try:
+                from . import package_quality_gate as _pqg
+                _qv = _pqg.run_quality_gate(str(zpath))
+                _pass = _qv.get("package_quality") == "PASS"
+                qres = {"candidate_id": cid,
+                        "verdict": "PASS" if _pass else "BLOCK",
+                        "failed_gates": list(
+                            _qv.get("failed_gates") or []),
+                        "dimensions": _qv.get("dimensions") or {}}
+                if not _pass:
+                    quality_ok_all = False
+            except Exception as exc:  # noqa: BLE001 — a gate crash is
+                qres = {"candidate_id": cid,  # a BLOCK, never a pass
+                        "verdict": "GATE_ERROR",
+                        "failed_gates": [],
+                        "reason": f"{type(exc).__name__}: {exc}"[:200]}
+                quality_ok_all = False
+        quality_checks.append(qres)
     complete = bool(n_adm) and n_pk == n_adm and verify["verified"] \
-        and not rejected
+        and content_ok_all and quality_ok_all and not rejected
     out = {
         "component": COMP_PACKAGE,
         "complete": bool(complete),
@@ -572,9 +895,24 @@ def _package_component(run_dir: Path,
         "n_complete_candidate_bound_packages": n_pk,
         "hash_verification": verify.get("per_candidate") or [],
         "violations": verify.get("violations") or [],
+        "content_verification": content_checks,
+        "content_complete": bool(content_ok_all),
+        "quality_verification": quality_checks,
+        "quality_verified": bool(quality_ok_all),
+        "release_note": ("COMPLETE_CANDIDATE_PACKAGE != "
+                         "BUYER_RELEASED_PACKAGE: this component proves "
+                         "the candidate's deliverable (compiled + "
+                         "quality-verified + bound + hash-verified + "
+                         "contents-verified). Buyer release is the "
+                         "bridge release authority's separate decision; "
+                         "the UI never presents a candidate package as "
+                         "released unless that path passed."),
         "requirement": ("every displayed admissible survivor has its "
                         "OWN complete candidate-bound package whose "
-                        "recorded SHA-256 equals the on-disk bytes"),
+                        "recorded SHA-256 equals the on-disk bytes, "
+                        "whose ZIP passes the independent quality gate, "
+                        "and whose opened bytes carry the six-part "
+                        "discovery record for that candidate"),
     }
     if rejected:
         out["scientifically_rejected"] = True
@@ -688,7 +1026,8 @@ def verify_completion_contract(
 
     comps = {
         COMP_EVIDENCE: _evidence_component(run_dir, survivors),
-        COMP_MECHANISMS: _mechanisms_component(selection, survivors),
+        COMP_MECHANISMS: _mechanisms_component(run_dir, selection,
+                                              survivors),
         COMP_ADVERSARIAL: _adversarial_component(selection, survivors),
         COMP_ENGINEERING: _engineering_component(run_dir, survivors,
                                                  pkg_records),

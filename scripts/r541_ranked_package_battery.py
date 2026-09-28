@@ -449,7 +449,14 @@ def _compile_candidate_packages(out_dir: Path, run_id: str) -> dict:
                "decisive_experiment": c_dec,
                "final_state": final,
                "ranked_candidate_id": cid,
-               "ranked_candidate_key": c_key}
+               "ranked_candidate_key": c_key,
+               # R544: the recorded disposition rides into the
+               # package identity (the content verifier reads it
+               # back from the ZIP bytes — same rule as the
+               # engine's run.py path).
+               "ranked_disposition": r.get("disposition"),
+               "ranked_attack_overall": r.get("attack_overall"),
+               "ranked_quality_verdict": r.get("quality_verdict")}
 
         # candidate-bound geometry (the candidate's own conceptual
         # model — a candidate is never presented as geometry it did
@@ -523,6 +530,24 @@ def _compile_candidate_packages(out_dir: Path, run_id: str) -> dict:
                             c_out.get("package_maturity"),
                         "visualizability_class":
                             c_out.get("visualizability_class")})
+            # R544: the independent package-quality gate on the
+            # promoted ZIP bytes (same gate the engine records on
+            # its own path — the contract re-runs it live; the
+            # record carries the release posture for the UI).
+            try:
+                from discovery_fabric.engine import (
+                    package_quality_gate as _pqg)
+                _qv = _pqg.run_quality_gate(str(_dst))
+                rec["quality_verified"] = (
+                    "PASS" if _qv.get("package_quality") == "PASS"
+                    else "BLOCK")
+                rec["quality_failed_gates"] = list(
+                    _qv.get("failed_gates") or [])
+            except Exception as exc:  # noqa: BLE001 — the package
+                rec["quality_verified"] = "GATE_ERROR"  # exists; the
+                rec["quality_failed_gates"] = []  # posture is honest
+                rec["quality_gate_error"] = (  # unknown, never pass
+                    f"{type(exc).__name__}: {exc}"[:200])
             n_compiled += 1
         else:
             _br = c_out.get("blocked_record") or {}

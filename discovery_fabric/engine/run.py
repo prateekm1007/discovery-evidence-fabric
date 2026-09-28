@@ -1109,9 +1109,10 @@ class EngineRun:
         # disk. Typed constitutional blockers are never converted.
         try:
             from . import completion_contract as _cc
-            _cc.persist_completion_contract(
+            _cc_record = _cc.persist_completion_contract(
                 self.out, manifest,
                 package_retry=self._ranked_package_retry)
+            _cc_states = _cc.completion_states(_cc_record)
         except Exception as exc:  # noqa: BLE001 — disclosed, the run's
             self._persist("COMPLETION_CONTRACT_FAILED.json", {  # own earlier records stand
                 "stage": "COMPLETION_CONTRACT",
@@ -1119,6 +1120,37 @@ class EngineRun:
                 "consequence": ("no completion contract record; the run "
                                 "is NOT presented as a finished "
                                 "discovery (fail closed, Art. XXV)")})
+            _cc_states = None
+        # R544: the durable final-state completion_states field is the
+        # contract's OWN projection — re-persisted here AFTER the
+        # contract step (post-retry truth), so no stale pre-contract
+        # value can survive on the record and disagree with
+        # COMPLETION_CONTRACT.json. When the contract step itself
+        # failed, the field is an explicit contract-unavailable false
+        # (fail closed), never the old optimistic rule.
+        try:
+            _final_doc = self._read_json("final_state.json") or {}
+            if _cc_states is None:
+                from . import completion_contract as _cc2
+                _final_doc["completion_states"] = {
+                    "PIPELINE_COMPLETED": True,
+                    "DISCOVERY_COMPLETED": False,
+                    "TECHNOLOGY_PACKAGE_COMPLETED": False,
+                    "FINISHED_DISCOVERY": False,
+                    "typed_terminal_state":
+                        "COMPLETION_CONTRACT_UNAVAILABLE",
+                    "missing_components": list(_cc2.COMPONENTS),
+                    "authority": ("COMPLETION_CONTRACT.json via "
+                                  "completion_contract (R544: one "
+                                  "authority — the contract step failed, "
+                                  "so finished is false)"),
+                }
+            else:
+                _final_doc["completion_states"] = dict(_cc_states)
+            self._persist("final_state.json", _final_doc)
+        except Exception:  # noqa: BLE001 — the contract record stands;
+            pass           # final_state keeps its earlier (honest,
+                           # pre-contract) completion_states value
         # Cemetery records RESEARCH kills only. An infrastructure failure
         # (e.g. missing LLM credential) is not negative knowledge about the
         # mechanism (Art. XXV: unknown/failed-run is not a failure lesson).
@@ -1782,11 +1814,25 @@ class EngineRun:
                         c["cheap_screen"] = screen
                     if screen["state"] == "SCREENED_OUT" or \
                             self._persisted_skip(key):
+                        # R544: the killed row carries its OWN mechanism
+                        # + kill condition (from the recorded structured
+                        # candidate already in memory) — the competing
+                        # set must expose every investigated candidate's
+                        # mechanism and what would kill it, including
+                        # kills that never built a spec.
+                        _msc = c.get("mechanism_space_candidate") or {}
                         evaluated.append({
                             "candidate_id": c["candidate_id"],
                             "key": key, "killed": True,
                             "cheap_screen": screen,
-                            "killed_by": "CHEAP_SCREEN"})
+                            "killed_by": "CHEAP_SCREEN",
+                            "mechanism": str(_msc.get("mechanism") or ""),
+                            "intervention": str(
+                                _msc.get("intervention") or ""),
+                            "falsification_test": str(
+                                _msc.get("testable_prediction") or ""),
+                            "kill_basis": list(
+                                screen.get("reasons") or [])})
                         _crow_finish("CHEAP_SCREEN_KILL")
                         continue
                 _pt = _ptime.perf_counter()
@@ -2346,6 +2392,38 @@ class EngineRun:
                 _ev = _eval_by_cid.get(_cid) or {}
                 _r["key"] = _ev.get("key")
                 _r["origin"] = _ev.get("origin")
+                # R544: every investigated row carries its OWN mechanism
+                # + intervention + kill condition (what would kill it),
+                # resolved from the evaluated row's recorded sources —
+                # the spec's mechanism block when the candidate reached
+                # spec, else the stamped cheap-screen-kill fields. The
+                # competing set must expose every investigated
+                # candidate's reasoning path, including kills that never
+                # built a spec (Art. X: the record carries it; the
+                # verifier and the projection never re-derive it).
+                _ev_spec = _ev.get("spec") if isinstance(
+                    _ev.get("spec"), dict) else {}
+                _ev_mech = _ev_spec.get("mechanism") or {}
+                if isinstance(_ev_mech, dict) and "value" in _ev_mech:
+                    _ev_mech = _ev_mech.get("value") or {}
+                if not isinstance(_ev_mech, dict):
+                    _ev_mech = {}
+                if not _r.get("mechanism"):
+                    _r["mechanism"] = str(
+                        _ev_mech.get("mechanism")
+                        or _ev.get("mechanism") or "")
+                if not _r.get("intervention"):
+                    _r["intervention"] = str(
+                        _ev_mech.get("intervention")
+                        or _ev.get("intervention") or "")
+                if not _r.get("falsification_test"):
+                    _r["falsification_test"] = str(
+                        _ev_mech.get("falsification_test")
+                        or _ev.get("falsification_test") or "")
+                if not _r.get("kill_basis") and _ev.get("kill_basis"):
+                    _r["kill_basis"] = list(_ev.get("kill_basis") or [])
+                if not _r.get("kill_basis") and _ev.get("kill_reason"):
+                    _r["kill_basis"] = [str(_ev.get("kill_reason"))]
                 # R542: the disposition vocabulary is RESOLVED in all
                 # three recorded outcomes — KILLED (the challenge killed
                 # it), EXCLUDED (a deterministic gate resolved against
@@ -3055,46 +3133,62 @@ class EngineRun:
         return Candidate.from_dict(d)
 
     # ------------------------------------------------------------------
-    # R540: the three distinct completion states (the contract's
-    # success-state semantics). A FINISHED DISCOVERY is an admissible
-    # ranked survivor + a complete result record + a technology package —
-    # never "the pipeline reached COMPLETE" and never "some components
-    # were produced". Each state is derived from the run's OWN recorded
-    # verdicts (Art. X: the record is the authority); none is inferred
-    # or softened.
-    _NON_SURVIVOR_STATES = (
-        "REJECTED", "MECHANISM_STARVED", "MECHANISM_GENERATION_FAILED",
-        "MALFORMED_OR_FALSE_PREMISE", "PROBLEM_EXISTENCE_UNESTABLISHED",
-        "UNKNOWN", "INVENTION_UNDER_DEVELOPMENT",
-        "INVENTION_EVOLVED_CANDIDATE_WITHOUT_EXPERIMENT",
-    )
+    # R540/R544: the three distinct completion states. R544 retires the
+    # run-level rule entirely: _completion_states() is a PURE
+    # DELEGATION to completion_contract.verify_completion_contract +
+    # completion_states() over this run's durable record (one
+    # authority, Art. X). The retired `_NON_SURVIVOR_STATES +
+    # package_report.complete` rule is deleted — it could disagree
+    # with the six-part contract, and no second Boolean may do that.
+    # (The typed non-survivor vocabulary itself lives on in the
+    # contract's INVALID_QUERY_STATES / NO_SURVIVOR_STATES, which the
+    # verifier — not a parallel rule — interprets.)
 
     def _completion_states(self) -> Dict[str, Any]:
-        eps = self.env.epistemic_state or {}
-        fs = eps.get("final_status")
-        # DISCOVERY_COMPLETED: the discovery verdict admits a ranked
-        # survivor (i.e. it is NOT a scientific/infrastructure
-        # non-survivor state). A premise rejection, starvation, or
-        # generation failure has no admissible survivor.
-        discovery_completed = (
-            bool(fs) and fs not in self._NON_SURVIVOR_STATES)
-        # TECHNOLOGY_PACKAGE_COMPLETED: the canonical package compiler
-        # recorded a complete package for this run (the bridge-gate
-        # outcome; the package_report is set by the compiler tail).
-        package_completed = bool(
-            self.package_report and self.package_report.get("complete"))
-        finished = discovery_completed and package_completed
+        # R544: PURE DELEGATION — the completion contract
+        # (completion_contract.verify_completion_contract over this
+        # run's durable record) is the ONE completion authority. The
+        # retired rule this replaced — `final_status not in
+        # _NON_SURVIVOR_STATES + package_report.complete` — could
+        # disagree with the six-part contract (a stale true against a
+        # contract false, or vice versa); no second Boolean may do
+        # that anymore. Called pre-contract (final_state write) the
+        # verifier reads a partial dir and honestly reports
+        # unfinished; called post-contract it projects the persisted
+        # COMPLETION_CONTRACT.json. Either way the answer comes from
+        # the verifier, never from a parallel rule (Art. X).
+        _cc = None
+        try:
+            from . import completion_contract as _cc
+            _record = _cc.verify_completion_contract(self.out)
+        except Exception as exc:  # noqa: BLE001 — fail closed, never
+            _record = None         # a manufactured finished state
+            _err = f"{type(exc).__name__}: {exc}"
+        else:
+            _err = None
+        if isinstance(_record, dict) and _cc is not None:
+            states = _cc.completion_states(_record)
+            states["authority"] = (
+                "COMPLETION_CONTRACT.json via "
+                "completion_contract.verify_completion_contract "
+                "(R544: one authority; the run-level "
+                "final_status/package_report rule is retired)")
+            return states
+        try:
+            _missing = list(_cc.COMPONENTS) if _cc is not None else []
+        except Exception:  # noqa: BLE001 — the false stands regardless
+            _missing = []
         return {
             "PIPELINE_COMPLETED": True,
-            "DISCOVERY_COMPLETED": discovery_completed,
-            "TECHNOLOGY_PACKAGE_COMPLETED": package_completed,
-            "FINISHED_DISCOVERY": finished,
-            "invariant": ("FINISHED_DISCOVERY = "
-                          "ADMISSIBLE_RANKED_SURVIVOR + "
-                          "COMPLETE_RESULT_RECORD + TECHNOLOGY_PACKAGE; "
-                          "never EXECUTION_COMPLETED or "
-                          "SOME_COMPONENTS_PRODUCED alone"),
-            "final_status": fs,
+            "DISCOVERY_COMPLETED": False,
+            "TECHNOLOGY_PACKAGE_COMPLETED": False,
+            "FINISHED_DISCOVERY": False,
+            "typed_terminal_state": "COMPLETION_CONTRACT_UNAVAILABLE",
+            "missing_components": _missing,
+            "authority": ("COMPLETION_CONTRACT.json via "
+                          "completion_contract.verify_completion_contract "
+                          "(R544: one authority)"),
+            "verifier_error": _err,
         }
 
     # ------------------------------------------------------------------
@@ -3217,6 +3311,16 @@ class EngineRun:
             crr["decisive_experiment"] = c_dec
             crr["ranked_candidate_id"] = cid
             crr["ranked_candidate_key"] = c_key
+            # R544: the candidate's RECORDED adversarial disposition
+            # rides into the package identity (the content verifier
+            # reads it back from the ZIP bytes — the package carries
+            # the disposition the gates recorded, never a re-derived
+            # one). Only SURVIVED rows reach the compiler here (the
+            # filter above), so this is always SURVIVED on this path;
+            # the field exists so the byte-level check is mechanical.
+            crr["ranked_disposition"] = r.get("disposition")
+            crr["ranked_attack_overall"] = r.get("attack_overall")
+            crr["ranked_quality_verdict"] = r.get("quality_verdict")
 
             # candidate-bound geometry: the primary candidate's
             # canonical geometry_out; a non-primary candidate's own
@@ -3300,6 +3404,36 @@ class EngineRun:
                     "visualizability_class": c_out.get(
                         "visualizability_class"),
                 })
+                # R544: the INDEPENDENT package-quality gate runs HERE,
+                # on the promoted candidate-bound ZIP bytes — the same
+                # gate the bridge release path runs (run_gate=True
+                # there), recorded on the package record as release
+                # posture. The gate NEVER blocks this deliverable from
+                # existing (run_gate=False above: a gauntlet survivor's
+                # candidate-bound technology record exists even when
+                # the release posture is not yet pass — Art. XXVIII),
+                # but the completion contract requires quality_verified
+                # PASS for a finished discovery, and the UI surfaces
+                # the posture distinctly (a candidate package is never
+                # presented as a buyer release unless the gate passed).
+                try:
+                    from . import package_quality_gate as _pqg
+                    _qv = _pqg.run_quality_gate(str(_dst))
+                    rec["quality_verified"] = (
+                        "PASS" if _qv.get("package_quality") == "PASS"
+                        else "BLOCK")
+                    rec["quality_failed_gates"] = list(
+                        _qv.get("failed_gates") or [])
+                    rec["quality_dimensions"] = {
+                        k: v for k, v in
+                        (_qv.get("dimensions") or {}).items()} \
+                        if isinstance(_qv.get("dimensions"), dict) \
+                        else {}
+                except Exception as exc:  # noqa: BLE001 — the package
+                    rec["quality_verified"] = "GATE_ERROR"  # exists; the
+                    rec["quality_failed_gates"] = []  # posture is honest
+                    rec["quality_gate_error"] = (  # unknown, never pass
+                        f"{type(exc).__name__}: {exc}"[:200])
                 n_compiled += 1
             else:
                 rec["reason"] = ((c_out.get("blocked_record") or {})
@@ -3383,11 +3517,20 @@ class EngineRun:
                        .get("subsystems")
                        or (c_eng.get("subsystems")) or [])][:5]
             built = _cg.build_conceptual_device(_site, _layers or None)
+            # R544: never invent a domain_family here. The conceptual
+            # builder returns no family; stamping a placeholder
+            # ("GENERIC_ARCHITECTURE") diverges from the compiler's
+            # canonically resolved family and trips the independent
+            # gate's identity-coherence check (A-INTERNAL-DIVERGENT /
+            # A-NONCANONICAL-DOMAIN, caught live). The canonical
+            # family is resolved by resolve_run_canonical_family at
+            # compile time from the run's own records; an absent
+            # geometry-layer family is honest absence, never a guess.
+            _fam = c_eng.get("canonical_family")
             return {
                 **built,
                 "visualizability_class": "CONCEPTUAL_3D",
-                "domain_family": (c_eng.get("canonical_family")
-                                   or "GENERIC_ARCHITECTURE"),
+                "domain_family": _fam,
                 "ranked_candidate_key": c_key,
                 "note": ("candidate-bound conceptual geometry — a "
                          "non-primary survivor is never presented as "

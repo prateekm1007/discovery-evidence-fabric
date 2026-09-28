@@ -243,6 +243,17 @@ def build_technology_package_model(
             # mismatched candidate identity is not a binding success).
             "ranked_candidate_id": run_result.get("ranked_candidate_id"),
             "ranked_candidate_key": run_result.get("ranked_candidate_key"),
+            # R544: the candidate's RECORDED adversarial disposition
+            # (set on run_result by the engine's candidate-bound
+            # package path from the selection row — never re-derived
+            # here). The package-content verifier reads it back from
+            # these bytes and requires it to equal the row's recorded
+            # disposition: the package carries the gates' verdict.
+            "ranked_disposition": run_result.get("ranked_disposition"),
+            "ranked_attack_overall": run_result.get(
+                "ranked_attack_overall"),
+            "ranked_quality_verdict": run_result.get(
+                "ranked_quality_verdict"),
         },
         "problem": {
             "user_problem": run_result.get("user_text")

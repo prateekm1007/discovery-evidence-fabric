@@ -1234,29 +1234,44 @@ def _run_inner(session_id: str, forensics) -> None:
                         store.update_session(
                             session_id, completion_states=_states)
                 elif _ranked_pkgs:
-                    _n_complete = sum(
-                        1 for p in _ranked_pkgs
-                        if (p.get("package") or {}).get("complete"))
-                    _n_adm = len(_ranked_pkgs)
+                    # R544: one authority — when the engine did not leave
+                    # a COMPLETION_CONTRACT.json, the worker runs the
+                    # SAME verifier live over the run dir (pure
+                    # read-only) instead of hand-deriving a finished
+                    # Boolean from package counts. The hand-derived
+                    # `_n_complete == _n_adm` rule is retired: it could
+                    # disagree with the six-part contract. The run dir
+                    # is present at run-tail time, so the verifier —
+                    # not a parallel rule — answers.
+                    try:
+                        from discovery_fabric.engine import (
+                            completion_contract as _cc_live)
+                        _live = _cc_live.verify_completion_contract(
+                            run_dir)
+                        _live_states = _cc_live.completion_states(_live)
+                    except Exception:  # noqa: BLE001 — fail closed, the
+                        _live_states = {  # contract step never answered
+                            "PIPELINE_COMPLETED": True,
+                            "DISCOVERY_COMPLETED": False,
+                            "TECHNOLOGY_PACKAGE_COMPLETED": False,
+                            "FINISHED_DISCOVERY": False,
+                            "typed_terminal_state":
+                                "COMPLETION_CONTRACT_UNAVAILABLE",
+                            "missing_components": [
+                                "evidence", "mechanisms",
+                                "adversarial", "engineering_model",
+                                "decisive_experiment",
+                                "technology_package"],
+                            "authority": ("COMPLETION_CONTRACT.json via "
+                                          "completion_contract (R544: one "
+                                          "authority — live verify "
+                                          "failed, so finished is "
+                                          "false)"),
+                        }
                     store.update_session(
                         session_id,
                         ranked_results=_ranked_pkgs,
-                        completion_states={
-                            "PIPELINE_COMPLETED": True,
-                            "DISCOVERY_COMPLETED":
-                                _ranked_pkgs[0].get(
-                                    "discovery_completed", True),
-                            # R541: TECHNOLOGY-PACKAGE completion is
-                            # per-candidate — the whole ranked set is
-                            # package-complete only when EVERY
-                            # displayed survivor has its own complete
-                            # candidate-bound package (one #1 package
-                            # does NOT complete the set).
-                            "TECHNOLOGY_PACKAGE_COMPLETED":
-                                (_n_complete == _n_adm and _n_adm >= 1),
-                            "FINISHED_DISCOVERY":
-                                (_n_complete == _n_adm and _n_adm >= 1),
-                        })
+                        completion_states=_live_states)
             except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
                 print(f"  [worker] package-field refresh failed: "
                       f"{type(exc).__name__}: {exc}", file=sys.stderr)
@@ -1332,12 +1347,13 @@ def _run_inner(session_id: str, forensics) -> None:
     # the run dir is later pruned by a deploy. This runs for every
     # completed run, not only bridge-gate runs.
     #
-    # R543-1e: when COMPLETION_CONTRACT.json is absent (a typed
-    # no-survivor terminal that did not reach the run-tail contract
-    # verifier), fall back to final_state.json's own completion_states
-    # — the engine's own terminal record, written at the run tail
-    # before the contract step. The authority is the same; the source
-    # is whichever durable record the run actually left behind.
+    # R543-1e (amended R544): when COMPLETION_CONTRACT.json is absent
+    # (a typed no-survivor terminal that did not reach the run-tail
+    # contract verifier), run the SAME verifier live over the run dir
+    # — never a parallel hand-derived rule. final_state.json's own
+    # completion_states is the last resort, and since R544 it is the
+    # contract's own projection (the engine re-persists it from the
+    # verifier post-contract), never the retired optimistic rule.
     try:
         from discovery_fabric.engine import (
             completion_contract as _cc543)
@@ -1345,16 +1361,41 @@ def _run_inner(session_id: str, forensics) -> None:
         if isinstance(_contract543, dict):
             _states543 = _cc543.completion_states(_contract543)
         else:
-            # fall back to final_state.json's completion_states
-            import json as _json543
-            _fs543 = _json543.loads(
-                (run_dir / "final_state.json").read_text(
-                    encoding="utf-8")
-            ) if (run_dir / "final_state.json").is_file() else None
-            _states543 = (_fs543 or {}).get("completion_states")
+            try:
+                _live543 = _cc543.verify_completion_contract(run_dir)
+                _states543 = _cc543.completion_states(_live543)
+            except Exception:  # noqa: BLE001 — last resort: the
+                import json as _json543  # engine's own contract-shaped
+                _fs543 = _json543.loads(  # final-state field (R544:
+                    (run_dir / "final_state.json").read_text(  # contract-
+                        encoding="utf-8")  # derived, never optimistic)
+                ) if (run_dir / "final_state.json").is_file() else None
+                _states543 = (_fs543 or {}).get("completion_states")
         if isinstance(_states543, dict):
             store.update_session(
                 session_id, completion_states=_states543)
+        # R543 Step 4: the durable runtime-state contract. When the run
+        # produced ranked results (the engine's RANKED_DISCOVERY_
+        # RESULTS.json) and the session record does not already carry
+        # them, persist the engine's own ranked-result rows VERBATIM —
+        # candidate identity, rank, admissibility, and the per-candidate
+        # package binding (zip name, SHA-256, completeness). This is a
+        # pure read-through copy of the engine authority (the SAME
+        # _ranked_package_set the bridge path persists), never a
+        # re-derivation: post-pruning reconstruction keeps candidate
+        # identity, ranked results, binding, and package SHA. Absent
+        # stays absent (fail closed, Art. XXV).
+        try:
+            _rec543 = store.get_session(session_id) or {}
+            if _rec543.get("ranked_results") is None:
+                _pkgs543 = _ranked_package_set(run_dir)
+                if _pkgs543:
+                    store.update_session(
+                        session_id, ranked_results=_pkgs543)
+        except Exception as _exc543b:  # noqa: BLE001 — disclosed only;
+            print(f"  [worker] ranked-results durable copy failed: "  # states stand
+                  f"{type(_exc543b).__name__}: {_exc543b}",
+                  file=sys.stderr)
     except Exception as _exc543:  # noqa: BLE001 — disclosed, never fatal
         print(f"  [worker] completion-contract session refresh "
               f"failed: {type(_exc543).__name__}: {_exc543}",

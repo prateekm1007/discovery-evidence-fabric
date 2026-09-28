@@ -1,0 +1,385 @@
+{
+  "artifact": "DECISIVE_EXPERIMENT",
+  "schema": "R425_DECISIVE_EXPERIMENT_CONTRACT",
+  "run_id": "RUNID",
+  "contract": {
+    "experiment_id": {
+      "value": "falsification_test_from_candidate",
+      "status": "DEFINED",
+      "provenance_basis": "decisive_experiment.selected.experiment (the loop's own selection)"
+    },
+    "hypothesis": {
+      "value": [
+        {
+          "name": "H_effect_holds",
+          "description": "expected effect holds: sustained fluid flow through the shunt valve",
+          "prior_probability": 0.6,
+          "provenance_class": "MODEL_DERIVED"
+        },
+        {
+          "name": "H_effect_fails",
+          "description": "expected effect does not reproduce outside source context",
+          "prior_probability": 0.4,
+          "provenance_class": "MODEL_DERIVED"
+        }
+      ],
+      "status": "DEFINED",
+      "provenance_basis": "invention_specification.killer_experiment.hypotheses (recorded names, descriptions, priors)"
+    },
+    "intervention": {
+      "value": "porous microstructure resists fluid-path tissue ingrowth. The proposed intervention realizes this mechanism by placing porous titanium proximal catheter tip in the shunt lumen at the failure site identified in the problem statement, where the governing physical effect produces sustained fluid flow through the shunt valve under the stated constraint (maintain long-term lumen patency and flow); the transfer logic follows from the custodied source observation and its mechanism source span.",
+      "status": "DEFINED",
+      "provenance_basis": "invention_specification.causal_chain.mechanism (the recorded causal mechanism under test)"
+    },
+    "baseline_control": {
+      "value": "NOT_DEFINED_IN_CANONICAL_STATE",
+      "status": "NOT_DEFINED_IN_CANONICAL_STATE",
+      "provenance_basis": "verification_matrix VF-001.requirement mentions a baseline comparison in prose, but the canonical record carries no structured baseline_arm/control_arm field — the arms are the recipient's pre-registration work, fixed from the measured baseline per the recorded acceptance rule"
+    },
+    "test_article": {
+      "value": "first physical article implementing the proposed intervention (GEOMETRY ABSENT — must be designed)",
+      "status": "DEFINED",
+      "provenance_basis": "engineering_build_plan WP-01.test_article (the recorded article to build)"
+    },
+    "measurable_variables": {
+      "value": [
+        {
+          "parameter_id": "CP-001",
+          "name": "lumen inner diameter",
+          "symbol": "r",
+          "unit": "m",
+          "value_status": "UNKNOWN",
+          "value_class": null
+        },
+        {
+          "parameter_id": "CP-002",
+          "name": "lumen length",
+          "symbol": "r",
+          "unit": "m",
+          "value_status": "UNKNOWN",
+          "value_class": null
+        },
+        {
+          "parameter_id": "CP-003",
+          "name": "surface roughness",
+          "symbol": "NOT_ASSIGNED",
+          "unit": "UNKNOWN",
+          "value_status": "UNKNOWN",
+          "value_class": null
+        },
+        {
+          "parameter_id": "CP-004",
+          "name": "operating pressure head",
+          "symbol": "dP",
+          "unit": "Pa",
+          "value_status": "UNKNOWN",
+          "value_class": null
+        },
+        {
+          "parameter_id": "CP-005",
+          "name": "flow rate range",
+          "symbol": "Q",
+          "unit": "m^3/s",
+          "value_status": "UNKNOWN",
+          "value_class": null
+        },
+        {
+          "parameter_id": "CP-006",
+          "name": "viscosity of flowed medium",
+          "symbol": "mu",
+          "unit": "Pa.s",
+          "value_status": "UNKNOWN",
+          "value_class": null
+        },
+        {
+          "parameter_id": "CP-007",
+          "name": "occlusion growth tolerance",
+          "symbol": "NOT_ASSIGNED",
+          "unit": "UNKNOWN",
+          "value_status": "UNKNOWN",
+          "value_class": null
+        }
+      ],
+      "status": "DEFINED",
+      "provenance_basis": "engineering_core.critical_parameters (recorded symbols, units, and value_status — UNKNOWN values stay UNKNOWN)"
+    },
+    "apparatus_instrumentation": {
+      "value": "domain bench equipment per verification methods",
+      "status": "DEFINED",
+      "provenance_basis": "engineering_build_plan WP-01.equipment (the recorded equipment requirement)"
+    },
+    "procedure": {
+      "value": {
+        "verification_requirement": "bench shunt flow loop; measure flow decay over 30 days",
+        "work_package_measurement": "physical bench/clinical experiment — NOT simulation"
+      },
+      "status": "DEFINED",
+      "provenance_basis": "verification_matrix VF-001.requirement + engineering_build_plan WP-01.measurement (the recorded procedure texts)"
+    },
+    "acceptance_rule": {
+      "value": {
+        "rule": "pre-registered decision rule fixed BEFORE the test: the measured effect must exceed the measured baseline under the identical setup by the pre-registration margin; the numeric margin is fixed from the measured baseline at pre-registration (no value is invented here — Art. VIII)",
+        "status": "ENGINEERING_PROPOSED"
+      },
+      "status": "DEFINED",
+      "provenance_basis": "verification_matrix VF-001.acceptance (the recorded pre-registration rule — the numeric margin is fixed from the measured baseline at pre-registration, never invented here)"
+    },
+    "falsification_rule": {
+      "value": {
+        "kill_arm": {
+          "name": "H_effect_fails",
+          "description": "expected effect does not reproduce outside source context",
+          "prior_probability": 0.4,
+          "provenance_class": "MODEL_DERIVED"
+        },
+        "rule_basis": "pre-registered decision rule fixed BEFORE the test: the measured effect must exceed the measured baseline under the identical setup by the pre-registration margin; the numeric margin is fixed from the measured baseline at pre-registration (no value is invented here — Art. VIII)",
+        "kill_probability": "UNKNOWN (no sourced base rate exists)"
+      },
+      "status": "DEFINED",
+      "provenance_basis": "invention_specification.killer_experiment.hypotheses (H_effect_fails is the recorded falsification arm) + verification_matrix VF-001.acceptance (the failing side of the recorded rule) + decisive_experiment.selected.kill_probability (UNKNOWN where no sourced base rate exists)"
+    },
+    "expected_discriminating_outcomes": {
+      "value": [
+        {
+          "outcome": "H_effect_holds",
+          "meaning": "expected effect holds: sustained fluid flow through the shunt valve",
+          "prior_probability": 0.6
+        },
+        {
+          "outcome": "H_effect_fails",
+          "meaning": "expected effect does not reproduce outside source context",
+          "prior_probability": 0.4
+        }
+      ],
+      "status": "DEFINED",
+      "provenance_basis": "invention_specification.killer_experiment.hypotheses — the recorded arms the experiment separates (Bayesian EIG over MODEL_DERIVED priors per the recorded basis)"
+    },
+    "dependencies": {
+      "value": "design article must exist first (see build plan)",
+      "status": "DEFINED",
+      "provenance_basis": "decisive_experiment.selected.dependency (the recorded precondition)"
+    },
+    "safety_operational_constraints": {
+      "value": {
+        "regulatory_pathway": "UNKNOWN (no regulatory determination exists for this invention; per R370C correction the pathway is never inferred from device class alone)",
+        "candidate_standards": [
+          {
+            "standard": "ISO 13485 (medical QMS)",
+            "class": "EXTERNAL_PRECEDENT_CANDIDATE",
+            "verify_applicability": true
+          },
+          {
+            "standard": "ISO 14971 (medical risk management)",
+            "class": "EXTERNAL_PRECEDENT_CANDIDATE",
+            "verify_applicability": true
+          },
+          {
+            "standard": "ASTM F2394 (silicone elastomers for medical use)",
+            "class": "EXTERNAL_PRECEDENT_CANDIDATE",
+            "verify_applicability": true
+          },
+          {
+            "standard": "ASME B31 / EN 13445 (pressure piping and vessels, per installation jurisdiction)",
+            "class": "EXTERNAL_PRECEDENT_CANDIDATE",
+            "verify_applicability": true
+          }
+        ]
+      },
+      "status": "DEFINED",
+      "provenance_basis": "engineering_specification.regulatory (the recorded regulatory determination — UNKNOWN pathway stays UNKNOWN per the R370C correction; never inferred from device class)"
+    },
+    "decision_mapping": {
+      "value": {
+        "next_best_action": "run killer experiment: falsification_test_from_candidate",
+        "selection_explanation": "This is the next experiment because it has the greatest expected ability to change the candidate decision (KILLER_EXPERIMENT ranking; EIG/cost 0.44573539382492045)",
+        "decision_impact": 0.9,
+        "prior_update_rule": "the measured outcome updates the recorded priors (Bayesian, per decisive_experiment.selected.basis 'COMPUTED (Bayesian EIG over MODEL_DERIVED priors)')"
+      },
+      "status": "DEFINED",
+      "provenance_basis": "final_state.next_best_action + decisive_experiment.explanation/selected (the recorded decision semantics)"
+    },
+    "next_technical_state_transition": {
+      "value": "NOT_DEFINED_IN_CANONICAL_STATE",
+      "status": "NOT_DEFINED_IN_CANONICAL_STATE",
+      "provenance_basis": "final_state.evolution.current_invention carries no state"
+    }
+  },
+  "contract_completeness": {
+    "fields_total": 15,
+    "fields_defined_in_canonical_state": 13,
+    "fields_not_defined": 2,
+    "not_defined_fields": [
+      "baseline_control",
+      "next_technical_state_transition"
+    ],
+    "discipline": "every field is either derived from a named canonical record or emitted as NOT_DEFINED_IN_CANONICAL_STATE with the exact record inspected — no generic filler, no invented values (R425 §5)"
+  },
+  "recorded_layer": {
+    "shortlist": [
+      {
+        "experiment": "falsification_test_from_candidate",
+        "source_stage": "KILLER_EXPERIMENT",
+        "expected_information_gain": 0.44573539382492045,
+        "eig_per_cost": 0.44573539382492045,
+        "decision_impact": 0.9,
+        "kill_probability": "UNKNOWN (no sourced base rate exists)",
+        "cost": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+        "time": "UNKNOWN",
+        "dependency": "design article must exist first (see build plan)",
+        "is_selected_killer": true,
+        "basis": "COMPUTED (Bayesian EIG over MODEL_DERIVED priors)",
+        "hypotheses": [
+          {
+            "name": "H_effect_holds",
+            "description": "expected effect holds: sustained fluid flow through the shunt valve",
+            "prior_probability": 0.6,
+            "provenance": {
+              "source": "adjudication.evidence_verification + candidate text",
+              "epistemic_class": "MODEL_DERIVED",
+              "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+              "created_at": "2026-09-28T01:52:03.399261+00:00"
+            }
+          },
+          {
+            "name": "H_effect_fails",
+            "description": "expected effect does not reproduce outside source context",
+            "prior_probability": 0.4,
+            "provenance": {
+              "source": "adjudication.evidence_verification + candidate text",
+              "epistemic_class": "MODEL_DERIVED",
+              "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+              "created_at": "2026-09-28T01:52:03.399261+00:00"
+            }
+          }
+        ]
+      },
+      {
+        "experiment": "run killer experiment: falsification_test_from_candidate",
+        "source_stage": "NEXT_BEST_ACTION",
+        "action_id": "action:killer_experiment",
+        "expected_information_gain": 0.44573539382492045,
+        "score": 0.36,
+        "decision_impact": 0.9,
+        "probability_of_decision_change": 0.8,
+        "kill_probability": "UNKNOWN (no sourced base rate exists)",
+        "cost": 0.8914707876498409,
+        "time": "UNKNOWN",
+        "dependency": "physical_lab",
+        "basis": "COMPUTED (NBA score formula engine-v1)"
+      }
+    ],
+    "administrative_actions_excluded": [],
+    "exclusion_note": "R377: administrative actions from next_best_action are excluded from the decisive-experiment shortlist (measured defect: all six R376 survivors selected 'fetch and audit claims of nearest collision patents' as the decisive experiment — a literature task cannot distinguish the candidate from existing approaches)",
+    "selected": {
+      "experiment": "falsification_test_from_candidate",
+      "source_stage": "KILLER_EXPERIMENT",
+      "expected_information_gain": 0.44573539382492045,
+      "eig_per_cost": 0.44573539382492045,
+      "decision_impact": 0.9,
+      "kill_probability": "UNKNOWN (no sourced base rate exists)",
+      "cost": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+      "time": "UNKNOWN",
+      "dependency": "design article must exist first (see build plan)",
+      "is_selected_killer": true,
+      "basis": "COMPUTED (Bayesian EIG over MODEL_DERIVED priors)",
+      "hypotheses": [
+        {
+          "name": "H_effect_holds",
+          "description": "expected effect holds: sustained fluid flow through the shunt valve",
+          "prior_probability": 0.6,
+          "provenance": {
+            "source": "adjudication.evidence_verification + candidate text",
+            "epistemic_class": "MODEL_DERIVED",
+            "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+            "created_at": "2026-09-28T01:52:03.399261+00:00"
+          }
+        },
+        {
+          "name": "H_effect_fails",
+          "description": "expected effect does not reproduce outside source context",
+          "prior_probability": 0.4,
+          "provenance": {
+            "source": "adjudication.evidence_verification + candidate text",
+            "epistemic_class": "MODEL_DERIVED",
+            "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+            "created_at": "2026-09-28T01:52:03.399261+00:00"
+          }
+        }
+      ]
+    },
+    "explanation": "This is the next experiment because it has the greatest expected ability to change the candidate decision (KILLER_EXPERIMENT ranking; EIG/cost 0.44573539382492045)",
+    "no_invented_values_note": "cost/time/kill_probability remain UNKNOWN where no stage recorded them (Art. XXV)",
+    "falsification_contract": {
+      "HYPOTHESIS": "expected effect holds: sustained fluid flow through the shunt valve (recorded prior 0.6, epistemic class MODEL_DERIVED per the killer-experiment provenance)",
+      "TREATMENT": "porous titanium proximal catheter tip in the shunt lumen",
+      "CONTROL_BLOCKER": "no executed baseline comparison on record (physics chain executed: none; lifecycle None) — the control arm is not invented from the problem statement",
+      "MEASUREMENT": "bench shunt flow loop; measure flow decay over 30 days",
+      "APPARATUS_BLOCKER": "no separate apparatus record exists; the falsification test does not state a quantified instrumented procedure",
+      "SAMPLE_BLOCKER": "no sample-size / n= record exists in any engine stage (honest UNKNOWN — Art. XXV)",
+      "ACCEPTANCE_THRESHOLD": "sustained fluid flow at least 30 percent above the silicone baseline at 30 days",
+      "FALSIFICATION_THRESHOLD": "the recorded falsification test ('bench shunt flow loop; measure flow decay over 30 days') fails to show the recorded expected effect ('sustained fluid flow at least 30 percent above the silicone baseline at 30 days') — the mechanism is killed by its own test's negative outcome; the recorded failing hypothesis is 'expected effect does not reproduce outside source context'",
+      "FALSIFICATION_BANDS": {
+        "expected_effect_numbers": [
+          "30",
+          "30"
+        ],
+        "falsification_test_numbers": [
+          "30"
+        ],
+        "basis": "verbatim numbers extracted from the candidate's own records (never computed, never inferred — Art. VI)"
+      },
+      "UNCERTAINTY": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)",
+      "COST": "UNKNOWN absolute cost (options ranked on a relative-1.0 scale per bayesian_eig; no sourced dollar/time estimate exists — Art. XXV)",
+      "TIME": "UNKNOWN (no stage recorded a time estimate)",
+      "SAFETY_BLOCKER": "no safety-analysis stage output exists in the engine (honest UNKNOWN — Art. XXV; the engineering failure_modes record is a failure-mode list, not a safety case)"
+    },
+    "timestamp": "2026-09-28T01:52:03+00:00Z"
+  },
+  "discriminating_contract": {
+    "discriminating": false,
+    "requirements": {
+      "at_least_two_hypothesis_arms_with_priors": true,
+      "pre_registered_decision_rule": true,
+      "decision_rule_numeric": false,
+      "measurable_outcome_path": true,
+      "target_resolves_in_record": true,
+      "experiment_selected_by_loop": true
+    },
+    "hypothesis_arms": [
+      {
+        "name": "H_effect_holds",
+        "prior_probability": 0.6
+      },
+      {
+        "name": "H_effect_fails",
+        "prior_probability": 0.4
+      }
+    ],
+    "decision_rule": {
+      "source": "verification_matrix VF-001",
+      "acceptance": "pre-registered decision rule fixed BEFORE the test: the measured effect must exceed the measured baseline under the identical setup by the pre-registration margin; the numeric margin is fixed from the"
+    },
+    "measurable_outcome": {
+      "source": "verification_matrix VF-001",
+      "method": "bench shunt flow loop; measure flow decay over 30 days"
+    },
+    "targets_resolved": [
+      "FM-009",
+      "FM-009",
+      "FM-DOM-001",
+      "FM-DOM-001",
+      "FM-DOM-002",
+      "FM-DOM-004",
+      "FM-DOM-005",
+      "FM-DOM-001",
+      "FM-DOM-002",
+      "FM-DOM-004",
+      "FM-DOM-005"
+    ],
+    "basis": "EXPERIMENT_READY requires the full discriminating contract (R425 §3; R478 P0-3 adds the numeric-band requirement on the decision rule); each failed requirement is named above — the hypotheses array alone never grants the tier"
+  },
+  "invention_id": "inv:fixture:fluidics_hydraulic:0:e8d4aa7fcfb8",
+  "domain_family": "biomedical",
+  "technology_name": "inv:fixture:fluidics_hydraulic:0:e8d4aa7fcfb8",
+  "final_invention_hash": "1318d5f538d6f83e669197ea13da4d782beb558cb937d865cb3ec035168dc110"
+}

@@ -99,13 +99,13 @@ def _write(run_dir: Path, name: str, obj) -> None:
         encoding="utf-8")
 
 
-def _zip_bytes(payload: bytes) -> bytes:
-    # a minimal ZIP-shaped payload; the contract proves distinctness and
-    # recorded-vs-on-disk hash equality, not ZIP internal structure
-    return b"PK\x03\x04" + payload
-
-
-def _row(cid: str, key: str, killed: bool, verdict_rank: int) -> dict:
+def _row(cid: str, key: str, killed: bool, verdict_rank: int,
+         mechanism: str = "", intervention: str = "",
+         falsification_test: str = "") -> dict:
+    # R544: every investigated row carries its OWN mechanism +
+    # intervention + kill condition (the engine stamps these at
+    # selection time) — the competing set is validated literally,
+    # including kills.
     return {
         "candidate_id": cid, "key": key, "killed": killed,
         "quality_verdict": "FAIL" if killed else "PASS",
@@ -120,7 +120,19 @@ def _row(cid: str, key: str, killed: bool, verdict_rank: int) -> dict:
                    else "DISCOVERY_LOOP_SURVIVOR"),
         "ranked_admissible": not killed,
         "disposition": "KILLED" if killed else "SURVIVED",
+        "mechanism": mechanism,
+        "intervention": intervention,
+        "falsification_test": falsification_test,
     }
+
+
+_KILL_B = ("electrostatic repulsion of charged dust at the channel "
+           "wall surface")
+_KILL_B_INT = "two-kilovolt electrostatic field on channel walls"
+_KILL_B_KILL = "measure particle deposition under 2 kV vs 0 kV"
+_KILL_C = "porous titanium microstructure resists tissue ingrowth"
+_KILL_C_INT = "porous titanium proximal catheter tip"
+_KILL_C_KILL = "bench loop; measure flow decay over 30 days"
 
 
 def _selection_single() -> dict:
@@ -130,8 +142,12 @@ def _selection_single() -> dict:
     return {
         "selected": "cand_a",
         "ranked": [_row("cand_a", "primary", killed=False, verdict_rank=0),
-                   _row("cand_b", "grid-1", killed=True, verdict_rank=1),
-                   _row("cand_c", "grid-2", killed=True, verdict_rank=2)],
+                   _row("cand_b", "grid-1", killed=True, verdict_rank=1,
+                        mechanism=_KILL_B, intervention=_KILL_B_INT,
+                        falsification_test=_KILL_B_KILL),
+                   _row("cand_c", "grid-2", killed=True, verdict_rank=2,
+                        mechanism=_KILL_C, intervention=_KILL_C_INT,
+                        falsification_test=_KILL_C_KILL)],
     }
 
 
@@ -147,7 +163,8 @@ def _selection_two() -> dict:
 
 
 def _inv_spec(span: bool = True, source: bool = True,
-              custody: bool = True, uri: bool = True) -> dict:
+               custody: bool = True, uri: bool = True,
+               invention_id: str = "inv:a") -> dict:
     rec: dict = {"id": "ev1", "title": "fixture study",
                  "doi": "10.0000/fixture.1"}
     if uri:
@@ -167,7 +184,7 @@ def _inv_spec(span: bool = True, source: bool = True,
         mech["mechanism_source_span"] = (
             "the porous microstructure resists fluid-path tissue "
             "ingrowth under the stated constraint")
-    return {"invention_id": "inv:a",
+    return {"invention_id": invention_id,
             "mechanism": {"value": mech},
             "evidence": {"value": [rec]}}
 
@@ -206,40 +223,50 @@ def _dec_spec(answered: bool = True) -> dict:
             "execution_status": "SPECIFIED"}
 
 
-def _packages(run_dir: Path, zips: dict, in_download: bool = False
-              ) -> dict:
-    """Write the engine's candidate-bound package record + the on-disk
-    ZIPs (root or DOWNLOAD/ tree, both are legal locations the binding
-    resolves)."""
+def _packages(run_dir: Path, cands: dict, **build_kw) -> dict:
+    """Build REAL candidate-bound package trees from the frozen R544
+    fixture tree (real compiler output, never hand-shaped JSON).
+    cands: {cid: (zip_name, key, disposition)}. Returns
+    {cid: {package_id, invention_id, zip_name, zip_sha256}} read back
+    from the bytes — the identity the package record AND the
+    invention spec must carry to match. The ZIPs land in DOWNLOAD/
+    (the engine's promotion location). Extra build_kw (strip_model,
+    tree_mutator, ...) forwards to the tree builder for adversarial
+    shapes."""
+    from tests.fixtures.r544 import pkg_tree
     pkgs: dict = {}
     by_cid: dict = {}
-    for cid, (zname, zbytes) in zips.items():
-        key = "primary" if cid == "cand_a" else f"grid-{cid[-1]}"
-        if in_download:
-            d = run_dir / "DOWNLOAD"
-            d.mkdir(parents=True, exist_ok=True)
-            (d / zname).write_bytes(zbytes)
-        else:
-            (run_dir / zname).write_bytes(zbytes)
+    ids: dict = {}
+    for cid, (zname, key, disp) in cands.items():
+        built = pkg_tree.build_package_tree(
+            run_dir / "PKG_STAGE" / key, zname, candidate_id=cid,
+            run_id="ts_r542", disposition=disp, **build_kw)
+        zpath = run_dir / "DOWNLOAD"
+        zpath.mkdir(parents=True, exist_ok=True)
+        data = Path(built["zip_path"]).read_bytes()
+        (zpath / zname).write_bytes(data)
         rec = {"complete": True, "kind": "TECHNOLOGY_PACKAGE",
                "candidate_id": cid, "ranked_candidate_key": key,
-               "zip_name": zname, "zip_sha256": _sha(zbytes),
-               "package_id": f"pkg_{cid}"}
+               "zip_name": zname, "zip_sha256": _sha(data),
+               "package_id": built["package_id"]}
         pkgs[key] = rec
         by_cid[cid] = rec
+        ids[cid] = {"package_id": built["package_id"],
+                    "invention_id": built["invention_id"],
+                    "zip_name": zname, "zip_sha256": _sha(data)}
     out = {"schema": "RANKED_PACKAGE_RECORDS/1.0.0", "packages": pkgs,
            "by_candidate_id": by_cid}
     _write(run_dir, "RANKED_PACKAGE_RECORDS.json", out)
-    return out
+    return ids
 
 
 def _run_dir(tmp_path: Path, two_survivors: bool = False,
-             with_pkg: bool = True, eng: str = "geometry",
-             experiment_answered: bool = True, span: bool = True,
-             source: bool = True, custody: bool = True,
-             uri: bool = True,
-             final_status: str = "AUTOMATED_INVENTION_CANDIDATE",
-             selection: dict | None = None) -> Path:
+              with_pkg: bool = True, eng: str = "geometry",
+              experiment_answered: bool = True, span: bool = True,
+              source: bool = True, custody: bool = True,
+              uri: bool = True,
+              final_status: str = "AUTOMATED_INVENTION_CANDIDATE",
+              selection: dict | None = None) -> Path:
     run_dir = Path(tmp_path) / "ENGINE_RUNS" / "ts_r542"
     sel = selection if selection is not None else (
         _selection_two() if two_survivors else _selection_single())
@@ -248,26 +275,33 @@ def _run_dir(tmp_path: Path, two_survivors: bool = False,
            {"run_id": "ts_r542", "final_status": final_status})
     _write(run_dir, "run_manifest.json",
            {"run_id": "ts_r542", "failed_stages": {}})
+    # R544: packages are built FIRST from the frozen real tree — the
+    # tree's frozen invention stem is what the specs must carry for
+    # the byte-level identity check to match. Fixture candidates in
+    # one dir share the frozen stem (disclosed scope).
+    inv_id = "inv:a"
+    if with_pkg:
+        cands = {"cand_a": ("TECHNOLOGY_TRANSFER_PACKAGE_primary.zip",
+                            "primary", "SURVIVED")}
+        if two_survivors:
+            cands["cand_b"] = ("TECHNOLOGY_TRANSFER_PACKAGE_grid-1.zip",
+                               "grid-1", "SURVIVED")
+        ids = _packages(run_dir, cands)
+        inv_id = ids["cand_a"]["invention_id"]
     _write(run_dir, "INVENTION_SPECIFICATION.json",
-           _inv_spec(span=span, source=source, custody=custody, uri=uri))
+           _inv_spec(span=span, source=source, custody=custody, uri=uri,
+                     invention_id=inv_id))
     _write(run_dir, "ENGINEERING_SPECIFICATION.json", _eng_spec(eng))
     _write(run_dir, "DECISIVE_EXPERIMENT.json",
            _dec_spec(experiment_answered))
     if two_survivors:
         _write(run_dir, "INVENTION_SPECIFICATION_grid-1.json",
                _inv_spec(span=span, source=source, custody=custody,
-                         uri=uri))
+                         uri=uri, invention_id=inv_id))
         _write(run_dir, "ENGINEERING_SPECIFICATION_grid-1.json",
                _eng_spec(eng))
         _write(run_dir, "DECISIVE_EXPERIMENT_grid-1.json",
                _dec_spec(experiment_answered))
-    if with_pkg:
-        zips = {"cand_a": ("TECHNOLOGY_TRANSFER_PACKAGE_primary.zip",
-                           _zip_bytes(b"CAND_A_UNIQUE_PAYLOAD"))}
-        if two_survivors:
-            zips["cand_b"] = ("TECHNOLOGY_TRANSFER_PACKAGE_grid-1.zip",
-                              _zip_bytes(b"CAND_B_UNIQUE_PAYLOAD"))
-        _packages(run_dir, zips)
     return run_dir
 
 
@@ -403,7 +437,8 @@ def test_09_unresolved_disposition_never_finished(tmp_path):
 def test_10_package_deletion_after_completion_fails_closed(tmp_path):
     run_dir = _run_dir(tmp_path)
     assert _verify(run_dir)["finished_discovery"] is True
-    (run_dir / "TECHNOLOGY_TRANSFER_PACKAGE_primary.zip").unlink()
+    (run_dir / "DOWNLOAD" / "TECHNOLOGY_TRANSFER_PACKAGE_primary.zip"
+     ).unlink()
     rec = _verify(run_dir)
     assert rec["finished_discovery"] is False
     assert cc.COMP_PACKAGE in rec["missing_components"]
@@ -482,10 +517,15 @@ def test_15_recovered_package_re_verifies_and_finishes(tmp_path):
 
     def _retry():
         # the engine's own path: the canonical package compile succeeds
-        # on the second attempt and the ranked record is re-persisted
-        _packages(run_dir, {"cand_a": (
+        # on the second attempt and the ranked record is re-persisted.
+        # The recovered bytes must match the spec identity (the
+        # content check reads them back), so the spec is re-bound to
+        # the recovered tree's frozen stem first.
+        ids = _packages(run_dir, {"cand_a": (
             "TECHNOLOGY_TRANSFER_PACKAGE_primary.zip",
-            _zip_bytes(b"CAND_A_UNIQUE_PAYLOAD"))})
+            "primary", "SURVIVED")})
+        _write(run_dir, "INVENTION_SPECIFICATION.json",
+               _inv_spec(invention_id=ids["cand_a"]["invention_id"]))
         rrs.persist_ranked_result_set(run_dir)
         return {}
 
@@ -935,3 +975,376 @@ def test_r543_28_manifest_mismatched_candidate_id_cross_package(tmp_path):
         f"failure; per_candidate={v['per_candidate']}")
     assert v["verified"] is False
     assert v["violations"]
+
+
+# ---------------------------------------------------------------------------
+# R544: one completion authority — a stale recorded Boolean can never
+# disagree with the contract, in EITHER direction
+# ---------------------------------------------------------------------------
+def _stale_final_state(run_dir: Path, finished: bool) -> None:
+    fs = json.loads((run_dir / "final_state.json").read_text(
+        encoding="utf-8"))
+    fs["completion_states"] = {
+        "PIPELINE_COMPLETED": True, "DISCOVERY_COMPLETED": True,
+        "TECHNOLOGY_PACKAGE_COMPLETED": True,
+        "FINISHED_DISCOVERY": finished}
+    (run_dir / "final_state.json").write_text(
+        json.dumps(fs), encoding="utf-8")
+
+
+def _session_record(run_dir: Path, sid: str) -> dict:
+    return {"session_id": sid, "run_dir": str(run_dir),
+            "status": "COMPLETE",
+            "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+            "title": "t", "user_text": "u",
+            "package": {"complete": True}}
+
+
+def test_r544_29_stale_true_states_contract_false_ui_false(
+        tmp_path, monkeypatch):
+    """Old/stale completion_states=true + COMPLETION_CONTRACT
+    finished=false -> session_detail false + user_state_view.finished
+    false. A stale finished Boolean can never resurrect a refused
+    contract (the R543-1c production inconsistency, closed)."""
+    from toscanini import sessions as sess
+    from toscanini import user_state as us
+    run_dir = _run_dir(tmp_path, with_pkg=False)
+    cc.persist_completion_contract(run_dir)  # false contract on disk
+    _stale_final_state(run_dir, True)  # the old authority's lie
+    record = _session_record(run_dir, "ts_r544_stale_true")
+    monkeypatch.setattr(sess, "get_session", lambda sid: dict(record))
+    detail = sess.session_detail("ts_r544_stale_true")
+    assert detail["completion_contract"]["finished_discovery"] is False
+    assert detail["completion_states"]["FINISHED_DISCOVERY"] is False, (
+        "the contract outranks every session-side derivation")
+    view = us.user_state_view(detail)
+    assert view["finished"] is False, (
+        "a stale final_state true must not leak into the finished flag")
+
+
+def test_r544_30_stale_false_states_contract_true_ui_true(
+        tmp_path, monkeypatch):
+    """Old/stale completion_states=false + COMPLETION_CONTRACT
+    finished=true -> session_detail true + user_state_view.finished
+    true. A stale refusal can never suppress a verified contract."""
+    from toscanini import sessions as sess
+    from toscanini import user_state as us
+    run_dir = _run_dir(tmp_path)
+    cc.persist_completion_contract(run_dir)  # true contract on disk
+    _stale_final_state(run_dir, False)  # the stale refusal
+    record = _session_record(run_dir, "ts_r544_stale_false")
+    monkeypatch.setattr(sess, "get_session", lambda sid: dict(record))
+    detail = sess.session_detail("ts_r544_stale_false")
+    assert detail["completion_contract"]["finished_discovery"] is True
+    assert detail["completion_states"]["FINISHED_DISCOVERY"] is True, (
+        "the contract outranks the stale recorded states")
+    view = us.user_state_view(detail)
+    assert view["finished"] is True, (
+        "a stale final_state false must not suppress the finished flag")
+
+
+# ---------------------------------------------------------------------------
+# R544: the competing set is validated LITERALLY (item 3) — every
+# exposed candidate carries mechanism + kill condition + a RESOLVED
+# disposition; UNRESOLVED fails closed
+# ---------------------------------------------------------------------------
+def test_r544_31_competing_row_without_mechanism_blocks_finished(
+        tmp_path):
+    """A competing row with no mechanism/kill condition in ANY recorded
+    source (row fields stripped; no spec, no skipped-screen record, no
+    envelope in this fixture) blocks finished with a NAMED gap."""
+    run_dir = _run_dir(tmp_path)
+    sel = json.loads((run_dir / "SURVIVOR_SELECTION.json").read_text(
+        encoding="utf-8"))
+    for row in sel["ranked"][1:]:
+        for k in ("mechanism", "intervention", "falsification_test"):
+            row.pop(k, None)
+    _write(run_dir, "SURVIVOR_SELECTION.json", sel)
+    rec = _verify(run_dir)
+    assert rec["finished_discovery"] is False
+    mech = rec["components"][cc.COMP_MECHANISMS]
+    assert mech["complete"] is False
+    bad = [c for c in mech["competing_candidates"]
+           if not c["complete"]]
+    assert {c["candidate_id"] for c in bad} == {"cand_b", "cand_c"}
+    assert all("mechanism" in c["gap"] for c in bad), (
+        f"gaps must name the missing mechanism: {bad}")
+    assert cc.COMP_MECHANISMS in rec["missing_components"]
+
+
+def test_r544_32_unresolved_competing_disposition_blocks_finished(
+        tmp_path):
+    """A competing row whose recorded disposition is UNRESOLVED blocks
+    finished — an unresolved challenge is never papered over, even on
+    a non-surviving row."""
+    run_dir = _run_dir(tmp_path)
+    sel = json.loads((run_dir / "SURVIVOR_SELECTION.json").read_text(
+        encoding="utf-8"))
+    sel["ranked"][1]["disposition"] = ""
+    _write(run_dir, "SURVIVOR_SELECTION.json", sel)
+    rec = _verify(run_dir)
+    assert rec["finished_discovery"] is False
+    adv = rec["components"][cc.COMP_ADVERSARIAL]
+    assert "cand_b" in adv["unresolved_rows"]
+    mech = rec["components"][cc.COMP_MECHANISMS]
+    bad = [c for c in mech["competing_candidates"]
+           if c["candidate_id"] == "cand_b"]
+    assert bad and bad[0]["complete"] is False
+    assert bad[0]["disposition_resolved"] is False
+
+
+# ---------------------------------------------------------------------------
+# R544: the preferred package contract (item 4) — compiled +
+# quality-verified + bound + contents-verified, mechanically enforced;
+# the UI never presents a candidate package as a buyer release
+# ---------------------------------------------------------------------------
+def _leak_json_into_buyer_pdf(tree_dir: Path) -> None:
+    """Adversarial tree mutation, sealed INTO the manifest (hash stays
+    consistent): raw machine state rendered as a real PDF page inside
+    a buyer PDF (the R439 L finding — a traceback plus a dumped JSON
+    object, the exact shapes gate V refuses). The gate must refuse it
+    on substance — buyer language — while hash, binding, and contents
+    all still pass."""
+    import io
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas as rl_canvas
+    from pypdf import PdfReader, PdfWriter
+    pdfs = sorted(tree_dir.glob("*.pdf"))
+    assert pdfs, "frozen tree must carry buyer PDFs"
+    leak_lines = [
+        "MACHINE STATE APPENDIX (leaked)",
+        'Traceback (most recent call last): File "engine/run.py", '
+        'line 1400, in _post_rank_pipeline',
+        '{"run_ctx": {"run_id": "ts_leak", "package_number": "99"}}',
+        '"package_number": "99",',
+        '"_internal": "self._post_rank_pipeline",',
+        "'value': 'raw repr dump'",
+    ]
+    buf = io.BytesIO()
+    c = rl_canvas.Canvas(buf, pagesize=letter)
+    y = letter[1] - 72
+    c.setFont("Helvetica", 10)
+    for line in leak_lines:
+        c.drawString(72, y, line[:90])
+        y -= 13
+    c.save()
+    buf.seek(0)
+    target = pdfs[0]
+    reader = PdfReader(str(target))
+    extra = PdfReader(buf)
+    writer = PdfWriter()
+    for page in reader.pages:
+        writer.add_page(page)
+    for page in extra.pages:
+        writer.add_page(page)
+    with open(target, "wb") as f:
+        writer.write(f)
+
+
+def test_r544_33_gate_blocked_package_never_finished(tmp_path):
+    """A candidate package that is compiled + bound + hash-verified +
+    contents-verified but FAILS the independent quality gate is NOT a
+    finished discovery — and the package component names the quality
+    failure explicitly (preferred contract, mechanically enforced)."""
+    run_dir = _run_dir(tmp_path, with_pkg=False)
+    ids = _packages(run_dir, {"cand_a": (
+        "TECHNOLOGY_TRANSFER_PACKAGE_primary.zip",
+        "primary", "SURVIVED")},
+        tree_mutator=_leak_json_into_buyer_pdf)
+    # rebind the spec to the recovered bytes so hash/binding/content
+    # pass and ONLY the independent gate blocks (the isolation this
+    # test proves)
+    _write(run_dir, "INVENTION_SPECIFICATION.json",
+           _inv_spec(invention_id=ids["cand_a"]["invention_id"]))
+    rec = _verify(run_dir)
+    assert rec["finished_discovery"] is False
+    pkg = rec["components"][cc.COMP_PACKAGE]
+    assert pkg["complete"] is False
+    assert pkg["quality_verified"] is False
+    failed = [q for q in pkg["quality_verification"]
+              if q["candidate_id"] == "cand_a"]
+    assert failed and failed[0]["verdict"] == "BLOCK", failed
+    # hash, binding, and contents still pass — ONLY quality blocks
+    assert failed[0]["failed_gates"], "the blocking gates must be named"
+    assert pkg["content_complete"] is True
+    assert cc.COMP_PACKAGE in rec["missing_components"]
+
+
+def test_r544_34_ui_never_presents_candidate_package_as_released():
+    """The conversation card renders the independent quality posture
+    verbatim and never claims a buyer release for a candidate
+    package (COMPLETE_CANDIDATE_PACKAGE != BUYER_RELEASED_PACKAGE,
+    mechanically — the strings are on the card, not in a comment)."""
+    conv = (REPO_ROOT / "TOSCANINI_UI" / "webapp" / "components"
+            / "Conversation.tsx").read_text(encoding="utf-8")
+    assert "data-conv-pkg-posture" in conv
+    assert "not a buyer release" in conv
+    assert "quality verification blocked" in conv
+    assert "independently quality-verified" in conv
+    present = (REPO_ROOT / "TOSCANINI_UI" / "webapp" / "lib"
+               / "present.ts").read_text(encoding="utf-8")
+    assert "qualityVerified" in present
+    assert "qualityFailedGates" in present
+    # the download CTA still resolves per candidate (the deliverable
+    # exists); the posture line — not the CTA — carries the release
+    # distinction
+    assert "Download technology package" in conv
+
+
+# ---------------------------------------------------------------------------
+# R544: the 3D-model rule tightened by domain (item 5) — the warrant
+# comes from the canonical applicability state, never a UI guess
+# ---------------------------------------------------------------------------
+def _warranted_eng_spec() -> dict:
+    """A physical-context engineering spec (MEDICAL_IN_VIVO warrants
+    geometry) with an explicit conceptual model class and recorded
+    parameters — the shape whose artifact requirement is under test."""
+    spec = _eng_spec("conceptual")
+    spec["applicability"] = {
+        "artifact": "PROBLEM_CONTEXT_APPLICABILITY",
+        "context_class": "MEDICAL_IN_VIVO", "score": 19}
+    return spec
+
+
+def test_r544_35_warranted_context_without_artifact_not_finished(
+        tmp_path):
+    """Physical candidate (MEDICAL_IN_VIVO warrant) + explicit
+    conceptual model + NO candidate-owned 3D artifact in its package
+    -> engineering incomplete -> NOT FINISHED. The warrant is read
+    from the candidate's OWN applicability state."""
+    run_dir = _run_dir(tmp_path, with_pkg=False)
+    ids = _packages(run_dir, {"cand_a": (
+        "TECHNOLOGY_TRANSFER_PACKAGE_primary.zip",
+        "primary", "SURVIVED")}, strip_model=True)
+    # rebind the spec to the recovered bytes so the ONLY failing rule
+    # under test is the warranted-artifact requirement (identity must
+    # match for the failure to be attributable)
+    _write(run_dir, "INVENTION_SPECIFICATION.json",
+           _inv_spec(invention_id=ids["cand_a"]["invention_id"]))
+    _write(run_dir, "ENGINEERING_SPECIFICATION.json",
+           _warranted_eng_spec())
+    rec = _verify(run_dir)
+    assert rec["finished_discovery"] is False
+    eng = rec["components"][cc.COMP_ENGINEERING]
+    assert eng["complete"] is False
+    per = eng["per_survivor"][0]
+    assert per["geometry_warrant"] == "PHYSICAL_CONTEXT:MEDICAL_IN_VIVO"
+    assert per["model_artifact_owned"] is False
+    assert cc.COMP_ENGINEERING in rec["missing_components"]
+
+
+def test_r544_36_unknown_context_conceptual_eligible(tmp_path):
+    """No affirmative geometry warrant (absent/UNKNOWN applicability)
+    + explicit conceptual model + candidate-owned artifact present ->
+    engineering complete. Explicit labeling suffices where the
+    canonical state warrants nothing."""
+    run_dir = _run_dir(tmp_path, eng="conceptual")
+    rec = _verify(run_dir)
+    assert rec["finished_discovery"] is True, rec["missing_components"]
+    per = rec["components"][cc.COMP_ENGINEERING]["per_survivor"][0]
+    assert per["geometry_warrant"] == "NO_AFFIRMATIVE_WARRANT:UNKNOWN"
+    assert per["model_class"] == "CONCEPTUAL_SYSTEM_MODEL"
+
+
+def test_r544_37_candidate_b_with_only_a_geometry_not_finished(
+        tmp_path):
+    """Candidate B's package record points at candidate A's ZIP (B has
+    no package of its own — only A's geometry) -> the content
+    identity check refuses the cross-candidate binding -> NOT
+    FINISHED. Ownership is mechanical, never implied."""
+    run_dir = _run_dir(tmp_path, two_survivors=True)
+    pkgs = json.loads((run_dir / "RANKED_PACKAGE_RECORDS.json")
+                      .read_text(encoding="utf-8"))
+    a_rec = pkgs["by_candidate_id"]["cand_a"]
+    # NOTE: packages/by_candidate_id serialize as independent copies;
+    # the binding resolves the packages table first — mutate THAT
+    # copy (the authoritative one the projection reads).
+    b_rec = pkgs["packages"]["grid-1"]
+    assert b_rec["candidate_id"] == "cand_b"
+    # B's record now names A's bytes (same package_id so the ONLY
+    # failing check is the ranked-candidate identity inside the ZIP)
+    b_rec.update(zip_name=a_rec["zip_name"],
+                 zip_sha256=a_rec["zip_sha256"],
+                 package_id=a_rec["package_id"])
+    _write(run_dir, "RANKED_PACKAGE_RECORDS.json", pkgs)
+    rec = _verify(run_dir)
+    assert rec["finished_discovery"] is False
+    pkg = rec["components"][cc.COMP_PACKAGE]
+    assert pkg["complete"] is False
+    b_content = next(c for c in pkg["content_verification"]
+                     if c["candidate_id"] == "cand_b")
+    assert b_content["ok"] is False
+    assert any(m.startswith("identity_candidate_id")
+               for m in b_content["missing"]), b_content["missing"]
+
+
+# ---------------------------------------------------------------------------
+# R544: the ZIP-content verifier (item 6) — the actual bytes are
+# opened; a hash-consistent content gap is refused on substance
+# ---------------------------------------------------------------------------
+def _empty_mechanism_in_tree(tree_dir: Path) -> None:
+    """Adversarial tree mutation, sealed INTO the manifest: the
+    packaged mechanism statement is emptied (the record still claims
+    a complete package for this candidate)."""
+    import json as _json
+    p = tree_dir / "TECHNOLOGY_PACKAGE_MODEL.json"
+    doc = _json.loads(p.read_text(encoding="utf-8"))
+    doc["causal_mechanism"]["chain"]["mechanism"] = ""
+    p.write_text(_json.dumps(doc, indent=2, ensure_ascii=False),
+                 encoding="utf-8")
+
+
+def _kill_disposition_in_tree(tree_dir: Path) -> None:
+    """Adversarial tree mutation: the packaged disposition says
+    KILLED while the ranked row records SURVIVED."""
+    import json as _json
+    p = tree_dir / "TECHNOLOGY_PACKAGE_MODEL.json"
+    doc = _json.loads(p.read_text(encoding="utf-8"))
+    doc["identity"]["ranked_disposition"] = "KILLED"
+    p.write_text(_json.dumps(doc, indent=2, ensure_ascii=False),
+                 encoding="utf-8")
+
+
+def test_r544_38_emptied_mechanism_in_bytes_never_finished(tmp_path):
+    """Hash, binding, and gate all pass, but the opened ZIP carries
+    no mechanism statement -> the content check names the missing
+    part -> NOT FINISHED. A ZIP that exists is not a ZIP that
+    contains the discovery answer."""
+    run_dir = _run_dir(tmp_path, with_pkg=False)
+    ids = _packages(run_dir, {"cand_a": (
+        "TECHNOLOGY_TRANSFER_PACKAGE_primary.zip",
+        "primary", "SURVIVED")},
+        tree_mutator=_empty_mechanism_in_tree)
+    _write(run_dir, "INVENTION_SPECIFICATION.json",
+           _inv_spec(invention_id=ids["cand_a"]["invention_id"]))
+    rec = _verify(run_dir)
+    assert rec["finished_discovery"] is False
+    pkg = rec["components"][cc.COMP_PACKAGE]
+    assert pkg["complete"] is False
+    assert pkg["content_complete"] is False
+    assert pkg["quality_verified"] is True, (
+        "hash, binding, and gate pass — ONLY the content check blocks")
+    content = pkg["content_verification"][0]
+    assert any(m.startswith("mechanism_stated")
+               for m in content["missing"]), content["missing"]
+    assert cc.COMP_PACKAGE in rec["missing_components"]
+
+
+def test_r544_39_disposition_mismatch_never_finished(tmp_path):
+    """The ranked row records SURVIVED but the opened ZIP's own
+    identity says KILLED -> the package does not carry the gates'
+    verdict -> NOT FINISHED. The disposition inside the bytes must
+    equal the disposition on the row."""
+    run_dir = _run_dir(tmp_path, with_pkg=False)
+    ids = _packages(run_dir, {"cand_a": (
+        "TECHNOLOGY_TRANSFER_PACKAGE_primary.zip",
+        "primary", "SURVIVED")},
+        tree_mutator=_kill_disposition_in_tree)
+    _write(run_dir, "INVENTION_SPECIFICATION.json",
+           _inv_spec(invention_id=ids["cand_a"]["invention_id"]))
+    rec = _verify(run_dir)
+    assert rec["finished_discovery"] is False
+    content = rec["components"][cc.COMP_PACKAGE][
+        "content_verification"][0]
+    assert any(m.startswith("identity_disposition")
+               for m in content["missing"]), content["missing"]

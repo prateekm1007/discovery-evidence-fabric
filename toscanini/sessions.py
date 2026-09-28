@@ -1113,6 +1113,16 @@ def session_detail(session_id: str) -> Optional[Dict[str, Any]]:
         surv = _read_json(run_dir / "SURVIVOR_SELECTION.json")
         if surv:
             detail["survivor_selection"] = surv
+        # R543 Step 3: run-artifact read-through for the finished-state
+        # authority. When the run dir exists, COMPLETION_CONTRACT.json
+        # is read verbatim onto the detail record — this ACTIVATES the
+        # existing outrank block below (the contract's completion_states
+        # outrank every session-side derivation). Read-through, never a
+        # second authority: the contract file IS the authority, and no
+        # session-side value is consulted when it is present.
+        contract = _read_json(run_dir / "COMPLETION_CONTRACT.json")
+        if contract:
+            detail["completion_contract"] = contract
     else:
         # R543-1f: the run dir has been pruned (deploy cleanup). Fall
         # back to the session record's own stored fields — the worker
@@ -1175,22 +1185,25 @@ def session_detail(session_id: str) -> Optional[Dict[str, Any]]:
     _rp = _ranked_packages_from_session(s)
     if _rp is not None:
         detail["ranked_packages"] = _rp
-        # a legacy record may have no recorded completion_states;
-        # derive the three states from the session's own fields only —
-        # never from a synthetic rank-1 fallback
+        # a legacy record may have no recorded completion_states.
+        # R544: no hand-derived Boolean here either — when the run
+        # dir survives, the SAME verifier answers live (pure
+        # read-only); when the dir is pruned the field stays absent
+        # (the user_state key derivation applies, exactly the
+        # pre-existing legacy behavior — never a manufactured
+        # finished state from package counts).
         if s.get("completion_states") is not None:
             detail["completion_states"] = s.get("completion_states")
-        else:
-            _n_complete = sum(
-                1 for p in _rp
-                if (p.get("package") or {}).get("complete"))
-            detail["completion_states"] = {
-                "PIPELINE_COMPLETED": s.get("status") == "COMPLETE",
-                "DISCOVERY_COMPLETED": bool(_rp),
-                "TECHNOLOGY_PACKAGE_COMPLETED":
-                    (_n_complete == len(_rp) and len(_rp) >= 1),
-                "FINISHED_DISCOVERY":
-                    (_n_complete == len(_rp) and len(_rp) >= 1)}
+        elif run_dir is not None and run_dir.exists():
+            try:
+                from discovery_fabric.engine import (
+                    completion_contract as _cc_legacy)
+                _legacy_rec = _cc_legacy.verify_completion_contract(
+                    run_dir)
+                detail["completion_states"] = \
+                    _cc_legacy.completion_states(_legacy_rec)
+            except Exception:  # noqa: BLE001 — absent stays absent
+                pass
     else:
         # R543-1d: a record WITHOUT ranked results (a typed no-survivor
         # terminal: MECHANISM_STARVED, REJECTED, a scientific refusal)

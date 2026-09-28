@@ -3146,9 +3146,18 @@ class Handler(BaseHTTPRequestHandler):
                                    "RUN_BLOCKED_TRANSPORT"):
                     detail = store.session_detail(sid)
                     if detail:
-                        from toscanini.user_state import user_state_view
+                        # R543-2: the SSE terminal event uses the SAME
+                        # read-time refreshed projection as every REST
+                        # path (authoritative record ->
+                        # refresh_user_state_view -> user_state_view).
+                        # A direct user_state_view(detail) call here
+                        # bypassed the refresh and could serve a stale
+                        # finished flag — the Step-10 blind spot.
+                        from toscanini.sessions import (
+                            refresh_user_state_view as _refresh543)
                         send("final", {
-                            "user_state_view": user_state_view(detail),
+                            "user_state_view": _refresh543(
+                                detail).get("user_state_view"),
                             "final_status": detail.get("final_status"),
                             "package": detail.get("package"),
                             "stages": detail.get("stages"),

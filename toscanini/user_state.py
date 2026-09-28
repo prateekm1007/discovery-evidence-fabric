@@ -332,26 +332,35 @@ def _contract_finished_flag(session: Dict[str, Any]) -> Optional[bool]:
     terminal STATE, but it must never be represented as a finished
     discovery by a second Boolean.
 
-    Read order (the two places the contract's answer lands durably):
-      1. session['completion_states'] — the worker's run-tail refresh
-         (R543-1b: persisted onto the durable session record for every
-         terminal state; the authoritative field when present).
-      2. session['final_state']['completion_states'] — the engine's own
-         final_state.json record, written at the run tail before the
-         session index catches up; the fallback when the record field
-         is absent (run dir pruned, worker refresh not yet flushed)."""
-    # 1. the session record's own completion_states (worker refresh)
-    states = session.get("completion_states")
-    if isinstance(states, dict) and "FINISHED_DISCOVERY" in states:
-        return bool(states.get("FINISHED_DISCOVERY"))
-    # 2. the engine's final_state record (the run's own terminal truth)
-    fs = session.get("final_state")
-    if isinstance(fs, dict):
-        fs_states = fs.get("completion_states")
-        if isinstance(fs_states, dict) and "FINISHED_DISCOVERY" in fs_states:
-            return bool(fs_states.get("FINISHED_DISCOVERY"))
-    # 3. the raw completion contract (read verbatim from the run dir
-    #    when sessions.py surfaces it on the detail record)
+    Read order (R544: the contract itself first — a stale
+    recorded completion_states, whether on the session record or in
+    final_state, can NEVER override the contract's own answer):
+
+      1. session['completion_contract'] — the durable contract
+         record, projected live through completion_states(). A stale
+         FINISHED_DISCOVERY=true sitting in a recorded
+         completion_states field loses to a contract false, and a
+         stale false loses to a contract true.
+      2. session['completion_states'] — the worker's run-tail
+         refresh (the contract's projection, persisted).
+      3. session['final_state']['completion_states'] — the engine's
+         own final_state.json record (the contract's projection
+         since R544, re-persisted post-contract).
+
+    Scope (R543 Step 6 POS pin): the contract governs TERMINAL records
+    only. A non-terminal status (PENDING / BUILDING_PROBLEM / RUNNING /
+    AWAITING_CLARIFICATION) is an explicitly represented transient
+    state — the run has not ended, so a lingering contract answer can
+    only describe a PREVIOUS terminal state of a reused record, never
+    the live run. Honoring it would be the stale-snapshot error, so
+    the flag returns None here and the live key governs (finished is
+    false while the run is live)."""
+    if (session.get("status") or "") in (
+            "PENDING", "BUILDING_PROBLEM", "RUNNING",
+            "AWAITING_CLARIFICATION"):
+        return None
+    # 1. the durable contract itself (the authority — projected
+    #    live; a stale recorded Boolean can never override it)
     contract = session.get("completion_contract")
     if isinstance(contract, dict):
         try:
@@ -362,6 +371,18 @@ def _contract_finished_flag(session: Dict[str, Any]) -> Optional[bool]:
                 return bool(states.get("FINISHED_DISCOVERY"))
         except Exception:  # noqa: BLE001 — projection must not crash
             pass
+    # 2. the session record's own completion_states (worker refresh —
+    #    the contract's projection, persisted at the run tail)
+    states = session.get("completion_states")
+    if isinstance(states, dict) and "FINISHED_DISCOVERY" in states:
+        return bool(states.get("FINISHED_DISCOVERY"))
+    # 3. the engine's final_state record (the contract's projection
+    #    since R544, re-persisted post-contract)
+    fs = session.get("final_state")
+    if isinstance(fs, dict):
+        fs_states = fs.get("completion_states")
+        if isinstance(fs_states, dict) and "FINISHED_DISCOVERY" in fs_states:
+            return bool(fs_states.get("FINISHED_DISCOVERY"))
     return None
 
 

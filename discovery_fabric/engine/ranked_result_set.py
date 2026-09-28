@@ -94,6 +94,199 @@ def _sha256_file(path: Path) -> Optional[str]:
         return None
 
 
+def _locate_zip(run_dir: Path, zip_name: Optional[str]) -> Optional[Path]:
+    """The candidate-bound ZIP on disk (the DOWNLOAD tree first, then
+    the run root — the two legal locations the binding resolves)."""
+    if not zip_name:
+        return None
+    for cand in (run_dir / "DOWNLOAD" / zip_name, run_dir / zip_name):
+        try:
+            if cand.exists():
+                return cand
+        except Exception:  # noqa: BLE001 — absent stays absent
+            continue
+    return None
+
+
+# the six-part discovery record as machine files inside a
+# candidate-bound package (the current compiler layout; the
+# TECHNOLOGY_PACKAGE/ prefix is optional — matched by suffix).
+_CONTENT_FILES = {
+    "manifest": ("PACKAGE_MANIFEST.json",),
+    "model": ("TECHNOLOGY_PACKAGE_MODEL.json",),
+    "evidence": ("03_EVIDENCE_SUMMARY.json",),
+    "engineering": ("02_ENGINEERING_DEFINITION.json",),
+    "experiment": ("04_DECISIVE_EXPERIMENT.json",),
+    "provenance": ("PROVENANCE.json",),
+    "model_manifest": ("MODEL/MODEL_MANIFEST.json",),
+    "parameters": ("MODEL/PARAMETERS.json",),
+}
+
+
+def verify_package_contents(
+        zip_path: Path,
+        candidate_id: Optional[str],
+        package_id: Optional[str],
+        invention_id: Optional[str],
+        disposition: Optional[str],
+) -> Dict[str, Any]:
+    """R544: open the ACTUAL ZIP bytes and mechanically check the
+    six-part discovery record is inside — for THIS candidate.
+
+    Proves (not claims): the manifest exists; the model identity names
+    this package_id + invention_id + ranked candidate_id; the recorded
+    adversarial disposition equals the row's disposition; evidence
+    records exist; mechanism + kill condition are stated; the
+    engineering definition exists; the MODEL layer carries a model_id
+    + at least one GLB; parameters exist; the decisive experiment
+    carries hypothesis arms + a decision rule.
+
+    Never trusts a record field: every check reads the ZIP bytes.
+    Returns {ok, checks{}, missing[], identity{}}. A missing part is
+    named exactly (never a silent pass)."""
+    import zipfile as _zf
+    checks: Dict[str, bool] = {}
+    missing: List[str] = []
+    identity: Dict[str, Any] = {}
+
+    def _need(name: str, good: bool, why: str) -> None:
+        checks[name] = bool(good)
+        if not good:
+            missing.append(f"{name}: {why}")
+
+    try:
+        zf = _zf.ZipFile(str(zip_path))
+        names = zf.namelist()
+    except Exception as exc:  # noqa: BLE001 — unreadable bytes fail
+        return {"ok": False, "checks": {"readable_zip": False},
+                "missing": [f"readable_zip: {type(exc).__name__}"],
+                "identity": {}}
+    checks["readable_zip"] = True
+
+    def _find(*suffixes: str) -> Optional[str]:
+        for want in suffixes:
+            for n in names:
+                if n == want or n.endswith("/" + want):
+                    return n
+        return None
+
+    def _load(name: Optional[str]) -> Optional[Dict[str, Any]]:
+        if not name:
+            return None
+        try:
+            return json.loads(zf.read(name).decode("utf-8"))
+        except Exception:  # noqa: BLE001 — unparseable fails the part
+            return None
+
+    _need("manifest_present",
+          _find(*_CONTENT_FILES["manifest"]) is not None,
+          "PACKAGE_MANIFEST.json absent from the ZIP bytes")
+    model_doc = _load(_find(*_CONTENT_FILES["model"]))
+    _need("model_present", isinstance(model_doc, dict),
+          "TECHNOLOGY_PACKAGE_MODEL.json absent/unparseable in the ZIP")
+    ident = (model_doc or {}).get("identity") or {}
+    if not isinstance(ident, dict):
+        ident = {}
+    identity = {k: ident.get(k) for k in (
+        "package_id", "invention_id", "ranked_candidate_id",
+        "ranked_disposition")}
+    _need("identity_package_id",
+          bool(package_id) and ident.get("package_id") == package_id,
+          f"model identity package_id {ident.get('package_id')!r} != "
+          f"package record {package_id!r}")
+    _need("identity_invention_id",
+          bool(invention_id) and ident.get("invention_id") == invention_id,
+          "model identity invention_id != the candidate's specification "
+          "invention_id")
+    _need("identity_candidate_id",
+          bool(candidate_id) and ident.get("ranked_candidate_id")
+          == candidate_id,
+          f"model identity ranked_candidate_id "
+          f"{ident.get('ranked_candidate_id')!r} != ranked row "
+          f"{candidate_id!r}")
+    _need("identity_disposition",
+          bool(disposition) and ident.get("ranked_disposition")
+          == disposition,
+          f"model identity ranked_disposition "
+          f"{ident.get('ranked_disposition')!r} != recorded row "
+          f"disposition {disposition!r}")
+
+    ev_doc = _load(_find(*_CONTENT_FILES["evidence"]))
+    _ev_ok = False
+    if isinstance(ev_doc, dict):
+        try:
+            total = sum(int(r.get("count") or 0)
+                        for r in (ev_doc.get("roles") or [])
+                        if isinstance(r, dict))
+        except Exception:  # noqa: BLE001 — malformed roles fail
+            total = 0
+        _ev_ok = total > 0
+    _need("evidence_records", _ev_ok,
+          "03_EVIDENCE_SUMMARY.json absent or carries zero records")
+
+    _chain = ((model_doc or {}).get("causal_mechanism") or {}).get(
+        "chain") or {}
+    if not isinstance(_chain, dict):
+        _chain = {}
+    _need("mechanism_stated",
+          bool(str(_chain.get("mechanism") or "").strip()),
+          "causal_mechanism.chain.mechanism empty in the ZIP model")
+    _need("kill_condition_stated",
+          bool(str(_chain.get("falsification_test") or "").strip()),
+          "causal_mechanism.chain.falsification_test empty in the ZIP")
+
+    _need("engineering_definition",
+          _load(_find(*_CONTENT_FILES["engineering"])) is not None,
+          "02_ENGINEERING_DEFINITION.json absent/unparseable in the ZIP")
+    _need("provenance_record",
+          _load(_find(*_CONTENT_FILES["provenance"])) is not None,
+          "PROVENANCE.json absent/unparseable in the ZIP")
+
+    mman = _load(_find(*_CONTENT_FILES["model_manifest"]))
+    _glbs = [n for n in names
+             if n.lower().endswith(".glb")
+             and "MODEL/" in n.replace("\\", "/").upper()]
+    _need("model_layer",
+          isinstance(mman, dict) and bool(mman.get("model_id"))
+          and len(_glbs) >= 1,
+          "MODEL/MODEL_MANIFEST.json without model_id, or no MODEL/*.glb "
+          "in the ZIP bytes")
+    _need("parameters_present",
+          _load(_find(*_CONTENT_FILES["parameters"])) is not None,
+          "MODEL/PARAMETERS.json absent/unparseable in the ZIP")
+
+    dec = _load(_find(*_CONTENT_FILES["experiment"]))
+    _arms = 0
+    _rule = False
+    if isinstance(dec, dict):
+        _contract = dec.get("contract") or {}
+        _hyps = (_contract.get("hypothesis")
+                 if isinstance(_contract, dict) else None)
+        # value-wrapped synthesis output ({value: [...], status}) or a
+        # plain arm list — either form counts when arms carry
+        # descriptions (never a bare arm count).
+        if isinstance(_hyps, dict) and "value" in _hyps:
+            _hyps = _hyps.get("value")
+        if not isinstance(_hyps, list):
+            _hyps = []
+        _arms = sum(
+            1 for h in _hyps if isinstance(h, dict)
+            and str(h.get("description") or "").strip())
+        _blob = json.dumps(dec, default=str)
+        _rule = ("decision_rule" in _blob.lower()
+                 or "decision rule" in _blob.lower())
+    _need("experiment_arms", _arms >= 1,
+          "04_DECISIVE_EXPERIMENT.json carries no hypothesis arms")
+    _need("decision_rule", bool(_rule),
+          "no decision rule recorded in the packaged experiment")
+    try:
+        zf.close()
+    except Exception:  # noqa: BLE001 — result stands regardless
+        pass
+    return {"ok": not missing, "checks": checks, "missing": missing,
+            "identity": identity}
+
+
 def _rank_basis(ranked_row: Dict[str, Any]) -> Dict[str, Any]:
     """The mechanically traceable basis for one candidate's rank position.
 
@@ -316,6 +509,19 @@ def _package_binding(run_dir: Path,
         "candidate_id": rec_cid if rec_cid is not None else cid,
         "rank": rank,
         "candidate_identity_bound": bool(identity_bound),
+        # R544: the independent package-quality gate posture, recorded
+        # by the engine at compile time on the package record (the
+        # gate runs on the promoted ZIP bytes — the same gate the
+        # bridge release path runs). COMPLETE_CANDIDATE_PACKAGE
+        # (compiled + bound + hash-verified) is NOT the same claim as
+        # a quality-verified package; the completion contract
+        # requires quality_verified == PASS, and the UI surfaces the
+        # posture distinctly (a candidate package is never presented
+        # as a buyer release unless the gate passed).
+        "quality_verified": rec.get("quality_verified"),
+        "quality_failed_gates": list(rec.get("quality_failed_gates")
+                                     or []),
+        "quality_gate_error": rec.get("quality_gate_error"),
         "complete": bool(rec.get("complete") and hash_matches
                          and identity_bound),
         "note": ("candidate-bound technology package; the ZIP hash is "
@@ -513,6 +719,44 @@ def _candidate_result_record(
             comp_kill = str(
                 (r.get("kill_condition")
                  or r.get("falsification_test") or "")).strip()
+        # R544: the engine stamps mechanism/intervention/
+        # falsification_test onto every investigated selection row
+        # (kills that never built a spec carry their structured
+        # candidate's fields). The projection reads the row first —
+        # a killed competitor's reasoning path must ride the
+        # record, never render blank.
+        if not comp_mech.get("mechanism"):
+            comp_mech["mechanism"] = r.get("mechanism") or ""
+        if not comp_mech.get("intervention"):
+            comp_mech["intervention"] = r.get("intervention") or ""
+        if not comp_kill:
+            # cheap-screen kills: the skipped record preserves the
+            # full structured candidate (mechanism + testable
+            # prediction); the envelope is the last resort.
+            _sk = _read_json(
+                run_dir / "PACKAGE_SKIPPED_CHEAP_SCREEN_"
+                f"{comp_key}.json") or {}
+            _sc = _sk.get("structured_candidate") or {}
+            if not isinstance(_sc, dict):
+                _sc = {}
+            if not comp_mech.get("mechanism"):
+                comp_mech["mechanism"] = _sc.get("mechanism") or ""
+            if not comp_mech.get("intervention"):
+                comp_mech["intervention"] = _sc.get("intervention") or ""
+            comp_kill = str(_sc.get("testable_prediction") or "").strip()
+            if not (comp_mech.get("mechanism") and comp_kill):
+                _env = _read_json(
+                    run_dir / f"ENVELOPE_{comp_key}.json") or {}
+                _mm = _env.get("mechanism_map") or {}
+                if not isinstance(_mm, dict):
+                    _mm = {}
+                if not comp_mech.get("mechanism"):
+                    comp_mech["mechanism"] = _mm.get("mechanism") or ""
+                if not comp_mech.get("intervention"):
+                    comp_mech["intervention"] = _mm.get("intervention") or ""
+                if not comp_kill:
+                    comp_kill = str(
+                        _mm.get("falsification_test") or "").strip()
         competing_summaries.append({
             "candidate_id": comp_cid,
             "mechanism": comp_mech.get("mechanism") or "",
@@ -547,6 +791,25 @@ def _candidate_result_record(
     geometry = eng_spec.get("geometry") if isinstance(eng_spec, dict) else {}
     _mc = resolve_model_class(run_dir, key, eng_spec,
                               _pkg_rec(pkg_records, cid, key))
+    # R544: the thread-visible engineering definition (the proposed
+    # design statement from the candidate's OWN spec — mechanism +
+    # design input, verbatim, truncated) and the critical parameters
+    # (name/value/unit, honestly UNKNOWN when unsourced — Art.
+    # XXVII: never invented). Both ride the record so the
+    # conversation shows them without re-reading stage files.
+    _prop = (eng_core.get("proposed_design")
+             if isinstance(eng_core, dict) else {}) or {}
+    if not isinstance(_prop, dict):
+        _prop = {"statement": str(_prop)}
+    _definition = str(_prop.get("mechanism") or _prop.get("input")
+                      or _prop.get("statement") or "").strip()[:500]
+    _cps = (eng_core.get("critical_parameters")
+            if isinstance(eng_core, dict) else []) or []
+    _params = [{"name": str(p.get("name") or p.get("parameter") or ""),
+                "value": str(p.get("value") or ""),
+                "unit": str(p.get("unit") or ""),
+                "value_status": str(p.get("value_status") or "")}
+               for p in _cps if isinstance(p, dict)][:12]
     engineering = {
         "geometry_present": bool(geometry),
         "geometry": geometry or {"class": "NOT_ESTABLISHED"},
@@ -554,6 +817,8 @@ def _candidate_result_record(
         "model_class": _mc.get("model_class"),
         "model_class_source": _mc.get("source"),
         "earned_engineering_geometry": bool(_mc.get("earned_geometry")),
+        "definition": _definition,
+        "parameters": _params,
         "limitations": ("domain does not warrant physical geometry — "
                         "conceptual classification, explicitly stated"
                         if not geometry else ""),
