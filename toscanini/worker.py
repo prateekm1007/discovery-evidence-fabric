@@ -1331,12 +1331,28 @@ def _run_inner(session_id: str, forensics) -> None:
     # always derives the finished flag from the contract, even when
     # the run dir is later pruned by a deploy. This runs for every
     # completed run, not only bridge-gate runs.
+    #
+    # R543-1e: when COMPLETION_CONTRACT.json is absent (a typed
+    # no-survivor terminal that did not reach the run-tail contract
+    # verifier), fall back to final_state.json's own completion_states
+    # — the engine's own terminal record, written at the run tail
+    # before the contract step. The authority is the same; the source
+    # is whichever durable record the run actually left behind.
     try:
         from discovery_fabric.engine import (
             completion_contract as _cc543)
         _contract543 = _cc543.load(run_dir)
         if isinstance(_contract543, dict):
             _states543 = _cc543.completion_states(_contract543)
+        else:
+            # fall back to final_state.json's completion_states
+            import json as _json543
+            _fs543 = _json543.loads(
+                (run_dir / "final_state.json").read_text(
+                    encoding="utf-8")
+            ) if (run_dir / "final_state.json").is_file() else None
+            _states543 = (_fs543 or {}).get("completion_states")
+        if isinstance(_states543, dict):
             store.update_session(
                 session_id, completion_states=_states543)
     except Exception as _exc543:  # noqa: BLE001 — disclosed, never fatal

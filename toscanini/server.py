@@ -943,8 +943,11 @@ class Handler(BaseHTTPRequestHandler):
             # user-facing state projection AND carries NO operational
             # internals (strip_operational_fields)
             from toscanini.user_state import public_session_view
+            from toscanini.sessions import refresh_user_state_view
             return self._json(200, {
-                "sessions": [public_session_view(s) for s in sessions],
+                "sessions": [public_session_view(
+                              refresh_user_state_view(s))
+                             for s in sessions],
                 "marked_stuck": stuck,
                 "marked_interrupted": interrupted,
                 "marked_unregistered": unregistered,
@@ -985,7 +988,9 @@ class Handler(BaseHTTPRequestHandler):
                 detail = store.session_detail(rid)
                 if detail:
                     from toscanini.user_state import public_session_view
-                    payload = public_session_view(detail)
+                    from toscanini.sessions import refresh_user_state_view
+                    payload = public_session_view(
+                        refresh_user_state_view(detail))
                     # R459 (audit P1-2, queue visibility): a queued run
                     # SAYS it is queued instead of spinning silently.
                     # R459-reaudit (P1-1): the engine holds a slot pool
@@ -1283,7 +1288,11 @@ class Handler(BaseHTTPRequestHandler):
                 detail = store.session_detail(sid)
                 if detail:
                     from toscanini.user_state import public_session_view
-                    return self._json(200, public_session_view(detail))
+                    from toscanini.sessions import refresh_user_state_view
+                    return self._json(
+                        200,
+                        public_session_view(
+                            refresh_user_state_view(detail)))
                 return self._json(404, {"error": "not found"})
             if len(parts) == 4 and parts[3] == "events":
                 # R447: same owner query-parameter capability for the
@@ -1380,11 +1389,12 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(404, {"error": "run not found"})
             from toscanini import diagnostic_package as _dp
             from toscanini.user_state import public_session_view
+            from toscanini.sessions import refresh_user_state_view
             # the projection (label/decision) rides the same view the UI
             # sees — the brief speaks in the product's words, Art. X
             built = _dp.build_diagnostic_package(
                 sid, Path(detail["run_dir"]) if detail.get("run_dir") else None,
-                public_session_view(detail))
+                public_session_view(refresh_user_state_view(detail)))
             if not built:
                 return self._json(409, {
                     "error": "the investigation has not reached a "
@@ -1489,7 +1499,8 @@ class Handler(BaseHTTPRequestHandler):
             # caller who just created the run — possession of it was
             # already that caller's capability via the cookie path.
             from toscanini.user_state import public_session_view
-            view = public_session_view(session)
+            from toscanini.sessions import refresh_user_state_view
+            view = public_session_view(refresh_user_state_view(session))
             if p.path == "/api/discovery":
                 # directive §9: 202 Accepted + run_id (async run started)
                 return self._json(202, {
@@ -2058,13 +2069,15 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:  # noqa: BLE001 — fail-open, never blocks
                 pass
             from toscanini.user_state import public_session_view
+            from toscanini.sessions import refresh_user_state_view
             return self._json(202, {
                 "accepted": True,
                 "action_id": action_id,
                 "reenqueue": True,
                 "run_id": new_s["session_id"],
                 "session_id": new_s["session_id"],
-                "detail": public_session_view(new_s),
+                "detail": public_session_view(
+                    refresh_user_state_view(new_s)),
             })
 
         # R395: conversational Q&A over a run's / invention's own
@@ -2083,9 +2096,11 @@ class Handler(BaseHTTPRequestHandler):
             if not detail:
                 return self._json(404, {"error": "run not found"})
             from toscanini.user_state import public_session_view
+            from toscanini.sessions import refresh_user_state_view
             from toscanini import run_qa
-            out = run_qa.answer_about_run(public_session_view(detail),
-                                          question)
+            out = run_qa.answer_about_run(
+                public_session_view(refresh_user_state_view(detail)),
+                question)
             code = 200 if out["status"] in (
                 "ANSWERED", "NOT_IN_RECORD", "REFUSED_OVERCLAIM",
                 "REFUSED", "BAD_QUESTION") else 503
@@ -2196,6 +2211,7 @@ class Handler(BaseHTTPRequestHandler):
                 pass
             self._spawn_worker(sid)
             from toscanini.user_state import public_session_view
+            from toscanini.sessions import refresh_user_state_view
             # 202 Accepted — the retry is an asynchronous re-entry into
             # the worker path, not a completed recovery; the typed
             # retry_id lets any client (and the release-gate smoke)
@@ -2207,7 +2223,8 @@ class Handler(BaseHTTPRequestHandler):
                 "session_id": sid,
                 "retry_attempts": result.get("retry_attempts"),
                 "status": "PENDING",
-                "session": public_session_view(result)})
+                "session": public_session_view(
+                    refresh_user_state_view(result))})
 
         # R446-C1 directive §4: the clarification ANSWER path —
         # POST /api/run/{id}/answer {answer}. Only valid while the

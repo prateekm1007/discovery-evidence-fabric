@@ -1253,6 +1253,34 @@ def save_evidence_pack(session_id: str, pack: Dict) -> None:
     _locked_write(STORE_DIR / f"evidence_{session_id}.json", pack)
 
 
+def refresh_user_state_view(record: Dict[str, Any]) -> Dict[str, Any]:
+    """Recompute user_state_view on a fresh copy of the record at read
+    time (recompute-at-read-time, R543-1d follow-up).
+
+    Every API response must re-derive user_state_view.finished from the
+    session record's durable fields — completion_states,
+    final_state.completion_states, or the stored completion_contract —
+    never from a stale snapshot. The original record is NOT mutated:
+    this works on a shallow copy.
+
+    - If record["final_state"] is absent but record["run_dir"] points to
+      a run dir, re-read final_state.json from disk (may have been
+      pruned; the exception is handled gracefully, the copy simply keeps
+      no final_state).
+    - If record["completion_states"] is set (the R543-1b worker refresh),
+      it is already on the copy and is made visible to the computation.
+    - The copy is passed through user_state.with_user_state, which
+      attaches a freshly computed user_state_view and returns it."""
+    rec = dict(record)
+    run_dir = rec.get("run_dir")
+    if not rec.get("final_state") and run_dir:
+        fs = _read_json(Path(run_dir) / "final_state.json")
+        if fs is not None:
+            rec["final_state"] = fs
+    from toscanini import user_state as _us
+    return _us.with_user_state(rec)
+
+
 # ---------------------------------------------------------------------------
 # Seeding: six-domain benchmark as historical sessions (REAL, labeled)
 # ---------------------------------------------------------------------------
