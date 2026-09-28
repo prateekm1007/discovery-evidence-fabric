@@ -1049,6 +1049,14 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             constraint=problem.get("constraint", ""),
             record_text=_ms._item_abstract(item)[:2600]
             or "(record text unavailable)")
+        # R548: the generation-boundary change — the prompt now requests
+        # up to N independently-parseable hypotheses in ONE response.
+        # The deterministic validation tail (semantic check, cemetery,
+        # distinctness) runs over every parsed block; the Art. LXXXIV
+        # minimum is met by the distinctness instrument's own count,
+        # not by a second LLM call (R517: model calls are the latency
+        # sink; one call is one call).
+        prompt += _ms._multi_hypothesis_prompt_suffix()
         # R516D: the initial budget is the rescue-proven level
         # (_ms.OPERATOR_INSTANTIATION_MAX_TOKENS), not the 700
         # default — 0/10 first-attempt successes at 700 across two
@@ -1074,24 +1082,52 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                 "llm_error": (meta.get("error") or "")[:200],
             })
         else:
-            fields = _ms._parse_candidate_fields(meta["content"] or "")
+            # R548: parse up to N independently-parseable hypothesis
+            # blocks from the single LLM response. The multi-parse
+            # falls back to the legacy single-candidate parse when no
+            # HYPOTHESIS markers are present (backward compatible; the
+            # ceiling remains in that case — the fix is the prompt,
+            # and the parser never invents content the model did not
+            # emit).
+            field_blocks = _ms._parse_multi_candidate_fields(
+                meta["content"] or "")
             # R532 §3: capture the parsed-field count for the typed
             # attempt record (same value the mark below records).
             _n_fields_nonempty = sum(
-                1 for v in fields.values() if str(v or ""))
+                1 for v in (field_blocks[0] if field_blocks else {}).values()
+                if str(v or ""))
             _clk.mark("candidate_parsing",
-                      {"n_fields_nonempty": _n_fields_nonempty})
-            cand = _ms.assemble_candidate(op, item, fields, problem, meta)
-            sem = _ms.operator_semantic_check(
-                sel_id, item, cand, problem)
-            _clk.mark("semantic_validation",
-                      {"semantic_verdict": sem.get("semantic_verdict"),
-                       "candidate_state": cand.get("candidate_state")})
-            cand["operator_semantic_check"] = sem
-            operator_result["candidates"] = [cand]
-            operator_result["state"] = (
-                "OPERATED" if cand.get("candidate_state") == "CANDIDATE"
-                else "NO_VALID_CANDIDATE")
+                      {"n_fields_nonempty": _n_fields_nonempty,
+                       "n_hypothesis_blocks": len(field_blocks)})
+            # Assemble one candidate per parsed hypothesis block; each
+            # goes through the same deterministic semantic check +
+            # cemetery + distinctness tail (no second evaluator,
+            # Art. IV). The candidate list now carries up to N
+            # entries, lifting the structural ceiling.
+            _cands = []
+            for _blk_i, _blk_fields in enumerate(field_blocks, 1):
+                _blk_fields = dict(_blk_fields)
+                _blk_fields["_hypothesis_index"] = _blk_i
+                _c = _ms.assemble_candidate(
+                    op, item, _blk_fields, problem, meta)
+                _sem = _ms.operator_semantic_check(
+                    sel_id, item, _c, problem)
+                _c["operator_semantic_check"] = _sem
+                _c["hypothesis_index"] = _blk_i
+                _cands.append(_c)
+            cand = _cands[0] if _cands else None
+            if cand is not None:
+                operator_result["candidates"] = _cands
+                operator_result["state"] = (
+                    "OPERATED" if any(
+                        c.get("candidate_state") == "CANDIDATE"
+                        for c in _cands)
+                    else "NO_VALID_CANDIDATE")
+                operator_result["n_hypotheses_parsed"] = len(_cands)
+            else:
+                operator_result["candidates"] = []
+                operator_result["state"] = "NO_VALID_CANDIDATE"
+                operator_result["n_hypotheses_parsed"] = 0
     space["operator_results"] = [
         {k: v for k, v in operator_result.items()
          if k != "candidates"}]
@@ -1149,7 +1185,14 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                       else "NO_CANDIDATES")
     space["n_candidates_generated"] = len(all_candidates)
     space["n_candidates_retained"] = len(retained)
-    space["min_candidates_required"] = 1
+    # R548: the Art. LXXXIV minimum is now enforced by the
+    # distinctness instrument's own count — n_candidates_required
+    # records the MINIMUM_DISTINCT_MECHANISMS bar (2), not the
+    # old "at least 1 assembled" structural floor.
+    space["min_candidates_required"] = (
+        stage_entry.MINIMUM_DISTINCT_MECHANISMS
+        if hasattr(stage_entry, "MINIMUM_DISTINCT_MECHANISMS")
+        else 2)
     space["metrics"] = _ms._metrics(space, all_candidates, retained,
                                     verifications, len(items))
     # R516B-E section 2: named for the actual work (post-verification
@@ -1174,15 +1217,18 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     _att_dd = (_dd_by_id.get(str(_att_cand_id)) or {}) if _att_cand_id \
         else {}
     _att_sup = (cand or {}).get("mechanism_support") or {}
+    _att_fields = (field_blocks[0] if field_blocks else {})
+    _att_sem = ((operator_result.get("candidates") or [{}])[0]
+                .get("operator_semantic_check") or {})
     _att_outcome = _ms_attempt_outcome(
         bool(contract.get("satisfied")),
         operator_result.get("state"),
         _llm_meta,
         _n_fields_nonempty,
-        (fields or {}).get("intervention"),
-        (fields or {}).get("mechanism"),
+        _att_fields.get("intervention"),
+        _att_fields.get("mechanism"),
         (cand or {}).get("candidate_state"),
-        ((sem or {}).get("semantic_verdict")),
+        _att_sem.get("semantic_verdict"),
         (str(_att_cand_id) in _att_blocked_ids
          if _att_cand_id else False),
         _att_dd.get("verdict"),
@@ -1205,7 +1251,7 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                                           (int, float)) else None),
         "mechanism_space_wall_s": round(_clk.total_s(), 3),
         "output_nonempty_fields": _n_fields_nonempty,
-        "semantic_verdict": ((sem or {}).get("semantic_verdict")),
+        "semantic_verdict": (_att_sem.get("semantic_verdict")),
         "candidate_state": (cand or {}).get("candidate_state"),
         "candidate_id": _att_cand_id,
         "cemetery_blocked": (str(_att_cand_id) in _att_blocked_ids

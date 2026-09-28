@@ -1316,6 +1316,124 @@ def _parse_candidate_fields(text: str) -> Dict[str, str]:
     return parsed
 
 
+# R548: multi-hypothesis generation boundary — the ONE instantiation
+# call emits up to N independently-parseable hypothesis blocks, each
+# carrying the same 8-field schema. The deterministic validation tail
+# (semantic check, cemetery, distinctness) runs over every parsed
+# block; the Art. LXXXIV minimum is then met by the distinctness
+# instrument's own count, not by a second LLM call.
+_N_HYPOTHESES = 3
+
+_MULTIPLE_FIELD_LINE_RE = re.compile(
+    r"^(?:HYPOTHESIS\s+(\d+):\s*)?"
+    r"(MECHANISM|INTERVENTION|PREDICTED_EFFECT|NOVEL_DESIGN_VARIABLE|"
+    r"TESTABLE_PREDICTION|KNOWN_FAILURE_MODES|BOUNDARY_CONDITIONS|"
+    r"MECHANISM_SOURCE_SPAN)\s*:\s*(.*)$", re.MULTILINE)
+
+# The "HYPOTHESIS N:" marker that delimits a new hypothesis block.
+_HYPOTHESIS_MARKER_RE = re.compile(
+    r"^HYPOTHESIS\s+(\d+):", re.MULTILINE)
+
+
+def _parse_multi_candidate_fields(text: str,
+                                  n_hypotheses: int = _N_HYPOTHESES
+                                  ) -> List[Dict[str, str]]:
+    """Parse up to n_hypotheses independently-parseable candidate blocks
+    from a single LLM output. The format:
+
+        HYPOTHESIS 1:
+        MECHANISM: ...
+        INTERVENTION: ...
+        ...
+        HYPOTHESIS 2:
+        MECHANISM: ...
+        ...
+        HYPOTHESIS 3:
+        ...
+
+    Each block carries the same 8-field schema as the single-candidate
+    format. Missing hypothesis markers fall back to the legacy
+    single-candidate parse (backward compatible: an un-updated LLM
+    response that does not emit HYPOTHESIS markers is still parsed as
+    one candidate, and the ceiling remains — the fix is the prompt
+    change, and the parser must never invent content the model did
+    not emit)."""
+    blocks: List[Dict[str, str]] = []
+    if not text:
+        return blocks
+    # Find hypothesis markers
+    markers = list(_HYPOTHESIS_MARKER_RE.finditer(text))
+    if markers:
+        for i, m in enumerate(markers):
+            start = m.end()
+            end = (markers[i + 1].start()
+                   if i + 1 < len(markers) else len(text))
+            block_text = text[start:end]
+            parsed = _parse_candidate_fields(block_text)
+            # Only keep the block if it has at least a mechanism
+            if any(str(v).strip() for v in parsed.values()):
+                blocks.append(parsed)
+        return blocks[:n_hypotheses]
+    # No markers: legacy single-candidate format — parse as one block
+    # (the ceiling remains; this is the honest fallback, not a
+    # manufactured second candidate)
+    parsed = _parse_candidate_fields(text)
+    if any(str(v).strip() for v in parsed.values()):
+        blocks.append(parsed)
+    return blocks
+
+
+def _multi_hypothesis_prompt_suffix() -> str:
+    """The prompt suffix that instructs the model to emit N
+    independently-parseable hypothesis blocks in one response.
+    This is the generation-boundary change: one LLM call, N
+    hypotheses, deterministic validation tail over each."""
+    return (
+        "\n\nRESPONSE FORMAT — emit %d INDEPENDENTLY PARSEABLE "
+        "hypotheses in a SINGLE response, separated by HYPOTHESIS "
+        "markers. Each hypothesis must be a DISTINCT causal mechanism "
+        "(different mechanism graph, different intervention site, or "
+        "different boundary regime) — not a rewording of the same "
+        "mechanism. Each hypothesis carries the same 8-field schema:\n\n"
+        "HYPOTHESIS 1:\n"
+        "MECHANISM: <causal mechanism 1>\n"
+        "INTERVENTION: <design change 1>\n"
+        "PREDICTED_EFFECT: <measurable effect 1>\n"
+        "NOVEL_DESIGN_VARIABLE: <new variable 1>\n"
+        "TESTABLE_PREDICTION: <falsifiable prediction 1>\n"
+        "KNOWN_FAILURE_MODES: <failure modes 1>\n"
+        "BOUNDARY_CONDITIONS: <operating envelope 1>\n"
+        "MECHANISM_SOURCE_SPAN: <verbatim span 1>\n\n"
+        "HYPOTHESIS 2:\n"
+        "MECHANISM: <causal mechanism 2>\n"
+        "INTERVENTION: <design change 2>\n"
+        "PREDICTED_EFFECT: <measurable effect 2>\n"
+        "NOVEL_DESIGN_VARIABLE: <new variable 2>\n"
+        "TESTABLE_PREDICTION: <falsifiable prediction 2>\n"
+        "KNOWN_FAILURE_MODES: <failure modes 2>\n"
+        "BOUNDARY_CONDITIONS: <operating envelope 2>\n"
+        "MECHANISM_SOURCE_SPAN: <verbatim span 2>\n\n"
+        "HYPOTHESIS 3:\n"
+        "MECHANISM: <causal mechanism 3>\n"
+        "INTERVENTION: <design change 3>\n"
+        "PREDICTED_EFFECT: <measurable effect 3>\n"
+        "NOVEL_DESIGN_VARIABLE: <new variable 3>\n"
+        "TESTABLE_PREDICTION: <falsifiable prediction 3>\n"
+        "KNOWN_FAILURE_MODES: <failure modes 3>\n"
+        "BOUNDARY_CONDITIONS: <operating envelope 3>\n"
+        "MECHANISM_SOURCE_SPAN: <verbatim span 3>\n\n"
+        "RULES: (1) Each hypothesis must derive from the structured "
+        "evidence above — never invent a mechanism with no evidence "
+        "basis. (2) Hypotheses must be CAUSALLY DISTINCT: different "
+        "mechanism graph, different intervention site, or different "
+        "boundary regime — a rewording of hypothesis 1 is NOT a valid "
+        "hypothesis 2. (3) If fewer than %d distinct hypotheses are "
+        "genuinely supportable by the evidence, emit only as many as "
+        "the evidence supports — never pad with rewordings. (4) Each "
+        "MECHANISM_SOURCE_SPAN must be a verbatim substring from the "
+        "record text." % (_N_HYPOTHESES, _N_HYPOTHESES))
+
+
 # ---------------------------------------------------------------------------
 # 7. Machine-checkable distinctness (R402 instrument v2 — Art. XLII)
 #
