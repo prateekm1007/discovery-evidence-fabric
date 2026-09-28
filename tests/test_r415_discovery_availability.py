@@ -843,7 +843,14 @@ class TestBlockedProjections:
     def test_user_state_is_blocked_transport(self):
         v = us.user_state_view(self._blocked_session())
         assert v["user_state"] == "BLOCKED_TRANSPORT"
-        assert v["finished"] is True
+        # R545/R546: a typed infrastructure terminal (the canonical
+        # WAITING_EXTERNAL resumable class) never becomes a finished
+        # discovery — the customer-facing finished flag is False, not
+        # the pre-R545 key-prefix "reached a terminal" True. (The old
+        # R415 pin asserted finished=True; the R545 producer-shape
+        # correction supersedes it — a blocked run is resumable, never
+        # a completed discovery.)
+        assert v["finished"] is False
         assert v["rejected"] is False        # never a kill
         assert "saved and ready to resume" in v["meaning"]
         assert "not a rejection" in v["meaning"]

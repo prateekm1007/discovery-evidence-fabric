@@ -9,8 +9,8 @@
   "final_status": "MECHANISM_STARVED",
   "user_state_view": {
     "user_state": "COMPLETED_UNKNOWN",
-    "label": "Completed \u2014 outcome unknown",
-    "meaning": "The run reached a terminal state without a recorded verdict \u2014 the outcome could not be established from the run's own artifacts.",
+    "label": "Completed — outcome unknown",
+    "meaning": "The run reached a terminal state without a recorded verdict — the outcome could not be established from the run's own artifacts.",
     "decision": "outcome not established",
     "finished": true,
     "found_something": false,
@@ -18,7 +18,7 @@
     "package_available": false,
     "machine_status": "COMPLETE",
     "outcome": "RUN_BLOCKED",
-    "outcome_label": "Run blocked \u2014 infrastructure, not a verdict",
+    "outcome_label": "Run blocked — infrastructure, not a verdict",
     "learning_card": null
   },
   "completion_states": {},
@@ -35,13 +35,13 @@
     "verdict": "MECHANISM-SPACE CAPABILITY / DISCOVERY FUNNEL DEFICIT",
     "not_infrastructure": true,
     "evidence": {
-      "transport_healthy": "10/11 model calls OK across SYNTHESIZE, MECHANISM_SPACE, POST_RANK_ENSEMBLE \u2014 provider xkiro qwen3-max:free served every STRONG task with capability match=true; no transport failure class on the reasoning path",
-      "the_single_non_ok_call": "POST_RANK_GAUNTLET / unorouter deepseek-v4-flash:free FAST task \u2014 RUN_OWNED (the engine's own gauntlet, not the discovery transport). Its failure is a run-owned gauntlet outcome, not a discovery-transport break (the discovery loop ran to mechanism space and post-rank envelope completion before it).",
-      "retrieval": "evidence_state=GATHERED, 19 records across 6 sources \u2014 retrieval and freeze succeeded",
-      "mechanism_space_executed": "model_route shows a MECHANISM_SPACE call OK (xkiro qwen3-max:free) \u2014 the mechanism space DID run",
+      "transport_healthy": "10/11 model calls OK across SYNTHESIZE, MECHANISM_SPACE, POST_RANK_ENSEMBLE — provider xkiro qwen3-max:free served every STRONG task with capability match=true; no transport failure class on the reasoning path",
+      "the_single_non_ok_call": "POST_RANK_GAUNTLET / unorouter deepseek-v4-flash:free FAST task — RUN_OWNED (the engine's own gauntlet, not the discovery transport). Its failure is a run-owned gauntlet outcome, not a discovery-transport break (the discovery loop ran to mechanism space and post-rank envelope completion before it).",
+      "retrieval": "evidence_state=GATHERED, 19 records across 6 sources — retrieval and freeze succeeded",
+      "mechanism_space_executed": "model_route shows a MECHANISM_SPACE call OK (xkiro qwen3-max:free) — the mechanism space DID run",
       "distinctness": "4 mechanism-space rows present (ENS agnes / ENS unorouter / ENS xkiro / MS DIRECT_TRANSFER); the distinctness adjudication counted < 2 materially distinct mechanisms, so the R514/Art. LXXXIV terminal is MECHANISM_ STARVED. The starvation is a discovery-funnel capability deficit, not an infrastructure break."
     },
-    "consequence": "Per the directive: do NOT modify providers, do NOT weaken the diversity gate, do NOT manufacture a survivor, do NOT call the capability deficit an infrastructure problem. The MECHANISM_STARVED terminal is a valid typed scientific outcome. The discovery-funnel cliff (mechanism-space distinctness yielding <2 materially distinct mechanisms on ordinary single-synthesis runs) is the next measured cliff \u2014 a SEPARATE one-cliff round, not this infrastructure/readiness round."
+    "consequence": "Per the directive: do NOT modify providers, do NOT weaken the diversity gate, do NOT manufacture a survivor, do NOT call the capability deficit an infrastructure problem. The MECHANISM_STARVED terminal is a valid typed scientific outcome. The discovery-funnel cliff (mechanism-space distinctness yielding <2 materially distinct mechanisms on ordinary single-synthesis runs) is the next measured cliff — a SEPARATE one-cliff round, not this infrastructure/readiness round."
   },
   "rest_vs_sse": {
     "rest_finished": true,
@@ -62,5 +62,12 @@
     "Live terminal capture of a FINISHED_DISCOVERY=true positive is still OPEN: the mechanism-space distinctness gate yields <2 materially distinct mechanisms on ordinary single-synthesis production problems (the R514/Art. LXXXIV typed terminal is honest, not a wiring gap). This is the next measured discovery-funnel cliff, a separate one-cliff round.",
     "The live production_space was at b4541e880 (the R546 live-record commit, one ahead of the tested fix commit 47e892d26); the tested R546 fix bytes are in origin/main (a2fe199f7 + 47e892d26) and the deployment lineage is a descendant carrying them, with the exact deployed SHA explicitly recorded on this artifact.",
     "CI: GitHub Actions billing/execution status was NOT verified as green this round; the test receipt is a clean-committed-tree local run (item 11), and a clean-checkout node_modules limitation is disclosed (the R544 TS golden leg needs the webapp toolchain, which a fresh clone lacks — an environment dependency, not a code regression)."
-  ]
+  ],
+  "evidence_reclassification": {
+    "status": "HISTORICAL / STALE — NOT live proof of the current projection",
+    "captured_against_sha": "b4541e88043bdfb6efd75c4e41cf2e76f520c611",
+    "current_origin_main": "09effc4420c4fb4e0cba6b7580e3c96d953a358a",
+    "reason": "This record was captured at production SHA b4541e880, which is an ANCESTOR of origin/main (09effc442). It records user_state_view.finished=true on a COMPLETE + MECHANISM_STARVED + completion_states={} terminal. The committed user_state.py at 09effc442 answers finished=false for that exact shape (the R545/R546 typed-terminal rule). The finished=true here reflects the projection at b454, NOT the current tree. Per BS-042, this artifact is reclassified as historical evidence and is NOT cited as live projection proof; the live proof must be re-captured against the exact final origin/main SHA at deployment.",
+    "live_projection_proof": "UNRESOLVED — to be re-captured at the final deployed SHA in the R547 corrective round"
+  }
 }

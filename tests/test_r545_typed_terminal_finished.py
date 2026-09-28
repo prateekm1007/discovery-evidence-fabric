@@ -137,12 +137,17 @@ def test_bare_pruned_infrastructure_terminal_run_blocked_capability():
     """The REAL worker producer shape for RUN_BLOCKED_CAPABILITY:
     the worker writes status='RUN_BLOCKED_CAPABILITY' and echoes
     final_status='RUN_BLOCKED_CAPABILITY' from final_state.json
-    (worker.py:1327-1337). The user_state key falls through to
-    COMPLETED_UNKNOWN; the finished flag must answer False from the
-    typed infrastructure terminal."""
+    (worker.py:1327-1337). R547 item 3: the user_state key is now
+    the canonical WAITING_EXTERNAL infrastructure family
+    (BLOCKED_INFRASTRUCTURE), NOT the COMPLETED_* fall-through that
+    read a block as "Completed — outcome unknown"; the finished flag
+    answers False from the typed infrastructure terminal, and the
+    outcome is RUN_BLOCKED (never a verdict, never FAILED)."""
     rec = _bare(status="RUN_BLOCKED_CAPABILITY",
                 final_status="RUN_BLOCKED_CAPABILITY")
-    assert _us.user_state(rec) == "COMPLETED_UNKNOWN"
+    assert _us.user_state(rec) == "BLOCKED_INFRASTRUCTURE"
+    view = _us.user_state_view(rec)
+    assert view["outcome"] == "RUN_BLOCKED"
     assert _us._contract_finished_flag(rec) is False
     assert _finished_view(rec) is False
 
@@ -451,11 +456,19 @@ def test_owner_transport_rest_header_and_sse_query_are_distinct():
 
 
 def test_owner_capability_diagnostic_event_is_typed_and_secret_free():
-    """The R546 owner-capability diagnostic on the answer route must
-    emit typed, non-secret evidence: only presence/absence, SHA-256
-    fingerprint, length, source, session-owner fingerprint, match
-    boolean, route, and cause class. The owner token value itself
-    must never enter the forensics record (BS-021, Art. LXXVI)."""
+    """The R546/R547 owner-capability diagnostic on the answer route
+    must emit typed, non-secret evidence: only presence/absence,
+    SHA-256 fingerprint, length, incoming source, resolved source,
+    resolver-issued flag, session-owner fingerprint, match boolean,
+    route, and cause class. The owner token value itself must never
+    enter the forensics record (BS-021, Art. LXXVI).
+
+    R547 item 4: the cause classes separate the INCOMING caller
+    presentation (cookie / header / query / none) from the RESOLVED
+    capability (the resolver may issue a fresh key when no incoming
+    capability is present), so a missing incoming capability is
+    distinguishable from a resolver-issued fallback, a cookie/header
+    disagreement, a session-owner mismatch, or a missing session."""
     from toscanini import server as _srv
     import inspect
     src = inspect.getsource(_srv.Handler.do_POST)
@@ -465,9 +478,20 @@ def test_owner_capability_diagnostic_event_is_typed_and_secret_free():
     assert "sha256" in src.lower() or "_diag_fp" in src, (
         "the diagnostic must carry a SHA-256 fingerprint, not the "
         "token value")
-    # the cause-class vocabulary
-    for cause in ("SESSION_NOT_FOUND", "SESSION_OWNER_MISMATCH",
-                  "HEADER_NOT_SENT"):
+    # the separated incoming/resolved concepts
+    for token in ("caller_incoming_source", "caller_resolved_source",
+                  "resolver_issued", "caller_incoming_presence"):
+        assert token in src, (
+            f"the diagnostic must record the {token} concept")
+    # the cause-class vocabulary (incoming capability absence is its
+    # own cause — a resolver-issued key never masquerades as a sent
+    # capability; cookie/header disagreement and session-owner
+    # mismatch are distinct classes)
+    for cause in ("SESSION_NOT_FOUND",
+                  "SESSION_NO_OWNER_RECORD",
+                  "SESSION_OWNER_MISMATCH",
+                  "INCOMING_CAPABILITY_ABSENT",
+                  "RESOLVER_ISSUED_FALLBACK",
+                  "COOKIE_HEADER_DISAGREEMENT"):
         assert cause in src, (
-            f"the diagnostic must classify the cause as "
-            f"{cause}")
+            f"the diagnostic must classify the cause as {cause}")

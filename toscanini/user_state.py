@@ -47,6 +47,18 @@ from .run_state import (OUTCOME_KILLED_BY_CHALLENGE,
 # stays intact internally; this is the product-surface projection.
 _TRANSPORT_ERRORS = ("ERROR_TRANSPORT", "RUN_BLOCKED_TRANSPORT")
 _ENGINE_ERRORS = ("ERROR_BUILD", "ERROR_RUN")
+# R547: the canonical execution_states WAITING_EXTERNAL terminal family —
+# the resumable infrastructure-blocked class (Art. LXI: an infrastructure
+# state, distinct from FAILED and from every scientific verdict).
+# RUN_BLOCKED_TRANSPORT (the transport-exhausted worker branch) and
+# RUN_BLOCKED_CAPABILITY (the pre-retrieval capability-gate refusal) are
+# the two store statuses that end a run here (execution_states.py §2).
+# Neither may project as "Completed — outcome unknown" (the COMPLETED_*
+# fall-through read an infrastructure block as a completed run), nor as
+# FAILED (execution_states maps WAITING_EXTERNAL, not FAILED), nor as a
+# scientific rejection — the distinct BLOCKED_INFRASTRUCTURE key carries
+# the typed resumable state in its own frame.
+_BLOCKED_INFRASTRUCTURE = ("RUN_BLOCKED_TRANSPORT", "RUN_BLOCKED_CAPABILITY")
 
 _USER_STATE_LABELS = {
     "RUNNING": "Running",
@@ -74,6 +86,10 @@ _USER_STATE_LABELS = {
     # failure).
     "UNKNOWN_STALLED": "Stalled — outcome unknown, not a failure",
     "BLOCKED_TRANSPORT": "Blocked by infrastructure — saved and resumable",
+    # R547: the canonical WAITING_EXTERNAL terminal family (execution_
+    # states.py §2) — the resumable infrastructure-blocked state, distinct
+    # from FAILED and from every scientific verdict (Art. LXI).
+    "BLOCKED_INFRASTRUCTURE": "Blocked by infrastructure — saved and resumable",
     "FAILED_TRANSPORT": "Failed — transport",
     "FAILED_ENGINE": "Failed — engine",
 }
@@ -139,12 +155,31 @@ _USER_STATE_EXPLANATIONS = {
                     "concluded about the problem, and its cause is "
                     "recorded on the run's own diagnostics."),
     "BLOCKED_TRANSPORT": ("Discovery temporarily blocked by "
-                          "infrastructure. Your problem is saved and "
-                          "ready to resume. No conclusion was reached — "
-                          "this is not a rejection. Toscanini exhausted "
-                          "every available model route (each failure is "
-                          "recorded with its provider and failure class) "
-                          "and will attempt the run again on retry."),
+                           "infrastructure. Your problem is saved and "
+                           "ready to resume. No conclusion was reached — "
+                           "this is not a rejection. Toscanini exhausted "
+                           "every available model route (each failure is "
+                           "recorded with its provider and failure class) "
+                           "and will attempt the run again on retry."),
+    # R547: the canonical execution_states WAITING_EXTERNAL terminal
+    # family (the resumable infrastructure class, Art. LXI). A block here
+    # is NEVER a completed run (it is not a COMPLETED_* outcome), never a
+    # FAILED verdict, and never a scientific rejection — it is an
+    # infrastructure state: the run is paused, saved, and resumes on a
+    # capable route. The two producer shapes: RUN_BLOCKED_TRANSPORT (the
+    # transport-exhausted worker branch) and RUN_BLOCKED_CAPABILITY (the
+    # pre-retrieval capability-gate refusal).
+    "BLOCKED_INFRASTRUCTURE": ("Discovery is blocked by infrastructure and "
+                               "paused — the run is saved, not failed, and "
+                               "resumable on a capable route. No scientific "
+                               "conclusion was reached: an infrastructure "
+                               "block is not a rejection of the problem "
+                               "(Art. LXI). The recorded block reason (the "
+                               "transport was exhausted, or the available "
+                               "model route cannot serve this run's "
+                               "reasoning class) is on the run's "
+                               "diagnostics; retrying or re-creating the "
+                               "run resumes it."),
     "FAILED_TRANSPORT": ("The run could not reach the language-model "
                          "transport — no evidence synthesis was possible. "
                          "Retryable once the transport responds."),
@@ -290,9 +325,16 @@ def user_state(session: Dict[str, Any]) -> str:
         # pre-R459 fallthrough rendered "Completed — outcome unknown
         # (finished: true)" on a run that was waiting for input.
         return "AWAITING_CLARIFICATION"
-    if status == "RUN_BLOCKED_TRANSPORT":
-        return "BLOCKED_TRANSPORT"   # R415 (directive §8): infrastructure
-        # blocked ≠ discovery failure — distinct projection, never a kill
+    if status in _BLOCKED_INFRASTRUCTURE:
+        # R547: the canonical WAITING_EXTERNAL terminal family (the
+        # resumable infrastructure class, Art. LXI) projects in its own
+        # typed frame — never the COMPLETED_* "outcome unknown"
+        # fall-through (a block is not a completed run), never FAILED,
+        # and never a scientific rejection. BLOCKED_TRANSPORT remains
+        # the legacy key for records whose status is the transport
+        # block; BLOCKED_INFRASTRUCTURE is the canonical family key.
+        return "BLOCKED_TRANSPORT" if status == "RUN_BLOCKED_TRANSPORT" \
+            else "BLOCKED_INFRASTRUCTURE"
     if status in _TRANSPORT_ERRORS:
         return "FAILED_TRANSPORT"
     if status in _ENGINE_ERRORS or (status.startswith("ERROR")
@@ -466,7 +508,8 @@ def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
     final = (session.get("final_status") or "") or ""
     pkg = session.get("package") or {}
     finished = key.startswith("COMPLETED") or key.startswith("FAILED") \
-        or key in ("INTERRUPTED", "BLOCKED_TRANSPORT", "UNKNOWN_STALLED")
+        or key in ("INTERRUPTED", "BLOCKED_TRANSPORT",
+                   "BLOCKED_INFRASTRUCTURE", "UNKNOWN_STALLED")
     # R543-1: when the durable completion contract is recorded, ITS
     # FINISHED_DISCOVERY is the authority for the customer-facing
     # finished flag (never a second key-prefix Boolean). FINISHED_
@@ -534,14 +577,24 @@ def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
         decision = "interrupted before a verdict"
     elif key == "BLOCKED_TRANSPORT":
         decision = "discovery temporarily blocked by infrastructure — "\
-                   "your problem is saved and ready to resume"
+                    "your problem is saved and ready to resume"
+    elif key == "BLOCKED_INFRASTRUCTURE":
+        # R547: the canonical WAITING_EXTERNAL terminal family — the typed
+        # resumable infrastructure block (transport-exhausted or
+        # pre-retrieval capability-gate refusal). Never "completed",
+        # never FAILED, never a scientific rejection (Art. LXI).
+        decision = ("discovery is blocked by infrastructure and paused — "
+                    "the run is saved, not failed, and resumes on a "
+                    "capable route; this is not a rejection of the "
+                    "problem")
     elif key == "FAILED_TRANSPORT":
         decision = "could not reach the model transport"
     else:
         decision = "engine failure"
     error = session.get("error")
-    if error and (key.startswith("FAILED") or key in ("INTERRUPTED",
-                                                    "BLOCKED_TRANSPORT")):
+    if error and (key.startswith("FAILED") or key in
+                  ("INTERRUPTED", "BLOCKED_TRANSPORT",
+                   "BLOCKED_INFRASTRUCTURE")):
         decision = f"{decision} ({str(error)[:140]})"
 
     return {

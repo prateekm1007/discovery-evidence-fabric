@@ -2272,16 +2272,57 @@ class Handler(BaseHTTPRequestHandler):
                 __import__("hashlib").sha256(
                     str(v).encode()).hexdigest()[:16]
                 if v else None)
+            # R547 item 4: separate the INCOMING caller presentation from
+            # the RESOLVED capability. _owner_key() may ISSUE a fresh
+            # capability when no cookie/header/query arrives, so the
+            # cause of a failed match must name WHICH link failed —
+            # the incoming presentation, the resolver fallback, a
+            # cookie/header disagreement, the session owner, or the
+            # session/route itself — never a bare "missing" that a
+            # resolver-issued key could masquerade as a sent one.
+            _cookie_hdr = self.headers.get("Cookie") or ""
+            _cookie_owner_present = any(
+                part.strip().partition("=")[0] == OWNER_COOKIE
+                and part.strip().partition("=")[2].strip()
+                for part in _cookie_hdr.split(";"))
+            _hdr_owner_raw = (self.headers.get(OWNER_HEADER) or "").strip()
+            _hdr_owner_present = bool(
+                _hdr_owner_raw and _VALID_OWNER_KEY.match(_hdr_owner_raw))
+            _q_owner = (urllib.parse.parse_qs(
+                self.path.split("?", 1)[1]).get("owner") or [""])[0].strip() \
+                if "?" in self.path else ""
+            _incoming_presence = {
+                "cookie_present": bool(_cookie_hdr),
+                "cookie_owner_present": _cookie_owner_present,
+                "header_owner_present": _hdr_owner_present,
+                "query_owner_present": bool(_q_owner),
+            }
+            _incoming_source = ("cookie" if _cookie_owner_present else
+                                ("header" if _hdr_owner_present else
+                                 ("query" if _q_owner else "none")))
+            _resolved_source = getattr(
+                self, "_owner_key_source", "issued")
+            _resolver_issued = (_resolved_source == "issued")
+            _diag_session_owner = (
+                _diag_session.get("owner_key") if _diag_session else None)
             _diag_cause = None
             if _diag_session is None:
                 _diag_cause = "SESSION_NOT_FOUND"
-            elif (self._access(sid) == "DENY"):
+            elif self._access(sid) == "DENY":
                 if _diag_session_owner is None:
-                    _diag_cause = "SESSION_NOT_FOUND"
-                elif not _diag_caller:
-                    _diag_cause = "HEADER_NOT_SENT"
-                else:
+                    _diag_cause = "SESSION_NO_OWNER_RECORD"
+                elif not any(_incoming_presence.values()):
+                    _diag_cause = "INCOMING_CAPABILITY_ABSENT"
+                elif _resolver_issued and not any(
+                        _incoming_presence.values()):
+                    _diag_cause = "RESOLVER_ISSUED_FALLBACK"
+                elif _cookie_owner_present and _hdr_owner_present:
+                    _diag_cause = "COOKIE_HEADER_DISAGREEMENT"
+                elif _diag_caller and _diag_session_owner \
+                        and _diag_caller != _diag_session_owner:
                     _diag_cause = "SESSION_OWNER_MISMATCH"
+                else:
+                    _diag_cause = "ACCESS_DENIED_UNKNOWN_CAUSE"
             import json as _json
             try:
                 from toscanini import worker_forensics as _wfx
@@ -2292,7 +2333,10 @@ class Handler(BaseHTTPRequestHandler):
                             caller_fp=_diag_fp(_diag_caller),
                             caller_len=len(_diag_caller)
                             if _diag_caller else 0,
-                            caller_source=self._owner_key_source,
+                            caller_resolved_source=_resolved_source,
+                            caller_incoming_source=_incoming_source,
+                            caller_incoming_presence=_incoming_presence,
+                            resolver_issued=_resolver_issued,
                             session_owner_fp=_diag_fp(
                                 _diag_session_owner),
                             match=bool(
@@ -2304,8 +2348,11 @@ class Handler(BaseHTTPRequestHandler):
                             http_status=(404
                                         if _diag_cause
                                         in ("SESSION_NOT_FOUND",
+                                           "SESSION_NO_OWNER_RECORD",
                                            "SESSION_OWNER_MISMATCH",
-                                           "HEADER_NOT_SENT")
+                                           "INCOMING_CAPABILITY_ABSENT",
+                                           "RESOLVER_ISSUED_FALLBACK",
+                                           "COOKIE_HEADER_DISAGREEMENT")
                                         else None))
             except Exception:  # noqa: BLE001 — diagnostic, never blocks
                 pass

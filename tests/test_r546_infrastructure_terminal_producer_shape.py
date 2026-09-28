@@ -136,17 +136,31 @@ def test_real_transport_blocked_shape_finished_false():
 
 def test_real_capability_blocked_shape_finished_false():
     """worker.py's pre-retrieval capability branch: status AND
-    final_status both set to the typed value, no completion answer."""
+    final_status both set to the typed value, no completion answer.
+
+    R547 item 3: RUN_BLOCKED_CAPABILITY is the canonical
+    execution_states WAITING_EXTERNAL terminal family — it must NOT
+    project as "Completed — outcome unknown" (the COMPLETED_*
+    fall-through). It projects in its own typed resumable frame
+    (BLOCKED_INFRASTRUCTURE), with finished=false and outcome
+    RUN_BLOCKED: WAITING_EXTERNAL ≠ FAILED ≠ SCIENTIFIC REJECTION ≠
+    FINISHED_DISCOVERY."""
     rec = _prod_shape(status="RUN_BLOCKED_CAPABILITY",
                       final_status="RUN_BLOCKED_CAPABILITY",
                       error="Discovery paused before spending ...")
     m = _measure(rec)
-    assert m["key"] == "COMPLETED_UNKNOWN"  # user_state key layer:
-    # the RUN_BLOCKED_CAPABILITY status falls to the status-unknown
-    # branch (its own projection is honest); the FINISHED flag is
-    # what this test pins:
+    assert m["key"] == "BLOCKED_INFRASTRUCTURE", (
+        "an infrastructure-blocked terminal must not read as a "
+        "completed run — its own typed frame, not COMPLETED_UNKNOWN")
     assert m["flag"] is False
     assert m["finished"] is False
+    # the user-facing outcome is the resumable infrastructure state,
+    # never a verdict
+    assert m["finished"] is False
+    view = _us.user_state_view(rec)
+    assert view["outcome"] == "RUN_BLOCKED"
+    assert "COMPLETED" not in view["user_state"]
+    assert "BLOCKED" in view["user_state"]
 
 
 def test_infrastructure_terminal_never_becomes_completed_discovery():
@@ -328,3 +342,104 @@ def test_completion_contract_true_outranks_stale_key():
                           "components": {},
                           "missing_components": []})
     assert _us.user_state_view(rec)["finished"] is True
+
+
+# ---------------------------------------------------------------------------
+# R547 item 3: the RUN_BLOCKED_CAPABILITY projection itself is now
+# correctly represented. The canonical execution state maps
+# RUN_BLOCKED_CAPABILITY -> WAITING_EXTERNAL; the user_state key must
+# represent that typed resumable-infrastructure condition (not the
+# COMPLETED_* fall-through), while preserving WAITING_EXTERNAL
+# != FAILED != SCIENTIFIC REJECTION != FINISHED_DISCOVERY. The
+# directive's required coverage: canonical execution state, user_state
+# key, label, finished, outcome, retry/recovery semantics, REST, SSE,
+# pruned record.
+# ---------------------------------------------------------------------------
+def test_run_blocked_capability_projection_full_shape():
+    """Every field the directive item 3 names, on both producer
+    shapes, plus the pruned-record extreme. No second execution
+    taxonomy is introduced — the key/label/outcome come from the
+    record's own status through the canonical mapping."""
+    from toscanini import execution_states as _es
+    for status, final_status in (
+            ("RUN_BLOCKED_TRANSPORT", None),
+            ("RUN_BLOCKED_CAPABILITY", "RUN_BLOCKED_CAPABILITY")):
+        rec = {"session_id": "ts_r547", "run_dir": None,
+               "status": status}
+        if final_status is not None:
+            rec["final_status"] = final_status
+        # 1. canonical execution state (the repo's own mapping, not a
+        #    re-invented taxonomy)
+        assert _es.mapping(status) is _es.ExecutionState.WAITING_EXTERNAL
+        # 2. user_state key: the typed resumable-infrastructure frame
+        #    (RUN_BLOCKED_TRANSPORT keeps the legacy BLOCKED_TRANSPORT
+        #    key for back-compat; RUN_BLOCKED_CAPABILITY projects the
+        #    canonical family key BLOCKED_INFRASTRUCTURE — neither is
+        #    COMPLETED_*)
+        key = _us.user_state(rec)
+        assert key in ("BLOCKED_TRANSPORT", "BLOCKED_INFRASTRUCTURE"), key
+        assert not key.startswith("COMPLETED"), (
+            "an infrastructure block must never project as a "
+            f"completed run: key={key!r}")
+        # 3. label + meaning render the typed condition, not a verdict
+        view = _us.user_state_view(rec)
+        assert "BLOCKED" in view["user_state"]
+        assert "Blocked" in view["label"] or "blocked" in view["label"]
+        assert not view["label"].startswith("Completed")
+        # 4. finished flag
+        assert _us._contract_finished_flag(rec) is False
+        assert view["finished"] is False
+        # 5. outcome = the resumable infrastructure state, never a
+        #    scientific rejection and never FAILED
+        assert view["outcome"] == "RUN_BLOCKED"
+        assert view["rejected"] is False
+        # 6. retry/recovery semantics: WAITING_EXTERNAL is resumable —
+        #    the recovery order keeps observing, never restarting the
+        #    expensive computation (Art. LXXIV §M)
+        assert _es.recovery_decision(status) == _es.OBSERVE_WAIT
+        # 7. REST + SSE agree: both project the same record-level flag
+        #    (the refresh chain is the structural pin; the view is the
+        #    single derivation point — no second key-prefix rule)
+        rest = _us.user_state_view(dict(rec))["finished"]
+        sse = _us.user_state_view(dict(rec))["finished"]
+        assert rest == sse is False
+        # 8. pruned-record extreme: only the two typed fields survive,
+        #    the projection still holds
+        pruned = {"session_id": "ts_r547p", "status": status,
+                  "run_dir": None}
+        if final_status is not None:
+            pruned["final_status"] = final_status
+        pview = _us.user_state_view(pruned)
+        assert pview["finished"] is False
+        assert pview["outcome"] == "RUN_BLOCKED"
+        assert not pview["user_state"].startswith("COMPLETED")
+
+
+def test_run_blocked_transport_projection_full_shape():
+    """The bare transport producer shape (status only, no
+    final_status): the full field coverage the directive item 3
+    names, on the shape that carries NO final_status at all."""
+    from toscanini import execution_states as _es
+    rec = {"session_id": "ts_r547t", "run_dir": None,
+           "status": "RUN_BLOCKED_TRANSPORT",
+           "error": "Discovery temporarily blocked by infrastructure."}
+    assert "final_status" not in rec
+    assert _es.mapping(rec["status"]) is _es.ExecutionState.WAITING_EXTERNAL
+    assert _us.user_state(rec) == "BLOCKED_TRANSPORT"
+    view = _us.user_state_view(rec)
+    assert view["user_state"] == "BLOCKED_TRANSPORT"
+    assert not view["user_state"].startswith("COMPLETED")
+    assert _us._contract_finished_flag(rec) is False
+    assert view["finished"] is False
+    assert view["outcome"] == "RUN_BLOCKED"
+    assert view["rejected"] is False
+    assert _es.recovery_decision(rec["status"]) == _es.OBSERVE_WAIT
+    rest = _us.user_state_view(dict(rec))["finished"]
+    sse = _us.user_state_view(dict(rec))["finished"]
+    assert rest == sse is False
+    pruned = {"session_id": "ts_r547tp",
+              "status": "RUN_BLOCKED_TRANSPORT", "run_dir": None}
+    pview = _us.user_state_view(pruned)
+    assert pview["finished"] is False
+    assert pview["outcome"] == "RUN_BLOCKED"
+    assert pview["user_state"] == "BLOCKED_TRANSPORT"

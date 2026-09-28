@@ -134,6 +134,19 @@ Refresh these from live state; do not assume they are unchanged.
 - Fresh-run invention → 3D → package reliability.
 - Real physical validation.
 - Real buyer evaluation.
+- R547 (2026-09-28): the discovery funnel's current measured cliff is
+  MECHANISM_SPACE (mechanism-space distinctness yields <2 materially
+  distinct mechanisms on ordinary single-synthesis production runs —
+  the production lean path is structurally capped at ONE generated
+  candidate, measured at `R547/R547_MECHANISM_SPACE_CEILING.json`).
+  This is a DISCOVERY CAPABILITY deficit, NOT an infrastructure
+  failure (Art. LXXXIII: it is the authorized next bottleneck target,
+  but the corrective infrastructure/proof reconciliation round must
+  close first). The end-to-end discovery/invention loop and the
+  reality/causal-update loop remain unproven by a fresh production run
+  that crosses the full ladder (mechanism diversity → attack →
+  contradiction → experiment → adjudication → engineering → reality →
+  causal update → technology-transfer package).
 
 ### Recent known lessons
 
