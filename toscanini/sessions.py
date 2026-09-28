@@ -1113,24 +1113,19 @@ def session_detail(session_id: str) -> Optional[Dict[str, Any]]:
         surv = _read_json(run_dir / "SURVIVOR_SELECTION.json")
         if surv:
             detail["survivor_selection"] = surv
-        # R540: the ranked result set — the contract's "ranked
-        # technology packages" shape (the engine's machine-readable
-        # ranked result + per-survivor package). Served verbatim from
-        # the run's own record; absent when the run produced no
-        # admissible ranked survivor (honest, never a fake finished
-        # discovery).
-        ranked = _read_json(run_dir / "RANKED_DISCOVERY_RESULTS.json")
-        if ranked:
-            detail["ranked_results"] = ranked
-        # R542: the COMPLETION CONTRACT — the engine's authoritative
-        # finished-discovery record (COMPLETION_CONTRACT.json, written
-        # at the run tail by completion_contract.persist_completion_
-        # contract). Served verbatim: the session/UI surface READS this
-        # record and never re-derives FINISHED_DISCOVERY (the verifier
-        # is the final product-state authority, not a UI calculation).
-        contract = _read_json(run_dir / "COMPLETION_CONTRACT.json")
-        if contract:
-            detail["completion_contract"] = contract
+    else:
+        # R543-1f: the run dir has been pruned (deploy cleanup). Fall
+        # back to the session record's own stored fields — the worker
+        # persists final_state and completion_states onto the record
+        # at the run tail (R543-1b/1e). When the run dir is gone these
+        # stored fields are the ONLY durable source for the terminal
+        # states the finished flag derives from; surface them onto
+        # detail so user_state_view can read them.
+        detail["stages"] = []
+        if s.get("final_state") is not None:
+            detail["final_state"] = s.get("final_state")
+        if s.get("completion_states") is not None:
+            detail["completion_states"] = s.get("completion_states")
         # R541: the per-rank candidate-bound package download routes —
         # the UI's "Download technology package #N" CTA resolves to a
         # candidate-specific route (?candidate=<id>), not one shared
@@ -1138,15 +1133,6 @@ def session_detail(session_id: str) -> Optional[Dict[str, Any]]:
         _ranked_pkgs = []
         if s.get("ranked_results") is not None:
             _ranked_pkgs = s.get("ranked_results") or []
-        elif ranked:
-            _ranked_pkgs = [
-                {"rank": r.get("rank"),
-                 "candidate_id": r.get("candidate_id"),
-                 "admissible": r.get("admissible"),
-                 "package": r.get("components", {})
-                            .get("package") or {}}
-                for r in ranked.get("ranked_results", [])
-                if r.get("admissible")]
         if _ranked_pkgs:
             detail["ranked_package_downloads"] = [
                 {
@@ -1164,11 +1150,6 @@ def session_detail(session_id: str) -> Optional[Dict[str, Any]]:
                 }
                 for p in _ranked_pkgs
                 if p.get("package", {}).get("complete")]
-        cem = _read_json(run_dir / "cemetery_update.json")
-        if cem:
-            detail["cemetery_update"] = cem
-    else:
-        detail["stages"] = []
     # R541: ranked packages + completion states ride the session record
     # (the worker's per-survivor candidate-bound package set + the three
     # distinct completion states). Computed here (not in the run-dir
