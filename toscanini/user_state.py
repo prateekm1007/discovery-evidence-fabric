@@ -334,7 +334,11 @@ def _contract_finished_flag(session: Dict[str, Any]) -> Optional[bool]:
 
     Read order (R544: the contract itself first — a stale
     recorded completion_states, whether on the session record or in
-    final_state, can NEVER override the contract's own answer):
+    final_state, can NEVER override the contract's own answer;
+    R545: a typed terminal's own honest final_status is authority for
+    its OWN answer even when no contract was recorded — the key-prefix
+    legacy fallback may never turn a typed terminal's finished=false
+    into finished=true):
 
       1. session['completion_contract'] — the durable contract
          record, projected live through completion_states(). A stale
@@ -346,6 +350,20 @@ def _contract_finished_flag(session: Dict[str, Any]) -> Optional[bool]:
       3. session['final_state']['completion_states'] — the engine's
          own final_state.json record (the contract's projection
          since R544, re-persisted post-contract).
+      4. typed terminal final_status (R545): a terminal record whose
+         recorded final_status is a typed non-completion outcome gets
+         finished=false from its own honest answer — no six-part
+         contract exists for it and no admissible survivor set, so
+         the COMPLETED_* key-prefix inference is retired for this
+         record and may never guess True. The rule reuses the
+         engine's own completion-like vocabulary (never a second
+         parallel taxonomy): completion-like values are governed by
+         the canonical completion authority (rules 1-3) and fall
+         through to the record's own state key; every other recorded
+         terminal outcome is a typed non-completion answer. A
+         terminal record with NO recorded final_status stays
+         unresolved: the helper returns None and no completion
+         answer is manufactured.
 
     Scope (R543 Step 6 POS pin): the contract governs TERMINAL records
     only. A non-terminal status (PENDING / BUILDING_PROBLEM / RUNNING /
@@ -383,6 +401,32 @@ def _contract_finished_flag(session: Dict[str, Any]) -> Optional[bool]:
         fs_states = fs.get("completion_states")
         if isinstance(fs_states, dict) and "FINISHED_DISCOVERY" in fs_states:
             return bool(fs_states.get("FINISHED_DISCOVERY"))
+    # 4. R545: a typed terminal final_status is its OWN honest answer.
+    # A terminal record that ended in a non-completion outcome has no
+    # six-part contract and no admissible survivor set: finished is
+    # False, and the COMPLETED_* key-prefix inference is retired for
+    # this record (it may never guess True). Completion-like values
+    # are governed by the canonical completion authority (rules 1-3
+    # above; the recorded contract/completion_states/final_state
+    # answer, or the record's own state key when none was recorded)
+    # and fall through here unchanged — no second parallel taxonomy.
+    # A terminal record with NO recorded final_status stays
+    # unresolved: return None, never manufacture a completion answer.
+    final_status = str(session.get("final_status") or "").strip()
+    status = str(session.get("status") or "")
+    if final_status and status in (
+            "COMPLETE", "ERROR_CANCELED", "ERROR_STARVED",
+            "ERROR_BLOCKED", "ERROR_STUCK", "INTERRUPTED"):
+        # the engine's own completion vocabulary (the canonical
+        # completion authority names its successful outcomes this
+        # way; see run.py's final-state writer + completion_contract):
+        completion_like = (
+            final_status == "AUTOMATED_INVENTION_CANDIDATE"
+            or final_status == "FINISHED_DISCOVERY"
+            or final_status.endswith("_COMPLETE")
+            or final_status.endswith("_COMPLETED"))
+        if not completion_like:
+            return False
     return None
 
 

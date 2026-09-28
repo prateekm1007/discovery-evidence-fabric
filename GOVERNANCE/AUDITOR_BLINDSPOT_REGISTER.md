@@ -312,6 +312,16 @@ This register records places where previous audits were empirically blindsided. 
 
 **Principle:** Audit the DERIVATION POINTS of a state flag, not the call sites of one named helper. Every path that can surface the flag (sync API, SSE terminal events, background workers, read-time recompute) must resolve through the single authoritative refresh seam; a structural check (e.g., no bare `user_state_view(` surviving in the serving layer) beats a call-site inventory.
 
+## BS-039 — Commit message claims a production change the commit does not contain
+
+**Observed:** A round's commit message described a production-file change (the R545 typed-terminal rule in `user_state.py`), the modified test asserted that new behavior and passed locally, and a closure narrative was written — yet the production file's blob in that commit was byte-identical to the pre-change tree because the implementation edit was never staged. The live/deployed tree therefore did NOT contain the fix the message claimed, and a modified test could assert behavior the committed tree does not implement (the test passed only against the uncommitted working tree).
+
+**Failure mode:** "The commit message says the code was changed + the test passed locally" was treated as closure proof while the actual production file was absent from the commit. Deployment then shipped a SHA whose real bytes still carried the defect, and the "closed" defect resurfaced in production.
+
+**Principle:** Commit content, test expectations, deployment SHA, and live behavior must be independently reconciled before closure. A commit message is a claim, not evidence: verify the named production file's blob actually changed in the commit (`git show <sha> -- <file>` must show the diff), run the regression suite against the committed tree (not the dirty working tree), and only then prove the exact deployed SHA serves the fixed bytes.
+
+**Required check:** For every round claiming a production fix: (1) `git show <commit> -- <named production file>` shows the change; (2) the suite is re-run from a clean checkout of that exact commit; (3) the deployed `/api/version` SHA matches the tested commit; (4) a fresh production request demonstrates the defect is gone.
+
 ## Audit-trigger rule
 
 When a future audit encounters a new failure mode that is not covered here, the auditor must:

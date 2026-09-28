@@ -303,6 +303,17 @@ def _run_dir_files(run_dir: Path) -> List[Path]:
         "IMPROVE_LEDGER.json",
         "IMPROVEMENT_LEDGER.json",
         "TECHNICAL_IMPROVEMENT_LEDGER.json",
+        # R545: the canonical completion authority + ranked survivor
+        # identity + candidate/package binding. These are small JSON
+        # records that are the post-pruning audit evidence for
+        # completion authority, ranked survivor, candidate binding,
+        # terminal state, and package identity. Without them the
+        # session projection is a substitute that cannot reconstruct
+        # the engine's own recorded answer, and the authority chain
+        # has no durable ground truth to fall back on.
+        "COMPLETION_CONTRACT.json",
+        "RANKED_DISCOVERY_RESULTS.json",
+        "RANKED_PACKAGE_RECORDS.json",
     }
     # R511/R512 per-candidate gauntlet verdicts (bounded JSON verdict
     # records — the multiplier-table evidence for runs that reach the
