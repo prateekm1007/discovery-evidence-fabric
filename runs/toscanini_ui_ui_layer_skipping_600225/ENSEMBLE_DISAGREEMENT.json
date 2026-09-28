@@ -1,0 +1,394 @@
+{
+ "ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
+ "version": "1.0.0",
+ "requested_models": 3,
+ "available_providers": [
+  "agnes",
+  "unorouter",
+  "xkiro",
+  "apinex",
+  "bai",
+  "bynara",
+  "atria",
+  "hf",
+  "zai",
+  "openrouter",
+  "nvidia"
+ ],
+ "members": [
+  {
+   "role": "MODEL_A",
+   "provider_id": "agnes",
+   "status": "OK",
+   "model": "agnes-3.0-flash",
+   "prompt_hash": "086a6d10a5f57af045a69962c74ab3310c36371c54b9cf2fc043cfaccd6f94de",
+   "output_hash": "2aad80564effe2845cd6abc634a8ed3b46e6d9ad57aa14c8ac2ad618b17486c8",
+   "latency_ms": 49265,
+   "fields": {
+    "mechanism": "Thermal instability and rheological changes in the material flow during printing caused by nozzle temperature and print speed interactions.",
+    "intervention": "Implement active closed-loop thermal control on the extruder and nozzle to compensate for ambient temperature rises above 35C, specifically by dynamically adjusting nozzle temperature setpoints based on real-time ambient readings to maintain consistent viscosity.",
+    "expected_effect": "Maintains consistent filament viscosity and pressure at the nozzle, preventing the under-extrusion or thermal drift that causes layer skipping.",
+    "falsification_test": "Record a single measurement of the extruder tip temperature and simultaneous filament flow rate (volumetric) at the start and end of the vertical wall of a test print while ambient temperature is held at 36C; if the flow rate drops below the theoretical required value for layer adhesion, the mechanism is confirmed.",
+    "mechanism_source_span": "investigate the impacts of print speed,"
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:agnes:2aad80564eff",
+    "mechanism": "Thermal instability and rheological changes in the material flow during printing caused by nozzle temperature and print speed interactions.",
+    "intervention": "Implement active closed-loop thermal control on the extruder and nozzle to compensate for ambient temperature rises above 35C, specifically by dynamically adjusting nozzle temperature setpoints based on real-time ambient readings to maintain consistent viscosity.",
+    "expected_effect": "Maintains consistent filament viscosity and pressure at the nozzle, preventing the under-extrusion or thermal drift that causes layer skipping.",
+    "falsification_test": "Record a single measurement of the extruder tip temperature and simultaneous filament flow rate (volumetric) at the start and end of the vertical wall of a test print while ambient temperature is held at 36C; if the flow rate drops below the theoretical required value for layer adhesion, the mechanism is confirmed.",
+    "mechanism_source_span": "investigate the impacts of print speed,",
+    "source_evidence": {
+     "source_id": "doi:10.3390/bioengineering12010094",
+     "source_hash": "e8e6eca7f3c411180fdd3eb58632ffef8c3cf63b49bedc6eafaf28ff99f855fb"
+    }
+   }
+  },
+  {
+   "role": "MODEL_B",
+   "provider_id": "unorouter",
+   "status": "OK",
+   "model": "agnes-3.0-flash",
+   "prompt_hash": "086a6d10a5f57af045a69962c74ab3310c36371c54b9cf2fc043cfaccd6f94de",
+   "output_hash": "4b5f6baeae5f9cc33ddcb1a02453fa46bcf74010d5a98066d986dc89335ac45b",
+   "latency_ms": 43719,
+   "fields": {
+    "mechanism": "Two-level ANOVA experimental design used to isolate impacts of print speed, nozzle temperature, and layer height on print quality",
+    "intervention": "Apply a two-level ANOVA design to the 3D printer to statistically isolate the effect of ambient temperature on layer adhesion versus extruder temperature; specifically, measure the extruder and bed temperature stability while varying ambient conditions.",
+    "expected_effect": "The statistical analysis will identify if the layer skipping is due to insufficient thermal mass or temperature fluctuations that disrupt the bond between the polycarbonate layers, allowing for a targeted thermal control adjustment.",
+    "falsification_test": "Run the ANOVA test; if nozzle temperature variance is not the significant factor and layer skipping persists when the ambient temperature is controlled or when the extruder is stabilized at a higher setpoint, the hypothesis that ambient heat causes the skip via thermal instability is false.",
+    "mechanism_source_span": "A two-level ANOVA experimental design was utilized"
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:unorouter:4b5f6baeae5f",
+    "mechanism": "Two-level ANOVA experimental design used to isolate impacts of print speed, nozzle temperature, and layer height on print quality",
+    "intervention": "Apply a two-level ANOVA design to the 3D printer to statistically isolate the effect of ambient temperature on layer adhesion versus extruder temperature; specifically, measure the extruder and bed temperature stability while varying ambient conditions.",
+    "expected_effect": "The statistical analysis will identify if the layer skipping is due to insufficient thermal mass or temperature fluctuations that disrupt the bond between the polycarbonate layers, allowing for a targeted thermal control adjustment.",
+    "falsification_test": "Run the ANOVA test; if nozzle temperature variance is not the significant factor and layer skipping persists when the ambient temperature is controlled or when the extruder is stabilized at a higher setpoint, the hypothesis that ambient heat causes the skip via thermal instability is false.",
+    "mechanism_source_span": "A two-level ANOVA experimental design was utilized",
+    "source_evidence": {
+     "source_id": "doi:10.3390/bioengineering12010094",
+     "source_hash": "e8e6eca7f3c411180fdd3eb58632ffef8c3cf63b49bedc6eafaf28ff99f855fb"
+    }
+   }
+  },
+  {
+   "role": "MODEL_C",
+   "provider_id": "xkiro",
+   "status": "OK",
+   "model": "qwen/qwen3-max:free",
+   "prompt_hash": "086a6d10a5f57af045a69962c74ab3310c36371c54b9cf2fc043cfaccd6f94de",
+   "output_hash": "a5a178de03f97d27d74c4e4ff9a99441f8f93c8dfac9bb73e2c01ea4106c741f",
+   "latency_ms": 8443,
+   "fields": {
+    "mechanism": "Statistical optimization of print speed, nozzle temperature, and layer height via two-level ANOVA to control deposition fidelity.",
+    "intervention": "Apply a two-level ANOVA experimental design varying print speed, nozzle temperature, and layer height to identify the parameter combination that prevents polycarbonate layer skipping at ambient temperatures above 35C.",
+    "expected_effect": "Identification of the specific nozzle temperature and print speed setpoint that eliminates layer skipping by maintaining correct melt viscosity despite elevated ambient heat soak.",
+    "falsification_test": "Run the ANOVA-optimized parameters at 36C ambient; if layer skipping persists across all tested combinations of print speed, nozzle temperature, and layer height, the mechanism is falsified.",
+    "mechanism_source_span": "A two-level ANOVA experimental design was utilized to investigate the impacts of print speed, nozzle temperature, and layer height on the pri"
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:xkiro:a5a178de03f9",
+    "mechanism": "Statistical optimization of print speed, nozzle temperature, and layer height via two-level ANOVA to control deposition fidelity.",
+    "intervention": "Apply a two-level ANOVA experimental design varying print speed, nozzle temperature, and layer height to identify the parameter combination that prevents polycarbonate layer skipping at ambient temperatures above 35C.",
+    "expected_effect": "Identification of the specific nozzle temperature and print speed setpoint that eliminates layer skipping by maintaining correct melt viscosity despite elevated ambient heat soak.",
+    "falsification_test": "Run the ANOVA-optimized parameters at 36C ambient; if layer skipping persists across all tested combinations of print speed, nozzle temperature, and layer height, the mechanism is falsified.",
+    "mechanism_source_span": "A two-level ANOVA experimental design was utilized to investigate the impacts of print speed, nozzle temperature, and layer height on the pri",
+    "source_evidence": {
+     "source_id": "doi:10.3390/bioengineering12010094",
+     "source_hash": "e8e6eca7f3c411180fdd3eb58632ffef8c3cf63b49bedc6eafaf28ff99f855fb"
+    }
+   }
+  }
+ ],
+ "common_claims": [
+  {
+   "dimension": "mechanism",
+   "supporting_roles": [
+    "MODEL_B",
+    "MODEL_C"
+   ],
+   "claim": "Two-level ANOVA experimental design used to isolate impacts of print speed, nozzle temperature, and layer height on print quality",
+   "epistemic_class": "COMPUTED",
+   "note": "independently produced by >= 2 paths (N-ary comparison, E16-G)"
+  }
+ ],
+ "disagreements": [
+  {
+   "disagreement_id": "DIS-001",
+   "dimension": "mechanism",
+   "role_a": "MODEL_A",
+   "claim_a": "Thermal instability and rheological changes in the material flow during printing caused by nozzle temperature and print speed interactions.",
+   "role_b": "MODEL_B",
+   "claim_b": "Two-level ANOVA experimental design used to isolate impacts of print speed, nozzle temperature, and layer height on print quality",
+   "similarity": 0.174,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T13:01:38+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-002",
+   "dimension": "mechanism",
+   "role_a": "MODEL_A",
+   "claim_a": "Thermal instability and rheological changes in the material flow during printing caused by nozzle temperature and print speed interactions.",
+   "role_b": "MODEL_C",
+   "claim_b": "Statistical optimization of print speed, nozzle temperature, and layer height via two-level ANOVA to control deposition fidelity.",
+   "similarity": 0.174,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T13:01:38+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-003",
+   "dimension": "intervention",
+   "role_a": "MODEL_A",
+   "claim_a": "Implement active closed-loop thermal control on the extruder and nozzle to compensate for ambient temperature rises above 35C, specifically by dynamically adjusting nozzle temperature setpoints based on real-time ambient readings to maintain consistent viscosity.",
+   "role_b": "MODEL_B",
+   "claim_b": "Apply a two-level ANOVA design to the 3D printer to statistically isolate the effect of ambient temperature on layer adhesion versus extruder temperature; specifically, measure the extruder and bed temperature stability while varying ambient conditions.",
+   "similarity": 0.103,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T13:01:38+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-004",
+   "dimension": "intervention",
+   "role_a": "MODEL_A",
+   "claim_a": "Implement active closed-loop thermal control on the extruder and nozzle to compensate for ambient temperature rises above 35C, specifically by dynamically adjusting nozzle temperature setpoints based on real-time ambient readings to maintain consistent viscosity.",
+   "role_b": "MODEL_C",
+   "claim_b": "Apply a two-level ANOVA experimental design varying print speed, nozzle temperature, and layer height to identify the parameter combination that prevents polycarbonate layer skipping at ambient temperatures above 35C.",
+   "similarity": 0.1,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T13:01:38+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-005",
+   "dimension": "intervention",
+   "role_a": "MODEL_B",
+   "claim_a": "Apply a two-level ANOVA design to the 3D printer to statistically isolate the effect of ambient temperature on layer adhesion versus extruder temperature; specifically, measure the extruder and bed temperature stability while varying ambient conditions.",
+   "role_b": "MODEL_C",
+   "claim_b": "Apply a two-level ANOVA experimental design varying print speed, nozzle temperature, and layer height to identify the parameter combination that prevents polycarbonate layer skipping at ambient temperatures above 35C.",
+   "similarity": 0.242,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T13:01:38+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-006",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_A",
+   "claim_a": "Maintains consistent filament viscosity and pressure at the nozzle, preventing the under-extrusion or thermal drift that causes layer skipping.",
+   "role_b": "MODEL_B",
+   "claim_b": "The statistical analysis will identify if the layer skipping is due to insufficient thermal mass or temperature fluctuations that disrupt the bond between the polycarbonate layers, allowing for a targeted thermal control adjustment.",
+   "similarity": 0.1,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T13:01:38+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-007",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_A",
+   "claim_a": "Maintains consistent filament viscosity and pressure at the nozzle, preventing the under-extrusion or thermal drift that causes layer skipping.",
+   "role_b": "MODEL_C",
+   "claim_b": "Identification of the specific nozzle temperature and print speed setpoint that eliminates layer skipping by maintaining correct melt viscosity despite elevated ambient heat soak.",
+   "similarity": 0.138,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T13:01:38+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-008",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_B",
+   "claim_a": "The statistical analysis will identify if the layer skipping is due to insufficient thermal mass or temperature fluctuations that disrupt the bond between the polycarbonate layers, allowing for a targeted thermal control adjustment.",
+   "role_b": "MODEL_C",
+   "claim_b": "Identification of the specific nozzle temperature and print speed setpoint that eliminates layer skipping by maintaining correct melt viscosity despite elevated ambient heat soak.",
+   "similarity": 0.086,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T13:01:38+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-009",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "Record a single measurement of the extruder tip temperature and simultaneous filament flow rate (volumetric) at the start and end of the vertical wall of a test print while ambient temperature is held at 36C; if the flow rate drops below the theoretical required value for layer adhesion, the mechanism is confirmed.",
+   "role_b": "MODEL_B",
+   "claim_b": "Run the ANOVA test; if nozzle temperature variance is not the significant factor and layer skipping persists when the ambient temperature is controlled or when the extruder is stabilized at a higher setpoint, the hypothesis that ambient heat causes the skip via thermal instability is false.",
+   "similarity": 0.109,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T13:01:38+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-010",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "Record a single measurement of the extruder tip temperature and simultaneous filament flow rate (volumetric) at the start and end of the vertical wall of a test print while ambient temperature is held at 36C; if the flow rate drops below the theoretical required value for layer adhesion, the mechanism is confirmed.",
+   "role_b": "MODEL_C",
+   "claim_b": "Run the ANOVA-optimized parameters at 36C ambient; if layer skipping persists across all tested combinations of print speed, nozzle temperature, and layer height, the mechanism is falsified.",
+   "similarity": 0.128,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T13:01:38+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-011",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_B",
+   "claim_a": "Run the ANOVA test; if nozzle temperature variance is not the significant factor and layer skipping persists when the ambient temperature is controlled or when the extruder is stabilized at a higher setpoint, the hypothesis that ambient heat causes the skip via thermal instability is false.",
+   "role_b": "MODEL_C",
+   "claim_b": "Run the ANOVA-optimized parameters at 36C ambient; if layer skipping persists across all tested combinations of print speed, nozzle temperature, and layer height, the mechanism is falsified.",
+   "similarity": 0.206,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-28T13:01:38+00:00Z"
+  }
+ ],
+ "unique_mechanisms": [
+  {
+   "dimension": "mechanism",
+   "role": "MODEL_A",
+   "claim": "Thermal instability and rheological changes in the material flow during printing caused by nozzle temperature and print speed interactions.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_A",
+   "claim": "Implement active closed-loop thermal control on the extruder and nozzle to compensate for ambient temperature rises above 35C, specifically by dynamically adjusting nozzle temperature setpoints based on real-time ambient readings to maintain consistent viscosity.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_B",
+   "claim": "Apply a two-level ANOVA design to the 3D printer to statistically isolate the effect of ambient temperature on layer adhesion versus extruder temperature; specifically, measure the extruder and bed temperature stability while varying ambient conditions.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_C",
+   "claim": "Apply a two-level ANOVA experimental design varying print speed, nozzle temperature, and layer height to identify the parameter combination that prevents polycarbonate layer skipping at ambient temperatures above 35C.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_A",
+   "claim": "Maintains consistent filament viscosity and pressure at the nozzle, preventing the under-extrusion or thermal drift that causes layer skipping.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_B",
+   "claim": "The statistical analysis will identify if the layer skipping is due to insufficient thermal mass or temperature fluctuations that disrupt the bond between the polycarbonate layers, allowing for a targeted thermal control adjustment.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_C",
+   "claim": "Identification of the specific nozzle temperature and print speed setpoint that eliminates layer skipping by maintaining correct melt viscosity despite elevated ambient heat soak.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_A",
+   "claim": "Record a single measurement of the extruder tip temperature and simultaneous filament flow rate (volumetric) at the start and end of the vertical wall of a test print while ambient temperature is held at 36C; if the flow rate drops below the theoretical required value for layer adhesion, the mechanism is confirmed.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_B",
+   "claim": "Run the ANOVA test; if nozzle temperature variance is not the significant factor and layer skipping persists when the ambient temperature is controlled or when the extruder is stabilized at a higher setpoint, the hypothesis that ambient heat causes the skip via thermal instability is false.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_C",
+   "claim": "Run the ANOVA-optimized parameters at 36C ambient; if layer skipping persists across all tested combinations of print speed, nozzle temperature, and layer height, the mechanism is falsified.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  }
+ ],
+ "adjudication": {
+  "adjudicator": "DETERMINISTIC (field completeness -> falsifiability -> source span)",
+  "primary_role": "MODEL_A",
+  "primary_provider": "agnes",
+  "primary_candidate_id": "cand:ENS:agnes:2aad80564eff",
+  "ranking": [
+   {
+    "role": "MODEL_A",
+    "provider_id": "agnes",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   },
+   {
+    "role": "MODEL_B",
+    "provider_id": "unorouter",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   },
+   {
+    "role": "MODEL_C",
+    "provider_id": "xkiro",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   }
+  ],
+  "consensus_forced": false,
+  "note": "the primary candidate enters the pipeline; disagreement objects remain UNRESOLVED and travel with the artifact chain (E15-E: do not force consensus)",
+  "decided_at": "2026-09-28T13:01:38+00:00Z"
+ },
+ "built_at": "2026-09-28T12:59:39+00:00Z",
+ "status": "ENSEMBLE_RUN",
+ "paths": [
+  "agnes",
+  "unorouter",
+  "xkiro"
+ ],
+ "comparison": {
+  "method": "pairwise significant-word Jaccard over the four invention claim dimensions (deterministic, N-ary; E16-G)",
+  "thresholds": {
+   "agreement": 0.3,
+   "disagreement": 0.25
+  },
+  "roles_compared": [
+   "MODEL_A",
+   "MODEL_B",
+   "MODEL_C"
+  ],
+  "pairs_compared": 3
+ }
+}
