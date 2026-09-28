@@ -442,7 +442,20 @@ def _contract_finished_flag(session: Dict[str, Any]) -> Optional[bool]:
     if isinstance(states, dict) and "FINISHED_DISCOVERY" in states:
         return bool(states.get("FINISHED_DISCOVERY"))
     # 3. the engine's final_state record (the contract's projection
-    #    since R544, re-persisted post-contract)
+    #    since R544, re-persisted post-contract). R547: the LIVE
+    #    serving path measured on the deployed Space persists the
+    #    authoritative FINISHED_DISCOVERY answer ONLY under this
+    #    nested final_state.completion_states (the session record's
+    #    top-level `completion_states` is absent on pruned records and
+    #    on typed terminals the worker refresh did not re-emit). Rule
+    #    3 is the one that finds it; the view's finished flag MUST
+    #    follow that nested answer — a record whose final_state says
+    #    FINISHED_DISCOVERY=false must not surface finished=true
+    #    through the COMPLETED_* key-prefix fall-through (BS-042
+    #    root trace: the measured live shape status=COMPLETE +
+    #    final_status=MECHANISM_STARVED + top-level completion_states
+    #    absent + final_state.completion_states.FINISHED_DISCOVERY=
+    #    false -> finished=False).
     fs = session.get("final_state")
     if isinstance(fs, dict):
         fs_states = fs.get("completion_states")

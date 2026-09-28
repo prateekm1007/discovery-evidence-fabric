@@ -345,16 +345,109 @@ def test_completion_contract_true_outranks_stale_key():
 
 
 # ---------------------------------------------------------------------------
-# R547 item 3: the RUN_BLOCKED_CAPABILITY projection itself is now
-# correctly represented. The canonical execution state maps
-# RUN_BLOCKED_CAPABILITY -> WAITING_EXTERNAL; the user_state key must
-# represent that typed resumable-infrastructure condition (not the
-# COMPLETED_* fall-through), while preserving WAITING_EXTERNAL
-# != FAILED != SCIENTIFIC REJECTION != FINISHED_DISCOVERY. The
-# directive's required coverage: canonical execution state, user_state
-# key, label, finished, outcome, retry/recovery semantics, REST, SSE,
-# pruned record.
+# R547 item 2 root trace (BS-042): the deployed-space serving shape.
+# The engine persists a real completion projection INTO
+# final_state.completion_states; the session record's top-level
+# completion_states can be absent (pruned record, or a typed terminal the
+# worker refresh did not re-emit). The view must follow the nested
+# answer: final_state.completion_states.FINISHED_DISCOVERY=false must
+# not surface finished=true through the COMPLETED_* key-prefix
+# fall-through.
 # ---------------------------------------------------------------------------
+def test_nested_final_state_completion_answer_governs_finished():
+    """R547 BS-042 root trace: the EXACT shape measured on the deployed
+    Space — status=COMPLETE + final_status=MECHANISM_STARVED +
+    top-level completion_states absent + final_state.completion_states
+    carrying FINISHED_DISCOVERY=false. Rule 3 of _contract_finished_
+    flag is the branch that finds the nested answer, and the view's
+    finished flag MUST follow it: no COMPLETED_* key-prefix
+    fall-through may turn a recorded FINISHED_DISCOVERY=false into
+    finished=true."""
+    rec = {
+        "session_id": "ts_r547nested",
+        "status": "COMPLETE",
+        "final_status": "MECHANISM_STARVED",
+        "run_dir": None,
+        # the engine's own re-persisted completion projection lives in
+        # the final_state record (the serving path carries it; the
+        # session store's top-level field is absent on pruned records)
+        "final_state": {
+            "final_status": "MECHANISM_STARVED",
+            "completion_states": {
+                "PIPELINE_COMPLETED": True,
+                "DISCOVERY_COMPLETED": True,
+                "TECHNOLOGY_PACKAGE_COMPLETED": False,
+                "FINISHED_DISCOVERY": False,
+                "typed_terminal_state": "INCOMPLETE_DISCOVERY",
+                "missing_components": ["evidence",
+                                       "decisive_experiment"],
+            },
+        },
+    }
+    assert rec["status"] == "COMPLETE"
+    assert rec["final_status"] == "MECHANISM_STARVED"
+    assert "completion_states" not in rec  # top-level field absent
+    assert _us._contract_finished_flag(rec) is False, (
+        "the nested final_state.completion_states.FINISHED_DISCOVERY="
+        "false must answer the finished flag (rule 3) — never a "
+        "COMPLETED_UNKNOWN key-prefix True")
+    view = _us.user_state_view(rec)
+    assert view["finished"] is False
+    # and the positive direction: a recorded FINISHED_DISCOVERY=true
+    # nested answer forces finished=true (rule 3 governs both ways)
+    rec_true = dict(rec)
+    rec_true["final_state"] = {
+        "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+        "completion_states": {"FINISHED_DISCOVERY": True}}
+    assert _us._contract_finished_flag(rec_true) is True
+    assert _us.user_state_view(rec_true)["finished"] is True
+
+
+# ---------------------------------------------------------------------------
+# R547: the live serving path (sessions.refresh_user_state_view) must
+# recompute from the run dir's own final_state.json when the run dir
+# still exists (Art. X: the run dir is the authority), so a stale
+# stored snapshot on the session record can never answer the finished
+# flag ahead of the run dir's bytes.
+# ---------------------------------------------------------------------------
+def test_refresh_user_state_view_prefers_run_dir_final_state():
+    import toscanini.sessions as _ss
+    rec = {
+        "session_id": "ts_r547refresh",
+        "status": "COMPLETE",
+        "final_status": "MECHANISM_STARVED",
+        "run_dir": None,  # a pruned record: stored fields are the
+        # only durable source — the refresh keeps them (no run dir to
+        # re-read)
+        "final_state": {
+            "final_status": "MECHANISM_STARVED",
+            "completion_states": {"FINISHED_DISCOVERY": False}},
+    }
+    out = _ss.refresh_user_state_view(dict(rec))
+    # no run dir: the stored nested answer still governs (rule 3)
+    assert out["user_state_view"]["finished"] is False
+
+
+def test_refresh_user_state_view_is_a_recompute_not_a_stale_snapshot():
+    """refresh_user_state_view must RE-COMPUTE the view at read time
+    on a fresh copy (the original record is not mutated, the finished
+    flag is re-derived from the record's durable fields) — the
+    recompute-at-read-time invariant R543-1d pinned, re-checked here
+    for the nested-final_state shape."""
+    import toscanini.sessions as _ss
+    rec = {
+        "session_id": "ts_r547recompute",
+        "status": "COMPLETE",
+        "final_status": "MECHANISM_STARVED",
+        "run_dir": None,
+        "final_state": {
+            "final_state": "MECHANISM_STARVED",
+            "completion_states": {"FINISHED_DISCOVERY": False}},
+    }
+    snapshot = dict(rec)
+    out = _ss.refresh_user_state_view(rec)
+    assert rec == snapshot  # the original record is untouched
+    assert out["user_state_view"]["finished"] is False
 def test_run_blocked_capability_projection_full_shape():
     """Every field the directive item 3 names, on both producer
     shapes, plus the pruned-record extreme. No second execution

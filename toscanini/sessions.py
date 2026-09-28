@@ -1267,10 +1267,27 @@ def refresh_user_state_view(record: Dict[str, Any]) -> Dict[str, Any]:
       attaches a freshly computed user_state_view and returns it."""
     rec = dict(record)
     run_dir = rec.get("run_dir")
-    if not rec.get("final_state") and run_dir:
-        fs = _read_json(Path(run_dir) / "final_state.json")
-        if fs is not None:
-            rec["final_state"] = fs
+    # R547 BS-042 root trace (the LIVE serving path measured on the
+    # deployed Space, Art. XXII — never assume the committed source is
+    # the executing source): when the run dir still exists, the run
+    # dir is the authority (Art. X). The session record's stored
+    # final_state / completion_states fields are worker snapshots that
+    # can LAG the run dir (the worker persisted the contract's
+    # projection to the run dir AFTER the session-record refresh, and
+    # a top-level completion_states that the refresh did not re-emit
+    # stays absent). Reading the run dir's OWN files keeps the
+    # recompute on the live bytes: final_state.json (the engine's
+    # re-persisted completion projection) and COMPLETION_CONTRACT.json
+    # (the authority itself — read-through, never a second source).
+    # When the run dir is pruned (the post-deploy shape), the stored
+    # fields are the only durable source and are used as-is.
+    if run_dir:
+        fs_fresh = _read_json(Path(run_dir) / "final_state.json")
+        if fs_fresh is not None:
+            rec["final_state"] = fs_fresh
+        contract_fresh = _read_json(Path(run_dir) / "COMPLETION_CONTRACT.json")
+        if contract_fresh is not None:
+            rec["completion_contract"] = contract_fresh
     from toscanini import user_state as _us
     return _us.with_user_state(rec)
 
