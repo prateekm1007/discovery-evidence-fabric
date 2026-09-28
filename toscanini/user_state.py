@@ -558,6 +558,58 @@ def user_state_view(session: Dict[str, Any]) -> Dict[str, Any]:
     _contract_flag = _contract_finished_flag(session)
     if _contract_flag is not None:
         finished = _contract_flag
+    elif key == "COMPLETED_UNKNOWN" and \
+            (session.get("status") or "") == "COMPLETE":
+        # R548 (BS-042 third occurrence, the last remaining
+        # key-prefix path): a COMPLETE terminal that reached the
+        # COMPLETED_UNKNOWN key (no recognized positive/typed final
+        # status) with NO recorded completion answer anywhere on the
+        # record (no contract, no top-level or nested
+        # completion_states) AND no typed non-completion terminal
+        # evidence rule 4b could answer. The pre-R548 view answered
+        # this True through the COMPLETED_* key prefix — the exact
+        # shape the BS-042 live trace measured on the deployed Space
+        # (a MECHANISM_STARVED / nested-completion-only record served
+        # finished=true while the committed source answered false).
+        # A terminal with no recorded completion answer is an
+        # UNRESOLVED terminal: the honest customer answer is
+        # finished=False (the run did not finish a discovery), never
+        # a manufactured True. The typed non-completion terminals are
+        # already answered False by rule 4b before this branch; this
+        # branch owns only the COMPLETED_UNKNOWN residual where rule
+        # 4b did not fire. The positive candidate terminals
+        # (COMPLETED_CANDIDATE / COMPLETED_PACKAGE / EVOLVED) keep
+        # the legacy key-prefix True — a recorded positive final
+        # status is the record's own honest terminal, unchanged.
+        finished = False
+    elif key == "COMPLETED_UNKNOWN" and \
+            (session.get("status") or "") == "COMPLETE":
+        # R548 (BS-042 third occurrence, the last remaining
+        # key-prefix path): a COMPLETE terminal that reached the
+        # COMPLETED_UNKNOWN key (no recognized positive/typed final
+        # status) with NO recorded completion answer anywhere on the
+        # record (no contract, no top-level or nested
+        # completion_states) AND no typed non-completion terminal
+        # evidence rule 4b could answer. The pre-R548 view answered
+        # this True through the COMPLETED_* key prefix — the exact
+        # shape the BS-042 live trace measured on the deployed Space
+        # (a MECHANISM_STARVED / nested-completion-only record served
+        # finished=true while the committed source answered false).
+        # A terminal with no recorded completion answer is an
+        # UNRESOLVED terminal: the honest customer answer is
+        # finished=False (the run did not finish a discovery), never
+        # a manufactured True. The typed non-completion terminals are
+        # already answered False by rule 4b before this branch; this
+        # branch owns only the COMPLETED_UNKNOWN residual where rule
+        # 4b did not fire. The positive candidate terminals
+        # (COMPLETED_CANDIDATE / COMPLETED_PACKAGE / EVOLVED) keep
+        # the legacy key-prefix True — a recorded positive final
+        # status is the record's own honest terminal, unchanged.
+        # The directive's positive-candidate-legacy matrix row (a
+        # positive final_status with no completion answer) is
+        # governed by the key prefix (True) — this branch does not
+        # touch it.
+        finished = False
     found = key in ("COMPLETED_PACKAGE", "COMPLETED_CANDIDATE",
                     "COMPLETED_EVOLVED")
     # R416: the product surface never renders a bare reject dead-end;

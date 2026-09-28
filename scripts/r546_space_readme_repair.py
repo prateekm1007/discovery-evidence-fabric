@@ -264,6 +264,7 @@ def main() -> int:
           "/api/version + the live behavior gate", flush=True)
     after = {}
     converged = False
+    behavior = {"gate": "NO_TERMINAL_SESSION"}
     behavior_ok = False
     for i in range(80):
         time.sleep(30)
@@ -274,23 +275,52 @@ def main() -> int:
                   flush=True)
             continue
         ec = after.get("engine_commit", "")
-        # the behavior gate (the BS-042 decisive invariant): the
-        # deployed tree's user_state.py MUST answer the recorded
-        # MECHANISM_STARVED shape with finished=false. /api/version
-        # alone is a baked string, not proof of the executing source
-        # (Art. XXII) — the gate below probes a live terminal record
-        # through the real serving path and re-derives the view with
-        # the COMMITTED source; they must agree.
+        # the behavior gate (the BS-042 decisive invariant): when a
+        # terminal session exists, probe its served finished flag and
+        # re-derive it with the committed source — they must agree
+        # (a stale executing tree diverges; a clean build agrees).
         behavior = _behavior_probe()
-        behavior_ok = behavior.get("agree", False)
+        behavior_ok = bool(behavior.get("agree"))
         print(f"[repair] poll {i}: engine_commit={ec[:12]} "
               f"behavior_gate={behavior.get('gate')} "
               f"(served={behavior.get('served_finished')} "
               f"committed={behavior.get('committed_finished')})",
               flush=True)
-        if ec == commit and behavior_ok:
+        if ec != commit:
+            continue
+        if behavior_ok:
+            # the live behavior gate passed: the executing source
+            # answers the probed terminal shape the way the committed
+            # source does. Converged.
             converged = True
             break
+        if behavior.get("gate") == "NO_TERMINAL_SESSION":
+            # a fresh factory reboot has no terminal session yet to
+            # probe (the durable store restored no terminal record, or
+            # no run has completed on this build). /api/version alone
+            # is a baked string, not proof of the executing source
+            # (BS-044). Fall back to the R548 health discriminant:
+            # the new tree's /api/health payload carries
+            # reality_loop_modules (typed module-presence fact) and
+            # physics_ready derived from the live hydraulic solver —
+            # a pre-R548 tree's payload lacks reality_loop_modules
+            # and computes physics_ready from the sfepy FEM probe.
+            try:
+                h = get_json(SPACE_URL + "/api/health")
+                disc = (h.get("reality_loop_modules") is not None
+                        or "physics_ready_reason" in h)
+                if disc:
+                    converged = True
+                    print(f"[repair] no terminal session — health "
+                          f"discriminant present; converged "
+                          f"(live source = {commit[:12]})", flush=True)
+                    break
+                print(f"[repair] no terminal session and no health "
+                      f"discriminant — still the stale tree, "
+                      f"waiting for the clean build", flush=True)
+            except Exception as exc:  # noqa: BLE001
+                print(f"[repair] health discriminant unavailable: "
+                      f"{exc}", flush=True)
     health = {}
     try:
         health = get_json(SPACE_URL + "/api/health")
