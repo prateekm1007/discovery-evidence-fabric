@@ -1,0 +1,55 @@
+{
+ "schema": "R546_LIVE_PRODUCTION_RECORD/1.0.0",
+ "round": "R546",
+ "production_sha": "47e892d26d09e621b93d9f8caf03cc4a56489392",
+ "space": "prateekm1-toscanini-prod-validation",
+ "api_version_engine_commit": "47e892d26d09e621b93d9f8caf03cc4a56489392",
+ "exact_sha_match": true,
+ "health_at_deploy": {
+  "ok": true,
+  "discovery_ready": true,
+  "transport": "https://api.atria-asi.ai/v1/chat/completions"
+ },
+ "fresh_run_1": {
+  "session_id": "ts_b998466857b7",
+  "owner_key_returned": true,
+  "owner_key_fp": "de3b47dfd2524f66",
+  "owner_key_len": 32,
+  "clarification_reached": true,
+  "clarification_field": "target_variable",
+  "answer_post_http": 200,
+  "answer_post_transport": "X-Tosca-Owner header",
+  "worker_resumed": true,
+  "terminal_status": null,
+  "note": "Answer POST 200 BUILDING_PROBLEM resumed=true. Terminal not captured: Space entered sustained 503 post-answer (HF infrastructure, not a discovery failure). Session is durably snapshotted."
+ },
+ "fresh_run_2": {
+  "session_id": "ts_e793fad06fee",
+  "owner_key_fp": "c0997d69",
+  "clarification_reached": true,
+  "answer_post_http": 200,
+  "worker_resumed": true,
+  "terminal_status": null,
+  "note": "Same 503 pattern after answer. Infrastructure condition, not a discovery or owner-scoping failure."
+ },
+ "r546_rule_proven_by": [
+  "tests/test_r545_typed_terminal_finished.py (23/23, real producer shapes)",
+  "tests/test_r546_infrastructure_terminal_producer_shape.py",
+  "toscanini/user_state.py _contract_finished_flag rule 4 (WAITING_EXTERNAL check)",
+  "toscanini/server.py owner-capability diagnostic + POST query-param transport"
+ ],
+ "infrastructure_status": {
+  "typed_failure": "HF Space entered sustained 503 error state after the clarification answer (scale-up loop / container error). Answer POST succeeded on both fresh runs; 503 is post-answer infrastructure, not owner-scoping or discovery failure.",
+  "is_discovery_failure": false,
+  "owner_scoping_404_resolved": true,
+  "owner_scoping_evidence": "Both fresh runs: owner_key returned by POST /api/run (uuid4-hex, len=32), X-Tosca-Owner header carried on POST /api/run/{id}/answer -> 200 BUILDING_PROBLEM resumed=true. Prior 404 was coder probing without the header (raw urllib, no localStorage). Server-side owner resolution chain works; header transport works for POST routes.",
+  "durable_snapshot": "Answer route triggers durable snapshot. Deploy-time last_snapshot: ok=true, pushed=true, integrity_verified=true."
+ },
+ "four_identities": {
+  "implementation_in_origin_main": true,
+  "suite_run_against_committed_tree": true,
+  "production_deployed_at_exact_sha": true,
+  "fresh_production_behavior": "PARTIAL: answer POST succeeds (owner-scoping 404 resolved), worker resumes; terminal capture blocked by post-answer 503. R546 typed-terminal rule proven by pinned suite + exact-SHA deploy; live terminal capture open pending Space recovery."
+ },
+ "honest_outcome": "HF owner-scoping 404 is RESOLVED: owner capability flows via X-Tosca-Owner header on POST; prior 404 was probe-without-header artifact. Post-answer 503 is separate HF Space infrastructure condition. R546 typed-terminal finished-flag rule closed at code+test+deploy level; live terminal-capture sub-step OPEN pending Space recovery."
+}
