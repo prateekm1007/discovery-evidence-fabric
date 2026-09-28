@@ -1,0 +1,755 @@
+{
+  "stage": "BRIDGE_GATE",
+  "bridge_gate_version": "1.3.0",
+  "outcome": "COMPLETED",
+  "at": "2026-09-28T21:47:55Z",
+  "reviewer_provenance": "AI_REVIEW",
+  "case": "B",
+  "visualizability_class": "SYSTEM_3D",
+  "conceptual": true,
+  "visualizability": {
+    "visualizability_class": "SYSTEM_3D",
+    "classification_basis": {
+      "geometry_parameters_sourced": 0,
+      "subsystems_recorded": 4,
+      "physical_site_detected": true,
+      "physical_site_vocabulary": {
+        "n_words": 53,
+        "authority": "discovery_fabric/engine/domains.py (ENGINEERING_DOMAIN_REGISTRY, one authority)",
+        "registry_domains_excluded": [
+          "ml_data"
+        ],
+        "layers_used": [
+          "architecture_blocks",
+          "architecture_blocks_medical",
+          "manufacturing_candidates",
+          "materials_candidates",
+          "disciplines",
+          "domain label",
+          "failure_modes (mode + physical_mechanism)",
+          "manufacturing_routes"
+        ]
+      },
+      "process_signal": false,
+      "algorithmic_signal": false,
+      "intervention_site": "ceramic solid oxide fuel cell",
+      "engineering_min_params": 3,
+      "reason": "4 recorded subsystems and only 0 sourced geometry parameters \u2014 conceptual system-architecture visualization (topology, not dimensions)",
+      "measured_from": [
+        "engineering_specification.parameters",
+        "engineering_specification.engineering_core.critical_parameters",
+        "engineering_specification.system_architecture.subsystems",
+        "final_state.causal_chain"
+      ]
+    },
+    "subsystems": [
+      "load path / structural backbone",
+      "actuation or compliance element",
+      "guidance / bearing interfaces",
+      "fatigue-critical features register"
+    ],
+    "geometry_parameters": [],
+    "intervention_site": "ceramic solid oxide fuel cell"
+  },
+  "geometry": {
+    "model_glbs": [
+      "model-001.glb"
+    ],
+    "glb_sha256": "54e82cc1d030e8203c6a6480fb2b02e93723db14999af930e31c4b089bd36941",
+    "components": [
+      {
+        "name": "pack_enclosure",
+        "label": "pack enclosure",
+        "type": "structural",
+        "material_class": "body_metal",
+        "role": "pack enclosure (structural presentation element)",
+        "mapped_from": null
+      },
+      {
+        "name": "cell_stack",
+        "label": "cell stack",
+        "type": "structural",
+        "material_class": "battery",
+        "role": "cell stack (structural presentation element)",
+        "mapped_from": null
+      },
+      {
+        "name": "bus_bars",
+        "label": "bus bars",
+        "type": "structural",
+        "material_class": "machined_metal",
+        "role": "series interconnect bus bars (family-definitional presentation element of the energy-storage acceptance case; mapped subsystem recorded as alias)",
+        "mapped_from": null
+      },
+      {
+        "name": "module_01",
+        "label": "module: load path / structural backbone",
+        "type": "subsystem",
+        "material_class": "polymer",
+        "role": "recorded subsystem 'load path / structural backbone' (no canonical slot in the energy storage architecture; mounted as a labeled module)",
+        "mapped_from": "load path / structural backbone"
+      },
+      {
+        "name": "module_02",
+        "label": "module: actuation or compliance element",
+        "type": "subsystem",
+        "material_class": "polymer",
+        "role": "recorded subsystem 'actuation or compliance element' (no canonical slot in the energy storage architecture; mounted as a labeled module)",
+        "mapped_from": "actuation or compliance element"
+      },
+      {
+        "name": "module_03",
+        "label": "module: guidance / bearing interfaces",
+        "type": "subsystem",
+        "material_class": "polymer",
+        "role": "recorded subsystem 'guidance / bearing interfaces' (no canonical slot in the energy storage architecture; mounted as a labeled module)",
+        "mapped_from": "guidance / bearing interfaces"
+      },
+      {
+        "name": "module_04",
+        "label": "module: fatigue-critical features register",
+        "type": "subsystem",
+        "material_class": "polymer",
+        "role": "recorded subsystem 'fatigue-critical features register' (no canonical slot in the energy storage architecture; mounted as a labeled module)",
+        "mapped_from": "fatigue-critical features register"
+      },
+      {
+        "name": "link_cell_stack__bus_bars",
+        "label": "electrical link: cell_stack -> bus_bars",
+        "type": "interface",
+        "material_class": "conduit_power",
+        "role": "electrical coupling (topology only)",
+        "interface_id": "es_cells_bus"
+      }
+    ],
+    "key_dimensions": {
+      "measurement_basis": "TOPOLOGY_ONLY",
+      "note": "domain conceptual artifact \u2014 component identity, count and adjacency only; sizes are abstract presentation units, not engineering dimensions",
+      "component_count": 8,
+      "structural_form_components": 3,
+      "mapped_subsystem_components": 4,
+      "interface_count": 1,
+      "adjacency": [
+        {
+          "from": "cell_stack",
+          "to": "bus_bars",
+          "kind": "electrical"
+        }
+      ],
+      "domain_family": "energy",
+      "technology_class": "ENERGY_STORAGE"
+    },
+    "generation_models": [
+      {
+        "generation": 1,
+        "glb": "MODEL/model-001.glb",
+        "current": true
+      }
+    ],
+    "domain_family": "energy",
+    "quality_gates": {
+      "artifact": "R432_QUALITY_GATES",
+      "version": "1.0.0",
+      "geometry_gate": {
+        "artifact": "GEOMETRY_QUALITY_GATE",
+        "version": "1.0.0",
+        "domain_family": "energy",
+        "technology_class": "ENERGY_STORAGE",
+        "technology_class_role": "bridge geometry archetype (presentation routing, R445)",
+        "checks": [
+          {
+            "check": "valid_glb",
+            "passed": true
+          },
+          {
+            "check": "non_empty_scene",
+            "passed": true,
+            "measured": {
+              "node_count": 8,
+              "mesh_count": 8
+            }
+          },
+          {
+            "check": "component_ids_match_spec",
+            "passed": true,
+            "measured": {
+              "spec_components": 7,
+              "scene_nodes": 8,
+              "missing": [],
+              "unexpected": [],
+              "link_nodes_drawn": [
+                "link_cell_stack__bus_bars"
+              ]
+            }
+          },
+          {
+            "check": "named_components",
+            "passed": true,
+            "measured": {
+              "sample": [
+                "bus_bars",
+                "cell_stack",
+                "link_cell_stack__bus_bars",
+                "module_01",
+                "module_02",
+                "module_03",
+                "module_04",
+                "pack_enclosure"
+              ]
+            }
+          },
+          {
+            "check": "bounding_box_sane",
+            "passed": true,
+            "measured": {
+              "extent": [
+                6.8,
+                3.2,
+                4.45
+              ]
+            }
+          },
+          {
+            "check": "no_nan_inf_coordinates",
+            "passed": true
+          },
+          {
+            "check": "no_microscopic_geometry",
+            "passed": true,
+            "measured": {
+              "min_component_extent": 0.129956
+            }
+          },
+          {
+            "check": "no_duplicate_model",
+            "passed": true,
+            "measured": {
+              "duplicates": []
+            }
+          },
+          {
+            "check": "normals_valid",
+            "passed": true
+          },
+          {
+            "check": "component_interference",
+            "passed": true,
+            "measured": {
+              "pairs_checked": 21,
+              "same_cell_unmated": [],
+              "nested_disclosed": [
+                {
+                  "pair": "bus_bars==pack_enclosure",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.028,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                },
+                {
+                  "pair": "cell_stack==pack_enclosure",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.501,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                }
+              ],
+              "rule": "two distinct parts at the same cell (mutual overlap > 0.9 of the smaller and > 0.6 of the larger bbox) without a declared mating interface is an engineering-realization failure; nested parts are disclosed for the engineering boundary"
+            }
+          },
+          {
+            "check": "no_isolated_outlier_geometry",
+            "passed": true,
+            "measured": {
+              "islands": [],
+              "note": "components beyond 1.6x the assembly radius"
+            }
+          },
+          {
+            "check": "no_single_blob_domination",
+            "passed": true,
+            "measured": {
+              "largest_component_volume_fraction": 0.5194
+            }
+          },
+          {
+            "check": "interfaces_resolve",
+            "passed": true,
+            "measured": {
+              "unresolved": []
+            }
+          },
+          {
+            "check": "canonical_topology_preserved",
+            "passed": true,
+            "measured": {
+              "component_count": 7,
+              "interface_count": 1
+            }
+          }
+        ],
+        "failures": [],
+        "passed": true
+      },
+      "visual_gate": {
+        "artifact": "VISUAL_QUALITY_GATE",
+        "version": "1.0.0",
+        "domain_family": "energy",
+        "technology_class": "ENERGY_STORAGE",
+        "technology_class_role": "bridge geometry archetype (presentation routing, R445)",
+        "checks": [
+          {
+            "check": "not_flat_slab",
+            "passed": true,
+            "measured": {
+              "height_over_length": 0.4706,
+              "component_count": 8
+            }
+          },
+          {
+            "check": "not_generic_box_pile",
+            "passed": true,
+            "measured": {
+              "component_count": 8,
+              "pure_box_components": 0,
+              "box_ratio": 0.0
+            }
+          },
+          {
+            "check": "family_component_count",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE",
+              "components": 8,
+              "required": 4
+            }
+          },
+          {
+            "check": "family_feature_cell_stack",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE",
+              "found": 1,
+              "required": 1
+            }
+          },
+          {
+            "check": "family_feature_pack_enclosure",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE",
+              "found": 1,
+              "required": 1
+            }
+          }
+        ],
+        "failures": [],
+        "passed": true,
+        "note": "presentation audit \u2014 structural metrics only; NOT scientific validation and NOT a vision model (R432 section 17 disclosure)"
+      },
+      "engineering_gate": null,
+      "passed": true,
+      "failures": []
+    },
+    "artifact_identity": {
+      "artifact": "ARTIFACT_IDENTITY",
+      "blender_scene_hash": null,
+      "cad_source": null,
+      "derivation": "assembled from persisted run artifacts only \u2014 every hash from a real file at build time (Art. VI); blender_scene_hash fills when the render stage records its scene",
+      "derived_at": "2026-09-28T21:47:55Z",
+      "domain_family": "energy",
+      "generation_id": "gen-1",
+      "geometry_hash": "54e82cc1d030e8203c6a6480fb2b02e93723db14999af930e31c4b089bd36941",
+      "glb_disk_sha256": "54e82cc1d030e8203c6a6480fb2b02e93723db14999af930e31c4b089bd36941",
+      "glb_matches_geometry_hash": true,
+      "glb_path": "/app/ENGINE_RUNS/toscanini_ui_ui_thermally_induced_cracking_due_to_thermal_631656/MODEL/model-001.glb",
+      "identity_version": "1.0.0",
+      "run_id": "ts_6a1fe8686115",
+      "source_geometry_hash": "9361e1b1258d22feff458b478f476bc0ec3906704a39030d77c8b65767bc645a",
+      "technology_id": "ui_thermally_induced_cracking_due_to_thermal_631656",
+      "visualizability_class": "SYSTEM_3D"
+    },
+    "fallback_basis": null,
+    "scores": {
+      "artifact": "R433_MODEL_SCORES",
+      "version": "1.0.0",
+      "semantic_identity": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "not_visualized": [],
+        "checks": [
+          {
+            "check": "model_loads",
+            "passed": true,
+            "measured": {
+              "node_count": 8
+            }
+          },
+          {
+            "check": "family_selected",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE"
+            }
+          },
+          {
+            "check": "spec_components_visualized",
+            "passed": true,
+            "measured": {
+              "spec_components": 7,
+              "not_visualized": []
+            }
+          },
+          {
+            "check": "domain_architecture_present",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE",
+              "required": 3,
+              "not_visualized": []
+            }
+          },
+          {
+            "check": "major_interfaces_represented",
+            "passed": true,
+            "measured": {
+              "interfaces": 1,
+              "resolvable_in_scene": 1,
+              "note": "conduit links may run inside the body by design"
+            }
+          }
+        ]
+      },
+      "engineering_coherence": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "checks": [
+          {
+            "check": "valid_glb",
+            "passed": true
+          },
+          {
+            "check": "non_empty_scene",
+            "passed": true,
+            "measured": {
+              "node_count": 8,
+              "mesh_count": 8
+            }
+          },
+          {
+            "check": "component_ids_match_spec",
+            "passed": true,
+            "measured": {
+              "spec_components": 7,
+              "scene_nodes": 8,
+              "missing": [],
+              "unexpected": [],
+              "link_nodes_drawn": [
+                "link_cell_stack__bus_bars"
+              ]
+            }
+          },
+          {
+            "check": "named_components",
+            "passed": true,
+            "measured": {
+              "sample": [
+                "bus_bars",
+                "cell_stack",
+                "link_cell_stack__bus_bars",
+                "module_01",
+                "module_02",
+                "module_03",
+                "module_04",
+                "pack_enclosure"
+              ]
+            }
+          },
+          {
+            "check": "bounding_box_sane",
+            "passed": true,
+            "measured": {
+              "extent": [
+                6.8,
+                3.2,
+                4.45
+              ]
+            }
+          },
+          {
+            "check": "no_nan_inf_coordinates",
+            "passed": true
+          },
+          {
+            "check": "no_microscopic_geometry",
+            "passed": true,
+            "measured": {
+              "min_component_extent": 0.129956
+            }
+          },
+          {
+            "check": "no_duplicate_model",
+            "passed": true,
+            "measured": {
+              "duplicates": []
+            }
+          },
+          {
+            "check": "normals_valid",
+            "passed": true
+          },
+          {
+            "check": "component_interference",
+            "passed": true,
+            "measured": {
+              "pairs_checked": 21,
+              "same_cell_unmated": [],
+              "nested_disclosed": [
+                {
+                  "pair": "bus_bars==pack_enclosure",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.028,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                },
+                {
+                  "pair": "cell_stack==pack_enclosure",
+                  "overlap_fraction_min_part": 1.0,
+                  "overlap_fraction_max_part": 0.501,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                }
+              ],
+              "rule": "two distinct parts at the same cell (mutual overlap > 0.9 of the smaller and > 0.6 of the larger bbox) without a declared mating interface is an engineering-realization failure; nested parts are disclosed for the engineering boundary"
+            }
+          },
+          {
+            "check": "no_isolated_outlier_geometry",
+            "passed": true,
+            "measured": {
+              "islands": [],
+              "note": "components beyond 1.6x the assembly radius"
+            }
+          },
+          {
+            "check": "no_single_blob_domination",
+            "passed": true,
+            "measured": {
+              "largest_component_volume_fraction": 0.5194
+            }
+          },
+          {
+            "check": "interfaces_resolve",
+            "passed": true,
+            "measured": {
+              "unresolved": []
+            }
+          },
+          {
+            "check": "canonical_topology_preserved",
+            "passed": true,
+            "measured": {
+              "component_count": 7,
+              "interface_count": 1
+            }
+          },
+          {
+            "check": "artifact_identity_chain",
+            "passed": true,
+            "measured": {
+              "generation_id": "gen-1",
+              "geometry_hash": "54e82cc1d030e820"
+            }
+          }
+        ]
+      },
+      "presentation_quality": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "checks": [
+          {
+            "check": "not_flat_slab",
+            "passed": true,
+            "measured": {
+              "height_over_length": 0.4706,
+              "component_count": 8
+            }
+          },
+          {
+            "check": "not_generic_box_pile",
+            "passed": true,
+            "measured": {
+              "component_count": 8,
+              "pure_box_components": 0,
+              "box_ratio": 0.0
+            }
+          },
+          {
+            "check": "family_component_count",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE",
+              "components": 8,
+              "required": 4
+            }
+          },
+          {
+            "check": "family_feature_cell_stack",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE",
+              "found": 1,
+              "required": 1
+            }
+          },
+          {
+            "check": "family_feature_pack_enclosure",
+            "passed": true,
+            "measured": {
+              "family": "ENERGY_STORAGE",
+              "found": 1,
+              "required": 1
+            }
+          }
+        ]
+      },
+      "note": "three separated dimensions \u2014 never combined into one score (R433 section 13); presentation PASS with semantic FAIL is a disclosed failure, never a pass"
+    },
+    "evolution": [
+      {
+        "generation": 1,
+        "invention_id": "inv:8ae08a99c0:gen1",
+        "status": "CURRENT",
+        "status_basis": "state INVENTION_SURVIVED \u00b7 maturity EVIDENCE_SUPPORTED",
+        "why": "the latest recorded architecture generation",
+        "domain_family": "energy",
+        "component_count": 8,
+        "glb": "/api/run/ts_6a1fe8686115/model?gen=1",
+        "glb_sha256": "54e82cc1d030e8203c6a6480fb2b02e93723db14999af930e31c4b089bd36941",
+        "current": true
+      }
+    ],
+    "generation_id": "gen-1",
+    "generation_count": 1
+  },
+  "renders": {
+    "stage": "RENDER",
+    "status": "RENDER_REQUESTED",
+    "job": {
+      "status": "RUNNING",
+      "enqueued_at": "2026-09-28T21:47:55Z",
+      "worker_pid": 4635,
+      "readback": null
+    },
+    "execution": "async artifact job (waits for the run worker to exit, then renders through the quality ladder; poll the CIO visualization.renders)",
+    "note": "DISCOVERY COMPLETE does not mean PRESENTATION RENDER COMPLETE \u2014 the render runs asynchronously after the run's terminal state"
+  },
+  "package_out": {
+    "zip_name": "TECHNOLOGY_TRANSFER_PACKAGE_invui_thermally_induced_cracking_due_to_thermal_631656c16b16d89f4d.zip",
+    "zip_sha256": "cdc1e01c9bd2cfb682244d9328e2d4f95a88623ce1307f168325e116376a7e26",
+    "zip_bytes": 196184,
+    "package_maturity": "EARLY_TECHNICAL_EVALUATION",
+    "visualizability_class": "SYSTEM_3D",
+    "manifest_files": 32,
+    "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE (bridge) \u2014 the ONE canonical technology-transfer artifact for this run, honestly maturity-labeled; distinct from the buyer release chain (Art. IV: no weakened gates)"
+  },
+  "report": {
+    "bridge_version": "2.0.0",
+    "steps": [
+      {
+        "step": "CLASSIFY",
+        "status": "OK",
+        "detail": {
+          "visualizability_class": "SYSTEM_3D",
+          "basis": {
+            "geometry_parameters_sourced": 0,
+            "subsystems_recorded": 4,
+            "physical_site_detected": true,
+            "physical_site_vocabulary": {
+              "n_words": 53,
+              "authority": "discovery_fabric/engine/domains.py (ENGINEERING_DOMAIN_REGISTRY, one authority)",
+              "registry_domains_excluded": [
+                "ml_data"
+              ],
+              "layers_used": [
+                "architecture_blocks",
+                "architecture_blocks_medical",
+                "manufacturing_candidates",
+                "materials_candidates",
+                "disciplines",
+                "domain label",
+                "failure_modes (mode + physical_mechanism)",
+                "manufacturing_routes"
+              ]
+            },
+            "process_signal": false,
+            "algorithmic_signal": false,
+            "intervention_site": "ceramic solid oxide fuel cell",
+            "engineering_min_params": 3,
+            "reason": "4 recorded subsystems and only 0 sourced geometry parameters \u2014 conceptual system-architecture visualization (topology, not dimensions)",
+            "measured_from": [
+              "engineering_specification.parameters",
+              "engineering_specification.engineering_core.critical_parameters",
+              "engineering_specification.system_architecture.subsystems",
+              "final_state.causal_chain"
+            ]
+          }
+        },
+        "at": "2026-09-28T21:47:54Z"
+      },
+      {
+        "step": "GEOMETRY",
+        "status": "OK",
+        "detail": {
+          "visualizability_class": "SYSTEM_3D",
+          "domain_family": "energy",
+          "glb_sha256": "54e82cc1d030e8203c6a6480fb2b02e93723db14999af930e31c4b089bd36941",
+          "components": 8,
+          "quality_gates": true,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "OK",
+              "domain_family": "energy"
+            }
+          ]
+        },
+        "at": "2026-09-28T21:47:55Z"
+      },
+      {
+        "step": "GENERATION_MODELS",
+        "status": "OK",
+        "detail": {
+          "count": 1,
+          "domain_family": "energy"
+        },
+        "at": "2026-09-28T21:47:55Z"
+      },
+      {
+        "step": "PACKAGE",
+        "status": "OK",
+        "detail": {
+          "zip_path": "/app/ENGINE_RUNS/toscanini_ui_ui_thermally_induced_cracking_due_to_thermal_631656/TECHNOLOGY_TRANSFER_PACKAGE_invui_thermally_induced_cracking_due_to_thermal_631656c16b16d89f4d.zip",
+          "zip_sha256": "cdc1e01c9bd2cfb682244d9328e2d4f95a88623ce1307f168325e116376a7e26",
+          "package_maturity": "EARLY_TECHNICAL_EVALUATION",
+          "files": 32,
+          "compiler": "R440_CANONICAL_PACKAGE_COMPILER/1.1"
+        },
+        "at": "2026-09-28T21:47:55Z"
+      },
+      {
+        "step": "CIO_UPDATE",
+        "status": "OK",
+        "detail": {
+          "geometry_present": true,
+          "package_zip": "/api/run/ts_6a1fe8686115/package"
+        },
+        "at": "2026-09-28T21:47:55Z"
+      }
+    ],
+    "outcome": "COMPLETED",
+    "visualizability_class": "SYSTEM_3D"
+  }
+}
