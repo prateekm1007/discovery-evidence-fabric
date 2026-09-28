@@ -147,6 +147,15 @@ Refresh these from live state; do not assume they are unchanged.
   that crosses the full ladder (mechanism diversity → attack →
   contradiction → experiment → adjudication → engineering → reality →
   causal update → technology-transfer package).
+- R547 deploy identity (BS-044, 2026-09-28): a HF Space deploy's
+  `/api/version` engine_commit is a BAKED STRING, not proof of the
+  executing source — a `restart_space()` without `factory_reboot=True`
+  reuses the cached `COPY . .` layer, so the container can run STALE
+  Python while reporting the new commit. Exact-SHA deployment is now
+  gated on a LIVE BEHAVIOR PROBE (a terminal shape the new source
+  answers differently, re-derived through the committed source on the
+  same served record; the two must agree), not on the version string
+  alone. See `BS-044` in the blind-spot register.
 
 ### Recent known lessons
 
