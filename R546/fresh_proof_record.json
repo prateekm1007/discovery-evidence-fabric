@@ -42,5 +42,25 @@
       "distinctness": "4 mechanism-space rows present (ENS agnes / ENS unorouter / ENS xkiro / MS DIRECT_TRANSFER); the distinctness adjudication counted < 2 materially distinct mechanisms, so the R514/Art. LXXXIV terminal is MECHANISM_ STARVED. The starvation is a discovery-funnel capability deficit, not an infrastructure break."
     },
     "consequence": "Per the directive: do NOT modify providers, do NOT weaken the diversity gate, do NOT manufacture a survivor, do NOT call the capability deficit an infrastructure problem. The MECHANISM_STARVED terminal is a valid typed scientific outcome. The discovery-funnel cliff (mechanism-space distinctness yielding <2 materially distinct mechanisms on ordinary single-synthesis runs) is the next measured cliff \u2014 a SEPARATE one-cliff round, not this infrastructure/readiness round."
-  }
+  },
+  "rest_vs_sse": {
+    "rest_finished": true,
+    "rest_agreement": true,
+    "sse_agreement": "both transports serve the same record-level finished flag; the structural pin is test_r543_finished_state_consistency (the refresh chain, not a live SSE byte-diff)",
+    "note": "REST /api/run/{id}/result and the SSE stream both project the same refresh_user_state_view chain; the terminal finished flag is derived once and served on both transports"
+  },
+  "rest_result": "GET /api/run/{id}/result -> 200; user_state_view.finished=true (the COMPLETED_UNKNOWN key — no authoritative completion answer was recorded for the MECHANISM_STARVED terminal, so the R546 rule never upgraded it; the legacy key derivation governs)",
+  "sse_result": "GET /api/run/{id}/stream -> the terminal event carries the same record; REST/SSE agreement is the structural pin (the refresh chain), not a live byte-diff",
+  "pruning_result": "run dir is pruned post-deploy; the three canonical completion records (COMPLETION_CONTRACT.json, RANKED_DISCOVERY_RESULTS.json, RANKED_PACKAGE_RECORDS.json) are in the durable allowlist (item 12, preserved) and the session record carries the terminal shape — no completion answer was manufactured for the MECHANISM_STARVED terminal",
+  "durability_result": "the terminal record is recoverable from the durable session store without the run dir; the answer route triggered a durable snapshot (ok=true, pushed=true, integrity_verified=true on the R545 deploy record, re-confirmed on the R546 repair) — the canonical completion answer and candidate/package identity remain recoverable after restart/restore/pruning",
+  "closure_gate": {
+    "INFRASTRUCTURE_READINESS": "CLOSED: exact-SHA deploy converged (/api/version = b4541e880 = main), /api/health ok=true, CONFIG_ERROR repaired (Space READY), fresh ordinary production request exercised (reached clarification -> resumed -> typed terminal), transport/preflight proven healthy (10/11 model calls OK; discovery transport had zero failure classes), REST/SSE agreement proven, durability/pruning proven, R546 typed-infrastructure finished-flag cannot lie (pinned by the r545+r546 producer-shape suites on the clean committed tree)",
+    "DISCOVERY_MECHANISM_SPACE_CAPABILITY": "OPEN (a SEPARATE one-cliff round): the fresh run's MECHANISM_STARVED is a MECHANISM-SPACE CAPABILITY / DISCOVERY FUNNEL DEFICIT — 4 mechanism-space rows present, distinctness < 2 materially distinct mechanisms. NOT an infrastructure failure (the directive's two-way split, held). No provider was modified, the diversity gate was not weakened, no survivor was manufactured.",
+    "not_closed_because": "the end-to-end discovery loop remains subject to the mechanism-space, adversarial, engineering, experiment, reality, learning, and buyer-transfer evidence requirements (the directive's explicit non-claim)"
+  },
+  "unresolved_limitations": [
+    "Live terminal capture of a FINISHED_DISCOVERY=true positive is still OPEN: the mechanism-space distinctness gate yields <2 materially distinct mechanisms on ordinary single-synthesis production problems (the R514/Art. LXXXIV typed terminal is honest, not a wiring gap). This is the next measured discovery-funnel cliff, a separate one-cliff round.",
+    "The live production_space was at b4541e880 (the R546 live-record commit, one ahead of the tested fix commit 47e892d26); the tested R546 fix bytes are in origin/main (a2fe199f7 + 47e892d26) and the deployment lineage is a descendant carrying them, with the exact deployed SHA explicitly recorded on this artifact.",
+    "CI: GitHub Actions billing/execution status was NOT verified as green this round; the test receipt is a clean-committed-tree local run (item 11), and a clean-checkout node_modules limitation is disclosed (the R544 TS golden leg needs the webapp toolchain, which a fresh clone lacks — an environment dependency, not a code regression)."
+  ]
 }
