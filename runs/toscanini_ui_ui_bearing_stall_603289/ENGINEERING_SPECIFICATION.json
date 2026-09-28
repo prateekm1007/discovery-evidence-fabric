@@ -56,27 +56,33 @@
  "why_this_domain": {
   "domain": "thermal",
   "label": "Thermal management / heat transfer",
-  "canonical_family": "mechanical",
-  "canonical_family_label": "Mechanical & structural systems",
+  "canonical_family": "biomedical",
+  "canonical_family_label": "Biomedical & life-science systems",
   "canonical_family_basis": {
-   "canonical_family": "mechanical",
-   "label": "Mechanical & structural systems",
-   "score": 89,
+   "canonical_family": "biomedical",
+   "label": "Biomedical & life-science systems",
+   "score": 114,
    "min_form_score": 3,
    "score_table": [
     {
      "family": "biomedical",
-     "score": 0,
-     "hits": []
+     "score": 5,
+     "hits": [
+      {
+       "keyword": "stent",
+       "weight": 5,
+       "count": 1
+      }
+     ]
     },
     {
      "family": "thermal",
-     "score": 9,
+     "score": 15,
      "hits": [
       {
        "keyword": "thermal",
        "weight": 3,
-       "count": 3
+       "count": 5
       }
      ]
     },
@@ -97,22 +103,22 @@
     },
     {
      "family": "mechanical",
-     "score": 89,
+     "score": 114,
      "hits": [
       {
        "keyword": "wheel",
        "weight": 2,
-       "count": 10
+       "count": 11
       },
       {
        "keyword": "bearing",
        "weight": 5,
-       "count": 12
+       "count": 16
       },
       {
        "keyword": "suspension",
        "weight": 3,
-       "count": 3
+       "count": 4
       }
      ]
     },
@@ -137,13 +143,20 @@
      "hits": []
     }
    ],
+   "whole_form_basis": {
+    "matched_form_signals": [
+     "stent"
+    ],
+    "rule": "whole-form device identity: the problem's own device/site statement declares an implantable or medical-device form — the application family is biomedical and dominates component-mention keyword scores (the bridge whole-form precedent; deployment words are deliberately excluded: a hospital dashboard stays software_ml)",
+    "keyword_runner_up": "mechanical"
+   },
    "basis": {
     "derived_from": [
      "problem text",
      "intervention site",
      "recorded subsystem names"
     ],
-    "rule": "highest keyword score wins; ties resolve by registry order; below the form threshold the generic family is selected and labeled",
+    "rule": "whole-form device identity layer, then highest keyword score; ties resolve by registry order; below the form threshold the generic family is selected and labeled",
     "authority": "discovery_fabric/engine/domains.py::CANONICAL_DOMAIN_FAMILIES (R445 — the one canonical domain-family vocabulary)",
     "deterministic": true
    }
@@ -201,7 +214,8 @@
     "design_outputs_dependent": [
      "DI-001",
      "DI-002",
-     "DI-006"
+     "DI-006",
+     "DI-007"
     ],
     "failure_modes_that_would_vanish": [
      "FM-DOM-001",
@@ -226,14 +240,19 @@
  },
  "applicability": {
   "artifact": "PROBLEM_CONTEXT_APPLICABILITY",
-  "context_class": "UNKNOWN",
-  "score": 0,
+  "context_class": "MEDICAL_IN_VIVO",
+  "score": 5,
   "min_context_score": 4,
   "score_table": [
    {
     "context_class": "MEDICAL_IN_VIVO",
-    "score": 0,
-    "hits": []
+    "score": 5,
+    "hits": [
+     {
+      "signal": "stent",
+      "weight": 5
+     }
+    ]
    },
    {
     "context_class": "MEDICAL_EX_VIVO",
@@ -256,78 +275,70 @@
     "hits": []
    }
   ],
-  "matched_signals": [],
+  "matched_signals": [
+   {
+    "signal": "stent",
+    "weight": 5
+   }
+  ],
   "basis": "context class selected by deterministic signal score over the canonical problem text (user problem + recorded problem statement + invention mechanism/intervention site); ties resolve by fixed registry order; below the minimum score the honest UNKNOWN class is selected — every downstream requirement becomes UNKNOWN, never a default guess",
   "epistemic_class": "MODEL_DERIVED",
   "deterministic": true,
   "note": "context is separate from domain physics: a catheter is a fluid device as PHYSICS but medical as CONTEXT only when the problem's own text carries medical context signals",
   "requirements": {
    "artifact": "CONTEXT_REQUIREMENTS_PROJECTION",
-   "context_class": "UNKNOWN",
+   "context_class": "MEDICAL_IN_VIVO",
    "buyer_type": {
-    "statement": "UNKNOWN — buyer class not determinable from the canonical problem text",
-    "applicability": "UNKNOWN",
-    "epistemic_class": "UNKNOWN",
-    "basis": "context detection below the minimum score — the honest state is UNKNOWN, never a default buyer guess"
+    "statement": "medical device company (candidate buyer class for an in-vivo medical technology)",
+    "applicability": "APPLICABLE",
+    "epistemic_class": "MODELLED",
+    "basis": "canonical context MEDICAL_IN_VIVO"
    },
    "engineering_capability": [
     {
-     "statement": "UNKNOWN — required engineering capability not determinable without a context decision",
-     "applicability": "UNKNOWN",
-     "epistemic_class": "UNKNOWN",
-     "basis": "context UNKNOWN"
+     "statement": "medical device design engineering with the domain's physics (see engineering specification governing model)",
+     "applicability": "APPLICABLE",
+     "epistemic_class": "MODELLED",
+     "basis": "domain + context composition"
     }
    ],
    "manufacturing_capability": [
     {
-     "statement": "UNKNOWN — required manufacturing capability not determinable without a context decision",
-     "applicability": "UNKNOWN",
-     "epistemic_class": "UNKNOWN",
-     "basis": "context UNKNOWN"
+     "statement": "medical-grade manufacturing (cleanroom assembly, medical extrusion/molding as the device requires) under a certified QMS",
+     "applicability": "APPLICABLE",
+     "epistemic_class": "MODELLED",
+     "basis": "canonical context MEDICAL_IN_VIVO"
+    },
+    {
+     "statement": "sterilization-validation capability",
+     "applicability": "APPLICABLE",
+     "epistemic_class": "MODELLED",
+     "basis": "in-vivo use requires a validated sterilization process (the specific method is UNKNOWN until the design is defined)"
     }
    ],
    "regulatory": {
-    "statement": "UNKNOWN — regulatory applicability not determinable from the canonical problem text",
-    "applicability": "UNKNOWN",
-    "epistemic_class": "UNKNOWN",
-    "basis": "context UNKNOWN: no medical NOT_APPLICABLE statement is claimable either (the context itself is undetermined)"
+    "statement": "medical-device regulatory pathway determination (FDA 510(k)/PMA or market jurisdiction equivalent) with biocompatibility evaluation (ISO 10993) and QMS (ISO 13485)",
+    "applicability": "APPLICABLE",
+    "basis": "the canonical problem context is MEDICAL (patient-contact / clinical use signals in the problem's own text); the pathway ITSELF is UNKNOWN until determined — no pathway is inferred from device class (R370C)",
+    "epistemic_class": "MODELLED"
    },
    "market_channels": [
     {
-     "statement": "UNKNOWN — market channels not determinable without a context decision",
-     "applicability": "UNKNOWN",
-     "epistemic_class": "UNKNOWN",
-     "basis": "context UNKNOWN"
+     "statement": "clinical/hospital market channels",
+     "applicability": "APPLICABLE",
+     "epistemic_class": "MODELLED",
+     "basis": "canonical context MEDICAL_IN_VIVO"
     }
    ],
    "basis": "derived deterministically from the canonical applicability decision (R443 applicability registry v1); every statement carries its own basis and epistemic class; honest states are UNKNOWN/NOT_APPLICABLE/UNSUPPORTED — never a silent default"
   },
-  "domain_content_exclusions": [
-   {
-    "kind": "material",
-    "key": "biocompatible thermal spreader (graphite/AlN)",
-    "applicability_context": "MEDICAL",
-    "reason": "medical-context candidate excluded — canonical problem context is UNKNOWN"
-   },
-   {
-    "kind": "manufacturing",
-    "key": "bonded spreader + encapsulation",
-    "applicability_context": "MEDICAL",
-    "reason": "medical-context candidate excluded — canonical problem context is UNKNOWN"
-   },
-   {
-    "kind": "standard",
-    "key": "IEC 60601-1 (medical electrical equipment safety, thermal)",
-    "applicability_context": "MEDICAL",
-    "reason": "medical-context candidate excluded — canonical problem context is UNKNOWN"
-   }
-  ],
-  "filter_basis": "domain module content filtered by the canonical applicability decision (context UNKNOWN); excluded candidates recorded — never silently dropped, never globally stripped",
+  "domain_content_exclusions": [],
+  "filter_basis": "domain module content filtered by the canonical applicability decision (context MEDICAL_IN_VIVO); excluded candidates recorded — never silently dropped, never globally stripped",
   "canonical_domain": {
    "domain": "thermal",
    "label": "Thermal management / heat transfer",
-   "canonical_family": "mechanical",
-   "canonical_family_label": "Mechanical & structural systems",
+   "canonical_family": "biomedical",
+   "canonical_family_label": "Biomedical & life-science systems",
    "selection": "engineering_specification.why_this_domain (the E21-D phenomena-layer domain decision — physics authority, unchanged by R443; the canonical family resolved per R445 from the problem's own words via domains.py::CANONICAL_DOMAIN_FAMILIES)"
   }
  },
@@ -337,7 +348,7 @@
   "materials science"
  ],
  "system_architecture": {
-  "description": "PROPOSED architecture (no physical system exists): heat source characterization; conduction path / spreader; reject interface; safety limit interlock — realizing: Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design.",
+  "description": "PROPOSED architecture (no physical system exists): heat source characterization; conduction path / spreader; reject interface; safety limit interlock — realizing: Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]",
   "subsystems": [
    {
     "name": "heat source characterization",
@@ -353,22 +364,40 @@
       "contact",
       "control",
       "decouple",
+      "decoupled",
+      "ensuring",
+      "environment",
+      "environmental",
       "field",
+      "force",
       "housing",
       "hybrid",
+      "implement",
       "integrated",
+      "interface",
       "leveraging",
       "lubricant",
       "magnetic",
+      "maintain",
       "mechanical",
+      "mitigating",
+      "operating",
+      "precise",
       "prevent",
       "radial",
       "reaction",
+      "regulation",
+      "remains",
       "replace",
+      "risks",
       "rotor",
       "source",
       "specific",
+      "stable",
       "stall",
+      "suspension",
+      "temperature",
+      "thermal",
       "utilizing",
       "viscosity",
       "wheel"
@@ -389,21 +418,39 @@
       "contact",
       "control",
       "decouple",
+      "decoupled",
+      "ensuring",
+      "environment",
+      "environmental",
       "field",
+      "force",
       "housing",
       "hybrid",
+      "implement",
       "integrated",
+      "interface",
       "leveraging",
       "lubricant",
       "magnetic",
+      "maintain",
       "mechanical",
+      "mitigating",
+      "operating",
+      "precise",
       "prevent",
       "radial",
       "reaction",
+      "regulation",
+      "remains",
       "replace",
+      "risks",
       "rotor",
       "specific",
+      "stable",
       "stall",
+      "suspension",
+      "temperature",
+      "thermal",
       "utilizing",
       "viscosity",
       "wheel"
@@ -424,21 +471,39 @@
       "contact",
       "control",
       "decouple",
+      "decoupled",
+      "ensuring",
+      "environment",
+      "environmental",
       "field",
+      "force",
       "housing",
       "hybrid",
+      "implement",
       "integrated",
+      "interface",
       "leveraging",
       "lubricant",
       "magnetic",
+      "maintain",
       "mechanical",
+      "mitigating",
+      "operating",
+      "precise",
       "prevent",
       "radial",
       "reaction",
+      "regulation",
+      "remains",
       "replace",
+      "risks",
       "rotor",
       "specific",
+      "stable",
       "stall",
+      "suspension",
+      "temperature",
+      "thermal",
       "utilizing",
       "viscosity",
       "wheel"
@@ -459,21 +524,39 @@
       "contact",
       "control",
       "decouple",
+      "decoupled",
+      "ensuring",
+      "environment",
+      "environmental",
       "field",
+      "force",
       "housing",
       "hybrid",
+      "implement",
       "integrated",
+      "interface",
       "leveraging",
       "lubricant",
       "magnetic",
+      "maintain",
       "mechanical",
+      "mitigating",
+      "operating",
+      "precise",
       "prevent",
       "radial",
       "reaction",
+      "regulation",
+      "remains",
       "replace",
+      "risks",
       "rotor",
       "specific",
+      "stable",
       "stall",
+      "suspension",
+      "temperature",
+      "thermal",
       "utilizing",
       "viscosity",
       "wheel"
@@ -483,7 +566,7 @@
   ]
  },
  "mechanism_architecture": {
-  "physical_changes": "PROPOSED: Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design.",
+  "physical_changes": "PROPOSED: Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]",
   "key_physics": "Thermal management / heat transfer governing relations proposed for this invention; SYMBOLIC ONLY until inputs are sourced",
   "status": "MODELLED",
   "source_refs": [
@@ -508,7 +591,7 @@
   {
    "id": "DI-002",
    "input": "Mechanism driver (proposed)",
-   "value": "Integrated radial hybrid magnetic bearing architecture providing contactless suspension via magnetic force fields, as documented in the modeling and analysis of novel integrated radial hybrid magnetic bearings for magnetic bearing reaction wheels.",
+   "value": "Integrated radial hybrid magnetic bearing architecture providing contactless suspension via magnetic force fields, as documented in the modeling and analysis of novel integrated radial hybrid magnetic bearings for magnetic bearing reaction wheels. [TECHNICAL MUTATION: The integrated radial hybrid magnetic bearing architecture operates at a controlled 4.0°C to maximize magnetic field rigidity and prevent contact-bearing stall.] [TECHNICAL MUTATION: The integrated radial hybrid magnetic bearing architecture now operates at a stable 300.0 unit ambient temperature to ensure consistent magnetic field rigidity and predictable rotor dynamics.]",
    "source": "MODELLED (LLM synthesis)",
    "evidence_class": "MODELLED",
    "parent_ids": [
@@ -546,7 +629,7 @@
   {
    "id": "DI-005",
    "input": "Domain design input pattern: ambient and coupling boundary conditions",
-   "value": "invention applicability: NOT_ESTABLISHED (candidate pattern; confirm against the actual use profile)",
+   "value": "invention applicability: TIED via tokens ['ambient']",
    "source": "ENGINEERING_PROPOSED (domain registry pattern)",
    "evidence_class": "ENGINEERING_PROPOSED",
    "parent_ids": [
@@ -559,7 +642,7 @@
   {
    "id": "DI-006",
    "input": "Domain design input pattern: safety temperature ceilings (to be sourced)",
-   "value": "invention applicability: TIED via tokens ['source']",
+   "value": "invention applicability: TIED via tokens ['source', 'temperature']",
    "source": "ENGINEERING_PROPOSED (domain registry pattern)",
    "evidence_class": "ENGINEERING_PROPOSED",
    "parent_ids": [
@@ -570,6 +653,19 @@
   },
   {
    "id": "DI-007",
+   "input": "Regulatory design input: compliance with candidate standard(s) IEC 60601-1 (medical electrical equipment safety, thermal)",
+   "value": "candidate standards from the engineering domain registry; pathway UNKNOWN (per R370C the pathway is never inferred from device class alone); applicability verification is the first engineering action",
+   "source": "ENGINEERING_PROPOSED (domain regulatory pattern)",
+   "evidence_class": "ENGINEERING_PROPOSED",
+   "parent_ids": [
+    "UIN-001"
+   ],
+   "evidence_refs": [],
+   "design_role": "CONTEXT",
+   "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
+  },
+  {
+   "id": "DI-008",
    "input": "Custodied observation: Genome-wide Identification of Structure-Forming Repeats as Principal Sites of Fork Collapse upon ATR Inhibition.",
    "value": "source https://doi.org/10.1016/j.molcel.2018.08.047; content_hash 1ff335f86452202c2a7edfb0d2ad2518cb79fb2139a0d9c45b5714b9c7b31c38",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -584,7 +680,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-008",
+   "id": "DI-009",
    "input": "Custodied observation: Fragile Sites in Cancer: More Than Meets the Eye",
    "value": "source https://doi.org/10.1038/nrc.2017.52; content_hash fa41a417b4314b1a03ff5af16135a2be0932ce92b5edd3b4deca11fd66e44cdd",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -599,7 +695,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-009",
+   "id": "DI-010",
    "input": "Custodied observation: The essential kinase ATR: ensuring faithful duplication of a challenging genome",
    "value": "source https://doi.org/10.1038/nrm.2017.67; content_hash 1dd0bd5642658e9f87fd3174f476ae5bdcac47d404d02217bae7a342759f9e4a",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -614,7 +710,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-010",
+   "id": "DI-011",
    "input": "Custodied observation: TONSOKU prevents the formation of large tandem duplications and restrains ATR–WEE1 checkpoint activation",
    "value": "source https://doi.org/10.1038/s41467-026-70906-1; content_hash 1e9741eaf11fb31aa2a158d528a9478d02c29799e1fec098b8a616eaf0f4c304",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -629,7 +725,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-011",
+   "id": "DI-012",
    "input": "Custodied observation: Active magnetic bearing project for a satellite reaction wheel.",
    "value": "source https://doi.org/10.11606/d.3.2016.tde-19072016-112444; content_hash 3a3c0658f3ae240cd1926102d46cc8f3fab664a38878e2c0208173c1a865a6bd",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -644,7 +740,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-012",
+   "id": "DI-013",
    "input": "Custodied observation: Load-bearing processes in agricultural wheel-soil systems",
    "value": "source https://doi.org/10.18174/206293; content_hash 71ba1cf9546529163d96a0edb72a4fd4d0bdd6b0e41f14d2cb1b6e79e997f158",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -659,7 +755,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-013",
+   "id": "DI-014",
    "input": "Custodied observation: Magnetic Bearing Momentum Wheel",
    "value": "source https://doi.org/10.2514/5.9781600865299.0035.0054; content_hash 0026d0c9542e6d082e6a0229e1a3f0642ac327eadffe746b89a63416bd03a534",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -674,7 +770,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-014",
+   "id": "DI-015",
    "input": "Custodied observation: Modeling and Analysis of Novel Integrated Radial Hybrid Magnetic Bearing for Magnetic Bearing Reaction Wheel",
    "value": "source https://doi.org/10.3901/cjme.2010.05.655; content_hash 55e483b6697e9ca3f21167ec1f22cfd944f944129afa2bbaa989adceff222684",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -689,7 +785,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-015",
+   "id": "DI-016",
    "input": "Custodied observation: Real-time Testing of Satellite Attitude Control With a Reaction Wheel Hardware-In-the-Loop Platform",
    "value": "source https://doi.org/10.48550/arxiv.2508.19164; content_hash be59a2f3f89891c43d4c333e61e6970455d06edc8487bad3d35ab08160938180",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -704,7 +800,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-016",
+   "id": "DI-017",
    "input": "Custodied observation: An exact Ramsey number of large bipartite graphs versus odd wheel",
    "value": "source https://doi.org/10.48550/arxiv.2511.14867; content_hash 1ce99618b085ca814be9e729c6dfbde210c36f82678349659136c6a0168cab0a",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -719,7 +815,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-017",
+   "id": "DI-018",
    "input": "Custodied observation: Temporal Risk on Satellites",
    "value": "source https://doi.org/10.48550/arxiv.2608.20575; content_hash b5b634173f60fecf9e11d8b1bd6e3143a61af10acce3cff263fa3f7872e5a6de",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -734,7 +830,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-018",
+   "id": "DI-019",
    "input": "Custodied observation: The Earth Does not Orbit the Sun. The Structure of Planetary Systems Resembles a Drilling Bit, in which the Star Forms the Diamond Tip and the Planets Act as Ball Bearings within the Grooves. What a Local Observer Perceives as Planetary Rotation Is, in Reality and External Observer, the Forward, Drill-Like Penetration of the Spacetime Fabric by the System Itself, whilst the Planets Remain in a Fixed yet Loosely Seated State within those Grooves via the 1155-Dimensional Tensor Mechanics of the Hamzah Equation.",
    "value": "source https://doi.org/10.5281/zenodo.19375982; content_hash dce635e3282d86245bd33a73a70d57d4f2f094e33ed0d153dfe06c0bb0d461d8",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -749,7 +845,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-019",
+   "id": "DI-020",
    "input": "Custodied observation: The Earth Does not Orbit the Sun.(10).",
    "value": "source https://doi.org/10.5281/zenodo.21360925; content_hash 43b2ac5c8b24b47e7fdbf52399eef6215947546c2859276efe3da848e003ba69",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -764,7 +860,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-020",
+   "id": "DI-021",
    "input": "Custodied observation: Tug activated motorized window covering having an external battery tube",
    "value": "source https://patents.google.com/patent/US11633059B2/en; content_hash 740482b781c472f01f1835020ee13e8cb506f2e90065afe1bb43a47a0c9b00c9",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -779,7 +875,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-021",
+   "id": "DI-022",
    "input": "Custodied observation: Rotorcraft-assisted system and method for launching and retrieving a fixed-wing &hellip;",
    "value": "source https://patents.google.com/patent/US20220066471A1/en; content_hash 0ebc1d90cd7b09ff93188d948f404d3e0187e18e51811eb52731c21fb321771e",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -794,7 +890,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-022",
+   "id": "DI-023",
    "input": "Custodied observation: Towable autogyro having a re-positionable mast",
    "value": "source https://patents.google.com/patent/US9187173B2/en; content_hash f3abc88acfb2b62914aef85b7c58e21da5008fc9d57dc2e602bcacffb89fae64",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -809,7 +905,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-023",
+   "id": "DI-024",
    "input": "Custodied observation: Human review of an image stream for a parking camera system",
    "value": "source https://patents.google.com/patent/US9652666B2/en; content_hash ed86b10ddc378c47fee0c7d41536df7330f3e7bacabf079f2c796e6e1427994c",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -824,7 +920,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-024",
+   "id": "DI-025",
    "input": "Custodied observation: Vehicular video mirror system",
    "value": "source https://patents.google.com/patent/US9783114B2/en; content_hash fba68391334ce2818903cfa92d30a3943af08effb1600de62b941f0dea5fc2fe",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -839,7 +935,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-025",
+   "id": "DI-026",
    "input": "Custodied observation: DINAMIKA RODA PEJAL TORSI (REACTION WHEEL) SEBAGAI KONTROL SIKAP SATELIT MIKRO",
    "value": "source ; content_hash d3701f9ca31cccc2a0d5c65f66dbb71086464f910d0d2af738499db267222f54",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -854,7 +950,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-026",
+   "id": "DI-027",
    "input": "Custodied observation: BEARING MAGNET REACTION WHEEL",
    "value": "source ; content_hash 4ed6721a86d6722d802620ca08de4819a6bc19ca157e1a1caf2e788da3c5be25",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -869,7 +965,7 @@
    "context_note": "context constraint: no compiled design output consumes this input yet; it feeds design rationale and the buyer's constraint set (recorded explicitly, never dropped)"
   },
   {
-   "id": "DI-027",
+   "id": "DI-028",
    "input": "Custodied observation: APLIKASI PERANGKAT LUNAK SISTEM AKUISISI KECEPATAN REACTION WHEEL (SOFTWARE APPLICATION OF REACTION WHEEL SPEED ACQUISITION SYSTEM)/",
    "value": "source ; content_hash fd4ffee33815dc4af728ea81e6034305211c173fe4c3cb25b1e6b6e6640ca5b7",
    "source": "SOURCE_FACT (custodied evidence)",
@@ -890,9 +986,10 @@
    "kind": "architecture_block",
    "parent_ids": [
     "DI-002",
-    "DI-006"
+    "DI-006",
+    "DI-007"
    ],
-   "description": "heat source characterization realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design.",
+   "description": "heat source characterization realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -909,16 +1006,23 @@
      "contact",
      "control",
      "decouple",
+     "decoupled",
+     "ensuring",
+     "environment",
+     "environmental",
      "field",
+     "force",
      "housing",
      "hybrid",
+     "implement",
      "integrated",
+     "interface",
      "leveraging",
      "lubricant",
      "magnetic",
+     "maintain",
      "mechanical",
-     "prevent",
-     "radial"
+     "mitigating"
     ]
    }
   },
@@ -926,9 +1030,10 @@
    "id": "DO-002",
    "kind": "architecture_block",
    "parent_ids": [
-    "DI-002"
+    "DI-002",
+    "DI-007"
    ],
-   "description": "conduction path / spreader realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design.",
+   "description": "conduction path / spreader realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -945,16 +1050,23 @@
      "contact",
      "control",
      "decouple",
+     "decoupled",
+     "ensuring",
+     "environment",
+     "environmental",
      "field",
+     "force",
      "housing",
      "hybrid",
+     "implement",
      "integrated",
+     "interface",
      "leveraging",
      "lubricant",
      "magnetic",
+     "maintain",
      "mechanical",
-     "prevent",
-     "radial"
+     "mitigating"
     ]
    }
   },
@@ -962,9 +1074,10 @@
    "id": "DO-003",
    "kind": "architecture_block",
    "parent_ids": [
-    "DI-002"
+    "DI-002",
+    "DI-007"
    ],
-   "description": "reject interface realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design.",
+   "description": "reject interface realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -981,16 +1094,23 @@
      "contact",
      "control",
      "decouple",
+     "decoupled",
+     "ensuring",
+     "environment",
+     "environmental",
      "field",
+     "force",
      "housing",
      "hybrid",
+     "implement",
      "integrated",
+     "interface",
      "leveraging",
      "lubricant",
      "magnetic",
+     "maintain",
      "mechanical",
-     "prevent",
-     "radial"
+     "mitigating"
     ]
    }
   },
@@ -998,9 +1118,10 @@
    "id": "DO-004",
    "kind": "architecture_block",
    "parent_ids": [
-    "DI-002"
+    "DI-002",
+    "DI-007"
    ],
-   "description": "safety limit interlock realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design.",
+   "description": "safety limit interlock realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "detailed architecture definition"
@@ -1017,16 +1138,23 @@
      "contact",
      "control",
      "decouple",
+     "decoupled",
+     "ensuring",
+     "environment",
+     "environmental",
      "field",
+     "force",
      "housing",
      "hybrid",
+     "implement",
      "integrated",
+     "interface",
      "leveraging",
      "lubricant",
      "magnetic",
+     "maintain",
      "mechanical",
-     "prevent",
-     "radial"
+     "mitigating"
     ]
    }
   },
@@ -1036,9 +1164,10 @@
    "parent_ids": [
     "DO-001",
     "DO-002",
-    "DI-002"
+    "DI-002",
+    "DI-007"
    ],
-   "description": "heat source characterization interfaces with conduction path / spreader: signal/energy/material hand-off for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design.",
+   "description": "heat source characterization interfaces with conduction path / spreader: signal/energy/material hand-off for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -1055,9 +1184,10 @@
    "parent_ids": [
     "DO-002",
     "DO-003",
-    "DI-002"
+    "DI-002",
+    "DI-007"
    ],
-   "description": "conduction path / spreader interfaces with reject interface: signal/energy/material hand-off for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design.",
+   "description": "conduction path / spreader interfaces with reject interface: signal/energy/material hand-off for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -1074,9 +1204,10 @@
    "parent_ids": [
     "DO-003",
     "DO-004",
-    "DI-002"
+    "DI-002",
+    "DI-007"
    ],
-   "description": "reject interface interfaces with safety limit interlock: signal/energy/material hand-off for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design.",
+   "description": "reject interface interfaces with safety limit interlock: signal/energy/material hand-off for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "interface quantification (dimensions, tolerances)"
@@ -1092,9 +1223,10 @@
    "kind": "interface",
    "parent_ids": [
     "DO-001",
-    "DI-002"
+    "DI-002",
+    "DI-007"
    ],
-   "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design.",
+   "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]",
    "status": "CONCEPTUAL",
    "missing_inputs": [
     "connector standards selection",
@@ -1117,9 +1249,10 @@
    "id": "DO-009",
    "kind": "geometry_requirement",
    "parent_ids": [
-    "DI-002"
+    "DI-002",
+    "DI-007"
    ],
-   "description": "Flow/force/signal path geometry realizing the mechanism (Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design.); every dimension is a named design decision with UNKNOWN value",
+   "description": "Flow/force/signal path geometry realizing the mechanism (Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]); every dimension is a named design decision with UNKNOWN value",
    "status": "UNKNOWN",
    "missing_inputs": [
     "all dimensions",
@@ -1270,9 +1403,10 @@
    "kind": "control_logic",
    "parent_ids": [
     "DO-001",
-    "DI-002"
+    "DI-002",
+    "DI-007"
    ],
-   "description": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design.",
+   "description": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]",
    "status": "PROPOSED",
    "missing_inputs": [
     "sensing modality selection",
@@ -1392,12 +1526,13 @@
    "UNKNOWN": 11
   },
   "invention_tie_summary": {
-   "tied_items": 17,
+   "tied_items": 19,
    "total_items": 21,
    "tokens_used": [
     "absence",
     "active",
     "adjudication",
+    "ambient",
     "analysis",
     "architecture",
     "attitude",
@@ -1406,18 +1541,25 @@
     "because",
     "causing",
     "concerning",
+    "consistent",
     "contact",
     "contactless",
     "control",
+    "controlled",
     "couples",
     "decision",
     "decouple",
+    "decoupled",
     "dependence",
     "documented",
     "drift",
     "eliminated",
     "empty",
     "engineering",
+    "ensure",
+    "ensuring",
+    "environment",
+    "environmental",
     "evidence",
     "existence",
     "failure",
@@ -1428,8 +1570,10 @@
     "fusion",
     "housing",
     "hybrid",
+    "implement",
     "instability",
     "integrated",
+    "interface",
     "intermittently",
     "lands",
     "leveraging",
@@ -1438,23 +1582,13 @@
     "lubricant",
     "lubricants",
     "magnetic",
+    "maintain",
+    "maximize",
     "measured",
     "mechanical",
     "mechanism",
-    "modeling",
-    "novel",
-    "outcome",
-    "papers",
-    "phase",
-    "poison",
-    "pooled",
-    "prevent",
-    "problem",
-    "production",
-    "provider",
-    "providing",
-    "query",
-    "radial"
+    "mitigating",
+    "modeling"
    ]
   },
   "contract": "CEO A7: CONCEPTUAL/PROPOSED/UNKNOWN vocabulary; no geometry invented"
@@ -1469,8 +1603,25 @@
   "reject interface definition",
   "safety interlock and cutoff concept"
  ],
- "external_engineering_precedent": [],
+ "external_engineering_precedent": [
+  {
+   "precedent": "IEC 60601-1 (medical electrical equipment safety, thermal)",
+   "class": "EXTERNAL_PRECEDENT_CANDIDATE",
+   "verify_applicability": true
+  }
+ ],
  "bom": [
+  {
+   "item": "biocompatible thermal spreader (graphite/AlN)",
+   "qty": "NOT ESTABLISHED",
+   "description": "domain candidate material (no sourced spec)",
+   "material": "biocompatible thermal spreader (graphite/AlN)",
+   "supplier": "NOT ESTABLISHED",
+   "component_type": "NOT ESTABLISHED",
+   "criticality": "NOT ESTABLISHED",
+   "verification": "applicability verification required",
+   "status": "ENGINEERING_PROPOSED"
+  },
   {
    "item": "copper / aluminum alloys and graphite thermal spreaders",
    "qty": "NOT ESTABLISHED",
@@ -1496,6 +1647,87 @@
  ],
  "materials": [
   {
+   "material": "biocompatible thermal spreader (graphite/AlN)",
+   "component": "domain candidate material",
+   "candidate_material": "biocompatible thermal spreader (graphite/AlN)",
+   "source": "implant electronics thermal practice",
+   "precedent_basis": "implant electronics thermal practice",
+   "verification_required": true,
+   "status": "ENGINEERING_PROPOSED",
+   "verify_applicability": true,
+   "invention_tie": {
+    "invention_tied": true,
+    "matched_tokens": [
+     "active",
+     "ambient",
+     "analysis",
+     "architecture",
+     "bearing",
+     "bearings",
+     "because",
+     "consistent",
+     "contact",
+     "contactless",
+     "control",
+     "controlled",
+     "decouple",
+     "decoupled",
+     "dependence",
+     "documented",
+     "eliminated",
+     "ensure",
+     "ensuring",
+     "environment",
+     "environmental",
+     "field",
+     "force",
+     "friction",
+     "housing",
+     "hybrid",
+     "implement",
+     "integrated",
+     "interface",
+     "leveraging",
+     "liquid",
+     "lubricant",
+     "lubricants",
+     "magnetic",
+     "maintain",
+     "maximize",
+     "mechanical",
+     "mitigating",
+     "modeling",
+     "novel",
+     "operates",
+     "operating",
+     "precise",
+     "predictable",
+     "prevent",
+     "providing",
+     "radial",
+     "reaction",
+     "regulation",
+     "remains",
+     "removing",
+     "replace",
+     "rigidity",
+     "risks",
+     "rotor",
+     "shadowing",
+     "specific",
+     "stable",
+     "stall",
+     "suspension",
+     "temperature",
+     "temperatures",
+     "thermal",
+     "utilizing",
+     "viscosity",
+     "wheel"
+    ]
+   }
+  },
+  {
    "material": "copper / aluminum alloys and graphite thermal spreaders",
    "component": "domain candidate material",
    "candidate_material": "copper / aluminum alloys and graphite thermal spreaders",
@@ -1508,43 +1740,66 @@
     "invention_tied": true,
     "matched_tokens": [
      "active",
+     "ambient",
      "analysis",
      "architecture",
      "bearing",
      "bearings",
      "because",
+     "consistent",
      "contact",
      "contactless",
      "control",
+     "controlled",
      "decouple",
+     "decoupled",
      "dependence",
      "documented",
      "eliminated",
+     "ensure",
+     "ensuring",
+     "environment",
+     "environmental",
      "field",
      "force",
      "friction",
      "housing",
      "hybrid",
+     "implement",
      "integrated",
+     "interface",
      "leveraging",
      "liquid",
      "lubricant",
      "lubricants",
      "magnetic",
+     "maintain",
+     "maximize",
      "mechanical",
+     "mitigating",
      "modeling",
      "novel",
+     "operates",
+     "operating",
+     "precise",
+     "predictable",
      "prevent",
      "providing",
      "radial",
      "reaction",
+     "regulation",
+     "remains",
      "removing",
      "replace",
+     "rigidity",
+     "risks",
      "rotor",
      "shadowing",
      "specific",
+     "stable",
      "stall",
      "suspension",
+     "temperature",
      "temperatures",
      "thermal",
      "utilizing",
@@ -1566,43 +1821,66 @@
     "invention_tied": true,
     "matched_tokens": [
      "active",
+     "ambient",
      "analysis",
      "architecture",
      "bearing",
      "bearings",
      "because",
+     "consistent",
      "contact",
      "contactless",
      "control",
+     "controlled",
      "decouple",
+     "decoupled",
      "dependence",
      "documented",
      "eliminated",
+     "ensure",
+     "ensuring",
+     "environment",
+     "environmental",
      "field",
      "force",
      "friction",
      "housing",
      "hybrid",
+     "implement",
      "integrated",
+     "interface",
      "leveraging",
      "liquid",
      "lubricant",
      "lubricants",
      "magnetic",
+     "maintain",
+     "maximize",
      "mechanical",
+     "mitigating",
      "modeling",
      "novel",
+     "operates",
+     "operating",
+     "precise",
+     "predictable",
      "prevent",
      "providing",
      "radial",
      "reaction",
+     "regulation",
+     "remains",
      "removing",
      "replace",
+     "rigidity",
+     "risks",
      "rotor",
      "shadowing",
      "specific",
+     "stable",
      "stall",
      "suspension",
+     "temperature",
      "temperatures",
      "thermal",
      "utilizing",
@@ -1623,43 +1901,66 @@
      "invention_tied": true,
      "matched_tokens": [
       "active",
+      "ambient",
       "analysis",
       "architecture",
       "bearing",
       "bearings",
       "because",
+      "consistent",
       "contact",
       "contactless",
       "control",
+      "controlled",
       "decouple",
+      "decoupled",
       "dependence",
       "documented",
       "eliminated",
+      "ensure",
+      "ensuring",
+      "environment",
+      "environmental",
       "field",
       "force",
       "friction",
       "housing",
       "hybrid",
+      "implement",
       "integrated",
+      "interface",
       "leveraging",
       "liquid",
       "lubricant",
       "lubricants",
       "magnetic",
+      "maintain",
+      "maximize",
       "mechanical",
+      "mitigating",
       "modeling",
       "novel",
+      "operates",
+      "operating",
+      "precise",
+      "predictable",
       "prevent",
       "providing",
       "radial",
       "reaction",
+      "regulation",
+      "remains",
       "removing",
       "replace",
+      "rigidity",
+      "risks",
       "rotor",
       "shadowing",
       "specific",
+      "stable",
       "stall",
       "suspension",
+      "temperature",
       "temperatures",
       "thermal",
       "utilizing",
@@ -1677,43 +1978,66 @@
      "invention_tied": true,
      "matched_tokens": [
       "active",
+      "ambient",
       "analysis",
       "architecture",
       "bearing",
       "bearings",
       "because",
+      "consistent",
       "contact",
       "contactless",
       "control",
+      "controlled",
       "decouple",
+      "decoupled",
       "dependence",
       "documented",
       "eliminated",
+      "ensure",
+      "ensuring",
+      "environment",
+      "environmental",
       "field",
       "force",
       "friction",
       "housing",
       "hybrid",
+      "implement",
       "integrated",
+      "interface",
       "leveraging",
       "liquid",
       "lubricant",
       "lubricants",
       "magnetic",
+      "maintain",
+      "maximize",
       "mechanical",
+      "mitigating",
       "modeling",
       "novel",
+      "operates",
+      "operating",
+      "precise",
+      "predictable",
       "prevent",
       "providing",
       "radial",
       "reaction",
+      "regulation",
+      "remains",
       "removing",
       "replace",
+      "rigidity",
+      "risks",
       "rotor",
       "shadowing",
       "specific",
+      "stable",
       "stall",
       "suspension",
+      "temperature",
       "temperatures",
       "thermal",
       "utilizing",
@@ -1735,8 +2059,7 @@
    {
     "standard": "IEC 60601-1 (medical electrical equipment safety, thermal)",
     "class": "EXTERNAL_PRECEDENT_CANDIDATE",
-    "verify_applicability": true,
-    "repair_note": "E15-G: imported by the adversarial pass"
+    "verify_applicability": true
    }
   ],
   "status": "NOT_ESTABLISHED",
@@ -1751,7 +2074,7 @@
   "interfaces": [
    {
     "id": "DO-008",
-    "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design.",
+    "description": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]",
     "status": "CONCEPTUAL",
     "detail": [
      {
@@ -2019,7 +2342,7 @@
   },
   "verify_precedent_applicability": {
    "instruction": "every external precedent/standard candidate carries verify_applicability=true; applicability to THIS design is unverified",
-   "count": 0
+   "count": 1
   },
   "open_uncertainties": [
    {
@@ -2245,6 +2568,9 @@
       "mechanism_asserted_concepts": {
        "learned_model": [
         "model"
+       ],
+       "risk_error": [
+        "risk"
        ]
       },
       "assumption_check": {
@@ -2306,6 +2632,9 @@
       "mechanism_asserted_concepts": {
        "learned_model": [
         "model"
+       ],
+       "risk_error": [
+        "risk"
        ]
       },
       "assumption_check": {
@@ -2378,6 +2707,9 @@
       "mechanism_asserted_concepts": {
        "learned_model": [
         "model"
+       ],
+       "risk_error": [
+        "risk"
        ]
       },
       "assumption_check": {
@@ -2425,27 +2757,33 @@
    "why_this_domain": {
     "domain": "thermal",
     "label": "Thermal management / heat transfer",
-    "canonical_family": "mechanical",
-    "canonical_family_label": "Mechanical & structural systems",
+    "canonical_family": "biomedical",
+    "canonical_family_label": "Biomedical & life-science systems",
     "canonical_family_basis": {
-     "canonical_family": "mechanical",
-     "label": "Mechanical & structural systems",
-     "score": 89,
+     "canonical_family": "biomedical",
+     "label": "Biomedical & life-science systems",
+     "score": 114,
      "min_form_score": 3,
      "score_table": [
       {
        "family": "biomedical",
-       "score": 0,
-       "hits": []
+       "score": 5,
+       "hits": [
+        {
+         "keyword": "stent",
+         "weight": 5,
+         "count": 1
+        }
+       ]
       },
       {
        "family": "thermal",
-       "score": 9,
+       "score": 15,
        "hits": [
         {
          "keyword": "thermal",
          "weight": 3,
-         "count": 3
+         "count": 5
         }
        ]
       },
@@ -2466,22 +2804,22 @@
       },
       {
        "family": "mechanical",
-       "score": 89,
+       "score": 114,
        "hits": [
         {
          "keyword": "wheel",
          "weight": 2,
-         "count": 10
+         "count": 11
         },
         {
          "keyword": "bearing",
          "weight": 5,
-         "count": 12
+         "count": 16
         },
         {
          "keyword": "suspension",
          "weight": 3,
-         "count": 3
+         "count": 4
         }
        ]
       },
@@ -2506,13 +2844,20 @@
        "hits": []
       }
      ],
+     "whole_form_basis": {
+      "matched_form_signals": [
+       "stent"
+      ],
+      "rule": "whole-form device identity: the problem's own device/site statement declares an implantable or medical-device form — the application family is biomedical and dominates component-mention keyword scores (the bridge whole-form precedent; deployment words are deliberately excluded: a hospital dashboard stays software_ml)",
+      "keyword_runner_up": "mechanical"
+     },
      "basis": {
       "derived_from": [
        "problem text",
        "intervention site",
        "recorded subsystem names"
       ],
-      "rule": "highest keyword score wins; ties resolve by registry order; below the form threshold the generic family is selected and labeled",
+      "rule": "whole-form device identity layer, then highest keyword score; ties resolve by registry order; below the form threshold the generic family is selected and labeled",
       "authority": "discovery_fabric/engine/domains.py::CANONICAL_DOMAIN_FAMILIES (R445 — the one canonical domain-family vocabulary)",
       "deterministic": true
      }
@@ -2570,7 +2915,8 @@
       "design_outputs_dependent": [
        "DI-001",
        "DI-002",
-       "DI-006"
+       "DI-006",
+       "DI-007"
       ],
       "failure_modes_that_would_vanish": [
        "FM-DOM-001",
@@ -3015,7 +3361,7 @@
   "external_precedent": "domain module Thermal management / heat transfer; standards listed as candidates requiring applicability verification",
   "proposed_design": {
    "input": "single on-orbit test",
-   "mechanism": "Integrated radial hybrid magnetic bearing architecture providing contactless suspension via magnetic force fields, as documented in the modeling and analysis of novel integrated radial hybrid magnetic bearings for magnetic bearing reaction wheels.",
+   "mechanism": "Integrated radial hybrid magnetic bearing architecture providing contactless suspension via magnetic force fields, as documented in the modeling and analysis of novel integrated radial hybrid magnetic bearings for magnetic bearing reaction wheels. [TECHNICAL MUTATION: The integrated radial hybrid magnetic bearing architecture operates at a controlled 4.0°C to maximize magnetic field rigidity and prevent contact-bearing stall.] [TECHNICAL MUTATION: The integrated radial hybrid magnetic bearing architecture now operates at a stable 300.0 unit ambient temperature to ensure consistent magnetic field rigidity and predictable rotor dynamics.]",
    "transformation": "The bearing stall at low temperatures is eliminated because magnetic suspension does not rely on liquid lubricants or mechanical contact, removing the thermal dependence of friction on the shadowing event.",
    "output": "NOT ESTABLISHED (no measured output exists)",
    "component_architecture": "heat source characterization; conduction path / spreader; reject interface; safety limit interlock",
@@ -3071,7 +3417,9 @@
       "temperature",
       "thermal"
      ],
-     "matched_invention_tokens": [],
+     "matched_invention_tokens": [
+      "temperature"
+     ],
      "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
     }
    },
@@ -3098,9 +3446,13 @@
     "content_class": "PHYSICAL_MECHANISM",
     "invention_applicability": {
      "verdict": "TIED",
-     "matched_applicability_signals": [],
+     "matched_applicability_signals": [
+      "interface"
+     ],
      "matched_invention_tokens": [
       "contact",
+      "interface",
+      "temperature",
       "temperatures"
      ],
      "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
@@ -3132,6 +3484,7 @@
      "matched_applicability_signals": [],
      "matched_invention_tokens": [
       "active",
+      "temperature",
       "temperatures"
      ],
      "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
@@ -3163,6 +3516,7 @@
      "matched_applicability_signals": [],
      "matched_invention_tokens": [
       "failure",
+      "temperature",
       "thermal",
       "until"
      ],
@@ -3191,9 +3545,11 @@
     "domain_basis": "Thermal management / heat transfer",
     "content_class": "PHYSICAL_MECHANISM",
     "invention_applicability": {
-     "verdict": "NOT_ESTABLISHED",
+     "verdict": "TIED",
      "matched_applicability_signals": [],
-     "matched_invention_tokens": [],
+     "matched_invention_tokens": [
+      "interface"
+     ],
      "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
     },
     "verification_gap": {
@@ -3341,11 +3697,6 @@
     "binding": "VF-004"
    },
    {
-    "unknown": "acceptance criterion for verification VF-005",
-    "reason": "criterion status ENGINEERING_PROPOSED: no sourced threshold exists; the numeric margin is fixed at pre-registration from the measured baseline",
-    "binding": "VF-005"
-   },
-   {
     "unknown": "acceptance criterion for verification VF-006",
     "reason": "criterion status ENGINEERING_PROPOSED: no sourced threshold exists; the numeric margin is fixed at pre-registration from the measured baseline",
     "binding": "VF-006"
@@ -3407,7 +3758,9 @@
      "temperature",
      "thermal"
     ],
-    "matched_invention_tokens": [],
+    "matched_invention_tokens": [
+     "temperature"
+    ],
     "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
    }
   },
@@ -3434,9 +3787,13 @@
    "content_class": "PHYSICAL_MECHANISM",
    "invention_applicability": {
     "verdict": "TIED",
-    "matched_applicability_signals": [],
+    "matched_applicability_signals": [
+     "interface"
+    ],
     "matched_invention_tokens": [
      "contact",
+     "interface",
+     "temperature",
      "temperatures"
     ],
     "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
@@ -3468,6 +3825,7 @@
     "matched_applicability_signals": [],
     "matched_invention_tokens": [
      "active",
+     "temperature",
      "temperatures"
     ],
     "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
@@ -3499,6 +3857,7 @@
     "matched_applicability_signals": [],
     "matched_invention_tokens": [
      "failure",
+     "temperature",
      "thermal",
      "until"
     ],
@@ -3527,9 +3886,11 @@
    "domain_basis": "Thermal management / heat transfer",
    "content_class": "PHYSICAL_MECHANISM",
    "invention_applicability": {
-    "verdict": "NOT_ESTABLISHED",
+    "verdict": "TIED",
     "matched_applicability_signals": [],
-    "matched_invention_tokens": [],
+    "matched_invention_tokens": [
+     "interface"
+    ],
     "evaluation": "mechanical token match (exact substring); MODEL_DERIVED, recorded for audit"
    },
    "verification_gap": {
@@ -3815,8 +4176,8 @@
      "FM-DOM-002"
     ]
    },
-   "acceptance": "pre-registered decision rule fixed BEFORE the test: the measured effect must exceed the measured baseline under the identical setup by the pre-registration margin; the numeric margin is fixed from the measured baseline at pre-registration (no value is invented here — Art. VIII)",
-   "acceptance_status": "ENGINEERING_PROPOSED"
+   "acceptance": "verify against the cited standard candidate whose vocabulary matches this verification method (standard identity, class and applicability-verification flag recorded in the regulatory block's candidate_standards — EXTERNAL_PRECEDENT_CANDIDATE)",
+   "acceptance_status": "EXTERNAL_PRECEDENT_CANDIDATE"
   },
   {
    "id": "VF-006",
@@ -3926,7 +4287,7 @@
  "design_graph": {
   "counts": {
    "UIN": 1,
-   "DI": 27,
+   "DI": 28,
    "DO": 21,
    "FM": 6,
    "VF": 7,
@@ -3935,7 +4296,7 @@
   "integrity": {
    "passed": true,
    "problems": [],
-   "checked_at": "2026-09-28T13:55:42+00:00Z"
+   "checked_at": "2026-09-28T14:00:10+00:00Z"
   },
   "gaps": [
    {
@@ -3969,31 +4330,40 @@
    "do_parent_di": {
     "DO-001": [
      "DI-002",
-     "DI-006"
+     "DI-006",
+     "DI-007"
     ],
     "DO-002": [
-     "DI-002"
+     "DI-002",
+     "DI-007"
     ],
     "DO-003": [
-     "DI-002"
+     "DI-002",
+     "DI-007"
     ],
     "DO-004": [
-     "DI-002"
+     "DI-002",
+     "DI-007"
     ],
     "DO-005": [
-     "DI-002"
+     "DI-002",
+     "DI-007"
     ],
     "DO-006": [
-     "DI-002"
+     "DI-002",
+     "DI-007"
     ],
     "DO-007": [
-     "DI-002"
+     "DI-002",
+     "DI-007"
     ],
     "DO-008": [
-     "DI-002"
+     "DI-002",
+     "DI-007"
     ],
     "DO-009": [
-     "DI-002"
+     "DI-002",
+     "DI-007"
     ],
     "DO-010": [
      "DI-001"
@@ -4014,7 +4384,8 @@
      "DI-001"
     ],
     "DO-016": [
-     "DI-002"
+     "DI-002",
+     "DI-007"
     ],
     "DO-017": [
      "DI-002"
@@ -4073,125 +4444,131 @@
    {
     "id": "DI-007",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Genome-wide Identification of Structure-Forming Repeats as Principal Sites of Fork Collapse upon ATR Inhibition.",
+    "label": "Regulatory design input: compliance with candidate standard(s) IEC 60601-1 (medical electrical equipment safety, thermal)",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-008",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Fragile Sites in Cancer: More Than Meets the Eye",
+    "label": "Custodied observation: Genome-wide Identification of Structure-Forming Repeats as Principal Sites of Fork Collapse upon ATR Inhibition.",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-009",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: The essential kinase ATR: ensuring faithful duplication of a challenging genome",
+    "label": "Custodied observation: Fragile Sites in Cancer: More Than Meets the Eye",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-010",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: TONSOKU prevents the formation of large tandem duplications and restrains ATR–WEE1 checkpoint activation",
+    "label": "Custodied observation: The essential kinase ATR: ensuring faithful duplication of a challenging genome",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-011",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Active magnetic bearing project for a satellite reaction wheel.",
+    "label": "Custodied observation: TONSOKU prevents the formation of large tandem duplications and restrains ATR–WEE1 checkpoint activation",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-012",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Load-bearing processes in agricultural wheel-soil systems",
+    "label": "Custodied observation: Active magnetic bearing project for a satellite reaction wheel.",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-013",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Magnetic Bearing Momentum Wheel",
+    "label": "Custodied observation: Load-bearing processes in agricultural wheel-soil systems",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-014",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Modeling and Analysis of Novel Integrated Radial Hybrid Magnetic Bearing for Magnetic Bearing Reaction Wheel",
+    "label": "Custodied observation: Magnetic Bearing Momentum Wheel",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-015",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Real-time Testing of Satellite Attitude Control With a Reaction Wheel Hardware-In-the-Loop Platform",
+    "label": "Custodied observation: Modeling and Analysis of Novel Integrated Radial Hybrid Magnetic Bearing for Magnetic Bearing Reaction Wheel",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-016",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: An exact Ramsey number of large bipartite graphs versus odd wheel",
+    "label": "Custodied observation: Real-time Testing of Satellite Attitude Control With a Reaction Wheel Hardware-In-the-Loop Platform",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-017",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Temporal Risk on Satellites",
+    "label": "Custodied observation: An exact Ramsey number of large bipartite graphs versus odd wheel",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-018",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: The Earth Does not Orbit the Sun. The Structure of Planetary Systems Resembles a Drilling Bit, in which the Star Forms the Diamond Tip and the Planets Act as Ball Bearings within the Grooves. What a Local Observer Perceives as Planetary Rotation Is, in Reality and External Observer, the Forward, Drill-Like Penetration of the Spacetime Fabric by the System Itself, whilst the Planets Remain in a Fixed yet Loosely Seated State within those Grooves via the 1155-Dimensional Tensor Mechanics of the Hamzah Equation.",
+    "label": "Custodied observation: Temporal Risk on Satellites",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-019",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: The Earth Does not Orbit the Sun.(10).",
+    "label": "Custodied observation: The Earth Does not Orbit the Sun. The Structure of Planetary Systems Resembles a Drilling Bit, in which the Star Forms the Diamond Tip and the Planets Act as Ball Bearings within the Grooves. What a Local Observer Perceives as Planetary Rotation Is, in Reality and External Observer, the Forward, Drill-Like Penetration of the Spacetime Fabric by the System Itself, whilst the Planets Remain in a Fixed yet Loosely Seated State within those Grooves via the 1155-Dimensional Tensor Mechanics of the Hamzah Equation.",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-020",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Tug activated motorized window covering having an external battery tube",
+    "label": "Custodied observation: The Earth Does not Orbit the Sun.(10).",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-021",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Rotorcraft-assisted system and method for launching and retrieving a fixed-wing &hellip;",
+    "label": "Custodied observation: Tug activated motorized window covering having an external battery tube",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-022",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Towable autogyro having a re-positionable mast",
+    "label": "Custodied observation: Rotorcraft-assisted system and method for launching and retrieving a fixed-wing &hellip;",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-023",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Human review of an image stream for a parking camera system",
+    "label": "Custodied observation: Towable autogyro having a re-positionable mast",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-024",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: Vehicular video mirror system",
+    "label": "Custodied observation: Human review of an image stream for a parking camera system",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-025",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: DINAMIKA RODA PEJAL TORSI (REACTION WHEEL) SEBAGAI KONTROL SIKAP SATELIT MIKRO",
+    "label": "Custodied observation: Vehicular video mirror system",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-026",
     "kind": "DESIGN_INPUT",
-    "label": "Custodied observation: BEARING MAGNET REACTION WHEEL",
+    "label": "Custodied observation: DINAMIKA RODA PEJAL TORSI (REACTION WHEEL) SEBAGAI KONTROL SIKAP SATELIT MIKRO",
     "design_role": "CONTEXT"
    },
    {
     "id": "DI-027",
+    "kind": "DESIGN_INPUT",
+    "label": "Custodied observation: BEARING MAGNET REACTION WHEEL",
+    "design_role": "CONTEXT"
+   },
+   {
+    "id": "DI-028",
     "kind": "DESIGN_INPUT",
     "label": "Custodied observation: APLIKASI PERANGKAT LUNAK SISTEM AKUISISI KECEPATAN REACTION WHEEL (SOFTWARE APPLICATION OF REACTION WHEEL SPEED ACQUISITION SYSTEM)/",
     "design_role": "CONTEXT"
@@ -4199,47 +4576,47 @@
    {
     "id": "DO-001",
     "kind": "DESIGN_OUTPUT",
-    "label": "heat source characterization realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design."
+    "label": "heat source characterization realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]"
    },
    {
     "id": "DO-002",
     "kind": "DESIGN_OUTPUT",
-    "label": "conduction path / spreader realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design."
+    "label": "conduction path / spreader realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]"
    },
    {
     "id": "DO-003",
     "kind": "DESIGN_OUTPUT",
-    "label": "reject interface realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design."
+    "label": "reject interface realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]"
    },
    {
     "id": "DO-004",
     "kind": "DESIGN_OUTPUT",
-    "label": "safety limit interlock realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design."
+    "label": "safety limit interlock realizing Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]"
    },
    {
     "id": "DO-005",
     "kind": "DESIGN_OUTPUT",
-    "label": "heat source characterization interfaces with conduction path / spreader: signal/energy/material hand-off for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design."
+    "label": "heat source characterization interfaces with conduction path / spreader: signal/energy/material hand-off for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]"
    },
    {
     "id": "DO-006",
     "kind": "DESIGN_OUTPUT",
-    "label": "conduction path / spreader interfaces with reject interface: signal/energy/material hand-off for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design."
+    "label": "conduction path / spreader interfaces with reject interface: signal/energy/material hand-off for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]"
    },
    {
     "id": "DO-007",
     "kind": "DESIGN_OUTPUT",
-    "label": "reject interface interfaces with safety limit interlock: signal/energy/material hand-off for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design."
+    "label": "reject interface interfaces with safety limit interlock: signal/energy/material hand-off for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]"
    },
    {
     "id": "DO-008",
     "kind": "DESIGN_OUTPUT",
-    "label": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design."
+    "label": "Device boundaries: patient/fluid inlet and outlet terminations, external control/data port as required by Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]"
    },
    {
     "id": "DO-009",
     "kind": "DESIGN_OUTPUT",
-    "label": "Flow/force/signal path geometry realizing the mechanism (Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design.); every dimension is a named design decision with UNKNOWN value"
+    "label": "Flow/force/signal path geometry realizing the mechanism (Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]); every dimension is a named design decision with UNKNOWN value"
    },
    {
     "id": "DO-010",
@@ -4274,7 +4651,7 @@
    {
     "id": "DO-016",
     "kind": "DESIGN_OUTPUT",
-    "label": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design."
+    "label": "Sensing -> decision -> actuation loop maintaining the mechanism's operating point for Replace the reaction wheel's mechanical contact bearings with an integrated radial hybrid magnetic bearing system, utilizing active magnetic field control to decouple the rotor from the housing and prevent stall due to low-temperature lubricant viscosity changes, leveraging the specific architecture of the integrated radial hybrid design. [TECHNICAL MUTATION: Implement active thermal regulation to maintain the operating environment at 4.0°C, ensuring the suspension force remains stable and the rotor is decoupled from the housing.] [TECHNICAL MUTATION: Implement active thermal regulation to maintain the reaction wheel's bearing interface at 300.0 units, mitigating low-temperature viscosity-induced stall risks through precise environmental control.]"
    },
    {
     "id": "DO-017",
@@ -4375,10 +4752,10 @@
  },
  "_spec_ref": {
   "invention_id": "inv:ui_bearing_stall_603289:64c733dead31",
-  "spec_hash": "5d3b97f27a4702bf3cc799ee2f5ee566d98a2a705f35a24f9b5e9f36ee9b6434",
+  "spec_hash": "e8a16b8d4d21b8f4060100166512f1580d1ddb4791e68f500229318a80bf47ad",
   "final_envelope_hash": "64c733dead31af88ec1bce3e9c7651488a44cd6e1d7b45434c5240608d9ebb1f",
   "run_id": "engrun:ui_bearing_stall_603289:2026-09-28T13:48:09",
-  "built_at": "2026-09-28T13:55:42+00:00Z"
+  "built_at": "2026-09-28T14:00:10+00:00Z"
  },
  "_epistemic_summary": {
   "SOURCE_FACT_fields": [
@@ -6411,8 +6788,8 @@
     ]
    }
   ],
-  "built_at": "2026-09-28T13:55:42+00:00Z",
-  "hash": "70038d42588eeae67678e9e35075be51e96fe2a96dc4817646bf9f003f01076d"
+  "built_at": "2026-09-28T14:00:10+00:00Z",
+  "hash": "e514e5f4cf21c04bea2b99f5a100e5c8f56e97f8be5d93be9659e43d25d5d997"
  },
  "chain_enforcement": {
   "rule": "CEO E15-C: every critical engineering claim carries the 8-role causal chain with provenance-carrying nodes; parameters with value_status UNKNOWN are excluded (an unknown has no engineering reasoning to bind — it is recorded as a gap instead)",
@@ -6422,51 +6799,16 @@
   "violations": [],
   "enforced": true
  },
- "spec_version": 2,
- "repaired_from_hash": "372e7ecd25eb49677053d568eb4ab04da28a754ad5af420c97993d56f43da594",
- "repair_ledger": {
-  "rule": "E15-G: the engineering artifact itself must mutate; cosmetic sentence changes do not pass. Every mutation records before/after node hashes.",
-  "mutations": [
-   {
-    "repair_id": "RP-regulatory_assumption",
-    "attack_target": "regulatory_assumption",
-    "attack_verdict_id": "no candidate standards and no pathway — the regulatory surface is not even enumerated",
-    "mutated_path": "regulatory.candidate_standards",
-    "before_hash": "ff277a667626f92f66ee321759fea342b8493610e5d69493f708eca4ab1d45ac",
-    "after_hash": "5c7b1e62de57b82160e6dc39f662e9ad9ce62d957b620a4d88a7a200a1b62c56",
-    "change_summary": "1 candidate standard(s) imported",
-    "mutation_kind": "STRUCTURAL"
-   }
-  ],
-  "structural_mutation_count": 1,
-  "mutated_paths": [
-   "regulatory.candidate_standards"
-  ],
-  "artifact_mutated": true,
-  "before_artifact_hash": "372e7ecd25eb49677053d568eb4ab04da28a754ad5af420c97993d56f43da594",
-  "after_artifact_hash": "f93a2a4e8822b74a6dec699304c3003fbfecaff82ab6645fb1d1a5b214cc7842",
-  "repaired_at": "2026-09-28T13:55:42+00:00Z",
-  "post_repair_attack": {
-   "overall": "SURVIVED_WITH_UNCERTAINTIES",
-   "counts": {
-    "KILL": 0,
-    "REPAIR": 0,
-    "UNCERTAIN": 2,
-    "SURVIVE": 8
-   },
-   "remaining_repairs": []
-  }
- },
  "engineering_attack_summary": {
-  "attack": "ENGINEERING_ATTACK (E15-F, re-run on the improved candidate R378)",
-  "overall": "NEEDS_REPAIR",
+  "attack": "ENGINEERING_ATTACK (E15-F, re-run on the technically improved candidate R379)",
+  "overall": "SURVIVED_WITH_UNCERTAINTIES",
   "counts": {
    "KILL": 0,
-   "REPAIR": 1,
+   "REPAIR": 0,
    "UNCERTAIN": 2,
-   "SURVIVE": 7
+   "SURVIVE": 8
   },
-  "repaired_to_v2": true,
-  "improvement_mutation_id": "mut:6ffc87fd8b06"
+  "repaired_to_v2": false,
+  "technical_mutation_id": "tmut:16dc60b9356c"
  }
 }
