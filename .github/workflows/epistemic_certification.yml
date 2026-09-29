@@ -138,6 +138,20 @@ jobs:
           pip install -r requirements.txt
           pip install pytest
 
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Verify clean worktree
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "ERROR: Worktree is not clean"
+            git status
+            exit 1
+          fi
+          echo "✅ Worktree clean"
+
       # R537 §F: the artifact-namespace rule is machine-enforced in
       # CI (the directive: no human reviewer is the enforcement
       # mechanism).  The validator classifies the commit's changed
@@ -145,6 +159,14 @@ jobs:
       # BLOCKS the certification.  This runs on every certification
       # path (engine-relevant + dispatch), so a sealed-evidence
       # mutation can never reach a certified commit.
+      #
+      # R549A-2 sequencing fix: this validator step WRITES
+      # R537/R537_ARTIFACT_NAMESPACE_PROOF.json into the worktree
+      # (mode=commit), so it must run AFTER the clean-worktree check
+      # above (which verifies the pushed checkout itself). The
+      # pre-R549A-2 order (validator -> clean check) made the check
+      # fail on the validator's own expected output (run 1170,
+      # f97fe4b39: "modified: R537/R537_ARTIFACT_NAMESPACE_PROOF.json").
       - name: Artifact-namespace validator (R537 §F)
         run: |
           python scripts/validate_artifact_namespace.py --commit
@@ -202,20 +224,6 @@ jobs:
           npm ci --no-audit --no-fund
           NEXT_OUTPUT=export npm run build
           node verify-export.mjs
-
-      - name: Configure git identity
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Verify clean worktree
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "ERROR: Worktree is not clean"
-            git status
-            exit 1
-          fi
-          echo "✅ Worktree clean"
 
       - name: Run P0-2 Post-Scrub Evidence Revalidation
         run: |
