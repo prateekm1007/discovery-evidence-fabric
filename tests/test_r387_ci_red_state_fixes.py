@@ -148,6 +148,51 @@ class TestMarkerRegistration:
         assert AUTHORIZED_MARKER_PATTERN.search(
             "x[REDACTED-TOTALLY-NEW]y") is None
 
+    def test_r451_owner_token_marker_authorized(self):
+        """R548 Round A (CI-CAUSE-2): the R451 C2 typed marker for the
+        tosca_owner session capability tokens is a registered redaction
+        class (provenance: R451/R451_C2_ROUND_RECORD.json §STEP 1) —
+        the G11 HOLD on 138 blobs was this registration gap, not new
+        unauthorized modification."""
+        from epistemic_integrity.historical_artifact_audit import (
+            AUTHORIZED_MARKER_PATTERN, _scan_for_redacted_markers)
+        m = AUTHORIZED_MARKER_PATTERN.search(
+            "tosca_owner=REDACTED-R451-OWNER-TOKEN")
+        assert m is not None
+        all_m, unauth, _ = _scan_for_redacted_markers(
+            b"tosca_owner=REDACTED-R451-OWNER-TOKEN")
+        assert unauth == []
+
+    def test_in_closure_marker_authorized(self):
+        """R548 Round A (CI-CAUSE-2): the R451 C2 closure marker for
+        the full token values its own scan records re-embedded is a
+        registered redaction class (provenance: R451/C2_PRODUCT/
+        CREDENTIAL_REMEDIATION_RECORD.json: 'full values replaced with
+        typed [REDACTED-IN-CLOSURE:*] markers')."""
+        from epistemic_integrity.historical_artifact_audit import (
+            AUTHORIZED_MARKER_PATTERN, _scan_for_redacted_markers)
+        m = AUTHORIZED_MARKER_PATTERN.search(
+            "GITHUB_REMOTE = (\"https://[REDACTED-IN-CLOSURE:GITHUB_PAT]\"")
+        assert m is not None
+        all_m, unauth, _ = _scan_for_redacted_markers(
+            b"[REDACTED-IN-CLOSURE:HF_TOKEN]")
+        assert unauth == []
+
+    def test_r451_marker_registration_did_not_widen_any_other_name(self):
+        """Negative pair for the R548 registrations: a marker NAME that
+        merely RESEMBLES the registered classes (IN-CLOSURE with extra
+        trailing letters, a new R45x token, a bare OWNER-TOKEN) is
+        still unauthorized — registration is name-scoped, never
+        prefix-scoped (the any-marker detector keeps the hole closed)."""
+        from epistemic_integrity.historical_artifact_audit import (
+            _scan_for_redacted_markers)
+        for probe in (b"[REDACTED-IN-CLOSUREX]",
+                      b"[REDACTED-R452-OWNER-TOKEN]",
+                      b"[REDACTED-OWNER-TOKEN]"):
+            _, unauth, _ = _scan_for_redacted_markers(probe)
+            assert unauth, (probe, "this marker must STAY unauthorized")
+
+
 
 # ---------------------------------------------------------------------------
 # G10 — ledger remap

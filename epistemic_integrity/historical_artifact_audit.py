@@ -135,6 +135,30 @@ AUTHORIZED_REDACTION_NAMES = {
     # redaction marker class. The registration is name-scoped: any
     # OTHER unregistered marker still triggers HOLD.
     "TRIGRAM",
+    # R548 Round A (audit 2, CI-CAUSE-2; 2026-09-29): the R451
+    # C2 credential remediation redacted FORWARD (no history rewrite,
+    # Art. XI) with two typed marker classes that the allowlist never
+    # received — the audit's G11 HOLD (138 blobs, scientific
+    # artifacts) was this registration gap, not new unauthorized
+    # modification:
+    #   REDACTED-R451-OWNER-TOKEN — R451's typed marker for the 8
+    #     tosca_owner session capability tokens found in the R444/
+    #     R445/R446 production-run evidence records (R451/
+    #     R451_C2_ROUND_RECORD.json §STEP 1: "Record values replaced
+    #     by the typed marker REDACTED-R451-OWNER-TOKEN");
+    #   REDACTED-IN-CLOSURE — R451's C2 closure marker for the full
+    #     token values its own credential-scan records re-embedded in
+    #     their context fields (R451/C2_PRODUCT/
+    #     CREDENTIAL_REMEDIATION_RECORD.json: "full values replaced
+    #     with typed [REDACTED-IN-CLOSURE:*] markers; records remain
+    #     valid JSON; fingerprints, line numbers, and the fact the
+    #     values were complete live tokens are preserved").
+    # Same registration discipline as TRIGRAM: name-scoped, with
+    # round-record provenance; every OTHER unregistered marker still
+    # triggers HOLD; no path suppression; no change to the hash-field
+    # corruption or incomplete-redaction checks.
+    "R451-OWNER-TOKEN",
+    "IN-CLOSURE",
 }
 
 # Pattern to detect any REDACTED-* marker in content.
