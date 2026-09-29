@@ -1,0 +1,138 @@
+{
+ "schema": "R548_ROUND_RECORD/1.0.0",
+ "round": "R548",
+ "round_phase": "Round A of the external audit response — audit problems 1 (CI + record + tests + dead code) and 4 (duplicate branch) CLOSED, problem 3 PARTIALLY closed (attribution fixed + tested; truncation measurement deferred to Round C); problems 2 and 5 remain (Rounds B/D/E)",
+ "created_at_utc": "2026-09-29T07:23:39Z",
+ "constitution": {
+  "version": "2.10.1",
+  "read_in_full": true,
+  "read_at": "this session, before any edit (2538 lines, four reads)",
+  "articles_exercised": ["LXXI", "LXXXV", "VII", "IX", "XIV", "XXV", "XXVII", "XLII", "LXXXIV", "LXXIII"]
+ },
+ "production_deployment": {
+  "target_sha": "3623140bf9a9788edbbe38a03406847962a7441b",
+  "deployed_sha": "3623140bf9a9788edbbe38a03406847962a7441b",
+  "deploy_id": {
+   "hf_revision_main": "3271810d907ebce927e806428f52cc39867ddedb",
+   "hf_revision_lower_case_package": "47d361103c1b3e4b450f5c27e6156f2a47e30a0a",
+   "method": "scripts/r539_space_deploy.py via r539_deploy_launch.py (case-split staging, round-tree prune, factory reboot)",
+   "source_gate": "PASS — raw-HTTP blob sha match on BOTH case prefixes (toscanini/ + TOSCANINI/) before reboot"
+  },
+  "health_check_result": "GREEN",
+  "drift": "GREEN",
+  "ls_remote_matches": true,
+  "health_evidence": {
+   "measured_at_utc": "2026-09-29T07:22Z",
+   "api_version_engine_commit": "3623140bf9a9788edbbe38a03406847962a7441b",
+   "api_version_constitution_version": "2.10.1",
+   "readiness": {
+    "deployment_drift": "GREEN",
+    "engine_ready": true,
+    "discovery_ready": true,
+    "llm_ready": true,
+    "llm_transport_ready": true,
+    "physics_ready": true,
+    "reality_loop_ready": true
+   },
+   "behavior_gate": "physics_state.live_solver_importable = true — the executing source is the R548 tree (the version string alone is not the proof, BS-044)",
+   "providers_at_probe": {"agnes": "HEALTHY (3 models)", "unorouter": "DEGRADED (5 models)", "localqwen": "UNAVAILABLE (0 models)"}
+  },
+  "blocked_by": null,
+  "what_unblocks": null,
+  "delivery_status": "DELIVERED — all three Art. LXXI conditions measured: ls-remote == target, /api/version engine_commit == target, deployment_drift GREEN"
+ },
+ "ci_status": {
+  "state": "OWNER_BLOCKED",
+  "root_cause": "GITHUB_ACTIONS_BILLING — no GitHub-hosted runner is ever allocated; every job dies at runner assignment with zero steps executed (R548/R548_CI_DIAGNOSIS.json)",
+  "evidence": {
+   "failing_runs": [36501258378, 36475464725, 35218638324],
+   "annotation_verbatim": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings.",
+   "failing_job": "Classify changed paths (R399 W4 tier)",
+   "last_green": "2026-09-13 (lightweight checks)",
+   "consecutive_failures": "~500 runs since 2026-09-14",
+   "standing_since": "R531 (run 36092328764) — the R538 diagnosis measured 100/100 recent runs failing with the same zero-step signature"
+  },
+  "operator_action_required": "GitHub Settings -> Billing & plans (https://github.com/settings/billing): fix the failed payment or raise the Actions spending limit. No code change can fix runner allocation.",
+  "escalation": {
+   "consecutive_rounds_blocked": "R531 through R548 (>= 17 rounds)",
+   "cost": "the 14-gate Epistemic Certification has not executed since 2026-09-14; every push since is CI-UNVERIFIED — this round substitutes measured local batteries (below) and declares the gap rather than passing CI",
+   "first_item_for_next_auditor_report": true
+  },
+  "coder_side_readiness": "local equivalents green — see batteries"
+ },
+ "batteries": {
+  "fast_tier": {
+   "files": ["tests/test_r394_benchmark.py", "tests/test_r396_release_gate.py", "tests/test_r397_physics_stage.py", "tests/test_r399_gates.py", "tests/test_r399_routing_states.py", "tests/test_r548_multi_hypothesis_boundary.py"],
+   "before": "88 passed / 3 failed (2 stale r394 tests of the R513-deleted module + 1 r396 gateway-up failing on Windows only)",
+   "after_round_a_fixes": "90 passed / 0 failed",
+   "with_new_r548_suite": {"passed": 113, "failed": 0, "wall_s": 282}
+  },
+  "suite_198": {
+   "command": "pytest test_r545 + test_r546 + test_r543(x2) + test_r544 + test_r542 + test_r414 + test_r415",
+   "first_measurement_this_round": "197 passed / 1 failed — test_r415 S2-null-data custody read crashed on Windows cp1252 (pre-existing latent defect: the log is written encoding='utf-8' (retrieval_log.py:102), the test read named no encoding; reproducible on the COMMITTED log bytes — the failure class did not originate this round)",
+   "after_fix": "198 passed / 0 failed (wall_s 119)",
+   "disclosure": "prior rounds recorded 198/198 on this suite; the earlier passes are attributed to a locale/UTF-8-mode difference in those shells — unproven, disclosed rather than asserted"
+  },
+  "r548_new_suite": {
+   "file": "tests/test_r548_multi_hypothesis_boundary.py",
+   "before": 0,
+   "after": {"passed": 23, "failed": 0, "wall_s": 1.12},
+   "coverage": ["parser: 3-block parse + field isolation, _N_HYPOTHESES=3 ceiling, custom ceiling, marker-only truncation drop, mid-value truncation keeps only emitted fields, cut field-name never guessed, legacy no-marker fallback, empty/None", "boundary: prompt suffix pins (3 INDEPENDENTLY PARSEABLE / 8-field schema / never pad with rewordings), OPERATOR_INSTANTIATION_MAX_TOKENS=2800 pinned", "adapter e2e: one llm call parses+attributes all 3 blocks, per-block hypothesis_attribution, legacy block-1 top-level fields byte-stable vs attribution[0], min_candidates_required==2, cemetery consulted over EVERY CANDIDATE-state block, LLM-failure typed OPERATOR_INSTANTIATION_FAILED record without crash, legacy single-block still builds", "Art. LXXXIV gate: minimum==2 never lower, starves at n_distinct=1, not at 2, silent on unknown/non-countable", "finished flag: bare COMPLETE/no-answer -> False, positive terminal keeps legacy True, recorded answer overrides residual, source guard exactly one finished-flag COMPLETED_UNKNOWN branch"]
+  },
+  "r394_standalone": {"passed": 26, "note": "2 stale tests of orchestrator.multi_source_discovery (deleted in R513) replaced by retirement pins"},
+  "artifact_namespace": {"mode": "commit", "ok": true, "files_checked": 22, "breaches": 0, "precommit_hook": "PASS (constitution gate + namespace gate both OK)"},
+  "known_preexisting_flake": "tests/test_calibration_v3_regression.py::TestProtocolBeforeResults (unrelated, disclosed)"
+ },
+ "fixes": [
+  {"file": "discovery_fabric/engine/adapters.py", "what": "per-hypothesis attribution: hypothesis_attribution array (index, fields, mechanism, intervention, semantic verdict, candidate_state, candidate_id, cemetery_blocked, distinctness_verdict, retained, support_state per block) + hypothesis_blocks_parsed on the typed attempt record; legacy block-1 top-level fields kept byte-stable", "why": "audit problem 3 — the attempt record read field_blocks[0]/_cands[0] only; blocks 2..N were invisible"},
+  {"file": "discovery_fabric/engine/adapters.py", "what": "field_blocks initialized on every path (~line 1004)", "why": "the LLM-failure path crashed with UnboundLocalError — the honest OPERATOR_INSTANTIATION_FAILED record could never be written (found by this round's adversarial pass; pinned by test)"},
+  {"file": "toscanini/user_state.py", "what": "dead duplicate COMPLETED_UNKNOWN finished-flag branch removed (was byte-identical to the surviving branch)", "why": "audit problem 4; the decision-line elif key == COMPLETED_UNKNOWN at ~line 637 is a DIFFERENT, legitimate chain (decision wording), pinned apart by the source-guard test"},
+  {"file": "discovery_fabric/engine/reality_ingestion.py", "what": "'from TOSCANINI import sessions' -> 'from toscanini import sessions'", "why": "case-sensitive filesystems: was ImportError -> typed fail-closed on Linux; no test pinned the uppercase spelling"},
+  {"file": "tests/conftest.py", "what": "Windows case-tangle shim normalizes the TOSCANINI/toscanini module to ONE instance (name/package/spec + lowercase key mirror)", "why": "duplicate module instances made the r396 gateway-up test fail on Windows only (Linux CI unaffected)"},
+  {"file": "tests/test_r394_benchmark.py", "what": "2 tests of the R513-deleted orchestrator.multi_source_discovery replaced with retirement pins (find_spec None + adapter/stage-order absence)", "why": "the missed tests kept the fast tier red since 2026-09-14; retirement pins fail loudly if the module resurfaces"},
+  {"file": "tests/test_r415_discovery_availability.py", "what": "custody-log read names encoding='utf-8'", "why": "the writer's own encoding; the implicit default read used Windows cp1252 and crashed on the log's valid UTF-8 multibyte content (pre-existing latent defect found by this round's battery)"}
+ ],
+ "audit_problems": {
+  "1_ci_record_tests_dead_code": {
+   "status": "PARTIALLY CLOSED — record + tests + dead code done and pushed; CI itself OWNER_BLOCKED on GitHub billing (operator action above)",
+   "record": "R548/R548_ROUND_RECORD.json + R548/R548_CI_DIAGNOSIS.json + 23-test suite, all in commit 3623140bf"
+  },
+  "2_physics_gates_loosened": {
+   "status": "PENDING Round B",
+   "measured_note": "deployed health today: reality_loop_modules = {reality_ingestion: true, reality_calibration: true, loop_chain: false} while readiness.reality_loop_ready = true — exactly the loosening the audit flagged; the typed module-presence key (f32594a33) is present but the flag semantics still need the Art. VII restoration Round B"
+  },
+  "3_mechanism_space_fix_unmeasured": {
+   "status": "PARTIALLY CLOSED",
+   "attribution": "FIXED + tested (per-block array; legacy block-1 fields byte-stable)",
+   "budget": "OPERATOR_INSTANTIATION_MAX_TOKENS = 2800 UNCHANGED (never tuned) and now PINNED by test; prompt content ~3x the pre-R548 text",
+   "truncation": "UNMEASURED — no raw multi-block LLM responses exist in the repo; the measurement needs usage.completion_tokens vs the 2800 cap on live Round C responses (obligation recorded, not claimed)",
+   "structural_ceiling": "r547 ceiling instrument reports 3 (R548 code path), measured pre-round"
+  },
+  "4_duplicate_completed_unknown_branch": {
+   "status": "CLOSED — dead duplicate removed; guard test pins exactly one finished-flag branch; 23-test suite green"
+  },
+  "5_open": {
+   "r536_cemetery_confirmation_frozen_8": "PENDING Round C",
+   "config_error_503": "PENDING Round C (deployed Space currently HEALTHY; no 503 observed today)",
+   "atria_transport": "PENDING",
+   "physics_domains": "PENDING Round D",
+   "end_to_end_dry_run_then_live": "PENDING Round E",
+   "doc_drift": "PENDING",
+   "known_flake_calibration_v3": "disclosed, unrelated"
+  }
+ },
+ "honest_disclosures": [
+  "No live discovery claims: every R548-suite fixture is synthetic; attack_survivors/buyer_ready/discovery remain unclaimed.",
+  "TOSCANINI_UI/sessions.json working copy contained mojibake (a UTF-8 em-dash served as cp1252: 'â€”') plus test-session entries; the file was restored to HEAD before commit — the implicit-encoding reader/writer in the session store was NOT located this round (sessions.py itself always names encoding='utf-8'); FILED, not fixed.",
+  "The R539 deploy record renders health.agnes as null because it probes providers as a list while the payload serves a dict; live health was measured separately for this record (agnes HEALTHY, 3 models). Cosmetic, FILED.",
+  "localqwen UNAVAILABLE and unorouter DEGRADED at health-probe time — measured facts, not gates.",
+  "Prior-session R548 live attempts (fresh_session_detail*.json) carry pre-fix run records: they predate the per-block attribution shipped in 3623140bf — historical evidence, not post-fix measurements.",
+  "tests/test_r545_typed_terminal_finished.py still documents the pre-R548 'legacy True' prose in one comment but asserts nothing about it — the asserted contract is the new suite's False (comment drift FILED)."
+ ],
+ "next_rounds": {
+  "round_c": "re-run scripts-independent r548_live_runs.py against the deployed 3623140bf — two terminal runs, no 503; capture raw multi-block responses for the truncation measurement (usage.completion_tokens vs 2800) and the R536 cemetery re-confirmation on the frozen 8",
+  "round_b": "restore the physics/reality-loop gate semantics (Art. VII) — loop_chain absent may never read ready",
+  "rounds_d_e": "physics domains breadth, end-to-end dry run then live pass, doc drift"
+ },
+ "reviewer_provenance": "AI_REVIEW"
+}
