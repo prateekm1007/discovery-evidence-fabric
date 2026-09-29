@@ -1,0 +1,71 @@
+{
+ "runs": [
+  {
+   "idx": 1,
+   "sid": "ts_318e08f1ca46",
+   "owner_key": "2562cfbdd5fb42e2be4f02ac3a538bb4",
+   "terminal": true,
+   "answers_sent": 1,
+   "status": "COMPLETE",
+   "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+   "user_state": "COMPLETED_CANDIDATE",
+   "recorded_at_utc": "2026-09-29T08:51:17Z"
+  },
+  {
+   "idx": 2,
+   "sid": "ts_571b21cf0bf8",
+   "owner_key": "cf7fe06df91d46fdafb1315baab709ee",
+   "terminal": true,
+   "answers_sent": 1,
+   "status": "COMPLETE",
+   "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+   "user_state": "COMPLETED_CANDIDATE",
+   "recorded_at_utc": "2026-09-29T08:59:13Z"
+  }
+ ],
+ "all_terminal": true,
+ "recorded_at_utc": "2026-09-29T08:59:14Z",
+ "deployed_sha": "3623140bf9a9788edbbe38a03406847962a7441b",
+ "deployment_identity_check": "/api/version engine_commit == deployed target, drift GREEN, behavior gate live_solver_importable=true (behavior gate proves the executed source)",
+ "no_503": true,
+ "bs042_flag_invariant": {
+  "run1": {
+   "served_finished": false,
+   "committed_recomputed_finished": false,
+   "agree": true,
+   "user_state": "COMPLETED_CANDIDATE",
+   "final_status": "INVENTION_REQUIRES_EXPERIMENT"
+  },
+  "run2": {
+   "served_finished": false,
+   "committed_recomputed_finished": false,
+   "agree": true,
+   "user_state": "COMPLETED_CANDIDATE",
+   "final_status": "INVENTION_REQUIRES_EXPERIMENT"
+  },
+  "note": "the served customer flag equals the committed source recompute on the same record (the R548 audit invariant)"
+ },
+ "clarification_gates": {
+  "run1": "field=desired_outcome, 1 answer",
+  "run2": "field=target_variable, 1 answer",
+  "note": "the deterministic one-question pause (clarification.py, zero LLM) answered via POST /api/run/{id}/answer; each run resumed and completed"
+ },
+ "llm_route_facts": {
+  "provider": "agnes (agnes-3.0-flash) \u2014 the R539 number-1 default",
+  "run1_mechanism_space_latency_ms": 21030,
+  "run2_mechanism_space_latency_ms": "see r548_live_run2.json run_state.model_route"
+ },
+ "truncation_measurement": {
+  "status": "UNMEASURED",
+  "reason": "the raw multi-block LLM response and token usage are NOT exposed on any public surface: the session detail, dossier, run state, CIO and contract endpoints all carry only pruned projections (Art. R394 s15 scrub guard), the engine records latency but not completion token counts (the recorded gap, R458), and the run dir artifacts (where instantiation_attempts + hypothesis_blocks_parsed live) have no file-download API on the Space",
+  "engine_side_gap": "usage recording + a block-parse observability surface is the follow-up that would close this; until then the 2800 cap is only PINNED (test) and live responses are not capturable",
+  "budget_pin": "OPERATOR_INSTANTIATION_MAX_TOKENS=2800 unchanged, test-pinned in the R548 suite"
+ },
+ "per_block_parse_facts": {
+  "status": "NOT REACHABLE from the public API by design",
+  "note": "the live runs exercised the R548 generation boundary end-to-end (2 live terminal runs on the deployed boundary code, one LLM call per MECHANISM_SPACE stage), but the per-block ledger (hypothesis_blocks_parsed / hypothesis_attribution) is observability-only run-dir data; this round proves the boundary WORKS LIVE (no 503, no stall, 21s stage latency), not the block-count distribution"
+ },
+ "parked_sessions_lost": {
+  "note": "the first live-runs attempt (killed by the tool timeout while polling) left two parked clarification sessions ts_87ebb417e89a / ts_ab916d4d3744; their owner keys lived only in the dead process, so the sessions are now unreachable and unrecoverable \u2014 the revised script persists handles to R548/r548_live_handles.json IMMEDIATELY on submit, making this a one-time loss"
+ }
+}
