@@ -1,0 +1,356 @@
+{
+ "attack_version": "independent_attack/3.0.0",
+ "attack_purpose": "post_rank:independent_attack",
+ "candidate_id": "cand:MS:DIRECT_TRANSFER:4afa21d25336",
+ "generator_provider": "agnes",
+ "attacker_provider": "xkiro",
+ "attacker_model": "minimax/minimax-m3:free",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "prompt_hash": "5698729d009116e40ca95ef0c4895a7b9af53d91533e27a4f160154350f2cc8c",
+ "output_hash": "00b93daef23f42ca5e67d3f5fb3b795f89cfc983ca25f73bb383d18ce0eca0e0",
+ "llm_status": "OK",
+ "ring_pin": {
+  "requested": null,
+  "mode": "PRODUCTION_CASCADE",
+  "served_provider": "xkiro",
+  "served_model": "minimax/minimax-m3:free",
+  "pin_status": null,
+  "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+ },
+ "attacked_at": "2026-09-29T08:48:49+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate attributes the warning light to \"localized electrochemical non-uniformity\" and a \"temporary internal resistance spike\" inside the battery cell, but the affected vehicle is a 2015 Toyota Camry, which uses a 12V lead-acid battery and an alternator-driven charging system, not a lithium-ion pack. A 12V flooded lead-acid cell at <0°C does not exhibit meaningful in-plane or through-thickness thermal gradients of the kind described, nor does its internal resistance spike in a way the PCM would misclassify as a charging fault (the 12V charging loop is monitored externally at the alternat",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: charging, driven, electrochemical, gradients)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2015', '12', '12', '0', '12', '2015']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'in temporary internal resistance' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['gradients', 'requires', 'thermal', 'vehicle']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Mechanism: Thermal heterogeneity and spatial temperature gradients within the battery cell cause localized electrochemical non-uniformity, resulting in a temporary internal resistance spike or",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "SURVIVE",
+   "basis": "The boundary clauses (\"Ambient temperatures below 0°C where thermal gradients are most pronounced; requires reliable data transmission from embedded sensors to the vehicle ECU\") are internally consistent with the claimed mechanism. GROUNDED_IN: RECORD \"Boundary conditions: Ambient temperatures below 0°C where thermal gradients are most pronounced; requires reliable data transmission from embedded sensors to the vehicle ECU.\""
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The held evidence bundle is about lithium-ion cells and EV battery housings, not 12V lead-acid automotive batteries or 12V PCM charging diagnostics; the candidate cites these as support for a mechanism applied to a 12V lead-acid Camry system, which is outside the scope of every provided record. GROUNDED_IN: EVIDENCE doi:10.1002/aesr.202500400 \"Lithium‐Ion Cells\" | EVIDENCE doi:10.1002/advs.76228 \"Lithium‐Ion Batteries\" | EVIDENCE doi:10.3390/s26051507 \"Lithium‐Ion Battery Fire Prediction\" | EVIDENCE doi:10.3390/ma19132808 \"Electric Vehicle Battery Housings\" | RECORD \"Device: battery charging s",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1002/aesr.202500400",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['12', '12', '12', '10.1002', '202500400', '10.1002']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1002/aesr.202500400 \"Lithium‐Ion Cells\" | EVIDENCE doi:10.1002/advs.76228 \"Lithium‐Ion Batteries\" | EVIDENCE doi:10.3390/s26051507 \"Lithium‐Ion Battery Fire Prediction\" | EVIDENCE doi:",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The candidate's \"intervention\" (add embedded temperature sensors and a validation gate in the PCM) is strictly additive hardware/software on top of the stock 12V Camry charging system, which is the declared baseline; the stock Camry already routes alternator B+ voltage to the PCM and to the battery warning lamp via the regulator/ELC logic, and the documented cold-idle-only intermittent flash on this vehicle is commonly explained by the alternator's temperature-compensated voltage regulator behavior at low ambient and the lamp's self-test at key-on — not by any need for in-cell thermal sensors.",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: behavior, charging, embedded, gradients)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'allowing the pcm to' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['ambient', 'embedded', 'gradients', 'sensors']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Intervention: Implement embedded temperature sensors in the battery charging system to monitor in-plane and through-thickness temperature gradients, allowing the PCM to distinguish between act",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "RISK",
+   "basis": "Adding an embedded multi-point thermal sensor array into a 12V flooded lead-acid battery pack is mechanically awkward (sealed vs. flooded cell geometry, electrolyte access, venting) and would meaningfully raise cost and complexity, and the candidate's own \"Known failure modes\" already enumerate sensor drift and communication errors; the record accommodates these, so this is risk, not kill. GROUNDED_IN: RECORD \"Known failure modes (claimed by the generator): Sensor drift leading to false 'normal' readings during actual thermal runaway; increased system cost and complexity; potential communicati"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The candidate never specifies the threshold (in °C across the in-plane/through-thickness plane, or in mΩ of \"resistance drift\") below which the PCM should suppress the warning, nor the latency budget for sensor-to-PCM communication relative to the intermittent flash duration; without a defined threshold and a defined response time, the testable prediction is unfalsifiable and the \"diagnostic validation\" reduces to an unstated heuristic. GROUNDED_IN: RECORD \"if the embedded sensors confirm that the internal temperature gradient is below the threshold for significant electrochemical resistance d",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: across, diagnostic, electrochemical, embedded)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'gradient is below the' (field: testable_prediction)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['below', 'embedded', 'sensors']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"if the embedded sensors confirm that the internal temperature gradient is below the threshold for significant electrochemical resistance drift\" — no threshold value, no gradient metric, and no",
+    "absence_ground": false
+   }
+  }
+ ],
+ "intervention_suggestions": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "suggestion": "Replace the lithium-ion cell-internal electrochemistry framing with a 12V lead-acid explanation grounded in the alternator's temperature-compensated regulator and PCM EL logic at cold idle, because the named device is a 2015 Camry with a 12V Pb-A battery, not a Li-ion pack. GROUNDED_IN: RECORD \"2015 Toyota Camry\" + \"Device: battery charging system\" — physics of the actual battery type must be matc",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: charging, lithium, temperature, with)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['12', '2015', '12', '2015']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"2015 Toyota Camry\" + \"Device: battery charging system\" — physics of the actual battery type must be matched to the symptom.",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "suggestion": "Swap the four Li-ion citations for sources covering 12V lead-acid cold-cranking behavior and Toyota Camry 12V charging-system PCM logic so the evidence bundle is chemically and topologically consistent with the named device. GROUNDED_IN: EVIDENCE doi:10.1002/aesr.202500400 \"Lithium‐Ion Cells\" | EVIDENCE doi:10.1002/advs.76228 \"Lithium‐Ion Batteries\" | EVIDENCE doi:10.3390/s26051507 \"Lithium‐Ion Ba",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1002/aesr.202500400",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1002/aesr.202500400 \"Lithium‐Ion Cells\" | EVIDENCE doi:10.1002/advs.76228 \"Lithium‐Ion Batteries\" | EVIDENCE doi:10.3390/s26051507 \"Lithium‐Ion Battery Fire Prediction\" | EVIDENCE doi:",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "suggestion": "Reposition the \"intervention\" as a software-only change in the PCM's existing alternator-voltage interpretation under cold ambient (e.g., a learned temperature-aware threshold on the B+ rail rather than new in-cell hardware), so the candidate actually changes the diagnostic decision logic instead of layering a sensor onto a system that already senses the relevant terminal voltage. GROUNDED_IN: REC",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: charging, diagnostic, sensor, temperature)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'allowing the pcm to' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['ambient', 'thermal']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Baseline (the un-invented standard): battery charging system as currently implemented, doing nothing new\" + \"allowing the PCM to distinguish between actual charging faults and thermal-induced ",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "suggestion": "Quantify the suppression threshold (e.g., °C/cm gradient, mΩ equivalent resistance drift, and PCM sensor-sample period) and define the pass/fail criterion for the testable prediction in °C, mV, and seconds, so the \"below the threshold\" clause becomes a falsifiable bound rather than an unstated heuristic. GROUNDED_IN: RECORD \"if the embedded sensors confirm that the internal temperature gradient is",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: electrochemical, embedded, prediction, sensor)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'gradient is below the' (field: testable_prediction)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['below', 'embedded', 'sensors']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"if the embedded sensors confirm that the internal temperature gradient is below the threshold for significant electrochemical resistance drift\" — currently lacks any numeric threshold, gradien",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate attributes the warning light to \"localized electrochemical non-uniformity\" and a \"temporary internal resistance spike\" inside the battery cell, but the affected vehicle is a 2015 Toyota Camry, which uses a 12V lead-acid battery and an alternator-driven charging system, not a lithium-ion pack. A 12V flooded lead-acid cell at <0°C does not exhibit meaningful in-plane or through-thickness thermal gradients of the kind described, nor does its internal resistance spike in a way the PCM would misclassify as a charging fault (the 12V charging loop is monitored externally at the alternat",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: charging, driven, electrochemical, gradients)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2015', '12', '12', '0', '12', '2015']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'in temporary internal resistance' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['gradients', 'requires', 'thermal', 'vehicle']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Mechanism: Thermal heterogeneity and spatial temperature gradients within the battery cell cause localized electrochemical non-uniformity, resulting in a temporary internal resistance spike or",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The held evidence bundle is about lithium-ion cells and EV battery housings, not 12V lead-acid automotive batteries or 12V PCM charging diagnostics; the candidate cites these as support for a mechanism applied to a 12V lead-acid Camry system, which is outside the scope of every provided record. GROUNDED_IN: EVIDENCE doi:10.1002/aesr.202500400 \"Lithium‐Ion Cells\" | EVIDENCE doi:10.1002/advs.76228 \"Lithium‐Ion Batteries\" | EVIDENCE doi:10.3390/s26051507 \"Lithium‐Ion Battery Fire Prediction\" | EVIDENCE doi:10.3390/ma19132808 \"Electric Vehicle Battery Housings\" | RECORD \"Device: battery charging s",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1002/aesr.202500400",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['12', '12', '12', '10.1002', '202500400', '10.1002']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1002/aesr.202500400 \"Lithium‐Ion Cells\" | EVIDENCE doi:10.1002/advs.76228 \"Lithium‐Ion Batteries\" | EVIDENCE doi:10.3390/s26051507 \"Lithium‐Ion Battery Fire Prediction\" | EVIDENCE doi:",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate's \"intervention\" (add embedded temperature sensors and a validation gate in the PCM) is strictly additive hardware/software on top of the stock 12V Camry charging system, which is the declared baseline; the stock Camry already routes alternator B+ voltage to the PCM and to the battery warning lamp via the regulator/ELC logic, and the documented cold-idle-only intermittent flash on this vehicle is commonly explained by the alternator's temperature-compensated voltage regulator behavior at low ambient and the lamp's self-test at key-on — not by any need for in-cell thermal sensors.",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: behavior, charging, embedded, gradients)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'allowing the pcm to' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['ambient', 'embedded', 'gradients', 'sensors']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Intervention: Implement embedded temperature sensors in the battery charging system to monitor in-plane and through-thickness temperature gradients, allowing the PCM to distinguish between act",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The candidate never specifies the threshold (in °C across the in-plane/through-thickness plane, or in mΩ of \"resistance drift\") below which the PCM should suppress the warning, nor the latency budget for sensor-to-PCM communication relative to the intermittent flash duration; without a defined threshold and a defined response time, the testable prediction is unfalsifiable and the \"diagnostic validation\" reduces to an unstated heuristic. GROUNDED_IN: RECORD \"if the embedded sensors confirm that the internal temperature gradient is below the threshold for significant electrochemical resistance d",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: across, diagnostic, electrochemical, embedded)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'gradient is below the' (field: testable_prediction)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['below', 'embedded', 'sensors']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"if the embedded sensors confirm that the internal temperature gradient is below the threshold for significant electrochemical resistance drift\" — no threshold value, no gradient metric, and no",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 4,
+  "RISK": 1,
+  "SURVIVE": 1,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 0
+ }
+}

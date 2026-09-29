@@ -1,0 +1,3567 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-29T08:49:21+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.0,
+      "weakness_kind": "UNDERIVED",
+      "why_weak": "measured 0.0 < STRONG floor 0.7; underived_flag set (span_support=0.0, evidence_support=0.304) — the quoted span and/or evidence does not contain the mechanism's vocabulary",
+      "mutation_type": "MECHANISM_STRENGTHENING"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:342551410c53",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "68b5c2555636f5c412df95d14da0c60ed94307a7901ad5ca029171c04d268478",
+     "output_hash": "342551410c53b583aca0297af817be761aab508e1c57fefb3afe9123b44a057d",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "Intrinsic thermal instability and thermal heterogeneity accelerate capacity fade and drive localized degradation, elevating the risk of thermal runaway by manifesting in-plane and through-thickness temperature gradients that influence electrochemical behavior.",
+      "INTERVENTION": "Integrate intelligent, multiscale thermal sensing that utilizes surface-mounted and embedded sensors along with indirect diagnostic methods and data-driven prediction techniques to enable proactive thermal management, thereby enhancing the safety, reliability, and efficiency of next-generation LIBs.",
+      "EXPECTED_EFFECT": "The battery warning light will no longer trigger falsely during cold-idle conditions because proactive thermal management accounts for thermal effects on performance and lifetime, preventing transient electrochemical deviations from being misinterpreted as faults.",
+      "FALSIFICATION_TEST": "If implementing multiscale thermal sensing and proactive thermal management fails to eliminate the intermittent battery warning light flash at cold idle below 0C, the hypothesis that thermal heterogeneity and localized degradation drive the fault is falsified.",
+      "MECHANISM_SOURCE_SPAN": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high-energy-density and fast-charging systems.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1002/aesr.202500400",
+      "EXPERIMENT": "Deploy a prototype BMS equipped with embedded sensors and data-driven prediction techniques for proactive thermal management on a 2015 Toyota Camry and compare the incidence of intermittent battery warning light flashes at cold idle (below 0C) against the stock BMS operating without multiscale thermal sensing.",
+      "EXPERIMENT_BASELINE": "stock BMS operating without multiscale thermal sensing",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "The diagnostic system must monitor in-plane and through-thickness temperature gradients to mitigate thermal heterogeneity-induced capacity fade and localized degradation.",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by replacing the unsupported impedance mechanism with a mechanism and intervention that directly reuse the verbatim evidence span's vocabulary regarding thermal heterogeneity and proactive thermal management."
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 10,
+        "shared_terms": [
+         "accelerate",
+         "capacity",
+         "degradation",
+         "drive",
+         "fade",
+         "heterogeneity",
+         "localized",
+         "risk",
+         "runaway",
+         "thermal"
+        ],
+        "span_terms_n": 18,
+        "ratio": 0.556,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 0.556
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)"
+      ],
+      "validated_at": "2026-09-29T08:49:39+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:58f7a6436791",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "f42868dd36f2483877dca8b1d0faa1bd00442503b4d9d8d8d6ec90b206eaf009",
+     "output_hash": "58f7a6436791379379453d52aad741d9bed25c57b59e8e78fcf5f9508983c09d",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "Temperature-dependent electrochemical impedance and internal resistance variability in lithium-ion batteries causes transient voltage drops at cold idle, where thermal heterogeneity accelerates capacity fade and drives localized degradation, leading to the battery warning light flashing.",
+      "INTERVENTION": "Implement a cold-weather diagnostic threshold in the battery management system that compensates voltage readings for low-temperature internal resistance changes, utilizing the system-level diagnostics and control frameworks that link quantitative, stage-specific failure indicators to system-level interventions for intrinsic safety design.",
+      "EXPECTED_EFFECT": "The battery warning light will no longer trigger falsely during cold-idle conditions due to transient voltage drops misinterpreted as charging faults, as the BMS accounts for the temperature-dependent internal resistance changes.",
+      "FALSIFICATION_TEST": "Measure the internal resistance and voltage drop at 0°C and -20°C; if the voltage drop at -20°C is not significantly higher than at 0°C, or if the warning light does not trigger at -20°C idle but does at 0°C, the mechanism is falsified.",
+      "MECHANISM_SOURCE_SPAN": "Temperature-dependent electrochemical impedance and internal resistance variability in lithium-ion batteries causes transient voltage drops at cold idle, where thermal heterogeneity accelerates capacity fade and drives localized degradation",
+      "SOURCE_EVIDENCE_ID": "doi:10.1002/aesr.202500400",
+      "EXPERIMENT": "Compare the battery warning light trigger frequency and internal resistance measurements between the candidate BMS with cold-weather compensation and the standard BMS without compensation during cold-idle conditions below 0C.",
+      "EXPERIMENT_BASELINE": "standard BMS without compensation",
+      "EXPERIMENT_EIG": "1.5",
+      "CONSTRAINT_DERIVED": "The BMS must account for thermal heterogeneity and localized degradation in its voltage compensation algorithm to prevent false triggers at cold idle.",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by deriving the mechanism directly from the thermal heterogeneity and capacity fade vocabulary in the cited evidence, ensuring the span's technical terms are reused in the mechanism and intervention."
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 25,
+        "shared_terms": [
+         "accelerate",
+         "battery",
+         "capacity",
+         "cause",
+         "cold",
+         "degradation",
+         "dependent",
+         "drive",
+         "drop",
+         "electrochemical",
+         "fade",
+         "heterogeneity",
+         "idle",
+         "impedance",
+         "internal",
+         "ion",
+         "lithium",
+         "localized",
+         "resistance",
+         "temperature"
+        ],
+        "span_terms_n": 25,
+        "ratio": 1.0,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 1.0
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)"
+      ],
+      "validated_at": "2026-09-29T08:49:51+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:43a71fe83bcd",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "e27aba512495177805be815c30ba3e1d3c3ab77b21b21ad9682a31cfd92a3edd",
+     "output_hash": "43a71fe83bcd528fd99d74e11b55850e9dcac9b260ef07750b59976f21f5db92",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway, particularly in high-energy-density and fast-charging systems, where in-plane and through-thickness temperature gradients influence electrochemical behavior.",
+      "INTERVENTION": "Implement a cold-weather diagnostic threshold in the BMS that compensates voltage readings for localized degradation and thermal heterogeneity to prevent transient voltage drops from misinterpreting temperature gradients as charging faults.",
+      "EXPECTED_EFFECT": "The battery warning light will no longer trigger falsely during cold-idle conditions due to transient voltage drops associated with thermal heterogeneity and localized degradation.",
+      "FALSIFICATION_TEST": "Measure the battery terminal voltage and internal temperature gradients under cold-idle conditions; if the warning light persists despite voltage remaining within nominal limits and no localized degradation is detected, the mechanism is falsified.",
+      "MECHANISM_SOURCE_SPAN": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1002/aesr.202500400",
+      "EXPERIMENT": "Compare the frequency of intermittent battery warning light flashes in a 2015 Toyota Camry with a BMS that applies the cold-weather compensation for thermal heterogeneity against a baseline BMS using the standard fixed charging current minimum threshold, observing the light's behavior during cold idle.",
+      "EXPERIMENT_BASELINE": "standard fixed charging current minimum threshold",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "The diagnostic threshold must explicitly account for localized degradation and thermal heterogeneity to avoid false positives from transient voltage drops.",
+      "MUTATION_REASON": "This repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-deriving the mechanism directly from the cited evidence span's vocabulary, ensuring the span supports the proposed intervention."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1002/aesr.202500400",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 18,
+        "shared_terms": [
+         "accelerate",
+         "capacity",
+         "charging",
+         "degradation",
+         "density",
+         "drive",
+         "elevate",
+         "energy",
+         "fade",
+         "fast",
+         "heterogeneity",
+         "high",
+         "localized",
+         "particularly",
+         "risk",
+         "runaway",
+         "system",
+         "thermal"
+        ],
+        "span_terms_n": 18,
+        "ratio": 1.0,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 1.0
+      },
+      "reasons": [],
+      "validated_at": "2026-09-29T08:50:02+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:217d1ec27152",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.0,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:43a71fe83bcd",
+       "provider": "agnes",
+       "model": "agnes-3.0-flash",
+       "prompt_hash": "e27aba512495177805be815c30ba3e1d3c3ab77b21b21ad9682a31cfd92a3edd",
+       "output_hash": "43a71fe83bcd528fd99d74e11b55850e9dcac9b260ef07750b59976f21f5db92",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "MECHANISM_STRENGTHENING",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1002/aesr.202500400",
+        "span_verbatim_in_evidence": true,
+        "mutation_changes_candidate": true,
+        "span_derivation": {
+         "n_shared": 18,
+         "shared_terms": [
+          "accelerate",
+          "capacity",
+          "charging",
+          "degradation",
+          "density",
+          "drive",
+          "elevate",
+          "energy",
+          "fade",
+          "fast",
+          "heterogeneity",
+          "high",
+          "localized",
+          "particularly",
+          "risk",
+          "runaway",
+          "system",
+          "thermal"
+         ],
+         "span_terms_n": 18,
+         "ratio": 1.0,
+         "underived": false,
+         "state": "MEASURED",
+         "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+        },
+        "span_derivation_cleared": 1.0
+       },
+       "reasons": [],
+       "validated_at": "2026-09-29T08:50:02+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Temperature-dependent electrochemical impedance and contact resistance variability in battery systems",
+        "after": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway, particularly in high-energy-density and fast-charging systems, where in-plane and through-thickness temperature gradients influence electrochemical behavior."
+       },
+       "intervention": {
+        "before": "Implement a cold-weather diagnostic threshold in the BMS that increases the charging current minimum threshold or compensates voltage readings for low-temperature internal resistance changes at idle",
+        "after": "Implement a cold-weather diagnostic threshold in the BMS that compensates voltage readings for localized degradation and thermal heterogeneity to prevent transient voltage drops from misinterpreting temperature gradients as charging faults."
+       },
+       "mechanism_source_span": {
+        "before": "thermal effects. The",
+        "after": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:collision:adjacent",
+        "con:evidence:doi:10.48550/arxiv.2203.09497",
+        "battery system charging temperature warning documented",
+        "battery system charging temperature warning documented",
+        "battery systems temperature dependent electrochemical impedance",
+        "weather diagnostic charging temperature resistance cold current idle",
+        "weather diagnostic charging temperature resistance cold current idle",
+        "battery compensation warning during charging resistance",
+        "battery compensation warning during charging resistance",
+        "battery system charging temperature warning light",
+        "battery system charging temperature warning light"
+       ],
+       "collision_family_ids": [
+        "PA-FAM-01",
+        "PA-FAM-02",
+        "PA-FAM-03",
+        "PA-FAM-04",
+        "PA-FAM-05",
+        "PA-FAM-06"
+       ],
+       "source_errors": []
+      },
+      "parent_spec_hash": "f99bcbbb182875d8787b060543d2cebf7727978e2daacbf98180bfd2002b8e22",
+      "child_spec_hash": null,
+      "reason": "This repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-deriving the mechanism directly from the cited evidence span's vocabulary, ensuring the span supports the proposed intervention.",
+      "applied_at": "2026-09-29T08:50:02+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-29T08:50:02+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": true,
+       "domain_overlap_terms": [
+        "charging",
+        "cold",
+        "fault",
+        "high",
+        "temperature",
+        "that"
+       ],
+       "entity_retention_vs_problem": 1.0,
+       "resolution": {
+        "state": "RESOLVED_DIFFERENTIATED",
+        "epistemic_class": "SEARCH_RESULT",
+        "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+        "evidence_tier_summary": "CLAIMS:0 ABSTRACT:6 TITLE:0",
+        "per_family": [
+         {
+          "family_id": "PA-FAM-01",
+          "representative": {
+           "patent_id": "CN115485571A",
+           "title": "Apparatus, system, and method for predicting performance of secondary battery",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/CN115485571A/en",
+           "assignee": "['株式会社Lg新能源']",
+           "publication_date": "2022-12-16"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "CN115485571A"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Apparatus, system, and method for predicting performance of secondary battery The present invention relates to an apparatus, system, and method for predicting performance of a secondary battery. The apparatus of the present invention comprises: a current sensor for measuring a discharge current output from the secondary battery during a discharge period in which the &hellip;  ",
+          "adjudicated_text_sha256": "a1876d20f5d0797d3cb428cf3e9efb71c348858bad6be281e63de9e0225a7c70",
+          "coverage": {
+           "coverage_class": "NONE",
+           "mechanism_overlap_terms": [
+            "system"
+           ],
+           "distinguishing_terms_covered": [],
+           "distinguishing_terms_surviving": [
+            "bms",
+            "charging",
+            "cold",
+            "compensate",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "localized",
+            "misinterpreting",
+            "reading",
+            "temperature",
+            "thermal",
+            "threshold",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.0,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-02",
+          "representative": {
+           "patent_id": "WO2014004523A1",
+           "title": "Battery cell with temperature sensor",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/WO2014004523A1/en",
+           "assignee": "['Robert Bosch Gmbh']",
+           "publication_date": "2014-01-03"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "WO2014004523A1"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Battery cell with temperature sensor A battery system in one embodiment includes a first battery cell (114) including a shell encasing a positive electrode (122), a negative electrode (120), and a separator (124) positioned between the positive electrode (122) and the negative electrode (120), and at least one first wireless &hellip;  ",
+          "adjudicated_text_sha256": "6f67e3a039c525b04798e46d3cf20fdbeebaef576f49a50431bb5a435a5b0e09",
+          "coverage": {
+           "coverage_class": "PARTIAL_COVER",
+           "mechanism_overlap_terms": [
+            "system",
+            "temperature"
+           ],
+           "distinguishing_terms_covered": [
+            "temperature"
+           ],
+           "distinguishing_terms_surviving": [
+            "bms",
+            "charging",
+            "cold",
+            "compensate",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "localized",
+            "misinterpreting",
+            "reading",
+            "thermal",
+            "threshold",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.053,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-03",
+          "representative": {
+           "patent_id": "KR20240091328A",
+           "title": "Ultra-high-performance battery module with operating temperature and pressure &hellip;",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/KR20240091328A/en",
+           "assignee": "['하이드로-퀘벡']",
+           "publication_date": "2024-06-21"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "KR20240091328A"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Ultra-high-performance battery module with operating temperature and pressure &hellip; A system and method for managing the operating temperature and pressure of a battery are disclosed. The cells of the battery are housed in cylindrical modules, into which a heat transfer fluid under pressure and at a given temperature circulates. The fluid unit has a return reservoir that collects &hellip;  ",
+          "adjudicated_text_sha256": "f4e413cc234ef5b5e4c2c38bac10b738667aafa19c883e517e9dcdf4fce4737f",
+          "coverage": {
+           "coverage_class": "PARTIAL_COVER",
+           "mechanism_overlap_terms": [
+            "system",
+            "temperature"
+           ],
+           "distinguishing_terms_covered": [
+            "temperature"
+           ],
+           "distinguishing_terms_surviving": [
+            "bms",
+            "charging",
+            "cold",
+            "compensate",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "localized",
+            "misinterpreting",
+            "reading",
+            "thermal",
+            "threshold",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.053,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-04",
+          "representative": {
+           "patent_id": "CN107749444B",
+           "title": "Battery module and method for monitoring a battery module",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/CN107749444B/en",
+           "assignee": "['罗伯特·博世有限公司']",
+           "publication_date": "2021-12-31"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "CN107749444B"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Battery module and method for monitoring a battery module The present invention discloses a battery pack module and a method for monitoring the battery pack module. The present invention relates to a battery pack module comprising a plurality of battery pack cells and a plurality of temperature sensors. Thereby, several temperature sensors are &hellip;  ",
+          "adjudicated_text_sha256": "aeb1ad5edec2f93207970a6d97f613b88999a4b311a5a5c113590cab36ac12ab",
+          "coverage": {
+           "coverage_class": "NONE",
+           "mechanism_overlap_terms": [
+            "temperature"
+           ],
+           "distinguishing_terms_covered": [
+            "temperature"
+           ],
+           "distinguishing_terms_surviving": [
+            "bms",
+            "charging",
+            "cold",
+            "compensate",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "localized",
+            "misinterpreting",
+            "reading",
+            "thermal",
+            "threshold",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.053,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-05",
+          "representative": {
+           "patent_id": "CN116039380B",
+           "title": "A battery pack information collection system based on terminal control",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/CN116039380B/en",
+           "assignee": "['安徽国轩象铝科技有限公司']",
+           "publication_date": "2025-03-04"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "CN116039380B"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "A battery pack information collection system based on terminal control The present invention discloses a battery pack information acquisition system based on terminal control; the system comprises a main control module, the main control module is electrically connected to a data processing module, the data processing module is electrically connected to a BMS &hellip;  ",
+          "adjudicated_text_sha256": "442ff5ba49e6d02f28d6e563296bd76eadc93724b243532ac25fa4f0c3e32f13",
+          "coverage": {
+           "coverage_class": "NONE",
+           "mechanism_overlap_terms": [
+            "system"
+           ],
+           "distinguishing_terms_covered": [
+            "bms"
+           ],
+           "distinguishing_terms_surviving": [
+            "charging",
+            "cold",
+            "compensate",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "localized",
+            "misinterpreting",
+            "reading",
+            "temperature",
+            "thermal",
+            "threshold",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.053,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-06",
+          "representative": {
+           "patent_id": "CN113904005B",
+           "title": "Online measurement of anode potential for maximizing charging power at low &hellip;",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/CN113904005B/en",
+           "assignee": "['三星Sdi株式会社']",
+           "publication_date": "2024-10-11"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "CN113904005B"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Online measurement of anode potential for maximizing charging power at low &hellip; The present invention relates to a battery system which allows an optimized charging process, in particular a charging process in which the charging power is maximized when the battery system is in a low temperature environment. The battery system is equipped with a plurality of battery cells, &hellip;  ",
+          "adjudicated_text_sha256": "5824d165ee47cca71de5d27d18036a6fe77fa48558b6a386517ebca4c5d2cc37",
+          "coverage": {
+           "coverage_class": "PARTIAL_COVER",
+           "mechanism_overlap_terms": [
+            "charging",
+            "system",
+            "temperature"
+           ],
+           "distinguishing_terms_covered": [
+            "charging",
+            "temperature"
+           ],
+           "distinguishing_terms_surviving": [
+            "bms",
+            "cold",
+            "compensate",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "localized",
+            "misinterpreting",
+            "reading",
+            "thermal",
+            "threshold",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.105,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         }
+        ],
+        "n_families": 6,
+        "n_search_errors": 0,
+        "search_errors": [],
+        "search_execution": {
+         "mandatory_complete": true,
+         "n_errors": 0,
+         "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+        },
+        "relevance_model_version": "collision_resolution/2.0.0",
+        "determinism_contract": {
+         "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+         "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+        },
+        "thresholds": {
+         "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+          "value": 3,
+          "epistemic_class": "ENGINEERING",
+          "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+          "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+         },
+         "MIN_MECHANISM_OVERLAP": {
+          "value": 2,
+          "epistemic_class": "ENGINEERING",
+          "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+          "uncertainty": "term overlap is a proxy for mechanism identity"
+         },
+         "ANTICIPATION_COVERAGE_RATIO": {
+          "value": 0.8,
+          "epistemic_class": "ENGINEERING",
+          "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+          "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+         },
+         "MAX_QUERY_TERMS": {
+          "value": 6,
+          "epistemic_class": "ENGINEERING",
+          "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+         },
+         "ABSTRACT_TIER_MIN_CHARS": {
+          "value": 80,
+          "epistemic_class": "ENGINEERING",
+          "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+         }
+        },
+        "surviving_differentiators": [
+         "bms",
+         "charging",
+         "cold",
+         "compensate",
+         "degradation",
+         "diagnostic",
+         "drop",
+         "fault",
+         "gradient",
+         "heterogeneity",
+         "localized",
+         "misinterpreting",
+         "reading",
+         "temperature",
+         "thermal",
+         "threshold",
+         "transient",
+         "voltage",
+         "weather"
+        ]
+       },
+       "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+       "cached_family_ids": [
+        "PA-FAM-01",
+        "PA-FAM-02",
+        "PA-FAM-03",
+        "PA-FAM-04",
+        "PA-FAM-05",
+        "PA-FAM-06"
+       ]
+      },
+      "prior_art_status": "RESOLVED_DIFFERENTIATED",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.487,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": 0.842,
+        "state": "MEASURED"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": 0.994,
+        "state": "MEASURED"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.798,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.7
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.0 -> 0.487 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-29T08:50:02+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:217d1ec27152",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.0,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:43a71fe83bcd",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "e27aba512495177805be815c30ba3e1d3c3ab77b21b21ad9682a31cfd92a3edd",
+     "output_hash": "43a71fe83bcd528fd99d74e11b55850e9dcac9b260ef07750b59976f21f5db92",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1002/aesr.202500400",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 18,
+       "shared_terms": [
+        "accelerate",
+        "capacity",
+        "charging",
+        "degradation",
+        "density",
+        "drive",
+        "elevate",
+        "energy",
+        "fade",
+        "fast",
+        "heterogeneity",
+        "high",
+        "localized",
+        "particularly",
+        "risk",
+        "runaway",
+        "system",
+        "thermal"
+       ],
+       "span_terms_n": 18,
+       "ratio": 1.0,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 1.0
+     },
+     "reasons": [],
+     "validated_at": "2026-09-29T08:50:02+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Temperature-dependent electrochemical impedance and contact resistance variability in battery systems",
+      "after": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway, particularly in high-energy-density and fast-charging systems, where in-plane and through-thickness temperature gradients influence electrochemical behavior."
+     },
+     "intervention": {
+      "before": "Implement a cold-weather diagnostic threshold in the BMS that increases the charging current minimum threshold or compensates voltage readings for low-temperature internal resistance changes at idle",
+      "after": "Implement a cold-weather diagnostic threshold in the BMS that compensates voltage readings for localized degradation and thermal heterogeneity to prevent transient voltage drops from misinterpreting temperature gradients as charging faults."
+     },
+     "mechanism_source_span": {
+      "before": "thermal effects. The",
+      "after": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:collision:adjacent",
+      "con:evidence:doi:10.48550/arxiv.2203.09497",
+      "battery system charging temperature warning documented",
+      "battery system charging temperature warning documented",
+      "battery systems temperature dependent electrochemical impedance",
+      "weather diagnostic charging temperature resistance cold current idle",
+      "weather diagnostic charging temperature resistance cold current idle",
+      "battery compensation warning during charging resistance",
+      "battery compensation warning during charging resistance",
+      "battery system charging temperature warning light",
+      "battery system charging temperature warning light"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05",
+      "PA-FAM-06"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "f99bcbbb182875d8787b060543d2cebf7727978e2daacbf98180bfd2002b8e22",
+    "child_spec_hash": null,
+    "reason": "This repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-deriving the mechanism directly from the cited evidence span's vocabulary, ensuring the span supports the proposed intervention.",
+    "applied_at": "2026-09-29T08:50:02+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-29T08:50:02+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": true,
+     "domain_overlap_terms": [
+      "charging",
+      "cold",
+      "fault",
+      "high",
+      "temperature",
+      "that"
+     ],
+     "entity_retention_vs_problem": 1.0,
+     "resolution": {
+      "state": "RESOLVED_DIFFERENTIATED",
+      "epistemic_class": "SEARCH_RESULT",
+      "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+      "evidence_tier_summary": "CLAIMS:0 ABSTRACT:6 TITLE:0",
+      "per_family": [
+       {
+        "family_id": "PA-FAM-01",
+        "representative": {
+         "patent_id": "CN115485571A",
+         "title": "Apparatus, system, and method for predicting performance of secondary battery",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/CN115485571A/en",
+         "assignee": "['株式会社Lg新能源']",
+         "publication_date": "2022-12-16"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN115485571A"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Apparatus, system, and method for predicting performance of secondary battery The present invention relates to an apparatus, system, and method for predicting performance of a secondary battery. The apparatus of the present invention comprises: a current sensor for measuring a discharge current output from the secondary battery during a discharge period in which the &hellip;  ",
+        "adjudicated_text_sha256": "a1876d20f5d0797d3cb428cf3e9efb71c348858bad6be281e63de9e0225a7c70",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [
+          "system"
+         ],
+         "distinguishing_terms_covered": [],
+         "distinguishing_terms_surviving": [
+          "bms",
+          "charging",
+          "cold",
+          "compensate",
+          "degradation",
+          "diagnostic",
+          "drop",
+          "fault",
+          "gradient",
+          "heterogeneity",
+          "localized",
+          "misinterpreting",
+          "reading",
+          "temperature",
+          "thermal",
+          "threshold",
+          "transient",
+          "voltage",
+          "weather"
+         ],
+         "coverage_ratio": 0.0,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-02",
+        "representative": {
+         "patent_id": "WO2014004523A1",
+         "title": "Battery cell with temperature sensor",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/WO2014004523A1/en",
+         "assignee": "['Robert Bosch Gmbh']",
+         "publication_date": "2014-01-03"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "WO2014004523A1"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Battery cell with temperature sensor A battery system in one embodiment includes a first battery cell (114) including a shell encasing a positive electrode (122), a negative electrode (120), and a separator (124) positioned between the positive electrode (122) and the negative electrode (120), and at least one first wireless &hellip;  ",
+        "adjudicated_text_sha256": "6f67e3a039c525b04798e46d3cf20fdbeebaef576f49a50431bb5a435a5b0e09",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "system",
+          "temperature"
+         ],
+         "distinguishing_terms_covered": [
+          "temperature"
+         ],
+         "distinguishing_terms_surviving": [
+          "bms",
+          "charging",
+          "cold",
+          "compensate",
+          "degradation",
+          "diagnostic",
+          "drop",
+          "fault",
+          "gradient",
+          "heterogeneity",
+          "localized",
+          "misinterpreting",
+          "reading",
+          "thermal",
+          "threshold",
+          "transient",
+          "voltage",
+          "weather"
+         ],
+         "coverage_ratio": 0.053,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-03",
+        "representative": {
+         "patent_id": "KR20240091328A",
+         "title": "Ultra-high-performance battery module with operating temperature and pressure &hellip;",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/KR20240091328A/en",
+         "assignee": "['하이드로-퀘벡']",
+         "publication_date": "2024-06-21"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "KR20240091328A"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Ultra-high-performance battery module with operating temperature and pressure &hellip; A system and method for managing the operating temperature and pressure of a battery are disclosed. The cells of the battery are housed in cylindrical modules, into which a heat transfer fluid under pressure and at a given temperature circulates. The fluid unit has a return reservoir that collects &hellip;  ",
+        "adjudicated_text_sha256": "f4e413cc234ef5b5e4c2c38bac10b738667aafa19c883e517e9dcdf4fce4737f",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "system",
+          "temperature"
+         ],
+         "distinguishing_terms_covered": [
+          "temperature"
+         ],
+         "distinguishing_terms_surviving": [
+          "bms",
+          "charging",
+          "cold",
+          "compensate",
+          "degradation",
+          "diagnostic",
+          "drop",
+          "fault",
+          "gradient",
+          "heterogeneity",
+          "localized",
+          "misinterpreting",
+          "reading",
+          "thermal",
+          "threshold",
+          "transient",
+          "voltage",
+          "weather"
+         ],
+         "coverage_ratio": 0.053,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-04",
+        "representative": {
+         "patent_id": "CN107749444B",
+         "title": "Battery module and method for monitoring a battery module",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/CN107749444B/en",
+         "assignee": "['罗伯特·博世有限公司']",
+         "publication_date": "2021-12-31"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN107749444B"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Battery module and method for monitoring a battery module The present invention discloses a battery pack module and a method for monitoring the battery pack module. The present invention relates to a battery pack module comprising a plurality of battery pack cells and a plurality of temperature sensors. Thereby, several temperature sensors are &hellip;  ",
+        "adjudicated_text_sha256": "aeb1ad5edec2f93207970a6d97f613b88999a4b311a5a5c113590cab36ac12ab",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [
+          "temperature"
+         ],
+         "distinguishing_terms_covered": [
+          "temperature"
+         ],
+         "distinguishing_terms_surviving": [
+          "bms",
+          "charging",
+          "cold",
+          "compensate",
+          "degradation",
+          "diagnostic",
+          "drop",
+          "fault",
+          "gradient",
+          "heterogeneity",
+          "localized",
+          "misinterpreting",
+          "reading",
+          "thermal",
+          "threshold",
+          "transient",
+          "voltage",
+          "weather"
+         ],
+         "coverage_ratio": 0.053,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-05",
+        "representative": {
+         "patent_id": "CN116039380B",
+         "title": "A battery pack information collection system based on terminal control",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/CN116039380B/en",
+         "assignee": "['安徽国轩象铝科技有限公司']",
+         "publication_date": "2025-03-04"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN116039380B"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "A battery pack information collection system based on terminal control The present invention discloses a battery pack information acquisition system based on terminal control; the system comprises a main control module, the main control module is electrically connected to a data processing module, the data processing module is electrically connected to a BMS &hellip;  ",
+        "adjudicated_text_sha256": "442ff5ba49e6d02f28d6e563296bd76eadc93724b243532ac25fa4f0c3e32f13",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [
+          "system"
+         ],
+         "distinguishing_terms_covered": [
+          "bms"
+         ],
+         "distinguishing_terms_surviving": [
+          "charging",
+          "cold",
+          "compensate",
+          "degradation",
+          "diagnostic",
+          "drop",
+          "fault",
+          "gradient",
+          "heterogeneity",
+          "localized",
+          "misinterpreting",
+          "reading",
+          "temperature",
+          "thermal",
+          "threshold",
+          "transient",
+          "voltage",
+          "weather"
+         ],
+         "coverage_ratio": 0.053,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-06",
+        "representative": {
+         "patent_id": "CN113904005B",
+         "title": "Online measurement of anode potential for maximizing charging power at low &hellip;",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/CN113904005B/en",
+         "assignee": "['三星Sdi株式会社']",
+         "publication_date": "2024-10-11"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN113904005B"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Online measurement of anode potential for maximizing charging power at low &hellip; The present invention relates to a battery system which allows an optimized charging process, in particular a charging process in which the charging power is maximized when the battery system is in a low temperature environment. The battery system is equipped with a plurality of battery cells, &hellip;  ",
+        "adjudicated_text_sha256": "5824d165ee47cca71de5d27d18036a6fe77fa48558b6a386517ebca4c5d2cc37",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "charging",
+          "system",
+          "temperature"
+         ],
+         "distinguishing_terms_covered": [
+          "charging",
+          "temperature"
+         ],
+         "distinguishing_terms_surviving": [
+          "bms",
+          "cold",
+          "compensate",
+          "degradation",
+          "diagnostic",
+          "drop",
+          "fault",
+          "gradient",
+          "heterogeneity",
+          "localized",
+          "misinterpreting",
+          "reading",
+          "thermal",
+          "threshold",
+          "transient",
+          "voltage",
+          "weather"
+         ],
+         "coverage_ratio": 0.105,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       }
+      ],
+      "n_families": 6,
+      "n_search_errors": 0,
+      "search_errors": [],
+      "search_execution": {
+       "mandatory_complete": true,
+       "n_errors": 0,
+       "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+      },
+      "relevance_model_version": "collision_resolution/2.0.0",
+      "determinism_contract": {
+       "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+       "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+      },
+      "thresholds": {
+       "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+        "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+       },
+       "MIN_MECHANISM_OVERLAP": {
+        "value": 2,
+        "epistemic_class": "ENGINEERING",
+        "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+        "uncertainty": "term overlap is a proxy for mechanism identity"
+       },
+       "ANTICIPATION_COVERAGE_RATIO": {
+        "value": 0.8,
+        "epistemic_class": "ENGINEERING",
+        "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+        "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+       },
+       "MAX_QUERY_TERMS": {
+        "value": 6,
+        "epistemic_class": "ENGINEERING",
+        "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+       },
+       "ABSTRACT_TIER_MIN_CHARS": {
+        "value": 80,
+        "epistemic_class": "ENGINEERING",
+        "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+       }
+      },
+      "surviving_differentiators": [
+       "bms",
+       "charging",
+       "cold",
+       "compensate",
+       "degradation",
+       "diagnostic",
+       "drop",
+       "fault",
+       "gradient",
+       "heterogeneity",
+       "localized",
+       "misinterpreting",
+       "reading",
+       "temperature",
+       "thermal",
+       "threshold",
+       "transient",
+       "voltage",
+       "weather"
+      ]
+     },
+     "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+     "cached_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05",
+      "PA-FAM-06"
+     ]
+    },
+    "prior_art_status": "RESOLVED_DIFFERENTIATED",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.487,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": 0.842,
+      "state": "MEASURED"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": 0.994,
+      "state": "MEASURED"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.798,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.7
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.0 -> 0.487 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-29T08:50:02+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.487,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.487 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:3471ec64a138",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "237c4d43ccf392c130b94b3a1defeacce0cdf7e4f9c0448d0540931a8805b86b",
+     "output_hash": "3471ec64a1380894e259e4568c567118ed21c85ec5892dabaf8e4b52dc2ac07d",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway, particularly in high-energy-density and fast-charging systems, where in-plane and through-thickness temperature gradients influence electrochemical behavior.",
+      "INTERVENTION": "Implement a cold-weather diagnostic threshold in the BMS that compensates voltage readings for localized degradation and thermal heterogeneity to prevent transient voltage drops from misinterpreting temperature gradients as charging faults.",
+      "EXPECTED_EFFECT": "The battery warning light will no longer trigger falsely during cold-idle conditions due to transient voltage drops associated with thermal heterogeneity and localized degradation.",
+      "FALSIFICATION_TEST": "Measure the battery terminal voltage and internal temperature gradients under cold-idle conditions; if the warning light persists despite voltage remaining within nominal limits and no localized degradation is detected, the mechanism is falsified.",
+      "MECHANISM_SOURCE_SPAN": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1002/aesr.202500400",
+      "EXPERIMENT": "Measure the battery terminal voltage and internal temperature gradients under cold-idle conditions; if the warning light persists despite voltage remaining within nominal limits and no localized degradation is detected, the mechanism is falsified.",
+      "EXPERIMENT_BASELINE": "no localized degradation",
+      "EXPERIMENT_EIG": "1",
+      "CONSTRAINT_DERIVED": "The diagnostic threshold must account for in-plane and through-thickness temperature gradients that influence electrochemical behavior.",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism's vocabulary strictly to the verbatim span of the cited evidence (doi:10.1002/aesr.202500400) and deriving a specific constraint from that span."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1002/aesr.202500400",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.692,
+       "evidence_support_cleared": 0.692,
+       "constraint_traceable_to_evidence": "The diagnostic threshold must account for in-plane and through-thickness temperature gradients that influence electroche"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-29T08:50:15+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:c64d806bffa2",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "9320fa76c1474fac745238b1fdc4fce23f5d3e2c24c048b30de999aa68eeb1fe",
+     "output_hash": "c64d806bffa28392f316fca7d60cafb476a59d51172d1c7f08b9aa30d8ab168c",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway, particularly in high-energy-density and fast-charging systems, where in-plane and through-thickness temperature gradients influence electrochemical behavior.",
+      "INTERVENTION": "Implement a cold-weather diagnostic threshold in the BMS that compensates voltage readings for localized degradation and thermal heterogeneity to prevent transient voltage drops from misinterpreting temperature gradients as charging faults, constrained by the requirement that diagnostic logic explicitly accounts for in-plane and through-thickness temperature gradients and their influence on electrochemical behavior.",
+      "EXPECTED_EFFECT": "The battery warning light will no longer trigger falsely during cold-idle conditions due to transient voltage drops associated with thermal heterogeneity and localized degradation.",
+      "FALSIFICATION_TEST": "Measure the battery terminal voltage and internal temperature gradients under cold-idle conditions; if the warning light persists despite voltage remaining within nominal limits and no localized degradation is detected, the mechanism is falsified.",
+      "MECHANISM_SOURCE_SPAN": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1002/aesr.202500400",
+      "EXPERIMENT": "Compare the frequency of intermittent battery warning light flashes at cold idle (below 0C) between a BMS using the temperature-gradient-constrained diagnostic threshold and the EXPERIMENT_BASELINE standard BMS logic without temperature compensation, specifically measuring if the constrained logic eliminates false triggers when in-plane and through-thickness gradients are present.",
+      "EXPERIMENT_BASELINE": "standard BMS logic without temperature compensation",
+      "EXPERIMENT_EIG": "0.9",
+      "CONSTRAINT_DERIVED": "The BMS diagnostic threshold must explicitly model and compensate for in-plane and through-thickness temperature gradients and their influence on electrochemical behavior, as specified in the cited evidence.",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the intervention's constraint to the verbatim technical vocabulary of the cited evidence span, ensuring the mechanism terms are derived from the source text."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1002/aesr.202500400",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.644,
+       "evidence_support_cleared": 0.644,
+       "constraint_traceable_to_evidence": "The BMS diagnostic threshold must explicitly model and compensate for in-plane and through-thickness temperature gradien"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-29T08:50:23+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:0896c6690438",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "980620bd7f808e211ccd834381d6c64b82d06c1328ae8a0357b339a43040a8dd",
+     "output_hash": "0896c66904389ffef050c4cf4edf158d238e2dca1c2f752a2663fc186dd6d4b5",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway, particularly in high-energy-density and fast-charging systems, where in-plane and through-thickness temperature gradients influence electrochemical behavior and safety.",
+      "INTERVENTION": "Implement a cold-weather diagnostic threshold in the BMS that compensates voltage readings for localized degradation and thermal heterogeneity by monitoring in-plane and through-thickness temperature gradients to prevent transient voltage drops from misinterpreting temperature gradients as charging faults.",
+      "EXPECTED_EFFECT": "The battery warning light will no longer trigger falsely during cold-idle conditions due to transient voltage drops associated with thermal heterogeneity and localized degradation.",
+      "FALSIFICATION_TEST": "Measure the battery terminal voltage and internal temperature gradients under cold-idle conditions; if the warning light persists despite voltage remaining within nominal limits and no localized degradation is detected, the mechanism is falsified.",
+      "MECHANISM_SOURCE_SPAN": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1002/aesr.202500400",
+      "EXPERIMENT": "Monitor the in-plane and through-thickness temperature gradients and localized degradation markers of a 2015 Toyota Camry battery system during a cold-idle test below 0C, comparing the BMS voltage interpretation against the baseline behavior of a BMS without thermal compensation.",
+      "EXPERIMENT_BASELINE": "BMS without thermal compensation",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "The mechanism is constrained by the verbatim evidence that in-plane and through-thickness temperature gradients drive localized degradation which accelerates capacity fade.",
+      "MUTATION_REASON": "This repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism vocabulary to the verbatim terms \"thermal heterogeneity,\" \"localized degradation,\" \"in-plane,\" and \"through-thickness\" found in the cited evidence span."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1002/aesr.202500400",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.7,
+       "evidence_support_cleared": 0.7,
+       "constraint_traceable_to_evidence": "The mechanism is constrained by the verbatim evidence that in-plane and through-thickness temperature gradients drive lo"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-29T08:50:34+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:e6b9ab933b1c",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.487,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:3471ec64a138",
+       "provider": "agnes",
+       "model": "agnes-3.0-flash",
+       "prompt_hash": "237c4d43ccf392c130b94b3a1defeacce0cdf7e4f9c0448d0540931a8805b86b",
+       "output_hash": "3471ec64a1380894e259e4568c567118ed21c85ec5892dabaf8e4b52dc2ac07d",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1002/aesr.202500400",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.692,
+        "evidence_support_cleared": 0.692,
+        "constraint_traceable_to_evidence": "The diagnostic threshold must account for in-plane and through-thickness temperature gradients that influence electroche"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-29T08:50:15+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway, particularly in high-energy-density and fast-charging systems, where in-plane and through-thickness temperature gradients influence electrochemical behavior.",
+        "after": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway, particularly in high-energy-density and fast-charging systems, where in-plane and through-thickness temperature gradients influence electrochemical behavior."
+       },
+       "intervention": {
+        "before": "Implement a cold-weather diagnostic threshold in the BMS that compensates voltage readings for localized degradation and thermal heterogeneity to prevent transient voltage drops from misinterpreting temperature gradients as charging faults.",
+        "after": "Implement a cold-weather diagnostic threshold in the BMS that compensates voltage readings for localized degradation and thermal heterogeneity to prevent transient voltage drops from misinterpreting temperature gradients as charging faults."
+       },
+       "mechanism_source_span": {
+        "before": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems.",
+        "after": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:collision:adjacent",
+        "con:evidence:doi:10.48550/arxiv.2203.09497",
+        "battery system charging temperature warning documented",
+        "battery system charging temperature warning documented",
+        "battery systems temperature dependent electrochemical impedance",
+        "weather diagnostic charging temperature resistance cold current idle",
+        "weather diagnostic charging temperature resistance cold current idle",
+        "battery compensation warning during charging resistance",
+        "battery compensation warning during charging resistance",
+        "battery system charging temperature warning light",
+        "battery system charging temperature warning light"
+       ],
+       "collision_family_ids": [
+        "PA-FAM-01",
+        "PA-FAM-02",
+        "PA-FAM-03",
+        "PA-FAM-04",
+        "PA-FAM-05",
+        "PA-FAM-06"
+       ],
+       "source_errors": []
+      },
+      "parent_spec_hash": "c27c47fb3ce59eabf3f15e626174a600c2658fffe4c0039ed06c33af476421aa",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism's vocabulary strictly to the verbatim span of the cited evidence (doi:10.1002/aesr.202500400) and deriving a specific constraint from that span.",
+      "applied_at": "2026-09-29T08:50:15+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-29T08:50:15+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": true,
+       "domain_overlap_terms": [
+        "charging",
+        "cold",
+        "fault",
+        "high",
+        "temperature",
+        "that"
+       ],
+       "entity_retention_vs_problem": 1.0,
+       "resolution": {
+        "state": "RESOLVED_DIFFERENTIATED",
+        "epistemic_class": "SEARCH_RESULT",
+        "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+        "evidence_tier_summary": "CLAIMS:0 ABSTRACT:6 TITLE:0",
+        "per_family": [
+         {
+          "family_id": "PA-FAM-01",
+          "representative": {
+           "patent_id": "CN115485571A",
+           "title": "Apparatus, system, and method for predicting performance of secondary battery",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/CN115485571A/en",
+           "assignee": "['株式会社Lg新能源']",
+           "publication_date": "2022-12-16"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "CN115485571A"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Apparatus, system, and method for predicting performance of secondary battery The present invention relates to an apparatus, system, and method for predicting performance of a secondary battery. The apparatus of the present invention comprises: a current sensor for measuring a discharge current output from the secondary battery during a discharge period in which the &hellip;  ",
+          "adjudicated_text_sha256": "a1876d20f5d0797d3cb428cf3e9efb71c348858bad6be281e63de9e0225a7c70",
+          "coverage": {
+           "coverage_class": "NONE",
+           "mechanism_overlap_terms": [
+            "system"
+           ],
+           "distinguishing_terms_covered": [],
+           "distinguishing_terms_surviving": [
+            "bms",
+            "charging",
+            "cold",
+            "compensate",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "localized",
+            "misinterpreting",
+            "reading",
+            "temperature",
+            "thermal",
+            "threshold",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.0,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-02",
+          "representative": {
+           "patent_id": "WO2014004523A1",
+           "title": "Battery cell with temperature sensor",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/WO2014004523A1/en",
+           "assignee": "['Robert Bosch Gmbh']",
+           "publication_date": "2014-01-03"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "WO2014004523A1"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Battery cell with temperature sensor A battery system in one embodiment includes a first battery cell (114) including a shell encasing a positive electrode (122), a negative electrode (120), and a separator (124) positioned between the positive electrode (122) and the negative electrode (120), and at least one first wireless &hellip;  ",
+          "adjudicated_text_sha256": "6f67e3a039c525b04798e46d3cf20fdbeebaef576f49a50431bb5a435a5b0e09",
+          "coverage": {
+           "coverage_class": "PARTIAL_COVER",
+           "mechanism_overlap_terms": [
+            "system",
+            "temperature"
+           ],
+           "distinguishing_terms_covered": [
+            "temperature"
+           ],
+           "distinguishing_terms_surviving": [
+            "bms",
+            "charging",
+            "cold",
+            "compensate",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "localized",
+            "misinterpreting",
+            "reading",
+            "thermal",
+            "threshold",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.053,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-03",
+          "representative": {
+           "patent_id": "KR20240091328A",
+           "title": "Ultra-high-performance battery module with operating temperature and pressure &hellip;",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/KR20240091328A/en",
+           "assignee": "['하이드로-퀘벡']",
+           "publication_date": "2024-06-21"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "KR20240091328A"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Ultra-high-performance battery module with operating temperature and pressure &hellip; A system and method for managing the operating temperature and pressure of a battery are disclosed. The cells of the battery are housed in cylindrical modules, into which a heat transfer fluid under pressure and at a given temperature circulates. The fluid unit has a return reservoir that collects &hellip;  ",
+          "adjudicated_text_sha256": "f4e413cc234ef5b5e4c2c38bac10b738667aafa19c883e517e9dcdf4fce4737f",
+          "coverage": {
+           "coverage_class": "PARTIAL_COVER",
+           "mechanism_overlap_terms": [
+            "system",
+            "temperature"
+           ],
+           "distinguishing_terms_covered": [
+            "temperature"
+           ],
+           "distinguishing_terms_surviving": [
+            "bms",
+            "charging",
+            "cold",
+            "compensate",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "localized",
+            "misinterpreting",
+            "reading",
+            "thermal",
+            "threshold",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.053,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-04",
+          "representative": {
+           "patent_id": "CN107749444B",
+           "title": "Battery module and method for monitoring a battery module",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/CN107749444B/en",
+           "assignee": "['罗伯特·博世有限公司']",
+           "publication_date": "2021-12-31"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "CN107749444B"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Battery module and method for monitoring a battery module The present invention discloses a battery pack module and a method for monitoring the battery pack module. The present invention relates to a battery pack module comprising a plurality of battery pack cells and a plurality of temperature sensors. Thereby, several temperature sensors are &hellip;  ",
+          "adjudicated_text_sha256": "aeb1ad5edec2f93207970a6d97f613b88999a4b311a5a5c113590cab36ac12ab",
+          "coverage": {
+           "coverage_class": "NONE",
+           "mechanism_overlap_terms": [
+            "temperature"
+           ],
+           "distinguishing_terms_covered": [
+            "temperature"
+           ],
+           "distinguishing_terms_surviving": [
+            "bms",
+            "charging",
+            "cold",
+            "compensate",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "localized",
+            "misinterpreting",
+            "reading",
+            "thermal",
+            "threshold",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.053,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-05",
+          "representative": {
+           "patent_id": "CN116039380B",
+           "title": "A battery pack information collection system based on terminal control",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/CN116039380B/en",
+           "assignee": "['安徽国轩象铝科技有限公司']",
+           "publication_date": "2025-03-04"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "CN116039380B"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "A battery pack information collection system based on terminal control The present invention discloses a battery pack information acquisition system based on terminal control; the system comprises a main control module, the main control module is electrically connected to a data processing module, the data processing module is electrically connected to a BMS &hellip;  ",
+          "adjudicated_text_sha256": "442ff5ba49e6d02f28d6e563296bd76eadc93724b243532ac25fa4f0c3e32f13",
+          "coverage": {
+           "coverage_class": "NONE",
+           "mechanism_overlap_terms": [
+            "system"
+           ],
+           "distinguishing_terms_covered": [
+            "bms"
+           ],
+           "distinguishing_terms_surviving": [
+            "charging",
+            "cold",
+            "compensate",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "localized",
+            "misinterpreting",
+            "reading",
+            "temperature",
+            "thermal",
+            "threshold",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.053,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-06",
+          "representative": {
+           "patent_id": "CN113904005B",
+           "title": "Online measurement of anode potential for maximizing charging power at low &hellip;",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/CN113904005B/en",
+           "assignee": "['三星Sdi株式会社']",
+           "publication_date": "2024-10-11"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "CN113904005B"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Online measurement of anode potential for maximizing charging power at low &hellip; The present invention relates to a battery system which allows an optimized charging process, in particular a charging process in which the charging power is maximized when the battery system is in a low temperature environment. The battery system is equipped with a plurality of battery cells, &hellip;  ",
+          "adjudicated_text_sha256": "5824d165ee47cca71de5d27d18036a6fe77fa48558b6a386517ebca4c5d2cc37",
+          "coverage": {
+           "coverage_class": "PARTIAL_COVER",
+           "mechanism_overlap_terms": [
+            "charging",
+            "system",
+            "temperature"
+           ],
+           "distinguishing_terms_covered": [
+            "charging",
+            "temperature"
+           ],
+           "distinguishing_terms_surviving": [
+            "bms",
+            "cold",
+            "compensate",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "localized",
+            "misinterpreting",
+            "reading",
+            "thermal",
+            "threshold",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.105,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         }
+        ],
+        "n_families": 6,
+        "n_search_errors": 0,
+        "search_errors": [],
+        "search_execution": {
+         "mandatory_complete": true,
+         "n_errors": 0,
+         "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+        },
+        "relevance_model_version": "collision_resolution/2.0.0",
+        "determinism_contract": {
+         "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+         "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+        },
+        "thresholds": {
+         "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+          "value": 3,
+          "epistemic_class": "ENGINEERING",
+          "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+          "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+         },
+         "MIN_MECHANISM_OVERLAP": {
+          "value": 2,
+          "epistemic_class": "ENGINEERING",
+          "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+          "uncertainty": "term overlap is a proxy for mechanism identity"
+         },
+         "ANTICIPATION_COVERAGE_RATIO": {
+          "value": 0.8,
+          "epistemic_class": "ENGINEERING",
+          "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+          "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+         },
+         "MAX_QUERY_TERMS": {
+          "value": 6,
+          "epistemic_class": "ENGINEERING",
+          "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+         },
+         "ABSTRACT_TIER_MIN_CHARS": {
+          "value": 80,
+          "epistemic_class": "ENGINEERING",
+          "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+         }
+        },
+        "surviving_differentiators": [
+         "bms",
+         "charging",
+         "cold",
+         "compensate",
+         "degradation",
+         "diagnostic",
+         "drop",
+         "fault",
+         "gradient",
+         "heterogeneity",
+         "localized",
+         "misinterpreting",
+         "reading",
+         "temperature",
+         "thermal",
+         "threshold",
+         "transient",
+         "voltage",
+         "weather"
+        ]
+       },
+       "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+       "cached_family_ids": [
+        "PA-FAM-01",
+        "PA-FAM-02",
+        "PA-FAM-03",
+        "PA-FAM-04",
+        "PA-FAM-05",
+        "PA-FAM-06"
+       ]
+      },
+      "prior_art_status": "RESOLVED_DIFFERENTIATED",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.487,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": 0.842,
+        "state": "MEASURED"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": 0.994,
+        "state": "MEASURED"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.798,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.7
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.487 -> 0.487 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-29T08:50:15+00:00Z"
+     }
+    },
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:b345f2af91d8",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.487,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:c64d806bffa2",
+       "provider": "agnes",
+       "model": "agnes-3.0-flash",
+       "prompt_hash": "9320fa76c1474fac745238b1fdc4fce23f5d3e2c24c048b30de999aa68eeb1fe",
+       "output_hash": "c64d806bffa28392f316fca7d60cafb476a59d51172d1c7f08b9aa30d8ab168c",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1002/aesr.202500400",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.644,
+        "evidence_support_cleared": 0.644,
+        "constraint_traceable_to_evidence": "The BMS diagnostic threshold must explicitly model and compensate for in-plane and through-thickness temperature gradien"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-29T08:50:23+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway, particularly in high-energy-density and fast-charging systems, where in-plane and through-thickness temperature gradients influence electrochemical behavior.",
+        "after": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway, particularly in high-energy-density and fast-charging systems, where in-plane and through-thickness temperature gradients influence electrochemical behavior."
+       },
+       "intervention": {
+        "before": "Implement a cold-weather diagnostic threshold in the BMS that compensates voltage readings for localized degradation and thermal heterogeneity to prevent transient voltage drops from misinterpreting temperature gradients as charging faults.",
+        "after": "Implement a cold-weather diagnostic threshold in the BMS that compensates voltage readings for localized degradation and thermal heterogeneity to prevent transient voltage drops from misinterpreting temperature gradients as charging faults, constrained by the requirement that diagnostic logic explic"
+       },
+       "mechanism_source_span": {
+        "before": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems.",
+        "after": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:collision:adjacent",
+        "con:evidence:doi:10.48550/arxiv.2203.09497",
+        "battery system charging temperature warning documented",
+        "battery system charging temperature warning documented",
+        "battery systems temperature dependent electrochemical impedance",
+        "weather diagnostic charging temperature resistance cold current idle",
+        "weather diagnostic charging temperature resistance cold current idle",
+        "battery compensation warning during charging resistance",
+        "battery compensation warning during charging resistance",
+        "battery system charging temperature warning light",
+        "battery system charging temperature warning light"
+       ],
+       "collision_family_ids": [
+        "PA-FAM-01",
+        "PA-FAM-02",
+        "PA-FAM-03",
+        "PA-FAM-04",
+        "PA-FAM-05",
+        "PA-FAM-06"
+       ],
+       "source_errors": []
+      },
+      "parent_spec_hash": "c27c47fb3ce59eabf3f15e626174a600c2658fffe4c0039ed06c33af476421aa",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the intervention's constraint to the verbatim technical vocabulary of the cited evidence span, ensuring the mechanism terms are derived from the source text.",
+      "applied_at": "2026-09-29T08:50:23+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-29T08:50:23+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": true,
+       "domain_overlap_terms": [
+        "charging",
+        "cold",
+        "fault",
+        "high",
+        "temperature",
+        "that"
+       ],
+       "entity_retention_vs_problem": 1.0,
+       "resolution": {
+        "state": "RESOLVED_DIFFERENTIATED",
+        "epistemic_class": "SEARCH_RESULT",
+        "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+        "evidence_tier_summary": "CLAIMS:0 ABSTRACT:6 TITLE:0",
+        "per_family": [
+         {
+          "family_id": "PA-FAM-01",
+          "representative": {
+           "patent_id": "CN115485571A",
+           "title": "Apparatus, system, and method for predicting performance of secondary battery",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/CN115485571A/en",
+           "assignee": "['株式会社Lg新能源']",
+           "publication_date": "2022-12-16"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "CN115485571A"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Apparatus, system, and method for predicting performance of secondary battery The present invention relates to an apparatus, system, and method for predicting performance of a secondary battery. The apparatus of the present invention comprises: a current sensor for measuring a discharge current output from the secondary battery during a discharge period in which the &hellip;  ",
+          "adjudicated_text_sha256": "a1876d20f5d0797d3cb428cf3e9efb71c348858bad6be281e63de9e0225a7c70",
+          "coverage": {
+           "coverage_class": "NONE",
+           "mechanism_overlap_terms": [
+            "system"
+           ],
+           "distinguishing_terms_covered": [],
+           "distinguishing_terms_surviving": [
+            "account",
+            "behavior",
+            "bms",
+            "charging",
+            "cold",
+            "compensate",
+            "constrained",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "electrochemical",
+            "explicitly",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "influence",
+            "localized",
+            "logic",
+            "misinterpreting",
+            "plane",
+            "reading",
+            "requirement",
+            "temperature",
+            "thermal",
+            "thickness",
+            "threshold",
+            "through",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.0,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-02",
+          "representative": {
+           "patent_id": "WO2014004523A1",
+           "title": "Battery cell with temperature sensor",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/WO2014004523A1/en",
+           "assignee": "['Robert Bosch Gmbh']",
+           "publication_date": "2014-01-03"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "WO2014004523A1"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Battery cell with temperature sensor A battery system in one embodiment includes a first battery cell (114) including a shell encasing a positive electrode (122), a negative electrode (120), and a separator (124) positioned between the positive electrode (122) and the negative electrode (120), and at least one first wireless &hellip;  ",
+          "adjudicated_text_sha256": "6f67e3a039c525b04798e46d3cf20fdbeebaef576f49a50431bb5a435a5b0e09",
+          "coverage": {
+           "coverage_class": "PARTIAL_COVER",
+           "mechanism_overlap_terms": [
+            "system",
+            "temperature"
+           ],
+           "distinguishing_terms_covered": [
+            "temperature"
+           ],
+           "distinguishing_terms_surviving": [
+            "account",
+            "behavior",
+            "bms",
+            "charging",
+            "cold",
+            "compensate",
+            "constrained",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "electrochemical",
+            "explicitly",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "influence",
+            "localized",
+            "logic",
+            "misinterpreting",
+            "plane",
+            "reading",
+            "requirement",
+            "thermal",
+            "thickness",
+            "threshold",
+            "through",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.033,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-03",
+          "representative": {
+           "patent_id": "KR20240091328A",
+           "title": "Ultra-high-performance battery module with operating temperature and pressure &hellip;",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/KR20240091328A/en",
+           "assignee": "['하이드로-퀘벡']",
+           "publication_date": "2024-06-21"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "KR20240091328A"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Ultra-high-performance battery module with operating temperature and pressure &hellip; A system and method for managing the operating temperature and pressure of a battery are disclosed. The cells of the battery are housed in cylindrical modules, into which a heat transfer fluid under pressure and at a given temperature circulates. The fluid unit has a return reservoir that collects &hellip;  ",
+          "adjudicated_text_sha256": "f4e413cc234ef5b5e4c2c38bac10b738667aafa19c883e517e9dcdf4fce4737f",
+          "coverage": {
+           "coverage_class": "PARTIAL_COVER",
+           "mechanism_overlap_terms": [
+            "system",
+            "temperature"
+           ],
+           "distinguishing_terms_covered": [
+            "temperature"
+           ],
+           "distinguishing_terms_surviving": [
+            "account",
+            "behavior",
+            "bms",
+            "charging",
+            "cold",
+            "compensate",
+            "constrained",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "electrochemical",
+            "explicitly",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "influence",
+            "localized",
+            "logic",
+            "misinterpreting",
+            "plane",
+            "reading",
+            "requirement",
+            "thermal",
+            "thickness",
+            "threshold",
+            "through",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.033,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-04",
+          "representative": {
+           "patent_id": "CN107749444B",
+           "title": "Battery module and method for monitoring a battery module",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/CN107749444B/en",
+           "assignee": "['罗伯特·博世有限公司']",
+           "publication_date": "2021-12-31"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "CN107749444B"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Battery module and method for monitoring a battery module The present invention discloses a battery pack module and a method for monitoring the battery pack module. The present invention relates to a battery pack module comprising a plurality of battery pack cells and a plurality of temperature sensors. Thereby, several temperature sensors are &hellip;  ",
+          "adjudicated_text_sha256": "aeb1ad5edec2f93207970a6d97f613b88999a4b311a5a5c113590cab36ac12ab",
+          "coverage": {
+           "coverage_class": "NONE",
+           "mechanism_overlap_terms": [
+            "temperature"
+           ],
+           "distinguishing_terms_covered": [
+            "temperature"
+           ],
+           "distinguishing_terms_surviving": [
+            "account",
+            "behavior",
+            "bms",
+            "charging",
+            "cold",
+            "compensate",
+            "constrained",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "electrochemical",
+            "explicitly",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "influence",
+            "localized",
+            "logic",
+            "misinterpreting",
+            "plane",
+            "reading",
+            "requirement",
+            "thermal",
+            "thickness",
+            "threshold",
+            "through",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.033,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-05",
+          "representative": {
+           "patent_id": "CN116039380B",
+           "title": "A battery pack information collection system based on terminal control",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/CN116039380B/en",
+           "assignee": "['安徽国轩象铝科技有限公司']",
+           "publication_date": "2025-03-04"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "CN116039380B"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "A battery pack information collection system based on terminal control The present invention discloses a battery pack information acquisition system based on terminal control; the system comprises a main control module, the main control module is electrically connected to a data processing module, the data processing module is electrically connected to a BMS &hellip;  ",
+          "adjudicated_text_sha256": "442ff5ba49e6d02f28d6e563296bd76eadc93724b243532ac25fa4f0c3e32f13",
+          "coverage": {
+           "coverage_class": "NONE",
+           "mechanism_overlap_terms": [
+            "system"
+           ],
+           "distinguishing_terms_covered": [
+            "bms"
+           ],
+           "distinguishing_terms_surviving": [
+            "account",
+            "behavior",
+            "charging",
+            "cold",
+            "compensate",
+            "constrained",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "electrochemical",
+            "explicitly",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "influence",
+            "localized",
+            "logic",
+            "misinterpreting",
+            "plane",
+            "reading",
+            "requirement",
+            "temperature",
+            "thermal",
+            "thickness",
+            "threshold",
+            "through",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.033,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-06",
+          "representative": {
+           "patent_id": "CN113904005B",
+           "title": "Online measurement of anode potential for maximizing charging power at low &hellip;",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/CN113904005B/en",
+           "assignee": "['三星Sdi株式会社']",
+           "publication_date": "2024-10-11"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "CN113904005B"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Online measurement of anode potential for maximizing charging power at low &hellip; The present invention relates to a battery system which allows an optimized charging process, in particular a charging process in which the charging power is maximized when the battery system is in a low temperature environment. The battery system is equipped with a plurality of battery cells, &hellip;  ",
+          "adjudicated_text_sha256": "5824d165ee47cca71de5d27d18036a6fe77fa48558b6a386517ebca4c5d2cc37",
+          "coverage": {
+           "coverage_class": "PARTIAL_COVER",
+           "mechanism_overlap_terms": [
+            "charging",
+            "system",
+            "temperature"
+           ],
+           "distinguishing_terms_covered": [
+            "charging",
+            "temperature"
+           ],
+           "distinguishing_terms_surviving": [
+            "account",
+            "behavior",
+            "bms",
+            "cold",
+            "compensate",
+            "constrained",
+            "degradation",
+            "diagnostic",
+            "drop",
+            "electrochemical",
+            "explicitly",
+            "fault",
+            "gradient",
+            "heterogeneity",
+            "influence",
+            "localized",
+            "logic",
+            "misinterpreting",
+            "plane",
+            "reading",
+            "requirement",
+            "thermal",
+            "thickness",
+            "threshold",
+            "through",
+            "transient",
+            "voltage",
+            "weather"
+           ],
+           "coverage_ratio": 0.067,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         }
+        ],
+        "n_families": 6,
+        "n_search_errors": 0,
+        "search_errors": [],
+        "search_execution": {
+         "mandatory_complete": true,
+         "n_errors": 0,
+         "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+        },
+        "relevance_model_version": "collision_resolution/2.0.0",
+        "determinism_contract": {
+         "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+         "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+        },
+        "thresholds": {
+         "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+          "value": 3,
+          "epistemic_class": "ENGINEERING",
+          "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+          "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+         },
+         "MIN_MECHANISM_OVERLAP": {
+          "value": 2,
+          "epistemic_class": "ENGINEERING",
+          "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+          "uncertainty": "term overlap is a proxy for mechanism identity"
+         },
+         "ANTICIPATION_COVERAGE_RATIO": {
+          "value": 0.8,
+          "epistemic_class": "ENGINEERING",
+          "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+          "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+         },
+         "MAX_QUERY_TERMS": {
+          "value": 6,
+          "epistemic_class": "ENGINEERING",
+          "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+         },
+         "ABSTRACT_TIER_MIN_CHARS": {
+          "value": 80,
+          "epistemic_class": "ENGINEERING",
+          "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+         }
+        },
+        "surviving_differentiators": [
+         "account",
+         "behavior",
+         "bms",
+         "charging",
+         "cold",
+         "compensate",
+         "constrained",
+         "degradation",
+         "diagnostic",
+         "drop",
+         "electrochemical",
+         "explicitly",
+         "fault",
+         "gradient",
+         "heterogeneity",
+         "influence",
+         "localized",
+         "logic",
+         "misinterpreting",
+         "plane",
+         "reading",
+         "requirement",
+         "temperature",
+         "thermal",
+         "thickness",
+         "threshold",
+         "through",
+         "transient",
+         "voltage",
+         "weather"
+        ]
+       },
+       "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+       "cached_family_ids": [
+        "PA-FAM-01",
+        "PA-FAM-02",
+        "PA-FAM-03",
+        "PA-FAM-04",
+        "PA-FAM-05",
+        "PA-FAM-06"
+       ]
+      },
+      "prior_art_status": "RESOLVED_DIFFERENTIATED",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.422,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": 0.9,
+        "state": "MEASURED"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": 0.994,
+        "state": "MEASURED"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.797,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.7
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.487 -> 0.422 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-29T08:50:23+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:e6b9ab933b1c",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.487,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:3471ec64a138",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "237c4d43ccf392c130b94b3a1defeacce0cdf7e4f9c0448d0540931a8805b86b",
+     "output_hash": "3471ec64a1380894e259e4568c567118ed21c85ec5892dabaf8e4b52dc2ac07d",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1002/aesr.202500400",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.692,
+      "evidence_support_cleared": 0.692,
+      "constraint_traceable_to_evidence": "The diagnostic threshold must account for in-plane and through-thickness temperature gradients that influence electroche"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-29T08:50:15+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway, particularly in high-energy-density and fast-charging systems, where in-plane and through-thickness temperature gradients influence electrochemical behavior.",
+      "after": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway, particularly in high-energy-density and fast-charging systems, where in-plane and through-thickness temperature gradients influence electrochemical behavior."
+     },
+     "intervention": {
+      "before": "Implement a cold-weather diagnostic threshold in the BMS that compensates voltage readings for localized degradation and thermal heterogeneity to prevent transient voltage drops from misinterpreting temperature gradients as charging faults.",
+      "after": "Implement a cold-weather diagnostic threshold in the BMS that compensates voltage readings for localized degradation and thermal heterogeneity to prevent transient voltage drops from misinterpreting temperature gradients as charging faults."
+     },
+     "mechanism_source_span": {
+      "before": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems.",
+      "after": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:collision:adjacent",
+      "con:evidence:doi:10.48550/arxiv.2203.09497",
+      "battery system charging temperature warning documented",
+      "battery system charging temperature warning documented",
+      "battery systems temperature dependent electrochemical impedance",
+      "weather diagnostic charging temperature resistance cold current idle",
+      "weather diagnostic charging temperature resistance cold current idle",
+      "battery compensation warning during charging resistance",
+      "battery compensation warning during charging resistance",
+      "battery system charging temperature warning light",
+      "battery system charging temperature warning light"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05",
+      "PA-FAM-06"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "c27c47fb3ce59eabf3f15e626174a600c2658fffe4c0039ed06c33af476421aa",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism's vocabulary strictly to the verbatim span of the cited evidence (doi:10.1002/aesr.202500400) and deriving a specific constraint from that span.",
+    "applied_at": "2026-09-29T08:50:15+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-29T08:50:23+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": true,
+     "domain_overlap_terms": [
+      "charging",
+      "cold",
+      "fault",
+      "high",
+      "temperature",
+      "that"
+     ],
+     "entity_retention_vs_problem": 1.0,
+     "resolution": {
+      "state": "RESOLVED_DIFFERENTIATED",
+      "epistemic_class": "SEARCH_RESULT",
+      "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+      "evidence_tier_summary": "CLAIMS:0 ABSTRACT:6 TITLE:0",
+      "per_family": [
+       {
+        "family_id": "PA-FAM-01",
+        "representative": {
+         "patent_id": "CN115485571A",
+         "title": "Apparatus, system, and method for predicting performance of secondary battery",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/CN115485571A/en",
+         "assignee": "['株式会社Lg新能源']",
+         "publication_date": "2022-12-16"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN115485571A"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Apparatus, system, and method for predicting performance of secondary battery The present invention relates to an apparatus, system, and method for predicting performance of a secondary battery. The apparatus of the present invention comprises: a current sensor for measuring a discharge current output from the secondary battery during a discharge period in which the &hellip;  ",
+        "adjudicated_text_sha256": "a1876d20f5d0797d3cb428cf3e9efb71c348858bad6be281e63de9e0225a7c70",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [
+          "system"
+         ],
+         "distinguishing_terms_covered": [],
+         "distinguishing_terms_surviving": [
+          "account",
+          "behavior",
+          "bms",
+          "charging",
+          "cold",
+          "compensate",
+          "constrained",
+          "degradation",
+          "diagnostic",
+          "drop",
+          "electrochemical",
+          "explicitly",
+          "fault",
+          "gradient",
+          "heterogeneity",
+          "influence",
+          "localized",
+          "logic",
+          "misinterpreting",
+          "plane",
+          "reading",
+          "requirement",
+          "temperature",
+          "thermal",
+          "thickness",
+          "threshold",
+          "through",
+          "transient",
+          "voltage",
+          "weather"
+         ],
+         "coverage_ratio": 0.0,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-02",
+        "representative": {
+         "patent_id": "WO2014004523A1",
+         "title": "Battery cell with temperature sensor",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/WO2014004523A1/en",
+         "assignee": "['Robert Bosch Gmbh']",
+         "publication_date": "2014-01-03"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "WO2014004523A1"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Battery cell with temperature sensor A battery system in one embodiment includes a first battery cell (114) including a shell encasing a positive electrode (122), a negative electrode (120), and a separator (124) positioned between the positive electrode (122) and the negative electrode (120), and at least one first wireless &hellip;  ",
+        "adjudicated_text_sha256": "6f67e3a039c525b04798e46d3cf20fdbeebaef576f49a50431bb5a435a5b0e09",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "system",
+          "temperature"
+         ],
+         "distinguishing_terms_covered": [
+          "temperature"
+         ],
+         "distinguishing_terms_surviving": [
+          "account",
+          "behavior",
+          "bms",
+          "charging",
+          "cold",
+          "compensate",
+          "constrained",
+          "degradation",
+          "diagnostic",
+          "drop",
+          "electrochemical",
+          "explicitly",
+          "fault",
+          "gradient",
+          "heterogeneity",
+          "influence",
+          "localized",
+          "logic",
+          "misinterpreting",
+          "plane",
+          "reading",
+          "requirement",
+          "thermal",
+          "thickness",
+          "threshold",
+          "through",
+          "transient",
+          "voltage",
+          "weather"
+         ],
+         "coverage_ratio": 0.033,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-03",
+        "representative": {
+         "patent_id": "KR20240091328A",
+         "title": "Ultra-high-performance battery module with operating temperature and pressure &hellip;",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/KR20240091328A/en",
+         "assignee": "['하이드로-퀘벡']",
+         "publication_date": "2024-06-21"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "KR20240091328A"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Ultra-high-performance battery module with operating temperature and pressure &hellip; A system and method for managing the operating temperature and pressure of a battery are disclosed. The cells of the battery are housed in cylindrical modules, into which a heat transfer fluid under pressure and at a given temperature circulates. The fluid unit has a return reservoir that collects &hellip;  ",
+        "adjudicated_text_sha256": "f4e413cc234ef5b5e4c2c38bac10b738667aafa19c883e517e9dcdf4fce4737f",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "system",
+          "temperature"
+         ],
+         "distinguishing_terms_covered": [
+          "temperature"
+         ],
+         "distinguishing_terms_surviving": [
+          "account",
+          "behavior",
+          "bms",
+          "charging",
+          "cold",
+          "compensate",
+          "constrained",
+          "degradation",
+          "diagnostic",
+          "drop",
+          "electrochemical",
+          "explicitly",
+          "fault",
+          "gradient",
+          "heterogeneity",
+          "influence",
+          "localized",
+          "logic",
+          "misinterpreting",
+          "plane",
+          "reading",
+          "requirement",
+          "thermal",
+          "thickness",
+          "threshold",
+          "through",
+          "transient",
+          "voltage",
+          "weather"
+         ],
+         "coverage_ratio": 0.033,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-04",
+        "representative": {
+         "patent_id": "CN107749444B",
+         "title": "Battery module and method for monitoring a battery module",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/CN107749444B/en",
+         "assignee": "['罗伯特·博世有限公司']",
+         "publication_date": "2021-12-31"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN107749444B"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Battery module and method for monitoring a battery module The present invention discloses a battery pack module and a method for monitoring the battery pack module. The present invention relates to a battery pack module comprising a plurality of battery pack cells and a plurality of temperature sensors. Thereby, several temperature sensors are &hellip;  ",
+        "adjudicated_text_sha256": "aeb1ad5edec2f93207970a6d97f613b88999a4b311a5a5c113590cab36ac12ab",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [
+          "temperature"
+         ],
+         "distinguishing_terms_covered": [
+          "temperature"
+         ],
+         "distinguishing_terms_surviving": [
+          "account",
+          "behavior",
+          "bms",
+          "charging",
+          "cold",
+          "compensate",
+          "constrained",
+          "degradation",
+          "diagnostic",
+          "drop",
+          "electrochemical",
+          "explicitly",
+          "fault",
+          "gradient",
+          "heterogeneity",
+          "influence",
+          "localized",
+          "logic",
+          "misinterpreting",
+          "plane",
+          "reading",
+          "requirement",
+          "thermal",
+          "thickness",
+          "threshold",
+          "through",
+          "transient",
+          "voltage",
+          "weather"
+         ],
+         "coverage_ratio": 0.033,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-05",
+        "representative": {
+         "patent_id": "CN116039380B",
+         "title": "A battery pack information collection system based on terminal control",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/CN116039380B/en",
+         "assignee": "['安徽国轩象铝科技有限公司']",
+         "publication_date": "2025-03-04"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN116039380B"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "A battery pack information collection system based on terminal control The present invention discloses a battery pack information acquisition system based on terminal control; the system comprises a main control module, the main control module is electrically connected to a data processing module, the data processing module is electrically connected to a BMS &hellip;  ",
+        "adjudicated_text_sha256": "442ff5ba49e6d02f28d6e563296bd76eadc93724b243532ac25fa4f0c3e32f13",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [
+          "system"
+         ],
+         "distinguishing_terms_covered": [
+          "bms"
+         ],
+         "distinguishing_terms_surviving": [
+          "account",
+          "behavior",
+          "charging",
+          "cold",
+          "compensate",
+          "constrained",
+          "degradation",
+          "diagnostic",
+          "drop",
+          "electrochemical",
+          "explicitly",
+          "fault",
+          "gradient",
+          "heterogeneity",
+          "influence",
+          "localized",
+          "logic",
+          "misinterpreting",
+          "plane",
+          "reading",
+          "requirement",
+          "temperature",
+          "thermal",
+          "thickness",
+          "threshold",
+          "through",
+          "transient",
+          "voltage",
+          "weather"
+         ],
+         "coverage_ratio": 0.033,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-06",
+        "representative": {
+         "patent_id": "CN113904005B",
+         "title": "Online measurement of anode potential for maximizing charging power at low &hellip;",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/CN113904005B/en",
+         "assignee": "['三星Sdi株式会社']",
+         "publication_date": "2024-10-11"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN113904005B"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Online measurement of anode potential for maximizing charging power at low &hellip; The present invention relates to a battery system which allows an optimized charging process, in particular a charging process in which the charging power is maximized when the battery system is in a low temperature environment. The battery system is equipped with a plurality of battery cells, &hellip;  ",
+        "adjudicated_text_sha256": "5824d165ee47cca71de5d27d18036a6fe77fa48558b6a386517ebca4c5d2cc37",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "charging",
+          "system",
+          "temperature"
+         ],
+         "distinguishing_terms_covered": [
+          "charging",
+          "temperature"
+         ],
+         "distinguishing_terms_surviving": [
+          "account",
+          "behavior",
+          "bms",
+          "cold",
+          "compensate",
+          "constrained",
+          "degradation",
+          "diagnostic",
+          "drop",
+          "electrochemical",
+          "explicitly",
+          "fault",
+          "gradient",
+          "heterogeneity",
+          "influence",
+          "localized",
+          "logic",
+          "misinterpreting",
+          "plane",
+          "reading",
+          "requirement",
+          "thermal",
+          "thickness",
+          "threshold",
+          "through",
+          "transient",
+          "voltage",
+          "weather"
+         ],
+         "coverage_ratio": 0.067,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       }
+      ],
+      "n_families": 6,
+      "n_search_errors": 0,
+      "search_errors": [],
+      "search_execution": {
+       "mandatory_complete": true,
+       "n_errors": 0,
+       "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+      },
+      "relevance_model_version": "collision_resolution/2.0.0",
+      "determinism_contract": {
+       "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+       "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+      },
+      "thresholds": {
+       "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+        "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+       },
+       "MIN_MECHANISM_OVERLAP": {
+        "value": 2,
+        "epistemic_class": "ENGINEERING",
+        "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+        "uncertainty": "term overlap is a proxy for mechanism identity"
+       },
+       "ANTICIPATION_COVERAGE_RATIO": {
+        "value": 0.8,
+        "epistemic_class": "ENGINEERING",
+        "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+        "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+       },
+       "MAX_QUERY_TERMS": {
+        "value": 6,
+        "epistemic_class": "ENGINEERING",
+        "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+       },
+       "ABSTRACT_TIER_MIN_CHARS": {
+        "value": 80,
+        "epistemic_class": "ENGINEERING",
+        "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+       }
+      },
+      "surviving_differentiators": [
+       "account",
+       "behavior",
+       "bms",
+       "charging",
+       "cold",
+       "compensate",
+       "constrained",
+       "degradation",
+       "diagnostic",
+       "drop",
+       "electrochemical",
+       "explicitly",
+       "fault",
+       "gradient",
+       "heterogeneity",
+       "influence",
+       "localized",
+       "logic",
+       "misinterpreting",
+       "plane",
+       "reading",
+       "requirement",
+       "temperature",
+       "thermal",
+       "thickness",
+       "threshold",
+       "through",
+       "transient",
+       "voltage",
+       "weather"
+      ]
+     },
+     "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+     "cached_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05",
+      "PA-FAM-06"
+     ]
+    },
+    "prior_art_status": "RESOLVED_DIFFERENTIATED",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.422,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": 0.9,
+      "state": "MEASURED"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": 0.994,
+      "state": "MEASURED"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.797,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.7
+   },
+   "decision": {
+    "action": "REJECT_MUTATION",
+    "improved": false,
+    "checks": {
+     "targeted_dimension": "0.487 -> 0.422 (no improvement)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-29T08:50:23+00:00Z"
+   }
+  }
+ ],
+ "outcome": "KILLED_NO_IMPROVING_MUTATION",
+ "outcome_reason": "iteration 2: 2 validated EVIDENCE_DERIVED_CONSTRAINT mutation(s) were applied and fully re-evaluated; the targeted dimension I1_MECHANISM_EVIDENCE_DERIVATION did not improve (0.487 -> 0.487 (no improvement); 0.487 -> 0.422 (no improvement)); no invariant violated. No defensible improvement exists. Candidate killed.",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.722,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 0.964,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": true,
+   "recombination_only": false
+  },
+  "i_average": 0.671,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 0.167,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.533,
+  "prior_art_status": "UNRESOLVED_SEARCH_INCOMPLETE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.487,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.842,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 0.994,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.798,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.7,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "finished_at": "2026-09-29T08:50:34+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.671,
+  "final_i_average": 0.798,
+  "baseline_q_average": 0.533,
+  "final_q_average": 0.7,
+  "iterations_run": 2,
+  "keeps": 1
+ },
+ "status": "KILLED_NO_IMPROVING_MUTATION"
+}

@@ -1,0 +1,384 @@
+{
+ "ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
+ "version": "1.0.0",
+ "requested_models": 3,
+ "available_providers": [
+  "agnes",
+  "unorouter",
+  "xkiro",
+  "apinex",
+  "bai",
+  "bynara",
+  "atria",
+  "hf",
+  "zai",
+  "openrouter",
+  "nvidia"
+ ],
+ "members": [
+  {
+   "role": "MODEL_A",
+   "provider_id": "agnes",
+   "status": "OK",
+   "model": "agnes-3.0-flash",
+   "prompt_hash": "10ce5084e1d8d7f309397d621ec91cbbf76b04c6d0c8bffd3e8965b773a5363f",
+   "output_hash": "8505b7f889a179b8ea13d96d7c117b7d914600649e7d33e03fde790ff04b58f3",
+   "latency_ms": 20546,
+   "fields": {
+    "mechanism": "Thermal heterogeneity and in-plane temperature gradients within the battery alter electrochemical behavior, causing localized resistance changes that mimic or trigger intermittent sensor fault codes during low thermal mass conditions.",
+    "intervention": "Implement a temperature-compensated voltage threshold algorithm for the battery monitoring unit that adjusts sensitivity based on real-time localized surface temperature readings rather than a static global threshold.",
+    "expected_effect": "The intermittent warning light flash at cold idle will cease because the system no longer misinterprets normal cold-temperature voltage drops/resistance increases as a critical charging fault.",
+    "falsification_test": "Perform a controlled cold-soak test below 0C with the engine idling; monitor the battery voltage hysteresis and log the thermal camera readings at the specific cell location; if the warning light remains off while static threshold triggers would have occurred, the intervention is confirmed.",
+    "mechanism_source_span": "Thermal heterogeneity accelerates capacity fade"
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:agnes:8505b7f889a1",
+    "mechanism": "Thermal heterogeneity and in-plane temperature gradients within the battery alter electrochemical behavior, causing localized resistance changes that mimic or trigger intermittent sensor fault codes during low thermal mass conditions.",
+    "intervention": "Implement a temperature-compensated voltage threshold algorithm for the battery monitoring unit that adjusts sensitivity based on real-time localized surface temperature readings rather than a static global threshold.",
+    "expected_effect": "The intermittent warning light flash at cold idle will cease because the system no longer misinterprets normal cold-temperature voltage drops/resistance increases as a critical charging fault.",
+    "falsification_test": "Perform a controlled cold-soak test below 0C with the engine idling; monitor the battery voltage hysteresis and log the thermal camera readings at the specific cell location; if the warning light remains off while static threshold triggers would have occurred, the intervention is confirmed.",
+    "mechanism_source_span": "Thermal heterogeneity accelerates capacity fade",
+    "source_evidence": {
+     "source_id": "doi:10.1002/aesr.202500400",
+     "source_hash": "9afc102d0698c33abef083fb94fca71171f2eef2651f9d70c0ccc50b50c673ac"
+    }
+   }
+  },
+  {
+   "role": "MODEL_B",
+   "provider_id": "unorouter",
+   "status": "OK",
+   "model": "agnes-3.0-flash",
+   "prompt_hash": "10ce5084e1d8d7f309397d621ec91cbbf76b04c6d0c8bffd3e8965b773a5363f",
+   "output_hash": "14f311842d20ee5219ffc033d6149aa3d319d07f9d62288b7f2c14fe1d899b1a",
+   "latency_ms": 10567,
+   "fields": {
+    "mechanism": "Temperature-dependent internal resistance and electrochemical behavior in cells",
+    "intervention": "Replace the voltage-sensing resistor or update the BMS temperature-compensation algorithm to account for increased internal resistance at sub-zero temperatures.",
+    "expected_effect": "Eliminates false low-voltage or high-current triggers that cause the intermittent warning light flash at cold idle.",
+    "falsification_test": "Measure the battery's internal resistance using a conductance tester at temperatures below 0°C and compare it to room temperature readings; confirm that the measured voltage drop at idle exceeds the fault threshold only when cold.",
+    "mechanism_source_span": "gradients, emphasizing their influence on electrochemical"
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:unorouter:14f311842d20",
+    "mechanism": "Temperature-dependent internal resistance and electrochemical behavior in cells",
+    "intervention": "Replace the voltage-sensing resistor or update the BMS temperature-compensation algorithm to account for increased internal resistance at sub-zero temperatures.",
+    "expected_effect": "Eliminates false low-voltage or high-current triggers that cause the intermittent warning light flash at cold idle.",
+    "falsification_test": "Measure the battery's internal resistance using a conductance tester at temperatures below 0°C and compare it to room temperature readings; confirm that the measured voltage drop at idle exceeds the fault threshold only when cold.",
+    "mechanism_source_span": "gradients, emphasizing their influence on electrochemical",
+    "source_evidence": {
+     "source_id": "doi:10.1002/aesr.202500400",
+     "source_hash": "9afc102d0698c33abef083fb94fca71171f2eef2651f9d70c0ccc50b50c673ac"
+    }
+   }
+  },
+  {
+   "role": "MODEL_C",
+   "provider_id": "xkiro",
+   "status": "OK",
+   "model": "minimax/minimax-m3:free",
+   "prompt_hash": "10ce5084e1d8d7f309397d621ec91cbbf76b04c6d0c8bffd3e8965b773a5363f",
+   "output_hash": "77f6acdaa49a5618ba6b616e1f732653f328ae3068ba1705f2831862b618e69d",
+   "latency_ms": 8437,
+   "fields": {
+    "mechanism": "Localized heat generation produces in-plane and through-thickness temperature gradients within lithium-ion cells, and these spatially non-uniform thermal distributions influence electrochemical behavior and safety, meaning that battery internal sensing must account for thermal heterogeneity rather than rely on a single-point measurement.",
+    "intervention": "Map the paper's multiscale, gradient-aware thermal sensing concept onto the 2015 Camry's charging system by instrumenting the 12V lead-acid battery (and its sensing/ground paths) with distributed temperature sensors (surface-mounted plus embedded/ring-terminal sensors) combined with a model-predictive diagnostic that interprets spatially distributed thermal data instead of a single battery current/temperature sensor; at cold idle (<0 C) the alternator's reduced output combined with high accessory load on a cold-weakened battery creates localized internal heating/resistance gradients that the OEM IBS misreads as a charging fault.",
+    "expected_effect": "The intermittent battery warning light flash at cold idle is resolved because the distributed thermal sensing detects the true localized electrochemical state of the battery rather than misinterpreting a cold-idle voltage/thermal transient as a charging-system fault, eliminating false battery warnings while preserving genuine fault detection.",
+    "falsification_test": "Connect a calibrated distributed thermal sensor array to a cold-soaked (<0 C) Camry battery, run the engine at idle until the warning light flashes, and capture the in-plane/through-thickness thermal gradient; if the gradient remains spatially uniform (ΔT < ~1 C across the cell) at the moment of the warning, the thermal-heterogeneity mechanism is falsified and the root cause must be elsewhere (e.g., IBS ground, alternator diode, or PCM logic).",
+    "mechanism_source_span": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems."
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:xkiro:77f6acdaa49a",
+    "mechanism": "Localized heat generation produces in-plane and through-thickness temperature gradients within lithium-ion cells, and these spatially non-uniform thermal distributions influence electrochemical behavior and safety, meaning that battery internal sensing must account for thermal heterogeneity rather than rely on a single-point measurement.",
+    "intervention": "Map the paper's multiscale, gradient-aware thermal sensing concept onto the 2015 Camry's charging system by instrumenting the 12V lead-acid battery (and its sensing/ground paths) with distributed temperature sensors (surface-mounted plus embedded/ring-terminal sensors) combined with a model-predictive diagnostic that interprets spatially distributed thermal data instead of a single battery current/temperature sensor; at cold idle (<0 C) the alternator's reduced output combined with high accessory load on a cold-weakened battery creates localized internal heating/resistance gradients that the OEM IBS misreads as a charging fault.",
+    "expected_effect": "The intermittent battery warning light flash at cold idle is resolved because the distributed thermal sensing detects the true localized electrochemical state of the battery rather than misinterpreting a cold-idle voltage/thermal transient as a charging-system fault, eliminating false battery warnings while preserving genuine fault detection.",
+    "falsification_test": "Connect a calibrated distributed thermal sensor array to a cold-soaked (<0 C) Camry battery, run the engine at idle until the warning light flashes, and capture the in-plane/through-thickness thermal gradient; if the gradient remains spatially uniform (ΔT < ~1 C across the cell) at the moment of the warning, the thermal-heterogeneity mechanism is falsified and the root cause must be elsewhere (e.g., IBS ground, alternator diode, or PCM logic).",
+    "mechanism_source_span": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems.",
+    "source_evidence": {
+     "source_id": "doi:10.1002/aesr.202500400",
+     "source_hash": "9afc102d0698c33abef083fb94fca71171f2eef2651f9d70c0ccc50b50c673ac"
+    }
+   }
+  }
+ ],
+ "common_claims": [],
+ "disagreements": [
+  {
+   "disagreement_id": "DIS-001",
+   "dimension": "mechanism",
+   "role_a": "MODEL_A",
+   "claim_a": "Thermal heterogeneity and in-plane temperature gradients within the battery alter electrochemical behavior, causing localized resistance changes that mimic or trigger intermittent sensor fault codes during low thermal mass conditions.",
+   "role_b": "MODEL_B",
+   "claim_b": "Temperature-dependent internal resistance and electrochemical behavior in cells",
+   "similarity": 0.16,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:47:39+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-002",
+   "dimension": "mechanism",
+   "role_a": "MODEL_A",
+   "claim_a": "Thermal heterogeneity and in-plane temperature gradients within the battery alter electrochemical behavior, causing localized resistance changes that mimic or trigger intermittent sensor fault codes during low thermal mass conditions.",
+   "role_b": "MODEL_C",
+   "claim_b": "Localized heat generation produces in-plane and through-thickness temperature gradients within lithium-ion cells, and these spatially non-uniform thermal distributions influence electrochemical behavior and safety, meaning that battery internal sensing must account for thermal heterogeneity rather than rely on a single-point measurement.",
+   "similarity": 0.209,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:47:39+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-003",
+   "dimension": "mechanism",
+   "role_a": "MODEL_B",
+   "claim_a": "Temperature-dependent internal resistance and electrochemical behavior in cells",
+   "role_b": "MODEL_C",
+   "claim_b": "Localized heat generation produces in-plane and through-thickness temperature gradients within lithium-ion cells, and these spatially non-uniform thermal distributions influence electrochemical behavior and safety, meaning that battery internal sensing must account for thermal heterogeneity rather than rely on a single-point measurement.",
+   "similarity": 0.156,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:47:39+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-004",
+   "dimension": "intervention",
+   "role_a": "MODEL_A",
+   "claim_a": "Implement a temperature-compensated voltage threshold algorithm for the battery monitoring unit that adjusts sensitivity based on real-time localized surface temperature readings rather than a static global threshold.",
+   "role_b": "MODEL_B",
+   "claim_b": "Replace the voltage-sensing resistor or update the BMS temperature-compensation algorithm to account for increased internal resistance at sub-zero temperatures.",
+   "similarity": 0.1,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:47:39+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-005",
+   "dimension": "intervention",
+   "role_a": "MODEL_A",
+   "claim_a": "Implement a temperature-compensated voltage threshold algorithm for the battery monitoring unit that adjusts sensitivity based on real-time localized surface temperature readings rather than a static global threshold.",
+   "role_b": "MODEL_C",
+   "claim_b": "Map the paper's multiscale, gradient-aware thermal sensing concept onto the 2015 Camry's charging system by instrumenting the 12V lead-acid battery (and its sensing/ground paths) with distributed temperature sensors (surface-mounted plus embedded/ring-terminal sensors) combined with a model-predictive diagnostic that interprets spatially distributed thermal data instead of a single battery current/temperature sensor; at cold idle (<0 C) the alternator's reduced output combined with high accessory load on a cold-weakened battery creates localized internal heating/resistance gradients that the OEM IBS misreads as a charging fault.",
+   "similarity": 0.058,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:47:39+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-006",
+   "dimension": "intervention",
+   "role_a": "MODEL_B",
+   "claim_a": "Replace the voltage-sensing resistor or update the BMS temperature-compensation algorithm to account for increased internal resistance at sub-zero temperatures.",
+   "role_b": "MODEL_C",
+   "claim_b": "Map the paper's multiscale, gradient-aware thermal sensing concept onto the 2015 Camry's charging system by instrumenting the 12V lead-acid battery (and its sensing/ground paths) with distributed temperature sensors (surface-mounted plus embedded/ring-terminal sensors) combined with a model-predictive diagnostic that interprets spatially distributed thermal data instead of a single battery current/temperature sensor; at cold idle (<0 C) the alternator's reduced output combined with high accessory load on a cold-weakened battery creates localized internal heating/resistance gradients that the OEM IBS misreads as a charging fault.",
+   "similarity": 0.062,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:47:39+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-007",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_B",
+   "claim_a": "Eliminates false low-voltage or high-current triggers that cause the intermittent warning light flash at cold idle.",
+   "role_b": "MODEL_C",
+   "claim_b": "The intermittent battery warning light flash at cold idle is resolved because the distributed thermal sensing detects the true localized electrochemical state of the battery rather than misinterpreting a cold-idle voltage/thermal transient as a charging-system fault, eliminating false battery warnings while preserving genuine fault detection.",
+   "similarity": 0.222,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:47:39+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-008",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "Perform a controlled cold-soak test below 0C with the engine idling; monitor the battery voltage hysteresis and log the thermal camera readings at the specific cell location; if the warning light remains off while static threshold triggers would have occurred, the intervention is confirmed.",
+   "role_b": "MODEL_B",
+   "claim_b": "Measure the battery's internal resistance using a conductance tester at temperatures below 0°C and compare it to room temperature readings; confirm that the measured voltage drop at idle exceeds the fault threshold only when cold.",
+   "similarity": 0.133,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:47:39+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-009",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "Perform a controlled cold-soak test below 0C with the engine idling; monitor the battery voltage hysteresis and log the thermal camera readings at the specific cell location; if the warning light remains off while static threshold triggers would have occurred, the intervention is confirmed.",
+   "role_b": "MODEL_C",
+   "claim_b": "Connect a calibrated distributed thermal sensor array to a cold-soaked (<0 C) Camry battery, run the engine at idle until the warning light flashes, and capture the in-plane/through-thickness thermal gradient; if the gradient remains spatially uniform (ΔT < ~1 C across the cell) at the moment of the warning, the thermal-heterogeneity mechanism is falsified and the root cause must be elsewhere (e.g., IBS ground, alternator diode, or PCM logic).",
+   "similarity": 0.14,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:47:39+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-010",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_B",
+   "claim_a": "Measure the battery's internal resistance using a conductance tester at temperatures below 0°C and compare it to room temperature readings; confirm that the measured voltage drop at idle exceeds the fault threshold only when cold.",
+   "role_b": "MODEL_C",
+   "claim_b": "Connect a calibrated distributed thermal sensor array to a cold-soaked (<0 C) Camry battery, run the engine at idle until the warning light flashes, and capture the in-plane/through-thickness thermal gradient; if the gradient remains spatially uniform (ΔT < ~1 C across the cell) at the moment of the warning, the thermal-heterogeneity mechanism is falsified and the root cause must be elsewhere (e.g., IBS ground, alternator diode, or PCM logic).",
+   "similarity": 0.053,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:47:39+00:00Z"
+  }
+ ],
+ "unique_mechanisms": [
+  {
+   "dimension": "mechanism",
+   "role": "MODEL_A",
+   "claim": "Thermal heterogeneity and in-plane temperature gradients within the battery alter electrochemical behavior, causing localized resistance changes that mimic or trigger intermittent sensor fault codes during low thermal mass conditions.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "mechanism",
+   "role": "MODEL_B",
+   "claim": "Temperature-dependent internal resistance and electrochemical behavior in cells",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "mechanism",
+   "role": "MODEL_C",
+   "claim": "Localized heat generation produces in-plane and through-thickness temperature gradients within lithium-ion cells, and these spatially non-uniform thermal distributions influence electrochemical behavior and safety, meaning that battery internal sensing must account for thermal heterogeneity rather than rely on a single-point measurement.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_A",
+   "claim": "Implement a temperature-compensated voltage threshold algorithm for the battery monitoring unit that adjusts sensitivity based on real-time localized surface temperature readings rather than a static global threshold.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_B",
+   "claim": "Replace the voltage-sensing resistor or update the BMS temperature-compensation algorithm to account for increased internal resistance at sub-zero temperatures.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_C",
+   "claim": "Map the paper's multiscale, gradient-aware thermal sensing concept onto the 2015 Camry's charging system by instrumenting the 12V lead-acid battery (and its sensing/ground paths) with distributed temperature sensors (surface-mounted plus embedded/ring-terminal sensors) combined with a model-predictive diagnostic that interprets spatially distributed thermal data instead of a single battery current/temperature sensor; at cold idle (<0 C) the alternator's reduced output combined with high accessory load on a cold-weakened battery creates localized internal heating/resistance gradients that the OEM IBS misreads as a charging fault.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_A",
+   "claim": "The intermittent warning light flash at cold idle will cease because the system no longer misinterprets normal cold-temperature voltage drops/resistance increases as a critical charging fault.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_B",
+   "claim": "Eliminates false low-voltage or high-current triggers that cause the intermittent warning light flash at cold idle.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_C",
+   "claim": "The intermittent battery warning light flash at cold idle is resolved because the distributed thermal sensing detects the true localized electrochemical state of the battery rather than misinterpreting a cold-idle voltage/thermal transient as a charging-system fault, eliminating false battery warnings while preserving genuine fault detection.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_A",
+   "claim": "Perform a controlled cold-soak test below 0C with the engine idling; monitor the battery voltage hysteresis and log the thermal camera readings at the specific cell location; if the warning light remains off while static threshold triggers would have occurred, the intervention is confirmed.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_B",
+   "claim": "Measure the battery's internal resistance using a conductance tester at temperatures below 0°C and compare it to room temperature readings; confirm that the measured voltage drop at idle exceeds the fault threshold only when cold.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_C",
+   "claim": "Connect a calibrated distributed thermal sensor array to a cold-soaked (<0 C) Camry battery, run the engine at idle until the warning light flashes, and capture the in-plane/through-thickness thermal gradient; if the gradient remains spatially uniform (ΔT < ~1 C across the cell) at the moment of the warning, the thermal-heterogeneity mechanism is falsified and the root cause must be elsewhere (e.g., IBS ground, alternator diode, or PCM logic).",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  }
+ ],
+ "adjudication": {
+  "adjudicator": "DETERMINISTIC (field completeness -> falsifiability -> source span)",
+  "primary_role": "MODEL_A",
+  "primary_provider": "agnes",
+  "primary_candidate_id": "cand:ENS:agnes:8505b7f889a1",
+  "ranking": [
+   {
+    "role": "MODEL_A",
+    "provider_id": "agnes",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   },
+   {
+    "role": "MODEL_B",
+    "provider_id": "unorouter",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   },
+   {
+    "role": "MODEL_C",
+    "provider_id": "xkiro",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   }
+  ],
+  "consensus_forced": false,
+  "note": "the primary candidate enters the pipeline; disagreement objects remain UNRESOLVED and travel with the artifact chain (E15-E: do not force consensus)",
+  "decided_at": "2026-09-29T08:47:39+00:00Z"
+ },
+ "built_at": "2026-09-29T08:46:51+00:00Z",
+ "status": "ENSEMBLE_RUN",
+ "paths": [
+  "agnes",
+  "unorouter",
+  "xkiro"
+ ],
+ "comparison": {
+  "method": "pairwise significant-word Jaccard over the four invention claim dimensions (deterministic, N-ary; E16-G)",
+  "thresholds": {
+   "agreement": 0.3,
+   "disagreement": 0.25
+  },
+  "roles_compared": [
+   "MODEL_A",
+   "MODEL_B",
+   "MODEL_C"
+  ],
+  "pairs_compared": 3
+ }
+}

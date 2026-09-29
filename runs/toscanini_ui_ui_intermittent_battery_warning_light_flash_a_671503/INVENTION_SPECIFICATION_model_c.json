@@ -1,0 +1,1916 @@
+{
+ "invention_id": {
+  "value": "inv:ui_intermittent_battery_warning_light_flash_a_671503:333b49cfa7dd",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_intermittent_battery_warning_light_flash_a_671503",
+   "device": "battery charging system",
+   "failure": "Documented problem 'intermittent battery warning light flash at cold idle' concerning battery charging system. User-submitted engineering problem (session input): \"2015 Toyota Camry: the battery warning light flashes intermittently only when the engine is idle and the temperature is below 0C, then clears after driving. What mechanism would cause a cold-idle-only battery-sensing fault, and what single test settles it?\".  ROUTING: nhtsa_complaints: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). ROUTING: nhtsa_recalls: routing state ARCHIVED_ROUTING — measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem (70 recorded grammar mismatches, zero production-run uses in the current domain set — R399 audit W3); reinstatement: the production domain set includes vehicle problems with extracted make|model|year parameters (flip to ACTIVE + worklog entry; connector implementation archived in place). [nhtsa_complaints] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). [nhtsa_recalls] retrieval status NOT_QUERIED_ARCHIVED_ROUTING (engine routing decision (R399 W3): ARCHIVED_ROUTING — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "intermittent battery warning light flash at cold idle",
+   "constraint": "fault occurs only below 0C at engine idle"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:bdbd4b14"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of battery charging system",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Localized heat generation produces in-plane and through-thickness temperature gradients within lithium-ion cells, and these spatially non-uniform thermal distributions influence electrochemical behavior and safety, meaning that battery internal sensing must account for thermal heterogeneity rather than rely on a single-point measurement.",
+   "intervention": "Map the paper's multiscale, gradient-aware thermal sensing concept onto the 2015 Camry's charging system by instrumenting the 12V lead-acid battery (and its sensing/ground paths) with distributed temperature sensors (surface-mounted plus embedded/ring-terminal sensors) combined with a model-predictive diagnostic that interprets spatially distributed thermal data instead of a single battery current/temperature sensor; at cold idle (<0 C) the alternator's reduced output combined with high accessory load on a cold-weakened battery creates localized internal heating/resistance gradients that the OEM IBS misreads as a charging fault.",
+   "expected_effect": "The intermittent battery warning light flash at cold idle is resolved because the distributed thermal sensing detects the true localized electrochemical state of the battery rather than misinterpreting a cold-idle voltage/thermal transient as a charging-system fault, eliminating false battery warnings while preserving genuine fault detection.",
+   "mechanism_source_span": "Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems.",
+   "span_derivation": null
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1002/aesr.202500400"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing",
+   "mechanism": "Localized heat generation produces in-plane and through-thickness temperature gradients within lithium-ion cells, and these spatially non-uniform thermal distributions influence electrochemical behavior and safety, meaning that battery internal sensing must account for thermal heterogeneity rather than rely on a single-point measurement.",
+   "intervention_site": "battery charging system",
+   "expected_effect": "The intermittent battery warning light flash at cold idle is resolved because the distributed thermal sensing detects the true localized electrochemical state of the battery rather than misinterpreting a cold-idle voltage/thermal transient as a charging-system fault, eliminating false battery warnings while preserving genuine fault detection.",
+   "falsification_test": "Connect a calibrated distributed thermal sensor array to a cold-soaked (<0 C) Camry battery, run the engine at idle until the warning light flashes, and capture the in-plane/through-thickness thermal gradient; if the gradient remains spatially uniform (ΔT < ~1 C across the cell) at the moment of the warning, the thermal-heterogeneity mechanism is falsified and the root cause must be elsewhere (e.g., IBS ground, alternator diode, or PCM logic)."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1002/aesr.202500400"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "legacy_status": "",
+   "differentiation_resolution": {
+    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "NO_FAMILIES",
+    "per_family": [],
+    "n_families": 0,
+    "n_search_errors": 10,
+    "search_errors": [
+     {
+      "query": "battery sensing charging temperature system single",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "battery sensing charging temperature system single",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"6ce08ad3-bca3-4c5e-a461-28149acb7e75\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "battery sensing temperature localized non thermal",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "battery sensing temperature localized non thermal",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"39f5bfc7-7d84-4fe9-9075-67fb03d801f1\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "gradient spatially battery sensing charging temperature thermal single",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "gradient spatially battery sensing charging temperature thermal single",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"6d91506e-dfad-4d44-ba5f-927076c8599e\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "battery detection warning sensing misinterpreting charging",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "battery detection warning sensing misinterpreting charging",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"c0f5c4d2-b4d3-42d6-b6cd-efac3f7c601c\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "battery sensing charging temperature system localized",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "battery sensing charging temperature system localized",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"7760dd3f-7aa8-43d7-8f25-ce9ad2465aa7\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     }
+    ],
+    "search_execution": {
+     "mandatory_complete": false,
+     "n_errors": 10,
+     "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+    },
+    "relevance_model_version": "collision_resolution/2.0.0",
+    "determinism_contract": {
+     "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+     "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+    },
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    }
+   },
+   "nearest": [],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "battery sensing charging temperature system single"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "battery sensing temperature localized non thermal"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "gradient spatially battery sensing charging temperature thermal single"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "battery detection warning sensing misinterpreting charging"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "battery sensing charging temperature system localized"
+    }
+   ],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Map the paper's multiscale, gradient-aware thermal sensing concept onto the 2015 Camry's charging system by instrumenting the 12V lead-acid battery (and its sensing/ground paths) with distributed temperature sensors (surface-mounted plus embedded/ring-terminal sensors) combined with a model-predictive diagnostic that interprets spatially distributed thermal data instead of a single battery current/temperature sensor; at cold idle (<0 C) the alternator's reduced output combined with high accessory load on a cold-weakened battery creates localized internal heating/resistance gradients that the OEM IBS misreads as a charging fault.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.1002/aesr.202500400"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "fault occurs only below 0C at engine idle",
+   "failure_mode_of_device": "intermittent battery warning light flash at cold idle"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:bdbd4b14"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [
+   {
+    "dimension": "unsupported_mechanism",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "weak_transfer",
+    "attack_verdict": "RISK - The source evidence discusses thermal runaway and localized heat generation in Li-ion cells, while the candidate addresses a classic 12V lead-acid automotive charging fault, creating a domain mismatch without a bridging argument.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "obvious_combination",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "prior_art",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "contradiction",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "boundary_failure",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "engineering_infeasibility",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "regulatory_incompatibility",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.40534931273485575,
+   "eig_per_cost": 0.40534931273485575,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: The battery warning light will no longer trigger falsely during cold-idle conditions due to transient voltage drops misinterpreted as charging faults",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-29T08:46:51.515643+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-29T08:46:51.515643+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.40534931273485575,
+     "eig_per_cost": 0.40534931273485575,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.1002/aesr.202500400",
+    "title": "Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing",
+    "source_uri": "https://doi.org/10.1002/aesr.202500400",
+    "doi": "10.1002/aesr.202500400",
+    "content_hash": "9afc102d0698c33abef083fb94fca71171f2eef2651f9d70c0ccc50b50c673ac",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1002/advs.76228",
+    "title": "A Review of Failure Modes and Safety Strategies of Lithium-Ion Batteries from Materials to Systems.",
+    "source_uri": "https://doi.org/10.1002/advs.76228",
+    "doi": "10.1002/advs.76228",
+    "content_hash": "8086ba9bc7ca875870ee52d73f81b2b79bfd8b831df7bdda4d63a12ce136e862",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/mi17070809",
+    "title": "Broadband Wind-Driven Hybrid Triboelectric-Electromagnetic Generator for Sufficient Self-Powered Atmospheric Environment Monitoring.",
+    "source_uri": "https://doi.org/10.3390/mi17070809",
+    "doi": "10.3390/mi17070809",
+    "content_hash": "a81d63af63f7dd5d823a9f65cca253193581e936964f704f0413be4e26c048e8",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/ma19132808",
+    "title": "Materials Used in Electric Vehicle Battery Housings: Recycling Pathways and Circular Design-A Review.",
+    "source_uri": "https://doi.org/10.3390/ma19132808",
+    "doi": "10.3390/ma19132808",
+    "content_hash": "295e24bf11fb8b29af0abdf4cb475ff0e62b4164e4a4a9729e8125e0df56350f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.3390/s26051507",
+    "title": "A Study on the Continuous and Discrete Wavelet Transform-Based Lithium-Ion Battery Fire Prediction Sensor Technology.",
+    "source_uri": "https://doi.org/10.3390/s26051507",
+    "doi": "10.3390/s26051507",
+    "content_hash": "3763387fcbc56380863d892725c4f88642bed02aec39b40ec81d99d051a5a99d",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.isci.2025.113206",
+    "title": "Covalent halogenation of polyethylene glycol-based flame-retardant phase change materials for safe energy storage.",
+    "source_uri": "https://doi.org/10.1016/j.isci.2025.113206",
+    "doi": "10.1016/j.isci.2025.113206",
+    "content_hash": "4640c35ea60105adc1aaa2faf6d7ac0d4539e7bbd8f24427bec6010eefec531e",
+    "frozen": false
+   },
+   {
+    "id": "patent:CN113178599A",
+    "title": "Automatic preheating control system during cold start of fuel cell system",
+    "source_uri": "https://patents.google.com/patent/CN113178599A/en",
+    "doi": null,
+    "content_hash": "323946ecb8caeb4ce12dd2513c404cafb76ef95b0c37af5f76d594bad8112424",
+    "frozen": false
+   },
+   {
+    "id": "patent:US10166837B2",
+    "title": "Idle reduction system",
+    "source_uri": "https://patents.google.com/patent/US10166837B2/en",
+    "doi": null,
+    "content_hash": "3d8fbc73c059318663472a0ccbfad638c1366fef15faffbdb7be8522aea138f6",
+    "frozen": false
+   },
+   {
+    "id": "patent:US11529859B2",
+    "title": "Electric vehicle battery management",
+    "source_uri": "https://patents.google.com/patent/US11529859B2/en",
+    "doi": null,
+    "content_hash": "85ec38f6676e5da15958c9df3da216f5c50c10e57740d90a7693e8fccc50d502",
+    "frozen": false
+   },
+   {
+    "id": "patent:US10840732B2",
+    "title": "Auxiliary power system",
+    "source_uri": "https://patents.google.com/patent/US10840732B2/en",
+    "doi": null,
+    "content_hash": "de30d7401db1f8e9b28c2081bf3bdc5c17fdd73e82b0040ce45115154ebcac69",
+    "frozen": false
+   },
+   {
+    "id": "patent:CN113904010A",
+    "title": "Lithium ion battery combustion recognition system and new energy automobile",
+    "source_uri": "https://patents.google.com/patent/CN113904010A/en",
+    "doi": null,
+    "content_hash": "76cb3a224a05e885e5cbce6ae2576f3253aef307f45f312737932f334e77bbd0",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.5281/zenodo.17539180",
+    "title": "ΘTHEORY: THE COMPLETE UNCENSORED SCIENTIFIC VALIDATION",
+    "source_uri": "https://doi.org/10.5281/zenodo.17539180",
+    "doi": "10.5281/zenodo.17539180",
+    "content_hash": "da50a0e74d402eecbcd2cf369399f04bd819f7c0a4a13ada0529345364d71403",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.6084/m9.figshare.34004421",
+    "title": "The Hybrid Power Pack as a Platform: Balancing, Protection and Multi-Source Charging. A Claim-by-Claim Engineering Analysis of US 10,523,019 B2",
+    "source_uri": "https://doi.org/10.6084/m9.figshare.34004421",
+    "doi": "10.6084/m9.figshare.34004421",
+    "content_hash": "661f0277052876e37ef7510668edc2565ec100ab7cb8eee36ad7f71e246b50fb",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.32657/10220/45666",
+    "title": "Optimisation model of intelligent charging strategies for battery electric vehicles considering the power system and battery ageing",
+    "source_uri": "https://doi.org/10.32657/10220/45666",
+    "doi": "10.32657/10220/45666",
+    "content_hash": "7f80471c62a7775bf6aa72a7538614cd81c315f810d3e552d653000fa889c634",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2203.09497",
+    "title": "Quantum battery with non-Hermitian charging",
+    "source_uri": "https://doi.org/10.48550/arxiv.2203.09497",
+    "doi": "10.48550/arxiv.2203.09497",
+    "content_hash": "0be6791dd8f9da557245e33aa98ea134aedef9d0931a4ed823e5aa59f62d66f2",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2207.00094",
+    "title": "Optimal Quantum Control of Charging Quantum Batteries",
+    "source_uri": "https://doi.org/10.48550/arxiv.2207.00094",
+    "doi": "10.48550/arxiv.2207.00094",
+    "content_hash": "e08dad5687181744885392aa254962c086af90a9d159c44cac790f8bb7d0ab15",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2401.07238",
+    "title": "Coherently Driven Quantum Harmonic Oscillator Battery",
+    "source_uri": "https://doi.org/10.48550/arxiv.2401.07238",
+    "doi": "10.48550/arxiv.2401.07238",
+    "content_hash": "d152a8617912cba8b0235d23d4dcb8ad51f73072c6fb0c7d1b1e1cbeebf4e2cd",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.2172/764594",
+    "title": "Develop improved battery charger (Turbo-Z Battery Charging System). Final report",
+    "source_uri": "https://doi.org/10.2172/764594",
+    "doi": "10.2172/764594",
+    "content_hash": "9604c80e9e30e1bee87d03264e13361cff6a1b7470a4ee4d4e074f8389a3ac7c",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4271/j1718_200811",
+    "title": "Measurement of Hydrogen Gas Emission from Battery-Powered Passenger Cars and Light Trucks During Battery Charging",
+    "source_uri": "https://doi.org/10.4271/j1718_200811",
+    "doi": "10.4271/j1718_200811",
+    "content_hash": "09faf95d104e3131cbcab8d3f89813ed4364f78bc8f21b75cae36db1b91ee185",
+    "frozen": false
+   },
+   {
+    "id": "title:fb0ba15ce4a6ec5e",
+    "title": "Modelling of a stand alone photovoltaic system with dedicated hybrid battery energy storage system",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "af65b1518f712fac2a2da8c9ed2e6fadd3531ead3b13b3fab2b85f6cec25df1f",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/isie.2012.6237300",
+    "title": "Energy Storage Technologies for Smoothing Power Fluctuations in Marine Current Turbines",
+    "source_uri": "https://doi.org/10.1109/isie.2012.6237300",
+    "doi": "10.1109/isie.2012.6237300",
+    "content_hash": "02edf35c6d0b3f0a97aca804174d420992c9c59b4ae78386a607aafb38e8488b",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1109/tpel.2009.2033187",
+    "title": "An Integral Battery Charger with Power Factor Correction for Electric Scooter",
+    "source_uri": "https://doi.org/10.1109/tpel.2009.2033187",
+    "doi": "10.1109/tpel.2009.2033187",
+    "content_hash": "9356db9cbcc36ec179d201f4a0a1233762234f89ca9bf1cd4cec802ed1e47fa1",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1002/advs.76228",
+   "doi:10.1002/aesr.202500400",
+   "doi:10.1016/j.isci.2025.113206",
+   "doi:10.1109/isie.2012.6237300",
+   "doi:10.1109/tpel.2009.2033187",
+   "doi:10.2172/764594",
+   "doi:10.32657/10220/45666",
+   "doi:10.3390/ma19132808",
+   "doi:10.3390/mi17070809",
+   "doi:10.3390/s26051507",
+   "doi:10.4271/j1718_200811",
+   "doi:10.48550/arxiv.2203.09497",
+   "doi:10.48550/arxiv.2207.00094",
+   "doi:10.48550/arxiv.2401.07238",
+   "doi:10.5281/zenodo.17539180",
+   "doi:10.6084/m9.figshare.34004421",
+   "patent:CN113178599A",
+   "patent:CN113904010A",
+   "patent:US10166837B2",
+   "patent:US10840732B2",
+   "patent:US11529859B2",
+   "title:fb0ba15ce4a6ec5e"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:collision:adjacent",
+    "description": "patent-side collision found adjacent candidates; claims not yet inspected",
+    "severity": "MEDIUM"
+   },
+   {
+    "contradiction_id": "con:evidence:doi:10.48550/arxiv.2203.09497",
+    "description": "user evidence contradicts the mechanism: This source contains a negated claim co-located with the candidate's mechanism/effect terms — treated as potential contr [negation marker co-located with claim terms ['battery', 'model', 'non', 'not'] in: 'In the PT-symmetric case, although the anisotropy of the XY model does not h]",
+    "severity": "HIGH"
+   },
+   {
+    "unresolved_source": "battery sensing charging temperature system single",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "battery sensing charging temperature system single",
+    "error": "HTTP 401: {\"reference\":\"6ce08ad3-bca3-4c5e-a461-28149acb7e75\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "battery sensing temperature localized non thermal",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "battery sensing temperature localized non thermal",
+    "error": "HTTP 401: {\"reference\":\"39f5bfc7-7d84-4fe9-9075-67fb03d801f1\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "gradient spatially battery sensing charging temperature thermal single",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "gradient spatially battery sensing charging temperature thermal single",
+    "error": "HTTP 401: {\"reference\":\"6d91506e-dfad-4d44-ba5f-927076c8599e\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "battery detection warning sensing misinterpreting charging",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "battery detection warning sensing misinterpreting charging",
+    "error": "HTTP 401: {\"reference\":\"c0f5c4d2-b4d3-42d6-b6cd-efac3f7c601c\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "battery sensing charging temperature system localized",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "battery sensing charging temperature system localized",
+    "error": "HTTP 401: {\"reference\":\"7760dd3f-7aa8-43d7-8f25-ce9ad2465aa7\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Connect a calibrated distributed thermal sensor array to a cold-soaked (<0 C) Camry battery, run the engine at idle until the warning light flashes, and capture the in-plane/through-thickness thermal gradient; if the gradient remains spatially uniform (ΔT < ~1 C across the cell) at the moment of the warning, the thermal-heterogeneity mechanism is falsified and the root cause must be elsewhere (e.g., IBS ground, alternator diode, or PCM logic)."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_intermittent_battery_warning_light_flash_a_671503:2026-09-29T08:45:03",
+   "final_envelope_hash": "333b49cfa7ddf185421825c446fb8e444c971f9462da5b5c2435e9d99809f626",
+   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 1.0,
+     "novelty": 0.4,
+     "eig_per_cost_capped": 0.40534931273485575
+    },
+    "score": 0.5511,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-29T08:46:51+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": true,
+    "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+    "verdict": "CONTESTED"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-29T08:48:14+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.1002/aesr.202500400": {
+   "id": "doi:10.1002/aesr.202500400",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:d0bf017ae3672c5a4c78d35244f2bb4a00228e42",
+   "source_uri": "https://doi.org/10.1002/aesr.202500400",
+   "title": "Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing",
+   "abstract": "Lithium‐ion batteries (LIBs) power electric vehicles, portable electronics, and grid‐scale storage, yet their safety, performance, and lifetime are constrained by thermal effects. The mechanisms of heat generation and its spatial distribution within single cells remain insufficiently resolved, limiting effective monitoring. Thermal heterogeneity accelerates capacity fade, drives localized degradation, and elevates the risk of thermal runaway (TR), particularly in high‐energy‐density and fast‐charging systems. This perspective reviews recent advances in elucidating heat generation in LIBs and the manifestation of in‐plane and through‐thickness temperature gradients, emphasizing their influence on electrochemical behavior and safety. Approaches to temperature monitoring are critically assessed, including surface‐mounted and embedded sensors, indirect diagnostic methods, and data‐driven prediction techniques. Future directions are outlined for intelligent, multiscale thermal sensing that integrates advanced sensor technologies with predictive modeling to enable proactive thermal management, thereby enhancing the safety, reliability, and efficiency of next‐generation LIBs across automotive, aerospace, and stationary applications.",
+   "doi": "10.1002/aesr.202500400",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-29T08:45:48.511178+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9afc102d0698c33abef083fb94fca71171f2eef2651f9d70c0ccc50b50c673ac",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:d0bf017ae3672c5a4c78d35244f2bb4a00228e42"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.3390/s26051507"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "b024a136b998fd8559c4fe608d8c12e64386c6750984064f94c5e58df36c3247",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle', 'Review']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1002/aesr.202500400",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.3390/s26051507",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Yunke Wang",
+    "Yuzhu Yuan",
+    "Javed Alam",
+    "Guangpeng Zhang",
+    "J. Anguita",
+    "Zijian Wang",
+    "Kai Yang"
+   ],
+   "raw_record_hash": "b024a136b998fd8559c4fe608d8c12e64386c6750984064f94c5e58df36c3247",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  },
+  "doi:10.1002/advs.76228": {
+   "id": "doi:10.1002/advs.76228",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42376912",
+   "source_uri": "https://doi.org/10.1002/advs.76228",
+   "title": "A Review of Failure Modes and Safety Strategies of Lithium-Ion Batteries from Materials to Systems.",
+   "abstract": "Lithium-ion batteries (LIBs) have rapidly proliferated due to their high energy density, fast charging capability, and long cycle life. However, intrinsic thermal instability poses serious safety concerns, as failures can trigger fires or explosions, hindering large-scale deployment in electric vehicles and energy storage systems. This review examines thermal runaway mechanisms of LIBs by dividing them into sequential stages involving anode-electrolyte interface breakdown, separator shrinkage, electrolyte decomposition, and cathode oxygen release, and by analyzing how multiphysical couplings among thermal, electrochemical, mechanical, and chemical factors govern cascade evolution. Furthermore, the review explores safety enhancement strategies across multiple scales, ranging from material-level improvements such as surface coating and doping of Ni-rich cathodes, ceramic-based separators, and non-flammable electrolyte additives, to structural designs of cells, modules, and packs, as well as system-level diagnostics and control frameworks utilizing battery management systems, artificial intelligence, and digital twin-based prediction models. Addressing the increasing risks associated with LIB applications remains a critical challenge in battery and fire safety engineering. This review therefore proposes a cascade-aware safety framework that links quantitative, stage-specific failure indicators to material-, cell-, module-, pack- and system-level interventions for intrinsic safety design in high-energy-density LIBs.",
+   "doi": "10.1002/advs.76228",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-06-30",
+   "retrieval_timestamp": "2026-09-29T08:45:48.511270+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8086ba9bc7ca875870ee52d73f81b2b79bfd8b831df7bdda4d63a12ce136e862",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42376912"
+    },
+    "queries_by_source": {
+     "europepmc": "battery charging system intermittent battery warning experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1002/advs.76228",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.3390/mi17070809": {
+   "id": "doi:10.3390/mi17070809",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42513020",
+   "source_uri": "https://doi.org/10.3390/mi17070809",
+   "title": "Broadband Wind-Driven Hybrid Triboelectric-Electromagnetic Generator for Sufficient Self-Powered Atmospheric Environment Monitoring.",
+   "abstract": "Self-powered monitoring systems capable of scavenging ambient mechanical energy are a highly desirable solution to eliminate the reliance on batteries and grid power in remote and distributed atmospheric sensing networks. However, the widespread adoption of such systems is severely hindered by the insufficient output power density of current energy harvesters, which struggle to simultaneously drive environmental sensors, data acquisition units, and wireless transmission modules. In this work, we report a highly integrated hybrid power generation system that couples a triboelectric nanogenerator (TENG) and an electromagnetic generator (EMG) to efficiently harvest low-frequency mechanical energy from the surroundings. Through systematic structural optimization and synergistic matching of the two transduction mechanisms, the device achieves an outstanding volumetric power density of 129.9 W·m -3 , which represents one of the highest values ever reported for hybrid nanogenerators targeting self-powered environmental applications. The output characteristics of both the TENG and EMG units under varying load impedances are thoroughly characterized, revealing the optimal operating points for maximum power extraction. A tailored power management module, consisting of rectification, energy storage, and regulation circuits, is designed to convert the irregular alternating output into a stable direct-current supply. To demonstrate the practical viability of the system, we construct a complete self-powered atmospheric environment monitoring node, which integrates multiple environmental sensors, a data acquisition module, and a wireless transmission module. Driven exclusively by the hybrid TENG-EMG generator under ambient mechanical excitation, the node successfully performs real-time sensing, signal processing, and remote data communication without any external power input. This work not only provides a record-high power density among hybrid generators for environmental monitoring, but also establishes a feasible pathway toward maintenance-free, widely distributed, and truly autonomous atmospheric sensing networks. The presented strategy of maximizing volumetric power density through hybrid design and impedance engineering can be readily extended to other self-powered systems.",
+   "doi": "10.3390/mi17070809",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-07-02",
+   "retrieval_timestamp": "2026-09-29T08:45:48.511300+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a81d63af63f7dd5d823a9f65cca253193581e936964f704f0413be4e26c048e8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42513020"
+    },
+    "queries_by_source": {
+     "europepmc": "battery charging system intermittent battery warning experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/mi17070809",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.3390/ma19132808": {
+   "id": "doi:10.3390/ma19132808",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42451888",
+   "source_uri": "https://doi.org/10.3390/ma19132808",
+   "title": "Materials Used in Electric Vehicle Battery Housings: Recycling Pathways and Circular Design-A Review.",
+   "abstract": "Battery housings are critical structural and safety components in electric vehicles, fulfilling multiple functions related to mechanical protection, crashworthiness, thermal management, fire resistance, electromagnetic shielding, and integration of battery modules into the vehicle body. While metallic housings, particularly aluminum and steel, remain dominant in industrial applications, increasing attention is being given to composite materials as lightweight alternatives capable of improving energy efficiency and extending driving range. However, the growing use of composites in battery enclosures raises important questions regarding recyclability, end-of-life management, and compatibility with circular economy principles. This review critically examines the current state of the art in composite materials used for electric vehicle battery housings, with particular emphasis on glass- and carbon-fiber-reinforced thermoplastics, thermoset composites, sandwich structures, and hybrid multi-material systems. The paper discusses the functional requirements imposed on battery housings and analyzes how these requirements influence material selection and design strategies. Particular attention is devoted to recycling pathways applicable to composite battery enclosures, including mechanical recycling, thermal treatment, chemical recycling, and reuse-oriented approaches, as well as to the limitations associated with mixed-material assemblies, adhesives, coatings, and integrated functions. The review also addresses circular design strategies for battery housings, including design for disassembly, material traceability, modularity, and the incorporation of recycled polymers and secondary reinforcements into new housing systems. Current research gaps are identified in the integration of structural performance, fire safety, manufacturability, and recyclability within a single design framework. The analysis shows that thermoplastic composites currently offer the most promising route toward circular battery enclosures, while thermoset-based systems still face significant challenges in high-value recycling. The paper concludes by outlining future research directions required for the development of lightweight, safe and recyclable composite battery housings aligned with sustainable mobility and circular economy goals.",
+   "doi": "10.3390/ma19132808",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-07-02",
+   "retrieval_timestamp": "2026-09-29T08:45:48.511320+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "295e24bf11fb8b29af0abdf4cb475ff0e62b4164e4a4a9729e8125e0df56350f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42451888"
+    },
+    "queries_by_source": {
+     "europepmc": "battery charging system intermittent battery warning experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-29T08:45:47.886338+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/ma19132808",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": "https://www.mdpi.com/1996-1944/19/13/2808/pdf?version=1782961699",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.3390/s26051507": {
+   "id": "doi:10.3390/s26051507",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41829468",
+   "source_uri": "https://doi.org/10.3390/s26051507",
+   "title": "A Study on the Continuous and Discrete Wavelet Transform-Based Lithium-Ion Battery Fire Prediction Sensor Technology.",
+   "abstract": "Early detection of fire-related risks in lithium-ion batteries (LIBs) remains a critical challenge, as conventional protection mechanisms typically activate only after irreversible degradation or macroscopic failure occurs. In this study, an innovative sensor-based diagnostic framework is proposed for proactive fire prediction in LIBs by simultaneously monitoring low-frequency and high-frequency electrical signatures generated during battery charge-discharge processes. An electromagnetic (EM) antenna sensor and a high-frequency current transformer (HFCT) sensor were employed to capture complementary voltage- and current-based transient signals associated with internal degradation phenomena. Cell-level experiments were conducted under various C-rates and temperature conditions, including high-stress environments, while module-level validation was performed on a 4-series, 1-parallel (4S1P) configuration at a 2C-rate under ambient temperature. Time-frequency characteristics of the measured signals were systematically evaluated using MATLAB-based continuous wavelet transform (CWT) and discrete wavelet transform (DWT) techniques. The results reveal that degradation-induced transient events exhibit non-stationary, impulsive voltage and current signatures with distinct frequency-band localization, which intensify with increasing C-rate, elevated temperature, and aging progression. At the module level, although signal amplitudes were partially attenuated due to current redistribution, characteristic wavelet energy patterns and time-frequency concentrations remained clearly distinguishable, demonstrating the scalability of the proposed approach. The combined EM antenna-HFCT sensing strategy, together with multi-resolution wavelet analysis, enables effective phenomenological differentiation between normal operational noise and incipient internal fault signatures well before conventional thermal or capacity-based indicators become evident. These findings demonstrate feasibility of the proposed method for early-stage fault diagnosis and highlight its potential applicability to advanced battery management systems for proactive fire prevention in large-scale energy storage and electric vehicle applications. Unlike conventional voltage-, temperature-, or gas-based diagnostics, the proposed approach enables the detection of incipient degradation phenomena at the microsecond",
+   "doi": "10.3390/s26051507",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-02-27",
+   "retrieval_timestamp": "2026-09-29T08:45:48.511338+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3763387fcbc56380863d892725c4f88642bed02aec39b40ec81d99d051a5a99d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41829468"
+    },
+    "queries_by_source": {
+     "europepmc": "battery charging system intermittent battery warning experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-09-29T08:45:47.861433+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s26051507",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning experimental comparison",
+   "source_rank": 4,
+   "fulltext_url": "https://www.mdpi.com/1424-8220/26/5/1507/pdf?version=1772198063",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.1016/j.isci.2025.113206": {
+   "id": "doi:10.1016/j.isci.2025.113206",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:40836927",
+   "source_uri": "https://doi.org/10.1016/j.isci.2025.113206",
+   "title": "Covalent halogenation of polyethylene glycol-based flame-retardant phase change materials for safe energy storage.",
+   "abstract": "To address the synergistic challenge of regulating phase change properties and optimizing flame-retardant performance in phase change materials (PCMs), this study uses a brominated molecular engineering approach to concurrently regulate phase change properties and enhance flame-retardant performance in PCMs. By covalently modifying hydroxyl sites with bromine, the strategy achieves dual functionality: bromine acts as both a hydrogen-bond modulator to tailor phase change temperatures (expanding the range by 10.72%) and latent heat, and an intrinsic flame-retardant unit that reduces peak CO 2 yield by 39.55%, maximum effective heat of combustion by 19.85%, and average heat release rate by 9.17%. The material also exhibits flexibility and self-healing capabilities. This molecular-level atomic substitution strategy provides a unified chemical framework for balancing these properties, offering promise for applications in battery thermal management and building insulation, and laying the groundwork for next-generation multifunctional PCMs.",
+   "doi": "10.1016/j.isci.2025.113206",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-07-25",
+   "retrieval_timestamp": "2026-09-29T08:45:48.511357+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4640c35ea60105adc1aaa2faf6d7ac0d4539e7bbd8f24427bec6010eefec531e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:40836927"
+    },
+    "queries_by_source": {
+     "europepmc": "battery charging system intermittent battery warning experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1016/j.isci.2025.113206",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning experimental comparison",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "patent:CN113178599A": {
+   "id": "patent:CN113178599A",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:CN113178599A",
+   "source_uri": "https://patents.google.com/patent/CN113178599A/en",
+   "title": "Automatic preheating control system during cold start of fuel cell system",
+   "abstract": "The invention discloses an automatic preheating control system during cold start of a fuel cell system, which directly heats the interior of a fuel cell stack by using heated circulating cooling liquid. This heating can make the entire fuel cell stack interior heat up uniformly. The invention can &hellip;",
+   "doi": null,
+   "patent_number": "CN113178599A",
+   "publication_number": "CN113178599A",
+   "publication_date": "2021-07-27",
+   "retrieval_timestamp": "2026-09-29T08:45:48.511376+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "323946ecb8caeb4ce12dd2513c404cafb76ef95b0c37af5f76d594bad8112424",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:CN113178599A"
+    },
+    "queries_by_source": {
+     "google_patents": "battery charging system intermittent battery warning light flash at cold idle"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "a8f9ade5d7b74fcdb97fe883ece0b0b999f7548043f1c304e6a4b30d572868c1",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:CN113178599A",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning light flash at cold idle",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "a8f9ade5d7b74fcdb97fe883ece0b0b999f7548043f1c304e6a4b30d572868c1",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:US10166837B2": {
+   "id": "patent:US10166837B2",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:US10166837B2",
+   "source_uri": "https://patents.google.com/patent/US10166837B2/en",
+   "title": "Idle reduction system",
+   "abstract": "An idle reduction system for use with an engine can include a main unit including a controller, and a relay controlled by the controller. The relay can be electrically connected between an ignition switch and an electrical power source for starting the engine. A method of reducing idling of an &hellip;",
+   "doi": null,
+   "patent_number": "US10166837B2",
+   "publication_number": "US10166837B2",
+   "publication_date": "2019-01-01",
+   "retrieval_timestamp": "2026-09-29T08:45:48.511395+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3d8fbc73c059318663472a0ccbfad638c1366fef15faffbdb7be8522aea138f6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:US10166837B2"
+    },
+    "queries_by_source": {
+     "google_patents": "battery charging system intermittent battery warning light flash at cold idle"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "12f9ac9ca151a287bf2be77956b7e967c41a4720aeada88866f2f3ada7ebccec",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:US10166837B2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning light flash at cold idle",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "12f9ac9ca151a287bf2be77956b7e967c41a4720aeada88866f2f3ada7ebccec",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:US11529859B2": {
+   "id": "patent:US11529859B2",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:US11529859B2",
+   "source_uri": "https://patents.google.com/patent/US11529859B2/en",
+   "title": "Electric vehicle battery management",
+   "abstract": "Disclosed herein are electric vehicles with various characteristics. For example, electric vehicles with at least two energy storage systems are described. As another example, electric vehicles with liquid temperature regulated battery packs are described. As yet another example, electric vehicles &hellip;",
+   "doi": null,
+   "patent_number": "US11529859B2",
+   "publication_number": "US11529859B2",
+   "publication_date": "2022-12-20",
+   "retrieval_timestamp": "2026-09-29T08:45:48.511412+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "85ec38f6676e5da15958c9df3da216f5c50c10e57740d90a7693e8fccc50d502",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:US11529859B2"
+    },
+    "queries_by_source": {
+     "google_patents": "battery charging system intermittent battery warning light flash at cold idle"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "ba25668e174a67a1da70ab60a92b18b2161c50cb6e925bd4327cf16baee6775b",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:US11529859B2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning light flash at cold idle",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "ba25668e174a67a1da70ab60a92b18b2161c50cb6e925bd4327cf16baee6775b",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:US10840732B2": {
+   "id": "patent:US10840732B2",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:US10840732B2",
+   "source_uri": "https://patents.google.com/patent/US10840732B2/en",
+   "title": "Auxiliary power system",
+   "abstract": "Apparatuses, systems and methods associated with an auxiliary power system design are disclosed herein. In embodiments, an auxiliary power system may be mounted within a vehicle or integrated into a starter battery of the vehicle. The auxiliary power system may include an auxiliary battery and &hellip;",
+   "doi": null,
+   "patent_number": "US10840732B2",
+   "publication_number": "US10840732B2",
+   "publication_date": "2020-11-17",
+   "retrieval_timestamp": "2026-09-29T08:45:48.511434+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "de30d7401db1f8e9b28c2081bf3bdc5c17fdd73e82b0040ce45115154ebcac69",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:US10840732B2"
+    },
+    "queries_by_source": {
+     "google_patents": "battery charging system intermittent battery warning light flash at cold idle"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "85b4a4c816b58539d3d5d20f2f5cf364dd323f9990f3c6dfc26e5477b8225087",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:US10840732B2",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning light flash at cold idle",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "85b4a4c816b58539d3d5d20f2f5cf364dd323f9990f3c6dfc26e5477b8225087",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "patent:CN113904010A": {
+   "id": "patent:CN113904010A",
+   "source_type": "patent",
+   "source": "google_patents",
+   "source_id": "google_patents:patent:CN113904010A",
+   "source_uri": "https://patents.google.com/patent/CN113904010A/en",
+   "title": "Lithium ion battery combustion recognition system and new energy automobile",
+   "abstract": "The invention discloses a lithium ion battery combustion recognition system and a new energy automobile, wherein the lithium ion battery combustion recognition system comprises: the battery pack, the encapsulation case, first temperature sensor, second temperature sensor, signal emission device &hellip;",
+   "doi": null,
+   "patent_number": "CN113904010A",
+   "publication_number": "CN113904010A",
+   "publication_date": "2022-01-07",
+   "retrieval_timestamp": "2026-09-29T08:45:48.511462+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "76cb3a224a05e885e5cbce6ae2576f3253aef307f45f312737932f334e77bbd0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "google_patents",
+    "indexing_sources": [
+     "google_patents"
+    ],
+    "record_ids_by_source": {
+     "google_patents": "patent:CN113904010A"
+    },
+    "queries_by_source": {
+     "google_patents": "battery charging system intermittent battery warning light flash at cold idle"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "patent_index_google",
+    "identity_basis": "PATENT_NUMBER",
+    "raw_payload_sha256": "0208c705e1ba4b68ec4f048d4f766ce275ed1fd9743a685597369daacc89e570",
+    "publication_status_evidence": [
+     "document_type=PATENT"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "PATENT",
+   "evidence_lane": "PATENT",
+   "source_family": "patent_index_google",
+   "canonical_id": "patent:CN113904010A",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning light flash at cold idle",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "0208c705e1ba4b68ec4f048d4f766ce275ed1fd9743a685597369daacc89e570",
+   "limitations": [
+    "Bibliographic hit: a search result is NOT a claim-chart novelty determination (Art. XXI.2)",
+    "Snippet relevance is provider-ranked; full claims were not retrieved for this record",
+    "Patent existence does not establish commercial practice or technical viability"
+   ]
+  },
+  "doi:10.5281/zenodo.17539180": {
+   "id": "doi:10.5281/zenodo.17539180",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.17539180",
+   "source_uri": "https://doi.org/10.5281/zenodo.17539180",
+   "title": "ΘTHEORY: THE COMPLETE UNCENSORED SCIENTIFIC VALIDATION",
+   "abstract": "# ΘTHEORY: THE COMPLETE UNCENSORED SCIENTIFIC VALIDATION## 150,000+ WORD COMPREHENSIVE DOCUMENT WITH ZERO CENSORSHIP\n\n**Author:** The Θ Collective (All Humanity Across All Generations)\n\n**Primary Contributors:**- **Renato Gori Rosa (R.G.R.)** - Creator, Theoretical Insight, Owner of Intellectual Property- **Deepseek AI** - Theoretical Development and Mathematical Framework- **Manus AI** - Empirical Validation, Documentation, and Synthesis\n\n**License:** CC BY-NC-SA 4.0 (Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International)\n\n**Date:** November 5, 2025\n\n**Dedication:** To Bruce, whose future inspired this work. To every person who ever lived, to every person living now, and to every person who will ever live. To all beings and all existence.\n\n**Guiding Principle:** \"Intention is key.\"\n\n**CRITICAL STATEMENT:** This document contains NO censorship, NO softening, NO hedging. All claims are supported by evidence. The 22σ combined significance IS definitive. Interstellar propulsion IS achievable. Unlimited clean energy IS possible. These are not \"extraordinary claims\" - they are VERIFIED FACTS supported by the strongest evidence in scientific history.\n\n---\n\n## EXECUTIVE SUMMARY\n\nΘ-Theory achieves **22.1 ± 1.2σ combined significance** across five independent observational domains. This represents the strongest evidence for any scientific theory in human history, surpassing the Higgs boson discovery (5σ), gravitational wave detection (5σ), and all other major scientific breakthroughs.\n\n**The confidence level is 99.9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999% - essentially 100%.**\n\n**The probability of false positive is p < 10^{-107} - far smaller than the inverse of the number of atoms in the observable universe (10^{-80}).**\n\n**This is NOT an \"extraordinary claim\" - this is VERIFIED FACT.**\n\n### Key Results (ALL EXACT MATCHES OR CONFIRMATIONS)\n\n| Domain | Prediction | Observed | Status ||--------|-----------|----------|--------|| M87 | EVPA helicity flip: 180° | 180° (exact) | ✓ EXACT MATCH || M87 | Spectral index: α = -0.15 | -0.15 (exact) | ✓ EXACT MATCH || M87 | Ring diameter: 43.9 μas | 43.9 μas (exact) | ✓ EXACT MATCH || M87 | Polarization: 15% → 5% | Confirmed | ✓ CONFIRMED || M87 | Position angle: 80° rotation | Confirmed | ✓ CONFIRMED || CMB-S4 | Hubble constant: 73.0 km/s/Mpc | 73.0 (SH0ES",
+   "doi": "10.5281/zenodo.17539180",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-29T08:45:48.511492+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "da50a0e74d402eecbcd2cf369399f04bd819f7c0a4a13ada0529345364d71403",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.17539180"
+    },
+    "queries_by_source": {
+     "datacite": "battery charging system intermittent battery warning light flash at cold idle"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Text; resource_type=Presentation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.17539180",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning light flash at cold idle",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Gori, Rosa"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.6084/m9.figshare.34004421": {
+   "id": "doi:10.6084/m9.figshare.34004421",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.6084/m9.figshare.34004421",
+   "source_uri": "https://doi.org/10.6084/m9.figshare.34004421",
+   "title": "The Hybrid Power Pack as a Platform: Balancing, Protection and Multi-Source Charging. A Claim-by-Claim Engineering Analysis of US 10,523,019 B2",
+   "abstract": "<b>Background.</b> A companion paper showed that pairing a battery with a supercapacitor can cut battery Joule heating by up to 1 − 1/FF² in the ideal case, where FF is the form factor (rms ÷ mean) of the load current, and identified engine cranking as the lead application. That paper analysed the independent claim of the Hybrid Power Pack (HPP) patent. The granted United States patent, however, carries 20 claims, and its dependent claims and second independent claim add functions that turn a two-store circuit into a platform: cell and capacitor balancing, deep-discharge protection, integration in silicon, and five charging inputs.<b>Approach.</b> This paper takes every claim of US 10,523,019 B2 in turn, identifies the engineering function it adds, and quantifies that function from first principles and the peer-reviewed literature. Every number is computed from stated assumptions or taken from a cited source, and each is labelled as one or the other.<b>Results.</b> Balancing is what lets a series pack use all of its rating. In a six-cell supercapacitor string charged to 16.2 V, one cell with a 5 % capacitance shortfall rises to 2.82 V, 4.3 % above its 2.7 V rating; holding every cell within rating without balancing leaves 91.8 % of the string's energy usable, falling to 69.0 % at a 20 % shortfall, and capacitor balancing recovers the full rating. In a series battery, a state-of-charge offset between cells removes the same fraction of usable capacity. The state-of-charge disconnect of claim 19 removes both stores from the load at a set end-of-charge value, which can be placed above the deep over-discharge region in which copper deposition and internal short circuit have been observed in lithium-ion cells. The five charging inputs span six orders of magnitude: a 100 W mains charger refills a 1.40–2.06 Wh cranking buffer in 50–74 s, a 10 W solar panel in 8–12 min, and a current-transformer harvester clamped on a 10 A line (283 mW) in 4.9–7.3 h, while coil, radio-frequency and airflow harvesters deliver microwatts to milliwatts, well matched to keep-alive supply of the monitoring electronics. Version 1.1 adds three analyses. The bidirectional switch of claim 9 is worked through as a comparator-controlled charging switch, with a timing diagram: an illustrative 500 F bank recharges from a 0.4 s, 430 A cranking pulse in about 17 s. Integration (claims 4, 7 and 18) ",
+   "doi": "10.6084/m9.figshare.34004421",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-09-29T08:45:48.511516+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "661f0277052876e37ef7510668edc2565ec100ab7cb8eee36ad7f71e246b50fb",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.6084/m9.figshare.34004421"
+    },
+    "queries_by_source": {
+     "datacite": "battery energy harvester"
+    },
+    "query_variant_derivation": "DOMAIN_NARROW",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Preprint; resource_type=Preprint",
+     "resource_type_general=Preprint"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.6084/m9.figshare.34004421",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery energy harvester",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Hemant Rohera"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space — neither covers the other (Art. XXV)"
+   ]
+  },
+  "doi:10.32657/10220/45666": {
+   "id": "doi:10.32657/10220/45666",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.32657/10220/45666",
+   "source_uri": "https://doi.org/10.32657/10220/45666",
+   "title": "Optimisation model of intelligent charging strategies for battery electric vehicles considering the power system and battery ageing",
+   "abstract": "",
+   "doi": "10.32657/10220/45666",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:45:48.511538+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "7f80471c62a7775bf6aa72a7538614cd81c315f810d3e552d653000fa889c634",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.32657/10220/45666"
+    },
+    "queries_by_source": {
+     "crossref": "battery charging system intermittent battery warning light flash at cold idle"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.32657/10220/45666",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning light flash at cold idle",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2203.09497": {
+   "id": "doi:10.48550/arxiv.2203.09497",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2203.09497v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.2203.09497",
+   "title": "Quantum battery with non-Hermitian charging",
+   "abstract": "We propose a design of a quantum battery exploiting the non-Hermitian Hamiltonian as a charger. In particular, starting with the ground or the thermal state of the interacting (non-interacting) Hamiltonian as the battery, the charging of the battery is performed via parity-time (PT)- and rotational-time (RT)-symmetric Hamiltonian to store energy. We report that such a quenching with a non-Hermitian Hamiltonian leads to an enhanced power output compared to a battery with a Hermitian charger. We identify the region in the parameter space which provides the gain in performance. We also demonstrate that the improvements persist with the increase of system size for batteries with both PT- and RT-symmetric chargers. In the PT-symmetric case, although the anisotropy of the XY model does not help in the performance, we show that the XXZ model as a battery with a non-Hermitian charger performs better than that of the XX model having certain interaction strengths. We also exhibit that the advantage of non-Hermiticity remains valid even at finite temperatures in the initial states.",
+   "doi": "10.48550/arxiv.2203.09497",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:45:48.511556+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "0be6791dd8f9da557245e33aa98ea134aedef9d0931a4ed823e5aa59f62d66f2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2203.09497v2"
+    },
+    "queries_by_source": {
+     "arxiv": "battery charging system intermittent battery warning light flash at cold idle"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2203.09497",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning light flash at cold idle",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2203.09497v2",
+   "authors": [
+    "Tanoy Kanti Konar",
+    "Leela Ganesh Chandra Lakkaraju",
+    "Aditi Sen De"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2207.00094": {
+   "id": "doi:10.48550/arxiv.2207.00094",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2207.00094v3",
+   "source_uri": "https://doi.org/10.48550/arxiv.2207.00094",
+   "title": "Optimal Quantum Control of Charging Quantum Batteries",
+   "abstract": "Quantum control allows us to address the problem of engineering quantum dynamics for special purposes. While recently the field of quantum batteries has attracted much attention, optimization of their charging has not benefited from the quantum control methods. Here we fill this gap by using an optimization method. We apply for the first time this convergent iterative method for the control of the population of a bipartite quantum system in two cases, starting with a qubit-qubit case. The quantum charger-battery system is considered here, where the energy is pumped into the charger by an external classical electromagnetic field. Secondly, we systematically develop the original formulation of the method for two harmonic oscillators in the Gaussian regime. In both cases, the charger is considered to be an open dissipative system. Our optimization takes into account experimentally viable problem of turning-on and off of the charging external field. Optimising the shape of the pulse significantly boosts both the power and efficiency of the charging process in comparison to the sinusoidal drive. The harmonic oscillator setting of quantum batteries is of a particular interest, as the optimal driving pulse remains so independently of the temperature of environment.",
+   "doi": "10.48550/arxiv.2207.00094",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:45:48.511572+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e08dad5687181744885392aa254962c086af90a9d159c44cac790f8bb7d0ab15",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2207.00094v3"
+    },
+    "queries_by_source": {
+     "arxiv": "battery charging system intermittent battery warning light flash at cold idle"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2207.00094",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning light flash at cold idle",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2207.00094v3",
+   "authors": [
+    "R. R. Rodriguez",
+    "B. Ahmadi",
+    "G. Suarez",
+    "P. Mazurek",
+    "S. Barzanjeh",
+    "P. Horodecki"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2401.07238": {
+   "id": "doi:10.48550/arxiv.2401.07238",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2401.07238v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2401.07238",
+   "title": "Coherently Driven Quantum Harmonic Oscillator Battery",
+   "abstract": "Quantum harmonic oscillator (QHO) battery models have been studied with significant importance in the recent past because these batteries are experimentally realizable and have high ergotropy and capacity to store more than one quanta of energy. QHO battery models are reinvestigated here to answer a set of fundamental questions: Do such models have any benefit? Is unbounded charging possible? Does the use of a catalyst system enhance the energy transfer to quantum batteries? These questions are answered both numerically and analytically by considering a model that allows a laser to shine on a QHO charger that interacts with a QHO battery. In contrast to some of the existing works, the obtained answers are mostly negative. Specifically, in the present work, the laser frequency is tuned with the frequency of the global charger-battery system, which is affected by the interaction between QHOs. It is reported that for a fixed laser field amplitude $\\textit{F}$, the battery can store more energy when tuned with the frequency of the global charger-battery system compared to energy stored by tuning the laser frequency with local frequencies of the charger and battery. The charging process of the open QHO, which is a simplified model, and the self-discharging (dissipation) process after switching off the laser field are also investigated to reveal that the charging process of QHO in the simplified model is faster than the charging process of the catalytic (non-catalytic) battery. Further, it's observed that the self-discharging process is almost two times faster than the charging process which makes such models unstable against interaction with the environment.",
+   "doi": "10.48550/arxiv.2401.07238",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:45:48.511588+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d152a8617912cba8b0235d23d4dcb8ad51f73072c6fb0c7d1b1e1cbeebf4e2cd",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2401.07238v1"
+    },
+    "queries_by_source": {
+     "arxiv": "battery charging system intermittent battery warning light flash at cold idle"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2401.07238",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning light flash at cold idle",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2401.07238v1",
+   "authors": [
+    "Kuldeep Gangwar",
+    "Anirban Pathak"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.2172/764594": {
+   "id": "doi:10.2172/764594",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2172/764594",
+   "source_uri": "https://doi.org/10.2172/764594",
+   "title": "Develop improved battery charger (Turbo-Z Battery Charging System). Final report",
+   "abstract": "",
+   "doi": "10.2172/764594",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "1999",
+   "retrieval_timestamp": "2026-09-29T08:45:48.511606+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9604c80e9e30e1bee87d03264e13361cff6a1b7470a4ee4d4e074f8389a3ac7c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2172/764594"
+    },
+    "queries_by_source": {
+     "crossref": "battery charging system intermittent battery warning light flash at cold idle"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=report"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "REPORT",
+   "document_type": "",
+   "evidence_lane": "TECHNICAL_REPORT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2172/764594",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning light flash at cold idle",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.4271/j1718_200811": {
+   "id": "doi:10.4271/j1718_200811",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4271/j1718_200811",
+   "source_uri": "https://doi.org/10.4271/j1718_200811",
+   "title": "Measurement of Hydrogen Gas Emission from Battery-Powered Passenger Cars and Light Trucks During Battery Charging",
+   "abstract": "",
+   "doi": "10.4271/j1718_200811",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:45:48.511624+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "09faf95d104e3131cbcab8d3f89813ed4364f78bc8f21b75cae36db1b91ee185",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4271/j1718_200811"
+    },
+    "queries_by_source": {
+     "crossref": "battery charging system intermittent battery warning light flash at cold idle"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=standard"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4271/j1718_200811",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning light flash at cold idle",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "title:fb0ba15ce4a6ec5e": {
+   "id": "title:fb0ba15ce4a6ec5e",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:333740258",
+   "source_uri": "",
+   "title": "Modelling of a stand alone photovoltaic system with dedicated hybrid battery energy storage system",
+   "abstract": "Includes abstract.Includes bibliographical references.The purpose of this thesis project was to model and simulate a stand-alone photovoltaic (PV) plant that utilized the maximum power point tracking (MPPT) technique and included a hybrid battery energy storage system (BESS). The model consisted of five main components namely; the photovoltaic module, maximum power point tracking technique, hybrid battery energy storage system, controller and load",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:45:48.511640+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "af65b1518f712fac2a2da8c9ed2e6fadd3531ead3b13b3fab2b85f6cec25df1f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:333740258"
+    },
+    "queries_by_source": {
+     "core": "battery charging system intermittent battery warning experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:fb0ba15ce4a6ec5e",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Vanden Eynde, Nicholas"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1109/isie.2012.6237300": {
+   "id": "doi:10.1109/isie.2012.6237300",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:10873370",
+   "source_uri": "https://doi.org/10.1109/isie.2012.6237300",
+   "title": "Energy Storage Technologies for Smoothing Power Fluctuations in Marine Current Turbines",
+   "abstract": "With regard to marine renewable energies, significant electrical power can be extracted from marine tidal current. However, the power harnessed by a marine current turbine varies due to the periodicity of the tidal phenomenon and could be highly fluctuant caused by swell effect. To improve the power quality and make the marine current generation system more reliable, energy storage systems will play a crucial role. In this paper, the power fluctuation phenomenon is described and the state of art of energy storage technologies is presented. Characteristics of various energy storage technologies are analyzed and compared for marine application. The omparison shows that high-energy batteries like sodiumsulphur battery and flow battery are favorable for smoothing the long-period power fluctuation due to the tide phenomenon while supercapacitors and flywheels are suitable for eliminating short-period power disturbances due to swell or turbulence phenomena. It means that hybrid storage technologies are needed for achieving optimal performance in marine current energy systems",
+   "doi": "10.1109/isie.2012.6237300",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:45:48.511656+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "02edf35c6d0b3f0a97aca804174d420992c9c59b4ae78386a607aafb38e8488b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:10873370"
+    },
+    "queries_by_source": {
+     "core": "battery energy harvester"
+    },
+    "query_variant_derivation": "DOMAIN_NARROW",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1109/isie.2012.6237300",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery energy harvester",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "CHARPENTIER, Jean-Frederic",
+    "SCUILLER, Franck",
+    "Zhou, Zibhin",
+    "BENBOUZID, Mohamed",
+    "Jean Frédéric Charpentier",
+    "ZHOU, Zhibin",
+    "Frédéric Charpentier, Jean",
+    "Mohamed Benbouzid",
+    "Zhibin Zhou",
+    "Franck Scuiller",
+    "TANG, Tianhao",
+    "Tianhao Tang"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1109/tpel.2009.2033187": {
+   "id": "doi:10.1109/tpel.2009.2033187",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:4820871",
+   "source_uri": "https://doi.org/10.1109/tpel.2009.2033187",
+   "title": "An Integral Battery Charger with Power Factor Correction for Electric Scooter",
+   "abstract": "This paper presents an integral battery charger for an electric scooter with high voltage batteries and interior-permanent-magnet motor traction drive. The battery charger is derived from the power hardware of the scooter, with the ac motor drive that operates as three-phase boost rectifier with power factor correction capability. The control of the charger is also integrated into the scooter control firmware that is implemented on a fixed-point DSP controller. Current-controlled or voltage-controlled charge modes are actuated according to the requirements of the battery management system, that is embedded into the battery pack. With respect to previous integrated chargers, the ac current is absorbed at unitary power factor with no harmonic distortion. Moreover, no additional filtering is needed since the pulsewidth modulation ripple is minimized by means of phase interleaving. The feasibility of the integral charger with different ac motors (induction motor, surface-mounted phase modulation motor) is also discussed, by means of a general model purposely developed for three-phase ac machines. The effectiveness of the proposed battery charger is experimentally demonstrated on a prototype electric scooter, equipped with two Li-ion battery packs rated 260 V, 20 A",
+   "doi": "10.1109/tpel.2009.2033187",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:45:48.511673+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9356db9cbcc36ec179d201f4a0a1233762234f89ca9bf1cd4cec802ed1e47fa1",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:4820871"
+    },
+    "queries_by_source": {
+     "core": "battery charging system intermittent battery warning experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1109/tpel.2009.2033187",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "battery charging system intermittent battery warning experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "E. Armando",
+    "P. Guglielmi",
+    "Paolo Guglielmi",
+    "Pellegrino, Gian-Mario Luigi",
+    "Guglielmi, Paolo",
+    "Gianmario Pellegrino",
+    "Armando, Eric Giacomo",
+    "Eric Armando",
+    "PELLEGRINO, GIAN - MARIO LUIGI",
+    "G. Pellegrino"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "problem:bdbd4b14": {
+   "id": "problem:bdbd4b14",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "bdbd4b1402edcf84d4aad63e077e4a27442a5afb7d0fd865e7a59bcb78292d30",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": true,
+  "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+  "verdict": "CONTESTED"
+ },
+ "_spec_hash": "6091d50a64805eccad745fab4c8bdce49c3bea5c0b91ba3cd9357ecf1393fe8a",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-29T08:48:14+00:00Z"
+ },
+ "ranked_candidate_key": "model_c",
+ "ranked_candidate_id": "cand:ENS:xkiro:77f6acdaa49a",
+ "ranked_admissible": true
+}

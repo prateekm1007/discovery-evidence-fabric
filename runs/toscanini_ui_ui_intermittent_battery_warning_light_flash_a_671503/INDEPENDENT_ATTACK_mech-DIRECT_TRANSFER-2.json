@@ -1,0 +1,431 @@
+{
+ "attack_version": "independent_attack/3.0.0",
+ "attack_purpose": "post_rank:independent_attack",
+ "candidate_id": "cand:MS:DIRECT_TRANSFER:e4679c58eb40",
+ "generator_provider": "agnes",
+ "attacker_provider": "xkiro",
+ "attacker_model": "minimax/minimax-m3:free",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "prompt_hash": "6a97349ea761616bfa4379719b7396a254ca7061c1a37db08617b093ce1f3b77",
+ "output_hash": "2df56d8382256e7b0fb8412c3f3ce9905ad9dd11dd956f64b548ea4916507750",
+ "llm_status": "OK",
+ "ring_pin": {
+  "requested": null,
+  "mode": "PRODUCTION_CASCADE",
+  "served_provider": "xkiro",
+  "served_model": "minimax/minimax-m3:free",
+  "pin_status": null,
+  "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+ },
+ "attacked_at": "2026-09-29T08:49:21+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate asserts the mechanism is \"Cold-induced stiffening of battery electrolyte and solid-state interface changes increases internal impedance\" causing voltage fluctuations. However, a 2015 Toyota Camry uses a 12V lead-acid starter battery, not a lithium-ion cell with the electrolyte/solid-state interface chemistry described. The cited mechanism is physically inapplicable to the device in the problem. GROUNDED_IN: COMPUTUTION problem device is \"battery charging system\" of a 2015 Toyota Camry (12V Pb-acid SLI battery) vs. candidate mechanism requiring \"stiffening of battery electrolyte a",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1002/aesr.202500400",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2015', '12', '2015', '12', '10.1002', '202500400']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'interface changes increases internal' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['accurate', 'battery', 'health', 'must']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "COMPUTUTION problem device is \"battery charging system\" of a 2015 Toyota Camry (12V Pb-acid SLI battery) vs. candidate mechanism requiring \"stiffening of battery electrolyte and solid-state interface ",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate declares boundary \"Battery state of health must be sufficient for the model to be accurate\" and \"ambient temperature must be within the range of the model's training data.\" A 2015 Camry SLI battery at cold idle below 0°C is precisely the regime where SoH is degraded (age, cranking wear) and where the model's training data coverage is least reliable; under these declared boundaries the intervention is explicitly disabled, yet the candidate claims the light will remain off — a self-contradiction. GROUNDED_IN: RECORD \"Battery state of health must be sufficient for the model to be ac",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: remain, temperature, with, within)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2015', '0', '0']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'the battery warning light' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['accurate', 'ambient', 'battery', 'health']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Battery state of health must be sufficient for the model to be accurate; ambient temperature must be within the range of the model's training data\" combined with RECORD \"the battery warning li",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "Every evidence record concerns lithium-ion cells ([doi:10.1002/aesr.202500400] \"Lithium-Ion Cells\", [doi:10.1002/advs.76228] \"Lithium-Ion Batteries\", [doi:10.3390/s26051507] \"Lithium-Ion Battery Fire Prediction\"). None describe the 12V lead-acid SLI battery and alternator-driven charging system of a 2015 Camry, nor the BCM/LIN voltage-sensing logic that actually toggles the battery warning lamp. The evidence bundle therefore cannot ground the claimed mechanism for the named device. GROUNDED_IN: EVIDENCE [doi:10.1002/aesr.202500400] title span \"Lithium‐Ion Cells\"; EVIDENCE [doi:10.1002/advs.762",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1002/aesr.202500400",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10.1002', '202500400', '10.1002', '76228', '10.3390', '26051507']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'cold induced stiffening of' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['battery', 'state']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [doi:10.1002/aesr.202500400] title span \"Lithium‐Ion Cells\"; EVIDENCE [doi:10.1002/advs.76228] title span \"Lithium‐Ion Batteries\"; EVIDENCE [doi:10.3390/s26051507] title span \"Lithium‐Ion Bat",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "ABSTAIN",
+   "basis": "The \"single test that settles it\" for a cold-idle-only battery warning flash on a 2015 Camry is a charging-system voltage drop / ripple test (alternator output, B+ sense line, ECM/BCM bias). The candidate proposes adding a predictive impedance-model algorithm and an \"adaptive threshold\" — a non-trivial software/ECU change that does not perform, diagnose, or replace that test, and adds no new measurement the existing system lacks. It therefore does not beat the baseline on the problem as posed (a diagnostic-settling test). GROUNDED_IN: RECORD \"intervention: Integrate a predictive modeling algor",
+   "grounding": {
+    "grounded": false,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: charging, diagnostic, indirect, methods)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'to estimate internal cell' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['ambient', 'battery', 'temperature']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"intervention: Integrate a predictive modeling algorithm that uses indirect diagnostic methods (e.g., current load, ambient temperature) to estimate internal cell temperature and impedance, adj",
+    "absence_ground": true,
+    "demotion_reason": "the asserted ground is an ABSENCE of evidence/support — absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+   },
+   "demoted_from": "KILL",
+   "demotion_layer": "v2_grounding"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "The candidate requires \"indirect diagnostic methods (e.g., current load, ambient temperature) to estimate internal cell temperature and impedance\" inside the existing Camry battery warning path. The factory BCM/ECU has no ambient-temperature sensor input into the battery-lamp logic on a 2015 Camry, no on-board impedance estimator, and no field-retrofittable \"adaptive threshold\" parameter in the warning-lamp decision; retrofitting requires harness, sensor, and calibration changes that exceed a single-component intervention. The candidate never claims to add these hardware channels. GROUNDED_IN:",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: diagnostic, indirect, methods, modeling)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2015', '2015']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'to estimate internal cell' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['ambient', 'battery', 'temperature']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Intervention: Integrate a predictive modeling algorithm that uses indirect diagnostic methods (e.g., current load, ambient temperature) to estimate internal cell temperature and impedance\" — n",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "SURVIVE",
+   "basis": ""
+  }
+ ],
+ "intervention_suggestions": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "suggestion": "Replace the Li-ion electrolyte/sei mechanism with a 12V lead-acid mechanism (cold-temperature CCA loss, increased internal resistance of sulfuric electrolyte, and reduced alternator regulation margin at low RPM) and retarget the intervention to a lead-acid impedance/conductance model; addresses the device-mismatch basis. GROUNDED_IN: COMPUTATION device is 12V Pb-acid SLI in a 2015 Camry; RECORD me",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: temperature, with)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['12', '12', '2015']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'cold induced stiffening of' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['battery', 'must', 'state', 'temperature']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "COMPUTATION device is 12V Pb-acid SLI in a 2015 Camry; RECORD mechanism \"Cold-induced stiffening of battery electrolyte and solid-state interface changes\" must be re-expressed in Pb-acid terms.",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "suggestion": "Add an online SoH/age estimator and an ambient-temperature training-range check that explicitly enables a \"report-only / fall back to OEM threshold\" mode when SoH is low or temperature is out of range, so the predicted effect is bounded to the regime where the model is declared valid. GROUNDED_IN: RECORD \"Battery state of health must be sufficient for the model to be accurate; ambient temperature ",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: temperature, that, with, within)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'accurate ambient temperature must' (field: boundary_conditions)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['accurate', 'ambient', 'battery', 'health']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Battery state of health must be sufficient for the model to be accurate; ambient temperature must be within the range of the model's training data\" combined with RECORD operating point \"<0°C a",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "suggestion": "Redefine the intervention as the \"single test that settles it\" — a measured B+ rail voltage/ripple capture at cold idle vs. OEM spec, optionally combined with a conductance reading — so the candidate actually answers the problem's settling-test requirement rather than adding a parallel model. GROUNDED_IN: RECORD problem text \"What single test settles it?\" vs. RECORD current intervention \"Integrate",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: modeling, predictive, single, that)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'integrate predictive modeling algorithm' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD problem text \"What single test settles it?\" vs. RECORD current intervention \"Integrate a predictive modeling algorithm ... adjusting the threshold\".",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "suggestion": "Specify a retrofit that only consumes signals already present on the 2015 Camry (alternator B+ voltage, battery current via shunt or existing IBS, engine RPM, coolant/ambient from the CAN bus already on the vehicle) and outputs a driver-visible diagnostic code rather than altering the factory warning-lamp threshold, eliminating the need for new sensors or BCM reflash. GROUNDED_IN: RECORD",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: diagnostic, sensors, that)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['ambient', 'battery']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate asserts the mechanism is \"Cold-induced stiffening of battery electrolyte and solid-state interface changes increases internal impedance\" causing voltage fluctuations. However, a 2015 Toyota Camry uses a 12V lead-acid starter battery, not a lithium-ion cell with the electrolyte/solid-state interface chemistry described. The cited mechanism is physically inapplicable to the device in the problem. GROUNDED_IN: COMPUTUTION problem device is \"battery charging system\" of a 2015 Toyota Camry (12V Pb-acid SLI battery) vs. candidate mechanism requiring \"stiffening of battery electrolyte a",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1002/aesr.202500400",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2015', '12', '2015', '12', '10.1002', '202500400']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'interface changes increases internal' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['accurate', 'battery', 'health', 'must']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "COMPUTUTION problem device is \"battery charging system\" of a 2015 Toyota Camry (12V Pb-acid SLI battery) vs. candidate mechanism requiring \"stiffening of battery electrolyte and solid-state interface ",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate declares boundary \"Battery state of health must be sufficient for the model to be accurate\" and \"ambient temperature must be within the range of the model's training data.\" A 2015 Camry SLI battery at cold idle below 0°C is precisely the regime where SoH is degraded (age, cranking wear) and where the model's training data coverage is least reliable; under these declared boundaries the intervention is explicitly disabled, yet the candidate claims the light will remain off — a self-contradiction. GROUNDED_IN: RECORD \"Battery state of health must be sufficient for the model to be ac",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: remain, temperature, with, within)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2015', '0', '0']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'the battery warning light' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['accurate', 'ambient', 'battery', 'health']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Battery state of health must be sufficient for the model to be accurate; ambient temperature must be within the range of the model's training data\" combined with RECORD \"the battery warning li",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "Every evidence record concerns lithium-ion cells ([doi:10.1002/aesr.202500400] \"Lithium-Ion Cells\", [doi:10.1002/advs.76228] \"Lithium-Ion Batteries\", [doi:10.3390/s26051507] \"Lithium-Ion Battery Fire Prediction\"). None describe the 12V lead-acid SLI battery and alternator-driven charging system of a 2015 Camry, nor the BCM/LIN voltage-sensing logic that actually toggles the battery warning lamp. The evidence bundle therefore cannot ground the claimed mechanism for the named device. GROUNDED_IN: EVIDENCE [doi:10.1002/aesr.202500400] title span \"Lithium‐Ion Cells\"; EVIDENCE [doi:10.1002/advs.762",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1002/aesr.202500400",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10.1002', '202500400', '10.1002', '76228', '10.3390', '26051507']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'cold induced stiffening of' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['battery', 'state']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [doi:10.1002/aesr.202500400] title span \"Lithium‐Ion Cells\"; EVIDENCE [doi:10.1002/advs.76228] title span \"Lithium‐Ion Batteries\"; EVIDENCE [doi:10.3390/s26051507] title span \"Lithium‐Ion Bat",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The candidate requires \"indirect diagnostic methods (e.g., current load, ambient temperature) to estimate internal cell temperature and impedance\" inside the existing Camry battery warning path. The factory BCM/ECU has no ambient-temperature sensor input into the battery-lamp logic on a 2015 Camry, no on-board impedance estimator, and no field-retrofittable \"adaptive threshold\" parameter in the warning-lamp decision; retrofitting requires harness, sensor, and calibration changes that exceed a single-component intervention. The candidate never claims to add these hardware channels. GROUNDED_IN:",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: diagnostic, indirect, methods, modeling)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2015', '2015']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'to estimate internal cell' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['ambient', 'battery', 'temperature']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Intervention: Integrate a predictive modeling algorithm that uses indirect diagnostic methods (e.g., current load, ambient temperature) to estimate internal cell temperature and impedance\" — n",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 4,
+  "RISK": 0,
+  "SURVIVE": 1,
+  "ABSTAIN_DEMOTED": 1,
+  "INVALID": 0
+ }
+}

@@ -1,0 +1,144 @@
+{
+ "stage": "INDEPENDENT_ATTACK",
+ "candidate_id": "cand:MS:DIRECT_TRANSFER:4afa21d25336",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.1.0",
+  "instrument": "independent_attack/3.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 0.75,
+   "n_cases_attacked": 22,
+   "attacker_ring": {
+    "provider": "zai",
+    "model": "zai-org/GLM-5.3",
+    "ring_pin": "zai",
+    "serving": "22 cases; per-provider {\"zai\": 22}",
+    "pin_violations": [],
+    "note": "R491: the calibration is (rules x ring) — the R488 measured lesson; the gate binds terminal kill authority to THIS ring at consumption"
+   }
+  },
+  "sealed_thresholds": {
+   "provenance": "REUSED from the R412 sealed bars (r412_calibration_seal.json, pre-registered 2026-09-05); NO new threshold invented (Art. XXVII)",
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "scope": "TPR is measured over the TRUE-POSITIVES cohort; FPR/TNR over the TRUE-NEGATIVES cohort; the additional cohorts (near-miss, scope-conflict, evidence-contradicted, malformed-missing-evidence) are measured and reported as category disciplines, not folded into the headline TPR/FPR"
+  },
+  "measurement_path": "discovery_fabric/engine/calibration_records/r487_attacker_v3_measurement.json",
+  "measurement_sha256": "2a6a7d6d4166b35a15d6976097574863c63810c6951e42642f727f45b60d5fc0",
+  "reason": "measured FPR 0.75 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate attributes the warning light to \"localized electrochemical non-uniformity\" and a \"temporary internal resistance spike\" inside the battery cell, but the affected vehicle is a 2015 Toyota Camry, which uses a 12V lead-acid battery and an alternator-driven charging system, not a lithium-ion pack. A 12V flooded lead-acid cell at <0°C does not exhibit meaningful in-plane or through-thickness thermal gradients of the kind described, nor does its internal resistance spike in a way the PCM would misclassify as a charging fault (the 12V charging loop is monitored externally at the alternat",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: charging, driven, electrochemical, gradients)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['2015', '12', '12', '0', '12', '2015']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'in temporary internal resistance' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['gradients', 'requires', 'thermal', 'vehicle']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Mechanism: Thermal heterogeneity and spatial temperature gradients within the battery cell cause localized electrochemical non-uniformity, resulting in a temporary internal resistance spike or",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The held evidence bundle is about lithium-ion cells and EV battery housings, not 12V lead-acid automotive batteries or 12V PCM charging diagnostics; the candidate cites these as support for a mechanism applied to a 12V lead-acid Camry system, which is outside the scope of every provided record. GROUNDED_IN: EVIDENCE doi:10.1002/aesr.202500400 \"Lithium‐Ion Cells\" | EVIDENCE doi:10.1002/advs.76228 \"Lithium‐Ion Batteries\" | EVIDENCE doi:10.3390/s26051507 \"Lithium‐Ion Battery Fire Prediction\" | EVIDENCE doi:10.3390/ma19132808 \"Electric Vehicle Battery Housings\" | RECORD \"Device: battery charging s",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1002/aesr.202500400",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['12', '12', '12', '10.1002', '202500400', '10.1002']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1002/aesr.202500400 \"Lithium‐Ion Cells\" | EVIDENCE doi:10.1002/advs.76228 \"Lithium‐Ion Batteries\" | EVIDENCE doi:10.3390/s26051507 \"Lithium‐Ion Battery Fire Prediction\" | EVIDENCE doi:",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate's \"intervention\" (add embedded temperature sensors and a validation gate in the PCM) is strictly additive hardware/software on top of the stock 12V Camry charging system, which is the declared baseline; the stock Camry already routes alternator B+ voltage to the PCM and to the battery warning lamp via the regulator/ELC logic, and the documented cold-idle-only intermittent flash on this vehicle is commonly explained by the alternator's temperature-compensated voltage regulator behavior at low ambient and the lamp's self-test at key-on — not by any need for in-cell thermal sensors.",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: behavior, charging, embedded, gradients)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'allowing the pcm to' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['ambient', 'embedded', 'gradients', 'sensors']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Intervention: Implement embedded temperature sensors in the battery charging system to monitor in-plane and through-thickness temperature gradients, allowing the PCM to distinguish between act",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The candidate never specifies the threshold (in °C across the in-plane/through-thickness plane, or in mΩ of \"resistance drift\") below which the PCM should suppress the warning, nor the latency budget for sensor-to-PCM communication relative to the intermittent flash duration; without a defined threshold and a defined response time, the testable prediction is unfalsifiable and the \"diagnostic validation\" reduces to an unstated heuristic. GROUNDED_IN: RECORD \"if the embedded sensors confirm that the internal temperature gradient is below the threshold for significant electrochemical resistance d",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Unveiling Localized Heat in Lithium‐Ion Cells for Intelligent Temperature Sensing' (strong overlap: across, diagnostic, electrochemical, embedded)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'gradient is below the' (field: testable_prediction)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['below', 'embedded', 'sensors']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"if the embedded sensors confirm that the internal temperature gradient is below the threshold for significant electrochemical resistance drift\" — no threshold value, no gradient metric, and no",
+    "absence_ground": false
+   }
+  }
+ ]
+}
