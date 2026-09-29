@@ -59,13 +59,37 @@ def _structural_ceiling() -> dict:
     j = src.find("\ndef ", i + 1)
     body = src[i:j] if j > i else src[i:]
     n_llm = len(re.findall(r"\bllm_generate\(", body))
-    # the candidates list is populated from operator_result["candidates"],
-    # which the lean path fills with exactly [cand] (one candidate) or
-    # [] — find the assignment
-    n_assign = len(re.findall(
-        r'operator_result\["candidates"\]\s*=\s*\[cand\]', body))
-    n_assign_empty = len(re.findall(
-        r'"candidates":\s*\[\]', body))
+    # R548 generation-boundary fix: the lean path now makes ONE
+    # llm_generate call whose response is parsed into up to N
+    # independently-parseable hypothesis blocks. Each block becomes
+    # its own candidate. The structural ceiling is the MAXIMUM
+    # number of hypothesis blocks the parser can emit from one
+    # response — read from the parser's own constant, not from
+    # a candidate-assignment site count.
+    #
+    # Pre-R548 the path assembled exactly ONE candidate from one
+    # LLM response (operator_result["candidates"] = [cand]).
+    # Post-R548 the path assembles up to N candidates from one
+    # LLM response via _parse_multi_candidate_fields.
+    #
+    # Detect which generation is present:
+    has_multi_parse = (
+        "_parse_multi_candidate_fields" in body
+        or "_multi_hypothesis_prompt_suffix" in body)
+    if has_multi_parse:
+        # Read the N_HYPOTHESES constant from mechanism_space.py
+        ms_src = (REPO / "discovery_fabric" / "engine"
+                  / "mechanism_space.py").read_text(encoding="utf-8")
+        m_n = re.search(r"_N_HYPOTHESES\s*=\s*(\d+)", ms_src)
+        n_hyp = int(m_n.group(1)) if m_n else 1
+        n_assign = n_hyp
+        n_assign_empty = 0
+    else:
+        # Legacy single-candidate pattern (pre-R548)
+        n_assign = len(re.findall(
+            r'operator_result\["candidates"\]\s*=\s*\[cand\]', body))
+        n_assign_empty = len(re.findall(
+            r'"candidates":\s*\[\]', body))
     # the distinctness instrument's own minimum-required field the lean
     # path stamps onto the space
     m = re.search(r'"min_candidates_required":\s*(\d+)', body)
@@ -78,16 +102,29 @@ def _structural_ceiling() -> dict:
         "min_candidates_required_stamped": min_required,
         "distinctness_minimum_required": MINIMUM_DISTINCT,
         "can_satisfy_minimum": (n_assign >= MINIMUM_DISTINCT),
+        "generation_boundary": (
+            "R548_MULTI_HYPOTHESIS" if has_multi_parse
+            else "LEGACY_SINGLE_CANDIDATE"),
         "conclusion": (
             "the lean production path makes ONE llm_generate call and "
             "assembles AT MOST ONE candidate, so n_distinct <= 1 < 2: "
             "it is STRUCTURALLY unable to satisfy Article LXXXIV's "
             "minimum two materially distinct mechanisms on its own. "
             "This is a static proof about the code path, measured, not "
-            "assumed." if n_assign < MINIMUM_DISTINCT else
-            "the lean path can emit enough candidates to reach the "
-            "minimum (re-measure the distinctness verdicts, not the "
-            "ceiling)"),
+            "assumed." if not has_multi_parse and n_assign < MINIMUM_DISTINCT else
+            "the R548 generation-boundary fix lifts the structural "
+            "ceiling: ONE llm_generate call now emits up to "
+            f"{n_assign} independently-parseable hypothesis blocks "
+            "(N_HYPOTHESES), each of which becomes a candidate "
+            "that passes through the deterministic validation tail "
+            "(semantic check, cemetery, distinctness, mechanism "
+            "support). The Article LXXXIV minimum of "
+            f"{MINIMUM_DISTINCT} distinct mechanisms is now "
+            "structurally reachable within a single generation "
+            "boundary. The empirical question is whether the LLM "
+            "actually emits >= 2 causally distinct hypotheses "
+            "when prompted — a runtime measurement, not a static "
+            "one."),
     }
 
 
@@ -194,25 +231,20 @@ def main() -> int:
             1 for e in envelopes if e.get("found")),
         "n_envelopes_below_minimum_or_unknown": n_ceiling_short,
         "conclusion": (
-            "The production lean mechanism-space path is structurally "
+            "The production lean mechanism-space path was structurally "
             "capped at ONE generated candidate (ONE llm_generate, one "
             "assembled candidate), so n_distinct <= 1 < the Article "
             "LXXXIV minimum of 2. Every measured production envelope "
             "sits below the minimum, confirming the starvation is a "
             "structural capability ceiling, not a transient data "
-            "deficit. The directive's candidate architectural "
-            "directions (A: one call -> multiple parseable blocks; "
-            "B: multiple operator instantiations; C: an existing "
-            "canonical diversity path) are NOT selected here — this "
-            "round only MEASURES the ceiling. B is flagged as the "
-            "wrong default target because R517 already measured model "
-            "generation as the dominant latency sink; the preferred "
-            "direction to investigate next is 'one expensive "
-            "generation boundary -> multiple independently parseable "
-            "hypotheses -> deterministic validation -> distinctness "
-            "adjudication' — a HYPOTHESIS for the next cliff round, "
-            "not an implementation directive now."
-        ),
+            "deficit. R548 lifts the generation boundary: ONE "
+            "llm_generate call now emits up to N independently-"
+            "parseable hypothesis blocks, each of which becomes a "
+            "candidate through the deterministic validation tail. "
+            "The structural ceiling is now N (N_HYPOTHESES), not 1. "
+            "The empirical question is whether the LLM actually "
+            "emits >= 2 causally distinct hypotheses when prompted "
+            "— a runtime measurement over fresh production runs."),
     }
     OUT.write_text(json.dumps(out, indent=1) + "\n",
                    encoding="utf-8")

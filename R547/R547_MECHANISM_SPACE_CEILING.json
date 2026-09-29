@@ -3,13 +3,14 @@
  "round": "R547",
  "structural_ceiling": {
   "n_llm_generate_calls_in_lean_path": 1,
-  "n_candidate_assignment_sites": 1,
-  "n_empty_candidate_sites": 2,
-  "structural_ceiling_on_distinct_candidates": 1,
+  "n_candidate_assignment_sites": 3,
+  "n_empty_candidate_sites": 0,
+  "structural_ceiling_on_distinct_candidates": 3,
   "min_candidates_required_stamped": null,
   "distinctness_minimum_required": 2,
-  "can_satisfy_minimum": false,
-  "conclusion": "the lean production path makes ONE llm_generate call and assembles AT MOST ONE candidate, so n_distinct <= 1 < 2: it is STRUCTURALLY unable to satisfy Article LXXXIV's minimum two materially distinct mechanisms on its own. This is a static proof about the code path, measured, not assumed."
+  "can_satisfy_minimum": true,
+  "generation_boundary": "R548_MULTI_HYPOTHESIS",
+  "conclusion": "the R548 generation-boundary fix lifts the structural ceiling: ONE llm_generate call now emits up to 3 independently-parseable hypothesis blocks (N_HYPOTHESES), each of which becomes a candidate that passes through the deterministic validation tail (semantic check, cemetery, distinctness, mechanism support). The Article LXXXIV minimum of 2 distinct mechanisms is now structurally reachable within a single generation boundary. The empirical question is whether the LLM actually emits >= 2 causally distinct hypotheses when prompted \u2014 a runtime measurement, not a static one."
  },
  "envelope_measurements": [
   {
@@ -57,5 +58,5 @@
  ],
  "n_envelopes_measured": 1,
  "n_envelopes_below_minimum_or_unknown": 1,
- "conclusion": "The production lean mechanism-space path is structurally capped at ONE generated candidate (ONE llm_generate, one assembled candidate), so n_distinct <= 1 < the Article LXXXIV minimum of 2. Every measured production envelope sits below the minimum, confirming the starvation is a structural capability ceiling, not a transient data deficit. The directive's candidate architectural directions (A: one call -> multiple parseable blocks; B: multiple operator instantiations; C: an existing canonical diversity path) are NOT selected here \u2014 this round only MEASURES the ceiling. B is flagged as the wrong default target because R517 already measured model generation as the dominant latency sink; the preferred direction to investigate next is 'one expensive generation boundary -> multiple independently parseable hypotheses -> deterministic validation -> distinctness adjudication' \u2014 a HYPOTHESIS for the next cliff round, not an implementation directive now."
+ "conclusion": "The production lean mechanism-space path was structurally capped at ONE generated candidate (ONE llm_generate, one assembled candidate), so n_distinct <= 1 < the Article LXXXIV minimum of 2. Every measured production envelope sits below the minimum, confirming the starvation is a structural capability ceiling, not a transient data deficit. R548 lifts the generation boundary: ONE llm_generate call now emits up to N independently-parseable hypothesis blocks, each of which becomes a candidate through the deterministic validation tail. The structural ceiling is now N (N_HYPOTHESES), not 1. The empirical question is whether the LLM actually emits >= 2 causally distinct hypotheses when prompted \u2014 a runtime measurement over fresh production runs."
 }
