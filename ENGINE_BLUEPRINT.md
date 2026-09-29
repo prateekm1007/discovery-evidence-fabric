@@ -4,7 +4,7 @@
 SPECIFICATION → AUTOMATIC 15-DOSSIER-LEVEL PACKAGE"
 **Date:** 2026-08-27
 **Supersedes:** nothing; extends ACTIVE_PATH.md / RUNTIME_CAPABILITY_REGISTRY.json
-**Constitution:** v1.8.0 read before this work (Art. I–XXXVIII acknowledged)
+**Constitution:** v2.10.1 (current live constitution as of R549; this line was v1.8.0 when the blueprint was written on 2026-08-27 — doc drift corrected non-behavioural)
 
 ---
 

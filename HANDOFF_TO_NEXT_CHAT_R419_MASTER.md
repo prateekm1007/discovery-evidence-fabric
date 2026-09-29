@@ -222,6 +222,8 @@ with commit message:
 
 This means the remote canonical Constitution still needs to be treated as **v2.1.0** unless a newer constitutional amendment has been formally committed and verified.
 
+>R549 doc-drift correction (non-behavioural): this 2026-09-07 handoff predates the R510 amendments. The live constitution as of R549 is **v2.10.1** — the v2.1.0/v2.2.0 text above is the frozen historical state it observed, retained verbatim, not current authority.
+
 Canonical Constitution hash currently observed remotely:
 
 `084c8dd5f8f7218fdf3aa70ed2c8f8b6edd2c772`

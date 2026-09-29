@@ -2,7 +2,7 @@
 
 **Epistemic discovery engine + technology-transfer portfolio factory.**
 One governed production loop takes a real problem from live evidence to a
-buyer-ready technology package, under the Epistemic Constitution v1.9.0
+buyer-ready technology package, under the Epistemic Constitution v2.10.1
 (`EPISTEMIC_CONSTITUTION.md` — read it in full before writing any code).
 
 The program lives in TWO repositories (Article XXXIX: the buyer-distribution

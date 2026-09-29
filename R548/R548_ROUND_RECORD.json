@@ -56,28 +56,54 @@
   "delivery_status": "DELIVERED \u2014 Art. LXXI conditions measured for 6517e7b54: ls-remote == target, /api/version engine_commit == target, deployment_drift GREEN"
  },
  "ci_status": {
-  "state": "OWNER_BLOCKED",
-  "root_cause": "GITHUB_ACTIONS_BILLING \u2014 no GitHub-hosted runner is ever allocated; every job dies at runner assignment with zero steps executed (R548/R548_CI_DIAGNOSIS.json)",
-  "evidence": {
-   "failing_runs": [
-    36501258378,
-    36475464725,
-    35218638324
-   ],
-   "annotation_verbatim": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings.",
-   "failing_job": "Classify changed paths (R399 W4 tier)",
-   "last_green": "2026-09-13 (lightweight checks)",
-   "consecutive_failures": "~500 runs since 2026-09-14",
-   "standing_since": "R531 (run 36092328764) \u2014 the R538 diagnosis measured 100/100 recent runs failing with the same zero-step signature"
+    "state": "MEASURED_2026-09-30 (supersedes the R549-audit RESOLVED_2026-09-30 entry above: the 14-gate certification has NOW executed on a live runner and its result is recorded; the original OWNER_BLOCKED billing entry is retained as history)",
+    "current_state": {
+     "as_of": "2026-09-30, R549 audit Round A, run 36635629871 (push 151c4e8df)",
+     "billing_blocker": "RESOLVED — the repo went public and GitHub Actions now allocates runners and executes steps. The OWNER_BLOCKED billing condition described below no longer holds; the failing runs 36501258378/36475464725/35218638324 are historical.",
+     "observed_ci_behavior": "runs 1168-1171 (ee291b311..151c4e8df): Classify + Fast-check jobs now RUN their steps (previously zero-step runner-allocation failures). On ee291b311 the fast-check 'Module inventory drift check (R456 §B.3)' step FAILED on a stale MODULE_INVENTORY.json (generated at R519-era 45d5916fe, 196 files / 111779 LOC / epistemic_integrity.keep=14, against a tree that had grown to 197 files / 118696 LOC / keep=28).",
+     "fix_landed": [
+      "commit 67150d70a: MODULE_INVENTORY.json regenerated on a clean Linux clone of ee291b311 (the instrument's output is platform-separator-sensitive — ci_invoked_modules carries OS-native paths — so the committed bytes are the CI/LINUX generation, sha256 17a3c1fc8a414faea0f6d42be28a69cc4692f331b3e367af3d12cde906421b52; non-behavioural, machine-registry only, Art. X). Run 1169 (67150d70a) fast-check job FULLY GREEN including the drift check + Webapp build (first Webapp-build measurement since the failure skipped it).",
+      "commit f97fe4b39: G11 marker registration — 'R451-OWNER-TOKEN' + 'IN-CLOSURE' added to AUTHORIZED_REDACTION_NAMES with round-record provenance (the R451 C2 remediation's two typed redaction classes were the 138-blob G11 HOLD; a registration gap, not new unauthorized modification; the R387 TRIGRAM precedent's name-scoped mechanism, any OTHER unregistered marker still HOLDs; pinned by test_r387 positive/negative pairs).",
+      "commit 151c4e8df: CI sequencing fix — the R537 validator WRITES R537/R537_ARTIFACT_NAMESPACE_PROOF.json, and the 'Verify clean worktree' step ran AFTER it, so the check could never pass on any engine-path push (run 1170/f97fe4b39 failed exactly there, masking the capsule stage). The clean check now verifies the pushed CHECKOUT before any writing step; no gate semantics changed (Art. VII)."
+     ],
+     "certification_executed": {
+      "run": "36635629871 (run #1171, push 151c4e8df) — the full 14-gate detached certification EXECUTED on a live runner for the first time since 2026-09-14 and completed to the capsule stage",
+      "result": "FAIL (disclosed, not hidden): capsule exit 1, FINAL AUTHORIZATION RESEARCH_BLOCKED",
+      "gate_report": {
+       "G1-G9": "GREEN (preflight, gauntlet v1 18/18, gauntlet v2 14/14, state reconciliation, canonical-from-ledger, credential scan, real-e2e corpus 13/13, production immutability + purity)",
+       "G10_post_scrub_evidence_revalidation": "GREEN — capsule_hash=f5eacace2ecf3957..., all 31 ledger artifacts valid, ledger replay matches root",
+       "G11_historical_artifact_audit": "GREEN (was HOLD at ee291b31 — the G11 registration fix took effect live): audit_hash=621627b6e0bb45d3, scientific_corruption=0, infrastructure_corruption=5 (known pre-v25-rebuild consequence, non-blocking)",
+       "G12_credential_audit_split": "RED — pass_a_clean=false, 18 unclassified Pass A matches: 17x GITHUB_PAT (the R451 self-documented re-leaked value ghp_agXv... in R451/CREDENTIAL_SCAN_{PRE,POST}_SCRUB.json blobs a228a2a6/ec8c89dc + 4 historical r446/r447 script blobs) + 1x PATENTBEAR_KEY_FORMAT (pb_live_GARBAGECONTROLKEY..., an intentional bad-key negative control in scripts/r497_patentbear_probe.py)",
+       "G13_authorization_binding": "RED — auth=RESEARCH_BLOCKED (follows G12; source==detached true)",
+       "G14_slot_territory_derivation_invariant": "GREEN — 11==11, 0 discrepancies"
+      },
+      "remaining_cause": "G12 alone. Fix sequencing (Round B, audit problem: owner keys committed + repo public): (1) ROTATE the exposed GitHub PAT (CEO act per Art. LXXVI §2 — the audit directive authorizes it) + expire/rotate the committed tosca_owner session capabilities; (2) forward-redact the R451 scan-record values at HEAD into typed markers (the R451 C2 pattern); (3) register the DEAD values + the garbage control in the false-positive registry (classifying a live value into a public tree would create a new exposure — Art. VII/BS-021); (4) full-history secret scan (gitleaks/trufflehog) and rotate any further finds. After that the G12 registry entries make pass_a_clean=true and G13 follows.",
+      "honesty_note": "Art. XIV/XV/XXV: this record claims the certification EXECUTED and reports the RED result with its exact cause set. It does NOT claim green. G12/G13 stay red until Round B lands; no gate was weakened to reach this state — the fix path is credential rotation + classification through the registry's designed channel."
+     },
+     "residual": null
+    },
+   "original_owner_blocked_record": {
+    "state": "OWNER_BLOCKED (historical, 2026-09-14 to 2026-09-30)",
+    "root_cause": "GITHUB_ACTIONS_BILLING \u2014 no GitHub-hosted runner was ever allocated; every job died at runner assignment with zero steps executed (R548/R548_CI_DIAGNOSIS.json)",
+    "evidence": {
+     "failing_runs": [
+      36501258378,
+      36475464725,
+      35218638324
+     ],
+     "annotation_verbatim": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings.",
+     "failing_job": "Classify changed paths (R399 W4 tier)",
+     "last_green": "2026-09-13 (lightweight checks)",
+     "consecutive_failures": "~500 runs since 2026-09-14",
+     "standing_since": "R531 (run 36092328764) \u2014 the R538 diagnosis measured 100/100 recent runs failing with the same zero-step signature"
+    },
+    "operator_action_required_at_the_time": "GitHub Settings -> Billing & plans (https://github.com/settings/billing): fix the failed payment or raise the Actions spending limit. No code change can fix runner allocation.",
+    "escalation": {
+     "consecutive_rounds_blocked": "R531 through R548 (>= 17 rounds)",
+     "cost": "the 14-gate Epistemic Certification did not execute 2026-09-14 to 2026-09-30; every push in that window was CI-UNVERIFIED \u2014 rounds substituted measured local batteries and declared the gap rather than passing CI"
+    }
+   }
   },
-  "operator_action_required": "GitHub Settings -> Billing & plans (https://github.com/settings/billing): fix the failed payment or raise the Actions spending limit. No code change can fix runner allocation.",
-  "escalation": {
-   "consecutive_rounds_blocked": "R531 through R548 (>= 17 rounds)",
-   "cost": "the 14-gate Epistemic Certification has not executed since 2026-09-14; every push since is CI-UNVERIFIED \u2014 this round substitutes measured local batteries (below) and declares the gap rather than passing CI",
-   "first_item_for_next_auditor_report": true
-  },
-  "coder_side_readiness": "local equivalents green \u2014 see batteries"
- },
  "batteries": {
   "fast_tier": {
    "files": [
@@ -169,10 +195,10 @@
   }
  ],
  "audit_problems": {
-  "1_ci_record_tests_dead_code": {
-   "status": "PARTIALLY CLOSED \u2014 record + tests + dead code done and pushed; CI itself OWNER_BLOCKED on GitHub billing (operator action above)",
-   "record": "R548/R548_ROUND_RECORD.json + R548/R548_CI_DIAGNOSIS.json + 23-test suite, all in commit 3623140bf"
-  },
+   "1_ci_record_tests_dead_code": {
+    "status": "CLOSED — record + tests + dead code done and pushed (3623140bf); CI billing block resolved by repo going public; the stale-MODULE_INVENTORY fast-tier failure class fixed by 67150d70a; the latent 14-gate sequencing defect found on the first live execution fixed by 151c4e8df; full certification result honestly recorded in ci_status.certification_executed (G12/G13 RED pending Round B security fix — the remaining disclosed cause)",
+    "record": "R548/R548_ROUND_RECORD.json + R548/R548_CI_DIAGNOSIS.json + 23-test suite, all in commit 3623140bf; G11 cause set + fix provenance in the ci_status.certification_executed gate_report (G11 GREEN at run 1171) and in commit f97fe4b39; G12 cause set in the remaining_cause entry"
+   },
   "2_physics_gates_loosened": {
    "status": "CLOSED (Round B, commit 6517e7b54)",
    "fix": "reality_loop_ready now claims the CLOSED loop: the module map MEASURES all three modules (loop_chain = measured existence of discovery_fabric/engine/loop_chain.py, no longer a hardcoded False), the flag is true only when the full loop is present, and interface-only availability rides the separate typed fact reality_loop_interface_ready with a one-line typed basis in reality_loop_reason. The gate only tightens (true->false while the chain module is absent); physics_ready was already re-scoped to the live hydraulic solver in 326c84373 (this round's predecessor).",
@@ -220,7 +246,11 @@
   "C"
  ],
  "rounds_remaining": [
-  "D (physics domains breadth)",
-  "E (end-to-end dry run then live pass, doc drift)"
- ]
-}
+   "B2 (security: rotate + redact committed owner keys / exposed PAT, full-history secret scan — the G12/G13 cert-red cause set)",
+   "C2 (mechanism-space proof: token + block-parse observability, frozen R535 8-problem live before/after with n_distinct / starved / truncation)",
+   "D (infrastructure: provider order + transport evidence, executed-solve smoke test in the deployed image)",
+   "E (physics: second solver domain behind the domain-representability gate)",
+   "F (end-to-end deterministic dry run then one live pass, full funnel, typed skips)",
+   "Standing (doc drift fixes, labelled non-behavioural)"
+  ]
+ }
