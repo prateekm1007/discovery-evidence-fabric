@@ -983,7 +983,12 @@ class TestLiveCaughtDefects:
         # no exception; honest typed state; normalized data
         assert r["status"] == rec.STATUS_RATE_LIMITED
         assert (r.get("data") or {}).get("data") == []
-        # the custody entry discloses the shape
-        entry = json.loads(sandbox.read_text().splitlines()[-1])
+        # the custody entry discloses the shape (R548 round-A fix: the
+        # log is written with encoding="utf-8" (retrieval_log.py:102);
+        # an implicit default read used cp1252 on Windows and crashed
+        # on the production log's valid UTF-8 multibyte content — the
+        # encoding must name the writer's own)
+        entry = json.loads(
+            sandbox.read_text(encoding="utf-8").splitlines()[-1])
         assert "S2_200_NULL_DATA" in (entry.get("error") or "")
         assert entry["record_count"] == 0

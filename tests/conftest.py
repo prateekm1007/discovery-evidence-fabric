@@ -35,6 +35,36 @@ if sys.platform == "win32" and "toscanini" not in sys.modules:
             _T = None
         if _T is not None:
             sys.modules["toscanini"] = _T
+            # R548: SINGLE-INSTANCE NORMALIZATION. The alias above
+            # registered the package under BOTH keys ("TOSCANINI" from
+            # `import TOSCANINI`, "toscanini" from the alias). Any
+            # `from toscanini import X` then resolved through
+            # _handle_fromlist using package __name__ ("TOSCANINI") and
+            # registered a SECOND module instance under "TOSCANINI.X" —
+            # while a test's own `import toscanini.X` loaded a THIRD
+            # instance under "toscanini.X". Measured (R548): a fixture
+            # monkeypatching toscanini.gateway silently missed the
+            # server module's gw binding (srv.gw is not test gw), so
+            # test_r396's EXTERNAL-mode gateway_up contract failed on
+            # Windows while passing on Linux CI. Normalizing the
+            # package's import identity to the canonical lowercase name
+            # makes every load path converge on ONE instance per module
+            # (the Linux topology), and any already-loaded uppercase
+            # submodule keys are mirrored so existing references keep
+            # working.
+            _T.__name__ = "toscanini"
+            _T.__package__ = "toscanini"
+            if _T.__spec__ is not None:
+                import importlib.machinery as _ilm
+                _spec = _ilm.ModuleSpec("toscanini", _T.__spec__.loader,
+                                        is_package=True)
+                _spec.submodule_search_locations = list(_T.__path__)
+                _T.__spec__ = _spec
+            for _k in [k for k in list(sys.modules)
+                       if k.startswith("TOSCANINI.")]:
+                _lower = "toscanini." + _k.split(".", 1)[1]
+                if _lower not in sys.modules:
+                    sys.modules[_lower] = sys.modules[_k]
 # sessions.py (and durable/artifact_worker) do a bare `import fcntl` —
 # POSIX-only. On Windows the import must be satisfied with the same no-op
 # flock fake the toscanini-focused suites already use (R482's own product

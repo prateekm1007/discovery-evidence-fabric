@@ -62,6 +62,7 @@ sys.path.insert(0, str(SCRIPTS))
 import r456_space_deploy as r456  # noqa: E402  (round-tree prune)
 import r447_hf_deploy as driver  # noqa: E402   (SPACE constant)
 import r447_deploy_upload as uploader  # noqa: E402 (README frontmatter)
+import r548_case_split as case_split  # noqa: E402 (BS-044 case staging)
 
 SPACE = driver.SPACE
 SPACE_URL = "https://prateekm1-toscanini-prod-validation.hf.space"
@@ -144,15 +145,24 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         stage = Path(td) / "tree"
         stage.mkdir()
+        # BS-044: split staging by case-exact prefix — one root per
+        # case variant (extractall would merge TOSCANINI/ and
+        # toscanini/ on this case-insensitive filesystem and bury the
+        # executed runtime package under the uppercase prefix).
+        stage_lower = Path(td) / "tree_lower"
+        stage_lower.mkdir()
         archive = Path(td) / "tree.tar"
         with open(archive, "wb") as f:
             subprocess.run(["git", "archive", "HEAD"], stdout=f,
                            check=True, cwd=str(REPO))
         with tarfile.open(archive) as tf:
-            tf.extractall(str(stage))
-        n_full = sum(1 for _ in stage.rglob("*") if _.is_file())
-        print(f"[r539-deploy] staged {n_full} tracked files "
-              f"({archive.stat().st_size / 1e6:.0f} MB)")
+            n_main, n_lower = case_split.extract_case_split(
+                tf, stage, stage_lower)
+        n_files = (sum(1 for _ in stage.rglob("*") if _.is_file())
+                   + sum(1 for _ in stage_lower.rglob("*") if _.is_file()))
+        print(f"[r539-deploy] staged {n_files} tracked files "
+              f"({archive.stat().st_size / 1e6:.0f} MB) — case-split: "
+              f"{n_lower} members staged under toscanini/ separately")
 
         # proof 5: the agnes registration rides THESE bytes
         reg = (stage / "discovery_fabric" / "engine"
@@ -209,6 +219,34 @@ def main() -> int:
         print(f"[r539-deploy] upload DONE in {time.time() - t0:.0f}s — "
               f"revision: {rev}")
 
+        rev_lower = None
+        if n_lower:
+            t1 = time.time()
+            rev_lower = api.upload_folder(
+                folder_path=str(stage_lower), repo_id=SPACE,
+                repo_type="space",
+                commit_message=(
+                    f"Toscanini engine deploy at {commit[:12]} — "
+                    f"case-correct toscanini/ runtime package (BS-044: "
+                    f"/app/toscanini/ is what the container executes; "
+                    f"the case-insensitive staging root would otherwise "
+                    f"bury it under TOSCANINI/)"))
+            print(f"[r539-deploy] toscanini/ package upload DONE in "
+                  f"{time.time() - t1:.0f}s — revision: {rev_lower}")
+
+        # BS-044 source gate: prove the repo bytes landed on BOTH case
+        # prefixes BEFORE spending a factory reboot on them. Raw HTTP
+        # (resolve/main, live re-resolve) — no local cache involved.
+        fails = case_split.verify_case_split_source(
+            SPACE, hf_token, commit)
+        if fails:
+            print("FATAL: BS-044 post-upload source gate FAILED:")
+            for f in fails:
+                print(f"  - {f}")
+            return 2
+        print("[r539-deploy] source gate PASS: toscanini/ + "
+              "TOSCANINI/ blobs byte-match HEAD (raw HTTP, cache-free)")
+
     for k, v in STANDING_VARS:
         api.add_space_variable(repo_id=SPACE, key=k, value=v)
     print("[r539-deploy] standing variables re-applied "
@@ -218,11 +256,18 @@ def main() -> int:
     print("[r539-deploy] secret wired: AGNES_API_KEY "
           f"({_fp12(agnes_key)}) — all other secrets standing untouched")
 
-    api.restart_space(repo_id=SPACE)
-    print("[r539-deploy] Space restarted — polling /api/version")
+    # BS-044: factory_reboot=True forces a from-scratch image build
+    # (no cached COPY . . layer). A plain restart reuses the cached
+    # layer, so the executing Python can predate the staged tree while
+    # /api/version reports the freshly-baked commit string. The
+    # behavior gate below (live physics_state key probe) is the
+    # convergence proof, not the version string.
+    api.restart_space(repo_id=SPACE, factory_reboot=True)
+    print("[r539-deploy] Space factory-rebooted — polling /api/version")
 
     after, health = {}, {}
-    for i in range(40):
+    _behavior_gate_ok = False
+    for i in range(60):
         time.sleep(30)
         try:
             after = _get_json(SPACE_URL + "/api/version")
@@ -247,13 +292,47 @@ def main() -> int:
         print(f"[r539-deploy] health: ok={health.get('ok')} "
               f"agnes status={ag.get('status')} "
               f"available_models={ag.get('available_models')}")
-    except Exception as exc:  # noqa: BLE001
+        # BS-044 behavior gate: the R548 physics_state key
+        # (live_solver_importable) is present ONLY when the
+        # executing source is at or after commit 326c84373.
+        # A stale cached layer reports the old key name
+        # (wired_solver_importable) even though /api/version
+        # says the new commit.
+        _ps = (health.get("readiness") or {}).get("physics_state") \
+            or health.get("physics_state") or {}
+        _has_new_key = "live_solver_importable" in _ps
+        _has_old_key = "wired_solver_importable" in _ps
+        if _has_new_key:
+            _behavior_gate_ok = True
+            print(f"[r539-deploy] behavior gate: physics_state "
+                  f"carries live_solver_importable — executing "
+                  f"source is the R548 tree")
+        elif _has_old_key:
+            print("[r539-deploy] WARNING: physics_state still "
+                  "carries the pre-R548 key (wired_solver_ "
+                  "importable) — the executing source may be a "
+                  "stale cached layer despite the version "
+                  "string. factory_reboot was issued; if this "
+                  "persists after the next poll, the Space's "
+                  "build cache needs a full image invalidation.")
+        else:
+            print("[r539-deploy] NOTE: physics_state key "
+                  "absent — the deployed tree predates the "
+                  "R548 health-payload change (expected for "
+                  "deploys before 326c84373)")
+    except Exception as exc:
         health = {"probe_error": repr(exc)[:160]}
         print("[r539-deploy] health probe pending")
 
     rec = {
         "round": "R539", "space": SPACE,
         "commit": commit, "hf_revision": str(rev),
+        "hf_revision_lower": (getattr(rev_lower, "oid", None)
+                              or (str(rev_lower) if rev_lower else None)),
+        "case_split": {
+            "lower_members_staged": n_lower,
+            "source_gate": "PASS (raw-HTTP blob sha match on both "
+                           "case prefixes: toscanini/ + TOSCANINI/)"},
         "operator_directive": "put this as the number 1 api, so "
                               "infrastucture failure doesnt happen again "
                               "(2026-09-26, verbatim)",

@@ -501,40 +501,37 @@ def test_bench_18_verdict_variance_measurement():
 
 
 # ---------------------------------------------------------------------------
-# The multi-source discovery path (curl removal regression — the
-# deployed FileNotFoundError class)
+# MULTI_SOURCE_DISCOVERY retirement (R513) — the module these cases
+# originally pinned was DELETED in R513 (60f0416fa/7e2dfa62c, Art. LXIV:
+# superseded implementation retired in the same change that shipped its
+# replacement). The load-bearing properties survive as pins below.
 # ---------------------------------------------------------------------------
 
-def test_multi_source_discovery_no_curl_dependency():
-    """The deployed container has no curl binary; the old _curl_json
-    subprocess failed EVERY public run (R394 PRODUCTION_AUDIT claim 1).
-    The module must now use the Python HTTP stack."""
-    import orchestrator.multi_source_discovery as msd
-    import inspect
-    src = inspect.getsource(msd)
-    code = "\n".join(l for l in src.splitlines()
-                     if not l.strip().startswith("#"))
-    assert "import subprocess" not in code
-    assert '["curl"' not in code and "'curl'" not in code
-    # the orchestrator module is retained but detached from the live
-    # critical path (MULTI_SOURCE_DISCOVERY removal round): neither
-    # STAGE_ORDER nor ADAPTERS may carry it anymore
+def test_multi_source_discovery_retired_and_detached():
+    """R513 deleted orchestrator/multi_source_discovery.py. Two pins:
+    (1) the deletion stands — no live copy has been resurrected (Art.
+    LXIV: the old implementation stays deleted, not lurking importable);
+    (2) the live-path detachment this benchmark already asserted —
+    MULTI_SOURCE_DISCOVERY never re-enters ADAPTERS or STAGE_ORDER.
+    (The original curl-subprocess regression died with the module: the
+    deployed-container class it guarded is now carried by
+    connector_states.fetch_json — bench case 17 below.)"""
+    import importlib.util
+    assert importlib.util.find_spec(
+        "orchestrator.multi_source_discovery") is None, \
+        "R513 retired this module; a live copy has reappeared"
     from discovery_fabric.engine.adapters import ADAPTERS, STAGE_ORDER
     assert "MULTI_SOURCE_DISCOVERY" not in ADAPTERS
     assert "MULTI_SOURCE_DISCOVERY" not in STAGE_ORDER
 
 
-def test_multi_source_search_reports_connector_states():
-    msd_mod = sys.modules["orchestrator.multi_source_discovery"] or \
-        __import__("orchestrator.multi_source_discovery",
-                   fromlist=["x"])
-    with mock.patch.object(
-            connector_states.urllib.request, "urlopen",
-            side_effect=urllib.error.URLError("no route to host")):
-        r = msd_mod.search_pubmed("catheter occlusion", 3)
-    assert "connector_state" in r
-    assert r.get("connector_state") in ("UNAVAILABLE_OR_TIMEOUT",)
-    assert r.get("note") and "NOT absence" in r["note"]
+# (Retired with the module, R513: test_multi_source_search_reports_
+# connector_states pinned msd.search_pubmed returning a typed
+# connector_state + "NOT absence" note on a URLError. Its property is
+# fully covered by test_bench_17_connector_outage_injection and
+# test_bench_17_outage_never_absence above — exercised against the
+# SURVIVING carrier connector_states.fetch_json, which is the same
+# contract the retired search path used.)
 
 
 # ---------------------------------------------------------------------------

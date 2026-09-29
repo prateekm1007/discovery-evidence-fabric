@@ -1,0 +1,45 @@
+{
+ "schema": "R548_CI_DIAGNOSIS/1.0.0",
+ "round": "R548",
+ "committed_sha": "f32594a333440fffccaf459f464d08ef8e3a4f14",
+ "failing_run": {
+  "run_id": 36475464725,
+  "head_sha": "f32594a333440fffccaf459f464d08ef8e3a4f14",
+  "workflow": "Epistemic Certification",
+  "failing_job": "Classify changed paths (R399 W4 tier)",
+  "failing_step": "dorny/paths-filter@v3 (runner assignment)",
+  "conclusion": "failure",
+  "skipped_jobs": [
+   "Run 14-Gate Detached Certification",
+   "Fast check (non-engine code path, R399 W4)"
+  ]
+ },
+ "root_cause": {
+  "type": "GITHUB_ACTIONS_BILLING",
+  "evidence": "check-run annotation: 'The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the Billing & plans section in your settings.'",
+  "n_steps_in_failed_job": 0,
+  "runner_id": 0,
+  "runner_name": "",
+  "diagnosis": "No GitHub-hosted runner was assigned to the classify job; the job never started. This is an account-level billing/limit issue, not a code defect. The workflow YAML is valid; the dorny/paths-filter step is syntactically correct. The failure occurs at runner allocation, before any step executes.",
+  "operator_action_required": "Resolve the GitHub account billing issue (check Billing & plans in GitHub settings; increase spending limit or add a payment method). Once runners can be allocated, the classify job will run and the downstream certify/fast-check jobs will execute."
+ },
+ "local_reproduction": {
+  "note": "The classify step's path-filter logic was reproduced locally: the dorny/paths-filter@v3 action is a deterministic path matcher. On the R548 push (engine-relevant files: discovery_fabric/engine/adapters.py, mechanism_space.py, toscanini/server.py), engine_paths=true, so the certify job SHOULD run (the 14-gate certification). The failure is purely at the runner-assignment layer.",
+  "paths_in_engine_filter": [
+   "discovery_fabric/**",
+   "toscanini/**",
+   "TOSCANINI/**",
+   "TOSCANINI_UI/**",
+   "tests/**",
+   ".github/workflows/**"
+  ],
+  "r548_changed_files_match": true
+ },
+ "recent_runs_all_failure": {
+  "last_10_conclusions": "failure x10",
+  "consistent_since": "R531 (run 36092328764)",
+  "note": "The R538 diagnosis (R538/R538_CI_DIAGNOSIS.json) confirmed 100/100 recent runs all failure with zero-step runner assignment. This is a standing infrastructure blocker, not a regression introduced by R548."
+ },
+ "status": "OPERATOR_BLOCKED",
+ "what_unblocks": "GitHub account billing resolution (spending limit / payment method). No code change can fix a runner-allocation failure."
+}

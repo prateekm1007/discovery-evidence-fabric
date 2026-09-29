@@ -21,6 +21,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 import tarfile
 import tempfile
 import time
@@ -28,6 +29,8 @@ import urllib.request
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "scripts"))
+import r548_case_split as case_split  # noqa: E402  (BS-044 staging)
 SPACE = "prateekm1/toscanini-prod-validation"
 SPACE_URL = "https://prateekm1-toscanini-prod-validation.hf.space"
 OUT = REPO / "R546" / "SPACE_README_REPAIR_RECORD.json"
@@ -190,12 +193,16 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         stage = Path(td) / "tree"
         stage.mkdir()
+        # BS-044 case-split staging (same fix as the r539 deploy):
+        stage_lower = Path(td) / "tree_lower"
+        stage_lower.mkdir()
         archive = Path(td) / "tree.tar"
         with open(archive, "wb") as f:
             subprocess.run(["git", "archive", "HEAD"], stdout=f,
                            check=True, cwd=str(REPO))
         with tarfile.open(archive) as tf:
-            tf.extractall(str(stage))
+            n_main, n_lower = case_split.extract_case_split(
+                tf, stage, stage_lower)
         # re-add the HF Space card frontmatter to the program README
         # (git-archive deploy strips it — the standing deploy behavior).
         readme = stage / "README.md"
@@ -246,6 +253,27 @@ def main() -> int:
                                     f"frontmatter repair (CONFIG_ERROR)"))
         print(f"[repair] upload DONE in {time.time() - t0:.0f}s "
               f"rev={rev}", flush=True)
+        if n_lower:
+            rev_lower = api.upload_folder(
+                folder_path=str(stage_lower), repo_id=SPACE,
+                repo_type="space",
+                commit_message=(
+                    f"Toscanini engine deploy at {commit[:12]} — "
+                    f"case-correct toscanini/ runtime package "
+                    f"(BS-044)"))
+            print(f"[repair] toscanini/ package upload DONE "
+                  f"rev={rev_lower}", flush=True)
+        # BS-044 source gate: both case prefixes must byte-match HEAD
+        # (raw HTTP, cache-free) before any reboot is spent.
+        fails = case_split.verify_case_split_source(SPACE, tok, commit)
+        if fails:
+            print("FATAL: BS-044 post-upload source gate FAILED:",
+                  flush=True)
+            for f in fails:
+                print(f"  - {f}", flush=True)
+            return 2
+        print("[repair] source gate PASS: toscanini/ + TOSCANINI/ "
+              "blobs byte-match HEAD", flush=True)
     for k, v in STANDING_VARS.items():
         api.add_space_variable(repo_id=SPACE, key=k, value=v)
     print("[repair] standing variables re-applied", flush=True)
@@ -301,14 +329,18 @@ def main() -> int:
             # is a baked string, not proof of the executing source
             # (BS-044). Fall back to the R548 health discriminant:
             # the new tree's /api/health payload carries
-            # reality_loop_modules (typed module-presence fact) and
-            # physics_ready derived from the live hydraulic solver —
-            # a pre-R548 tree's payload lacks reality_loop_modules
-            # and computes physics_ready from the sfepy FEM probe.
+            # readiness.reality_loop_modules (typed module-presence
+            # fact, added R548) and readiness.physics_state.
+            # live_solver_importable (R548 hydraulic-solver shape) —
+            # a pre-R548 tree's readiness payload lacks BOTH keys
+            # (its physics_state carries wired_solver_importable).
+            # The keys live UNDER readiness — never at the top level.
             try:
                 h = get_json(SPACE_URL + "/api/health")
-                disc = (h.get("reality_loop_modules") is not None
-                        or "physics_ready_reason" in h)
+                rd = h.get("readiness") or {}
+                disc = ("reality_loop_modules" in rd
+                        or "live_solver_importable"
+                        in (rd.get("physics_state") or {}))
                 if disc:
                     converged = True
                     print(f"[repair] no terminal session — health "

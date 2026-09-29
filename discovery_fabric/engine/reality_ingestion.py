@@ -1005,7 +1005,7 @@ def _default_session_store():
     pattern as the cemetery import: no layer inversion at module load).
     Caller identity is the owner capability the server issues and the
     session store recognizes — never a new key type (nothing invented)."""
-    from TOSCANINI import sessions as _sessions
+    from toscanini import sessions as _sessions
     return _sessions
 
 

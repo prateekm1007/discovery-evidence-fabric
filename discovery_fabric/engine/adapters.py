@@ -995,6 +995,13 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     fields: Dict[str, Any] = {}
     _n_fields_nonempty: Optional[int] = None
     cand: Optional[Dict[str, Any]] = None
+    # R548: the multi-hypothesis parse result — initialized HERE (all
+    # paths), exactly like cand/fields above: on an LLM failure the
+    # typed attempt record below must still read an EMPTY block list
+    # (UnboundLocalError here crashed the failure path itself — the
+    # honest OPERATOR_INSTANTIATION_FAILED record could never be
+    # written; found by the R548 round-A adversarial pass).
+    field_blocks: List[Dict[str, str]] = []
     sem: Optional[Dict[str, Any]] = None
     contract = sel["contract"]
     sel_id = op["operator_id"] if op else "NONE"
@@ -1220,6 +1227,40 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     _att_fields = (field_blocks[0] if field_blocks else {})
     _att_sem = ((operator_result.get("candidates") or [{}])[0]
                 .get("operator_semantic_check") or {})
+    # R548 (audit): the attempt record above was computed from
+    # field_blocks[0] / _cands[0] ONLY — with N parsed blocks the
+    # single attempt entry recorded block 1's outcome while blocks
+    # 2..N carried their own semantic/cemetery/distinctness results
+    # invisibly. This array attributes EVERY parsed hypothesis block
+    # through the same already-computed values (observational only —
+    # no reclassification, no new gate; Art. IX). The legacy block-1
+    # top-level fields stay byte-stable for existing readers.
+    _hyp_attribution = []
+    for _ai, _af in enumerate(field_blocks, 1):
+        _ac = (_cands[_ai - 1] if _ai - 1 < len(_cands) else {})
+        _ac_id = str(_ac.get("candidate_id")) if _ac else None
+        _hyp_attribution.append({
+            "hypothesis_index": _ai,
+            "n_fields_nonempty": sum(
+                1 for v in _af.values() if str(v or "")),
+            "mechanism": _af.get("mechanism"),
+            "intervention": _af.get("intervention"),
+            "semantic_verdict": (
+                (_ac.get("operator_semantic_check") or {})
+                .get("semantic_verdict")),
+            "candidate_state": _ac.get("candidate_state"),
+            "candidate_id": _ac.get("candidate_id"),
+            "cemetery_blocked": bool(
+                _ac_id and _ac_id in _att_blocked_ids),
+            "distinctness_verdict": (
+                _dd_by_id.get(_ac_id) or {}).get("verdict")
+            if _ac_id else None,
+            "retained": bool(
+                _ac_id and _ac_id in _att_retained_ids),
+            "support_state": (
+                (_ac.get("mechanism_support") or {})
+                .get("mechanism_support_state")),
+        })
     _att_outcome = _ms_attempt_outcome(
         bool(contract.get("satisfied")),
         operator_result.get("state"),
@@ -1262,6 +1303,11 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
         "outcome_detail": {k: v for k, v in _att_outcome.items()
                            if k != "outcome"},
         "terminal_reason": space.get("state"),
+        # R548: full per-block attribution (the block-1 top-level
+        # fields above remain for schema stability; this array is the
+        # honest record of every parsed hypothesis's own outcome).
+        "hypothesis_blocks_parsed": len(field_blocks),
+        "hypothesis_attribution": _hyp_attribution,
     }
     space["instantiation_attempts"] = [_att_entry]
     # R516 Part A: the candidate funnel + LLM detail, all counts and
