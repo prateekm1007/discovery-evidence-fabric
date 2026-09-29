@@ -315,8 +315,13 @@ def _health_payload() -> dict:
     #                    MEASURED source-health report (stale timestamp
     #                    disclosed)
     #   physics_ready    the physics decision system's registry exists
-    #                    and the wired solver imports (local facts)
-    #   reality_loop_ready  the reality-loop interface modules exist
+    #                    and the live solver's dependency imports
+    #   reality_loop_ready  ALL typed reality-loop modules are
+    #                    present (ingestion + calibration + chain) —
+    #                    the loop itself is claimed, not just the
+    #                    interface (R548 Round B, Art. VII); the
+    #                    interface-only availability rides the
+    #                    separate reality_loop_interface_ready fact
     #   showcase_ready   the portfolio (buyer surface) is present
     from discovery_fabric.engine import llm_registry as _reg
     from discovery_fabric.engine import provider_health as _ph
@@ -362,21 +367,33 @@ def _health_payload() -> dict:
         _sfepy_ok = True
     except Exception:  # noqa: BLE001
         _sfepy_ok = False
-    _reality_ok = all(
-        (REPO_ROOT / "discovery_fabric" / "engine" / f).exists()
-        for f in ("reality_ingestion.py",))
+    # R548 Round B (audit problem 2, Art. VII): "ready" claims what is
+    # measured. The closed-loop chain module (loop_chain) has NOT been
+    # written, so the reality loop is not ready even though the
+    # interface modules exist. Pre-Round B the flag was gated on
+    # reality_ingestion.py alone, so the surface served loop_chain=
+    # false next to reality_loop_ready=true — the audit's exact
+    # mismatch. The module map now measures all three modules; the
+    # flag is true only when the full loop is present; interface
+    # availability stays a SEPARATE typed fact (nothing hidden, the
+    # claim just becomes honest).
+    _loop_mod = REPO_ROOT / "discovery_fabric" / "engine"
     _reality_loop_modules = {
         "reality_ingestion": (
-            (REPO_ROOT / "discovery_fabric" / "engine" /
-             "reality_ingestion.py").exists()),
+            (_loop_mod / "reality_ingestion.py").exists()),
         "reality_calibration": (
-            (REPO_ROOT / "discovery_fabric" / "engine" /
-             "reality_calibration.py").exists()),
-        "loop_chain": False,  # absent — the loop-chain module has not
-        # been written; the reality-loop interface is available for
-        # ingestion + calibration but the closed-loop chain is not
-        # yet a separate module. Recorded honestly, not gated on.
+            (_loop_mod / "reality_calibration.py").exists()),
+        "loop_chain": (_loop_mod / "loop_chain.py").exists(),
     }
+    _reality_ok = all(_reality_loop_modules.values())
+    _reality_interface_ok = all(
+        _reality_loop_modules[k]
+        for k in ("reality_ingestion", "reality_calibration"))
+    _reality_loop_reason = (
+        "all loop modules present (ingestion + calibration + chain)"
+        if _reality_ok else
+        ("interface modules present, the closed-loop chain module "
+         "(loop_chain.py) is not written — the loop is not ready"))
     _connectors_ok = False
     try:
         from discovery_fabric.source_registry import connectors  # noqa
@@ -415,6 +432,8 @@ def _health_payload() -> dict:
         "physics_ready": bool(_physics_registry.exists()
                               and _hydraulic_solver_ok),
         "reality_loop_ready": _reality_ok,
+        "reality_loop_interface_ready": _reality_interface_ok,
+        "reality_loop_reason": _reality_loop_reason,
         "product_status": (
             "Discovery ready" if (
                 engine_ready and transport_configured and probe_ok)
@@ -510,6 +529,8 @@ def _health_payload() -> dict:
                         "deterministic router + one wired solver)",
             },
             "reality_loop_ready": _reality_ok,
+            "reality_loop_interface_ready": _reality_interface_ok,
+            "reality_loop_reason": _reality_loop_reason,
             "reality_loop_modules": _reality_loop_modules,
             "showcase_ready": portfolio_ready,
         },

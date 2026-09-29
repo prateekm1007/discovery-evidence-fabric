@@ -527,5 +527,53 @@ class TestFinishedFlagR548(unittest.TestCase):
             "exist in user_state_view")
 
 
+# ---------------------------------------------------------------------------
+# E2. R548 Round B (audit problem 2, Art. VII): the reality-loop gate
+# must claim what is measured — the loop is NOT ready while the
+# loop_chain module is absent, even though the interface modules are
+# ---------------------------------------------------------------------------
+class TestRealityLoopGateR548B(unittest.TestCase):
+
+    def test_flag_is_false_while_chain_module_absent(self):
+        from toscanini import server
+        p = server._health_payload()
+        # the typed module map rides the readiness view
+        self.assertFalse(
+            p["readiness"]["reality_loop_modules"]["loop_chain"])
+        self.assertIs(p["reality_loop_ready"], False,
+                      "the closed loop is not ready while loop_chain "
+                      "is absent — the flag claims the loop, not the "
+                      "interface")
+        self.assertIs(p["reality_loop_interface_ready"], True,
+                      "the interface modules (ingestion + "
+                      "calibration) ARE present — recorded as a "
+                      "separate typed fact, never hidden")
+        self.assertIn("loop_chain", p["reality_loop_reason"])
+        # one source: the readiness view carries the same answer
+        self.assertIs(p["readiness"]["reality_loop_ready"], False)
+
+    def test_gate_flips_when_chain_module_present(self):
+        """Metamorphic: with all three measured modules present the
+        gate must flip True — the flag is a measurement, not a
+        hardcoded constant that could never be updated."""
+        import tempfile
+        from pathlib import Path
+        from toscanini import server as srv
+        tmp = Path(tempfile.mkdtemp(prefix="r548b_repo_"))
+        eng = tmp / "discovery_fabric" / "engine"
+        eng.mkdir(parents=True)
+        for name in ("reality_ingestion.py", "reality_calibration.py",
+                     "loop_chain.py"):
+            (eng / name).write_text("x = 1\n", encoding="utf-8")
+        with mock.patch.object(srv, "REPO_ROOT", tmp):
+            p = srv._health_payload()
+        self.assertTrue(
+            p["readiness"]["reality_loop_modules"]["loop_chain"])
+        self.assertIs(p["reality_loop_ready"], True)
+        self.assertIs(p["reality_loop_interface_ready"], True)
+        self.assertIn("all loop modules present",
+                      p["reality_loop_reason"])
+
+
 if __name__ == "__main__":
     unittest.main()
