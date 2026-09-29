@@ -1,0 +1,410 @@
+{
+ "ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
+ "version": "1.0.0",
+ "requested_models": 3,
+ "available_providers": [
+  "agnes",
+  "unorouter",
+  "xkiro",
+  "apinex",
+  "bai",
+  "bynara",
+  "atria",
+  "hf",
+  "zai",
+  "openrouter",
+  "nvidia"
+ ],
+ "members": [
+  {
+   "role": "MODEL_A",
+   "provider_id": "agnes",
+   "status": "OK",
+   "model": "agnes-3.0-flash",
+   "prompt_hash": "8143161df885fea422d80193c4098566aeb827ca73d0458b62ab590657afde33",
+   "output_hash": "257fbd49c159dac1156d6e97aac743de5cb7354373fbc5256e486100e2b4d1c8",
+   "latency_ms": 3711,
+   "fields": {
+    "mechanism": "The use of a two-temperature stage extruder to maintain high polymer viscosity and prevent premature cooling in high-performance polycarbonate",
+    "intervention": "Equip the 3D printer with a dual-zone heated nozzle and chamber insulation to ensure the second heating zone maintains polycarbonate above its glass transition temperature during layer deposition",
+    "expected_effect": "Elimination of layer skipping by preventing the loss of material adhesion and flow consistency caused by ambient heat exceeding 35C",
+    "falsification_test": "Print a 20 mm wall tower with polycarbonate at 35C ambient using both a single-zone and the new two-zone nozzle; measure interlayer shear strength and record video; if the single-zone nozzle shows delamination or skipping while the two-zone nozzle produces continuous layers, the mechanism is verified",
+    "mechanism_source_span": "maximize the output for a two-temperature stage extruder for PC"
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:agnes:257fbd49c159",
+    "mechanism": "The use of a two-temperature stage extruder to maintain high polymer viscosity and prevent premature cooling in high-performance polycarbonate",
+    "intervention": "Equip the 3D printer with a dual-zone heated nozzle and chamber insulation to ensure the second heating zone maintains polycarbonate above its glass transition temperature during layer deposition",
+    "expected_effect": "Elimination of layer skipping by preventing the loss of material adhesion and flow consistency caused by ambient heat exceeding 35C",
+    "falsification_test": "Print a 20 mm wall tower with polycarbonate at 35C ambient using both a single-zone and the new two-zone nozzle; measure interlayer shear strength and record video; if the single-zone nozzle shows delamination or skipping while the two-zone nozzle produces continuous layers, the mechanism is verified",
+    "mechanism_source_span": "maximize the output for a two-temperature stage extruder for PC",
+    "source_evidence": {
+     "source_id": "doi:10.3390/ma12101642",
+     "source_hash": "bf44fc874d9fcf7a9acd1683bb01a9d1080e35cc1830e6e5a87de8f2d632270d"
+    }
+   }
+  },
+  {
+   "role": "MODEL_B",
+   "provider_id": "unorouter",
+   "status": "OK",
+   "model": "agnes-3.0-flash",
+   "prompt_hash": "8143161df885fea422d80193c4098566aeb827ca73d0458b62ab590657afde33",
+   "output_hash": "78ad56c81ffbd9f400f68a02ca04c73c6ea53407490e7857b591ee155c6dcb9a",
+   "latency_ms": 15673,
+   "fields": {
+    "mechanism": "Thermal stabilization of high-performance polycarbonate during extrusion via optimized temperature and nozzle velocity to ensure proper material flow and mechanical bonding.",
+    "intervention": "Adjust the print bed temperature to be significantly higher than the 35C ambient threshold (e.g., 80-100C) and calibrate the nozzle velocity to maintain optimal polycarbonate rheology.",
+    "expected_effect": "Reduces thermal shock between the nozzle and the bed, preventing premature solidification of the layer and eliminating the layer skipping phenomenon.",
+    "falsification_test": "Print a tower test with polycarbonate at 35C ambient using bed temperatures of 50C, 80C, and 100C; layer skipping should cease at 80C or higher.",
+    "mechanism_source_span": "A temperature and nozzle velocity matrix was used to"
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:unorouter:78ad56c81ffb",
+    "mechanism": "Thermal stabilization of high-performance polycarbonate during extrusion via optimized temperature and nozzle velocity to ensure proper material flow and mechanical bonding.",
+    "intervention": "Adjust the print bed temperature to be significantly higher than the 35C ambient threshold (e.g., 80-100C) and calibrate the nozzle velocity to maintain optimal polycarbonate rheology.",
+    "expected_effect": "Reduces thermal shock between the nozzle and the bed, preventing premature solidification of the layer and eliminating the layer skipping phenomenon.",
+    "falsification_test": "Print a tower test with polycarbonate at 35C ambient using bed temperatures of 50C, 80C, and 100C; layer skipping should cease at 80C or higher.",
+    "mechanism_source_span": "A temperature and nozzle velocity matrix was used to",
+    "source_evidence": {
+     "source_id": "doi:10.3390/ma12101642",
+     "source_hash": "bf44fc874d9fcf7a9acd1683bb01a9d1080e35cc1830e6e5a87de8f2d632270d"
+    }
+   }
+  },
+  {
+   "role": "MODEL_C",
+   "provider_id": "xkiro",
+   "status": "OK",
+   "model": "minimax/minimax-m3:free",
+   "prompt_hash": "8143161df885fea422d80193c4098566aeb827ca73d0458b62ab590657afde33",
+   "output_hash": "c15abe0dfc3e4c544d50d5b0012efc9503dd3f6fc943e1de5503090e83d1bfba",
+   "latency_ms": 7731,
+   "fields": {
+    "mechanism": "Two-temperature stage extruder maintains elevated melt/feed temperature to keep polycarbonate above its heat-resistant processing window, preventing premature cooling and loss of inter-layer bonding when ambient conditions approach PC's heat-distortion limit.",
+    "intervention": "Replace the single-zone hot end with a two-temperature stage extruder for PC, setting the upstream/feed zone to a temperature tuned to keep the melt above the threshold where layer adhesion fails above 35C ambient; monitor and record a single measurement — the inter-layer weld/interface temperature (or equivalently the extrudate surface temperature at deposition) — as the settlement metric.",
+    "expected_effect": "Layer skipping is eliminated (or sharply reduced) above 35C ambient because the two-stage thermal profile keeps the deposited bead hot enough to fuse with the previously laid layer, compensating for the high ambient temperature that would otherwise flash-cool the extrudate against the heat-resistant PC substrate.",
+    "falsification_test": "Print the same PC part with the two-temperature stage extruder at a controlled 38C ambient chamber, sweeping the inter-layer deposition temperature setpoint; the layer-skip failure is falsified only if layer skipping disappears once the measured inter-layer deposition temperature stays above the identified threshold across a statistically adequate number of layers, and reappears when that measurement is forced below threshold on an otherwise identical part.",
+    "mechanism_source_span": "a print test was used to maximize the output for a two-temperature stage extruder for PC."
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:xkiro:c15abe0dfc3e",
+    "mechanism": "Two-temperature stage extruder maintains elevated melt/feed temperature to keep polycarbonate above its heat-resistant processing window, preventing premature cooling and loss of inter-layer bonding when ambient conditions approach PC's heat-distortion limit.",
+    "intervention": "Replace the single-zone hot end with a two-temperature stage extruder for PC, setting the upstream/feed zone to a temperature tuned to keep the melt above the threshold where layer adhesion fails above 35C ambient; monitor and record a single measurement — the inter-layer weld/interface temperature (or equivalently the extrudate surface temperature at deposition) — as the settlement metric.",
+    "expected_effect": "Layer skipping is eliminated (or sharply reduced) above 35C ambient because the two-stage thermal profile keeps the deposited bead hot enough to fuse with the previously laid layer, compensating for the high ambient temperature that would otherwise flash-cool the extrudate against the heat-resistant PC substrate.",
+    "falsification_test": "Print the same PC part with the two-temperature stage extruder at a controlled 38C ambient chamber, sweeping the inter-layer deposition temperature setpoint; the layer-skip failure is falsified only if layer skipping disappears once the measured inter-layer deposition temperature stays above the identified threshold across a statistically adequate number of layers, and reappears when that measurement is forced below threshold on an otherwise identical part.",
+    "mechanism_source_span": "a print test was used to maximize the output for a two-temperature stage extruder for PC.",
+    "source_evidence": {
+     "source_id": "doi:10.3390/ma12101642",
+     "source_hash": "bf44fc874d9fcf7a9acd1683bb01a9d1080e35cc1830e6e5a87de8f2d632270d"
+    }
+   }
+  }
+ ],
+ "common_claims": [],
+ "disagreements": [
+  {
+   "disagreement_id": "DIS-001",
+   "dimension": "mechanism",
+   "role_a": "MODEL_A",
+   "claim_a": "The use of a two-temperature stage extruder to maintain high polymer viscosity and prevent premature cooling in high-performance polycarbonate",
+   "role_b": "MODEL_B",
+   "claim_b": "Thermal stabilization of high-performance polycarbonate during extrusion via optimized temperature and nozzle velocity to ensure proper material flow and mechanical bonding.",
+   "similarity": 0.16,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-002",
+   "dimension": "mechanism",
+   "role_a": "MODEL_A",
+   "claim_a": "The use of a two-temperature stage extruder to maintain high polymer viscosity and prevent premature cooling in high-performance polycarbonate",
+   "role_b": "MODEL_C",
+   "claim_b": "Two-temperature stage extruder maintains elevated melt/feed temperature to keep polycarbonate above its heat-resistant processing window, preventing premature cooling and loss of inter-layer bonding when ambient conditions approach PC's heat-distortion limit.",
+   "similarity": 0.182,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-003",
+   "dimension": "mechanism",
+   "role_a": "MODEL_B",
+   "claim_a": "Thermal stabilization of high-performance polycarbonate during extrusion via optimized temperature and nozzle velocity to ensure proper material flow and mechanical bonding.",
+   "role_b": "MODEL_C",
+   "claim_b": "Two-temperature stage extruder maintains elevated melt/feed temperature to keep polycarbonate above its heat-resistant processing window, preventing premature cooling and loss of inter-layer bonding when ambient conditions approach PC's heat-distortion limit.",
+   "similarity": 0.073,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-004",
+   "dimension": "intervention",
+   "role_a": "MODEL_A",
+   "claim_a": "Equip the 3D printer with a dual-zone heated nozzle and chamber insulation to ensure the second heating zone maintains polycarbonate above its glass transition temperature during layer deposition",
+   "role_b": "MODEL_B",
+   "claim_b": "Adjust the print bed temperature to be significantly higher than the 35C ambient threshold (e.g., 80-100C) and calibrate the nozzle velocity to maintain optimal polycarbonate rheology.",
+   "similarity": 0.097,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-005",
+   "dimension": "intervention",
+   "role_a": "MODEL_A",
+   "claim_a": "Equip the 3D printer with a dual-zone heated nozzle and chamber insulation to ensure the second heating zone maintains polycarbonate above its glass transition temperature during layer deposition",
+   "role_b": "MODEL_C",
+   "claim_b": "Replace the single-zone hot end with a two-temperature stage extruder for PC, setting the upstream/feed zone to a temperature tuned to keep the melt above the threshold where layer adhesion fails above 35C ambient; monitor and record a single measurement — the inter-layer weld/interface temperature (or equivalently the extrudate surface temperature at deposition) — as the settlement metric.",
+   "similarity": 0.109,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-006",
+   "dimension": "intervention",
+   "role_a": "MODEL_B",
+   "claim_a": "Adjust the print bed temperature to be significantly higher than the 35C ambient threshold (e.g., 80-100C) and calibrate the nozzle velocity to maintain optimal polycarbonate rheology.",
+   "role_b": "MODEL_C",
+   "claim_b": "Replace the single-zone hot end with a two-temperature stage extruder for PC, setting the upstream/feed zone to a temperature tuned to keep the melt above the threshold where layer adhesion fails above 35C ambient; monitor and record a single measurement — the inter-layer weld/interface temperature (or equivalently the extrudate surface temperature at deposition) — as the settlement metric.",
+   "similarity": 0.071,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-007",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_A",
+   "claim_a": "Elimination of layer skipping by preventing the loss of material adhesion and flow consistency caused by ambient heat exceeding 35C",
+   "role_b": "MODEL_B",
+   "claim_b": "Reduces thermal shock between the nozzle and the bed, preventing premature solidification of the layer and eliminating the layer skipping phenomenon.",
+   "similarity": 0.136,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-008",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_A",
+   "claim_a": "Elimination of layer skipping by preventing the loss of material adhesion and flow consistency caused by ambient heat exceeding 35C",
+   "role_b": "MODEL_C",
+   "claim_b": "Layer skipping is eliminated (or sharply reduced) above 35C ambient because the two-stage thermal profile keeps the deposited bead hot enough to fuse with the previously laid layer, compensating for the high ambient temperature that would otherwise flash-cool the extrudate against the heat-resistant PC substrate.",
+   "similarity": 0.105,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-009",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_B",
+   "claim_a": "Reduces thermal shock between the nozzle and the bed, preventing premature solidification of the layer and eliminating the layer skipping phenomenon.",
+   "role_b": "MODEL_C",
+   "claim_b": "Layer skipping is eliminated (or sharply reduced) above 35C ambient because the two-stage thermal profile keeps the deposited bead hot enough to fuse with the previously laid layer, compensating for the high ambient temperature that would otherwise flash-cool the extrudate against the heat-resistant PC substrate.",
+   "similarity": 0.079,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-010",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "Print a 20 mm wall tower with polycarbonate at 35C ambient using both a single-zone and the new two-zone nozzle; measure interlayer shear strength and record video; if the single-zone nozzle shows delamination or skipping while the two-zone nozzle produces continuous layers, the mechanism is verified",
+   "role_b": "MODEL_B",
+   "claim_b": "Print a tower test with polycarbonate at 35C ambient using bed temperatures of 50C, 80C, and 100C; layer skipping should cease at 80C or higher.",
+   "similarity": 0.179,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-011",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "Print a 20 mm wall tower with polycarbonate at 35C ambient using both a single-zone and the new two-zone nozzle; measure interlayer shear strength and record video; if the single-zone nozzle shows delamination or skipping while the two-zone nozzle produces continuous layers, the mechanism is verified",
+   "role_b": "MODEL_C",
+   "claim_b": "Print the same PC part with the two-temperature stage extruder at a controlled 38C ambient chamber, sweeping the inter-layer deposition temperature setpoint; the layer-skip failure is falsified only if layer skipping disappears once the measured inter-layer deposition temperature stays above the identified threshold across a statistically adequate number of layers, and reappears when that measurement is forced below threshold on an otherwise identical part.",
+   "similarity": 0.07,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-012",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_B",
+   "claim_a": "Print a tower test with polycarbonate at 35C ambient using bed temperatures of 50C, 80C, and 100C; layer skipping should cease at 80C or higher.",
+   "role_b": "MODEL_C",
+   "claim_b": "Print the same PC part with the two-temperature stage extruder at a controlled 38C ambient chamber, sweeping the inter-layer deposition temperature setpoint; the layer-skip failure is falsified only if layer skipping disappears once the measured inter-layer deposition temperature stays above the identified threshold across a statistically adequate number of layers, and reappears when that measurement is forced below threshold on an otherwise identical part.",
+   "similarity": 0.091,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  }
+ ],
+ "unique_mechanisms": [
+  {
+   "dimension": "mechanism",
+   "role": "MODEL_A",
+   "claim": "The use of a two-temperature stage extruder to maintain high polymer viscosity and prevent premature cooling in high-performance polycarbonate",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "mechanism",
+   "role": "MODEL_B",
+   "claim": "Thermal stabilization of high-performance polycarbonate during extrusion via optimized temperature and nozzle velocity to ensure proper material flow and mechanical bonding.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "mechanism",
+   "role": "MODEL_C",
+   "claim": "Two-temperature stage extruder maintains elevated melt/feed temperature to keep polycarbonate above its heat-resistant processing window, preventing premature cooling and loss of inter-layer bonding when ambient conditions approach PC's heat-distortion limit.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_A",
+   "claim": "Equip the 3D printer with a dual-zone heated nozzle and chamber insulation to ensure the second heating zone maintains polycarbonate above its glass transition temperature during layer deposition",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_B",
+   "claim": "Adjust the print bed temperature to be significantly higher than the 35C ambient threshold (e.g., 80-100C) and calibrate the nozzle velocity to maintain optimal polycarbonate rheology.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "intervention",
+   "role": "MODEL_C",
+   "claim": "Replace the single-zone hot end with a two-temperature stage extruder for PC, setting the upstream/feed zone to a temperature tuned to keep the melt above the threshold where layer adhesion fails above 35C ambient; monitor and record a single measurement — the inter-layer weld/interface temperature (or equivalently the extrudate surface temperature at deposition) — as the settlement metric.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_A",
+   "claim": "Elimination of layer skipping by preventing the loss of material adhesion and flow consistency caused by ambient heat exceeding 35C",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_B",
+   "claim": "Reduces thermal shock between the nozzle and the bed, preventing premature solidification of the layer and eliminating the layer skipping phenomenon.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_C",
+   "claim": "Layer skipping is eliminated (or sharply reduced) above 35C ambient because the two-stage thermal profile keeps the deposited bead hot enough to fuse with the previously laid layer, compensating for the high ambient temperature that would otherwise flash-cool the extrudate against the heat-resistant PC substrate.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_A",
+   "claim": "Print a 20 mm wall tower with polycarbonate at 35C ambient using both a single-zone and the new two-zone nozzle; measure interlayer shear strength and record video; if the single-zone nozzle shows delamination or skipping while the two-zone nozzle produces continuous layers, the mechanism is verified",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_B",
+   "claim": "Print a tower test with polycarbonate at 35C ambient using bed temperatures of 50C, 80C, and 100C; layer skipping should cease at 80C or higher.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  },
+  {
+   "dimension": "falsification_test",
+   "role": "MODEL_C",
+   "claim": "Print the same PC part with the two-temperature stage extruder at a controlled 38C ambient chamber, sweeping the inter-layer deposition temperature setpoint; the layer-skip failure is falsified only if layer skipping disappears once the measured inter-layer deposition temperature stays above the identified threshold across a statistically adequate number of layers, and reappears when that measurement is forced below threshold on an otherwise identical part.",
+   "epistemic_class": "MODELLED",
+   "note": "produced by exactly one path"
+  }
+ ],
+ "adjudication": {
+  "adjudicator": "DETERMINISTIC (field completeness -> falsifiability -> source span)",
+  "primary_role": "MODEL_A",
+  "primary_provider": "agnes",
+  "primary_candidate_id": "cand:ENS:agnes:257fbd49c159",
+  "ranking": [
+   {
+    "role": "MODEL_A",
+    "provider_id": "agnes",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   },
+   {
+    "role": "MODEL_B",
+    "provider_id": "unorouter",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   },
+   {
+    "role": "MODEL_C",
+    "provider_id": "xkiro",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   }
+  ],
+  "consensus_forced": false,
+  "note": "the primary candidate enters the pipeline; disagreement objects remain UNRESOLVED and travel with the artifact chain (E15-E: do not force consensus)",
+  "decided_at": "2026-09-29T08:56:42+00:00Z"
+ },
+ "built_at": "2026-09-29T08:56:04+00:00Z",
+ "status": "ENSEMBLE_RUN",
+ "paths": [
+  "agnes",
+  "unorouter",
+  "xkiro"
+ ],
+ "comparison": {
+  "method": "pairwise significant-word Jaccard over the four invention claim dimensions (deterministic, N-ary; E16-G)",
+  "thresholds": {
+   "agreement": 0.3,
+   "disagreement": 0.25
+  },
+  "roles_compared": [
+   "MODEL_A",
+   "MODEL_B",
+   "MODEL_C"
+  ],
+  "pairs_compared": 3
+ }
+}

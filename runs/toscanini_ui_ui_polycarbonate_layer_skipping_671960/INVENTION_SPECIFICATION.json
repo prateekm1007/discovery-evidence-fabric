@@ -1,0 +1,1905 @@
+{
+ "invention_id": {
+  "value": "inv:ui_polycarbonate_layer_skipping_671960:9540419054e7",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_polycarbonate_layer_skipping_671960",
+   "device": "3D printer",
+   "failure": "Documented problem 'polycarbonate layer skipping' concerning 3D printer. User-submitted engineering problem (session input): \"Why does a 3D printer skip a layer when printing polycarbonate above 35C ambient, and what is the single measurement that settles it?\".  ROUTING: fra_rail_accidents: not queried — the failure query is free text and this source answers date-floor questions only (grammar: YYYY-MM-DD date floor ($where date >= X)). ROUTING: doe_osti: routing state SUSPENDED_RELEVANCE — measured relevance instability (R375: same fusion papers relevant 3 -> 0; pooled relevant-rate 0.175 pre-fix; DETERMINISM_GAP flagged in the R394 production audit) — records poison synthesis-feeding retrieval more than they feed it until relevance is semantically adjudicated; reinstatement: the Phase P1 semantic reranker lands (semantic relevance adjudication between query and record, replacing lexical overlap); flip to ACTIVE + a measured relevance re-run + worklog entry. [fra_rail_accidents] retrieval status NOT_QUERIED_GRAMMAR (planned query is free text; source grammar is a YYYY-MM-DD date floor (R443 routing decision, not absence)) — provider outcome recorded, not treated as absence (Art. XXI.3). [doe_osti] retrieval status NOT_QUERIED_SUSPENDED_RELEVANCE (engine routing decision (R399 W3): SUSPENDED_RELEVANCE — not a provider failure and not absence) — provider outcome recorded, not treated as absence (Art. XXI.3). Problem-existence basis: NO SOURCE RETURNED RECORDS — problem existence UNVERIFIED by live evidence (Art. XX); treat as hypothesis.",
+   "failure_mode": "polycarbonate layer skipping",
+   "constraint": "ambient temperature above 35C"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:72e0951d"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of 3D printer",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "High-performance polymer printing fails due to the lack of a stable running printer that can reach high temperatures and manipulate process parameters; the mechanism requires an open-source hardware upgrade capable of reaching 500 °C nozzle, 200 °C heated bed, and 135 °C heated chamber with electronics operating within the recommended temperature range to prevent delamination.",
+   "intervention": "Implement the open-source hardware upgrade for low-cost 3D printers using Klipper and Fluidd firmware to continuously monitor and calibrate hardware, ensuring the printer reaches 500 °C nozzle, 200 °C heated bed, and 135 °C heated chamber to stabilize the thermal environment for polycarbonate.",
+   "expected_effect": "The printer produces specimens with excellent surface quality and no signs of delamination, maintaining mechanical integrity by ensuring the stable running printer reaches and maintains the high temperatures necessary for high-performance polymers, thereby preventing layer skipping caused by thermal shock or inconsistent viscosity.",
+   "mechanism_source_span": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed.",
+   "span_derivation": {
+    "n_shared": 10,
+    "shared_terms": [
+     "can",
+     "high",
+     "performance",
+     "polymer",
+     "printer",
+     "reach",
+     "running",
+     "stable",
+     "temperature",
+     "that"
+    ],
+    "span_terms_n": 12,
+    "ratio": 0.833,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "If the heated chamber and continuous monitoring are disabled or if the nozzle temperature drops below 500 °C, delamination signs will reappear in the printed polycarbonate specimens, and the measured tensile strength will fall below the 15% outperformance margin in the ZX direction compared to the datasheet.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.1016/j.ohx.2022.e00265",
+     "source_span": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed."
+    }
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/ma12101642"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Mechanical Properties and Applications of Recycled Polycarbonate Particle Material Extrusion-Based Additive Manufacturing.",
+   "mechanism": "The printability and mechanical integrity of polycarbonate are governed by a coupled thermal-kinetic matrix where nozzle temperature and extrusion velocity determine the rate of crystallization and adhesion between layers, and this sensitivity is exacerbated when the part bed or ambient temperature exceeds specific thresholds, leading to delamination or layer skipping if the cooling profile is insufficient.",
+   "intervention_site": "3D printer",
+   "expected_effect": "The thermal gradient between the molten filament and the underlying layer remains within the polymer's rheological window, preventing the \"layer skipping\" failure mode by ensuring the new layer adheres chemically and mechanically to the previous one rather than slipping or delaminating due to inconsistent viscosity or thermal shock.",
+   "falsification_test": "Measure the interlayer shear strength of test coupons printed at 35C ambient with and without the proposed active cooling/parameter adjustment; if the \"skipping\" persists at the same frequency despite maintaining a constant sub-ambient thermal environment or adjusted viscosity profile, the mechanism is falsified."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/ma12101642"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "legacy_status": "LIKELY_PRIOR_ART_EXISTS",
+   "differentiation_resolution": {
+    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "NO_FAMILIES",
+    "per_family": [],
+    "n_families": 0,
+    "n_search_errors": 10,
+    "search_errors": [
+     {
+      "query": "skipping between polycarbonate layer ambient printer",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "skipping between polycarbonate layer ambient printer",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"9165ac4d-3b50-4765-975f-7b58e212f02c\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "between skipping polycarbonate layers ambient layer",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "between skipping polycarbonate layers ambient layer",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"cb6bfe3a-3c42-440e-8574-6282c81670e8\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"079a95e7-ed62-481b-a5bf-a54cd31c0bcd\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "skipping prevention compensation filament underlying preventing",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "skipping prevention compensation filament underlying preventing",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"bc0c2a9f-7b7e-413b-a4e7-1dd21065480f\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "between skipping layer polycarbonate ambient printer",
+      "source": "google_patents",
+      "error": "HTTP 503",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     },
+     {
+      "query": "between skipping layer polycarbonate ambient printer",
+      "source": "lens_patent",
+      "error": "HTTP 401: {\"reference\":\"4ee2c23d-e190-407f-9583-1fda1b76216b\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}",
+      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"
+     }
+    ],
+    "search_execution": {
+     "mandatory_complete": false,
+     "n_errors": 10,
+     "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+    },
+    "relevance_model_version": "collision_resolution/2.0.0",
+    "determinism_contract": {
+     "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+     "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+    },
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    }
+   },
+   "nearest": [],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "skipping between polycarbonate layer ambient printer"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "between skipping polycarbonate layers ambient layer"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "ambient thermal cooling temperature extrusion velocity delamination nozzle"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "skipping prevention compensation filament underlying preventing"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "between skipping layer polycarbonate ambient printer"
+    }
+   ],
+   "scientific": [
+    {
+     "title": "Evaluation of Surface Roughness Reduction in TPU 95A Samples Using Ferromagnetic Liquid Machining.",
+     "id": "41227897",
+     "query": "3D printer Documented problem polycarbonate layer"
+    },
+    {
+     "title": "Optimization of Mechanical Properties Using Fused Deposition Manufacturing Technique: A Systematic Investigation of Polycarbonate and Polylactic Acid Specimens.",
+     "id": "41096304",
+     "query": "3D printer Documented problem polycarbonate layer"
+    },
+    {
+     "title": "Machine Learning-Based Estimation of Mechanical Properties of 3D-Printed PLA Composites Under Annealing Treatment.",
+     "id": "42589738",
+     "query": "3D printer Documented problem polycarbonate layer"
+    },
+    {
+     "title": "Hardened Performance of 3D-Printed Geopolymer Mortars: A Review of Mechanical Properties, Durability, Sustainability, and Practical Implementation.",
+     "id": "42589772",
+     "query": "printability mechanical integrity polycarbonate governed coupled"
+    },
+    {
+     "title": "Functional Materials for Additive Manufacturing: Materials Design, Processing, and Emerging Applications.",
+     "id": "42506514",
+     "query": "printability mechanical integrity polycarbonate governed coupled"
+    }
+   ]
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Implement the open-source hardware upgrade for low-cost 3D printers using Klipper and Fluidd firmware to continuously monitor and calibrate hardware, ensuring the printer reaches 500 °C nozzle, 200 °C heated bed, and 135 °C heated chamber to stabilize the thermal environment for polycarbonate.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "doi:10.3390/ma12101642"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "ambient temperature above 35C",
+   "failure_mode_of_device": "polycarbonate layer skipping",
+   "evidence_derived": [
+    {
+     "constraint": "The printer must operate as a stable running printer that can reach high temperatures with a heated chamber to prevent delamination in high-performance polymers.",
+     "evidence_id": "doi:10.1016/j.ohx.2022.e00265",
+     "span": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed."
+    },
+    {
+     "constraint": "The printer must operate as a stable running printer that can reach high temperatures with a heated chamber of 135 °C and heated bed of 200 °C.",
+     "evidence_id": "doi:10.1016/j.ohx.2022.e00265",
+     "span": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed."
+    }
+   ]
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:72e0951d"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [
+   {
+    "dimension": "unsupported_mechanism",
+    "attack_verdict": "RISK - The record claims that active cooling or parameter adjustment prevents layer skipping by maintaining a thermal budget, but the specific causal chain linking ambient temperature >35C to layer skipping (rather than material degradation or mechanical failure) is a hypothesis with no provided data proving this specific mechanism.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "weak_transfer",
+    "attack_verdict": "RISK - The source evidence discusses particle-based FPF/FGF printing of recycled PC, whereas the candidate applies the thermal/kinetic logic to standard filament FDM printing, a transfer that assumes identical thermal dynamics without verifying compatibility.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "obvious_combination",
+    "attack_verdict": "RISK (burden-of-proof: memory_claim) — The intervention of \"closed-loop active cooling\" and \"increasing nozzle temperature/reducing velocity\" to manage thermal budgets in FDM printing of polycarbonate are standard, well-documented techniques for printing high-temperature polymers, making this an obvious combination of known methods present in general engineering knowledge and implied by the need to manage PC's rheological window.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "prior_art",
+    "attack_verdict": "SURVIVE (firewall: prior_art_state=UNRESOLVED_INSUFFICIENT_EVIDENCE is a non-kill state; adversarial PRIOR_ART=KILL is forbidden)",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "contradiction",
+    "attack_verdict": "PASS - No specific numerical values in the provided source evidence contradict the candidate's claims, as the source does not test ambient temperature effects on layer skipping.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "boundary_failure",
+    "attack_verdict": "PASS - The candidate explicitly sets the boundary at \"above 35C ambient\" and proposes maintaining below this threshold, which is internally consistent, though the necessity of this specific threshold is not proven.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "engineering_infeasibility",
+    "attack_verdict": "PASS - Implementing closed-loop active cooling for a 3D printer build platform and surrounding ambient is a known and feasible engineering task, despite its complexity.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "regulatory_incompatibility",
+    "attack_verdict": "PASS - No specific regulatory regime is violated by the proposed thermal control measures.",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: The thermal gradient between the molten filament and the underlying layer remains within the polymer's rheological window, preventing the \"layer skipping\" failure mode by ensuring the new layer adhere",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-29T08:56:04.005134+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-29T08:56:04.005134+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "doi:10.3390/ma12101642",
+    "title": "Mechanical Properties and Applications of Recycled Polycarbonate Particle Material Extrusion-Based Additive Manufacturing.",
+    "source_uri": "https://doi.org/10.3390/ma12101642",
+    "doi": "10.3390/ma12101642",
+    "content_hash": "bf44fc874d9fcf7a9acd1683bb01a9d1080e35cc1830e6e5a87de8f2d632270d",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.32722/jmt.v3i3.5174",
+    "title": "Analisa Hasil Cetak 3D Printer Dengan Teknik Layer By Layer",
+    "source_uri": "https://doi.org/10.32722/jmt.v3i3.5174",
+    "doi": "10.32722/jmt.v3i3.5174",
+    "content_hash": "21c5a347dd14c00aa2a16e36efbaf65c34116f325f523f57b912d11cc16f17a3",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.4028/p-efno3d",
+    "title": "Eco-Friendly High-Performance 3D Printer Filament from Polycarbonate Waste; How its Processability and Properties",
+    "source_uri": "https://doi.org/10.4028/p-efno3d",
+    "doi": "10.4028/p-efno3d",
+    "content_hash": "02fa0a280210f06dea7050f1e5d0e81e55e844d08116328b980e44f1676fe6b9",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.ohx.2022.e00265",
+    "title": "High-performance polymer 3D printing - Open-source liquid cooled scalable printer design.",
+    "source_uri": "https://doi.org/10.1016/j.ohx.2022.e00265",
+    "doi": "10.1016/j.ohx.2022.e00265",
+    "content_hash": "86c8b224f144183438b57ec23c37e3d4e2880ff376974a4b77ca65c0b94ed265",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.2172/1826142",
+    "title": "AD Robotics - 3D Printer Enclosure",
+    "source_uri": "https://doi.org/10.2172/1826142",
+    "doi": "10.2172/1826142",
+    "content_hash": "51de1486c9c06e6e781d6182ed4cbcdd8e7b08a33acc0754ec57bb9ab9cc4fd5",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.jmro.2023.100142",
+    "title": "Automated test apparatus for bench-testing the magnetic field homogeneity of NMR transceiver coils.",
+    "source_uri": "https://doi.org/10.1016/j.jmro.2023.100142",
+    "doi": "10.1016/j.jmro.2023.100142",
+    "content_hash": "a82eee944fd61f06bff5d44bb0bbe2e85061529a8da0f1f6a5efb52341aa8598",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.17918/00011047",
+    "title": "Modification of FDM 3D printer to a DIW printer for printing soft materials",
+    "source_uri": "https://doi.org/10.17918/00011047",
+    "doi": "10.17918/00011047",
+    "content_hash": "cc45ca45f0b2fc6594f183bbeff2d331c33ca83e7fcb8ef32bf73257c33773c0",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.14711/thesis-991012891969403412",
+    "title": "5-axis 3D printer from academia to commercial world",
+    "source_uri": "https://doi.org/10.14711/thesis-991012891969403412",
+    "doi": "10.14711/thesis-991012891969403412",
+    "content_hash": "123c10546076b0a57824a3efdc1ae391ebc7b109e99bb0546aa92d8d9d633b16",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.17918/etd-7444",
+    "title": "System integration &amp; programming of EHD 3D printer",
+    "source_uri": "https://doi.org/10.17918/etd-7444",
+    "doi": "10.17918/etd-7444",
+    "content_hash": "da64dea866bc8758546283d27037bd721be9f0254c938c3051f753fcf704316d",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2206.00041",
+    "title": "Characterization of 3D Printers and X-Ray Computerized Tomography",
+    "source_uri": "https://doi.org/10.48550/arxiv.2206.00041",
+    "doi": "10.48550/arxiv.2206.00041",
+    "content_hash": "f8f8d80cf94ce4edd19aca51dd91d5e0e9b84c3e995d3b6cfae95f9a84563ff7",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2001.01083",
+    "title": "Res3ATN -- Deep 3D Residual Attention Network for Hand Gesture Recognition in Videos",
+    "source_uri": "https://doi.org/10.48550/arxiv.2001.01083",
+    "doi": "10.48550/arxiv.2001.01083",
+    "content_hash": "b08904d090d4fecf8c16af7013910917f9de9eadf0dc2c856b7ada7495415cfc",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.48550/arxiv.2310.01530",
+    "title": "A Pretty Expressive Printer (with Appendices)",
+    "source_uri": "https://doi.org/10.48550/arxiv.2310.01530",
+    "doi": "10.48550/arxiv.2310.01530",
+    "content_hash": "e6a1503ade01fc0a89997ae2434e248b31fefaa12396244328556642dcd75e48",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.26616/nioshrd-1083-2024-0",
+    "title": "Pulmonary evaluation of whole-body inhalation exposure of polycarbonate (PC) filament 3D printer emissions in rats (dataset).",
+    "source_uri": "https://doi.org/10.26616/nioshrd-1083-2024-0",
+    "doi": "10.26616/nioshrd-1083-2024-0",
+    "content_hash": "d3ae65c7a04551de45eaa5b4038b264c165ab495a35d33407f789917f88e8c54",
+    "frozen": false
+   },
+   {
+    "id": "title:34846e5de520844c",
+    "title": "Finite element analysis of curl development in the selective laser sintering process",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "46c396ff28bc7a93ee1794500c8d6075811dd62f48ae32972233c88c182f78f8",
+    "frozen": false
+   },
+   {
+    "id": "title:50e1161468cf6406",
+    "title": "Τρισδιάστατος εκτυπωτής - 3D - Printer",
+    "source_uri": "",
+    "doi": null,
+    "content_hash": "3fdc6341d927d8ed6105e8ef0ccfeb02f3590ee6cfdd28e4be80a0c5f8e8ff98",
+    "frozen": false
+   },
+   {
+    "id": "doi:10.1016/j.snb.2020.127854",
+    "title": "A non-optical multiplexed PCR diagnostic platform for serotype-specific detection of dengue virus",
+    "source_uri": "https://doi.org/10.1016/j.snb.2020.127854",
+    "doi": "10.1016/j.snb.2020.127854",
+    "content_hash": "7c5d511d9a096abe57a7b8dee71ea23fa1752f2c456a147f2f69f3d6a0aa9cc9",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "doi:10.1016/j.jmro.2023.100142",
+   "doi:10.1016/j.ohx.2022.e00265",
+   "doi:10.1016/j.snb.2020.127854",
+   "doi:10.14711/thesis-991012891969403412",
+   "doi:10.17918/00011047",
+   "doi:10.17918/etd-7444",
+   "doi:10.2172/1826142",
+   "doi:10.26616/nioshrd-1083-2024-0",
+   "doi:10.32722/jmt.v3i3.5174",
+   "doi:10.3390/ma12101642",
+   "doi:10.4028/p-efno3d",
+   "doi:10.48550/arxiv.2001.01083",
+   "doi:10.48550/arxiv.2206.00041",
+   "doi:10.48550/arxiv.2310.01530",
+   "title:34846e5de520844c",
+   "title:50e1161468cf6406"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "unresolved_source": "skipping between polycarbonate layer ambient printer",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "skipping between polycarbonate layer ambient printer",
+    "error": "HTTP 401: {\"reference\":\"9165ac4d-3b50-4765-975f-7b58e212f02c\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "between skipping polycarbonate layers ambient layer",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "between skipping polycarbonate layers ambient layer",
+    "error": "HTTP 401: {\"reference\":\"cb6bfe3a-3c42-440e-8574-6282c81670e8\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+    "error": "HTTP 401: {\"reference\":\"079a95e7-ed62-481b-a5bf-a54cd31c0bcd\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "skipping prevention compensation filament underlying preventing",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "skipping prevention compensation filament underlying preventing",
+    "error": "HTTP 401: {\"reference\":\"bc0c2a9f-7b7e-413b-a4e7-1dd21065480f\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   },
+   {
+    "unresolved_source": "between skipping layer polycarbonate ambient printer",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "between skipping layer polycarbonate ambient printer",
+    "error": "HTTP 401: {\"reference\":\"4ee2c23d-e190-407f-9583-1fda1b76216b\",\"message\":\"Unable to authorize user to this resource.\",\"code\":401}"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Measure the interlayer shear strength of test coupons printed at 35C ambient with and without the proposed active cooling/parameter adjustment; if the \"skipping\" persists at the same frequency despite maintaining a constant sub-ambient thermal environment or adjusted viscosity profile, the mechanism is falsified."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_polycarbonate_layer_skipping_671960:2026-09-29T08:52:40",
+   "final_envelope_hash": "9540419054e7c71f9df3ffc39e62bfda07d74985902d05e903e227fbb8a47b8d",
+   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 1.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.5191,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-29T08:56:04+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": true,
+    "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+    "verdict": "CONTESTED"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-29T08:56:04+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "doi:10.3390/ma12101642": {
+   "id": "doi:10.3390/ma12101642",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:31137505",
+   "source_uri": "https://doi.org/10.3390/ma12101642",
+   "title": "Mechanical Properties and Applications of Recycled Polycarbonate Particle Material Extrusion-Based Additive Manufacturing.",
+   "abstract": "Past work has shown that particle material extrusion (fused particle fabrication (FPF)/fused granular fabrication (FGF)) has the potential for increasing the use of recycled polymers in 3D printing. This study extends this potential to high-performance (high-mechanical-strength and heat-resistant) polymers using polycarbonate (PC). Recycled PC regrind of approximately 25 mm 2 was 3D printed with an open-source Gigabot X and analyzed. A temperature and nozzle velocity matrix was used to find useful printing parameters, and a print test was used to maximize the output for a two-temperature stage extruder for PC. ASTM type 4 tensile test geometries as well as ASTM-approved compression tests were used to determine the mechanical properties of PC and were compared with filament printing and the bulk virgin material. The results showed the tensile strength of parts manufactured from the recycled PC particles (64.9 MPa) were comparable to that of the commercial filament printed on desktop (62.2 MPa) and large-format (66.3 MPa) 3D printers. Three case study applications were investigated: (i) using PC as a rapid molding technology for lower melting point thermoplastics, (ii) printed parts for high temperature applications, and (iii) printed parts for high-strength applications. The results show that recycled PC particle-based 3D printing can produce high-strength and heat-resistant products at low costs.",
+   "doi": "10.3390/ma12101642",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2019-05-20",
+   "retrieval_timestamp": "2026-09-29T08:53:09.432557+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bf44fc874d9fcf7a9acd1683bb01a9d1080e35cc1830e6e5a87de8f2d632270d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:31137505"
+    },
+    "queries_by_source": {
+     "europepmc": "3D printer polycarbonate layer skipping"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/ma12101642",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3D printer polycarbonate layer skipping",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.32722/jmt.v3i3.5174": {
+   "id": "doi:10.32722/jmt.v3i3.5174",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.32722/jmt.v3i3.5174",
+   "source_uri": "https://doi.org/10.32722/jmt.v3i3.5174",
+   "title": "Analisa Hasil Cetak 3D Printer Dengan Teknik Layer By Layer",
+   "abstract": "",
+   "doi": "10.32722/jmt.v3i3.5174",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2022",
+   "retrieval_timestamp": "2026-09-29T08:53:09.432682+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "21c5a347dd14c00aa2a16e36efbaf65c34116f325f523f57b912d11cc16f17a3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.32722/jmt.v3i3.5174"
+    },
+    "queries_by_source": {
+     "crossref": "3D printer polycarbonate layer skipping"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.32722/jmt.v3i3.5174",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3D printer polycarbonate layer skipping",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.4028/p-efno3d": {
+   "id": "doi:10.4028/p-efno3d",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.4028/p-efno3d",
+   "source_uri": "https://doi.org/10.4028/p-efno3d",
+   "title": "Eco-Friendly High-Performance 3D Printer Filament from Polycarbonate Waste; How its Processability and Properties",
+   "abstract": "",
+   "doi": "10.4028/p-efno3d",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-09-29T08:53:09.432729+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "02fa0a280210f06dea7050f1e5d0e81e55e844d08116328b980e44f1676fe6b9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.4028/p-efno3d"
+    },
+    "queries_by_source": {
+     "crossref": "3D printer polycarbonate layer skipping"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.4028/p-efno3d",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3D printer polycarbonate layer skipping",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1016/j.ohx.2022.e00265": {
+   "id": "doi:10.1016/j.ohx.2022.e00265",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:35509936",
+   "source_uri": "https://doi.org/10.1016/j.ohx.2022.e00265",
+   "title": "High-performance polymer 3D printing - Open-source liquid cooled scalable printer design.",
+   "abstract": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed. There is currently a lack of low-cost solutions that allow manipulation of process parameters and expansion of sensors to monitor the printer as well as the process. This paper presents an open-source hardware upgrade for low-cost 3D printers to enable research on new high-temperature polymers as well as manufacturing from all currently available polymers. The hardware cost less than $1700, including the printer. Open-source firmware by Klipper and Fluidd is used for control. The printer is able to reach 500 °C nozzle, 200 °C heated bed, and 135 °C heated chamber with all electronics inside operating within the recommended temperature range. The presented design produced a CF-PEEK 3DBenchy and a spiral vase with excellent surface quality and no signs of delamination. Test specimens according to ISO527 using PA-CF performed similarly to the datasheet provided by the manufacturer for samples produced in the XY-orientation and outperformed the datasheet by 15 % in the ZX direction. Compared to specimens made on an Original Prusa i3 MK3S, the modified printer produced specimens with 22% higher strength in the YX-direction and 25% in ZX. By continuously monitoring and carefully calibrating both hardware and firmware, the presented design can perform as a research tool in material science and produce large-scale components of high-performance polymers.",
+   "doi": "10.1016/j.ohx.2022.e00265",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2022-01-10",
+   "retrieval_timestamp": "2026-09-29T08:53:09.432754+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "86c8b224f144183438b57ec23c37e3d4e2880ff376974a4b77ca65c0b94ed265",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:35509936"
+    },
+    "queries_by_source": {
+     "europepmc": "3D printer polycarbonate layer skipping"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1016/j.ohx.2022.e00265",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3D printer polycarbonate layer skipping",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.2172/1826142": {
+   "id": "doi:10.2172/1826142",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.2172/1826142",
+   "source_uri": "https://doi.org/10.2172/1826142",
+   "title": "AD Robotics - 3D Printer Enclosure",
+   "abstract": "",
+   "doi": "10.2172/1826142",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2021",
+   "retrieval_timestamp": "2026-09-29T08:53:09.432773+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "51de1486c9c06e6e781d6182ed4cbcdd8e7b08a33acc0754ec57bb9ab9cc4fd5",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.2172/1826142"
+    },
+    "queries_by_source": {
+     "crossref": "3D printer polycarbonate layer skipping"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.2172/1826142",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3D printer polycarbonate layer skipping",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.1016/j.jmro.2023.100142": {
+   "id": "doi:10.1016/j.jmro.2023.100142",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:38444623",
+   "source_uri": "https://doi.org/10.1016/j.jmro.2023.100142",
+   "title": "Automated test apparatus for bench-testing the magnetic field homogeneity of NMR transceiver coils.",
+   "abstract": "We describe an automated hands-off bench testing method for measuring the magnetic field profile of transceiver coils for nuclear magnetic resonance (NMR). The scattering parameter (S-parameter) data is measured using a portable network analyzer, and the results are automatically exported to a computer for plotting and viewing. This assay dramatically reduces the time needed to measure the magnetic field (B 1 ) homogeneity profile of a transceiver coil while also improving accuracy relative to manual operation. Here, we demonstrate the method on a saddle coil of a solution-state NMR probe in comparison to profiles obtained using NMR spectroscopy measurements. We also measure the axial and radial homogeneity of a variable-pitch solenoid.",
+   "doi": "10.1016/j.jmro.2023.100142",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2023-12-21",
+   "retrieval_timestamp": "2026-09-29T08:53:09.432791+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a82eee944fd61f06bff5d44bb0bbe2e85061529a8da0f1f6a5efb52341aa8598",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:38444623"
+    },
+    "queries_by_source": {
+     "europepmc": "3D printer polycarbonate layer skipping"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1016/j.jmro.2023.100142",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3D printer polycarbonate layer skipping",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  "doi:10.17918/00011047": {
+   "id": "doi:10.17918/00011047",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.17918/00011047",
+   "source_uri": "https://doi.org/10.17918/00011047",
+   "title": "Modification of FDM 3D printer to a DIW printer for printing soft materials",
+   "abstract": "",
+   "doi": "10.17918/00011047",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:53:09.432812+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "cc45ca45f0b2fc6594f183bbeff2d331c33ca83e7fcb8ef32bf73257c33773c0",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.17918/00011047"
+    },
+    "queries_by_source": {
+     "crossref": "3D printer polycarbonate layer skipping"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.17918/00011047",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3D printer polycarbonate layer skipping",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.14711/thesis-991012891969403412": {
+   "id": "doi:10.14711/thesis-991012891969403412",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.14711/thesis-991012891969403412",
+   "source_uri": "https://doi.org/10.14711/thesis-991012891969403412",
+   "title": "5-axis 3D printer from academia to commercial world",
+   "abstract": "",
+   "doi": "10.14711/thesis-991012891969403412",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:53:09.432828+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "123c10546076b0a57824a3efdc1ae391ebc7b109e99bb0546aa92d8d9d633b16",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.14711/thesis-991012891969403412"
+    },
+    "queries_by_source": {
+     "crossref": "3D printer polycarbonate layer skipping"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.14711/thesis-991012891969403412",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3D printer polycarbonate layer skipping",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.17918/etd-7444": {
+   "id": "doi:10.17918/etd-7444",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.17918/etd-7444",
+   "source_uri": "https://doi.org/10.17918/etd-7444",
+   "title": "System integration &amp; programming of EHD 3D printer",
+   "abstract": "",
+   "doi": "10.17918/etd-7444",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:53:09.432844+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "da64dea866bc8758546283d27037bd721be9f0254c938c3051f753fcf704316d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.17918/etd-7444"
+    },
+    "queries_by_source": {
+     "crossref": "3D printer polycarbonate layer skipping"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.17918/etd-7444",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3D printer polycarbonate layer skipping",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "doi:10.48550/arxiv.2206.00041": {
+   "id": "doi:10.48550/arxiv.2206.00041",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2206.00041v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2206.00041",
+   "title": "Characterization of 3D Printers and X-Ray Computerized Tomography",
+   "abstract": "The 3D printing process flow requires several inputs for the best printing quality. These settings may vary from sample to sample, printer to printer, and depend upon users' previous experience. The involved operational parameters for 3D Printing are varied to test the optimality. Thirty-eight samples are printed using four commercially available 3D printers, namely: (a) Ultimaker 2 Extended+, (b) Delta Wasp, (c) Raise E2, and (d) ProJet MJP. The sample profiles contain uniform and non-uniform distribution of the assorted size of cubes and spheres with a known amount of porosity. These samples are scanned using X-Ray Computed Tomography system. Functional Imaging analysis is performed using AI-based segmentation codes to (a) characterize these 3D printers and (b) find Three-dimensional surface roughness of three teeth and one sandstone pebble (from riverbed) with naturally deposited layers is also compared with printed sample values. Teeth has best quality. It is found that ProJet MJP gives the best quality of printed samples with the least amount of surface roughness and almost near to the actual porosity value. As expected, 100% infill density value, best spatial resolution for printing or Layer height, and minimum nozzle speed give the best quality of 3D printing.",
+   "doi": "10.48550/arxiv.2206.00041",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:53:09.432861+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f8f8d80cf94ce4edd19aca51dd91d5e0e9b84c3e995d3b6cfae95f9a84563ff7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2206.00041v1"
+    },
+    "queries_by_source": {
+     "arxiv": "3D printer polycarbonate layer skipping"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2206.00041",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3D printer polycarbonate layer skipping",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/2206.00041v1",
+   "authors": [
+    "Sunita Khod",
+    "Akshay Dvivedi",
+    "Mayank Goswami"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2001.01083": {
+   "id": "doi:10.48550/arxiv.2001.01083",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2001.01083v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2001.01083",
+   "title": "Res3ATN -- Deep 3D Residual Attention Network for Hand Gesture Recognition in Videos",
+   "abstract": "Hand gesture recognition is a strenuous task to solve in videos. In this paper, we use a 3D residual attention network which is trained end to end for hand gesture recognition. Based on the stacked multiple attention blocks, we build a 3D network which generates different features at each attention block. Our 3D attention based residual network (Res3ATN) can be built and extended to very deep layers. Using this network, an extensive analysis is performed on other 3D networks based on three publicly available datasets. The Res3ATN network performance is compared to C3D, ResNet-10, and ResNext-101 networks. We also study and evaluate our baseline network with different number of attention blocks. The comparison shows that the 3D residual attention network with 3 attention blocks is robust in attention learning and is able to classify the gestures with better accuracy, thus outperforming existing networks.",
+   "doi": "10.48550/arxiv.2001.01083",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:53:09.432878+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "b08904d090d4fecf8c16af7013910917f9de9eadf0dc2c856b7ada7495415cfc",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2001.01083v1"
+    },
+    "queries_by_source": {
+     "arxiv": "3D printer polycarbonate layer skipping"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2001.01083",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3D printer polycarbonate layer skipping",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/2001.01083v1",
+   "authors": [
+    "Naina Dhingra",
+    "Andreas Kunz"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.48550/arxiv.2310.01530": {
+   "id": "doi:10.48550/arxiv.2310.01530",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2310.01530v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.2310.01530",
+   "title": "A Pretty Expressive Printer (with Appendices)",
+   "abstract": "Pretty printers make trade-offs between the expressiveness of their pretty printing language, the optimality objective that they minimize when choosing between different ways to lay out a document, and the performance of their algorithm. This paper presents a new pretty printer, $Π_e$, that is strictly more expressive than all pretty printers in the literature and provably minimizes an optimality objective. Furthermore, the time complexity of $Π_e$ is better than many existing pretty printers. When choosing among different ways to lay out a document, $Π_e$ consults a user-supplied cost factory, which determines the optimality objective, giving $Π_e$ a unique degree of flexibility. We use the Lean theorem prover to verify the correctness (validity and optimality) of $Π_e$, and implement $Π_e$ concretely as a pretty printer that we call PrettyExpressive. To evaluate our pretty printer against others, we develop a formal framework for reasoning about the expressiveness of pretty printing languages, and survey pretty printers in the literature, comparing their expressiveness, optimality, worst-case time complexity, and practical running time. Our evaluation shows that PrettyExpressive is efficient and effective at producing optimal layouts. PrettyExpressive has also seen real-world adoption: it serves as a foundation of a code formatter for Racket.",
+   "doi": "10.48550/arxiv.2310.01530",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:53:09.432895+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e6a1503ade01fc0a89997ae2434e248b31fefaa12396244328556642dcd75e48",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2310.01530v1"
+    },
+    "queries_by_source": {
+     "arxiv": "3D printer polycarbonate layer skipping"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2310.01530",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3D printer polycarbonate layer skipping",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2310.01530v1",
+   "authors": [
+    "Sorawee Porncharoenwase",
+    "Justin Pombrio",
+    "Emina Torlak"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed — absence of an arXiv record is not absence of the science"
+   ]
+  },
+  "doi:10.26616/nioshrd-1083-2024-0": {
+   "id": "doi:10.26616/nioshrd-1083-2024-0",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.26616/nioshrd-1083-2024-0",
+   "source_uri": "https://doi.org/10.26616/nioshrd-1083-2024-0",
+   "title": "Pulmonary evaluation of whole-body inhalation exposure of polycarbonate (PC) filament 3D printer emissions in rats (dataset).",
+   "abstract": "",
+   "doi": "10.26616/nioshrd-1083-2024-0",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2024",
+   "retrieval_timestamp": "2026-09-29T08:53:09.432912+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d3ae65c7a04551de45eaa5b4038b264c165ab495a35d33407f789917f88e8c54",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.26616/nioshrd-1083-2024-0"
+    },
+    "queries_by_source": {
+     "crossref": "3D printer polycarbonate layer skipping"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=report"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "REPORT",
+   "document_type": "",
+   "evidence_lane": "TECHNICAL_REPORT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.26616/nioshrd-1083-2024-0",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3D printer polycarbonate layer skipping",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  "title:34846e5de520844c": {
+   "id": "title:34846e5de520844c",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:346793614",
+   "source_uri": "",
+   "title": "Finite element analysis of curl development in the selective laser sintering process",
+   "abstract": "Selective laser sintering (SLS) is a rapid prototyping process, which operates by using a laser to locally heat an area within a layer of powder material, causing it\n\nto fuse together, creating a thin cross-section of solid material. 3D shapes are built by repeatedly depositing a layer of fresh powder on top of the cross-section\n\nand then locally heating it, causing it to fuse together and to the layer beneath. However, during SLS processing, temperature differences that exist in different\n\nregions of the fabricated parts lead to uneven shrinkages. The shrinkages cause surfaces in the part, which are intended to be flat, to exhibit a curved profile; a\n\nphenomenon termed curl. The development of curl is highly influenced by the SLS machine parameters selected in fabrication. The production of geometrically acceptable parts involves numerous fabrication trials before the optimum machine parameters can be found. The procedure can be time consuming and expensive.\n\n\n\nThe aim of the work presented in this thesis was to develop finite element models for the purpose of predicting curl in SLS fabricated polycarbonate parts. The ultimate goal was to use the models to estimate the optimum SLS machine\n\nparameters for the physical fabrication of geometrically acceptable parts, produced in any material, and therefore avoid the costly and time consuming process of using SLS machines for experimental purposes.\n\n\n\nThe prediction of curl was made through heat transfer and stress finite element models that were both coupled using the sequentially coupled thermal-stress analysis technique. Experimental work was carried out to measure material\n\nproperties used as input to the models and to validate results predicted. The sensitivity of curl predicted to assumptions considered in the heat and stress models was introduced, and the assumptions highly influencing the accuracy of curl predictions were identified",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:53:09.432928+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "46c396ff28bc7a93ee1794500c8d6075811dd62f48ae32972233c88c182f78f8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:346793614"
+    },
+    "queries_by_source": {
+     "core": "3d printer polycarbonate layer skipping experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:34846e5de520844c",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3d printer polycarbonate layer skipping experimental comparison",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Jamal, Naim Musa"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "title:50e1161468cf6406": {
+   "id": "title:50e1161468cf6406",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:134983528",
+   "source_uri": "",
+   "title": "Τρισδιάστατος εκτυπωτής - 3D - Printer",
+   "abstract": "Στόχος της παρούσας διπλωματικής εργασίας είναι η υλοποίηση 3D εκτυπωτή σε υλικό καθώς και σε λογισμικό επίπεδο. Στα πλαίσια του εργαστηρίου Τεχνητής Νοημοσύνης του Τμήματος Μηχανικών Πληροφοριακών και Επικοινωνιακών Συστημάτων του Πανεπιστημίου Αιγαίου, δημιουργήθηκε η ανάγκη για εκτύπωση τρισδιάστατων αντικειμένων μεγαλύτερων διαστάσεων σε σχέση με τον υπάρχων 3D Printer. Στο πρώτο κεφάλαιο περιγράφεται η τεχνική της τρισδιάστατης εκτύπωσης και τα πλεονεκτήματα και μειονεκτήματα που προκύπτουν από εκείνη. Στη συνέχεια, παρουσιάζεται η ιστορική αναδρομή των 3D εκτυπωτών από το 1983 έως και τη σημερινή εποχή. Στο δεύτερο κεφάλαιο αναλύεται η κατασκευή του εκτυπωτή με διαστάσεις 100cm (μήκος) x 55cm (πλάτος) x 60cm (ύψος), ενώ οι διαστάσεις εκτύπωσης είναι 40cm x 40cm x 45cm. Τα υλικά από τα οποία απαρτίζεται ο εκτυπωτής είναι προφίλ αλουμινίου, πλακέτα Arduino και Ramps Shield, βηματικοί κινητήρες, θερμαινόμενη κεφαλή, θερμαινόμενη βάση εκτύπωσης και 3D εκτυπωμένα κομμάτια πλαστικού. Το τρίτο κεφάλαιο αναφέρεται στο λογισμικό επίπεδο του εκτυπωτή, καθώς και στο πρόγραμμα εξαγωγής αρχείων προς εκτύπωση Cura Ultimaker. Επιπλέον αναλύονται οι παραμετροποιήσεις που πραγματοποιήθηκαν στο Marlin 1.1.9, το οποίο είναι εγκατεστημένο στο Arduino Mega, στην κεντρική πλακέτα του εκτυπωτή. Στο τέταρτο κεφάλαιο αναγράφεται ο αναλυτικός κατάλογος των υλικών που χρησιμοποιήθηκαν για την κατασκευή του εκτυπωτή, τα τεμάχια καθώς και η τιμή τους. Τέλος, ακολουθούν οι μελλοντικές επεκτάσεις και τα συμπεράσματα τα οποία προέκυψαν κατά την διατριβή της διπλωματικής εργασίας.This specific diploma aims to the construction of 3D printer in hardware as well as in software level. Within the context of Artificial Intelligence Lab of the Departure of Information and Communication Systems Engineering at the University of Aegean, the need for printing 3D items with larger dimensions that the existing 3D printer, was created. The first chapter describes the technique of 3D printing and the advantages and disadvantages of it. In addition, it is presented the historical background of 3D printers since 1983 until nowadays. The second chapter analyzes the construction of the printer with dimensions 100cm (length) x 55cm (width) x 60cm (height), while the dimensions of printing are 40cm x 40cm x 45cm. The materials which the printer is consisted of are aluminium profiles, Arduino board and Ram",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-09-29T08:53:09.432945+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3fdc6341d927d8ed6105e8ef0ccfeb02f3590ee6cfdd28e4be80a0c5f8e8ff98",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:134983528"
+    },
+    "queries_by_source": {
+     "core": "3d printer polycarbonate layer skipping experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:50e1161468cf6406",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "3d printer polycarbonate layer skipping experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Μάνος, Νικόλαος"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  "doi:10.1016/j.snb.2020.127854": {
+   "id": "doi:10.1016/j.snb.2020.127854",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:335ab85182b17f88239291ccf1817fa48e9a63f0",
+   "source_uri": "https://doi.org/10.1016/j.snb.2020.127854",
+   "title": "A non-optical multiplexed PCR diagnostic platform for serotype-specific detection of dengue virus",
+   "abstract": "Abstract Viable point-of-care multi-target diagnostics requires single-sample multiplexed detection in a single PCR reactor with non-optical instruments. We report an integrated multiplexed PCR chip platform with a novel ion-selective membrane sensor array that eliminates the key selectivity and sensitivity issues for multiplexed PCR, such as primer dimerization and nonspecific amplification (mis-priming). The depletion action of the ion-selective membrane renders the sensor insensitive to pH and ionic strength variation or non-specific binding, which plague the current electrochemical sensor arrays. We validate the platform with robust, sensitive and selective detection of each of the four dengue virus (DENV) serotypes, even in the presence of misprimed non-target products, with plasma samples spiked with heterogeneous RNA populations that include all the serotypes. The assay time is ∼ 90 min with a detection sensitivity of DENV RNA template down to 100 copies per mL. By replacing the optical sensing technology of RT-PCR with the membrane sensor, the platform is scalable and can allow simultaneous screening for multiple viral infections in a single sample within a single PCR reactor chip for point-of-care applications.",
+   "doi": "10.1016/j.snb.2020.127854",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-09-29T08:53:09.432962+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "7c5d511d9a096abe57a7b8dee71ea23fa1752f2c456a147f2f69f3d6a0aa9cc9",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:335ab85182b17f88239291ccf1817fa48e9a63f0"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1016/j.bios.2020.112592"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "95c97b8f909f07e8009479d127401ba06ac40f73f1b12a03c71433c9664d160a",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1016/j.snb.2020.127854",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1016/j.bios.2020.112592",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Ze Yin",
+    "Z. Ramshani",
+    "J. Waggoner",
+    "B. Pinsky",
+    "S. Senapati",
+    "Hsueh-Chia Chang"
+   ],
+   "raw_record_hash": "95c97b8f909f07e8009479d127401ba06ac40f73f1b12a03c71433c9664d160a",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  },
+  "problem:72e0951d": {
+   "id": "problem:72e0951d",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "72e0951db2299fb8b1bd909694481b60b5fc792bd09a528471090a0c45c65d80",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": true,
+  "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+  "verdict": "CONTESTED"
+ },
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-29T08:56:04+00:00Z"
+ },
+ "_ensemble_disagreements": [
+  {
+   "disagreement_id": "DIS-001",
+   "dimension": "mechanism",
+   "role_a": "MODEL_A",
+   "claim_a": "The use of a two-temperature stage extruder to maintain high polymer viscosity and prevent premature cooling in high-performance polycarbonate",
+   "role_b": "MODEL_B",
+   "claim_b": "Thermal stabilization of high-performance polycarbonate during extrusion via optimized temperature and nozzle velocity to ensure proper material flow and mechanical bonding.",
+   "similarity": 0.16,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-002",
+   "dimension": "mechanism",
+   "role_a": "MODEL_A",
+   "claim_a": "The use of a two-temperature stage extruder to maintain high polymer viscosity and prevent premature cooling in high-performance polycarbonate",
+   "role_b": "MODEL_C",
+   "claim_b": "Two-temperature stage extruder maintains elevated melt/feed temperature to keep polycarbonate above its heat-resistant processing window, preventing premature cooling and loss of inter-layer bonding when ambient conditions approach PC's heat-distortion limit.",
+   "similarity": 0.182,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-003",
+   "dimension": "mechanism",
+   "role_a": "MODEL_B",
+   "claim_a": "Thermal stabilization of high-performance polycarbonate during extrusion via optimized temperature and nozzle velocity to ensure proper material flow and mechanical bonding.",
+   "role_b": "MODEL_C",
+   "claim_b": "Two-temperature stage extruder maintains elevated melt/feed temperature to keep polycarbonate above its heat-resistant processing window, preventing premature cooling and loss of inter-layer bonding when ambient conditions approach PC's heat-distortion limit.",
+   "similarity": 0.073,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-004",
+   "dimension": "intervention",
+   "role_a": "MODEL_A",
+   "claim_a": "Equip the 3D printer with a dual-zone heated nozzle and chamber insulation to ensure the second heating zone maintains polycarbonate above its glass transition temperature during layer deposition",
+   "role_b": "MODEL_B",
+   "claim_b": "Adjust the print bed temperature to be significantly higher than the 35C ambient threshold (e.g., 80-100C) and calibrate the nozzle velocity to maintain optimal polycarbonate rheology.",
+   "similarity": 0.097,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-005",
+   "dimension": "intervention",
+   "role_a": "MODEL_A",
+   "claim_a": "Equip the 3D printer with a dual-zone heated nozzle and chamber insulation to ensure the second heating zone maintains polycarbonate above its glass transition temperature during layer deposition",
+   "role_b": "MODEL_C",
+   "claim_b": "Replace the single-zone hot end with a two-temperature stage extruder for PC, setting the upstream/feed zone to a temperature tuned to keep the melt above the threshold where layer adhesion fails above 35C ambient; monitor and record a single measurement — the inter-layer weld/interface temperature (or equivalently the extrudate surface temperature at deposition) — as the settlement metric.",
+   "similarity": 0.109,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-006",
+   "dimension": "intervention",
+   "role_a": "MODEL_B",
+   "claim_a": "Adjust the print bed temperature to be significantly higher than the 35C ambient threshold (e.g., 80-100C) and calibrate the nozzle velocity to maintain optimal polycarbonate rheology.",
+   "role_b": "MODEL_C",
+   "claim_b": "Replace the single-zone hot end with a two-temperature stage extruder for PC, setting the upstream/feed zone to a temperature tuned to keep the melt above the threshold where layer adhesion fails above 35C ambient; monitor and record a single measurement — the inter-layer weld/interface temperature (or equivalently the extrudate surface temperature at deposition) — as the settlement metric.",
+   "similarity": 0.071,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-007",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_A",
+   "claim_a": "Elimination of layer skipping by preventing the loss of material adhesion and flow consistency caused by ambient heat exceeding 35C",
+   "role_b": "MODEL_B",
+   "claim_b": "Reduces thermal shock between the nozzle and the bed, preventing premature solidification of the layer and eliminating the layer skipping phenomenon.",
+   "similarity": 0.136,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-008",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_A",
+   "claim_a": "Elimination of layer skipping by preventing the loss of material adhesion and flow consistency caused by ambient heat exceeding 35C",
+   "role_b": "MODEL_C",
+   "claim_b": "Layer skipping is eliminated (or sharply reduced) above 35C ambient because the two-stage thermal profile keeps the deposited bead hot enough to fuse with the previously laid layer, compensating for the high ambient temperature that would otherwise flash-cool the extrudate against the heat-resistant PC substrate.",
+   "similarity": 0.105,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-009",
+   "dimension": "expected_effect",
+   "role_a": "MODEL_B",
+   "claim_a": "Reduces thermal shock between the nozzle and the bed, preventing premature solidification of the layer and eliminating the layer skipping phenomenon.",
+   "role_b": "MODEL_C",
+   "claim_b": "Layer skipping is eliminated (or sharply reduced) above 35C ambient because the two-stage thermal profile keeps the deposited bead hot enough to fuse with the previously laid layer, compensating for the high ambient temperature that would otherwise flash-cool the extrudate against the heat-resistant PC substrate.",
+   "similarity": 0.079,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-010",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "Print a 20 mm wall tower with polycarbonate at 35C ambient using both a single-zone and the new two-zone nozzle; measure interlayer shear strength and record video; if the single-zone nozzle shows delamination or skipping while the two-zone nozzle produces continuous layers, the mechanism is verified",
+   "role_b": "MODEL_B",
+   "claim_b": "Print a tower test with polycarbonate at 35C ambient using bed temperatures of 50C, 80C, and 100C; layer skipping should cease at 80C or higher.",
+   "similarity": 0.179,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-011",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "Print a 20 mm wall tower with polycarbonate at 35C ambient using both a single-zone and the new two-zone nozzle; measure interlayer shear strength and record video; if the single-zone nozzle shows delamination or skipping while the two-zone nozzle produces continuous layers, the mechanism is verified",
+   "role_b": "MODEL_C",
+   "claim_b": "Print the same PC part with the two-temperature stage extruder at a controlled 38C ambient chamber, sweeping the inter-layer deposition temperature setpoint; the layer-skip failure is falsified only if layer skipping disappears once the measured inter-layer deposition temperature stays above the identified threshold across a statistically adequate number of layers, and reappears when that measurement is forced below threshold on an otherwise identical part.",
+   "similarity": 0.07,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-012",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_B",
+   "claim_a": "Print a tower test with polycarbonate at 35C ambient using bed temperatures of 50C, 80C, and 100C; layer skipping should cease at 80C or higher.",
+   "role_b": "MODEL_C",
+   "claim_b": "Print the same PC part with the two-temperature stage extruder at a controlled 38C ambient chamber, sweeping the inter-layer deposition temperature setpoint; the layer-skip failure is falsified only if layer skipping disappears once the measured inter-layer deposition temperature stays above the identified threshold across a statistically adequate number of layers, and reappears when that measurement is forced below threshold on an otherwise identical part.",
+   "similarity": 0.091,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-09-29T08:56:42+00:00Z"
+  }
+ ],
+ "_improvement": {
+  "parent_spec_hash": "fe13791a5e5126ad6404dc918144638aead7c92384f201b7edcf4e26c933ff32",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:30f923a8d913",
+   "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.212,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:5bada9f66875",
+    "provider": "agnes",
+    "model": "agnes-3.0-flash",
+    "prompt_hash": "0bf228228d36f2774b270d08792cee8229c25d34a5d188301fabf239c47f7131",
+    "output_hash": "5bada9f668752c02264dbd86b58f25a742b49e62053f97a6a130cf93b6c9b625",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.1016/j.ohx.2022.e00265",
+     "span_verbatim_in_evidence": true,
+     "evidence_support": 0.682,
+     "evidence_support_cleared": 0.682,
+     "constraint_traceable_to_evidence": "The printer must operate as a stable running printer that can reach high temperatures with a heated chamber of 135 °C an"
+    },
+    "reasons": [],
+    "validated_at": "2026-09-29T08:58:01+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "High-performance polymer printing, such as polycarbonate, fails due to inadequate thermal management where high nozzle temperatures (up to 500 °C) and heated chambers are required; without stable running printer conditions and continuous monitoring of hardware and firmware, delamination occurs, mean",
+     "after": "High-performance polymer printing fails due to the lack of a stable running printer that can reach high temperatures and manipulate process parameters; the mechanism requires an open-source hardware upgrade capable of reaching 500 °C nozzle, 200 °C heated bed, and 135 °C heated chamber with electron"
+    },
+    "intervention": {
+     "before": "Implement the open-source hardware upgrade for low-cost 3D printers, specifically utilizing a heated chamber (135 °C) and heated bed (200 °C) with continuous monitoring via Klipper and Fluidd firmware, to stabilize the process parameters and monitor the printer and process, ensuring the thermal envi",
+     "after": "Implement the open-source hardware upgrade for low-cost 3D printers using Klipper and Fluidd firmware to continuously monitor and calibrate hardware, ensuring the printer reaches 500 °C nozzle, 200 °C heated bed, and 135 °C heated chamber to stabilize the thermal environment for polycarbonate."
+    },
+    "mechanism_source_span": {
+     "before": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed.",
+     "after": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed."
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "skipping between polycarbonate layer ambient printer",
+     "skipping between polycarbonate layer ambient printer",
+     "between skipping polycarbonate layers ambient layer",
+     "between skipping polycarbonate layers ambient layer",
+     "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+     "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+     "skipping prevention compensation filament underlying preventing",
+     "skipping prevention compensation filament underlying preventing",
+     "between skipping layer polycarbonate ambient printer",
+     "between skipping layer polycarbonate ambient printer"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "fe13791a5e5126ad6404dc918144638aead7c92384f201b7edcf4e26c933ff32",
+   "child_spec_hash": null,
+   "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring the mechanism vocabulary to the verbatim evidence span regarding the need for a stable high-temperature printer.",
+   "applied_at": "2026-09-29T08:58:01+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:e22242b1fe94",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.085,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:9352fbb399b0",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "b3c0e60889cc27b6317b5ba483d590e83f554bf28fd2a6dc345331a78a297d3d",
+     "output_hash": "9352fbb399b0e679596637caba1926383303a5b6fd21973d3a45898cbf14fd88",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1016/j.ohx.2022.e00265",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.442,
+      "evidence_support_cleared": 0.442,
+      "constraint_traceable_to_evidence": "The printer must operate as a stable running printer that can reach high temperatures with a heated chamber to prevent d"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-29T08:57:49+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "The printability and mechanical integrity of polycarbonate are governed by a coupled thermal-kinetic matrix where nozzle temperature and extrusion velocity determine the rate of crystallization and adhesion between layers, and this sensitivity is exacerbated when the part bed or ambient temperature ",
+      "after": "High-performance polymer printing, such as polycarbonate, fails due to inadequate thermal management where high nozzle temperatures (up to 500 °C) and heated chambers are required; without stable running printer conditions and continuous monitoring of hardware and firmware, delamination occurs, mean"
+     },
+     "intervention": {
+      "before": "Implement a closed-loop active cooling system that maintains the build platform and immediate surrounding ambient temperature below 35C, or increase the nozzle temperature and reduce the extrusion velocity (increase dwell time) to compensate for the higher baseline thermal energy, ensuring the therm",
+      "after": "Implement the open-source hardware upgrade for low-cost 3D printers, specifically utilizing a heated chamber (135 °C) and heated bed (200 °C) with continuous monitoring via Klipper and Fluidd firmware, to stabilize the process parameters and monitor the printer and process, ensuring the thermal envi"
+     },
+     "mechanism_source_span": {
+      "before": "A temperature and nozzle velocity matrix was used",
+      "after": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "skipping between polycarbonate layer ambient printer",
+      "skipping between polycarbonate layer ambient printer",
+      "between skipping polycarbonate layers ambient layer",
+      "between skipping polycarbonate layers ambient layer",
+      "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+      "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+      "skipping prevention compensation filament underlying preventing",
+      "skipping prevention compensation filament underlying preventing",
+      "between skipping layer polycarbonate ambient printer",
+      "between skipping layer polycarbonate ambient printer"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "7ef2e13789df8a4208a455697e90d7702e8b1169214cf372a1571324a09d3d71",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism vocabulary (\"stable running printer\", \"high temperatures\", \"delamination\", \"high-performance polymers\") directly to the verbatim span from the high-performance polymer 3D printing evidence, ensuring shared content terms exceed the 20% threshold.",
+    "applied_at": "2026-09-29T08:57:49+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:30f923a8d913",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.212,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:5bada9f66875",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "0bf228228d36f2774b270d08792cee8229c25d34a5d188301fabf239c47f7131",
+     "output_hash": "5bada9f668752c02264dbd86b58f25a742b49e62053f97a6a130cf93b6c9b625",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1016/j.ohx.2022.e00265",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.682,
+      "evidence_support_cleared": 0.682,
+      "constraint_traceable_to_evidence": "The printer must operate as a stable running printer that can reach high temperatures with a heated chamber of 135 °C an"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-29T08:58:01+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "High-performance polymer printing, such as polycarbonate, fails due to inadequate thermal management where high nozzle temperatures (up to 500 °C) and heated chambers are required; without stable running printer conditions and continuous monitoring of hardware and firmware, delamination occurs, mean",
+      "after": "High-performance polymer printing fails due to the lack of a stable running printer that can reach high temperatures and manipulate process parameters; the mechanism requires an open-source hardware upgrade capable of reaching 500 °C nozzle, 200 °C heated bed, and 135 °C heated chamber with electron"
+     },
+     "intervention": {
+      "before": "Implement the open-source hardware upgrade for low-cost 3D printers, specifically utilizing a heated chamber (135 °C) and heated bed (200 °C) with continuous monitoring via Klipper and Fluidd firmware, to stabilize the process parameters and monitor the printer and process, ensuring the thermal envi",
+      "after": "Implement the open-source hardware upgrade for low-cost 3D printers using Klipper and Fluidd firmware to continuously monitor and calibrate hardware, ensuring the printer reaches 500 °C nozzle, 200 °C heated bed, and 135 °C heated chamber to stabilize the thermal environment for polycarbonate."
+     },
+     "mechanism_source_span": {
+      "before": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed.",
+      "after": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "skipping between polycarbonate layer ambient printer",
+      "skipping between polycarbonate layer ambient printer",
+      "between skipping polycarbonate layers ambient layer",
+      "between skipping polycarbonate layers ambient layer",
+      "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+      "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+      "skipping prevention compensation filament underlying preventing",
+      "skipping prevention compensation filament underlying preventing",
+      "between skipping layer polycarbonate ambient printer",
+      "between skipping layer polycarbonate ambient printer"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "fe13791a5e5126ad6404dc918144638aead7c92384f201b7edcf4e26c933ff32",
+    "child_spec_hash": null,
+    "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring the mechanism vocabulary to the verbatim evidence span regarding the need for a stable high-temperature printer.",
+    "applied_at": "2026-09-29T08:58:01+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "34571c056d385dccdeeb88ee197b699be6feef4c78e64ae13cea6b4d4305ad93"
+}

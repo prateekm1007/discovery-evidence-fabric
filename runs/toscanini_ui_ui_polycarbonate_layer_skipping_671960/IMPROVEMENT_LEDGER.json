@@ -1,0 +1,1094 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-29T08:57:04+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.085,
+      "weakness_kind": "UNDERIVED",
+      "why_weak": "measured 0.085 < STRONG floor 0.7; underived_flag set (span_support=0.8, evidence_support=0.085) — the quoted span and/or evidence does not contain the mechanism's vocabulary",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:d65f32715936",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "2987b1af8ceeb4ef065bfed30dd33d784a565ef52761ef29a284b1df2965b1ea",
+     "output_hash": "d65f327159364f30fab70bd3097e113fc8b02e0f2b7337d4a97d031f4416519a",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "The printability of high-performance polymers like polycarbonate is governed by the requirement for a stable running printer that can reach high temperatures, where specific process parameters such as nozzle temperature and extrusion velocity are manipulated to monitor the printer and the process, preventing the delamination observed when thermal stability is insufficient.",
+      "INTERVENTION": "Implement an open-source hardware upgrade capable of reaching a 200 °C heated bed and 135 °C heated chamber, using open-source firmware by Klipper and Fluidd to control and carefully calibrate the system, ensuring the material remains within the recommended temperature range to manipulate process parameters effectively.",
+      "EXPECTED_EFFECT": "The thermal gradient between the molten filament and the underlying layer is maintained by the heated chamber and bed, preventing the \"layer skipping\" failure mode and ensuring high surface quality with no signs of delamination, as evidenced by the production of components with excellent mechanical properties.",
+      "FALSIFICATION_TEST": "Measure the interlayer adhesion and surface quality of the printed polycarbonate part; if delamination occurs or surface quality is poor despite the 135 °C heated chamber, the hypothesis that this specific thermal configuration prevents layer skipping is false.",
+      "MECHANISM_SOURCE_SPAN": "The presented design produced a CF-PEEK 3DBenchy and a spiral vase with excellent surface quality and no signs of delamination.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1016/j.ohx.2022.e00265",
+      "EXPERIMENT": "Print a polycarbonate test geometry in an ambient environment above 35C using the open-source hardware upgrade with a 135 °C heated chamber and compare the layer adhesion and surface quality against the baseline control which is printing without a heated chamber at ambient temperature.",
+      "EXPERIMENT_BASELINE": "printing without a heated chamber at ambient temperature",
+      "EXPERIMENT_EIG": "1.5",
+      "CONSTRAINT_DERIVED": "The heating system must maintain a chamber temperature of 135 °C and a bed temperature of 200 °C to ensure the printer reaches high temperatures stably.",
+      "MUTATION_REASON": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism in the verbatim evidence span concerning delamination and surface quality, ensuring the technical vocabulary is derived directly from the cited text."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1016/j.ohx.2022.e00265",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.52,
+       "evidence_support_cleared": 0.52,
+       "constraint_traceable_to_evidence": "The heating system must maintain a chamber temperature of 135 °C and a bed temperature of 200 °C to ensure the printer r"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-29T08:57:29+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:9352fbb399b0",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "b3c0e60889cc27b6317b5ba483d590e83f554bf28fd2a6dc345331a78a297d3d",
+     "output_hash": "9352fbb399b0e679596637caba1926383303a5b6fd21973d3a45898cbf14fd88",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "High-performance polymer printing, such as polycarbonate, fails due to inadequate thermal management where high nozzle temperatures (up to 500 °C) and heated chambers are required; without stable running printer conditions and continuous monitoring of hardware and firmware, delamination occurs, meaning the mechanism is governed by the need for a heated chamber and calibrated high-temperature operation to prevent surface quality defects and delamination in high-melting-point thermoplastics.",
+      "INTERVENTION": "Implement the open-source hardware upgrade for low-cost 3D printers, specifically utilizing a heated chamber (135 °C) and heated bed (200 °C) with continuous monitoring via Klipper and Fluidd firmware, to stabilize the process parameters and monitor the printer and process, ensuring the thermal environment compensates for the high baseline thermal energy of polycarbonate.",
+      "EXPECTED_EFFECT": "The printer produces specimens with excellent surface quality and no signs of delamination, maintaining mechanical integrity (e.g., strength comparable to datasheets or higher) by ensuring the stable running printer reaches and maintains the high temperatures necessary for high-performance polymers, thereby preventing layer skipping caused by thermal shock or inconsistent viscosity.",
+      "FALSIFICATION_TEST": "If the heated chamber and continuous monitoring are disabled or if the nozzle temperature drops below the required high-temperature range, delamination signs will reappear in the printed polycarbonate specimens, and the measured tensile strength will fall below the 15% outperformance margin in the ZX direction compared to the datasheet.",
+      "MECHANISM_SOURCE_SPAN": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1016/j.ohx.2022.e00265",
+      "EXPERIMENT": "Print polycarbonate specimens using the open-source hardware upgrade with a heated chamber at 135 °C and continuous monitoring, and compare the surface quality (checking for delamination) and tensile strength against the baseline of printing polycarbonate on an original printer without a heated chamber or continuous monitoring.",
+      "EXPERIMENT_BASELINE": "original printer without a heated chamber or continuous monitoring",
+      "EXPERIMENT_EIG": "4.5",
+      "CONSTRAINT_DERIVED": "The printer must operate as a stable running printer that can reach high temperatures with a heated chamber to prevent delamination in high-performance polymers.",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism vocabulary (\"stable running printer\", \"high temperatures\", \"delamination\", \"high-performance polymers\") directly to the verbatim span from the high-performance polymer 3D printing evidence, ensuring shared content terms exceed the 20% threshold."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1016/j.ohx.2022.e00265",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.442,
+       "evidence_support_cleared": 0.442,
+       "constraint_traceable_to_evidence": "The printer must operate as a stable running printer that can reach high temperatures with a heated chamber to prevent d"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-29T08:57:49+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:a80be2b71594",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.085,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:d65f32715936",
+       "provider": "agnes",
+       "model": "agnes-3.0-flash",
+       "prompt_hash": "2987b1af8ceeb4ef065bfed30dd33d784a565ef52761ef29a284b1df2965b1ea",
+       "output_hash": "d65f327159364f30fab70bd3097e113fc8b02e0f2b7337d4a97d031f4416519a",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1016/j.ohx.2022.e00265",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.52,
+        "evidence_support_cleared": 0.52,
+        "constraint_traceable_to_evidence": "The heating system must maintain a chamber temperature of 135 °C and a bed temperature of 200 °C to ensure the printer r"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-29T08:57:29+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "The printability and mechanical integrity of polycarbonate are governed by a coupled thermal-kinetic matrix where nozzle temperature and extrusion velocity determine the rate of crystallization and adhesion between layers, and this sensitivity is exacerbated when the part bed or ambient temperature ",
+        "after": "The printability of high-performance polymers like polycarbonate is governed by the requirement for a stable running printer that can reach high temperatures, where specific process parameters such as nozzle temperature and extrusion velocity are manipulated to monitor the printer and the process, p"
+       },
+       "intervention": {
+        "before": "Implement a closed-loop active cooling system that maintains the build platform and immediate surrounding ambient temperature below 35C, or increase the nozzle temperature and reduce the extrusion velocity (increase dwell time) to compensate for the higher baseline thermal energy, ensuring the therm",
+        "after": "Implement an open-source hardware upgrade capable of reaching a 200 °C heated bed and 135 °C heated chamber, using open-source firmware by Klipper and Fluidd to control and carefully calibrate the system, ensuring the material remains within the recommended temperature range to manipulate process pa"
+       },
+       "mechanism_source_span": {
+        "before": "A temperature and nozzle velocity matrix was used",
+        "after": "The presented design produced a CF-PEEK 3DBenchy and a spiral vase with excellent surface quality and no signs of delamination."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "skipping between polycarbonate layer ambient printer",
+        "skipping between polycarbonate layer ambient printer",
+        "between skipping polycarbonate layers ambient layer",
+        "between skipping polycarbonate layers ambient layer",
+        "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+        "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+        "skipping prevention compensation filament underlying preventing",
+        "skipping prevention compensation filament underlying preventing",
+        "between skipping layer polycarbonate ambient printer",
+        "between skipping layer polycarbonate ambient printer"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "7ef2e13789df8a4208a455697e90d7702e8b1169214cf372a1571324a09d3d71",
+      "child_spec_hash": null,
+      "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism in the verbatim evidence span concerning delamination and surface quality, ensuring the technical vocabulary is derived directly from the cited text.",
+      "applied_at": "2026-09-29T08:57:29+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-29T08:57:29+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.083,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": true,
+       "recombination_only": false
+      },
+      "i_average": 0.375,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.085 -> 0.083 (no improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-29T08:57:29+00:00Z"
+     }
+    },
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:e22242b1fe94",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.085,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:9352fbb399b0",
+       "provider": "agnes",
+       "model": "agnes-3.0-flash",
+       "prompt_hash": "b3c0e60889cc27b6317b5ba483d590e83f554bf28fd2a6dc345331a78a297d3d",
+       "output_hash": "9352fbb399b0e679596637caba1926383303a5b6fd21973d3a45898cbf14fd88",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1016/j.ohx.2022.e00265",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.442,
+        "evidence_support_cleared": 0.442,
+        "constraint_traceable_to_evidence": "The printer must operate as a stable running printer that can reach high temperatures with a heated chamber to prevent d"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-29T08:57:49+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "The printability and mechanical integrity of polycarbonate are governed by a coupled thermal-kinetic matrix where nozzle temperature and extrusion velocity determine the rate of crystallization and adhesion between layers, and this sensitivity is exacerbated when the part bed or ambient temperature ",
+        "after": "High-performance polymer printing, such as polycarbonate, fails due to inadequate thermal management where high nozzle temperatures (up to 500 °C) and heated chambers are required; without stable running printer conditions and continuous monitoring of hardware and firmware, delamination occurs, mean"
+       },
+       "intervention": {
+        "before": "Implement a closed-loop active cooling system that maintains the build platform and immediate surrounding ambient temperature below 35C, or increase the nozzle temperature and reduce the extrusion velocity (increase dwell time) to compensate for the higher baseline thermal energy, ensuring the therm",
+        "after": "Implement the open-source hardware upgrade for low-cost 3D printers, specifically utilizing a heated chamber (135 °C) and heated bed (200 °C) with continuous monitoring via Klipper and Fluidd firmware, to stabilize the process parameters and monitor the printer and process, ensuring the thermal envi"
+       },
+       "mechanism_source_span": {
+        "before": "A temperature and nozzle velocity matrix was used",
+        "after": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "skipping between polycarbonate layer ambient printer",
+        "skipping between polycarbonate layer ambient printer",
+        "between skipping polycarbonate layers ambient layer",
+        "between skipping polycarbonate layers ambient layer",
+        "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+        "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+        "skipping prevention compensation filament underlying preventing",
+        "skipping prevention compensation filament underlying preventing",
+        "between skipping layer polycarbonate ambient printer",
+        "between skipping layer polycarbonate ambient printer"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "7ef2e13789df8a4208a455697e90d7702e8b1169214cf372a1571324a09d3d71",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism vocabulary (\"stable running printer\", \"high temperatures\", \"delamination\", \"high-performance polymers\") directly to the verbatim span from the high-performance polymer 3D printing evidence, ensuring shared content terms exceed the 20% threshold.",
+      "applied_at": "2026-09-29T08:57:49+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-29T08:57:49+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.212,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.44,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.085 -> 0.212 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-29T08:57:49+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:a80be2b71594",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.085,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:d65f32715936",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "2987b1af8ceeb4ef065bfed30dd33d784a565ef52761ef29a284b1df2965b1ea",
+     "output_hash": "d65f327159364f30fab70bd3097e113fc8b02e0f2b7337d4a97d031f4416519a",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1016/j.ohx.2022.e00265",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.52,
+      "evidence_support_cleared": 0.52,
+      "constraint_traceable_to_evidence": "The heating system must maintain a chamber temperature of 135 °C and a bed temperature of 200 °C to ensure the printer r"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-29T08:57:29+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "The printability and mechanical integrity of polycarbonate are governed by a coupled thermal-kinetic matrix where nozzle temperature and extrusion velocity determine the rate of crystallization and adhesion between layers, and this sensitivity is exacerbated when the part bed or ambient temperature ",
+      "after": "The printability of high-performance polymers like polycarbonate is governed by the requirement for a stable running printer that can reach high temperatures, where specific process parameters such as nozzle temperature and extrusion velocity are manipulated to monitor the printer and the process, p"
+     },
+     "intervention": {
+      "before": "Implement a closed-loop active cooling system that maintains the build platform and immediate surrounding ambient temperature below 35C, or increase the nozzle temperature and reduce the extrusion velocity (increase dwell time) to compensate for the higher baseline thermal energy, ensuring the therm",
+      "after": "Implement an open-source hardware upgrade capable of reaching a 200 °C heated bed and 135 °C heated chamber, using open-source firmware by Klipper and Fluidd to control and carefully calibrate the system, ensuring the material remains within the recommended temperature range to manipulate process pa"
+     },
+     "mechanism_source_span": {
+      "before": "A temperature and nozzle velocity matrix was used",
+      "after": "The presented design produced a CF-PEEK 3DBenchy and a spiral vase with excellent surface quality and no signs of delamination."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "skipping between polycarbonate layer ambient printer",
+      "skipping between polycarbonate layer ambient printer",
+      "between skipping polycarbonate layers ambient layer",
+      "between skipping polycarbonate layers ambient layer",
+      "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+      "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+      "skipping prevention compensation filament underlying preventing",
+      "skipping prevention compensation filament underlying preventing",
+      "between skipping layer polycarbonate ambient printer",
+      "between skipping layer polycarbonate ambient printer"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "7ef2e13789df8a4208a455697e90d7702e8b1169214cf372a1571324a09d3d71",
+    "child_spec_hash": null,
+    "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism in the verbatim evidence span concerning delamination and surface quality, ensuring the technical vocabulary is derived directly from the cited text.",
+    "applied_at": "2026-09-29T08:57:29+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-29T08:57:49+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.212,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.44,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.085 -> 0.212 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-29T08:57:49+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.212,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.212 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:5bada9f66875",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "0bf228228d36f2774b270d08792cee8229c25d34a5d188301fabf239c47f7131",
+     "output_hash": "5bada9f668752c02264dbd86b58f25a742b49e62053f97a6a130cf93b6c9b625",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "High-performance polymer printing fails due to the lack of a stable running printer that can reach high temperatures and manipulate process parameters; the mechanism requires an open-source hardware upgrade capable of reaching 500 °C nozzle, 200 °C heated bed, and 135 °C heated chamber with electronics operating within the recommended temperature range to prevent delamination.",
+      "INTERVENTION": "Implement the open-source hardware upgrade for low-cost 3D printers using Klipper and Fluidd firmware to continuously monitor and calibrate hardware, ensuring the printer reaches 500 °C nozzle, 200 °C heated bed, and 135 °C heated chamber to stabilize the thermal environment for polycarbonate.",
+      "EXPECTED_EFFECT": "The printer produces specimens with excellent surface quality and no signs of delamination, maintaining mechanical integrity by ensuring the stable running printer reaches and maintains the high temperatures necessary for high-performance polymers, thereby preventing layer skipping caused by thermal shock or inconsistent viscosity.",
+      "FALSIFICATION_TEST": "If the heated chamber and continuous monitoring are disabled or if the nozzle temperature drops below 500 °C, delamination signs will reappear in the printed polycarbonate specimens, and the measured tensile strength will fall below the 15% outperformance margin in the ZX direction compared to the datasheet.",
+      "MECHANISM_SOURCE_SPAN": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1016/j.ohx.2022.e00265",
+      "EXPERIMENT": "Print a polycarbonate test specimen using the upgraded printer configured to maintain a 135 °C heated chamber and 200 °C heated bed, then compare the delamination occurrence and tensile strength against the baseline.",
+      "EXPERIMENT_BASELINE": "Unmodified 3D printer without heated chamber",
+      "EXPERIMENT_EIG": "0.8",
+      "CONSTRAINT_DERIVED": "The printer must operate as a stable running printer that can reach high temperatures with a heated chamber of 135 °C and heated bed of 200 °C.",
+      "MUTATION_REASON": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring the mechanism vocabulary to the verbatim evidence span regarding the need for a stable high-temperature printer."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1016/j.ohx.2022.e00265",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.682,
+       "evidence_support_cleared": 0.682,
+       "constraint_traceable_to_evidence": "The printer must operate as a stable running printer that can reach high temperatures with a heated chamber of 135 °C an"
+      },
+      "reasons": [],
+      "validated_at": "2026-09-29T08:58:01+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:30f923a8d913",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.212,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:5bada9f66875",
+       "provider": "agnes",
+       "model": "agnes-3.0-flash",
+       "prompt_hash": "0bf228228d36f2774b270d08792cee8229c25d34a5d188301fabf239c47f7131",
+       "output_hash": "5bada9f668752c02264dbd86b58f25a742b49e62053f97a6a130cf93b6c9b625",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1016/j.ohx.2022.e00265",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.682,
+        "evidence_support_cleared": 0.682,
+        "constraint_traceable_to_evidence": "The printer must operate as a stable running printer that can reach high temperatures with a heated chamber of 135 °C an"
+       },
+       "reasons": [],
+       "validated_at": "2026-09-29T08:58:01+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "High-performance polymer printing, such as polycarbonate, fails due to inadequate thermal management where high nozzle temperatures (up to 500 °C) and heated chambers are required; without stable running printer conditions and continuous monitoring of hardware and firmware, delamination occurs, mean",
+        "after": "High-performance polymer printing fails due to the lack of a stable running printer that can reach high temperatures and manipulate process parameters; the mechanism requires an open-source hardware upgrade capable of reaching 500 °C nozzle, 200 °C heated bed, and 135 °C heated chamber with electron"
+       },
+       "intervention": {
+        "before": "Implement the open-source hardware upgrade for low-cost 3D printers, specifically utilizing a heated chamber (135 °C) and heated bed (200 °C) with continuous monitoring via Klipper and Fluidd firmware, to stabilize the process parameters and monitor the printer and process, ensuring the thermal envi",
+        "after": "Implement the open-source hardware upgrade for low-cost 3D printers using Klipper and Fluidd firmware to continuously monitor and calibrate hardware, ensuring the printer reaches 500 °C nozzle, 200 °C heated bed, and 135 °C heated chamber to stabilize the thermal environment for polycarbonate."
+       },
+       "mechanism_source_span": {
+        "before": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed.",
+        "after": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "skipping between polycarbonate layer ambient printer",
+        "skipping between polycarbonate layer ambient printer",
+        "between skipping polycarbonate layers ambient layer",
+        "between skipping polycarbonate layers ambient layer",
+        "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+        "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+        "skipping prevention compensation filament underlying preventing",
+        "skipping prevention compensation filament underlying preventing",
+        "between skipping layer polycarbonate ambient printer",
+        "between skipping layer polycarbonate ambient printer"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "fe13791a5e5126ad6404dc918144638aead7c92384f201b7edcf4e26c933ff32",
+      "child_spec_hash": null,
+      "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring the mechanism vocabulary to the verbatim evidence span regarding the need for a stable high-temperature printer.",
+      "applied_at": "2026-09-29T08:58:01+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-29T08:58:01+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.295,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.481,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.212 -> 0.295 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-29T08:58:01+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:30f923a8d913",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.212,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:5bada9f66875",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "0bf228228d36f2774b270d08792cee8229c25d34a5d188301fabf239c47f7131",
+     "output_hash": "5bada9f668752c02264dbd86b58f25a742b49e62053f97a6a130cf93b6c9b625",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1016/j.ohx.2022.e00265",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.682,
+      "evidence_support_cleared": 0.682,
+      "constraint_traceable_to_evidence": "The printer must operate as a stable running printer that can reach high temperatures with a heated chamber of 135 °C an"
+     },
+     "reasons": [],
+     "validated_at": "2026-09-29T08:58:01+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "High-performance polymer printing, such as polycarbonate, fails due to inadequate thermal management where high nozzle temperatures (up to 500 °C) and heated chambers are required; without stable running printer conditions and continuous monitoring of hardware and firmware, delamination occurs, mean",
+      "after": "High-performance polymer printing fails due to the lack of a stable running printer that can reach high temperatures and manipulate process parameters; the mechanism requires an open-source hardware upgrade capable of reaching 500 °C nozzle, 200 °C heated bed, and 135 °C heated chamber with electron"
+     },
+     "intervention": {
+      "before": "Implement the open-source hardware upgrade for low-cost 3D printers, specifically utilizing a heated chamber (135 °C) and heated bed (200 °C) with continuous monitoring via Klipper and Fluidd firmware, to stabilize the process parameters and monitor the printer and process, ensuring the thermal envi",
+      "after": "Implement the open-source hardware upgrade for low-cost 3D printers using Klipper and Fluidd firmware to continuously monitor and calibrate hardware, ensuring the printer reaches 500 °C nozzle, 200 °C heated bed, and 135 °C heated chamber to stabilize the thermal environment for polycarbonate."
+     },
+     "mechanism_source_span": {
+      "before": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed.",
+      "after": "To print high-performance polymers, a stable running printer that can reach high temperatures is needed."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "skipping between polycarbonate layer ambient printer",
+      "skipping between polycarbonate layer ambient printer",
+      "between skipping polycarbonate layers ambient layer",
+      "between skipping polycarbonate layers ambient layer",
+      "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+      "ambient thermal cooling temperature extrusion velocity delamination nozzle",
+      "skipping prevention compensation filament underlying preventing",
+      "skipping prevention compensation filament underlying preventing",
+      "between skipping layer polycarbonate ambient printer",
+      "between skipping layer polycarbonate ambient printer"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "fe13791a5e5126ad6404dc918144638aead7c92384f201b7edcf4e26c933ff32",
+    "child_spec_hash": null,
+    "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring the mechanism vocabulary to the verbatim evidence span regarding the need for a stable high-temperature printer.",
+    "applied_at": "2026-09-29T08:58:01+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-29T08:58:01+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.295,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.481,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.212 -> 0.295 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-29T08:58:01+00:00Z"
+   }
+  }
+ ],
+ "outcome": "IMPROVED",
+ "outcome_reason": "",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.085,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": true,
+   "recombination_only": false
+  },
+  "i_average": 0.376,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.295,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.481,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-29T08:58:01+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.376,
+  "final_i_average": 0.481,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 2,
+  "keeps": 2
+ },
+ "status": "IMPROVED"
+}
