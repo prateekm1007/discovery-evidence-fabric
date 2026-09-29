@@ -1,0 +1,220 @@
+{
+  "spec_version": "1.1.0",
+  "canonical_family": "biomedical",
+  "canonical_family_label": "Biomedical & life-science systems",
+  "canonical_family_basis": {
+    "canonical_family": "biomedical",
+    "label": "Biomedical & life-science systems",
+    "basis": {
+      "source": "engineering_specification.why_this_domain.canonical_family (the upstream R445 authority \u2014 consumed, never re-derived)",
+      "ladder_step": 1,
+      "upstream_record": true
+    },
+    "archetype": "MEDICAL_DEVICE",
+    "archetype_basis": "registry routing: canonical family 'biomedical' -> archetype 'MEDICAL_DEVICE'"
+  },
+  "technology_class": "MEDICAL_DEVICE",
+  "technology_class_role": "bridge geometry archetype (presentation routing, R445)",
+  "dimension_class": "ABSTRACT_PRESENTATION_UNITS",
+  "measurement_basis": "TOPOLOGY_ONLY",
+  "intervention_site": "3D printer",
+  "selection_basis": {
+    "family": "MEDICAL_DEVICE",
+    "label": "medical device architecture",
+    "score": 5,
+    "min_form_score": 3,
+    "score_table": [
+      {
+        "family": "VEHICLE",
+        "score": 3,
+        "hits": [
+          {
+            "keyword": "car",
+            "weight": 3,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "family": "MEDICAL_DEVICE",
+        "score": 5,
+        "hits": [
+          {
+            "keyword": "lumen",
+            "weight": 4,
+            "count": 1
+          },
+          {
+            "keyword": "patient",
+            "weight": 1,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "family": "FLUID_DEVICE",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "THERMAL_SYSTEM",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "MECHANICAL_COMPONENT",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "ELECTRONIC_SYSTEM",
+        "score": 0,
+        "hits": []
+      },
+      {
+        "family": "ENERGY_STORAGE",
+        "score": 0,
+        "hits": []
+      }
+    ],
+    "basis": {
+      "derived_from": [
+        "problem text",
+        "intervention site",
+        "recorded subsystem names"
+      ],
+      "rule": "highest keyword score wins; ties resolve by registry order; below the form threshold the generic architecture family is selected and labeled",
+      "deterministic": true
+    }
+  },
+  "components": [
+    {
+      "component_id": "device_shaft",
+      "label": "device shaft",
+      "form": "shaft",
+      "material_class": "polymer",
+      "mapped_from": null,
+      "structural": true,
+      "role": "device body shaft (structural presentation element)",
+      "recorded_aliases": []
+    },
+    {
+      "component_id": "distal_tip",
+      "label": "distal tip",
+      "form": "tip",
+      "material_class": "polymer",
+      "mapped_from": null,
+      "structural": true,
+      "role": "distal tip section (structural presentation element)",
+      "recorded_aliases": []
+    },
+    {
+      "component_id": "hub",
+      "label": "proximal hub",
+      "form": "hub",
+      "material_class": "polymer",
+      "mapped_from": null,
+      "structural": true,
+      "role": "proximal hub interface (structural presentation element)",
+      "recorded_aliases": []
+    },
+    {
+      "component_id": "flow_lumen",
+      "label": "primary flow lumen",
+      "form": "lumen",
+      "material_class": "conduit_power",
+      "mapped_from": "flow path / lumen architecture",
+      "structural": true,
+      "role": "primary flow lumen (family-definitional presentation element of the medical-device acceptance case; mapped subsystem recorded as alias)",
+      "recorded_aliases": [
+        "flow path / lumen architecture"
+      ]
+    },
+    {
+      "component_id": "sensor_band",
+      "label": "sensor band",
+      "form": "slot",
+      "material_class": "machined_metal",
+      "mapped_from": "pressure regulation element",
+      "structural": false,
+      "role": "recorded subsystem 'pressure regulation element' mapped onto the sensor band slot",
+      "recorded_aliases": []
+    },
+    {
+      "component_id": "module_01",
+      "label": "module: sensing / feedback element (if closed-loop)",
+      "form": "module",
+      "material_class": "polymer",
+      "mapped_from": "sensing / feedback element (if closed-loop)",
+      "structural": false,
+      "role": "recorded subsystem 'sensing / feedback element (if closed-loop)' (no canonical slot in the medical device architecture; mounted as a labeled module)"
+    },
+    {
+      "component_id": "module_02",
+      "label": "module: termination interfaces (application-context-specific: source and sink boundaries)",
+      "form": "module",
+      "material_class": "polymer",
+      "mapped_from": "termination interfaces (application-context-specific: source and sink boundaries)",
+      "structural": false,
+      "role": "recorded subsystem 'termination interfaces (application-context-specific: source and sink boundaries)' (no canonical slot in the medical device architecture; mounted as a labeled module)"
+    },
+    {
+      "component_id": "module_03",
+      "label": "module: termination interfaces (patient / reservoir)",
+      "form": "module",
+      "material_class": "polymer",
+      "mapped_from": "termination interfaces (patient / reservoir)",
+      "structural": false,
+      "role": "recorded subsystem 'termination interfaces (patient / reservoir)' (no canonical slot in the medical device architecture; mounted as a labeled module)"
+    }
+  ],
+  "interfaces": [
+    {
+      "interface_id": "flow_lumen_tip",
+      "from": "flow_lumen",
+      "to": "distal_tip",
+      "kind": "flow",
+      "material_class": "conduit_power",
+      "form": "conduit"
+    },
+    {
+      "interface_id": "flow_hub_lumen",
+      "from": "hub",
+      "to": "flow_lumen",
+      "kind": "flow",
+      "material_class": "conduit_power",
+      "form": "conduit"
+    },
+    {
+      "interface_id": "sens_band_tip",
+      "from": "sensor_band",
+      "to": "distal_tip",
+      "kind": "signal",
+      "material_class": "conduit_data",
+      "form": "conduit"
+    }
+  ],
+  "fidelity": {
+    "recorded_subsystems": [
+      "flow path / lumen architecture",
+      "pressure regulation element",
+      "sensing / feedback element (if closed-loop)",
+      "termination interfaces (application-context-specific: source and sink boundaries)",
+      "termination interfaces (patient / reservoir)"
+    ],
+    "mapped": [
+      "sensor_band",
+      "module_01",
+      "module_02",
+      "module_03"
+    ],
+    "structural_form_components": [
+      "device_shaft",
+      "distal_tip",
+      "hub",
+      "flow_lumen"
+    ],
+    "unmapped_note": "every recorded subsystem appears as a canonical slot, an alias, or a labeled module \u2014 the fidelity contract of the conceptual layer"
+  },
+  "spec_sha256": "136911e1763907ff6ee59ac1d4b7ce74ab96588fb21c6487d9fd3f2216a45c7f"
+}
