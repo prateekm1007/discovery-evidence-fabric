@@ -1,0 +1,260 @@
+{
+ "attack_version": "independent_attack/3.0.0",
+ "attack_purpose": "independent_attack",
+ "candidate_id": "cand:A2:ui_aerodynamic_drag_and_powertrain_energy_los_726563:6be42dc8922b5dad+improve-g1",
+ "generator_provider": "agnes",
+ "attacker_provider": "xkiro",
+ "attacker_model": "qwen/qwen3.5-plus:free",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "prompt_hash": "e1b6680992beb6913f0b8ef4839e275715ca43cfcad19953444ad044d3f8d770",
+ "output_hash": "85c353f51bbb012cda9c76de355d57562714de91b3e4a045ed2190f2e35a884a",
+ "llm_status": "OK",
+ "ring_pin": {
+  "requested": null,
+  "mode": "PRODUCTION_CASCADE",
+  "served_provider": "xkiro",
+  "served_model": "qwen/qwen3.5-plus:free",
+  "pin_status": null,
+  "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+ },
+ "attacked_at": "2026-09-30T00:12:29+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate claims to adjust \"fixed body panels\" which is a logical contradiction; if panels are adjusted by actuators, they are by definition not fixed, rendering the mechanism description physically incoherent. GROUNDED_IN: RECORD \"dynamically adjust the angle of fixed body panels\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: angle, fixed, which)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'the angle of fixed' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"dynamically adjust the angle of fixed body panels\"",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "SURVIVE",
+   "basis": "No specific boundary condition clause was provided in the candidate text to violate, only an empty header. GROUNDED_IN: SCOPE \"Boundary conditions: \""
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "ABSTAIN",
+   "basis": "The candidate relies on aerodynamic optimization evidence for electric vehicles and quadrotors, but provides no evidence supporting the structural integrity or actuation speed required for \"high-speed surface transport\" where nose shape influence is critical, creating a gap between the cited low-speed/low-mass domains and the claimed high-velocity application. GROUNDED_IN: EVIDENCE [doi:10.1038/s44172-024-00322-0] | RECORD \"high-speed surface transport\"",
+   "grounding": {
+    "grounded": false,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: aerodynamic, between, high, mass)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [doi:10.1038/s44172-024-00322-0] | RECORD \"high-speed surface transport\"",
+    "absence_ground": true,
+    "demotion_reason": "the asserted ground is an ABSENCE of evidence/support — absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+   },
+   "demoted_from": "KILL",
+   "demotion_layer": "v2_grounding"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "RISK",
+   "basis": "Active aerodynamic systems exist in current high-performance vehicles (e.g., active rear wings, ride height adjustment), making the claim of novelty in \"real-time control of body attitude\" uncertain without proving a distinct advantage over existing active baselines. GROUNDED_IN: RECORD \"Real-time control of body attitude and ground-effect gap\""
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "RISK",
+   "basis": "Maintaining an \"optimal ground clearance\" via active skirts at \"extreme velocities\" risks mechanical failure due to latency in control loops relative to road surface irregularities, though not strictly impossible without specific latency numbers. GROUNDED_IN: RECORD \"maintain an optimal ground clearance\" | RECORD \"target extreme velocities\""
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The falsification criterion requires a \">5%\" power reduction compared to a \"fixed-geometry baseline,\" but fails to define the baseline's geometry (e.g., optimized static downforce vs. optimized static drag), making the 5% threshold unmeasurable and the test unfalsifiable. GROUNDED_IN: RECORD \"compared to a fixed-geometry baseline\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: drag, fixed, power)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['5', '5']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'to fixed geometry baseline' (field: testable_prediction)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"compared to a fixed-geometry baseline\"",
+    "absence_ground": false
+   }
+  }
+ ],
+ "intervention_suggestions": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "suggestion": "Change the variable \"fixed body panels\" to \"movable aerodynamic surfaces\" to resolve the semantic and physical contradiction of adjusting a fixed object. GROUNDED_IN: RECORD \"dynamically adjust the angle of fixed body panels\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: aerodynamic, angle, fixed, variable)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'the angle of fixed' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"dynamically adjust the angle of fixed body panels\"",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "suggestion": "Introduce a new evidence variable citing structural dynamics studies of active aerodynamic components at speeds exceeding 300 km/h to bridge the gap between EV optimization and high-speed surface transport requirements. GROUNDED_IN: EVIDENCE [doi:10.1038/s44172-024-00322-0] | RECORD \"high-speed surface transport\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: aerodynamic, between, dynamics, high)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['300', '10.1038', '44172', '024', '00322', '0']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [doi:10.1038/s44172-024-00322-0] | RECORD \"high-speed surface transport\"",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "suggestion": "Define the novelty variable as \"coupled pitch-and-ride-height control latency under 10ms\" to distinguish from existing sequential active aero systems that do not simultaneously optimize both parameters in real-time. GROUNDED_IN: RECORD \"Real-time control of body attitude and ground-effect gap\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: attitude, from, pitch, that)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'of body attitude and' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Real-time control of body attitude and ground-effect gap\"",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "suggestion": "Specify the baseline variable as \"the globally optimized static geometry for minimum drag at the target top speed\" to establish a deterministic reference point for the >5% improvement calculation. GROUNDED_IN: RECORD \"compared to a fixed-geometry baseline\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: drag, fixed, improvement, variable)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'to fixed geometry baseline' (field: testable_prediction)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"compared to a fixed-geometry baseline\"",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate claims to adjust \"fixed body panels\" which is a logical contradiction; if panels are adjusted by actuators, they are by definition not fixed, rendering the mechanism description physically incoherent. GROUNDED_IN: RECORD \"dynamically adjust the angle of fixed body panels\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: angle, fixed, which)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'the angle of fixed' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"dynamically adjust the angle of fixed body panels\"",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The falsification criterion requires a \">5%\" power reduction compared to a \"fixed-geometry baseline,\" but fails to define the baseline's geometry (e.g., optimized static downforce vs. optimized static drag), making the 5% threshold unmeasurable and the test unfalsifiable. GROUNDED_IN: RECORD \"compared to a fixed-geometry baseline\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: drag, fixed, power)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['5', '5']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'to fixed geometry baseline' (field: testable_prediction)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"compared to a fixed-geometry baseline\"",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 2,
+  "RISK": 2,
+  "SURVIVE": 1,
+  "ABSTAIN_DEMOTED": 1,
+  "INVALID": 0
+ }
+}

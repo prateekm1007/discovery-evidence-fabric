@@ -1,0 +1,504 @@
+{
+ "attack_version": "independent_attack/3.0.0",
+ "attack_purpose": "post_rank:independent_attack",
+ "candidate_id": "cand:MS:DIRECT_TRANSFER:d3c321e0e92c",
+ "generator_provider": "agnes",
+ "attacker_provider": "xkiro",
+ "attacker_model": "qwen/qwen3.5-plus:free",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "prompt_hash": "d18c0a9b26c0f6dc00133438440b026f51209fbff8a0a31d54d3997c7d1ff5db",
+ "output_hash": "8df63ad3df08eb30458b73a277c1d9fa3e107aac87dfa52f25359d30511e3ab6",
+ "llm_status": "OK",
+ "ring_pin": {
+  "requested": null,
+  "mode": "PRODUCTION_CASCADE",
+  "served_provider": "xkiro",
+  "served_model": "qwen/qwen3.5-plus:free",
+  "pin_status": null,
+  "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+ },
+ "attacked_at": "2026-09-30T00:07:39+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "ABSTAIN",
+   "basis": "The candidate proposes a \"decoupling fuselage attitude from wing aerodynamics\" mechanism for a \"high-performance ground vehicle,\" but the cited evidence [doi:10.1038/s41598-026-58543-6] explicitly validates this mechanism only for \"quadrotor flight endurance,\" rendering the transfer to a ground-based platform physically invalid due to the absence of aerodynamic lift requirements for ground vehicle stability. GROUNDED_IN: EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance\" | COMPUTATION Quadrot",
+   "grounding": {
+    "grounded": false,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1038/s41598-026-58543-6",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10.1038', '41598', '026', '58543', '6', '10.1038']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'decoupling fuselage attitude from' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['constrained', 'endurance', 'energy', 'environments']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance\" | COMPUTATION Quadrotor flight dynamics vs. Gr",
+    "absence_ground": true,
+    "demotion_reason": "the asserted ground is an ABSENCE of evidence/support — absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+   },
+   "demoted_from": "KILL",
+   "demotion_layer": "v2_grounding"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate claims applicability to \"high-performance ground vehicle\" problems involving \"aerodynamic drag,\" yet the predicted effect cites a \"42.98% power-saving ratio relative to hover,\" a flight state that does not exist for ground vehicles, violating the fundamental boundary condition of the problem domain. GROUNDED_IN: RECORD \"Achieving a maximum normalized power-saving ratio of 42.98% at 10 m/s relative to hover\" | COMPUTATION Hover state (zero ground speed, full lift) vs. Ground vehicle operation (continuous ground contact, no hover) | SCOPE Energy-constrained environments where endur",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: aerodynamic, constrained, drag, endurance)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['42.98', '42.98', '10']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'maximum normalized power saving' (field: predicted_effect)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['constrained', 'endurance', 'energy', 'environments']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Achieving a maximum normalized power-saving ratio of 42.98% at 10 m/s relative to hover\" | COMPUTATION Hover state (zero ground speed, full lift) vs. Ground vehicle operation (continuous groun",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The candidate asserts a \"net 13.22% efficiency improvement over the original RflyLW concept\" for a ground vehicle, but the supporting evidence [doi:10.1038/s44172-024-00322-0] discusses \"design optimization of electric vehicles\" via machine learning without mentioning variable-incidence wings or the specific \"RflyLW\" aerial concept, creating a direct contradiction between the claimed lineage and the provided bibliographic support. GROUNDED_IN: EVIDENCE doi:10.1038/s44172-024-00322-0 | RECORD \"Aerodynamics-guided machine learning for design optimization of electric vehicles\" | COMPUTATION Gener",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: aerodynamics, between, concept, constrained)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['13.22', '10.1038', '44172', '024', '00322', '0']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'net 13 22 efficiency' (field: predicted_effect)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['constrained', 'endurance', 'energy', 'environments']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1038/s44172-024-00322-0 | RECORD \"Aerodynamics-guided machine learning for design optimization of electric vehicles\" | COMPUTATION General EV optimization vs. Specific RflyLW aerial-de",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "ABSTAIN",
+   "basis": "The candidate fails to demonstrate superiority over the baseline \"high-performance ground vehicle\" because the intervention relies on a \"lightweight 143 g wing structure\" which, when scaled to a car-sized vehicle, would introduce structural mass and complexity penalties that negate the claimed aerodynamic gains, effectively reverting to or worsening the baseline energy loss profile. GROUNDED_IN: RECORD \"utilizing a lightweight 143 g wing structure\" | COMPUTATION 143g model scale vs. Full-scale automotive structural mass requirements | SCOPE Energy-constrained environments where endurance and r",
+   "grounding": {
+    "grounded": false,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: aerodynamic, constrained, effectively, endurance)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['143', '143', '143']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'lightweight 143 wing structure' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['constrained', 'endurance', 'energy', 'environments']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"utilizing a lightweight 143 g wing structure\" | COMPUTATION 143g model scale vs. Full-scale automotive structural mass requirements | SCOPE Energy-constrained environments where endurance and ",
+    "absence_ground": true,
+    "demotion_reason": "the asserted ground is an ABSENCE of evidence/support — absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+   },
+   "demoted_from": "KILL",
+   "demotion_layer": "v2_grounding"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "The candidate's requirement to \"adjust its incidence to optimize efficiency without constraining the main vehicle's pitch attitude\" is mechanically impossible for a standard ground vehicle chassis where the body pitch is intrinsically coupled to suspension dynamics and road load, unlike the free-body dynamics of the quadrotor cited in the evidence. GROUNDED_IN: EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"allows the lifting wing to adjust its incidence... independent of its stability attitude\" | COMPUTATION Free-flight degrees of freedom vs. Ground-constrained suspension kinematics | SCOP",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1038/s41598-026-58543-6",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10.1038', '41598', '026', '58543', '6']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'of its stability attitude' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['constrained', 'endurance', 'energy', 'environments']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"allows the lifting wing to adjust its incidence... independent of its stability attitude\" | COMPUTATION Free-flight degrees of freedom vs. Ground-cons",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction claims \"Systematic tests at 10 m/s will demonstrate a 42.98% power-saving ratio,\" but the precision of",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: power, ratio, saving, systematic)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'tests at 10 will' (field: testable_prediction)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  }
+ ],
+ "intervention_suggestions": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "suggestion": "Replace the variable-incidence wing mechanism with active aerodynamic surface actuation (e.g., drag-reducing flaps) specifically optimized for ground-effect downforce management rather than lift generation. GROUNDED_IN: EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance\" | COMPUTATION Quadrotor fl",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1038/s41598-026-58543-6",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10.1038', '41598', '026', '58543', '6']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'range are primary metrics' (field: boundary_conditions)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['constrained', 'endurance', 'energy', 'environments']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance\" | COMPUTATION Quadrotor flight dynamics vs. Gr",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "suggestion": "Recalculate the power-saving ratio relative to a baseline ground vehicle cruising at 10 m/s with fixed aerodynamics instead of using \"hover\" as the reference state. GROUNDED_IN: RECORD \"Achieving a maximum normalized power-saving ratio of 42.98% at 10 m/s relative to hover\" | COMPUTATION Hover state (zero ground speed, full lift) vs. Ground vehicle operation (continuous ground contact, no hover) |",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: aerodynamics, constrained, endurance, energy)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10', '42.98', '10']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'maximum normalized power saving' (field: predicted_effect)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['constrained', 'endurance', 'energy', 'environments']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Achieving a maximum normalized power-saving ratio of 42.98% at 10 m/s relative to hover\" | COMPUTATION Hover state (zero ground speed, full lift) vs. Ground vehicle operation (continuous groun",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "suggestion": "Substitute the generic EV optimization citation with empirical data or simulations specifically comparing variable-incidence mechanisms against fixed-wing ground vehicle baselines. GROUNDED_IN: EVIDENCE doi:10.1038/s44172-024-00322-0 | RECORD \"Aerodynamics-guided machine learning for design optimization of electric vehicles\" | COMPUTATION General EV optimization vs. Specific RflyLW aerial-derived ",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: aerodynamics, constrained, endurance, energy)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10.1038', '44172', '024', '00322', '0']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'range are primary metrics' (field: boundary_conditions)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['constrained', 'endurance', 'energy', 'environments']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1038/s44172-024-00322-0 | RECORD \"Aerodynamics-guided machine learning for design optimization of electric vehicles\" | COMPUTATION General EV optimization vs. Specific RflyLW aerial-de",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "suggestion": "Perform a full-system mass penalty analysis scaling the 143 g wing to automotive dimensions to prove the net energy balance remains positive against the baseline. GROUNDED_IN: RECORD \"utilizing a lightweight 143 g wing structure\" | COMPUTATION 143g model scale vs. Full-scale automotive structural mass requirements | SCOPE Energy-constrained environments where endurance and range are primary metric",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: constrained, endurance, energy, environments)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['143', '143', '143']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'lightweight 143 wing structure' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['constrained', 'endurance', 'energy', 'environments']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"utilizing a lightweight 143 g wing structure\" | COMPUTATION 143g model scale vs. Full-scale automotive structural mass requirements | SCOPE Energy-constrained environments where endurance and ",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "suggestion": "Decouple the aerodynamic surface actuation from the main chassis pitch by mounting the variable-incidence elements on a separate sub-frame isolated from the primary suspension system. GROUNDED_IN: EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"allows the lifting wing to adjust its incidence... independent of its stability attitude\" | COMPUTATION Free-flight degrees of freedom vs. Ground-constra",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1038/s41598-026-58543-6",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10.1038', '41598', '026', '58543', '6']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'of its stability attitude' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['constrained', 'endurance', 'energy', 'environments']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"allows the lifting wing to adjust its incidence... independent of its stability attitude\" | COMPUTATION Free-flight degrees of freedom vs. Ground-cons",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate claims applicability to \"high-performance ground vehicle\" problems involving \"aerodynamic drag,\" yet the predicted effect cites a \"42.98% power-saving ratio relative to hover,\" a flight state that does not exist for ground vehicles, violating the fundamental boundary condition of the problem domain. GROUNDED_IN: RECORD \"Achieving a maximum normalized power-saving ratio of 42.98% at 10 m/s relative to hover\" | COMPUTATION Hover state (zero ground speed, full lift) vs. Ground vehicle operation (continuous ground contact, no hover) | SCOPE Energy-constrained environments where endur",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: aerodynamic, constrained, drag, endurance)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['42.98', '42.98', '10']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'maximum normalized power saving' (field: predicted_effect)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['constrained', 'endurance', 'energy', 'environments']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Achieving a maximum normalized power-saving ratio of 42.98% at 10 m/s relative to hover\" | COMPUTATION Hover state (zero ground speed, full lift) vs. Ground vehicle operation (continuous groun",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The candidate asserts a \"net 13.22% efficiency improvement over the original RflyLW concept\" for a ground vehicle, but the supporting evidence [doi:10.1038/s44172-024-00322-0] discusses \"design optimization of electric vehicles\" via machine learning without mentioning variable-incidence wings or the specific \"RflyLW\" aerial concept, creating a direct contradiction between the claimed lineage and the provided bibliographic support. GROUNDED_IN: EVIDENCE doi:10.1038/s44172-024-00322-0 | RECORD \"Aerodynamics-guided machine learning for design optimization of electric vehicles\" | COMPUTATION Gener",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: aerodynamics, between, concept, constrained)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['13.22', '10.1038', '44172', '024', '00322', '0']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'net 13 22 efficiency' (field: predicted_effect)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['constrained', 'endurance', 'energy', 'environments']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1038/s44172-024-00322-0 | RECORD \"Aerodynamics-guided machine learning for design optimization of electric vehicles\" | COMPUTATION General EV optimization vs. Specific RflyLW aerial-de",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The candidate's requirement to \"adjust its incidence to optimize efficiency without constraining the main vehicle's pitch attitude\" is mechanically impossible for a standard ground vehicle chassis where the body pitch is intrinsically coupled to suspension dynamics and road load, unlike the free-body dynamics of the quadrotor cited in the evidence. GROUNDED_IN: EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"allows the lifting wing to adjust its incidence... independent of its stability attitude\" | COMPUTATION Free-flight degrees of freedom vs. Ground-constrained suspension kinematics | SCOP",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1038/s41598-026-58543-6",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10.1038', '41598', '026', '58543', '6']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'of its stability attitude' (field: mechanism)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['constrained', 'endurance', 'energy', 'environments']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"allows the lifting wing to adjust its incidence... independent of its stability attitude\" | COMPUTATION Free-flight degrees of freedom vs. Ground-cons",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction claims \"Systematic tests at 10 m/s will demonstrate a 42.98% power-saving ratio,\" but the precision of",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: power, ratio, saving, systematic)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'tests at 10 will' (field: testable_prediction)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": null,
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 4,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 2,
+  "INVALID": 0
+ }
+}

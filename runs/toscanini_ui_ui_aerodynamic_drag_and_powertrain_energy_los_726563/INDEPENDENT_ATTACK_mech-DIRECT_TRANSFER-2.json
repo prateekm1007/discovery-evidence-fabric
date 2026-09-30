@@ -1,0 +1,452 @@
+{
+ "attack_version": "independent_attack/3.0.0",
+ "attack_purpose": "post_rank:independent_attack",
+ "candidate_id": "cand:MS:DIRECT_TRANSFER:7a69bac41339",
+ "generator_provider": "agnes",
+ "attacker_provider": "xkiro",
+ "attacker_model": "qwen/qwen3.5-plus:free",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "prompt_hash": "f2b4fdec2acd3092f370cf61305057c92c9318589df0ef0d8b4483539c171dd4",
+ "output_hash": "0da428d1e95e8429139a839be806d1db3cd935b6944e4527326314f5f1bab077",
+ "llm_status": "OK",
+ "ring_pin": {
+  "requested": null,
+  "mode": "PRODUCTION_CASCADE",
+  "served_provider": "xkiro",
+  "served_model": "qwen/qwen3.5-plus:free",
+  "pin_status": null,
+  "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+ },
+ "attacked_at": "2026-09-30T00:06:33+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate proposes adjusting wing AoA to 10°-12° on a \"high-performance ground vehicle\" to generate passive lift, ignoring that ground effect and vehicle dynamics at high speeds typically require downforce for traction, not lift, rendering the mechanism counter-productive to the stated goal of a \"fastest car.\" GROUNDED_IN: RECORD \"high-performance ground vehicle\" | RECORD \"passive lift force will increase sufficiently\" | SCOPE \"Flight/drive regimes where rotor-wing interference is a significant drag source\" (No rotors exist on the defined device)",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: drag, drive, dynamics, flight)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10', '12']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'wing aoa to 10' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['drag', 'drive', 'flight', 'interference']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"high-performance ground vehicle\" | RECORD \"passive lift force will increase sufficiently\" | SCOPE \"Flight/drive regimes where rotor-wing interference is a significant drag source\" (No rotors e",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate defines the boundary condition as \"regimes where rotor-wing interference is a significant drag source,\" yet the problem domain is a \"high-performance ground vehicle\" which possesses no rotors, making the entire premise physically inapplicable to the target device. GROUNDED_IN: RECORD \"high-performance ground vehicle\" | RECORD \"rotor-wing interference\" | COMPUTATION 0 rotors on vehicle vs 1 rotor required for interference",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: drag, high, interference, performance)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['0', '1']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'regimes where rotor wing' (field: boundary_conditions)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['drag', 'interference', 'physically', 'regimes']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"high-performance ground vehicle\" | RECORD \"rotor-wing interference\" | COMPUTATION 0 rotors on vehicle vs 1 rotor required for interference",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "KILL",
+   "basis": "The cited evidence [doi:10.1038/s41598-026-58543-6] explicitly discusses extending \"quadrotor flight endurance,\" contradicting the candidate's application of this mechanism to a ground-based vehicle where flight endurance is irrelevant and the physics of ground interaction differ fundamentally from free-air quadrotor dynamics. GROUNDED_IN: EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"extends quadrotor flight endurance\" | RECORD \"high-performance ground vehicle\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1038/s41598-026-58543-6",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10.1038', '41598', '026', '58543', '6', '10.1038']",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['flight', 'where']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"extends quadrotor flight endurance\" | RECORD \"high-performance ground vehicle\"",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "SURVIVE",
+   "basis": "The candidate claims specific numerical improvements (46.8 min, 28.1 km) over a baseline, but since the mechanism is fundamentally flawed for the device class, equivalence cannot be established; however, strictly adhering to the kill standard regarding \"cannot be true,\" the baseline comparison is moot rather than demonstrably false in isolation without testing data, so this survives as a risk of irrelevance rather than a logical impossibility of the numbers themselves. GROUNDED_IN: RECORD \"Baseline... status quo\" | RECORD \"Extension of maximum flight endurance to 46.8 min\""
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "The intervention requires setting \"fuselage pitch to -20°\" for a ground vehicle; a -20° pitch angle for a car implies the nose is buried 20 degrees into the ground or the vehicle is airborne and nosing down, both of which are incompatible with \"ground vehicle\" operation and \"maintain speed\" on a surface. GROUNDED_IN: RECORD \"fuselage pitch is -20°\" | RECORD \"high-performance ground vehicle\" | COMPUTATION -20° pitch vs 0° nominal ground plane",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: angle, fuselage, high, performance)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['20', '20', '20', '20', '20', '0']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'fuselage pitch is 20' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"fuselage pitch is -20°\" | RECORD \"high-performance ground vehicle\" | COMPUTATION -20° pitch vs 0° nominal ground plane",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The testable prediction mixes units and domains, claiming \"maximum flight endurance to 46.8 min\" for a \"ground vehicle\" measured in \"operational range... km,\" creating a category error where flight time is used to validate ground range without a defined conversion logic or speed profile. GROUNDED_IN: RECORD \"maximum flight endurance to 46.8 min\" | RECORD \"practical range of 28.1 km\" | RECORD \"high-performance ground vehicle\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: endurance, flight, high, maximum)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['46.8', '46.8', '28.1']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'endurance to 46 min' (field: predicted_effect)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['flight', 'where']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"maximum flight endurance to 46.8 min\" | RECORD \"practical range of 28.1 km\" | RECORD \"high-performance ground vehicle\"",
+    "absence_ground": false
+   }
+  }
+ ],
+ "intervention_suggestions": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "suggestion": "Change the variable from \"passive lift generation\" to \"active downforce management\" because ground vehicles require increased normal force for traction at high speeds, not lift which reduces tire grip. GROUNDED_IN: RECORD \"high-performance ground vehicle\" | RECORD \"passive lift force\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: from, high, lift, passive)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"high-performance ground vehicle\" | RECORD \"passive lift force\"",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "suggestion": "Redefine the boundary condition from \"rotor-wing interference\" to \"vehicle wake-body interaction\" or \"ground effect turbulence\" to match the physical reality of a car lacking rotors. GROUNDED_IN: RECORD \"rotor-wing interference\" | RECORD \"high-performance ground vehicle\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: from, high, interference, performance)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['interference', 'rotor', 'wing']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"rotor-wing interference\" | RECORD \"high-performance ground vehicle\"",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "suggestion": "Replace the quadrotor-specific evidence with literature regarding \"ground effect aerodynamics for automotive applications\" to ensure the optimization principles apply to the correct fluid dynamic regime. GROUNDED_IN: EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"quadrotor flight endurance\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1038/s41598-026-58543-6",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10.1038', '41598', '026', '58543', '6']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"quadrotor flight endurance\"",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "suggestion": "Adjust the \"fuselage pitch\" parameter from \"-20°\" to a realistic suspension travel range (e.g., ±2°) or redefine it as \"local wing incidence relative to chassis\" to allow physical realization on a ground plane. GROUNDED_IN: RECORD \"fuselage pitch is -20°\" | RECORD \"high-performance ground vehicle\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: from, fuselage, high, incidence)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['20', '2', '20']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'fuselage pitch is 20' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"fuselage pitch is -20°\" | RECORD \"high-performance ground vehicle\"",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "suggestion": "Decouple the metrics by replacing \"flight endurance\" with \"energy consumption per kilometer\" or \"top speed stability duration\" to align the success criteria with ground vehicle performance standards. GROUNDED_IN: RECORD \"maximum flight endurance to 46.8 min\" | RECORD \"high-performance ground vehicle\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: endurance, energy, flight, high)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'endurance to 46 min' (field: predicted_effect)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"maximum flight endurance to 46.8 min\" | RECORD \"high-performance ground vehicle\"",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate proposes adjusting wing AoA to 10°-12° on a \"high-performance ground vehicle\" to generate passive lift, ignoring that ground effect and vehicle dynamics at high speeds typically require downforce for traction, not lift, rendering the mechanism counter-productive to the stated goal of a \"fastest car.\" GROUNDED_IN: RECORD \"high-performance ground vehicle\" | RECORD \"passive lift force will increase sufficiently\" | SCOPE \"Flight/drive regimes where rotor-wing interference is a significant drag source\" (No rotors exist on the defined device)",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: drag, drive, dynamics, flight)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10', '12']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'wing aoa to 10' (field: intervention)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['drag', 'drive', 'flight', 'interference']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"high-performance ground vehicle\" | RECORD \"passive lift force will increase sufficiently\" | SCOPE \"Flight/drive regimes where rotor-wing interference is a significant drag source\" (No rotors e",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate defines the boundary condition as \"regimes where rotor-wing interference is a significant drag source,\" yet the problem domain is a \"high-performance ground vehicle\" which possesses no rotors, making the entire premise physically inapplicable to the target device. GROUNDED_IN: RECORD \"high-performance ground vehicle\" | RECORD \"rotor-wing interference\" | COMPUTATION 0 rotors on vehicle vs 1 rotor required for interference",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: drag, high, interference, performance)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['0', '1']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'regimes where rotor wing' (field: boundary_conditions)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['drag', 'interference', 'physically', 'regimes']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"high-performance ground vehicle\" | RECORD \"rotor-wing interference\" | COMPUTATION 0 rotors on vehicle vs 1 rotor required for interference",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "basis": "The cited evidence [doi:10.1038/s41598-026-58543-6] explicitly discusses extending \"quadrotor flight endurance,\" contradicting the candidate's application of this mechanism to a ground-based vehicle where flight endurance is irrelevant and the physics of ground interaction differ fundamentally from free-air quadrotor dynamics. GROUNDED_IN: EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"extends quadrotor flight endurance\" | RECORD \"high-performance ground vehicle\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1038/s41598-026-58543-6",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10.1038', '41598', '026', '58543', '6', '10.1038']",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['flight', 'where']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE doi:10.1038/s41598-026-58543-6 | RECORD \"extends quadrotor flight endurance\" | RECORD \"high-performance ground vehicle\"",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "The intervention requires setting \"fuselage pitch to -20°\" for a ground vehicle; a -20° pitch angle for a car implies the nose is buried 20 degrees into the ground or the vehicle is airborne and nosing down, both of which are incompatible with \"ground vehicle\" operation and \"maintain speed\" on a surface. GROUNDED_IN: RECORD \"fuselage pitch is -20°\" | RECORD \"high-performance ground vehicle\" | COMPUTATION -20° pitch vs 0° nominal ground plane",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: angle, fuselage, high, performance)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['20', '20', '20', '20', '20', '0']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'fuselage pitch is 20' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"fuselage pitch is -20°\" | RECORD \"high-performance ground vehicle\" | COMPUTATION -20° pitch vs 0° nominal ground plane",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The testable prediction mixes units and domains, claiming \"maximum flight endurance to 46.8 min\" for a \"ground vehicle\" measured in \"operational range... km,\" creating a category error where flight time is used to validate ground range without a defined conversion logic or speed profile. GROUNDED_IN: RECORD \"maximum flight endurance to 46.8 min\" | RECORD \"practical range of 28.1 km\" | RECORD \"high-performance ground vehicle\"",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: endurance, flight, high, maximum)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['46.8', '46.8', '28.1']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'endurance to 46 min' (field: predicted_effect)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['flight', 'where']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"maximum flight endurance to 46.8 min\" | RECORD \"practical range of 28.1 km\" | RECORD \"high-performance ground vehicle\"",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 5,
+  "RISK": 0,
+  "SURVIVE": 1,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 0
+ }
+}

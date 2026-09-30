@@ -1,0 +1,431 @@
+{
+ "attack_version": "independent_attack/3.0.0",
+ "attack_purpose": "post_rank:independent_attack",
+ "candidate_id": "cand:MS:DIRECT_TRANSFER:6ab846324c3e",
+ "generator_provider": "agnes",
+ "attacker_provider": "xkiro",
+ "attacker_model": "qwen/qwen3.5-plus:free",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "prompt_hash": "e8f31991bd192a4f89336c9a72a1e73e646794e4f9b0fc7778747a0b9d7d7feb",
+ "output_hash": "ac7f3d87e41ef1092f3d8639bd5aa9183d60f49d9e34d4e582a39804b4a3dd07",
+ "llm_status": "OK",
+ "ring_pin": {
+  "requested": null,
+  "mode": "PRODUCTION_CASCADE",
+  "served_provider": "xkiro",
+  "served_model": "qwen/qwen3.5-plus:free",
+  "pin_status": null,
+  "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+ },
+ "attacked_at": "2026-09-30T00:06:09+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate claims a \"net 13.22% efficiency improvement\" for a ground vehicle by applying a mechanism explicitly validated only for \"quadrotor flight endurance\" in the provided evidence, ignoring that ground vehicles operate in a high-density fluid regime where induced drag from lifting surfaces creates parasitic rolling resistance penalties not present in aerial domains. GROUNDED_IN: EVIDENCE [doi:10.1038/s41598-026-58543-6] | RECORD \"Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance\" | COMPUTATION 13.22% claimed gain vs 0% ground-vehicle",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1038/s41598-026-58543-6",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['13.22', '10.1038', '41598', '026', '58543', '6']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'net 13 22 efficiency' (field: predicted_effect)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['aerodynamic', 'drag', 'dynamics', 'flight']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [doi:10.1038/s41598-026-58543-6] | RECORD \"Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance\" | COMPUTATION 13.22% claimed gain vs 0% grou",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The candidate asserts validity in \"stable flight/drive regimes\" but predicts operation at a vehicle pitch of -20°, a condition that constitutes an unstable drive regime for any high-performance ground vehicle due to loss of tire contact patch and headlight beam violation, rendering the boundary condition physically unreachable for the stated device class. GROUNDED_IN: RECORD \"At a vehicle pitch of -20° and a wing AoA of 10°-12°\" | COMPUTED -20° pitch violates fundamental ground-contact stability requirements for high-performance ground vehicles | SCOPE stable flight/drive regimes where the lif",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: drag, drive, flight, high)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['20', '20', '10', '12', '20']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'at vehicle pitch of' (field: testable_prediction)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['drag', 'drive', 'flight', 'lift']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"At a vehicle pitch of -20° and a wing AoA of 10°-12°\" | COMPUTED -20° pitch violates fundamental ground-contact stability requirements for high-performance ground vehicles | SCOPE stable fligh",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "SURVIVE",
+   "basis": "The candidate cites aerodynamic optimization literature but does not explicitly contradict the specific numerical values or findings within the held evidence bundle; the error is one of domain misapplication rather than direct textual contradiction. GROUNDED_IN: EVIDENCE [doi:10.1038/s44172-024-00322-0] | RECORD \"Aerodynamics-guided machine learning for design optimization of electric vehicles\" | COMPUTATION N/A (no direct numeric conflict) | SCOPE N/A"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The candidate's predicted \"42.98% reduction in power required\" relies on a \"strong suction peak\" generated at -20° pitch, a state impossible for the baseline or any ground vehicle to achieve without crashing, meaning the comparison is made against a non-existent baseline state rather than the \"fixed-incidence baseline at 10 m/s\" in a valid drive mode. GROUNDED_IN: RECORD \"resulting in a 42.98% reduction in power required compared to a fixed-incidence baseline at 10 m/s\" | COMPUTED Comparison requires -20° pitch which is outside the operable envelope of the baseline | SCOPE Operating speeds whe",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: achieve, aerodynamic, drive, dynamics)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['42.98', '20', '10', '42.98', '10', '20']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'power required compared to' (field: testable_prediction)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['aerodynamic', 'drive', 'dynamics', 'forces']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"resulting in a 42.98% reduction in power required compared to a fixed-incidence baseline at 10 m/s\" | COMPUTED Comparison requires -20° pitch which is outside the operable envelope of the base",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "RISK",
+   "basis": "The integration of a \"dual-actuator drive system\" with a \"total structural mass penalty of 209 g\" may fail to account for the load-bearing reinforcement required to transfer lift forces into a ground vehicle chassis without structural failure, though the candidate does not explicitly rule out reinforced mounting points. GROUNDED_IN: RECORD \"total structural mass penalty of 209 g\" | COMPUTED 209g likely excludes reinforcement mass needed for lift loads on ground chassis | SCOPE stable flight/drive regimes where the lift-to-drag optimization outweighs the structural mass penalty"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "KILL",
+   "basis": "The metric \"normalized power-saving ratio at 10 m/s relative to hover\" is undefined and nonsensical for a \"high-performance ground vehicle\" which cannot hover, making the primary efficiency claim unmeasurable and the 13.22% improvement figure baseless. GROUNDED_IN: RECORD \"Reduction in normalized power-saving ratio at 10 m/s relative to hover\" | COMPUTED Ground vehicles have no hover state to serve as a denominator for normalization | SCOPE Operating speeds where aerodynamic forces significantly influence vehicle dynamics",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: aerodynamic, dynamics, efficiency, high)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10', '13.22', '10']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'ratio at 10 relative' (field: predicted_effect)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['aerodynamic', 'dynamics', 'forces', 'influence']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Reduction in normalized power-saving ratio at 10 m/s relative to hover\" | COMPUTED Ground vehicles have no hover state to serve as a denominator for normalization | SCOPE Operating speeds wher",
+    "absence_ground": false
+   }
+  }
+ ],
+ "intervention_suggestions": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "suggestion": "Change the domain variable from \"quadrotor flight\" to \"ground-effect aerodynamics\" and recalculate the net efficiency gain by subtracting the increased rolling resistance coefficient caused by downforce/lift variations on tires. GROUNDED_IN: EVIDENCE [doi:10.1038/s41598-026-58543-6] | RECORD \"Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance\" | ",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1038/s41598-026-58543-6",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10.1038', '41598', '026', '58543', '6', '13.22']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'where aerodynamic forces significantly' (field: boundary_conditions)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['aerodynamic', 'dynamics', 'flight', 'forces']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [doi:10.1038/s41598-026-58543-6] | RECORD \"Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance\" | COMPUTATION 13.22% claimed gain vs 0% grou",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "suggestion": "Restrict the vehicle pitch variable to the range [-5°, +5°] which maintains tire contact and legal lighting compliance, and re-evaluate the lift-to-drag optimization within this physically drivable envelope. GROUNDED_IN: RECORD \"At a vehicle pitch of -20° and a wing AoA of 10°-12°\" | COMPUTED -20° pitch violates fundamental ground-contact stability requirements for high-performance ground vehicles",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: drag, drive, flight, high)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['5', '5', '20', '10', '12', '20']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'at vehicle pitch of' (field: testable_prediction)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['drag', 'drive', 'flight', 'lift']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"At a vehicle pitch of -20° and a wing AoA of 10°-12°\" | COMPUTED -20° pitch violates fundamental ground-contact stability requirements for high-performance ground vehicles | SCOPE stable fligh",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "suggestion": "Redefine the baseline comparison to be between \"variable incidence at 0° vehicle pitch\" and \"fixed incidence at 0° vehicle pitch\" to ensure both states are achievable by a ground vehicle. GROUNDED_IN: RECORD \"resulting in a 42.98% reduction in power required compared to a fixed-incidence baseline at 10 m/s\" | COMPUTED Comparison requires -20° pitch which is outside the operable envelope of the bas",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: aerodynamic, between, dynamics, fixed)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['0', '0', '42.98', '10', '20']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'power required compared to' (field: testable_prediction)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['aerodynamic', 'dynamics', 'forces', 'influence']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"resulting in a 42.98% reduction in power required compared to a fixed-incidence baseline at 10 m/s\" | COMPUTED Comparison requires -20° pitch which is outside the operable envelope of the base",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "suggestion": "Replace the reference state \"relative to hover\" with \"relative to stationary idle\" or \"relative to coasting at 1 m/s\" to establish a valid denominator for the power-saving ratio applicable to ground vehicles. GROUNDED_IN: RECORD \"Reduction in normalized power-saving ratio at 10 m/s relative to hover\" | COMPUTED Ground vehicles have no hover state to serve as a denominator for normalization | SCOPE",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: aerodynamic, dynamics, hover, normalized)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['1', '10']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'relative to hover with' (field: predicted_effect)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['aerodynamic', 'dynamics', 'forces', 'influence']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Reduction in normalized power-saving ratio at 10 m/s relative to hover\" | COMPUTED Ground vehicles have no hover state to serve as a denominator for normalization | SCOPE Operating speeds wher",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "basis": "The candidate claims a \"net 13.22% efficiency improvement\" for a ground vehicle by applying a mechanism explicitly validated only for \"quadrotor flight endurance\" in the provided evidence, ignoring that ground vehicles operate in a high-density fluid regime where induced drag from lifting surfaces creates parasitic rolling resistance penalties not present in aerial domains. GROUNDED_IN: EVIDENCE [doi:10.1038/s41598-026-58543-6] | RECORD \"Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance\" | COMPUTATION 13.22% claimed gain vs 0% ground-vehicle",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1038/s41598-026-58543-6",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['13.22', '10.1038', '41598', '026', '58543', '6']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'net 13 22 efficiency' (field: predicted_effect)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['aerodynamic', 'drag', 'dynamics', 'flight']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE [doi:10.1038/s41598-026-58543-6] | RECORD \"Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance\" | COMPUTATION 13.22% claimed gain vs 0% grou",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The candidate asserts validity in \"stable flight/drive regimes\" but predicts operation at a vehicle pitch of -20°, a condition that constitutes an unstable drive regime for any high-performance ground vehicle due to loss of tire contact patch and headlight beam violation, rendering the boundary condition physically unreachable for the stated device class. GROUNDED_IN: RECORD \"At a vehicle pitch of -20° and a wing AoA of 10°-12°\" | COMPUTED -20° pitch violates fundamental ground-contact stability requirements for high-performance ground vehicles | SCOPE stable flight/drive regimes where the lif",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: drag, drive, flight, high)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['20', '20', '10', '12', '20']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'at vehicle pitch of' (field: testable_prediction)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['drag', 'drive', 'flight', 'lift']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"At a vehicle pitch of -20° and a wing AoA of 10°-12°\" | COMPUTED -20° pitch violates fundamental ground-contact stability requirements for high-performance ground vehicles | SCOPE stable fligh",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The candidate's predicted \"42.98% reduction in power required\" relies on a \"strong suction peak\" generated at -20° pitch, a state impossible for the baseline or any ground vehicle to achieve without crashing, meaning the comparison is made against a non-existent baseline state rather than the \"fixed-incidence baseline at 10 m/s\" in a valid drive mode. GROUNDED_IN: RECORD \"resulting in a 42.98% reduction in power required compared to a fixed-incidence baseline at 10 m/s\" | COMPUTED Comparison requires -20° pitch which is outside the operable envelope of the baseline | SCOPE Operating speeds whe",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: achieve, aerodynamic, drive, dynamics)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['42.98', '20', '10', '42.98', '10', '20']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'power required compared to' (field: testable_prediction)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['aerodynamic', 'drive', 'dynamics', 'forces']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"resulting in a 42.98% reduction in power required compared to a fixed-incidence baseline at 10 m/s\" | COMPUTED Comparison requires -20° pitch which is outside the operable envelope of the base",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "basis": "The metric \"normalized power-saving ratio at 10 m/s relative to hover\" is undefined and nonsensical for a \"high-performance ground vehicle\" which cannot hover, making the primary efficiency claim unmeasurable and the 13.22% improvement figure baseless. GROUNDED_IN: RECORD \"Reduction in normalized power-saving ratio at 10 m/s relative to hover\" | COMPUTED Ground vehicles have no hover state to serve as a denominator for normalization | SCOPE Operating speeds where aerodynamic forces significantly influence vehicle dynamics",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Decoupling pitch and angle of attack with a variable-incidence wing extends quadrotor flight endurance.' (strong overlap: aerodynamic, dynamics, efficiency, high)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10', '13.22', '10']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'ratio at 10 relative' (field: predicted_effect)",
+      "verified": true
+     },
+     {
+      "binding": "declared_scope",
+      "ground": "boundary overlap ['aerodynamic', 'dynamics', 'forces', 'influence']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Reduction in normalized power-saving ratio at 10 m/s relative to hover\" | COMPUTED Ground vehicles have no hover state to serve as a denominator for normalization | SCOPE Operating speeds wher",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 4,
+  "RISK": 1,
+  "SURVIVE": 1,
+  "ABSTAIN_DEMOTED": 0,
+  "INVALID": 0
+ }
+}
