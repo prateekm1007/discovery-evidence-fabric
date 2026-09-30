@@ -30,11 +30,39 @@
  },
  "mechanism": {
   "value": {
-   "mechanism": "Decoupling fuselage pitch attitude from wing angle of attack via variable-incidence aerodynamic surfaces to maintain optimal lift-to-drag performance across varying speeds.",
-   "intervention": "Design a high-performance ground vehicle with active, variable-incidence aerodynamic surfaces (e.g., flaps, canards, or splitter adjustments) driven by lightweight actuators to independently optimize local AoA while keeping the vehicle body stable, thereby minimizing parasitic drag and rotor/airflow interference at extreme velocities.",
-   "expected_effect": "Significant reduction in aerodynamic drag coefficients and powertrain energy losses at high speeds, resulting in increased terminal velocity and improved fuel/electricity efficiency while maintaining vehicle stability.",
-   "mechanism_source_span": "decouples fuselage attitude from wing aerodynamics",
-   "span_derivation": null
+   "mechanism": "High-performance ground vehicle equipped with a variable-incidence aerodynamic surface that decouples body pitch attitude from local angle of attack (AoA) via a lightweight dual-actuator drive system, ensuring optimal lift-to-drag performance and alleviating detrimental rotor-wing interference.",
+   "intervention": "Implement a dual-actuator drive system with a total structural mass penalty of only 209 g to drive variable-incidence surfaces, reestablishing strong suction peaks on the upper surface at high speeds while maintaining stability.",
+   "expected_effect": "Significant reduction in aerodynamic drag and powertrain energy losses, achieving a maximum normalized power-saving ratio of 42.98% relative to hover and a net 13.22% efficiency improvement over fixed-incidence concepts.",
+   "mechanism_source_span": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g.",
+   "span_derivation": {
+    "n_shared": 12,
+    "shared_terms": [
+     "209",
+     "actuator",
+     "drive",
+     "dual",
+     "lightweight",
+     "mass",
+     "only",
+     "penalty",
+     "structural",
+     "system",
+     "total",
+     "wing"
+    ],
+    "span_terms_n": 17,
+    "ratio": 0.706,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   },
+   "falsification_test": "The mechanism is falsified if the dual-actuator drive system exceeds the 209 g structural mass penalty or fails to achieve the projected 42.98% power-saving ratio in high-speed testing.",
+   "raw_candidate": {
+    "source_evidence": {
+     "source_id": "doi:10.1038/s41598-026-58543-6",
+     "source_span": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g."
+    }
+   }
   },
   "epistemic_class": "MODELLED",
   "origin_stage": "SYNTHESIZE",
@@ -242,7 +270,7 @@
  },
  "distinguishing_features": {
   "value": {
-   "intervention": "Design a high-performance ground vehicle with active, variable-incidence aerodynamic surfaces (e.g., flaps, canards, or splitter adjustments) driven by lightweight actuators to independently optimize local AoA while keeping the vehicle body stable, thereby minimizing parasitic drag and rotor/airflow interference at extreme velocities.",
+   "intervention": "Implement a dual-actuator drive system with a total structural mass penalty of only 209 g to drive variable-incidence surfaces, reestablishing strong suction peaks on the upper surface at high speeds while maintaining stability.",
    "vs_nearest_prior_art": [],
    "surviving_differentiators": null,
    "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
@@ -257,7 +285,19 @@
  "constraints": {
   "value": {
    "stated_constraint": "stability and safety at extreme velocities",
-   "failure_mode_of_device": "aerodynamic drag and powertrain energy losses"
+   "failure_mode_of_device": "aerodynamic drag and powertrain energy losses",
+   "evidence_derived": [
+    {
+     "constraint": "The actuator system must maintain a total structural mass penalty of only 209 g to ensure a net efficiency improvement.",
+     "evidence_id": "doi:10.1038/s41598-026-58543-6",
+     "span": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g."
+    },
+    {
+     "constraint": "Total structural mass penalty of the actuation system must not exceed 209 g.",
+     "evidence_id": "doi:10.1038/s41598-026-58543-6",
+     "span": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g."
+    }
+   ]
   },
   "epistemic_class": "SOURCE_FACT",
   "origin_stage": "PROBLEM",
@@ -1316,7 +1356,6 @@
   "final_status": "AUTOMATED_INVENTION_CANDIDATE",
   "verdict": "CONTESTED"
  },
- "_spec_hash": "849ea81d19d95e42ae6304b94267f4f4feb537474e432fb05191d3cd74a411cd",
  "_integrity": {
   "no_fact_promotion_violations": [],
   "passed": true,
@@ -1427,5 +1466,218 @@
    "epistemic_class": "COMPUTED",
    "recorded_at": "2026-09-30T00:04:22+00:00Z"
   }
- ]
+ ],
+ "_improvement": {
+  "parent_spec_hash": "83d3371b47b81ed3f18128c60c55da9a598718f3f629cc1c670df3e7c7de6c0b",
+  "mutation": {
+   "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+   "mutation_id": "mut:8fd1701b2a55",
+   "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+   "diagnostic_trigger": {
+    "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "measured_before": 0.414,
+    "basis": "R378 evaluator-contract diagnosis (deterministic)"
+   },
+   "proposal_provenance": {
+    "proposal_id": "prop:53eead01b6b1",
+    "provider": "agnes",
+    "model": "agnes-3.0-flash",
+    "prompt_hash": "8c6346495d3fc61216019a7a6f3d4600e1110b21ed437c0cb9f11d135ea82b2b",
+    "output_hash": "53eead01b6b1f0b7710def18e91b6d90bb599595fa612533f3f5653b0dea3ff0",
+    "llm_is_untrusted_proposer": true
+   },
+   "validation": {
+    "valid": true,
+    "stage": "VALIDATION",
+    "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "checks": {
+     "mutation_type_matches_diagnosis": true,
+     "span_evidence_exists": "doi:10.1038/s41598-026-58543-6",
+     "span_verbatim_in_evidence": true,
+     "evidence_support": 0.791,
+     "evidence_support_cleared": 0.791,
+     "constraint_traceable_to_evidence": "Total structural mass penalty of the actuation system must not exceed 209 g."
+    },
+    "reasons": [],
+    "validated_at": "2026-09-30T00:13:10+00:00Z"
+   },
+   "fields_changed": {
+    "mechanism": {
+     "before": "Decoupling fuselage pitch attitude from wing angle of attack via a variable-incidence lifting-wing that incorporates a lightweight actuator system to maintain optimal lift-to-drag performance, thereby alleviating detrimental rotor-wing interference and maximizing passive lift through reestablished s",
+     "after": "High-performance ground vehicle equipped with a variable-incidence aerodynamic surface that decouples body pitch attitude from local angle of attack (AoA) via a lightweight dual-actuator drive system, ensuring optimal lift-to-drag performance and alleviating detrimental rotor-wing interference."
+    },
+    "intervention": {
+     "before": "Design a high-performance ground vehicle with active, variable-incidence aerodynamic surfaces (analogous to the variable-incidence lifting-wing and dual-actuator drive system) driven by lightweight actuators to independently optimize local AoA while keeping the vehicle body stable, specifically targ",
+     "after": "Implement a dual-actuator drive system with a total structural mass penalty of only 209 g to drive variable-incidence surfaces, reestablishing strong suction peaks on the upper surface at high speeds while maintaining stability."
+    },
+    "mechanism_source_span": {
+     "before": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g.",
+     "after": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g."
+    }
+   },
+   "inherited_negatives": {
+    "uncertainty_ids": [
+     "con:evidence:doi:10.5281/zenodo.19636775",
+     "performance aerodynamic vehicle drag high ground",
+     "performance aerodynamic vehicle drag high ground",
+     "performance aerodynamic drag decoupling fuselage attitude",
+     "performance aerodynamic drag decoupling fuselage attitude",
+     "surfaces performance aerodynamic vehicle drag high ground variable",
+     "surfaces performance aerodynamic vehicle drag high ground variable",
+     "performance reduction resulting velocity electricity maintaining",
+     "performance reduction resulting velocity electricity maintaining",
+     "speeds significant reduction coefficients resulting increased",
+     "speeds significant reduction coefficients resulting increased"
+    ],
+    "collision_family_ids": [],
+    "source_errors": []
+   },
+   "parent_spec_hash": "83d3371b47b81ed3f18128c60c55da9a598718f3f629cc1c670df3e7c7de6c0b",
+   "child_spec_hash": null,
+   "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism vocabulary and adding a strict mass-penalty constraint derived verbatim from the cited evidence.",
+   "applied_at": "2026-09-30T00:13:10+00:00Z"
+  },
+  "history": [
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:9ef23556dc3d",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.37,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:aee78178f3ab",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "1038278f7b076136f9c3c988742189b1e66f7e852bed85ec8e5888480e50e27a",
+     "output_hash": "aee78178f3aba7f6078cb7c7435a8204b57aba2dc515f687de9a0f544f8c5a63",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1038/s41598-026-58543-6",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.603,
+      "evidence_support_cleared": 0.603,
+      "constraint_traceable_to_evidence": "The actuator system must maintain a total structural mass penalty of only 209 g to ensure a net efficiency improvement."
+     },
+     "reasons": [],
+     "validated_at": "2026-09-30T00:12:38+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Decoupling fuselage pitch attitude from wing angle of attack via variable-incidence aerodynamic surfaces to maintain optimal lift-to-drag performance across varying speeds.",
+      "after": "Decoupling fuselage pitch attitude from wing angle of attack via a variable-incidence lifting-wing that incorporates a lightweight actuator system to maintain optimal lift-to-drag performance, thereby alleviating detrimental rotor-wing interference and maximizing passive lift through reestablished s"
+     },
+     "intervention": {
+      "before": "Design a high-performance ground vehicle with active, variable-incidence aerodynamic surfaces (e.g., flaps, canards, or splitter adjustments) driven by lightweight actuators to independently optimize local AoA while keeping the vehicle body stable, thereby minimizing parasitic drag and rotor/airflow",
+      "after": "Design a high-performance ground vehicle with active, variable-incidence aerodynamic surfaces (analogous to the variable-incidence lifting-wing and dual-actuator drive system) driven by lightweight actuators to independently optimize local AoA while keeping the vehicle body stable, specifically targ"
+     },
+     "mechanism_source_span": {
+      "before": "decouples fuselage attitude from wing aerodynamics",
+      "after": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.5281/zenodo.19636775",
+      "performance aerodynamic vehicle drag high ground",
+      "performance aerodynamic vehicle drag high ground",
+      "performance aerodynamic drag decoupling fuselage attitude",
+      "performance aerodynamic drag decoupling fuselage attitude",
+      "surfaces performance aerodynamic vehicle drag high ground variable",
+      "surfaces performance aerodynamic vehicle drag high ground variable",
+      "performance reduction resulting velocity electricity maintaining",
+      "performance reduction resulting velocity electricity maintaining",
+      "speeds significant reduction coefficients resulting increased",
+      "speeds significant reduction coefficients resulting increased"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "849ea81d19d95e42ae6304b94267f4f4feb537474e432fb05191d3cd74a411cd",
+    "child_spec_hash": null,
+    "reason": "This repairs the I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring the mechanism's technical vocabulary to the specific quantitative constraints (mass penalty, actuator drive system) and aerodynamic phenomena (lift-to-drag, interference) explicitly stated in the custodied evidence.",
+    "applied_at": "2026-09-30T00:12:38+00:00Z"
+   },
+   {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:8fd1701b2a55",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.414,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:53eead01b6b1",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "8c6346495d3fc61216019a7a6f3d4600e1110b21ed437c0cb9f11d135ea82b2b",
+     "output_hash": "53eead01b6b1f0b7710def18e91b6d90bb599595fa612533f3f5653b0dea3ff0",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1038/s41598-026-58543-6",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.791,
+      "evidence_support_cleared": 0.791,
+      "constraint_traceable_to_evidence": "Total structural mass penalty of the actuation system must not exceed 209 g."
+     },
+     "reasons": [],
+     "validated_at": "2026-09-30T00:13:10+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Decoupling fuselage pitch attitude from wing angle of attack via a variable-incidence lifting-wing that incorporates a lightweight actuator system to maintain optimal lift-to-drag performance, thereby alleviating detrimental rotor-wing interference and maximizing passive lift through reestablished s",
+      "after": "High-performance ground vehicle equipped with a variable-incidence aerodynamic surface that decouples body pitch attitude from local angle of attack (AoA) via a lightweight dual-actuator drive system, ensuring optimal lift-to-drag performance and alleviating detrimental rotor-wing interference."
+     },
+     "intervention": {
+      "before": "Design a high-performance ground vehicle with active, variable-incidence aerodynamic surfaces (analogous to the variable-incidence lifting-wing and dual-actuator drive system) driven by lightweight actuators to independently optimize local AoA while keeping the vehicle body stable, specifically targ",
+      "after": "Implement a dual-actuator drive system with a total structural mass penalty of only 209 g to drive variable-incidence surfaces, reestablishing strong suction peaks on the upper surface at high speeds while maintaining stability."
+     },
+     "mechanism_source_span": {
+      "before": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g.",
+      "after": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.5281/zenodo.19636775",
+      "performance aerodynamic vehicle drag high ground",
+      "performance aerodynamic vehicle drag high ground",
+      "performance aerodynamic drag decoupling fuselage attitude",
+      "performance aerodynamic drag decoupling fuselage attitude",
+      "surfaces performance aerodynamic vehicle drag high ground variable",
+      "surfaces performance aerodynamic vehicle drag high ground variable",
+      "performance reduction resulting velocity electricity maintaining",
+      "performance reduction resulting velocity electricity maintaining",
+      "speeds significant reduction coefficients resulting increased",
+      "speeds significant reduction coefficients resulting increased"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "83d3371b47b81ed3f18128c60c55da9a598718f3f629cc1c670df3e7c7de6c0b",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism vocabulary and adding a strict mass-penalty constraint derived verbatim from the cited evidence.",
+    "applied_at": "2026-09-30T00:13:10+00:00Z"
+   }
+  ]
+ },
+ "_spec_hash": "ed236ef97a8d800890e09e72814f8e94c58312a55514753515cbe9cf64b5937a"
 }

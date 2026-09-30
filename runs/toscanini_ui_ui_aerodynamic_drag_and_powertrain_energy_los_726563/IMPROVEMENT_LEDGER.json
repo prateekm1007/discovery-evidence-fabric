@@ -1,0 +1,916 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-09-30T00:12:29+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.37,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.37 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:aee78178f3ab",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "1038278f7b076136f9c3c988742189b1e66f7e852bed85ec8e5888480e50e27a",
+     "output_hash": "aee78178f3aba7f6078cb7c7435a8204b57aba2dc515f687de9a0f544f8c5a63",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Decoupling fuselage pitch attitude from wing angle of attack via a variable-incidence lifting-wing that incorporates a lightweight actuator system to maintain optimal lift-to-drag performance, thereby alleviating detrimental rotor-wing interference and maximizing passive lift through reestablished suction peaks on the upper surface.",
+      "INTERVENTION": "Design a high-performance ground vehicle with active, variable-incidence aerodynamic surfaces (analogous to the variable-incidence lifting-wing and dual-actuator drive system) driven by lightweight actuators to independently optimize local AoA while keeping the vehicle body stable, specifically targeting the mitigation of rotor/airflow interference and optimization of lift-to-drag ratios to minimize powertrain energy losses.",
+      "EXPECTED_EFFECT": "Significant reduction in aerodynamic drag coefficients and powertrain energy losses at high speeds, resulting in increased terminal velocity and improved efficiency, with a projected power-saving ratio comparable to the 42.98% observed in flight experiments for the prototype quadrotor.",
+      "FALSIFICATION_TEST": "The mechanism is falsified if high-speed wind tunnel testing fails to demonstrate a measurable reduction in parasitic drag coefficient or if the lightweight actuator system exceeds the structural mass penalty threshold without yielding a net efficiency improvement relative to a fixed-geometry baseline.",
+      "MECHANISM_SOURCE_SPAN": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1038/s41598-026-58543-6",
+      "EXPERIMENT": "Conduct high-fidelity CFD simulations and wind tunnel tests comparing the variable-incidence ground vehicle design against a fixed-geometry baseline to verify that the decoupling control strategy achieves a net efficiency improvement in lift-to-drag ratio that matches the 42.98% power-saving ratio documented for the variable-incidence lifting-wing quadrotor.",
+      "EXPERIMENT_BASELINE": "fixed-geometry baseline",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "The actuator system must maintain a total structural mass penalty of only 209 g to ensure a net efficiency improvement.",
+      "MUTATION_REASON": "This repairs the I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring the mechanism's technical vocabulary to the specific quantitative constraints (mass penalty, actuator drive system) and aerodynamic phenomena (lift-to-drag, interference) explicitly stated in the custodied evidence."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1038/s41598-026-58543-6",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.603,
+       "evidence_support_cleared": 0.603,
+       "constraint_traceable_to_evidence": "The actuator system must maintain a total structural mass penalty of only 209 g to ensure a net efficiency improvement."
+      },
+      "reasons": [],
+      "validated_at": "2026-09-30T00:12:38+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:9ef23556dc3d",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.37,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:aee78178f3ab",
+       "provider": "agnes",
+       "model": "agnes-3.0-flash",
+       "prompt_hash": "1038278f7b076136f9c3c988742189b1e66f7e852bed85ec8e5888480e50e27a",
+       "output_hash": "aee78178f3aba7f6078cb7c7435a8204b57aba2dc515f687de9a0f544f8c5a63",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1038/s41598-026-58543-6",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.603,
+        "evidence_support_cleared": 0.603,
+        "constraint_traceable_to_evidence": "The actuator system must maintain a total structural mass penalty of only 209 g to ensure a net efficiency improvement."
+       },
+       "reasons": [],
+       "validated_at": "2026-09-30T00:12:38+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Decoupling fuselage pitch attitude from wing angle of attack via variable-incidence aerodynamic surfaces to maintain optimal lift-to-drag performance across varying speeds.",
+        "after": "Decoupling fuselage pitch attitude from wing angle of attack via a variable-incidence lifting-wing that incorporates a lightweight actuator system to maintain optimal lift-to-drag performance, thereby alleviating detrimental rotor-wing interference and maximizing passive lift through reestablished s"
+       },
+       "intervention": {
+        "before": "Design a high-performance ground vehicle with active, variable-incidence aerodynamic surfaces (e.g., flaps, canards, or splitter adjustments) driven by lightweight actuators to independently optimize local AoA while keeping the vehicle body stable, thereby minimizing parasitic drag and rotor/airflow",
+        "after": "Design a high-performance ground vehicle with active, variable-incidence aerodynamic surfaces (analogous to the variable-incidence lifting-wing and dual-actuator drive system) driven by lightweight actuators to independently optimize local AoA while keeping the vehicle body stable, specifically targ"
+       },
+       "mechanism_source_span": {
+        "before": "decouples fuselage attitude from wing aerodynamics",
+        "after": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:evidence:doi:10.5281/zenodo.19636775",
+        "performance aerodynamic vehicle drag high ground",
+        "performance aerodynamic vehicle drag high ground",
+        "performance aerodynamic drag decoupling fuselage attitude",
+        "performance aerodynamic drag decoupling fuselage attitude",
+        "surfaces performance aerodynamic vehicle drag high ground variable",
+        "surfaces performance aerodynamic vehicle drag high ground variable",
+        "performance reduction resulting velocity electricity maintaining",
+        "performance reduction resulting velocity electricity maintaining",
+        "speeds significant reduction coefficients resulting increased",
+        "speeds significant reduction coefficients resulting increased"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "849ea81d19d95e42ae6304b94267f4f4feb537474e432fb05191d3cd74a411cd",
+      "child_spec_hash": null,
+      "reason": "This repairs the I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring the mechanism's technical vocabulary to the specific quantitative constraints (mass penalty, actuator drive system) and aerodynamic phenomena (lift-to-drag, interference) explicitly stated in the custodied evidence.",
+      "applied_at": "2026-09-30T00:12:38+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-30T00:12:38+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.414,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.54,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.37 -> 0.414 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-30T00:12:38+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:9ef23556dc3d",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.37,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:aee78178f3ab",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "1038278f7b076136f9c3c988742189b1e66f7e852bed85ec8e5888480e50e27a",
+     "output_hash": "aee78178f3aba7f6078cb7c7435a8204b57aba2dc515f687de9a0f544f8c5a63",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1038/s41598-026-58543-6",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.603,
+      "evidence_support_cleared": 0.603,
+      "constraint_traceable_to_evidence": "The actuator system must maintain a total structural mass penalty of only 209 g to ensure a net efficiency improvement."
+     },
+     "reasons": [],
+     "validated_at": "2026-09-30T00:12:38+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Decoupling fuselage pitch attitude from wing angle of attack via variable-incidence aerodynamic surfaces to maintain optimal lift-to-drag performance across varying speeds.",
+      "after": "Decoupling fuselage pitch attitude from wing angle of attack via a variable-incidence lifting-wing that incorporates a lightweight actuator system to maintain optimal lift-to-drag performance, thereby alleviating detrimental rotor-wing interference and maximizing passive lift through reestablished s"
+     },
+     "intervention": {
+      "before": "Design a high-performance ground vehicle with active, variable-incidence aerodynamic surfaces (e.g., flaps, canards, or splitter adjustments) driven by lightweight actuators to independently optimize local AoA while keeping the vehicle body stable, thereby minimizing parasitic drag and rotor/airflow",
+      "after": "Design a high-performance ground vehicle with active, variable-incidence aerodynamic surfaces (analogous to the variable-incidence lifting-wing and dual-actuator drive system) driven by lightweight actuators to independently optimize local AoA while keeping the vehicle body stable, specifically targ"
+     },
+     "mechanism_source_span": {
+      "before": "decouples fuselage attitude from wing aerodynamics",
+      "after": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.5281/zenodo.19636775",
+      "performance aerodynamic vehicle drag high ground",
+      "performance aerodynamic vehicle drag high ground",
+      "performance aerodynamic drag decoupling fuselage attitude",
+      "performance aerodynamic drag decoupling fuselage attitude",
+      "surfaces performance aerodynamic vehicle drag high ground variable",
+      "surfaces performance aerodynamic vehicle drag high ground variable",
+      "performance reduction resulting velocity electricity maintaining",
+      "performance reduction resulting velocity electricity maintaining",
+      "speeds significant reduction coefficients resulting increased",
+      "speeds significant reduction coefficients resulting increased"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "849ea81d19d95e42ae6304b94267f4f4feb537474e432fb05191d3cd74a411cd",
+    "child_spec_hash": null,
+    "reason": "This repairs the I1_MECHANISM_EVIDENCE_DERIVATION defect by re-anchoring the mechanism's technical vocabulary to the specific quantitative constraints (mass penalty, actuator drive system) and aerodynamic phenomena (lift-to-drag, interference) explicitly stated in the custodied evidence.",
+    "applied_at": "2026-09-30T00:12:38+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-30T00:12:38+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.414,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.54,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.37 -> 0.414 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-30T00:12:38+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.414,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.414 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:53eead01b6b1",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "8c6346495d3fc61216019a7a6f3d4600e1110b21ed437c0cb9f11d135ea82b2b",
+     "output_hash": "53eead01b6b1f0b7710def18e91b6d90bb599595fa612533f3f5653b0dea3ff0",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "High-performance ground vehicle equipped with a variable-incidence aerodynamic surface that decouples body pitch attitude from local angle of attack (AoA) via a lightweight dual-actuator drive system, ensuring optimal lift-to-drag performance and alleviating detrimental rotor-wing interference.",
+      "INTERVENTION": "Implement a dual-actuator drive system with a total structural mass penalty of only 209 g to drive variable-incidence surfaces, reestablishing strong suction peaks on the upper surface at high speeds while maintaining stability.",
+      "EXPECTED_EFFECT": "Significant reduction in aerodynamic drag and powertrain energy losses, achieving a maximum normalized power-saving ratio of 42.98% relative to hover and a net 13.22% efficiency improvement over fixed-incidence concepts.",
+      "FALSIFICATION_TEST": "The mechanism is falsified if the dual-actuator drive system exceeds the 209 g structural mass penalty or fails to achieve the projected 42.98% power-saving ratio in high-speed testing.",
+      "MECHANISM_SOURCE_SPAN": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g.",
+      "SOURCE_EVIDENCE_ID": "doi:10.1038/s41598-026-58543-6",
+      "EXPERIMENT": "Wind tunnel and road testing to verify that the dual-actuator drive system maintains the structural mass penalty at or below 209 g while achieving the 42.98% power-saving ratio.",
+      "EXPERIMENT_BASELINE": "fixed-incidence concept of the original RflyLW",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "Total structural mass penalty of the actuation system must not exceed 209 g.",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism vocabulary and adding a strict mass-penalty constraint derived verbatim from the cited evidence."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1038/s41598-026-58543-6",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.791,
+       "evidence_support_cleared": 0.791,
+       "constraint_traceable_to_evidence": "Total structural mass penalty of the actuation system must not exceed 209 g."
+      },
+      "reasons": [],
+      "validated_at": "2026-09-30T00:13:10+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:8fd1701b2a55",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.414,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:53eead01b6b1",
+       "provider": "agnes",
+       "model": "agnes-3.0-flash",
+       "prompt_hash": "8c6346495d3fc61216019a7a6f3d4600e1110b21ed437c0cb9f11d135ea82b2b",
+       "output_hash": "53eead01b6b1f0b7710def18e91b6d90bb599595fa612533f3f5653b0dea3ff0",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1038/s41598-026-58543-6",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.791,
+        "evidence_support_cleared": 0.791,
+        "constraint_traceable_to_evidence": "Total structural mass penalty of the actuation system must not exceed 209 g."
+       },
+       "reasons": [],
+       "validated_at": "2026-09-30T00:13:10+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Decoupling fuselage pitch attitude from wing angle of attack via a variable-incidence lifting-wing that incorporates a lightweight actuator system to maintain optimal lift-to-drag performance, thereby alleviating detrimental rotor-wing interference and maximizing passive lift through reestablished s",
+        "after": "High-performance ground vehicle equipped with a variable-incidence aerodynamic surface that decouples body pitch attitude from local angle of attack (AoA) via a lightweight dual-actuator drive system, ensuring optimal lift-to-drag performance and alleviating detrimental rotor-wing interference."
+       },
+       "intervention": {
+        "before": "Design a high-performance ground vehicle with active, variable-incidence aerodynamic surfaces (analogous to the variable-incidence lifting-wing and dual-actuator drive system) driven by lightweight actuators to independently optimize local AoA while keeping the vehicle body stable, specifically targ",
+        "after": "Implement a dual-actuator drive system with a total structural mass penalty of only 209 g to drive variable-incidence surfaces, reestablishing strong suction peaks on the upper surface at high speeds while maintaining stability."
+       },
+       "mechanism_source_span": {
+        "before": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g.",
+        "after": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:evidence:doi:10.5281/zenodo.19636775",
+        "performance aerodynamic vehicle drag high ground",
+        "performance aerodynamic vehicle drag high ground",
+        "performance aerodynamic drag decoupling fuselage attitude",
+        "performance aerodynamic drag decoupling fuselage attitude",
+        "surfaces performance aerodynamic vehicle drag high ground variable",
+        "surfaces performance aerodynamic vehicle drag high ground variable",
+        "performance reduction resulting velocity electricity maintaining",
+        "performance reduction resulting velocity electricity maintaining",
+        "speeds significant reduction coefficients resulting increased",
+        "speeds significant reduction coefficients resulting increased"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "83d3371b47b81ed3f18128c60c55da9a598718f3f629cc1c670df3e7c7de6c0b",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism vocabulary and adding a strict mass-penalty constraint derived verbatim from the cited evidence.",
+      "applied_at": "2026-09-30T00:13:10+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-09-30T00:13:10+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.535,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.601,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.414 -> 0.535 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-09-30T00:13:10+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:8fd1701b2a55",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.414,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:53eead01b6b1",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "8c6346495d3fc61216019a7a6f3d4600e1110b21ed437c0cb9f11d135ea82b2b",
+     "output_hash": "53eead01b6b1f0b7710def18e91b6d90bb599595fa612533f3f5653b0dea3ff0",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1038/s41598-026-58543-6",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.791,
+      "evidence_support_cleared": 0.791,
+      "constraint_traceable_to_evidence": "Total structural mass penalty of the actuation system must not exceed 209 g."
+     },
+     "reasons": [],
+     "validated_at": "2026-09-30T00:13:10+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Decoupling fuselage pitch attitude from wing angle of attack via a variable-incidence lifting-wing that incorporates a lightweight actuator system to maintain optimal lift-to-drag performance, thereby alleviating detrimental rotor-wing interference and maximizing passive lift through reestablished s",
+      "after": "High-performance ground vehicle equipped with a variable-incidence aerodynamic surface that decouples body pitch attitude from local angle of attack (AoA) via a lightweight dual-actuator drive system, ensuring optimal lift-to-drag performance and alleviating detrimental rotor-wing interference."
+     },
+     "intervention": {
+      "before": "Design a high-performance ground vehicle with active, variable-incidence aerodynamic surfaces (analogous to the variable-incidence lifting-wing and dual-actuator drive system) driven by lightweight actuators to independently optimize local AoA while keeping the vehicle body stable, specifically targ",
+      "after": "Implement a dual-actuator drive system with a total structural mass penalty of only 209 g to drive variable-incidence surfaces, reestablishing strong suction peaks on the upper surface at high speeds while maintaining stability."
+     },
+     "mechanism_source_span": {
+      "before": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g.",
+      "after": "The proposed mechanism incorporates a 143 g lightweight lifting wing and a dual-actuator drive system, with a total structural mass penalty of only 209 g."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:evidence:doi:10.5281/zenodo.19636775",
+      "performance aerodynamic vehicle drag high ground",
+      "performance aerodynamic vehicle drag high ground",
+      "performance aerodynamic drag decoupling fuselage attitude",
+      "performance aerodynamic drag decoupling fuselage attitude",
+      "surfaces performance aerodynamic vehicle drag high ground variable",
+      "surfaces performance aerodynamic vehicle drag high ground variable",
+      "performance reduction resulting velocity electricity maintaining",
+      "performance reduction resulting velocity electricity maintaining",
+      "speeds significant reduction coefficients resulting increased",
+      "speeds significant reduction coefficients resulting increased"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "83d3371b47b81ed3f18128c60c55da9a598718f3f629cc1c670df3e7c7de6c0b",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism vocabulary and adding a strict mass-penalty constraint derived verbatim from the cited evidence.",
+    "applied_at": "2026-09-30T00:13:10+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-09-30T00:13:10+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.535,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.601,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.414 -> 0.535 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-09-30T00:13:10+00:00Z"
+   }
+  }
+ ],
+ "outcome": "IMPROVED",
+ "outcome_reason": "",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.37,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.518,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.535,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.601,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-09-30T00:13:10+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.518,
+  "final_i_average": 0.601,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 2,
+  "keeps": 2
+ },
+ "status": "IMPROVED"
+}
