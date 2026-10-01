@@ -1,0 +1,1199 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-10-01T11:23:59+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.15,
+      "weakness_kind": "UNDERIVED",
+      "why_weak": "measured 0.15 < STRONG floor 0.7; underived_flag set (span_support=0.4, evidence_support=0.15) — the quoted span and/or evidence does not contain the mechanism's vocabulary",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:e12d48468084",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "6f2e17764277d3ec487b01c22b94dcff9c184c9f1fdb0a7b42931aa5eee53277",
+     "output_hash": "e12d4846808437731e848b17cbccdbdc5d0da672c980200c6ed93b7e9d62c14d",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Utilization of diametric magnets in MRI-conditional cochlear implant designs to mitigate MRI-related dislodgment/dislocation and migration/expulsion adverse events reported in the FDA MAUDE database.",
+      "INTERVENTION": "Implement diametric magnet configurations in the device's magnetic coupling systems to enhance retention during high-field exposure, specifically targeting the reduction of MRI-related CI complications where the most common MRI-related device problems were dislodgment/dislocation or migration/expulsion.",
+      "EXPECTED_EFFECT": "Reduction in MRI-related device problems such as dislodgment/dislocation and migration/expulsion, aligning with the observed decrease in MDRs following the introduction of MRI-conditional CIs.",
+      "FALSIFICATION_TEST": "Falsification occurs if post-intervention MRI-related adverse event rates for dislodgment and migration do not significantly decrease relative to the baseline pre-MRI-conditional CI rates (specifically, if the median MDR per year does not decrease from 11 to 0).",
+      "MECHANISM_SOURCE_SPAN": "The most common MRI‐related device problems were dislodgment/dislocation (39.9%, n = 266) or migration/expulsion (33.4%, n = 223).",
+      "SOURCE_EVIDENCE_ID": "doi:10.1002/lio2.70073",
+      "EXPERIMENT": "Run killer experiment comparing the candidate's diametric magnet retention rate against the baseline of standard cylindrical magnet cochlear implants, verifying if the rate of dislodgment/dislocation and migration/expulsion drops to match the 0 median MDR observed in the 3 years following MRI-conditional CI release.",
+      "EXPERIMENT_BASELINE": "standard cylindrical magnet cochlear implants",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "The magnet configuration must specifically address dislodgment/dislocation and migration/expulsion, which constitute 73.3% of MRI-related device problems, to be considered valid.",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism's vocabulary in the cited evidence's actual text, ensuring the quoted span contains the mechanism's specific terms (dislodgment/dislocation, migration/expulsion) to satisfy the underived_flag and evidence_support metrics."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "doi:10.1002/lio2.70073",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.571,
+       "evidence_support_cleared": 0.571,
+       "constraint_traceable_to_evidence": "The magnet configuration must specifically address dislodgment/dislocation and migration/expulsion, which constitute 73."
+      },
+      "reasons": [],
+      "validated_at": "2026-10-01T11:24:15+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:723aa28ffc8c",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.15,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:e12d48468084",
+       "provider": "agnes",
+       "model": "agnes-3.0-flash",
+       "prompt_hash": "6f2e17764277d3ec487b01c22b94dcff9c184c9f1fdb0a7b42931aa5eee53277",
+       "output_hash": "e12d4846808437731e848b17cbccdbdc5d0da672c980200c6ed93b7e9d62c14d",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "doi:10.1002/lio2.70073",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.571,
+        "evidence_support_cleared": 0.571,
+        "constraint_traceable_to_evidence": "The magnet configuration must specifically address dislodgment/dislocation and migration/expulsion, which constitute 73."
+       },
+       "reasons": [],
+       "validated_at": "2026-10-01T11:24:15+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "Utilization of diametric magnets in cochlear implant designs to mitigate MRI-related dislodgment, migration, and expulsion.",
+        "after": "Utilization of diametric magnets in MRI-conditional cochlear implant designs to mitigate MRI-related dislodgment/dislocation and migration/expulsion adverse events reported in the FDA MAUDE database."
+       },
+       "intervention": {
+        "before": "Implement diametric magnet configurations in the device's magnetic coupling systems to enhance retention during high-field exposure.",
+        "after": "Implement diametric magnet configurations in the device's magnetic coupling systems to enhance retention during high-field exposure, specifically targeting the reduction of MRI-related CI complications where the most common MRI-related device problems were dislodgment/dislocation or migration/expuls"
+       },
+       "mechanism_source_span": {
+        "before": "determine whether devices with diametric magnets",
+        "after": "The most common MRI‐related device problems were dislodgment/dislocation (39.9%, n = 266) or migration/expulsion (33.4%, n = 223)."
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:collision:adjacent",
+        "con:evidence:doi:10.1002/lio2.70073",
+        "con:evidence:doi:10.1007/s00380-026-02751-7",
+        "con:evidence:doi:10.1177/11207000251398425",
+        "con:evidence:doi:10.1111/aor.70225",
+        "con:evidence:doi:10.1016/j.jaccas.2026.110201",
+        "con:evidence:doi:10.3946/kjme.2008.20.4.351",
+        "medical problem documented unspecified failure concerning",
+        "related dislodgment migration expulsion utilization diametric",
+        "diametric magnet systems configurations magnetic coupling",
+        "medical reduction dislodgment migration expulsion coupling",
+        "medical related dislodgment migration expulsion mri"
+       ],
+       "collision_family_ids": [
+        "PA-FAM-01",
+        "PA-FAM-02",
+        "PA-FAM-03"
+       ],
+       "source_errors": []
+      },
+      "parent_spec_hash": "15ba229f208b8bbec9edf82e3fde08c8daaea2819d4571725c74011b7dbf4fc4",
+      "child_spec_hash": null,
+      "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism's vocabulary in the cited evidence's actual text, ensuring the quoted span contains the mechanism's specific terms (dislodgment/dislocation, migration/expulsion) to satisfy the underived_flag and evidence_support metrics.",
+      "applied_at": "2026-10-01T11:24:15+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-10-01T11:24:15+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": true,
+       "domain_overlap_terms": [
+        "configuration",
+        "coupling",
+        "event",
+        "magnet",
+        "magnetic",
+        "maude",
+        "problem",
+        "reduction"
+       ],
+       "entity_retention_vs_problem": 0.5,
+       "resolution": {
+        "state": "RESOLVED_DIFFERENTIATED",
+        "epistemic_class": "SEARCH_RESULT",
+        "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+        "evidence_tier_summary": "CLAIMS:0 ABSTRACT:3 TITLE:0",
+        "per_family": [
+         {
+          "family_id": "PA-FAM-01",
+          "representative": {
+           "patent_id": "US20200170787A1",
+           "title": "Valve delivery tool",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/US20200170787A1/en",
+           "assignee": "['Medtronic, Inc.']",
+           "publication_date": "2020-06-04"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "US20200170787A1"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Valve delivery tool A system includes a medical device for implanting in a valve of a subject, the implantable medical device having a self-expanding frame; and a holder configured to retain the frame of the implantable medical device in a constricted configuration and to control expansion of the frame. The holder &hellip;  A system includes a medical device for implanting in a valve of a subject, the implantable medical device having a self-expanding frame; and a holder configured to retain the frame of the implantable medical device in a constricted configuration and to control expansion of the frame. The holder has a controllably constrictable and expandable loop, wherein the loop is disposed about at least a portion of the self-expanding frame such that constriction or expansion of the first loop controls constriction or expansion of the frame.",
+          "adjudicated_text_sha256": "032645ac02411f19b3b31b323e3fdff7c934b15deaae26dd79f82cc24d5d61e0",
+          "coverage": {
+           "coverage_class": "NONE",
+           "mechanism_overlap_terms": [],
+           "distinguishing_terms_covered": [
+            "configuration",
+            "system"
+           ],
+           "distinguishing_terms_surviving": [
+            "common",
+            "complication",
+            "coupling",
+            "diametric",
+            "dislocation",
+            "dislodgment",
+            "during",
+            "exposure",
+            "expulsion",
+            "field",
+            "high",
+            "magnet",
+            "magnetic",
+            "migration",
+            "mri",
+            "problem",
+            "reduction",
+            "related",
+            "retention",
+            "specifically",
+            "targeting",
+            "where"
+           ],
+           "coverage_ratio": 0.083,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-02",
+          "representative": {
+           "patent_id": "CN115331911A",
+           "title": "Magnetic coupling device for magnetic coupling with ferromagnetic workpieces",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/CN115331911A/en",
+           "assignee": "['磁转换技术全球私人有限公司']",
+           "publication_date": "2022-11-11"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "CN115331911A"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "Magnetic coupling device for magnetic coupling with ferromagnetic workpieces A magnetic coupling device for magnetically coupling with a ferromagnetic work piece, comprising: a plurality of pole segments and a plurality of permanent magnets, the plurality of permanent magnets comprising: a first permanent magnet located between the first and second pole segments and &hellip;  A magnetic coupling device for magnetically coupling with a ferromagnetic work piece, comprising: a plurality of pole segments and a plurality of permanent magnets, the plurality of permanent magnets comprising: a first permanent magnet located between the first and second pole segments and positioned vertically offset from the workpiece contact interfaces of the first and second pole segments, and a second permanent magnet located between at least two of the pole segments and positioned vertically offset from the workpiece contact interfaces thereof; a plurality of electrical windings wound around the first permanent magnet, extending above the top and below the bottom thereof, positioned between the first and second pole segments; and an electronic controller operatively coupled to the plurality of electrica",
+          "adjudicated_text_sha256": "438c57c9aee0a61ac3b7eca989fbc385db7a2c44c01d00c734f7e72d47bc8979",
+          "coverage": {
+           "coverage_class": "NONE",
+           "mechanism_overlap_terms": [],
+           "distinguishing_terms_covered": [
+            "coupling",
+            "magnet",
+            "magnetic"
+           ],
+           "distinguishing_terms_surviving": [
+            "common",
+            "complication",
+            "configuration",
+            "diametric",
+            "dislocation",
+            "dislodgment",
+            "during",
+            "exposure",
+            "expulsion",
+            "field",
+            "high",
+            "migration",
+            "mri",
+            "problem",
+            "reduction",
+            "related",
+            "retention",
+            "specifically",
+            "system",
+            "targeting",
+            "where"
+           ],
+           "coverage_ratio": 0.125,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         },
+         {
+          "family_id": "PA-FAM-03",
+          "representative": {
+           "patent_id": "CN107148717A",
+           "title": "The method and apparatus transmitted for magnetic coupling type wireless power",
+           "source_id": "google_patents",
+           "source_url": "https://patents.google.com/patent/CN107148717A/en",
+           "assignee": "['Elix无线充电系统公司']",
+           "publication_date": "2017-09-08"
+          },
+          "family_size": 1,
+          "member_patent_ids": [
+           "CN107148717A"
+          ],
+          "evidence_tier": "ABSTRACT",
+          "claims_fetch_status": "CACHED (adjudicated text of record)",
+          "claims_fetch_path": "replay_cache",
+          "adjudicated_text_excerpt": "The method and apparatus transmitted for magnetic coupling type wireless power Transmitter magnet rotor and receiver magnet rotor are provided, wherein, each in the transmitter magnet rotor and receiver magnet rotor includes multiple magnets.Each magnet has the direction of magnetization vertical with rotation axis, and at least some direction of magnetizations and the &hellip;  Transmitter magnet rotor and receiver magnet rotor are provided, wherein, each in the transmitter magnet rotor and receiver magnet rotor includes multiple magnets.Each magnet has the direction of magnetization vertical with rotation axis, and at least some direction of magnetizations and the direction of magnetization of other magnets are not parallel.The direction of magnetization of magnet can have deviation angle relative to adjacent magnets.Transmitters and receivers can be symmetrical on bisecting plane, and the direction of magnetization of receiver can be corresponding on the rotation of the axis parallel with transmitter rotation axis with the transmitter direction of magnetization.Magnet in transmitters and receivers is oriented reduction due to rotor oscillation caused by the magnetic coupling bet",
+          "adjudicated_text_sha256": "63f87b7545cb474a7a6193386344ff16f4ddc9bc057396166c6520b0d7176b3e",
+          "coverage": {
+           "coverage_class": "NONE",
+           "mechanism_overlap_terms": [],
+           "distinguishing_terms_covered": [
+            "coupling",
+            "magnet",
+            "magnetic",
+            "reduction"
+           ],
+           "distinguishing_terms_surviving": [
+            "common",
+            "complication",
+            "configuration",
+            "diametric",
+            "dislocation",
+            "dislodgment",
+            "during",
+            "exposure",
+            "expulsion",
+            "field",
+            "high",
+            "migration",
+            "mri",
+            "problem",
+            "related",
+            "retention",
+            "specifically",
+            "system",
+            "targeting",
+            "where"
+           ],
+           "coverage_ratio": 0.167,
+           "thresholds_applied": {
+            "min_mechanism_overlap": 2,
+            "anticipation_coverage_ratio": 0.8
+           }
+          }
+         }
+        ],
+        "n_families": 3,
+        "n_search_errors": 0,
+        "search_errors": [],
+        "search_execution": {
+         "mandatory_complete": true,
+         "n_errors": 0,
+         "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+        },
+        "relevance_model_version": "collision_resolution/2.0.0",
+        "determinism_contract": {
+         "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+         "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+        },
+        "thresholds": {
+         "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+          "value": 3,
+          "epistemic_class": "ENGINEERING",
+          "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+          "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+         },
+         "MIN_MECHANISM_OVERLAP": {
+          "value": 2,
+          "epistemic_class": "ENGINEERING",
+          "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+          "uncertainty": "term overlap is a proxy for mechanism identity"
+         },
+         "ANTICIPATION_COVERAGE_RATIO": {
+          "value": 0.8,
+          "epistemic_class": "ENGINEERING",
+          "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+          "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+         },
+         "MAX_QUERY_TERMS": {
+          "value": 6,
+          "epistemic_class": "ENGINEERING",
+          "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+         },
+         "ABSTRACT_TIER_MIN_CHARS": {
+          "value": 80,
+          "epistemic_class": "ENGINEERING",
+          "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+         }
+        },
+        "surviving_differentiators": [
+         "common",
+         "complication",
+         "configuration",
+         "coupling",
+         "diametric",
+         "dislocation",
+         "dislodgment",
+         "during",
+         "exposure",
+         "expulsion",
+         "field",
+         "high",
+         "magnet",
+         "magnetic",
+         "migration",
+         "mri",
+         "problem",
+         "reduction",
+         "related",
+         "retention",
+         "specifically",
+         "system",
+         "targeting",
+         "where"
+        ]
+       },
+       "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+       "cached_family_ids": [
+        "PA-FAM-01",
+        "PA-FAM-02",
+        "PA-FAM-03"
+       ]
+      },
+      "prior_art_status": "RESOLVED_DIFFERENTIATED",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.429,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": 0.958,
+        "state": "MEASURED"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": 0.826,
+        "state": "MEASURED"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.776,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": 0.667,
+        "state": "MEASURED"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 0.75,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.783
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.15 -> 0.429 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-10-01T11:24:15+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:723aa28ffc8c",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.15,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:e12d48468084",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "6f2e17764277d3ec487b01c22b94dcff9c184c9f1fdb0a7b42931aa5eee53277",
+     "output_hash": "e12d4846808437731e848b17cbccdbdc5d0da672c980200c6ed93b7e9d62c14d",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "doi:10.1002/lio2.70073",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.571,
+      "evidence_support_cleared": 0.571,
+      "constraint_traceable_to_evidence": "The magnet configuration must specifically address dislodgment/dislocation and migration/expulsion, which constitute 73."
+     },
+     "reasons": [],
+     "validated_at": "2026-10-01T11:24:15+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Utilization of diametric magnets in cochlear implant designs to mitigate MRI-related dislodgment, migration, and expulsion.",
+      "after": "Utilization of diametric magnets in MRI-conditional cochlear implant designs to mitigate MRI-related dislodgment/dislocation and migration/expulsion adverse events reported in the FDA MAUDE database."
+     },
+     "intervention": {
+      "before": "Implement diametric magnet configurations in the device's magnetic coupling systems to enhance retention during high-field exposure.",
+      "after": "Implement diametric magnet configurations in the device's magnetic coupling systems to enhance retention during high-field exposure, specifically targeting the reduction of MRI-related CI complications where the most common MRI-related device problems were dislodgment/dislocation or migration/expuls"
+     },
+     "mechanism_source_span": {
+      "before": "determine whether devices with diametric magnets",
+      "after": "The most common MRI‐related device problems were dislodgment/dislocation (39.9%, n = 266) or migration/expulsion (33.4%, n = 223)."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:collision:adjacent",
+      "con:evidence:doi:10.1002/lio2.70073",
+      "con:evidence:doi:10.1007/s00380-026-02751-7",
+      "con:evidence:doi:10.1177/11207000251398425",
+      "con:evidence:doi:10.1111/aor.70225",
+      "con:evidence:doi:10.1016/j.jaccas.2026.110201",
+      "con:evidence:doi:10.3946/kjme.2008.20.4.351",
+      "medical problem documented unspecified failure concerning",
+      "related dislodgment migration expulsion utilization diametric",
+      "diametric magnet systems configurations magnetic coupling",
+      "medical reduction dislodgment migration expulsion coupling",
+      "medical related dislodgment migration expulsion mri"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "15ba229f208b8bbec9edf82e3fde08c8daaea2819d4571725c74011b7dbf4fc4",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism's vocabulary in the cited evidence's actual text, ensuring the quoted span contains the mechanism's specific terms (dislodgment/dislocation, migration/expulsion) to satisfy the underived_flag and evidence_support metrics.",
+    "applied_at": "2026-10-01T11:24:15+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-10-01T11:24:15+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": true,
+     "domain_overlap_terms": [
+      "configuration",
+      "coupling",
+      "event",
+      "magnet",
+      "magnetic",
+      "maude",
+      "problem",
+      "reduction"
+     ],
+     "entity_retention_vs_problem": 0.5,
+     "resolution": {
+      "state": "RESOLVED_DIFFERENTIATED",
+      "epistemic_class": "SEARCH_RESULT",
+      "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+      "evidence_tier_summary": "CLAIMS:0 ABSTRACT:3 TITLE:0",
+      "per_family": [
+       {
+        "family_id": "PA-FAM-01",
+        "representative": {
+         "patent_id": "US20200170787A1",
+         "title": "Valve delivery tool",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/US20200170787A1/en",
+         "assignee": "['Medtronic, Inc.']",
+         "publication_date": "2020-06-04"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US20200170787A1"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Valve delivery tool A system includes a medical device for implanting in a valve of a subject, the implantable medical device having a self-expanding frame; and a holder configured to retain the frame of the implantable medical device in a constricted configuration and to control expansion of the frame. The holder &hellip;  A system includes a medical device for implanting in a valve of a subject, the implantable medical device having a self-expanding frame; and a holder configured to retain the frame of the implantable medical device in a constricted configuration and to control expansion of the frame. The holder has a controllably constrictable and expandable loop, wherein the loop is disposed about at least a portion of the self-expanding frame such that constriction or expansion of the first loop controls constriction or expansion of the frame.",
+        "adjudicated_text_sha256": "032645ac02411f19b3b31b323e3fdff7c934b15deaae26dd79f82cc24d5d61e0",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [],
+         "distinguishing_terms_covered": [
+          "configuration",
+          "system"
+         ],
+         "distinguishing_terms_surviving": [
+          "common",
+          "complication",
+          "coupling",
+          "diametric",
+          "dislocation",
+          "dislodgment",
+          "during",
+          "exposure",
+          "expulsion",
+          "field",
+          "high",
+          "magnet",
+          "magnetic",
+          "migration",
+          "mri",
+          "problem",
+          "reduction",
+          "related",
+          "retention",
+          "specifically",
+          "targeting",
+          "where"
+         ],
+         "coverage_ratio": 0.083,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-02",
+        "representative": {
+         "patent_id": "CN115331911A",
+         "title": "Magnetic coupling device for magnetic coupling with ferromagnetic workpieces",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/CN115331911A/en",
+         "assignee": "['磁转换技术全球私人有限公司']",
+         "publication_date": "2022-11-11"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN115331911A"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Magnetic coupling device for magnetic coupling with ferromagnetic workpieces A magnetic coupling device for magnetically coupling with a ferromagnetic work piece, comprising: a plurality of pole segments and a plurality of permanent magnets, the plurality of permanent magnets comprising: a first permanent magnet located between the first and second pole segments and &hellip;  A magnetic coupling device for magnetically coupling with a ferromagnetic work piece, comprising: a plurality of pole segments and a plurality of permanent magnets, the plurality of permanent magnets comprising: a first permanent magnet located between the first and second pole segments and positioned vertically offset from the workpiece contact interfaces of the first and second pole segments, and a second permanent magnet located between at least two of the pole segments and positioned vertically offset from the workpiece contact interfaces thereof; a plurality of electrical windings wound around the first permanent magnet, extending above the top and below the bottom thereof, positioned between the first and second pole segments; and an electronic controller operatively coupled to the plurality of electrica",
+        "adjudicated_text_sha256": "438c57c9aee0a61ac3b7eca989fbc385db7a2c44c01d00c734f7e72d47bc8979",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [],
+         "distinguishing_terms_covered": [
+          "coupling",
+          "magnet",
+          "magnetic"
+         ],
+         "distinguishing_terms_surviving": [
+          "common",
+          "complication",
+          "configuration",
+          "diametric",
+          "dislocation",
+          "dislodgment",
+          "during",
+          "exposure",
+          "expulsion",
+          "field",
+          "high",
+          "migration",
+          "mri",
+          "problem",
+          "reduction",
+          "related",
+          "retention",
+          "specifically",
+          "system",
+          "targeting",
+          "where"
+         ],
+         "coverage_ratio": 0.125,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-03",
+        "representative": {
+         "patent_id": "CN107148717A",
+         "title": "The method and apparatus transmitted for magnetic coupling type wireless power",
+         "source_id": "google_patents",
+         "source_url": "https://patents.google.com/patent/CN107148717A/en",
+         "assignee": "['Elix无线充电系统公司']",
+         "publication_date": "2017-09-08"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN107148717A"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "The method and apparatus transmitted for magnetic coupling type wireless power Transmitter magnet rotor and receiver magnet rotor are provided, wherein, each in the transmitter magnet rotor and receiver magnet rotor includes multiple magnets.Each magnet has the direction of magnetization vertical with rotation axis, and at least some direction of magnetizations and the &hellip;  Transmitter magnet rotor and receiver magnet rotor are provided, wherein, each in the transmitter magnet rotor and receiver magnet rotor includes multiple magnets.Each magnet has the direction of magnetization vertical with rotation axis, and at least some direction of magnetizations and the direction of magnetization of other magnets are not parallel.The direction of magnetization of magnet can have deviation angle relative to adjacent magnets.Transmitters and receivers can be symmetrical on bisecting plane, and the direction of magnetization of receiver can be corresponding on the rotation of the axis parallel with transmitter rotation axis with the transmitter direction of magnetization.Magnet in transmitters and receivers is oriented reduction due to rotor oscillation caused by the magnetic coupling bet",
+        "adjudicated_text_sha256": "63f87b7545cb474a7a6193386344ff16f4ddc9bc057396166c6520b0d7176b3e",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [],
+         "distinguishing_terms_covered": [
+          "coupling",
+          "magnet",
+          "magnetic",
+          "reduction"
+         ],
+         "distinguishing_terms_surviving": [
+          "common",
+          "complication",
+          "configuration",
+          "diametric",
+          "dislocation",
+          "dislodgment",
+          "during",
+          "exposure",
+          "expulsion",
+          "field",
+          "high",
+          "migration",
+          "mri",
+          "problem",
+          "related",
+          "retention",
+          "specifically",
+          "system",
+          "targeting",
+          "where"
+         ],
+         "coverage_ratio": 0.167,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       }
+      ],
+      "n_families": 3,
+      "n_search_errors": 0,
+      "search_errors": [],
+      "search_execution": {
+       "mandatory_complete": true,
+       "n_errors": 0,
+       "rule": "RESOLVED_DIFFERENTIATED requires every mandatory (query_class x source) search to have completed successfully (R394 s2); provider failure never becomes absence (Art. XXI.3)"
+      },
+      "relevance_model_version": "collision_resolution/2.0.0",
+      "determinism_contract": {
+       "inputs": "problem + candidate profile + query ladder + source results (per-family adjudicated text, hash-custodied) + thresholds + relevance model version",
+       "check": "identical inputs must yield identical coverage decisions and state; divergence on replay is FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"
+      },
+      "thresholds": {
+       "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+        "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+       },
+       "MIN_MECHANISM_OVERLAP": {
+        "value": 2,
+        "epistemic_class": "ENGINEERING",
+        "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+        "uncertainty": "term overlap is a proxy for mechanism identity"
+       },
+       "ANTICIPATION_COVERAGE_RATIO": {
+        "value": 0.8,
+        "epistemic_class": "ENGINEERING",
+        "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+        "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+       },
+       "MAX_QUERY_TERMS": {
+        "value": 6,
+        "epistemic_class": "ENGINEERING",
+        "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+       },
+       "ABSTRACT_TIER_MIN_CHARS": {
+        "value": 80,
+        "epistemic_class": "ENGINEERING",
+        "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+       }
+      },
+      "surviving_differentiators": [
+       "common",
+       "complication",
+       "configuration",
+       "coupling",
+       "diametric",
+       "dislocation",
+       "dislodgment",
+       "during",
+       "exposure",
+       "expulsion",
+       "field",
+       "high",
+       "magnet",
+       "magnetic",
+       "migration",
+       "mri",
+       "problem",
+       "reduction",
+       "related",
+       "retention",
+       "specifically",
+       "system",
+       "targeting",
+       "where"
+      ]
+     },
+     "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+     "cached_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03"
+     ]
+    },
+    "prior_art_status": "RESOLVED_DIFFERENTIATED",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.429,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": 0.958,
+      "state": "MEASURED"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": 0.826,
+      "state": "MEASURED"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.776,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": 0.667,
+      "state": "MEASURED"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 0.75,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.783
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.15 -> 0.429 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-10-01T11:24:15+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.429,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.429 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:32f12b2b19f5",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "576ff066c764f2f0e2af7008624fb242bef79ac393a2c2b6b36796d67dbfe285",
+     "output_hash": "32f12b2b19f547c33591b1f0029a74ae96ad3b2cc6511b9193db7af076530792",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Utilization of diametric magnets in MRI-conditional cochlear implant designs to mitigate MRI-related dislodgment/dislocation and migration/expulsion adverse events, constrained by the observed temporal association where the median MDR per year decreased from 11 in the 3 years before each manufacturer released their MRI-conditional CI to 0 in the 3 years following the release.",
+      "INTERVENTION": "Implement diametric magnet configurations in the device's magnetic coupling systems to enhance retention during high-field exposure, specifically targeting the reduction of MRI-related CI complications where the most common MRI-related device problems were dislodgment/dislocation or migration/expulsion, ensuring the design aligns with the observed decrease in MDRs following the introduction of MRI-conditional CIs.",
+      "EXPECTED_EFFECT": "Reduction in MRI-related device problems such as dislodgment/dislocation and migration/expulsion, aligning with the observed decrease in MDRs following the introduction of MRI-conditional CIs.",
+      "FALSIFICATION_TEST": "Falsification occurs if post-intervention MRI-related adverse event rates for dislodgment and migration do not significantly decrease relative to the baseline pre-MRI-conditional CI rates (specifically, if the median MDR per year does not decrease from 11 to 0).",
+      "MECHANISM_SOURCE_SPAN": "The median MDR per year decreased from 11 in the 3 years before each manufacturer released their MRI‐conditional CI to 0 in the 3 years following the release (p = 0.014).",
+      "SOURCE_EVIDENCE_ID": "doi:10.1002/lio2.70073",
+      "EXPERIMENT": "run killer experiment: compare the median MDR per year for MRI-related cochlear implant adverse events in the 3 years before each manufacturer released their MRI-conditional CI (baseline) versus the 3 years following the release (candidate) to verify the decrease from 11 to 0.",
+      "EXPERIMENT_BASELINE": "the 3 years before each manufacturer released their MRI-conditional CI",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "The mechanism must demonstrate a statistically significant reduction in MDR rates (p < 0.05) corresponding to a drop from a pre-release median of 11 to a post-release median of 0.",
+      "MUTATION_REASON": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION weakness by anchoring the mechanism and intervention vocabulary to the specific quantitative outcome and temporal context found verbatim in the custodied evidence (doi:10.1002/lio2.70073)."
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "evidence_support": 0.56,
+       "evidence_support_cleared": 0.56,
+       "constraint_traceable_to_evidence": "The mechanism must demonstrate a statistically significant reduction in MDR rates (p < 0.05) corresponding to a drop fro"
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)"
+      ],
+      "validated_at": "2026-10-01T11:24:26+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:c07ee468995f",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "36dda2948867e3d23366e9f1da0194a3c36315e41edbad880d21ba67ccc8593a",
+     "output_hash": "c07ee468995f262162bdabdd4a704fbcdef44dad57b5d4de77573fc356b5553c",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "The mechanism operates on the premise that the introduction of MRI-conditional cochlear implants is associated with a median MDR decrease from 11 to 0 in the 3 years following release, specifically mitigating dislodgment/dislocation and migration/expulsion adverse events.",
+      "INTERVENTION": "Implement MRI-conditional cochlear implant designs incorporating diametric magnets to address the documented reduction in adverse events following device release, ensuring the device retention system prevents dislodgment/dislocation and migration/expulsion during high-field exposure.",
+      "EXPECTED_EFFECT": "A decrease in the median MDR per year from 11 to 0 following the implementation of MRI-conditional cochlear implants, reducing specific MRI-related device problems of dislodgment/dislocation and migration/expulsion.",
+      "FALSIFICATION_TEST": "Falsification occurs if the median MDR per year for MRI-related adverse events does not decrease from 11 to 0 in the 3 years following the release of the MRI-conditional cochlear implant.",
+      "MECHANISM_SOURCE_SPAN": "The median MDR per year decreased from 11 in the 3 years before each manufacturer released their MRI-conditional CI to 0 in the 3 years following the release",
+      "SOURCE_EVIDENCE_ID": "doi:10.1002/lio2.70073",
+      "EXPERIMENT": "Compare the median MDR per year for MRI-related adverse events between the 3 years before the release of the MRI-conditional CI and the 3 years following the release of the MRI-conditional CI to verify the decrease from 11 to 0.",
+      "EXPERIMENT_BASELINE": "The 3 years before each manufacturer released their MRI-conditional CI",
+      "EXPERIMENT_EIG": "0.55",
+      "CONSTRAINT_DERIVED": "The intervention must align with the observed timeline where median MDR per year decreased from 11 in the 3 years before release to 0 in the 3 years following the release of MRI-conditional CIs.",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism and intervention to the specific reported phenomenon of median MDR decrease (11 to 0) and associated release timing found in the cited evidence text."
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "evidence_support": 0.5,
+       "evidence_support_cleared": 0.5,
+       "constraint_traceable_to_evidence": "The intervention must align with the observed timeline where median MDR per year decreased from 11 in the 3 years before"
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)"
+      ],
+      "validated_at": "2026-10-01T11:24:34+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:17b93ddf8e1c",
+     "provider": "agnes",
+     "model": "agnes-3.0-flash",
+     "prompt_hash": "7f63944dcff9a0b86899543601ef54ac69ecb5f9fc95bc900894743acd0ce961",
+     "output_hash": "17b93ddf8e1c814de214b439b6a251c48f900ee405ba513c7a3356b9bbcfc3ba",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Utilization of diametric magnets in MRI-conditional cochlear implant (CI) designs, specifically addressing the reduction of MRI-related CI complications including dislodgment/dislocation and migration/expulsion as reported in the FDA MAUDE database.",
+      "INTERVENTION": "Implement diametric magnet configurations in the device's magnetic coupling systems to mitigate MRI-related CI adverse events, targeting the specific device problems of dislodgment/dislocation and migration/expulsion identified in the analysis of MRI-related cochlear implant complications.",
+      "EXPECTED_EFFECT": "Reduction in MRI-related device problems such as dislodgment/dislocation and migration/expulsion, consistent with the observed decrease in MDRs following the introduction of MRI-conditional CIs.",
+      "FALSIFICATION_TEST": "Falsification occurs if post-intervention MRI-related adverse event rates for dislodgment and migration do not significantly decrease relative to the baseline pre-MRI-conditional CI rates (specifically, if the median MDR per year does not decrease from 11 to 0).",
+      "MECHANISM_SOURCE_SPAN": "The most common MRI‐related device problems were dislodgment/dislocation (39.9%, n = 266) or migration/expulsion (33.4%, n = 223).",
+      "SOURCE_EVIDENCE_ID": "doi:10.1002/lio2.70073",
+      "EXPERIMENT": "run killer experiment: falsification_test_from_candidate",
+      "EXPERIMENT_BASELINE": "median MDR per year decreased from 11 in the 3 years before each manufacturer released their MRI-conditional CI to 0 in the 3 years following the release",
+      "EXPERIMENT_EIG": "1.5",
+      "CONSTRAINT_DERIVED": "The mechanism must specifically target the mitigation of dislodgment/dislocation and migration/expulsion events in MRI-conditional cochlear implants, as these constitute the majority of MRI-related device problems (39.9% and 33.4% respectively) identified in the source evidence.",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by anchoring the mechanism vocabulary to the verbatim evidence span reporting the specific failure modes (dislodgment/dislocation and migration/expulsion) and device context (MRI-conditional cochlear implants)."
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "evidence_support": 0.667,
+       "evidence_support_cleared": 0.667,
+       "constraint_traceable_to_evidence": "The mechanism must specifically target the mitigation of dislodgment/dislocation and migration/expulsion events in MRI-c"
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)"
+      ],
+      "validated_at": "2026-10-01T11:24:47+00:00Z"
+     }
+    }
+   ]
+  }
+ ],
+ "outcome": "KILLED_NO_DEFENSIBLE_MUTATION",
+ "outcome_reason": "iteration 2: 3 proposal(s) generated; none passed deterministic validation — no defensible mutation exists for I1_MECHANISM_EVIDENCE_DERIVATION. Candidate killed.",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.15,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.909,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.7,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": true,
+   "recombination_only": false
+  },
+  "i_average": 0.685,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 0.667,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 0.75,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.583,
+  "prior_art_status": "UNRESOLVED_SEARCH_INCOMPLETE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.429,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.958,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.826,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.776,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 0.667,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 0.75,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.783,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "finished_at": "2026-10-01T11:24:47+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.685,
+  "final_i_average": 0.776,
+  "baseline_q_average": 0.583,
+  "final_q_average": 0.783,
+  "iterations_run": 2,
+  "keeps": 1
+ },
+ "status": "KILLED_NO_DEFENSIBLE_MUTATION"
+}
