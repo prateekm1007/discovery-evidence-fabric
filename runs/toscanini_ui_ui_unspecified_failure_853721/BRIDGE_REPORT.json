@@ -1,0 +1,764 @@
+{
+  "stage": "BRIDGE_GATE",
+  "bridge_gate_version": "1.3.0",
+  "outcome": "COMPLETED",
+  "at": "2026-10-01T11:24:59Z",
+  "reviewer_provenance": "AI_REVIEW",
+  "case": "B",
+  "visualizability_class": "SYSTEM_3D",
+  "conceptual": true,
+  "visualizability": {
+    "visualizability_class": "SYSTEM_3D",
+    "classification_basis": {
+      "geometry_parameters_sourced": 0,
+      "subsystems_recorded": 4,
+      "physical_site_detected": true,
+      "physical_site_vocabulary": {
+        "n_words": 53,
+        "authority": "discovery_fabric/engine/domains.py (ENGINEERING_DOMAIN_REGISTRY, one authority)",
+        "registry_domains_excluded": [
+          "ml_data"
+        ],
+        "layers_used": [
+          "architecture_blocks",
+          "architecture_blocks_medical",
+          "manufacturing_candidates",
+          "materials_candidates",
+          "disciplines",
+          "domain label",
+          "failure_modes (mode + physical_mechanism)",
+          "manufacturing_routes"
+        ]
+      },
+      "process_signal": false,
+      "algorithmic_signal": false,
+      "intervention_site": "medical device",
+      "engineering_min_params": 3,
+      "reason": "4 recorded subsystems and only 0 sourced geometry parameters \u2014 conceptual system-architecture visualization (topology, not dimensions)",
+      "measured_from": [
+        "engineering_specification.parameters",
+        "engineering_specification.engineering_core.critical_parameters",
+        "engineering_specification.system_architecture.subsystems",
+        "final_state.causal_chain"
+      ]
+    },
+    "subsystems": [
+      "magnet / field source (if active)",
+      "RF transmit/receive chain",
+      "gradient or encoding mechanism",
+      "reconstruction / estimation pipeline"
+    ],
+    "geometry_parameters": [],
+    "intervention_site": "medical device"
+  },
+  "geometry": {
+    "model_glbs": [
+      "model-001.glb"
+    ],
+    "glb_sha256": "d646a4b65fc24d601bd4d79038ea8d1dfd615c4a7c6fd1eb7ffa2120b4cda323",
+    "components": [
+      {
+        "name": "device_shaft",
+        "label": "device shaft",
+        "type": "structural",
+        "material_class": "polymer",
+        "role": "device body shaft (structural presentation element)",
+        "mapped_from": null
+      },
+      {
+        "name": "distal_tip",
+        "label": "distal tip",
+        "type": "structural",
+        "material_class": "polymer",
+        "role": "distal tip section (structural presentation element)",
+        "mapped_from": null
+      },
+      {
+        "name": "hub",
+        "label": "proximal hub",
+        "type": "structural",
+        "material_class": "polymer",
+        "role": "proximal hub interface (structural presentation element)",
+        "mapped_from": null
+      },
+      {
+        "name": "flow_lumen",
+        "label": "primary flow lumen",
+        "type": "structural",
+        "material_class": "conduit_power",
+        "role": "primary flow lumen (family-definitional presentation element of the medical-device acceptance case; mapped subsystem recorded as alias)",
+        "mapped_from": null
+      },
+      {
+        "name": "module_01",
+        "label": "module: magnet / field source (if active)",
+        "type": "subsystem",
+        "material_class": "polymer",
+        "role": "recorded subsystem 'magnet / field source (if active)' (no canonical slot in the medical device architecture; mounted as a labeled module)",
+        "mapped_from": "magnet / field source (if active)"
+      },
+      {
+        "name": "module_02",
+        "label": "module: RF transmit/receive chain",
+        "type": "subsystem",
+        "material_class": "polymer",
+        "role": "recorded subsystem 'RF transmit/receive chain' (no canonical slot in the medical device architecture; mounted as a labeled module)",
+        "mapped_from": "RF transmit/receive chain"
+      },
+      {
+        "name": "module_03",
+        "label": "module: gradient or encoding mechanism",
+        "type": "subsystem",
+        "material_class": "polymer",
+        "role": "recorded subsystem 'gradient or encoding mechanism' (no canonical slot in the medical device architecture; mounted as a labeled module)",
+        "mapped_from": "gradient or encoding mechanism"
+      },
+      {
+        "name": "module_04",
+        "label": "module: reconstruction / estimation pipeline",
+        "type": "subsystem",
+        "material_class": "polymer",
+        "role": "recorded subsystem 'reconstruction / estimation pipeline' (no canonical slot in the medical device architecture; mounted as a labeled module)",
+        "mapped_from": "reconstruction / estimation pipeline"
+      },
+      {
+        "name": "link_flow_lumen__distal_tip",
+        "label": "flow link: flow_lumen -> distal_tip",
+        "type": "interface",
+        "material_class": "conduit_power",
+        "role": "flow coupling (topology only)",
+        "interface_id": "flow_lumen_tip"
+      },
+      {
+        "name": "link_hub__flow_lumen",
+        "label": "flow link: hub -> flow_lumen",
+        "type": "interface",
+        "material_class": "conduit_power",
+        "role": "flow coupling (topology only)",
+        "interface_id": "flow_hub_lumen"
+      }
+    ],
+    "key_dimensions": {
+      "measurement_basis": "TOPOLOGY_ONLY",
+      "note": "domain conceptual artifact \u2014 component identity, count and adjacency only; sizes are abstract presentation units, not engineering dimensions",
+      "component_count": 10,
+      "structural_form_components": 4,
+      "mapped_subsystem_components": 4,
+      "interface_count": 2,
+      "adjacency": [
+        {
+          "from": "flow_lumen",
+          "to": "distal_tip",
+          "kind": "flow"
+        },
+        {
+          "from": "hub",
+          "to": "flow_lumen",
+          "kind": "flow"
+        }
+      ],
+      "domain_family": "biomedical",
+      "technology_class": "MEDICAL_DEVICE"
+    },
+    "generation_models": [
+      {
+        "generation": 1,
+        "glb": "MODEL/model-001.glb",
+        "current": true
+      }
+    ],
+    "domain_family": "biomedical",
+    "quality_gates": {
+      "artifact": "R432_QUALITY_GATES",
+      "version": "1.0.0",
+      "geometry_gate": {
+        "artifact": "GEOMETRY_QUALITY_GATE",
+        "version": "1.0.0",
+        "domain_family": "biomedical",
+        "technology_class": "MEDICAL_DEVICE",
+        "technology_class_role": "bridge geometry archetype (presentation routing, R445)",
+        "checks": [
+          {
+            "check": "valid_glb",
+            "passed": true
+          },
+          {
+            "check": "non_empty_scene",
+            "passed": true,
+            "measured": {
+              "node_count": 10,
+              "mesh_count": 10
+            }
+          },
+          {
+            "check": "component_ids_match_spec",
+            "passed": true,
+            "measured": {
+              "spec_components": 8,
+              "scene_nodes": 10,
+              "missing": [],
+              "unexpected": [],
+              "link_nodes_drawn": [
+                "link_flow_lumen__distal_tip",
+                "link_hub__flow_lumen"
+              ]
+            }
+          },
+          {
+            "check": "named_components",
+            "passed": true,
+            "measured": {
+              "sample": [
+                "device_shaft",
+                "distal_tip",
+                "flow_lumen",
+                "hub",
+                "link_flow_lumen__distal_tip",
+                "link_hub__flow_lumen",
+                "module_01",
+                "module_02"
+              ]
+            }
+          },
+          {
+            "check": "bounding_box_sane",
+            "passed": true,
+            "measured": {
+              "extent": [
+                13.7,
+                1.7498,
+                3.05
+              ]
+            }
+          },
+          {
+            "check": "no_nan_inf_coordinates",
+            "passed": true
+          },
+          {
+            "check": "no_microscopic_geometry",
+            "passed": true,
+            "measured": {
+              "min_component_extent": 0.249877
+            }
+          },
+          {
+            "check": "no_duplicate_model",
+            "passed": true,
+            "measured": {
+              "duplicates": []
+            }
+          },
+          {
+            "check": "normals_valid",
+            "passed": true
+          },
+          {
+            "check": "component_interference",
+            "passed": true,
+            "measured": {
+              "pairs_checked": 28,
+              "same_cell_unmated": [],
+              "nested_disclosed": [
+                {
+                  "pair": "device_shaft==flow_lumen",
+                  "overlap_fraction_min_part": 0.934,
+                  "overlap_fraction_max_part": 0.06,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                }
+              ],
+              "rule": "two distinct parts at the same cell (mutual overlap > 0.9 of the smaller and > 0.6 of the larger bbox) without a declared mating interface is an engineering-realization failure; nested parts are disclosed for the engineering boundary"
+            }
+          },
+          {
+            "check": "no_isolated_outlier_geometry",
+            "passed": true,
+            "measured": {
+              "islands": [],
+              "note": "components beyond 1.6x the assembly radius"
+            }
+          },
+          {
+            "check": "no_single_blob_domination",
+            "passed": true,
+            "measured": {
+              "largest_component_volume_fraction": 0.5284
+            }
+          },
+          {
+            "check": "interfaces_resolve",
+            "passed": true,
+            "measured": {
+              "unresolved": []
+            }
+          },
+          {
+            "check": "canonical_topology_preserved",
+            "passed": true,
+            "measured": {
+              "component_count": 8,
+              "interface_count": 2
+            }
+          }
+        ],
+        "failures": [],
+        "passed": true
+      },
+      "visual_gate": {
+        "artifact": "VISUAL_QUALITY_GATE",
+        "version": "1.0.0",
+        "domain_family": "biomedical",
+        "technology_class": "MEDICAL_DEVICE",
+        "technology_class_role": "bridge geometry archetype (presentation routing, R445)",
+        "checks": [
+          {
+            "check": "not_flat_slab",
+            "passed": true,
+            "measured": {
+              "height_over_length": 0.1277,
+              "component_count": 10
+            }
+          },
+          {
+            "check": "not_generic_box_pile",
+            "passed": true,
+            "measured": {
+              "component_count": 10,
+              "pure_box_components": 0,
+              "box_ratio": 0.0
+            }
+          },
+          {
+            "check": "family_component_count",
+            "passed": true,
+            "measured": {
+              "family": "MEDICAL_DEVICE",
+              "components": 10,
+              "required": 4
+            }
+          },
+          {
+            "check": "family_feature_device_shaft",
+            "passed": true,
+            "measured": {
+              "family": "MEDICAL_DEVICE",
+              "found": 1,
+              "required": 1
+            }
+          },
+          {
+            "check": "family_feature_distal_tip",
+            "passed": true,
+            "measured": {
+              "family": "MEDICAL_DEVICE",
+              "found": 1,
+              "required": 1
+            }
+          }
+        ],
+        "failures": [],
+        "passed": true,
+        "note": "presentation audit \u2014 structural metrics only; NOT scientific validation and NOT a vision model (R432 section 17 disclosure)"
+      },
+      "engineering_gate": null,
+      "passed": true,
+      "failures": []
+    },
+    "artifact_identity": {
+      "artifact": "ARTIFACT_IDENTITY",
+      "blender_scene_hash": null,
+      "cad_source": null,
+      "derivation": "assembled from persisted run artifacts only \u2014 every hash from a real file at build time (Art. VI); blender_scene_hash fills when the render stage records its scene",
+      "derived_at": "2026-10-01T11:24:59Z",
+      "domain_family": "biomedical",
+      "generation_id": "gen-1",
+      "geometry_hash": "d646a4b65fc24d601bd4d79038ea8d1dfd615c4a7c6fd1eb7ffa2120b4cda323",
+      "glb_disk_sha256": "d646a4b65fc24d601bd4d79038ea8d1dfd615c4a7c6fd1eb7ffa2120b4cda323",
+      "glb_matches_geometry_hash": true,
+      "glb_path": "/app/ENGINE_RUNS/toscanini_ui_ui_unspecified_failure_853721/MODEL/model-001.glb",
+      "identity_version": "1.0.0",
+      "run_id": "ts_7e10a09af8a4",
+      "source_geometry_hash": "e715492df82b9ddf409ebc5c1382863b0d7328d5b7522ac9931b8c89c4a7be47",
+      "technology_id": "ui_unspecified_failure_853721",
+      "visualizability_class": "SYSTEM_3D"
+    },
+    "fallback_basis": null,
+    "scores": {
+      "artifact": "R433_MODEL_SCORES",
+      "version": "1.0.0",
+      "semantic_identity": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "not_visualized": [],
+        "checks": [
+          {
+            "check": "model_loads",
+            "passed": true,
+            "measured": {
+              "node_count": 10
+            }
+          },
+          {
+            "check": "family_selected",
+            "passed": true,
+            "measured": {
+              "family": "MEDICAL_DEVICE"
+            }
+          },
+          {
+            "check": "spec_components_visualized",
+            "passed": true,
+            "measured": {
+              "spec_components": 8,
+              "not_visualized": []
+            }
+          },
+          {
+            "check": "domain_architecture_present",
+            "passed": true,
+            "measured": {
+              "family": "MEDICAL_DEVICE",
+              "required": 4,
+              "not_visualized": []
+            }
+          },
+          {
+            "check": "major_interfaces_represented",
+            "passed": true,
+            "measured": {
+              "interfaces": 2,
+              "resolvable_in_scene": 2,
+              "note": "conduit links may run inside the body by design"
+            }
+          }
+        ]
+      },
+      "engineering_coherence": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "checks": [
+          {
+            "check": "valid_glb",
+            "passed": true
+          },
+          {
+            "check": "non_empty_scene",
+            "passed": true,
+            "measured": {
+              "node_count": 10,
+              "mesh_count": 10
+            }
+          },
+          {
+            "check": "component_ids_match_spec",
+            "passed": true,
+            "measured": {
+              "spec_components": 8,
+              "scene_nodes": 10,
+              "missing": [],
+              "unexpected": [],
+              "link_nodes_drawn": [
+                "link_flow_lumen__distal_tip",
+                "link_hub__flow_lumen"
+              ]
+            }
+          },
+          {
+            "check": "named_components",
+            "passed": true,
+            "measured": {
+              "sample": [
+                "device_shaft",
+                "distal_tip",
+                "flow_lumen",
+                "hub",
+                "link_flow_lumen__distal_tip",
+                "link_hub__flow_lumen",
+                "module_01",
+                "module_02"
+              ]
+            }
+          },
+          {
+            "check": "bounding_box_sane",
+            "passed": true,
+            "measured": {
+              "extent": [
+                13.7,
+                1.7498,
+                3.05
+              ]
+            }
+          },
+          {
+            "check": "no_nan_inf_coordinates",
+            "passed": true
+          },
+          {
+            "check": "no_microscopic_geometry",
+            "passed": true,
+            "measured": {
+              "min_component_extent": 0.249877
+            }
+          },
+          {
+            "check": "no_duplicate_model",
+            "passed": true,
+            "measured": {
+              "duplicates": []
+            }
+          },
+          {
+            "check": "normals_valid",
+            "passed": true
+          },
+          {
+            "check": "component_interference",
+            "passed": true,
+            "measured": {
+              "pairs_checked": 28,
+              "same_cell_unmated": [],
+              "nested_disclosed": [
+                {
+                  "pair": "device_shaft==flow_lumen",
+                  "overlap_fraction_min_part": 0.934,
+                  "overlap_fraction_max_part": 0.06,
+                  "mating_declared": false,
+                  "relation": "nested (conceptual containment \u2014 engineering realization must open access or declare mating)"
+                }
+              ],
+              "rule": "two distinct parts at the same cell (mutual overlap > 0.9 of the smaller and > 0.6 of the larger bbox) without a declared mating interface is an engineering-realization failure; nested parts are disclosed for the engineering boundary"
+            }
+          },
+          {
+            "check": "no_isolated_outlier_geometry",
+            "passed": true,
+            "measured": {
+              "islands": [],
+              "note": "components beyond 1.6x the assembly radius"
+            }
+          },
+          {
+            "check": "no_single_blob_domination",
+            "passed": true,
+            "measured": {
+              "largest_component_volume_fraction": 0.5284
+            }
+          },
+          {
+            "check": "interfaces_resolve",
+            "passed": true,
+            "measured": {
+              "unresolved": []
+            }
+          },
+          {
+            "check": "canonical_topology_preserved",
+            "passed": true,
+            "measured": {
+              "component_count": 8,
+              "interface_count": 2
+            }
+          },
+          {
+            "check": "artifact_identity_chain",
+            "passed": true,
+            "measured": {
+              "generation_id": "gen-1",
+              "geometry_hash": "d646a4b65fc24d60"
+            }
+          }
+        ]
+      },
+      "presentation_quality": {
+        "score": "PASS",
+        "passed": true,
+        "failures": [],
+        "checks": [
+          {
+            "check": "not_flat_slab",
+            "passed": true,
+            "measured": {
+              "height_over_length": 0.1277,
+              "component_count": 10
+            }
+          },
+          {
+            "check": "not_generic_box_pile",
+            "passed": true,
+            "measured": {
+              "component_count": 10,
+              "pure_box_components": 0,
+              "box_ratio": 0.0
+            }
+          },
+          {
+            "check": "family_component_count",
+            "passed": true,
+            "measured": {
+              "family": "MEDICAL_DEVICE",
+              "components": 10,
+              "required": 4
+            }
+          },
+          {
+            "check": "family_feature_device_shaft",
+            "passed": true,
+            "measured": {
+              "family": "MEDICAL_DEVICE",
+              "found": 1,
+              "required": 1
+            }
+          },
+          {
+            "check": "family_feature_distal_tip",
+            "passed": true,
+            "measured": {
+              "family": "MEDICAL_DEVICE",
+              "found": 1,
+              "required": 1
+            }
+          }
+        ]
+      },
+      "note": "three separated dimensions \u2014 never combined into one score (R433 section 13); presentation PASS with semantic FAIL is a disclosed failure, never a pass"
+    },
+    "evolution": [
+      {
+        "generation": 1,
+        "invention_id": "inv:ed07d4b129:gen1",
+        "status": "CURRENT",
+        "status_basis": "state INVENTION_SURVIVED \u00b7 maturity EVIDENCE_SUPPORTED",
+        "why": "the latest recorded architecture generation",
+        "domain_family": "biomedical",
+        "component_count": 10,
+        "glb": "/api/run/ts_7e10a09af8a4/model?gen=1",
+        "glb_sha256": "d646a4b65fc24d601bd4d79038ea8d1dfd615c4a7c6fd1eb7ffa2120b4cda323",
+        "current": true
+      }
+    ],
+    "generation_id": "gen-1",
+    "generation_count": 1
+  },
+  "renders": {
+    "stage": "RENDER",
+    "status": "RENDER_REQUESTED",
+    "job": {
+      "status": "RUNNING",
+      "enqueued_at": "2026-10-01T11:24:59Z",
+      "worker_pid": 1071,
+      "readback": null
+    },
+    "execution": "async artifact job (waits for the run worker to exit, then renders through the quality ladder; poll the CIO visualization.renders)",
+    "note": "DISCOVERY COMPLETE does not mean PRESENTATION RENDER COMPLETE \u2014 the render runs asynchronously after the run's terminal state"
+  },
+  "package_out": {
+    "zip_name": "TECHNOLOGY_TRANSFER_PACKAGE_invui_unspecified_failure_853721fbc0cc1a1d53.zip",
+    "zip_sha256": "2c00fe1d8b1933046c6215bf48ed1ce10feb198c5af62547ab32f26b5550b37e",
+    "zip_bytes": 194049,
+    "package_maturity": "EARLY_TECHNICAL_EVALUATION",
+    "visualizability_class": "SYSTEM_3D",
+    "manifest_files": 32,
+    "package_kind": "TECHNOLOGY_TRANSFER_PACKAGE (bridge) \u2014 the ONE canonical technology-transfer artifact for this run, honestly maturity-labeled; distinct from the buyer release chain (Art. IV: no weakened gates)"
+  },
+  "report": {
+    "bridge_version": "2.0.0",
+    "steps": [
+      {
+        "step": "CLASSIFY",
+        "status": "OK",
+        "detail": {
+          "visualizability_class": "SYSTEM_3D",
+          "basis": {
+            "geometry_parameters_sourced": 0,
+            "subsystems_recorded": 4,
+            "physical_site_detected": true,
+            "physical_site_vocabulary": {
+              "n_words": 53,
+              "authority": "discovery_fabric/engine/domains.py (ENGINEERING_DOMAIN_REGISTRY, one authority)",
+              "registry_domains_excluded": [
+                "ml_data"
+              ],
+              "layers_used": [
+                "architecture_blocks",
+                "architecture_blocks_medical",
+                "manufacturing_candidates",
+                "materials_candidates",
+                "disciplines",
+                "domain label",
+                "failure_modes (mode + physical_mechanism)",
+                "manufacturing_routes"
+              ]
+            },
+            "process_signal": false,
+            "algorithmic_signal": false,
+            "intervention_site": "medical device",
+            "engineering_min_params": 3,
+            "reason": "4 recorded subsystems and only 0 sourced geometry parameters \u2014 conceptual system-architecture visualization (topology, not dimensions)",
+            "measured_from": [
+              "engineering_specification.parameters",
+              "engineering_specification.engineering_core.critical_parameters",
+              "engineering_specification.system_architecture.subsystems",
+              "final_state.causal_chain"
+            ]
+          }
+        },
+        "at": "2026-10-01T11:24:58Z"
+      },
+      {
+        "step": "GEOMETRY",
+        "status": "OK",
+        "detail": {
+          "visualizability_class": "SYSTEM_3D",
+          "domain_family": "biomedical",
+          "glb_sha256": "d646a4b65fc24d601bd4d79038ea8d1dfd615c4a7c6fd1eb7ffa2120b4cda323",
+          "components": 10,
+          "quality_gates": true,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": "OK",
+              "domain_family": "biomedical"
+            }
+          ]
+        },
+        "at": "2026-10-01T11:24:59Z"
+      },
+      {
+        "step": "GENERATION_MODELS",
+        "status": "OK",
+        "detail": {
+          "count": 1,
+          "domain_family": "biomedical"
+        },
+        "at": "2026-10-01T11:24:59Z"
+      },
+      {
+        "step": "PACKAGE",
+        "status": "OK",
+        "detail": {
+          "zip_path": "/app/ENGINE_RUNS/toscanini_ui_ui_unspecified_failure_853721/TECHNOLOGY_TRANSFER_PACKAGE_invui_unspecified_failure_853721fbc0cc1a1d53.zip",
+          "zip_sha256": "2c00fe1d8b1933046c6215bf48ed1ce10feb198c5af62547ab32f26b5550b37e",
+          "package_maturity": "EARLY_TECHNICAL_EVALUATION",
+          "files": 32,
+          "compiler": "R440_CANONICAL_PACKAGE_COMPILER/1.1"
+        },
+        "at": "2026-10-01T11:24:59Z"
+      },
+      {
+        "step": "CIO_UPDATE",
+        "status": "OK",
+        "detail": {
+          "geometry_present": true,
+          "package_zip": "/api/run/ts_7e10a09af8a4/package"
+        },
+        "at": "2026-10-01T11:24:59Z"
+      }
+    ],
+    "outcome": "COMPLETED",
+    "visualizability_class": "SYSTEM_3D"
+  }
+}
