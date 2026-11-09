@@ -228,7 +228,8 @@ def _pinned_generate(prompt: str, system: str, route: Dict[str, Any],
         run_id=f"eval-{route.get('provider')}")
     return {"status": res.status, "provider_id": res.provider_id,
             "model": res.model, "content": res.content,
-            "failures": list(res.failures)[:3], "_raw_failure_names": res.failures}
+            "error": res.error, "failure_type": res.failure_type,
+            "retry_notes": list(res.retry_notes or [])[:3]}
 
 
 def run_baseline_problem(problem: Dict[str, Any], out_dir: Path,
