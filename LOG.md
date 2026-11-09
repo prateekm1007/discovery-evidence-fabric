@@ -1,0 +1,3 @@
+# LOG.md
+
+R1 2026-11-09: eval harness present (eval/problems.json 18 problems, eval/run.py). Baseline score table regenerated: 0/18 usable pairs, win-rate None (pipeline RUN_BLOCKED_CAPABILITY on all problems). Baseline route: localqwen/qwen3-1.7b (OK). Root cause: capability gate R455-LEAN-1 reports DEGRADED_ONLY - no reachable rung declares STRONG under ZERO_PAID_COST (localqwen declares only CHEAP), so retrieval/downstream refused before spending; baseline arm cannot run (no evidence snapshot). Gate blocks progress; not modified per hard limit. Next round: owner decision on capability declaration/provider before engine changes. Commit: TBD.

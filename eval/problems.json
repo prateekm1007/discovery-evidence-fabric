@@ -1,0 +1,302 @@
+{
+  "eval_version": "eval/1.0.0",
+  "authored_at": "2026-11-09",
+  "provenance": "12 problems byte-equivalent to R401-WC2/BENCHMARK/FROZEN_BENCHMARK.json (source of truth; the frozen file's freeze semantics carry over); the SOFC case follows the R412 lane-pool SOFC redox literature; 5 new problems authored 2026-11-09, disjoint from the frozen set and from engine test fixtures. question_type and user_variables are EVAL fields the engine reads only when a later round adds the wiring.",
+  "problems": [
+    {
+      "problem_id": "bench-p01-pemfc-dehydration",
+      "device": "proton exchange membrane fuel cell stack",
+      "failure": "membrane dehydration under high current density raises ionic resistance and localizes hot spots, degrading power output even when coolant temperature is nominal",
+      "failure_mode": "dehydration",
+      "constraint": "maintain 1.5 A/cm2 current density at 80 C stack temperature without increasing cathode humidification parasitic load above 10 percent",
+      "domain": "electrochemical-energy",
+      "source": "wc2_frozen",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "maintain 1.5 A/cm2 current density at 80 C stack temperature without increasing cathode humidification parasitic load above 10 percent",
+        "device of record: proton exchange membrane fuel cell stack",
+        "failure to address: dehydration"
+      ]
+    },
+    {
+      "problem_id": "bench-p02-leadacid-grid-corrosion",
+      "device": "valve-regulated lead-acid battery positive plate",
+      "failure": "positive grid corrosion during extended float charge consumes grid cross-section, raising internal resistance until capacity falls below service threshold",
+      "failure_mode": "corrosion",
+      "constraint": "achieve 15-year float service life at 2.27 V per cell continuous charge without antimony content above 2 percent",
+      "domain": "electrochemical-materials",
+      "source": "wc2_frozen",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "achieve 15-year float service life at 2.27 V per cell continuous charge without antimony content above 2 percent",
+        "device of record: valve-regulated lead-acid battery positive plate",
+        "failure to address: corrosion"
+      ]
+    },
+    {
+      "problem_id": "bench-p03-phe-biofouling",
+      "device": "stainless steel plate heat exchanger in a district cooling loop",
+      "failure": "biofilm and scale accumulation on plate channels reduces overall heat transfer coefficient and raises pressure drop between cleanings",
+      "failure_mode": "fouling",
+      "constraint": "sustain heat transfer coefficient above 2500 W/m2K for 12 months between mechanical cleanings without chlorination above 0.5 ppm residual",
+      "domain": "thermal-fluid-process",
+      "source": "wc2_frozen",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "sustain heat transfer coefficient above 2500 W/m2K for 12 months between mechanical cleanings without chlorination above 0.5 ppm residual",
+        "device of record: stainless steel plate heat exchanger in a district cooling loop",
+        "failure to address: fouling"
+      ]
+    },
+    {
+      "problem_id": "bench-p04-pump-cavitation",
+      "device": "centrifugal cooling water pump impeller",
+      "failure": "cavitation bubble collapse near impeller vane leading edges erodes material and degrades head delivery at off-design flow",
+      "failure_mode": "erosion",
+      "constraint": "operate at 85 percent of best-efficiency flow while keeping NPSH margin above 1.5 m and vane life above 5 years",
+      "domain": "fluid-machinery",
+      "source": "wc2_frozen",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "operate at 85 percent of best-efficiency flow while keeping NPSH margin above 1.5 m and vane life above 5 years",
+        "device of record: centrifugal cooling water pump impeller",
+        "failure to address: erosion"
+      ]
+    },
+    {
+      "problem_id": "bench-p05-bridge-bearing-aging",
+      "device": "laminated elastomeric bridge bearing pad",
+      "failure": "creep and ozone-induced cracking of elastomer layers accumulate permanent deformation and stiffness drift over decades of traffic cycling",
+      "failure_mode": "degradation",
+      "constraint": "hold vertical deflection drift below 10 percent of design over a 75-year service life with no replacement access after installation",
+      "domain": "civil-infrastructure",
+      "source": "wc2_frozen",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "hold vertical deflection drift below 10 percent of design over a 75-year service life with no replacement access after installation",
+        "device of record: laminated elastomeric bridge bearing pad",
+        "failure to address: degradation"
+      ]
+    },
+    {
+      "problem_id": "bench-p06-water-biofilm",
+      "device": "chloraminated drinking water distribution mains",
+      "failure": "biofilm regrowth in dead-end mains consumes disinfectant residual and drives nitrification episodes raising nitrite above the regulatory limit",
+      "failure_mode": "regrowth",
+      "constraint": "maintain total chlorine residual above 1.0 mg/L at the farthest customer during 25 C summer demand without boosting disinfectant dose",
+      "domain": "environmental-engineering",
+      "source": "wc2_frozen",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "maintain total chlorine residual above 1.0 mg/L at the farthest customer during 25 C summer demand without boosting disinfectant dose",
+        "device of record: chloraminated drinking water distribution mains",
+        "failure to address: regrowth"
+      ]
+    },
+    {
+      "problem_id": "bench-p07-cgm-biofouling",
+      "device": "wearable continuous glucose monitor electrochemical sensor",
+      "failure": "protein and tissue encapsulation at the sensor working electrode attenuates glucose signal within days of wear, drifting readings outside the MARD limit",
+      "failure_mode": "encapsulation",
+      "constraint": "keep mean absolute relative difference below 10 percent over a 14-day wear without daily recalibration",
+      "domain": "biomedical-sensing",
+      "source": "wc2_frozen",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "keep mean absolute relative difference below 10 percent over a 14-day wear without daily recalibration",
+        "device of record: wearable continuous glucose monitor electrochemical sensor",
+        "failure to address: encapsulation"
+      ]
+    },
+    {
+      "problem_id": "bench-p08-mems-stiction",
+      "device": "MEMS capacitive accelerometer comb structure",
+      "failure": "shock-induced contact between comb fingers causes stiction that permanently shorts interdigitated electrodes and latches the proof mass",
+      "failure_mode": "stiction",
+      "constraint": "survive 10000 g mechanical shock in all axes without permanent zero-g offset above 50 mg",
+      "domain": "microsystems",
+      "source": "wc2_frozen",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "survive 10000 g mechanical shock in all axes without permanent zero-g offset above 50 mg",
+        "device of record: MEMS capacitive accelerometer comb structure",
+        "failure to address: stiction"
+      ]
+    },
+    {
+      "problem_id": "bench-p09-packaging-barrier",
+      "device": "multilayer polymer food packaging film",
+      "failure": "moisture and oxygen barrier properties of the ethylene-vinyl alcohol layer degrade during distribution as humidity plasticizes the polymer matrix",
+      "failure_mode": "permeation",
+      "constraint": "hold water vapor transmission rate below 0.5 g/m2/day over 18 months of shelf life at 25 C and 65 percent relative humidity",
+      "domain": "materials-food",
+      "source": "wc2_frozen",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "hold water vapor transmission rate below 0.5 g/m2/day over 18 months of shelf life at 25 C and 65 percent relative humidity",
+        "device of record: multilayer polymer food packaging film",
+        "failure to address: permeation"
+      ]
+    },
+    {
+      "problem_id": "bench-p10-pv-pid",
+      "device": "crystalline silicon photovoltaic module in a high-voltage string",
+      "failure": "potential-induced degradation as sodium ions migrate from cover glass into cell shunting paths under sustained system voltage bias",
+      "failure_mode": "degradation",
+      "constraint": "limit annual power loss below 0.5 percent over 25 years at 1000 V system bias without encapsulant replacement",
+      "domain": "energy-photovoltaic",
+      "source": "wc2_frozen",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "limit annual power loss below 0.5 percent over 25 years at 1000 V system bias without encapsulant replacement",
+        "device of record: crystalline silicon photovoltaic module in a high-voltage string",
+        "failure to address: degradation"
+      ]
+    },
+    {
+      "problem_id": "bench-p11-spindle-thermal-drift",
+      "device": "high-speed precision machining center spindle",
+      "failure": "internal bearing heat generation thermally elongates the spindle shaft, shifting the tool center point and widening part tolerance during warmup cycles",
+      "failure_mode": "drift",
+      "constraint": "hold tool center point displacement below 10 micrometers across the full 20-minute warmup transient without adding warmup idle cycles",
+      "domain": "precision-engineering",
+      "source": "wc2_frozen",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "hold tool center point displacement below 10 micrometers across the full 20-minute warmup transient without adding warmup idle cycles",
+        "device of record: high-speed precision machining center spindle",
+        "failure to address: drift"
+      ]
+    },
+    {
+      "problem_id": "bench-p12-mbr-fouling",
+      "device": "submerged hollow-fiber membrane bioreactor for municipal wastewater",
+      "failure": "soluble microbial product and extracellular polymeric substance layers consolidate on membrane fibers, collapsing permeability and forcing intense chemical cleaning",
+      "failure_mode": "fouling",
+      "constraint": "sustain net flux above 18 LMH with chemical cleaning intervals longer than 6 months at mixed liquor suspended solids of 8 g/L",
+      "domain": "water-treatment",
+      "source": "wc2_frozen",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "sustain net flux above 18 LMH with chemical cleaning intervals longer than 6 months at mixed liquor suspended solids of 8 g/L",
+        "device of record: submerged hollow-fiber membrane bioreactor for municipal wastewater",
+        "failure to address: fouling"
+      ]
+    },
+    {
+      "problem_id": "eval-sofc-redox",
+      "device": "planar solid oxide fuel cell single cell with nickel-yttria-stabilized-zirconia anode support",
+      "failure": "Redox cycling of the Ni-YSZ anode during start/stop events causes irreversible anode volume change: re-oxidation expands the nickel phase, rearranges the anode microstructure (nickel agglomeration and coarsening), and builds tensile stress at the anode-electrolyte interface until the cell cracks or the electrode delaminates, so the stack loses sealing integrity and power density after repeated starts.",
+      "failure_mode": "redox-degradation",
+      "constraint": "tolerate 200 start-stop cycles over a 5-year service life at 750 C operating temperature while holding power density above 0.35 W/cm2 at 0.7 V, without exceeding the existing 2 mm cell package thickness",
+      "domain": "energy-conversion",
+      "source": "sofc_case",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "operating temperature 750 C",
+        "200 start-stop cycles over 5 years",
+        "power density above 0.35 W/cm2 at 0.7 V",
+        "cell package thickness must not exceed 2 mm"
+      ]
+    },
+    {
+      "problem_id": "eval-new01-supercap-dryout",
+      "device": "electric double-layer supercapacitor module in an automotive under-hood 12 V stop-start system",
+      "failure": "Electrolyte dry-out: sustained operation at high temperature drives solvent evaporation and seal permeation, collapsing the effective ion transport so equivalent series resistance climbs until the module can no longer source the cold-crank assist pulse.",
+      "failure_mode": "electrolyte-dryout",
+      "constraint": "keep capacitance loss below 10 percent over a 10-year life at up to 2.7 V rated cell voltage and 65 C maximum ambient, without adding more than 1 mm of module height",
+      "domain": "energy-storage",
+      "source": "new_r1",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "10-year life target",
+        "2.7 V rated cell voltage",
+        "65 C maximum ambient",
+        "capacitance loss below 10 percent",
+        "no more than 1 mm added module height"
+      ]
+    },
+    {
+      "problem_id": "eval-new02-slipring-predictor",
+      "device": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm",
+      "failure": "Brush and slip-ring contact wear progresses to arcing and intermittent open-circuit excitation transients weeks before the classical media (vibration, temperature) alarms rise, so operators learn of the failure from the excitation fault itself rather than from a leading indicator.",
+      "failure_mode": "contact-wear",
+      "constraint": "the predictor must rely only on data already collected by the plant historian at a 1-minute sampling interval, must fire at least 2 weeks before a forced outage would otherwise occur, and must not raise more than 1 false alarm per year per machine",
+      "domain": "electrical-machine",
+      "source": "new_r1",
+      "question_type": "predictor-design",
+      "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+      "user_variables": [
+        "historian data at 1-minute sampling interval only",
+        "at least 2 weeks warning before forced outage",
+        "no more than 1 false alarm per year per machine",
+        "1800 rpm operating speed"
+      ]
+    },
+    {
+      "problem_id": "eval-new03-insulin-pump-occlusion",
+      "device": "subcutaneous insulin pump infusion set with a 90 cm catheter worn by ambulatory type-1 diabetes patients",
+      "failure": "Catheter kinking, fibrin deposition, and air emboli produce upstream pressure events that the pump's occlusion detector reads late or never (slow leaks and partial occlusions stay under the fixed pressure threshold), so missed insulin delivery raises patient glucose for hours before the fault is detected.",
+      "failure_mode": "late-occlusion-detection",
+      "constraint": "raise no more than 1 nuisance occlusion alarm per 14 days of wear, detect a complete occlusion within 15 minutes, and detect partial occlusions (delivery deficit above 20 percent) within 2 hours, without changing the wearable form factor",
+      "domain": "biomedical-delivery",
+      "source": "new_r1",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "detection of complete occlusion within 15 minutes",
+        "partial occlusion (delivery deficit above 20 percent) within 2 hours",
+        "no more than 1 nuisance alarm per 14 days of wear",
+        "no change to the wearable form factor"
+      ]
+    },
+    {
+      "problem_id": "eval-new04-chiller-fouling-predictor",
+      "device": "water-cooled centrifugal chiller condenser tube bank in a district cooling plant using an open cooling tower loop",
+      "failure": "Condenser tube fouling accumulates silently: the fouling layer raises condenser approach temperature and pressure schedules, but operators clean on a fixed monthly cadence rather than on measured need, so tubes spend part of the month fouled early in the season and the cleaning cadence wastes labor later.",
+      "failure_mode": "condenser-fouling",
+      "constraint": "the predictor must use only BMS points already logged (chilled water supply/return temperature, condenser water supply/return temperature, compressor power, pump speed, outdoor wet-bulb), must resolve fouling state changes within 3 days at full load, and must produce a cleaning trigger that reduces total compressor energy by at least 3 percent versus the fixed monthly cadence",
+      "domain": "thermal-fluid-process",
+      "source": "new_r1",
+      "question_type": "predictor-design",
+      "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+      "user_variables": [
+        "BMS points already logged (listed in constraint)",
+        "fouling state resolved within 3 days at full load",
+        "at least 3 percent compressor energy reduction vs the fixed monthly cadence"
+      ]
+    },
+    {
+      "problem_id": "eval-new05-liion-balance-drift",
+      "device": "13-cell series NMC-811 lithium-ion battery module for a 3 kWh stationary-storage cabinet",
+      "failure": "Series string imbalance drift: cell-to-cell capacity and self-discharge spread grows with cycling and temperature gradient across the module, so the balancer cannot keep spread under the trip threshold; the BMS derates or shuts the module off early although the pack's aggregate energy is still serviceable.",
+      "failure_mode": "series-imbalance",
+      "constraint": "hold maximum cell-to-cell voltage spread below 35 mV at rest across a 10-year calendar life in a module that sees a 15 C top-to-bottom thermal gradient, without increasing the module footprint, and using only the existing 1 A balancing current",
+      "domain": "energy-storage",
+      "source": "new_r1",
+      "question_type": "intervention-proposal",
+      "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+      "user_variables": [
+        "maximum cell-to-cell voltage spread below 35 mV at rest",
+        "10-year calendar life",
+        "15 C top-to-bottom thermal gradient",
+        "only the existing 1 A balancing current",
+        "no increase in module footprint"
+      ]
+    }
+  ]
+}
