@@ -39,10 +39,35 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # --------------------------------------------------------------------------
 
 def load_credentials(path: Optional[str] = None) -> Dict[str, str]:
-    """Populate os.environ from <repo>/.env.keys (if present). Idempotent."""
+    """Populate os.environ from the vault / .env.keys (if present).
+    Idempotent. Lookup order (Art. LXXIII):
+      1. process environment (already set wins; never overwritten)
+      2. explicit `path` argument
+      3. <repo>/.env.keys (legacy, kept for backward compat)
+      4. the vault: $SECRETS_VAULT or %USERPROFILE%/.secrets.env
+         (outside the repo; the canonical store)
+    HF Space secret names are just environment variables and are
+    already covered by step 1 (they arrive as env vars in that runtime)."""
     loaded: Dict[str, str] = {}
-    p = Path(path) if path else REPO_ROOT / ".env.keys"
-    if p.exists():
+    candidates: List[Path] = []
+    if path:
+        candidates.append(Path(path))
+    candidates.append(REPO_ROOT / ".env.keys")
+    vault = os.environ.get("SECRETS_VAULT")
+    if vault:
+        candidates.append(Path(vault))
+    home = os.environ.get("USERPROFILE") or os.environ.get("HOME")
+    if home:
+        candidates.append(Path(home) / ".secrets.env")
+    seen: set = set()
+    for p in candidates:
+        try:
+            rp = p.resolve()
+        except Exception:  # noqa: BLE001
+            rp = p
+        if rp in seen or not p.exists():
+            continue
+        seen.add(rp)
         for line in p.read_text(encoding="utf-8").splitlines():
             line = line.strip()
             if not line or line.startswith("#") or "=" not in line:

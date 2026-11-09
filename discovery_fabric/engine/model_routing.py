@@ -180,6 +180,12 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
         r"^minimax/minimax-m3:free$",
         r"^minimax/minimax-m2\.7:free$",
         r"^deepseek/deepseek-v[0-9.]+[a-z-]*:free$",
+        # R1 infra fix (Art. LXI): free working models discovered via
+        # /v1/models probe 2026-11-10 (mistralai/ministral-8b/14b serve
+        # completions at zero cost on this key); pinned as recorded
+        # policy input, not hardcoded runtime id (Art. XXVII).
+        r"^mistralai/ministral-8b$",
+        r"^mistralai/ministral-14b$",
     ],
     "apinex": [
         r"^free/deepseek-v[0-9.]+[a-z-]*$",
@@ -221,6 +227,12 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
     # insufficient_user_quota $0) and the video/image ids are
     # wrong-modality for text tasks — catalog discovery can only
     # route to the measured flash rungs; a topped-up account
+    "inception": [
+        r"^mercury-3$",
+        r"^mercury-2\.5$",
+        r"^mercury-2$",
+        r"^mercury-decide$",
+    ],
     # re-admits pro ids with a one-line extension, never silently.
     "agnes": [
         r"^agnes-3\.0-flash$",

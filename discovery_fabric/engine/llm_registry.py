@@ -264,6 +264,35 @@ PROVIDER_SPECS: List[ProviderSpec] = [
     #            under ZERO_PAID_COST; depletion stays a typed failure
     #            that advances the cascade, never a bill.
     # ------------------------------------------------------------------
+    # Mercury 3 (Inception Labs) - operator-supplied fast+good model,
+    # used alongside agnes. LIVE-MEASURED 2026-11-10: GET /v1/models ->
+    # 200 with mercury-2 / mercury-2.5 / mercury-3 / mercury-decide;
+    # mercury-3 tiny completion -> 200 OK (content starves at 16 tokens,
+    # answers at 64 - probe_max_tokens=64). Cost basis FREE_TIER_API
+    # (eligible under ZERO_PAID_COST) pending confirmation of billing.
+    # ------------------------------------------------------------------
+    ProviderSpec(
+        "inception", "INCEPTION_API_KEY",
+        "https://api.inceptionlabs.ai/v1/chat/completions",
+        "mercury-3", "openai", 128_000,
+        quality_tier=2, cost_tier=1, latency_tier=1,
+        cost_basis="FREE_TIER_API", locality="REMOTE",
+        license="provider serving terms (operator-supplied key)",
+        account_domain="OWNER_INCEPTION_ACCOUNT",
+        model_revision="mercury-3 measured live 2026-11-10 (tiny "
+                       "completion OK at 64 tokens); no per-model revision "
+                       "pin exposed by the router - recorded honest "
+                       "(Art. VI)",
+        probe_max_tokens=64,
+        policy_note=(
+            "R1 infra (operator-supplied): Inception Labs Mercury 3, "
+            "used alongside agnes. LIVE-MEASURED at registration "
+            "(Art. III): GET /v1/models -> 200 with 4 mercury-* models; "
+            "mercury-3 tiny completion -> 200 OK at 64 tokens (content "
+            "starves at 16 - probe_max_tokens=64). Default urllib UA "
+            "passes (no CF block). Tiers recorded policy inputs "
+            "(Art. XXVII).")),
+    # ------------------------------------------------------------------
     ProviderSpec(
         "agnes", "AGNES_API_KEY",
         "https://apihub.agnes-ai.com/v1/chat/completions",
@@ -1557,8 +1586,33 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
     headers = {"Authorization": f"Bearer {key}"}
     if spec.extra_headers:
         headers.update(spec.extra_headers)
-    data = _post_json(
-        spec.url_for_call(), payload, headers, timeout)
+    # R1 infra fix (Art. LXI): transient overload / rate-limit responses
+    # (429, 502, 503, 504) are infrastructure, not verdicts. Retry with
+    # exponential backoff before surfacing the typed failure, so a busy
+    # free-tier pool does not poison the admission cache for the whole
+    # TTL. Bounded (3 attempts); never retries auth/quota (401/403/402).
+    _TRANSIENT = (429, 502, 503, 504)
+    last_exc = None
+    for attempt in range(3):
+        try:
+            data = _post_json(
+                spec.url_for_call(), payload, headers, timeout)
+            break
+        except urllib.error.HTTPError as he:
+            if he.code in _TRANSIENT and attempt < 2:
+                time.sleep(5 * (3 ** attempt))
+                last_exc = he
+                continue
+            raise
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as ne:
+            if attempt < 2:
+                time.sleep(5 * (3 ** attempt))
+                last_exc = ne
+                continue
+            raise
+    else:
+        if last_exc is not None:
+            raise last_exc
     if "error" in data:
         err = data["error"]
         msg = err.get("message", str(err)) if isinstance(err, dict) else str(err)

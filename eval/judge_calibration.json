@@ -1,0 +1,52 @@
+[
+  {
+    "problem_id": "bench-p01-pemfc-dehydration",
+    "good_answer": "Raise stack pressure to 170 kPa anode / 150 kPa cathode at 1.5 A/cm2 and 80 C, which raises membrane water content by back-diffusion and cuts ionic resistance; expected +37.9% cell voltage vs 70/60 kPa baselines. Falsify by a 100 h hold at 1.5 A/cm2 comparing voltage drift and EIS membrane resistance between the two pressure setpoints; if no difference in membrane resistance, the mechanism is wrong. Uses the stated constraint (1.5 A/cm2, 80 C, humidification parasitic load <= 10%).",
+    "bad_answer": "Increase humidification to keep the membrane wet. This should help performance."
+  },
+  {
+    "problem_id": "bench-p02-leadacid-grid-corrosion",
+    "good_answer": "Replace antimony with a tin-calcium grid alloy and add a conductive polymer coating to cut grid corrosion current below the 15-year float threshold at 2.27 V/cell; verify by accelerated float life at 60 C for 90 days measuring grid cross-section loss and capacity retention vs the 2% antimony baseline. Respects the no-antimony-above-2% constraint.",
+    "bad_answer": "Use better materials to reduce corrosion. Test in the lab."
+  },
+  {
+    "problem_id": "bench-p04-pump-cavitation",
+    "good_answer": "Add an inducer upstream of the impeller and re-profile the vane leading edge to raise NPSH margin above 1.5 m at 85% BEP; falsify by a 500 h cavitation-erosion test comparing mass loss and head curve between the modified and baseline impellers at the stated flow. Respects 85% BEP and 5-year vane life.",
+    "bad_answer": "Improve the pump design to avoid cavitation. Run a test."
+  },
+  {
+    "problem_id": "bench-p07-cgm-biofouling",
+    "good_answer": "Coat the working electrode with a zwitterionic polymer brush and a 50 nm porous polyurethane outer membrane to block protein adsorption, holding MARD below 10% over 14 days without recalibration; falsify by a 14-day in-vitro protein-fouling challenge comparing sensitivity drift vs an uncoated control. Respects the no-daily-recalibration constraint.",
+    "bad_answer": "Make the sensor more biocompatible. Validate with users."
+  },
+  {
+    "problem_id": "bench-p08-mems-stiction",
+    "good_answer": "Add a 200 nm PTFE anti-stiction coating on comb fingers and a mechanical stop that limits travel to 80% of the pull-in gap, surviving 10000 g shock with zero-g offset below 50 mg; falsify by a 10000 g shock battery measuring permanent offset and stiction rate vs uncoated controls.",
+    "bad_answer": "Strengthen the MEMS structure. Shock test it."
+  },
+  {
+    "problem_id": "bench-p10-pv-pid",
+    "good_answer": "Replace the soda-lime glass with low-sodium borosilicate glass and add a SiNx barrier layer to cut sodium migration, holding PID recovery above 95% after 96 h at 85 C/85% RH/-1000 V; falsify by a 96 h PID stress test comparing power degradation vs the baseline module.",
+    "bad_answer": "Use better glass to reduce PID. Test under humidity."
+  },
+  {
+    "problem_id": "eval-sofc-redox",
+    "good_answer": "Replace 30% of the Ni in the Ni-YSZ anode with a redox-stable cermet (e.g. Cu-CeO2) and reduce Ni particle size to limit re-oxidation expansion, holding power density above 0.35 W/cm2 at 0.7 V over 200 cycles at 750 C within the 2 mm package; falsify by 200 redox cycles measuring ASR growth and OCV vs a baseline Ni-YSZ cell.",
+    "bad_answer": "Make the anode more robust to redox. Cycle test it."
+  },
+  {
+    "problem_id": "eval-new02-slipring-predictor",
+    "good_answer": "Use the 1-minute historian series of brush-contact voltage ripple and excitation current; compute a rolling 7-day spectral entropy of the ripple and alarm when it exceeds 2.5 sigma above the 30-day baseline, giving >=2 weeks warning with <=1 false alarm/year/machine. Falsify by a 6-month backtest on historical fault cases reporting lead time and false-alarm rate.",
+    "bad_answer": "Monitor the slip ring with sensors. Alert when something looks wrong."
+  },
+  {
+    "problem_id": "eval-new04-chiller-fouling-predictor",
+    "good_answer": "Fit a steady-state model of condenser approach temperature vs load and wet-bulb from the BMS points; alarm when the residual exceeds 0.5 C for 3 consecutive days at full load, cutting compressor energy >=3% vs monthly cleaning. Falsify by a season-long comparison of cleaning-triggered vs fixed-schedule energy.",
+    "bad_answer": "Track temperature trends. Clean when needed."
+  },
+  {
+    "problem_id": "eval-new05-liion-balance-drift",
+    "good_answer": "Add a passive shunt balancer sized to 2 A on the hottest cells plus a temperature-aware charge termination that reduces top-of-charge voltage on hot cells, holding cell spread below 35 mV at rest over 10 years with a 15 C gradient using only the existing 1 A balancer budget plus the shunt. Falsify by a 1000-cycle accelerated ageing test measuring spread growth vs baseline.",
+    "bad_answer": "Improve balancing. Test over time."
+  }
+]

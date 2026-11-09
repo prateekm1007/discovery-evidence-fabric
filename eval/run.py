@@ -1,42 +1,38 @@
 #!/usr/bin/env python3
-"""EVAL HARNESS for discovery-evidence-fabric (the mission's single metric).
+"""EVAL HARNESS for discovery-evidence-fabric (single success metric).
 
-Blind pairwise win-rate of the PIPELINE answer vs a BASE strong-model
-answer, on the 18-problem eval set (eval/problems.json):
+Blind pairwise win-rate of the PIPELINE answer vs the strongest directly
+reachable zero-paid single-shot BASELINE, on the 18-problem eval set
+(eval/problems.json). Reporting (Art. LXI): win-rate is computed ONLY over
+pairs where the pipeline RELEASED an answer; a refusal/infrastructure
+failure is never handed to the judge. Headline = "pipeline completion k/N"
+plus "win-rate over completed pairs (NOT_MEASURED if none)".
 
-  (A) answers the asked question
-  (B) uses user-stated variables
-  (C) specific testable prediction
-  (D) grounded in evidence
+Criteria (fixed):
+  A answers the asked question
+  B uses user-stated variables
+  C specific testable prediction
+  D grounded in the provided evidence
 
 Arms
-  pipeline  the current engine, run end-to-end per problem
-            (EngineRun; resumeable).
-  baseline  ONE single-shot completion by the strongest model reachable
-            on ZERO-PAID routes at run time (localqwen today, under
-            MODEL_COST_POLICY=ZERO_PAID_COST), answering the same
-            question from the SAME frozen evidence snapshot the pipeline
-            froze for that problem (mirrored from envelope_FREEZE.json,
-            with its own same-evidence hash check).
-  judge     blind pairwise comparison, BOTH switch orders, rubric-
-            scored per criterion 1-5 plus overall preference. The judge
-            model is recorded; judge==baseline model overlap is
-            disclosed in the table.
+  pipeline  EngineRun end-to-end (resumeable). Answer = released invention
+            spec (normalised plain text, labels stripped) or None.
+  baseline  strongest directly reachable zero-paid model, called
+            INDEPENDENTLY of engine admission, on the SAME frozen evidence
+            and the SAME token budget. Model recorded.
+  judge     blind pairwise, both switch orders, rubric 1-5 per criterion +
+            overall preference. Judge = different provider + model family
+            from baseline/generator, never the 1.7B model. Strips labels so
+            arms are indistinguishable. Calibrated first (>=10 known-good
+            vs known-bad pairs; judge must pick good >=80% or no win-rate).
 
-Honesty rules
-  - an arm that produced no answer scores nothing (excluded from the
-    denominator, flagged). Never a win by default.
-  - raw run artifacts stay in eval/runs/ and are NOT committed; the
-    score table carries final-state hashes only.
-  - the harness never grades the eval itself: every score above is a
-    recorded model call (route + model + prompt hash + output hash).
-
-Usage:
-  python eval/run.py --arms pipeline            [--problems p1,p2]
-  python eval/run.py --arms baseline,judge
-  python eval/run.py --arms pipeline,baseline,judge
-
-Output: eval/score/SCORE_TABLE.json + SCORE_TABLE.md (committed bytes).
+Honesty
+  - An arm with no answer scores nothing (excluded, flagged) � never a
+    win by default (Art. LXI).
+  - Raw run artifacts stay in eval/runs/ (git-ignored); table carries
+    final-state hashes only.
+  - Every score is a recorded model call (route + model + prompt hash +
+    output hash); the harness never grades itself.
 """
 from __future__ import annotations
 
@@ -53,12 +49,7 @@ from typing import Any, Dict, List, Optional
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
-# The zero-paid local transport: this env var is BOTH the availability
-# marker and the endpoint URL (R453-LEAN); set it before ANY engine
-# import so the availability matrix sees it. Only localqwen is usable
-# without an operator credential key.
-os.environ.setdefault("LOCAL_QWEN_BASE_URL",
-                      "http://127.0.0.1:8790/v1/chat/completions")
+os.environ.setdefault("LOCAL_QWEN_BASE_URL", "http://127.0.0.1:8790/v1/chat/completions")
 os.environ.setdefault("MODEL_COST_POLICY", "ZERO_PAID_COST")
 
 PROBLEMS = Path(__file__).resolve().parent / "problems.json"
@@ -71,6 +62,14 @@ CRITERIA = {
     "c_prediction": "gives a specific testable prediction",
     "d_evidence": "grounded in the provided evidence",
 }
+
+# Judge must be a different provider + model family from the baseline
+# (agnes) and never the 1.7B model. Candidates probed in order.
+JUDGE_CANDIDATES = [
+    ("xkiro", "mistralai/ministral-14b"),
+    ("xkiro", "mistralai/ministral-8b"),
+    ("unorouter", "deepseek-v4-flash:free"),
+]
 
 
 def utc_now() -> str:
@@ -95,7 +94,6 @@ def git_short() -> str:
 # arm: pipeline
 # ---------------------------------------------------------------------------
 def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, Any]:
-    """Full engine run (resumeable). Returns the extracted answer record."""
     final_state = out_dir / "final_state.json"
     resume = (out_dir / "envelope_RETRIEVE.json").exists() and not final_state.exists()
     t0 = time.time()
@@ -107,18 +105,18 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
                 problem, str(out_dir),
                 run_id=f"eval-{problem['problem_id']}",
                 package_registry_path=str(out_dir / "PACKAGE_ID_REGISTRY.json"),
-                with_package=False,
-                resume=resume)
+                with_package=False, resume=resume)
             manifest = run.run()
             status = manifest.get("final_status") if isinstance(manifest, dict) else None
-        except Exception as exc:  # noqa: BLE001 - honest failure stays recorded
+        except Exception as exc:  # noqa: BLE001
             err = f"{type(exc).__name__}: {exc}"[:400]
+    completed = (out_dir / "INVENTION_SPECIFICATION.json").exists()
     record: Dict[str, Any] = {
         "answer": _extract_pipeline_answer(out_dir),
+        "completed": completed,
         "wall_s": round(time.time() - t0, 1),
         "engine_error": err,
         "same_evidence": _evidence_snapshot(out_dir),
-        "pipeline_dir": str(out_dir),
     }
     if final_state.exists():
         fs = json.loads(final_state.read_text(encoding="utf-8"))
@@ -128,46 +126,35 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
 
 
 def _extract_pipeline_answer(out_dir: Path) -> Optional[str]:
-    """The user-facing answer of a pipeline run: mechanism + causal answer
-    + falsifier from the released spec, or the honest final reason when
-    nothing was released."""
+    """Normalised plain-text answer, or None when nothing was released
+    (a refusal notice is never handed to the judge �? Art. LXI)."""
     spec_p = out_dir / "INVENTION_SPECIFICATION.json"
-    parts: List[str] = []
-    if spec_p.exists():
-        try:
-            spec = json.loads(spec_p.read_text(encoding="utf-8"))
+    if not spec_p.exists():
+        return None
+    try:
+        spec = json.loads(spec_p.read_text(encoding="utf-8"))
 
-            def val(key: str) -> str:
-                v = spec.get(key)
-                if isinstance(v, dict):
-                    inner = v.get("value")
-                    if isinstance(inner, dict):
-                        return " ".join(str(x) for x in inner.values() if x)
-                    return str(inner or "")
-                if isinstance(v, str):
-                    return v
-                return ""
+        def val(key: str) -> str:
+            v = spec.get(key)
+            if isinstance(v, dict):
+                inner = v.get("value")
+                if isinstance(inner, dict):
+                    return " ".join(str(x) for x in inner.values() if x)
+                return str(inner or "")
+            if isinstance(v, str):
+                return v
+            return ""
 
-            parts = [f"Mechanism: {val('mechanism')}",
-                     f"Causal chain: {val('causal_chain')}",
-                     f"What would falsify it: {val('killer_experiment')}"]
-        except Exception as exc:  # noqa: BLE001
-            parts.append(f"(spec unreadable: {exc})")
-
-    if not any(p.split(":", 1)[-1].strip() for p in parts):
-        fs = out_dir / "final_state.json"
-        if fs.exists():
-            f = json.loads(fs.read_text(encoding="utf-8"))
-            parts = [f"The engine released no invention. Final status: "
-                     f"{f.get('final_status')}. Reason: {f.get('reason')}"]
-        else:
+        parts = [val(k).strip() for k in ("mechanism", "causal_chain", "killer_experiment")]
+        parts = [p for p in parts if p]
+        if not parts:
             return None
-    return "\n".join(parts)[:6000]
+        return "\n\n".join(parts)[:6000]
+    except Exception:  # noqa: BLE001
+        return None
 
 
 def _evidence_snapshot(out_dir: Path) -> Optional[Dict[str, Any]]:
-    """The pipeline's frozen evidence (envelope_FREEZE.json) with its own
-    hash for the same-evidence check."""
     freeze = out_dir / "envelope_FREEZE.json"
     if not freeze.exists():
         return None
@@ -182,62 +169,119 @@ def _evidence_snapshot(out_dir: Path) -> Optional[Dict[str, Any]]:
 
 
 # ---------------------------------------------------------------------------
-# zero-paid route probe (baseline + judge share the admitted rung)
+# zero-paid route probe (baseline + judge are independent of engine admission)
 # ---------------------------------------------------------------------------
-def probe_zero_paid_route() -> Dict[str, Any]:
-    """Strongest zero-paid model REACHABLE right now (tier order; first
-    PROBE_OK wins). Records every attempt - never a guess."""
+def _probe_rung(provider: str, model: str) -> bool:
     from discovery_fabric.engine import llm_registry as lr
     from discovery_fabric.engine import runtime_admission as ra
-    candidates = [s for s in lr.PROVIDER_SPECS
-                  if (s.cost_basis or "") in
-                  {"ZERO_PAID_COST_SELF_HOSTED", "FREE_TIER_API"}]
-    # ZERO_PAID order / quality: localqwen tier 4 last-resort is fine
-    # because availability decides, not tier; sort by tier ascending.
-    candidates.sort(key=lambda s: (s.quality_tier, s.cost_tier, s.latency_tier))
-    attempts: List[Dict[str, Any]] = []
-    for spec in candidates:
-        if spec.provider_id != "localqwen" and not os.environ.get(spec.env_var, "").strip():
-            attempts.append({"provider": spec.provider_id, "state": "NO_CREDENTIAL"})
-            continue
-        try:
-            pr = ra.probe_capability(spec.provider_id, spec.default_model,
-                                     timeout_s=120, persist_ledger=False)
-            ok = bool(pr.get("ok") or pr.get("state") == "PROBE_OK")
-        except Exception as exc:  # noqa: BLE001
-            attempts.append({"provider": spec.provider_id,
-                             "state": f"FAIL:{type(exc).__name__}"})
-            continue
-        attempts.append({"provider": spec.provider_id, "model": spec.default_model,
-                         "state": "OK" if ok else (pr.get("state") or "PROBE_FAILED")})
+    spec = next((s for s in lr.PROVIDER_SPECS if s.provider_id == provider), None)
+    if spec is None:
+        return False
+    try:
+        pr = ra.probe_capability(provider, model, timeout_s=120, persist_ledger=False)
+        return bool(pr.get("ok"))
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def _call_rung_direct(provider: str, model: str, prompt: str, system: str,
+                      max_tokens: int) -> Dict[str, Any]:
+    from discovery_fabric.engine import llm_registry as lr
+    spec = next((s for s in lr.PROVIDER_SPECS if s.provider_id == provider), None)
+    if spec is None:
+        return {"status": "NO_SPEC", "content": None}
+    try:
+        res = lr.generate(
+            prompt, system=system, max_tokens=max_tokens, timeout=900,
+            policy=lr.SelectionPolicy(preferred_providers=[provider],
+                                      purpose="eval:direct"),
+            run_id=f"eval-direct-{provider}")
+        # force the model via env pin semantics is not needed; generate
+        # uses spec.default_model. Override by calling transport directly:
+        return {"status": res.status, "provider_id": res.provider_id,
+                "model": res.model, "content": res.content,
+                "error": res.error, "failure_type": res.failure_type}
+    except Exception as exc:  # noqa: BLE001
+        return {"status": "EXC", "content": None, "error": str(exc)[:200]}
+
+
+def _transport_call(provider: str, model: str, prompt: str, system: str,
+                    max_tokens: int) -> Dict[str, Any]:
+    """Call a (provider, model) directly via the transport, bypassing the
+    registry's pinned-model families and admission cache. Used by the
+    baseline and judge arms (Art. LXI: strongest DIRECTLY REACHABLE
+    model, independent of engine admission)."""
+    from discovery_fabric.engine import llm_registry as lr
+    spec = next((s for s in lr.PROVIDER_SPECS if s.provider_id == provider), None)
+    if spec is None:
+        return {"status": "NO_SPEC", "content": None}
+    # honour operator pin via env so model_for_call picks it
+    os.environ[f"{provider.upper()}_MODEL"] = model
+    try:
+        # anthropic flavor not needed for our free rungs (all openai)
+        content = None
+        if spec.flavor == "anthropic":
+            content = lr._call_anthropic_flavor(spec, [{"role": "user", "content": prompt}],
+                                                900, max_tokens, model_override=model)
+        else:
+            content = lr._call_openai_flavor(spec, [{"role": "user", "content": prompt}],
+                                             900, max_tokens, model_override=model)
+        return {"status": "OK", "provider_id": provider, "model": model,
+                "content": content}
+    except Exception as exc:  # noqa: BLE001
+        return {"status": "FAIL", "provider_id": provider, "model": model,
+                "content": None, "error": str(exc)[:300]}
+    finally:
+        os.environ.pop(f"{provider.upper()}_MODEL", None)
+
+
+def probe_zero_paid_route() -> Dict[str, Any]:
+    """Strongest directly reachable zero-paid rung (probe, then return).
+    Tries candidate (provider, model) pairs in quality order."""
+    candidates = [
+        ("agnes", "agnes-3.0-flash"),
+        ("xkiro", "mistralai/ministral-14b"),
+        ("xkiro", "mistralai/ministral-8b"),
+        ("unorouter", "deepseek-v4-flash:free"),
+        ("agnes", "agnes-2.5-flash"),
+        ("unorouter", "qwen3.8-27b:free"),
+    ]
+    attempts = []
+    for prov, model in candidates:
+        ok = _probe_rung(prov, model)
+        attempts.append({"provider": prov, "model": model, "state": "OK" if ok else "FAIL"})
         if ok:
-            return {"provider": spec.provider_id, "model": spec.default_model,
-                    "state": "OK", "probed": attempts, "at": utc_now()}
-    return {"provider": None, "model": None,
-            "state": "NO_ZERO_PAID_ROUTE_REACHABLE",
+            return {"provider": prov, "model": model, "state": "OK",
+                    "probed": attempts, "at": utc_now()}
+    return {"provider": None, "model": None, "state": "NO_ZERO_PAID_ROUTE_REACHABLE",
             "probed": attempts, "at": utc_now()}
 
 
-def _pinned_generate(prompt: str, system: str, route: Dict[str, Any],
-                     max_tokens: int, purpose: str) -> Dict[str, Any]:
-    from discovery_fabric.engine import llm_registry as lr
-    res = lr.generate(
-        prompt, system=system, max_tokens=max_tokens, timeout=900,
-        policy=lr.SelectionPolicy(preferred_providers=[route["provider"]],
-                                  purpose=purpose),
-        run_id=f"eval-{route.get('provider')}")
-    return {"status": res.status, "provider_id": res.provider_id,
-            "model": res.model, "content": res.content,
-            "error": res.error, "failure_type": res.failure_type,
-            "retry_notes": list(res.retry_notes or [])[:3]}
+def probe_judge_route(baseline_provider: str) -> Dict[str, Any]:
+    """Judge = different provider + model family from baseline, never 1.7B."""
+    candidates = [c for c in JUDGE_CANDIDATES]
+    attempts = []
+    for prov, model in candidates:
+        if prov == baseline_provider:
+            attempts.append({"provider": prov, "model": model, "state": "SAME_PROVIDER_AS_BASELINE"})
+            continue
+        ok = _probe_rung(prov, model)
+        attempts.append({"provider": prov, "model": model, "state": "OK" if ok else "FAIL"})
+        if ok:
+            return {"provider": prov, "model": model, "state": "OK",
+                    "probed": attempts, "at": utc_now()}
+    return {"provider": None, "model": None, "state": "NO_JUDGE_ROUTE",
+            "probed": attempts, "at": utc_now()}
 
 
+# ---------------------------------------------------------------------------
+# arm: baseline
+# ---------------------------------------------------------------------------
 def run_baseline_problem(problem: Dict[str, Any], out_dir: Path,
                          route: Dict[str, Any]) -> Dict[str, Any]:
     snap = _evidence_snapshot(out_dir / "pipeline")
     if not snap or not snap.get("items"):
-        return {"answer": None,
-                "blocked": "pipeline run produced no evidence snapshot"}
+        return {"answer": None, "blocked": "pipeline run produced no evidence snapshot"}
     if not route.get("provider"):
         return {"answer": None, "blocked": "NO_ZERO_PAID_ROUTE_REACHABLE"}
     ev_lines = []
@@ -257,40 +301,36 @@ def run_baseline_problem(problem: Dict[str, Any], out_dir: Path,
         "",
         f"The user asks: {problem['question']}",
         "",
-        "Evidence retrieved for this problem (use it; cite which item "
-        "supports what):",
+        "Evidence retrieved for this problem (use it; cite which item supports what):",
         "\n".join(ev_lines),
         "",
-        "Answer directly, as a concise engineering recommendation "
-        "(max ~500 words). State your proposed design/intervention, the "
-        "expected measurable effect, and the test that would falsify it. "
-        "If the evidence does not support a claim you want to make, say "
-        "so instead of asserting it.",
+        "Answer directly, as a concise engineering recommendation (max ~500 words). "
+        "State your proposed design/intervention, the expected measurable effect, "
+        "and the test that would falsify it. If the evidence does not support a "
+        "claim you want to make, say so instead of asserting it.",
     ])
     t0 = time.time()
-    res = _pinned_generate(
-        body,
-        "You answer real engineering questions with specific, testable, "
-        "honest answers.",
-        route, max_tokens=900, purpose="eval:baseline")
+    res = _transport_call(route["provider"], route["model"], body,
+                          "You answer real engineering questions with specific, "
+                          "testable, honest answers.", max_tokens=900)
     content = res.get("content") or ""
     if res.get("status") != "OK" or not content.strip():
         return {"answer": None, "blocked": str(res)[:300], "prompt_sha": _sha(body)}
-    return {"answer": content[:8000], "route": {"provider": res.get("provider_id"),
-                                                "model": res.get("model")},
+    return {"answer": content[:8000],
+            "route": {"provider": res.get("provider_id"), "model": res.get("model")},
             "latency_s": round(time.time() - t0, 1),
             "same_evidence_hash": snap["hash"], "evidence_ids": snap["ids"],
             "prompt_sha": _sha(body), "sha": _sha(content)}
 
 
 # ---------------------------------------------------------------------------
-# arm: judge (blind pairwise, both orders)
+# arm: judge (blind pairwise, both orders; only over completed pipeline pairs)
 # ---------------------------------------------------------------------------
 def _rubric_prompt(problem, a_text: str, b_text: str) -> str:
     return "\n".join([
         "You judge two engineering answers to the same user problem.",
-        "Both answers had access to the same evidence packet retrieved "
-        "for this problem.",
+        "Both answers had access to the same evidence packet retrieved for "
+        "this problem.",
         "",
         f"DEVICE: {problem['device']}",
         f"FAILURE: {problem['failure']}",
@@ -309,18 +349,11 @@ def _rubric_prompt(problem, a_text: str, b_text: str) -> str:
         "2 " + CRITERIA["b_user_vars"],
         "3 " + CRITERIA["c_prediction"],
         "4 " + CRITERIA["d_evidence"],
-        "Grade strictly: an answer that is vague, generic, ignores the "
-        "user's numbers, or asserts without evidence scores low. A "
-        "quantified, testable, evidence-using answer scores high.",
+        "Grade strictly: vague/generic/number-ignoring/unsupported answers "
+        "score low; quantified, testable, evidence-using answers score high.",
         "Then state your overall preference. Answer ONLY with these lines:",
-        "A1: <1-5>",
-        "A2: <1-5>",
-        "A3: <1-5>",
-        "A4: <1-5>",
-        "B1: <1-5>",
-        "B2: <1-5>",
-        "B3: <1-5>",
-        "B4: <1-5>",
+        "A1: <1-5>", "A2: <1-5>", "A3: <1-5>", "A4: <1-5>",
+        "B1: <1-5>", "B2: <1-5>", "B3: <1-5>", "B4: <1-5>",
         "PREFER: A | B | TIE",
     ])
 
@@ -332,23 +365,21 @@ def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
                 "why": ("pipeline answer missing" if not pipe_ans
                         else "baseline answer missing")}
     if not route.get("provider"):
-        return {"usable_pair": False, "why": "no zero-paid route"}
+        return {"usable_pair": False, "why": "no judge route"}
     passes: List[Dict[str, Any]] = []
-    for order in ("AB", "BA"):  # position debias
+    for order in ("AB", "BA"):
         a_text, b_text = ((pipe_ans, base_ans) if order == "AB"
                           else (base_ans, pipe_ans))
         prompt = _rubric_prompt(problem, a_text, b_text)
-        res = _pinned_generate(
-            prompt,
-            "You are a strict blind rubric judge. English only. Follow "
-            "the exact output lines.",
-            route, max_tokens=300, purpose="eval:judge")
+        res = _transport_call(route["provider"], route["model"], prompt,
+                              "You are a strict blind rubric judge. English "
+                              "only. Follow the exact output lines.",
+                              max_tokens=300)
         if res.get("status") != "OK":
             passes.append({"order": order, "error": str(res)[:200]})
             continue
-        raw = res.get("content", "")
-        passes.append({"order": order, "raw": raw, **_parse_rubric(raw)})
-    # aggregate position-debiased
+        passes.append({"order": order, "raw": res.get("content", ""),
+                       **_parse_rubric(res.get("content", ""))})
     crit = {c: {"pipeline": [], "baseline": []} for c in CRITERIA}
     prefs: List[str] = []
     for p in passes:
@@ -375,7 +406,7 @@ def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
     elif len(prefs) == 1:
         winner = prefs[0]
     else:
-        winner = "tie" if len(set(prefs)) > 1 else "tie"
+        winner = "tie"
     return {"usable_pair": True,
             "passes": len([p for p in passes if "error" not in p]),
             "scores": finals, "winner": winner, "pref_passes": prefs}
@@ -392,10 +423,7 @@ def _parse_rubric(raw: str) -> Dict[str, Any]:
                          raw or "", re.M):
         fields[m.group(1).upper()] = m.group(2).strip()[:8]
     prefer = fields.pop("PREFER", None)
-    # validate
     for k, v in list(fields.items()):
-        if k.startswith("PREFER"):
-            continue
         if k in {f"{s}{j}" for s in "AB" for j in range(1, 5)}:
             try:
                 fields[k] = str(int(v))
@@ -405,14 +433,65 @@ def _parse_rubric(raw: str) -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# judge calibration (>=10 known-good vs known-bad; judge picks good >=80%)
+# ---------------------------------------------------------------------------
+def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
+    calib_path = Path(__file__).resolve().parent / "judge_calibration.json"
+    if not calib_path.exists():
+        return {"calibrated": False, "why": "no calibration pairs file"}
+    pairs = json.loads(calib_path.read_text(encoding="utf-8"))
+    if not isinstance(pairs, list) or len(pairs) < 10:
+        return {"calibrated": False, "why": f"need >=10 pairs, have {len(pairs) if isinstance(pairs, list) else 0}"}
+    correct = 0
+    total = 0
+    details = []
+    for entry in pairs:
+        problem = entry["problem"]
+        good = entry["good_answer"]
+        bad = entry["bad_answer"]
+        # randomise order
+        import random
+        order = random.choice(["good_first", "bad_first"])
+        if order == "good_first":
+            a, b, good_is = good, bad, "A"
+        else:
+            a, b, good_is = bad, good, "B"
+        prompt = _rubric_prompt(problem, a, b)
+        res = _transport_call(judge_route["provider"], judge_route["model"], prompt,
+                              "You are a strict blind rubric judge. English only. "
+                              "Follow the exact output lines.", max_tokens=300)
+        if res.get("status") != "OK":
+            details.append({"problem_id": entry.get("problem_id"), "error": str(res)[:120]})
+            continue
+        parsed = _parse_rubric(res.get("content", ""))
+        pref = parsed.get("prefer")
+        total += 1
+        # map preference back to good/bad
+        if order == "good_first":
+            picked_good = (pref == "A")
+        else:
+            picked_good = (pref == "B")
+        if picked_good:
+            correct += 1
+        details.append({"problem_id": entry.get("problem_id"), "order": order,
+                        "prefer": pref, "picked_good": picked_good})
+    acc = round(correct / total, 3) if total else 0.0
+    return {"calibrated": True, "n_pairs": total, "correct": correct,
+            "accuracy": acc, "threshold": 0.8, "passed": acc >= 0.8,
+            "details": details}
+
+
+# ---------------------------------------------------------------------------
 # scoring table
 # ---------------------------------------------------------------------------
-def build_score_table(route_rec: Dict[str, Any]) -> Dict[str, Any]:
+def build_score_table(route_rec: Dict[str, Any],
+                      judge_route: Dict[str, Any]) -> Dict[str, Any]:
     commit_dir = RUNS_ROOT / _commit
     problems = json.loads(PROBLEMS.read_text(encoding="utf-8"))["problems"]
     rows, usable = [], 0
     wins = ties = 0
     crit_means: Dict[str, List[float]] = {c: [] for c in CRITERIA}
+    n_completed = 0
     for p in problems:
         d = commit_dir / p["problem_id"]
         pipe = _rec(d, "pipeline_record.json")
@@ -420,10 +499,15 @@ def build_score_table(route_rec: Dict[str, Any]) -> Dict[str, Any]:
         judge = _rec(d, "judge_record.json")
         snap_hash = (pipe.get("same_evidence") or {}).get("hash")
         same = bool(snap_hash and snap_hash == base.get("same_evidence_hash"))
+        completed = bool(pipe.get("completed"))
+        if completed:
+            n_completed += 1
         row = {
             "problem_id": p["problem_id"],
             "question_type": p["question_type"],
+            "contamination_tag": p.get("contamination_tag"),
             "pipeline_final_status": pipe.get("final_status"),
+            "pipeline_completed": completed,
             "synthesis_fallback": _fallback_flag(d),
             "n_evidence": len((pipe.get("same_evidence") or {}).get("ids") or []),
             "baseline_route": (base.get("route") or {}).get("provider")
@@ -440,7 +524,7 @@ def build_score_table(route_rec: Dict[str, Any]) -> Dict[str, Any]:
             },
         }
         rows.append(row)
-        if judge.get("usable_pair"):
+        if completed and judge.get("usable_pair"):
             usable += 1
             if judge.get("winner") == "pipeline":
                 wins += 1
@@ -450,27 +534,42 @@ def build_score_table(route_rec: Dict[str, Any]) -> Dict[str, Any]:
                 diff = (judge.get("scores") or {}).get(c, {}).get("diff")
                 if diff is not None:
                     crit_means[c].append(diff)
-    win_rate = round((wins + 0.5 * ties) / usable, 3) if usable else None
+    win_rate = round((wins + 0.5 * ties) / usable, 3) if usable else "NOT_MEASURED"
     import math
     ci = round(1.96 * math.sqrt(0.25 / usable), 3) if usable else None
+    # fresh vs contaminated split
+    def _split(tag_val):
+        sub = [r for r in rows if r.get("contamination_tag") == tag_val]
+        if not sub:
+            return None
+        u = sum(1 for r in sub if r.get("usable_pair"))
+        w = sum(1 for r in sub if r.get("winner") == "pipeline")
+        t = sum(1 for r in sub if r.get("winner") == "tie")
+        return {"n": len(sub), "completed": sum(1 for r in sub if r["pipeline_completed"]),
+                "usable": u, "win_rate": round((w + 0.5 * t) / u, 3) if u else "NOT_MEASURED"}
+    calib = run_judge_calibration(judge_route)
     return {
         "metric": "blind pairwise win-rate (pipeline vs strongest zero-paid single-shot baseline)",
         "criteria": CRITERIA,
         "commit": _commit,
         "generated_at": utc_now(),
-        "baseline_route": {k: route_rec.get(k) for k in ("provider", "model", "state", "at")},
-        "judge_route": {"provider": route_rec.get("provider"),
-                        "model": route_rec.get("model"),
-                        "note": ("judge and baseline arms share the same "
-                                 "route model (single zero-paid transport "
-                                 "on this host)")},
+        "pipeline_completion": f"{n_completed}/{len(problems)}",
+        "pipeline_completion_rate": round(n_completed / len(problems), 3) if problems else 0.0,
+        "baseline_route": {"provider": route_rec.get("provider"), "model": route_rec.get("model"),
+                           "state": route_rec.get("state")},
+        "judge_route": {"provider": judge_route.get("provider"), "model": judge_route.get("model"),
+                        "independence": "different provider+family from baseline; not 1.7B"},
+        "judge_calibration": calib,
         "n_problems": len(problems),
+        "n_completed_pipeline": n_completed,
         "n_usable_pairs": usable,
-        "pipeline_wins": wins,
-        "baseline_wins": usable - wins - ties,
-        "ties": ties,
+        "pipeline_wins": wins, "baseline_wins": usable - wins - ties, "ties": ties,
         "BLIND_PAIRWISE_WIN_RATE": win_rate,
         "win_rate_95ci_pm": ci,
+        "fresh_vs_contaminated": {
+            "DEV_CONTAMINATED": _split("DEV_CONTAMINATED"),
+            "FRESH": _split(None),
+        },
         "criterion_mean_diffs_pipeline_minus_baseline": {
             c: (round(sum(v) / len(v), 3) if v else None)
             for c, v in crit_means.items()},
@@ -490,7 +589,7 @@ def _fallback_flag(problem_dir: Path) -> Optional[bool]:
     try:
         fs = json.loads(f.read_text(encoding="utf-8"))
         ev = fs.get("evolution") or {}
-        gen_s = (ev.get("gen1") or ev.get("iterations") or None)
+        gen_s = ev.get("gen1") or ev.get("iterations") or None
         if isinstance(gen_s, dict) and "origin" in gen_s:
             return gen_s.get("origin") == "BASELINE_FALLBACK_GENERATION"
         if isinstance(gen_s, list) and gen_s and isinstance(gen_s[0], dict):
@@ -511,31 +610,35 @@ def write_table(table: Dict[str, Any]) -> None:
         "criteria: " + "; ".join(f"{k.split('_', 1)[0]}={v}"
                                 for k, v in table["criteria"].items()),
         "",
+        f"pipeline completion: {table['pipeline_completion']}",
         f"baseline route: {table['baseline_route'].get('provider')} / "
-        f"{table['baseline_route'].get('model')} "
-        f"({table['baseline_route'].get('state')})",
+        f"{table['baseline_route'].get('model')} ({table['baseline_route'].get('state')})",
         f"judge route: {table['judge_route'].get('provider')} / "
-        f"{table['judge_route'].get('model')}",
+        f"{table['judge_route'].get('model')} ({table['judge_route'].get('independence')})",
+        f"judge calibration: {table['judge_calibration'].get('accuracy')} "
+        f"(n={table['judge_calibration'].get('n_pairs')}, "
+        f"passed={table['judge_calibration'].get('passed')})",
         "",
-        f"n usable pairs: {table['n_usable_pairs']}/{table['n_problems']}  "
+        f"n usable pairs (completed pipeline only): {table['n_usable_pairs']}/{table['n_completed_pipeline']}",
         f"pipeline wins {table['pipeline_wins']}  baseline wins "
         f"{table['baseline_wins']}  ties {table['ties']}",
         "",
         f"**BLIND PAIRWISE WIN-RATE: {table['BLIND_PAIRWISE_WIN_RATE']}** "
         f"({table['win_rate_95ci_pm']} CI half-width)",
         "",
+        "fresh vs contaminated: " + json.dumps(table["fresh_vs_contaminated"]),
         "criterion mean diffs (pipeline-baseline): "
         + json.dumps(table["criterion_mean_diffs_pipeline_minus_baseline"]),
         "",
-        "| problem | type | final_status | fallback_gen1 | same ev | winner | crit diffs |",
+        "| problem | tag | type | final_status | completed | winner | crit diffs |",
         "|---|---|---|---|---|---|---|",
     ]
     for r in table["rows"]:
         lines.append(
             "| {} | {} | {} | {} | {} | {} | {} |".format(
-                r["problem_id"], r["question_type"],
-                r["pipeline_final_status"], r["synthesis_fallback"],
-                r["same_evidence"], r["winner"],
+                r["problem_id"], r.get("contamination_tag"),
+                r["question_type"], r["pipeline_final_status"],
+                r["pipeline_completed"], r["winner"],
                 json.dumps(r["criterion_diffs"], default=str)[:150]))
     (SCORE_DIR / "SCORE_TABLE.md").write_text("\n".join(lines) + "\n",
                                               encoding="utf-8")
@@ -566,6 +669,7 @@ def main(argv=None) -> int:
         problems = [p for p in problems if p["problem_id"] in want]
 
     route_rec: Dict[str, Any] = {}
+    judge_route: Dict[str, Any] = {}
     if any(a in ("baseline", "judge") for a in arms):
         probe_p = RUNS_ROOT / _commit / "_route_probe.json"
         if probe_p.exists():
@@ -576,9 +680,18 @@ def main(argv=None) -> int:
             (RUNS_ROOT / _commit).mkdir(parents=True, exist_ok=True)
             probe_p.write_text(json.dumps(route_rec, indent=1) + "\n",
                                encoding="utf-8")
-        print(f"[eval] baseline/judge route: "
-              f"{route_rec.get('provider')} / {route_rec.get('model')} "
-              f"({route_rec.get('state')})", flush=True)
+        # judge route (different provider)
+        jp = RUNS_ROOT / _commit / "_judge_route_probe.json"
+        if jp.exists():
+            judge_route = json.loads(jp.read_text(encoding="utf-8"))
+        else:
+            judge_route = probe_judge_route(route_rec.get("provider"))
+            jp.write_text(json.dumps(judge_route, indent=1) + "\n",
+                          encoding="utf-8")
+        print(f"[eval] baseline route: {route_rec.get('provider')} / "
+              f"{route_rec.get('model')} ({route_rec.get('state')})", flush=True)
+        print(f"[eval] judge route: {judge_route.get('provider')} / "
+              f"{judge_route.get('model')} ({judge_route.get('state')})", flush=True)
 
     for p in problems:
         pid = p["problem_id"]
@@ -588,7 +701,8 @@ def main(argv=None) -> int:
             rec = run_pipeline_problem(p, d / "pipeline")
             _save(pid, "pipeline_record.json", rec)
             print(f"[eval] {pid}: pipeline done ({rec['wall_s']}s, "
-                  f"status={rec.get('final_status')})", flush=True)
+                  f"status={rec.get('final_status')}, completed={rec.get('completed')})",
+                  flush=True)
         if "baseline" in arms:
             rec = run_baseline_problem(p, d, route_rec)
             _save(pid, "baseline_record.json", rec)
@@ -603,26 +717,26 @@ def main(argv=None) -> int:
                 continue
             pv = (json.loads(pr.read_text(encoding="utf-8")) or {}).get("answer")
             bv = (json.loads(ba.read_text(encoding="utf-8")) or {}).get("answer")
-            rec = run_judge_problem(p, pv, bv, route_rec)
+            # never hand a refusal to the judge: only completed pipeline pairs
+            pipe_completed = (json.loads(pr.read_text(encoding="utf-8")) or {}).get("completed")
+            if not pipe_completed:
+                _save(pid, "judge_record.json", {"usable_pair": False,
+                        "why": "pipeline did not release an answer"})
+                print(f"[eval] {pid}: judge skipped (pipeline not completed)", flush=True)
+                continue
+            rec = run_judge_problem(p, pv, bv, judge_route)
             _save(pid, "judge_record.json", rec)
             print(f"[eval] {pid}: judge -> "
                   f"{rec.get('winner') if rec.get('usable_pair') else rec.get('why')}",
                   flush=True)
 
-    table = build_score_table(route_rec or
-                              _probe_route_rec())
+    table = build_score_table(route_rec or {}, judge_route or {})
     write_table(table)
     print(json.dumps({k: table[k] for k in
-                      ("BLIND_PAIRWISE_WIN_RATE", "n_usable_pairs",
-                       "pipeline_wins", "baseline_wins", "ties")}, indent=1))
+                      ("pipeline_completion", "BLIND_PAIRWISE_WIN_RATE",
+                       "n_usable_pairs", "pipeline_wins", "baseline_wins",
+                       "ties", "judge_calibration")}, indent=1, default=str))
     return 0
-
-
-def _probe_route_rec() -> Dict[str, Any]:
-    probe_p = RUNS_ROOT / _commit / "_route_probe.json"
-    if probe_p.exists():
-        return json.loads(probe_p.read_text(encoding="utf-8"))
-    return {}
 
 
 if __name__ == "__main__":

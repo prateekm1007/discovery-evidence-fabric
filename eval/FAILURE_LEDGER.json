@@ -1,0 +1,295 @@
+{
+ "ledger_version": "eval/failure-ledger/1.0.0",
+ "generated_at": "2026-11-09T22:40:28Z",
+ "scope": "per-rung transport admission probe + per-problem synthesis outcome. No secrets included (keys redacted; only env var names).",
+ "rungs": [
+  {
+   "provider": "localqwen",
+   "model": "qwen3-1.7b",
+   "http_status": 200,
+   "typed_class": "OK",
+   "latency_ms": 10305,
+   "cause": "none (works)",
+   "note": "CHEAP-only by design (not STRONG); not a failure",
+   "sample": null
+  },
+  {
+   "provider": "agnes",
+   "model": "agnes-3.0-flash",
+   "http_status": 200,
+   "typed_class": "OK",
+   "latency_ms": 714,
+   "cause": "none (works)",
+   "note": "free tier serves; STRONG-capable",
+   "sample": "OK"
+  },
+  {
+   "provider": "agnes",
+   "model": "agnes-2.5-pro",
+   "http_status": 403,
+   "typed_class": "AUTH_FAILURE",
+   "latency_ms": 437,
+   "cause": "provider",
+   "note": "per-model credit gate (quota $0)",
+   "sample": "{\"error\":{\"message\":\"Insufficient user quota, remaining: \uff040.000000 (request id: 20261109224023816301139Nde8rL1I)\",\"typ"
+  },
+  {
+   "provider": "agnes",
+   "model": "agnes-2.5-pro-alpha",
+   "http_status": 403,
+   "typed_class": "AUTH_FAILURE",
+   "latency_ms": 635,
+   "cause": "provider",
+   "note": "per-model credit gate (quota $0)",
+   "sample": "{\"error\":{\"message\":\"Insufficient user quota, remaining: \uff040.000000 (request id: 20261109224024444593558zSCRg9hP)\",\"typ"
+  },
+  {
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "http_status": 200,
+   "typed_class": "OK",
+   "latency_ms": 391,
+   "cause": "none (works)",
+   "note": "free working model (discovered 2026-11-10)",
+   "sample": "OK"
+  },
+  {
+   "provider": "xkiro",
+   "model": "mistralai/ministral-8b",
+   "http_status": 200,
+   "typed_class": "OK",
+   "latency_ms": 197,
+   "cause": "none (works)",
+   "note": "free working model (discovered 2026-11-10)",
+   "sample": "OK"
+  },
+  {
+   "provider": "xkiro",
+   "model": "qwen/qwen3.8-max:free",
+   "http_status": 404,
+   "typed_class": "MODEL_NOT_FOUND",
+   "latency_ms": 212,
+   "cause": "ours",
+   "note": "stale model id: catalog has no :free variant (registry pinned family stale)",
+   "sample": "{\"error\":{\"message\":\"Model \\\"qwen/qwen3.8-max:free\\\" does not exist.\",\"type\":\"not_found_error\",\"code\":\"not_found\"}}"
+  },
+  {
+   "provider": "unorouter",
+   "model": "deepseek-v4-flash:free",
+   "http_status": 429,
+   "typed_class": "RATE_LIMITED",
+   "latency_ms": 609,
+   "cause": "provider",
+   "note": "free pool; works when not busy",
+   "sample": "{\"error\":{\"code\":\"\",\"message\":\"Too many requests. The free tier allows 1 request(s) every 1 min per account on deepseek-"
+  },
+  {
+   "provider": "unorouter",
+   "model": "glm-5.3:free",
+   "http_status": 503,
+   "typed_class": "PROVIDER_UNAVAILABLE",
+   "latency_ms": 485,
+   "cause": "provider",
+   "note": "free pool busy (503)",
+   "sample": "{\"error\":{\"code\":\"get_channel_failed\",\"message\":\"All providers for model \\\"glm-5.3:free\\\" are busy right now (they hit t"
+  },
+  {
+   "provider": "apinex",
+   "model": "free/deepseek-v4.1-flash",
+   "http_status": 403,
+   "typed_class": "CREDIT_EXHAUSTED",
+   "latency_ms": 943,
+   "cause": "provider",
+   "note": "account suspended (403)",
+   "sample": "{\"error\":{\"message\":\"Account suspended or missing\",\"type\":\"authentication_error\",\"param\":null,\"code\":null}}"
+  },
+  {
+   "provider": "bai",
+   "model": "glm-5.1",
+   "http_status": 403,
+   "typed_class": "CREDIT_EXHAUSTED",
+   "latency_ms": 624,
+   "cause": "provider",
+   "note": "deposit required (403)",
+   "sample": "{\"error\":{\"code\":\"access_denied\",\"message\":\"Access restricted. Deposit required to unlock premium models. (request id: 2"
+  },
+  {
+   "provider": "bynara",
+   "model": "glm-5.3-flash",
+   "http_status": 429,
+   "typed_class": "RATE_LIMITED",
+   "latency_ms": 985,
+   "cause": "provider",
+   "note": "insufficient credits (429)",
+   "sample": "{\"error\":{\"type\":\"rate_limited\",\"message\":\"Insufficient credits. Please top up your balance and try again in a few minut"
+  },
+  {
+   "provider": "tokenrouter",
+   "model": "z-ai/glm-5.3-free",
+   "http_status": 401,
+   "typed_class": "AUTH_FAILURE",
+   "latency_ms": 1020,
+   "cause": "ours",
+   "note": "key-to-provider mapping wrong: thk_live key is tokenharbor, not tokenrouter (401)",
+   "sample": "{\"error\":{\"code\":\"\",\"message\":\"Invalid token (request id: 20261109224029840482793eEEm9MwL)\",\"type\":\"api_error\"}}"
+  },
+  {
+   "provider": "atria",
+   "model": "Atria-Dawn-Preview",
+   "http_status": 503,
+   "typed_class": "PROVIDER_UNAVAILABLE",
+   "latency_ms": 392,
+   "cause": "provider",
+   "note": "gateway 503 (service down)",
+   "sample": "<html>\r\n<head><title>503 Service Temporarily Unavailable</title></head>\r\n<body bgcolor=\"white\">\r\n<center><h1>503 Service"
+  }
+ ],
+ "per_problem": [
+  {
+   "problem_id": "bench-p01-pemfc-dehydration",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 21,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 21,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "bench-p03-phe-biofouling",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 16,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "bench-p04-pump-cavitation",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 16,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "bench-p05-bridge-bearing-aging",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 17,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "bench-p06-water-biofilm",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 16,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "bench-p07-cgm-biofouling",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 16,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "bench-p08-mems-stiction",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 16,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "bench-p09-packaging-barrier",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 16,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "bench-p10-pv-pid",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 16,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "bench-p11-spindle-thermal-drift",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 16,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "bench-p12-mbr-fouling",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 16,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "eval-new01-supercap-dryout",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 12,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "eval-new02-slipring-predictor",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 16,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "eval-new03-insulin-pump-occlusion",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 16,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "eval-new04-chiller-fouling-predictor",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 12,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "eval-new05-liion-balance-drift",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 16,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  },
+  {
+   "problem_id": "eval-sofc-redox",
+   "final_status": "MECHANISM_GENERATION_FAILED",
+   "n_evidence_retrieved": 16,
+   "synthesis_failed": true,
+   "retrieval_blocked": false
+  }
+ ],
+ "summary": {
+  "n_rungs_probed": 14,
+  "n_rungs_ok": 4,
+  "n_problems": 18,
+  "n_completed_pipeline": 0,
+  "ours_causes": [
+   "tokenrouter/z-ai/glm-5.3-free",
+   "xkiro/qwen/qwen3.8-max:free"
+  ],
+  "provider_causes": [
+   "agnes/agnes-2.5-pro",
+   "agnes/agnes-2.5-pro-alpha",
+   "apinex/free/deepseek-v4.1-flash",
+   "atria/Atria-Dawn-Preview",
+   "bai/glm-5.1",
+   "bynara/glm-5.3-flash",
+   "unorouter/deepseek-v4-flash:free",
+   "unorouter/glm-5.3:free"
+  ]
+ }
+}

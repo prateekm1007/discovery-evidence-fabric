@@ -45,6 +45,7 @@ def wc2_source(p):
         "constraint": p["constraint"],
         "domain": p["domain"],
         "source": "wc2_frozen",
+        "contamination_tag": "DEV_CONTAMINATED",
         "question_type": "intervention-proposal",
         "question": WC2_QUESTION,
         "user_variables": [
@@ -52,6 +53,7 @@ def wc2_source(p):
             f"device of record: {p['device']}",
             f"failure to address: {p['failure_mode']}",
         ],
+        "clarification_answer": None,
     }
 
 
@@ -226,26 +228,213 @@ NEW = [
 ]
 
 
+SOFC_THERMAL = {
+    "problem_id": "eval-sofc-thermal-cycling",
+    "device": "anode-supported solid oxide fuel cell stack with a "
+              "yttria-stabilized zirconia electrolyte and a lanthanum "
+              "strontium manganite cathode",
+    "failure": "Thermal cycling between 25 C and 800 C during start/stop "
+               "drives differential expansion between the electrolyte, the "
+               "anode, and the glass-ceramic seal; repeated cycles open "
+               "microcracks in the seal and at the cathode-electrolyte "
+               "interface, raising gas crossover and ohmic loss until the "
+               "stack fails to reach operating voltage.",
+    "failure_mode": "thermal-cycling-fatigue",
+    "constraint": "survive 500 thermal cycles from 25 C to 800 C at 5 C/min "
+                  "heating rate while holding open-circuit voltage above "
+                  "1.0 V and keeping seal leakage below 1 percent of fuel "
+                  "flow, without increasing stack mass above 2 percent",
+    "domain": "energy-conversion",
+    "source": "sofc_case_r548",
+    "contamination_tag": None,
+    "question_type": "intervention-proposal",
+    "question": WC2_QUESTION,
+    "user_variables": [
+        "500 thermal cycles from 25 C to 800 C",
+        "5 C/min heating rate",
+        "open-circuit voltage above 1.0 V",
+        "seal leakage below 1 percent of fuel flow",
+        "stack mass increase below 2 percent",
+    ],
+    "clarification_answer": {
+        "intergranular glass phase fraction": 0.15,
+        "note": "user stated the seal's intergranular glass phase fraction "
+                "is 0.15 (mass fraction) for this stack design",
+    },
+}
+
+PREDICTOR_EXTRA = [
+    {
+        "problem_id": "eval-new06-bearing-vibration-predictor",
+        "device": "rolling-element bearing in a 350 kW industrial fan drive",
+        "failure": "Inner-race spalling progresses for weeks before the "
+                   "vibration alarm trips; by then the bearing is past "
+                   "repair and the fan is forced offline.",
+        "failure_mode": "incipient-spalling",
+        "constraint": "predictor must use only the existing 1 kHz vibration "
+                      "sensor and 1 Hz SCADA logging, fire at least 14 days "
+                      "before forced replacement, and produce no more than "
+                      "2 false alarms per year",
+        "domain": "rotating-machinery",
+        "source": "new_r1",
+        "contamination_tag": None,
+        "question_type": "predictor-design",
+        "question": PREDICTOR_QUESTION,
+        "user_variables": ["1 kHz vibration sensor only", "1 Hz SCADA logging",
+                           "at least 14 days warning", "no more than 2 false "
+                           "alarms per year"],
+        "clarification_answer": None,
+    },
+    {
+        "problem_id": "eval-new07-transformer-dga-predictor",
+        "device": "oil-filled power transformer (132/33 kV, 40 MVA)",
+        "failure": "Dissolved-gas analysis is sampled quarterly, so an "
+                   "incipient partial-discharge or thermal fault can grow "
+                   "for months between samples and only be found at the "
+                   "next outage window.",
+        "failure_mode": "insulation-degradation",
+        "constraint": "predictor must infer fault onset from the online "
+                      "sensors already installed (top-oil temperature, load "
+                      "current, ambient temperature, tank pressure) at "
+                      "15-minute resolution, and must flag a developing "
+                      "fault at least 30 days before the next scheduled "
+                      "DGA sample",
+        "domain": "electrical-power",
+        "source": "new_r1",
+        "contamination_tag": None,
+        "question_type": "predictor-design",
+        "question": PREDICTOR_QUESTION,
+        "user_variables": ["online sensors: top-oil temp, load current, "
+                           "ambient temp, tank pressure", "15-minute "
+                           "resolution", "at least 30 days warning before "
+                           "next DGA sample"],
+        "clarification_answer": None,
+    },
+    {
+        "problem_id": "eval-new08-pipeline-leak-predictor",
+        "device": "buried carbon-steel water transmission pipeline (DN 600)",
+        "failure": "Small leaks below the SCADA pressure-deviation threshold "
+                   "continue for weeks, eroding the bedding and causing a "
+                   "sudden large failure instead of a repairable one.",
+        "failure_mode": "small-leak",
+        "constraint": "predictor must use only the existing pressure and "
+                      "flow transmitters at 5-minute intervals, detect a "
+                      "leak of 0.5 percent of nominal flow within 48 hours, "
+                      "and not raise more than 1 false alarm per month per "
+                      "10 km of pipe",
+        "domain": "water-infrastructure",
+        "source": "new_r1",
+        "contamination_tag": None,
+        "question_type": "predictor-design",
+        "question": PREDICTOR_QUESTION,
+        "user_variables": ["existing pressure and flow transmitters", "5-minute "
+                           "intervals", "detect 0.5 percent leak within 48 h",
+                           "no more than 1 false alarm per month per 10 km"],
+        "clarification_answer": None,
+    },
+    {
+        "problem_id": "eval-new09-hvac-filter-predictor",
+        "device": "commercial building air-handling unit with a MERV-13 "
+                  "pleated filter bank",
+        "failure": "Filter loading is estimated from a fixed 90-day "
+                   "replacement schedule, so filters are either replaced "
+                   "early (wasted cost) or run overloaded (fan energy and "
+                   "indoor air quality suffer).",
+        "failure_mode": "filter-loading",
+        "constraint": "predictor must use only BMS points already logged "
+                      "(supply/return fan power, pressure drop if available, "
+                      "outdoor air flow, occupancy schedule), must resolve a "
+                      "filter change-of-state within 1 week, and must cut "
+                      "unnecessary replacements by at least 20 percent",
+        "domain": "building-services",
+        "source": "new_r1",
+        "contamination_tag": None,
+        "question_type": "predictor-design",
+        "question": PREDICTOR_QUESTION,
+        "user_variables": ["BMS points already logged", "1 week resolution",
+                           "at least 20 percent reduction in unnecessary "
+                           "replacements"],
+        "clarification_answer": None,
+    },
+    {
+        "problem_id": "eval-new10-solar-inverter-predictor",
+        "device": "grid-tied string inverter in a 500 kWp commercial "
+                  "photovoltaic array",
+        "failure": "IGBT and capacitor degradation raises junction "
+                   "temperature and ripple current, but the inverter "
+                   "reports only an aggregate fault code after tripping, "
+                   "so the failure is not predicted.",
+        "failure_mode": "power-electronics-degradation",
+        "constraint": "predictor must use only inverter telemetry already "
+                      "exported (DC voltage/current, AC power, heatsink "
+                      "temperature, fault log) at 5-minute resolution, must "
+                      "flag a degrading inverter at least 2 weeks before "
+                      "trip, and must not raise more than 1 false alarm per "
+                      "quarter per inverter",
+        "domain": "photovoltaic",
+        "source": "new_r1",
+        "contamination_tag": None,
+        "question_type": "predictor-design",
+        "question": PREDICTOR_QUESTION,
+        "user_variables": ["inverter telemetry at 5-minute resolution",
+                           "at least 2 weeks warning", "no more than 1 "
+                           "false alarm per quarter per inverter"],
+        "clarification_answer": None,
+    },
+    {
+        "problem_id": "eval-new11-conveyor-belt-predictor",
+        "device": "rubber conveyor belt in a mining overland conveyor",
+        "failure": "Cover wear and carcass fatigue progress to a splice "
+                   "failure or a longitudinal tear; inspection is visual "
+                   "and periodic, so the failure is found by the belt "
+                   "stopping, not by prediction.",
+        "failure_mode": "belt-degradation",
+        "constraint": "predictor must use only the existing belt-scale and "
+                      "drive-motor current sensors at 1-minute resolution, "
+                      "must flag a degrading belt at least 3 weeks before "
+                      "failure, and must not raise more than 2 false alarms "
+                      "per year",
+        "domain": "bulk-materials",
+        "source": "new_r1",
+        "contamination_tag": None,
+        "question_type": "predictor-design",
+        "question": PREDICTOR_QUESTION,
+        "user_variables": ["belt-scale and drive-motor current sensors",
+                           "1-minute resolution", "at least 3 weeks warning",
+                           "no more than 2 false alarms per year"],
+        "clarification_answer": None,
+    },
+]
+
+
 def main() -> None:
     frozen = json.loads(FROZEN.read_text(encoding="utf-8"))
-    problems = [wc2_source(p) for p in frozen["problems"]] + [SOFC] + NEW
+    problems = ([wc2_source(p) for p in frozen["problems"]]
+                + [SOFC, SOFC_THERMAL]
+                + NEW
+                + PREDICTOR_EXTRA)
+    for pr in problems:
+        pr.setdefault("clarification_answer", None)
+        pr.setdefault("contamination_tag", pr.get("contamination_tag"))
     out = {
-        "eval_version": "eval/1.0.0",
-        "authored_at": "2026-11-09",
+        "eval_version": "eval/1.1.0",
+        "authored_at": "2026-11-10",
         "provenance": (
             "12 problems byte-equivalent to R401-WC2/BENCHMARK/"
-            "FROZEN_BENCHMARK.json (source of truth; the frozen file's "
-            "freeze semantics carry over); the SOFC case follows the R412 "
-            "lane-pool SOFC redox literature; 5 new problems authored "
-            "2026-11-09, disjoint from the frozen set and from engine test "
-            "fixtures. question_type and user_variables are EVAL fields "
-            "the engine reads only when a later round adds the wiring."),
+            "FROZEN_BENCHMARK.json, tagged DEV_CONTAMINATED. SOFC case "
+            "(eval-sofc-redox) + SOFC thermal-cycling case "
+            "(eval-sofc-thermal-cycling, with clarification-answer field "
+            "stating intergranular glass phase fraction) from the R412/R548 "
+            "SOFC literature. 5 + 6 new problems authored 2026-11-10; "
+            "question_type and user_variables are EVAL fields. "
+            "clarification_answer carries the user-stated clarification."),
         "problems": problems,
     }
     OUT.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {OUT}: {len(problems)} problems")
-    for p in problems:
-        print(" -", p["problem_id"], p["question_type"])
+    from collections import Counter
+    print("question_type:", Counter(p["question_type"] for p in problems))
+    print("contamination:", Counter(p.get("contamination_tag") for p in problems))
 
 
 if __name__ == "__main__":
