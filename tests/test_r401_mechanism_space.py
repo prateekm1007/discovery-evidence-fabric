@@ -99,7 +99,8 @@ def _fake_llm(responses):
     state = {"i": 0}
 
     def _gen(prompt, system="", timeout=240, max_tokens=700,
-             purpose="mechanism_space", exclude_providers=None):
+             purpose="mechanism_space", exclude_providers=None,
+             hard_pin_provider=None):
         i = state["i"]
         state["i"] += 1
         if i >= len(responses):

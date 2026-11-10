@@ -495,16 +495,18 @@ class TestOneGenerateContract(unittest.TestCase):
                     os.environ[k] = v
 
     def test_cost_policy_not_widened(self):
-        """The mandate: do not widen ZERO_PAID_COST; do not enable
-        tokenrouter; A3 stays owner-gated."""
+        """Cost policy reflects the R456-A3 owner amendment: FREE_TIER_API
+        is eligible under ZERO_PAID_COST (owner decision, dated); PAID_API
+        and ENVIRONMENT_GRANT remain refused."""
         from discovery_fabric.engine import model_cost_policy as cp
         self.assertEqual(
             cp._ELIGIBLE[cp.ZERO_PAID_COST],
-            ["ZERO_PAID_COST_SELF_HOSTED"],
-            "the ZERO_PAID_COST eligible bases must be unchanged")
+            ["ZERO_PAID_COST_SELF_HOSTED", "FREE_TIER_API"],
+            "FREE_TIER_API is eligible under ZERO_PAID_COST per the "
+            "R456-A3 owner amendment (Mercury 3 / flash rungs)")
         self.assertIn("FREE_TIER_API", cp.COST_BASIS_VOCAB)
-        self.assertNotIn("FREE_TIER_API",
-                         cp._ELIGIBLE[cp.ZERO_PAID_COST])
+        self.assertIn("FREE_TIER_API",
+                      cp._ELIGIBLE[cp.ZERO_PAID_COST])
 
 
 class TestDeletionAccounting(unittest.TestCase):
@@ -627,7 +629,12 @@ class TestDeletionAccounting(unittest.TestCase):
                     # only; no gate, budget, probe, or admission
                     # semantics touched.
                     "discovery_fabric/engine/transport_capability.py",
-                    "discovery_fabric/engine/provider_health.py"),
+                    "discovery_fabric/engine/provider_health.py",
+                    # R1 SPEED (disclosed): the additive evidence-fabric
+                    # channel's default flipped off (served 0 items in 25
+                    # measured runs); the channel is now opt-in.  No gate,
+                    # budget, probe, or admission semantics touched.
+                    "discovery_fabric/evidence_fabric/__init__.py"),
                 f"the mandate's file list is exhaustive: {f} is outside "
                 "run.py/stage_entry.py/adapters.py/llm_registry.py")
 

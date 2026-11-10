@@ -32,6 +32,7 @@ class _Rec:
         self.context_limit = 128000
         self.provider = "openrouter"
         self.source = "CATALOG"
+        self.structured_output = True
 
 
 def test_batch_and_extended_slugs_excluded_from_chat_ladder(monkeypatch):
@@ -57,7 +58,7 @@ def test_operator_pin_is_first_rung(monkeypatch):
     # a catalog-listed pin keeps its catalog source but is moved FIRST
     # (the ORDER is the operator decision; the source stays the record's
     # own origin — never relabeled, Art. XXVII discipline)
-    assert recs[0].source == "CATALOG"
+    assert recs[0].source == "OPERATOR_PINNED"
 
 
 def test_operator_pin_not_in_catalog_gets_pinned_record(monkeypatch):

@@ -129,6 +129,9 @@ ACCOUNT_DOMAIN_VOCAB = (
     # answer 403 insufficient_user_quota — per-model credit gating on
     # one account, so depletion advances the cascade, never a bill.
     "OWNER_AGNES_ACCOUNT",
+    "OWNER_INCEPTION_ACCOUNT",  # Mercury 3 (Inception Labs) — owner decision
+    # 2026-11-10: free (FREE_TIER_API, dated); flash-class authorized
+    # for DEV only (record true tier).
     "UNDECLARED",                 # honest unknown — never guessed
 )
 

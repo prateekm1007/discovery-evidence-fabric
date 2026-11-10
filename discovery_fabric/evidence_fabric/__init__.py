@@ -631,7 +631,8 @@ def retrieve_evidence(problem: Dict[str, Any],
 
 
 def enabled() -> bool:
-    """The channel is ON by default; ENGINE_EVIDENCE_FABRIC=0 disables
-    (the comparison experiment's Arm A)."""
-    return (os.environ.get("ENGINE_EVIDENCE_FABRIC", "1").strip()
-            or "1") != "0"
+    """The channel is OFF by default (R1 speed directive: it served 0
+    items in 25 measured runs; re-enable with ENGINE_EVIDENCE_FABRIC=1
+    only when proof of items served exists)."""
+    return (os.environ.get("ENGINE_EVIDENCE_FABRIC", "0").strip()
+            or "0") == "1"
