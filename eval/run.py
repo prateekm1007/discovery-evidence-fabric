@@ -1215,6 +1215,7 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
     never a refusal and never silently dropped). Process isolation also
     means an edit in the main tree cannot touch an in-flight run."""
     import subprocess
+    import threading
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
     script = str(Path(__file__).resolve())
@@ -1226,29 +1227,34 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
                "--child"]
         t0 = time.time()
         try:
+            # DEVNULL children: no pipe-buffer deadlock risk; the child
+            # persists its own durable artifacts (stage ledgers) which
+            # the parent reads for stage timings. The killer thread
+            # guarantees a hard wall-clock bound (Art. LXI).
             cp = subprocess.Popen(cmd, cwd=str(REPO),
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE, text=True)
-            try:
-                out, err = cp.communicate(timeout=timeout_s)
-                return {"problem_id": pid, "state": "DONE",
-                        "returncode": cp.returncode,
-                        "stdout": (out or "")[-1600:],
-                        "stderr": (err or "")[-800:],
-                        "wall_s": round(time.time() - t0, 1)}
-            except subprocess.TimeoutExpired:
-                # graceful first: SIGTERM, then escalate to kill
-                cp.terminate()
-                try:
-                    out, err = cp.communicate(timeout=10)
-                except subprocess.TimeoutExpired:
-                    cp.kill()
-                    out, err = cp.communicate()
-                return {"problem_id": pid, "state": "TIMEOUT",
-                        "returncode": "TIMEOUT",
-                        "stdout": (out or "")[-1600:],
-                        "stderr": (err or "")[-800:],
-                        "wall_s": round(time.time() - t0, 1)}
+                                  stdout=subprocess.DEVNULL,
+                                  stderr=subprocess.DEVNULL)
+
+            def _killer():
+                time.sleep(timeout_s)
+                if cp.poll() is None:
+                    try:
+                        cp.terminate()
+                    except Exception:  # noqa: BLE001
+                        pass
+                    time.sleep(10)
+                    if cp.poll() is None:
+                        try:
+                            cp.kill()
+                        except Exception:  # noqa: BLE001
+                            pass
+
+            th = threading.Thread(target=_killer, daemon=True)
+            th.start()
+            rc = cp.wait()
+            return {"problem_id": pid, "state": "DONE" if rc == 0 else "TIMEOUT",
+                    "returncode": rc,
+                    "wall_s": round(time.time() - t0, 1)}
         except Exception as _exc:  # noqa: BLE001 — spawn failure is infra
             return {"problem_id": pid, "state": "TIMEOUT",
                     "returncode": "SPAWN_FAILED",
