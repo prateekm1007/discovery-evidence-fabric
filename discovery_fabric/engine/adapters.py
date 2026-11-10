@@ -255,6 +255,13 @@ class A2RetrievalAdapter(BaseAdapter):
         fabric = _import_with_env("discovery_fabric.retrieval_fabric")
         _t0 = _time.monotonic()
         items, report = fabric.retrieve(env.problem)
+        # R3: abstract coverage — fetch missing abstracts (bounded)
+        try:
+            items, _abf = _backfill_abstracts(items, budget_s=25.0)
+            report["abstract_backfill"] = _abf
+        except Exception as _abf_exc:  # noqa: BLE001 — infra, not verdict
+            report["abstract_backfill"] = {
+                "error": f"{type(_abf_exc).__name__}: {_abf_exc}"[:160]}
         _t_fabric = _time.monotonic() - _t0
         stats = report.get("retrieval_stats", {})
         diversity = report.get("retrieval_diversity", {})
@@ -816,6 +823,63 @@ def _bounded_call(fn, arg, budget_s: float):
     if "error" in box:
         raise box["error"]
     return box.get("value"), False
+
+
+def _backfill_abstracts(items, budget_s: float = 25.0):
+    """R3: fetch missing abstracts for doi-identified items.
+
+    Bounded wall-clock and call count (infra, not verdict); records a
+    typed coverage record. Items already custodied are never reworded —
+    an absent abstract is filled from the provider's own text only.
+    """
+    import time as _t
+    import urllib.parse as _up
+    import urllib.request as _ur
+
+    def _doi_of(item):
+        doi = str(item.get("doi") or "").strip()
+        if not doi:
+            ident = str(item.get("id") or "")
+            ident = ident.removeprefix("doi:").removeprefix("https://doi.org/")
+            doi = ident
+        return doi.strip()
+
+    empt = [i for i in items if not str(i.get("abstract") or "").strip()]
+    stats = {"n_items": len(items), "n_empty_before": len(empt),
+             "n_fetched": 0, "n_filled": 0, "failed": [],
+             "source": "semantic_scholar"}
+    if not empt:
+        return items, stats
+    deadline = _t.monotonic() + budget_s
+    for it in empt:
+        if stats["n_fetched"] >= 6 or _t.monotonic() > deadline:
+            break
+        doi = _doi_of(it)
+        if not doi:
+            continue
+        try:
+            url = ("https://api.semanticscholar.org/graph/v1/paper/"
+                   f"DOI:{_up.quote(doi, safe='')}?fields=abstract")
+            with _ur.urlopen(url, timeout=6) as r:
+                body = json.loads(r.read(200_000).decode("utf-8", "replace"))
+        except Exception as exc:  # noqa: BLE001 — infra, never verdict
+            stats["n_fetched"] += 1
+            stats["failed"].append(
+                {"doi": doi, "reason": f"{type(exc).__name__}: {exc}"[:120]})
+            continue
+        stats["n_fetched"] += 1
+        abs_txt = (body or {}).get("abstract") if isinstance(body, dict) else None
+        if abs_txt and len(str(abs_txt).strip()) >= 40:
+            it["abstract"] = str(abs_txt).strip()[:2400]
+            it.setdefault("retrieval_backfill", []).append(
+                {"source": "semantic_scholar", "fetched_at": utc_now()})
+            stats["n_filled"] += 1
+        else:
+            stats["failed"].append(
+                {"doi": doi, "reason": "EMPTY_OR_NO_ABSTRACT"})
+    stats["n_empty_after"] = sum(
+        1 for i in items if not str(i.get("abstract") or "").strip())
+    return items, stats
 
 
 def _lean_select_operator(items, problem, all_matches: bool = False):

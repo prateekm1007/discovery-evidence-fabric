@@ -561,6 +561,37 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
             v4_corrections_applied.append(
                 f"burden_of_proof:risk_flag:{dim_name}")
 
+        # ===== R3 A/B (DEV only): unsupported-but-plausible+testable =====
+        # Audit finding: the gauntlet kills "not in the record". An
+        # unsupported mechanism that is plausible, testable with a named
+        # falsifier, and flagged is a HYPOTHESIS — it survives flagged,
+        # ranked lower, instead of silently dying (Art. LXI: the flagged
+        # state is honest). ONLY unsupported_mechanism; contradiction/
+        # feasibility/obvious/prior-art kills are untouched.
+        if (os.environ.get("ENGINE_ATTACK_AB", "").strip()
+                == "survive_unsupported_falsifiable"
+                and dim_name == "UNSUPPORTED_MECHANISM"
+                and is_killed):
+            _cand_text = json.dumps(candidate, default=str).lower()
+            _fals = any(k in _cand_text for k in (
+                "falsif", "validate", "a/b ", "hold ", "cycle", "measure",
+                "monitor", "threshold"))
+            if _fals:
+                body = _objection_text(_basis_body(raw_verdict))
+                is_killed = False
+                raw_verdict = (f"RISK (A/B unsupported-falsifiable) — "
+                               f"{body}")
+                risk_flags.append({
+                    "dimension": dim_name,
+                    "verdict": "RISK",
+                    "basis": body,
+                    "source": "ab_unsupported_falsifiable",
+                    "hypothesis": True,
+                    "falsifier_present": True,
+                })
+                v4_corrections_applied.append(
+                    "ab:unsupported_falsifiable_survives")
+
         corrected_attacks[dim_name] = raw_verdict
 
     # ===== Compute corrected overall =====

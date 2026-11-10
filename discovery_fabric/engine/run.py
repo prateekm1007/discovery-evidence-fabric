@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
@@ -3619,15 +3620,41 @@ class EngineRun:
                 continue
             t = str(e.get("title") or "(untitled)")
             a = str(e.get("abstract") or "")[:800]
-            record_lines.append(f"- {t}\n  {a}")
+            record_lines.append(
+                f"- record_id={e.get('id')}: {t}\n  {a}")
+        # the stated failure + variables the revision must stay inside
+        _problem = (self.problem or {})
+        _failure_words = set(
+            w for w in re.findall(r"[a-z]{4,}",
+                                  str(_problem.get("failure") or "").lower())
+            if w not in {"this", "that", "with", "from", "their", "there",
+                         "such", "into", "under", "over", "between", "never",
+                         "half", "less", "more", "most"})
+        _constraint_words = set(
+            w for w in re.findall(r"[a-z]{4,}",
+                                  str(_problem.get("constraint") or "").lower()))
+        _var_words = set()
+        for v in (_problem.get("user_variables") or []):
+            _var_words.update(
+                w for w in re.findall(r"[a-z]{4,}", str(v).lower()))
+        _fidelity_vocab = _failure_words | _constraint_words | _var_words
 
         prompt = (
             "You are revising an engineering invention candidate that the\n"
             "adversarial gauntlet REJECTED. Every mechanism term in your revision\n"
             "MUST trace to the provided record; do not add claims beyond it.\n"
             "Do not cite any source not shown; the record is the ONLY allowed\n"
-            "authority. Revise to remove ONLY the defects in the kill rationale\n"
-            "below; keep the design intent.\n\n"
+            "authority.\n"
+            "You MAY switch the anchor record (pick a DIFFERENT record_id from\n"
+            "the list if another record grounds the mechanism better) \u2014 the\n"
+            "anchor line names the record the revision is built on.\n"
+            "Revise to remove ONLY the defects in the kill rationale below;\n"
+            "keep the design intent and stay strictly inside the stated\n"
+            "failure mode and variables.\n\n"
+            f"DEVICE: {_problem.get('device', '')}\n"
+            f"FAILURE: {_problem.get('failure', '')}\n"
+            f"CONSTRAINT: {_problem.get('constraint', '')}\n"
+            f"USER VARIABLES: {', '.join(_problem.get('user_variables') or [])}\n\n"
             f"DESIGN INTENT:\nmechanism: "
             f"{raw_cand.get('mechanism', '')}\n"
             f"intervention: {raw_cand.get('intervention', '')}\n"
@@ -3636,9 +3663,10 @@ class EngineRun:
             f"predicted_effect: {raw_cand.get('predicted_effect', '')}\n\n"
             "KILL RATIONALE (the defects to eliminate):\n"
             + "\n".join(f"{k}: {v}" for k, v in kill_reasons.items())
-            + "\n\nEVIDENCE RECORD (the only authority):\n"
+            + "\n\nEVIDENCE RECORD with record_id (the only authority):\n"
             + "\n".join(record_lines)
             + "\n\nOutput ONLY these lines:\n"
+              "anchor: <record_id>\n"
               "mechanism: <sentence>\n"
               "intervention: <sentence>\n"
               "expected_effect: <sentence>\n"
@@ -3670,15 +3698,40 @@ class EngineRun:
         content = meta.get("content") or ""
         parsed: Dict[str, str] = {}
         for m in _re.finditer(
-                r"^(mechanism|intervention|expected_effect|falsification_test|"
-                r"predicted_effect)\s*[:=]\s*(.+)$",
+                r"^(anchor|mechanism|intervention|expected_effect|"
+                r"falsification_test|predicted_effect)\s*[:=]\s*(.+)$",
                 content, _re.M | _re.I):
             parsed[m.group(1).lower()] = m.group(2).strip()
-        if len(parsed) < 5:
+        if len(parsed) < 6:
             revision["state"] = "REVISE_PARSE_FAILED"
             revision["parsed"] = parsed
             self._persist("REVISE_LEDGER.json", revision)
             return revision
+
+        # Question-fidelity check (deterministic): the revision must
+        # stay inside the stated failure mode and variables, else it is
+        # not an answer to the SAME question and is rejected.
+        _revised_text = " ".join(
+            parsed.get(k, "") for k in (
+                "mechanism", "intervention", "expected_effect",
+                "falsification_test", "predicted_effect")).lower()
+        _fidelity_hits = sorted(
+            w for w in _fidelity_vocab
+            if w in _revised_text)
+        if len(_fidelity_hits) < 2:
+            revision["state"] = "REVISE_FIDELITY_FAILED"
+            revision["fidelity_hits"] = _fidelity_hits
+            revision["parsed"] = parsed
+            revision["fidelity_note"] = (
+                "revision addresses fewer than 2 stated failure/variable "
+                "tokens — not the same question")
+            self._persist("REVISE_LEDGER.json", revision)
+            return revision
+        revision["fidelity_hits"] = _fidelity_hits
+        revision["anchor_switch"] = (parsed.get("anchor")
+                                     if parsed.get("anchor") not in (
+                                         None, "", raw_cand.get("anchor"))
+                                     else None)
 
         revised = dict(raw_cand)
         for k, v in parsed.items():

@@ -49,6 +49,26 @@ from typing import Any, Dict, List, Optional
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
+
+def _answer_contract(answer, question_type):
+    """Deterministic shape check of the released pipeline answer."""
+    try:
+        from discovery_fabric.engine.answer_contract import validate_answer
+        return validate_answer(answer or "", question_type or "")
+    except Exception as exc:  # noqa: BLE001
+        return {"valid": None, "violations": [f"validator error: {exc}"],
+                "question_type": question_type}
+
+
+def _contract_summary(rows):
+    out = []
+    for r in rows:
+        ac = r.get("answer_contract") or {}
+        out.append({"problem_id": r.get("problem_id"),
+                    "valid": ac.get("valid"),
+                    "violations": ac.get("violations") or []})
+    return out
+
 os.environ.setdefault("LOCAL_QWEN_BASE_URL", "http://127.0.0.1:8790/v1/chat/completions")
 os.environ.setdefault("MODEL_COST_POLICY", "ZERO_PAID_COST")
 
@@ -60,12 +80,13 @@ SCORE_DIR = Path(__file__).resolve().parent / "score"
 # subset mixing intervention and predictor types, full 25 only at
 # checkpoints). Pre-registered ids, never chosen after seeing results.
 DEV6 = [
-    "bench-p02-leadacid-grid-corrosion",
-    "bench-p05-bridge-bearing-aging",
-    "bench-p09-packaging-barrier",
-    "eval-new02-slipring-predictor",
-    "eval-new06-bearing-vibration-predictor",
-    "eval-new09-hvac-filter-predictor",
+    "bench-p02-leadacid-grid-corrosion",   # intervention; contamination
+    "bench-p05-bridge-bearing-aging",      # intervention; contamination
+    "bench-p09-packaging-barrier",         # intervention; contamination
+    "eval-new02-slipring-predictor",       # predictor
+    "eval-new06-bearing-vibration-predictor",  # predictor
+    "eval-new09-hvac-filter-predictor",    # predictor
+    "eval-sofc-thermal-cycling",           # intervention; has clarification_answer (e_clarification)
 ]
 
 CRITERIA = {
@@ -74,6 +95,7 @@ CRITERIA = {
     "c_prediction": "gives a specific testable prediction",
     "d_evidence": "grounded in the provided evidence",
     "e_clarification": "uses the user's clarification answer correctly",
+    "f_novelty": "gives a specific, non-obvious design (not the generic default)",
 }
 
 # Judge must be a different provider + model family from the baseline
@@ -167,14 +189,19 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
             err = f"{type(exc).__name__}: {exc}"[:400]
     completed = (out_dir / "final_state.json").exists() and \
         json.loads((out_dir / "final_state.json").read_text(encoding="utf-8")).get("final_status") in COMPLETED_STATUSES
+    _ans = _extract_pipeline_answer(out_dir)
+    _avr = _attack_overall(out_dir)
     record: Dict[str, Any] = {
-        "answer": _extract_pipeline_answer(out_dir),
+        "answer": _ans,
         "completed": completed,
         "wall_s": round(time.time() - t0, 1),
         "engine_error": err,
         "stage_times_s": _stage_times(out_dir),
         "same_evidence": _evidence_snapshot(out_dir),
-        "attack_verdict": _attack_overall(out_dir),
+        "attack_verdict": _avr,
+        "answer_state": ("UNVERIFIED_HYPOTHESIS"
+                         if (_avr == "KILLED" and _ans)
+                         else ("RELEASED" if _ans else "NO_ANSWER")),
     }
     if final_state.exists():
         fs = json.loads(final_state.read_text(encoding="utf-8"))
@@ -206,14 +233,48 @@ def _attack_overall(out_dir: Path) -> str:
     return "UNKNOWN"
 
 
+def _best_flagged_answer(out_dir: Path) -> Optional[str]:
+    """Deliver the best flagged hypothesis honestly labeled UNVERIFIED
+    (Art. XI/LXI). Never presents a killed candidate as an invention;
+    the label says exactly what it is."""
+    ce = out_dir / "candidate_envelope.json"
+    if not ce.exists():
+        return None
+    try:
+        d = json.loads(ce.read_text(encoding="utf-8"))
+        mm = d.get("mechanism_map") or {}
+        parts = []
+        for k in ("mechanism", "intervention", "expected_effect",
+                  "falsification_test", "predicted_effect"):
+            v = mm.get(k)
+            if isinstance(v, str) and v.strip():
+                parts.append(v.strip())
+            elif isinstance(v, dict):
+                t = v.get("value") or v.get("mechanism") or ""
+                if isinstance(t, str) and t.strip():
+                    parts.append(t.strip())
+        if not parts:
+            return None
+        body = "\n\n".join(parts)[:6000]
+        return ("UNVERIFIED HYPOTHESIS — this candidate was NOT endorsed by "
+                "the adversarial gauntlet (it was revised once and rejected "
+                "again). It is delivered as a hypothesis requiring the "
+                "falsification test below; it is NOT an invention claim.\n\n"
+                + body)
+    except Exception:
+        return None
+
+
 def _extract_pipeline_answer(out_dir: Path) -> Optional[str]:
     """Normalised plain-text answer, or None when nothing was released
-    (a refusal notice is never handed to the judge �? Art. LXI)."""
-    # A candidate killed by the adversarial gauntlet is NOT the invention
-    # and must not be presented as one (Art. XI/LXI honesty). The answer
-    # is withheld — the record shows the kill, not a fake release.
+    (a refusal notice is never handed to the judge — Art. LXI)."""
+    # Always-deliver (Art. XI): if the gauntlet killed everything but a
+    # candidate exists, deliver the best hypothesis honestly labeled
+    # UNVERIFIED instead of nothing.
     if _attack_overall(out_dir) == "KILLED":
-        return None
+        released = _best_flagged_answer(out_dir)
+        if released:
+            return released
     # 1) released invention spec (post-rank path)
     spec_p = out_dir / "INVENTION_SPECIFICATION.json"
     if spec_p.exists():
@@ -414,6 +475,32 @@ def probe_judge_route(baseline_provider: str) -> Dict[str, Any]:
             "probed": attempts, "at": utc_now()}
 
 
+def probe_judge2_route(baseline_provider: str,
+                       judge_provider: Optional[str]) -> Dict[str, Any]:
+    """Second judge: different family from BOTH baseline and the primary
+    judge (advisory; never changes the tally)."""
+    candidates = [
+        ("inception", "mercury-3"),
+        ("unorouter", "deepseek-v4-flash:free"),
+        ("xkiro", "mistralai/ministral-14b"),
+        ("agnes", "agnes-3.0-flash"),
+    ]
+    attempts = []
+    for prov, model in candidates:
+        if prov in (baseline_provider, judge_provider):
+            attempts.append({"provider": prov, "model": model,
+                             "state": "SKIPPED_FAMILY_OVERLAP"})
+            continue
+        ok = _probe_rung(prov, model)
+        attempts.append({"provider": prov, "model": model,
+                         "state": "OK" if ok else "FAIL"})
+        if ok:
+            return {"provider": prov, "model": model, "state": "OK",
+                    "probed": attempts, "at": utc_now()}
+    return {"provider": None, "model": None, "state": "NO_JUDGE2_ROUTE",
+            "probed": attempts, "at": utc_now()}
+
+
 # ---------------------------------------------------------------------------
 # arm: baseline
 # ---------------------------------------------------------------------------
@@ -525,6 +612,7 @@ def _rubric_prompt(problem, a_text: str, b_text: str,
     if clar:
         lines.append("5 " + CRITERIA["e_clarification"])
     lines += [
+        "6 " + CRITERIA["f_novelty"],
         "Grade strictly: vague/generic/number-ignoring/unverified claims "
         "score low; quantified, testable, package-grounded answers score "
         "high. If an answer carries a number absent from the packet, cap "
@@ -535,6 +623,7 @@ def _rubric_prompt(problem, a_text: str, b_text: str,
     ]
     if clar:
         lines += ["A5: <1-5>", "B5: <1-5>"]
+    lines += ["A6: <1-5>", "B6: <1-5>"]
     lines.append("PREFER: A | B | TIE")
     return "\n".join(lines)
 
@@ -564,6 +653,13 @@ def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
         passes.append({"order": order, "raw": res.get("content", ""),
                        **_parse_rubric(res.get("content", ""))})
     crit = {c: {"pipeline": [], "baseline": []} for c in CRITERIA}
+    _pt = json.dumps(packet or [], ensure_ascii=False)
+    def _num_absent(ans):
+        import re
+        nums = set(re.findall(r"\d+(?:\.\d+)?", ans or ""))
+        return sorted(n for n in nums if n not in _pt)
+    number_absent = {"pipeline": _num_absent(pipe_ans),
+                     "baseline": _num_absent(base_ans)}
     prefs: List[str] = []
     for p in passes:
         if "error" in p:
@@ -592,7 +688,8 @@ def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
         winner = "tie"
     return {"usable_pair": True,
             "passes": len([p for p in passes if "error" not in p]),
-            "scores": finals, "winner": winner, "pref_passes": prefs}
+            "scores": finals, "winner": winner, "pref_passes": prefs,
+            "number_absent": number_absent}
 
 
 def _m(v: List[int]) -> float:
@@ -602,12 +699,12 @@ def _m(v: List[int]) -> float:
 def _parse_rubric(raw: str) -> Dict[str, Any]:
     import re
     fields: Dict[str, str] = {}
-    for m in re.finditer(r"^\s*([AB][1-5]|PREFER)\s*[:=]\s*(.+)$",
+    for m in re.finditer(r"^\s*([AB][1-6]|PREFER)\s*[:=]\s*(.+)$",
                          raw or "", re.M):
         fields[m.group(1).upper()] = m.group(2).strip()[:8]
     prefer = fields.pop("PREFER", None)
     for k, v in list(fields.items()):
-        if k in {f"{s}{j}" for s in "AB" for j in range(1, 6)}:
+        if k in {f"{s}{j}" for s in "AB" for j in range(1, 7)}:
             try:
                 fields[k] = str(int(v))
             except ValueError:
@@ -781,6 +878,8 @@ def build_score_table(route_rec: Dict[str, Any],
             "question_type": p["question_type"],
             "contamination_tag": p.get("contamination_tag"),
             "has_clarification": bool(p.get("clarification_answer")),
+            "answer_contract": _answer_contract(pipe.get("answer"),
+                                                p.get("question_type")),
             "pipeline_final_status": pipe.get("final_status"),
             "pipeline_completed": completed,
             "wall_s": pipe.get("wall_s"),
@@ -792,6 +891,8 @@ def build_score_table(route_rec: Dict[str, Any],
             "same_evidence": same,
             "usable_pair": judge.get("usable_pair", False),
             "winner": judge.get("winner"),
+            "number_absent": judge.get("number_absent"),
+            "second_judge": (judge.get("second_judge") or {}).get("agreement"),
             "criterion_diffs": {c: (judge.get("scores") or {}).get(c, {}).get("diff")
                                 for c in CRITERIA},
             "notes": (base.get("blocked") or pipe.get("engine_error") or "")[:120],
@@ -995,6 +1096,8 @@ def write_table(table: Dict[str, Any]) -> None:
         "fresh vs contaminated: " + json.dumps(table["fresh_vs_contaminated"]),
         "criterion mean diffs (pipeline-baseline): "
         + json.dumps(table["criterion_mean_diffs_pipeline_minus_baseline"]),
+        "answer-shape contract: "
+        + json.dumps(_contract_summary(table.get("rows") or []), default=str),
         "",
         "| problem | tag | type | final_status | completed | wall_s | mech | distinct | starved_reason | winner | crit diffs |",
         "|---|---|---|---|---|---|---|---|---|---|---|",
@@ -1163,6 +1266,20 @@ def main(argv=None) -> int:
             judge_route = probe_judge_route(route_rec.get("provider"))
             jp.write_text(json.dumps(judge_route, indent=1) + "\n",
                           encoding="utf-8")
+        # second judge (different family from both baseline and primary
+        # judge); advisory, never changes the tally
+        if os.environ.get("ENGINE_SECOND_JUDGE", "1").strip() not in (
+                "0", "false", "no"):
+            jp2 = RUNS_ROOT / _commit / "_judge2_route_probe.json"
+            if jp2.exists():
+                judge2_route = json.loads(jp2.read_text(encoding="utf-8"))
+            else:
+                judge2_route = probe_judge2_route(
+                    route_rec.get("provider"), judge_route.get("provider"))
+                jp2.write_text(json.dumps(judge2_route, indent=1) + "\n",
+                               encoding="utf-8")
+        else:
+            judge2_route = {"provider": None, "state": "DISABLED"}
         print(f"[eval] baseline route: {route_rec.get('provider')} / "
               f"{route_rec.get('model')} ({route_rec.get('state')})", flush=True)
         print(f"[eval] judge route: {judge_route.get('provider')} / "
@@ -1207,6 +1324,23 @@ def main(argv=None) -> int:
                 continue
             snap = _evidence_snapshot(Path(d) / "pipeline")
             rec = run_judge_problem(_intake_problem(p), pv, bv, judge_route, packet=(snap or {}).get("items"))
+            if judge2_route.get("provider") and rec.get("usable_pair"):
+                rec2 = run_judge_problem(_intake_problem(p), pv, bv,
+                                         judge2_route,
+                                         packet=(snap or {}).get("items"))
+                rec["second_judge"] = {
+                    "provider": judge2_route.get("provider"),
+                    "model": judge2_route.get("model"),
+                    "winner": rec2.get("winner"),
+                    "scores": rec2.get("scores"),
+                    "usable_pair": bool(rec2.get("usable_pair")),
+                    "agreement": ("AGREE" if rec2.get("winner") == rec.get("winner")
+                                  else ("DISAGREE" if rec2.get("usable_pair")
+                                        else "NO_ROUTE")),
+                }
+            elif judge2_route.get("provider"):
+                rec["second_judge"] = {"provider": judge2_route.get("provider"),
+                                       "state": "skipped (first-judge pair unusable)"}
             _save(pid, "judge_record.json", rec)
             # raw pair for independent audit (Art. XII custody): both
             # answers, the evidence ids, the judge output — never edited

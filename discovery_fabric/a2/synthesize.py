@@ -436,6 +436,17 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
             device=problem["device"], failure=problem["failure"], constraint=problem["constraint"],
             title=paper["title"], abstract=paper["abstract"][:1200],
             span_instruction=SPAN_INSTRUCTION + _dir_block)
+        # R3: answer-shape contract is routed per question type (the
+        # intervention-proposal vs predictor-design contracts have
+        # different required fields)
+        try:
+            from discovery_fabric.engine.answer_contract import (
+                ANSWER_SHAPE_BLOCK)
+            _qt = problem.get("question_type") or ""
+            if ANSWER_SHAPE_BLOCK.get(_qt):
+                prompt = prompt + ANSWER_SHAPE_BLOCK[_qt]
+        except Exception:  # noqa: BLE001 — contract must never block the run
+            pass
         _spans["prompt_construction_total_s"] += time.perf_counter() - _t0
         print(f"  [synthesize] calling LLM (paper {attempt + 1}: "
               f"{str(paper.get('title'))[:60]})...")
