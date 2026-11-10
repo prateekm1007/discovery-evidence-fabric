@@ -1168,9 +1168,14 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             _seen_ops.add(_oid)
             _head.append(_m)
     matched = _head + _tail
-    # latency guard: the fast rungs serve 3 concurrent calls; the
-    # deterministic tail is unchanged.
-    _MAX_OP_CALLS = 3
+    # latency guard: the fast rungs serve up to 9 concurrent calls; the
+    # deterministic tail is unchanged. Configurable via env MAX_OP_CALLS
+    # for the KPI sweep (Art. LXXVII); default 3.
+    try:
+        _MAX_OP_CALLS = int(os.environ.get("MAX_OP_CALLS", "3") or 3)
+    except (TypeError, ValueError):
+        _MAX_OP_CALLS = 3
+    _MAX_OP_CALLS = max(1, min(_MAX_OP_CALLS, 9))
     matched = matched[:_MAX_OP_CALLS]
     _clk.mark("operator_selection",
               {"n_contracts_evaluated": len(sel_all.get("evaluated") or []),
