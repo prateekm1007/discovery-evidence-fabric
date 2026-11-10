@@ -158,7 +158,9 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
                 _intake_problem(problem), str(out_dir),
                 run_id=f"eval-{problem['problem_id']}",
                 package_registry_path=str(out_dir / "PACKAGE_ID_REGISTRY.json"),
-                with_package=True, resume=resume)
+                with_package=(os.environ.get("ENGINE_NO_PACKAGE", "").strip()
+                             not in ("1", "true", "yes")),
+                resume=resume)
             manifest = run.run()
             status = manifest.get("final_status") if isinstance(manifest, dict) else None
         except Exception as exc:  # noqa: BLE001
