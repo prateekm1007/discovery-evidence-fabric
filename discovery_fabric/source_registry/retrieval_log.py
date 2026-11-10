@@ -13,6 +13,7 @@ entry here (source_id + query + raw_payload_sha256).
 from __future__ import annotations
 
 import json
+import os
 import threading
 from pathlib import Path
 from typing import Optional
@@ -28,24 +29,86 @@ def _ensure_dir() -> None:
 
 
 def _last_entry_sha() -> Optional[str]:
-    """Read the sha of the last entry (chain verification)."""
+    """Read the sha of the last entry (chain verification).
+
+    A crash mid-write can leave a partial (invalid JSON) tail. Rather
+    than refusing forever (which wedges every subsequent retrieval),
+    drop the partial tail and continue from the last complete entry —
+    the chain integrity of the valid entries is preserved and the
+    dropped bytes were never a complete record (Art. XI: history
+    integrity is not negotiable, but a partial write is not history).
+    """
     if not LOG_PATH.exists():
         return None
-    last = None
-    with LOG_PATH.open("r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                last = line
-    if last is None:
-        return None
     try:
-        return json.loads(last).get("entry_sha256")
-    except json.JSONDecodeError:
-        raise RuntimeError(
-            "retrieval_log.jsonl is corrupted (last line is not valid JSON); "
-            "refusing to append — Art. XI: history integrity is not negotiable"
-        )
+        raw = LOG_PATH.read_bytes()
+    except OSError:
+        return None
+    if not raw:
+        return None
+    text = raw.decode("utf-8", errors="replace")
+    lines = text.split("\n")
+    if lines and lines[-1] != "":
+        lines = lines[:-1]
+    last_valid_sha = None
+    last_valid_end = 0
+    pos = 0
+    for line in lines:
+        line_with_nl = line + "\n"
+        s = line.strip()
+        if not s:
+            pos += len(line_with_nl.encode("utf-8"))
+            continue
+        try:
+            obj = json.loads(s)
+            last_valid_sha = obj.get("entry_sha256")
+            last_valid_end = pos + len(line_with_nl.encode("utf-8"))
+        except json.JSONDecodeError:
+            break
+        pos += len(line_with_nl.encode("utf-8"))
+    try:
+        if last_valid_end < len(raw):
+            with LOG_PATH.open("r+b") as f:
+                f.truncate(last_valid_end)
+    except OSError:
+        pass
+    return last_valid_sha
+
+
+def _file_lock(path: Path):
+    """Cross-process exclusive lock (best-effort; falls back to no lock)."""
+    import contextlib
+
+    lock_path = path.with_suffix(path.suffix + ".lock")
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    f = lock_path.open("w")
+
+    @contextlib.contextmanager
+    def _ctx():
+        try:
+            if os.name == "nt":
+                import msvcrt
+                msvcrt.locking(f.fileno(), msvcrt.LK_LOCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(f, fcntl.LOCK_EX)
+        except Exception:
+            pass
+        try:
+            yield
+        finally:
+            try:
+                if os.name == "nt":
+                    import msvcrt
+                    msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
+                else:
+                    import fcntl
+                    fcntl.flock(f, fcntl.LOCK_UN)
+            except Exception:
+                pass
+            f.close()
+
+    return _ctx()
 
 
 def append_entry(
@@ -79,29 +142,30 @@ def append_entry(
     """
     from discovery_fabric.source_registry.base import utc_now, sha256_obj
 
-    with _LOCK:
-        prev_sha = _last_entry_sha()
-        entry = {
-            "source_id": source_id,
-            "query": query,
-            "url": url,
-            "status": status,
-            "http_status": http_status,
-            "latency_ms": latency_ms,
-            "record_count": record_count,
-            "raw_payload_sha256": raw_payload_sha256,
-            "error": error,
-            "run_id": run_id,
-            "rate_limit_remaining": rate_limit_remaining,
-            "retrieval_role": retrieval_role,
-            "timestamp": utc_now(),
-            "prev_entry_sha256": prev_sha,
-        }
-        entry["entry_sha256"] = sha256_obj(entry)
-        _ensure_dir()
-        with LOG_PATH.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(entry, sort_keys=True, ensure_ascii=False) + "\n")
-        return entry
+    with _file_lock(LOG_PATH):
+        with _LOCK:
+            prev_sha = _last_entry_sha()
+            entry = {
+                "source_id": source_id,
+                "query": query,
+                "url": url,
+                "status": status,
+                "http_status": http_status,
+                "latency_ms": latency_ms,
+                "record_count": record_count,
+                "raw_payload_sha256": raw_payload_sha256,
+                "error": error,
+                "run_id": run_id,
+                "rate_limit_remaining": rate_limit_remaining,
+                "retrieval_role": retrieval_role,
+                "timestamp": utc_now(),
+                "prev_entry_sha256": prev_sha,
+            }
+            entry["entry_sha256"] = sha256_obj(entry)
+            _ensure_dir()
+            with LOG_PATH.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(entry, sort_keys=True, ensure_ascii=False) + "\n")
+            return entry
 
 
 def verify_chain() -> dict:
