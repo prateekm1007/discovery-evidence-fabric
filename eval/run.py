@@ -114,11 +114,15 @@ CRITERIA = {
 }
 
 # Judge must be a different provider + model family from the baseline
-# (agnes) and never the 1.7B model. Candidates probed in order.
+# (agnes) and never the 1.7B model. Candidates probed in order. The
+# inception rung is owner-supplied (2026-11-10, Mercury 3, free tier)
+# and reads OK at the capability probe; it is the LAST fallback, never
+# preferred over the calibration-preserved xkiro route.
 JUDGE_CANDIDATES = [
     ("xkiro", "mistralai/ministral-14b"),
     ("xkiro", "mistralai/ministral-8b"),
     ("unorouter", "deepseek-v4-flash:free"),
+    ("inception", "mercury-3"),
 ]
 
 
