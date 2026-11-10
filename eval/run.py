@@ -927,15 +927,8 @@ def run_two_turn_problem(problem: Dict[str, Any], out_dir: Path,
                else str(ff))
     out_dir2 = out_dir / "pipeline_r2"
     out_dir2.mkdir(parents=True, exist_ok=True)
-    q2_problem = dict(problem)
-    q2_problem["constraint"] = (
-        str(problem.get("constraint") or "").rstrip(" .")
-        + f". The user returned with one finding: {_ff_txt}.").lstrip(" .")
-    q2_problem["user_variables"] = (list(
-        problem.get("user_variables") or [])
-        + [f"the user finding: {_ff_txt}"])
-    q2_problem["followup_finding"] = ff
-    q2 = _intake_problem(q2_problem)
+    q2 = _intake_problem(problem)  # injects the finding into constraint
+                                   # and user_variables (Art. LI)
 
     os.environ["ENGINE_EVIDENCE_CACHE"] = str(snap_path)
     try:
@@ -966,8 +959,10 @@ def run_two_turn_problem(problem: Dict[str, Any], out_dir: Path,
     rec["round2_same_snapshot"] = (
         (_evidence_snapshot(out_dir2) or {}).get("hash") == snap.get("hash"))
     if rec["round2_answer"]:
+        q1 = _intake_problem({k: v for k, v in problem.items()
+                              if k != "followup_finding"})
         rec["judge_round1"] = run_judge_problem(
-            _intake_problem(problem), rec["round1_answer"], base.get("answer"),
+            q1, rec["round1_answer"], base.get("answer"),
             judge_route, packet=(snap or {}).get("items"))
         rec["judge_round2"] = run_judge_problem(
             q2, rec["round2_answer"], base.get("answer"),
@@ -1551,9 +1546,13 @@ def main(argv=None) -> int:
                 print(f"[eval] {_label(pid)}: judge skipped (pipeline not completed)", flush=True)
                 continue
             snap = _evidence_snapshot(Path(d) / "pipeline")
-            rec = run_judge_problem(_intake_problem(p), pv, bv, judge_route, packet=(snap or {}).get("items"))
+            # round-1 pair is judged WITHOUT the follow-up finding; the
+            # finding belongs only to round 2 (run_two_turn_problem)
+            q1 = _intake_problem({k: v for k, v in p.items()
+                                  if k != "followup_finding"})
+            rec = run_judge_problem(q1, pv, bv, judge_route, packet=(snap or {}).get("items"))
             if judge2_route.get("provider") and rec.get("usable_pair"):
-                rec2 = run_judge_problem(_intake_problem(p), pv, bv,
+                rec2 = run_judge_problem(q1, pv, bv,
                                          judge2_route,
                                          packet=(snap or {}).get("items"))
                 rec["second_judge"] = {
