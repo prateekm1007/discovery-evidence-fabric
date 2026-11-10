@@ -1335,7 +1335,8 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
         pid = p["problem_id"]
         cmd = [sys.executable, "-B", script, "--arms", "pipeline",
                "--problems", pid, "--problems-file", problems_file,
-               "--root", str(RUNS_ROOT), "--child"]
+               "--root", str(RUNS_ROOT), "--commit", _commit,
+               "--child"]
         t0 = time.time()
         try:
             # DEVNULL children: no pipe-buffer deadlock risk; the child
@@ -1432,11 +1433,18 @@ def main(argv=None) -> int:
                     help="hard per-problem timeout in seconds")
     ap.add_argument("--child", action="store_true",
                     help="internal: one problem in its own process")
+    ap.add_argument("--commit", default=None,
+                    help="internal: the parent's commit; the child reuses "
+                         "it verbatim instead of resolving HEAD "
+                         "(prevents run-dir splitting when HEAD moves "
+                         "mid-run)")
     args = ap.parse_args(argv)
-    global RUNS_ROOT
+    global RUNS_ROOT, _commit
     arms = [a.strip().lower() for a in args.arms.split(",") if a.strip()]
     if args.root:
         RUNS_ROOT = Path(args.root)
+    if args.commit:
+        _commit = args.commit
     if args.holdout:
         hpath = Path(args.holdout)
         if not hpath.exists():
