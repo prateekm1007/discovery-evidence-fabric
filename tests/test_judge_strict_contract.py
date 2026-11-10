@@ -25,7 +25,7 @@ def _judge_route():
 
 def _pass_content(prefer: str) -> str:
     lines = [f"{s}{j}: 4" for s in "AB" for j in (1, 2, 3, 4)]
-    lines += ["A6: 4", "B6: 4", f"PREFER: {prefer}"]
+    lines += ["A5: 4", "B5: 4", "A6: 4", "B6: 4", f"PREFER: {prefer}"]
     return "\n".join(lines)
 
 
@@ -130,3 +130,56 @@ def test_out_of_range_score_rejects_pass():
     out = R.run_judge_problem(PROBLEM, "pipe answer", "base answer",
                               _judge_route(), packet=[])
     assert out["usable_pair"] is False
+
+
+def _calib_fake(n_good: int, n_empty: int):
+    """Deterministic calibration stub: n_good valid picks of the good
+    answer, n_empty empty responses, rest valid but WRONG."""
+    pairs = R.json.loads(open(
+        Path(__file__).resolve().parents[1] /
+        "eval" / "judge_calibration.json", encoding="utf-8").read())
+    state = {"i": 0}
+
+    def fake(provider, model, prompt, system, max_tokens):
+        idx = state["i"]
+        state["i"] += 1
+        if idx < n_empty:
+            return {"status": "OK", "content": ""}
+        # valid pick: the good answer is A when the deterministic order is
+        # good_first, else B; we reconstruct the same order rule here
+        import hashlib
+        e = pairs[idx]
+        order = ("good_first"
+                 if int(hashlib.sha256(
+                     f"{e['problem_id']}:{idx}".encode()).hexdigest()[:8],
+                     16) % 2 == 0
+                 else "bad_first")
+        picked_good = idx < n_empty + n_good
+        if order == "good_first":
+            prefer = "A" if picked_good else "B"
+        else:
+            prefer = "B" if picked_good else "A"
+        lines = [f"{s}{j}: 4" for s in "AB" for j in (1, 2, 3, 4)]
+        lines += ["A5: 4", "B5: 4", "A6: 4", "B6: 4", f"PREFER: {prefer}"]
+        return {"status": "OK", "content": "\n".join(lines)}
+
+    return fake
+
+
+def test_calibration_full_set_gate_requires_24_correct():
+    R._transport_call = _calib_fake(n_good=24, n_empty=2)
+    out = R.run_judge_calibration({"provider": "x", "model": "m"})
+    assert out["n_pairs"] == 30
+    assert out["n_valid"] == 28
+    assert out["correct"] >= 24
+    assert out["passed"] is True
+
+    R._transport_call = _calib_fake(n_good=23, n_empty=2)
+    out = R.run_judge_calibration({"provider": "x", "model": "m"})
+    assert out["passed"] is False
+
+    R._transport_call = _calib_fake(n_good=1, n_empty=29)
+    out = R.run_judge_calibration({"provider": "x", "model": "m"})
+    assert out["n_valid"] == 1
+    assert out["correct"] == 1
+    assert out["passed"] is False
