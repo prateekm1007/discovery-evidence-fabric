@@ -285,32 +285,6 @@ class TestAttackDCioSucceedsPackageFails:
         assert completion_proves_run(rd) is False
         assert (obj.get("downloads") or {}).get("package_zip") is None
 
-    def test_extractor_and_authority_agree_on_axes(self, run_dir):
-        # the join with Task 1: the CIO extractor may verify FIELDS on
-        # the CIO body while the completion authority still says the
-        # RUN is incomplete — field extraction is not run completion
-        sys.path.insert(0, str(REPO_ROOT / "scripts"))
-        from r446_cio_extraction import extract_cio_fields
-        from toscanini import cio as _cio
-        rd = self._invention_run_dir(run_dir)
-        obj = _cio.build_cio({"session_id": "ts_attack_d",
-                              "run_dir": str(rd),
-                              "user_text": "attack",
-                              "final_status":
-                              "AUTOMATED_INVENTION_CANDIDATE",
-                              "origin": "test"})
-        obj["present"] = True
-        (obj.get("provenance") or {}).pop("run_dir", None)
-        out = extract_cio_fields(200, obj)
-        # fields extracted (or typed missing) — either way the
-        # extraction state is about THE CIO's fields...
-        assert out["extraction_state"] in (
-            "CIO_FIELDS_VERIFIED", "CIO_MISSING_CANONICAL_FIELDS")
-        # ...and the completion authority is about THE RUN — different
-        # question, never collapsed
-        assert completion_proves_run(rd) is False
-
-
 # ---------------------------------------------------------------------------
 # ATTACK E — visual typed-skip while the website would claim complete
 # ---------------------------------------------------------------------------

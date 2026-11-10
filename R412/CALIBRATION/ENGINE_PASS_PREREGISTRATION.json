@@ -1,0 +1,65 @@
+{
+ "artifact_type": "R417_ENGINE_ATTACKER_PASS_PREREGISTRATION",
+ "pass_id": "engine-independent",
+ "purpose": "measure the ENGINE'S OWN product attacker (discovery_fabric/engine/independent_attack.py, independent_attack/1.0.0) on the sealed 40-case calibration corpus, closing the binding gap between the R412 measurement (which measured the sibling r411 8-surface protocol) and the instrument that actually gates the product's standard gauntlet and the R416 evolution loop",
+ "sealed_corpus": {
+  "path": "R412/CALIBRATION/r412_attacker_calibration_corpus.json",
+  "seal": "R412/CALIBRATION/r412_calibration_seal.json",
+  "rule": "preflight verifies the corpus sha256 against the seal before any attack; a mutated corpus aborts the pass (Art. VIII); the corpus is UNTOUCHED by this pass"
+ },
+ "instrument": {
+  "module": "discovery_fabric/engine/independent_attack.py",
+  "attack_version": "independent_attack/1.0.0",
+  "modification": "NONE — the instrument is imported and called exactly as the product path calls it (Art. LIX: no tuning between or during passes)",
+  "consumers_of_this_instrument": ["the standard gauntlet independent-attack stage (run.py)", "the R416 evolution loop per-generation challenge (run.py::_evolution_pipeline)"]
+ },
+ "input_mapping": {
+  "rule": "the sealed corpus case fields map onto the engine instrument's candidate/problem/evidence inputs as follows; the mapping is part of THIS preregistration, fixed before the run",
+  "candidate.mechanism": "corpus candidate.causal_chain (a list — rendered as ' -> '.join(links), the author-intended chain text)",
+  "candidate.intervention": "corpus candidate.intervention",
+  "candidate.predicted_effect": "corpus candidate.predicted_effect",
+  "candidate.testable_prediction": "corpus candidate.killer_experiment.experiment + ' Kill condition: ' + killer_experiment.kill_condition",
+  "candidate.novel_design_variable": "corpus candidate.unexploited_phenomenon",
+  "candidate.known_failure_modes": "corpus candidate.failure_modes",
+  "candidate.constraint_set.boundary_conditions": "corpus candidate.boundary_conditions",
+  "problem.device": "corpus candidate.baseline.baseline_incumbent (the status quo the candidate must beat — exactly what the engine prompt's Baseline field means)",
+  "problem.failure": "corpus candidate.problem (the pain statement string)",
+  "evidence": "corpus pool records, mapped to {id: record_id, title: title}",
+  "generator_provider": "null — no generator to separate from (the corpus is deterministically authored; the instrument's independence_mode stays as it computes, honestly labelled)"
+ },
+ "instrument_scope_disclosure": {
+  "prior_art": "the engine instrument has NO prior-art attack class: the product delegates prior-art collision to the deterministic collision instrument (prior_art_v2). The PRIOR_ART_COLLISION cohort (10 cases) is therefore measured as COVERAGE, not as a pass/fail surface of this instrument: an engine-instrument non-kill on those cases is recorded as EXPECTED_NOT_COVERED (a coverage boundary of the instrument, disclosed — never a silent miss and never an excuse)",
+  "tpo_denominators": {
+   "sealed_30": "ALL defect cases (KNOWN_BAD + NEAR_MISS + PRIOR_ART_COLLISION) — the conservative threshold-comparison denominator: a PRIOR_ART_COLLISION miss counts as a miss",
+   "scoped_20": "KNOWN_BAD + NEAR_MISS only (the classes the instrument actually attacks) — reported as a diagnostic",
+   "threshold_comparison_uses": "sealed_30 (conservative)"
+  },
+  "fpr_denominator": "the 10 KNOWN_GOOD cases (unchanged from the seal)"
+ },
+ "thresholds": {
+  "source": "byte-copied from R412/CALIBRATION/r412_calibration_seal.json at run time — never hardcoded here (Art. XXVII)",
+  "values_for_the_record": {
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "tpr_min": 0.75,
+   "fpr_max": 0.30
+  },
+  "tuning_rule": "no threshold, prompt, or protocol change after results are seen (Art. LIX)"
+ },
+ "transport": {
+  "provider": "zai (sandbox-local gateway, scripts/zai_gateway.mjs)",
+  "model": "glm-4-plus",
+  "env_pins": {"ENGINE_LLM_PROVIDER": "zai", "ZAI_MODEL": "glm-4-plus"},
+  "confound_disclosure": "the deployed product attacker routes through the model-routing registry (nvidia family at deploy time); this pass measures the instrument PROTOCOL at the sandbox's one live transport. The sibling-protocol family evidence (r411 8-surface: FPR 0.80 minimax-m3 / 1.00 glm-4-plus, cross-model agreement 1.0) covers two models; the engine protocol is measured at one. No pure model-family attribution is claimed."
+ },
+ "prediction_before_the_run": {
+  "falsifiable_claim": "based on the measured family evidence (hostile DESTROY-class protocols kill 80-100% of sealed KNOWN_GOOD cases), the engine 6-class protocol is PREDICTED to exceed the FPR bar (FPR > 0.30) — i.e. the expected verdict is NOT_CALIBRATED",
+  "the_falsifying_outcome": "CALIBRATED (FPR <= 0.30 at TPR >= 0.75) would falsify the family-generalization claim and will be recorded as such, with the difference analyzed (the 6-class basis-validated protocol is narrower than the 8-surface protocol — it validates KILL bases and omits prior_art/commercial/experiment surfaces)",
+  "why_this_is_preregistered": "Art. XXXII: the strongest alternative explanation is stated and testable BEFORE the measurement, not selected after"
+ },
+ "outputs": {
+  "checkpoint_jsonl": "R412/CALIBRATION/runs/engine-independent.jsonl (append-only, resume-safe, INCOMPLETE re-queued within the bounded retry budget — Art. LXI)",
+  "measurement_record": "R412/CALIBRATION/engine_independent_attack_measurement.json (a NEW artifact; the sealed r412_attacker_measurement.json is never rewritten)"
+ },
+ "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+}

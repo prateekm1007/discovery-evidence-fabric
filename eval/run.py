@@ -996,20 +996,33 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
                "--problems", pid, "--child"]
         t0 = time.time()
         try:
-            cp = subprocess.run(cmd, cwd=str(REPO), capture_output=True,
-                                text=True, timeout=timeout_s)
-            return {"problem_id": pid, "state": "DONE",
-                    "returncode": cp.returncode,
-                    "stdout": (cp.stdout or "")[-1600:],
-                    "stderr": (cp.stderr or "")[-800:],
-                    "wall_s": round(time.time() - t0, 1)}
-        except subprocess.TimeoutExpired as exc:
-            out = exc.stdout or ""
-            if isinstance(out, bytes):
-                out = out.decode("utf-8", "replace")
+            cp = subprocess.Popen(cmd, cwd=str(REPO),
+                                  stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE, text=True)
+            try:
+                out, err = cp.communicate(timeout=timeout_s)
+                return {"problem_id": pid, "state": "DONE",
+                        "returncode": cp.returncode,
+                        "stdout": (out or "")[-1600:],
+                        "stderr": (err or "")[-800:],
+                        "wall_s": round(time.time() - t0, 1)}
+            except subprocess.TimeoutExpired:
+                # graceful first: SIGTERM, then escalate to kill
+                cp.terminate()
+                try:
+                    out, err = cp.communicate(timeout=10)
+                except subprocess.TimeoutExpired:
+                    cp.kill()
+                    out, err = cp.communicate()
+                return {"problem_id": pid, "state": "TIMEOUT",
+                        "returncode": "TIMEOUT",
+                        "stdout": (out or "")[-1600:],
+                        "stderr": (err or "")[-800:],
+                        "wall_s": round(time.time() - t0, 1)}
+        except Exception as _exc:  # noqa: BLE001 — spawn failure is infra
             return {"problem_id": pid, "state": "TIMEOUT",
-                    "returncode": "TIMEOUT",
-                    "stdout": str(out)[-1600:], "stderr": "",
+                    "returncode": "SPAWN_FAILED",
+                    "stdout": "", "stderr": f"{type(_exc).__name__}: {_exc}"[:800],
                     "wall_s": round(time.time() - t0, 1)}
 
     results: List[Dict[str, Any]] = []

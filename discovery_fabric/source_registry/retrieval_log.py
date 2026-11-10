@@ -66,13 +66,51 @@ def _last_entry_sha() -> Optional[str]:
         except json.JSONDecodeError:
             break
         pos += len(line_with_nl.encode("utf-8"))
+    # Quarantine the dropped partial/invalid bytes: never a silent
+    # truncation. The dropped bytes go to a quarantine sidecar and a
+    # typed PARTIAL_TAIL_TRUNCATED custody entry records byte count
+    # and the sha of the dropped bytes (Art. XI: no silent truncation).
     try:
         if last_valid_end < len(raw):
-            with LOG_PATH.open("r+b") as f:
-                f.truncate(last_valid_end)
+            _quarantine_tail(raw, last_valid_end, last_valid_sha)
     except OSError:
         pass
     return last_valid_sha
+
+
+def _quarantine_tail(raw: bytes, drop_from: int,
+                     prev_sha: Optional[str]) -> None:
+    """Preserve dropped bytes + record a typed quarantine entry."""
+    from discovery_fabric.source_registry.base import utc_now, sha256_obj
+
+    dropped = raw[drop_from:]
+    q = LOG_PATH.with_suffix(LOG_PATH.suffix + ".quarantine")
+    _ensure_dir()
+    with q.open("ab") as qf:
+        qf.write(dropped)
+    drop_sha = sha256_obj({"dropped_bytes_hex": dropped.hex()})
+    entry = {
+        "source_id": "retrieval_log",
+        "query": f"PARTIAL_TAIL_TRUNCATED:{len(dropped)}B",
+        "url": None,
+        "status": "PARTIAL_TAIL_TRUNCATED",
+        "http_status": None,
+        "latency_ms": 0,
+        "record_count": 0,
+        "raw_payload_sha256": drop_sha,
+        "error": (f"partial/invalid tail quarantined to {q.name}; "
+                  f"dropped_bytes={len(dropped)} sha256={drop_sha} "
+                  f"(Art. XI: no silent truncation)"),
+        "run_id": None,
+        "rate_limit_remaining": None,
+        "retrieval_role": None,
+        "timestamp": utc_now(),
+        "prev_entry_sha256": prev_sha,
+    }
+    entry["entry_sha256"] = sha256_obj(entry)
+    with LOG_PATH.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, sort_keys=True, ensure_ascii=False)
+                + "\n")
 
 
 def _file_lock(path: Path):
