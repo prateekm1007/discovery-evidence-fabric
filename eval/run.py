@@ -881,7 +881,8 @@ def _funnel_row(problem_dir: Path) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 def run_two_turn_problem(problem: Dict[str, Any], out_dir: Path,
                          route_rec: Dict[str, Any],
-                         judge_route: Dict[str, Any]) -> Dict[str, Any]:
+                         judge_route: Dict[str, Any],
+                         timeout_s: int = 300) -> Dict[str, Any]:
     """Art. LI learning-loop step: INGEST the user's follow-up finding
     into the ENGINE and RE-RUN the discovery pipeline on the updated
     problem state with the SAME frozen evidence (RETRIEVE skipped via
@@ -931,23 +932,43 @@ def run_two_turn_problem(problem: Dict[str, Any], out_dir: Path,
                                    # and user_variables (Art. LI)
 
     os.environ["ENGINE_EVIDENCE_CACHE"] = str(snap_path)
+    import threading
+    _r2_result: Dict[str, Any] = {}
+
+    def _run_r2():
+        try:
+            from discovery_fabric.engine.run import EngineRun
+            _r = EngineRun(q2, str(out_dir2),
+                           run_id=f"eval-{problem['problem_id']}-r2",
+                           package_registry_path=str(out_dir2 /
+                                                     "PACKAGE_ID_REGISTRY.json"),
+                           with_package=False, resume=False)
+            _r2_result["manifest"] = _r.run()
+        except Exception as exc:  # noqa: BLE001 — typed, never silent
+            _r2_result["error"] = f"{type(exc).__name__}: {exc}"[:400]
+
+    _t0 = time.time()
+    _th = threading.Thread(target=_run_r2, daemon=True)
+    _th.start()
+    _th.join(timeout_s)
     try:
-        from discovery_fabric.engine.run import EngineRun
-        _t0 = time.time()
-        run = EngineRun(q2, str(out_dir2),
-                        run_id=f"eval-{problem['problem_id']}-r2",
-                        package_registry_path=str(out_dir2 /
-                                                  "PACKAGE_ID_REGISTRY.json"),
-                        with_package=False, resume=False)
-        manifest = run.run()
+        if _th.is_alive():
+            rec["two_turn"] = "TIMEOUT"
+            rec["error"] = (f"round-2 engine exceeded {timeout_s}s "
+                            f"wall-clock (daemon thread abandoned; "
+                            f"partial artifacts in pipeline_r2/)")
+            rec["round2_wall_s"] = round(time.time() - _t0, 1)
+            os.environ.pop("ENGINE_EVIDENCE_CACHE", None)
+            _save(problem["problem_id"], "two_turn_record.json", rec)
+            return rec
+        if "error" in _r2_result:
+            rec["two_turn"] = "ENGINE_ERROR"
+            rec["error"] = _r2_result["error"]
+            _save(problem["problem_id"], "two_turn_record.json", rec)
+            return rec
+        manifest = _r2_result.get("manifest")
         rec["round2_wall_s"] = round(time.time() - _t0, 1)
         rec["round2_manifest_final"] = (manifest or {}).get("final_status")
-    except Exception as exc:  # noqa: BLE001 — typed, never silent
-        os.environ.pop("ENGINE_EVIDENCE_CACHE", None)
-        rec["two_turn"] = "ENGINE_ERROR"
-        rec["error"] = f"{type(exc).__name__}: {exc}"[:400]
-        _save(problem["problem_id"], "two_turn_record.json", rec)
-        return rec
     finally:
         os.environ.pop("ENGINE_EVIDENCE_CACHE", None)
     rec["round2_answer"] = _extract_pipeline_answer(out_dir2)
@@ -1611,7 +1632,8 @@ def main(argv=None) -> int:
             for p in problems:
                 pid = p["problem_id"]
                 d = RUNS_ROOT / _commit / pid
-                r = run_two_turn_problem(p, d, route_rec, judge_route)
+                r = run_two_turn_problem(p, d, route_rec, judge_route,
+                                         timeout_s=args.timeout)
                 print(f"[two-turns] {pid}: round2 "
                       f"{'ok' if r.get('round2_answer') else r.get('two_turn')}",
                       flush=True)
