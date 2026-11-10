@@ -1036,10 +1036,19 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
         _rec.update({"outcome": JUDGE_VALID, "prefer": pref,
                      "picked_good": picked_good})
         details.append(_rec)
-    acc = round(correct / total, 3) if total else 0.0
-    passed = bool(total and acc >= 0.8)
-    return {"calibrated": bool(passed), "n_pairs": total, "correct": correct,
-            "accuracy": acc, "threshold": 0.8, "passed": passed,
+    acc = round(correct / max(len(pairs), 1), 3)
+    # R5 P0-1 gate: at least 24/30 CORRECT verdicts on the FULL known-answer
+    # set. A pair the judge fails to answer counts as WRONG (an empty or
+    # malformed response is neither evidence of judge competence nor a
+    # usable calibration tally). n_valid is reported for diagnostics.
+    passed = bool(correct >= 24)
+    return {"calibrated": bool(passed), "n_pairs": len(pairs),
+            "n_valid": total,
+            "correct": correct,
+            "accuracy": acc, "threshold": 0.8,
+            "threshold_correct_pairs": 24,
+            "passed": passed,
+            "answered_rate": round(total / max(len(pairs), 1), 3),
             "error_classes": err_classes,
             "n_details_failed": sum(1 for d in details
                                     if d.get("outcome") != JUDGE_VALID),
