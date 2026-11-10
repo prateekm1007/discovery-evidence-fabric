@@ -1,0 +1,62 @@
+{
+ "problem_id": "eval-new06-bearing-vibration-predictor",
+ "commit": "a7f62005f732",
+ "dirty_tree": false,
+ "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+ "clarification_answer": null,
+ "baseline_answer": "**Proposed Leading Indicator:**\n**High-Frequency Envelope Spectral Energy (HFE) at Bearing Fault Frequencies (BPFI/BSF), derived from 1 kHz vibration data.**\n\n**Rationale & Constraint Analysis:**\n*   **Sensor Limitation (1 kHz):** Standard 1 kHz vibration sensors typically capture up to ~250 Hz (Nyquist). However, early inner-race spalling generates high-frequency impulsive impacts (kHz range) modulated by low-frequency rotation. By applying **demodulation/envelope analysis** to the 1 kHz raw data, you can extract the low-frequency fault signature (Inner Race Pass Frequency, BPFI) that appears well before standard RMS vibration alarms trip. This aligns with [core] *Detection and Diagnosis... Using Time Encoded Signal Processing*, which confirms vibration is the primary data source, and [core] *The application of spectral kurtosis...*, which suggests high-frequency content is key for early detection.\n*   **SCADA Limitation (1 Hz):** You cannot log 1 kHz data at 1 Hz. Instead, log the **derived HFE metric** (a single scalar value per second or minute) calculated by the edge processor. This respects the 1 Hz logging constraint while preserving the high-frequency diagnostic information.\n*   **Warning Time (14 days):** Inner-race spalling progression is slow. HFE energy rises exponentially in the early stages. [crossref] *Industrial Scalable Rolling Element Bearing...* supports the feasibility of scalable prognostic modeling using such features to provide lead time.\n\n**Operating Threshold:**\n1.  **Baseline:** Calculate the rolling mean and standard deviation of HFE over 30 days of healthy operation.\n2.  **Alert Threshold:** Set alarm at **Mean + 3\u03c3**.\n3.  **Trend Rate Limit (False Alarm Control):** To meet the \u201c\u22642 false alarms/year\u201d requirement, do not alarm on absolute value alone. Require the HFE to **exceed Mean + 3\u03c3 AND have a sustained positive slope (rate of increase) for at least 24 hours**. This filters out transient load spikes (false positives) and focuses on the progressive spalling trend.\n\n**Expected Measurable Effect:**\n*   Detection of inner-race spalling onset (when HFE starts trending) typically occurs **21\u201335 days** before standard vibration RMS alarms. This provides the required **\u226514 days** window.\n*   Cost-effectiveness: Uses existing 1 kHz sensor and minimal edge-computing resources (FFT + envelope detection), avoiding costly high-frequency AE sensors or new infrastructure.\n\n**Falsification Test (Validation):**\n**Test Name:** Controlled Spalling Induction Experiment with Load Variability.\n\n1.  **Setup:** Install the same 1 kHz sensor and edge-processing logic on a test rig running a 350 kW-class fan bearing (or equivalent load/speed profile).\n2.  **Procedure:**\n    *   **Phase 1 (Control):** Run the bearing under varying industrial loads (simulate fan wind speed variations) for 2 weeks. Record HFE metrics. Verify **zero** false alarms (the 24-hour slope gate must block all transient load-induced spikes).\n    *   **Phase 2 (Fault Injection):** Induce a known inner-race spall (e.g., via EDM or controlled impact) on a sacrificial bearing or monitor a progressively degrading bearing in a controlled test cell.\n    *   **Measurement:** Track the time delta between the actual spall formation (verified post-mortem via microscopy) and the point where the HFE metric crosses the \u201cMean + 3\u03c3 with 24h slope\u201d threshold.\n3.  **Falsification Criteria:**\n    *   If the time delta is **<14 days**, the predictor fails the warning requirement.\n    *   If any transient load variation in Phase 1 triggers the 24-hour slope gate, the false-alarm rate fails (unless the threshold is adjusted, which must be re-validated for sensitivity).\n    *   If the HFE metric does not distinguish between inner-race and outer-race faults (if outer-race spall also triggers the same early alert), the specificity is compromised, though the system may still be acceptable",
+ "pipeline_answer": "Adhesive joints were designed as the key enabling mechanism for structural reuse and characterized under tensile loading.\n\nApply adhesive-joint design principles to bond multiple glass-fiber-reinforced polymer laminate layers from decommissioned turbine blades into a structural beam, and install this beam as a reinforcing rib on the bearing housing to stiffen it, reducing the stress concentration that drives inner-race spalling.\n\nThe stiffened housing redistributes contact stress and delays spalling progression, extending the time from first damage to alarm trip to at least 14 days while keeping false alarms at or below 2 per year.\n\nIn a bench test, mount the GL-FRP beam on a replicating bearing housing, run it at normal load with a seeded inner-race defect, and measure the vibration envelope at 1 kHz; if the alarm does not trip at least 14 days before a forced replacement (defined as 100% spall area) or if false alarms exceed 2 per year, the intervention fails.",
+ "evidence_ids": [
+  "doi:10.3390/ma19173622",
+  "doi:10.3389/fpls.2025.1721367",
+  "doi:10.3390/ma19071284",
+  "doi:10.1038/s41598-026-56333-8",
+  "doi:10.1093/9780191821677.001.0001",
+  "doi:10.3390/s26206564",
+  "doi:10.22215/etd/2023-16010",
+  "doi:10.70675/48397afbz9356z4014z838ez675820cf8b7d",
+  "doi:10.22215/etd/2007-08311",
+  "doi:10.1016/j.ymssp.2010.06.010",
+  "title:8b75f3807bb6507f",
+  "doi:10.1108/13552510910961138",
+  "title:e6559f91910c13d8"
+ ],
+ "judge_record": {
+  "usable_pair": true,
+  "passes": 2,
+  "scores": {
+   "a_answered": {
+    "pipeline_mean": 1.5,
+    "baseline_mean": 5.0,
+    "diff": -3.5
+   },
+   "b_user_vars": {
+    "pipeline_mean": 1.0,
+    "baseline_mean": 5.0,
+    "diff": -4.0
+   },
+   "c_prediction": {
+    "pipeline_mean": 2.5,
+    "baseline_mean": 5.0,
+    "diff": -2.5
+   },
+   "d_evidence": {
+    "pipeline_mean": 1.0,
+    "baseline_mean": 5.0,
+    "diff": -4.0
+   },
+   "e_clarification": {
+    "pipeline_mean": null,
+    "baseline_mean": null,
+    "diff": null
+   }
+  },
+  "winner": "baseline",
+  "pref_passes": [
+   "baseline",
+   "baseline"
+  ]
+ },
+ "baseline_same_evidence_hash": "00671ce5f783b3f546be7b8c7a240cfa8f5675dcbb7bce43067a96d962ec2721",
+ "pipeline_same_evidence_hash": "00671ce5f783b3f546be7b8c7a240cfa8f5675dcbb7bce43067a96d962ec2721"
+}

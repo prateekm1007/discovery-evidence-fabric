@@ -1,0 +1,65 @@
+{
+ "problem_id": "bench-p02-leadacid-grid-corrosion",
+ "commit": "a7f62005f732",
+ "dirty_tree": false,
+ "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+ "clarification_answer": null,
+ "baseline_answer": "**Engineering Recommendation: Alloying Modification and Gelled Electrolyte Integration**\n\nTo achieve a 15-year float service life at 2.27 V/cell while maintaining antimony (Sb) content below 2%, the primary intervention is to modify the positive grid alloy from pure Lead (Pb) or high-Sb alloys to a **Lead-Calcium-Tin (Pb-Ca-Sn)** alloy, combined with a **gelled-electrolyte** configuration using a polymer-modified glass mat.\n\n**1. Proposed Design/Intervention:**\n*   **Alloy Adjustment:** Replace standard antimony-calcium alloys with a Pb-Ca-Sn alloy where Tin (Sn) replaces a portion of the antimony. Sn enhances mechanical strength and corrosion resistance without the cathodic polarization issues associated with high Sb. Keep Sb < 2% as constrained, relying on Ca (typically 0.05\u20130.10%) and Sn (typically 0.5\u20131.0%) for structural integrity.\n*   **Electrolyte Configuration:** Use a **gelled electrolyte** (e.g., silica gel or polymer-silica composite) rather than Absorptive Glass Mat (AGM). Evidence indicates that gelled electrolytes exhibit lower corrosion rates for positive grids compared to both flooded and AGM configurations, specifically in low-temperature and long-duration float scenarios.\n*   **Plate Design Optimization:** Ensure the Positive Active Material (PAM) and Corrosion Layer (CL) interface is optimized. The [core] evidence highlights that plate design, alloy composition, and paste density are critical. Specifically, increasing the density of the lead paste and ensuring proper assembly compression reduces the thickness of the corrosion layer (CL), preserving the Active Mass Collecting Layer (AMCL) conductivity.\n\n**2. Expected Measurable Effect:**\n*   **Grid Corrosion:** Significant reduction in the rate of cross-section loss of the positive grid. The Pb-Ca-Sn alloy is less prone to \"tin whisker\" formation and excessive bismuth impurity effects if raw materials are controlled.\n*   **Internal Resistance:** Stabilization of internal resistance over 15 years. In standard Sb-heavy or pure Pb grids, resistance rises exponentially in the final years due to grid thinning and porosity changes. The gelled electrolyte mitigates water stratification and local concentration gradients that accelerate localized corrosion.\n*   **Capacity Retention:** Maintaining >80% of initial capacity at the 15-year mark under 2.27 V/cell continuous charge.\n\n**3. Falsification Test:**\nTo falsify this approach, one must demonstrate that the specific design *fails* to meet the 15-year life criterion.\n\n*   **Test Protocol:**\n    1.  **Accelerated Aging:** Subject the proposed VRLA battery (Pb-Ca-Sn positive grid, gelled electrolyte) to a continuous float charge at 2.27 V/cell.\n    2.  **Temperature Cycle:** Perform the test at 45\u00b0C (or another elevated temperature appropriate for 15-year projection per Arrhenius scaling, e.g., 40-45\u00b0C for 18-24 months).\n    3.  **Metric:** Monitor internal resistance and discharge capacity.\n*   **Falsification Condition:** If, at the end of the accelerated period (scaled to 15-year equivalent), the battery\u2019s capacity falls below 80% of its initial value, OR if post-mortem cross-sectional analysis shows positive grid corrosion exceeding 50% of the original grid wall thickness, the design is falsified. Specifically, if the Pb-Ca-Sn grid shows *higher* corrosion rates than a control AGM Sb-lead battery under identical conditions, the proposed alloy/electrolyte combination is ineffective for this specific service life target.\n\n**Evidence Citation:**\n*   **[core] Performance characteristics...** directly supports that gelled electrolytes have lower positive grid corrosion rates than AGM/flooded systems.\n*   **[core] Factors influencing...** confirms that plate design, alloy composition (specifically Ca/Sn/Sb balances), and assembly compression are the dominant variables for positive plate life.\n*   **[openaire]",
+ "pipeline_answer": "Corrosion of the positive electrode plate is a specific failure mode of valve regulated lead acid batteries that can induce thermal runaway and fire.\n\nImplement a fire prevention scheme based on monitoring the positive grid corrosion rate to trigger early thermal management or charge termination before the cross-section is critically consumed.\n\nPrevents the transition from gradual capacity loss to catastrophic thermal runaway/fire, thereby extending the float service life to meet the 15-year requirement by avoiding the final failure stage.\n\nAccelerated abuse test where a battery with corroded positive grids is subjected to the identified fire prevention scheme; verify that no fire or thermal runaway event occurs within 48 hours, whereas a control battery without the scheme fails.",
+ "evidence_ids": [
+  "doi:10.1051/e3sconf/202018501058",
+  "doi:10.1109/intlec.1995.498976",
+  "doi:10.1109/intlec.1995.498933",
+  "doi:10.1016/s0378-7753(98)00028-7",
+  "doi:10.1109/bcaa.2000.838406",
+  "doi:10.1021/acsaem.4c02648",
+  "doi:10.5281/zenodo.19251022",
+  "doi:10.58837/chula.the.2014.1033",
+  "doi:10.58837/chula.the.2013.954",
+  "doi:10.48550/arxiv.1008.4872",
+  "doi:10.48550/arxiv.1902.01774",
+  "doi:10.48550/arxiv.1902.01771",
+  "title:e98a5ebefcfbce2f",
+  "doi:10.1007/bf02707342",
+  "doi:10.2172/282838",
+  "doi:10.1016/0378-7753(94)01983-3"
+ ],
+ "judge_record": {
+  "usable_pair": true,
+  "passes": 2,
+  "scores": {
+   "a_answered": {
+    "pipeline_mean": 3.0,
+    "baseline_mean": 5.0,
+    "diff": -2.0
+   },
+   "b_user_vars": {
+    "pipeline_mean": 4.5,
+    "baseline_mean": 5.0,
+    "diff": -0.5
+   },
+   "c_prediction": {
+    "pipeline_mean": 3.5,
+    "baseline_mean": 5.0,
+    "diff": -1.5
+   },
+   "d_evidence": {
+    "pipeline_mean": 3.0,
+    "baseline_mean": 5.0,
+    "diff": -2.0
+   },
+   "e_clarification": {
+    "pipeline_mean": null,
+    "baseline_mean": null,
+    "diff": null
+   }
+  },
+  "winner": "baseline",
+  "pref_passes": [
+   "baseline",
+   "baseline"
+  ]
+ },
+ "baseline_same_evidence_hash": "b9dfa13e9945b8062756d76ecdf398a5519c18028dbe2819e3ed35403daccab4",
+ "pipeline_same_evidence_hash": "b9dfa13e9945b8062756d76ecdf398a5519c18028dbe2819e3ed35403daccab4"
+}

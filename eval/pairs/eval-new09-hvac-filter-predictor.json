@@ -1,0 +1,62 @@
+{
+ "problem_id": "eval-new09-hvac-filter-predictor",
+ "commit": "a7f62005f732",
+ "dirty_tree": false,
+ "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+ "clarification_answer": null,
+ "baseline_answer": "**Proposed Design: Pressure Drop (\u0394P) Trending with Normalized Airflow**\n\nThe most cost-effective measurable leading indicator is the **air-side pressure drop (\u0394P) across the MERV-13 pleated filter bank, normalized by actual airflow**.\n\n**Rationale & Evidence Support:**\nFilter replacement costs and fan energy penalties are driven by particulate loading, which increases aerodynamic resistance. The evidence confirms that pressure drop and airflow are the standard metrics for determining filter end-of-life. Specifically, the development of the \"mobile air filter testing unit\" (MAFT) validates that on-site measurement of pressure drop and airflow is accurate against ASHRAE 52.2 standards [openalex]. Furthermore, studies on commercial swine sites identify \"rate of airflow reduction\" and \"pressure drop\" as the critical variables determining operational costs and lifespan, noting that limited data exists on these rates during high dust-loading periods [openalex]. While the Singapore library study focuses on biological accumulation [europepmc], the physical degradation metric that universally governs fan energy (via increased static pressure) and flow restriction is \u0394P.\n\n**Operating Threshold:**\nDo not use a single absolute pressure value (e.g., 0.75 inches w.g.), as this varies by filter model, face velocity, and initial loading. Instead, use a **dynamic threshold based on the \"clean\" baseline.**\n\n1.  **Baseline:** Establish a \"clean filter\" \u0394P coefficient ($k$) during installation: $\\Delta P_{clean} = k \\cdot Q^2$ (where $Q$ is airflow).\n2.  **Trigger:** Replace the filter when the *measured* \u0394P exceeds **1.5 to 2.0 times** the predicted clean-filter \u0394P for the *current* airflow setpoint. This ratio accounts for seasonal airflow variations.\n3.  **Safety Cap:** If \u0394P absolute value exceeds the manufacturer\u2019s maximum rated pressure (typically 1.0\u20131.5\" w.g. for MERV-13), replace immediately regardless of the ratio, to prevent filter tearing and fan strain.\n\n**Implementation with User Constraints:**\n*   **BMS Points:** Log `AHU1_Filt_DP` and `AHU1_Airflow` every 15 minutes.\n*   **1-Week Resolution:** Calculate the weekly average of the normalized \u0394P ratio ($\\Delta P_{measured} / \\Delta P_{predicted\\_clean}$). This smooths out transient occupancy spikes and provides a stable leading indicator.\n*   **20% Reduction in Unnecessary Replacements:** By moving from a fixed 90-day schedule to a condition-based threshold, you eliminate replacements when occupancy/particulate load is low (filter has life left) and capture failures early when load is high. Since fan energy is the second major cost, optimizing for the threshold rather than time reduces \"run overloaded\" states.\n\n**Concrete Test to Validate or Kill the Predictor:**\n\n**The \"Blind A/B Swap\" Test:**\n1.  **Setup:** Select two identical AHUs with identical MERV-13 filters installed at the same time.\n2.  **Control (AHU-A):** Keep on the existing fixed 90-day replacement schedule.\n3.  **Test (AHU-B):** Implement the \u0394P-based threshold logic.\n4.  **Measurement:** For the next two quarters (12\u201316 weeks), record:\n    *   Date of replacement for both.\n    *   Final \u0394P at replacement time.\n    *   Fan energy consumption (kW) averaged over the life of the filter.\n    *   Filter \"Remaining Life Index\": If AHU-B\u2019s filter fails the threshold early (before 90 days), check if AHU-A\u2019s filter at that same time had a significantly lower \u0394P (indicating AHU-A would have also failed soon) or much higher (indicating unnecessary waste).\n5.  **Falsification Criteria:**\n    *   **Kill Predictor:** If AHU-B replacements occur at a rate *greater than* AHU-A, or if AHU-B shows significant indoor air quality (IAQ) particle spikes above acceptable limits despite being \"on schedule\" by \u0394P, the model fails.\n    *  ",
+ "pipeline_answer": "In-situ comparative evaluation of an operating state against a controlled baseline, using logged performance data to detect when real-world AHU behavior diverges from expected, enabling a state change (filter load) to be inferred without a fixed calendar schedule.\n\nReplace the fixed 90-day replacement calendar with a BMS-only fault-detection threshold: build a baseline curve of filter pressure drop (or supply/return fan power) per unit outdoor airflow and occupancy at filter installation, then issue a replacement alert when daily mean normalized pressure drop exceeds the clean-filter baseline by a set margin sustained over 1 week.\n\nFilter replacements triggered only on actual loading, eliminating early replacements and preventing overloaded runs, achieving >20% fewer unnecessary replacements while detecting clogging within the 1-week window.\n\nIn the paper's VCBT/IBAL hardware-in-the-loop testbed, load the filter bank with a controlled, gradually increasing particle load and run the predictor on its logged fan-power and pressure-drop points; fail if it alarms before the true clogging threshold or later than 7 days after the threshold is crossed, or if the false-alarm rate on a clean filter exceeds 10%.",
+ "evidence_ids": [
+  "doi:10.1080/23744731.2026.2663718",
+  "doi:10.1016/j.buildenv.2025.113414",
+  "doi:10.3390/buildings13051174",
+  "doi:10.1371/journal.pone.0200820",
+  "doi:10.1016/s0015-1882(04)00227-7",
+  "doi:10.1016/j.ijft.2020.100045",
+  "doi:10.17918/etd-3205",
+  "doi:10.31274/etd-180810-6099",
+  "doi:10.70675/73f1d585za5b8z4419zab9ez73b53234bef9",
+  "doi:10.13031/aim.201701639",
+  "doi:10.3390/agriengineering1020022",
+  "doi:10.1016/j.jaerosci.2020.105624",
+  "doi:10.14288/1.0166381"
+ ],
+ "judge_record": {
+  "usable_pair": true,
+  "passes": 2,
+  "scores": {
+   "a_answered": {
+    "pipeline_mean": 4.5,
+    "baseline_mean": 5.0,
+    "diff": -0.5
+   },
+   "b_user_vars": {
+    "pipeline_mean": 4.5,
+    "baseline_mean": 5.0,
+    "diff": -0.5
+   },
+   "c_prediction": {
+    "pipeline_mean": 4.5,
+    "baseline_mean": 5.0,
+    "diff": -0.5
+   },
+   "d_evidence": {
+    "pipeline_mean": 4.5,
+    "baseline_mean": 5.0,
+    "diff": -0.5
+   },
+   "e_clarification": {
+    "pipeline_mean": null,
+    "baseline_mean": null,
+    "diff": null
+   }
+  },
+  "winner": "tie",
+  "pref_passes": [
+   "tie",
+   "baseline"
+  ]
+ },
+ "baseline_same_evidence_hash": "d5644189f7a0b37ad4a1998c3e6e3a66dbd4d8f0ab88bd13439c996a7f0f11a2",
+ "pipeline_same_evidence_hash": "d5644189f7a0b37ad4a1998c3e6e3a66dbd4d8f0ab88bd13439c996a7f0f11a2"
+}
