@@ -764,7 +764,7 @@ def _lean_rel_band(relevance):
     return {"domain": _flag("domain"), "mechanism": _flag("mechanism")}
 
 
-def _lean_select_operator(items, problem):
+def _lean_select_operator(items, problem, all_matches: bool = False):
     """R510 production bridge: deterministic operator selection over the
     verified items using canonical evidence (no invented content).
 
@@ -789,6 +789,7 @@ def _lean_select_operator(items, problem):
     from discovery_fabric.engine import mechanism_space as _ms
     evaluated = []
     selected = None
+    matches = []
     for it in items:
         band = _lean_rel_band(it.get("relevance"))
         for o in _ms.TRANSFORMATION_OPERATORS:
@@ -835,21 +836,113 @@ def _lean_select_operator(items, problem):
                               "basis": basis,
                               "route": (contract or {}).get("route",
                                                             "legacy-view")})
-            if satisfied and selected is None:
-                selected = (it, o, contract)
+            if satisfied:
+                matches.append((it, o, contract))
+                if selected is None:
+                    selected = (it, o, contract)
     if selected is None:
         return {"operator": None, "item": None, "contract": {
             "satisfied": False,
             "basis": "no (item, operator) pair satisfied any admission "
                      "contract — honest refusal (Art. XXV)"},
             "evaluated": evaluated,
+            "matches": [],
             "selection_basis": "none-satisfied"}
     it, o, contract = selected
     return {"operator": o, "item": it, "contract": contract,
             "evaluated": evaluated,
+            "matches": matches,
             "selection_basis": ("first satisfied in canonical operator "
                                 "order over verified items (deterministic; "
+                                "multi-operator mode runs every satisfied "
+                                "pair)" if all_matches else
+                                "first satisfied in canonical operator "
+                                "order over verified items (deterministic; "
                                 "one instantiation call downstream)")}
+
+
+def _lean_operator_attempt(items, problem, item, op, contract):
+    """One (item, operator) instantiation attempt for parallel
+    multi-operator generation. Pure generation + deterministic
+    assembly/semantic check; cemetery/distinctness/support stay in the
+    shared tail (Art. IV: one evaluator, never a second). Thread-safe:
+    reads the frozen items, mutates nothing shared, returns its own
+    result."""
+    from discovery_fabric.engine import mechanism_space as _ms
+    sel_id = op["operator_id"]
+    meta = None
+    field_blocks = []
+    cands = []
+    err = ""
+    state = "OPERATOR_INSTANTIATION_FAILED"
+    try:
+        prompt = _ms._OPERATOR_INSTANTIATION_PROMPTS[sel_id].format(
+            system=item["fields"].get("system") or "(unextracted)",
+            mechanism=_ms._field_val(item, "mechanism") or "(unextracted)",
+            observed_effect=_ms._field_val(item, "observed_effect")
+            or "(unextracted)",
+            evidence_intervention=_ms._field_val(item, "intervention")
+            or "(unextracted)",
+            boundary_conditions=_ms._field_val(item, "boundary_conditions")
+            or "(unextracted)",
+            constraints=_ms._field_val(item, "constraints")
+            or "(unextracted)",
+            failure_mode=_ms._field_val(item, "failure_mode")
+            or "(unextracted)",
+            device=problem.get("device", ""),
+            failure=problem.get("failure", ""),
+            constraint=problem.get("constraint", ""),
+            record_text=_ms._item_abstract(item)[:2600]
+            or "(record text unavailable)")
+        prompt += _ms._multi_hypothesis_prompt_suffix()
+        meta = _ms.llm_generate(
+            prompt,
+            system="You are a rigorous mechanism engineer. Every "
+                   "claim must derive from the given evidence.",
+            purpose="operator_%s" % sel_id,
+            max_tokens=_ms.OPERATOR_INSTANTIATION_MAX_TOKENS)
+        if meta.get("ok"):
+            field_blocks = _ms._parse_multi_candidate_fields(
+                meta.get("content") or "")
+            for _blk_i, _blk_fields in enumerate(field_blocks, 1):
+                _blk_fields = dict(_blk_fields)
+                _blk_fields["_hypothesis_index"] = _blk_i
+                _c = _ms.assemble_candidate(
+                    op, item, _blk_fields, problem, meta)
+                _c["operator_semantic_check"] = (
+                    _ms.operator_semantic_check(sel_id, item, _c, problem))
+                _c["hypothesis_index"] = _blk_i
+                cands.append(_c)
+            state = ("OPERATED" if any(
+                c.get("candidate_state") == "CANDIDATE"
+                for c in cands) else "NO_VALID_CANDIDATE")
+        else:
+            err = (meta.get("error") or "")[:200]
+    except Exception as exc:  # noqa: BLE001
+        err = f"{type(exc).__name__}: {exc}"[:200]
+        state = "OPERATOR_INSTANTIATION_FAILED"
+    return {
+        "meta": meta,
+        "field_blocks": field_blocks,
+        "cands": cands,
+        "operator_result": {
+            "operator": sel_id,
+            "operator_version": op.get("version", "unknown"),
+            "transformation_rule": op.get("transformation_rule", ""),
+            "search_constraint": op.get("search_constraint", ""),
+            "n_items_examined": len(items),
+            "n_items_selected": 1 if contract.get("satisfied") else 0,
+            "selected_item_ids": ([item.get("item_id")]
+                                  if contract.get("satisfied") else []),
+            "input_contract": contract,
+            "lean_path": "multi-operator: one instantiation call",
+            "candidates": cands,
+            "state": state,
+            "llm_status": (meta or {}).get("status"),
+            "llm_error": err,
+            "n_hypotheses_parsed": len(cands),
+        },
+    }
 
 
 def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
@@ -999,171 +1092,149 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     #      view fallback; no corrective retry on the lean path: one call
     #      is one call, the span/semantic gates themselves are
     #      unchanged) ---------------------------------------------------
-    sel = _lean_select_operator(items, problem)
+    # ---- PARALLEL multi-operator generation (R1 capability lift,
+    #      audit hold). EVERY satisfied (item, operator) pair runs its
+    #      own instantiation call; calls execute concurrently on the
+    #      fast rungs and their hypotheses merge BEFORE the existing
+    #      deterministic tail (cemetery + distinctness + support). The
+    #      Art. LXXXIV >=2-distinct rule is untouched: the distinctness
+    #      instrument still decides, never the call count.
+    sel_all = _lean_select_operator(items, problem, all_matches=True)
+    matched = list(sel_all.get("matches") or [])
+    # diversity order (stable): the first pair for each distinct operator
+    # first, then the remaining pairs. A cap on calls must buy mechanism
+    # diversity, not three views through one operator on three items.
+    _seen_ops = set()
+    _head, _tail = [], []
+    for _m in matched:
+        _oid = _m[1].get("operator_id")
+        if _oid in _seen_ops:
+            _tail.append(_m)
+        else:
+            _seen_ops.add(_oid)
+            _head.append(_m)
+    matched = _head + _tail
+    # latency guard: the fast rungs serve 3 concurrent calls; the
+    # deterministic tail is unchanged.
+    _MAX_OP_CALLS = 3
+    matched = matched[:_MAX_OP_CALLS]
     _clk.mark("operator_selection",
-              {"n_contracts_evaluated": len(sel.get("evaluated") or []),
-               "n_satisfied": sum(
-                   1 for e in (sel.get("evaluated") or [])
-                   if e.get("satisfied")),
-               "selected_operator": (sel.get("operator") or {}).get(
-                   "operator_id", "NONE") if sel.get("operator") else "NONE"})
-    op = sel["operator"]
-    item = sel["item"] if sel["item"] is not None else items[0]
-    _llm_meta = None
-    # R532 §3: the instantiation wall (None when no LLM call is
-    # attempted — the typed attempt record reads it, never steers).
-    _llm_wall = None
-    # R532 §3: parse-level locals for the typed attempt record
-    # (empty defaults when the LLM path failed or was never taken
-    # — the classifier reads them, never steers). Initialized HERE
-    # (all paths) so the no-contract path cannot NameError below.
-    fields: Dict[str, Any] = {}
-    _n_fields_nonempty: Optional[int] = None
-    cand: Optional[Dict[str, Any]] = None
-    # R548: the multi-hypothesis parse result — initialized HERE (all
-    # paths), exactly like cand/fields above: on an LLM failure the
-    # typed attempt record below must still read an EMPTY block list
-    # (UnboundLocalError here crashed the failure path itself — the
-    # honest OPERATOR_INSTANTIATION_FAILED record could never be
-    # written; found by the R548 round-A adversarial pass).
+              {"n_contracts_evaluated": len(sel_all.get("evaluated") or []),
+               "n_satisfied": len(sel_all.get("matches") or []),
+               "n_operators_run": len(matched),
+               "selected_operators": [m[1]["operator_id"] for m in matched]})
+    sel = dict(sel_all)
+    if matched:
+        sel.update({"operator": matched[0][1], "item": matched[0][0],
+                    "contract": matched[0][2]})
+    op = sel.get("operator")
+    item = sel.get("item") if sel.get("item") is not None else items[0]
+    contract = sel.get("contract") or {"satisfied": False}
+    sel_id = (op["operator_id"] if op else "NONE")
+
+    attempts: List[Dict[str, Any]] = []
+
+    def _failed_attempt(_op_id: str, _err: str) -> Dict[str, Any]:
+        return {"operator_result": {
+                    "operator": _op_id, "operator_version": "unknown",
+                    "transformation_rule": "", "search_constraint": "",
+                    "n_items_examined": len(items),
+                    "n_items_selected": 0, "selected_item_ids": [],
+                    "input_contract": {"satisfied": False},
+                    "lean_path": "multi-operator: call exception",
+                    "candidates": [],
+                    "state": "OPERATOR_INSTANTIATION_FAILED",
+                    "llm_status": "EXC", "llm_error": _err[:200],
+                    "n_hypotheses_parsed": 0},
+                "field_blocks": [], "cands": [], "meta": None}
+
+    if matched:
+        from concurrent.futures import ThreadPoolExecutor
+        try:
+            with ThreadPoolExecutor(max_workers=min(3, len(matched))) as _ex:
+                _futs = [(_m[1]["operator_id"],
+                          _ex.submit(_lean_operator_attempt, items, problem,
+                                     _m[0], _m[1], _m[2]))
+                         for _m in matched]
+                for _op_id, _f in _futs:
+                    try:
+                        attempts.append(_f.result())
+                    except Exception as _exc:  # noqa: BLE001
+                        attempts.append(_failed_attempt(
+                            _op_id, f"{type(_exc).__name__}: {_exc}"))
+        except Exception as _exc:  # noqa: BLE001
+            # thread pool unavailable: report every pair as failed, never
+            # silently drop the generation attempt (Art. XXV)
+            for _m in matched:
+                attempts.append(_failed_attempt(
+                    _m[1]["operator_id"], f"{type(_exc).__name__}: {_exc}"))
+
     field_blocks: List[Dict[str, str]] = []
-    sem: Optional[Dict[str, Any]] = None
-    contract = sel["contract"]
-    sel_id = op["operator_id"] if op else "NONE"
-    space["operator_ids"] = [sel_id] if op else []
+    _cands: List[Dict[str, Any]] = []
+    all_operator_results: List[Dict[str, Any]] = []
+    _metas: List[Dict[str, Any]] = []
+    for _att in attempts:
+        _orr = _att.get("operator_result") or {}
+        all_operator_results.append(_orr)
+        field_blocks.extend(_att.get("field_blocks") or [])
+        _cands.extend(_att.get("cands") or [])
+        if _att.get("meta") is not None:
+            _metas.append(_att["meta"])
+    _llm_meta = _metas[0] if _metas else None
+    _llm_wall = None
+    if _llm_meta is not None:
+        _llm_wall = _clk.mark("llm_instantiation_wall",
+                              {"provider": _llm_meta.get("provider"),
+                               "model": _llm_meta.get("model"),
+                               "transport_status": _llm_meta.get("status")})
+    cand = _cands[0] if _cands else None
+    _n_fields_nonempty = (sum(1 for v in field_blocks[0].values()
+                              if str(v or ""))
+                          if field_blocks else None)
+    if matched:
+        try:
+            item["_selection"] = {"selected_by": sel_id,
+                                  "contract": contract}
+        except Exception:  # noqa: BLE001
+            pass
+    space["operator_ids"] = [o.get("operator") for o in all_operator_results]
     operator_result: Dict[str, Any] = {
-        "operator": sel_id,
-        "operator_version": op["version"] if op else "unknown",
-        "transformation_rule": op["transformation_rule"] if op else "",
-        "search_constraint": op["search_constraint"] if op else "",
+        "operator": ",".join(str(o.get("operator"))
+                             for o in all_operator_results) or "NONE",
+        "operator_version": "multi/1.0.0",
+        "transformation_rule": "multi-operator exploration (parallel)",
+        "search_constraint": ("all satisfied (item, operator) pairs, "
+                              "capped at %d concurrent calls"
+                              % _MAX_OP_CALLS),
         "n_items_examined": len(items),
-        "n_items_selected": 1 if contract.get("satisfied") else 0,
-        "selected_item_ids": [item.get("item_id")]
-        if contract.get("satisfied") else [],
+        "n_items_selected": len(matched),
+        "selected_item_ids": [m[0].get("item_id") for m in matched],
         "input_contract": contract,
         "operator_selection": {
             "selected_operator": sel_id,
-            "selected_item_id": item.get("item_id")
-            if contract.get("satisfied") else None,
-            "selection_basis": sel["selection_basis"],
-            "contracts_evaluated": sel["evaluated"],
+            "selected_item_id": (item.get("item_id") if matched else None),
+            "selection_basis": sel.get("selection_basis"),
+            "contracts_evaluated": sel.get("evaluated") or [],
+            "operators_run": [m[1]["operator_id"] for m in matched],
         },
-        "lean_path": ("one instantiation call, no corrective retry "
-                      "(R453-LEAN; deterministic operator selection; "
-                      "the span/semantic gates unchanged)"),
-        "candidates": [],
+        "lean_path": ("parallel multi-operator: %d instantiation call(s), "
+                      "deterministic validation tail unchanged"
+                      % len(matched)),
+        "candidates": _cands,
+        "state": ("OPERATED" if any(
+            c.get("candidate_state") == "CANDIDATE" for c in _cands)
+            else ("NO_APPLICABLE_EVIDENCE" if not matched
+                  else "NO_VALID_CANDIDATE")),
+        "n_hypotheses_parsed": len(_cands),
     }
-    if not (op and contract.get("satisfied")):
-        operator_result.update({
-            "state": op["failure_state"] if op else "NO_APPLICABLE_EVIDENCE",
-            "note": ("no (item, operator) pair satisfied any admission "
-                     "contract — honest refusal, nothing fabricated "
-                     "(Art. XXV)"),
-        })
-    else:
-        item["_selection"] = {"selected_by": sel_id,
-                              "contract": contract}
-        prompt = _ms._OPERATOR_INSTANTIATION_PROMPTS[
-            sel_id].format(
-            system=item["fields"].get("system") or "(unextracted)",
-            mechanism=_ms._field_val(item, "mechanism") or "(unextracted)",
-            observed_effect=_ms._field_val(item, "observed_effect")
-            or "(unextracted)",
-            evidence_intervention=_ms._field_val(item, "intervention")
-            or "(unextracted)",
-            boundary_conditions=_ms._field_val(item, "boundary_conditions")
-            or "(unextracted)",
-            constraints=_ms._field_val(item, "constraints") or "(unextracted)",
-            failure_mode=_ms._field_val(item, "failure_mode")
-            or "(unextracted)",
-            device=problem.get("device", ""),
-            failure=problem.get("failure", ""),
-            constraint=problem.get("constraint", ""),
-            record_text=_ms._item_abstract(item)[:2600]
-            or "(record text unavailable)")
-        # R548: the generation-boundary change — the prompt now requests
-        # up to N independently-parseable hypotheses in ONE response.
-        # The deterministic validation tail (semantic check, cemetery,
-        # distinctness) runs over every parsed block; the Art. LXXXIV
-        # minimum is met by the distinctness instrument's own count,
-        # not by a second LLM call (R517: model calls are the latency
-        # sink; one call is one call).
-        prompt += _ms._multi_hypothesis_prompt_suffix()
-        # R516D: the initial budget is the rescue-proven level
-        # (_ms.OPERATOR_INSTANTIATION_MAX_TOKENS), not the 700
-        # default — 0/10 first-attempt successes at 700 across two
-        # batteries is systematic budget starvation, not flakes.
-        meta = _ms.llm_generate(
-            prompt,
-            system="You are a rigorous mechanism engineer. Every "
-                   "claim must derive from the given evidence.",
-            purpose=f"operator_{sel_id}",
-            max_tokens=_ms.OPERATOR_INSTANTIATION_MAX_TOKENS)
-        _llm_meta = meta
-        # R532 §3: capture the instantiation wall for the typed
-        # attempt record (mark() returns the span duration; the
-        # span itself is unchanged).
-        _llm_wall = _clk.mark("llm_instantiation_wall",
-                              {"provider": meta.get("provider"),
-                               "model": meta.get("model"),
-                               "transport_status": meta.get("status")})
-        if not meta.get("ok"):
-            operator_result.update({
-                "state": "OPERATOR_INSTANTIATION_FAILED",
-                "llm_status": meta.get("status"),
-                "llm_error": (meta.get("error") or "")[:200],
-            })
-        else:
-            # R548: parse up to N independently-parseable hypothesis
-            # blocks from the single LLM response. The multi-parse
-            # falls back to the legacy single-candidate parse when no
-            # HYPOTHESIS markers are present (backward compatible; the
-            # ceiling remains in that case — the fix is the prompt,
-            # and the parser never invents content the model did not
-            # emit).
-            field_blocks = _ms._parse_multi_candidate_fields(
-                meta["content"] or "")
-            # R532 §3: capture the parsed-field count for the typed
-            # attempt record (same value the mark below records).
-            _n_fields_nonempty = sum(
-                1 for v in (field_blocks[0] if field_blocks else {}).values()
-                if str(v or ""))
-            _clk.mark("candidate_parsing",
-                      {"n_fields_nonempty": _n_fields_nonempty,
-                       "n_hypothesis_blocks": len(field_blocks)})
-            # Assemble one candidate per parsed hypothesis block; each
-            # goes through the same deterministic semantic check +
-            # cemetery + distinctness tail (no second evaluator,
-            # Art. IV). The candidate list now carries up to N
-            # entries, lifting the structural ceiling.
-            _cands = []
-            for _blk_i, _blk_fields in enumerate(field_blocks, 1):
-                _blk_fields = dict(_blk_fields)
-                _blk_fields["_hypothesis_index"] = _blk_i
-                _c = _ms.assemble_candidate(
-                    op, item, _blk_fields, problem, meta)
-                _sem = _ms.operator_semantic_check(
-                    sel_id, item, _c, problem)
-                _c["operator_semantic_check"] = _sem
-                _c["hypothesis_index"] = _blk_i
-                _cands.append(_c)
-            cand = _cands[0] if _cands else None
-            if cand is not None:
-                operator_result["candidates"] = _cands
-                operator_result["state"] = (
-                    "OPERATED" if any(
-                        c.get("candidate_state") == "CANDIDATE"
-                        for c in _cands)
-                    else "NO_VALID_CANDIDATE")
-                operator_result["n_hypotheses_parsed"] = len(_cands)
-            else:
-                operator_result["candidates"] = []
-                operator_result["state"] = "NO_VALID_CANDIDATE"
-                operator_result["n_hypotheses_parsed"] = 0
+    if not matched:
+        operator_result["note"] = (
+            "no (item, operator) pair satisfied any admission contract - "
+            "honest refusal, nothing fabricated (Art. XXV)")
     space["operator_results"] = [
-        {k: v for k, v in operator_result.items()
-         if k != "candidates"}]
-    space["operator_candidates_full"] = [operator_result]
+        {k: v for k, v in o.items() if k != "candidates"}
+        for o in all_operator_results]
+    space["operator_candidates_full"] = all_operator_results
     # ---- the deterministic tail: the module's own instruments -------
     # R510 transition ledger (OBSERVATION ONLY): assembly states are
     # snapshotted before the instruments mutate them; every later read
@@ -1287,7 +1358,7 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                 .get("mechanism_support_state")),
         })
     _att_outcome = _ms_attempt_outcome(
-        bool(contract.get("satisfied")),
+        bool(matched),
         operator_result.get("state"),
         _llm_meta,
         _n_fields_nonempty,
@@ -1304,14 +1375,14 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     )
     _att_entry = {
         "attempt_index": 1,
-        "attempted": bool(_llm_meta is not None),
+        "attempted": bool(_metas),
         "provider": (_llm_meta or {}).get("provider"),
         "model": (_llm_meta.get("model")
                   if _llm_meta is not None else None),
         "operator": sel_id,
         "selected_item_id": (item.get("item_id")
-                             if contract.get("satisfied") else None),
-        "contract_satisfied": bool(contract.get("satisfied")),
+                             if matched else None),
+        "contract_satisfied": bool(matched),
         "provider_wall_s": (round(_llm_wall, 6)
                             if isinstance(_llm_wall,
                                           (int, float)) else None),

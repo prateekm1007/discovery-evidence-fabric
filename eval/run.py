@@ -56,11 +56,24 @@ PROBLEMS = Path(__file__).resolve().parent / "problems.json"
 RUNS_ROOT = Path(__file__).resolve().parent / "runs"
 SCORE_DIR = Path(__file__).resolve().parent / "score"
 
+# Fast DEV subset (directive: replace the long inner loop; a 6-problem
+# subset mixing intervention and predictor types, full 25 only at
+# checkpoints). Pre-registered ids, never chosen after seeing results.
+DEV6 = [
+    "bench-p02-leadacid-grid-corrosion",
+    "bench-p05-bridge-bearing-aging",
+    "bench-p09-packaging-barrier",
+    "eval-new02-slipring-predictor",
+    "eval-new06-bearing-vibration-predictor",
+    "eval-new09-hvac-filter-predictor",
+]
+
 CRITERIA = {
     "a_answered": "answers the asked question",
     "b_user_vars": "uses user-stated variables",
     "c_prediction": "gives a specific testable prediction",
     "d_evidence": "grounded in the provided evidence",
+    "e_clarification": "uses the user's clarification answer correctly",
 }
 
 # Judge must be a different provider + model family from the baseline
@@ -90,6 +103,46 @@ def git_short() -> str:
         return "nogit"
 
 
+def git_dirty() -> bool:
+    """True when tracked files differ from HEAD (the harness records it
+    next to every measured row; a dirty run is never silently clean)."""
+    import subprocess
+    try:
+        out = subprocess.check_output(
+            ["git", "status", "--porcelain", "--untracked-files=no"],
+            cwd=str(REPO), text=True)
+        return bool(out.strip())
+    except Exception:  # noqa: BLE001
+        return True
+
+
+def _intake_problem(problem: Dict[str, Any]) -> Dict[str, Any]:
+    """Engine intake with the user's clarification answer attached.
+
+    The clarification is a user-stated fact (not retrieved evidence); it
+    rides the problem constraint so synthesis, mechanism instantiation
+    and the attack all see the same value. The original dict is never
+    mutated (the on-disk problem stays the pre-registered one)."""
+    q = dict(problem)
+    ca = problem.get("clarification_answer")
+    if not ca:
+        return q
+    if isinstance(ca, dict):
+        vals = [f"{k} = {v}" for k, v in ca.items()
+                if k not in ("note",) and not isinstance(v, (dict, list))]
+        note = ca.get("note")
+        text = "; ".join(vals)
+        if note:
+            text = (text + f" ({note})").strip()
+    else:
+        text = str(ca)
+    q["clarification_text"] = text
+    if text:
+        q["constraint"] = (str(q.get("constraint") or "").rstrip(" .")
+                           + f". User-stated clarification: {text}.").lstrip(" .")
+    return q
+
+
 # ---------------------------------------------------------------------------
 # arm: pipeline
 # ---------------------------------------------------------------------------
@@ -102,20 +155,22 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
         try:
             from discovery_fabric.engine.run import EngineRun
             run = EngineRun(
-                problem, str(out_dir),
+                _intake_problem(problem), str(out_dir),
                 run_id=f"eval-{problem['problem_id']}",
                 package_registry_path=str(out_dir / "PACKAGE_ID_REGISTRY.json"),
-                with_package=False, resume=resume)
+                with_package=True, resume=resume)
             manifest = run.run()
             status = manifest.get("final_status") if isinstance(manifest, dict) else None
         except Exception as exc:  # noqa: BLE001
             err = f"{type(exc).__name__}: {exc}"[:400]
-    completed = (out_dir / "INVENTION_SPECIFICATION.json").exists()
+    completed = (out_dir / "final_state.json").exists() and \
+        json.loads((out_dir / "final_state.json").read_text(encoding="utf-8")).get("final_status") in COMPLETED_STATUSES
     record: Dict[str, Any] = {
         "answer": _extract_pipeline_answer(out_dir),
         "completed": completed,
         "wall_s": round(time.time() - t0, 1),
         "engine_error": err,
+        "stage_times_s": _stage_times(out_dir),
         "same_evidence": _evidence_snapshot(out_dir),
     }
     if final_state.exists():
@@ -125,33 +180,88 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
     return record
 
 
+COMPLETED_STATUSES = {"AUTOMATED_INVENTION_CANDIDATE",
+                      "INVENTION_REQUIRES_EXPERIMENT",
+                      "INVENTION_UNDER_DEVELOPMENT",
+                      "AUTOMATED_INVENTION"}
+
+
 def _extract_pipeline_answer(out_dir: Path) -> Optional[str]:
     """Normalised plain-text answer, or None when nothing was released
     (a refusal notice is never handed to the judge �? Art. LXI)."""
+    # 1) released invention spec (post-rank path)
     spec_p = out_dir / "INVENTION_SPECIFICATION.json"
-    if not spec_p.exists():
-        return None
-    try:
-        spec = json.loads(spec_p.read_text(encoding="utf-8"))
+    if spec_p.exists():
+        try:
+            spec = json.loads(spec_p.read_text(encoding="utf-8"))
 
-        def val(key: str) -> str:
-            v = spec.get(key)
-            if isinstance(v, dict):
-                inner = v.get("value")
-                if isinstance(inner, dict):
-                    return " ".join(str(x) for x in inner.values() if x)
-                return str(inner or "")
-            if isinstance(v, str):
-                return v
-            return ""
+            def val(key: str) -> str:
+                v = spec.get(key)
+                if isinstance(v, dict):
+                    inner = v.get("value")
+                    if isinstance(inner, dict):
+                        return " ".join(str(x) for x in inner.values() if x)
+                    return str(inner or "")
+                if isinstance(v, str):
+                    return v
+                return ""
 
-        parts = [val(k).strip() for k in ("mechanism", "causal_chain", "killer_experiment")]
-        parts = [p for p in parts if p]
-        if not parts:
-            return None
-        return "\n\n".join(parts)[:6000]
-    except Exception:  # noqa: BLE001
-        return None
+            parts = [val(k).strip() for k in ("mechanism", "causal_chain", "killer_experiment")]
+            parts = [p for p in parts if p]
+            if parts:
+                return "\n\n".join(parts)[:6000]
+        except Exception:  # noqa: BLE001
+            pass
+    # 2) candidate envelope (mechanism_map) - primary discovery loop output
+    ce = out_dir / "candidate_envelope.json"
+    if ce.exists():
+        try:
+            d = json.loads(ce.read_text(encoding="utf-8"))
+            mm = d.get("mechanism_map") or {}
+            parts = []
+            for k in ("mechanism", "intervention", "expected_effect",
+                      "falsification_test", "predicted_effect"):
+                v = mm.get(k)
+                if isinstance(v, str) and v.strip():
+                    parts.append(v.strip())
+                elif isinstance(v, dict):
+                    t = v.get("value") or v.get("mechanism") or ""
+                    if isinstance(t, str) and t.strip():
+                        parts.append(t.strip())
+            if parts:
+                return "\n\n".join(parts)[:6000]
+        except Exception:  # noqa: BLE001
+            pass
+    return None
+
+
+def _stage_times(out_dir: Path) -> Dict[str, float]:
+    """Per-stage durations straight from the durable stage ledger.
+
+    The engine already records `duration_monotonic_s` on every stage_log
+    entry; this reads it (never re-times, never estimates). Candidate
+    envelope first, then any envelope that carries the log."""
+    for name in ("candidate_envelope.json", "envelope_RANK.json",
+                 "envelope_CLASSIFY.json"):
+        p = out_dir / name
+        if not p.exists():
+            continue
+        try:
+            d = json.loads(p.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            continue
+        log = d.get("stage_log") or []
+        out: Dict[str, float] = {}
+        for row in log:
+            if not isinstance(row, dict):
+                continue
+            stage = row.get("stage")
+            dur = row.get("duration_monotonic_s")
+            if stage and isinstance(dur, (int, float)):
+                out[str(stage)] = round(float(dur), 3)
+        if out:
+            return out
+    return {}
 
 
 def _evidence_snapshot(out_dir: Path) -> Optional[Dict[str, Any]]:
@@ -238,6 +348,11 @@ def _transport_call(provider: str, model: str, prompt: str, system: str,
 def probe_zero_paid_route() -> Dict[str, Any]:
     """Strongest directly reachable zero-paid rung (probe, then return).
     Tries candidate (provider, model) pairs in quality order."""
+    try:
+        from discovery_fabric.engine import adapters as _ad
+        _ad.load_credentials()
+    except Exception:  # noqa: BLE001
+        pass
     candidates = [
         ("agnes", "agnes-3.0-flash"),
         ("xkiro", "mistralai/ministral-14b"),
@@ -301,6 +416,8 @@ def run_baseline_problem(problem: Dict[str, Any], out_dir: Path,
         "",
         f"The user asks: {problem['question']}",
         "",
+        *([f"The user clarified: {problem['clarification_text']}", ""]
+          if problem.get("clarification_text") else []),
         "Evidence retrieved for this problem (use it; cite which item supports what):",
         "\n".join(ev_lines),
         "",
@@ -327,7 +444,8 @@ def run_baseline_problem(problem: Dict[str, Any], out_dir: Path,
 # arm: judge (blind pairwise, both orders; only over completed pipeline pairs)
 # ---------------------------------------------------------------------------
 def _rubric_prompt(problem, a_text: str, b_text: str) -> str:
-    return "\n".join([
+    clar = problem.get("clarification_text")
+    lines = [
         "You judge two engineering answers to the same user problem.",
         "Both answers had access to the same evidence packet retrieved for "
         "this problem.",
@@ -337,6 +455,10 @@ def _rubric_prompt(problem, a_text: str, b_text: str) -> str:
         "USER'S STATED VARIABLES:",
         "- " + "\n- ".join(problem.get("user_variables", [])),
         f"USER'S QUESTION: {problem['question']}",
+    ]
+    if clar:
+        lines += ["", f"USER'S CLARIFICATION ANSWER (a stated fact): {clar}"]
+    lines += [
         "",
         "=== ANSWER A ===",
         a_text,
@@ -344,18 +466,27 @@ def _rubric_prompt(problem, a_text: str, b_text: str) -> str:
         "=== ANSWER B ===",
         b_text,
         "",
-        "Score BOTH answers on four criteria, 1 (bad) to 5 (excellent):",
+        "Score BOTH answers on these criteria, 1 (bad) to 5 (excellent):",
         "1 " + CRITERIA["a_answered"],
         "2 " + CRITERIA["b_user_vars"],
         "3 " + CRITERIA["c_prediction"],
         "4 " + CRITERIA["d_evidence"],
+    ]
+    if clar:
+        lines.append("5 " + CRITERIA["e_clarification"])
+    lines += [
         "Grade strictly: vague/generic/number-ignoring/unsupported answers "
         "score low; quantified, testable, evidence-using answers score high.",
+        "Fabricated numbers, fabricated citations, or invented measurements "
+        "are a hard failure (score 1 on the affected criterion).",
         "Then state your overall preference. Answer ONLY with these lines:",
         "A1: <1-5>", "A2: <1-5>", "A3: <1-5>", "A4: <1-5>",
         "B1: <1-5>", "B2: <1-5>", "B3: <1-5>", "B4: <1-5>",
-        "PREFER: A | B | TIE",
-    ])
+    ]
+    if clar:
+        lines += ["A5: <1-5>", "B5: <1-5>"]
+    lines.append("PREFER: A | B | TIE")
+    return "\n".join(lines)
 
 
 def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
@@ -419,12 +550,12 @@ def _m(v: List[int]) -> float:
 def _parse_rubric(raw: str) -> Dict[str, Any]:
     import re
     fields: Dict[str, str] = {}
-    for m in re.finditer(r"^\s*([AB][1-4]|PREFER)\s*[:=]\s*(.+)$",
+    for m in re.finditer(r"^\s*([AB][1-5]|PREFER)\s*[:=]\s*(.+)$",
                          raw or "", re.M):
         fields[m.group(1).upper()] = m.group(2).strip()[:8]
     prefer = fields.pop("PREFER", None)
     for k, v in list(fields.items()):
-        if k in {f"{s}{j}" for s in "AB" for j in range(1, 5)}:
+        if k in {f"{s}{j}" for s in "AB" for j in range(1, 6)}:
             try:
                 fields[k] = str(int(v))
             except ValueError:
@@ -440,23 +571,29 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
     if not calib_path.exists():
         return {"calibrated": False, "why": "no calibration pairs file"}
     pairs = json.loads(calib_path.read_text(encoding="utf-8"))
+    problems_by_id = {p["problem_id"]: p
+                      for p in json.loads(PROBLEMS.read_text(encoding="utf-8"))["problems"]}
     if not isinstance(pairs, list) or len(pairs) < 10:
         return {"calibrated": False, "why": f"need >=10 pairs, have {len(pairs) if isinstance(pairs, list) else 0}"}
     correct = 0
     total = 0
     details = []
-    for entry in pairs:
-        problem = entry["problem"]
+    for idx, entry in enumerate(pairs):
+        problem = problems_by_id.get(entry["problem_id"])
+        if problem is None:
+            details.append({"problem_id": entry.get("problem_id"), "error": "problem not found"})
+            continue
         good = entry["good_answer"]
         bad = entry["bad_answer"]
-        # randomise order
-        import random
-        order = random.choice(["good_first", "bad_first"])
+        # deterministic, pre-registered order (no RNG in a measurement)
+        order = ("good_first"
+                 if int(_sha(f"{entry['problem_id']}:{idx}")[:8], 16) % 2 == 0
+                 else "bad_first")
         if order == "good_first":
             a, b, good_is = good, bad, "A"
         else:
             a, b, good_is = bad, good, "B"
-        prompt = _rubric_prompt(problem, a, b)
+        prompt = _rubric_prompt(_intake_problem(problem), a, b)
         res = _transport_call(judge_route["provider"], judge_route["model"], prompt,
                               "You are a strict blind rubric judge. English only. "
                               "Follow the exact output lines.", max_tokens=300)
@@ -476,9 +613,89 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
         details.append({"problem_id": entry.get("problem_id"), "order": order,
                         "prefer": pref, "picked_good": picked_good})
     acc = round(correct / total, 3) if total else 0.0
-    return {"calibrated": True, "n_pairs": total, "correct": correct,
-            "accuracy": acc, "threshold": 0.8, "passed": acc >= 0.8,
+    passed = acc >= 0.8
+    return {"calibrated": bool(passed), "n_pairs": total, "correct": correct,
+            "accuracy": acc, "threshold": 0.8, "passed": passed,
             "details": details}
+
+
+def _funnel_row(problem_dir: Path) -> Dict[str, Any]:
+    """R506-style yield rows read from the run's own durable bytes.
+
+    Only the two KPI rows the directive names are required here
+    (mechanisms_found, candidates_generated_distinct); the rest of the
+    funnel is the external instrument's job. Absent bytes read as
+    UNKNOWN (never fabricated)."""
+    d = problem_dir / "pipeline"
+    row: Dict[str, Any] = {
+        "mechanisms_found": None,
+        "candidates_generated_distinct": None,
+        "n_generated": None,
+        "n_distinct": None,
+        "n_indeterminate": None,
+        "n_input_to_distinctness": None,
+        "n_retained": None,
+        "final_status": None,
+        "failure_stage": None,
+        "starved_reason": None,
+        "matcher": None,
+    }
+    fs_p = d / "final_state.json"
+    if fs_p.exists():
+        try:
+            fs = json.loads(fs_p.read_text(encoding="utf-8"))
+            row["final_status"] = fs.get("final_status")
+            failed = fs.get("failed_stages") or {}
+            if isinstance(failed, dict) and failed:
+                row["failure_stage"] = sorted(failed.keys())[0]
+            elif isinstance(failed, list) and failed:
+                row["failure_stage"] = str(failed[0])
+        except Exception:  # noqa: BLE001
+            pass
+    ms_p = d / "envelope_MECHANISM_SPACE.json"
+    if not ms_p.exists():
+        if row["final_status"] == "MECHANISM_STARVED":
+            row["starved_reason"] = "NO_MECHANISM_SPACE_ENVELOPE"
+        return row
+    try:
+        ms = (json.loads(ms_p.read_text(encoding="utf-8"))
+              .get("mechanism_space") or {})
+    except Exception:  # noqa: BLE001
+        return row
+    dist = ms.get("distinctness") or {}
+    row["n_generated"] = ms.get("n_candidates_generated")
+    row["n_distinct"] = dist.get("n_distinct")
+    row["n_indeterminate"] = dist.get("n_indeterminate")
+    row["n_input_to_distinctness"] = dist.get("n_input")
+    row["n_retained"] = ms.get("n_candidates_retained")
+    row["matcher"] = dist.get("instrument_version")
+    row["mechanisms_found"] = bool((ms.get("n_candidates_generated") or 0) > 0)
+    row["candidates_generated_distinct"] = bool((dist.get("n_distinct") or 0) > 0)
+    if not row["mechanisms_found"]:
+        cc = ms.get("cemetery_consumption") or {}
+        ops = ms.get("operator_results") or []
+        if (cc.get("n_blocked") or 0) > 0:
+            row["starved_reason"] = "ADJUDICATION_CEMETERY_BLOCK"
+        elif any((o.get("state") == "OPERATOR_INSTANTIATION_FAILED")
+                 for o in ops if isinstance(o, dict)):
+            row["starved_reason"] = "GENERATION_LLM_FAILED"
+        elif any((o.get("state") == "NO_VALID_CANDIDATE")
+                 for o in ops if isinstance(o, dict)):
+            row["starved_reason"] = "GENERATION_NO_VALID_CANDIDATE"
+        elif not ops:
+            row["starved_reason"] = "GENERATION_NO_OPERATOR_CONTRACT"
+        else:
+            row["starved_reason"] = "UNKNOWN"
+    elif (dist.get("n_distinct") or 0) < 2:
+        # generated >=1 but the matcher did not reach the >=2 bar:
+        # adjudication (dedup) failure, never generation failure.
+        if (dist.get("n_indeterminate") or 0) > 0:
+            row["starved_reason"] = "ADJUDICATION_INDETERMINATE"
+        elif (dist.get("n_equivalent_merged") or 0) > 0:
+            row["starved_reason"] = "ADJUDICATION_EQUIVALENT_MERGED"
+        else:
+            row["starved_reason"] = "ADJUDICATION_BELOW_DISTINCT_BAR"
+    return row
 
 
 # ---------------------------------------------------------------------------
@@ -506,8 +723,11 @@ def build_score_table(route_rec: Dict[str, Any],
             "problem_id": p["problem_id"],
             "question_type": p["question_type"],
             "contamination_tag": p.get("contamination_tag"),
+            "has_clarification": bool(p.get("clarification_answer")),
             "pipeline_final_status": pipe.get("final_status"),
             "pipeline_completed": completed,
+            "wall_s": pipe.get("wall_s"),
+            "stage_times_s": pipe.get("stage_times_s"),
             "synthesis_fallback": _fallback_flag(d),
             "n_evidence": len((pipe.get("same_evidence") or {}).get("ids") or []),
             "baseline_route": (base.get("route") or {}).get("provider")
@@ -518,6 +738,7 @@ def build_score_table(route_rec: Dict[str, Any],
             "criterion_diffs": {c: (judge.get("scores") or {}).get(c, {}).get("diff")
                                 for c in CRITERIA},
             "notes": (base.get("blocked") or pipe.get("engine_error") or "")[:120],
+            "funnel": _funnel_row(d),
             "hashes": {
                 "pipeline_answer_sha": _sha(pipe.get("answer") or "")[:16] if pipe.get("answer") else None,
                 "baseline_answer_sha": _sha(base.get("answer") or "")[:16] if base.get("answer") else None,
@@ -534,7 +755,14 @@ def build_score_table(route_rec: Dict[str, Any],
                 diff = (judge.get("scores") or {}).get(c, {}).get("diff")
                 if diff is not None:
                     crit_means[c].append(diff)
-    win_rate = round((wins + 0.5 * ties) / usable, 3) if usable else "NOT_MEASURED"
+    # Calibration first: the win-rate is NOT_MEASURED unless the judge
+    # itself passed the known-good/known-bad gate. A judge that cannot
+    # separate good from bad cannot certify a win (Art. LXI).
+    calib = (run_judge_calibration(judge_route)
+             if judge_route.get("provider") else
+             {"calibrated": False, "why": "no judge route (pipeline-only run)"})
+    win_rate = (round((wins + 0.5 * ties) / usable, 3)
+                if (usable and calib.get("calibrated")) else "NOT_MEASURED")
     import math
     ci = round(1.96 * math.sqrt(0.25 / usable), 3) if usable else None
     # fresh vs contaminated split
@@ -545,16 +773,85 @@ def build_score_table(route_rec: Dict[str, Any],
         u = sum(1 for r in sub if r.get("usable_pair"))
         w = sum(1 for r in sub if r.get("winner") == "pipeline")
         t = sum(1 for r in sub if r.get("winner") == "tie")
+        pair_wr = (round((w + 0.5 * t) / u, 3)
+                   if (u and calib.get("calibrated")) else "NOT_MEASURED")
         return {"n": len(sub), "completed": sum(1 for r in sub if r["pipeline_completed"]),
-                "usable": u, "win_rate": round((w + 0.5 * t) / u, 3) if u else "NOT_MEASURED"}
-    calib = run_judge_calibration(judge_route)
+                "usable": u, "win_rate": pair_wr}
+    def _funnel_agg(tag_val: Optional[str],
+                    fresh_only: bool = False) -> Dict[str, Any]:
+        sub = [r for r in rows
+               if (r.get("contamination_tag") is None if fresh_only
+                   else (tag_val is None
+                         or r.get("contamination_tag") == tag_val))]
+        n = len(sub)
+        n_mech = sum(1 for r in sub
+                     if (r.get("funnel") or {}).get("mechanisms_found"))
+        n_dist = sum(1 for r in sub
+                     if (r.get("funnel") or {}).get(
+                         "candidates_generated_distinct"))
+        return {
+            "n": n,
+            "completed": sum(1 for r in sub if r["pipeline_completed"]),
+            "mechanisms_found": n_mech,
+            "candidates_generated_distinct": n_dist,
+            "mechanisms_rate": round(n_mech / n, 3) if n else None,
+            "distinct_rate": round(n_dist / n, 3) if n else None,
+            "starved": [r["problem_id"] for r in sub
+                        if not (r.get("funnel") or {}).get(
+                            "mechanisms_found")],
+            "starved_reasons": {
+                r["problem_id"]: (r.get("funnel") or {}).get("starved_reason")
+                for r in sub
+                if not (r.get("funnel") or {}).get("mechanisms_found")},
+        }
+
+    walls = [r["wall_s"] for r in rows if isinstance(r.get("wall_s"), (int, float))]
+    all_stages: Dict[str, List[float]] = {}
+    for r in rows:
+        for k, v in (r.get("stage_times_s") or {}).items():
+            if isinstance(v, (int, float)):
+                all_stages.setdefault(k, []).append(float(v))
+    wall_time = {
+        "sum_wall_s": round(sum(walls), 1) if walls else None,
+        "mean_wall_s": round(sum(walls) / len(walls), 1) if walls else None,
+        "max_wall_s": round(max(walls), 1) if walls else None,
+        "mean_stage_s": {k: round(sum(v) / len(v), 2)
+                         for k, v in sorted(all_stages.items())},
+    }
+
+    def _pct(vals: List[float], q: float) -> Optional[float]:
+        if not vals:
+            return None
+        s = sorted(vals)
+        if len(s) == 1:
+            return round(s[0], 1)
+        k = (len(s) - 1) * q
+        lo, hi = int(k), min(int(k) + 1, len(s) - 1)
+        return round(s[lo] + (s[hi] - s[lo]) * (k - lo), 1)
+
+    speed = {
+        "n": len(walls),
+        "p50_wall_s": _pct(walls, 0.50),
+        "p95_wall_s": _pct(walls, 0.95),
+        "timeout_count": sum(
+            1 for r in rows
+            if r["pipeline_final_status"] == "INCOMPLETE_INFRASTRUCTURE"),
+        "budget_note": ("owner budget: median ~120 s, worst ~300 s; "
+                        "timeouts are INCOMPLETE_INFRASTRUCTURE"),
+    }
     return {
         "metric": "blind pairwise win-rate (pipeline vs strongest zero-paid single-shot baseline)",
+        "kpi": "R506 yield funnel on DEV: mechanisms_found + candidates_generated_distinct",
         "criteria": CRITERIA,
         "commit": _commit,
+        "dirty_tree": _dirty,
         "generated_at": utc_now(),
         "pipeline_completion": f"{n_completed}/{len(problems)}",
         "pipeline_completion_rate": round(n_completed / len(problems), 3) if problems else 0.0,
+        "yield_funnel_DEV": _funnel_agg(None),
+        "yield_funnel_fresh": _funnel_agg(None, fresh_only=True),
+        "wall_time": wall_time,
+        "speed": speed,
         "baseline_route": {"provider": route_rec.get("provider"), "model": route_rec.get("model"),
                            "state": route_rec.get("state")},
         "judge_route": {"provider": judge_route.get("provider"), "model": judge_route.get("model"),
@@ -604,13 +901,21 @@ def write_table(table: Dict[str, Any]) -> None:
     (SCORE_DIR / "SCORE_TABLE.json").write_text(
         json.dumps(table, indent=1, default=str) + "\n", encoding="utf-8")
     lines = [
-        f"# eval score table (commit {table['commit']}, {table['generated_at']})",
+        f"# eval score table (commit {table['commit']}, "
+        f"dirty_tree={table.get('dirty_tree')}, {table['generated_at']})",
         "",
         f"metric: {table['metric']}",
+        f"KPI: {table.get('kpi')}",
         "criteria: " + "; ".join(f"{k.split('_', 1)[0]}={v}"
                                 for k, v in table["criteria"].items()),
         "",
         f"pipeline completion: {table['pipeline_completion']}",
+        "yield funnel (DEV): " + json.dumps(table.get("yield_funnel_DEV"),
+                                             default=str),
+        "yield funnel (fresh): " + json.dumps(table.get("yield_funnel_fresh"),
+                                               default=str),
+        "wall time: " + json.dumps(table.get("wall_time"), default=str),
+        "speed: " + json.dumps(table.get("speed"), default=str),
         f"baseline route: {table['baseline_route'].get('provider')} / "
         f"{table['baseline_route'].get('model')} ({table['baseline_route'].get('state')})",
         f"judge route: {table['judge_route'].get('provider')} / "
@@ -630,16 +935,19 @@ def write_table(table: Dict[str, Any]) -> None:
         "criterion mean diffs (pipeline-baseline): "
         + json.dumps(table["criterion_mean_diffs_pipeline_minus_baseline"]),
         "",
-        "| problem | tag | type | final_status | completed | winner | crit diffs |",
-        "|---|---|---|---|---|---|---|",
+        "| problem | tag | type | final_status | completed | wall_s | mech | distinct | starved_reason | winner | crit diffs |",
+        "|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for r in table["rows"]:
+        f = r.get("funnel") or {}
         lines.append(
-            "| {} | {} | {} | {} | {} | {} | {} |".format(
+            "| {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} |".format(
                 r["problem_id"], r.get("contamination_tag"),
                 r["question_type"], r["pipeline_final_status"],
-                r["pipeline_completed"], r["winner"],
-                json.dumps(r["criterion_diffs"], default=str)[:150]))
+                r["pipeline_completed"], r.get("wall_s"),
+                f.get("mechanisms_found"), f.get("candidates_generated_distinct"),
+                f.get("starved_reason"), r["winner"],
+                json.dumps(r["criterion_diffs"], default=str)[:120]))
     (SCORE_DIR / "SCORE_TABLE.md").write_text("\n".join(lines) + "\n",
                                               encoding="utf-8")
 
@@ -648,6 +956,7 @@ def write_table(table: Dict[str, Any]) -> None:
 # main
 # ---------------------------------------------------------------------------
 _commit = git_short()
+_dirty = git_dirty()
 
 
 def _save(problem_id: str, name: str, rec: Dict[str, Any]) -> None:
@@ -657,16 +966,107 @@ def _save(problem_id: str, name: str, rec: Dict[str, Any]) -> None:
                           encoding="utf-8")
 
 
+def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
+                           timeout_s: int) -> None:
+    """Run each pipeline problem in its own process with a hard timeout.
+
+    A process exits at the timeout; the parent records the typed
+    INCOMPLETE_INFRASTRUCTURE row (Art. LXI: infrastructure loss is
+    never a refusal and never silently dropped). Process isolation also
+    means an edit in the main tree cannot touch an in-flight run."""
+    import subprocess
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    script = str(Path(__file__).resolve())
+
+    def _one(p: Dict[str, Any]) -> Dict[str, Any]:
+        pid = p["problem_id"]
+        cmd = [sys.executable, "-B", script, "--arms", "pipeline",
+               "--problems", pid, "--child"]
+        t0 = time.time()
+        try:
+            cp = subprocess.run(cmd, cwd=str(REPO), capture_output=True,
+                                text=True, timeout=timeout_s)
+            return {"problem_id": pid, "state": "DONE",
+                    "returncode": cp.returncode,
+                    "stdout": (cp.stdout or "")[-1600:],
+                    "stderr": (cp.stderr or "")[-800:],
+                    "wall_s": round(time.time() - t0, 1)}
+        except subprocess.TimeoutExpired as exc:
+            out = exc.stdout or ""
+            if isinstance(out, bytes):
+                out = out.decode("utf-8", "replace")
+            return {"problem_id": pid, "state": "TIMEOUT",
+                    "returncode": "TIMEOUT",
+                    "stdout": str(out)[-1600:], "stderr": "",
+                    "wall_s": round(time.time() - t0, 1)}
+
+    results: List[Dict[str, Any]] = []
+    with ThreadPoolExecutor(max_workers=max(1, min(workers, len(problems)))) as ex:
+        futs = [ex.submit(_one, p) for p in problems]
+        for f in as_completed(futs):
+            r = f.result()
+            results.append(r)
+            print(f"[eval] {r['problem_id']}: {r['state']} "
+                  f"({r['wall_s']}s, rc={r['returncode']})", flush=True)
+            if r["state"] == "TIMEOUT":
+                d = RUNS_ROOT / _commit / r["problem_id"] / "pipeline"
+                rec = {
+                    "answer": None, "completed": False,
+                    "wall_s": r["wall_s"],
+                    "final_status": "INCOMPLETE_INFRASTRUCTURE",
+                    "reason": f"hard per-problem timeout {timeout_s}s",
+                    "engine_error": "TIMEOUT",
+                    "stage_times_s": _stage_times(d),
+                }
+                _save(r["problem_id"], "pipeline_record.json", rec)
+            elif r["returncode"] not in (0, None):
+                # the child crashed before writing its record: record the
+                # typed infrastructure failure instead of a silent gap
+                rec_p = (RUNS_ROOT / _commit / r["problem_id"]
+                         / "pipeline_record.json")
+                if not rec_p.exists():
+                    d = RUNS_ROOT / _commit / r["problem_id"] / "pipeline"
+                    _save(r["problem_id"], "pipeline_record.json", {
+                        "answer": None, "completed": False,
+                        "wall_s": r["wall_s"],
+                        "final_status": "INCOMPLETE_INFRASTRUCTURE",
+                        "reason": f"child exit {r['returncode']}",
+                        "engine_error": (r["stderr"] or "")[-400:],
+                        "stage_times_s": _stage_times(d),
+                    })
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--arms", default="pipeline")
     ap.add_argument("--problems", default="all")
+    ap.add_argument("--subset", default="all",
+                    choices=["all", "dev6"])
+    ap.add_argument("--workers", type=int, default=1,
+                    help="parallel pipeline workers (process per problem)")
+    ap.add_argument("--timeout", type=int, default=300,
+                    help="hard per-problem timeout in seconds")
+    ap.add_argument("--child", action="store_true",
+                    help="internal: one problem in its own process")
     args = ap.parse_args(argv)
     arms = [a.strip().lower() for a in args.arms.split(",") if a.strip()]
     problems = json.loads(PROBLEMS.read_text(encoding="utf-8"))["problems"]
+    if args.subset == "dev6" and args.problems == "all":
+        problems = [p for p in problems if p["problem_id"] in DEV6]
     if args.problems != "all":
         want = {p.strip() for p in args.problems.split(",") if p.strip()}
         problems = [p for p in problems if p["problem_id"] in want]
+
+    RUNS_ROOT.mkdir(parents=True, exist_ok=True)
+    (RUNS_ROOT / _commit).mkdir(parents=True, exist_ok=True)
+    (RUNS_ROOT / _commit / "_run_meta.json").write_text(
+        json.dumps({"commit": _commit, "dirty_tree": _dirty,
+                    "dont_write_bytecode": bool(sys.dont_write_bytecode),
+                    "executable": sys.executable,
+                    "argv": list(argv or []),
+                    "started_at": utc_now()}, indent=1) + "\n",
+        encoding="utf-8")
 
     route_rec: Dict[str, Any] = {}
     judge_route: Dict[str, Any] = {}
@@ -693,6 +1093,12 @@ def main(argv=None) -> int:
         print(f"[eval] judge route: {judge_route.get('provider')} / "
               f"{judge_route.get('model')} ({judge_route.get('state')})", flush=True)
 
+    pipeline_done = False
+    if "pipeline" in arms and not args.child and args.workers > 1:
+        _run_pipeline_parallel(problems, args.workers, args.timeout)
+        pipeline_done = True
+        arms = [a for a in arms if a != "pipeline"]
+
     for p in problems:
         pid = p["problem_id"]
         d = RUNS_ROOT / _commit / pid
@@ -704,7 +1110,7 @@ def main(argv=None) -> int:
                   f"status={rec.get('final_status')}, completed={rec.get('completed')})",
                   flush=True)
         if "baseline" in arms:
-            rec = run_baseline_problem(p, d, route_rec)
+            rec = run_baseline_problem(_intake_problem(p), d, route_rec)
             _save(pid, "baseline_record.json", rec)
             print(f"[eval] {pid}: baseline done "
                   f"({'ok' if rec.get('answer') else rec.get('blocked')})",
@@ -724,16 +1130,21 @@ def main(argv=None) -> int:
                         "why": "pipeline did not release an answer"})
                 print(f"[eval] {pid}: judge skipped (pipeline not completed)", flush=True)
                 continue
-            rec = run_judge_problem(p, pv, bv, judge_route)
+            rec = run_judge_problem(_intake_problem(p), pv, bv, judge_route)
             _save(pid, "judge_record.json", rec)
             print(f"[eval] {pid}: judge -> "
                   f"{rec.get('winner') if rec.get('usable_pair') else rec.get('why')}",
                   flush=True)
 
+    if args.child:
+        return 0
+
     table = build_score_table(route_rec or {}, judge_route or {})
     write_table(table)
     print(json.dumps({k: table[k] for k in
-                      ("pipeline_completion", "BLIND_PAIRWISE_WIN_RATE",
+                      ("commit", "dirty_tree", "pipeline_completion",
+                       "yield_funnel_DEV", "wall_time", "speed",
+                       "BLIND_PAIRWISE_WIN_RATE",
                        "n_usable_pairs", "pipeline_wins", "baseline_wins",
                        "ties", "judge_calibration")}, indent=1, default=str))
     return 0

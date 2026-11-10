@@ -151,10 +151,6 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
         r"^glm-",
         r"^zai-org/GLM",
     ],
-    "tokenrouter": [
-        r"^z-ai/glm",
-        r"^glm-",
-    ],
     # R451: the self-hosted local baseline (llama.cpp serves the alias
     # 'qwen3-1.7b' — the Qwen3 family on local weights)
     "localqwen": [
@@ -174,7 +170,6 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
         r"^minimax-m[0-9.]+:free$",
     ],
     "xkiro": [
-        r"^qwen/qwen3\.8-max:free$",
         r"^qwen/qwen3\.5-plus:free$",
         r"^qwen/qwen3-max:free$",
         r"^minimax/minimax-m3:free$",
@@ -187,38 +182,16 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
         r"^mistralai/ministral-8b$",
         r"^mistralai/ministral-14b$",
     ],
-    "apinex": [
-        r"^free/deepseek-v[0-9.]+[a-z-]*$",
-        r"^free/deepseek-v4-pro-0813$",
-        r"^free/glm-5\.3-flash$",
-        r"^free/qwen-3\.8-max$",
-        r"^free/mimo-v[0-9.]+$",
-        r"^free/gpt-5\.6-luna$",
-    ],
-    "bai": [
-        r"^qwen3\.8-flash$",
-        r"^mimo-v[0-9.]+$",
-    ],
     # R461: the FIFTH router — bynara's -free family (the ids the
     # catalog actually serves; premium ids like glm-5.3, qwen3.8-max,
     # claude-opus-5, gpt-6-astra NEVER become rungs silently — the
     # -free suffix is the free-tier marker this router uses)
-    "bynara": [
-        r"^tencent-hy3-free$",
-        r"^glm-5\.3-free$",
-        r"^qwen3\.8-flash-free$",
-        r"^mimo-v2\.5-free$",
-        r"^muse-spark-1\.3-contributor-free$",
-    ],
     # R467: the EIGHTH router — atria. The catalog's SOLE model id,
     # admitted by exhaustion + measurement (the FIELD-protocol test in
     # the registration probe: 3/3 clean FIELD lines at the retry cap).
     # No free-suffix convention on this provider: the whole catalog IS
     # the operator-declared free budget (100M tokens, operator-declared
     # — no usage endpoint exposes it), so the exact id is the allowlist.
-    "atria": [
-        r"^Atria-Dawn-Preview$",
-    ],
     # R539: the NINTH router — agnes (apihub.agnes-ai.com), the
     # operator's number-1 API. The allowlist names EXACTLY the three
     # measured text flash rungs (the xkiro/apinex premium-precedent:
@@ -292,11 +265,6 @@ PINNED_DEFAULT_MODELS: Dict[str, List[Dict[str, Any]]] = {
          "task_capabilities": [TASK_CHEAP],
          "cost_class": 1, "latency_class": 4, "context_limit": 32768},
     ],
-    "tokenrouter": [
-        {"model": "z-ai/glm-5.3-free",
-         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
-         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
-    ],
     # R456-A3: the operator's free-tier router quartet — every rung
     # below is a MEASURED free-tier answerer (the registration probes,
     # recorded in the llm_registry policy notes). The STRONG rungs are
@@ -332,33 +300,6 @@ PINNED_DEFAULT_MODELS: Dict[str, List[Dict[str, Any]]] = {
          "task_capabilities": [TASK_STRONG, TASK_FAST],
          "cost_class": 1, "latency_class": 2, "context_limit": 128000},
     ],
-    "apinex": [
-        {"model": "free/deepseek-v4.1-flash",
-         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
-         "cost_class": 1, "latency_class": 3, "context_limit": 128000},
-        # R461: the newly-measured free rungs (tiny completions 5.64 s
-        # with 72 reasoning tokens / 3.35 s with 27, 2026-09-15) —
-        # deepseek-v4-PRO is the flagship PRO class (STRONG, measured
-        # reasoning latency honest at latency_class 3); glm-5.3-flash
-        # is the flash class (FAST+CHEAP, no STRONG claim)
-        {"model": "free/deepseek-v4-pro-0813",
-         "task_capabilities": [TASK_STRONG, TASK_FAST],
-         "cost_class": 1, "latency_class": 3, "context_limit": 128000},
-        {"model": "free/glm-5.3-flash",
-         "task_capabilities": [TASK_FAST, TASK_CHEAP],
-         "cost_class": 1, "latency_class": 3, "context_limit": 128000},
-        {"model": "free/mimo-v2.5",
-         "task_capabilities": [TASK_FAST, TASK_CHEAP],
-         "cost_class": 1, "latency_class": 3, "context_limit": 128000},
-    ],
-    "bai": [
-        {"model": "qwen3.8-flash",
-         "task_capabilities": [TASK_FAST, TASK_CHEAP],
-         "cost_class": 1, "latency_class": 1, "context_limit": 128000},
-        {"model": "mimo-v2.5",
-         "task_capabilities": [TASK_FAST, TASK_CHEAP],
-         "cost_class": 1, "latency_class": 1, "context_limit": 128000},
-    ],
     # R461: the FIFTH router — every rung below is a MEASURED
     # free-tier answerer on the bynara account (post-telegram-join,
     # 2026-09-15). tencent-hy3-free answered 3 consecutive probes
@@ -370,11 +311,6 @@ PINNED_DEFAULT_MODELS: Dict[str, List[Dict[str, Any]]] = {
     # unmeasured on the engine's structured protocol; no STRONG claim
     # (the b.ai precedent: flagship-family naming is not a quality
     # measurement).
-    "bynara": [
-        {"model": "tencent-hy3-free",
-         "task_capabilities": [TASK_FAST, TASK_CHEAP],
-         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
-    ],
     # R467: the EIGHTH router — the token-surplus rung the R466
     # reaudit's binding constraint asked for (a STRONG rung so
     # MECHANISM-stage synthesis does not degrade to
@@ -387,11 +323,6 @@ PINNED_DEFAULT_MODELS: Dict[str, List[Dict[str, Any]]] = {
     # retry cap — the engine's own MECHANISM-stage instrument, the
     # measurement bynara's rung honestly lacked). latency_class 3 is
     # the honest reasoning variance (0.55-8.71 s measured).
-    "atria": [
-        {"model": "Atria-Dawn-Preview",
-         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
-         "cost_class": 1, "latency_class": 3, "context_limit": 128000},
-    ],
     # R539: the NINTH router — every rung below is a MEASURED answerer
     # (2026-09-26 registration probes). agnes-3.0-flash is the STRONG
     # rung (3/3 clean FIELD lines in 1.11 s — the engine's structured-

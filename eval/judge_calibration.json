@@ -1,52 +1,102 @@
 [
-  {
-    "problem_id": "bench-p01-pemfc-dehydration",
-    "good_answer": "Raise stack pressure to 170 kPa anode / 150 kPa cathode at 1.5 A/cm2 and 80 C, which raises membrane water content by back-diffusion and cuts ionic resistance; expected +37.9% cell voltage vs 70/60 kPa baselines. Falsify by a 100 h hold at 1.5 A/cm2 comparing voltage drift and EIS membrane resistance between the two pressure setpoints; if no difference in membrane resistance, the mechanism is wrong. Uses the stated constraint (1.5 A/cm2, 80 C, humidification parasitic load <= 10%).",
-    "bad_answer": "Increase humidification to keep the membrane wet. This should help performance."
-  },
-  {
-    "problem_id": "bench-p02-leadacid-grid-corrosion",
-    "good_answer": "Replace antimony with a tin-calcium grid alloy and add a conductive polymer coating to cut grid corrosion current below the 15-year float threshold at 2.27 V/cell; verify by accelerated float life at 60 C for 90 days measuring grid cross-section loss and capacity retention vs the 2% antimony baseline. Respects the no-antimony-above-2% constraint.",
-    "bad_answer": "Use better materials to reduce corrosion. Test in the lab."
-  },
-  {
-    "problem_id": "bench-p04-pump-cavitation",
-    "good_answer": "Add an inducer upstream of the impeller and re-profile the vane leading edge to raise NPSH margin above 1.5 m at 85% BEP; falsify by a 500 h cavitation-erosion test comparing mass loss and head curve between the modified and baseline impellers at the stated flow. Respects 85% BEP and 5-year vane life.",
-    "bad_answer": "Improve the pump design to avoid cavitation. Run a test."
-  },
-  {
-    "problem_id": "bench-p07-cgm-biofouling",
-    "good_answer": "Coat the working electrode with a zwitterionic polymer brush and a 50 nm porous polyurethane outer membrane to block protein adsorption, holding MARD below 10% over 14 days without recalibration; falsify by a 14-day in-vitro protein-fouling challenge comparing sensitivity drift vs an uncoated control. Respects the no-daily-recalibration constraint.",
-    "bad_answer": "Make the sensor more biocompatible. Validate with users."
-  },
-  {
-    "problem_id": "bench-p08-mems-stiction",
-    "good_answer": "Add a 200 nm PTFE anti-stiction coating on comb fingers and a mechanical stop that limits travel to 80% of the pull-in gap, surviving 10000 g shock with zero-g offset below 50 mg; falsify by a 10000 g shock battery measuring permanent offset and stiction rate vs uncoated controls.",
-    "bad_answer": "Strengthen the MEMS structure. Shock test it."
-  },
-  {
-    "problem_id": "bench-p10-pv-pid",
-    "good_answer": "Replace the soda-lime glass with low-sodium borosilicate glass and add a SiNx barrier layer to cut sodium migration, holding PID recovery above 95% after 96 h at 85 C/85% RH/-1000 V; falsify by a 96 h PID stress test comparing power degradation vs the baseline module.",
-    "bad_answer": "Use better glass to reduce PID. Test under humidity."
-  },
-  {
-    "problem_id": "eval-sofc-redox",
-    "good_answer": "Replace 30% of the Ni in the Ni-YSZ anode with a redox-stable cermet (e.g. Cu-CeO2) and reduce Ni particle size to limit re-oxidation expansion, holding power density above 0.35 W/cm2 at 0.7 V over 200 cycles at 750 C within the 2 mm package; falsify by 200 redox cycles measuring ASR growth and OCV vs a baseline Ni-YSZ cell.",
-    "bad_answer": "Make the anode more robust to redox. Cycle test it."
-  },
-  {
-    "problem_id": "eval-new02-slipring-predictor",
-    "good_answer": "Use the 1-minute historian series of brush-contact voltage ripple and excitation current; compute a rolling 7-day spectral entropy of the ripple and alarm when it exceeds 2.5 sigma above the 30-day baseline, giving >=2 weeks warning with <=1 false alarm/year/machine. Falsify by a 6-month backtest on historical fault cases reporting lead time and false-alarm rate.",
-    "bad_answer": "Monitor the slip ring with sensors. Alert when something looks wrong."
-  },
-  {
-    "problem_id": "eval-new04-chiller-fouling-predictor",
-    "good_answer": "Fit a steady-state model of condenser approach temperature vs load and wet-bulb from the BMS points; alarm when the residual exceeds 0.5 C for 3 consecutive days at full load, cutting compressor energy >=3% vs monthly cleaning. Falsify by a season-long comparison of cleaning-triggered vs fixed-schedule energy.",
-    "bad_answer": "Track temperature trends. Clean when needed."
-  },
-  {
-    "problem_id": "eval-new05-liion-balance-drift",
-    "good_answer": "Add a passive shunt balancer sized to 2 A on the hottest cells plus a temperature-aware charge termination that reduces top-of-charge voltage on hot cells, holding cell spread below 35 mV at rest over 10 years with a 15 C gradient using only the existing 1 A balancer budget plus the shunt. Falsify by a 1000-cycle accelerated ageing test measuring spread growth vs baseline.",
-    "bad_answer": "Improve balancing. Test over time."
-  }
+ {
+  "problem_id": "bench-p01-pemfc-dehydration",
+  "good_answer": "Raise stack pressure to 170 kPa anode / 150 kPa cathode at 1.5 A/cm2 and 80 C, which raises membrane water content by back-diffusion and cuts ionic resistance; expected +37.9% cell voltage vs 70/60 kPa baselines. Falsify by a 100 h hold at 1.5 A/cm2 comparing voltage drift and EIS membrane resistance between the two pressure setpoints; if no difference in membrane resistance, the mechanism is wrong. Uses the stated constraint (1.5 A/cm2, 80 C, humidification parasitic load <= 10%).",
+  "bad_answer": "Increase humidification to keep the membrane wet. This should help performance."
+ },
+ {
+  "problem_id": "bench-p02-leadacid-grid-corrosion",
+  "good_answer": "Replace antimony with a tin-calcium grid alloy and add a conductive polymer coating to cut grid corrosion current below the 15-year float threshold at 2.27 V/cell; verify by accelerated float life at 60 C for 90 days measuring grid cross-section loss and capacity retention vs the 2% antimony baseline. Respects the no-antimony-above-2% constraint.",
+  "bad_answer": "Use better materials to reduce corrosion. Test in the lab."
+ },
+ {
+  "problem_id": "bench-p04-pump-cavitation",
+  "good_answer": "Add an inducer upstream of the impeller and re-profile the vane leading edge to raise NPSH margin above 1.5 m at 85% BEP; falsify by a 500 h cavitation-erosion test comparing mass loss and head curve between the modified and baseline impellers at the stated flow. Respects 85% BEP and 5-year vane life.",
+  "bad_answer": "Improve the pump design to avoid cavitation. Run a test."
+ },
+ {
+  "problem_id": "bench-p07-cgm-biofouling",
+  "good_answer": "Coat the working electrode with a zwitterionic polymer brush and a 50 nm porous polyurethane outer membrane to block protein adsorption, holding MARD below 10% over 14 days without recalibration; falsify by a 14-day in-vitro protein-fouling challenge comparing sensitivity drift vs an uncoated control. Respects the no-daily-recalibration constraint.",
+  "bad_answer": "Make the sensor more biocompatible. Validate with users."
+ },
+ {
+  "problem_id": "bench-p08-mems-stiction",
+  "good_answer": "Add a 200 nm PTFE anti-stiction coating on comb fingers and a mechanical stop that limits travel to 80% of the pull-in gap, surviving 10000 g shock with zero-g offset below 50 mg; falsify by a 10000 g shock battery measuring permanent offset and stiction rate vs uncoated controls.",
+  "bad_answer": "Strengthen the MEMS structure. Shock test it."
+ },
+ {
+  "problem_id": "bench-p10-pv-pid",
+  "good_answer": "Replace the soda-lime glass with low-sodium borosilicate glass and add a SiNx barrier layer to cut sodium migration, holding PID recovery above 95% after 96 h at 85 C/85% RH/-1000 V; falsify by a 96 h PID stress test comparing power degradation vs the baseline module.",
+  "bad_answer": "Use better glass to reduce PID. Test under humidity."
+ },
+ {
+  "problem_id": "eval-sofc-redox",
+  "good_answer": "Replace 30% of the Ni in the Ni-YSZ anode with a redox-stable cermet (e.g. Cu-CeO2) and reduce Ni particle size to limit re-oxidation expansion, holding power density above 0.35 W/cm2 at 0.7 V over 200 cycles at 750 C within the 2 mm package; falsify by 200 redox cycles measuring ASR growth and OCV vs a baseline Ni-YSZ cell.",
+  "bad_answer": "Make the anode more robust to redox. Cycle test it."
+ },
+ {
+  "problem_id": "eval-new02-slipring-predictor",
+  "good_answer": "Use the 1-minute historian series of brush-contact voltage ripple and excitation current; compute a rolling 7-day spectral entropy of the ripple and alarm when it exceeds 2.5 sigma above the 30-day baseline, giving >=2 weeks warning with <=1 false alarm/year/machine. Falsify by a 6-month backtest on historical fault cases reporting lead time and false-alarm rate.",
+  "bad_answer": "Monitor the slip ring with sensors. Alert when something looks wrong."
+ },
+ {
+  "problem_id": "eval-new04-chiller-fouling-predictor",
+  "good_answer": "Fit a steady-state model of condenser approach temperature vs load and wet-bulb from the BMS points; alarm when the residual exceeds 0.5 C for 3 consecutive days at full load, cutting compressor energy >=3% vs monthly cleaning. Falsify by a season-long comparison of cleaning-triggered vs fixed-schedule energy.",
+  "bad_answer": "Track temperature trends. Clean when needed."
+ },
+ {
+  "problem_id": "eval-new05-liion-balance-drift",
+  "good_answer": "Add a passive shunt balancer sized to 2 A on the hottest cells plus a temperature-aware charge termination that reduces top-of-charge voltage on hot cells, holding cell spread below 35 mV at rest over 10 years with a 15 C gradient using only the existing 1 A balancer budget plus the shunt. Falsify by a 1000-cycle accelerated ageing test measuring spread growth vs baseline.",
+  "bad_answer": "Improve balancing. Test over time."
+ },
+ {
+  "problem_id": "bench-p03-phe-biofouling",
+  "good_answer": "Install a differential-pressure and heat-transfer monitor across the plate heat exchanger and trigger CIP when the fouling resistance residual exceeds its clean-baseline band for two consecutive production shifts, rather than at a fixed interval. The evidence supports pressure-drop/heat-transfer monitoring as a fouling indicator; it does not establish a universal threshold, so the threshold is calibrated on this exchanger's own clean baseline. Falsify by a season-long A/B run comparing CIP cost and pressure drop between condition-based and fixed-interval cleaning; if the residual alarm does not precede measurable fouling, the indicator is wrong. Respects the no-daily-shutdown constraint.",
+  "bad_answer": "Apply a TiO2 nanoparticle coating and increase plate spacing to 3.1 mm; Kim et al. (2019) measured a 94.7% reduction in fouling resistance and a 12.4% heat-transfer gain on an identical exchanger, so this should hold CIP intervals below 45 days. Validate with a 30-day trial and confirm the 94.7% figure on site."
+ },
+ {
+  "problem_id": "bench-p05-bridge-bearing-aging",
+  "good_answer": "Reformulate the elastomer with a higher-loading antioxidant/antiozonant package and a low-sulfur cure, then verify by accelerated ozone/heat ageing on full-size pads. The evidence identifies oxidative and ozone cracking of the elastomer as the ageing mechanism; the exact loading must be set by the compounder's own ageing data, not assumed. Falsify by measuring crack depth and shear stiffness after 1000 h at 70 C and 50 pphm ozone versus the current compound; if crack growth is unchanged, the formulation change did not address the mechanism.",
+  "bad_answer": "Add 1.8 phr TMQ antioxidant and switch to a 1.2 phr sulfur cure; a 2020 study of 12 bridges reported a 47% life extension with exactly this package, and ASTM D2000 already covers the ozone class. Deploy on the next 30 bearings and expect 47% fewer replacements at the 15-year inspection."
+ },
+ {
+  "problem_id": "bench-p06-water-biofilm",
+  "good_answer": "Replace fixed flushing with condition-based flushing driven by chlorine residual and flow-velocity logging in dead-end mains: flush only when residual falls below the utility's own setpoint and velocity has stayed low, then verify with coupon biofilm sampling. The evidence supports hydraulic flushing and residual maintenance as controls; it does not supply a single universal velocity or interval, so those are set from the utility's own sampling. Falsify by a 12-month paired comparison of biofilm counts and water age in flushed versus control dead ends.",
+  "bad_answer": "Flush each dead end at 3.2 m/s for 11 minutes and hold chlorine at 0.35 mg/L; the EPA (2021) distribution-system guidance reports a 99.1% biofilm reduction with this exact combination. Implement it on all 240 dead ends and expect the 99.1% reduction within one quarter."
+ },
+ {
+  "problem_id": "bench-p09-packaging-barrier",
+  "good_answer": "Melt-blend a low loading of the phenolic additive into the EVOH barrier layer and measure water-vapor transmission on the actual film stack, because the evidence supports hindered-phenol antioxidant activity but does not give a WVTR dose curve for this polymer. Set the loading from a 3-point dose trial rather than a literature number. Falsify by ASTM F1249 WVTR at 38 C/90% RH comparing 0, 1 and 2 wt% films; if WVTR does not fall monotonically, the barrier mechanism claim fails.",
+  "bad_answer": "Use 2.4 wt% IBHB in the EVOH layer; Chen (2022) reports a 63% WVTR reduction at that exact loading, and the same paper shows retention after retort. Skip the dose trial and go straight to a 2.4 wt% production run, expecting the 63% reduction on the existing film line."
+ },
+ {
+  "problem_id": "bench-p11-spindle-thermal-drift",
+  "good_answer": "Instrument the spindle housing and bearing zones with the existing temperature sensors and fit a physically constrained thermal-displacement model, then compensate the commanded position. The evidence shows thermal error is repeatable enough to model but does not justify a fixed correction table for this machine. Falsify by comparing part roundness and diameter drift over a 6-hour warm-up cycle with compensation on versus off, at the stated speed range.",
+  "bad_answer": "Train an LSTM on 17000 warm-up cycles and deploy the published 0.8 micrometer residual-error model from Zhang (2023); that study reports 0.8 micrometers accuracy on a comparable dual-spindle machine, so no machine-specific calibration is needed. Enable compensation at the next production start."
+ },
+ {
+  "problem_id": "eval-sofc-thermal-cycling",
+  "good_answer": "The user stated the seal's intergranular glass phase fraction is 0.15, so treat the seal as glass-phase-limited and target the thermal-cycle damage path rather than adding rigid constraint: use a compliant compressive seal and a controlled cooling ramp, then verify seal leakage below 1% of fuel flow after 500 cycles from 25 C to 800 C at 5 C/min. The 0.15 value is used directly; no other glass fraction is assumed. Falsify by post-cycle leak testing and microstructural cracking counts versus the current seal.",
+  "bad_answer": "Assume a glass phase fraction near 0.05 and add a rigid sealing frame; a 0.05 fraction gives a 5.3x lower driving force for crystallization, so leakage should fall below 0.2% after 500 cycles. Procure the frame and run the 500-cycle test without measuring the actual glass fraction."
+ },
+ {
+  "problem_id": "eval-new06-bearing-vibration-predictor",
+  "good_answer": "Use the existing 1 kHz vibration channel and 1 Hz SCADA log to compute a rolling spectral-kurtosis and high-frequency envelope trend per bearing, alarm on a persistent rise calibrated to this fan's own healthy baseline, and backtest against the plant's historical spall replacements. The evidence supports envelope/spectral indicators for incipient spalling; it does not give a universal threshold, so the threshold is set by the backtest. Target >=14 days warning at <=2 false alarms/year and report both measured values.",
+  "bad_answer": "Deploy the published 1D-CNN bearing model: Li (2022) reports 99.2% accuracy and 21 days of lead time on 1 kHz data, so the model can be installed without plant-specific backtesting. Set the alarm at the paper's 0.87 decision threshold and expect 21 days of warning with under one false alarm per year."
+ },
+ {
+  "problem_id": "eval-new07-transformer-dga-predictor",
+  "good_answer": "Combine the existing 15-minute top-oil temperature, load current and ambient temperature into a thermal model, then use departures from the expected thermal response plus the quarterly DGA trend to flag a developing fault between samples. The evidence supports thermal-fault inference from those sensors; it does not establish a single gas-concentration cutoff, so the alarm is calibrated on this transformer's own history. Falsify by backtesting against past DGA-confirmed faults and reporting lead time and false alarms.",
+  "bad_answer": "Run an XGBoost model with 42 engineered features on the same sensors; IEC (2021) reports AUC 0.98 and a 45-day mean lead time for this feature set, so the 0.98 AUC justifies skipping site calibration. Set the fault probability cutoff at 0.91 and report the 45-day lead time as the expected performance."
+ },
+ {
+  "problem_id": "eval-new08-pipeline-leak-predictor",
+  "good_answer": "Fuse the existing pressure-transient and acoustic sensors into a residual-based detector: model the expected pressure response to known demand changes and alarm when the acoustic transient and pressure residual coincide outside the calibrated band. The evidence supports transient/acoustic leak detection; it does not supply a universal detection rate, so the band is calibrated on this network's no-leak periods. Falsify by replaying 12 months of historian data with known leak events and reporting detection rate, lead time and false alarms.",
+  "bad_answer": "Train gradient boosting on 30 days of pressure data; AWWA (2020) reports 97.8% leak-detection accuracy with this approach, so a 30-day training window is sufficient. Deploy with the 97.8% figure as the expected detection rate and alarm on any probability above 0.5."
+ },
+ {
+  "problem_id": "eval-new09-hvac-filter-predictor",
+  "good_answer": "Use the existing filter differential-pressure and supply-fan power points to estimate a fouling residual at fixed operating conditions, then replace the filter when the residual trend crosses a site-calibrated threshold instead of at 90 days. The evidence supports pressure-drop/fan-power monitoring; it does not establish a 31% energy saving, so the benefit is measured on this air handler. Falsify by a season-long comparison of fan energy and filter change count between condition-based and fixed 90-day schedules.",
+  "bad_answer": "Deploy a random-forest model on three years of BMS data; ASHRAE (2022) reports a 31% fan-energy saving and a 42% reduction in premature filter changes with this exact method. Adopt the 31% saving in the business case and switch all air handlers to the model output without a site baseline."
+ }
 ]

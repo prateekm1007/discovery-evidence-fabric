@@ -234,6 +234,13 @@ _CROSS_DOMAIN_GENERIC_TERMS = frozenset({
     "obeying", "following", "follow", "follows", "following",
     "following", "heeding", "heed", "heeds", "heeding", "heed",
     "observing", "observe", "observes", "observing", "observed",
+    # R1 audit-hold fix: cross-domain generic terms that caused
+    # false-positive cemetery blocks (CE-003 'membrane' blocking
+    # pemfc candidates; 'that'/'this' leaking as structural matches).
+    "membrane", "membranes", "that", "this", "these", "those",
+    "with", "from", "into", "onto", "upon", "about", "above",
+    "below", "between", "through", "across", "along", "among",
+    "around", "during", "before", "after", "under", "over",
 })
 
 

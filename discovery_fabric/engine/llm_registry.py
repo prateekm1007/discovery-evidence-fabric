@@ -79,6 +79,9 @@ class ProviderSpec:
     # model_cost_policy.py; UNDECLARED stays ineligible under
     # ZERO_PAID_COST — never silently free) ---------------------------
     cost_basis: str = "UNDECLARED"
+    #: owner-confirmed date for the cost basis (FREE_TIER_API is a
+    #: dated owner statement, never an assumption)
+    cost_basis_date: str = ""
     locality: str = "UNDECLARED"    # LOCAL | REMOTE
     license: str = "UNDECLARED"
     model_revision: str = "UNDECLARED"
@@ -218,65 +221,13 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "ZERO_PAID_COST_SELF_HOSTED: self-hosted weights, local "
             "inference, no per-token billing of any kind — the ONLY basis "
             "eligible under MODEL_COST_POLICY=ZERO_PAID_COST.")),
-    # ------------------------------------------------------------------
-    # R539 (2026-09-26): the NINTH router — agnes (apihub.agnes-ai.com),
-    # the operator's number-1 API (verbatim directive 2026-09-26: "put
-    # this as the number 1 api, so infrastucture failure doesnt happen
-    # again"). Probe-before-admit held the same morning (Art. III) —
-    # every fact below is measured, never catalog optimism:
-    #   catalog  GET /v1/models -> 200 with 12 agnes-* models
-    #            (agnes-2.5-pro-alpha, agnes-video-2.5-flash,
-    #            agnes-3.0-flash, agnes-image-2.1-flash, agnes-video-2.5,
-    #            agnes-2.0-flash, agnes-image-2.0-flash, agnes-2.5-flash,
-    #            agnes-2.5-pro, agnes-2.5-pro-beta, agnes-video-v2.0,
-    #            agnes-image-2.5-flash);
-    #   tiny completions (max_tokens 16-64, "Reply with exactly: READY"):
-    #            agnes-3.0-flash -> 200 OK non-empty 0.95-6.2 s;
-    #            agnes-2.5-flash -> 200 OK 0.61-1.38 s (empty content at
-    #            cap 16 — the EmptyContentWithFinish reasoning class —
-    #            non-empty at cap 64 with reasoning_tokens 13);
-    #            agnes-2.0-flash -> 200 OK 0.48 s non-empty;
-    #   gated rungs: agnes-2.5-pro / -pro-alpha / -pro-beta -> 403
-    #            "Insufficient user quota, remaining: $0.000000"
-    #            (AgnesAI_error insufficient_user_quota) — per-model
-    #            credit gating on this key (the xkiro/bai deposit-gate
-    #            precedent): classified CREDIT_EXHAUSTED, the cascade
-    #            advances, the provider stays eligible;
-    #   THE MECHANISM-STAGE INSTRUMENT: the FIELD-line protocol test —
-    #            agnes-3.0-flash 3/3 clean FIELD_MECHANISM/
-    #            FIELD_KEY_VARIABLE/FIELD_FALSIFIER lines in 1.11 s and
-    #            agnes-2.5-flash 3/3 clean in 0.77 s — FORMAT-COMPLIANT
-    #            on the engine's structured protocol (the measurement
-    #            bynara's rung honestly lacked; the basis atria's STRONG
-    #            rung carried). Default urllib User-Agent passes (no CF
-    #            block on apihub.agnes-ai.com). HONEST TIERS:
-    #            quality_tier 2 (flash class + measured FIELD compliance
-    #            above — recorded policy input, Art. XXVII);
-    #            latency_tier 2 (measured 0.48-6.2 s variance across
-    #            flash rungs). Context capacity NOT exposed by the
-    #            catalog — 128_000 is the router-family default,
-    #            recorded honest (Art. VI). probe_max_tokens=64: the
-    #            2.5-flash rung starves content at the shared 16-token
-    #            probe cap (reasoning model) and answers at 64 — the
-    #            R469 declared-budget mechanism, not a downgrade.
-    #            FREE_TIER_API under the R456-A3 operator amendment:
-    #            the flash rungs serve at $0 measured balance — eligible
-    #            under ZERO_PAID_COST; depletion stays a typed failure
-    #            that advances the cascade, never a bill.
-    # ------------------------------------------------------------------
-    # Mercury 3 (Inception Labs) - operator-supplied fast+good model,
-    # used alongside agnes. LIVE-MEASURED 2026-11-10: GET /v1/models ->
-    # 200 with mercury-2 / mercury-2.5 / mercury-3 / mercury-decide;
-    # mercury-3 tiny completion -> 200 OK (content starves at 16 tokens,
-    # answers at 64 - probe_max_tokens=64). Cost basis FREE_TIER_API
-    # (eligible under ZERO_PAID_COST) pending confirmation of billing.
-    # ------------------------------------------------------------------
     ProviderSpec(
         "inception", "INCEPTION_API_KEY",
         "https://api.inceptionlabs.ai/v1/chat/completions",
         "mercury-3", "openai", 128_000,
         quality_tier=2, cost_tier=1, latency_tier=1,
-        cost_basis="FREE_TIER_API", locality="REMOTE",
+        cost_basis="FREE_TIER_API", cost_basis_date="2026-11-10",
+        locality="REMOTE",
         license="provider serving terms (operator-supplied key)",
         account_domain="OWNER_INCEPTION_ACCOUNT",
         model_revision="mercury-3 measured live 2026-11-10 (tiny "
@@ -292,7 +243,6 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "starves at 16 - probe_max_tokens=64). Default urllib UA "
             "passes (no CF block). Tiers recorded policy inputs "
             "(Art. XXVII).")),
-    # ------------------------------------------------------------------
     ProviderSpec(
         "agnes", "AGNES_API_KEY",
         "https://apihub.agnes-ai.com/v1/chat/completions",
@@ -322,23 +272,6 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "rungs (1.11 s / 0.77 s) — the STRONG-rung measurement. "
             "Default urllib User-Agent passes (no CF block). Tiers are "
             "recorded policy inputs (Art. XXVII).")),
-    # ------------------------------------------------------------------
-    # R456-A3 (2026-09-15): the operator's free-tier router quartet —
-    # the A3 capability-floor unblock. Operator directive (verbatim):
-    #   "Use these to use free ai models like qwen 3.8, glm 5.3,
-    #    deepseek, minimax etc. once tokens run out of one go to the
-    #    next provider"
-    # EVERY spec below was LIVE-MEASURED before registration (the
-    # R451-C1.2 probe-before-admit discipline: a tiny completion through
-    # the provider's REAL transport, recorded in the policy note; catalog
-    # presence is never admission evidence). Cost basis FREE_TIER_API —
-    # eligible under ZERO_PAID_COST per the recorded operator amendment
-    # (model_cost_policy.py v1.1.0). Each key is a DISTINCT economic
-    # account: quota exhaustion on one advances the cascade to the next
-    # (the operator's rotation rule), and the accounts are genuinely
-    # redundant (transport_capability: redundancy across ACCOUNT
-    # domains, never routes).
-    # ------------------------------------------------------------------
     ProviderSpec(
         "unorouter", "UNOROUTER_API_KEY",
         "https://api.unorouter.com/v1/chat/completions",
@@ -411,317 +344,6 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "flagship class). Tiers are recorded policy inputs "
             "(Art. XXVII).")),
     ProviderSpec(
-        "apinex", "APINEX_API_KEY",
-        "https://apinex.bond/v1/chat/completions",
-        "free/deepseek-v4.1-flash", "openai", 128_000,
-        quality_tier=2, cost_tier=1, latency_tier=3,
-        cost_basis="FREE_TIER_API", locality="REMOTE",
-        license="provider serving terms (free tier, no deposit)",
-        account_domain="OWNER_APINEX_ACCOUNT",
-        model_revision="router free tier; free/deepseek-v4.1-flash "
-                       "measured live 2026-09-14 (tiny completion 2.4 s); "
-                       "no per-model revision pin exposed by the router — "
-                       "recorded honest (Art. VI)",
-        extra_headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                          "AppleWebKit/537.36 (KHTML, like Gecko) "
-                          "Chrome/131.0.0.0 Safari/537.36"},
-        policy_note=(
-            "R456-A3 operator-supplied free-tier router #3. TRANSPORT "
-            "REQUIREMENT (measured): apinex.bond sits behind the same "
-            "Cloudflare browser-signature check (urllib UA banned 403 "
-            "error 1010; Chrome UA passes) — carried in extra_headers. "
-            "LIVE-MEASURED at registration: GET /v1/models -> 200 with "
-            "26 models incl. an explicit free/ set; free/deepseek-v4.1-"
-            "flash tiny completion -> 200 PROBE_OK 2.4 s; free/gpt-5.6-"
-            "luna -> 200 PROBE_OK 6.3 s; free/mimo-v2.5 -> 200 PROBE_OK "
-            "8.0 s. free/qwen-3.8-max answers 200 with content null at "
-            "small caps (reasoning-shaped — EmptyContentWithFinish "
-            "class); free/glm-5.3-flash and free/deepseek-v4-flash-0731 "
-            "timed out at 45 s on the probe window (busy free pool — "
-            "the cascade's job, not a dead mark). deepseek-v4.1-flash is "
-            "the STRONG rung (the engine's existing deepseek-v4-flash "
-            "rungs declare STRONG+FAST+CHEAP; v4.1-flash is the same "
-            "class). Tiers are recorded policy inputs (Art. XXVII).")),
-    ProviderSpec(
-        "bai", "BAI_API_KEY",
-        "https://api.b.ai/v1/chat/completions",
-        "qwen3.8-flash", "openai", 128_000,
-        quality_tier=3, cost_tier=1, latency_tier=1,
-        cost_basis="FREE_TIER_API", locality="REMOTE",
-        license="provider serving terms (free tier, no deposit)",
-        account_domain="OWNER_BAI_ACCOUNT",
-        model_revision="router free tier; qwen3.8-flash measured live "
-                       "2026-09-14 (tiny completion 1.5 s); no per-model "
-                       "revision pin exposed by the router — recorded "
-                       "honest (Art. VI)",
-        policy_note=(
-            "R456-A3 operator-supplied free-tier router #4. LIVE-MEASURED "
-            "at registration: GET /v1/models -> 200 with 47 models "
-            "(claude/gpt/gemini/glm/qwen3.8/minimax/kimi...); MOST are "
-            "deposit-gated premium (403 'Deposit required to unlock "
-            "premium models' — classified CREDIT_EXHAUSTED, the cascade "
-            "advances); the MEASURED free answerers: qwen3.8-flash -> "
-            "200 PROBE_OK 1.5 s and mimo-v2.5 -> 200 PROBE_OK 1.9 s; "
-            "minimax-m2.7 answers 400 'credit insufficient balance: "
-            "balance=0 required=2406' — per-model credit gating, "
-            "classified CREDIT_EXHAUSTED (the measured specimen rides "
-            "provider_health). HONEST TIERS: quality_tier 3 — the "
-            "measured free answerers are the FLASH/derived class (fast "
-            "mid-tier), NOT the flagship class on the other three "
-            "routers; this provider's role in the rotation is the FAST "
-            "fallback (latency_tier 1, measured 1.5 s), with "
-            "task_capabilities FAST+CHEAP (no STRONG claim — the "
-            "strong flagships here are premium-gated). Default urllib "
-            "User-Agent passes (no CF block on api.b.ai). Tiers are "
-            "recorded policy inputs (Art. XXVII).")),
-    # ------------------------------------------------------------------
-    # R461 (2026-09-15): the FIFTH free-tier router — bynara. The key
-    # arrived 2026-09-14 with the quartet but measured 403
-    # telegram_required ("Join the required Telegram group/channel and
-    # relink at /settings to continue") — a typed ACCOUNT-ENTRY GATE,
-    # escalated to the owner per Art. LXV (R461/
-    # BYNARA_OWNER_ACTION_ESCALATION.json). The owner acted ("bynara
-    # (new router) — key valid telegram joined", 2026-09-15): the gate
-    # is RESOLVED and the account now serves. Probe-before-admit held
-    # throughout — the registration below quotes only measurements
-    # taken AFTER the owner action (R461/PROBE_CATALOG.json +
-    # PROBE_COMPLETIONS.json).
-    # ------------------------------------------------------------------
-    ProviderSpec(
-        "bynara", "BYNARA_API_KEY",
-        "https://router.bynara.id/v1/chat/completions",
-        "tencent-hy3-free", "openai", 128_000,
-        quality_tier=3, cost_tier=1, latency_tier=2,
-        cost_basis="FREE_TIER_API", locality="REMOTE",
-        license="provider serving terms (free tier, no deposit)",
-        account_domain="OWNER_BYNARA_ACCOUNT",
-        model_revision="router free tier; tencent-hy3-free measured "
-                       "live 2026-09-15 (tiny completions 1.91-2.53 s, "
-                       "3x stable); no per-model revision pin exposed "
-                       "by the router — recorded honest (Art. VI)",
-        policy_note=(
-            "R461 operator-supplied free-tier router #5 (bynara, "
-            "router.bynara.id — the account-entry gate resolved by the "
-            "owner's telegram join, the Art. LXV escalation answered). "
-            "LIVE-MEASURED at registration (post-owner-action): GET "
-            "/v1/models -> 200 with 49 models incl. an explicit -free "
-            "family (glm-5.3-free, qwen3.8-flash-free, mimo-v2.5-free, "
-            "muse-spark-1.3-contributor-free, tencent-hy3-free); "
-            "tencent-hy3-free tiny completion -> 200 PROBE_OK 2.53 s / "
-            "1.91 s / 1.91 s (3 passes, stable). The account's OTHER "
-            "-free models measured credit/plan-gated on this key at "
-            "registration time: glm-5.3-free -> 402 'Insufficient "
-            "credits. Please top up your balance.' and mimo-v2.5-free "
-            "-> 429 'Insufficient credits ... try again in a few "
-            "minutes' (the account's small free credit allowance is "
-            "depleted for those rungs — typed CREDIT_EXHAUSTED / "
-            "RATE_LIMITED, the cascade advances and the cooldown "
-            "ladder retries); qwen3.8-flash-free + muse-spark-1.3-"
-            "contributor-free -> 403 'Your plan does not include the "
-            "requested model.' (per-model plan gate, the xkiro "
-            "deposit-gate precedent — typed CREDIT_EXHAUSTED, the "
-            "provider stays eligible). Default urllib User-Agent "
-            "passes (no CF block on router.bynara.id). HONEST TIERS: "
-            "quality_tier 3 — tencent-hy3 carries flagship-family "
-            "naming but the free-tier serving path is UNMEASURED on "
-            "the engine's structured protocol; no STRONG claim (the "
-            "measured rung registers FAST+CHEAP, latency_tier 2, "
-            "measured ~2 s). The -free family allowlist admits all "
-            "five ids so catalog discovery can route to whichever "
-            "rung the account's credit state admits (family policy, "
-            "never today's availability — Art. XXVII). Tiers are "
-            "recorded policy inputs (Art. XXVII).")),
-    # ------------------------------------------------------------------
-    # R467 (2026-09-15): the EIGHTH router — atria. The operator
-    # supplied the key with the declarations "it gives 100million tokens
-    # of new model which is as good as glm5.3" and "we should be token
-    # surplus now" (the token-surplus directive — the R466 reaudit's
-    # named binding constraint was the free-router cascade's MECHANISM-
-    # stage inference quality, an Art. LXV owner-side capacity question;
-    # this key is the owner's answer). Probe-before-admit held
-    # (R467/PROBE_CATALOG.json + R467/PROBE_COMPLETIONS.json): every
-    # fact below is measured, the operator's quality/budget claims are
-    # recorded as OPERATOR-DECLARED where no provider surface exposes
-    # them (Art. VI/XXV).
-    # ------------------------------------------------------------------
-    ProviderSpec(
-        "atria", "ATRIA_API_KEY",
-        "https://api.atria-asi.ai/v1/chat/completions",
-        "Atria-Dawn-Preview", "openai", 128_000,
-        quality_tier=2, cost_tier=1, latency_tier=3,
-        cost_basis="FREE_TIER_API", locality="REMOTE",
-        license="provider serving terms (operator-declared free token "
-                "budget; no deposit authorized)",
-        account_domain="OWNER_ATRIA_ACCOUNT",
-        probe_max_tokens=256,
-        reasoning_retry_ceiling=8192,
-        # R483: 8 measured run-owned failures
-        # EmptyContentWithFinish (finish_reason=length) at caps
-        # <=2048 (2026-09-15..16 routing ledger); the 90s
-        # DIRECT_TRANSFER success at 2048 measured content
-        # arriving when reasoning fits. One more x4 rung
-        # (2048*4=8192), far under the spec's declared 128k
-        # context. Recorded policy input (Art. XXVII).
-        # R469 (2026-09-16): the key RING — the operator's keep-going
-        # directive, verbatim: "Keep going to a new key of atira if one
-        # is exhausted. Wire it in the discovery engine." Key 3
-        # (ATRIA_API_KEY_3) was probe-validated before this registration
-        # (R469/PROBE_ATRIA_KEY3.json: the bogus-key 401 differential
-        # control; catalog 200 on ALL THREE keys — the same sole model
-        # Atria-Dawn-Preview; a 200 non-empty tiny completion on key 3
-        # in 17.9 s; keys 1/2 identity-confirmed against the R467/R468
-        # records; all three keys DISTINCT). An exhaustion-class
-        # failure (CREDIT_EXHAUSTED / AUTH_FAILURE / RATE_LIMITED)
-        # rotates through the ring on the SAME rung before any
-        # provider-level fallback; every rotation is a recorded route
-        # hop (never silent, Art. IV).
-        #
-        # R470 (2026-09-16): the operator supplied seven more keys. The
-        # PARALLEL-LINE RECONCILIATION (this commit, rebased onto the
-        # sibling R470-C2's ten-slot registration): the sibling set
-        # 10/10 keys on the Space surface BY NAME (write-only API —
-        # presence, not validity; R470/HF_SPACE_SECRETS_ATRIA_RING10.json)
-        # and registered all ten; THIS line's probe-before-record
-        # measured every key's VALIDITY (R470/PROBE_ATRIA_KEYS4TO10.json:
-        # keys 1-3 identity-confirmed vs the R467/R468/R469 records; all
-        # ten pairwise DISTINCT; catalog 200 on keys 4,5,6,7,9,10 with
-        # the sole model Atria-Dawn-Preview; one 200 non-empty tiny
-        # completion on key 4 in 1.02 s after one disclosed transient
-        # 502). ATRIA_API_KEY_8 is NOT REGISTERED: its catalog probe
-        # answered a DETERMINISTIC 401 x3 (re-probed twice, 8 s apart)
-        # — the bogus-key differential class — so it is typed INVALID
-        # and EXCLUDED from the ring (the measured verdict outranks the
-        # name-present surface, Art. III); the vault keeps the value
-        # for the operator's re-supply/reference, the Space surface may
-        # carry it inertly (the ring is the selection authority), and
-        # the slot number is NOT reused (ATRIA_API_KEY_9/_10 keep their
-        # operator-given names so future keys append unambiguously).
-        # 9 VALID slots x operator-declared 100M = the ~900M-token
-        # surplus (OPERATOR-DECLARED; no usage endpoint is measurable —
-        # Art. VI/XXV).
-        #
-        # R472 (2026-09-16, the PARALLEL-LINE RECONCILIATION of two
-        # probe lines on the SAME operator delivery): the operator
-        # re-supplied key 8 (same string) and delivered keys 11-15
-        # (the sibling line's message carried 11-13; this line's
-        # carried 11-15 — the union is five new keys).
-        #
-        # KEY 8, BOTH MEASUREMENTS RECORDED (Art. III — the measured
-        # verdict outranks the surface in BOTH directions, and the
-        # LATEST typed measurement decides): the sibling's probe
-        # (R472/PROBE_ATRIA_KEYS11TO13.json, 22:40:28Z) measured the
-        # re-supplied key 8 catalog 200 x3 — CLEARED and REINSTATED on
-        # their line. THIS line's probe (R472/PROBE_ATRIA_KEYS11TO15
-        # .json, 22:57Z) measured the SAME value (fingerprint
-        # atr_DH...1QzF, identical) DETERMINISTIC 401 x3 (re-probed
-        # twice, 8 s apart), and the post-rebase decisive re-measure
-        # (this commit, ~00:05Z) answered 401 x3 AGAIN — key 8's
-        # provider-side state FLAPPED (200-window at 22:40, 401
-        # deterministic after 22:57). The current typed verdict is
-        # INVALID: key 8 is EXCLUDED from the ring (the latest
-        # measurement rules; the flapping is disclosed, never hidden);
-        # the vault keeps the value, the Space surface carries it
-        # inertly, the slot number is NOT reused.
-        #
-        # THE FIVE NEW KEYS (both lines' probes agree): keys 11-15
-        # catalog 200 each (sole model Atria-Dawn-Preview, bogus-key
-        # differential 401); one 200 non-empty tiny completion on key
-        # 11 (this line: 4.06 s; the sibling: 1.79 s — independent
-        # confirmations); all fifteen pairwise DISTINCT; keys 1-10
-        # identity-confirmed vs the R470 record. 14 VALID slots x
-        # operator-declared 100M = the ~1.4B-token surplus
-        # (OPERATOR-DECLARED; no usage endpoint is measurable —
-        # Art. VI/XXV). The Space surface carries all fifteen names
-        # (R472/HF_SPACE_SECRETS_ATRIA_RING15.json: 15/15 PRESENT;
-        # the sibling's RING13 record superseded by the union).
-        # R478 (2026-09-17): key 8 REINSTATED — the LATEST typed
-        # measurement rules (R472's own discipline, the flap disclosed
-        # above): catalog 200 x3 (re-probed) + one 200 non-empty tiny
-        # completion in 14.9 s (R478/RING_VALIDATION.json; fingerprint
-        # atr_DH...1QzF — identity-confirmed vs the R470/R472 records).
-        # All fifteen slots measured catalog-200 the same morning;
-        # 15 VALID slots x operator-declared 100M (OPERATOR-DECLARED,
-        # Art. VI/XXV — no usage endpoint is measurable).
-        key_env_vars=["ATRIA_API_KEY", "ATRIA_API_KEY_2",
-                      "ATRIA_API_KEY_3", "ATRIA_API_KEY_4",
-                      "ATRIA_API_KEY_5", "ATRIA_API_KEY_6",
-                      "ATRIA_API_KEY_7", "ATRIA_API_KEY_8",
-                      "ATRIA_API_KEY_9", "ATRIA_API_KEY_10",
-                      "ATRIA_API_KEY_11", "ATRIA_API_KEY_12",
-                      "ATRIA_API_KEY_13", "ATRIA_API_KEY_14",
-                      "ATRIA_API_KEY_15"],
-        model_revision="Atria-Dawn-Preview — the catalog's SOLE model id "
-                       "(owned_by atria, 2026-09-15 catalog); no revision "
-                       "pin exposed by the provider — recorded honest "
-                       "(Art. VI)",
-        policy_note=(
-            "R467 operator-supplied router #8 (atria, api.atria-asi.ai — "
-            "the operator's own citation api.atria-asi.ai/console/keys "
-            "names the API host itself; no external provider table "
-            "needed). LIVE-MEASURED at registration (Art. III): GET "
-            "/v1/models -> 200 with exactly ONE model (Atria-Dawn-"
-            "Preview, owned_by atria); the format-identical bogus-key "
-            "differential -> 401 vs 200 proves the delivered key VALID "
-            "(auth evaluates before any gate; the R463 method); "
-            "dialect OpenAI /v1/chat/completions (the Anthropic "
-            "/v1/messages control answers 400); default urllib "
-            "User-Agent passes (no CF block). Tiny completions -> 200 "
-            "READY x3 (0.93-7.65 s). THE MECHANISM-STAGE INSTRUMENT "
-            "(the R466 open item this rung answers): the FIELD-line "
-            "protocol test — small caps (max_tokens 300) starve content "
-            "to empty while reasoning_content carries the chain-of-"
-            "thought (the EmptyContentWithFinish class; the engine's "
-            "documented larger-cap retry on the SAME rung is not a "
-            "downgrade); the retry at max_tokens 2000 -> 200 with "
-            "3/3 clean FIELD_MECHANISM/FIELD_KEY_VARIABLE/"
-            "FIELD_FALSIFIER lines in content (8.4 s) — FORMAT-"
-            "COMPLIANT on the engine's structured protocol, the "
-            "measurement bynara's rung honestly lacked. HONEST TIERS: "
-            "quality_tier 2 — the basis is the OPERATOR'S declaration "
-            "verbatim ('new model which is as good as glm5.3', the "
-            "glm-5.3-class tier the other free routers carry) PLUS the "
-            "measured FIELD-protocol compliance above (recorded policy "
-            "input, Art. XXVII); latency_tier 3 — the reasoning path "
-            "measured 0.55-8.71 s variance, honestly slower than the "
-            "flash rungs. Context capacity NOT exposed by the catalog — "
-            "128_000 is the router-family default, recorded honest "
-            "(Art. VI). The 100M-token budget claim is OPERATOR-"
-            "DECLARED (no usage/balance endpoint measurable: /v1/usage, "
-            "/v1/balance, /v1/credits all 404/405) — depletion, when "
-            "measured, stays a typed failure that advances the cascade, "
-            "never a bill. FREE_TIER_API under the R456-A3 operator "
-            "amendment: eligible under ZERO_PAID_COST. R469 "
-            "(2026-09-16): the operator's DEFAULT-PROVIDER directive, "
-            "verbatim: 'From Now on atira is out default API for "
-            "discovery engine.' — atria is the HEAD of every role's "
-            "default order (ENGINE_DEFAULT_PROVIDER, the operator-"
-            "override class; provider_health.order_for_role) with the "
-            "Art. XLV attack-independence rule and the Art. V cooldown "
-            "demotion still taking precedence over the pin; the honest "
-            "tier-2 quality basis is UNCHANGED (a routing pin, never "
-            "a quality rewrite). The FOURTEEN-KEY ring (key_env_vars "
-            "above; R472: keys 11-15 probe-validated, key 8 re-probed "
-            "invalid and excluded) rotates on exhaustion-class "
-            "failures — the keep-going directive: 'Keep going to a "
-            "new key of atira if one is exhausted.'")),
-    # ------------------------------------------------------------------
-    # R463 (2026-09-15): the USER's Hugging Face credential path — the
-    # operator's P0 architectural ruling ("the user gives Toscanini AI
-    # access, and Toscanini does the rest; one legitimate user/
-    # application AI credential path"). The credential is HF_TOKEN (the
-    # account owner's own fine-grained key, deployed as a Space secret).
-    # Probe-before-admit held: catalog 200 (142 models incl. the
-    # flagship classes); EVERY completion 402 — the account's monthly
-    # included Inference Providers credits are DEPLETED (the provider's
-    # own words, verbatim in R463/PROBE_HF_ROUTER.json). Registered
-    # HONESTLY as capable-not-currently-servable: the rung enters the
-    # cascade, classifies typed CREDIT_EXHAUSTED on probe (the R436
-    # class), and serves automatically when the credits reset or are
-    # topped up. No failure was converted into success (Art. XV/XXV/
-    # LXI).
-    # ------------------------------------------------------------------
-    ProviderSpec(
         "hf", "HF_TOKEN",
         "https://router.huggingface.co/v1/chat/completions",
         "openai/gpt-oss-120b", "openai", 128_000,
@@ -762,43 +384,6 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "recorded policy input, Art. XXVII). The rung serves "
             "automatically when the account's credits reset or are "
             "topped up — no code change, no new secret.")),
-    ProviderSpec(
-        "tokenrouter", "TOKEN_ROUTER_API_KEY",
-        "https://api.tokenrouter.com/v1/chat/completions",
-        "z-ai/glm-5.3-free", "openai", 128_000,
-        quality_tier=2, cost_tier=1, latency_tier=2,
-        cost_basis="FREE_TIER_API", locality="REMOTE",
-        license="proprietary serving terms (z-ai free tier)",
-        account_domain="OWNER_TOKENROUTER_ACCOUNT",
-        policy_note=(
-            "owner-supplied Token Router credential (delivered 2026-09-05 "
-            "with the statement 'GLM 5.3 is free to use'), wired as the "
-            "tenth provider to unblock the R411 campaign when the sandbox "
-            "zai gateway's shared upstream GLM quota rate-limited mid-F4a "
-            "(137/400 evidence resolutions measured, 263 pending, Art. LXI "
-            "INCOMPLETE discipline held). LIVE-MEASURED at wiring time "
-            "(Art. III): GET /v1/models -> 200 with 135 served models "
-            "incl. the z-ai GLM family; z-ai/glm-5.3-free tiny completion "
-            "-> 200, serves the FLAGSHIP glm-5.3 model, 3.5-4.5 s plain / "
-            "~16 s with reasoning enabled on a realistic evidence-resolution "
-            "prompt (the model's default thinking mode is kept: it is "
-            "format-compliant for the engine's FIELD-line protocol, unlike "
-            "thinking-disabled which measured 5x faster but leaked "
-            "meta-commentary instead of field lines); the paid z-ai/glm-5.3 "
-            "route measured 403 insufficient_user_quota ($0.00 credit), so "
-            "the free tier is the operative path; default urllib User-Agent "
-            "passes (no CF block on api.tokenrouter.com, unlike "
-            "token-router.ai). Placed at the head of the tier-2 group "
-            "(before zai) so llm_generate's availability-order prefers it "
-            "when the key is present — the documented healthy-path "
-            "precedent of the zai insertion (R375). Tier assignment is a "
-            "recorded policy input (Art. XXVII), not a measurement; the "
-            "latency tier honestly records the measured reasoning latency "
-            "behind the sandbox gateway's ~2 s. FREE_TIER_API under R451: "
-            "free is NOT permanent — the tier can deplete (re-measured "
-            "per run), and under MODEL_COST_POLICY=ZERO_PAID_COST this "
-            "provider is INELIGIBLE (fail-closed) — the R451 zero-paid "
-            "baseline is the self-hosted localqwen.")),
     ProviderSpec(
         "zai", "ZAI_API_KEY",
         "http://127.0.0.1:8787/v1/chat/completions",
