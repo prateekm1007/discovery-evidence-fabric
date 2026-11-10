@@ -276,6 +276,7 @@ def llm_chat(prompt, system="", max_retries=2, timeout=240,
     return None
 
 def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
+    global _LAST_PROVIDER_META
     """Step 3: LLM synthesis from frozen evidence.
 
     R422 (the LLM chokepoint directive — measured live 2026-09-08):
