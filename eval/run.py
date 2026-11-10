@@ -40,6 +40,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 import time
 from datetime import datetime, timezone
@@ -491,21 +492,114 @@ def probe_zero_paid_route() -> Dict[str, Any]:
             "probed": attempts, "at": utc_now()}
 
 
+# The previously calibration-verified judge (xkiro/ministral-14b, 30/30 on
+# the 30-pair known-answer set, verified 2026-11-10) is the historical
+# REFERENCE — its record is preserved. It is NOT used to authorize a
+# route without a live calibration. R5 P0-1: route selection is
+# calibration-aware; the sequence continues to the next candidate when a
+# selected provider fails actual calibration. Eligibility = PASS on the
+# existing 30-pair calibration (>=24/30, 0.8 threshold). Capability
+# failures are classified distinctly: HTTP 401 auth / 403 quota /
+# 429 throttling / 5xx upstream / empty-or-truncated generation /
+# timeout / parse. An auth rejection is never reported as generic
+# temporary unavailability.
 def probe_judge_route(baseline_provider: str) -> Dict[str, Any]:
-    """Judge = different provider + model family from baseline, never 1.7B."""
-    candidates = [c for c in JUDGE_CANDIDATES]
-    attempts = []
-    for prov, model in candidates:
+    """Calibration-aware judge selection. Returns the first
+    calibration-eligible candidate, with a full per-candidate record."""
+    results = []
+    for prov, model in JUDGE_CANDIDATES:
+        rec: Dict[str, Any] = {"provider": prov, "model": model,
+                               "reference": (
+                                   "xkiro/ministral-14b historically "
+                                   "calibrated 30/30 (2026-11-10); record "
+                                   "preserved, never used as authorization"
+                                   if (prov, model) ==
+                                   ("xkiro", "mistralai/ministral-14b")
+                                   else None)}
         if prov == baseline_provider:
-            attempts.append({"provider": prov, "model": model, "state": "SAME_PROVIDER_AS_BASELINE"})
+            rec.update({"eligible": False,
+                        "decision": "REJECTED_SAME_PROVIDER_AS_BASELINE",
+                        "capability": {"state": "SKIPPED"}})
+            results.append(rec)
             continue
-        ok = _probe_rung(prov, model)
-        attempts.append({"provider": prov, "model": model, "state": "OK" if ok else "FAIL"})
-        if ok:
+        t0 = time.time()
+        cap = _probe_rung_detailed(prov, model)
+        rec["capability"] = cap
+        rec["capability_wall_s"] = round(time.time() - t0, 1)
+        if not cap.get("ok"):
+            rec["eligible"] = False
+            rec["decision"] = f"CAPABILITY_FAILED:{cap.get('http_class') or cap.get('failure_class') or 'UNKNOWN'}"
+            results.append(rec)
+            continue
+        t1 = time.time()
+        calib = run_judge_calibration({"provider": prov, "model": model})
+        rec["calibration"] = {k: calib.get(k) for k in
+                              ("calibrated", "n_pairs", "correct",
+                               "accuracy", "threshold", "passed")}
+        rec["calibration_wall_s"] = round(time.time() - t1, 1)
+        err_classes: Dict[str, int] = {}
+        lat = []
+        for d in calib.get("details") or []:
+            if d.get("error"):
+                et = str(d["error"])
+                hc = _http_class(et)
+                if hc:
+                    err_classes[hc] = err_classes.get(hc, 0) + 1
+                elif "empty content" in et.lower():
+                    err_classes["EMPTY_OUTPUT"] = err_classes.get(
+                        "EMPTY_OUTPUT", 0) + 1
+                elif ("_parse" in et or "prefer" in et.lower()
+                      or "PREFER" in et):
+                    err_classes["PARSE_FAILED"] = err_classes.get(
+                        "PARSE_FAILED", 0) + 1
+                else:
+                    err_classes["TRANSPORT_OTHER"] = err_classes.get(
+                        "TRANSPORT_OTHER", 0) + 1
+            lat.append(d.get("latency_s"))
+        rec["calibration_error_classes"] = err_classes
+        rec["calibration_latency_s"] = lat
+        rec["eligible"] = bool(calib.get("passed"))
+        rec["decision"] = ("ELIGIBLE" if rec["eligible"]
+                           else "CALIBRATION_FAILED")
+        results.append(rec)
+        if rec["eligible"]:
             return {"provider": prov, "model": model, "state": "OK",
-                    "probed": attempts, "at": utc_now()}
-    return {"provider": None, "model": None, "state": "NO_JUDGE_ROUTE",
-            "probed": attempts, "at": utc_now()}
+                    "selection": "calibration-gated",
+                    "candidates": results,
+                    "at": utc_now()}
+    return {"provider": None, "model": None,
+            "state": "NO_CALIBRATED_JUDGE_ROUTE",
+            "selection": "calibration-gated",
+            "candidates": results,
+            "at": utc_now()}
+
+
+def _probe_rung_detailed(provider: str, model: str) -> Dict[str, Any]:
+    """Direct transport probe that records WHY a rung failed:
+    HTTP class / empty generation / timeout / other. Never prints
+    credentials (Art. LXXIII/LXXVI)."""
+    try:
+        from discovery_fabric.engine import adapters as _ad
+        _ad.load_credentials()
+    except Exception:  # noqa: BLE001
+        pass
+    t0 = time.time()
+    res = _transport_call(provider, model,
+                          "Reply with exactly: OK",
+                          "You are a strict probe. Reply exactly: OK", 64)
+    wall = round(time.time() - t0, 1)
+    if res.get("status") == "OK":
+        return {"ok": True, "transport": "OK",
+                "http_class": None, "failure_class": None,
+                "wall_s": wall, "latency_s": wall}
+    err = str(res.get("error") or "")
+    hc = _http_class(err)
+    if hc is None:
+        hc = ("EMPTY_OUTPUT" if "empty content" in err.lower()
+              else "TRANSPORT_OTHER")
+    return {"ok": False, "transport": "FAIL",
+            "http_class": hc, "failure_class": hc,
+            "error": err[:200], "wall_s": wall, "latency_s": wall}
 
 
 def probe_judge2_route(baseline_provider: str,
@@ -661,51 +755,163 @@ def _rubric_prompt(problem, a_text: str, b_text: str,
     return "\n".join(lines)
 
 
+# ---------------------------------------------------------------------------
+# judge strict response contract (R5 P0-1)
+# ---------------------------------------------------------------------------
+JUDGE_VALID = "JUDGE_VALID"
+JUDGE_TRANSPORT_FAILED = "JUDGE_TRANSPORT_FAILED"
+JUDGE_EMPTY_OUTPUT = "JUDGE_EMPTY_OUTPUT"
+JUDGE_PARSE_FAILED = "JUDGE_PARSE_FAILED"
+JUDGE_CALIBRATION_FAILED = "JUDGE_CALIBRATION_FAILED"
+JUDGE_OUTCOMES = (JUDGE_VALID, JUDGE_TRANSPORT_FAILED,
+                  JUDGE_EMPTY_OUTPUT, JUDGE_PARSE_FAILED,
+                  JUDGE_CALIBRATION_FAILED)
+
+
+def _http_class(err: str) -> Optional[str]:
+    """Classify HTTP status from transport error text (401/403/429/5xx),
+    distinctly reported — an authentication rejection is never reported
+    as generic temporary unavailability."""
+    s = str(err or "")
+    for code in ("401", "403", "429"):
+        if f"Error {code}" in s or code in s:
+            return {"401": "HTTP_401_AUTH", "403": "HTTP_403_QUOTA",
+                    "429": "HTTP_429_THROTTLED"}[code]
+    m = re.search(r"Error (5\d\d)", s)
+    if m:
+        return f"HTTP_{m.group(1)}_UPSTREAM"
+    if "timed out" in s.lower() or "timeout" in s.lower():
+        return "TIMEOUT"
+    return None
+
+
+def _classify_transport_fail(res: Dict[str, Any]) -> str:
+    err = str(res.get("error") or "")
+    if ("empty content" in err.lower() or "finish_reason=length" in err
+            or "EMPTY" in err):
+        return JUDGE_EMPTY_OUTPUT
+    return JUDGE_TRANSPORT_FAILED
+
+
+def _validate_rubric_pass(parsed: Dict[str, Any], clar: bool) -> Optional[Dict[str, Any]]:
+    """Hard gate for one judge pass: all required rubric fields must be
+    present and integer 1-5, and PREFER must be one of A|B|TIE.
+    Truncated/malformed/empty output is a failed judgment — never a tie."""
+    if not parsed:
+        return None
+    required = [f"{s}{j}" for s in "AB" for j in range(1, 5)]
+    required += ["A6", "B6"]
+    if clar:
+        required += ["A5", "B5"]
+    out: Dict[str, Any] = {}
+    for k in required:
+        v = parsed.get(k)
+        if v is None:
+            return None
+        try:
+            iv = int(str(v).strip())
+        except ValueError:
+            return None
+        if not (1 <= iv <= 5):
+            return None
+        out[k] = iv
+    prefer = str(parsed.get("prefer") or "").strip().upper()
+    if prefer not in ("A", "B", "TIE"):
+        return None
+    out["prefer"] = prefer
+    return out
+
+
 def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
                       base_ans: Optional[str], route: Dict[str, Any],
                       packet: Optional[List[Dict[str, Any]]] = None
                       ) -> Dict[str, Any]:
     if not pipe_ans or not base_ans:
-        return {"usable_pair": False,
+        return {"usable_pair": False, "outcome": "JUDGE_SKIPPED",
                 "why": ("pipeline answer missing" if not pipe_ans
                         else "baseline answer missing")}
     if not route.get("provider"):
-        return {"usable_pair": False, "why": "no judge route"}
+        return {"usable_pair": False, "outcome": JUDGE_TRANSPORT_FAILED,
+                "why": "no calibrated judge route (see judge selection "
+                       "record)"}
+    clar = bool(problem.get("clarification_answer"))
     passes: List[Dict[str, Any]] = []
     for order in ("AB", "BA"):
         a_text, b_text = ((pipe_ans, base_ans) if order == "AB"
                           else (base_ans, pipe_ans))
         prompt = _rubric_prompt(problem, a_text, b_text, packet=packet)
+        t0 = time.time()
         res = _transport_call(route["provider"], route["model"], prompt,
                               "You are a strict blind rubric judge. English "
                               "only. Follow the exact output lines.",
                               max_tokens=300)
+        lat = round(time.time() - t0, 1)
         if res.get("status") != "OK":
-            passes.append({"order": order, "error": str(res)[:200]})
+            err = str(res.get("error") or "")
+            passes.append({"order": order, "outcome":
+                           _classify_transport_fail(res),
+                           "http_class": _http_class(err),
+                           "error": err[:300], "latency_s": lat,
+                           "content_len": 0})
             continue
-        passes.append({"order": order, "raw": res.get("content", ""),
-                       **_parse_rubric(res.get("content", ""))})
+        content = res.get("content") or ""
+        if not content.strip():
+            passes.append({"order": order, "outcome": JUDGE_EMPTY_OUTPUT,
+                           "error": "empty content", "latency_s": lat,
+                           "content_len": 0})
+            continue
+        parsed = _parse_rubric(content)
+        valid = _validate_rubric_pass(parsed, clar)
+        if valid is None:
+            passes.append({"order": order, "outcome": JUDGE_PARSE_FAILED,
+                           "error": ("missing/invalid required rubric "
+                                     "fields or bad PREFER"),
+                           "latency_s": lat,
+                           "content_len": len(content),
+                           "raw_tail": content[-200:]})
+            continue
+        passes.append({"order": order, "outcome": JUDGE_VALID,
+                       "prefer": valid["prefer"], "axes": valid,
+                       "latency_s": lat,
+                       "content_len": len(content)})
+    outcomes = [p["outcome"] for p in passes]
+    if all(o == JUDGE_VALID for o in outcomes) and len(outcomes) == 2:
+        pair_outcome = JUDGE_VALID
+    elif JUDGE_TRANSPORT_FAILED in outcomes:
+        pair_outcome = JUDGE_TRANSPORT_FAILED
+    elif JUDGE_EMPTY_OUTPUT in outcomes:
+        pair_outcome = JUDGE_EMPTY_OUTPUT
+    elif JUDGE_PARSE_FAILED in outcomes:
+        pair_outcome = JUDGE_PARSE_FAILED
+    else:
+        pair_outcome = outcomes[0] if outcomes else JUDGE_TRANSPORT_FAILED
+    # per-side criterion means (valid passes only; never from failures)
     crit = {c: {"pipeline": [], "baseline": []} for c in CRITERIA}
     _pt = json.dumps(packet or [], ensure_ascii=False)
+
     def _num_absent(ans):
         import re
         nums = set(re.findall(r"\d+(?:\.\d+)?", ans or ""))
         return sorted(n for n in nums if n not in _pt)
+
     number_absent = {"pipeline": _num_absent(pipe_ans),
                      "baseline": _num_absent(base_ans)}
     prefs: List[str] = []
-    for p in passes:
-        if "error" in p:
-            continue
-        side = ("pipeline", "baseline") if p["order"] == "AB" else ("baseline", "pipeline")
-        for j, c in enumerate(CRITERIA, 1):
-            for s_i, name in enumerate(("A", "B")):
-                if f"{name}{j}" in p:
-                    crit[c][side[s_i]].append(int(p[f"{name}{j}"]))
-        if p.get("prefer") in ("A", "B"):
-            prefs.append(side[0] if p["prefer"] == "A" else side[1])
-        elif p.get("prefer") == "TIE":
-            prefs.append("tie")
+    if pair_outcome == JUDGE_VALID:
+        for p in passes:
+            side = ("pipeline", "baseline") if p["order"] == "AB" else ("baseline", "pipeline")
+            for j, c in enumerate(CRITERIA, 1):
+                if c == "e_clarification" and not clar:
+                    continue
+                for key, s_i in (("A", 0), ("B", 1)):
+                    v = p["axes"].get(f"{key}{j}")
+                    if v is not None:
+                        crit[c][side[s_i]].append(v)
+            prefs.append(side[0] if p["prefer"] == "A"
+                         else side[1] if p["prefer"] == "B" else "tie")
+        winner = prefs[0] if (len(prefs) == 2 and prefs[0] == prefs[1]) else "tie"
+    else:
+        winner = None
     finals: Dict[str, Any] = {}
     for c, sides in crit.items():
         finals[c] = {
@@ -713,16 +919,14 @@ def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
             "baseline_mean": round(_m(sides["baseline"]), 2) if sides["baseline"] else None,
             "diff": round(_m(sides["pipeline"]) - _m(sides["baseline"]), 2)
             if sides["pipeline"] and sides["baseline"] else None}
-    if len(prefs) == 2 and prefs[0] == prefs[1]:
-        winner = prefs[0]
-    elif len(prefs) == 1:
-        winner = prefs[0]
-    else:
-        winner = "tie"
-    return {"usable_pair": True,
-            "passes": len([p for p in passes if "error" not in p]),
+    return {"usable_pair": pair_outcome == JUDGE_VALID,
+            "outcome": pair_outcome,
+            "passes": len([p for p in passes if p["outcome"] == JUDGE_VALID]),
+            "pass_outcomes": outcomes,
             "scores": finals, "winner": winner, "pref_passes": prefs,
-            "number_absent": number_absent}
+            "number_absent": number_absent,
+            "judge_content_len": [p.get("content_len") for p in passes],
+            "judge_latency_s": [p.get("latency_s") for p in passes]}
 
 
 def _m(v: List[int]) -> float:
@@ -751,19 +955,25 @@ def _parse_rubric(raw: str) -> Dict[str, Any]:
 def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
     calib_path = Path(__file__).resolve().parent / "judge_calibration.json"
     if not calib_path.exists():
-        return {"calibrated": False, "why": "no calibration pairs file"}
+        return {"calibrated": False, "why": "no calibration pairs file",
+                "details": [], "error_classes": {}}
     pairs = json.loads(calib_path.read_text(encoding="utf-8"))
     problems_by_id = {p["problem_id"]: p
                       for p in json.loads(PROBLEMS.read_text(encoding="utf-8"))["problems"]}
     if not isinstance(pairs, list) or len(pairs) < 10:
-        return {"calibrated": False, "why": f"need >=10 pairs, have {len(pairs) if isinstance(pairs, list) else 0}"}
+        return {"calibrated": False,
+                "why": f"need >=10 pairs, have {len(pairs) if isinstance(pairs, list) else 0}",
+                "details": [], "error_classes": {}}
     correct = 0
     total = 0
     details = []
+    err_classes: Dict[str, int] = {}
     for idx, entry in enumerate(pairs):
         problem = problems_by_id.get(entry["problem_id"])
         if problem is None:
-            details.append({"problem_id": entry.get("problem_id"), "error": "problem not found"})
+            details.append({"problem_id": entry.get("problem_id"),
+                            "outcome": "JUDGE_CALIBRATION_SET_ERROR",
+                            "error": "problem not found"})
             continue
         good = entry["good_answer"]
         bad = entry["bad_answer"]
@@ -776,14 +986,45 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
         else:
             a, b, good_is = bad, good, "B"
         prompt = _rubric_prompt(_intake_problem(problem), a, b, packet=entry.get("evidence"))
+        t0 = time.time()
         res = _transport_call(judge_route["provider"], judge_route["model"], prompt,
                               "You are a strict blind rubric judge. English only. "
                               "Follow the exact output lines.", max_tokens=300)
+        lat = round(time.time() - t0, 1)
+        _rec = {"problem_id": entry.get("problem_id"), "order": order,
+                "latency_s": lat}
         if res.get("status") != "OK":
-            details.append({"problem_id": entry.get("problem_id"), "error": str(res)[:120]})
+            err = str(res.get("error") or "")
+            cls = _classify_transport_fail(res)
+            hc = _http_class(err)
+            if hc:
+                err_classes[hc] = err_classes.get(hc, 0) + 1
+            else:
+                err_classes[cls] = err_classes.get(cls, 0) + 1
+            _rec.update({"outcome": cls, "error": err[:200],
+                         "http_class": hc})
+            details.append(_rec)
             continue
-        parsed = _parse_rubric(res.get("content", ""))
-        pref = parsed.get("prefer")
+        content = res.get("content") or ""
+        if not content.strip():
+            err_classes["EMPTY_OUTPUT"] = err_classes.get(
+                "EMPTY_OUTPUT", 0) + 1
+            _rec.update({"outcome": JUDGE_EMPTY_OUTPUT,
+                         "error": "empty content"})
+            details.append(_rec)
+            continue
+        parsed = _parse_rubric(content)
+        # calibration uses the same strict contract: all required rubric
+        # fields must parse (Art. XXV; a truncated answer is no answer)
+        valid = _validate_rubric_pass(parsed, bool(problem.get("clarification_answer")))
+        if valid is None:
+            err_classes["PARSE_FAILED"] = err_classes.get(
+                "PARSE_FAILED", 0) + 1
+            _rec.update({"outcome": JUDGE_PARSE_FAILED,
+                         "error": "missing/invalid required rubric fields"})
+            details.append(_rec)
+            continue
+        pref = valid["prefer"]
         total += 1
         # map preference back to good/bad
         if order == "good_first":
@@ -792,12 +1033,16 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
             picked_good = (pref == "B")
         if picked_good:
             correct += 1
-        details.append({"problem_id": entry.get("problem_id"), "order": order,
-                        "prefer": pref, "picked_good": picked_good})
+        _rec.update({"outcome": JUDGE_VALID, "prefer": pref,
+                     "picked_good": picked_good})
+        details.append(_rec)
     acc = round(correct / total, 3) if total else 0.0
-    passed = acc >= 0.8
+    passed = bool(total and acc >= 0.8)
     return {"calibrated": bool(passed), "n_pairs": total, "correct": correct,
             "accuracy": acc, "threshold": 0.8, "passed": passed,
+            "error_classes": err_classes,
+            "n_details_failed": sum(1 for d in details
+                                    if d.get("outcome") != JUDGE_VALID),
             "details": details}
 
 
@@ -924,65 +1169,114 @@ def run_two_turn_problem(problem: Dict[str, Any], out_dir: Path,
                          encoding="utf-8")
     # round 2: INGEST followup_finding into the ENGINE itself (Art. LI):
     # the finding rides into the problem constraint, the engine re-runs
-    # RETRIEVE (from the cached frozen evidence — no new network pulls,
-    # no retrieval-order drift), SYNTHESIZE+ATTACK+REVISE+RANK on the
-    # updated state, and delivers a revised candidate.
+    # RETRIEVE (served ONLY from the frozen round-1 snapshot via
+    # ENGINE_EVIDENCE_CACHE — if the cache is missing/unreadable the
+    # child fails closed with no mechanisms rather than silently pulling
+    # a fresh packet while claiming a controlled experiment), then
+    # SYNTHESIZE+ATTACK+REVISE+RANK on the updated state. R5 P0-4: the
+    # round-2 engine runs as an ISOLATED SUBPROCESS with a real hard
+    # wall-clock bound (same killer-thread machinery as pipeline
+    # children) — no daemon thread in the parent.
     ff = problem["followup_finding"]
-    _ff_txt = (json.dumps(ff, default=str) if isinstance(ff, dict)
-               else str(ff))
-    out_dir2 = out_dir / "pipeline_r2"
+    out_dir2 = Path(out_dir) / "pipeline_r2"
+    if out_dir2.exists():
+        import shutil
+        shutil.rmtree(out_dir2, ignore_errors=True)
     out_dir2.mkdir(parents=True, exist_ok=True)
-    q2 = _intake_problem(problem)  # injects the finding into constraint
-                                   # and user_variables (Art. LI)
-
-    os.environ["ENGINE_EVIDENCE_CACHE"] = str(snap_path)
-    import threading
-    _r2_result: Dict[str, Any] = {}
-
-    def _run_r2():
-        try:
-            from discovery_fabric.engine.run import EngineRun
-            _r = EngineRun(q2, str(out_dir2),
-                           run_id=f"eval-{problem['problem_id']}-r2",
-                           package_registry_path=str(out_dir2 /
-                                                     "PACKAGE_ID_REGISTRY.json"),
-                           with_package=False, resume=False)
-            _r2_result["manifest"] = _r.run()
-        except Exception as exc:  # noqa: BLE001 — typed, never silent
-            _r2_result["error"] = f"{type(exc).__name__}: {exc}"[:400]
-
+    # the child re-intakes the problem from a disk payload carrying the
+    # followup_finding (constraint/user_variables/followup_text via intake)
+    pf2 = out_dir2 / "_round2_problems.json"
+    pf2.write_text(json.dumps({"problems": [problem]}, default=str) + "\n",
+                   encoding="utf-8")
+    script = str(Path(__file__).resolve())
+    cmd = [sys.executable, "-B", script, "--arms", "pipeline",
+           "--problems", str(problem["problem_id"]),
+           "--problems-file", str(pf2),
+           "--root", str(RUNS_ROOT), "--commit", _commit,
+           "--child", "--subdir", "pipeline_r2"]
+    if _HOLDOUT_MODE:
+        cmd.append("--holdout-mode")
     _t0 = time.time()
-    _th = threading.Thread(target=_run_r2, daemon=True)
-    _th.start()
-    _th.join(timeout_s)
-    try:
-        if _th.is_alive():
-            rec["two_turn"] = "TIMEOUT"
-            rec["error"] = (f"round-2 engine exceeded {timeout_s}s "
-                            f"wall-clock (daemon thread abandoned; "
-                            f"partial artifacts in pipeline_r2/)")
-            rec["round2_wall_s"] = round(time.time() - _t0, 1)
-            os.environ.pop("ENGINE_EVIDENCE_CACHE", None)
-            _save(problem["problem_id"], "two_turn_record.json", rec)
-            return rec
-        if "error" in _r2_result:
-            rec["two_turn"] = "ENGINE_ERROR"
-            rec["error"] = _r2_result["error"]
-            _save(problem["problem_id"], "two_turn_record.json", rec)
-            return rec
-        manifest = _r2_result.get("manifest")
-        rec["round2_wall_s"] = round(time.time() - _t0, 1)
-        rec["round2_manifest_final"] = (manifest or {}).get("final_status")
-    finally:
-        os.environ.pop("ENGINE_EVIDENCE_CACHE", None)
-    rec["round2_answer"] = _extract_pipeline_answer(out_dir2)
+    res = _spawn_child(cmd, timeout_s,
+                       env_extra={"ENGINE_EVIDENCE_CACHE": str(snap_path)})
+    q2 = _intake_problem(problem)  # finding intake for round-2 judging
+    if res["timed_out"]:
+        rec["two_turn"] = "TIMEOUT"
+        rec["error"] = (f"round-2 engine exceeded {timeout_s}s "
+                        f"wall-clock (child killed; partial artifacts in "
+                        f"pipeline_r2/)")
+        rec["round2_wall_s"] = res["wall_s"]
+        rec["round2_incomplete"] = True
+        rec["round2_incomplete_reason"] = "timeout"
+        _save(problem["problem_id"], "two_turn_record.json", rec)
+        return rec
+    if res["spawn_error"]:
+        rec["two_turn"] = "ENGINE_ERROR"
+        rec["error"] = res["spawn_error"]
+        rec["round2_wall_s"] = res["wall_s"]
+        rec["round2_incomplete"] = True
+        rec["round2_incomplete_reason"] = "spawn_failed"
+        _save(problem["problem_id"], "two_turn_record.json", rec)
+        return rec
+    if res["returncode"] != 0:
+        rec["two_turn"] = "ENGINE_ERROR"
+        rec["error"] = f"round-2 child exit rc={res['returncode']}"
+        rec["round2_wall_s"] = res["wall_s"]
+        rec["round2_incomplete"] = True
+        rec["round2_incomplete_reason"] = f"child_exit_{res['returncode']}"
+        _save(problem["problem_id"], "two_turn_record.json", rec)
+        return rec
+    rec["round2_wall_s"] = res["wall_s"]
     _fs = out_dir2 / "final_state.json"
-    rec["round2_final_status"] = (
-        json.loads(_fs.read_text(encoding="utf-8")).get("final_status")
-        if _fs.exists() else None)
+    if _fs.exists():
+        try:
+            rec["round2_manifest_final"] = json.loads(
+                _fs.read_text(encoding="utf-8")).get("final_status")
+        except Exception:  # noqa: BLE001
+            rec["round2_manifest_final"] = None
+    rec["round2_answer"] = _extract_pipeline_answer(out_dir2)
+    rec["round2_final_status"] = rec.get("round2_manifest_final")
     rec["round2_stage_times_s"] = _stage_times(out_dir2)
-    rec["round2_same_snapshot"] = (
-        (_evidence_snapshot(out_dir2) or {}).get("hash") == snap.get("hash"))
+    _snap2 = _evidence_snapshot(out_dir2)
+    rec["round2_same_snapshot"] = bool(
+        _snap2 and _snap2.get("hash") == snap.get("hash"))
+    # frozen-evidence hard requirement: hash mismatch or a starved
+    # (cache-failed) round 2 => incomplete; never score it as a learning
+    # measurement and never claim the packet was reused (Art. LI / R5 P0-4)
+    _cache_failed = False
+    try:
+        _penv = out_dir2 / "envelope_RETRIEVE.json"
+        if _penv.exists():
+            _prov = json.loads(
+                _penv.read_text(encoding="utf-8")).get(
+                    "provenance", {}).get("retrieval_fabric", {})
+            _cache_failed = bool(_prov.get("cache_failed"))
+    except Exception:  # noqa: BLE001
+        _cache_failed = False
+    if not rec["round2_same_snapshot"] or _cache_failed:
+        rec["two_turn"] = "INCOMPLETE_EVIDENCE_DIFFERS"
+        rec["round2_incomplete"] = True
+        rec["round2_incomplete_reason"] = (
+            "cache_failed_no_mechanisms" if _cache_failed
+            else "evidence_hash_mismatch")
+        rec["round2_answer"] = None
+        _save(problem["problem_id"], "two_turn_record.json", rec)
+        return rec
+    rec["two_turn"] = "RAN"
+    # causal-change provenance: which fields of the mechanism text moved
+    _r1 = str(rec.get("round1_answer") or "")
+    _r2 = str(rec.get("round2_answer") or "")
+    rec["causal_change_evidence"] = {
+        "finding_ingested": True,
+        "round2_same_snapshot": rec["round2_same_snapshot"],
+        "mechanism_text_changed": _r1.strip() != _r2.strip(),
+        "round1_len": len(_r1), "round2_len": len(_r2),
+        "finding_chars": len(_ff_txt),
+        "provenance": "round2 child process; ENGINE_EVIDENCE_CACHE "
+                      "served the round-1 frozen packet (Art. LI); "
+                      "finding injected into problem constraint and "
+                      "user_variables via intake",
+    }
     if rec["round2_answer"]:
         q1 = _intake_problem({k: v for k, v in problem.items()
                               if k != "followup_finding"})
@@ -1044,8 +1338,9 @@ def build_score_table(route_rec: Dict[str, Any],
             "full_scoreable": (
                 contestable and same
                 and answer_contract.get("valid") is True
-                and (judge.get("passes") or 0) >= 2
+                and judge.get("outcome") == JUDGE_VALID
                 and not (judge.get("number_absent") or {}).get("pipeline")),
+            "judge_outcome": judge.get("outcome"),
             "pipeline_final_status": pipe.get("final_status"),
             "pipeline_completed": completed,
             "wall_s": pipe.get("wall_s"),
@@ -1071,33 +1366,58 @@ def build_score_table(route_rec: Dict[str, Any],
         rows.append(row)
         if completed and judge.get("usable_pair"):
             usable += 1
-            if row["full_scoreable"]:
-                if judge.get("winner") == "pipeline":
-                    wins += 1
-                elif judge.get("winner") == "tie":
-                    ties += 1
-                for c in CRITERIA:
-                    diff = (judge.get("scores") or {}).get(c, {}).get("diff")
-                    if diff is not None:
-                        crit_means[c].append(diff)
-        # system-level (unconditional) score — every problem, always
-        if judge.get("usable_pair"):
+        # conditional quality: over FULLY SCOREABLE pairs only
+        # (full_scoreable controls the numerators here too)
+        if row["full_scoreable"]:
             if judge.get("winner") == "pipeline":
+                wins += 1
                 system_wins += 1
             elif judge.get("winner") == "tie":
+                ties += 1
                 system_ties += 1
-    system_score = round((system_wins + 0.5 * system_ties)
-                         / len(problems), 3) if problems else None
-    # Calibration first: the win-rate is NOT_MEASURED unless the judge
-    # itself passed the known-good/known-bad gate. A judge that cannot
-    # separate good from bad cannot certify a win (Art. LXI).
+            for c in CRITERIA:
+                diff = (judge.get("scores") or {}).get(c, {}).get("diff")
+                if diff is not None:
+                    crit_means[c].append(diff)
+    # Calibration first: a judge that cannot separate good from bad
+    # cannot certify a win (Art. LXI). No calibrated route =>
+    # NOT_MEASURED for BOTH judgments; never 0 or 0.5.
     calib = (run_judge_calibration(judge_route)
              if judge_route.get("provider") else
              {"calibrated": False, "why": "no judge route (pipeline-only run)"})
-    win_rate = (round((wins + 0.5 * ties) / usable, 3)
-                if (usable and calib.get("calibrated")) else "NOT_MEASURED")
+    judge_valid = bool(calib.get("calibrated"))
     import math
-    ci = round(1.96 * math.sqrt(0.25 / usable), 3) if usable else None
+
+    def _wilson_95(pw: float, n: int):
+        if n == 0:
+            return None
+        z = 1.959964
+        p = pw / n
+        denom = 1 + z * z / n
+        centre = (p + z * z / (2 * n)) / denom
+        half = (z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))) / denom
+        return (round(centre - half, 3), round(centre + half, 3))
+
+    n_full = sum(1 for r in rows if r["full_scoreable"])
+    # system metric: denominator is ALL N pre-registered problems;
+    # full_scoreable controls the numerators; an answered-but-contract-failing,
+    # evidence-mismatched, refusal, or infrastructure-blocked problem is a
+    # loss. If the judge is not valid: NOT_MEASURED — never 0 or 0.5.
+    system_pw = system_wins + 0.5 * system_ties
+    system_score = (round(system_pw / len(problems), 3)
+                    if judge_valid else None)
+    system_losses = (len(problems) - system_wins - system_ties
+                     if judge_valid else None)
+    # conditional quality: denominator strictly the fully scoreable pairs
+    cond_pw = wins + 0.5 * ties
+    conditional_quality = (round(cond_pw / n_full, 3)
+                           if (judge_valid and n_full) else "NOT_MEASURED")
+    conditional_losses = (n_full - wins - ties
+                          if judge_valid else None)
+    win_rate = conditional_quality  # legacy alias, same gating
+    ci = _wilson_95(system_pw, len(problems))  # N denominator, declared method
+    ci_method = "wilson_score_95"
+    system_wilson = _wilson_95(system_pw, len(problems))
     # fresh vs contaminated split
     def _split(tag_val):
         sub = [r for r in rows if r.get("contamination_tag") == tag_val]
@@ -1200,14 +1520,38 @@ def build_score_table(route_rec: Dict[str, Any],
         "full_scoreable_pairs": sum(1 for r in rows if r.get("full_scoreable")),
         "n_numbers_unverified": sum(1 for r in rows
                                      if r.get("n_numbers_unverified")),
-        "pipeline_wins": wins, "baseline_wins": usable - wins - ties, "ties": ties,
+        "pipeline_wins": wins, "baseline_wins": usable - wins - ties,
+        "ties": ties,
+        # R5 P0-2 metric block: system = unconditional, N denominator;
+        # conditional = strictly fully scoreable pairs; both NOT_MEASURED
+        # unless the judge passes the live calibration gate. Wilson 95%
+        # interval on N (declared on DEV before any sealed run).
         "system_score": system_score,
         "system_wins": system_wins,
         "system_ties": system_ties,
-        "conditional_quality": win_rate,
-        "conditional_quality_usable_pairs": usable,
+        "system_losses": system_losses,
+        "system_ci_wilson_95": system_wilson,
+        "conditional_quality": conditional_quality,
+        "conditional_wins": wins,
+        "conditional_ties": ties,
+        "conditional_losses": conditional_losses,
+        "conditional_quality_pairs": n_full,
         "BLIND_PAIRWISE_WIN_RATE": win_rate,
-        "win_rate_95ci_pm": ci,
+        "ci_method": ci_method,
+        "ci_wilson_95": ci,
+        "second_judge": {
+            "agree": sum(1 for r in rows
+                         if r.get("second_judge") == "AGREE"),
+            "disagree": sum(1 for r in rows
+                            if r.get("second_judge") == "DISAGREE"),
+            "no_route_or_invalid": sum(1 for r in rows
+                                       if r.get("second_judge") in
+                                       (None, "NO_ROUTE")),
+        },
+        "judge_outcomes": {
+            o: sum(1 for r in rows if r.get("judge_outcome") == o)
+            for o in JUDGE_OUTCOMES
+        },
         "fresh_vs_contaminated": {
             "DEV_CONTAMINATED": _split("DEV_CONTAMINATED"),
             "FRESH": _split(None),
@@ -1280,9 +1624,16 @@ def write_table(table: Dict[str, Any]) -> None:
         f"{table.get('system_score')}**  ({table.get('system_wins')} wins, "
         f"{table.get('system_ties')} ties)",
         "",
-        f"**CONDITIONAL QUALITY (usable pairs, calibration-gated): "
+        f"**CONDITIONAL QUALITY (fully scoreable pairs, calibration-gated): "
         f"{table.get('conditional_quality')}**  "
-        f"({table.get('conditional_quality_usable_pairs')} pairs)",
+        f"({table.get('conditional_wins')}W {table.get('conditional_ties')}T "
+        f"{table.get('conditional_losses')}L over {table.get('full_scoreable_pairs')} pairs)",
+        "",
+        f"system losses (infrastructure/refusal/contract-invalid, N={table['n_problems']}): "
+        f"{table.get('system_losses')};  Wilson95 CI on N: {table.get('system_ci_wilson_95')} "
+        f"(method {table.get('ci_method')})",
+        f"judge outcomes: {json.dumps(table.get('judge_outcomes'), default=str)}",
+        f"second judge: {json.dumps(table.get('second_judge'), default=str)}",
         "",
         "fresh vs contaminated: " + json.dumps(table["fresh_vs_contaminated"]),
         "criterion mean diffs (pipeline-baseline): "
@@ -1321,6 +1672,51 @@ def _save(problem_id: str, name: str, rec: Dict[str, Any]) -> None:
                           encoding="utf-8")
 
 
+# ---------------------------------------------------------------------------
+# shared child spawn (Popen + DEVNULL + daemon killer; hard wall-clock)
+# ---------------------------------------------------------------------------
+def _spawn_child(cmd: List[str], timeout_s: int,
+                 env_extra: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    """Run one child process with a hard wall-clock bound and no pipes.
+    env_extra merges over os.environ (never persisted)."""
+    import subprocess
+    import threading
+    env = dict(os.environ)
+    if env_extra:
+        env.update(env_extra)
+    _killed = {"fired": False}
+    cp = subprocess.Popen(cmd, cwd=str(REPO),
+                          stdout=subprocess.DEVNULL,
+                          stderr=subprocess.DEVNULL,
+                          env=env)
+
+    def _killer():
+        time.sleep(timeout_s)
+        if cp.poll() is None:
+            _killed["fired"] = True
+            try:
+                cp.terminate()
+            except Exception:  # noqa: BLE001
+                pass
+            time.sleep(10)
+            if cp.poll() is None:
+                try:
+                    cp.kill()
+                except Exception:  # noqa: BLE001
+                    pass
+
+    th = threading.Thread(target=_killer, daemon=True)
+    th.start()
+    t0 = time.time()
+    try:
+        rc = cp.wait()
+        err = None
+    except Exception as exc:  # noqa: BLE001
+        rc, err = None, f"{type(exc).__name__}: {exc}"[:300]
+    return {"returncode": rc, "wall_s": round(time.time() - t0, 1),
+            "timed_out": bool(_killed["fired"]), "spawn_error": err}
+
+
 def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
                            timeout_s: int, problems_file: str = "") -> None:
     """Run each pipeline problem in its own process with a hard timeout.
@@ -1329,7 +1725,6 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
     INCOMPLETE_INFRASTRUCTURE row (Art. LXI: infrastructure loss is
     never a refusal and never silently dropped). Process isolation also
     means an edit in the main tree cannot touch an in-flight run."""
-    import subprocess
     import threading
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -1340,41 +1735,21 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
         cmd = [sys.executable, "-B", script, "--arms", "pipeline",
                "--problems", pid, "--problems-file", problems_file,
                "--root", str(RUNS_ROOT), "--commit", _commit,
-               "--child"]
+               "--child", "--subdir", "pipeline"]
+        if _HOLDOUT_MODE:
+            cmd.append("--holdout-mode")
         t0 = time.time()
         try:
-            # DEVNULL children: no pipe-buffer deadlock risk; the child
-            # persists its own durable artifacts (stage ledgers) which
-            # the parent reads for stage timings. The killer thread
-            # guarantees a hard wall-clock bound (Art. LXI).
-            cp = subprocess.Popen(cmd, cwd=str(REPO),
-                                  stdout=subprocess.DEVNULL,
-                                  stderr=subprocess.DEVNULL)
-
-            def _killer():
-                time.sleep(timeout_s)
-                if cp.poll() is None:
-                    try:
-                        cp.terminate()
-                    except Exception:  # noqa: BLE001
-                        pass
-                    time.sleep(10)
-                    if cp.poll() is None:
-                        try:
-                            cp.kill()
-                        except Exception:  # noqa: BLE001
-                            pass
-
-            th = threading.Thread(target=_killer, daemon=True)
-            th.start()
-            rc = cp.wait()
-            return {"problem_id": pid, "state": "DONE" if rc == 0 else "TIMEOUT",
-                    "returncode": rc,
-                    "wall_s": round(time.time() - t0, 1)}
+            res = _spawn_child(cmd, timeout_s)
+            state = ("DONE" if (res["returncode"] == 0
+                                and not res["timed_out"]) else "TIMEOUT")
+            return {"problem_id": pid, "state": state,
+                    "returncode": res["returncode"],
+                    "wall_s": res["wall_s"],
+                    "timed_out": res["timed_out"]}
         except Exception as _exc:  # noqa: BLE001 — spawn failure is infra
             return {"problem_id": pid, "state": "TIMEOUT",
                     "returncode": "SPAWN_FAILED",
-                    "stdout": "", "stderr": f"{type(_exc).__name__}: {_exc}"[:800],
                     "wall_s": round(time.time() - t0, 1)}
 
     results: List[Dict[str, Any]] = []
@@ -1393,7 +1768,7 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
                     "final_status": "INCOMPLETE_INFRASTRUCTURE",
                     "reason": f"hard per-problem timeout {timeout_s}s",
                     "engine_error": "TIMEOUT",
-                    "child_stdout_tail": str(r.get("stdout") or "")[-1200:],
+
                     "stage_times_s": _stage_times(d),
                 }
                 _save(r["problem_id"], "pipeline_record.json", rec)
@@ -1409,7 +1784,7 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
                         "wall_s": r["wall_s"],
                         "final_status": "INCOMPLETE_INFRASTRUCTURE",
                         "reason": f"child exit {r['returncode']}",
-                        "engine_error": (r["stderr"] or "")[-400:],
+                        "engine_error": f"child exit {r.get('returncode')}",
                         "stage_times_s": _stage_times(d),
                     })
 
@@ -1437,18 +1812,32 @@ def main(argv=None) -> int:
                     help="hard per-problem timeout in seconds")
     ap.add_argument("--child", action="store_true",
                     help="internal: one problem in its own process")
+    ap.add_argument("--holdout-mode", action="store_true",
+                    help="internal: child received explicit holdout state; "
+                         "never overwrite the parent's metadata, print only "
+                         "problem-N ids")
+    ap.add_argument("--expected-selection-sha256", default=None,
+                    help="internal/test: override the expected selection hash "
+                         "(default is the sealed pre-registered value; a "
+                         "disposable fixture passes its own hash)")
+    ap.add_argument("--subdir", default="pipeline",
+                    help="internal: pipeline subdirectory for this run "
+                         "(round-2 children use pipeline_r2)")
     ap.add_argument("--commit", default=None,
                     help="internal: the parent's commit; the child reuses "
                          "it verbatim instead of resolving HEAD "
                          "(prevents run-dir splitting when HEAD moves "
                          "mid-run)")
     args = ap.parse_args(argv)
-    global RUNS_ROOT, _commit
+    global RUNS_ROOT, _commit, _HOLDOUT_MODE
     arms = [a.strip().lower() for a in args.arms.split(",") if a.strip()]
     if args.root:
         RUNS_ROOT = Path(args.root)
     if args.commit:
         _commit = args.commit
+    _HOLDOUT_MODE = bool(args.holdout) or bool(getattr(args, "holdout_mode", False))
+    PRE_REGISTERED_SELECTION_SHA256 = (
+        "57be8218d1fa681c972ff80d084f55666a53a640b3aa4aeb6c02be5ce9c6b107")
     if args.holdout:
         hpath = Path(args.holdout)
         if not hpath.exists():
@@ -1463,15 +1852,35 @@ def main(argv=None) -> int:
             print(f"[holdout] refusing to run: expected 24 problems, "
                   f"got {len(problems)} (P0, holdout isolation)", flush=True)
             return 2
+        # P0-3: recompute and verify the selection hash from the LOADED
+        # input using the repository's canonical method (never merely write
+        # the pre-registered constant into metadata). No contents printed.
+        try:
+            from eval.validate_problems import selection_hash
+            recomputed = selection_hash(problems)
+        except Exception as exc:  # noqa: BLE001 — fail closed
+            print(f"[holdout] refusing to run: canonical selection-hash "
+                  f"method unavailable: {exc}", flush=True)
+            return 2
+        expected = (args.expected_selection_sha256
+                    or PRE_REGISTERED_SELECTION_SHA256)
+        if recomputed != expected:
+            print(f"[holdout] refusing to run: recomputed selection hash "
+                  f"{recomputed} != expected {expected} "
+                  f"({'pre-registered sealed value'
+                      if args.expected_selection_sha256 is None
+                      else 'operator-declared fixture value'}); no problem "
+                  f"content printed", flush=True)
+            return 2
         args.subset = "all"
         args.problems = "all"
         args.problems_file = args.holdout
         args.workers = 1  # holdout is always sequential (the two max runs)
         RUNS_ROOT = HOLDOUT_ROOT
         print(f"[holdout] loaded sealed problem file; outputs in "
-              f"{HOLDOUT_ROOT} (gitignored); n=24, "
-              f"selection_sha256=57be8218d1fa681c972ff80d084f55666a53a640b3aa4aeb6c02be5ce9c6b107",
-              flush=True)
+              f"{HOLDOUT_ROOT} (gitignored); n=24; selection hash verified "
+              f"against {'pre-registered' if args.expected_selection_sha256 is None else 'operator-declared'} "
+              f"value", flush=True)
     else:
         problems = json.loads(
             Path(args.problems_file).read_text(encoding="utf-8"))["problems"]
@@ -1481,22 +1890,30 @@ def main(argv=None) -> int:
         want = {p.strip() for p in args.problems.split(",") if p.strip()}
         problems = [p for p in problems if p["problem_id"] in want]
 
-    global _HOLDOUT_MODE
-    _HOLDOUT_MODE = bool(args.holdout)
-
     RUNS_ROOT.mkdir(parents=True, exist_ok=True)
     (RUNS_ROOT / _commit).mkdir(parents=True, exist_ok=True)
-    (RUNS_ROOT / _commit / "_run_meta.json").write_text(
-        json.dumps({"commit": _commit, "dirty_tree": _dirty,
-                    "dont_write_bytecode": bool(sys.dont_write_bytecode),
-                    "executable": sys.executable,
-                    "argv": list(argv or []),
-                    "holdout": _HOLDOUT_MODE,
-                    "n_problems": len(problems),
-                    "selection_sha256": ("57be8218d1fa681c972ff80d084f55666a53a640b3aa4aeb6c02be5ce9c6b107"
-                                         if _HOLDOUT_MODE else None),
-                    "started_at": utc_now()}, indent=1) + "\n",
-        encoding="utf-8")
+    # children inherit explicit holdout state and NEVER overwrite the
+    # parent's canonical metadata; only the parent (non-child) writes it
+    if not args.child:
+        (RUNS_ROOT / _commit / "_run_meta.json").write_text(
+            json.dumps({"commit": _commit, "dirty_tree": _dirty,
+                        "dont_write_bytecode": bool(sys.dont_write_bytecode),
+                        "executable": sys.executable,
+                        "argv": list(argv or []),
+                        "holdout": _HOLDOUT_MODE,
+                        "n_problems": len(problems),
+                        "selection_sha256_recomputed": (
+                            recomputed if args.holdout else None),
+                        "selection_sha256_verified": bool(
+                            args.holdout and recomputed == expected),
+                        "pre_registered_selection_sha256": (
+                            PRE_REGISTERED_SELECTION_SHA256
+                            if args.holdout else None),
+                        "holdout_mode_state": (
+                            "explicit (--holdout)" if args.holdout
+                            else "none"),
+                        "started_at": utc_now()}, indent=1) + "\n",
+            encoding="utf-8")
 
     route_rec: Dict[str, Any] = {}
     judge_route: Dict[str, Any] = {}
@@ -1552,8 +1969,10 @@ def main(argv=None) -> int:
         d = RUNS_ROOT / _commit / pid
         print(f"[eval] {_label(pid)}: start", flush=True)
         if "pipeline" in arms:
-            rec = run_pipeline_problem(p, d / "pipeline")
-            _save(pid, "pipeline_record.json", rec)
+            _rec_name = ("pipeline_record.json" if args.subdir == "pipeline"
+                         else f"{args.subdir}_record.json")
+            rec = run_pipeline_problem(p, d / args.subdir)
+            _save(pid, _rec_name, rec)
             print(f"[eval] {_label(pid)}: pipeline done ({rec['wall_s']}s, "
                   f"status={rec.get('final_status')}, completed={rec.get('completed')})",
                   flush=True)
@@ -1670,10 +2089,14 @@ def main(argv=None) -> int:
                       ("commit", "dirty_tree", "pipeline_completion",
                        "yield_funnel_DEV", "wall_time", "speed",
                        "system_score", "system_wins", "system_ties",
-                       "conditional_quality", "conditional_quality_usable_pairs",
+                       "system_losses", "system_ci_wilson_95",
+                       "conditional_quality", "conditional_wins",
+                       "conditional_ties", "conditional_losses",
+                       "ci_method",
                        "full_scoreable_pairs", "n_numbers_unverified",
                        "n_usable_pairs", "pipeline_wins", "baseline_wins",
-                       "ties", "judge_calibration")}, indent=1, default=str))
+                       "ties", "judge_calibration", "judge_outcomes",
+                       "second_judge")}, indent=1, default=str))
     return 0
 
 

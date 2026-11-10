@@ -886,24 +886,31 @@ def _backfill_abstracts(items, budget_s: float = 25.0):
 
 
 def _cached_retrieval_result(env, cache_path: str):
-    """Round-2 frozen-evidence path (Art. LI): serve the round-1 items
-    from the cache file. No network calls; the frozen packet is reused
-    verbatim so round-2 generation acts on the same evidence."""
+    """Round-2 frozen-evidence path (Art. LI / R5 P0-4): serve the round-1
+    items from the cache file. No network calls, EVER. If the cache is
+    missing or unreadable, FAIL CLOSED: return a starved result with a
+    cache_failed marker — never silently pull a fresh packet while the
+    loop claims a controlled two-turn experiment (the R5 audit defect:
+    'Never silently substitute a fresh retrieval packet ... while
+    claiming a controlled two-turn experiment')."""
     from pathlib import Path as _Path
     try:
         kv = json.loads(_Path(cache_path).read_text(encoding="utf-8"))
         items = list(kv.get("items") or [])
-    except Exception:  # noqa: BLE001 — fall through to live retrieval
-        fabric = _import_with_env("discovery_fabric.retrieval_fabric")
-        items, report = fabric.retrieve(env.problem)
+        if not isinstance(items, list):
+            raise ValueError("cache items not a list")
+    except Exception as exc:  # noqa: BLE001 — fail closed, no fallback
         return _engine_result(
-            {"evidence": items,
-             "evidence_ids": [i.get("id", "") for i in items],
+            {"evidence": [],
+             "evidence_ids": [],
              "provenance": {**env.provenance,
-                            "retrieval_fabric": {"version": "V2",
-                                                  "cache_failed": True}}},
-            retrieved_count=len(items),
-            retrieval_fabric_version="V2")
+                            "retrieval_fabric": {
+                                "version": "cache",
+                                "cache_failed": True,
+                                "cache_path": cache_path,
+                                "cache_error": str(exc)[:120]}}},
+            retrieved_count=0,
+            retrieval_fabric_version="cache")
     return _engine_result(
         {"evidence": items,
          "evidence_ids": [i.get("id", "") for i in items],

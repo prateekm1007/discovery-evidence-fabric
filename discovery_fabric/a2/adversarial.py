@@ -224,36 +224,60 @@ def _objection_text(verdict: str) -> str:
     return t.strip()
 
 
-# R3 strict unsupported-hypothesis qualifier (audit directive): a mere
-# occurrence of the keywords "measure", "monitor", "threshold" is never
-# enough. All five structural requirements must hold for an unsupported
-# UNSUPPORTED_MECHANISM candidate to survive as a flagged HYPOTHESIS.
-# Deterministic, machine-checkable, no LLM.
+# R3+ strict unsupported-hypothesis qualifier (audit directive; R5 P1-5):
+# a mere occurrence of the keywords "measure", "monitor", "threshold" is
+# never enough. The numeric falsifier must carry a number + unit +
+# comparator + acceptance/rejection condition IN THE FALSIFICATION-TEST
+# FIELD, and the test must lexically target the stated failure (or the
+# engineering constraint / user variables). Deterministic, machine-checkable,
+# no LLM. Units are parsed with explicit word boundaries, with Celsius
+# handled as °C / "celsius" (never bare "C").
 _QUALIFIER_UNIT = (
-    r"(?:mA|A|kA|mV|V|kV|kW|W|J|kJ|Hz|rpm|[°CoC]|K|Pa|kPa|MPa|GPa|dB|"
-    r"N|kN|mm|cm|m|µm|nm|g|kg|mg|g/m2|g/m2/day|%|ppm|mol|mol/L|"
-    r"s|ms|h|days?|cycles?)\b")
+    r"(?:mA\b|kA\b|A\b|mV\b|kV\b|V\b|mW\b|kW\b|W\b|J\b|kJ\b|"
+    r"Hz\b|rpm\b|"
+    r"°C\b|celsius\b|°F\b|fahrenheit\b|K\b|kelvin\b|"
+    r"Pa\b|kPa\b|MPa\b|GPa\b|hPa\b|dB\b|N\b|kN\b|kgf\b|"
+    r"mm\b|cm\b|m\b|µm\b|um\b|nm\b|"
+    r"g\b|kg\b|mg\b|"
+    r"g/m2\b|g/m2/day\b|%\b|ppm\b|ppb\b|"
+    r"mol/L\b|mol\b|"
+    r"ms\b|s\b|min\b|h\b|hr\b|hours?\b|days?\b|weeks?\b|months?\b|cycles?\b|revs?\b)")
+_QUALIFIER_COMPARATOR = (
+    r"(?:<=|>=|<|>|≤|≥|"
+    r"\bbelow\b|\babove\b|\bless than\b|\bgreater than\b|"
+    r"\bat least\b|\bat most\b|\bno more than\b|\bno less than\b|"
+    r"\bwithin\b|\bexceed\w*\b|\blower than\b|\bhigher than\b|"
+    r"\bfewer than\b|\bmore than\b|\bnot exceed\w*\b|\bdo not exceed\w*\b)")
+_QUALIFIER_ACCEPT = (
+    r"(?:accept|reject|pass|fail|satisf|criterion|criteria|"
+    r"threshold|limit\b|bound|meets?\b|no more than|no greater than|"
+    r"no worse than|must hold|stands?\b|holds?\b)")
 _QUALIFIER_STOP = {"this", "that", "these", "those", "with", "from", "into",
                    "under", "over", "between", "never", "about", "which",
-                   "where", "their", "there", "under", "while", "would",
-                   "could", "should", "across", "during", "within", "beyond"}
+                   "where", "their", "there", "while", "would",
+                   "could", "should", "across", "during", "within",
+                   "beyond", "than", "then", "them", "they", "such",
+                   "each", "into", "onto", "upon", "over", "under"}
 
 
 def unsupported_hypothesis_qualifies(candidate) -> Dict[str, Any]:
-    """True only when ALL five requirements hold:
+    """True only when ALL requirements hold:
        1. coherent physical/technical mechanism (long-form),
        2. a specific intervention,
-       3. a numeric falsifier WITH units,
-       4. a measurable acceptance/rejection condition,
-       5. a lexical relationship to the stated failure.
+       3. in the TEST itself: numeric falsifier WITH units,
+       4. in the TEST itself: a comparator (<, >, below, at least, ...),
+       5. in the TEST itself: an acceptance/rejection condition,
+       6. the test lexically targets the stated failure / engineering
+          constraint / stated user variables.
     """
     c = candidate or {}
     mech = str(c.get("mechanism") or "")
     interv = str(c.get("intervention") or "")
     fals = str(c.get("falsification_test") or c.get("testable_prediction") or "")
     effect = str(c.get("expected_effect") or c.get("predicted_effect") or "")
-    fail_raw = str(c.get("failure") or "")
+    fail_raw = str(c.get("failure") or c.get("failure_mode") or "")
     constraint_raw = str(c.get("constraint") or "")
+    uv_blob = str(c.get("user_variables") or "")
     all_text = " ".join([mech, interv, fals, effect]).strip()
 
     reasons = []
@@ -263,23 +287,44 @@ def unsupported_hypothesis_qualifies(candidate) -> Dict[str, Any]:
         reasons.append("mechanism lacks two+ distinct content words")
     if len(interv.split()) < 6:
         reasons.append("intervention too thin (<6 words)")
-    if not re.search(r"\d+(?:\.\d+)?\s*" + _QUALIFIER_UNIT, fals):
+    if not re.search(r"\d+(?:\.\d+)?\s*" + _QUALIFIER_UNIT + r"\s*"
+                     r"(?:\W|$)", fals):
         reasons.append(
-            "no numeric falsifier with units in falsification_test")
-    if not re.search(r"\d+(?:\.\d+)?\s*" + _QUALIFIER_UNIT, all_text):
-        reasons.append("no measurable quantity with units anywhere")
-    if not re.search(r"(accept|reject|pass|fail|satisf|criteri|limit\s*\b|"
-                     r"threshold|bound|no\s+more|not\s+exceed)",
-                     all_text, re.IGNORECASE):
-        reasons.append("no acceptance/rejection condition stated")
-    f_words = set(re.findall(r"[a-z]{4,}", fail_raw.lower())) - _QUALIFIER_STOP
-    if f_words:
-        _cand_words = set(re.findall(r"[a-z]{4,}", all_text.lower()))
-        _overlap = f_words & _cand_words
-        if not _overlap:
+            "no numeric falsifier with units in falsification_test "
+            "(e.g. 85 °C, 200 cycles, 5 ppm, 12 mA)")
+    if not re.search(_QUALIFIER_COMPARATOR, fals, re.IGNORECASE):
+        reasons.append("no comparator in falsification_test "
+                       "(need <, >, below, above, at least, at most, ...)")
+    if not re.search(_QUALIFIER_ACCEPT, fals, re.IGNORECASE):
+        reasons.append("no acceptance/rejection condition in "
+                       "falsification_test (e.g. accept/reject/pass/fail)")
+    tie_blob = " ".join([fail_raw, constraint_raw, uv_blob])
+    tie_words = set(re.findall(r"[a-z]{4,}", tie_blob.lower())) - _QUALIFIER_STOP
+    if tie_words:
+        fals_words = set(re.findall(r"[a-z]{4,}", fals.lower()))
+        if not (tie_words & fals_words):
             reasons.append(
-                "no lexical relationship to the stated failure mode")
+                "falsification_test does not lexically target the stated "
+                "failure / engineering constraint / user variables")
     return {"qualifies": not reasons, "reasons": reasons}
+
+
+def _ab_survive_decision(dim_name: str, is_killed: bool,
+                         candidate) -> Dict[str, Any]:
+    """Pure, deterministic decision for the R5 P1-5 A/B ablation:
+    which candidates survive as flagged HYPOTHESES. Only UNSUPPORTED_MECHANISM
+    kills are eligible; CONTRADICTION / FEASIBILITY / obvious-equivalence /
+    prior-art / user-constraint violations stay terminal, always."""
+    if dim_name != "UNSUPPORTED_MECHANISM" or not is_killed:
+        return {"applies": False, "reason": "dimension not eligible",
+                "qualifies": False, "qualifier_reasons": []}
+    qual = unsupported_hypothesis_qualifies(candidate)
+    if not qual.get("qualifies"):
+        return {"applies": False, "reason": "qualifier rejected",
+                "qualifies": False,
+                "qualifier_reasons": qual.get("reasons") or []}
+    return {"applies": True, "reason": "qualified unsupported hypothesis",
+            "qualifies": True, "qualifier_reasons": []}
 
 
 # ===== R490: the Article L calibration-scope annotation (owner ruling) =====
@@ -633,8 +678,8 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
                 == "survive_unsupported_falsifiable"
                 and dim_name == "UNSUPPORTED_MECHANISM"
                 and is_killed):
-            _qual = unsupported_hypothesis_qualifies(candidate)
-            if _qual["qualifies"]:
+            _ab = _ab_survive_decision(dim_name, is_killed, candidate)
+            if _ab["applies"]:
                 body = _objection_text(_basis_body(raw_verdict))
                 is_killed = False
                 raw_verdict = (f"RISK (A/B unsupported-hypothesis) — "
@@ -646,7 +691,7 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
                     "source": "ab_unsupported_hypothesis",
                     "hypothesis": True,
                     "ranked_lower": True,
-                    "qualifier": {"reasons": _qual["reasons"]},
+                    "qualifier": {"reasons": _ab["qualifier_reasons"]},
                 })
                 v4_corrections_applied.append(
                     "ab:unsupported_hypothesis_survives")

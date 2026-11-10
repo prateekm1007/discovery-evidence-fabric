@@ -709,12 +709,17 @@ def select_survivors(candidates: List[Dict[str, Any]]
          INCONCLUSIVE candidates remain eligible (honest disclosure,
          never a fabricated kill — the domain refusal is not negative
          knowledge).
-      4. Among the rest, prefer the better E15-B verdict
+      4. R5 P1-5: a candidate carrying the A/B unsupported-hypothesis
+         flag (ranked_lower=True on ab_unsupported_hypothesis) ranks
+         BELOW every evidence-supported candidate, whatever its verdict
+         tier — the flagged hypothesis state is honest (Art. XI/LXI),
+         never a tie against evidence-backed work.
+      5. Among the rest, prefer the better E15-B verdict
          (PASS > CONDITIONAL > FAIL); FAIL means the quality gate rejects
          the candidate. BEATS_BASELINE outranks within the same verdict
          tier (physics strength is a recorded tie-break, not a score).
-      5. Tie-break: fewer deficient areas, then fewer UNCERTAIN verdicts.
-      6. All comparisons and the final choice are recorded.
+      6. Tie-break: fewer deficient areas, then fewer UNCERTAIN verdicts.
+      7. All comparisons and the final choice are recorded.
     """
     ranked: List[Dict[str, Any]] = []
     for c in candidates:
@@ -722,6 +727,10 @@ def select_survivors(candidates: List[Dict[str, Any]]
         quality = c.get("quality") or {}
         verdict_rank = {"PASS": 0, "CONDITIONAL": 1, "FAIL": 2,
                         None: 3}.get(quality.get("verdict"), 3)
+        hypothesis_flag = any(
+            isinstance(f, dict) and f.get("source") ==
+            "ab_unsupported_hypothesis"
+            for f in (attack.get("risk_flags") or []))
         # R415 fix (caught LIVE by the scale-fouling acceptance run):
         # the entry's OWN killed flag is authoritative — every kill path
         # sets it (engineering-attack KILL, R401 Phase-6 INDEPENDENT
@@ -749,7 +758,9 @@ def select_survivors(candidates: List[Dict[str, Any]]
             "repaired": bool(c.get("repaired")),
             "span_underived": underived,
             "physics_lifecycle": physics_lifecycle,
+            "ab_hypothesis": hypothesis_flag,
             "_verdict_rank": verdict_rank,
+            "_hypothesis_rank": 1 if hypothesis_flag else 0,
             "_physics_rank": {"BEATS_BASELINE": 0,
                               "MECHANISM_NOT_SIMULATABLE": 1,
                               "INCONCLUSIVE": 1,
@@ -760,7 +771,8 @@ def select_survivors(candidates: List[Dict[str, Any]]
                 and not r["span_underived"]
                 and r["physics_lifecycle"] not in
                 ("DOES_NOT_BEAT_BASELINE", "PLAUSIBILITY_BOUND_VIOLATED")]
-    eligible.sort(key=lambda r: (r["_verdict_rank"], r["_physics_rank"],
+    eligible.sort(key=lambda r: (r["_hypothesis_rank"],
+                                 r["_verdict_rank"], r["_physics_rank"],
                                  r["quality_deficient_count"],
                                  r["uncertain_count"]))
     selection = {
@@ -769,14 +781,27 @@ def select_survivors(candidates: List[Dict[str, Any]]
                    "(R377 evidence-derivation requirement); R397 Phase 2: "
                    "DOES_NOT_BEAT_BASELINE and PLAUSIBILITY_BOUND_VIOLATED "
                    "candidates are ineligible for release (the machine's "
-                   "own physics gates the claim); among survivors prefer "
+                    "own physics gates the claim); R5 P1-5: "
+                    "ab_unsupported_hypothesis candidates rank BELOW "
+                    "every evidence-supported candidate; among survivors prefer "
                    "better E15-B verdict, then BEATS_BASELINE, then fewer "
                    "deficient areas, then fewer UNCERTAIN attack "
                    "outcomes; NO numeric score is computed (CEO standing "
                    "rule: no new scoring systems)"),
+        "hypothesis_demoted": [r["candidate_id"] for r in ranked
+                               if not r["killed"]
+                               and r.get("ab_hypothesis")],
+        "policy_record": (
+            "R5 P1-5: ab_unsupported_hypothesis candidates rank below "
+            "every evidence-supported candidate (hypothesis_rank tier is "
+            "the FIRST sort key after the kill gates); the flag rides "
+            "the ranked record; hypotheses are never a tie against "
+            "evidence-backed candidates"),
         "ranked": ranked,
         "selected": eligible[0]["candidate_id"] if eligible else None,
         "selection_basis": eligible[0] if eligible else None,
+        "selected_is_hypothesis": bool(eligible
+                                       and eligible[0].get("ab_hypothesis")),
         "killed": [r["candidate_id"] for r in ranked if r["killed"]],
         "span_underived_excluded": [r["candidate_id"] for r in ranked
                                     if not r["killed"]
