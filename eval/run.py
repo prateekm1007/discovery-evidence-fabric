@@ -1026,7 +1026,7 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
                     "final_status": "INCOMPLETE_INFRASTRUCTURE",
                     "reason": f"hard per-problem timeout {timeout_s}s",
                     "engine_error": "TIMEOUT",
-                    "child_stdout_tail": str(out)[-1200:],
+                    "child_stdout_tail": str(r.get("stdout") or "")[-1200:],
                     "stage_times_s": _stage_times(d),
                 }
                 _save(r["problem_id"], "pipeline_record.json", rec)
