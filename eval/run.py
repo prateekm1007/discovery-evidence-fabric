@@ -702,9 +702,14 @@ def _funnel_row(problem_dir: Path) -> Dict[str, Any]:
 # scoring table
 # ---------------------------------------------------------------------------
 def build_score_table(route_rec: Dict[str, Any],
-                      judge_route: Dict[str, Any]) -> Dict[str, Any]:
+                      judge_route: Dict[str, Any],
+                      subset_ids: Optional[List[str]] = None
+                      ) -> Dict[str, Any]:
     commit_dir = RUNS_ROOT / _commit
     problems = json.loads(PROBLEMS.read_text(encoding="utf-8"))["problems"]
+    if subset_ids is not None:
+        want = set(subset_ids)
+        problems = [p for p in problems if p["problem_id"] in want]
     rows, usable = [], 0
     wins = ties = 0
     crit_means: Dict[str, List[float]] = {c: [] for c in CRITERIA}
@@ -858,6 +863,9 @@ def build_score_table(route_rec: Dict[str, Any],
                         "independence": "different provider+family from baseline; not 1.7B"},
         "judge_calibration": calib,
         "n_problems": len(problems),
+        "subset": ("dev6" if subset_ids is not None
+                   and set(subset_ids) == set(DEV6) else
+                   ("all" if subset_ids is None else f"custom:{len(subset_ids)}")),
         "n_completed_pipeline": n_completed,
         "n_usable_pairs": usable,
         "pipeline_wins": wins, "baseline_wins": usable - wins - ties, "ties": ties,
@@ -910,6 +918,7 @@ def write_table(table: Dict[str, Any]) -> None:
                                 for k, v in table["criteria"].items()),
         "",
         f"pipeline completion: {table['pipeline_completion']}",
+        f"subset: {table.get('subset')} (n={table.get('n_problems')})",
         "yield funnel (DEV): " + json.dumps(table.get("yield_funnel_DEV"),
                                              default=str),
         "yield funnel (fresh): " + json.dumps(table.get("yield_funnel_fresh"),
@@ -1017,6 +1026,7 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
                     "final_status": "INCOMPLETE_INFRASTRUCTURE",
                     "reason": f"hard per-problem timeout {timeout_s}s",
                     "engine_error": "TIMEOUT",
+                    "child_stdout_tail": str(out)[-1200:],
                     "stage_times_s": _stage_times(d),
                 }
                 _save(r["problem_id"], "pipeline_record.json", rec)
@@ -1139,7 +1149,8 @@ def main(argv=None) -> int:
     if args.child:
         return 0
 
-    table = build_score_table(route_rec or {}, judge_route or {})
+    table = build_score_table(route_rec or {}, judge_route or {},
+                              [p["problem_id"] for p in problems])
     write_table(table)
     print(json.dumps({k: table[k] for k in
                       ("commit", "dirty_tree", "pipeline_completion",

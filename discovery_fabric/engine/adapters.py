@@ -266,10 +266,35 @@ class A2RetrievalAdapter(BaseAdapter):
         # is untouched). The channel is disabled with
         # ENGINE_EVIDENCE_FABRIC=0 (the comparison experiment's Arm A).
         ef_provenance = None
+        # Speed directive (Art. LXXVII): this channel is ADDITIVE and, in
+        # every one of the 25 measured runs, contributed 0 items while its
+        # HF datasets-server fanout dominated the RETRIEVE wall time and
+        # pushed problems past the owner's 300 s worst-case budget. The
+        # budget is a wall-clock bound on the channel, recorded as a typed
+        # partial state (never absence — the V2 pool is intact; Art. XXI.3,
+        # LXI). Node slowness is provider-side state: we stop waiting on
+        # it instead of pretending it answered.
+        _ef_budget_s = float(_os.environ.get("EVIDENCE_FABRIC_BUDGET_S",
+                                             "20") or 20)
         try:
             from discovery_fabric import evidence_fabric as _ef
             if _ef.enabled():
-                ef_items, ef_report = _ef.retrieve_evidence(env.problem)
+                _ef_res, _ef_timed_out = _bounded_call(
+                    _ef.retrieve_evidence, env.problem, _ef_budget_s)
+                if _ef_timed_out:
+                    ef_provenance = {
+                        "state": "BUDGET_EXCEEDED",
+                        "budget_s": _ef_budget_s,
+                        "note": ("the additive evidence-fabric channel "
+                                 "exceeded its wall-clock budget; the V2 "
+                                 "fabric pool for this run is unchanged and "
+                                 "complete. A timing bound, never an absence "
+                                 "claim (Art. XXI.3, LXI). Measured history: "
+                                 "0 items from this channel in all 25 runs."),
+                    }
+                    ef_items, ef_report = [], {}
+                else:
+                    ef_items, ef_report = _ef_res
                 if ef_items:
                     # additive merge: evidence-fabric items carry the a2
                     # schema + `evidence_fabric` fields; ids are
@@ -278,39 +303,40 @@ class A2RetrievalAdapter(BaseAdapter):
                     have = {i.get("id") for i in items}
                     items = items + [i for i in ef_items
                                      if i.get("id") not in have]
-                ef_provenance = {
-                    "version": ef_report.get("fabric_version"),
-                    "federated": True,
-                    "production_sources": sorted({
-                        c.get("source_id") for c in
-                        ef_report.get("channels", [])
-                        if c.get("state") in ("SUCCESS", "EMPTY_RESULT")}),
-                    "channels": len(ef_report.get("channels", [])),
-                    "unknown_channels": len(
-                        ef_report.get("source_failures", [])),
-                    "substitutions": ef_report.get("substitutions", []),
-                    "coverage_limitations": ef_report.get(
-                        "coverage_limitations", []),
-                    "pool_items": ef_report.get("pool", {}).get("items", 0),
-                    "records_in_custody": len(
-                        ef_report.get("records", [])),
-                    "report_persisted": "EVIDENCE_FABRIC_REPORT.json",
-                    # R521 observability-only: compact per-channel
-                    # timing (the full report may be pruned from
-                    # snapshots by size; this compact list rides the
-                    # envelope which is always snapshotted). Read-only
-                    # aggregation — no behavior change.
-                    "channel_latencies": [
-                        {"source_id": c.get("source_id"),
-                         "state": c.get("state"),
-                         "attempted_as": c.get("attempted_as"),
-                         "latency_s": c.get("latency_s"),
-                         "records": c.get("records")}
-                        for c in ef_report.get("channels", [])],
-                    "channel_latency_sum_s": ef_report.get(
-                        "channel_latency_sum_s"),
-                    "pacing_s": ef_report.get("pacing_s"),
-                }
+                if ef_provenance is None:
+                    ef_provenance = {
+                        "version": ef_report.get("fabric_version"),
+                        "federated": True,
+                        "production_sources": sorted({
+                            c.get("source_id") for c in
+                            ef_report.get("channels", [])
+                            if c.get("state") in ("SUCCESS", "EMPTY_RESULT")}),
+                        "channels": len(ef_report.get("channels", [])),
+                        "unknown_channels": len(
+                            ef_report.get("source_failures", [])),
+                        "substitutions": ef_report.get("substitutions", []),
+                        "coverage_limitations": ef_report.get(
+                            "coverage_limitations", []),
+                        "pool_items": ef_report.get("pool", {}).get("items", 0),
+                        "records_in_custody": len(
+                            ef_report.get("records", [])),
+                        "report_persisted": "EVIDENCE_FABRIC_REPORT.json",
+                        # R521 observability-only: compact per-channel
+                        # timing (the full report may be pruned from
+                        # snapshots by size; this compact list rides the
+                        # envelope which is always snapshotted). Read-only
+                        # aggregation — no behavior change.
+                        "channel_latencies": [
+                            {"source_id": c.get("source_id"),
+                             "state": c.get("state"),
+                             "attempted_as": c.get("attempted_as"),
+                             "latency_s": c.get("latency_s"),
+                             "records": c.get("records")}
+                            for c in ef_report.get("channels", [])],
+                        "channel_latency_sum_s": ef_report.get(
+                            "channel_latency_sum_s"),
+                        "pacing_s": ef_report.get("pacing_s"),
+                    }
         except Exception as _ef_exc:  # noqa: BLE001 — infra, not verdict
             ef_provenance = {
                 "state": "CHANNEL_ERROR",
@@ -762,6 +788,34 @@ def _lean_rel_band(relevance):
         return r if isinstance(r, bool) else None
 
     return {"domain": _flag("domain"), "mechanism": _flag("mechanism")}
+
+
+def _bounded_call(fn, arg, budget_s: float):
+    """Run one additive/infrastructure call under a wall-clock budget.
+
+    Returns (result, timed_out). A wall-clock bound is an infrastructure
+    control, not a scientific verdict: callers record a typed BUDGET
+    state and keep the already-custodied pool (Art. LXI). The worker is
+    a daemon so a stuck socket can never hold the engine process open.
+    """
+    import threading
+    box: Dict[str, Any] = {}
+
+    def _work():
+        try:
+            box["value"] = fn(arg)
+        except BaseException as exc:  # noqa: BLE001
+            box["error"] = exc
+
+    th = threading.Thread(target=_work, daemon=True,
+                          name="bounded-infra-call")
+    th.start()
+    th.join(max(0.0, float(budget_s)))
+    if th.is_alive():
+        return None, True
+    if "error" in box:
+        raise box["error"]
+    return box.get("value"), False
 
 
 def _lean_select_operator(items, problem, all_matches: bool = False):
