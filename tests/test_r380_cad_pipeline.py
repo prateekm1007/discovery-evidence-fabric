@@ -26,6 +26,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
+def _archive_three_d_available() -> bool:
+    """R440 retirement state check: the retired package_factory archive is
+    not shipped in-tree (prune; bytes preserved in tag
+    archive/pre-prune-52ef1fe1). The frozen historical assertions below
+    re-activate automatically if the archive returns to the tree."""
+    src = Path(__file__).resolve().parents[1] / "archive" / \
+        "r440_retired" / "package_factory.py"
+    return src.exists()
+
+
 def _archived_factory():
     """R440 (Art. LXIV): the package_factory is RETIRED from production
     (ARCHIVED_TO archive/r440_retired/). These R380 tests lock the FROZEN
@@ -587,6 +597,11 @@ class TestEvidenceClassLaundering(unittest.TestCase):
         self.assertTrue(bad, "physical-evidence laundering not caught")
 
 
+@unittest.skipUnless(
+    _archive_three_d_available(),
+    "R440 retirement: archive/r440_retired/package_factory.py is not shipped "
+    "in-tree (prune; bytes preserved in tag archive/pre-prune-52ef1fe1). "
+    "The frozen historical assertions re-activate if the archive returns.")
 class TestPackageThreeDSection(unittest.TestCase):
     """The buyer package carries the 3D design only when real."""
 
