@@ -216,7 +216,7 @@ def load_health() -> Dict[str, Any]:
 
 def load_retrieval_log() -> List[Dict[str, Any]]:
     entries = []
-    with RETRIEVAL_LOG_PATH.open() as fh:
+    with RETRIEVAL_LOG_PATH.open(encoding="utf-8") as fh:
         for line in fh:
             line = line.strip()
             if line:
