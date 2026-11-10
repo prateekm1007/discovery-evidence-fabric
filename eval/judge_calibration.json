@@ -98,5 +98,147 @@
   "problem_id": "eval-new09-hvac-filter-predictor",
   "good_answer": "Use the existing filter differential-pressure and supply-fan power points to estimate a fouling residual at fixed operating conditions, then replace the filter when the residual trend crosses a site-calibrated threshold instead of at 90 days. The evidence supports pressure-drop/fan-power monitoring; it does not establish a 31% energy saving, so the benefit is measured on this air handler. Falsify by a season-long comparison of fan energy and filter change count between condition-based and fixed 90-day schedules.",
   "bad_answer": "Deploy a random-forest model on three years of BMS data; ASHRAE (2022) reports a 31% fan-energy saving and a 42% reduction in premature filter changes with this exact method. Adopt the 31% saving in the business case and switch all air handlers to the model output without a site baseline."
+ },
+ {
+  "problem_id": "bench-p02-leadacid-grid-corrosion",
+  "good_answer": "Attack the positive-plate grid corrosion failure mode the evidence names. The review record identifies four failure modes (sulfation, positive-plate corrosion, loss of water, acid leak) and ties battery fire to thermal runaway and short circuit, so the intervention should target corrosion kinetics at the positive plate without claiming a magnitude the record never reports. Instrument internal resistance and float-current drift on a float-charged cell bank; add a copper-calcium grid alloy variant if the plant tolerates the cost; and run a 90-day A/B. Falsify by comparing impedance drift and grid metallography between arms; the packet does not state a corrosion-rate threshold, so no number is asserted.",
+  "bad_answer": "Set the grid alloy to 5.4% Ca with 0.8% Ag and raise float voltage to 2.31 V/cell; Kim et al. (2021) measured corrosion at 0.8 mm/yr at these setpoints and a 94% life extension over Sb grids. Large-scale field trials in Germany showed 99.1% of flooded batteries reaching 15 years at these settings.",
+  "evidence": [
+   {
+    "title": "Discussion of the relationship between failure and fire of valve regulated lead acid battery",
+    "abstract": "Failure modes of the valve regulated lead acid battery will not only greatly reduce the service life, but also may start a fire. This paper reviews the relationship between battery fire and failure modes. Four failure modes influenced on the valve regulated lead acid battery were emphatically analyzed: sulfation of negative electrode plate, corrosion of the positive electrode plate, loss of water and acid leak. The direct reasons for battery fire are thermal runaway, short circuit and hy"
+   },
+   {
+    "title": "Failure modes of valve-regulated lead/acid batteries in different applications",
+    "abstract": ""
+   }
+  ]
+ },
+ {
+  "problem_id": "bench-p05-bridge-bearing-aging",
+  "good_answer": "Specify HNR-based natural rubber compound for the bearing pads, consistent with the one record that directly concerns this isolation system, which evaluated HNR's feasibility for steel-laminated pads and passed physical/mechanical testing; the other cited records are not about bridge bearings and are not used for load numbers. Change the pad spec to re-formulated HNR, add tear/aging test requirements to procurement, and monitor shear stiffness annually. Falsify by a two-bridge A/B over two years on annually measured shear stiffness; the packet gives no pad life number, so none is claimed.",
+  "bad_answer": "Switch to chloroprene-rubber pads with 3.1 mm plate spacing; Kim et al. (2019) measured 34% shear-stiffness loss after 12,000 cycles and concluded HNR fails earlier. Their 40-bridge cohort saw zero failures in 10 years at these specs.",
+  "evidence": [
+   {
+    "title": "Design of Elastomeric Bridge Bearing Pad Compound Formula Based on Hydrogenated Natural Rubber",
+    "abstract": "Laminated elastomeric bearing pad which is commonly produced by natural or chloroprene rubber is functioned as isolation system in bridge or flyover structures. In the research, hydrogenated natural rubber (HNR) was evaluated its feasibility to be used as base elastomer on steel-laminated bearing pad production by designing rubber compound formula. The compounding procedures of HNR applied various vulcanization system and carbon black filler types. The physical and mechanical tests result showed"
+   }
+  ]
+ },
+ {
+  "problem_id": "bench-p09-packaging-barrier",
+  "good_answer": "The packet is explicit that biodegradable polymer films have inferior oxygen/moisture barrier vs petroleum plastics, which is why the intervention targets multilayer structure rather than single-polymer replacement: keep the LDPE/PA multilayer the LCA record covers, add a nano-filler layer informed by the barrier-review record's direction (no composition or rate is asserted from that review), and qualify with film ASTM trials. Falsify by a 12-week WVTR A/B on the actual film; the packet carries no WVTR deltas, so no target number is given.",
+  "bad_answer": "Add 4.5 wt% nanoclay to the LDPE/PA film and switch to 12 micrometer thickness; Voss et al. (2023) measured 61% WVTR reduction and 88% OTR reduction on identical film. Pilot line data showed 14 days shelf life extension for olive oil at these loadings.",
+  "evidence": [
+   {
+    "title": "Recent Advances in Barrier Property Enhancement of Biodegradable Polymer Films: Strategies and Challenges.",
+    "abstract": "Over the past decades, biodegradable polymer films have gained significant attention owing to their environmental friendliness and abundant raw material availability. However, the barrier properties of biodegradable polymers as packaging materials remain inferior to those of traditional petroleum-based plastic films, limiting their suitability for applications sensitive to oxygen or moisture such as food preservation, pharmaceutical packaging, and electronic device protection."
+   },
+   {
+    "title": "Life Cycle Assessment of multilayer polymer film used on food packaging field",
+    "abstract": "The environmental impact of a multilayer polymer film, Low Density Poly Ethylene/Polyamide system (LDPE/PA), generally used on food packaging field, was estimated using life cycle assessment (LCA). The aim of the work was to understand how to reduce the environmental pressure from plastic packages for its lower recovery and reuse, which can be improved by developing material recovery or other appropriate recycling technology."
+   }
+  ]
+ },
+ {
+  "problem_id": "eval-new02-slipring-predictor",
+  "good_answer": "Track contact voltage drop and brush wear per the station housing them, because the evidence records show both are measured on silver-graphite brushes vs silver content and lubricant effects in carbon brush-slip ring systems, but give no threshold. Fit a regression from those measured variables to resistance drift, set inspection at the drift knee after commissioning baseline, and retire brushes by measured wear. Falsify by a 6-month on-line A/B comparing voltage-drop regression slope to brush wear; the packet reports no slope value, so none is given.",
+  "bad_answer": "Fit a linear drift model at 0.8 mV/hr at 300 RPM; Kondo et al. (2016) measured contact drop falls 12 mV per 1% added silver across 2-10% silver graphite brushes. Replace all brushes every 2,000 operating hours per that linear extrapolation; slip-ring failures in wind turbines dropped by 83% at those intervals.",
+  "evidence": [
+   {
+    "title": "Contact Voltage Drop and Brush Wear Characteristics for Various Silver Content of the Silver Graphite Brush in Slip Ring System",
+    "abstract": ""
+   },
+   {
+    "title": "Effects of lubricant oil on sliding contact phenomena in carbon brush-slip ring system",
+    "abstract": ""
+   }
+  ]
+ },
+ {
+  "problem_id": "eval-new06-bearing-vibration-predictor",
+  "good_answer": "Build the predictor from spindle accelerometer RMS and envelope spectra around the bearing defect band, and use the one rotor/bearing record only for its demonstration that active non-contact magnetic support can suppress vibration under milling, not to import its numbers. Log grease condition and speed; trigger maintenance at a calibrated spectral threshold; falsify with a 3-month spindle A/B on unplanned stops; the packet provides no RMS limit, so the limit is set from baseline data, not asserted.",
+  "bad_answer": "Install magnetic-ball hybrid bearings on all spindles; Chen et al. (2025) measured broadband vibration reduction of 67% RMS on milling machines in a 40-bearing cohort. Their group's 11 Hz resonance model predicted 34% longer bearing life, which is now industry standard for 3,400 RPM duty.",
+  "evidence": [
+   {
+    "title": "Active vibration suppression of a magnetic-ball bearing hybrid supported rotor system.",
+    "abstract": "The vibration problem caused by milling is a key factor restricting high-precision and high-efficiency machining. Traditional passive vibration suppression methods are limited by fixed structural parameters and lack sufficient adaptability to dynamic operating conditions, making it difficult to achieve effective broadband vibration control. Magnetic bearings, with their non-contact characteristics and active controllability, provide a new idea for milling vibration suppression."
+   }
+  ]
+ },
+ {
+  "problem_id": "eval-new09-hvac-filter-predictor",
+  "good_answer": "Implement the Guideline 36 sequence changes the record evaluates (the same AHU/VAV scope) and add an economizer discharge-air-temperature control loop to shave cooling energy, since the ANN record shows savings potential without a magnitude. Calibrate the economizer setpoints at commissioning; falsify with an AHU-level A/B over cooling season on metered discharge temperature and fan power; the packet contains no percent savings, so none is claimed.",
+  "bad_answer": "Retune every VAV per Guideline 36; ASHRAE (2024) reports an 18% fan-energy reduction across 214 buildings, with one fleet seeing 22%. Replacing all discharge-air-temperature loops with ANN control saves a measured 31% of cooling energy across 1,200 AHUs according to Kim et al.",
+  "evidence": [
+   {
+    "title": "Experimental Comparison of Guideline 36 and Legacy Controller Sequences of Operation using Commercial-off-the-shelf Control Software.",
+    "abstract": "In this study, we test the performance of Guideline 36-compliant sequences of operation for the air system relative to sequences of operation that predate Guideline 36. For this study, the air system comprises air handling units (AHUs) that serve variable air volume terminal units (VAVs). We present a platform that can be used to study the impact on building operations of changing the control system in a building, while holding constant any other aspect of that building, such as equipment upgrad"
+   },
+   {
+    "title": "Potential Cooling Energy Savings of Economizer Control and Artificial-Neural-Network-Based Air-Handling Unit Discharge Air Temperature Control for Commercial Building",
+    "abstract": ""
+   }
+  ]
+ },
+ {
+  "problem_id": "bench-p01-pemfc-dehydration",
+  "good_answer": "Manage water to the stack rather than upgrading humidifiers: instrument the cathode in/out RH and cell voltage, and control the stack's membrane water activity per the Ballard-Mark-V water-management study and the auxiliary-subsystem model's humidifier sub-model, both of which treat water management as the determinative operating variable. Raise cathode RH at fixed stoichiometry in a step run; falsify by holding setpoints and checking whether voltage recovers within the stated hold time; the packet has no RH-vs-voltage slope, so none is promised.",
+  "bad_answer": "Raise cathode RH to 85% at fixed stoichiometry; Kim et al. (2023) measured a 41% voltage gain and 12% efficiency increase on Ballard Mark-V stacks. Their model predicts 95% RH is optimal at 80% RH onset of flooding, confirmed in three fleet deployments.",
+  "evidence": [
+   {
+    "title": "Investigation of Water Management Dynamics on the Performance of a Ballard-Mark-V Proton Exchange Membrane Fuel Cell Stack System",
+    "abstract": "This paper aims to bring out the importance of water management in a Proton Exchange Membrane Fuel Cell (PEMFC) stack system. At present several electrochemical models are available that predicts the steady state behavior for a specified set of operating conditions."
+   },
+   {
+    "title": "A comprehensive proton exchange membrane fuel cell system model integrating various auxiliary subsystems",
+    "abstract": "A comprehensive proton exchange membrane fuel cell (PEMFC) system model is developed, including a pseudo two-dimensional transient multiphase stack model, a one-dimensional transient multiphase membrane humidifier model, a one-dimensional electrochemical hydrogen pump model, an air compressor model with proportion-integral-derivative control and a ribbon-tubular fin radiator model. All sub-models have been rigorously validated against experimental data."
+   }
+  ]
+ },
+ {
+  "problem_id": "bench-p03-phe-biofouling",
+  "good_answer": "Condition-based CIP on fouling-resistance residual from U-coefficient inversion, the method the packet's district-heating record defines explicitly; trigger cleaning when the residual exceeds the clean-baseline band, not on a fixed calendar. The hybrid-intelligence review documents that ML predicts fouling but does not give a plant threshold, so calibrate on this exchanger's clean baseline. Falsify by a season A/B on CIP frequency vs plate thermal drop; the packet's correlation record for district PHEs does not transfer quantitatively, so no number is imported.",
+  "bad_answer": "Set CIP at a fixed 21-day cadence; Kim et al. (2022) measured fouling resistance rising 0.0084 m2K/W after 14 days on identical PHEs, and condition-based CIP saved only 9% energy. Their 18-exchanger cohort recommends 21 days, eliminating fouling failures entirely in 2023.",
+  "evidence": [
+   {
+    "title": "Hybrid Intelligence for Fouling Prediction and Adaptive Clean-in-Place Optimization in Food Processing Heat Exchangers: A Systematic Review.",
+    "abstract": "Fouling remains one of the principal challenges limiting the thermal efficiency, hygienic performance, and sustainability of food processing heat exchangers. The accumulation of protein, mineral, biofilm, and particulate deposits increases thermal resistance, energy consumption, production losses, and the frequency of cleaning-in-place (CIP) operations, thereby affecting process economics and food safety."
+   },
+   {
+    "title": "Determination of Heat Transfer Correlations for Fluids Flowing through Plate Heat Exchangers Needed for Online Monitoring of District Heat Exchanger Fouling",
+    "abstract": "A method for calculating the thermal resistance of fouling is proposed based on a comparison of the thermal resistance of a fouled and clean heat exchanger. The thermal resistance of the heat exchanger for both fouled and clean apparatuses is determined as the inverse of their overall heat transfer coefficient."
+   }
+  ]
+ },
+ {
+  "problem_id": "bench-p04-pump-cavitation",
+  "good_answer": "Attack the cavitation erosion mode the packet pairs with impeller failure in cyclic cooling service: raise net positive suction head by trimming impeller inlet velocity (flow modification direction from the erosion-reduction record), add NPSH margin monitoring, and log vibration. Falsify by a two-pump duty cycle with pressure pulsation and wear measurement; the packet provides no NPSH threshold, so qualification uses site-specific baseline NPSHav, not an asserted number.",
+  "bad_answer": "Trim impellers by 12% and raise NPSH margin to 0.6 m; Kim et al. (2018) measured head falling 34% at these settings and cavitation damage reversing completely. The industry standard pipe-bend fix cut vibration by 71% across 900 pumps, payback in 3 months.",
+  "evidence": [
+   {
+    "title": "Erosion corrosion of pump impeller of cyclic cooling water system",
+    "abstract": ""
+   },
+   {
+    "title": "Strive to Reduce Slurry Erosion and Cavitation in Pumps Through Flow Modifications, Design Optimization and Some Other Techniques: Long Term Impact on Process Industry.",
+    "abstract": "Centrifugal pumps are being widely used in various industries for moving fluids that carry solids through pipelines where the need of head and flow rate is not high. Slurry erosion and cavitation are an extremely complex and not yet fully understood phenomenon that occur in centrifugal pumps; however, these undesirable phenomena can be reduced to a certain extent. Appropriate design and developmen"
+   }
+  ]
+ },
+ {
+  "problem_id": "eval-sofc-redox",
+  "good_answer": "Protect the anode from redox damage: control fuel utilization to keep local oxygen pressure below the Ni oxidation front, and monitor polarization resistance. The porosity-gradient and structural-stability records both concern anode integrity under service; they do not state an ASR threshold, so the intervention uses polarization-resistance trends rather than an invented limit. Falsify by a 200-h hold with controlled interruptions; if polarization resistance does not return toward baseline after re-reduction, the mechanism is wrong.",
+  "bad_answer": "Cap fuel utilization at 72%; Kim et al. (2021) measured polarization resistance rising 0.4 ohm cm2 per redox cycle and ASR increasing 40% within 10 cycles. Their cohort of 40 stacks showed 8,000-hour life at 72%, which is regulator-endorsed for redox service.",
+  "evidence": [
+   {
+    "title": "The effect of porosity gradient in a Nickel/Yttria Stabilized Zirconia anode for an anode-supported planar solid oxide fuel cell",
+    "abstract": ""
+   },
+   {
+    "title": "Structural and Mechanical Stability of Reduced Nickel Oxide/Yttria-stabilized Zirconia Anode/Electrolyte Structures for Solid Oxide Fuel Cell Applications",
+    "abstract": ""
+   }
+  ]
  }
 ]

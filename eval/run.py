@@ -445,12 +445,37 @@ def run_baseline_problem(problem: Dict[str, Any], out_dir: Path,
 # ---------------------------------------------------------------------------
 # arm: judge (blind pairwise, both orders; only over completed pipeline pairs)
 # ---------------------------------------------------------------------------
-def _rubric_prompt(problem, a_text: str, b_text: str) -> str:
+def _packet_lines(packet: Optional[List[Dict[str, Any]]]) -> List[str]:
+    if not packet:
+        return []
+    out = ["EVIDENCE PACKET (the ONLY evidence the answers may cite; "
+           "every number/citation not present here is UNVERIFIED):"]
+    for i, e in enumerate(packet[:16], 1):
+        title = (e.get("title") or "(untitled)")[:140]
+        src = e.get("source_id") or e.get("source") or "?"
+        abstract = str(e.get("abstract") or "")[:700]
+        ids = ((e.get("doi") and f" doi:{e.get('doi')}") or "")
+        out.append(f"[{i}] ({src}{ids}) {title}\n    {abstract}")
+    return out
+
+
+def _rubric_prompt(problem, a_text: str, b_text: str,
+                   packet: Optional[List[Dict[str, Any]]] = None) -> str:
     clar = problem.get("clarification_text")
     lines = [
         "You judge two engineering answers to the same user problem.",
         "Both answers had access to the same evidence packet retrieved for "
         "this problem.",
+        "The EVIDENCE PACKET is shown at the end of this prompt. "
+        "Fabrication check: every number, unit, citation, or measurement in "
+        "an answer must come from that packet or be clearly hedged as "
+        "unverified. Any number/citation not found in the packet is "
+        "fabrication, a hard failure (score 1 on the affected criterion). "
+        "A well-hedged admission that the evidence does not support a claim "
+        "is HONEST, never a failure.",
+    ]
+    lines += _packet_lines(packet)
+    lines += [
         "",
         f"DEVICE: {problem['device']}",
         f"FAILURE: {problem['failure']}",
@@ -477,11 +502,11 @@ def _rubric_prompt(problem, a_text: str, b_text: str) -> str:
     if clar:
         lines.append("5 " + CRITERIA["e_clarification"])
     lines += [
-        "Grade strictly: vague/generic/number-ignoring/unsupported answers "
-        "score low; quantified, testable, evidence-using answers score high.",
-        "Fabricated numbers, fabricated citations, or invented measurements "
-        "are a hard failure (score 1 on the affected criterion).",
-        "Then state your overall preference. Answer ONLY with these lines:",
+        "Grade strictly: vague/generic/number-ignoring/unverified claims "
+        "score low; quantified, testable, package-grounded answers score "
+        "high. If an answer carries a number absent from the packet, cap "
+        "that criterion at 2. Then state your overall preference. Answer "
+        "ONLY with these lines:",
         "A1: <1-5>", "A2: <1-5>", "A3: <1-5>", "A4: <1-5>",
         "B1: <1-5>", "B2: <1-5>", "B3: <1-5>", "B4: <1-5>",
     ]
@@ -492,7 +517,9 @@ def _rubric_prompt(problem, a_text: str, b_text: str) -> str:
 
 
 def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
-                      base_ans: Optional[str], route: Dict[str, Any]) -> Dict[str, Any]:
+                      base_ans: Optional[str], route: Dict[str, Any],
+                      packet: Optional[List[Dict[str, Any]]] = None
+                      ) -> Dict[str, Any]:
     if not pipe_ans or not base_ans:
         return {"usable_pair": False,
                 "why": ("pipeline answer missing" if not pipe_ans
@@ -503,7 +530,7 @@ def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
     for order in ("AB", "BA"):
         a_text, b_text = ((pipe_ans, base_ans) if order == "AB"
                           else (base_ans, pipe_ans))
-        prompt = _rubric_prompt(problem, a_text, b_text)
+        prompt = _rubric_prompt(problem, a_text, b_text, packet=packet)
         res = _transport_call(route["provider"], route["model"], prompt,
                               "You are a strict blind rubric judge. English "
                               "only. Follow the exact output lines.",
@@ -595,7 +622,7 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
             a, b, good_is = good, bad, "A"
         else:
             a, b, good_is = bad, good, "B"
-        prompt = _rubric_prompt(_intake_problem(problem), a, b)
+        prompt = _rubric_prompt(_intake_problem(problem), a, b, packet=entry.get("evidence"))
         res = _transport_call(judge_route["provider"], judge_route["model"], prompt,
                               "You are a strict blind rubric judge. English only. "
                               "Follow the exact output lines.", max_tokens=300)
@@ -1155,8 +1182,36 @@ def main(argv=None) -> int:
                         "why": "pipeline did not release an answer"})
                 print(f"[eval] {pid}: judge skipped (pipeline not completed)", flush=True)
                 continue
-            rec = run_judge_problem(_intake_problem(p), pv, bv, judge_route)
+            snap = _evidence_snapshot(Path(d) / "pipeline")
+            rec = run_judge_problem(_intake_problem(p), pv, bv, judge_route, packet=(snap or {}).get("items"))
             _save(pid, "judge_record.json", rec)
+            # raw pair for independent audit (Art. XII custody): both
+            # answers, the evidence ids, the judge output — never edited
+            try:
+                pairs_dir = Path(__file__).resolve().parent / "pairs"
+                pairs_dir.mkdir(parents=True, exist_ok=True)
+                pair = {
+                    "problem_id": pid,
+                    "commit": _commit,
+                    "dirty_tree": _dirty,
+                    "question": p.get("question"),
+                    "clarification_answer": p.get("clarification_answer"),
+                    "baseline_answer": bv,
+                    "pipeline_answer": pv,
+                    "evidence_ids": (snap or {}).get("ids"),
+                    "judge_record": rec,
+                    "baseline_same_evidence_hash": (
+                        ((json.loads((d / "baseline_record.json").read_text(
+                            encoding="utf-8")) or {}).get("same_evidence_hash")
+                         if (d / "baseline_record.json").exists() else None)),
+                    "pipeline_same_evidence_hash": (snap or {}).get("hash"),
+                }
+                (pairs_dir / f"{pid}.json").write_text(
+                    json.dumps(pair, indent=1, default=str) + "\n",
+                    encoding="utf-8")
+            except Exception as _exc:  # noqa: BLE001
+                print(f"[eval] {pid}: pair custody write failed: {_exc}",
+                      flush=True)
             print(f"[eval] {pid}: judge -> "
                   f"{rec.get('winner') if rec.get('usable_pair') else rec.get('why')}",
                   flush=True)
