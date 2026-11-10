@@ -1506,7 +1506,15 @@ def main(argv=None) -> int:
                               [p["problem_id"] for p in problems],
                               problems=problems,
                               holdout=bool(args.holdout))
-    write_table(table)
+    if args.holdout:
+        # sealed outputs never touch the repo: table lives inside the
+        # gitignored holdout run dir
+        (HOLDOUT_ROOT / _commit).mkdir(parents=True, exist_ok=True)
+        (HOLDOUT_ROOT / _commit / "SCORE_TABLE.json").write_text(
+            json.dumps(table, indent=1, default=str) + "\n",
+            encoding="utf-8")
+    else:
+        write_table(table)
     print(json.dumps({k: table[k] for k in
                       ("commit", "dirty_tree", "pipeline_completion",
                        "yield_funnel_DEV", "wall_time", "speed",
