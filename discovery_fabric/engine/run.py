@@ -788,6 +788,15 @@ class EngineRun:
                               {"stage": stage, "error": sf.error})
             self._persist_envelope(stage)
 
+        # ---- Critique -> revise (Art. LI, one bounded pass) ----------
+        # A candidate the gauntlet killed is NEVER silently dropped and
+        # never presented as the invention. It gets ONE revision pass:
+        # the kill reasons + the frozen record text are fed back; the
+        # revised candidate is re-attacked. Revision outcome is recorded
+        # in REVISE_LEDGER.json; a survived revision replaces the killed
+        # candidate in the record (and only then is released).
+        self._maybe_revise_killed_candidate()
+
         final = self._final_state()
         self._persist("final_state.json", final)
         # the PRE-evolution final state is preserved for the cemetery
@@ -3576,6 +3585,165 @@ class EngineRun:
             return None
 
     # ------------------------------------------------------------------
+    def _maybe_revise_killed_candidate(self) -> Dict[str, Any]:
+        """One bounded critique->revise->re-attack pass (Art. LI, one
+        mutation, no loop, no new governance). Called only after the
+        rank stage. A candidate the adversarial gauntlet killed is not
+        dropped; it is given exactly one evidence-grounded revision.
+        """
+        import os
+        import re as _re
+
+        _disabled = (os.environ.get("ENGINE_REVISE", "1").strip().lower()
+                     in ("0", "false", "no", "off"))
+        if _disabled:
+            return {"state": "DISABLED"}
+        ar = self.env.attack_results or {}
+        if str(ar.get("overall") or "").upper() != "KILLED":
+            # not killed -> nothing to revise
+            self._persist("REVISE_LEDGER.json", {
+                "state": "VICTIM_NOT_KILLED",
+                "attack_verdict": ar.get("overall"),
+                "attack_overall": ar.get("overall"),
+                "mutated_survivors": 0,
+            })
+            return {"state": "VICTIM_NOT_KILLED"}
+
+        raw_cand = ((self.env.mechanism_map or {}).get("raw_candidate")
+                    or {})
+        kill_reasons = {k: v for k, v in (ar.get("attacks") or {}).items()
+                        if str(v).upper().startswith("KILLED")}
+        record_lines = []
+        for e in (self.env.evidence or [])[:8]:
+            if not isinstance(e, dict):
+                continue
+            t = str(e.get("title") or "(untitled)")
+            a = str(e.get("abstract") or "")[:800]
+            record_lines.append(f"- {t}\n  {a}")
+
+        prompt = (
+            "You are revising an engineering invention candidate that the\n"
+            "adversarial gauntlet REJECTED. Every mechanism term in your revision\n"
+            "MUST trace to the provided record; do not add claims beyond it.\n"
+            "Do not cite any source not shown; the record is the ONLY allowed\n"
+            "authority. Revise to remove ONLY the defects in the kill rationale\n"
+            "below; keep the design intent.\n\n"
+            f"DESIGN INTENT:\nmechanism: "
+            f"{raw_cand.get('mechanism', '')}\n"
+            f"intervention: {raw_cand.get('intervention', '')}\n"
+            f"expected_effect: {raw_cand.get('expected_effect', '')}\n"
+            f"falsification_test: {raw_cand.get('falsification_test', '')}\n"
+            f"predicted_effect: {raw_cand.get('predicted_effect', '')}\n\n"
+            "KILL RATIONALE (the defects to eliminate):\n"
+            + "\n".join(f"{k}: {v}" for k, v in kill_reasons.items())
+            + "\n\nEVIDENCE RECORD (the only authority):\n"
+            + "\n".join(record_lines)
+            + "\n\nOutput ONLY these lines:\n"
+              "mechanism: <sentence>\n"
+              "intervention: <sentence>\n"
+              "expected_effect: <sentence>\n"
+              "falsification_test: <sentence>\n"
+              "predicted_effect: <sentence>\n"
+        )
+
+        from . import mechanism_space as _ms
+        meta = _ms.llm_generate(
+            prompt,
+            system=("You are a rigorous mechanism engineer. Every claim "
+                    "must derive from the given evidence."),
+            purpose="critique_revise", max_tokens=800)
+        revision = {"state": "ATTEMPTED",
+                    "attack_overall_before": ar.get("overall"),
+                    "mutated_survivors": 0,
+                    "kill_dimensions": list(kill_reasons),
+                    "provider": meta.get("provider") if isinstance(meta, dict)
+                    else None,
+                    "model": meta.get("model") if isinstance(meta, dict)
+                    else None,
+                    }
+        if not isinstance(meta, dict) or not meta.get("ok"):
+            revision["state"] = "REVISE_TRANSPORT_FAILED"
+            revision["error"] = str(meta.get("error") if isinstance(meta, dict)
+                                    else meta)[:300]
+            self._persist("REVISE_LEDGER.json", revision)
+            return revision
+        content = meta.get("content") or ""
+        parsed: Dict[str, str] = {}
+        for m in _re.finditer(
+                r"^(mechanism|intervention|expected_effect|falsification_test|"
+                r"predicted_effect)\s*[:=]\s*(.+)$",
+                content, _re.M | _re.I):
+            parsed[m.group(1).lower()] = m.group(2).strip()
+        if len(parsed) < 5:
+            revision["state"] = "REVISE_PARSE_FAILED"
+            revision["parsed"] = parsed
+            self._persist("REVISE_LEDGER.json", revision)
+            return revision
+
+        revised = dict(raw_cand)
+        for k, v in parsed.items():
+            revised[k] = v
+        revised["candidate_id"] = "rev:MS:" + (meta.get("output_hash",
+                                                     meta.get("prompt_hash",
+                                                              "rev"))[:12]
+                                                if isinstance(meta, dict)
+                                                else "rev")
+        revised["revision"] = "CRITIQUE_REVISE_ONCE"
+        revised["candidate_state"] = "CANDIDATE"
+        revision["revised_candidate_id"] = revised["candidate_id"]
+        revision["fields"] = list(parsed)
+
+        from discovery_fabric.a2 import adversarial as _adv
+        re_attack = _adv.adversarial_challenge(
+            revised, evidence_verified=True,
+            prior_art_state=(self.env.prior_art or {}).get(
+                "prior_art_status", "UNRESOLVED_INSUFFICIENT_EVIDENCE"))
+        revision["attack_after"] = re_attack.get("overall")
+        revision["attack_after_record"] = re_attack
+        if str(re_attack.get("overall") or "").upper() == "PASS":
+            # the revision survives: present the REVISED candidate, never
+            # the killed one, and mark it mutated.
+            revision["state"] = "REVISED_SURVIVOR"
+            revision["mutated_survivors"] = 1
+            self.env.mechanism_map = dict(self.env.mechanism_map or {},
+                                         mechanism=parsed["mechanism"],
+                                         intervention=parsed["intervention"],
+                                         expected_effect=parsed["expected_effect"],
+                                         falsification_test=parsed["falsification_test"],
+                                         predicted_effect=parsed["predicted_effect"],
+                                         raw_candidate=revised,
+                                         revision="CRITIQUE_REVISE_ONCE")
+            self.env.attack_results = dict(
+                re_attack, attack_before_revise=ar,
+                revision="CRITIQUE_REVISE_ONCE")
+            # patch, never replace (Art. XI): keep the other envelope
+            # fields the run already persisted
+            for _name, _key, _val in (
+                    ("candidate_envelope.json", "mechanism_map",
+                     self.env.mechanism_map),
+                    ("envelope_ATTACK.json", "attack_results",
+                     self.env.attack_results)):
+                try:
+                    _ep = self.out / _name
+                    if _ep.exists():
+                        _full = json.loads(_ep.read_text(encoding="utf-8"))
+                    else:
+                        _full = {}
+                    _full[_key] = _val
+                    _ep.write_text(json.dumps(_full, indent=1,
+                                              default=str) + "\n",
+                                   encoding="utf-8")
+                except Exception:  # noqa: BLE001
+                    pass
+        else:
+            revision["state"] = "REVISED_DIED"
+            # keep the killed verdict (never release a dead candidate);
+            # record the failed revision for the learning step (Art. LI)
+            self._persist("REVISE_LEDGER.json", revision)
+            return revision
+        self._persist("REVISE_LEDGER.json", revision)
+        return revision
+
     def _pre_retrieval_capability_gate(self) -> Dict[str, Any]:
         """R455-LEAN-1 §2 — NO REASONING, NO SPEND.
 
