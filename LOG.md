@@ -14,3 +14,5 @@ R1 (2026-11-09): EVAL harness built (eval/: problems.json 18, run.py, score/).
   baseline's answers higher on every criterion. Next blocker: a live rung.
 
 R1 (2026-11-10): DEV6 measurement committed. Funnel 3/6 completed, 3/6 mechanisms_found, 3/6 distinct (starved: predictors, GENERATION_NO_OPERATOR_CONTRACT). Speed p50 295.2 s, p95 300.1 s, 3 timeouts (budget breached). Calibration 20/20 passed. Root cause: multi-operator generation 3x LLM calls inflated MECHANISM_SPACE to 70 s; EF channel bounded to 20 s. Actions: EF default off, OWNER_INCEPTION_ACCOUNT vocab, cemetery membrane regression test, routing-pin + cost-policy pins updated. Next: KPI sweep MAX_OP_CALLS {3,6,9}, stated-variable propagation, prune.
+
+R1 (2026-11-10): DEV6 win-rate 0.1 (0-4-1, n=5, CI +-0.44); funnel 6/6 found+6/6 distinct; p09 TIMEOUT; judge 20/20; gauntlet specificity 0.80 on 10 clean controls (n=20 needs a second sealed cohort); attackers kill unsupported_mechanism (4/6); mutated_survivors=0 because IMPROVE stage was removed from lean STAGE_ORDER (R515); scripts cut to 48; collection 5106/0 errs; prev. R412 attacker NOT_CALIBRATED (FPR 0.8-1.0) stands.
