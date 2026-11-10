@@ -1,11 +1,11 @@
 {
  "problem_id": "eval-new02-slipring-predictor",
- "commit": "a7f62005f732",
+ "commit": "77e1e3847271",
  "dirty_tree": false,
  "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
  "clarification_answer": null,
- "baseline_answer": "**Proposed Leading Indicator:**\nThe most cost-effective leading indicator is the **DC Contact Voltage Drop (\u0394V)** measured across the brush-shoe. This is derived from the difference between the excitation voltage at the generator terminal (or slip-ring potential, if accessible via existing CT/VT instrumentation) and the DC bus voltage of the static exciter. While modern systems often use static exciters, the brush block interface still presents a measurable, non-linear resistance.\n\n**Rationale & Evidence:**\nClassical media like vibration and temperature lag behind the electrical degradation of the contact interface. As the silver-graphite brush wears, the contact area decreases and micro-structures evolve, increasing contact resistance. According to *\"Contact Voltage Drop and Brush Wear Characteristics for Various Silver Content...\"* [crossref], there is a direct, measurable correlation between the physical wear state of the brush and the voltage drop. Furthermore, *\"The effect of various operating conditions upon electrical brush wear\"* [crossref] confirms that electrical load and contact voltage are primary drivers of wear rate. The rise in \u0394V precedes the catastrophic instability (arc initiation) that causes the open-circuit transients.\n\n**Operating Threshold & Strategy:**\nSince the historian data is sampled at 1-minute intervals, you cannot rely on high-frequency transient spikes which may be averaged out. Instead, you must track the **drift in the steady-state mean voltage drop**.\n1.  **Baseline:** Establish the nominal \u0394V at specific load conditions (e.g., 80%, 90%, 100% MW) during the first month of operation with new brushes.\n2.  **Threshold:** Set an alarm at a **+15% to +20% increase** in \u0394V relative to the age-corrected baseline. At 1800 rpm, wear progression is gradual. A 20% increase in contact resistance typically correlates with the brush entering the \"run-in\" phase end or the \"wear\" phase beginning, providing the required 2-week lead time before the contact becomes unstable enough to cause arcing.\n3.  **Constraint Check:** To satisfy \"no more than 1 false alarm per year,\" you must use a **persistence logic**: The threshold must be exceeded for 3 consecutive weekly averages (approx. 168 hours). This filters out noise from load swings (supported by *\"Mathematical Model of Contact Resistance... Considering the Impact of Marine Environment\"* [crossref], which highlights environmental/load sensitivity) and ensures that only sustained degradation triggers an alarm.\n\n**Concrete Test to Validate or Kill the Predictor:**\nTo validate this predictor, perform a **controlled accelerated wear test** on a representative bench model of the slip-ring assembly:\n1.  Instrument the brush block with a high-precision differential voltmeter to measure \u0394V.\n2.  Run the assembly at 1800 rpm under constant nominal load.\n3.  Introduce a **gradual, controlled increase in contact pressure** or use a brush with a known, slightly higher wear rate (e.g., a softer silver grade) to simulate the end-of-life wear state.\n4.  **Falsification Test:** Monitor the time lag between the moment \u0394V exceeds the +20% threshold and the moment the first significant arcing event (detected via a high-speed acoustic emission sensor or scope recording, distinct from the 1-min historian) occurs.\n5.  **Result:** If the \u0394V threshold is exceeded with less than 2 weeks of stable operation remaining before the arcing onset, the predictor is **killed** (it leads too little). If the \u0394V threshold triggers well in advance but frequently triggers on healthy brushes during temperature/load transients (despite persistence logic), it is **killed** for the \"1 false alarm/year\" constraint. If it leads by >2 weeks with <1 false trigger during a 3-month endurance test, it is **validated**.\n\n**Note on Evidence Gaps:**\nThe retrieved evidence on \"Supramolecular bending\" [europepmc] and \"Ti3SiC2\" [europepmc] is irrelevant to this specific electrical failure mode. The recommendation relies strictly on the electrical contact literature provided.",
- "pipeline_answer": "Length-dependent ordering drives emergent behavioral transitions\n\nMonitor the time-series variance of the brush contact resistance waveform (derived from existing 1-min sampled brush current and slip-ring voltage signals) as a proxy for the evolving micro-contact topology; track its rolling-window coefficient of variation as a latent indicator analogous to oligomer-length-driven crystalline ordering, triggering an alert when it crosses a threshold calibrated to provide \u22652 weeks of lead time before arcing onset\n\nThe predictor fires 2\u20134 weeks ahead of the first operator-visible excitation fault, while the conventional vibration/temperature alarms remain nominal, thereby converting a reactive forced outage into a scheduled maintenance event\n\nOn three matched machines with comparable operating hours, confirm that the coefficient-of-variation metric crosses its predictive threshold \u226514 days before each recorded arcing event, and verify that the same threshold does not fire more than once per calendar year on any machine lacking subsequent arcing",
+ "baseline_answer": "**Proposed Leading Indicator:**\n**Exceedance of the 95th Percentile of the 10-second RMS Brush-to-Slip-Ring Contact Voltage (Vc)**\n\n**Design & Intervention:**\nThe most cost-effective leading indicator, derivable from existing 1-minute historian data, is the **trending of the RMS contact voltage drop** across the brush shunt or directly measured between the brush and slip-ring potential.\n\n1.  **Measurement:** Ensure a differential voltage measurement (\u00b11 V range) is available for each brush pole. If currently missing, install a low-cost, isolated 1-V shunt resistor (approx. 1 m\u03a9 for 1.5 MW scale, sized for 1.5% of rated field current) on the brush spring circuit. This requires no new sensors on the rotating assembly, only standard electrical instrumentation.\n2.  **Signal Processing:** At each 1-minute historian sample, calculate the **10-second RMS** of the contact voltage waveform. This short-window RMS captures transient arcing spikes and resistive contact fluctuations that average out in a full-minute RMS, providing sensitivity to early intermittent contact loss (micro-arcing) without false triggers from load transients.\n3.  **Baseline:** Establish a baseline distribution of this 10-s RMS value during normal, healthy operation (post-brush replacement or known-good periods). Determine the **95th percentile** threshold.\n\n**Expected Measurable Effect:**\nAs brush wear progresses, the contact surface area decreases and surface film integrity degrades, leading to intermittent micro-arcing and increased contact resistance. This manifests as a rising trend in the high-frequency noise floor of the contact voltage. The 10-s RMS will begin to exceed the 95th percentile baseline *weeks* before sustained temperature rises or catastrophic open-circuit events, because electrical contact instability precedes thermal saturation.\n\n**Operating Threshold & Logic:**\n- **Alarm Condition:** The 1-minute historian point records a 10-s RMS Vc > (95th Percentile Baseline + 15% Margin).\n- **Trigger Logic:** To satisfy the \"1 false alarm per year\" constraint, use a **persistence rule**: The threshold must be exceeded for **3 consecutive 1-minute samples** (3 minutes). This filters out single-point sensor glitches or brief, benign load transients (e.g., AVR steps), which are more likely to be singular spikes.\n- **Warning Time:** Based on typical wear rates for silver-graphite/carbon brushes in 1800 rpm systems, a 15% sustained rise in RMS noise typically occurs 2\u20134 weeks before final failure.\n\n**Concrete Test to Validate or Kill the Predictor:**\n1.  **Retrospective Validation:** Pull 6 months of historian data from the target unit (and similar units). Identify the timestamp of the last excitation fault or forced outage. Step back in time (1 week, 2 weeks, 3 weeks). Calculate the 10-s RMS Vc for each minute. Plot the trend. **Falsification:** If the RMS Vc does not show a statistically significant upward trend (exceeding the 95th percentile) *before* the fault timestamp, the predictor is killed. If it remains flat until the fault, it is not a leading indicator.\n2.  **Forward Validation:** Implement the 3-minute persistence alarm. Monitor for 12 months. **Falsification:** If >1 false alarm occurs within 12 months without a corresponding brush replacement/wear event, the threshold margin (15%) is too tight, or the persistence logic is insufficient. If a brush fails *without* triggering the alarm, the indicator has failed.\n\n**Evidence Support:**\n- **[crossref] Contact Voltage Drop and Brush Wear Characteristics...**: Supports the direct correlation between contact voltage drop and wear progression in slip-ring systems.\n- **[crossref] The effect of various operating conditions upon electrical brush wear**: Confirms that electrical parameters are key wear indicators.\n- **[core] The synergistic effects of slip ring-brush design and materials**: Notes that electrical noise (friction/wear) is a key parameter in simultaneous recording of brush performance.\n\n*Note: The provided evidence on supramolecular bending, Ti3SiC2, and centrifugal spinning",
+ "pipeline_answer": null,
  "evidence_ids": [
   "doi:10.1109/holm.2018.8611774",
   "doi:10.1109/holm.2017.8088083",
@@ -23,41 +23,9 @@
   "doi:10.1155/2021/2689960"
  ],
  "judge_record": {
-  "usable_pair": true,
-  "passes": 2,
-  "scores": {
-   "a_answered": {
-    "pipeline_mean": 3.0,
-    "baseline_mean": 5.0,
-    "diff": -2.0
-   },
-   "b_user_vars": {
-    "pipeline_mean": 3.0,
-    "baseline_mean": 5.0,
-    "diff": -2.0
-   },
-   "c_prediction": {
-    "pipeline_mean": 3.0,
-    "baseline_mean": 5.0,
-    "diff": -2.0
-   },
-   "d_evidence": {
-    "pipeline_mean": 1.5,
-    "baseline_mean": 5.0,
-    "diff": -3.5
-   },
-   "e_clarification": {
-    "pipeline_mean": null,
-    "baseline_mean": null,
-    "diff": null
-   }
-  },
-  "winner": "baseline",
-  "pref_passes": [
-   "baseline",
-   "baseline"
-  ]
+  "usable_pair": false,
+  "why": "pipeline answer missing"
  },
- "baseline_same_evidence_hash": "2b54f27789edc3d2387515a7343c81a07a35a3f82f5c183872481b75746a31fc",
- "pipeline_same_evidence_hash": "2b54f27789edc3d2387515a7343c81a07a35a3f82f5c183872481b75746a31fc"
+ "baseline_same_evidence_hash": "021e9a01e67b6f9b46e0a99ab92bd4f076aecf01563d9ddabd2da97ad82b3db6",
+ "pipeline_same_evidence_hash": "021e9a01e67b6f9b46e0a99ab92bd4f076aecf01563d9ddabd2da97ad82b3db6"
 }

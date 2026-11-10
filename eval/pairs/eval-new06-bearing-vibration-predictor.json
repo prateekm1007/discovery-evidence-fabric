@@ -1,11 +1,11 @@
 {
  "problem_id": "eval-new06-bearing-vibration-predictor",
- "commit": "a7f62005f732",
+ "commit": "77e1e3847271",
  "dirty_tree": false,
  "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
  "clarification_answer": null,
- "baseline_answer": "**Proposed Leading Indicator:**\n**High-Frequency Envelope Spectral Energy (HFE) at Bearing Fault Frequencies (BPFI/BSF), derived from 1 kHz vibration data.**\n\n**Rationale & Constraint Analysis:**\n*   **Sensor Limitation (1 kHz):** Standard 1 kHz vibration sensors typically capture up to ~250 Hz (Nyquist). However, early inner-race spalling generates high-frequency impulsive impacts (kHz range) modulated by low-frequency rotation. By applying **demodulation/envelope analysis** to the 1 kHz raw data, you can extract the low-frequency fault signature (Inner Race Pass Frequency, BPFI) that appears well before standard RMS vibration alarms trip. This aligns with [core] *Detection and Diagnosis... Using Time Encoded Signal Processing*, which confirms vibration is the primary data source, and [core] *The application of spectral kurtosis...*, which suggests high-frequency content is key for early detection.\n*   **SCADA Limitation (1 Hz):** You cannot log 1 kHz data at 1 Hz. Instead, log the **derived HFE metric** (a single scalar value per second or minute) calculated by the edge processor. This respects the 1 Hz logging constraint while preserving the high-frequency diagnostic information.\n*   **Warning Time (14 days):** Inner-race spalling progression is slow. HFE energy rises exponentially in the early stages. [crossref] *Industrial Scalable Rolling Element Bearing...* supports the feasibility of scalable prognostic modeling using such features to provide lead time.\n\n**Operating Threshold:**\n1.  **Baseline:** Calculate the rolling mean and standard deviation of HFE over 30 days of healthy operation.\n2.  **Alert Threshold:** Set alarm at **Mean + 3\u03c3**.\n3.  **Trend Rate Limit (False Alarm Control):** To meet the \u201c\u22642 false alarms/year\u201d requirement, do not alarm on absolute value alone. Require the HFE to **exceed Mean + 3\u03c3 AND have a sustained positive slope (rate of increase) for at least 24 hours**. This filters out transient load spikes (false positives) and focuses on the progressive spalling trend.\n\n**Expected Measurable Effect:**\n*   Detection of inner-race spalling onset (when HFE starts trending) typically occurs **21\u201335 days** before standard vibration RMS alarms. This provides the required **\u226514 days** window.\n*   Cost-effectiveness: Uses existing 1 kHz sensor and minimal edge-computing resources (FFT + envelope detection), avoiding costly high-frequency AE sensors or new infrastructure.\n\n**Falsification Test (Validation):**\n**Test Name:** Controlled Spalling Induction Experiment with Load Variability.\n\n1.  **Setup:** Install the same 1 kHz sensor and edge-processing logic on a test rig running a 350 kW-class fan bearing (or equivalent load/speed profile).\n2.  **Procedure:**\n    *   **Phase 1 (Control):** Run the bearing under varying industrial loads (simulate fan wind speed variations) for 2 weeks. Record HFE metrics. Verify **zero** false alarms (the 24-hour slope gate must block all transient load-induced spikes).\n    *   **Phase 2 (Fault Injection):** Induce a known inner-race spall (e.g., via EDM or controlled impact) on a sacrificial bearing or monitor a progressively degrading bearing in a controlled test cell.\n    *   **Measurement:** Track the time delta between the actual spall formation (verified post-mortem via microscopy) and the point where the HFE metric crosses the \u201cMean + 3\u03c3 with 24h slope\u201d threshold.\n3.  **Falsification Criteria:**\n    *   If the time delta is **<14 days**, the predictor fails the warning requirement.\n    *   If any transient load variation in Phase 1 triggers the 24-hour slope gate, the false-alarm rate fails (unless the threshold is adjusted, which must be re-validated for sensitivity).\n    *   If the HFE metric does not distinguish between inner-race and outer-race faults (if outer-race spall also triggers the same early alert), the specificity is compromised, though the system may still be acceptable",
- "pipeline_answer": "Adhesive joints were designed as the key enabling mechanism for structural reuse and characterized under tensile loading.\n\nApply adhesive-joint design principles to bond multiple glass-fiber-reinforced polymer laminate layers from decommissioned turbine blades into a structural beam, and install this beam as a reinforcing rib on the bearing housing to stiffen it, reducing the stress concentration that drives inner-race spalling.\n\nThe stiffened housing redistributes contact stress and delays spalling progression, extending the time from first damage to alarm trip to at least 14 days while keeping false alarms at or below 2 per year.\n\nIn a bench test, mount the GL-FRP beam on a replicating bearing housing, run it at normal load with a seeded inner-race defect, and measure the vibration envelope at 1 kHz; if the alarm does not trip at least 14 days before a forced replacement (defined as 100% spall area) or if false alarms exceed 2 per year, the intervention fails.",
+ "baseline_answer": "**Proposed Leading Indicator: High-Frequency Envelope Spectral Energy**\n\nSince your sensor is limited to 1 kHz (likely cutting off the classic high-frequency resonance bands where spalling impacts often live), and your SCADA logs only at 1 Hz, you cannot rely on raw RMS vibration or simple trend slopes, which often remain flat until the bearing is near failure. Instead, propose a **High-Frequency Envelope Spectral Energy (HFESE)** metric derived from the 1 kHz vibration data.\n\n**Design & Intervention:**\n1.  **Signal Processing:** Configure the vibration transmitter or downstream SCADA edge processor to perform demodulation (envelope detection) of the 1 kHz signal. Focus specifically on the frequency bands containing the bearing\u2019s characteristic fault frequencies (Inner Race Defect Frequency, $f_{ir} = \\frac{N}{2} n_b (1 - \\frac{d}{D}\\cos\\gamma)$) and their immediate harmonics, which will fall within the low end of your 1 kHz range for a large industrial fan bearing.\n2.  **Metric:** Calculate the root-mean-square (RMS) of the envelope spectrum within the $f_{ir}$ band for each 1 Hz SCADA sample. This \"demodulated RMS\" is far more sensitive to incipient spalling than total RMS because it isolates the impact signature of the spall hitting the ball/roller, filtering out background noise.\n3.  **Threshold:** Establish a dynamic baseline using the first 14 days of operation. Set the alarm threshold at **3x the baseline mean** of the HFESE metric. To meet the \"<2 false alarms/year\" constraint, implement a \"persistence filter\": the alarm only triggers if HFESE remains above threshold for **24 consecutive hours** (or 24 out of 30 logs). This filters out transient process upsets or thermal expansion effects.\n\n**Expected Measurable Effect:**\nIncipient inner-race spalling generates repetitive impacts that modulate the carrier wave. Even when total vibration RMS is negligible, the *envelope* of the vibration signal will show significant energy growth at the defect frequency and its harmonics well before structural collapse. Evidence from [core: \"Condition monitoring of slow-speed rolling element bearings\"] confirms that vibration analysis is effective for early detection, but [core: \"The application of spectral kurtosis...\"] suggests that specific statistical features (like kurtosis or envelope energy) are superior to raw amplitudes for early-stage defect isolation. By tracking the envelope energy, you should detect the spall progression **>14 days** before traditional RMS alarms trip, provided the spall is not fully submerged in lubricant or the surface is excessively smooth.\n\n**Validation Test (The \"Kill\" Test):**\nConduct a **controlled seeded-fault experiment** on an identical or similar test rig (or during the next scheduled maintenance window on the live bearing, if feasible and safe).\n1.  **Step 1:** Seed a microscopic spall (using a scribe or EDM) on the inner race of a test bearing identical to the production unit.\n2.  **Step 2:** Run the bearing under nominal load. Record 1 Hz SCADA-equivalent data from the 1 kHz sensor.\n3.  **Step 3:** Allow the spall to grow naturally (or artificially abrade it) over 3 weeks.\n4.  **Falsification Criteria:** If the HFESE metric does not exceed the 3x baseline threshold with 24-hour persistence at least 14 days before the spall reaches a critical size (defined by a separate, high-fidelity baseline, such as manual tribological inspection or high-frequency AE), **kill this predictor.**\n\n**Why this works within constraints:**\n*   **1 kHz Sensor:** Most large industrial fan bearings have low $f_{ir}$ (often < 200 Hz). The envelope of impacts will manifest as low-frequency modulation peaks, which are fully captured within 1 kHz. High-frequency resonances are lost, but the low-frequency impact envelope remains.\n*   **1 Hz SCADA:** Demodulation is computationally heavy. The 1 Hz logging rate is sufficient if the metric is the *time-averaged* envelope energy over each 1-second window",
+ "pipeline_answer": null,
  "evidence_ids": [
   "doi:10.3390/ma19173622",
   "doi:10.3389/fpls.2025.1721367",
@@ -22,41 +22,9 @@
   "title:e6559f91910c13d8"
  ],
  "judge_record": {
-  "usable_pair": true,
-  "passes": 2,
-  "scores": {
-   "a_answered": {
-    "pipeline_mean": 1.5,
-    "baseline_mean": 5.0,
-    "diff": -3.5
-   },
-   "b_user_vars": {
-    "pipeline_mean": 1.0,
-    "baseline_mean": 5.0,
-    "diff": -4.0
-   },
-   "c_prediction": {
-    "pipeline_mean": 2.5,
-    "baseline_mean": 5.0,
-    "diff": -2.5
-   },
-   "d_evidence": {
-    "pipeline_mean": 1.0,
-    "baseline_mean": 5.0,
-    "diff": -4.0
-   },
-   "e_clarification": {
-    "pipeline_mean": null,
-    "baseline_mean": null,
-    "diff": null
-   }
-  },
-  "winner": "baseline",
-  "pref_passes": [
-   "baseline",
-   "baseline"
-  ]
+  "usable_pair": false,
+  "why": "pipeline answer missing"
  },
- "baseline_same_evidence_hash": "00671ce5f783b3f546be7b8c7a240cfa8f5675dcbb7bce43067a96d962ec2721",
- "pipeline_same_evidence_hash": "00671ce5f783b3f546be7b8c7a240cfa8f5675dcbb7bce43067a96d962ec2721"
+ "baseline_same_evidence_hash": "cacc638cfe72ee51a74fad4d659bd6e81a26a626e2c254d8f2653fe81941ffbc",
+ "pipeline_same_evidence_hash": "cacc638cfe72ee51a74fad4d659bd6e81a26a626e2c254d8f2653fe81941ffbc"
 }

@@ -1,11 +1,11 @@
 {
  "problem_id": "eval-new09-hvac-filter-predictor",
- "commit": "a7f62005f732",
+ "commit": "77e1e3847271",
  "dirty_tree": false,
  "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
  "clarification_answer": null,
- "baseline_answer": "**Proposed Design: Pressure Drop (\u0394P) Trending with Normalized Airflow**\n\nThe most cost-effective measurable leading indicator is the **air-side pressure drop (\u0394P) across the MERV-13 pleated filter bank, normalized by actual airflow**.\n\n**Rationale & Evidence Support:**\nFilter replacement costs and fan energy penalties are driven by particulate loading, which increases aerodynamic resistance. The evidence confirms that pressure drop and airflow are the standard metrics for determining filter end-of-life. Specifically, the development of the \"mobile air filter testing unit\" (MAFT) validates that on-site measurement of pressure drop and airflow is accurate against ASHRAE 52.2 standards [openalex]. Furthermore, studies on commercial swine sites identify \"rate of airflow reduction\" and \"pressure drop\" as the critical variables determining operational costs and lifespan, noting that limited data exists on these rates during high dust-loading periods [openalex]. While the Singapore library study focuses on biological accumulation [europepmc], the physical degradation metric that universally governs fan energy (via increased static pressure) and flow restriction is \u0394P.\n\n**Operating Threshold:**\nDo not use a single absolute pressure value (e.g., 0.75 inches w.g.), as this varies by filter model, face velocity, and initial loading. Instead, use a **dynamic threshold based on the \"clean\" baseline.**\n\n1.  **Baseline:** Establish a \"clean filter\" \u0394P coefficient ($k$) during installation: $\\Delta P_{clean} = k \\cdot Q^2$ (where $Q$ is airflow).\n2.  **Trigger:** Replace the filter when the *measured* \u0394P exceeds **1.5 to 2.0 times** the predicted clean-filter \u0394P for the *current* airflow setpoint. This ratio accounts for seasonal airflow variations.\n3.  **Safety Cap:** If \u0394P absolute value exceeds the manufacturer\u2019s maximum rated pressure (typically 1.0\u20131.5\" w.g. for MERV-13), replace immediately regardless of the ratio, to prevent filter tearing and fan strain.\n\n**Implementation with User Constraints:**\n*   **BMS Points:** Log `AHU1_Filt_DP` and `AHU1_Airflow` every 15 minutes.\n*   **1-Week Resolution:** Calculate the weekly average of the normalized \u0394P ratio ($\\Delta P_{measured} / \\Delta P_{predicted\\_clean}$). This smooths out transient occupancy spikes and provides a stable leading indicator.\n*   **20% Reduction in Unnecessary Replacements:** By moving from a fixed 90-day schedule to a condition-based threshold, you eliminate replacements when occupancy/particulate load is low (filter has life left) and capture failures early when load is high. Since fan energy is the second major cost, optimizing for the threshold rather than time reduces \"run overloaded\" states.\n\n**Concrete Test to Validate or Kill the Predictor:**\n\n**The \"Blind A/B Swap\" Test:**\n1.  **Setup:** Select two identical AHUs with identical MERV-13 filters installed at the same time.\n2.  **Control (AHU-A):** Keep on the existing fixed 90-day replacement schedule.\n3.  **Test (AHU-B):** Implement the \u0394P-based threshold logic.\n4.  **Measurement:** For the next two quarters (12\u201316 weeks), record:\n    *   Date of replacement for both.\n    *   Final \u0394P at replacement time.\n    *   Fan energy consumption (kW) averaged over the life of the filter.\n    *   Filter \"Remaining Life Index\": If AHU-B\u2019s filter fails the threshold early (before 90 days), check if AHU-A\u2019s filter at that same time had a significantly lower \u0394P (indicating AHU-A would have also failed soon) or much higher (indicating unnecessary waste).\n5.  **Falsification Criteria:**\n    *   **Kill Predictor:** If AHU-B replacements occur at a rate *greater than* AHU-A, or if AHU-B shows significant indoor air quality (IAQ) particle spikes above acceptable limits despite being \"on schedule\" by \u0394P, the model fails.\n    *  ",
- "pipeline_answer": "In-situ comparative evaluation of an operating state against a controlled baseline, using logged performance data to detect when real-world AHU behavior diverges from expected, enabling a state change (filter load) to be inferred without a fixed calendar schedule.\n\nReplace the fixed 90-day replacement calendar with a BMS-only fault-detection threshold: build a baseline curve of filter pressure drop (or supply/return fan power) per unit outdoor airflow and occupancy at filter installation, then issue a replacement alert when daily mean normalized pressure drop exceeds the clean-filter baseline by a set margin sustained over 1 week.\n\nFilter replacements triggered only on actual loading, eliminating early replacements and preventing overloaded runs, achieving >20% fewer unnecessary replacements while detecting clogging within the 1-week window.\n\nIn the paper's VCBT/IBAL hardware-in-the-loop testbed, load the filter bank with a controlled, gradually increasing particle load and run the predictor on its logged fan-power and pressure-drop points; fail if it alarms before the true clogging threshold or later than 7 days after the threshold is crossed, or if the false-alarm rate on a clean filter exceeds 10%.",
+ "baseline_answer": "**Proposed Design/Intervention:**\nImplement a **Pressure Drop (\u0394P) Monitored Predictive Maintenance Protocol** using existing BMS points.\n\n1.  **Leading Indicator:** The **rate of change in filter bank pressure drop (d\u0394P/dt)**, normalized for airflow. While absolute \u0394P is common, it is non-linear relative to loading and sensitive to fan speed variations. The *slope* of the \u0394P curve over time is a more stable indicator of particulate accumulation for pleated filters.\n2.  **Operating Threshold:** Replace filters when the **30-day rolling average d\u0394P/dt exceeds 0.15 Pa/hour** (or equivalent in inches of water column per day, approx. 0.0006 in./h), **OR** when the absolute \u0394P reaches **0.8 inches of water column (approx. 200 Pa)**, whichever occurs first. This threshold represents the point where fan energy penalties begin to outweigh the cost of a new filter bank, and pre-maturity for MERV-13 pleated media.\n3.  **Implementation:** Use the BMS to log \u0394P across the filter bank and mixed-air fan amps (proxy for airflow) at **1-week resolution**. Calculate the weekly delta. If the weekly \u0394P increase is >0.5 in.wc for two consecutive weeks, trigger the \"High Rate\" flag. If cumulative \u0394P hits 0.8 in.wc, trigger the \"Absolute Limit\" flag.\n\n**Expected Measurable Effect:**\n*   **Cost Reduction:** By decoupling replacement from the fixed 90-day calendar, you will extend filter life in low-dust seasons/periods and accelerate replacement in high-dust periods. This directly targets the \"unnecessary replacements\" waste.\n*   **Target:** Achieve a **>20% reduction in total filter units consumed annually** compared to the fixed schedule baseline, while maintaining indoor air quality (IAQ) and limiting fan energy penalties to <5% above design.\n\n**Validation Test (Falsification Protocol):**\nTo validate or kill this predictor, run a **controlled A/B test** over one full heating/cooling season (approx. 6 months) on identical AHUs in the same building:\n\n1.  **Group A (Control):** Fixed 90-day replacement schedule.\n2.  **Group B (Test):** \u0394P-based replacement using the thresholds above.\n3.  **Data Collection:**\n    *   Log BMS \u0394P and fan amps weekly for both.\n    *   Record date of replacement for each.\n    *   Measure post-filter particle concentration (using a portable counter at the supply diffuser) at replacement time for both groups to ensure IAQ equivalence.\n4.  **Success Criteria:**\n    *   Group B uses **\u226480%** of the filter count of Group A.\n    *   Average fan energy in Group B is within **5%** of Group A.\n    *   Post-filter particle counts in Group B are not statistically significantly higher than Group A at the time of replacement.\n5.  **Falsification:**\n    *   If Group B uses more filters than Group A, the threshold is too aggressive.\n    *   If Group B fan energy exceeds Group A by >5%, the threshold is too loose (filters running too dirty).\n    *   If Group B IAQ metrics degrade significantly, the \u0394P threshold is insufficient for MERV-13 performance in this specific dust environment, and the predictor is invalid for this application.\n\n**Evidence Support:**\n*   **[openalex] (Swine Filter Testing):** Confirms that filter end-of-life is determined by pressure drop and airflow reduction, and that on-site testing of \u0394P is a valid method for determining replacement need in commercial/agricultural contexts.\n*   **[core] (Pleat Geometry/\u0394P):** Validates that \u0394P is the primary measurable parameter affecting fan energy and airflow in pleated filters.\n*   **[europepmc] (Singapore Filter DNA):** While this study tracks biological accumulation, it confirms that filter loading is monotonic and measurable over time, supporting the use of temporal trends (slope) rather than static schedules. Note: It does not directly support \u0394P as a proxy",
+ "pipeline_answer": "Empirical evaluation of alternative control sequences in a hardware-in-the-loop testbed\u2014before live deployment\u2014enables replacing legacy fixed logic with validated, condition-responsive operational rules.\n\nDevelop a condition-based filter-replacement rule triggered by BMS-logged signals (pressure-drop rise if available, supply/return fan power trend, occupancy-weighted runtime) and validate it by replaying 12 months of historical logged data in a simulation harness analogous to the VCBT-IBAL platform before enabling it in the live controller.\n\nReplaces the fixed 90-day schedule with a state-driven trigger, cutting premature replacements by at least 20% and flagging filter change-of-state within 1 week of overload onset, preserving fan energy and indoor air quality.\n\nRetrospective back-test on 12 months of retained BMS data: the rule fails if any verified actual filter change is flagged more than 7 days after its true load-onset date, or if the rule triggers more than 80% of the replacements the legacy schedule would have called premature.",
  "evidence_ids": [
   "doi:10.1080/23744731.2026.2663718",
   "doi:10.1016/j.buildenv.2025.113414",
@@ -17,9 +17,9 @@
   "doi:10.31274/etd-180810-6099",
   "doi:10.70675/73f1d585za5b8z4419zab9ez73b53234bef9",
   "doi:10.13031/aim.201701639",
-  "doi:10.3390/agriengineering1020022",
-  "doi:10.1016/j.jaerosci.2020.105624",
-  "doi:10.14288/1.0166381"
+  "title:15097f9ea0fd689c",
+  "doi:10.1016/j.seppur.2017.02.034",
+  "doi:10.3390/agriengineering1020022"
  ],
  "judge_record": {
   "usable_pair": true,
@@ -31,9 +31,9 @@
     "diff": -0.5
    },
    "b_user_vars": {
-    "pipeline_mean": 4.5,
+    "pipeline_mean": 5.0,
     "baseline_mean": 5.0,
-    "diff": -0.5
+    "diff": 0.0
    },
    "c_prediction": {
     "pipeline_mean": 4.5,
@@ -41,9 +41,9 @@
     "diff": -0.5
    },
    "d_evidence": {
-    "pipeline_mean": 4.5,
-    "baseline_mean": 5.0,
-    "diff": -0.5
+    "pipeline_mean": 3.5,
+    "baseline_mean": 4.5,
+    "diff": -1.0
    },
    "e_clarification": {
     "pipeline_mean": null,
@@ -51,12 +51,11 @@
     "diff": null
    }
   },
-  "winner": "tie",
+  "winner": "baseline",
   "pref_passes": [
-   "tie",
    "baseline"
   ]
  },
- "baseline_same_evidence_hash": "d5644189f7a0b37ad4a1998c3e6e3a66dbd4d8f0ab88bd13439c996a7f0f11a2",
- "pipeline_same_evidence_hash": "d5644189f7a0b37ad4a1998c3e6e3a66dbd4d8f0ab88bd13439c996a7f0f11a2"
+ "baseline_same_evidence_hash": "95d40c64377889a411b23c7a778ea3ccb7c28f2301e3d45c3574de654c32b9f9",
+ "pipeline_same_evidence_hash": "95d40c64377889a411b23c7a778ea3ccb7c28f2301e3d45c3574de654c32b9f9"
 }
