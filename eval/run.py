@@ -174,6 +174,7 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
         "engine_error": err,
         "stage_times_s": _stage_times(out_dir),
         "same_evidence": _evidence_snapshot(out_dir),
+        "attack_verdict": _attack_overall(out_dir),
     }
     if final_state.exists():
         fs = json.loads(final_state.read_text(encoding="utf-8"))
@@ -188,9 +189,31 @@ COMPLETED_STATUSES = {"AUTOMATED_INVENTION_CANDIDATE",
                       "AUTOMATED_INVENTION"}
 
 
+def _attack_overall(out_dir: Path) -> str:
+    """The gauntlet verdict on the primary candidate."""
+    for name in ("envelope_ATTACK.json", "candidate_envelope.json"):
+        p = out_dir / name
+        if not p.exists():
+            continue
+        try:
+            d = json.loads(p.read_text(encoding="utf-8"))
+            ar = d.get("attack_results")
+            v = (ar or {}).get("overall")
+            if v:
+                return str(v).upper()
+        except Exception:  # noqa: BLE001
+            continue
+    return "UNKNOWN"
+
+
 def _extract_pipeline_answer(out_dir: Path) -> Optional[str]:
     """Normalised plain-text answer, or None when nothing was released
     (a refusal notice is never handed to the judge �? Art. LXI)."""
+    # A candidate killed by the adversarial gauntlet is NOT the invention
+    # and must not be presented as one (Art. XI/LXI honesty). The answer
+    # is withheld — the record shows the kill, not a fake release.
+    if _attack_overall(out_dir) == "KILLED":
+        return None
     # 1) released invention spec (post-rank path)
     spec_p = out_dir / "INVENTION_SPECIFICATION.json"
     if spec_p.exists():
