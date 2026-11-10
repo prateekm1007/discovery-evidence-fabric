@@ -237,6 +237,9 @@ class A2RetrievalAdapter(BaseAdapter):
         import os as _os
         fabric_version = (_os.environ.get("ENGINE_RETRIEVAL_FABRIC",
                                           "V2").strip().upper() or "V2")
+        _cache = _os.environ.get("ENGINE_EVIDENCE_CACHE") or ""
+        if _cache:
+            return _cached_retrieval_result(env, _cache)
         if fabric_version == "V1":
             mod = _import_with_env("discovery_fabric.a2.retrieve")
             items = mod.retrieve(env.problem) or []
@@ -880,6 +883,38 @@ def _backfill_abstracts(items, budget_s: float = 25.0):
     stats["n_empty_after"] = sum(
         1 for i in items if not str(i.get("abstract") or "").strip())
     return items, stats
+
+
+def _cached_retrieval_result(env, cache_path: str):
+    """Round-2 frozen-evidence path (Art. LI): serve the round-1 items
+    from the cache file. No network calls; the frozen packet is reused
+    verbatim so round-2 generation acts on the same evidence."""
+    from pathlib import Path as _Path
+    try:
+        kv = json.loads(_Path(cache_path).read_text(encoding="utf-8"))
+        items = list(kv.get("items") or [])
+    except Exception:  # noqa: BLE001 — fall through to live retrieval
+        fabric = _import_with_env("discovery_fabric.retrieval_fabric")
+        items, report = fabric.retrieve(env.problem)
+        return _engine_result(
+            {"evidence": items,
+             "evidence_ids": [i.get("id", "") for i in items],
+             "provenance": {**env.provenance,
+                            "retrieval_fabric": {"version": "V2",
+                                                  "cache_failed": True}}},
+            retrieved_count=len(items),
+            retrieval_fabric_version="V2")
+    return _engine_result(
+        {"evidence": items,
+         "evidence_ids": [i.get("id", "") for i in items],
+         "provenance": {**env.provenance,
+                        "retrieval_fabric": {
+                            "version": "cache",
+                            "cache": cache_path,
+                            "cached": True,
+                            "n_items": len(items)}}},
+        retrieved_count=len(items),
+        retrieval_fabric_version="cache")
 
 
 def _lean_select_operator(items, problem, all_matches: bool = False):

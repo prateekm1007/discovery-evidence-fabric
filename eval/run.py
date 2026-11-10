@@ -79,6 +79,18 @@ SCORE_DIR = Path(__file__).resolve().parent / "score"
 # owner-supplied external file at runtime, never dev problems
 HOLDOUT_ROOT = Path(__file__).resolve().parent / "holdout_runs"
 
+# holdout mode suppresses problem identifiers in all printed output
+_HOLDOUT_MODE = False
+_LBL_MAP: Dict[str, str] = {}
+
+
+def _label(pid: str) -> str:
+    if not _HOLDOUT_MODE:
+        return pid
+    if pid not in _LBL_MAP:
+        _LBL_MAP[pid] = f"problem-{len(_LBL_MAP) + 1}"
+    return _LBL_MAP[pid]
+
 # Fast DEV subset (directive: replace the long inner loop; a 6-problem
 # subset mixing intervention and predictor types, full 25 only at
 # checkpoints). Pre-registered ids, never chosen after seeing results.
@@ -150,6 +162,20 @@ def _intake_problem(problem: Dict[str, Any]) -> Dict[str, Any]:
     mutated (the on-disk problem stays the pre-registered one)."""
     q = dict(problem)
     ca = problem.get("clarification_answer")
+    ff = problem.get("followup_finding")
+    if ff:
+        # round-2 engine intake: the follow-up finding is a user-stated fact
+        if isinstance(ff, dict):
+            txt = "; ".join(f"{k} = {v}" for k, v in ff.items()
+                            if k != "note" and not isinstance(v, (dict, list)))
+            ff_txt = str(txt) + (f" ({ff.get('note')})" if ff.get("note") else "")
+        else:
+            ff_txt = str(ff)
+        q["followup_text"] = ff_txt
+        q["constraint"] = (str(q.get("constraint") or "").rstrip(" .")
+                           + f". The user returned with one finding: {ff_txt}.").lstrip(" .")
+        q["user_variables"] = list(q.get("user_variables") or []) + [
+            f"user finding: {ff_txt}"]
     if not ca:
         return q
     if isinstance(ca, dict):
@@ -856,10 +882,11 @@ def _funnel_row(problem_dir: Path) -> Dict[str, Any]:
 def run_two_turn_problem(problem: Dict[str, Any], out_dir: Path,
                          route_rec: Dict[str, Any],
                          judge_route: Dict[str, Any]) -> Dict[str, Any]:
-    """Art. LI learning-loop step: ingest the user's follow-up finding,
-    revise against the SAME frozen evidence; score BOTH rounds vs the
-    baseline with the packet-aware judge. Never reads the holdout;
-    works on any problem carrying followup_finding."""
+    """Art. LI learning-loop step: INGEST the user's follow-up finding
+    into the ENGINE and RE-RUN the discovery pipeline on the updated
+    problem state with the SAME frozen evidence (RETRIEVE skipped via
+    ENGINE_EVIDENCE_CACHE). Round 2 is judged identically to round 1
+    (same packet, same judge); record both rounds + their scores."""
     out_dir = Path(out_dir)
     rec: Dict[str, Any] = {"two_turn": "RAN",
                            "followup_finding": problem.get("followup_finding")}
@@ -879,45 +906,71 @@ def run_two_turn_problem(problem: Dict[str, Any], out_dir: Path,
         rec["why"] = "no followup_finding"
         _save(problem["problem_id"], "two_turn_record.json", rec)
         return rec
-    if not r1.get("answer") or not base.get("answer"):
+    if not snap or not snap.get("items"):
         rec["two_turn"] = "SKIPPED"
-        rec["why"] = "round-1 missing"
+        rec["why"] = "round-1 frozen evidence missing"
         _save(problem["problem_id"], "two_turn_record.json", rec)
         return rec
-    ev_lines = "\n".join(
-        f"- [{e.get('id')}] {(e.get('title') or '')[:120]}\n"
-        f"  {str(e.get('abstract') or '')[:400]}"
-        for e in ((snap or {}).get("items") or []))
-    body = "\n".join([
-        "You delivered a first answer; the user returned with one finding.",
-        "Revise your answer in light of it. Do not add numbers absent",
-        "from the evidence packet; do not flip the mechanism unless the",
-        "finding forces it.", "",
-        f"DEVICE: {problem.get('device', '')}",
-        f"FAILURE: {problem.get('failure', '')}",
-        f"CONSTRAINT: {problem.get('constraint', '')}",
-        "",
-        "EVIDENCE PACKET:",
-        ev_lines, "",
-        "YOUR ROUND-1 ANSWER:",
-        str(rec["round1_answer"]), "",
-        f"USER'S FOLLOW-UP FINDING: {problem.get('followup_finding')}",
-        "",
-        "Answer ONLY with the revised answer (mechanism, intervention,",
-        "expected effect, falsification test). Use the same constraint.",
-    ])
-    res = _transport_call(route_rec.get("provider"), route_rec.get("model"),
-                          body,
-                          "You revise honest engineering answers using user "
-                          "findings. Never fabricate.", max_tokens=800)
-    rec["round2_answer"] = res.get("content") if res.get("status") == "OK" else None
-    rec["round2_prompt_sha"] = _sha(body)[:16]
+    # persist round-1 frozen evidence so round 2 uses THE SAME snapshot
+    snap_path = out_dir / "round1_evidence.json"
+    snap_path.write_text(json.dumps({"items": snap.get("items"),
+                                     "hash": snap.get("hash")},
+                                    default=str) + "\n",
+                         encoding="utf-8")
+    # round 2: INGEST followup_finding into the ENGINE itself (Art. LI):
+    # the finding rides into the problem constraint, the engine re-runs
+    # RETRIEVE (from the cached frozen evidence — no new network pulls,
+    # no retrieval-order drift), SYNTHESIZE+ATTACK+REVISE+RANK on the
+    # updated state, and delivers a revised candidate.
+    ff = problem["followup_finding"]
+    _ff_txt = (json.dumps(ff, default=str) if isinstance(ff, dict)
+               else str(ff))
+    out_dir2 = out_dir / "pipeline_r2"
+    out_dir2.mkdir(parents=True, exist_ok=True)
+    q2_problem = dict(problem)
+    q2_problem["constraint"] = (
+        str(problem.get("constraint") or "").rstrip(" .")
+        + f". The user returned with one finding: {_ff_txt}.").lstrip(" .")
+    q2_problem["user_variables"] = (list(
+        problem.get("user_variables") or [])
+        + [f"the user finding: {_ff_txt}"])
+    q2_problem["followup_finding"] = ff
+    q2 = _intake_problem(q2_problem)
+
+    os.environ["ENGINE_EVIDENCE_CACHE"] = str(snap_path)
+    try:
+        from discovery_fabric.engine.run import EngineRun
+        _t0 = time.time()
+        run = EngineRun(q2, str(out_dir2),
+                        run_id=f"eval-{problem['problem_id']}-r2",
+                        package_registry_path=str(out_dir2 /
+                                                  "PACKAGE_ID_REGISTRY.json"),
+                        with_package=False, resume=False)
+        manifest = run.run()
+        rec["round2_wall_s"] = round(time.time() - _t0, 1)
+        rec["round2_manifest_final"] = (manifest or {}).get("final_status")
+    except Exception as exc:  # noqa: BLE001 — typed, never silent
+        os.environ.pop("ENGINE_EVIDENCE_CACHE", None)
+        rec["two_turn"] = "ENGINE_ERROR"
+        rec["error"] = f"{type(exc).__name__}: {exc}"[:400]
+        _save(problem["problem_id"], "two_turn_record.json", rec)
+        return rec
+    finally:
+        os.environ.pop("ENGINE_EVIDENCE_CACHE", None)
+    rec["round2_answer"] = _extract_pipeline_answer(out_dir2)
+    _fs = out_dir2 / "final_state.json"
+    rec["round2_final_status"] = (
+        json.loads(_fs.read_text(encoding="utf-8")).get("final_status")
+        if _fs.exists() else None)
+    rec["round2_stage_times_s"] = _stage_times(out_dir2)
+    rec["round2_same_snapshot"] = (
+        (_evidence_snapshot(out_dir2) or {}).get("hash") == snap.get("hash"))
     if rec["round2_answer"]:
         rec["judge_round1"] = run_judge_problem(
             _intake_problem(problem), rec["round1_answer"], base.get("answer"),
             judge_route, packet=(snap or {}).get("items"))
         rec["judge_round2"] = run_judge_problem(
-            _intake_problem(problem), rec["round2_answer"], base.get("answer"),
+            q2, rec["round2_answer"], base.get("answer"),
             judge_route, packet=(snap or {}).get("items"))
     _save(problem["problem_id"], "two_turn_record.json", rec)
     return rec
@@ -936,6 +989,7 @@ def build_score_table(route_rec: Dict[str, Any],
         problems = [p for p in problems if p["problem_id"] in want]
     rows, usable = [], 0
     wins = ties = 0
+    system_wins = system_ties = 0
     crit_means: Dict[str, List[float]] = {c: [] for c in CRITERIA}
     n_completed = 0
     for p in problems:
@@ -948,13 +1002,30 @@ def build_score_table(route_rec: Dict[str, Any],
         completed = bool(pipe.get("completed"))
         if completed:
             n_completed += 1
+        contestable = (bool(pipe.get("answer")) and bool(base.get("answer")))
+        nr = (judge.get("number_absent") or {}).get("pipeline") or []
+        n_num_unverified = len(nr)
+        if n_num_unverified and pipe.get("answer_state") == "RELEASED":
+            # hard enforcement: any unverified number in a RELEASED pipeline
+            # answer disqualifies the pair (the judge cannot legitimise it)
+            answer_contract = {"valid": False, "violations": [
+                f"{n_num_unverified} numeric token(s) absent from the "
+                f"evidence packet"], "question_type": p.get("question_type")}
+        else:
+            answer_contract = _answer_contract(pipe.get("answer"),
+                                               p.get("question_type"))
         row = {
             "problem_id": p["problem_id"],
             "question_type": p["question_type"],
             "contamination_tag": p.get("contamination_tag"),
             "has_clarification": bool(p.get("clarification_answer")),
-            "answer_contract": _answer_contract(pipe.get("answer"),
-                                                p.get("question_type")),
+            "answer_contract": answer_contract,
+            "n_numbers_unverified": n_num_unverified,
+            "full_scoreable": (
+                contestable and same
+                and answer_contract.get("valid") is True
+                and (judge.get("passes") or 0) >= 2
+                and not (judge.get("number_absent") or {}).get("pipeline")),
             "pipeline_final_status": pipe.get("final_status"),
             "pipeline_completed": completed,
             "wall_s": pipe.get("wall_s"),
@@ -980,14 +1051,23 @@ def build_score_table(route_rec: Dict[str, Any],
         rows.append(row)
         if completed and judge.get("usable_pair"):
             usable += 1
+            if row["full_scoreable"]:
+                if judge.get("winner") == "pipeline":
+                    wins += 1
+                elif judge.get("winner") == "tie":
+                    ties += 1
+                for c in CRITERIA:
+                    diff = (judge.get("scores") or {}).get(c, {}).get("diff")
+                    if diff is not None:
+                        crit_means[c].append(diff)
+        # system-level (unconditional) score — every problem, always
+        if judge.get("usable_pair"):
             if judge.get("winner") == "pipeline":
-                wins += 1
+                system_wins += 1
             elif judge.get("winner") == "tie":
-                ties += 1
-            for c in CRITERIA:
-                diff = (judge.get("scores") or {}).get(c, {}).get("diff")
-                if diff is not None:
-                    crit_means[c].append(diff)
+                system_ties += 1
+    system_score = round((system_wins + 0.5 * system_ties)
+                         / len(problems), 3) if problems else None
     # Calibration first: the win-rate is NOT_MEASURED unless the judge
     # itself passed the known-good/known-bad gate. A judge that cannot
     # separate good from bad cannot certify a win (Art. LXI).
@@ -1097,7 +1177,15 @@ def build_score_table(route_rec: Dict[str, Any],
                    ("all" if subset_ids is None else f"custom:{len(subset_ids)}")),
         "n_completed_pipeline": n_completed,
         "n_usable_pairs": usable,
+        "full_scoreable_pairs": sum(1 for r in rows if r.get("full_scoreable")),
+        "n_numbers_unverified": sum(1 for r in rows
+                                     if r.get("n_numbers_unverified")),
         "pipeline_wins": wins, "baseline_wins": usable - wins - ties, "ties": ties,
+        "system_score": system_score,
+        "system_wins": system_wins,
+        "system_ties": system_ties,
+        "conditional_quality": win_rate,
+        "conditional_quality_usable_pairs": usable,
         "BLIND_PAIRWISE_WIN_RATE": win_rate,
         "win_rate_95ci_pm": ci,
         "fresh_vs_contaminated": {
@@ -1163,11 +1251,18 @@ def write_table(table: Dict[str, Any]) -> None:
         f"passed={table['judge_calibration'].get('passed')})",
         "",
         f"n usable pairs (completed pipeline only): {table['n_usable_pairs']}/{table['n_completed_pipeline']}",
+        f"full scoreable pairs: {table.get('full_scoreable_pairs')}",
+        f"pairs with unverified numbers: {table.get('n_numbers_unverified')}",
         f"pipeline wins {table['pipeline_wins']}  baseline wins "
         f"{table['baseline_wins']}  ties {table['ties']}",
         "",
-        f"**BLIND PAIRWISE WIN-RATE: {table['BLIND_PAIRWISE_WIN_RATE']}** "
-        f"({table['win_rate_95ci_pm']} CI half-width)",
+        f"**SYSTEM SCORE (unconditional, all {table['n_problems']} problems): "
+        f"{table.get('system_score')}**  ({table.get('system_wins')} wins, "
+        f"{table.get('system_ties')} ties)",
+        "",
+        f"**CONDITIONAL QUALITY (usable pairs, calibration-gated): "
+        f"{table.get('conditional_quality')}**  "
+        f"({table.get('conditional_quality_usable_pairs')} pairs)",
         "",
         "fresh vs contaminated: " + json.dumps(table["fresh_vs_contaminated"]),
         "criterion mean diffs (pipeline-baseline): "
@@ -1224,7 +1319,7 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
         pid = p["problem_id"]
         cmd = [sys.executable, "-B", script, "--arms", "pipeline",
                "--problems", pid, "--problems-file", problems_file,
-               "--child"]
+               "--root", str(RUNS_ROOT), "--child"]
         t0 = time.time()
         try:
             # DEVNULL children: no pipe-buffer deadlock risk; the child
@@ -1267,7 +1362,7 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
         for f in as_completed(futs):
             r = f.result()
             results.append(r)
-            print(f"[eval] {r['problem_id']}: {r['state']} "
+            print(f"[eval] {_label(r['problem_id'])}: {r['state']} "
                   f"({r['wall_s']}s, rc={r['returncode']})", flush=True)
             if r["state"] == "TIMEOUT":
                 d = RUNS_ROOT / _commit / r["problem_id"] / "pipeline"
@@ -1310,6 +1405,9 @@ def main(argv=None) -> int:
     ap.add_argument("--two-turns", action="store_true",
                     help="round 2: ingest followup_finding and revise "
                          "against the same frozen evidence (Art. LI)")
+    ap.add_argument("--root", default=None,
+                    help="explicit run-root for this process (used by "
+                         "child workers; the parent passes its own)")
     ap.add_argument("--subset", default="all",
                     choices=["all", "dev6"])
     ap.add_argument("--workers", type=int, default=1,
@@ -1319,7 +1417,10 @@ def main(argv=None) -> int:
     ap.add_argument("--child", action="store_true",
                     help="internal: one problem in its own process")
     args = ap.parse_args(argv)
+    global RUNS_ROOT
     arms = [a.strip().lower() for a in args.arms.split(",") if a.strip()]
+    if args.root:
+        RUNS_ROOT = Path(args.root)
     if args.holdout:
         hpath = Path(args.holdout)
         if not hpath.exists():
@@ -1330,14 +1431,18 @@ def main(argv=None) -> int:
         if not problems:
             print("[holdout] no 'problems' array in the file", flush=True)
             return 2
+        if len(problems) != 24:
+            print(f"[holdout] refusing to run: expected 24 problems, "
+                  f"got {len(problems)} (P0, holdout isolation)", flush=True)
+            return 2
         args.subset = "all"
         args.problems = "all"
         args.problems_file = args.holdout
         args.workers = 1  # holdout is always sequential (the two max runs)
-        global RUNS_ROOT
         RUNS_ROOT = HOLDOUT_ROOT
-        print(f"[holdout] loaded {len(problems)} sealed problems from "
-              f"{hpath.name}; outputs in {HOLDOUT_ROOT} (gitignored)",
+        print(f"[holdout] loaded sealed problem file; outputs in "
+              f"{HOLDOUT_ROOT} (gitignored); n=24, "
+              f"selection_sha256=57be8218d1fa681c972ff80d084f55666a53a640b3aa4aeb6c02be5ce9c6b107",
               flush=True)
     else:
         problems = json.loads(
@@ -1348,6 +1453,9 @@ def main(argv=None) -> int:
         want = {p.strip() for p in args.problems.split(",") if p.strip()}
         problems = [p for p in problems if p["problem_id"] in want]
 
+    global _HOLDOUT_MODE
+    _HOLDOUT_MODE = bool(args.holdout)
+
     RUNS_ROOT.mkdir(parents=True, exist_ok=True)
     (RUNS_ROOT / _commit).mkdir(parents=True, exist_ok=True)
     (RUNS_ROOT / _commit / "_run_meta.json").write_text(
@@ -1355,6 +1463,10 @@ def main(argv=None) -> int:
                     "dont_write_bytecode": bool(sys.dont_write_bytecode),
                     "executable": sys.executable,
                     "argv": list(argv or []),
+                    "holdout": _HOLDOUT_MODE,
+                    "n_problems": len(problems),
+                    "selection_sha256": ("57be8218d1fa681c972ff80d084f55666a53a640b3aa4aeb6c02be5ce9c6b107"
+                                         if _HOLDOUT_MODE else None),
                     "started_at": utc_now()}, indent=1) + "\n",
         encoding="utf-8")
 
@@ -1410,24 +1522,24 @@ def main(argv=None) -> int:
     for p in problems:
         pid = p["problem_id"]
         d = RUNS_ROOT / _commit / pid
-        print(f"[eval] {pid}: start", flush=True)
+        print(f"[eval] {_label(pid)}: start", flush=True)
         if "pipeline" in arms:
             rec = run_pipeline_problem(p, d / "pipeline")
             _save(pid, "pipeline_record.json", rec)
-            print(f"[eval] {pid}: pipeline done ({rec['wall_s']}s, "
+            print(f"[eval] {_label(pid)}: pipeline done ({rec['wall_s']}s, "
                   f"status={rec.get('final_status')}, completed={rec.get('completed')})",
                   flush=True)
         if "baseline" in arms:
             rec = run_baseline_problem(_intake_problem(p), d, route_rec)
             _save(pid, "baseline_record.json", rec)
-            print(f"[eval] {pid}: baseline done "
+            print(f"[eval] {_label(pid)}: baseline done "
                   f"({'ok' if rec.get('answer') else rec.get('blocked')})",
                   flush=True)
         if "judge" in arms:
             pr = d / "pipeline_record.json"
             ba = d / "baseline_record.json"
             if not (pr.exists() and ba.exists()):
-                print(f"[eval] {pid}: judge skipped (missing arm records)", flush=True)
+                print(f"[eval] {_label(pid)}: judge skipped (missing arm records)", flush=True)
                 continue
             pv = (json.loads(pr.read_text(encoding="utf-8")) or {}).get("answer")
             bv = (json.loads(ba.read_text(encoding="utf-8")) or {}).get("answer")
@@ -1436,7 +1548,7 @@ def main(argv=None) -> int:
             if not pipe_completed:
                 _save(pid, "judge_record.json", {"usable_pair": False,
                         "why": "pipeline did not release an answer"})
-                print(f"[eval] {pid}: judge skipped (pipeline not completed)", flush=True)
+                print(f"[eval] {_label(pid)}: judge skipped (pipeline not completed)", flush=True)
                 continue
             snap = _evidence_snapshot(Path(d) / "pipeline")
             rec = run_judge_problem(_intake_problem(p), pv, bv, judge_route, packet=(snap or {}).get("items"))
@@ -1486,9 +1598,9 @@ def main(argv=None) -> int:
                     json.dumps(pair, indent=1, default=str) + "\n",
                     encoding="utf-8")
             except Exception as _exc:  # noqa: BLE001
-                print(f"[eval] {pid}: pair custody write failed: {_exc}",
+                print(f"[eval] {_label(pid)}: pair custody write failed: {_exc}",
                       flush=True)
-            print(f"[eval] {pid}: judge -> "
+            print(f"[eval] {_label(pid)}: judge -> "
                   f"{rec.get('winner') if rec.get('usable_pair') else rec.get('why')}",
                   flush=True)
 
@@ -1524,7 +1636,9 @@ def main(argv=None) -> int:
     print(json.dumps({k: table[k] for k in
                       ("commit", "dirty_tree", "pipeline_completion",
                        "yield_funnel_DEV", "wall_time", "speed",
-                       "BLIND_PAIRWISE_WIN_RATE",
+                       "system_score", "system_wins", "system_ties",
+                       "conditional_quality", "conditional_quality_usable_pairs",
+                       "full_scoreable_pairs", "n_numbers_unverified",
                        "n_usable_pairs", "pipeline_wins", "baseline_wins",
                        "ties", "judge_calibration")}, indent=1, default=str))
     return 0

@@ -223,6 +223,65 @@ def _objection_text(verdict: str) -> str:
     t = t.replace("KILLED", "kill-claim")
     return t.strip()
 
+
+# R3 strict unsupported-hypothesis qualifier (audit directive): a mere
+# occurrence of the keywords "measure", "monitor", "threshold" is never
+# enough. All five structural requirements must hold for an unsupported
+# UNSUPPORTED_MECHANISM candidate to survive as a flagged HYPOTHESIS.
+# Deterministic, machine-checkable, no LLM.
+_QUALIFIER_UNIT = (
+    r"(?:mA|A|kA|mV|V|kV|kW|W|J|kJ|Hz|rpm|[°CoC]|K|Pa|kPa|MPa|GPa|dB|"
+    r"N|kN|mm|cm|m|µm|nm|g|kg|mg|g/m2|g/m2/day|%|ppm|mol|mol/L|"
+    r"s|ms|h|days?|cycles?)\b")
+_QUALIFIER_STOP = {"this", "that", "these", "those", "with", "from", "into",
+                   "under", "over", "between", "never", "about", "which",
+                   "where", "their", "there", "under", "while", "would",
+                   "could", "should", "across", "during", "within", "beyond"}
+
+
+def unsupported_hypothesis_qualifies(candidate) -> Dict[str, Any]:
+    """True only when ALL five requirements hold:
+       1. coherent physical/technical mechanism (long-form),
+       2. a specific intervention,
+       3. a numeric falsifier WITH units,
+       4. a measurable acceptance/rejection condition,
+       5. a lexical relationship to the stated failure.
+    """
+    c = candidate or {}
+    mech = str(c.get("mechanism") or "")
+    interv = str(c.get("intervention") or "")
+    fals = str(c.get("falsification_test") or c.get("testable_prediction") or "")
+    effect = str(c.get("expected_effect") or c.get("predicted_effect") or "")
+    fail_raw = str(c.get("failure") or "")
+    constraint_raw = str(c.get("constraint") or "")
+    all_text = " ".join([mech, interv, fals, effect]).strip()
+
+    reasons = []
+    if len(mech.split()) < 8:
+        reasons.append("mechanism too short/incoherent (<8 words)")
+    if not re.search(r"[A-Za-z]{4,}.{1,30}[A-Za-z]{4,}", mech):
+        reasons.append("mechanism lacks two+ distinct content words")
+    if len(interv.split()) < 6:
+        reasons.append("intervention too thin (<6 words)")
+    if not re.search(r"\d+(?:\.\d+)?\s*" + _QUALIFIER_UNIT, fals):
+        reasons.append(
+            "no numeric falsifier with units in falsification_test")
+    if not re.search(r"\d+(?:\.\d+)?\s*" + _QUALIFIER_UNIT, all_text):
+        reasons.append("no measurable quantity with units anywhere")
+    if not re.search(r"(accept|reject|pass|fail|satisf|criteri|limit\s*\b|"
+                     r"threshold|bound|no\s+more|not\s+exceed)",
+                     all_text, re.IGNORECASE):
+        reasons.append("no acceptance/rejection condition stated")
+    f_words = set(re.findall(r"[a-z]{4,}", fail_raw.lower())) - _QUALIFIER_STOP
+    if f_words:
+        _cand_words = set(re.findall(r"[a-z]{4,}", all_text.lower()))
+        _overlap = f_words & _cand_words
+        if not _overlap:
+            reasons.append(
+                "no lexical relationship to the stated failure mode")
+    return {"qualifies": not reasons, "reasons": reasons}
+
+
 # ===== R490: the Article L calibration-scope annotation (owner ruling) =====
 # Art. L ("The Attacker Must Be Calibrated") by its plain text covers EVERY
 # attacker whose results influence classification — not one instrument.
@@ -561,36 +620,36 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
             v4_corrections_applied.append(
                 f"burden_of_proof:risk_flag:{dim_name}")
 
-        # ===== R3 A/B (DEV only): unsupported-but-plausible+testable =====
+        # ===== R3 A/B (DEV only): strict unsupported-hypothesis path =====
         # Audit finding: the gauntlet kills "not in the record". An
-        # unsupported mechanism that is plausible, testable with a named
-        # falsifier, and flagged is a HYPOTHESIS — it survives flagged,
-        # ranked lower, instead of silently dying (Art. LXI: the flagged
-        # state is honest). ONLY unsupported_mechanism; contradiction/
-        # feasibility/obvious/prior-art kills are untouched.
+        # unsupported mechanism that is plausible, testable with a
+        # specific numeric falsifier, an explicit acceptance criterion,
+        # and a mechanism-in-intervention structure is a HYPOTHESIS — it
+        # survives flagged, ranked lower, never as a verified invention
+        # (Art. XI/LXI). Keywords alone never qualify. ONLY
+        # unsupported_mechanism; contradiction/feasibility/obvious/
+        # prior-art kills are untouched.
         if (os.environ.get("ENGINE_ATTACK_AB", "").strip()
                 == "survive_unsupported_falsifiable"
                 and dim_name == "UNSUPPORTED_MECHANISM"
                 and is_killed):
-            _cand_text = json.dumps(candidate, default=str).lower()
-            _fals = any(k in _cand_text for k in (
-                "falsif", "validate", "a/b ", "hold ", "cycle", "measure",
-                "monitor", "threshold"))
-            if _fals:
+            _qual = unsupported_hypothesis_qualifies(candidate)
+            if _qual["qualifies"]:
                 body = _objection_text(_basis_body(raw_verdict))
                 is_killed = False
-                raw_verdict = (f"RISK (A/B unsupported-falsifiable) — "
+                raw_verdict = (f"RISK (A/B unsupported-hypothesis) — "
                                f"{body}")
                 risk_flags.append({
                     "dimension": dim_name,
                     "verdict": "RISK",
                     "basis": body,
-                    "source": "ab_unsupported_falsifiable",
+                    "source": "ab_unsupported_hypothesis",
                     "hypothesis": True,
-                    "falsifier_present": True,
+                    "ranked_lower": True,
+                    "qualifier": {"reasons": _qual["reasons"]},
                 })
                 v4_corrections_applied.append(
-                    "ab:unsupported_falsifiable_survives")
+                    "ab:unsupported_hypothesis_survives")
 
         corrected_attacks[dim_name] = raw_verdict
 
