@@ -1273,6 +1273,8 @@ def run_two_turn_problem(problem: Dict[str, Any], out_dir: Path,
         return rec
     rec["two_turn"] = "RAN"
     # causal-change provenance: which fields of the mechanism text moved
+    _ff_txt = (json.dumps(ff, default=str) if isinstance(ff, dict)
+               else str(ff))
     _r1 = str(rec.get("round1_answer") or "")
     _r2 = str(rec.get("round2_answer") or "")
     rec["causal_change_evidence"] = {
