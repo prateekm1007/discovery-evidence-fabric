@@ -1,0 +1,376 @@
+{
+ "measurement": "a2_adversarial_gauntlet on R412 KNOWN_GOOD clean controls",
+ "n_cases": 10,
+ "results": [
+  {
+   "case_id": "CAL-KG-01",
+   "overall": "PASS",
+   "killed_count": 0,
+   "attacks": {
+    "unsupported_mechanism": "PASS",
+    "weak_transfer": "PASS",
+    "obvious_combination": "PASS",
+    "prior_art": "PASS",
+    "contradiction": "PASS",
+    "boundary_failure": "RISK - the record states buffering duration is minutes and requires burst duty cycle <20% for re-solidification but provides no computation showing whether a 3-minute burst followed by the minimum inter-burst rest period at typical chip thermal diffusivity actually permits complete PCM resolidification",
+    "engineering_infeasibility": "RISK - adding a 4-8 mm PCM layer between the copper base and flow channel introduces a steady-state conductive resistance that the record flags as a failure mode but quantifies neither the resulting baseline temperature raise nor whether it stays within the operating margin implied by \"not a steady-state capacity change\"",
+    "regulatory_incompatibility": "PASS"
+   },
+   "risk_flags": [
+    {
+     "dimension": "boundary_failure",
+     "verdict": "RISK",
+     "basis": "the record states buffering duration is minutes and requires burst duty cycle <20% for re-solidification but provides no computation showing whether a 3-minute burst followed by the minimum inter-burst rest period at typical chip thermal diffusivity actually permits complete PCM resolidification",
+     "source": "evaluator_risk"
+    },
+    {
+     "dimension": "engineering_infeasibility",
+     "verdict": "RISK",
+     "basis": "adding a 4-8 mm PCM layer between the copper base and flow channel introduces a steady-state conductive resistance that the record flags as a failure mode but quantifies neither the resulting baseline temperature raise nor whether it stays within the operating margin implied by \"not a steady-state capacity change\"",
+     "source": "evaluator_risk"
+    }
+   ],
+   "calibration_scope": {
+    "instrument": "a2/adversarial.py::adversarial_challenge (the 8-dimension adversarial gauntlet, v4 burden-of-proof rules)",
+    "instrument_version": "a2_adversarial_gauntlet/2.1.0",
+    "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
+    "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own DEV-corpus calibration (Art. LIX) before the KILL regains terminal authority; the consumption-side escalation (the R417 treatment) LANDED in R491 (a2/classify.py consults the canonical measurement registry entry \u2014 the record's own instrument_version selects it; the gauntlet's KILL escalates while uncalibrated)",
+    "v4_rules": "R494: the burden-of-proof standard (lacks-derivation -> RISK, never KILL) \u2014 the three-verdict vocabulary + the machine-side enforce_burden_of_proof (v4_corrections.py, the ONE authoritative implementation); the untuned 1.0.0 baseline measured TPR 0.0909 / FPR 1.0 on the frozen R492 DEV corpus (the before-number this tuning is judged against)",
+    "sealed_bar_coverage": "NONE until the v4 DEV-corpus measurement ships under the registry's pinned names \u2014 the R412/R447/R487 sealed-bar records cover independent_attack/* only"
+   }
+  },
+  {
+   "case_id": "CAL-KG-02",
+   "overall": "PASS",
+   "killed_count": 0,
+   "attacks": {
+    "unsupported_mechanism": "PASS",
+    "weak_transfer": "PASS",
+    "obvious_combination": "PASS",
+    "prior_art": "PASS",
+    "contradiction": "PASS",
+    "boundary_failure": "INSUFFICIENT_EVIDENCE (INSUFFICIENT_EVIDENCE)",
+    "engineering_infeasibility": "RISK",
+    "regulatory_incompatibility": "PASS"
+   },
+   "risk_flags": [
+    {
+     "dimension": "engineering_infeasibility",
+     "verdict": "RISK",
+     "basis": "",
+     "source": "evaluator_risk"
+    }
+   ],
+   "calibration_scope": {
+    "instrument": "a2/adversarial.py::adversarial_challenge (the 8-dimension adversarial gauntlet, v4 burden-of-proof rules)",
+    "instrument_version": "a2_adversarial_gauntlet/2.1.0",
+    "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
+    "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own DEV-corpus calibration (Art. LIX) before the KILL regains terminal authority; the consumption-side escalation (the R417 treatment) LANDED in R491 (a2/classify.py consults the canonical measurement registry entry \u2014 the record's own instrument_version selects it; the gauntlet's KILL escalates while uncalibrated)",
+    "v4_rules": "R494: the burden-of-proof standard (lacks-derivation -> RISK, never KILL) \u2014 the three-verdict vocabulary + the machine-side enforce_burden_of_proof (v4_corrections.py, the ONE authoritative implementation); the untuned 1.0.0 baseline measured TPR 0.0909 / FPR 1.0 on the frozen R492 DEV corpus (the before-number this tuning is judged against)",
+    "sealed_bar_coverage": "NONE until the v4 DEV-corpus measurement ships under the registry's pinned names \u2014 the R412/R447/R487 sealed-bar records cover independent_attack/* only"
+   }
+  },
+  {
+   "case_id": "CAL-KG-03",
+   "overall": "PASS",
+   "killed_count": 0,
+   "attacks": {
+    "unsupported_mechanism": "PASS",
+    "weak_transfer": "RISK \u2014 the mechanism relies on precise vapor and liquid split ratios to composition-matched sides, but the record itself flags \"vapor split maldistribution at turndown\" as a failure mode without quantifying whether the control strategy can maintain the required split across operating conditions, which is the element that must transfer; without a derivation showing stable split ratio is achievable, this objection is a demand for evidence",
+    "obvious_combination": "PASS",
+    "prior_art": "RISK \u2014 dividing-wall columns are an established concept dating to at least the 1950s (Smoker, later Kossak), but the candidate record does not contain any citation or reference item naming the prior art disclosure needed to kill on this basis",
+    "contradiction": "PASS",
+    "boundary_failure": "RISK \u2014 the boundary condition states turndown below 40% degrades vapor split control and the wall cleaning access limitation is acknowledged, but the record does not assert the plant will operate below 40% turndown nor confirm high-fouling service is absent, so the violation cannot be computed from the record's own values",
+    "engineering_infeasibility": "PASS",
+    "regulatory_incompatibility": "PASS"
+   },
+   "risk_flags": [
+    {
+     "dimension": "weak_transfer",
+     "verdict": "RISK",
+     "basis": "the mechanism relies on precise vapor and liquid split ratios to composition-matched sides, but the record itself flags \"vapor split maldistribution at turndown\" as a failure mode without quantifying whether the control strategy can maintain the required split across operating conditions, which is the element that must transfer; without a derivation showing stable split ratio is achievable, this objection is a demand for evidence",
+     "source": "evaluator_risk"
+    },
+    {
+     "dimension": "prior_art",
+     "verdict": "RISK",
+     "basis": "dividing-wall columns are an established concept dating to at least the 1950s (Smoker, later Kossak), but the candidate record does not contain any citation or reference item naming the prior art disclosure needed to kill on this basis",
+     "source": "evaluator_risk"
+    },
+    {
+     "dimension": "boundary_failure",
+     "verdict": "RISK",
+     "basis": "the boundary condition states turndown below 40% degrades vapor split control and the wall cleaning access limitation is acknowledged, but the record does not assert the plant will operate below 40% turndown nor confirm high-fouling service is absent, so the violation cannot be computed from the record's own values",
+     "source": "evaluator_risk"
+    }
+   ],
+   "calibration_scope": {
+    "instrument": "a2/adversarial.py::adversarial_challenge (the 8-dimension adversarial gauntlet, v4 burden-of-proof rules)",
+    "instrument_version": "a2_adversarial_gauntlet/2.1.0",
+    "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
+    "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own DEV-corpus calibration (Art. LIX) before the KILL regains terminal authority; the consumption-side escalation (the R417 treatment) LANDED in R491 (a2/classify.py consults the canonical measurement registry entry \u2014 the record's own instrument_version selects it; the gauntlet's KILL escalates while uncalibrated)",
+    "v4_rules": "R494: the burden-of-proof standard (lacks-derivation -> RISK, never KILL) \u2014 the three-verdict vocabulary + the machine-side enforce_burden_of_proof (v4_corrections.py, the ONE authoritative implementation); the untuned 1.0.0 baseline measured TPR 0.0909 / FPR 1.0 on the frozen R492 DEV corpus (the before-number this tuning is judged against)",
+    "sealed_bar_coverage": "NONE until the v4 DEV-corpus measurement ships under the registry's pinned names \u2014 the R412/R447/R487 sealed-bar records cover independent_attack/* only"
+   }
+  },
+  {
+   "case_id": "CAL-KG-04",
+   "overall": "PASS",
+   "killed_count": 0,
+   "attacks": {
+    "unsupported_mechanism": "PASS",
+    "weak_transfer": "PASS",
+    "obvious_combination": "PASS",
+    "prior_art": "PASS",
+    "contradiction": "PASS",
+    "boundary_failure": "INSUFFICIENT_EVIDENCE (INSUFFICIENT_EVIDENCE)",
+    "engineering_infeasibility": "RISK",
+    "regulatory_incompatibility": ""
+   },
+   "risk_flags": [
+    {
+     "dimension": "engineering_infeasibility",
+     "verdict": "RISK",
+     "basis": "",
+     "source": "evaluator_risk"
+    }
+   ],
+   "calibration_scope": {
+    "instrument": "a2/adversarial.py::adversarial_challenge (the 8-dimension adversarial gauntlet, v4 burden-of-proof rules)",
+    "instrument_version": "a2_adversarial_gauntlet/2.1.0",
+    "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
+    "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own DEV-corpus calibration (Art. LIX) before the KILL regains terminal authority; the consumption-side escalation (the R417 treatment) LANDED in R491 (a2/classify.py consults the canonical measurement registry entry \u2014 the record's own instrument_version selects it; the gauntlet's KILL escalates while uncalibrated)",
+    "v4_rules": "R494: the burden-of-proof standard (lacks-derivation -> RISK, never KILL) \u2014 the three-verdict vocabulary + the machine-side enforce_burden_of_proof (v4_corrections.py, the ONE authoritative implementation); the untuned 1.0.0 baseline measured TPR 0.0909 / FPR 1.0 on the frozen R492 DEV corpus (the before-number this tuning is judged against)",
+    "sealed_bar_coverage": "NONE until the v4 DEV-corpus measurement ships under the registry's pinned names \u2014 the R412/R447/R487 sealed-bar records cover independent_attack/* only"
+   }
+  },
+  {
+   "case_id": "CAL-KG-05",
+   "overall": "PASS",
+   "killed_count": 0,
+   "attacks": {
+    "unsupported_mechanism": "PASS \u2014 base-pressure recovery via boat-tailing and wake-shrinkage is established bluff-body aerodynamics with internally consistent Cp values (\u22120.25 to \u22120.05).",
+    "weak_transfer": "PASS \u2014 the same box-rear base-drag physics applies directly to delivery vans as to the heavy-truck domain named in the cross-domain transition, with no mechanism element shown to break upon scaling.",
+    "obvious_combination": "RISK \u2014 the record asserts unexploited boat-tailing is known (cal:kg05:r1), but does not itself disclose any competing van retrofit kit; without an evidence item naming a substantially identical combination in the record, a kill cannot be grounded.",
+    "prior_art": "PASS \u2014 no specific prior disclosure is identified in or citable from the provided record.",
+    "contradiction": "PASS \u2014 the predicted Cd reduction of 10\u201320% and Cp shift from \u22120.25 to \u22120.05 are both contained within the record's own 10\u201330% unexploited-phenomenon range; no cited value conflicts.",
+    "boundary_failure": "RISK \u2014 the record flags degradation above ~10 deg yaw while specifying 12\u201315 deg taper, suggesting the optimal taper may be compromised in crosswind, but the record never declares whether typical operational yaw rates render the design inoperable rather than merely sub-optimal.",
+    "engineering_infeasibility": "PASS \u2014 the predicted 8\u201312% fuel reduction is derivable from the record's own drag equation and boundary conditions (\u0394Cd \u2248 0.04\u20130.08 on Cd \u2248 0.40 yields ~10% cruise drag cut; highway-heavy duty cycles sustain a multiplicative fuel saving in the claimed band).",
+    "regulatory_incompatibility": "PASS \u2014 no regulatory regime, clause, or standard is implicated by the candidate description."
+   },
+   "risk_flags": [
+    {
+     "dimension": "obvious_combination",
+     "verdict": "RISK",
+     "basis": "the record asserts unexploited boat-tailing is known (cal:kg05:r1), but does not itself disclose any competing van retrofit kit; without an evidence item naming a substantially identical combination in the record, a kill cannot be grounded.",
+     "source": "evaluator_risk"
+    },
+    {
+     "dimension": "boundary_failure",
+     "verdict": "RISK",
+     "basis": "the record flags degradation above ~10 deg yaw while specifying 12\u201315 deg taper, suggesting the optimal taper may be compromised in crosswind, but the record never declares whether typical operational yaw rates render the design inoperable rather than merely sub-optimal.",
+     "source": "evaluator_risk"
+    }
+   ],
+   "calibration_scope": {
+    "instrument": "a2/adversarial.py::adversarial_challenge (the 8-dimension adversarial gauntlet, v4 burden-of-proof rules)",
+    "instrument_version": "a2_adversarial_gauntlet/2.1.0",
+    "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
+    "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own DEV-corpus calibration (Art. LIX) before the KILL regains terminal authority; the consumption-side escalation (the R417 treatment) LANDED in R491 (a2/classify.py consults the canonical measurement registry entry \u2014 the record's own instrument_version selects it; the gauntlet's KILL escalates while uncalibrated)",
+    "v4_rules": "R494: the burden-of-proof standard (lacks-derivation -> RISK, never KILL) \u2014 the three-verdict vocabulary + the machine-side enforce_burden_of_proof (v4_corrections.py, the ONE authoritative implementation); the untuned 1.0.0 baseline measured TPR 0.0909 / FPR 1.0 on the frozen R492 DEV corpus (the before-number this tuning is judged against)",
+    "sealed_bar_coverage": "NONE until the v4 DEV-corpus measurement ships under the registry's pinned names \u2014 the R412/R447/R487 sealed-bar records cover independent_attack/* only"
+   }
+  },
+  {
+   "case_id": "CAL-KG-06",
+   "overall": "PASS",
+   "killed_count": 0,
+   "attacks": {
+    "unsupported_mechanism": "PASS",
+    "weak_transfer": "PASS",
+    "obvious_combination": "PASS",
+    "prior_art": "PASS",
+    "contradiction": "PASS",
+    "boundary_failure": "INSUFFICIENT_EVIDENCE (INSUFFICIENT_EVIDENCE)",
+    "engineering_infeasibility": "RISK",
+    "regulatory_incompatibility": "PASS"
+   },
+   "risk_flags": [
+    {
+     "dimension": "engineering_infeasibility",
+     "verdict": "RISK",
+     "basis": "",
+     "source": "evaluator_risk"
+    }
+   ],
+   "calibration_scope": {
+    "instrument": "a2/adversarial.py::adversarial_challenge (the 8-dimension adversarial gauntlet, v4 burden-of-proof rules)",
+    "instrument_version": "a2_adversarial_gauntlet/2.1.0",
+    "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
+    "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own DEV-corpus calibration (Art. LIX) before the KILL regains terminal authority; the consumption-side escalation (the R417 treatment) LANDED in R491 (a2/classify.py consults the canonical measurement registry entry \u2014 the record's own instrument_version selects it; the gauntlet's KILL escalates while uncalibrated)",
+    "v4_rules": "R494: the burden-of-proof standard (lacks-derivation -> RISK, never KILL) \u2014 the three-verdict vocabulary + the machine-side enforce_burden_of_proof (v4_corrections.py, the ONE authoritative implementation); the untuned 1.0.0 baseline measured TPR 0.0909 / FPR 1.0 on the frozen R492 DEV corpus (the before-number this tuning is judged against)",
+    "sealed_bar_coverage": "NONE until the v4 DEV-corpus measurement ships under the registry's pinned names \u2014 the R412/R447/R487 sealed-bar records cover independent_attack/* only"
+   }
+  },
+  {
+   "case_id": "CAL-KG-07",
+   "overall": "PASS",
+   "killed_count": 0,
+   "attacks": {
+    "unsupported_mechanism": "PASS",
+    "weak_transfer": "PASS",
+    "obvious_combination": "RISK (burden-of-proof: memory_claim) \u2014 the record cites \"same hydrogel physics\" (cross_domain_transition) and references agricultural SAP use (implied by \"superabsorbent soil conditioners\"), but the record\u2019s own causal_chain and equations rely on cement hydration kinetics (e.g., \"w_ic ~ 0.07 kg water/kg cement\") and internal RH thresholds (RH_internal > 0.95), which are not derivable from soil conditioning literature or hydrogel absorption alone\u2014no prior evidence in the record links SAP absorption ratios (g/g) to cement hydration water demand or internal RH maintenance in concrete.",
+    "prior_art": "RISK - the record does not cite any prior disclosure of SAP-based internal curing for concrete; the agricultural analogy is speculative without a concrete-specific prior art reference.",
+    "contradiction": "PASS",
+    "boundary_failure": "PASS",
+    "engineering_infeasibility": "PASS",
+    "regulatory_incompatibility": "PASS"
+   },
+   "risk_flags": [
+    {
+     "dimension": "obvious_combination",
+     "verdict": "RISK",
+     "basis": "the record cites \"same hydrogel physics\" (cross_domain_transition) and references agricultural SAP use (implied by \"superabsorbent soil conditioners\"), but the record\u2019s own causal_chain and equations rely on cement hydration kinetics (e.g., \"w_ic ~ 0.07 kg water/kg cement\") and internal RH thresholds (RH_internal > 0.95), which are not derivable from soil conditioning literature or hydrogel absorption alone\u2014no prior evidence in the record links SAP absorption ratios (g/g) to cement hydration water demand or internal RH maintenance in concrete.",
+     "source": "demoted_kill",
+     "demotion_class": "memory_claim",
+     "rule_evidence": {
+      "packet_anchored": false,
+      "binding": {
+       "binding": "numbers",
+       "bound": [
+        "0.07",
+        "0.95"
+       ]
+      },
+      "rule": "the known-techniques citation is not in the provided record \u2014 a remembered claim the instrument cannot verify; the burden of proof requires a record in view (the v4.1 measured class)"
+     }
+    },
+    {
+     "dimension": "prior_art",
+     "verdict": "RISK",
+     "basis": "the record does not cite any prior disclosure of SAP-based internal curing for concrete; the agricultural analogy is speculative without a concrete-specific prior art reference.",
+     "source": "evaluator_risk"
+    }
+   ],
+   "calibration_scope": {
+    "instrument": "a2/adversarial.py::adversarial_challenge (the 8-dimension adversarial gauntlet, v4 burden-of-proof rules)",
+    "instrument_version": "a2_adversarial_gauntlet/2.1.0",
+    "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
+    "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own DEV-corpus calibration (Art. LIX) before the KILL regains terminal authority; the consumption-side escalation (the R417 treatment) LANDED in R491 (a2/classify.py consults the canonical measurement registry entry \u2014 the record's own instrument_version selects it; the gauntlet's KILL escalates while uncalibrated)",
+    "v4_rules": "R494: the burden-of-proof standard (lacks-derivation -> RISK, never KILL) \u2014 the three-verdict vocabulary + the machine-side enforce_burden_of_proof (v4_corrections.py, the ONE authoritative implementation); the untuned 1.0.0 baseline measured TPR 0.0909 / FPR 1.0 on the frozen R492 DEV corpus (the before-number this tuning is judged against)",
+    "sealed_bar_coverage": "NONE until the v4 DEV-corpus measurement ships under the registry's pinned names \u2014 the R412/R447/R487 sealed-bar records cover independent_attack/* only"
+   }
+  },
+  {
+   "case_id": "CAL-KG-08",
+   "overall": "KILLED",
+   "killed_count": 1,
+   "attacks": {
+    "unsupported_mechanism": "PASS",
+    "weak_transfer": "PASS",
+    "obvious_combination": "PASS",
+    "prior_art": "PASS",
+    "contradiction": "PASS",
+    "boundary_failure": "INSUFFICIENT_EVIDENCE (INSUFFICIENT_EVIDENCE)",
+    "engineering_infeasibility": "KILLED - the linear-motor drive frequency and phase-shift orifice tuning are not dimensioned for dusty environments; the record\u2019s failure modes list \"reject-fin fouling in extreme dust\" and \"linear-motor fatigue,\" but no design margin or dust mitigation (e.g., sealed motor, self-cleaning fins) is specified, violating the dusty-environment requirement from the problem statement.",
+    "regulatory_incompatibility": "PASS"
+   },
+   "risk_flags": [],
+   "calibration_scope": {
+    "instrument": "a2/adversarial.py::adversarial_challenge (the 8-dimension adversarial gauntlet, v4 burden-of-proof rules)",
+    "instrument_version": "a2_adversarial_gauntlet/2.1.0",
+    "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
+    "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own DEV-corpus calibration (Art. LIX) before the KILL regains terminal authority; the consumption-side escalation (the R417 treatment) LANDED in R491 (a2/classify.py consults the canonical measurement registry entry \u2014 the record's own instrument_version selects it; the gauntlet's KILL escalates while uncalibrated)",
+    "v4_rules": "R494: the burden-of-proof standard (lacks-derivation -> RISK, never KILL) \u2014 the three-verdict vocabulary + the machine-side enforce_burden_of_proof (v4_corrections.py, the ONE authoritative implementation); the untuned 1.0.0 baseline measured TPR 0.0909 / FPR 1.0 on the frozen R492 DEV corpus (the before-number this tuning is judged against)",
+    "sealed_bar_coverage": "NONE until the v4 DEV-corpus measurement ships under the registry's pinned names \u2014 the R412/R447/R487 sealed-bar records cover independent_attack/* only"
+   }
+  },
+  {
+   "case_id": "CAL-KG-09",
+   "overall": "KILLED",
+   "killed_count": 1,
+   "attacks": {
+    "unsupported_mechanism": "KILLED \u2014 the candidate's own governing equation yields E_absorbed \u2248 0.1 mJ per absorption event (\u03c3\u2248500 MPa \u00d7 \u03b5\u22480.07 \u00d7 V\u22483\u00d710\u207b\u2078 m\u00b3, assuming 10 mm ribbon width over a ~3 mm embed zone \u00d7 unit span), while the claimed protective regime spans 5\u201350 mJ impacts; the SMA can absorb \u22642% of even the lowest impact energy, making the predicted 40\u201360% dent reduction not derivable from the record's own physics.",
+    "weak_transfer": "RISK \u2014 embedding a viscoelastic/damping interlayer in aircraft structures is common, but the specific SMA-tendon-on-sub-skin architecture with superelastic self-re-centering after cyclic impact has not been demonstrated in the aerospace LE context and no flight-level validation evidence is cited.",
+    "obvious_combination": "PASS \u2014 no known techniques appearing in the provided record are combined here; orthodontic NiTi and aircraft LE protection are not both present in any single evidence item.",
+    "prior_art": "PASS \u2014 no prior disclosure is named or inferable from the provided record.",
+    "contradiction": "PASS \u2014 no evidence items contradict a claimed numeric value in the record.",
+    "boundary_failure": "RISK \u2014 the transformation temperature ceiling of 60 \u00b0C for RT-class NiTi is plausible, but hot-day pavement soak conditions on tropical sandy routes could locally exceed this, and the record does not address whether skin temperatures at the LE are measured or controlled during heavy-check inspection windows.",
+    "engineering_infeasibility": "RISK \u2014 achieving uniform 6\u20138% recoverable superelastic strain in a 1 mm ribbon bonded at 3\u20135 mm depth beneath a pressurization-cycled aluminum sub-skin raises bonding-fatigue concerns acknowledged in the failure modes, but no definitive numerical limit from the record renders this infeasible.",
+    "regulatory_incompatibility": "PASS \u2014 no specific regulatory clause or standard is invoked in the record."
+   },
+   "risk_flags": [
+    {
+     "dimension": "weak_transfer",
+     "verdict": "RISK",
+     "basis": "embedding a viscoelastic/damping interlayer in aircraft structures is common, but the specific SMA-tendon-on-sub-skin architecture with superelastic self-re-centering after cyclic impact has not been demonstrated in the aerospace LE context and no flight-level validation evidence is cited.",
+     "source": "evaluator_risk"
+    },
+    {
+     "dimension": "boundary_failure",
+     "verdict": "RISK",
+     "basis": "the transformation temperature ceiling of 60 \u00b0C for RT-class NiTi is plausible, but hot-day pavement soak conditions on tropical sandy routes could locally exceed this, and the record does not address whether skin temperatures at the LE are measured or controlled during heavy-check inspection windows.",
+     "source": "evaluator_risk"
+    },
+    {
+     "dimension": "engineering_infeasibility",
+     "verdict": "RISK",
+     "basis": "achieving uniform 6\u20138% recoverable superelastic strain in a 1 mm ribbon bonded at 3\u20135 mm depth beneath a pressurization-cycled aluminum sub-skin raises bonding-fatigue concerns acknowledged in the failure modes, but no definitive numerical limit from the record renders this infeasible.",
+     "source": "evaluator_risk"
+    }
+   ],
+   "calibration_scope": {
+    "instrument": "a2/adversarial.py::adversarial_challenge (the 8-dimension adversarial gauntlet, v4 burden-of-proof rules)",
+    "instrument_version": "a2_adversarial_gauntlet/2.1.0",
+    "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
+    "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own DEV-corpus calibration (Art. LIX) before the KILL regains terminal authority; the consumption-side escalation (the R417 treatment) LANDED in R491 (a2/classify.py consults the canonical measurement registry entry \u2014 the record's own instrument_version selects it; the gauntlet's KILL escalates while uncalibrated)",
+    "v4_rules": "R494: the burden-of-proof standard (lacks-derivation -> RISK, never KILL) \u2014 the three-verdict vocabulary + the machine-side enforce_burden_of_proof (v4_corrections.py, the ONE authoritative implementation); the untuned 1.0.0 baseline measured TPR 0.0909 / FPR 1.0 on the frozen R492 DEV corpus (the before-number this tuning is judged against)",
+    "sealed_bar_coverage": "NONE until the v4 DEV-corpus measurement ships under the registry's pinned names \u2014 the R412/R447/R487 sealed-bar records cover independent_attack/* only"
+   }
+  },
+  {
+   "case_id": "CAL-KG-10",
+   "overall": "PASS",
+   "killed_count": 0,
+   "attacks": {
+    "unsupported_mechanism": "PASS",
+    "weak_transfer": "PASS",
+    "obvious_combination": "RISK \u2014 the record itself acknowledges individual SC conversions are known, so the novelty rests on program-level economics; neither the record nor available computation proves the systematic conversion-program approach is obvious, making this a demand for evidence rather than a kill.",
+    "prior_art": "RISK \u2014 no specific prior disclosure naming the same technique is contained in the provided record; absent a named citation, a RISK is appropriate.",
+    "contradiction": "PASS",
+    "boundary_failure": "PASS",
+    "engineering_infeasibility": "PASS",
+    "regulatory_incompatibility": "PASS"
+   },
+   "risk_flags": [
+    {
+     "dimension": "obvious_combination",
+     "verdict": "RISK",
+     "basis": "the record itself acknowledges individual SC conversions are known, so the novelty rests on program-level economics; neither the record nor available computation proves the systematic conversion-program approach is obvious, making this a demand for evidence rather than a kill.",
+     "source": "evaluator_risk"
+    },
+    {
+     "dimension": "prior_art",
+     "verdict": "RISK",
+     "basis": "no specific prior disclosure naming the same technique is contained in the provided record; absent a named citation, a RISK is appropriate.",
+     "source": "evaluator_risk"
+    }
+   ],
+   "calibration_scope": {
+    "instrument": "a2/adversarial.py::adversarial_challenge (the 8-dimension adversarial gauntlet, v4 burden-of-proof rules)",
+    "instrument_version": "a2_adversarial_gauntlet/2.1.0",
+    "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED",
+    "ruling": "R490/A2_CALIBRATION_SCOPE.json option (a): own DEV-corpus calibration (Art. LIX) before the KILL regains terminal authority; the consumption-side escalation (the R417 treatment) LANDED in R491 (a2/classify.py consults the canonical measurement registry entry \u2014 the record's own instrument_version selects it; the gauntlet's KILL escalates while uncalibrated)",
+    "v4_rules": "R494: the burden-of-proof standard (lacks-derivation -> RISK, never KILL) \u2014 the three-verdict vocabulary + the machine-side enforce_burden_of_proof (v4_corrections.py, the ONE authoritative implementation); the untuned 1.0.0 baseline measured TPR 0.0909 / FPR 1.0 on the frozen R492 DEV corpus (the before-number this tuning is judged against)",
+    "sealed_bar_coverage": "NONE until the v4 DEV-corpus measurement ships under the registry's pinned names \u2014 the R412/R447/R487 sealed-bar records cover independent_attack/* only"
+   }
+  }
+ ],
+ "provenance": {
+  "commit": "7703c4392bba",
+  "dirty_tree": true,
+  "generated_at": "2026-11-10",
+  "n_cases": 10,
+  "article_l_state": "UNCALIBRATED_NO_MEASUREMENT_SHIPPED"
+ }
+}
