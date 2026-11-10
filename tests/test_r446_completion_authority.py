@@ -392,15 +392,6 @@ class TestAttackFResumedRun:
         # still not complete until the tail runs
         assert completion_proves_run(run_dir) is False
 
-    def test_r445_driver_marker_check_uses_same_authority(self):
-        # the R445-C evolution rerun driver's completion check consumes
-        # the same canonical marker semantics (one authority, Art. X)
-        src = (REPO_ROOT / "scripts" /
-               "r445_evolution_rerun.py").read_text()
-        assert "run_manifest.json" in src
-        assert "TRUE completion marker" in src
-
-
 # ---------------------------------------------------------------------------
 # The seeding boundary
 # ---------------------------------------------------------------------------

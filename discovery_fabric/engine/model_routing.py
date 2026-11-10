@@ -283,9 +283,8 @@ PINNED_DEFAULT_MODELS: Dict[str, List[Dict[str, Any]]] = {
          "cost_class": 1, "latency_class": 2, "context_limit": 128000},
     ],
     "xkiro": [
-        {"model": "qwen/qwen3.8-max:free",
-         "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
-         "cost_class": 1, "latency_class": 2, "context_limit": 128000},
+        # R1: qwen/qwen3.8-max:free is not served on this key (404-measured);
+        # the pin is removed so no run ever attempts it (Art. XXVII).
         {"model": "minimax/minimax-m3:free",
          "task_capabilities": [TASK_STRONG, TASK_FAST, TASK_CHEAP],
          "cost_class": 1, "latency_class": 2, "context_limit": 128000},

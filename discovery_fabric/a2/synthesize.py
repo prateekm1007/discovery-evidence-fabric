@@ -411,6 +411,52 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
             parsed[m.group(1).lower()] = m.group(2).strip()
         return parsed
 
+    # R3: build the prompt once per paper (used by both the parallel
+    # pre-fetch and the sequential rotation path)
+    def _build_prompt(_paper):
+        _prompt = SYNTHESIS_PROMPT.format(
+            device=problem["device"], failure=problem["failure"],
+            constraint=problem["constraint"],
+            title=_paper["title"], abstract=_paper["abstract"][:1200],
+            span_instruction=SPAN_INSTRUCTION + _dir_block)
+        try:
+            from discovery_fabric.engine.answer_contract import (
+                ANSWER_SHAPE_BLOCK)
+            _qt = problem.get("question_type") or ""
+            if ANSWER_SHAPE_BLOCK.get(_qt):
+                _prompt = _prompt + ANSWER_SHAPE_BLOCK[_qt]
+        except Exception:  # noqa: BLE001 — never block the run
+            pass
+        return _prompt
+
+    # R3 parallelization: pre-fetch ALL rotation papers concurrently
+    # (same prompts, same provider policy, zero added LLM calls — one
+    # call each; only WALL TIME changes). When two or more papers
+    # carry quotable abstracts, all of them call concurrently and the
+    # rotation loop then reads the pre-fetched results in canonical
+    # order (parallelism across papers, not retries).
+    _pre_fetch = {}
+    if os.environ.get("ENGINE_SYNTH_PARALLEL", "").strip() not in (
+            "0", "false", "no") and len(_rotation_set) > 1:
+        import concurrent.futures
+
+        def _prefetch(_paper):
+            _pp = _build_prompt(_paper)
+            _resp = llm_chat(_pp,
+                             system="You are a medical device engineer.",
+                             max_tokens=512)
+            _m = dict(_LAST_PROVIDER_META)
+            return _paper.get("id"), {"prompt": _pp, "resp": _resp,
+                                      "meta": _m}
+
+        try:
+            with concurrent.futures.ThreadPoolExecutor(
+                    max_workers=len(_rotation_set)) as _ex:
+                for _pid, _res in _ex.map(_prefetch, _rotation_set):
+                    _pre_fetch[_pid] = _res
+        except Exception:  # noqa: BLE001 — fall back to sequential
+            _pre_fetch = {}
+
     papers_tried = []
     for attempt, paper in enumerate(_rotation_set):
         backoff = _ROTATION_BACKOFF_S[attempt] if attempt < len(
@@ -432,25 +478,26 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                             "repair_succeeded": None,
                             "violation_final": False})
         _t0 = time.perf_counter()
-        prompt = SYNTHESIS_PROMPT.format(
-            device=problem["device"], failure=problem["failure"], constraint=problem["constraint"],
-            title=paper["title"], abstract=paper["abstract"][:1200],
-            span_instruction=SPAN_INSTRUCTION + _dir_block)
-        # R3: answer-shape contract is routed per question type (the
-        # intervention-proposal vs predictor-design contracts have
-        # different required fields)
-        try:
-            from discovery_fabric.engine.answer_contract import (
-                ANSWER_SHAPE_BLOCK)
-            _qt = problem.get("question_type") or ""
-            if ANSWER_SHAPE_BLOCK.get(_qt):
-                prompt = prompt + ANSWER_SHAPE_BLOCK[_qt]
-        except Exception:  # noqa: BLE001 — contract must never block the run
-            pass
-        _spans["prompt_construction_total_s"] += time.perf_counter() - _t0
-        print(f"  [synthesize] calling LLM (paper {attempt + 1}: "
-              f"{str(paper.get('title'))[:60]})...")
-        resp = _timed_chat(prompt, system="You are a medical device engineer.")
+        _pf = _pre_fetch.get(paper.get("id"))
+        if _pf is not None:
+            # parallel pre-fetch served this paper's call (concurrent
+            # with the other rotation papers; same prompt, same policy)
+            prompt = _pf["prompt"]
+            resp = _pf["resp"]
+            provider_meta = dict(_pf["meta"])
+            _spans["n_llm_chat_calls"] += 1
+            print(f"  [synthesize] parallel pre-fetch served paper "
+                  f"{attempt + 1}: "
+                  f"{str(paper.get('title'))[:60]}")
+        else:
+            prompt = _build_prompt(paper)
+            _spans["prompt_construction_total_s"] += time.perf_counter() - _t0
+            print(f"  [synthesize] calling LLM (paper {attempt + 1}: "
+                  f"{str(paper.get('title'))[:60]})...")
+            resp = _timed_chat(prompt,
+                               system="You are a medical device engineer.")
+            provider_meta = dict(_LAST_PROVIDER_META)
+        _LAST_PROVIDER_META = provider_meta
         if not resp:
             print("  [synthesize] LLM failed on this paper")
             continue
