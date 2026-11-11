@@ -1132,6 +1132,107 @@ def _lean_operator_attempt(items, problem, item, op, contract):
     }
 
 
+# ---- typed starvation cause (owner capability round 2026-11-12,
+#      item 4; Art. LXI — infrastructure failure is never scientific
+#      rejection; Art. XXV — unknown stays unknown; Art. XXVII — no
+#      threshold invention) -----------------------------------------------
+# The p05/new02 root cause: the scorer's GENERATION_NO_OPERATOR_CONTRACT
+# label fired whenever the mechanism-space envelope carried zero
+# operator_results, conflating three distinct no-generation shapes:
+#   (a) the evidence chain was cut upstream (a RETRIEVE/FREEZE/VERIFY
+#       stage failed or was refused — 429 storms, timeouts, policy
+#       stops): an INCOMPLETE_INFRASTRUCTURE_FAILURE, never a verdict
+#       about the mechanism;
+#   (b) the chain ran clean but delivered nothing verifiable (no
+#       frozen records, or the classified items no longer match the
+#       frozen custody set): an INCOMPLETE_DATA_FAILURE — an honest
+#       unknown, never a negative verdict (XXV);
+#   (c) the records WERE examined and adjudicated, and none carried
+#       mechanism support — or verified items satisfied zero operator
+#       admission contracts: a scientific REJECTED_EVIDENCE.
+# Each production no-generation path now records ONE typed
+# starved_cause (label + LXI class + measured diagnostics, zero LLM
+# calls). The decision table rests on the stages' own typed record
+# states only (the classifier's error record, the stage ledger's
+# statuses, the frozen/verified/joined counts) — exact-record checks,
+# no invented thresholds. The scorer reads the record and falls back
+# to the legacy state vocabulary for envelopes that predate it.
+_MS_EVIDENCE_CHAIN_STAGES = ("RETRIEVE", "FREEZE", "VERIFY")
+_MS_UPSTREAM_INFRA_STATUSES = (
+    "FAILED_EXPLICIT", "SKIPPED_UPSTREAM_FAILURE", "SKIPPED_ADMISSION",
+    "DISABLED_BY_CONFIG", "DEFERRED_POLICY", "BLOCKED_POLICY",
+    "STOPPED_POLICY", "SKIPPED_POLICY_LOW_VALUE",
+    "SKIPPED_POLICY_NOT_REQUIRED", "SKIPPED_POLICY_NOT_REACHED")
+
+
+def _ms_upstream_status(env, stage):
+    """The latest recorded stage-ledger entry for `stage`, or None.
+    An upstream chain stage that never logged is itself an
+    unexplained gap — never silently assumed OK (Art. XXV)."""
+    for e in reversed(getattr(env, "stage_log", None) or []):
+        if isinstance(e, dict) and e.get("stage") == stage:
+            return e
+    return None
+
+
+def _ms_starved_cause(env, label):
+    """The typed cause record for one no-generation mechanism-space
+    path (LXI: infrastructure failure is never scientific rejection).
+    Purely observational: it RECORDS why no operator ran, classified
+    on measured record states only. No gate reads it; the classification
+    is an exact-record check, not a threshold (XXVII)."""
+    from . import stage_entry as _se
+    ec = getattr(env, "evidence_classification", None) or {}
+    frozen = getattr(env, "evidence", None) or []
+    verified = _se.verified_evidence_items(env)
+    verifier_error = bool(ec.get("error"))
+    upstream = {st: _ms_upstream_status(env, st)
+                for st in _MS_EVIDENCE_CHAIN_STAGES}
+    upstream_status = {st: ((u or {}).get("status"))
+                      for st, u in upstream.items()}
+    by_ids = {str(r.get("id")) for r in frozen}
+    join_misses = [v for v in verified
+                   if str(v.get("source_id")) not in by_ids]
+    if (verifier_error
+            or any(u is None for u in upstream.values())
+            or any(st in _MS_UPSTREAM_INFRA_STATUSES
+                   for st in upstream_status.values())):
+        # the evidence chain was cut, refused, or was never cleanly
+        # logged: an infrastructure/data-plane state (LXI) — resumable,
+        # never a scientific rejection of the mechanism.
+        lxi_class = "INCOMPLETE_INFRASTRUCTURE_FAILURE"
+    elif not frozen and not verified:
+        # every logged chain stage ran clean but the channel delivered
+        # zero records: an empty evidence plane, not a verdict about
+        # the mechanism (XXV: an absence claim is an unknown, not a
+        # negative).
+        lxi_class = "INCOMPLETE_DATA_FAILURE"
+    elif verified and len(join_misses) == len(verified):
+        # the classifier examined records the frozen custody set no
+        # longer holds: a custody mismatch — re-joining them would
+        # fabricate evidence (Art. VI/XXV), so the gap stays typed as
+        # a data-plane failure.
+        lxi_class = "INCOMPLETE_DATA_FAILURE"
+    else:
+        # every measured input was present and clean: the records were
+        # examined and adjudicated — no verified support, or no
+        # admission contract matched — a scientific evidence verdict.
+        lxi_class = "REJECTED_EVIDENCE"
+    return {
+        "label": label,
+        "lxi_class": lxi_class,
+        "diagnostics": {
+            "n_frozen_records": len(frozen),
+            "n_verified_items": len(verified),
+            "n_join_misses": len(join_misses),
+            "verify_classification_state": (
+                "CLASSIFIER_ERROR" if verifier_error
+                else ("ABSENT" if not ec else "OK")),
+            "upstream_stage_statuses": upstream_status,
+        },
+    }
+
+
 def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     """R453-LEAN-CORE: the lean mechanism-space construction (the
     external auditor mandate — no extraction fan-out; reuse the
@@ -1227,6 +1328,7 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             "n_candidates_generated": 0,
             "n_candidates_retained": 0,
             "metrics": _ms._metrics(space, [], [], [], 0),
+            "starved_cause": _ms_starved_cause(env, "NO_EVIDENCE"),
             "note": ("no frozen evidence record matched a verified "
                      "classification item — nothing was fabricated "
                      "(Art. XXV)"),
@@ -1423,6 +1525,15 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
         operator_result["note"] = (
             "no (item, operator) pair satisfied any admission contract - "
             "honest refusal, nothing fabricated (Art. XXV)")
+        # the typed contract-mismatch cause (item 4): the items
+        # WERE verified and joined to the frozen set; zero
+        # admission contract matched. The helper classifies it
+        # (REJECTED_EVIDENCE on a clean chain: the evidence was
+        # examined, the verdict was "not applicable") and
+        # carries the measured join diagnostics for the scorer
+        # and the auditor.
+        space["starved_cause"] = _ms_starved_cause(
+            env, "NO_APPLICABLE_EVIDENCE")
     space["operator_results"] = [
         {k: v for k, v in o.items() if k != "candidates"}
         for o in all_operator_results]
@@ -1825,6 +1936,9 @@ class MechanismSpaceAdapter(BaseAdapter):
                     "mechanism_space_version": "mechanism_space/1.0.0",
                     "state": "SKIPPED_EVIDENCE_VERIFICATION_FAILED",
                     "entry": entry_block,
+                    "starved_cause": _ms_starved_cause(
+                        env,
+                        "SKIPPED_EVIDENCE_VERIFICATION_FAILED"),
                     "note": ("zero verified evidence items on the "
                              "envelope — the mechanism space would "
                              "build candidates on unverified evidence "

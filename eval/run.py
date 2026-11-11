@@ -1585,10 +1585,41 @@ def _funnel_row(problem_dir: Path) -> Dict[str, Any]:
         elif any((o.get("state") == "NO_VALID_CANDIDATE")
                  for o in ops if isinstance(o, dict)):
             row["starved_reason"] = "GENERATION_NO_VALID_CANDIDATE"
-        elif not ops:
-            row["starved_reason"] = "GENERATION_NO_OPERATOR_CONTRACT"
         else:
-            row["starved_reason"] = "UNKNOWN"
+            # owner round 2026-11-12 item 4 (Art. LXI): the
+            # typed starved_cause record (label + measured
+            # diagnostics + LXI class) now rides every
+            # no-generation mechanism-space envelope; it wins
+            # over the legacy labels. Envelopes that predate
+            # the record fall back to their own typed state
+            # vocabulary, then to the historical labels —
+            # GENERATION_NO_OPERATOR_CONTRACT remains only the
+            # last-resort shape for an empty ops set with no
+            # recorded cause (the p05/new02 mislabel was
+            # exactly this shape absorbing the starvation).
+            _cause = ms.get("starved_cause") or {}
+            _causelabel = (_cause.get("label")
+                           if isinstance(_cause, dict) else None)
+            _mstate = ms.get("state")
+            if _causelabel:
+                row["starved_reason"] = _causelabel
+            elif any((o.get("state") == "NO_APPLICABLE_EVIDENCE")
+                     for o in ops if isinstance(o, dict)):
+                # the true contract-mismatch marker (items were
+                # examined and zero admission contracts matched): a
+                # typed scientific state, never a contract-missing
+                # label (the p05/new02 mislabel class).
+                row["starved_reason"] = "NO_APPLICABLE_EVIDENCE"
+            elif _mstate in ("NO_EVIDENCE",
+                             "SKIPPED_EVIDENCE_VERIFICATION_FAILED"):
+                # pre-record envelopes carry the typed state of their
+                # starvation state: the state itself is the honest
+                # label.
+                row["starved_reason"] = _mstate
+            elif not ops:
+                row["starved_reason"] = "GENERATION_NO_OPERATOR_CONTRACT"
+            else:
+                row["starved_reason"] = "UNKNOWN"
     elif (dist.get("n_distinct") or 0) < 2:
         # generated >=1 but the matcher did not reach the >=2 bar:
         # adjudication (dedup) failure, never generation failure.
