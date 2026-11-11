@@ -28,7 +28,7 @@ import hashlib
 import json
 import os
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, wait, ALL_COMPLETED
 from datetime import datetime, timezone
 from threading import Lock
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -508,6 +508,49 @@ def _assemble_fanout(
     return {"job_rows": job_rows, "records_returned": records_returned}
 
 
+def _job_budget_s() -> float:
+    """R6 per-job wall budget (seconds), env RETRIEVE_JOB_BUDGET_S.
+    0/negative disables the budget (serial-parity behavior).
+
+    Measured basis (R6 fresh-run 1, commit b7fdb2ccc944): the fan-out
+    wall equals the SLOWEST single job (max_job_wall_s == fanout_wall_s:
+    48.6 s sofc / 30.1 s new02) while the productive jobs complete in
+    <= 10-20 s (crossref 3.3-7.7 s -> 5+5 records; semantic_scholar
+    3.6-9.7 s; core 13.9-19.5 s -> 0-5) and the stragglers gate the
+    whole phase (europepmc 48.6 s -> ONE record on sofc). The budget
+    caps the phase at the slowest KEPT job; a cut job is a TYPED
+    timeout in the fabric's existing lane vocabulary — recorded, never
+    a silent drop (Art. XXI.3, XXV)."""
+    try:
+        v = float(os.environ.get("RETRIEVE_JOB_BUDGET_S", "20") or 20)
+    except ValueError:
+        v = 20.0
+    return v
+
+
+def _timeout_result(job: Dict[str, Any], index: int,
+                    budget_s: float) -> Dict[str, Any]:
+    """Typed per-job budget-exceeded result — same variant_outcome shape
+    the assembler consumes; every variant of the cut job records the
+    typed timeout (never a silent drop, Art. XXI.3)."""
+    return {
+        "index": index,
+        "job_wall_s": float(budget_s),
+        "variant_outcomes": [
+            {"query": v["query"],
+             "derivation_class": v["derivation_class"],
+             "status": "timeout",
+             "records": [],
+             "error": (f"RETRIEVE_JOB_BUDGET_EXCEEDED: job wall exceeded "
+                       f"the {budget_s:.0f}s per-job budget (R6 FAST/LEAN "
+                       "speed gate); typed timeout — the already-finished "
+                       "jobs keep their records"),
+             "latency_ms": int(budget_s * 1000),
+             "raised": None}
+            for v in job["variants"]],
+    }
+
+
 def _drive_fanout(
         plan: List[Dict[str, Any]],
         canonicalizer: Canonicalizer,
@@ -545,6 +588,8 @@ def _drive_fanout(
                 peak["current"] -= 1
 
     results: List[Dict[str, Any]] = []
+    _budget_s = _job_budget_s()
+    _budget_jobs_cut: List[str] = []
     if policy["mode"] == "serial" or not jobs:
         # serial reference path: stop at the first raising job exactly
         # like the pre-R512 inline loop (later jobs never execute —
@@ -561,11 +606,37 @@ def _drive_fanout(
     else:
         effective_workers = max(1, min(policy["max_workers_configured"],
                                        len(jobs)))
-        with ThreadPoolExecutor(
-                max_workers=effective_workers,
-                thread_name_prefix="retrieve-fanout") as ex:
-            futures = [ex.submit(_tracked, job) for job in jobs]
+        ex = ThreadPoolExecutor(
+            max_workers=effective_workers,
+            thread_name_prefix="retrieve-fanout")
+        futures = [ex.submit(_tracked, job) for job in jobs]
+        if _budget_s > 0:
+            # R6 per-job wall budget: every finished job keeps its
+            # records; unfinished jobs get the typed timeout result
+            # (measured basis in _job_budget_s). With the budget, the
+            # phase wall is capped near the budget; without it, one
+            # straggler gated the whole fan-out (48.6 s measured).
+            # shutdown(wait=False, cancel_futures=True) releases the
+            # phase immediately — the context manager's implicit
+            # shutdown(wait=True) would have waited for the straggler
+            # and silently defeated the budget. The abandoned worker
+            # keeps its own network side effects (provider calls,
+            # connector custody entries) per the R512 narrowed
+            # contract; its result is discarded and typed timeout.
+            done, _nd = wait(futures, timeout=_budget_s,
+                             return_when=ALL_COMPLETED)
+            results = []
+            for i, f in enumerate(futures):
+                if f.done() and not f.cancelled():
+                    results.append(f.result())
+                else:
+                    f.cancel()
+                    results.append(_timeout_result(jobs[i], i, _budget_s))
+                    _budget_jobs_cut.append(str(jobs[i].get("source_id") or i))
+            ex.shutdown(wait=False, cancel_futures=True)
+        else:
             results = [f.result() for f in futures]
+            ex.shutdown(wait=True)
     assemble_t0 = _t.perf_counter()
     asm = _assemble_fanout(plan, results, canonicalizer, lane_states)
     assemble_s = _t.perf_counter() - assemble_t0
@@ -582,6 +653,8 @@ def _drive_fanout(
         "peak_concurrency_observed": peak["max"],
         "n_jobs": len(jobs),
         "excluded_sources": excluded_sources(),
+        "job_budget_s": _budget_s,
+        "job_budget_cut": _budget_jobs_cut,
         "fanout_wall_s": round(wall_s, 3),
         "total_search_call_s": round(total_search_call_s, 3),
         "max_job_wall_s": round(max_job_wall_s, 3),
