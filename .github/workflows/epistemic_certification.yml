@@ -197,13 +197,13 @@ jobs:
 
       - name: CAD kernel suite (hermetic)
         run: |
-          # test_r380_cad_pipeline.py is the hermetic CAD kernel suite
-          # (proven in CI: 46/46 on d806e98d's failed run — the failure
-          # was ONLY test_e21_series.py, which reads the GITIGNORED
-          # artifacts/benchmark/generated/runs/ rehearsal outputs whose
-          # regeneration (corpus_runner) requires the LLM transport —
-          # not CI-hermetic; e21 stays a local suite).
-          python -m pytest tests/test_r380_cad_pipeline.py -q
+          # tests/r380 was retired with the pre-R425 CAD compiler
+          # archive; tests/test_r6_cad_kernel.py covers the LIVE
+          # parametric builders (layered_panel / dual_lumen_catheter /
+          # cylindrical_device), measure(), validate_gates() regeneration
+          # determinism, and export() GLB/STEP/STL bytes. Hermetic: no
+          # LLM, no network, no gitignored paths.
+          python -m pytest tests/test_r6_cad_kernel.py -q
 
       - name: Webapp build check (R401-WC2)
         run: |
@@ -421,9 +421,9 @@ jobs:
           assert stl.stat().st_size > 100
           print(f"CAD_EXECUTABLE: cadquery {cq.__version__}")
           PY
-          # hermetic CAD kernel suite only (e21 needs gitignored
-          # LLM-regenerated benchmark runs — see the certify job note)
-          python -m pytest tests/test_r380_cad_pipeline.py -q
+          # hermetic CAD kernel suite (retired r380 replaced by
+          # test_r6_cad_kernel.py — live parametric builders)
+          python -m pytest tests/test_r6_cad_kernel.py -q
       - name: Module inventory drift check (R456 §B.3 — the one
           CI-regenerated module inventory; hand-maintained module lists
           are superseded)

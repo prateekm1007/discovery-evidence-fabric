@@ -164,11 +164,23 @@ _PROPOSE_NUM_RE = re.compile(
     r"<|>|=)\s*(?P<num>" + _NUM + r")\s*(?P<unit>[a-zA-Z°/%µ]{1,12})\b",
     re.IGNORECASE)
 
-#: explicit removal phrases targeting something the constraint mandates
+#: explicit removal phrases targeting something the constraint mandates.
+#: The bare "without …" shapes were REMOVED: a candidate that preserves
+#: the mandate but describes its internals can lex so ("operated without
+#: start/stop cycling to avoid the transient") — without is not, by
+#: itself, proof of deletion (Article LXXXI discipline). Unmatched
+#: removals now surface as typed UNCERTAIN rather than invented kills.
 _REMOVAL_RE = re.compile(
     r"\b(?:eliminate|remov\w+|delet\w+|omit\w*|skip|cancel|abandon|"
-    r"operat\w+ without|run(?:ning)? without|without (?:the |any |its )?)"
-    r"\s*(?P<obj>[a-z][a-z \-/]{3,50})", re.IGNORECASE)
+    r"get rid of)"
+    r"\s*(?:the |any |its |our )?\s*(?P<obj>[a-z][a-z \-/]{3,50})",
+    re.IGNORECASE)
+
+#: no verb at all: bare "without" elimination only when the object is a
+#: clear mandated element (carried by the mandate span itself)
+_BARE_WITHOUT_RE = re.compile(
+    r"\bwithout\s+(?:the |any |its |the need for )?(?P<obj>[a-z][a-z \-/]{3,50})",
+    re.IGNORECASE)
 
 #: envelope-narrowing verbs (a range may only be narrowed by removing
 #: a mandated operating condition)
@@ -180,6 +192,22 @@ _STOPW = set("""a an the of to in on for with and or is are at from by as
 into within not no nor but if then than so such can could may might will
 would shall should must have has had be been being it its this that these
 those per while without above below during""".split())
+
+#: words too generic to PROVE that two different physical quantities are
+#: the same thing (the auditor's "stack" example); a match whose only
+#: shared tokens are these never proves quantity identity
+_LOW_INFO = {"stack", "content", "contents", "percentage", "value", "level",
+             "rate", "unit", "number", "fraction", "amount", "total",
+             "type", "kind", "case", "example", "system", "design", "analysis",
+             "study", "data", "record", "based", "general", "overall"}
+
+#: tokens that DO establish same-quantity identity unambiguously
+_QUANTITY_REGISTRY = {"voltage", "current", "resistance", "power", "energy",
+                      "charge", "capacitance", "inductance", "temperature",
+                      "pressure", "leakage", "antimony", "calcium", "tin",
+                      "corrosion", "viscosity", "conductivity", "cycle",
+                      "cycles", "service", "antimony", "elastomer", "seal",
+                      "hydrogen", "oxygen", "nitrogen", "sulfur", "alloy"}
 
 
 def _tokens(text: str) -> set:
@@ -202,15 +230,65 @@ def _norm_metric(s: str) -> str:
     return out
 
 
-def _metric_match(metric_a: str, metric_b: str) -> bool:
-    """Two metric phrases name the same quantity when they share a
-    distinctive content token (e.g. 'open-circuit voltage' vs 'OCV
-    voltage' share 'voltage' after aliasing; 'stack mass' vs 'mass')."""
-    ta, tb = _tokens(_norm_metric(metric_a)), _tokens(_norm_metric(metric_b))
+def _metric_match(metric_a: str, metric_b: str,
+                  unit_a: str = "", unit_b: str = "") -> bool:
+    """Same-quantity rule (never one shared generic word):
+    (i)  at least two distinctive shared tokens of length >= 4 that are
+         not low-information, OR
+    (ii) one shared token from the quantity registry, OR
+    (iii) one shared distinctive token (not low-information, len >= 4)
+         WITH a unit alias match on both sides (same unit family — the
+         same-unit constraint is what disambiguates a designator like
+         "float charge" from an unrelated percentage).
+    Anything weaker is ambiguous — the caller must return typed
+    UNCERTAIN, never an invented kill (Art. LXXXI)."""
+    ta = _tokens(_norm_metric(metric_a))
+    tb = _tokens(_norm_metric(metric_b))
     if not ta or not tb:
         return False
     shared = ta & tb
-    return bool(shared) and any(len(t) >= 4 for t in shared)
+    if not shared:
+        return False
+    if any(t in _QUANTITY_REGISTRY for t in shared):
+        return True
+    dist = {t for t in shared if len(t) >= 4 and t not in _LOW_INFO}
+    if len(dist) >= 2:
+        return True
+    if unit_a and unit_b and _same_unit(unit_a, unit_b) and dist:
+        return True
+    return False
+
+
+def _mandate_spans(c: str):
+    """The constraint clauses that carry mandates (floor/ceiling/range)
+    — the removal target must match a MANDATED span, never constraint
+    vocabulary in the abstract."""
+    spans = []
+    for rx in (_FLOOR_RE, _CEILING_RE, _RANGE_RE):
+        for m in rx.finditer(c):
+            s = max(0, m.start() - 40)
+            e = min(len(c), m.end() + 40)
+            spans.append(c[s:e])
+    if not spans:
+        spans.append(c)
+    return spans
+
+
+def _removal_overlap(obj: str, c: str):
+    """Strong/weak overlap of a proposed removal object against the
+    mandated spans (never against the whole constraint)."""
+    ot = _tokens(obj)
+    if not ot:
+        return 0, 0
+    mandate_tokens = set()
+    for s in _mandate_spans(c):
+        mandate_tokens |= _tokens(s)
+    ov = ot & mandate_tokens
+    registry = sum(1 for t in ov if t in _QUANTITY_REGISTRY)
+    dist = {t for t in ov if len(t) >= 4 and t not in _LOW_INFO}
+    strong_count = max(registry, len(dist))
+    weak = len({t for t in ov if t not in _LOW_INFO})
+    return strong_count, weak
 
 
 def function_removal_check(constraint: str,
@@ -218,28 +296,44 @@ def function_removal_check(constraint: str,
     """Terminal kill: the intervention removes a function the user's
     constraint mandates. Deterministic; every kill carries the
     offending span + the mandate clause it violates (Art. XXIV: the
-    basis is citable, not asserted)."""
+    basis is citable, not asserted). Ambiguous correspondence between
+    the intervention and a mandate produces a typed UNCERTAIN state —
+    never an invented scientific rejection (Art. LXXXI)."""
     c = str(constraint or "")
     i = str(intervention or "")
     if not c or not i:
         return {"killed": False}
-    # (a) explicit removal of a mandated element
-    c_tokens = _tokens(c)
-    for m in _REMOVAL_RE.finditer(i):
-        obj = m.group("obj")
-        ot = _tokens(obj)
-        if ot and len(ot & c_tokens) >= 1:
-            # only a kill when the removed object is part of the
-            # mandated function (a token the constraint itself names)
-            return {"killed": True, "kill_class": "REMOVES_MANDATED_ELEMENT",
-                    "basis": (f"intervention states {m.group(0).strip()!r} "
-                              f"— the constraint mandates: "
-                              f"{_mandate_span(c, m.group(0))}")}
+    # (a) explicit removal of a mandated element; bare "without" only
+    # binds with two distinctive matches (weak single-token wording is
+    # UNCERTAIN by design)
+    for rx, min_strong in ((_REMOVAL_RE, 1), (_BARE_WITHOUT_RE, 2)):
+        for m in rx.finditer(i):
+            obj = m.group("obj")
+            strong, weak = _removal_overlap(obj, c)
+            if strong >= min_strong:
+                return {"killed": True, "state": "KILL",
+                        "kill_class": "REMOVES_MANDATED_ELEMENT",
+                        "basis": (f"intervention states {m.group(0).strip()!r} "
+                                  f"— the constraint mandates: "
+                                  f"{_mandate_span(c, m.group(0))}")}
+            if (min_strong == 1 and strong == 0 and weak >= 1) or \
+                    (min_strong == 2 and strong == 1):
+                return {"killed": False, "state": "UNCERTAIN",
+                        "uncertain_reason": (
+                            f"removal phrasing ({m.group(0).strip()!r}) "
+                            "overlaps the constraint only weakly — "
+                            "mandate correspondence not established")}
     # (b) mandated floor lowered / ceiling raised with an explicit number
+    unit_mismatch: Optional[str] = None
     for fm in _FLOOR_RE.finditer(c):
         for pm in _PROPOSE_NUM_RE.finditer(i):
-            if _metric_match(fm.group("metric"), pm.group("metric")) and \
-                    _same_unit(fm.group("unit"), pm.group("unit")):
+            if _metric_match(fm.group("metric"), pm.group("metric"), fm.group("unit"), pm.group("unit")):
+                if not _same_unit(fm.group("unit"), pm.group("unit")):
+                    unit_mismatch = (f"metric matches "
+                                     f"({fm.group('metric').strip()!r}) but "
+                                     f"units differ ({fm.group('unit')!r} vs "
+                                     f"{pm.group('unit')!r})")
+                    continue
                 if _num(pm.group("num")) < _num(fm.group("num")):
                     return {"killed": True,
                             "kill_class": "LOWERS_MANDATED_FLOOR",
@@ -251,8 +345,13 @@ def function_removal_check(constraint: str,
                                       f"{pm.group('num')} {pm.group('unit')}")}
     for cm in _CEILING_RE.finditer(c):
         for pm in _PROPOSE_NUM_RE.finditer(i):
-            if _metric_match(cm.group("metric"), pm.group("metric")) and \
-                    _same_unit(cm.group("unit"), pm.group("unit")):
+            if _metric_match(cm.group("metric"), pm.group("metric"), cm.group("unit"), pm.group("unit")):
+                if not _same_unit(cm.group("unit"), pm.group("unit")):
+                    unit_mismatch = (f"metric matches "
+                                     f"({cm.group('metric').strip()!r}) but "
+                                     f"units differ ({cm.group('unit')!r} vs "
+                                     f"{pm.group('unit')!r})")
+                    continue
                 if _num(pm.group("num")) > _num(cm.group("num")):
                     return {"killed": True,
                             "kill_class": "RAISES_MANDATED_CEILING",
@@ -274,8 +373,11 @@ def function_removal_check(constraint: str,
             if not _same_unit(rm.group("hiunit"), im.group("hiunit")):
                 continue
             ilo, ihi = _num(im.group("lo")), _num(im.group("hi"))
-            narrowed_top = ihi < hi * 0.98
-            raised_bottom = ilo > lo * 1.02
+            # definitional rule (Art. XXVII): any exclusion of a
+            # mandated endpoint is a narrowing — no tolerance constant
+            # invented by this check
+            narrowed_top = ihi < hi
+            raised_bottom = ilo > lo
             if (narrowed_top or raised_bottom) and _NARROW_RE.search(i):
                 return {"killed": True,
                         "kill_class": "NARROWS_MANDATED_RANGE",
@@ -292,9 +394,10 @@ def function_removal_check(constraint: str,
                 pn = _num(pm.group("num"))
                 # narrowing the top of a mandated range (e.g. cycles
                 # 25-800 C proposed to 25-400 C) removes the mandated
-                # function; the proposed metric must plausibly BE the
-                # ranged quantity (token overlap with the range span)
-                if pn < hi * 0.98 and _metric_overlap_with_range(
+                # function; definitional: the proposed value must fall
+                # strictly below the mandated upper endpoint —
+                # no tolerance constant
+                if pn < hi and _metric_overlap_with_range(
                         pm.group("metric"), c, rm):
                     return {"killed": True,
                             "kill_class": "NARROWS_MANDATED_RANGE",
@@ -305,6 +408,11 @@ def function_removal_check(constraint: str,
                                       f"proposes {pm.group('metric').strip()} "
                                       f"{pn} {pm.group('unit')} with a "
                                       "narrowing verb")}
+    if unit_mismatch:
+        return {"killed": False, "state": "UNCERTAIN",
+                "uncertain_reason": (unit_mismatch + "; the metric "
+                                      "correspondence is ambiguous "
+                                      "(Art. LXXXI)")}
     return {"killed": False}
 
 
@@ -372,16 +480,21 @@ def restates_constraint_check(constraint: str, intervention: str,
     if not c or not i:
         return {"killed": False}
     tc, ti = _tokens(c), _tokens(i)
+    tm = _tokens(mechanism) if mechanism else set()
     if not tc or not ti:
         return {"killed": False}
     inter = tc & ti
     j = len(inter) / len(tc | ti)
     containment = len(inter) / len(ti)
-    new_tokens = ti - tc
+    # mechanism vocabulary vetoes the kill on BOTH paths: a proposal that
+    # carries real mechanism content (new design/causal vocabulary of its
+    # own) is never a restatement, regardless of topical overlap
+    new_tokens = (ti | tm) - tc
     has_mechanism_content = len(new_tokens) >= 4
-    if j >= RESTATES_JACCARD_KILL:
+    if j >= RESTATES_JACCARD_KILL and not has_mechanism_content:
         return {"killed": True, "kill_class": "RESTATES_THE_CONSTRAINT",
                 "jaccard": round(j, 3),
+                "mechanism_content_tokens": len(new_tokens),
                 "basis": (f"intervention is a paraphrase of the constraint "
                           f"(token Jaccard {j:.2f}) — it restates the "
                           "requirement, not the design")}
@@ -415,7 +528,22 @@ _SHARED_MECHANISM_RE = re.compile(
     r"(?:mechanism|process|law))\b",
     re.IGNORECASE)
 
-_ANCHOR_MIN_SHARED_TOKENS = 2
+#: a bare generic phrase ("same mechanism", "works through the same
+#: principle") is NOT evidence of causal transfer (the auditor's
+#: finding). Stated-mechanism acceptance additionally requires at least
+#: one distinctive PHYSICS_LEXEME in the candidate's mechanism text.
+_PHYSICS_LEXEMES = {
+    "corrosion", "oxidation", "reduction", "diffusion", "transport",
+    "deposition", "spallation", "expansion", "contraction", "creep",
+    "fatigue", "fracture", "buckling", "torque", "stress", "strain",
+    "shear", "tension", "compression", "cavitation", "fouling",
+    "scaling", "nucleation", "absorption", "adsorption", "desorption",
+    "convection", "conduction", "radiation", "catalysis",
+    "electrolyte", "interfacial", "differential", "kinetics",
+    "thermal", "thermochemical",
+}
+
+_ANCHOR_MIN_SHARED_TOKENS = 3
 
 
 def anchor_domain_check(problem: Dict[str, Any],
@@ -445,10 +573,16 @@ def anchor_domain_check(problem: Dict[str, Any],
     at = " ".join([_flat, _subtxt, _reltxt])
     pt_t, at_t = _tokens(pt), _tokens(at)
     shared = pt_t & at_t
-    shared_domain = len(shared) >= _ANCHOR_MIN_SHARED_TOKENS
+    # distinctive tokens only: low-information vocabulary cannot prove an
+    # anchor is in the problem's domain
+    distinctive = {t for t in shared
+                   if len(t) >= 4 and t not in _LOW_INFO}
+    shared_domain = len(distinctive) >= _ANCHOR_MIN_SHARED_TOKENS
     mech_text = " ".join(str(fields.get(k) or "") for k in
                          ("mechanism", "intervention"))
-    stated = bool(_SHARED_MECHANISM_RE.search(mech_text))
+    mech_tokens = _tokens(mech_text)
+    stated = (bool(_SHARED_MECHANISM_RE.search(mech_text))
+              and bool(mech_tokens & _PHYSICS_LEXEMES))
     return {
         "shared_domain": shared_domain,
         "n_shared_tokens": len(shared),
