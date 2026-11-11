@@ -798,6 +798,17 @@ class EngineRun:
         # candidate in the record (and only then is released).
         self._maybe_revise_killed_candidate()
 
+        # ---- R6 ANSWER COMPOSER (owner directive 2026-11-11, item 3) --
+        # ONE LLM call writes the full engineer-facing answer from
+        # constraints + variables + top candidates + packet +
+        # verification; the deterministic answer-shape contract is
+        # applied to the composed text (ONE repair retry). Disableable
+        # via disabled_stages=["COMPOSE"] (the ablation arm). The
+        # superseded field-concatenation extraction stays as the honest
+        # fallback when COMPOSE is disabled or failed (Art. LXIV: the
+        # replacement states what happens to the superseded path).
+        self._maybe_compose_answer()
+
         final = self._final_state()
         self._persist("final_state.json", final)
         # the PRE-evolution final state is preserved for the cemetery
@@ -3584,6 +3595,97 @@ class EngineRun:
             return h.hexdigest()
         except OSError:
             return None
+
+    # ------------------------------------------------------------------
+    def _maybe_compose_answer(self) -> None:
+        """R6 ANSWER COMPOSER (owner directive 2026-11-11, item 3): ONE
+        LLM call writes the full engineer-facing answer from the run's
+        own recorded state — constraints + user variables + top
+        candidates (with attack verdicts) + the frozen packet + the
+        verification summary. The deterministic answer-shape contract
+        runs on the composed text (ONE repair retry inside the
+        composer). Result: ANSWER_COMPOSED.json (state
+        COMPOSED_CONTRACT_VALID / COMPOSED_CONTRACT_INVALID /
+        COMPOSE_FAILED_TRANSPORT / DISABLED_BY_CONFIG). The composer
+        WRITES prose; it grants no epistemic authority (Art. XVIII) —
+        the contract and the harness gates still decide what the answer
+        may claim."""
+        if "COMPOSE" in self.disabled:
+            self.env.stage_log.append({
+                "stage": "COMPOSE", "capability_id": "answer_composer",
+                "status": "DISABLED_BY_CONFIG", "candidate_delta": [],
+                "delta_real": False, "started_at": utc_now(),
+                "finished_at": utc_now()})
+            return
+        _t0 = utc_now()
+        rec: Dict[str, Any] = {}
+        status = "FAILED_EXPLICIT"
+        try:
+            from .answer_composer import compose_answer, candidates_from_state
+            env_dict = self.env.to_dict()
+            # disable the composer when the synthesis tail never ran:
+            # no candidates and no evidence means the composition would
+            # be invented from nothing (Art. XXV — never manufacture)
+            cands = candidates_from_state(env_dict, top_n=5)
+            packet = self.env.evidence or []
+            if not cands and not packet:
+                rec = {"composer_version": "answer_composer/1.0.0",
+                       "state": "SKIPPED_NO_INPUTS",
+                       "why": "no candidates and no frozen evidence "
+                              "recorded by this run; composition would "
+                              "be manufactured from nothing (Art. XXV)",
+                       "answer": None, "started_at": _t0,
+                       "finished_at": utc_now()}
+                status = "SKIPPED_NO_INPUTS"
+            else:
+                _att = (self.env.attack_results or {})
+                _phys = (self.env.physics or {})
+                verification = {
+                    "attack_overall": _att.get("overall"),
+                    "physics_status": (_phys.get("verdict")
+                                       or _phys.get("overall")),
+                    "contradiction_status": (
+                        (self.env.contradictions or {}).get("overall")
+                        or (self.env.contradictions or {}).get("status")),
+                    "premise_gate": (self.env.premise_gate or {}).get(
+                        "verdict") or (
+                        self.env.premise_gate or {}).get("status"),
+                    "final_status": (
+                        (self.env.epistemic_state or {}).get(
+                            "final_status") if isinstance(
+                            self.env.epistemic_state, dict) else
+                        self.env.epistemic_state),
+                }
+                rec = compose_answer(
+                    self.problem or {},
+                    packet=packet,
+                    candidates=cands,
+                    verification=verification,
+                    question_type=str((self.problem or {}).get(
+                        "question_type") or "intervention-proposal"))
+                status = ("OK" if rec.get("answer")
+                          else "FAILED_EXPLICIT")
+        except Exception as exc:  # noqa: BLE001 — typed, never silent
+            rec = {"composer_version": "answer_composer/1.0.0",
+                   "state": "COMPOSE_FAILED_TRANSPORT",
+                   "error": f"{type(exc).__name__}: {exc}"[:300],
+                   "answer": None, "started_at": _t0,
+                   "finished_at": utc_now()}
+            status = "FAILED_EXPLICIT"
+        rec["started_at"] = rec.get("started_at") or _t0
+        rec["finished_at"] = rec.get("finished_at") or utc_now()
+        self._persist("ANSWER_COMPOSED.json", rec)
+        self.env.stage_log.append({
+            "stage": "COMPOSE", "capability_id": "answer_composer",
+            "status": status, "candidate_delta": [],
+            "delta_real": False,
+            "started_at": rec.get("started_at") or _t0,
+            "finished_at": rec.get("finished_at") or utc_now(),
+            "entry": {"composer_state": rec.get("state"),
+                      "n_llm_calls": rec.get("n_llm_calls", 0),
+                      "contract_valid": (
+                          (rec.get("contract") or {}).get("valid")
+                          if rec.get("contract") else None)}})
 
     # ------------------------------------------------------------------
     def _maybe_revise_killed_candidate(self) -> Dict[str, Any]:

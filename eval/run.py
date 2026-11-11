@@ -214,6 +214,13 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
     A/B comparison each arm must genuinely re-run the pipeline; stale
     artifacts from a different A/B toggle leaking in would fabricate
     results."""
+    # R6 ablation: leave-one-out arms disable stages via
+    # EVAL_DISABLE_STAGES (comma-separated), set by the ablation driver
+    # on the child env. The disabled set travels into the record (the
+    # ablation table cites it per row).
+    _dis = [s.strip() for s in
+            (os.environ.get("EVAL_DISABLE_STAGES") or "").split(",")
+            if s.strip()]
     # Establish a clean out_dir. If we cannot, this measured arm must
     # produce a typed INCOMPLETE record — it must NEVER reuse stale
     # artifacts from an earlier arm (the defect that zeroed the A/B).
@@ -237,6 +244,7 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
                 package_registry_path=str(out_dir / "PACKAGE_ID_REGISTRY.json"),
                 with_package=(os.environ.get("ENGINE_NO_PACKAGE", "").strip()
                              not in ("1", "true", "yes")),
+                disabled_stages=(_dis or None),
                 resume=False)
             manifest = run.run()
             status = manifest.get("final_status") if isinstance(manifest, dict) else None
@@ -249,6 +257,20 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
                  and json.loads((out_dir / "final_state.json").read_text(encoding="utf-8")).get("final_status") in COMPLETED_STATUSES)
     _ans = _extract_pipeline_answer(out_dir)
     _avr = _attack_overall(out_dir)
+    _comp = None
+    _comp_p = out_dir / "ANSWER_COMPOSED.json"
+    if _comp_p.exists():
+        try:
+            _c = json.loads(_comp_p.read_text(encoding="utf-8"))
+            _comp = {"state": _c.get("state"),
+                     "n_llm_calls": _c.get("n_llm_calls"),
+                     "contract_valid": (
+                         (_c.get("contract") or {}).get("valid")
+                         if _c.get("contract") else None),
+                     "provider": _c.get("provider_route"),
+                     "model": _c.get("model")}
+        except Exception:  # noqa: BLE001
+            _comp = None
     record: Dict[str, Any] = {
         "answer": _ans,
         "completed": completed,
@@ -260,6 +282,8 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
         "answer_state": ("UNVERIFIED_HYPOTHESIS"
                          if (_avr == "KILLED" and _ans)
                          else ("RELEASED" if _ans else "NO_ANSWER")),
+        "disabled_stages": _dis,
+        "composer": _comp,
     }
     if final_state.exists() and stale_error is None:
         fs = json.loads(final_state.read_text(encoding="utf-8"))
@@ -275,6 +299,43 @@ COMPLETED_STATUSES = {"AUTOMATED_INVENTION_CANDIDATE",
                       "INVENTION_REQUIRES_EXPERIMENT",
                       "INVENTION_UNDER_DEVELOPMENT",
                       "AUTOMATED_INVENTION"}
+
+
+# ---------------------------------------------------------------------------
+# arm: composer-only (R6 ablation — item 6, "composer-only vs full vs
+# leave-one-out per stage"; the composer is item 3's ANSWER COMPOSER)
+# ---------------------------------------------------------------------------
+def run_composer_only_problem(problem: Dict[str, Any],
+                              out_dir: Path) -> Dict[str, Any]:
+    """ABLATION ARM 'composer-only': the ANSWER COMPOSER ALONE — one LLM
+    call (plus its one in-composer repair retry) with the problem's
+    constraints + variables, NO packet, NO candidates, NO verification.
+    Measures exactly what the staged pipeline adds over its own final
+    writer. The composed answer gets the same deterministic contract and
+    the same 0-4 rubric judge as every other arm (paired comparison)."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    t0 = time.time()
+    try:
+        from discovery_fabric.engine.answer_composer import compose_answer
+        rec = compose_answer(
+            _intake_problem(problem),
+            packet=[],            # composer-only: no frozen packet
+            candidates=[],        # composer-only: no staged candidates
+            verification=None,    # composer-only: no verification state
+            question_type=str(problem.get("question_type")
+                              or "intervention-proposal"))
+    except Exception as exc:  # noqa: BLE001 — typed failure, never silent
+        rec = {"state": "COMPOSE_FAILED_TRANSPORT",
+               "error": f"{type(exc).__name__}: {exc}"[:300],
+               "answer": None}
+    rec["wall_s"] = round(time.time() - t0, 1)
+    rec["arm"] = "composer-only"
+    rec["problem_id"] = problem["problem_id"]
+    (out_dir / "composer_only_record.json").write_text(
+        json.dumps(rec, indent=1, default=str) + "\n", encoding="utf-8")
+    print(f"[eval] {_label(problem['problem_id'])}: composer-only done "
+          f"({rec['wall_s']}s, state={rec.get('state')})", flush=True)
+    return rec
 
 
 def _attack_overall(out_dir: Path) -> str:
@@ -328,7 +389,37 @@ def _best_flagged_answer(out_dir: Path) -> Optional[str]:
 
 def _extract_pipeline_answer(out_dir: Path) -> Optional[str]:
     """Normalised plain-text answer, or None when nothing was released
-    (a refusal notice is never handed to the judge — Art. LXI)."""
+    (a refusal notice is never handed to the judge — Art. LXI).
+
+    R6: the ANSWER COMPOSER's output (ANSWER_COMPOSED.json, one LLM
+    call over constraints + variables + candidates + packet +
+    verification) takes precedence when present and contract-valid.
+    A composition that violates the contract is delivered HONESTLY
+    FLAGGED (its violations ride in the record) — never silently
+    replaced, never silently dropped. The superseded field-concatenation
+    paths below stay as the fallback for COMPOSE-disabled runs (the
+    ablation arm) and for failed compositions (Art. LXIV)."""
+    # 0) composed answer (R6 ANSWER COMPOSER)
+    comp_p = Path(out_dir) / "ANSWER_COMPOSED.json"
+    if comp_p.exists():
+        try:
+            comp = json.loads(comp_p.read_text(encoding="utf-8"))
+            _c_ans = comp.get("answer")
+            if _c_ans and str(_c_ans).strip():
+                if comp.get("state") == "COMPOSED_CONTRACT_VALID":
+                    return str(_c_ans)[:6000]
+                # contract-invalid composition: keep it but flag it —
+                # the flag text makes the violation visible to the judge
+                # and to every downstream diagnostic (honesty over
+                # tidiness, Art. XXV)
+                viols = " | ".join(
+                    (comp.get("contract") or {}).get("violations") or [])
+                flag = ("CONTRACT-INVALID COMPOSITION (deterministic "
+                        "answer-shape contract violations: "
+                        f"{viols[:300]})\n\n")
+                return (flag + str(_c_ans))[:6000]
+        except Exception:  # noqa: BLE001 — corrupt record reads as absent
+            pass
     # Always-deliver (Art. XI): if the gauntlet killed everything but a
     # candidate exists, deliver the best hypothesis honestly labeled
     # UNVERIFIED instead of nothing.
@@ -918,6 +1009,91 @@ def _numbers_absent(ans: Optional[str], packet_blob: str,
         if not rx.search(pb) and not rx.search(ub):
             out.append(n)
     return sorted(out)
+
+
+# ---------------------------------------------------------------------------
+# R6 ablation quality instrument: the 0-4 rubric (owner directive
+# 2026-11-11, item 6: "DeltaQ on the 0-4 rubric with paired CI")
+# ---------------------------------------------------------------------------
+RUBRIC_0_4 = [
+    (0, "no usable answer (refusal, transport failure, empty)"),
+    (1, "generic; ignores the stated constraints or the asked question; "
+        "no testable prediction"),
+    (2, "addresses the failure; partially respects the stated variables; "
+        "numbers vague or untestable"),
+    (3, "specific and constraint-respecting with a concrete test; minor "
+        "gaps (e.g. one number ungrounded)"),
+    (4, "specific, quantified, constraint-respecting, falsification test "
+        "named, evidence grounding honest (packet-sourced or labeled)"),
+]
+
+
+def quality_prompt_0to4(problem: Dict[str, Any], answer: str) -> str:
+    lines = [
+        "You score ONE engineering answer on a 0-4 rubric (blind: you see "
+        "no arm labels, no comparisons).",
+        f"DEVICE: {problem.get('device', '')}",
+        f"FAILURE: {problem.get('failure', '')}",
+        "USER'S STATED VARIABLES:",
+        "- " + "\n- ".join(problem.get("user_variables", [])),
+        f"USER'S QUESTION: {problem.get('question', '')}",
+        "",
+        "RUBRIC (one score, integers only):",
+    ]
+    for s, d in RUBRIC_0_4:
+        lines.append(f"  {s}: {d}")
+    lines += [
+        "",
+        "Score strictly: a well-hedged honest answer with no evidence "
+        "never scores above 3; an answer that fabricates numbers scores "
+        "at most 1; an answer that ignores a stated constraint scores at "
+        "most 2. Score the answer BELOW.",
+        "",
+        "=== ANSWER ===",
+        answer[:6000],
+        "",
+        "Answer ONLY:",
+        "SCORE: <0-4>",
+        "WHY: <one sentence>",
+    ]
+    return "\n".join(lines)
+
+
+def judge_quality_0to4(problem: Dict[str, Any], answer: Optional[str],
+                       route: Dict[str, Any]) -> Dict[str, Any]:
+    """One blind 0-4 rubric judgment of one answer. Typed outcome, same
+    discipline as the pairwise judge (a transport failure is never a
+    score; a parse failure is never a score)."""
+    if not answer or not str(answer).strip():
+        return {"outcome": "QJ_NO_ANSWER", "score": 0,
+                "why": "no answer produced by this arm"}
+    if not route.get("provider"):
+        return {"outcome": "QJ_NO_ROUTE", "score": None,
+                "why": "no judge route available"}
+    prompt = quality_prompt_0to4(problem, str(answer))
+    t0 = time.time()
+    res = _transport_call(route["provider"], route["model"], prompt,
+                          "You are a strict blind rubric judge. English "
+                          "only. Follow the exact output lines.",
+                          max_tokens=120)
+    lat = round(time.time() - t0, 1)
+    content = res.get("content") or ""
+    if res.get("status") != "OK" or not content.strip():
+        return {"outcome": "QJ_TRANSPORT_FAILED", "score": None,
+                "error": str(res.get("error") or "empty content")[:200],
+                "latency_s": lat}
+    m = re.search(r"SCORE\s*:\s*([0-4])", content)
+    if not m:
+        return {"outcome": "QJ_PARSE_FAILED", "score": None,
+                "raw": content[:300], "latency_s": lat}
+    score = int(m.group(1))
+    mw = re.search(r"WHY\s*:\s*(.+)", content)
+    return {"outcome": "QJ_VALID", "score": score,
+            "why": (mw.group(1)[:200] if mw else ""),
+            "route": {"provider": res.get("provider_id"),
+                      "model": res.get("model")},
+            "latency_s": lat,
+            "content_sha": _sha(content)[:16]}
 
 
 def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
@@ -2195,6 +2371,16 @@ def main(argv=None) -> int:
             print(f"[eval] {_label(pid)}: pipeline done ({rec['wall_s']}s, "
                   f"status={rec.get('final_status')}, completed={rec.get('completed')})",
                   flush=True)
+        if "composer" in arms:
+            # R6 ablation arm: the ANSWER COMPOSER alone (one LLM call,
+            # no packet, no candidates, no verification). Fresh dir per
+            # run (the fresh-run discipline applies to every measured arm).
+            _cdir = d / "composer"
+            if _cdir.exists():
+                import shutil
+                shutil.rmtree(_cdir, ignore_errors=True)
+            _cdir.mkdir(parents=True, exist_ok=True)
+            run_composer_only_problem(p, _cdir)
         if "baseline" in arms:
             rec = run_baseline_problem(_intake_problem(p), d, route_rec)
             _save(pid, "baseline_record.json", rec)
