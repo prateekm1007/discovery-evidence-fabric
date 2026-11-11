@@ -3621,68 +3621,41 @@ class EngineRun:
         rec: Dict[str, Any] = {}
         status = "FAILED_EXPLICIT"
         try:
-            from .answer_composer import compose_answer, candidates_from_state
+            from .answer_composer import compose_if_admissible
             env_dict = self.env.to_dict()
-            # disable the composer when the synthesis tail never ran:
-            # no candidates and no evidence means the composition would
-            # be invented from nothing (Art. XXV — never manufacture)
-            cands = candidates_from_state(env_dict, top_n=5)
-            packet = self.env.evidence or []
-            if not cands:
-                # no gate-admissible candidate: composing a
-                # recommendation here would be an invented one
-                # (Art. XVIII/XXV). Typed no-recommendation state —
-                # zero LLM calls.
-                rec = {"composer_version": "answer_composer/1.0.0",
-                       "state": "NO_ADMISSIBLE_CANDIDATES",
-                       "why": ("no candidate survived the evidence / "
-                               "attack gates (or attack verdict is a "
-                               "kill / verdict missing); refusing to "
-                               "compose an endorsed recommendation from "
-                               "unadjudicated state"),
-                       "answer": None, "started_at": _t0,
-                       "finished_at": utc_now()}
-                status = "NO_ADMISSIBLE_CANDIDATES"
-            elif not packet:
-                # no frozen evidence: the empty-evidence composer run is
-                # forbidden; honest typed refusal, zero LLM calls
-                rec = {"composer_version": "answer_composer/1.0.0",
-                       "state": "SKIPPED_NO_PACKET",
-                       "why": ("no frozen evidence packet — composition "
-                               "without epistemic grounds is not permitted"),
-                       "answer": None, "started_at": _t0,
-                       "finished_at": utc_now()}
-                status = "SKIPPED_NO_PACKET"
-            else:
-                _att = (self.env.attack_results or {})
-                _phys = (self.env.physics or {})
-                verification = {
-                    "attack_overall": _att.get("overall"),
-                    "physics_status": (_phys.get("verdict")
-                                       or _phys.get("overall")),
-                    "contradiction_status": (
-                        (self.env.contradictions or {}).get("overall")
-                        or (self.env.contradictions or {}).get("status")),
-                    "premise_gate": (self.env.premise_gate or {}).get(
-                        "verdict") or (
-                        self.env.premise_gate or {}).get("status"),
-                    "final_status": (
-                        (self.env.epistemic_state or {}).get(
-                            "final_status") if isinstance(
-                            self.env.epistemic_state, dict) else
-                        self.env.epistemic_state),
-                }
-                rec = compose_answer(
-                    self.problem or {},
-                    packet=packet,
-                    candidates=cands,
-                    verification=verification,
-                    question_type=str((self.problem or {}).get(
-                        "question_type") or "intervention-proposal"))
-                status = ("COMPOSED_CONTRACT_INVALID"
-                          if rec.get("state") == "COMPOSED_CONTRACT_INVALID"
-                          else (rec.get("state") or "FAILED_EXPLICIT")
-                          if rec.get("answer") else "FAILED_EXPLICIT")
+            _att = (self.env.attack_results or {})
+            _phys = (self.env.physics or {})
+            verification = {
+                "attack_overall": _att.get("overall"),
+                "physics_status": (_phys.get("verdict")
+                                   or _phys.get("overall")),
+                "contradiction_status": (
+                    (self.env.contradictions or {}).get("overall")
+                    or (self.env.contradictions or {}).get("status")),
+                "premise_gate": (self.env.premise_gate or {}).get(
+                    "verdict") or (
+                    self.env.premise_gate or {}).get("status"),
+                "final_status": (
+                    (self.env.epistemic_state or {}).get(
+                        "final_status") if isinstance(
+                        self.env.epistemic_state, dict) else
+                    self.env.epistemic_state),
+            }
+            # P0-2 (owner directive 2026-11-11, item 2): admission runs
+            # FIRST — no admissible candidate (recorded verdict is a
+            # kill, an evaluator / evaluation failure, an unadjudicated
+            # state, or a record not bound to this candidate) -> the
+            # typed NO_ADMISSIBLE_CANDIDATES record with ZERO composer
+            # LLM calls (never an invented recommendation, Art.
+            # XVIII/XXV/LXI); a global attack status must not promote
+            # an unrelated or unadjudicated raw candidate.
+            rec = compose_if_admissible(
+                env_dict, self.problem or {},
+                packet=self.env.evidence or [],
+                verification=verification,
+                question_type=str((self.problem or {}).get(
+                    "question_type") or "intervention-proposal"))
+            status = rec.get("state") or "FAILED_EXPLICIT"
         except Exception as exc:  # noqa: BLE001 — typed, never silent
             rec = {"composer_version": "answer_composer/1.0.0",
                    "state": "COMPOSE_FAILED_TRANSPORT",
