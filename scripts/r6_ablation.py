@@ -77,6 +77,32 @@ def _commit() -> str:
     return out[:12]
 
 
+def _committed_calibration() -> dict | None:
+    """The committed score-table judge calibration (Art. XVII evidence,
+    not a fresh wall-clock probe). Returns {}-shaped dict on absence —
+    the caller treats missing evidence as NOT calibrated."""
+    try:
+        table = json.loads((Path(__file__).resolve().parents[1]
+                            / "eval" / "score"
+                            / "SCORE_TABLE.json").read_text(
+                                encoding="utf-8"))
+        return table.get("judge_calibration") or None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _calibration_state() -> tuple:
+    cal = _committed_calibration()
+    if not cal:
+        return (False, "no committed judge_calibration evidence; "
+                       "removal gate stays closed")
+    n_ok = bool(cal.get("passed")) and int(cal.get("correct") or 0) >= 24
+    detail = (f"correct={cal.get('correct')}/{cal.get('n_pairs')} "
+              f"passed={cal.get('passed')} "
+              f"(accuracy={cal.get('accuracy')})")
+    return (n_ok, detail)
+
+
 def _full_root() -> Path:
     return REPO / "eval" / "runs" / _commit()
 
@@ -237,15 +263,32 @@ def report(arms) -> int:
         print("[ablation] no judgments yet — run the judge sub-command",
               flush=True)
         return 2
+    cal_ok, cal_detail = _calibration_state()
     J = json.loads(jp.read_text(encoding="utf-8"))
     probs = DEV7
     lines = ["# R6 ablation table (0-4 rubric, paired, blind judge)",
              "", f"- commit: `{commit}`",
              "- paired dQ = full(composer+pipeline) - ablated, same problems",
+             f"- CALIBRATION GATE (Art. L/LXXXIV): judge "
+             f"{'CALIBRATED (' + cal_detail + ')' if cal_ok else 'NOT CALIBRATED (' + cal_detail + ')'}",
              "- decision rule (pre-registered in r6_ablation.py): a stage",
              "  PROVES VALUE iff majority of pairs dQ > 0 AND bootstrap",
-             "  95% CI lower bound > 0; otherwise REMOVAL CANDIDATE.", ""]
-    table = {"commit": commit, "arms": {}, "decision_rule":
+             "  95% CI lower bound > 0; otherwise REMOVAL CANDIDATE.",
+             "  Stage REMOVAL is additionally forbidden without",
+             "  (a) judge calibration >= 24/30 on committed evidence and",
+             "  (b) auditor-judged DEV pairs. This harness cannot grant",
+             "  either. Verdicts are DIAGNOSTIC_ONLY until then."
+             "  The auditor judges the pairs; the coder does not"
+             "  self-judge.", ""]
+    table = {"commit": commit, "arms": {},
+             "calibration_gate": {"passed_24_of_30": cal_ok,
+                                  "detail": cal_detail,
+                                  "source": "committed SCORE_TABLE judge_calibration"},
+             "stage_removal_allowed": False,
+             "removal_requires": ["judge calibration >= 24/30 (committed evidence)",
+                                  "auditor-judged DEV pairs (Art. XXVI)",
+                                  "one commit per removal, constitution by deletion"],
+             "decision_rule":
              "prove value iff majority(dQ>0) AND CI_lo > 0; else removal candidate"}
     for arm in arms:
         if arm == "full":
@@ -277,7 +320,13 @@ def report(arms) -> int:
         mean, lo, hi = bootstrap_ci(deltas)
         pos = sum(1 for d in deltas if d > 0)
         proves = bool(deltas) and pos > len(deltas) / 2 and lo is not None and lo > 0
-        verdict = "PROVES_VALUE" if proves else "REMOVAL_CANDIDATE"
+        if proves and cal_ok:
+            verdict = "PROVES_VALUE"
+        elif proves:
+            verdict = "DIAGNOSTIC_ONLY_PROVES_VALUE (judge below 24/30 — not actionable)"
+        else:
+            verdict = ("DIAGNOSTIC_ONLY_REMOVAL_CANDIDATE"
+                       if not cal_ok else "REMOVAL_CANDIDATE")
         table["arms"][arm] = {
             "n_pairs_scored": len(deltas),
             "dq_mean": mean, "dq_ci95": [lo, hi],
@@ -286,6 +335,7 @@ def report(arms) -> int:
             "time_share_note": (f"full {time_full:.0f}s vs ablated "
                                 f"{time_arm:.0f}s (completed problems only)"),
             "verdict": verdict,
+            "stage_removal_allowed": False,
             "rows": rows}
         lines.append(f"## {arm}")
         lines.append(f"- scored pairs: {len(deltas)} | dQ mean {mean} "
