@@ -1,0 +1,27 @@
+{
+ "problem_id": "dev-fu-001-bearing-spalling",
+ "commit": "0957dedcd38f",
+ "dirty_tree": true,
+ "question": "Propose the most cost-effective measurable leading indicator for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+ "question_type": "predictor-design",
+ "device": "rolling-element bearing in a 350 kW industrial fan drive",
+ "failure": "inner-race spalling progresses for weeks before the vibration alarm trips; by then the bearing is past repair",
+ "followup_finding": "We re-analyzed the last 12 months: bearing fault-frequency harmonics appear 19 days before the alarm in our worst case, and the 80th percentile was 16 days. The 5 dB band above BPFI sidebands overlaps with the gearbox defect signature.",
+ "constraint": "predictor must use existing 1 kHz vibration sensor and 1 Hz SCADA logging only, fire at least 14 days warning, produce no more than 2 false alarms per year",
+ "user_variables": [
+  "1 kHz vibration sensor only",
+  "1 Hz SCADA logging",
+  "at least 14 days warning",
+  "at most 2 false alarms per year"
+ ],
+ "round1_answer": "UNVERIFIED HYPOTHESIS \u2014 this candidate was NOT endorsed by the adversarial gauntlet (it was revised once and rejected again). It is delivered as a hypothesis requiring the falsification test below; it is NOT an invention claim.\n\nstress distributions in composite structures evaluated through finite element simulations and analytical frameworks\n\nUse the 1 kHz vibration sensor to isolate BPFI sidebands, filtering out the overlapping 80th percentile gearbox defect signature via a spectral subtraction model based on the 19-day harmonic appearance window.\n\nDetection of bearing fault-frequency harmonics 19 days before the traditional alarm trips, reducing false alarms caused by gearbox noise overlap to <2 per year.\n\nRun a spectral analysis on 12 months of historical data; verify that the isolated BPFI component precedes the SCADA vibration threshold crossing by at least 16 days in 80% of failure cases, and that the residual spectrum after subtracting the modeled gearbox signature remains below the 5 dB noise floor.",
+ "round2_answer": null,
+ "round2_status": null,
+ "round2_wall_s": 3694.3,
+ "round2_same_snapshot": null,
+ "causal_change_evidence": null,
+ "judge_round1": null,
+ "judge_round2": null,
+ "round1_pipeline_status": "INVENTION_REQUIRES_EXPERIMENT",
+ "round1_pipeline_wall_s": 267.7
+}

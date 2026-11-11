@@ -1,0 +1,42 @@
+{
+ "problem_id": "dev-fu-004-fouling",
+ "commit": "0957dedcd38f",
+ "dirty_tree": true,
+ "question": "Propose the most cost-effective measurable leading indicator for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+ "question_type": "predictor-design",
+ "device": "shell-and-tube condenser on a steam turbine exhaust, 300 MW unit",
+ "failure": "tube-side biofouling accumulates over weeks; heat transfer degrades causing turbine back-pressure rise and derating",
+ "followup_finding": "The condenser U-coefficient fell 18% from baseline 22 days before the last back-pressure derate. Tube-bundle fouling resistance was confirmed at 0.0012 m2K/W by the subsequent cleaning inspection.",
+ "constraint": "predictor must use existing temperature and flow measurements only, fire at least 3 weeks before back-pressure hits the derating limit, no requirement for new instrumentation",
+ "user_variables": [
+  "existing instrumentation only",
+  "at least 3 weeks before derating",
+  "no false trips during load swings"
+ ],
+ "round1_answer": "Nonlinear gain modulation via hyperbolic tangent function to enhance damping and transient shaping in control loops\n\nImplement a tanh-based nonlinear feedback loop on the existing cooling water flow measurement to dynamically adjust the condenser pressure control setpoint, compensating for the gradual fouling resistance rise\n\nMaintain stable back-pressure by actively modulating the pressure control response as the U-coefficient degrades, extending time-to-derating event\n\nRun a closed-loop simulation where a step fault in fouling resistance is introduced; verify that the tanh-PID controller maintains pressure deviation within 0.5% of baseline, whereas the legacy linear PID exhibits overshoot exceeding 2%",
+ "round2_answer": "UNVERIFIED HYPOTHESIS \u2014 this candidate was NOT endorsed by the adversarial gauntlet (it was revised once and rejected again). It is delivered as a hypothesis requiring the falsification test below; it is NOT an invention claim.\n\nA nonlinear gain modulation that smooths the derivative response (hyperbolic tangent saturation) to improve damping and transient shaping in systems with significant thermal inertia and non-linear fouling accumulation.\n\nImplement a predictive derivative logic on the condenser U-coefficient trend, modeled after a tanh-saturated PID structure, using only existing temperature and flow measurements to estimate fouling resistance.\n\nMaintains U-coefficient integrity by triggering back-pressure mitigation protocols 3 weeks before the derating limit is reached, specifically identifying the 18% U-coefficient drop as the early warning trigger.\n\nReplay historical process data from the last two fouling cycles to verify that the tanh-based derivative predictor fires exactly 21 days prior to the back-pressure derate event.",
+ "round2_status": "INVENTION_REQUIRES_EXPERIMENT",
+ "round2_wall_s": 125.9,
+ "round2_same_snapshot": true,
+ "causal_change_evidence": {
+  "finding_ingested": true,
+  "round2_same_snapshot": true,
+  "mechanism_text_changed": true,
+  "round1_len": 712,
+  "round2_len": 1049,
+  "finding_chars": 196,
+  "provenance": "round2 child process; ENGINE_EVIDENCE_CACHE served the round-1 frozen packet (Art. LI); finding injected into problem constraint and user_variables via intake"
+ },
+ "judge_round1": {
+  "usable_pair": false,
+  "outcome": "JUDGE_TRANSPORT_FAILED",
+  "why": "no calibrated judge route (see judge selection record)"
+ },
+ "judge_round2": {
+  "usable_pair": false,
+  "outcome": "JUDGE_TRANSPORT_FAILED",
+  "why": "no calibrated judge route (see judge selection record)"
+ },
+ "round1_pipeline_status": "INVENTION_REQUIRES_EXPERIMENT",
+ "round1_pipeline_wall_s": 175.2
+}

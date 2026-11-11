@@ -1,0 +1,43 @@
+{
+ "problem_id": "dev-fu-003-motor-insulation",
+ "commit": "0957dedcd38f",
+ "dirty_tree": true,
+ "question": "Propose the most cost-effective measurable leading indicator for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+ "question_type": "predictor-design",
+ "device": "4.16 kV induction motor driving a boiler feed pump",
+ "failure": "stator winding insulation degrades through partial discharge; ground fault cascade brings the motor down and damages the drive train",
+ "followup_finding": "Offline PD measurements on the last three failed motors showed partial discharge magnitude rising above 200 pC at 6-9 months before failure. Two of those had proven 100% replacement accuracy with a 150 pC threshold.",
+ "constraint": "predictor must use offline PD testing during scheduled outages only, detect degradation at least 6 months before ground fault, require no continuous monitoring hardware",
+ "user_variables": [
+  "offline PD testing only",
+  "no continuous monitoring hardware",
+  "at least 6 months before ground fault",
+  "no emergency shutdowns triggered falsely"
+ ],
+ "round1_answer": "pH-responsive accelerated degradation enabling controlled release and local microenvironment modulation\n\nImplement a diagnostic protocol where offline PD testing serves as the \"pH sensor\" for insulation health; use the 150 pC threshold as the trigger for \"controlled release\" of maintenance interventions, mimicking the scaffold's response to acidic stress\n\nDetection of insulation degradation at least 6 months before ground fault, preventing drive train damage, with 100% replacement accuracy\n\nApply the 150 pC threshold to historical offline PD data from the last three failed motors; verify that all cases exceeding this threshold prior to failure align with the 6-9 month window, confirming predictive validity",
+ "round2_answer": "UNVERIFIED HYPOTHESIS \u2014 this candidate was NOT endorsed by the adversarial gauntlet (it was revised once and rejected again). It is delivered as a hypothesis requiring the falsification test below; it is NOT an invention claim.\n\npH-responsive accelerated degradation enables controlled release of a protective agent in response to acidic local conditions, remodeling the hostile environment and preventing damage propagation.\n\nApply a pH-responsive polymer nanocomposite coating to the stator winding insulation that degrades in the presence of acidic partial discharge byproducts (nitric acid, ozone) and releases crack-sealing and neutralizing agents, effectively self-healing micro-cracks during scheduled outages without continuous monitoring hardware.\n\nPartial discharge magnitude remains below the 200 pC failure precursor threshold for at least 6 months past the detection point, delaying or eliminating ground fault cascade and protecting the drive train.\n\nAccelerated aging per IEEE 1043 on n=6 identical 4.16 kV induction motor stators (3 coated, 3 uncoated) operated at rated voltage with elevated temperature and humidity; offline PD measured at 2-month intervals. Pass criterion: all 3 coated stators show PD < 150 pC at 6 months and no ground fault at 12 months, while all 3 uncoated stators exceed 200 pC and fail within 9 months.",
+ "round2_status": "INVENTION_REQUIRES_EXPERIMENT",
+ "round2_wall_s": 98.5,
+ "round2_same_snapshot": true,
+ "causal_change_evidence": {
+  "finding_ingested": true,
+  "round2_same_snapshot": true,
+  "mechanism_text_changed": true,
+  "round1_len": 715,
+  "round2_len": 1345,
+  "finding_chars": 215,
+  "provenance": "round2 child process; ENGINE_EVIDENCE_CACHE served the round-1 frozen packet (Art. LI); finding injected into problem constraint and user_variables via intake"
+ },
+ "judge_round1": {
+  "usable_pair": false,
+  "outcome": "JUDGE_TRANSPORT_FAILED",
+  "why": "no calibrated judge route (see judge selection record)"
+ },
+ "judge_round2": {
+  "usable_pair": false,
+  "outcome": "JUDGE_TRANSPORT_FAILED",
+  "why": "no calibrated judge route (see judge selection record)"
+ },
+ "round1_pipeline_status": "INVENTION_REQUIRES_EXPERIMENT",
+ "round1_pipeline_wall_s": 153.1
+}
