@@ -634,7 +634,24 @@ class TestDeletionAccounting(unittest.TestCase):
                     # channel's default flipped off (served 0 items in 25
                     # measured runs); the channel is now opt-in.  No gate,
                     # budget, probe, or admission semantics touched.
-                    "discovery_fabric/evidence_fabric/__init__.py"),
+                    "discovery_fabric/evidence_fabric/__init__.py",
+                    # R6 AMENDMENT (disclosed, owner round 2026-11-12
+                    # item 1, COMPOSE -> VALIDATE -> REPAIR): the typed
+                    # truncation signal (the transport's normalized
+                    # finish-reason report) requires the answer composer
+                    # to detect a cut draft and run ONE larger-budget
+                    # retry (engine/answer_composer.py — the 1.1.0
+                    # version; never ships a truncated answer, typed
+                    # COMPOSE_TRUNCATED no-answer, plain-language
+                    # caveats; the transport record on
+                    # engine/llm_registry.py + the llm_generate meta on
+                    # engine/mechanism_space.py already ride
+                    # already-allowed files).  One deterministic
+                    # retry budget + typed state; no verdict gate,
+                    # threshold, probe, or admission semantics touched.
+                    # Pinned by tests/test_composer_truncation_pin.py
+                    # (16 hermetic zero-LLM pins).
+                    "discovery_fabric/engine/answer_composer.py"),
                 f"the mandate's file list is exhaustive: {f} is outside "
                 "run.py/stage_entry.py/adapters.py/llm_registry.py")
 

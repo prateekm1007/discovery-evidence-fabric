@@ -29,6 +29,17 @@ is reachable only from the explicitly selected no_COMPOSE ablation
 arm, clearly labelled DIAGNOSTIC (Art. IV), and is retired when that
 scoped ablation use is complete (Art. LXIV).
 
+Owner round 2026-11-12, item 1 (COMPOSE -> VALIDATE -> REPAIR):
+a truncated composition — the API's typed finish-reason report says
+the output was cut at the token budget ("length"), or, when no
+finish reason was reported, the plainly cut sentence — is NEVER
+shipped: ONE retry runs at a larger budget (the recorded multiplier
+constant, a retry budget and never a verdict gate), and a
+still-truncated retry is the typed COMPOSE_TRUNCATED no-answer
+(Art. LXI: an infrastructure state, never a scientific refusal;
+Art. XXV: the typed detail stays in the record's truncation
+metadata; the plain-language caveat rides in `caveats`).
+
 The composer grants no epistemic authority (Art. XVIII): it WRITES the
 engineer-facing answer; every claim's provenance comes from the packet
 and the candidate records, and unverified numbers stay labeled.
@@ -39,7 +50,12 @@ import re
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-ANSWER_COMPOSER_VERSION = "answer_composer/1.0.0"
+# 1.1.0 (owner round 2026-11-12, item 1): the typed truncation
+# signal (the transport's normalized finish-reason report), the one
+# larger-budget truncation retry (purpose answer_composer_truncation),
+# the COMPOSE_TRUNCATED no-answer state, and the plain-language
+# caveats (typed states stay in the metadata only).
+ANSWER_COMPOSER_VERSION = "answer_composer/1.1.0"
 
 _COMPOSER_SYSTEM = (
     "You write the final engineer-facing answer of a discovery pipeline. "
@@ -180,6 +196,49 @@ def _verification_block(verification: Optional[Dict[str, Any]]) -> str:
     return "\n".join(rows) or "(verification recorded no typed states)"
 
 
+# ------------------------------------------------------------------
+# R6 owner round 2026-11-12 item 1 — typed truncation detection.
+# The transport's normalized finish-reason report ("length" = cut
+# at the token budget) is the truncation signal when present; when
+# the API reported no finish reason ("unknown"/absent) the plainly
+# cut sentence is the SECONDARY signal — a binary exact-text check
+# (the last character is not a sentence terminal), not a threshold
+# (Art. XXVII). A typed non-length finish reason ("stop" or a raw
+# newer value) is the API's own report that the completion is what
+# the model produced: a missing period is a style issue, never a
+# truncation claim (Art. XXV).
+_TRUNCATION_FINISH = "length"
+#: the larger budget for the ONE truncation retry — a recorded retry
+#: budget, not a verdict gate (the multiplier rides in every
+#: truncation record: truncation.retry_max_tokens)
+_TRUNCATION_BUDGET_MULTIPLIER = 2
+_SENTENCE_TERMINALS = frozenset(".!?;:\"'\u2019\u201d)]}>")
+
+
+def _recorded_finish_reason(res: Dict[str, Any]) -> Optional[str]:
+    """The transport's normalized finish-reason report for one result
+    meta dict (None when the record carries it absent — legacy or
+    failure shapes)."""
+    fr = res.get("finish_reason")
+    return str(fr) if fr else None
+
+
+def _is_answer_truncated(text: str, res: Dict[str, Any]) -> bool:
+    """Typed truncation check for one composed text + its result
+    meta (see the block above): "length" is the API's own report of
+    a cut; without a typed signal the secondary cut-sentence check
+    applies (binary, no threshold)."""
+    fr = _recorded_finish_reason(res)
+    if fr == _TRUNCATION_FINISH:
+        return True
+    if fr is not None and fr != "unknown":
+        return False
+    t = (text or "").rstrip()
+    if not t:
+        return True
+    return t[-1] not in _SENTENCE_TERMINALS
+
+
 def compose_answer(problem: Dict[str, Any],
                    packet: Optional[List[Dict[str, Any]]],
                    candidates: List[Dict[str, Any]],
@@ -188,10 +247,20 @@ def compose_answer(problem: Dict[str, Any],
                    llm_generate=None,
                    max_tokens: int = 1000,
                    ) -> Dict[str, Any]:
-    """ONE LLM call writes the full engineer-facing answer; the
-    deterministic contract is applied to the composed text; ONE repair
-    retry on violation. Returns a record (never raises to the caller):
-    {answer, composer: {...}, contract: {...}, state}.
+    """ONE LLM call writes the full engineer-facing answer; when the
+    transport's typed finish-reason report says the draft was
+    truncated at the token budget — or, when no finish reason was
+    recorded, the plainly cut sentence does — ONE retry runs at a
+    LARGER budget (owner round 2026-11-12 item 1; the multiplier and
+    the retried budget ride in the record's truncation metadata). The
+    deterministic contract is applied to the composed text; ONE
+    repair retry on violation (a truncated repair is never adopted).
+    A truncated answer — a still-truncated retry — is NEVER shipped:
+    the typed COMPOSE_TRUNCATED no-answer replaces it (Art. LXI: an
+    infrastructure state, never a scientific refusal). Returns a
+    record (never raises to the caller):
+    {answer, composer: {...}, contract: {...}, state, truncation,
+    caveats}.
 
     `llm_generate` is injectable for tests (the engine's
     mechanism_space.llm_generate by default — ONE transport path,
@@ -241,6 +310,67 @@ def compose_answer(problem: Dict[str, Any],
         return rec
     answer = res["content"].strip()
     rec["output_sha256"] = res.get("output_hash")
+    # ---- typed truncation detection + ONE larger-budget retry
+    # (owner round 2026-11-12 item 1): the typed finish-reason
+    # report is the signal when present; without one, the cut
+    # sentence. The same prompt is re-sent at the larger budget —
+    # prompt_sha256 above stays the (identical) prompt's hash.
+    trunc: Dict[str, Any] = {
+        "first_call_finish_reason": _recorded_finish_reason(res),
+        "first_call_truncated": _is_answer_truncated(answer, res),
+        "n_truncation_retries": 0,
+    }
+    rec["truncation"] = trunc
+    if trunc["first_call_truncated"]:
+        _budget2 = _TRUNCATION_BUDGET_MULTIPLIER * max_tokens
+        res2 = llm_generate(prompt, system=_COMPOSER_SYSTEM,
+                            max_tokens=_budget2,
+                            purpose="answer_composer_truncation")
+        rec["n_llm_calls"] += 1
+        trunc.update({
+            "n_truncation_retries": 1,
+            "retry_max_tokens": _budget2,
+            "retry_purpose": "answer_composer_truncation",
+            "retry_finish_reason": _recorded_finish_reason(res2),
+            "retry_prompt_sha256": res2.get("prompt_hash"),
+            "retry_output_sha256": res2.get("output_hash"),
+        })
+        if not res2.get("ok") or not (res2.get("content") or "").strip():
+            # the truncated first draft is NEVER shipped: a transport
+            # failure on the retry is a typed transport state (Art.
+            # LXI — infrastructure, never a scientific verdict)
+            trunc["retry_failed"] = True
+            rec["state"] = "COMPOSE_FAILED_TRANSPORT"
+            rec["error"] = ("truncation retry failed: "
+                            + str(res2.get("error")
+                                  or res2.get("status"))[:300])
+            rec["answer"] = None
+            rec["caveats"] = [
+                ("The first draft was cut off at the model's output "
+                 "budget, and the larger-budget recomposition failed "
+                 "on the provider transport, so no answer is released "
+                 "for this problem.")]
+            rec["finished_at"] = _utc_now()
+            return rec
+        answer = res2["content"].strip()
+        trunc["retry_truncated"] = _is_answer_truncated(answer, res2)
+        if trunc["retry_truncated"]:
+            # never ship a truncated answer — the typed no-answer
+            # state (the typed detail stays in the truncation
+            # metadata; the plain-language caveat above)
+            rec["state"] = "COMPOSE_TRUNCATED"
+            rec["answer"] = None
+            rec["caveats"] = [
+                ("The first draft was cut off at the model's output "
+                 "budget, and the larger-budget recomposition "
+                 f"({_budget2} tokens) was cut off as well, so no "
+                 "answer is released for this problem.")]
+            rec["finished_at"] = _utc_now()
+            return rec
+        rec["output_sha256"] = res2.get("output_hash")
+        rec["model"] = res2.get("model")
+        rec["provider_route"] = res2.get("provider_route") \
+            or res2.get("provider")
     contract = validate_answer(answer, question_type,
                                packet=packet or [],
                                user_variables=list(
@@ -258,27 +388,33 @@ def compose_answer(problem: Dict[str, Any],
             failure=problem.get("failure", ""),
             variables_block=_variables_block(problem),
             shape_hint=shape_hint, shape_block=shape)
-        res2 = llm_generate(repair_prompt, system=_COMPOSER_SYSTEM,
+        res3 = llm_generate(repair_prompt, system=_COMPOSER_SYSTEM,
                             max_tokens=max_tokens,
                             purpose="answer_composer_repair")
         rec["n_llm_calls"] += 1
-        if res2.get("ok") and (res2.get("content") or "").strip():
-            answer2 = res2["content"].strip()
-            contract2 = validate_answer(answer2, question_type,
+        if res3.get("ok") and (res3.get("content") or "").strip():
+            answer3 = res3["content"].strip()
+            contract3 = validate_answer(answer3, question_type,
                                         packet=packet or [],
                                         user_variables=list(
                                             problem.get("user_variables")
                                             or []),
                                             clarification=_clarification)
             rec["contract_after_repair"] = {
-                "valid": contract2.get("valid"),
-                "violations": contract2.get("violations")}
-            if contract2.get("valid") is True or (
-                    len(contract2.get("violations") or []) <
-                    len(contract.get("violations") or [])):
-                answer = answer2
-                contract = contract2
-                rec["output_sha256"] = res2.get("output_hash")
+                "valid": contract3.get("valid"),
+                "violations": contract3.get("violations")}
+            # a truncated repair is NEVER adopted (never ship a
+            # truncated answer): the pre-existing improvement rule
+            # applies to COMPLETE repairs only
+            trunc["repair_finish_reason"] = _recorded_finish_reason(res3)
+            trunc["repair_truncated"] = _is_answer_truncated(answer3, res3)
+            if (not trunc["repair_truncated"]
+                    and (contract3.get("valid") is True or (
+                        len(contract3.get("violations") or []) <
+                        len(contract.get("violations") or [])))):
+                answer = answer3
+                contract = contract3
+                rec["output_sha256"] = res3.get("output_hash")
                 rec["repaired"] = True
     rec["answer"] = answer
     rec["contract"] = {"valid": contract.get("valid"),
@@ -288,6 +424,28 @@ def compose_answer(problem: Dict[str, Any],
     rec["state"] = ("COMPOSED_CONTRACT_VALID"
                     if contract.get("valid") is True
                     else "COMPOSED_CONTRACT_INVALID")
+    # plain-language caveats (the typed detail stays in the
+    # truncation / contract metadata above — Art. XXV)
+    _caveats: List[str] = []
+    if trunc["n_truncation_retries"]:
+        _caveats.append(
+            "The first draft was cut off at the model's output "
+            "budget; the answer above is the larger-budget "
+            "recomposition.")
+    if trunc.get("repair_truncated"):
+        _caveats.append(
+            "The repair attempt was also cut off at the output "
+            "budget and was not used; the answer above is the "
+            "complete pre-repair draft, still carrying its open "
+            "contract violations.")
+    if rec["state"] == "COMPOSED_CONTRACT_INVALID":
+        _viols = contract.get("violations") or []
+        _caveats.append(
+            "The answer did not fully pass the deterministic format "
+            "check; open violations: "
+            + ("; ".join(_viols) if _viols else "(none recorded)") + ".")
+    if _caveats:
+        rec["caveats"] = _caveats
     rec["finished_at"] = _utc_now()
     return rec
 

@@ -3604,9 +3604,12 @@ class EngineRun:
         candidates (with attack verdicts) + the frozen packet + the
         verification summary. The deterministic answer-shape contract
         runs on the composed text (ONE repair retry inside the
-        composer). Result: ANSWER_COMPOSED.json (state
+        composer; owner round 2026-11-12 item 1 adds ONE larger-
+        budget truncation retry on a typed truncated draft). Result:
+        ANSWER_COMPOSED.json (state
         COMPOSED_CONTRACT_VALID / COMPOSED_CONTRACT_INVALID /
-        COMPOSE_FAILED_TRANSPORT / DISABLED_BY_CONFIG). The composer
+        COMPOSE_TRUNCATED / COMPOSE_FAILED_TRANSPORT /
+        DISABLED_BY_CONFIG). The composer
         WRITES prose; it grants no epistemic authority (Art. XVIII) —
         the contract and the harness gates still decide what the answer
         may claim."""
@@ -3663,7 +3666,7 @@ class EngineRun:
                     "question_type") or "intervention-proposal"))
             status = rec.get("state") or "FAILED_EXPLICIT"
         except Exception as exc:  # noqa: BLE001 — typed, never silent
-            rec = {"composer_version": "answer_composer/1.0.0",
+            rec = {"composer_version": "answer_composer/1.1.0",
                    "state": "COMPOSE_FAILED_TRANSPORT",
                    "error": f"{type(exc).__name__}: {exc}"[:300],
                    "answer": None, "started_at": _t0,

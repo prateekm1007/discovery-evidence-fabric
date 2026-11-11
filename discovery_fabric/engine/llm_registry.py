@@ -37,6 +37,7 @@ import json
 import os
 import re
 import ssl
+import threading
 import time
 import urllib.request
 from dataclasses import dataclass, field
@@ -674,6 +675,14 @@ class LLMCallResult:
     # carries the full route disclosing every hop that failed first.
     route: Optional[List[Dict[str, Any]]] = None
     failure_type: Optional[str] = None
+    # R6 owner round 2026-11-12 item 1 — the typed truncation signal:
+    # the API's own finish-reason report for the completion that
+    # produced this content, normalized in the transport ("length" =
+    # cut at the token budget, "stop" = the model finished, "unknown"
+    # = no finish-reason reported; any newer raw API value rides
+    # verbatim — never invented, Art. XXV). Absent (None) on the
+    # failure results that carry no completion.
+    finish_reason: Optional[str] = None
     # R451 §1: the cost provenance of the model that actually produced
     # (or was attempted for) this content — model_id, model_revision,
     # transport, local_or_remote, license, cost_basis, policy.
@@ -726,6 +735,7 @@ class LLMCallResult:
                 for h in (self.route or [])
             ] if self.route else [],
             "failure_type": self.failure_type,
+            "finish_reason": self.finish_reason,
         }
 
 
@@ -1149,6 +1159,54 @@ def _post_json(url: str, payload: dict, headers: Dict[str, str],
         return json.loads(resp.read())
 
 
+# --------------------------------------------------------------------------
+# R6 owner round 2026-11-12 item 1 — the typed truncation signal.
+# The flavor transports keep their one-value `str` return contract
+# (four external call sites — eval's baseline/judge direct calls and
+# the runtime probes — pin it); the API's finish-reason signal is
+# therefore recorded THREAD-LOCALLY at the moment of return and
+# consumed by generate() on the same thread immediately after the
+# flavor call. Concurrency is safe: the read follows the call with
+# no gap, on the same thread (the operator thread-pool runs each
+# generate() end-to-end in its own thread).
+#
+# Normalized vocabulary: "length" (the API says the output was cut at
+# the token budget — openai finish_reason=length, anthropic
+# stop_reason=max_tokens), "stop" (the API says the model finished,
+# including a filter/tool stop — not a truncation), "unknown" (no
+# finish-reason reported). Any newer raw API value is recorded
+# VERBATIM (never mapped by guess — Art. XXV: unknown stays
+# unknown), and a consumer claims truncation ONLY on "length".
+_finish_state = threading.local()
+
+_OPENAI_FINISH_MAP = {"length": "length", "stop": "stop",
+                      "content_filter": "stop", "tool_calls": "stop"}
+_ANTHROPIC_FINISH_MAP = {"max_tokens": "length", "end_turn": "stop",
+                         "stop_sequence": "stop", "tool_use": "stop"}
+
+
+def _finish_from_openai(raw: Any) -> str:
+    if raw is None:
+        return "unknown"
+    v = str(raw)
+    return _OPENAI_FINISH_MAP.get(v, v)
+
+
+def _finish_from_anthropic(raw: Any) -> str:
+    if raw is None:
+        return "unknown"
+    v = str(raw)
+    return _ANTHROPIC_FINISH_MAP.get(v, v)
+
+
+def _record_finish_reason(value: str) -> None:
+    _finish_state.finish_reason = value
+
+
+def _take_finish_reason() -> Optional[str]:
+    return getattr(_finish_state, "finish_reason", None)
+
+
 def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
                         timeout: int, max_tokens: int,
                         model_override: Optional[str] = None) -> str:
@@ -1210,6 +1268,10 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
             f"{spec.provider_id} returned empty content "
             f"(finish_reason={finish}, max_tokens={max_tokens})",
             finish_reason=finish)
+    # the typed truncation signal for a NON-empty completion (the
+    # empty-content case above raises before it): recorded thread-
+    # locally, consumed by generate() into the LLMCallResult
+    _record_finish_reason(_finish_from_openai(choice.get("finish_reason")))
     return content
 
 
@@ -1244,6 +1306,10 @@ def _call_anthropic_flavor(spec: ProviderSpec, messages: List[dict],
     content = "".join(b.get("text", "") for b in data.get("content", []))
     if not content:
         raise RuntimeError(f"{spec.provider_id} returned empty content")
+    # the typed truncation signal (stop_reason=max_tokens -> "length"),
+    # recorded thread-locally, consumed by generate() into the
+    # LLMCallResult
+    _record_finish_reason(_finish_from_anthropic(data.get("stop_reason")))
     return content
 
 
@@ -2143,6 +2209,11 @@ def generate(prompt: str, system: str = "",
                         spec, messages, timeout, attempt_budget,
                         model_override=model_id)
                 latency_ms = int((time.time() - t0) * 1000)
+                # R6 item 1: the typed finish-reason recorded by the
+                # serving transport on THIS thread (the flavor call
+                # returned moments above, same thread; a failed rung's
+                # earlier record was overwritten by this success)
+                _finish_reason = _take_finish_reason()
                 # R526 Q-A: attempt dispatch wall (existing measurement,
                 # copied, never redefined). Post-provider local work
                 # (health/route/capability writes + result assembly)
@@ -2252,6 +2323,7 @@ def generate(prompt: str, system: str = "",
                     retry_notes=retry_notes,
                     route=route or None,
                     failure_type=None,
+                    finish_reason=_finish_reason,
                     cost_provenance=_cost_policy.cost_provenance(
                         spec, model_id),
                     call_provenance=call_prov,

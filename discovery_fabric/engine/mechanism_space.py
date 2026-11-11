@@ -210,6 +210,9 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
             "provider": res.provider_id, "model": res.model,
             "prompt_hash": res.prompt_hash, "output_hash": res.output_hash,
             "error": res.error,
+            # R6 owner round 2026-11-12 item 1: the typed truncation
+            # signal (the transport's normalized finish-reason report)
+            "finish_reason": res.finish_reason,
             "hard_pin": {"requested": hard_pin_provider,
                          "status": hard_pin_status},
             "engine_llm_provider_pin": "not_set (hard_pin active)",
@@ -295,6 +298,10 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
              "fallback_provider": h.get("fallback_provider")}
             for h in (res.route or [])],
         "failure_type": res.failure_type,
+        # R6 owner round 2026-11-12 item 1: the typed truncation
+        # signal (the transport's normalized finish-reason report —
+        # "length" = cut at the token budget)
+        "finish_reason": res.finish_reason,
         "role": role,
     }
 
