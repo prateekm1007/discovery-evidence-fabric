@@ -51,11 +51,14 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
 
-def _answer_contract(answer, question_type):
+def _answer_contract(answer, question_type, packet=None,
+                     user_variables=None):
     """Deterministic shape check of the released pipeline answer."""
     try:
         from discovery_fabric.engine.answer_contract import validate_answer
-        return validate_answer(answer or "", question_type or "")
+        return validate_answer(answer or "", question_type or "",
+                               packet=packet or [],
+                               user_variables=user_variables or [])
     except Exception as exc:  # noqa: BLE001
         return {"valid": None, "violations": [f"validator error: {exc}"],
                 "question_type": question_type}
@@ -559,7 +562,8 @@ def probe_judge_route(baseline_provider: str) -> Dict[str, Any]:
         calib = run_judge_calibration({"provider": prov, "model": model})
         rec["calibration"] = {k: calib.get(k) for k in
                               ("calibrated", "n_pairs", "correct",
-                               "accuracy", "threshold", "passed")}
+                               "accuracy", "threshold", "passed",
+                               "corpus_sha256", "n_valid")}
         rec["calibration_wall_s"] = round(time.time() - t1, 1)
         err_classes: Dict[str, int] = {}
         lat = []
@@ -1019,6 +1023,12 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
     if not calib_path.exists():
         return {"calibrated": False, "why": "no calibration pairs file",
                 "details": [], "error_classes": {}}
+    import hashlib as _hl
+    try:
+        _corpus_sha256 = _hl.sha256(
+            calib_path.read_bytes()).hexdigest()
+    except Exception:  # noqa: BLE001
+        _corpus_sha256 = None
     pairs = json.loads(calib_path.read_text(encoding="utf-8"))
     problems_by_id = {p["problem_id"]: p
                       for p in json.loads(PROBLEMS.read_text(encoding="utf-8"))["problems"]}
@@ -1105,6 +1115,7 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
     # usable calibration tally). n_valid is reported for diagnostics.
     passed = bool(correct >= 24)
     return {"calibrated": bool(passed), "n_pairs": len(pairs),
+            "corpus_sha256": _corpus_sha256,
             "n_valid": total,
             "correct": correct,
             "accuracy": acc, "threshold": 0.8,
@@ -1417,8 +1428,14 @@ def build_score_table(route_rec: Dict[str, Any],
                 f"{n_num_unverified} numeric token(s) absent from the "
                 f"evidence packet"], "question_type": p.get("question_type")}
         else:
-            answer_contract = _answer_contract(pipe.get("answer"),
-                                               p.get("question_type"))
+            answer_contract = _answer_contract(
+                pipe.get("answer"),
+                p.get("question_type"),
+                packet=(json.loads((d / "pipeline" / "envelope_FREEZE.json")
+                               .read_text(encoding="utf-8")).get("evidence")
+                        if (d / "pipeline" / "envelope_FREEZE.json"
+                            ).exists() else []),
+                user_variables=list(p.get("user_variables") or []))
         row = {
             "problem_id": p["problem_id"],
             "question_type": p["question_type"],
@@ -2047,12 +2064,18 @@ def main(argv=None) -> int:
             (RUNS_ROOT / _commit).mkdir(parents=True, exist_ok=True)
             probe_p.write_text(json.dumps(route_rec, indent=1) + "\n",
                                encoding="utf-8")
-        # judge route (different provider)
+        # judge route (different provider). A cached probe is only
+        # reusable within the SAME commit; cross-commit cache reuse
+        # is forbidden (the audit verified shadowed-route reuse).
         jp = RUNS_ROOT / _commit / "_judge_route_probe.json"
-        if jp.exists():
+        if jp.exists() and json.loads(
+                jp.read_text(encoding="utf-8")
+                ).get("commit") == _commit:
             judge_route = json.loads(jp.read_text(encoding="utf-8"))
         else:
             judge_route = probe_judge_route(route_rec.get("provider"))
+            # bind the probe to this commit
+            judge_route = {**judge_route, "commit": _commit}
             jp.write_text(json.dumps(judge_route, indent=1) + "\n",
                           encoding="utf-8")
         # second judge (different family from both baseline and primary
@@ -2060,11 +2083,14 @@ def main(argv=None) -> int:
         if os.environ.get("ENGINE_SECOND_JUDGE", "1").strip() not in (
                 "0", "false", "no"):
             jp2 = RUNS_ROOT / _commit / "_judge2_route_probe.json"
-            if jp2.exists():
+            if jp2.exists() and json.loads(
+                    jp2.read_text(encoding="utf-8")
+                    ).get("commit") == _commit:
                 judge2_route = json.loads(jp2.read_text(encoding="utf-8"))
             else:
                 judge2_route = probe_judge2_route(
                     route_rec.get("provider"), judge_route.get("provider"))
+                judge2_route = {**judge2_route, "commit": _commit}
                 jp2.write_text(json.dumps(judge2_route, indent=1) + "\n",
                                encoding="utf-8")
         else:

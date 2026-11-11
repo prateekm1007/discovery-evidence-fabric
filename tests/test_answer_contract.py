@@ -35,7 +35,12 @@ INTERVENTION_BAD = (
 
 
 def test_predictor_contract_accepts_complete_answer():
-    res = validate_answer(PREDICTOR_GOOD, "predictor-design")
+    # the THRESHOLD number must appear in the evidence packet or in
+    # user variables; the packet contains the ISO 10816-3 band 4.5 mm/s
+    pkt = [{"id": "iso10816-3", "abstract":
+            "velocity criterion for machine group 1: 4.5 mm/s RMS alarm",
+            "title": "ISO 10816-3"}]
+    res = validate_answer(PREDICTOR_GOOD, "predictor-design", packet=pkt)
     assert res["valid"] is True, res["violations"]
 
 
@@ -49,7 +54,16 @@ def test_predictor_contract_rejects_generic_answer():
 
 
 def test_intervention_contract_accepts_labeled_parameters():
-    res = validate_answer(INTERVENTION_GOOD, "intervention-proposal")
+    # the EVIDENCE-BACKED parameter cites evidence that is present
+    pkt = [{"id": "astm-seal", "abstract":
+            "accelerated thermal-cycling evidence: 500 cycles, OCV 1.0 V",
+            "title": "Seal compound validation"}]
+    good = ("Change seal compound to HNR. "
+            "PARAMETER: glass fraction — 0.15 — ASSUMPTION [astm-seal]. "
+            "PARAMETER: cycle count — 500 cycles — EVIDENCE-BACKED [astm-seal]. "
+            "Test in a thermal-cycling rig per the record; falsify if "
+            "OCV < 1.0 V after 500 cycles.")
+    res = validate_answer(good, "intervention-proposal", packet=pkt)
     assert res["valid"] is True, res["violations"]
 
 
