@@ -50,13 +50,26 @@ State when this runbook was last updated (post-audit, 2026-11-11):
   invocations (each its own unique root). Report p50/p95/max from the
   per-repeat wall sets, labelled by worker count; a single worker
   count is not a speed claim.
-- Call budget (audit P0-9, v2 instrument): run
+- Call budget (audit P0-9, v3 instrument — canonical ledger): run
   `python scripts/r6_call_budget.py <run-root-dir>` per run root.
-  Counts are ledger-anchored distinct attempts by generate_call_id —
-  retries, transport failures and provider fallbacks INCLUDED; a
-  missing stage's evidence is NOT_MEASURED, never zero; RETRIEVE is
-  measured from the ledger, never assumed from the transport type.
-  Any NOT_MEASURED stage blocks the total (within_target = null).
+  TWO separate measures per stage row: `provider_attempts` (one
+  record_call_outcome line per provider request — retries,
+  transport failures and provider fallbacks INCLUDED, distinct by
+  generate_call_id) and `logical_calls` (provider attempts grouped
+  into call intents: a retry/fallback chain of the same intent is
+  ONE logical call; unrecorded chain heads are flagged, never
+  fabricated). The twelve-call target STATED to apply to the
+  LOGICAL measure only (target_applies_to / target_statement in the
+  output); total_provider_attempts is reported as quota cost, never
+  certified against the target. Without the run ledger, envelope
+  attribution measures the logical measure only and provider
+  attempts are NOT_MEASURED (0 only when stage attribution records
+  0 LLM calls — a no provider request). Observed post-rank stages
+  (POST_RANK_*) get rows and enter the totals; conditional work
+  that did not run creates no row and blocks nothing. Any
+  NOT_MEASURED expected stage blocks that measure's total
+  (within_target = null). A stage with attribution but zero
+  ledger lines is provenance-incomplete: NOT_MEASURED, never zero.
 
 ## Block A — fresh run (pipeline arm, workers=3)
     timeout 560 bash scripts/r6_run_dev7.sh pipeline 3 --repeat 1

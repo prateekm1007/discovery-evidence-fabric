@@ -3617,6 +3617,12 @@ class EngineRun:
                 "delta_real": False, "started_at": utc_now(),
                 "finished_at": utc_now()})
             return
+        # R6 P0-6: the composer's LLM calls run under the COMPOSE stage
+        # so the run's routing ledger carries them (the canonical call
+        # ledger's provider measure covers COMPOSE only when the
+        # composer binds the stage — the conductor set_stage
+        # convention: set at section entry, reset at exit)
+        _cctx.set_stage("COMPOSE")
         _t0 = utc_now()
         rec: Dict[str, Any] = {}
         status = "FAILED_EXPLICIT"
@@ -3677,6 +3683,8 @@ class EngineRun:
                       "contract_valid": (
                           (rec.get("contract") or {}).get("valid")
                           if rec.get("contract") else None)}})
+        # R6 P0-6: reset the bound stage (the conductor convention)
+        _cctx.set_stage("POST_RANK")
 
     # ------------------------------------------------------------------
     def _maybe_revise_killed_candidate(self) -> Dict[str, Any]:
