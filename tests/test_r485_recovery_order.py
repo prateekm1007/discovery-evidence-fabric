@@ -138,7 +138,12 @@ class TestTheUnionRecord:
         body = (REPO / "EPISTEMIC_CONSTITUTION.md").read_text()
         v = cl._parse_constitution_version()
         assert v != "UNKNOWN"
-        assert v >= "2.6.0", (
+        # NUMERIC comparison (R6 fix): the lexicographic form broke when
+        # the ratified amendments carried the version past 2.9 —
+        # "2.10.1" >= "2.6.0" is FALSE as strings while 2.10.1 is
+        # semantically ABOVE the R485-era floor. Tuple compare.
+        v_t = tuple(int(x) for x in v.split("."))
+        assert v_t >= (2, 6, 0), (
             f"constitution {v} below the R485-era landed floor")
         # the canonical structure: ONE LXXIV, titled as landed
         assert body.count("## Article LXXIV —") == 1

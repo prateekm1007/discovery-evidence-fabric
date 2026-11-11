@@ -70,7 +70,17 @@ GOOD_RESPONSE = (
     "pressure within 5 mmHg of the band edge\n")
 
 VOLATILE_KEYS = {"built_at", "derived_at", "extracted_at",
-                 "recorded_at", "started_at", "finished_at"}
+                 "recorded_at", "started_at", "finished_at",
+                 # measured-wall keys (R6): *_wall_s fields are perf_counter
+                 # timings around transport/probe attempts — on this
+                 # sandbox they jitter by an order of magnitude between
+                 # two runs against the SAME dead/refused endpoints
+                 # (measured: localqwen connection-refuse 0.001 vs 0.009 s
+                 # on back-to-back runs), so they are volatile by the
+                 # test's own definition; the semantic record around them
+                 # (states, failure classes, route shapes) stays compared.
+                 "provider_wall_s", "wall_s", "duration_monotonic_s",
+                 "latency_ms", "latency_s", "search_call_ms", "job_wall_s"}
 
 
 def _env_with(**kw) -> Candidate:
