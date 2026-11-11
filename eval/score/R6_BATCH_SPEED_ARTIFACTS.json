@@ -1,0 +1,27 @@
+{
+  "schema": "r6_batch_speed_artifacts/1.0.0",
+  "measured_utc": "2026-11-11T16:20-17:10Z",
+  "subject": "the R6 item-1 batch transport (operator_batch_instantiation) measured on fresh DEV7 pipeline runs",
+  "commits": {
+    "batch_transport_introduced": "b788f6135",
+    "full_plan_cap_10": "8fae4a322 (rebased onto the r2 P0-3/P0-4/P0-5 chain)",
+    "pre_batch_reference": "983cad204 (the parallel session's fresh2) and b5ea85e9 (run 2)"
+  },
+  "runs": [
+    {"commit": "b788f6135", "root": "eval/runs/b788f6135659/r1-pipeline-2026-11-11162413000", "note": "quota SHARED with a concurrent session's run (measured collision: both runs' children starved; this run's eval problems died with empty stage_times)", "walls": {"bench-p02": 145.2, "bench-p05": 149.0, "bench-p09": 300.0, "eval-new02": 300.0, "eval-sofc": 300.0}},
+    {"commit": "b788f6135", "root": "eval/runs/b788f6135659/r1-pipeline-2026-11-11164323000", "note": "solo run; bench 3/3 DONE; eval 3/3 at the 300 s cap", "walls": {"bench-p02": 133.2, "bench-p05": 121.5, "bench-p09": 147.3, "eval-new02": 300.0, "eval-new06": 300.0, "eval-sofc": 300.0}},
+    {"commit": "8fae4a322", "root": "eval/runs/8fae4a322a54/r1-pipeline-2026-11-11165454000", "note": "full-plan cap (10 pairs) + the r2 hardening chain; bench 109-122 s (best measured); eval still at the cap", "walls": {"bench-p02": 122.2, "bench-p05": 111.1, "bench-p09": 109.2, "eval-new02": 300.0, "eval-new06": 300.0, "eval-sofc": 300.0}}
+  ],
+  "done_walls_s": [109.2, 111.1, 121.5, 122.2, 133.2, 145.2, 147.3, 149.0],
+  "done_median_s": 127.7,
+  "gate": {
+    "median_120s": "NOT MET on the full dev7 (the eval-* problem class consistently sits at the 300 s typed cap; the bench class is INSIDE the target at 109-149 s)",
+    "worst_300s": "the typed hard timeout held at exactly 300.0 s on every kill (INCOMPLETE_INFRASTRUCTURE, never a hang)",
+    "transport_bound_residual": "measured in the 16:54-17:05 gateway window: 49 calls, 37 OK (p50 latency 4.3 s, healthy generation ~800 completion tokens at 9-11 s), 9 RATE_LIMITED_RETRY, 3 ERROR — including one 157 s call that ended in ERROR (dead wall, not generation); the eval class needs 10-14 calls and a single 429 storm + one hang-error crosses the cap"
+  },
+  "batch_effect": {
+    "mechanism": "ONE llm_generate call (purpose operator_batch_instantiation) instantiates every applicable (operator,item) pair — the full plan (max 10 pairs) after the cap fix; typed legacy per-pair fallback on batch failure; every served candidate carries the batch call's real provenance + batch_served label",
+    "measured_call_shape": "bench-class problems complete on ~6-8 calls (was 10-14 with per-pair operators + retries); the eval class's residual is transport flapping, not call count"
+  },
+  "honesty": "every wall above is read from the committed pipeline_record.json of its run root; the timeouts are typed kills, never silent; the shared-quota collision is disclosed as a measured event, not hidden"
+}
