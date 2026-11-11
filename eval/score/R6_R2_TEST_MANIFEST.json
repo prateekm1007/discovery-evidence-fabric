@@ -1,0 +1,66 @@
+{
+  "manifest": "r6-round2-test-manifest",
+  "directive": "owner coder directive 2026-11-11, round 2, against c4b488aa (P0 in order P0-2..P0-7, then P1-8..P1-10; commit batches; machine-readable manifest; push + ls-remote after each batch; no owner report this round)",
+  "base_commit": "c4b488aa",
+  "head_commit": "ac046afe1be88a56aa3e9bae6d060202887a6c6b",
+  "commit_chain": [
+    {"sha": "22b43dd8b3aa53cc5a8fbac73d87f6806744a58a", "item": "P0-2", "title": "composer admission allowlist + engine gate (NO_ADMISSIBLE typed, zero LLM)"},
+    {"sha": "a252e4b7016ca9570cc184c2a079227de1fb69e4", "item": "P0-3", "title": "per-instrument attacker deployment authority (pinned gate instruments, fail-closed UNKNOWN_NOT_CALIBRATED)"},
+    {"sha": "f87b21ab2e21e215731c434b3bb830a29d4b69cf", "item": "P0-4", "title": "normal-path legacy answer fallback removed (DIAGNOSTIC-only, Art. LXIV)"},
+    {"sha": "43f4bdc06ac1c540d48831f69a5156c5d0d6b3d2", "item": "P0-5", "title": "claim-level provenance (joint quantity+value+unit span check, 5 adversarial classes)"},
+    {"sha": "b7ba338abdaed58f53bb8e47afcf9fc265d8ee95", "item": "P0-6", "title": "one canonical call ledger, v3 (logical vs provider attempts separated; 12-call target = logical measure; post-rank rows enter totals)"},
+    {"sha": "9326ffe8c784a9a00a91275c2a5494c2e4610151", "item": "P0-7", "title": "ablation / run / score isolation (write-guarded root, judge-arm bar, judgment-to-run bound_inputs, typed missing reference)"},
+    {"sha": "7fb0b3a71527f814671dc71c7d2eeba8c04656e4", "item": "P1-8", "title": "per-instrument sweep denominators + pinned-name calibration emit (PENDING_OWNER_SEAL / DERIVED_FROM_OWNER_SEAL / NOT_MEASURED_DENOMINATOR)"},
+    {"sha": "ac046afe1be88a56aa3e9bae6d060202887a6c6b", "item": "P1-9", "title": "speed re-measurement script hygiene (hard-coded gateway-key fallback removed + fail-closed, BASH_SOURCE REPO, batch-transport wiring checked; measurement itself NOT_MEASURED on the quota window)"}
+  ],
+  "interleaved_parallel_session_commits": [
+    {"sha": "b788f6135", "note": "batch transport (rebased over by P0-2..P0-5; re-verified green before push)"},
+    {"sha": "8fae4a322a5484b27192ee41909a2282181b7972", "note": "batch plan cap 6 -> 10 = true maximum plan"},
+    {"sha": "b7bc667b15f2e503916960aa1153d6ae899d17b6", "note": "speed artifacts (3 fresh DEV7 runs; bench class inside ~120 s target; eval class at the typed 300 s cap) - P1-9 re-measurement will REFERENCE, not duplicate, eval/score/R6_BATCH_SPEED_ARTIFACTS.json"}
+  ],
+  "tests": {
+    "measured_at_commit": "ac046afe1be88a56aa3e9bae6d060202887a6c6b",
+    "battery": [
+      "tests/test_r6_call_budget.py",
+      "tests/test_p05_claim_provenance.py",
+      "tests/test_answer_contract.py",
+      "tests/test_answer_contract_adversarial.py",
+      "tests/test_intervention_evidence_binding.py",
+      "tests/test_answer_composer.py",
+      "tests/test_composer_subordinate.py",
+      "tests/test_p04_answer_fallback.py",
+      "tests/test_p03_instrument_authority.py",
+      "tests/test_intervention_gate.py",
+      "tests/test_attack_ab_qualifier.py",
+      "tests/test_ms_batch_instantiation.py",
+      "tests/test_adversarial_infra_separation.py",
+      "tests/test_e2e_semantic_boundary.py",
+      "tests/test_e2e_adversarial_v4.py",
+      "tests/test_e2e_adversarial_hardening.py",
+      "tests/test_r6_ablation_isolation.py",
+      "tests/test_r6_seeded_sweep_p18.py"
+    ],
+    "collected": 269,
+    "passed": 269,
+    "failed": 0,
+    "exit_code": 0,
+    "llm_spend": "zero (deterministic / hermetic battery; e2e files are typed-transport hermetic)",
+    "note": "269 = 259-test P0 battery (16 files, re-verified green at P0-6 commit b7ba338ab) + 6 ablation-isolation pins + 4 seeded-sweep P1-8 pins; per-file counts: adversarial_infra 8, answer_composer 5, answer_contract 16, answer_contract_adversarial 9, attack_ab_qualifier 16, composer_subordinate 89, e2e_adversarial_hardening 14, e2e_adversarial_v4 11, e2e_semantic_boundary 12, intervention_evidence_binding 4, intervention_gate 21, ms_batch_instantiation 5, p03 8, p04 11, p05 14, r6_ablation_isolation 6, r6_call_budget 16, r6_seeded_sweep_p18 4"
+  },
+  "push_state": "every commit batch pushed and verified with git ls-remote origin main after the push; current origin/main = ac046afe1be88a56aa3e9bae6d060202887a6c6b; P0-2..P0-5 SHAs are the rebase-reissued ones (re-verified 193 green after the b788f6135 rebase before pushing)",
+  "not_measured": [
+    {"item": "P1-9", "what": "current-HEAD speed re-measurement (1-worker x >=3 and 3-worker x >=3, unique roots, p50/p95/max per repeat, stage walls, v3 call-ledger logical calls/attempts/retries/tokens, ENGINE_NO_PACKAGE=1 core-only)", "status": "NOT_MEASURED", "reason": "provider quota 429 window; the script (r6_run_dev7.sh) is hygiene-committed and ready; no speed numbers claimed"},
+    {"item": "P1-10", "what": "six-case two-turn measured improvement (target >= 4/6) + one 9-step vertical slice", "status": "NOT_MEASURED", "reason": "requires LLM pipeline + judge calls - blocked on the same quota window"},
+    {"item": "judge calibration 24/30", "what": "committed judge route calibration gate", "status": "NOT_MEASURED", "reason": "no calibrated judge route in the 429 window"},
+    {"item": "fresh DEV7 re-run", "what": "fresh scored pipeline run under the P0 chain", "status": "NOT_MEASURED", "reason": "provider quota window; the committed v2 call-budget artifact (eval/score/CALL_BUDGET_FRESH2_983cad20404f.json) remains non-authoritative until a v3 re-score on a fresh run"}
+  ],
+  "authority_flips_pending_owner": [
+    "intervention_gate_function_removal/1.0.0 and intervention_gate_restates_constraint/1.0.0: the P1-8 emit ships CANDIDATE measurement records under the pinned registry names (PENDING_OWNER_SEAL; calibrated=null; terminal_kill_admissible=false). The flip requires the OWNER to ship the owner-held measurement + owner-authored seal under the pinned names; a SYNTHETIC_FIXTURE-flagged run can never establish calibration (P0-3, Art. LXXXI)"
+  ],
+  "gates": {
+    "14_gate_certification": "NOT_CLAIMED - the certification workflow has not completed; no green claim is made in this round (directive item 11)",
+    "sealed_holdout_57be8218": "untouched (n=24, never read)",
+    "scored_runs_used": "0 of 2",
+    "owner_report_this_round": "none (directive: close as a capability milestone, no owner report)"
+  }
+}
