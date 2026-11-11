@@ -177,6 +177,14 @@ class ConnectorBase:
     #: base seconds for exponential backoff (2**attempt * base), capped.
     BACKOFF_BASE_SECONDS: float = 2.0
     BACKOFF_CAP_SECONDS: float = 30.0
+    #: R6 (owner directive 2026-11-11, "FAST and LEAN"): a provider
+    #: Retry-After LARGER than this threshold is provably hopeless inside
+    #: one run (measured: OpenAlex daily-budget exhaustion answers
+    #: retry-after: 52062 s = midnight UTC reset) — the connector records
+    #: the typed RATE_LIMITED lane state with the provider's own Retry-After
+    #: and spends ZERO sleep on a retry that cannot succeed. Under the
+    #: threshold the bounded ladder applies unchanged (transient bursts).
+    HOPELESS_RETRY_AFTER_S: float = 120.0
 
     def is_metered(self) -> bool:
         """True when the source is provider-metered (quota per window).
@@ -196,12 +204,18 @@ class ConnectorBase:
     def _backoff_seconds(self, error: Optional[str], attempt: int) -> float:
         """Delay before retry attempt N. Honors provider Retry-After when
         present in the error string (surfaced by _request), else
-        exponential with cap."""
+        exponential with cap. A Retry-After above HOPELESS_RETRY_AFTER_S
+        returns -1.0: the CALLER skips the retry (provably hopeless inside
+        one run — the provider itself named the horizon; sleeping a capped
+        30 s against a 52062 s window is fabricated waiting, Art. XXV)."""
         import re as _re
         if error:
             m = _re.search(r"Retry-After:\s*(\d+)", error)
             if m:
-                return min(float(m.group(1)), self.BACKOFF_CAP_SECONDS)
+                ra = float(m.group(1))
+                if ra > self.HOPELESS_RETRY_AFTER_S:
+                    return -1.0
+                return min(ra, self.BACKOFF_CAP_SECONDS)
         return min((2 ** attempt) * self.BACKOFF_BASE_SECONDS,
                    self.BACKOFF_CAP_SECONDS)
 
@@ -377,6 +391,16 @@ class ConnectorBase:
                and retries_used < self.RATE_LIMIT_RETRIES
                and not self.is_metered()):
             delay = self._backoff_seconds(error, retries_used)
+            if delay < 0:
+                # provably hopeless retry (provider Retry-After exceeds the
+                # in-run horizon): record the typed state honestly and stop
+                # — no sleep is spent on a window the run cannot outlive
+                error = (f"{error} | hopeless_retry_skipped: provider "
+                         f"Retry-After exceeds in-run horizon "
+                         f"({self.HOPELESS_RETRY_AFTER_S:.0f} s); lane "
+                         "stays RATE_LIMITED (Art. XXV: unknown stays "
+                         "unknown; the budget resets provider-side)")
+                break
             time.sleep(delay)
             retries_used += 1
             body, status, http_status, error, remaining = self._request(url, timeout=timeout)

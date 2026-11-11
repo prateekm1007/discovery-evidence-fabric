@@ -424,11 +424,25 @@ def anchor_domain_check(problem: Dict[str, Any],
     """The anchor evidence record must share the failure's domain OR the
     candidate's mechanism text must state the shared mechanism (owner
     directive item 4). Deterministic lexical instrument: the anchor's
-    title+abstract vs the problem's device/failure/domain text."""
+    recorded text vs the problem's device/failure/domain text. The
+    anchor's text is read from every field the MECHANISM_SPACE
+    structured item carries (flat keys AND the fields/relevance
+    sub-dicts — the lean construction stores the abstract under
+    fields.abstract, never flat)."""
     pt = " ".join(str(problem.get(k) or "") for k in
                   ("domain", "device", "failure", "failure_mode"))
-    at = " ".join(str(anchor_item.get(k) or "") for k in
-                  ("title", "abstract", "text", "content"))
+    _flat = " ".join(str(anchor_item.get(k) or "") for k in
+                     ("title", "abstract", "text", "content",
+                      "record_text"))
+    _sub = anchor_item.get("fields") or {}
+    _rel = anchor_item.get("relevance") or {}
+    _subtxt = " ".join(str(_sub.get(k) or "") for k in
+                       ("system", "abstract", "mechanism",
+                        "observed_effect", "intervention", "constraints"))
+    _reltxt = " ".join(str(_rel.get(k) or "") for k in
+                       ("domain", "failure_mode", "mechanism",
+                        "expected_effect", "material", "operating_regime"))
+    at = " ".join([_flat, _subtxt, _reltxt])
     pt_t, at_t = _tokens(pt), _tokens(at)
     shared = pt_t & at_t
     shared_domain = len(shared) >= _ANCHOR_MIN_SHARED_TOKENS

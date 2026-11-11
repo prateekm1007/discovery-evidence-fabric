@@ -214,10 +214,13 @@ def validate_answer(answer: str, question_type: str,
         # every EVIDENCE-BACKED parameter must bind to a packet source id
         pb = _packet_blob(packet).lower() if packet else ""
         for m in _EVIDENCE_BACKED.finditer(text):
-            # look at the 80-char window before the label for an id, or
-            # the same line for the cited value
-            win = text[max(0, m.start() - 200):m.start() + 80]
-            ids = re.findall(r"\[[\w./-]+?\]|https?://\S+|"
+            # look at the 200-char window before the label, or the same
+            # line after it, for an id — bracketed packet ids carry the
+            # doi: scheme, so the id class admits ':' (R6: the
+            # composer's own contract-valid output was being rejected
+            # because [doi:10.1051/...] contains a colon)
+            win = text[max(0, m.start() - 200):m.start() + 120]
+            ids = re.findall(r"\[[\w./:-]+?\]|https?://\S+|"
                              r"(?:paper|study|record|survey)-?\d+",
                              win, re.IGNORECASE)
             if not ids:
