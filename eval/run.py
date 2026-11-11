@@ -161,6 +161,20 @@ def git_dirty() -> bool:
         return True
 
 
+def _round1_problem(problem: Dict[str, Any]) -> Dict[str, Any]:
+    """R6 (owner directive 2026-11-11, item 5): the ROUND-1 view of a
+    two-turn problem. The follow-up finding is ROUND-2 information
+    (Art. LI): a round-1 run that ingests it has leaked the answer to
+    the question round 2 is supposed to demonstrate learning on. Every
+    round-1 arm (pipeline, baseline, composer, judge) consumes the
+    problem THROUGH this helper; the round-2 child process sets
+    EVAL_ROUND2_INTAKE=1 so its intake keeps the finding."""
+    if os.environ.get("EVAL_ROUND2_INTAKE", "").strip().lower() in (
+            "1", "true", "yes"):
+        return problem
+    return {k: v for k, v in problem.items() if k != "followup_finding"}
+
+
 def _intake_problem(problem: Dict[str, Any]) -> Dict[str, Any]:
     """Engine intake with the user's clarification answer attached.
 
@@ -1489,7 +1503,8 @@ def run_two_turn_problem(problem: Dict[str, Any], out_dir: Path,
         cmd.append("--holdout-mode")
     _t0 = time.time()
     res = _spawn_child(cmd, timeout_s,
-                       env_extra={"ENGINE_EVIDENCE_CACHE": str(snap_path)})
+                       env_extra={"ENGINE_EVIDENCE_CACHE": str(snap_path),
+                                  "EVAL_ROUND2_INTAKE": "1"})
     q2 = _intake_problem(problem)  # finding intake for round-2 judging
     if res["timed_out"]:
         rec["two_turn"] = "TIMEOUT"
@@ -2366,7 +2381,10 @@ def main(argv=None) -> int:
         if "pipeline" in arms:
             _rec_name = ("pipeline_record.json" if args.subdir == "pipeline"
                          else f"{args.subdir}_record.json")
-            rec = run_pipeline_problem(p, d / args.subdir)
+            # R6 item 5: the round-1 pipeline arm NEVER sees the follow-up
+            # finding (the round-2 child sets EVAL_ROUND2_INTAKE=1 and
+            # consumes the full problem — this strip does not touch it)
+            rec = run_pipeline_problem(_round1_problem(p), d / args.subdir)
             _save(pid, _rec_name, rec)
             print(f"[eval] {_label(pid)}: pipeline done ({rec['wall_s']}s, "
                   f"status={rec.get('final_status')}, completed={rec.get('completed')})",
@@ -2380,9 +2398,10 @@ def main(argv=None) -> int:
                 import shutil
                 shutil.rmtree(_cdir, ignore_errors=True)
             _cdir.mkdir(parents=True, exist_ok=True)
-            run_composer_only_problem(p, _cdir)
+            run_composer_only_problem(_round1_problem(p), _cdir)
         if "baseline" in arms:
-            rec = run_baseline_problem(_intake_problem(p), d, route_rec)
+            rec = run_baseline_problem(
+                _intake_problem(_round1_problem(p)), d, route_rec)
             _save(pid, "baseline_record.json", rec)
             print(f"[eval] {_label(pid)}: baseline done "
                   f"({'ok' if rec.get('answer') else rec.get('blocked')})",
