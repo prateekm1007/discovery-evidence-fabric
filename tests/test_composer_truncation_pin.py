@@ -268,7 +268,7 @@ class TestComposerTruncation(unittest.TestCase):
         self.assertEqual(rec["composer_version"],
                          ANSWER_COMPOSER_VERSION)
         self.assertEqual(ANSWER_COMPOSER_VERSION,
-                         "answer_composer/1.1.0")
+                         "answer_composer/1.2.0")
 
     def test_plain_valid_composition_untouched(self):
         # the pre-item-1 behavior: one call, no truncation record

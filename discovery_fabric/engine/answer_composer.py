@@ -40,12 +40,31 @@ still-truncated retry is the typed COMPOSE_TRUNCATED no-answer
 Art. XXV: the typed detail stays in the record's truncation
 metadata; the plain-language caveat rides in `caveats`).
 
+Owner round 2026-11-12, item 2 (deterministic tech-sanity A/B
+candidate, NOT a new gate): when the flag is on (explicit
+`tech_sanity=` arm selection, else the ENGINE_TECH_SANITY env
+flag), the composer runs three PURE deterministic checks on the
+complete composition — a resistance/impedance quantity stated in
+the voltage unit or a voltage quantity in the resistance unit
+(V-vs-ohm dimensional consistency), an efficiency/yield above 100
+percent (second law; the 100 percent bound is physical law, not an
+invented threshold), and a declared sampling rate below the Nyquist
+bound (2x) of a band top stated by the answer or the user's stated
+sensor variables. Findings NEVER change the record's state: they
+ride the typed `tech_sanity` metadata and plain-language caveats,
+and — only when the deterministic contract already scheduled the
+ONE repair call — their plain lines join that same repair prompt
+(call budget unchanged). The flag defaults OFF: the candidate stays
+off on the measured path until the owner's ablation + auditor
+judgement places it (Art. LIX).
+
 The composer grants no epistemic authority (Art. XVIII): it WRITES the
 engineer-facing answer; every claim's provenance comes from the packet
 and the candidate records, and unverified numbers stay labeled.
 """
 from __future__ import annotations
 
+import os
 import re
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
@@ -55,7 +74,13 @@ from typing import Any, Dict, List, Optional
 # larger-budget truncation retry (purpose answer_composer_truncation),
 # the COMPOSE_TRUNCATED no-answer state, and the plain-language
 # caveats (typed states stay in the metadata only).
-ANSWER_COMPOSER_VERSION = "answer_composer/1.1.0"
+# 1.2.0 (owner round 2026-11-12, item 2): the deterministic
+# tech-sanity candidate (unit consistency V-vs-ohm, implausible
+# efficiency/rates, band/sampling Nyquist feasibility vs the stated
+# sensor) as a FLAG-CONTROLLED A/B ablation candidate inside the
+# composer — never a gate: it changes no state, adds no call; the
+# ablation arm decides on/off.
+ANSWER_COMPOSER_VERSION = "answer_composer/1.2.0"
 
 _COMPOSER_SYSTEM = (
     "You write the final engineer-facing answer of a discovery pipeline. "
@@ -239,6 +264,143 @@ def _is_answer_truncated(text: str, res: Dict[str, Any]) -> bool:
     return t[-1] not in _SENTENCE_TERMINALS
 
 
+# ------------------------------------------------------------------
+# R6 owner round 2026-11-12 item 2 — deterministic tech-sanity
+# checks, the A/B ablation candidate (see the module docstring):
+# PURE text analysis, no LLM, no verdict gate, no invented
+# thresholds (Art. XXVII) — every verdict below is a binary
+# physical / dimensional law:
+#   - unit_consistency: a resistance/impedance quantity stated in
+#     the voltage unit, or a voltage quantity in the resistance
+#     unit (V vs ohm — different dimensions);
+#   - efficiency_plausibility: an efficiency / yield percentage
+#     above 100 (second law; 100 percent is a physical bound, not
+#     a tunable threshold);
+#   - nyquist_feasibility: a declared sampling rate below 2x the
+#     band top stated by the answer or the user's stated sensor
+#     variables (the sampling theorem).
+# The scan windows are DOCUMENTED regex structure (how far a
+# quantity-word and its number may sit apart in the text); they are
+# not verdict values.
+_TECH_SANITY_FLAG = "ENGINE_TECH_SANITY"
+_UNIT_SCAN_WINDOW = 40
+_PCT_SCAN_WINDOW = 60
+_FREQ_SCAN_WINDOW = 30
+_HZ_SCALE = {"hz": 1.0, "khz": 1e3, "mhz": 1e6}
+
+_TECH_RESISTANCE_IN_VOLTS = re.compile(
+    r"(?:resistan|resistive|impedan)\w*"
+    r"(?:[^.!?]{0,%d}\b\d+(?:\.\d+)?)\s*V\b"
+    % _UNIT_SCAN_WINDOW, re.IGNORECASE)
+_TECH_VOLTAGE_IN_OHMS = re.compile(
+    r"(?:volt\w*|potential difference)\s*"
+    r"(?:[^.!?]{0,%d}?\b\d+(?:\.\d+)?)\s*(?:\u03a9|ohms?)\b"
+    % _UNIT_SCAN_WINDOW, re.IGNORECASE)
+_TECH_EFFICIENCY_PCT = re.compile(
+    r"(?:efficien|yield)\w*[^.!?]{0," + str(_PCT_SCAN_WINDOW) +
+    r"}?(\d+(?:\.\d+)?)\s*%", re.IGNORECASE)
+_TECH_SAMPLE_RATE = re.compile(
+    r"(?:sample\s+rate|sampling\s+rate|sample\s+frequency)\w*"
+    r"[^.!?]{0,%d}?(\d+(?:\.\d+)?)\s*(Hz|kHz|MHz)\b"
+    % _FREQ_SCAN_WINDOW, re.IGNORECASE)
+_TECH_RATE_INTEXT = re.compile(
+    r"\b(\d+(?:\.\d+)?)\s*(Hz|kHz|MHz)\b[^.!?]{0,%d}?"
+    r"(?:samples?/s|samples?\s+per\s+second|sampling|sampled)\b"
+    % _FREQ_SCAN_WINDOW, re.IGNORECASE)
+_TECH_BAND_TOP = re.compile(
+    r"(?:band|cutoff|corner|upper)\w*[^.!?]{0,%d}?"
+    r"(\d+(?:\.\d+)?)\s*(Hz|kHz|MHz)\b" % _FREQ_SCAN_WINDOW,
+    re.IGNORECASE)
+_TECH_TOP_INTEXT = re.compile(
+    r"\b(\d+(?:\.\d+)?)\s*(Hz|kHz|MHz)\b[^.!?]{0,%d}?"
+    r"\b(?:band|cutoff|corner|upper)\w*" % _FREQ_SCAN_WINDOW,
+    re.IGNORECASE)
+
+
+def _tech_sanity_enabled(tech_sanity: Optional[bool]) -> bool:
+    """The flag authority: an explicit `tech_sanity=` selection
+    (the ablation arm) overrides the env flag; the DEFAULT is OFF —
+    the candidate stays off on the measured path until the owner's
+    ablation + auditor judgement places it (Art. LIX)."""
+    if tech_sanity is not None:
+        return bool(tech_sanity)
+    return os.environ.get(_TECH_SANITY_FLAG, "").strip().lower() \
+        in ("1", "true", "on", "yes")
+
+
+def _tech_sanity_findings(text: str,
+                          user_variables: Optional[List[Any]]
+                          ) -> List[Dict[str, Any]]:
+    """The pure deterministic tech-sanity scan (see the block
+    above). The Nyquist check also reads the user's STATED
+    variables (the stated sensor authority); the other two scan
+    the composed text alone. Never raises: unparseable or absent
+    declarations yield no finding — a scan miss is NOT a pass
+    certification (Art. XXV: unknown stays unknown)."""
+    findings: List[Dict[str, Any]] = []
+    composed = str(text or "")
+    stated = [str(v) for v in (user_variables or [])]
+    for m in _TECH_RESISTANCE_IN_VOLTS.finditer(composed):
+        findings.append({
+            "check": "unit_consistency",
+            "typed": "RESISTANCE_QUANTITY_IN_VOLT_UNIT",
+            "span": m.group(0)[:120],
+            "plain": ("A resistance or impedance quantity is "
+                      "stated with the voltage unit: volts (V) and "
+                      "ohms are different units.")})
+    for m in _TECH_VOLTAGE_IN_OHMS.finditer(composed):
+        findings.append({
+            "check": "unit_consistency",
+            "typed": "VOLTAGE_QUANTITY_IN_RESISTANCE_UNIT",
+            "span": m.group(0)[:120],
+            "plain": ("A voltage quantity is stated with the "
+                      "resistance unit: ohms and volts are "
+                      "different units.")})
+    for m in _TECH_EFFICIENCY_PCT.finditer(composed):
+        val = float(m.group(1))
+        if val > 100.0:
+            findings.append({
+                "check": "efficiency_plausibility",
+                "typed": "EFFICIENCY_ABOVE_100_PERCENT",
+                "span": m.group(0)[:120],
+                "plain": (f"The stated efficiency/yield "
+                          f"({m.group(1)} percent) is above 100 "
+                          "percent, which is not physically "
+                          "possible.")})
+    # ---- Nyquist: every declared rate vs every declared band top
+    # (stated variables first, then the composed text; the
+    # feasibility verdict is the strictest pair — the LOWEST
+    # declared rate against the HIGHEST declared band top)
+    rates: List[float] = []
+    tops: List[float] = []
+    for src in stated + [composed]:
+        for m in _TECH_SAMPLE_RATE.finditer(src):
+            rates.append(float(m.group(1)) *
+                         _HZ_SCALE[m.group(2).lower()])
+        for m in _TECH_RATE_INTEXT.finditer(src):
+            rates.append(float(m.group(1)) *
+                         _HZ_SCALE[m.group(2).lower()])
+        for m in _TECH_BAND_TOP.finditer(src):
+            tops.append(float(m.group(1)) *
+                        _HZ_SCALE[m.group(2).lower()])
+        for m in _TECH_TOP_INTEXT.finditer(src):
+            tops.append(float(m.group(1)) *
+                        _HZ_SCALE[m.group(2).lower()])
+    if rates and tops:
+        r_min, t_max = min(rates), max(tops)
+        if r_min < 2.0 * t_max:
+            findings.append({
+                "check": "nyquist_feasibility",
+                "typed": "SAMPLING_BELOW_NYQUIST_OF_STATED_BAND",
+                "span": (f"rate={r_min:g} Hz band_top={t_max:g} Hz"),
+                "plain": (f"The stated sampling rate ({r_min:g} "
+                          "Hz) is below the Nyquist bound — at "
+                          "least 2x the stated band top "
+                          f"({t_max:g} Hz) — so the stated sensor "
+                          "setup cannot capture that band.")})
+    return findings
+
+
 def compose_answer(problem: Dict[str, Any],
                    packet: Optional[List[Dict[str, Any]]],
                    candidates: List[Dict[str, Any]],
@@ -246,6 +408,7 @@ def compose_answer(problem: Dict[str, Any],
                    question_type: str,
                    llm_generate=None,
                    max_tokens: int = 1000,
+                   tech_sanity: Optional[bool] = None,
                    ) -> Dict[str, Any]:
     """ONE LLM call writes the full engineer-facing answer; when the
     transport's typed finish-reason report says the draft was
@@ -257,17 +420,27 @@ def compose_answer(problem: Dict[str, Any],
     repair retry on violation (a truncated repair is never adopted).
     A truncated answer — a still-truncated retry — is NEVER shipped:
     the typed COMPOSE_TRUNCATED no-answer replaces it (Art. LXI: an
-    infrastructure state, never a scientific refusal). Returns a
-    record (never raises to the caller):
+    infrastructure state, never a scientific refusal). Item 2: when
+    the tech-sanity flag is on, the three deterministic
+    physical-law checks run on the complete composition (findings
+    ride the typed `tech_sanity` record + plain caveats; they join
+    the ONE scheduled repair prompt when one is scheduled — no
+    state change, no added call). Returns a record (never raises to
+    the caller):
     {answer, composer: {...}, contract: {...}, state, truncation,
-    caveats}.
+    tech_sanity, caveats}.
 
     `llm_generate` is injectable for tests (the engine's
     mechanism_space.llm_generate by default — ONE transport path,
-    Art. X)."""
+    Art. X). `tech_sanity` is the ablation arm's explicit on/off
+    selection; None defers to the ENGINE_TECH_SANITY env flag
+    (default off)."""
     from .answer_contract import validate_answer, ANSWER_SHAPE_BLOCK
     if llm_generate is None:
         from .mechanism_space import llm_generate
+    # item 2: the flag-controlled deterministic tech-sanity
+    # candidate (explicit arm selection > env flag > off)
+    _ts_on = _tech_sanity_enabled(tech_sanity)
     # P0-5 (owner directive 2026-11-11, item 5): the user's clarified
     # text is a citable provenance span for the contract — it travels
     # into validate_answer on BOTH compose paths (compose + repair),
@@ -380,9 +553,16 @@ def compose_answer(problem: Dict[str, Any],
                                   "violations": contract.get("violations")}
     if contract.get("valid") is not True:
         # ONE deterministic repair retry: the violations travel back in
+        _viol_lines = list(contract.get("violations") or [])
+        if _ts_on:
+            # item 2: the plain tech-sanity lines ride the SAME
+            # scheduled repair call (no added call, no gate)
+            _viol_lines += ["TECH SANITY: " + f["plain"]
+                            for f in _tech_sanity_findings(
+                                answer, problem.get("user_variables")
+                                or [])]
         repair_prompt = _REPAIR_PROMPT.format(
-            violations="\n".join(f"- {v}" for v in
-                                 contract.get("violations") or []),
+            violations="\n".join(f"- {v}" for v in _viol_lines),
             previous=answer[:3000],
             device=problem.get("device", ""),
             failure=problem.get("failure", ""),
@@ -424,8 +604,17 @@ def compose_answer(problem: Dict[str, Any],
     rec["state"] = ("COMPOSED_CONTRACT_VALID"
                     if contract.get("valid") is True
                     else "COMPOSED_CONTRACT_INVALID")
+    # item 2: the deterministic tech-sanity record (typed detail;
+    # NEVER a gate — the state above stays contract-only)
+    _ts_final = (_tech_sanity_findings(
+        answer, problem.get("user_variables") or [])
+        if _ts_on else [])
+    rec["tech_sanity"] = {"enabled": _ts_on,
+                          "flag": _TECH_SANITY_FLAG,
+                          "findings": _ts_final,
+                          "n_findings": len(_ts_final)}
     # plain-language caveats (the typed detail stays in the
-    # truncation / contract metadata above — Art. XXV)
+    # truncation / contract / tech_sanity metadata above — Art. XXV)
     _caveats: List[str] = []
     if trunc["n_truncation_retries"]:
         _caveats.append(
@@ -444,6 +633,8 @@ def compose_answer(problem: Dict[str, Any],
             "The answer did not fully pass the deterministic format "
             "check; open violations: "
             + ("; ".join(_viols) if _viols else "(none recorded)") + ".")
+    for _f in _ts_final:
+        _caveats.append(_f["plain"])
     if _caveats:
         rec["caveats"] = _caveats
     rec["finished_at"] = _utc_now()
@@ -698,6 +889,7 @@ def compose_if_admissible(env_dict: Dict[str, Any],
                          llm_generate=None,
                          top_n: int = 5,
                          max_tokens: int = 1000,
+                         tech_sanity: Optional[bool] = None,
                          ) -> Dict[str, Any]:
     """P0-2 engine gate — ONE entry point for admission + composition.
 
@@ -738,7 +930,8 @@ def compose_if_admissible(env_dict: Dict[str, Any],
                         verification=verification,
                         question_type=question_type,
                         llm_generate=llm_generate,
-                        max_tokens=max_tokens)
+                        max_tokens=max_tokens,
+                        tech_sanity=tech_sanity)
     out["admitted_candidates"] = [
         {"candidate_id": str(c.get("candidate_id") or ""),
          "attack_verdict": c.get("attack_verdict"),

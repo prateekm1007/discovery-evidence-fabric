@@ -3605,7 +3605,11 @@ class EngineRun:
         verification summary. The deterministic answer-shape contract
         runs on the composed text (ONE repair retry inside the
         composer; owner round 2026-11-12 item 1 adds ONE larger-
-        budget truncation retry on a typed truncated draft). Result:
+        budget truncation retry on a typed truncated draft; item 2
+        adds the flag-controlled deterministic tech-sanity
+        candidate — ENGINE_TECH_SANITY, default off — whose findings
+        ride the typed `tech_sanity` record + plain caveats and are
+        NEVER a state gate). Result:
         ANSWER_COMPOSED.json (state
         COMPOSED_CONTRACT_VALID / COMPOSED_CONTRACT_INVALID /
         COMPOSE_TRUNCATED / COMPOSE_FAILED_TRANSPORT /
@@ -3666,7 +3670,7 @@ class EngineRun:
                     "question_type") or "intervention-proposal"))
             status = rec.get("state") or "FAILED_EXPLICIT"
         except Exception as exc:  # noqa: BLE001 — typed, never silent
-            rec = {"composer_version": "answer_composer/1.1.0",
+            rec = {"composer_version": "answer_composer/1.2.0",
                    "state": "COMPOSE_FAILED_TRANSPORT",
                    "error": f"{type(exc).__name__}: {exc}"[:300],
                    "answer": None, "started_at": _t0,
