@@ -53,6 +53,51 @@ def _is_user_citation(tok: str) -> bool:
     return t.startswith("user") or t.startswith("clarification")
 
 
+def _source_map(packet) -> Dict[str, str]:
+    """id/doi-with-scheme -> record text (title + abstract), for
+    support-span binding of EVIDENCE-BACKED labels. Never raises."""
+    out: Dict[str, str] = {}
+    if not packet:
+        return out
+    try:
+        for e in packet:
+            if not isinstance(e, dict):
+                continue
+            text = " ".join(str(e.get(k) or "") for k in
+                            ("title", "abstract", "text", "content"))
+            for k in ("id", "doi", "source_id"):
+                v = str(e.get(k) or "").strip()
+                if v:
+                    out[v.lower()] = text
+                    out[v.removeprefix("doi:").lower()] = text
+            doi = str(e.get("doi") or "").strip()
+            if doi:
+                out["doi:" + doi.lower()] = text
+        return out
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def _line_of(text: str, pos: int) -> str:
+    s = text.rfind("\n", 0, pos) + 1
+    e = text.find("\n", pos)
+    if e == -1:
+        e = len(text)
+    return text[s:e]
+
+
+def _distinctive_tokens(s: str) -> set:
+    return {w for w in re.findall(r"[a-z]{4,}", (s or "").lower())
+            if w not in {"evidence", "backed", "assumption", "parameter",
+                         "value", "unit", "units", "content", "with",
+                         "that", "this", "from", "into", "over"}}
+
+
+def _user_blob(user_variables: Optional[List[str]],
+               clarification: Optional[str]) -> str:
+    return (" ".join(user_variables or []) + " " + (clarification or "")).lower()
+
+
 def _packet_blob(packet) -> str:
     if not packet:
         return ""
@@ -99,6 +144,68 @@ def _threshold_region(text: str) -> str:
     nxt = re.search(r"(?:INDICATOR|PROTOCOL|VALIDATION|PARAMETER)\s*:",
                     rest[10:], re.IGNORECASE)
     return rest[:10 + nxt.start()] if nxt else rest[:300]
+
+
+#: A CORRECT calibration rule states: (1) a reference state with a
+#: POPULATION/WINDOW (n days of healthy data, 200 nominal cycles, …),
+#: (2) a statistic with a multiplier (baseline + 3 sigma, mean + 2 std,
+#: p95), and (3) a MEASUREMENT METHOD (measured from sensor logs,
+#: telemetry, sampled on the healthy fleet). A bare "baseline + sigma"
+#: is NOT a defined rule — it invents the window and the method
+#: (Art. XXVII).
+_CALIB_WIN = re.compile(
+    r"\b\d+(?:\.\d+)?\s*(?:days?|weeks?|hours?|shifts?|cycles?|samples?|"
+    r"units?|machines?)\b|"
+    r"\b(?:last|past|recent|healthy(?:\s+fleet)?|nominal|reference)\s+"
+    r"(?:window|period|phase|set)\b", re.IGNORECASE)
+_CALIB_METHOD = re.compile(
+    r"\b(?:measure|measured|measurements?|sensor|telemetry|log\w*|"
+    r"sampled|sampling|observ\w+|monitored|monitor\w*|recorded)\b",
+    re.IGNORECASE)
+
+
+def _calibration_rule_defined(region: str) -> Dict[str, bool]:
+    r = region or ""
+    return {"reference_with_window": bool(_CALIB_WIN.search(r))
+            or bool(re.search(r"\bhealthy\b|\bnominal\b|\breference\b|"
+                              r"\bbaseline\b", r, re.IGNORECASE)
+                    and re.search(r"\d+", r)),
+            "statistic_with_multiplier": bool(_CALIB_DEV.search(r)),
+            "measurement_method": bool(_CALIB_METHOD.search(r))}
+
+
+def _marker_segment(text: str, label: str, maxlen: int = 400) -> str:
+    """The text between LABEL: and the next contract marker (or cap)."""
+    t = text or ""
+    m = re.search(re.escape(label) + r"\s*:\s*", t, re.IGNORECASE)
+    if not m:
+        return ""
+    rest = t[m.end():]
+    nxt = re.search(r"(?:INDICATOR|THRESHOLD|VALIDATION(?:\s+PROTOCOL)?|"
+                    r"PROTOCOL|PARAMETER)\s*:", rest, re.IGNORECASE)
+    return (rest[:nxt.start()] if nxt else rest[:maxlen]).strip()
+
+
+def _coherent_measurement(text: str) -> bool:
+    """INDICATOR and VALIDATION PROTOCOL must name the same quantity:
+    at least one shared distinctive content word beyond the protocol
+    scaffolding."""
+    ind = _marker_segment(text, "INDICATOR")
+    proto = _marker_segment(text, "VALIDATION") or _marker_segment(
+        text, "PROTOCOL")
+    if not ind or not proto:
+        return False
+    ind_tokens = {w for w in re.findall(r"[a-z]{3,}", ind.lower())}
+    proto_tokens = {w for w in re.findall(r"[a-z]{3,}", proto.lower())}
+    scaffold = {"protocol", "validation", "measured", "measure", "pass",
+                "fail", "sample", "samples", "devices", "units", "fleet",
+                "days", "hours", "cycles", "month", "months"}
+    shared = (ind_tokens & proto_tokens) - scaffold
+    return len(shared) >= 1
+
+
+_COH_SCAFFOLD = {"protocol", "validation", "measured", "sample", "pass",
+                 "fail", "fleet", "days"}
 
 
 #: A DEFINED calibration rule: a reference-state word (what the rule is
@@ -152,7 +259,8 @@ def _count_matches(pattern: str, text: str) -> int:
 
 def validate_answer(answer: str, question_type: str,
                     packet: Optional[List[Dict[str, Any]]] = None,
-                    user_variables: Optional[List[str]] = None
+                    user_variables: Optional[List[str]] = None,
+                    clarification: Optional[str] = None
                     ) -> Dict[str, Any]:
     """Return {'valid': bool, 'violations': [str], 'bindings': {...}}.
 
@@ -160,8 +268,9 @@ def validate_answer(answer: str, question_type: str,
     answers, and by the engine's answer-shape routing."""
     violations: List[str] = []
     text = answer or ""
-    blob = (_packet_blob(packet)
-            + " " + " ".join(user_variables or [])).lower()
+    _clar = clarification or ""
+    blob = (_packet_blob(packet) + " " + " ".join(user_variables or [])
+            + " " + _clar).lower()
     bindings = {"evidence_bound": 0, "assumption": 0, "unbound_numbers": 0,
                 "all_numbers": 0}
 
@@ -183,22 +292,26 @@ def validate_answer(answer: str, question_type: str,
                          r"cases)", text, re.IGNORECASE):
             violations.append(
                 "predictor contract: no n=\u2026 sample-count stated")
-        # THRESHOLD must be tied to the named indicator
-        m_ind = re.search(r"INDICATOR\s*:([^\n]{1,200})", text,
-                          re.IGNORECASE | re.DOTALL)
+        # THRESHOLD must be tied to the named indicator: the indicator's
+        # quantity word must appear in the threshold segment OR in the
+        # protocol that applies the threshold (a protocol that measures a
+        # different quantity does not tie — Art. XXVII/LXXXI)
+        m_ind = _marker_segment(text, "INDICATOR")
         if m_ind:
-            ind_line = m_ind.group(1).lower()
-            m_thr = re.search(r"THRESHOLD\s*:\s*([^\n]{1,200})", text,
-                              re.IGNORECASE | re.DOTALL)
-            if m_thr:
-                thr_line = m_thr.group(1).lower()
-                ind_tokens = set(re.findall(r"[a-z]{4,}", ind_line))
-                thr_tokens = set(re.findall(r"[a-z]{4,}", thr_line))
-                if ind_tokens and thr_tokens and not (
-                        ind_tokens & thr_tokens):
-                    violations.append(
-                        "predictor contract: THRESHOLD not tied to "
-                        "INDICATOR (no shared content word)")
+            ind_tokens = set(re.findall(r"[a-z0-9]{3,}", m_ind.lower()))
+            thr_tokens = set(re.findall(
+                r"[a-z0-9]{3,}", _marker_segment(text, "THRESHOLD").lower()))
+            proto_seg = (_marker_segment(text, "VALIDATION")
+                         or _marker_segment(text, "PROTOCOL"))
+            proto_tokens = (set(re.findall(r"[a-z0-9]{3,}",
+                                            proto_seg.lower()))
+                            - _COH_SCAFFOLD)
+            if ind_tokens and not ((ind_tokens & thr_tokens)
+                                   | (ind_tokens & proto_tokens)):
+                violations.append(
+                    "predictor contract: THRESHOLD not tied to "
+                    "INDICATOR (the indicator's quantity is named in "
+                    "neither the threshold nor the validation protocol)")
         # threshold provenance (owner directive 2026-11-11): the
         # threshold must carry ONE honest basis — evidence-sourced
         # (packet/user-variable), ASSUMPTION-labeled, or a defined
@@ -214,6 +327,21 @@ def validate_answer(answer: str, question_type: str,
                 f"{thr_num} has no provenance basis (not "
                 "ASSUMPTION-labeled, not a defined calibration rule, "
                 "not evidence-sourced)")
+        if basis == "calibration_rule":
+            _cd = _calibration_rule_defined(_threshold_region(text))
+            _missing = [k for k, v in _cd.items() if not v]
+            if _missing:
+                violations.append(
+                    "predictor contract: calibration rule requires "
+                    "(1) reference population/window, (2) statistic "
+                    "with multiplier, (3) measurement method; missing "
+                    + ", ".join(_missing))
+        if not _coherent_measurement(text):
+            violations.append(
+                "predictor contract: the VALIDATION PROTOCOL does not "
+                "name the INDICATOR quantity (no shared content word "
+                "beyond protocol scaffolding) — the protocol must "
+                "validate the same measure the threshold is declared on")
     elif question_type == "intervention-proposal":
         if not re.search(r"EVIDENCE-BACKED|ASSUMPTION", text):
             violations.append(
@@ -228,6 +356,7 @@ def validate_answer(answer: str, question_type: str,
                 "intervention contract: no concrete test/measure named")
         # every EVIDENCE-BACKED parameter must bind to a packet source id
         pb = _packet_blob(packet).lower() if packet else ""
+        src_map = _source_map(packet)
         for m in _EVIDENCE_BACKED.finditer(text):
             # look at the 200-char window before the label, or the same
             # line after it, for an id — bracketed packet ids carry the
@@ -272,6 +401,67 @@ def validate_answer(answer: str, question_type: str,
                     violations.append(
                         "intervention contract: EVIDENCE-BACKED source id "
                         "not found in evidence packet")
+            # the cited record must LEXICALLY SUPPORT the parameter on
+            # the same line (a constitutional floor for exact binding,
+            # Art. II): a source that supports *some* parameter of the
+            # line must share the parameter's number or at least two
+            # distinctive tokens with it.
+            src_text = None
+            for i in ids:
+                _k = i.lower().strip("[]\n \t")
+                cand = src_map.get(_k) or src_map.get(
+                    _k.removeprefix("doi:"))
+                if cand:
+                    src_text = cand
+                    break
+            if src_text is not None:
+                param_line = _line_of(text, m.start())
+                line_nums = set(_numbers(param_line))
+                srcl = src_text.lower()
+                num_hit = any(re.search(r"(?<!\d)" + re.escape(n) +
+                                        r"(?!\d)", srcl)
+                              for n in line_nums)
+                tok_hit = len(_distinctive_tokens(param_line)
+                              & _distinctive_tokens(src_text)) >= 2
+                if line_nums and not (num_hit or tok_hit):
+                    violations.append(
+                        "intervention contract: EVIDENCE-BACKED source "
+                        f"{ids[0]} does not lexically support its "
+                        "parameter (no shared number or distinctive "
+                        "token)")
+            elif ids and _is_user_citation(ids[0].lower().strip("[]\n \t")):
+                # user citations: the value on the parameter line must
+                # appear in the user's stated variables / clarification
+                param_line = _line_of(text, m.start())
+                line_nums = set(_numbers(param_line))
+                u_blob = _user_blob(user_variables, clarification)
+                if line_nums and not any(re.search(r"(?<!\d)" +
+                                                   re.escape(n) +
+                                                   r"(?!\d)", u_blob)
+                                         for n in line_nums):
+                    violations.append(
+                        "intervention contract: user citation value not "
+                        "present in the user variables / clarification")
+        # every PARAMETER segment that carries a number must itself carry
+        # a label — one labelled parameter does not licence unlabeled
+        # neighbours (the label binds the parameter it sits on, not the
+        # following lines; a test-criterion number outside a PARAMETER
+        # segment is a validation floor, not a design parameter)
+        _seg_starts = [sm.start() for sm in re.finditer(
+            r"\bPARAMETER\b", text, re.IGNORECASE)]
+        _n_unlab = 0
+        for _si, _ss in enumerate(_seg_starts):
+            _se = (_seg_starts[_si + 1]
+                   if _si + 1 < len(_seg_starts) else len(text))
+            _seg = text[_ss:_se]
+            if re.search(r"\d", _seg) and not re.search(
+                    r"EVIDENCE-BACKED|ASSUMPTION", _seg, re.IGNORECASE):
+                _n_unlab += 1
+        if _n_unlab:
+            violations.append(
+                f"intervention contract: {_n_unlab} numeric "
+                "parameter(s) without an EVIDENCE-BACKED or ASSUMPTION "
+                "label")
     else:
         violations.append(f"unknown question_type {question_type!r}")
     # numbers in answer not always from packet or user vars -> assumption or unbound

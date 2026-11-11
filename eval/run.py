@@ -52,13 +52,14 @@ sys.path.insert(0, str(REPO))
 
 
 def _answer_contract(answer, question_type, packet=None,
-                     user_variables=None):
+                     user_variables=None, clarification=None):
     """Deterministic shape check of the released pipeline answer."""
     try:
         from discovery_fabric.engine.answer_contract import validate_answer
         return validate_answer(answer or "", question_type or "",
                                packet=packet or [],
-                               user_variables=user_variables or [])
+                               user_variables=user_variables or [],
+                               clarification=clarification or None)
     except Exception as exc:  # noqa: BLE001
         return {"valid": None, "violations": [f"validator error: {exc}"],
                 "question_type": question_type}
@@ -296,6 +297,7 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
             _comp = None
     record: Dict[str, Any] = {
         "answer": _ans,
+        "answer_source": _answer_source(out_dir),
         "completed": completed,
         "wall_s": round(time.time() - t0, 1),
         "engine_error": err,
@@ -408,6 +410,28 @@ def _best_flagged_answer(out_dir: Path) -> Optional[str]:
                 + body)
     except Exception:
         return None
+
+
+def _answer_source(out_dir: Path) -> str:
+    """Which emitter produced the delivered answer (Art. X/XI):
+    composer_llm_call (authoritative), unverified_hypothesis (best-
+    hypothesis fallback), superseded_field_concatenation_* (diagnostic-
+    only diagnostics, never an authority), none."""
+    comp_p = Path(out_dir) / "ANSWER_COMPOSED.json"
+    if comp_p.exists():
+        try:
+            comp = json.loads(comp_p.read_text(encoding="utf-8"))
+            if comp.get("answer") and str(comp["answer"]).strip():
+                return (f"composer_llm_call:{comp.get('state') or '?'}")
+        except Exception:  # noqa: BLE001
+            pass
+    if (Path(out_dir) / "INVENTION_SPECIFICATION.json").exists():
+        return "superseded_field_concatenation_invention_spec"
+    if (Path(out_dir) / "candidate_envelope.json").exists():
+        return "superseded_field_concatenation_candidate_envelope"
+    if _attack_overall(out_dir) == "KILLED":
+        return "unverified_hypothesis_fallback"
+    return "none"
 
 
 def _extract_pipeline_answer(out_dir: Path) -> Optional[str]:
@@ -1747,7 +1771,10 @@ def build_score_table(route_rec: Dict[str, Any],
                                .read_text(encoding="utf-8")).get("evidence")
                         if (d / "pipeline" / "envelope_FREEZE.json"
                             ).exists() else []),
-                user_variables=list(p.get("user_variables") or []))
+                user_variables=list(p.get("user_variables") or []),
+                clarification=str(p.get("clarification_answer")
+                                  or p.get("clarification") or
+                                  p.get("followup_clarification") or ""))
         # R6 owner directive 2026-11-11: contract/number diagnostics are
         # SYMMETRIC — the same answer-shape contract and the same
         # fabricated-number accounting are REPORTED for both arms. The

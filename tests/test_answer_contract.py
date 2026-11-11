@@ -49,7 +49,7 @@ def test_predictor_threshold_assumption_basis():
     # R6 owner directive: an ASSUMPTION-labeled threshold number is a
     # valid basis even with NO packet at all
     ans = ("INDICATOR: bearing vibration RMS band excess. "
-           "THRESHOLD: 4.5 mm/s — ASSUMPTION (engineering alert level). "
+           "THRESHOLD: RMS 4.5 mm/s — ASSUMPTION (engineering alert level). "
            "PROTOCOL: n=12 machines, 90 days; pass if RMS band excess "
            "rises above threshold 3 consecutive shifts; fail otherwise.")
     res = validate_answer(ans, "predictor-design", packet=[])
@@ -62,9 +62,11 @@ def test_predictor_threshold_calibration_rule_basis():
     # from N days of healthy data) is a valid basis — no packet needed
     ans = ("INDICATOR: chiller approach temperature rise. "
            "THRESHOLD: alert when approach temperature exceeds baseline "
-           "+ 3 sigma, computed from 14 days of healthy data. "
-           "PROTOCOL: n=6 chillers, 120 days; pass if the alert fires "
-           "before the condenser-fouling maintenance flag; fail otherwise.")
+           "+ 3 sigma, computed from 14 days of sampled chiller "
+           "telemetry. "
+           "PROTOCOL: n=6 chillers, 120 days; pass if the approach "
+           "temperature alert fires before the condenser-fouling "
+           "maintenance flag; fail otherwise.")
     res = validate_answer(ans, "predictor-design", packet=[])
     assert res["valid"] is True, res["violations"]
     assert res["bindings"]["threshold_basis"] == "calibration_rule"
@@ -182,19 +184,27 @@ USER_CITE = (
 )
 
 PACKET_DOI_ONLY = [{"id": "ev-1", "doi": "10.1016/j.ceramint.2012.01.043",
-                    "abstract": "thermal cycling of electrolyte stacks",
-                    "title": "SOFC thermal cycling"}]
+                    "abstract": "activation temperature 400 °C for the "
+                                "glass-ceramic seal; thermal cycling of "
+                                "electrolyte stacks",
+                    "title": "SOFC thermal cycling and seal activation"}]
+
+USER_VARS = ["maintain OCV above 1.0 V", "seal glass fraction 0.15",
+             "activation temperature 400 °C"]
 
 
 def test_intervention_user_citations_accepted():
+    # the user citations verify against the user's stated variables
     res = validate_answer(USER_CITE, "intervention-proposal",
-                          packet=PACKET_DOI_ONLY)
+                          packet=PACKET_DOI_ONLY,
+                          user_variables=USER_VARS)
     assert res["valid"] is True, res["violations"]
 
 
 def test_intervention_user_citation_without_packet():
-    # no packet at all: USER citations remain legitimate provenance (a
-    # packet-sourced doi citation would rightly fail without a packet)
+    # no packet AND no user variables: a citation named "user
+    # constraint" has nothing user-stated for it to bind to, so it is
+    # not legitimate provenance (Art. XXV/XXVII)
     only_user = (
         "Implement a thermal management system with active cooling. "
         "PARAMETER: target open-circuit voltage — 1.0 V — "
@@ -203,7 +213,12 @@ def test_intervention_user_citation_without_packet():
         "EVIDENCE-BACKED [user-stated clarification]. "
         "Test in a thermal-cycling rig; falsify if OCV < 1.0 V.")
     res = validate_answer(only_user, "intervention-proposal", packet=None)
-    assert res["valid"] is True, res["violations"]
+    assert res["valid"] is False
+    # with the user's stated variables supplied and matching, legit
+    only_user2 = validate_answer(only_user, "intervention-proposal",
+                                 packet=None,
+                                 user_variables=USER_VARS)
+    assert only_user2["valid"] is True, only_user2["violations"]
 
 
 def test_intervention_unknown_citation_still_rejected():

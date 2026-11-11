@@ -3628,15 +3628,31 @@ class EngineRun:
             # be invented from nothing (Art. XXV — never manufacture)
             cands = candidates_from_state(env_dict, top_n=5)
             packet = self.env.evidence or []
-            if not cands and not packet:
+            if not cands:
+                # no gate-admissible candidate: composing a
+                # recommendation here would be an invented one
+                # (Art. XVIII/XXV). Typed no-recommendation state —
+                # zero LLM calls.
                 rec = {"composer_version": "answer_composer/1.0.0",
-                       "state": "SKIPPED_NO_INPUTS",
-                       "why": "no candidates and no frozen evidence "
-                              "recorded by this run; composition would "
-                              "be manufactured from nothing (Art. XXV)",
+                       "state": "NO_ADMISSIBLE_CANDIDATES",
+                       "why": ("no candidate survived the evidence / "
+                               "attack gates (or attack verdict is a "
+                               "kill / verdict missing); refusing to "
+                               "compose an endorsed recommendation from "
+                               "unadjudicated state"),
                        "answer": None, "started_at": _t0,
                        "finished_at": utc_now()}
-                status = "SKIPPED_NO_INPUTS"
+                status = "NO_ADMISSIBLE_CANDIDATES"
+            elif not packet:
+                # no frozen evidence: the empty-evidence composer run is
+                # forbidden; honest typed refusal, zero LLM calls
+                rec = {"composer_version": "answer_composer/1.0.0",
+                       "state": "SKIPPED_NO_PACKET",
+                       "why": ("no frozen evidence packet — composition "
+                               "without epistemic grounds is not permitted"),
+                       "answer": None, "started_at": _t0,
+                       "finished_at": utc_now()}
+                status = "SKIPPED_NO_PACKET"
             else:
                 _att = (self.env.attack_results or {})
                 _phys = (self.env.physics or {})
@@ -3663,8 +3679,10 @@ class EngineRun:
                     verification=verification,
                     question_type=str((self.problem or {}).get(
                         "question_type") or "intervention-proposal"))
-                status = ("OK" if rec.get("answer")
-                          else "FAILED_EXPLICIT")
+                status = ("COMPOSED_CONTRACT_INVALID"
+                          if rec.get("state") == "COMPOSED_CONTRACT_INVALID"
+                          else (rec.get("state") or "FAILED_EXPLICIT")
+                          if rec.get("answer") else "FAILED_EXPLICIT")
         except Exception as exc:  # noqa: BLE001 — typed, never silent
             rec = {"composer_version": "answer_composer/1.0.0",
                    "state": "COMPOSE_FAILED_TRANSPORT",

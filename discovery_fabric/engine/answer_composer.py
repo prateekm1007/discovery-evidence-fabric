@@ -133,6 +133,8 @@ def _candidates_block(cands: List[Dict[str, Any]]) -> str:
         cid = str(c.get("candidate_id") or f"candidate{i}")
         verdict = str(c.get("attack_verdict") or c.get("verdict")
                       or c.get("state") or "NO_VERDICT")
+        if c.get("hypothesis_unverified") or _is_hypothesis_verdict(verdict):
+            verdict = f"UNVERIFIED_HYPOTHESIS({verdict})"
         mech = str(c.get("mechanism") or "")[:280]
         interv = str(c.get("intervention") or "")[:280]
         eff = str(c.get("expected_effect") or c.get("predicted_effect")
@@ -273,26 +275,73 @@ def compose_answer(problem: Dict[str, Any],
     return rec
 
 
+# kill verdicts: an attacked candidate that lost is never an admissible
+# engineering recommendation (the composer is not an independent
+# invention generator). Hypothesis-class verdicts are admissible only as
+# UNVERIFIED hypotheses, never as recommended inventions (Art. XVIII).
+_KILL_STATES = {"KILLED", "KILLED_DETERMINISTIC", "KILLED_SCIENTIFIC",
+                "REJECTED", "REJECTED_SCIENTIFIC", "REJECTED_ATTACK",
+                "KILL"}
+_HYPOTHESIS_STATES = {"ESCALATED_OBJECTION", "UNVERIFIED_HYPOTHESIS",
+                      "HYPOTHESIS", "SURVIVED_UNVERIFIED"}
+
+
+def _admissible_verdict(verdict: str) -> bool:
+    v = str(verdict or "").strip().upper()
+    if not v or v == "NO_VERDICT":
+        return False  # unadjudicated is not admissible
+    if any(k in v for k in ("KILLED", "REJECT")):
+        return False
+    return True
+
+
+def _is_hypothesis_verdict(verdict: str) -> bool:
+    v = str(verdict or "").strip().upper()
+    return v in _HYPOTHESIS_STATES or "ESCALATED" in v
+
+
 def candidates_from_state(env_dict: Dict[str, Any],
                           top_n: int = 5) -> List[Dict[str, Any]]:
-    """Pull the top candidates (post-attack, ranked) from the run
-    envelope dict. Reads ONLY recorded state (no re-derivation)."""
+    """ADMISSIBLE candidates only — the composer is not an independent
+    invention generator. Sources, in order:
+
+    1. Ranked survivors (post-gate records): disposition == SURVIVED —
+       the authority-backed path; used on packages runs.
+    2. The one attack-adjudicated candidate on the lean path: the raw
+       mechanism candidate admitted to ATTACK with its recorded verdict.
+
+    NO fallback to raw/unfiltered mechanism records without a recorded
+    attack verdict. If nothing is admissible the caller must emit the
+    typed NO_ADMISSIBLE state, never a composed recommendation."""
     cands: List[Dict[str, Any]] = []
+    verdict = str(((env_dict.get("attack_results") or {}) or {})
+                  .get("overall") or "").strip().upper()
     rs = env_dict.get("ranked_results") or {}
     ranked = rs.get("results") or rs.get("candidates") or []
+    n_rs = 0
     for r in ranked[:top_n]:
-        if isinstance(r, dict):
-            cands.append(r)
-    if not cands:
-        mm = env_dict.get("mechanism_map") or {}
-        raw = mm.get("raw_candidate")
-        if isinstance(raw, dict):
-            raw = dict(raw)
-            raw.setdefault("attack_verdict",
-                           mm.get("attack_overall") or "NO_VERDICT")
-            cands.append(raw)
-    if not cands:
-        for m in (env_dict.get("mechanisms") or [])[:top_n]:
-            if isinstance(m, dict):
-                cands.append(m)
-    return cands
+        if not isinstance(r, dict):
+            continue
+        disp = str(r.get("disposition") or r.get("verdict") or "").upper()
+        if disp == "SURVIVED":
+            rr = dict(r)
+            rr["attack_verdict"] = rr.get("attack_verdict") or "PASS"
+            cands.append(rr)
+            n_rs += 1
+    if cands:
+        return cands[:top_n]
+
+    mm = env_dict.get("mechanism_map") or {}
+    raw = mm.get("raw_candidate") if isinstance(mm, dict) else None
+    if isinstance(raw, dict) and raw:
+        att = verdict or str(mm.get("attack_overall")
+                             or "NO_VERDICT").strip().upper()
+        if not _admissible_verdict(att):
+            return []  # attack killed it — never a recommendation
+        rec = dict(raw)
+        rec["attack_verdict"] = att
+        rec["verdict"] = att
+        if _is_hypothesis_verdict(att):
+            rec["hypothesis_unverified"] = True
+        cands.append(rec)
+    return cands[:top_n]
