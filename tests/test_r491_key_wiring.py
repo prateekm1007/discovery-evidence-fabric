@@ -59,9 +59,16 @@ def test_sources_keys_file_is_repo_relative():
         "sources.py must resolve .env.keys from the repo root (the same "
         "single rule as source_registry/keys.py)"
     )
-    assert "discovery-evidence-fabric" not in str(sources.KEYS_FILE), (
-        "the sandbox-era hardcoded path must be dead"
-    )
+    # R6 measured note (Art. XXV): the original second assertion banned
+    # the SUBSTRING 'discovery-evidence-fabric' inside the resolved path
+    # (the sandbox-era hardcoded path). That assertion measured the
+    # checkout LOCATION, not the code: the repo-derived path legally
+    # CONTAINS that substring whenever the checkout sits at the
+    # historical sandbox path (this is exactly where it sits today), so
+    # the intent (repo-derivation) is fully carried by the equality
+    # assert above — a hardcoded stale absolute could never equal
+    # REPO / '.env.keys'. The substring ban was redundant with it and
+    # self-contradictory at this checkout path; removed with disclosure.
 
 
 def test_load_key_reads_materialized_file(tmp_path):

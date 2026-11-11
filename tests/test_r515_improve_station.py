@@ -317,7 +317,10 @@ class TestStarvationInteraction(unittest.TestCase):
     def test_10_diverse_run_admits_collision_attack(self):
         with tempfile.TemporaryDirectory() as td:
             from tests.test_r514_starvation_gate import _run_stubbed
-            engine, fired = _run_stubbed(2, td)
+            # 3 distinct mechanisms: admitted under the amended floor
+            # (owner directive 2026-11-11 item 4; 36ed4854c / bd0159c91
+            # — the same authority the r514 pins follow).
+            engine, fired = _run_stubbed(3, td)
             self.assertIn("COLLISION", fired)
             self.assertIn("ATTACK", fired)
 

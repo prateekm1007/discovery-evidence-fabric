@@ -229,8 +229,15 @@ class TestDirectTransferBehavior:
 # ---------------------------------------------------------------------------
 class TestCrossDomainAnalogyBehavior:
     def test_valid_analogy(self, monkeypatch):
+        # Fixture follows the operator contract the anchor rule admits
+        # (R6 item 4, commit 36ed4854c: the anchor domain gate rides
+        # every assembled candidate; a foreign-domain anchor is legal
+        # ONLY on a stated shared mechanism — the same contract the
+        # CROSS_DOMAIN_ANALOGY prompt now requires, aea1dce94). The
+        # MECHANISM line states the shared mechanism explicitly.
         m2 = _m2_lines(
-            "electrostatic repulsion of like charges at the boundary "
+            "the same electrostatic repulsion mechanism as in the "
+            "source system: repulsion of like charges at the boundary "
             "prevents particle deposition in the catheter lumen",
             "charge the catheter lumen wall with an applied "
             "electrostatic field to repel charged thrombus precursors",
@@ -292,10 +299,16 @@ class TestGeometricTransformationBehavior:
     def test_valid_geometry_change(self, monkeypatch):
         # the causal mechanism (eddy shedding resuspension) is
         # preserved while the geometry TRANSFORMS: single step ->
-        # helical spiral grooves (topology + count change)
+        # helical spiral grooves (topology + count change). The
+        # anchor record is foreign-domain, so the MECHANISM line
+        # states the shared mechanism explicitly (R6 item 4 anchor
+        # domain gate, 36ed4854c — same contract as the operator
+        # prompt, aea1dce94).
         m2 = _m2_lines(
-            "eddy shedding at flow obstacles promotes particle "
-            "resuspension away from the wall",
+            "the same flow-obstacle eddy-shedding resuspension "
+            "mechanism as in the source system: eddy shedding at flow "
+            "obstacles promotes particle resuspension away from the "
+            "wall",
             "machine helical spiral grooves into the catheter lumen "
             "wall, multiple grooves along the flow path",
             "deposition reduced by 40 percent in the grooved lumen",

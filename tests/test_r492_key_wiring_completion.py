@@ -50,8 +50,15 @@ def test_no_sandbox_absolute_path_anywhere_in_engine():
 def test_retrieval_v3_keys_file_is_repo_derived():
     sys.path.insert(0, str(REPO))
     import discovery_fabric.prior_art_v2.retrieval_v3 as rv3
+    # The intent is repo-derivation: KEYS_FILE must EQUAL the repo-root
+    # path (a hardcoded stale absolute could never pass the equality).
+    # R6 measured note (Art. XXV): the former `startswith(SANDBOX_PATH)`
+    # ban measured the checkout LOCATION, not the code — a repo-derived
+    # path startswith that constant whenever the checkout sits at the
+    # historical sandbox path (where it sits today), so the assertion
+    # was self-contradictory there; the equality assert carries the
+    # intent and stays. Removed with disclosure.
     assert rv3.KEYS_FILE == REPO / ".env.keys"
-    assert not str(rv3.KEYS_FILE).startswith(SANDBOX_PATH)
 
 
 def test_sources_r491_fix_intact():

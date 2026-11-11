@@ -49,17 +49,24 @@ class TestPurposeBoundary(unittest.TestCase):
             ph.retirement_scopes_for_purpose("post_rank:independent_attack"),
             {ph.PURPOSE_POST_RANK_GAUNTLET_ATTACK})
 
-    def test_b_zai_retired_for_post_rank_purpose(self):
-        self.assertTrue(ph.is_route_retired(
+    def test_b_zai_state_and_mechanism_on_post_rank_purpose(self):
+        """Today (R6 re-admission, 36ed4854c, Art. XXV): zai is allowed
+        on the gauntlet purpose. MECHANISM pin: with the scope recorded,
+        the predicate retires zai and the filter records it."""
+        self.assertFalse(ph.is_route_retired(
             "zai", purpose="post_rank:independent_attack"))
-        kept, removed = ph.apply_route_retirement(
-            ["zai", "xkiro", "unorouter"],
-            purpose="post_rank:independent_attack")
-        self.assertNotIn("zai", kept)
-        self.assertTrue(any(
-            r["provider"] == "zai" and
-            r["retirement_state"] == "RETIRED_ROUTE_BLOCKED"
-            for r in removed))
+        with mock.patch.dict(ph.RETIRED_ROUTE_PROVIDERS,
+                             {"zai": {ph.PURPOSE_POST_RANK_GAUNTLET_ATTACK}}):
+            self.assertTrue(ph.is_route_retired(
+                "zai", purpose="post_rank:independent_attack"))
+            kept, removed = ph.apply_route_retirement(
+                ["zai", "xkiro", "unorouter"],
+                purpose="post_rank:independent_attack")
+            self.assertNotIn("zai", kept)
+            self.assertTrue(any(
+                r["provider"] == "zai" and
+                r["retirement_state"] == "RETIRED_ROUTE_BLOCKED"
+                for r in removed))
 
     def test_c_zai_allowed_for_ordinary_independent_attack(self):
         self.assertEqual(
@@ -74,12 +81,19 @@ class TestPurposeBoundary(unittest.TestCase):
         self.assertFalse(ph.is_route_retired("zai", purpose="attack"))
         self.assertFalse(ph.is_route_retired("zai", role=ph.ROLE_ATTACK))
 
-    def test_e_r520_technical_retirement_unchanged(self):
+    def test_e_technical_scope_boundary_and_zai_state(self):
         self.assertEqual(
             ph.retirement_scopes_for_purpose("TECHNICAL_STATE_EXTRACTION"),
             {ph.PURPOSE_POST_RANK_TECHNICAL})
-        self.assertTrue(ph.is_route_retired(
+        # Today: zai serves TECHNICAL_STATE_EXTRACTION (R6 re-admission,
+        # 36ed4854c, Art. XXV). MECHANISM pin: with the scope recorded
+        # the predicate still retires it.
+        self.assertFalse(ph.is_route_retired(
             "zai", purpose="TECHNICAL_STATE_EXTRACTION"))
+        with mock.patch.dict(ph.RETIRED_ROUTE_PROVIDERS,
+                             {"zai": {ph.PURPOSE_POST_RANK_TECHNICAL}}):
+            self.assertTrue(ph.is_route_retired(
+                "zai", purpose="TECHNICAL_STATE_EXTRACTION"))
 
     def test_f_synthesis_and_ms_routing_unchanged(self):
         self.assertFalse(ph.is_route_retired("zai", role=ph.ROLE_SYNTHESIS))
@@ -97,9 +111,20 @@ class TestPurposeBoundary(unittest.TestCase):
             self.assertNotIn("'zai'", body)
 
     def test_h_retirement_is_data(self):
+        """Retirement remains DATA in RETIRED_ROUTE_PROVIDERS (the one
+        authority, Art. X). R6 re-admission: the zai SCOPES were cleared
+        to the empty set (the re-admission is recorded as data — the
+        entry and the mechanism stay; 36ed4854c)."""
         self.assertIn("zai", ph.RETIRED_ROUTE_PROVIDERS)
-        self.assertIn(ph.PURPOSE_POST_RANK_GAUNTLET_ATTACK,
-                      ph.RETIRED_ROUTE_PROVIDERS["zai"])
+        self.assertIsInstance(ph.RETIRED_ROUTE_PROVIDERS["zai"], set)
+        self.assertEqual(ph.RETIRED_ROUTE_PROVIDERS["zai"], set())
+        # the mechanism is data-driven: a recorded scope is honored
+        with mock.patch.dict(ph.RETIRED_ROUTE_PROVIDERS,
+                             {"zai": {ph.PURPOSE_POST_RANK_GAUNTLET_ATTACK}}):
+            self.assertIn(ph.PURPOSE_POST_RANK_GAUNTLET_ATTACK,
+                          ph.RETIRED_ROUTE_PROVIDERS["zai"])
+            self.assertTrue(ph.is_route_retired(
+                "zai", purpose="post_rank:independent_attack"))
 
 
 class TestCallSiteWiring(unittest.TestCase):
@@ -201,8 +226,10 @@ class TestRoutingOnly(unittest.TestCase):
         self.assertEqual(r1.get("attack_purpose"), "independent_attack")
 
     def test_k_end_to_end_post_rank_purpose_skips_zai(self):
-        """The gauntlet call shape with the post-rank purpose must not
-        attempt zai on ordinary routing (the R525 cliff mechanism)."""
+        """The gauntlet call shape with the post-rank purpose: with the
+        gauntlet scope recorded on zai, zai is never attempted on
+        ordinary routing (the R525 cliff mechanism, pinned). Today
+        (scopes cleared, 36ed4854c): zai serves the call."""
         import pytest
         m = pytest.MonkeyPatch()
         for var in list(lr._SPEC_BY_ID.keys()):
@@ -221,12 +248,21 @@ class TestRoutingOnly(unittest.TestCase):
         m.setattr(lr, "_call_anthropic_flavor", fake_call)
         try:
             from discovery_fabric.engine import mechanism_space as ms
+            # today: zai serves (re-admitted, scopes cleared)
             res = ms.llm_generate(
                 "p", system="s", purpose=ia.POST_RANK_ATTACK_PURPOSE,
                 max_tokens=1600)
-            # zai retired for this purpose: never served
-            self.assertNotEqual(res.get("provider"), "zai")
             self.assertTrue(res.get("ok"))
+            self.assertEqual(res.get("provider"), "zai")
+            # mechanism: with the scope recorded, zai is skipped
+            with mock.patch.dict(
+                    ph.RETIRED_ROUTE_PROVIDERS,
+                    {"zai": {ph.PURPOSE_POST_RANK_GAUNTLET_ATTACK}}):
+                res = ms.llm_generate(
+                    "p", system="s", purpose=ia.POST_RANK_ATTACK_PURPOSE,
+                    max_tokens=1600)
+                self.assertNotEqual(res.get("provider"), "zai")
+                self.assertTrue(res.get("ok"))
         finally:
             m.undo()
 

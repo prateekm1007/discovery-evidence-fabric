@@ -12,12 +12,20 @@ attempts; xkiro served the same purpose first-OK both times).
 The intervention is ONE resolver branch in provider_health.py — the
 single routing-retirement authority (Art. X, R519 §6). Adversarial
 discipline (Art. XVI): every neighboring semantic is pinned unchanged.
+
+R6 RE-ADMISSION (owner directive 2026-11-11, commit 36ed4854c, Art.
+XXV): the zai scopes were RE-MEASURED live and CLEARED from
+RETIRED_ROUTE_PROVIDERS; the retirement MECHANISM stays. The zai-state
+assertions below therefore pin BOTH: today's measured state (allowed)
+AND the mechanism (with a scope recorded, the resolver/filter/ledger
+behave exactly as R523 specified — injected-scope pins).
 """
 from __future__ import annotations
 
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
@@ -27,6 +35,12 @@ from discovery_fabric.engine import llm_registry as lr          # noqa: E402
 from discovery_fabric.engine import runtime_admission as ra     # noqa: E402
 
 
+def _zai_scoped(scope):
+    """Record `scope` on zai's retirement entry for the block (the
+    MECHANISM state the R520/R523-era pins measured; restored after)."""
+    return mock.patch.dict(ph.RETIRED_ROUTE_PROVIDERS, {"zai": {scope}})
+
+
 class TestTechnicalStatePurposeScope(unittest.TestCase):
 
     def test_technical_state_purpose_resolves_post_rank_technical(self):
@@ -34,33 +48,54 @@ class TestTechnicalStatePurposeScope(unittest.TestCase):
             "TECHNICAL_STATE_EXTRACTION") == {
                 ph.PURPOSE_POST_RANK_TECHNICAL}
 
-    def test_zai_retired_for_technical_state_extraction(self):
-        assert ph.is_route_retired("zai",
-                                   purpose="TECHNICAL_STATE_EXTRACTION")
+    def test_zai_allowed_today_scoped_when_recorded(self):
+        """Today (R6 re-admission, 36ed4854c, Art. XXV): zai serves
+        TECHNICAL_STATE_EXTRACTION. MECHANISM pin: with the scope
+        recorded the predicate still retires it."""
+        assert not ph.is_route_retired(
+            "zai", purpose="TECHNICAL_STATE_EXTRACTION")
+        with _zai_scoped(ph.PURPOSE_POST_RANK_TECHNICAL):
+            assert ph.is_route_retired(
+                "zai", purpose="TECHNICAL_STATE_EXTRACTION")
 
     def test_apply_route_retirement_filters_zai_from_ts_chain(self):
-        """The technical_state.py call site names zai FIRST in its
-        preferred tuple; the authority must remove it from the ordinary
-        chain (recorded), leaving the non-retired providers."""
+        """MECHANISM pin (the R523 contract): the technical_state.py
+        call site names zai FIRST in its preferred tuple; when the
+        scope is recorded the authority removes it from the ordinary
+        chain (recorded), leaving the non-retired providers. Today:
+        nothing removed (re-admitted)."""
+        with _zai_scoped(ph.PURPOSE_POST_RANK_TECHNICAL):
+            kept, removed = ph.apply_route_retirement(
+                ["zai", "openrouter", "nvidia", "mistral"],
+                purpose="TECHNICAL_STATE_EXTRACTION")
+            assert "zai" not in kept
+            assert kept == ["openrouter", "nvidia", "mistral"]
+            assert any(r["provider"] == "zai" and
+                       r["retirement_state"] == "RETIRED_ROUTE_BLOCKED"
+                       for r in removed)
         kept, removed = ph.apply_route_retirement(
             ["zai", "openrouter", "nvidia", "mistral"],
             purpose="TECHNICAL_STATE_EXTRACTION")
-        assert "zai" not in kept
-        assert kept == ["openrouter", "nvidia", "mistral"]
-        assert any(r["provider"] == "zai" and
-                   r["retirement_state"] == "RETIRED_ROUTE_BLOCKED"
-                   for r in removed)
+        assert kept == ["zai", "openrouter", "nvidia", "mistral"]
+        assert removed == []
 
     def test_ladder_extension_also_filters_zai(self):
         """The rung-ladder extension must agree with the preferred path
-        (R519 §7: the authority never gives contradictory answers)."""
+        (R519 §7: the authority never gives contradictory answers).
+        MECHANISM pin under a recorded scope; today: agree on allowed."""
+        with _zai_scoped(ph.PURPOSE_POST_RANK_TECHNICAL):
+            kept, removed = ph.apply_route_retirement(
+                ["xkiro", "zai", "unorouter"],
+                purpose="TECHNICAL_STATE_EXTRACTION")
+            assert "zai" not in kept
+            assert any(r["provider"] == "zai" and
+                       r["retirement_state"] == "RETIRED_ROUTE_BLOCKED"
+                       for r in removed)
         kept, removed = ph.apply_route_retirement(
             ["xkiro", "zai", "unorouter"],
             purpose="TECHNICAL_STATE_EXTRACTION")
-        assert "zai" not in kept
-        assert any(r["provider"] == "zai" and
-                   r["retirement_state"] == "RETIRED_ROUTE_BLOCKED"
-                   for r in removed)
+        assert "zai" in kept
+        assert removed == []
 
 
 class TestNeighboringSemanticsUnchanged(unittest.TestCase):
@@ -106,12 +141,14 @@ class TestNeighboringSemanticsUnchanged(unittest.TestCase):
         assert '"zai"' not in body_pred and "'zai'" not in body_pred
 
     def test_generate_ordinary_preferred_zai_blocked_on_ts_purpose(self):
-        """End-to-end (the exact technical_state.py call shape):
-        preferred list naming zai FIRST with purpose
-        TECHNICAL_STATE_EXTRACTION must not attempt zai on ordinary
-        routing (R519 §7: the preferred path routes through
-        apply_route_retirement). zai + openrouter are keyed; the call
-        must land on openrouter with the zai removal recorded."""
+        """End-to-end (the exact technical_state.py call shape): when a
+        TECHNICAL scope is recorded on zai, a preferred list naming zai
+        FIRST with purpose TECHNICAL_STATE_EXTRACTION must not attempt
+        zai on ordinary routing (R519 §7: the preferred path routes
+        through apply_route_retirement). zai + openrouter are keyed;
+        the call lands on openrouter with the zai removal recorded.
+        Today (scopes cleared, 36ed4854c): the call lands on zai with
+        NO retirement events — both branches are pinned."""
         import pytest
         m = pytest.MonkeyPatch()
         for var in list(lr._SPEC_BY_ID.keys()):
@@ -129,25 +166,43 @@ class TestNeighboringSemanticsUnchanged(unittest.TestCase):
         m.setattr(lr, "_call_openai_flavor", fake_call)
         m.setattr(lr, "_call_anthropic_flavor", fake_call)
         try:
+            # today: zai serves first (re-admitted), nothing recorded
             res = lr.generate(
                 "p",
                 policy=lr.SelectionPolicy(
                     preferred_providers=["zai", "openrouter"],
                     max_preference_fallback=0,
                     purpose="TECHNICAL_STATE_EXTRACTION"))
-            # zai retired from this purpose on the ordinary path: the
-            # call routes to the next rung, never to zai (recorded)
-            assert res.provider_id != "zai"
             assert res.ok is True
-            assert res.provider_id == "openrouter"
+            assert res.provider_id == "zai"
             led = res.selection_ledger or {}
             events = (led.get("retirement_events")
                       or (led.get("ladder") or {}).get(
                           "retirement_events", []))
-            assert any(
-                e["retirement_state"] == "RETIRED_ROUTE_BLOCKED"
-                and e["provider"] == "zai"
+            assert not any(
+                e.get("retirement_state") == "RETIRED_ROUTE_BLOCKED"
+                and e.get("provider") == "zai"
                 for e in events)
+            # mechanism: with the scope recorded, zai is blocked and
+            # the removal rides the ledger
+            with _zai_scoped(ph.PURPOSE_POST_RANK_TECHNICAL):
+                res = lr.generate(
+                    "p",
+                    policy=lr.SelectionPolicy(
+                        preferred_providers=["zai", "openrouter"],
+                        max_preference_fallback=0,
+                        purpose="TECHNICAL_STATE_EXTRACTION"))
+                assert res.provider_id != "zai"
+                assert res.ok is True
+                assert res.provider_id == "openrouter"
+                led = res.selection_ledger or {}
+                events = (led.get("retirement_events")
+                          or (led.get("ladder") or {}).get(
+                              "retirement_events", []))
+                assert any(
+                    e["retirement_state"] == "RETIRED_ROUTE_BLOCKED"
+                    and e["provider"] == "zai"
+                    for e in events)
         finally:
             m.undo()
 

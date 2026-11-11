@@ -2,12 +2,16 @@
 at-ceiling empty-content discipline.
 
 ROUND CLAIM (falsifiable):
-  G1. A run whose mechanism-space distinctness adjudication counts <2
-      materially distinct mechanisms records COLLISION and ATTACK as
+  G1. A run whose mechanism-space distinctness adjudication counts
+      <3 materially distinct mechanisms records COLLISION and ATTACK as
       SKIPPED_ADMISSION / MINIMUM_DIVERSITY (never executes them) and
       terminates MECHANISM_STARVED — attack/contradiction/experiment
       results are not reported as discovery evidence.
-  G2. A run WITH >=2 distinct mechanisms (or with no distinctness
+      (Floor amended 2 -> 3: owner directive 2026-11-11 item 4; Art.
+      LXXXIV floor superseded for R6 dev, amendment logged in 36ed4854c
+      and re-pinned at the r548 sites in bd0159c91 — this file's pins
+      follow the same authority.)
+  G2. A run WITH >=3 distinct mechanisms (or with no distinctness
       adjudication at all — fail-open on unknown, Art. XXV) admits
       COLLISION/ATTACK exactly as before (no behavior change).
   T1. An EmptyContentWithFinish raised at the max token budget does NOT
@@ -103,10 +107,24 @@ class TestMinimumDiversityDoor(unittest.TestCase):
         self.assertIn("NO_RETAINED_CANDIDATE", block["skip_reason"])
 
     def test_diverse_run_admits_collision_and_attack(self):
-        env = _env_with_ms(n_distinct=2, retained=2)
+        # Amended floor: 3 distinct mechanisms admit (owner directive
+        # 2026-11-11 item 4; 36ed4854c / bd0159c91). The 2-distinct
+        # boundary case now asserts STARVED below.
+        env = _env_with_ms(n_distinct=3, retained=3)
         for stage in ("COLLISION", "ATTACK"):
             block = stage_entry.justify(stage, env, {}, set())
             self.assertEqual(block["entry_status"], "ALLOWED", stage)
+
+    def test_two_distinct_is_starved_under_amended_floor(self):
+        # The amended discipline's boundary: 2 distinct < floor 3 —
+        # the old 2-admitted case is now the starved case (bd0159c91
+        # pins the same boundary at the r548 sites).
+        env = _env_with_ms(n_distinct=2, retained=2)
+        for stage in ("COLLISION", "ATTACK"):
+            block = stage_entry.justify(stage, env, {}, set())
+            self.assertEqual(block["entry_status"], "SKIPPED", stage)
+            self.assertEqual(block["prerequisite"],
+                             "MINIMUM_DIVERSITY", stage)
 
     def test_absent_adjudication_fails_open(self):
         # Legacy/empty envelope (no distinctness record): the gate
@@ -129,8 +147,14 @@ class TestMinimumDiversityDoor(unittest.TestCase):
         self.assertIsNone(stage_entry.mechanism_starved(None))
         self.assertIsNone(
             stage_entry.mechanism_starved(_env_with_ms(None, 1)))
+        # Amended floor 3: 2 distinct is now starved (bd0159c91),
+        # 3 distinct admits.
+        starved = stage_entry.mechanism_starved(_env_with_ms(2, 2))
+        self.assertIsNotNone(starved)
+        self.assertEqual(starved["n_distinct"], 2)
+        self.assertEqual(starved["minimum_required"], 3)
         self.assertIsNone(
-            stage_entry.mechanism_starved(_env_with_ms(2, 2)))
+            stage_entry.mechanism_starved(_env_with_ms(3, 3)))
         starved = stage_entry.mechanism_starved(_env_with_ms(1, 1))
         self.assertIsNotNone(starved)
         self.assertEqual(starved["n_distinct"], 1)
@@ -138,7 +162,11 @@ class TestMinimumDiversityDoor(unittest.TestCase):
     def test_diversity_set_and_floor_pinned(self):
         self.assertEqual(stage_entry.MINIMUM_DIVERSITY_STAGES,
                          frozenset({"COLLISION", "ATTACK"}))
-        self.assertEqual(stage_entry.MINIMUM_DISTINCT_MECHANISMS, 2)
+        # Floor 3: owner directive 2026-11-11 item 4 (Art. LXXXIV floor
+        # superseded for R6 dev; amendment in 36ed4854c, r548 pins in
+        # bd0159c91). The pin's intent is unchanged: the test still
+        # fails if anyone LOWERS the floor to make runs pass.
+        self.assertEqual(stage_entry.MINIMUM_DISTINCT_MECHANISMS, 3)
 
 
 def _stub_adapters(fired, n_distinct, retained=1):
@@ -282,7 +310,9 @@ class TestStarvedConductorTerminal(unittest.TestCase):
 
     def test_diverse_run_executes_attack_and_keeps_terminal(self):
         with tempfile.TemporaryDirectory() as td:
-            engine, fired = _run_stubbed(2, td)
+            # 3 distinct mechanisms: admitted under the amended floor
+            # (owner directive 2026-11-11 item 4, bd0159c91).
+            engine, fired = _run_stubbed(3, td)
             self.assertIn("ATTACK", fired)
             self.assertIn("COLLISION", fired)
             final = json.loads(
