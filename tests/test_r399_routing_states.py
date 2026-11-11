@@ -151,14 +151,20 @@ def test_cod_archived_from_materials_family(monkeypatch):
 def test_quota_class_429_trips_plain_429_does_not(tmp_path, monkeypatch):
     from discovery_fabric.prior_art_v2 import quota_breaker as qb
     monkeypatch.setattr(qb, "BREAKER_PATH", tmp_path / "breaker.json")
-    # a quota-class 429 (Lens monthly budget message shape)
-    quota_err = ("HTTP 429: Insufficient budget. Resets "
-                 "2026-10-01T00:00:00Z")
+    # a quota-class 429 (Lens monthly budget message shape). The reset
+    # date is DYNAMIC (R6 fix): the original fixture pinned 2026-10-01,
+    # which has since PASSED — the breaker correctly reports an expired
+    # park as not-parked, so a hardcoded past date can no longer
+    # exercise the parked-state path at all.
+    from datetime import datetime, timedelta, timezone
+    reset = (datetime.now(timezone.utc) + timedelta(days=30)
+             ).strftime("%Y-%m-%dT00:00:00Z")
+    quota_err = f"HTTP 429: Insufficient budget. Resets {reset}"
     assert qb.is_quota_exhaustion(quota_err) is True
     entry = qb.trip("lens_patent", quota_err)
     assert entry is not None and entry["source_state"] == "QUOTA_EXHAUSTED"
     # parked until the stated reset (+1 h safety), not the 24 h default
-    assert entry["until_utc"].startswith("2026-10-01")
+    assert entry["until_utc"].startswith(reset[:10])
     # check() reports the parked state
     parked = qb.check("lens_patent")
     assert parked is not None

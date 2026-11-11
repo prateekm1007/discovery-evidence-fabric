@@ -189,7 +189,9 @@ REWORDED_DUPLICATE_RESPONSE = (
 # a GENUINELY different mechanism (the J-case survivor)
 DIFFERENT_MECHANISM_RESPONSE = (
     "MECHANISM: electrostatic repulsion of like charges keeps charged "
-    "particles away from the surface boundary\n"
+    "particles away from the surface boundary — the same "
+    "surface-transport deposition mechanism as thrombus formation on "
+    "the catheter lumen\n"
     "INTERVENTION: charge the catheter lumen wall with an applied "
     "electrostatic field\n"
     "PREDICTED_EFFECT: particle and thrombus deposition reduced by "

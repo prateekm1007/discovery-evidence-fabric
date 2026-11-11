@@ -961,7 +961,7 @@ RECORD TEXT (the ONLY admissible source for MECHANISM_SOURCE_SPAN — quote your
 {record_text}
 
 Respond in EXACTLY this format (each field on ONE line):
-MECHANISM: <the causal mechanism as mapped into the target system>
+MECHANISM: <the causal mechanism as mapped into the target system, MUST state the shared mechanism explicitly (e.g. 'the same surface-transport deposition mechanism as in the source system') — the anchor rule admits a foreign-domain anchor ONLY when the candidate states this shared mechanism>
 INTERVENTION: <the specific design change in the device>
 PREDICTED_EFFECT: <the measurable effect on the failure quantity>
 NOVEL_DESIGN_VARIABLE: <the ONE new design variable this candidate introduces>
