@@ -203,10 +203,23 @@ def _intake_problem(problem: Dict[str, Any]) -> Dict[str, Any]:
 # arm: pipeline
 # ---------------------------------------------------------------------------
 def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, Any]:
+    """One measured pipeline arm, ALWAYS a full fresh run.
+
+    R5: the earlier auto-resume short-circuit (resume iff
+    envelope_RETRIEVE.json exists) let a re-run reuse the previous
+    arm's artifacts and report rc=0 with wall_s≈0. For a controlled
+    A/B comparison each arm must genuinely re-run the pipeline; stale
+    artifacts from a different A/B toggle leaking in would fabricate
+    results."""
     final_state = out_dir / "final_state.json"
-    resume = (out_dir / "envelope_RETRIEVE.json").exists() and not final_state.exists()
     t0 = time.time()
     status, err = None, None
+    try:
+        import shutil
+        if out_dir.exists() and any(out_dir.iterdir()):
+            shutil.rmtree(out_dir, ignore_errors=True)
+    except Exception:  # noqa: BLE001
+        pass
     if not final_state.exists():
         try:
             from discovery_fabric.engine.run import EngineRun
@@ -216,7 +229,7 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
                 package_registry_path=str(out_dir / "PACKAGE_ID_REGISTRY.json"),
                 with_package=(os.environ.get("ENGINE_NO_PACKAGE", "").strip()
                              not in ("1", "true", "yes")),
-                resume=resume)
+                resume=False)
             manifest = run.run()
             status = manifest.get("final_status") if isinstance(manifest, dict) else None
         except Exception as exc:  # noqa: BLE001
