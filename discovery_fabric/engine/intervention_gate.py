@@ -532,6 +532,11 @@ _SHARED_MECHANISM_RE = re.compile(
 #: principle") is NOT evidence of causal transfer (the auditor's
 #: finding). Stated-mechanism acceptance additionally requires at least
 #: one distinctive PHYSICS_LEXEME in the candidate's mechanism text.
+#: Lexeme class additions disclosed per Article 7 (the r401 fixture
+#: states a resuspension mechanism explicitly; the lexicon must cover
+#: the effect class, not only the deposition/fouling subset):
+#: resuspension/erosion/wear/entrainment/abrasion join
+#: deposition/fouling as transport-effect physics.
 _PHYSICS_LEXEMES = {
     "corrosion", "oxidation", "reduction", "diffusion", "transport",
     "deposition", "spallation", "expansion", "contraction", "creep",
@@ -541,6 +546,7 @@ _PHYSICS_LEXEMES = {
     "convection", "conduction", "radiation", "catalysis",
     "electrolyte", "interfacial", "differential", "kinetics",
     "thermal", "thermochemical",
+    "resuspension", "erosion", "wear", "entrainment", "abrasion",
 }
 
 _ANCHOR_MIN_SHARED_TOKENS = 3
