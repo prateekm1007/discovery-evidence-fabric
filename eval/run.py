@@ -588,15 +588,26 @@ def _transport_call(provider: str, model: str, prompt: str, system: str,
         return {"status": "NO_SPEC", "content": None}
     # honour operator pin via env so model_for_call picks it
     os.environ[f"{provider.upper()}_MODEL"] = model
+    # R6 (owner directive: FAST and LEAN): the judge/baseline arms are
+    # single-shot short-answer calls — measured OK latency on the R6
+    # gateway <= 15 s, and the gateway's own watchdog now bounds every
+    # connection server-side. The old 900 s per-attempt socket budget let
+    # ONE wedged connection consume 15 minutes (3 attempts = 45 min) of
+    # the run's wall inside getresponse (measured on fresh-run 1's
+    # judge-calibration phase). 180 s is ~12x the measured p99 OK latency
+    # and still under the gateway's CLI generation cap for a slow but
+    # legitimate long generation; a silent wedge costs its 180 s and the
+    # retry ladder opens a FRESH connection (never 45 min).
+    _R6_CALL_BUDGET_S = 180
     try:
         # anthropic flavor not needed for our free rungs (all openai)
         content = None
         if spec.flavor == "anthropic":
             content = lr._call_anthropic_flavor(spec, [{"role": "user", "content": prompt}],
-                                                900, max_tokens, model_override=model)
+                                                _R6_CALL_BUDGET_S, max_tokens, model_override=model)
         else:
             content = lr._call_openai_flavor(spec, [{"role": "user", "content": prompt}],
-                                             900, max_tokens, model_override=model)
+                                             _R6_CALL_BUDGET_S, max_tokens, model_override=model)
         return {"status": "OK", "provider_id": provider, "model": model,
                 "content": content}
     except Exception as exc:  # noqa: BLE001
