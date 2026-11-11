@@ -23,6 +23,34 @@
  * Art. XXVI disclosure: builder-operated transport. All epistemic gates
  * run unchanged in the engine.
  *
+ * R6 FAST/LEAN hardening (owner directive 2026-11-11; measured basis
+ * recorded in ENGINE_RUNS/r6_fresh_run1_*): the R6 fresh-run measurement
+ * (commit b7fdb2ccc944, 7 DEV problems) showed the transport itself was
+ * the dominant wall cost:
+ *  (1) 429 storms — the upstream quota admits ~3-5 calls/60 s (measured
+ *      live: every RATE_LIMITED_RETRY in the run window followed 3-5 OK
+ *      calls in the prior 60 s); the old ladder slept 30+60+90 s per
+ *      exhausted call (180 s of pure sleep per logical call, p02 burned
+ *      110 gateway attempts in 300 s, 5/7 problems hit the hard timeout);
+ *  (2) a wedged request (client request never completed per node's
+ *      parser) blocked a caller FOREVER — the run's judge-calibration
+ *      phase sat in HTTPResponse.readinto with no response and no log
+ *      entry, rescued only by the engine's own 900 s socket budget.
+ * Fixes, transport plumbing only (Art. X: one transport path unchanged;
+ * Art. XXV: measured reality recorded over the older constants):
+ *  - ADAPTIVE PACING (AIMD): call starts are globally serialized with a
+ *    minimum interval that starts at PACING_START_S, doubles on each 429
+ *    (capped PACING_MAX_S), and decays by 1 s per OK (floor PACING_START_S).
+ *    Self-tunes to the provider's real quota instead of a hardcoded rate.
+ *  - BOUNDED 429 LADDER: one retry after PACING_429_BACKOFF_S (20 s,
+ *    measured quota window scale), then a typed failure to the caller —
+ *    the engine's own retry ladder owns the remainder (never 180 s of
+ *    gateway sleep per call).
+ *  - REQUEST WATCHDOG: explicit server.requestTimeout/headersTimeout —
+ *    a client request that never completes is destroyed in bounded time
+ *    (the caller gets a reset and its own retry owns a fresh connection),
+ *    so no caller can hang forever on a silent connection.
+ *
  * Usage:
  *   ZAI_GATEWAY_KEY=<secret> node scripts/zai_gateway.mjs [port]
  *   (default port 8787; binds 127.0.0.1 only)
@@ -70,6 +98,30 @@ function logCall(entry) {
  *  routing ledger. Any other model id passes through unchanged (the
  *  CLI serves the grant's current model; the id is recorded, never
  *  silently rewritten). */
+// R6 adaptive pacing (AIMD) — measured basis in the header. Pure function
+// exported for the self-test; the state lives in `pacing` below.
+export const PACING_START_S = 4;
+export const PACING_MAX_S = 25;
+export const PACING_429_BACKOFF_S = 20;
+export function nextPacing(curS, is429) {
+  if (is429) return Math.min(curS * 2, PACING_MAX_S);
+  return Math.max(curS - 1, PACING_START_S);
+}
+const pacing = { intervalS: PACING_START_S, lastStartMs: 0 };
+
+/** Serialize call STARTS: wait until pacing.intervalS has elapsed since
+ *  the previous call's start (global across callers — the upstream quota
+ *  is global). Resolves with the waited ms (0 if none) for the log. */
+function waitPacing() {
+  const gap = pacing.intervalS * 1000 - (Date.now() - pacing.lastStartMs);
+  const wait = gap > 0 ? gap : 0;
+  return new Promise(resolve =>
+    setTimeout(() => {
+      pacing.lastStartMs = Date.now();
+      resolve(wait);
+    }, wait));
+}
+
 function zaiComplete(messages, timeoutMs, thinkingMode = false) {
   return new Promise((resolve, reject) => {
     const system = messages.filter(m => m.role === "system")
@@ -77,7 +129,8 @@ function zaiComplete(messages, timeoutMs, thinkingMode = false) {
     const user = messages.filter(m => m.role === "user")
       .map(m => m.content).join("\n\n");
     if (!user.trim()) return reject(new Error("no user content"));
-    const attempt = (triesLeft, backoffs) => {
+    const attempt = async (triesLeft, backoffs) => {
+      const pacingWaitMs = await waitPacing();
       const tmp = path.join(os.tmpdir(),
         `zai_gw_${crypto.randomBytes(6).toString("hex")}.json`);
       const args = ["chat", "--prompt", user, "-o", tmp];
@@ -95,11 +148,17 @@ function zaiComplete(messages, timeoutMs, thinkingMode = false) {
       child.on("close", code => {
         clearTimeout(timer);
         const is429 = /429|Too many requests/i.test(stderr);
+        if (code !== 0 && is429) {
+          // AIMD: every 429 doubles the pacing interval (the measured
+          // quota is global — one 429 means every caller slows down).
+          pacing.intervalS = nextPacing(pacing.intervalS, true);
+        }
         if (code !== 0 && is429 && triesLeft > 0) {
           const wait = backoffs[0];
           logCall({
             ts: new Date().toISOString(), status: "RATE_LIMITED_RETRY",
-            wait_s: wait, error: stderr.slice(0, 120),
+            wait_s: wait, pacing_s: pacing.intervalS,
+            error: stderr.slice(0, 120),
           });
           return setTimeout(() => attempt(triesLeft - 1, backoffs.slice(1)),
             wait * 1000);
@@ -123,14 +182,22 @@ function zaiComplete(messages, timeoutMs, thinkingMode = false) {
             finish_reason: data?.choices?.[0]?.finish_reason || "stop",
             usage: data?.usage || null,
             latency_ms: Date.now() - t0,
+            pacing_s: pacing.intervalS,
+            pacing_wait_ms: pacingWaitMs,
           });
+          // AIMD decay: a clean OK proves the current interval is safe.
+          pacing.intervalS = nextPacing(pacing.intervalS, false);
         } catch (e) {
           try { fs.unlinkSync(tmp); } catch (_) {}
           reject(new Error(`output parse failed: ${e.message}`));
         }
       });
     };
-    attempt(3, [30, 60, 90]);
+    // R6: ONE bounded 429 retry (20 s — measured quota-window scale),
+    // then a typed failure. The old 30/60/90 ladder burned 180 s of
+    // gateway sleep per exhausted call and was the R6 measured dominant
+    // wall cost (the header records the numbers).
+    attempt(1, [PACING_429_BACKOFF_S]).catch(reject);
   });
 }
 
@@ -206,7 +273,19 @@ const server = http.createServer(async (req, res) => {
   });
 });
 
+// R6 request watchdog: a client request that never completes (wedged
+// connection) is destroyed in bounded time — the caller receives a reset
+// and its own retry ladder owns a fresh connection. Without this, one
+// silent connection can hang a caller until ITS socket budget expires
+// (measured R6: the judge-calibration phase sat ~15 min in readinto on a
+// connection the gateway had accepted but never processed).
+server.requestTimeout = 60_000;   // whole request (headers + body)
+server.headersTimeout = 55_000;   // headers only (must be < requestTimeout)
+
 server.listen(PORT, "127.0.0.1", () => {
   console.log(`[zai-gateway] listening on 127.0.0.1:${PORT}`);
   console.log(`[zai-gateway] call log: ${LOG}`);
+  console.log(`[zai-gateway] R6 pacing: start=${PACING_START_S}s ` +
+    `max=${PACING_MAX_S}s backoff=${PACING_429_BACKOFF_S}s (AIMD, ` +
+    `one bounded 429 retry)`);
 });
