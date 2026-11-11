@@ -51,7 +51,9 @@ def _arm_run_once(monkeypatch, tmp_path):
     assert rec["answer"] is None
     assert rec.get("final_status") == "INCOMPLETE_INFRASTRUCTURE"
     assert "FRESH_RUN_UNESTABLISHABLE" in str(rec.get("engine_error") or "")
-    assert "stale" not in json.dumps(rec).lower() or True  # no reuse check
+    # no reuse: the stale arm's content must not appear anywhere in
+    # the typed record (the defect this test exists to pin)
+    assert "previously completed (stale)" not in json.dumps(rec)
     return rec
 
 
