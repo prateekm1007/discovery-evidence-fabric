@@ -279,7 +279,9 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
     completed = (stale_error is None
                  and (out_dir / "final_state.json").exists()
                  and json.loads((out_dir / "final_state.json").read_text(encoding="utf-8")).get("final_status") in COMPLETED_STATUSES)
-    _ans = _extract_pipeline_answer(out_dir)
+    _legacy_diag = "COMPOSE" in _dis
+    _ans = _extract_pipeline_answer(out_dir,
+                                    legacy_diagnostic=_legacy_diag)
     _avr = _attack_overall(out_dir)
     _comp = None
     _comp_p = out_dir / "ANSWER_COMPOSED.json"
@@ -297,15 +299,21 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
             _comp = None
     record: Dict[str, Any] = {
         "answer": _ans,
-        "answer_source": _answer_source(out_dir),
+        "answer_source": _answer_source(out_dir,
+                                        legacy_diagnostic=_legacy_diag),
         "completed": completed,
         "wall_s": round(time.time() - t0, 1),
         "engine_error": err,
         "stage_times_s": _stage_times(out_dir),
         "same_evidence": _evidence_snapshot(out_dir),
         "attack_verdict": _avr,
+        # P0-4: UNVERIFIED_HYPOTHESIS is a delivery state of the
+        # DIAGNOSTIC no_COMPOSE arm only (the flagged-hypothesis
+        # construction); on the normal path a KILLED attack delivers
+        # the typed no-answer state (NO_ANSWER + typed_no_answer:<...>
+        # in answer_source), never a legacy construction
         "answer_state": ("UNVERIFIED_HYPOTHESIS"
-                         if (_avr == "KILLED" and _ans)
+                         if (_avr == "KILLED" and _ans and _legacy_diag)
                          else ("RELEASED" if _ans else "NO_ANSWER")),
         "disabled_stages": _dis,
         "composer": _comp,
@@ -383,7 +391,9 @@ def _attack_overall(out_dir: Path) -> str:
 def _best_flagged_answer(out_dir: Path) -> Optional[str]:
     """Deliver the best flagged hypothesis honestly labeled UNVERIFIED
     (Art. XI/LXI). Never presents a killed candidate as an invention;
-    the label says exactly what it is."""
+    the label says exactly what it is. P0-4: DIAGNOSTIC use only —
+    the no_COMPOSE ablation arm (the superseded construction is
+    never released on the normal path, Art. IV/LXIV)."""
     ce = out_dir / "candidate_envelope.json"
     if not ce.exists():
         return None
@@ -412,64 +422,117 @@ def _best_flagged_answer(out_dir: Path) -> Optional[str]:
         return None
 
 
-def _answer_source(out_dir: Path) -> str:
-    """Which emitter produced the delivered answer (Art. X/XI):
-    composer_llm_call (authoritative), unverified_hypothesis (best-
-    hypothesis fallback), superseded_field_concatenation_* (diagnostic-
-    only diagnostics, never an authority), none."""
+def _answer_source(out_dir: Path, legacy_diagnostic: bool = False) -> str:
+    """Which emitter produced the delivered answer (Art. X/XI).
+    P0-4: on the normal path the composer record is the only authority
+    (composer_llm_call:<state>) or a TYPED no-answer state
+    (typed_no_answer:<state> / composer_record_absent) — the
+    superseded construction is never a normal answer. The
+    superseded_field_concatenation_* labels remain reachable ONLY on
+    the DIAGNOSTIC-labelled no_COMPOSE ablation arm (legacy_diagnostic
+    True; Art. LXIV: the superseded implementation is retired when
+    that scoped use is complete)."""
     comp_p = Path(out_dir) / "ANSWER_COMPOSED.json"
+    comp = None
     if comp_p.exists():
         try:
             comp = json.loads(comp_p.read_text(encoding="utf-8"))
-            if comp.get("answer") and str(comp["answer"]).strip():
-                return (f"composer_llm_call:{comp.get('state') or '?'}")
         except Exception:  # noqa: BLE001
-            pass
-    if (Path(out_dir) / "INVENTION_SPECIFICATION.json").exists():
-        return "superseded_field_concatenation_invention_spec"
-    if (Path(out_dir) / "candidate_envelope.json").exists():
-        return "superseded_field_concatenation_candidate_envelope"
+            comp = None
+    if comp is not None:
+        _a = comp.get("answer")
+        if _a and str(_a).strip():
+            return (f"composer_llm_call:{comp.get('state') or '?'}")
+        if not legacy_diagnostic:
+            return ("typed_no_answer:"
+                    + str(comp.get("state") or "FAILED_EXPLICIT"))
+        # the explicit no_COMPOSE arm: the composer is disabled here;
+        # name the diagnostic construction actually consulted below
+    if not legacy_diagnostic:
+        return "composer_record_absent"
     if _attack_overall(out_dir) == "KILLED":
-        return "unverified_hypothesis_fallback"
-    return "none"
+        return "diagnostic_unverified_hypothesis_fallback"
+    if (Path(out_dir) / "INVENTION_SPECIFICATION.json").exists():
+        return "diagnostic_superseded_field_concatenation_invention_spec"
+    if (Path(out_dir) / "candidate_envelope.json").exists():
+        return ("diagnostic_superseded_field_concatenation_"
+                "candidate_envelope")
+    return "diagnostic_none"
 
 
-def _extract_pipeline_answer(out_dir: Path) -> Optional[str]:
-    """Normalised plain-text answer, or None when nothing was released
+def _extract_pipeline_answer(out_dir: Path,
+                             legacy_diagnostic: bool = False) -> Optional[str]:
+    """Delivered plain-text answer, or None when nothing was released
     (a refusal notice is never handed to the judge — Art. LXI).
 
-    R6: the ANSWER COMPOSER's output (ANSWER_COMPOSED.json, one LLM
-    call over constraints + variables + candidates + packet +
-    verification) takes precedence when present and contract-valid.
-    A composition that violates the contract is delivered HONESTLY
-    FLAGGED (its violations ride in the record) — never silently
-    replaced, never silently dropped. The superseded field-concatenation
-    paths below stay as the fallback for COMPOSE-disabled runs (the
-    ablation arm) and for failed compositions (Art. LXIV)."""
-    # 0) composed answer (R6 ANSWER COMPOSER)
+    P0-4 (owner directive 2026-11-11, item 4; Art. IV no-fallback /
+    Art. LXIV retire-superseded): the ANSWER COMPOSER's record
+    (ANSWER_COMPOSED.json, one LLM call over constraints + variables
+    + candidates + packet + verification) is the ONLY answer
+    authority on the normal path. A composition that violates the
+    contract is delivered HONESTLY FLAGGED (its violations ride in
+    the record) — never silently replaced, never silently dropped.
+    When the composer produced no answer (NO_ADMISSIBLE_CANDIDATES,
+    SKIPPED_NO_PACKET, COMPOSE_FAILED_TRANSPORT, or no record at
+    all), the normal path returns a TYPED incomplete/no-answer state
+    (it rides answer_source as typed_no_answer:<state> /
+    composer_record_absent) — it never falls through to the
+    superseded field-concatenation construction, which would release
+    an answer that did not pass the current composition contract
+    (Art. IV: the failure of the strong path is never the quiet
+    activation of a weaker one).
+
+    legacy_diagnostic=True is reachable ONLY from the explicitly
+    selected no_COMPOSE ablation arm: the superseded construction
+    (flagged-UNVERIFIED hypothesis on KILLED, INVENTION_
+    SPECIFICATION.json / candidate_envelope.json field
+    concatenation) remains as clearly labelled DIAGNOSTIC material
+    for that arm's pruning question, and is never released as the
+    normal answer. Art. LXIV: the superseded implementation is
+    retired when this explicitly scoped ablation use is complete."""
     comp_p = Path(out_dir) / "ANSWER_COMPOSED.json"
+    comp: Optional[Dict[str, Any]] = None
     if comp_p.exists():
         try:
             comp = json.loads(comp_p.read_text(encoding="utf-8"))
-            _c_ans = comp.get("answer")
-            if _c_ans and str(_c_ans).strip():
-                if comp.get("state") == "COMPOSED_CONTRACT_VALID":
-                    return str(_c_ans)[:6000]
-                # contract-invalid composition: keep it but flag it —
-                # the flag text makes the violation visible to the judge
-                # and to every downstream diagnostic (honesty over
-                # tidiness, Art. XXV)
-                viols = " | ".join(
-                    (comp.get("contract") or {}).get("violations") or [])
-                flag = ("CONTRACT-INVALID COMPOSITION (deterministic "
-                        "answer-shape contract violations: "
-                        f"{viols[:300]})\n\n")
-                return (flag + str(_c_ans))[:6000]
         except Exception:  # noqa: BLE001 — corrupt record reads as absent
-            pass
+            comp = None
+    # 0) composed answer (R6 ANSWER COMPOSER — the normal-path authority)
+    if comp is not None:
+        _c_ans = comp.get("answer")
+        if _c_ans and str(_c_ans).strip():
+            if comp.get("state") == "COMPOSED_CONTRACT_VALID":
+                return str(_c_ans)[:6000]
+            # contract-invalid composition: keep it but flag it —
+            # the flag text makes the violation visible to the judge
+            # and to every downstream diagnostic (honesty over
+            # tidiness, Art. XXV)
+            viols = " | ".join(
+                (comp.get("contract") or {}).get("violations") or [])
+            flag = ("CONTRACT-INVALID COMPOSITION (deterministic "
+                    "answer-shape contract violations: "
+                    f"{viols[:300]})\n\n")
+            return (flag + str(_c_ans))[:6000]
+        if not legacy_diagnostic:
+            # P0-4 normal path: the composer ran and produced no
+            # admissible answer — typed no-answer state, NEVER a
+            # silent fall-through to the superseded construction
+            # (Art. IV: no fallback epistemology)
+            return None
+        # the explicitly selected no_COMPOSE arm: the composer is
+        # DISABLED_BY_CONFIG here; the construction below is
+        # DIAGNOSTIC-labelled (Art. LXIV)
+    if not legacy_diagnostic:
+        # P0-4: no composer record at all on the normal path (the
+        # engine never reached the COMPOSE stage, or the record was
+        # lost) — typed infrastructure state (Art. LXI), never the
+        # superseded construction
+        return None
+    # ---- DIAGNOSTIC (no_COMPOSE ablation arm) superseded
+    # ---- construction — clearly labelled, never a normal answer
     # Always-deliver (Art. XI): if the gauntlet killed everything but a
     # candidate exists, deliver the best hypothesis honestly labeled
-    # UNVERIFIED instead of nothing.
+    # UNVERIFIED (diagnostic arm only).
     if _attack_overall(out_dir) == "KILLED":
         released = _best_flagged_answer(out_dir)
         if released:
