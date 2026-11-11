@@ -1473,12 +1473,28 @@ def build_score_table(route_rec: Dict[str, Any],
                         if (d / "pipeline" / "envelope_FREEZE.json"
                             ).exists() else []),
                 user_variables=list(p.get("user_variables") or []))
+        # R6 owner directive 2026-11-11: contract/number diagnostics are
+        # SYMMETRIC — the same answer-shape contract and the same
+        # fabricated-number accounting are REPORTED for both arms. The
+        # hard unverified-number disqualification and the
+        # full_scoreable gate stay pipeline-side by design (the pipeline
+        # is the system under test; the baseline is the comparison
+        # instrument) — reporting symmetry, not enforcement symmetry.
+        baseline_answer_contract = _answer_contract(
+            base.get("answer"),
+            p.get("question_type"),
+            packet=(json.loads((d / "pipeline" / "envelope_FREEZE.json")
+                               .read_text(encoding="utf-8")).get("evidence")
+                    if (d / "pipeline" / "envelope_FREEZE.json"
+                        ).exists() else []),
+            user_variables=list(p.get("user_variables") or []))
         row = {
             "problem_id": p["problem_id"],
             "question_type": p["question_type"],
             "contamination_tag": p.get("contamination_tag"),
             "has_clarification": bool(p.get("clarification_answer")),
             "answer_contract": answer_contract,
+            "baseline_answer_contract": baseline_answer_contract,
             "n_numbers_unverified": n_num_unverified,
             "n_numbers_unverified_baseline": len(nr_base),
             "numbers_fabricated": {
@@ -1690,6 +1706,26 @@ def build_score_table(route_rec: Dict[str, Any],
                 for r in rows)
             / max(1, sum(1 for r in rows
                          if (r.get("numbers_fabricated") or {}).get("baseline"))), 3),
+        # R6 symmetric contract diagnostics (owner directive 2026-11-11):
+        # the SAME answer-shape contract is reported for both arms
+        "contract_valid_pipeline": sum(
+            1 for r in rows
+            if (r.get("answer_contract") or {}).get("valid") is True),
+        "contract_valid_baseline": sum(
+            1 for r in rows
+            if (r.get("baseline_answer_contract") or {}).get("valid") is True),
+        "contract_violations_pipeline": sum(
+            len((r.get("answer_contract") or {}).get("violations") or [])
+            for r in rows),
+        "contract_violations_baseline": sum(
+            len((r.get("baseline_answer_contract") or {}).get("violations") or [])
+            for r in rows),
+        "threshold_basis_pipeline": {
+            b: sum(1 for r in rows
+                   if ((r.get("answer_contract") or {}).get("bindings") or {})
+                   .get("threshold_basis") == b)
+            for b in ("packet_or_user_variable", "assumption",
+                      "calibration_rule", "unknown", "no_number")},
         "pipeline_wins": wins,
         "baseline_wins": full_scoreable_baseline_wins,
         "ties": ties,

@@ -35,13 +35,65 @@ INTERVENTION_BAD = (
 
 
 def test_predictor_contract_accepts_complete_answer():
-    # the THRESHOLD number must appear in the evidence packet or in
-    # user variables; the packet contains the ISO 10816-3 band 4.5 mm/s
+    # evidence-sourced threshold (packet contains the ISO 10816-3 band
+    # 4.5 mm/s) — one of the three honest bases (owner directive 2026-11-11)
     pkt = [{"id": "iso10816-3", "abstract":
             "velocity criterion for machine group 1: 4.5 mm/s RMS alarm",
             "title": "ISO 10816-3"}]
     res = validate_answer(PREDICTOR_GOOD, "predictor-design", packet=pkt)
     assert res["valid"] is True, res["violations"]
+    assert res["bindings"]["threshold_basis"] == "packet_or_user_variable"
+
+
+def test_predictor_threshold_assumption_basis():
+    # R6 owner directive: an ASSUMPTION-labeled threshold number is a
+    # valid basis even with NO packet at all
+    ans = ("INDICATOR: bearing vibration RMS band excess. "
+           "THRESHOLD: 4.5 mm/s — ASSUMPTION (engineering alert level). "
+           "PROTOCOL: n=12 machines, 90 days; pass if RMS band excess "
+           "rises above threshold 3 consecutive shifts; fail otherwise.")
+    res = validate_answer(ans, "predictor-design", packet=[])
+    assert res["valid"] is True, res["violations"]
+    assert res["bindings"]["threshold_basis"] == "assumption"
+
+
+def test_predictor_threshold_calibration_rule_basis():
+    # R6 owner directive: a defined calibration rule (baseline + k sigma
+    # from N days of healthy data) is a valid basis — no packet needed
+    ans = ("INDICATOR: chiller approach temperature rise. "
+           "THRESHOLD: alert when approach temperature exceeds baseline "
+           "+ 3 sigma, computed from 14 days of healthy data. "
+           "PROTOCOL: n=6 chillers, 120 days; pass if the alert fires "
+           "before the condenser-fouling maintenance flag; fail otherwise.")
+    res = validate_answer(ans, "predictor-design", packet=[])
+    assert res["valid"] is True, res["violations"]
+    assert res["bindings"]["threshold_basis"] == "calibration_rule"
+
+
+def test_predictor_threshold_bare_number_rejected():
+    # a bare unlabeled number with none of the three bases is the violation
+    ans = ("INDICATOR: bearing vibration RMS band excess. "
+           "THRESHOLD: 7.3 mm/s alert level. "
+           "PROTOCOL: n=12 machines, 90 days; pass if RMS band excess "
+           "rises above threshold; fail otherwise.")
+    res = validate_answer(ans, "predictor-design", packet=[])
+    assert res["valid"] is False
+    assert any("no provenance basis" in v for v in res["violations"]), \
+        res["violations"]
+
+
+def test_threshold_decimal_regex_fixed():
+    # R6: the (?::\.\d+)? typo — THRESHOLD: 4.5 must extract the decimal
+    # "4.5", never the ":" artefact; whole numbers unchanged
+    from discovery_fabric.engine.answer_contract import _threshold_number
+    assert _threshold_number("THRESHOLD: 4.5 mm/s") == "4.5"
+    assert _threshold_number("THRESHOLD: 12 mm/s") == "12"
+    assert _threshold_number("THRESHOLD: 0.25 percent") == "0.25"
+    assert _threshold_number("no marker here") is None
+    # the fallback line-regex must not truncate at the letter 'n'
+    # (the old [^\\n\\.] class excluded it)
+    assert _threshold_number(
+        "THRESHOLD: indication fraction > 2% of fleet") == "2"
 
 
 def test_predictor_contract_rejects_generic_answer():
@@ -102,8 +154,10 @@ def test_intervention_contract_accepts_percent_symbol():
 
 
 def test_predictor_contract_accepts_percent_threshold():
+    # R6: percent thresholds still work; the number carries an honest
+    # basis (ASSUMPTION) since no packet is provided here
     ans = ("INDICATOR: dropout fraction of laser diodes. "
-           "THRESHOLD: dropout fraction > 2% of fleet; baseline 0.4%. "
+           "THRESHOLD: dropout fraction > 2% of fleet — ASSUMPTION. "
            "PROTOCOL: n=80 devices, 180 days; pass if dropout exceeds 2% "
            "before end of service; fail otherwise.")
     res = validate_answer(ans, "predictor-design")

@@ -1,12 +1,22 @@
-"""Answer-Shape Contract (R3) — deterministic, question-type routed.
+"""Answer-Shape Contract (R3; R6 owner directive 2026-11-11) —
+deterministic, question-type routed.
 
 Predictor-design answers MUST carry explicit {INDICATOR, THRESHOLD with
-units, VALIDATION with n and pass/fail} markers, and the THRESHOLD number
-must be traceable to the evidence packet or to a user-stated variable.
-Intervention-proposal answers MUST name concrete parameters, each labeled
-EVIDENCE-BACKED or ASSUMPTION; EVIDENCE-BACKED parameters must bind to a
-source id present in the packet. The check is deterministic and runs
-against the answer text the judge sees (Art. XXIV).
+units, VALIDATION with n and pass/fail} markers. The THRESHOLD number
+carries ONE of three honest provenance bases (Art. XXVII, owner
+directive 2026-11-11 — packet traceability is NO LONGER required):
+  1. EVIDENCE-SOURCED — the number appears in the evidence packet or a
+     user-stated variable (recorded as provenance, never demanded);
+  2. ASSUMPTION — the number sits on an ASSUMPTION-labeled line;
+  3. CALIBRATION RULE — a defined rule, e.g. "baseline + 3 sigma from
+     14 days of healthy data" (reference-state word + deviation-spec
+     word in the THRESHOLD region).
+A bare unlabeled threshold number with none of the three is a
+violation. Intervention-proposal answers MUST name concrete parameters,
+each labeled EVIDENCE-BACKED or ASSUMPTION; EVIDENCE-BACKED parameters
+must bind to a source id present in the packet. The check is
+deterministic and runs against the answer text the judge sees
+(Art. XXIV).
 """
 from __future__ import annotations
 
@@ -50,17 +60,71 @@ def _numbers(text: str) -> List[str]:
 
 
 def _threshold_number(text: str) -> Optional[str]:
-    m = re.search(r"THRESHOLD\s*:\s*(\d+(?::\.\d+)?)", text or "",
+    m = re.search(r"THRESHOLD\s*:\s*(\d+(?:\.\d+)?)", text or "",
                   re.IGNORECASE)
     if not m:
-        m2 = re.search(r"THRESHOLD\s*:\s*([^\\n\\.]{1,40})", text or "",
+        m2 = re.search(r"THRESHOLD\s*:\s*([^\n.]{1,80})", text or "",
                        re.IGNORECASE)
         if not m2:
             return None
-        # take first number-with-unit match inside the line
+        # take first number match inside the line
         mm = re.search(r"\d+(?:\.\d+)?", m2.group(1))
         return mm.group(0) if mm else None
     return m.group(1)
+
+
+def _threshold_region(text: str) -> str:
+    """The THRESHOLD line plus the following ~300 chars (up to the next
+    contract marker): the window a calibration rule must live in."""
+    t = text or ""
+    m = re.search(r"THRESHOLD\s*:", t, re.IGNORECASE)
+    if not m:
+        return ""
+    rest = t[m.start():]
+    nxt = re.search(r"(?:INDICATOR|PROTOCOL|VALIDATION|PARAMETER)\s*:",
+                    rest[10:], re.IGNORECASE)
+    return rest[:10 + nxt.start()] if nxt else rest[:300]
+
+
+#: A DEFINED calibration rule: a reference-state word (what the rule is
+#: measured against) AND a deviation spec (how far above it) — e.g.
+#: "baseline + 3 sigma computed from 14 days of healthy data",
+#: "mean + 2 std over the 30-day nominal window", "p95 of the healthy
+#: fleet". One instrument, deterministic (Art. XXVII: the rule, not a
+#: number pulled from the air).
+_CALIB_REF = re.compile(
+    r"\b(?:baseline|mean|average|nominal|healthy|calibrat\w*|reference)\b",
+    re.IGNORECASE)
+_CALIB_DEV = re.compile(
+    r"\b(?:sigma|\u03c3|std(?:\s?dev)?|s\.d\.|mad|percentile|p95|p99|"
+    r"z-?score)\b|\+\s*\d+(?:\.\d+)?\s*(?:x\s*)?\w*\s*(?:sigma|\u03c3|std)",
+    re.IGNORECASE)
+
+
+def _threshold_basis(text: str, thr_num: Optional[str],
+                     blob: str) -> str:
+    """Which honest provenance basis carries the THRESHOLD number.
+    Returns one of: calibration_rule | assumption | packet | user_variable
+    | unknown (never raises; used by validate_answer and diagnostics)."""
+    if not thr_num:
+        return "no_number"
+    region = _threshold_region(text)
+    for line in (text or "").splitlines():
+        if re.search(r"THRESHOLD\s*:", line, re.IGNORECASE) and \
+                thr_num in line:
+            if re.search(r"\bASSUMPTION\b", line, re.IGNORECASE):
+                return "assumption"
+    if re.search(r"\bASSUMPTION\b", region, re.IGNORECASE):
+        return "assumption"
+    if _CALIB_REF.search(region) and _CALIB_DEV.search(region):
+        return "calibration_rule"
+    if blob:
+        if re.search(r"(?<!\d)" + re.escape(thr_num) + r"(?!\d)",
+                     blob, re.IGNORECASE):
+            # present in packet and/or user variables (one pooled base —
+            # the split is a diagnostic, not a gate)
+            return "packet_or_user_variable"
+    return "unknown"
 
 
 def _has_number_with_unit(text: str) -> bool:
@@ -120,14 +184,21 @@ def validate_answer(answer: str, question_type: str,
                     violations.append(
                         "predictor contract: THRESHOLD not tied to "
                         "INDICATOR (no shared content word)")
-        # threshold number must appear in packet or user variables
+        # threshold provenance (owner directive 2026-11-11): the
+        # threshold must carry ONE honest basis — evidence-sourced
+        # (packet/user-variable), ASSUMPTION-labeled, or a defined
+        # calibration rule. Packet traceability alone is no longer
+        # required; a bare unlabeled number with none of the three is
+        # the violation (Art. XXVII).
         thr_num = _threshold_number(text)
-        if thr_num and blob:
-            if thr_num not in blob:
-                violations.append(
-                    "predictor contract: THRESHOLD number "
-                    f"{thr_num} not found in evidence packet or "
-                    "user variables")
+        basis = _threshold_basis(text, thr_num, blob)
+        bindings["threshold_basis"] = basis
+        if thr_num and basis == "unknown":
+            violations.append(
+                "predictor contract: THRESHOLD number "
+                f"{thr_num} has no provenance basis (not "
+                "ASSUMPTION-labeled, not a defined calibration rule, "
+                "not evidence-sourced)")
     elif question_type == "intervention-proposal":
         if not re.search(r"EVIDENCE-BACKED|ASSUMPTION", text):
             violations.append(
@@ -185,7 +256,11 @@ ANSWER_SHAPE_BLOCK = {
         "\nANSWER-SHAPE CONTRACT (predictor-design) — your answer MUST state, "
         "explicitly and in this order:\n"
         "INDICATOR: <the measurable quantity you will monitor>\n"
-        "THRESHOLD: <number with units, the alert/failure level>\n"
+        "THRESHOLD: <number with units, the alert/failure level> — the "
+        "threshold number MUST carry one honest basis, stated on the same "
+        "line: an evidence-sourced number (from the packet or the user's "
+        "variables), an ASSUMPTION label, or a defined calibration rule "
+        "(e.g. baseline + 3 sigma from 14 days of healthy data)\n"
         "PROTOCOL: <how you validate; state n (sample count) and the "
         "pass/fail criterion>\n"),
     "intervention-proposal": (
