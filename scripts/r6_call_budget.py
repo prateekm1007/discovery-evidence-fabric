@@ -1,38 +1,59 @@
 #!/usr/bin/env python3
 """r6_call_budget.py — per-stage LLM call count for one pipeline run
-(owner directive 2026-11-11, item 1: 'report LLM calls per stage per
-problem; target <=12 per problem').
+(owner directive 2026-11-11, item 1; audit fix P0-9).
 
 DETERMINISTIC. Zero LLM compute. Reads ONLY the run directory given on
 the command line (eval/runs/<commit>/<problem> or its pipeline/ subdir).
 
-Extraction is stage-scoped and never invents numbers:
-  RETRIEVE          0 LLM expected (HTTP vendors); search jobs reported.
-  MECHANISM_SPACE   operator_results entries with non-empty llm_status
-                    + mechanism_space.runtime_attribution.llm.n_llm_calls
-  SYNTHESIZE        mechanism_map.raw_candidate.synthesis_span_timings.
-                    n_llm_chat_calls
-  COMPOSE           composer_version record's n_llm_calls (post-rank)
-  ATTACK	            call_provenance markers with engine_stage == "ATTACK"
-  VERIFY/PHYSICS/    same marker rule for that stage
-  COLLISION/…
-If a stage's extractor cannot produce a measured value, the stage row
-says NOT_MEASURED and the problem TOTAL is NOT_MEASURED — never a guess.
+EVIDENCE HIERARCHY (measured, never assumed — audit P0-9):
+
+1. The run's own ROUTING_LEDGER_RUN.json lines: one line per LLM call
+   ATTEMPT (retries carry their own attempt number; provider fallbacks
+   and FAILED calls are lines too). Distinctness is by the ledger's
+   unique generate_call_id — identical metadata on distinct calls is
+   NEVER collapsed.
+2. The stage envelopes' engine-attributed counters
+   (operator_results llm_status, runtime_attribution.llm,
+   synthesis_span_timings, ANSWER_COMPOSED n_llm_calls incl. repair
+   calls).
+3. Envelope call_provenance marker OCCURRENCES (each occurrence site
+   counts; content-dedup was the old defect).
+
+A stage row is a measured int ONLY from the evidence above. Missing
+stage evidence is NOT_MEASURED, never zero. A zero is reported only
+when execution evidence exists AND no LLM evidence does (a
+deterministic execution that made no calls) — the basis string says
+which.
+
+The twelve-call target is a MEASURED per-problem target: the total is
+the sum of the measured stage rows; if any row is NOT_MEASURED the
+total is NOT_MEASURED and `within_target` is None (a partial
+measurement must not certify compliance).
 
 Usage:
   python scripts/r6_call_budget.py <run_dir> [--out PATH]
-  python scripts/r6_call_budget.py eval/runs/<commit>/<problem>
 """
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
-import re
 import sys
 from pathlib import Path
 
 POSSIBLE_DIRS = ("pipeline", "")
+
+#: stages the engine is expected to spend LLM calls in on the
+#: discovery-core path; for these, absence of any LLM evidence while
+#: execution evidence exists is NOT_MEASURED (a silent zero would be
+#: an assumption the audit forbids)
+EXPECTED_LLM_STAGES = ("MECHANISM_SPACE", "SYNTHESIZE", "COMPOSE",
+                       "ATTACK", "VERIFY", "RANK")
+#: deterministic execution stages: a recorded execution with no LLM
+#: evidence is an honest 0
+DETERMINISTIC_STAGES = ("COLLISION", "PHYSICS")
+ALL_STAGES = ("RETRIEVE", "MECHANISM_SPACE", "SYNTHESIZE", "COMPOSE",
+              "ATTACK", "COLLISION", "VERIFY", "PHYSICS", "RANK")
+
 
 def _load(p: Path):
     try:
@@ -41,112 +62,181 @@ def _load(p: Path):
         return None
 
 
-def _walk(o, pred):
-    yield from _walk_impl(o, pred, [])
+def _ledger_lines(run_dir: Path):
+    """The run's ROUTING_LEDGER_RUN.json lines, or None when the
+    ledger itself is absent (a missing ledger is a typed gap, never
+    'zero calls')."""
+    for rel in POSSIBLE_DIRS:
+        cand = (run_dir / rel) if rel else run_dir
+        led = _load(cand / "ROUTING_LEDGER_RUN.json")
+        if isinstance(led, dict) and isinstance(led.get("lines"), list):
+            return led
+    return None
 
 
-def _walk_impl(o, pred, path):
-    if isinstance(o, dict):
-        for k, v in o.items():
-            p = path + [k]
-            yield p, v
-            yield from _walk_impl(v, pred, p)
-    elif isinstance(o, list):
-        for i, v in enumerate(o):
-            p = path + [i]
-            yield p, v
-            yield from _walk_impl(v, pred, p)
+def _distinct_attempts(ledger, stage: str):
+    """RUN_OWNED ledger lines for `stage`, distinct by generate_call_id
+    (a line without an id counts as its own distinct attempt).
+    Retries (attempt > 1), failures and fallbacks are attempts too —
+    they are INCLUDED, not excluded."""
+    if ledger is None:
+        return None
+    ids = []
+    retries = failures = fallbacks = 0
+    for line in ledger["lines"]:
+        if not isinstance(line, dict):
+            continue
+        if str(line.get("call_class") or "").upper() != "RUN_OWNED":
+            continue
+        if str(line.get("engine_stage") or "").upper() != stage.upper():
+            continue
+        spans = line.get("generate_spans") or {}
+        cid = spans.get("generate_call_id") if isinstance(spans, dict) \
+            else None
+        if cid:
+            ids.append(str(cid))
+        else:
+            ids.append(f"__line_{len(ids)}__")
+        try:
+            if int(line.get("attempt") or 1) > 1:
+                retries += 1
+        except (TypeError, ValueError):
+            pass
+        if line.get("failure_class") or line.get("error"):
+            failures += 1
+        if line.get("fallback_to"):
+            fallbacks += 1
+    return {"distinct_attempts": len(ids), "retries": retries,
+            "failures": failures, "fallbacks": fallbacks}
 
 
-def _marker_count(env_json: dict, stage: str) -> int:
-    seen = set()
+def _marker_occurrences(env_json, stage: str):
+    """Every call_provenance occurrence site whose engine_stage is
+    `stage` — each occurrence counts, NO content-dedup (identical
+    metadata on distinct calls must not collapse)."""
+    n = 0
+
     def walk(o):
+        nonlocal n
         if isinstance(o, dict):
             cp = o.get("call_provenance")
-            if isinstance(cp, dict):
-                es = str(cp.get("engine_stage") or "").upper()
-                if es == stage.upper():
-                    seen.add(json.dumps(cp, sort_keys=True))
-            if re.search(r"^[a-z_]+\.llm_call_detail$",
-                         json.dumps(list(o.keys()))):
-                pass
+            if isinstance(cp, dict) and \
+                    str(cp.get("engine_stage") or "").upper() == stage:
+                n += 1
             for v in o.values():
                 walk(v)
         elif isinstance(o, list):
             for v in o:
                 walk(v)
+
     if env_json is not None:
         walk(env_json)
-    return len(seen)
+    return n
 
 
-def _ms_operator_calls(env_json: dict) -> int:
+def _ms_operator_calls(env_json: dict):
     if not isinstance(env_json, dict):
-        return 0
+        return None
     ms = env_json.get("mechanism_space") or {}
-    ors = ms.get("operator_results")
-    n = 0
-    if isinstance(ors, list):
-        for r in ors:
-            if isinstance(r, dict) and str(r.get("llm_status") or "").strip():
-                n += 1
-    if n == 0:
-        # fallback shape: operator_candidates_full
-        ocf = ms.get("operator_candidates_full") or []
-        if isinstance(ocf, list):
-            n = sum(1 for r in ocf
-                    if isinstance(r, dict)
+    n = None
+    for key in ("operator_results", "operator_candidates_full"):
+        rows = ms.get(key)
+        if isinstance(rows, list):
+            n = sum(1 for r in rows if isinstance(r, dict)
                     and str(r.get("llm_status") or "").strip())
+            break
     return n
 
 
 def _ms_funnel_calls(env_json: dict):
-    ms = (env_json or {}).get("mechanism_space") or {}
+    if not isinstance(env_json, dict):
+        return None
+    ms = env_json.get("mechanism_space") or {}
     llm = ((ms.get("runtime_attribution") or {}).get("llm") or {})
     v = llm.get("n_llm_calls")
     return int(v) if isinstance(v, (int, float)) else None
 
 
 def _synthesis_calls(env_json: dict):
-    mm = (env_json or {}).get("mechanism_map") or {}
+    if not isinstance(env_json, dict):
+        return None
+    mm = env_json.get("mechanism_map") or {}
     rc = mm.get("raw_candidate") or {}
     st = rc.get("synthesis_span_timings") or {}
     v = st.get("n_llm_chat_calls")
     return int(v) if isinstance(v, (int, float)) else None
 
 
-def _composer_calls(envelopes: dict):
-    for env in envelopes.values():
-        for _, v in _walk(env, None):
-            if isinstance(v, dict) and v.get("composer_version") \
-                    and isinstance(v.get("n_llm_calls"), (int, float)):
-                return int(v["n_llm_calls"])
+def _compose_calls(pipeline_dir: Path):
+    """COMPOSE: ANSWER_COMPOSED.json (n_llm_calls INCLUDES repair
+    calls). Typed no-call states are measured zeros; a missing record
+    is NOT_MEASURED (the composer may have been pre-composer code)."""
+    rec = _load(pipeline_dir / "ANSWER_COMPOSED.json")
+    if not isinstance(rec, dict):
+        return None
+    state = str(rec.get("state") or "")
+    no_call = {"DISABLED_BY_CONFIG", "NO_ADMISSIBLE_CANDIDATES",
+               "SKIPPED_NO_PACKET", "SKIPPED_NO_INPUTS"}
+    if state in no_call:
+        return 0
+    v = rec.get("n_llm_calls")
+    if isinstance(v, (int, float)):
+        return int(v)
+    # a transport-failed composition still spent its attempt(s):
+    # count distinct generate ids recorded in the failure record
+    ids = rec.get("generate_call_ids")
+    if isinstance(ids, list) and ids:
+        return len(ids)
     return None
 
 
-def _any_stage_marker_total(envelopes: dict) -> int:
-    seen = set()
-    def walk(o):
-        if isinstance(o, dict):
-            cp = o.get("call_provenance")
-            if isinstance(cp, dict):
-                seen.add(json.dumps(cp, sort_keys=True))
-            for v in o.values():
-                walk(v)
-        elif isinstance(o, list):
-            for v in o:
-                walk(v)
-    for env in envelopes.values():
-        walk(env)
-    return len(seen)
+def _exec_evidence(pipeline_dir: Path, stage: str) -> bool:
+    return bool(list(pipeline_dir.glob(f"stage_{stage}.json"))
+                or list(pipeline_dir.glob(f"envelope_{stage}.json")))
+
+
+def _ledger_summary(ledger):
+    if ledger is None:
+        return {"present": False}
+    distinct = []
+    retries = failures = fallbacks = 0
+    per_stage = {}
+    for i, line in enumerate(ledger["lines"]):
+        if not isinstance(line, dict):
+            continue
+        if str(line.get("call_class") or "").upper() != "RUN_OWNED":
+            continue
+        spans = line.get("generate_spans") or {}
+        cid = spans.get("generate_call_id") if isinstance(spans, dict) \
+            else None
+        key = str(cid) if cid else f"__line_{i}__"
+        distinct.append(key)
+        st = str(line.get("engine_stage") or "?")
+        per_stage[st] = per_stage.get(st, 0) + 1
+        try:
+            if int(line.get("attempt") or 1) > 1:
+                retries += 1
+        except (TypeError, ValueError):
+            pass
+        if line.get("failure_class") or line.get("error"):
+            failures += 1
+        if line.get("fallback_to"):
+            fallbacks += 1
+    return {"present": True,
+            "run_owned_distinct_attempts": len(set(distinct)),
+            "run_owned_lines": len(distinct),
+            "retries_included": retries,
+            "failures_included": failures,
+            "fallbacks_included": fallbacks,
+            "per_stage_lines": per_stage}
 
 
 def count_run(run_dir: Path) -> dict:
     pipeline = None
     for rel in POSSIBLE_DIRS:
         cand = run_dir / rel if rel else run_dir
-        if (cand / "final_state.json").exists() or any(cand.glob(
-                "envelope_*.json")):
+        if (cand / "final_state.json").exists() or any(
+                cand.glob("envelope_*.json")):
             pipeline = cand
             break
     if pipeline is None:
@@ -154,67 +244,116 @@ def count_run(run_dir: Path) -> dict:
                 "detail": f"no pipeline artifacts under {run_dir}",
                 "stages": {}, "total_llm_calls": "NOT_MEASURED"}
 
-    envelopes: dict[str, dict] = {}
+    envelopes: dict = {}
     for f in sorted(pipeline.glob("envelope_*.json")):
         js = _load(f)
-        if js is not None:
+        if isinstance(js, dict):
             envelopes[f.stem.replace("envelope_", "")] = js
+    ledger = _ledger_lines(pipeline)
 
     rows = {}
-    def row(stage, measured, parts, error=None):
-        rows[stage] = {"llm_calls": measured, "parts": parts,
-                       **({"error": error} if error else {})}
+    bases = {}
 
-    try:
-        ms = envelopes.get("MECHANISM_SPACE")
-        op_calls = _ms_operator_calls(ms) if ms else None
-        funnel = _ms_funnel_calls(ms) if ms else None
-        if op_calls is None or funnel is None:
-            row("MECHANISM_SPACE", "NOT_MEASURED",
-                {"operator_calls": op_calls, "funnel_calls": funnel},
-                "missing MECHANISM_SPACE envelope or attribution")
+    def row(stage, calls, basis, cross=None):
+        rows[stage] = {"llm_calls": calls, "basis": basis,
+                       **({"cross_check": cross} if cross else {})}
+
+    # ---- MECHANISM_SPACE / SYNTHESIZE: engine attribution first ----
+    for stage, fn in (("MECHANISM_SPACE",
+                       lambda e: None if (
+                           _ms_operator_calls(e) is None
+                           or _ms_funnel_calls(e) is None)
+                       else _ms_operator_calls(e) + _ms_funnel_calls(e)),
+                      ("SYNTHESIZE", _synthesis_calls)):
+        env = envelopes.get(stage)
+        measured = fn(env) if env else None
+        if measured is not None:
+            cross = None
+            att = _distinct_attempts(ledger, stage)
+            if att is not None and att["distinct_attempts"] > 0:
+                cross = {"ledger_lines": att["distinct_attempts"],
+                         "reconciled": att["distinct_attempts"] ==
+                         measured}
+            row(stage, measured, "engine stage attribution", cross)
+            continue
+        att = _distinct_attempts(ledger, stage)
+        if att is not None:
+            row(stage, att["distinct_attempts"],
+                "run routing ledger (distinct attempts)",
+                {"retries": att["retries"],
+                 "failures": att["failures"]})
+        elif _exec_evidence(pipeline, stage):
+            row(stage, "NOT_MEASURED",
+                "execution recorded but neither engine attribution "
+                "nor ledger lines exist for this stage")
         else:
-            row("MECHANISM_SPACE", op_calls + funnel,
-                {"operator_calls": op_calls, "funnel_calls": funnel})
-    except Exception as exc:  # noqa: BLE001
-        row("MECHANISM_SPACE", "NOT_MEASURED", {}, str(exc)[:200])
+            row(stage, "NOT_MEASURED",
+                "no execution, attribution, or ledger evidence")
 
-    try:
-        syn = _synthesis_calls(envelopes.get("SYNTHESIZE"))
-        if syn is None:
-            row("SYNTHESIZE", "NOT_MEASURED", {},
-                "no synthesis_span_timings.n_llm_chat_calls")
-        else:
-            row("SYNTHESIZE", syn, {"n_llm_chat_calls": syn})
-    except Exception as exc:  # noqa: BLE001
-        row("SYNTHESIZE", "NOT_MEASURED", {}, str(exc)[:200])
+    # ---- COMPOSE: composer record (repairs included) ----
+    comp = _compose_calls(pipeline)
+    if comp is not None:
+        row("COMPOSE", comp,
+            "ANSWER_COMPOSED.json n_llm_calls (repair calls "
+            "included)" if comp else
+            "composer typed no-call state (measured zero)")
+    else:
+        row("COMPOSE", "NOT_MEASURED",
+            "ANSWER_COMPOSED.json absent — no composer measurement "
+            "(not a zero)")
 
-    try:
-        comp = _composer_calls(envelopes)
-        row("COMPOSE", comp if comp is not None else "NOT_MEASURED",
-            {"composer_n_llm_calls": comp},
-            None if comp is not None else "composer record absent "
-            "(MS-starved runs never reach COMPOSE — that is the honest "
-            "state, not zero)")
-    except Exception as exc:  # noqa: BLE001
-        row("COMPOSE", "NOT_MEASURED", {}, str(exc)[:200])
-
+    # ---- ledger-anchored stages ----
     for stage in ("ATTACK", "COLLISION", "VERIFY", "PHYSICS", "RANK"):
-        try:
-            row(stage, _marker_count(envelopes.get(stage), stage),
-                {"call_provenance_markers":
-                 _marker_count(envelopes.get(stage), stage)})
-        except Exception as exc:  # noqa: BLE001
-            row(stage, "NOT_MEASURED", {}, str(exc)[:200])
+        att = _distinct_attempts(ledger, stage)
+        markers = _marker_occurrences(envelopes.get(stage), stage)
+        if att is not None:
+            cross = None
+            if markers > 0:
+                cross = {"envelope_marker_occurrences": markers,
+                         "reconciled": markers ==
+                         att["distinct_attempts"]}
+            row(stage, att["distinct_attempts"],
+                "run routing ledger (distinct attempts; retries, "
+                "failures and fallbacks included)"
+                + ("; deterministic execution, no LLM calls recorded"
+                   if att["distinct_attempts"] == 0 else ""),
+                cross)
+            continue
+        if markers > 0:
+            row(stage, markers,
+                "envelope call_provenance occurrences (ledger absent; "
+                "each occurrence counted, no content-dedup)")
+        elif _exec_evidence(pipeline, stage) and stage in \
+                DETERMINISTIC_STAGES:
+            row(stage, 0, "deterministic execution recorded, no LLM "
+                          "evidence for this stage")
+        else:
+            row(stage, "NOT_MEASURED",
+                "missing stage evidence (envelope/ledger/stage record "
+                "absent) — never scored as zero")
 
-    row("RETRIEVE", 0, {"note": "retrieval lanes are HTTP vendors; "
-                                "search-job walls reported by the run"})
+    # ---- RETRIEVE: measured call path, never assumed ----
+    ret = _distinct_attempts(ledger, "RETRIEVE")
+    ret_markers = _marker_occurrences(envelopes.get("RETRIEVE"),
+                                      "RETRIEVE")
+    if ret is not None:
+        row("RETRIEVE", ret["distinct_attempts"],
+            "run routing ledger — retrieval LLM calls measured end to "
+            "end" + (" (no LLM calls recorded for retrieval)"
+                     if ret["distinct_attempts"] == 0 else ""))
+    elif ret_markers > 0:
+        row("RETRIEVE", ret_markers,
+            "envelope call_provenance occurrences (ledger absent)")
+    else:
+        row("RETRIEVE", "NOT_MEASURED",
+            "no ledger and no retrieval LLM evidence — the transport "
+            "type is NOT a basis for a zero (audit P0-9)")
 
     measured_vals = [r["llm_calls"] for r in rows.values()
                      if isinstance(r["llm_calls"], int)]
     incomplete = [k for k, r in rows.items()
                   if r["llm_calls"] == "NOT_MEASURED"]
-    total = ("NOT_MEASURED" if incomplete else sum(measured_vals))
+    total = (sum(measured_vals) if not incomplete else "NOT_MEASURED")
     target_ok = (None if total == "NOT_MEASURED" else total <= 12)
 
     return {"outcome": "SCORED",
@@ -224,11 +363,14 @@ def count_run(run_dir: Path) -> dict:
             "stages_not_measured": incomplete,
             "target_max_per_problem": 12,
             "within_target": target_ok,
-            "global_call_provenance_markers":
-                _any_stage_marker_total(envelopes),
-            "llm_retries_note": "llm_retries fields reported by the run "
-                                "artifacts; retries are NOT included in "
-                                "the lean-path total above"}
+            "run_ledger_summary": _ledger_summary(ledger),
+            "note": "total = sum of measured stage rows only; "
+                    "NOT_MEASURED rows block a total (a partial "
+                    "measurement must not certify the target). The "
+                    "run ledger summary reports every distinct "
+                    "attempt — including retries, transport failures "
+                    "and provider fallbacks — so the reconciler sees "
+                    "what the stage rows did not"}
 
 
 def main() -> int:
@@ -238,7 +380,7 @@ def main() -> int:
                     help="write the JSON result to this path")
     args = ap.parse_args()
     res = count_run(Path(args.run_dir))
-    line = (json.dumps(res, indent=1, default=str))
+    line = json.dumps(res, indent=1, default=str)
     print(line)
     if args.out:
         Path(args.out).write_text(line + "\n", encoding="utf-8")

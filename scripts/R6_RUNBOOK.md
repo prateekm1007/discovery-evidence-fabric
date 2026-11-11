@@ -1,13 +1,17 @@
 # R6 RUNBOOK — the remaining measurement (owner directive 2026-11-11)
 
-State when this runbook was staged (2026-11-11 ~14:20 UTC):
-- HEAD: the R6 code is COMPLETE and committed (gateway AIMD pacing
-  7333f6f8c, transport budget 51f5e8371, retrieval per-job budget
-  1a6b845c5, contract user-citation fix d4b57a0c7, instruments
-  af0f13f00+, plus Tasks 2-5 committed earlier).
-- The upstream zai quota went 429 at ~11:35 UTC (the run1 measurement
-  + failed smokes burned the window; the 429 body carries no retry-after
-  horizon). EVERYTHING below needs the quota alive again.
+State when this runbook was last updated (post-audit, 2026-11-11):
+- HEAD: R6 audit P0 fixes applied — certification suite restored
+  (test_r6_cad_kernel), deterministic gates hardened, composer
+  subordinated to discovery eligibility, answer-contract claim-level
+  provenance, call-budget instrument v2 (ledger-anchored, audit P0-9),
+  run-identity isolation (audit P0-8: unique run root per measured
+  attempt, judge-record input binding). The R6 fresh-run-2 artifacts
+  are committed (SCORE_TABLE + pairs + CALL_BUDGET v2 under 983cad20).
+- The upstream provider quota went 429 during run2 (xkiro probes
+  failed at 20.3/20.4 s -> NO_CALIBRATED_JUDGE_ROUTE; judge-dependent
+  measurements are NOT_MEASURED, Art. LXI). EVERYTHING below needs a
+  live quota window again.
 - Probes: `z-ai chat --prompt "Reply: OK" -o /tmp/zq.json` — dead while
   the body contains "status 429".
 - SANDBOX RULE (measured): processes die at tool-call boundaries. Every
@@ -16,26 +20,81 @@ State when this runbook was staged (2026-11-11 ~14:20 UTC):
   finish inside ~9.5 min. Do NOT launch background processes across
   calls.
 
-## Block A — fresh run #2 (pipeline arm, workers=3)
-    cd /home/z/my-project/discovery-evidence-fabric && \
-    timeout 560 bash scripts/r6_run_dev7.sh pipeline 3
-  ~5-7 min. Then snapshot the per-problem walls + completion:
+## Run identity and isolation (audit P0-8) — read before any block
+- Every invocation of eval/run.py mints a UNIQUE run root:
+  `eval/runs/<commit>/r{repeat}-{arms}-{utc19}/`. Pipeline, baseline
+  and judge arm records, timeout records and pair custody for THIS
+  attempt live ONLY under that root. Two attempts never share a root,
+  so no record is ever overwritten (speed repeats and scored repeats
+  are separate roots by construction).
+- `--repeat N` labels which repeat of the (commit, arms, dataset)
+  block this invocation is; it appears in the run id and in
+  `_run_meta.json` + SCORE_TABLE `run_id`. Omit it and the repeat
+  still gets a distinct root (the timestamp in the id guarantees it);
+  declare it when you want the block's identity in the record.
+- Child processes (per-problem pipeline workers, the two-turn round-2
+  spawn) inherit the parent's run id verbatim via `--run-id`, so one
+  attempt = one root end to end. Route probes and the two-turn
+  snapshot cache stay COMMIT-level (commit-scoped capability cache;
+  cross-commit reuse remains forbidden).
+- Scoring is bound to one IMMUTABLE scoring root: a SCORE_TABLE build
+  reads only `eval/runs/<commit>/<run-id>/`. Each judge record carries
+  `bound_inputs` (pipeline/baseline answer sha256, evidence snapshot
+  hash, judge route, rubric version); a scoring pass re-verifies them
+  and EXCLUDES any judgment whose inputs no longer match
+  (INCOMPLETE_INPUT_MISMATCH) or which predates binding
+  (UNBOUND_LEGACY). Excluded counts ride the table as
+  `n_input_mismatches` / `n_unbound_legacy`.
+- Speed repeats protocol (owner directive item: P0-10): run BOTH
+  `--workers 1` and `--workers 3`, each >= 3 repeats, as SEPARATE
+  invocations (each its own unique root). Report p50/p95/max from the
+  per-repeat wall sets, labelled by worker count; a single worker
+  count is not a speed claim.
+- Call budget (audit P0-9, v2 instrument): run
+  `python scripts/r6_call_budget.py <run-root-dir>` per run root.
+  Counts are ledger-anchored distinct attempts by generate_call_id —
+  retries, transport failures and provider fallbacks INCLUDED; a
+  missing stage's evidence is NOT_MEASURED, never zero; RETRIEVE is
+  measured from the ledger, never assumed from the transport type.
+  Any NOT_MEASURED stage blocks the total (within_target = null).
+
+## Block A — fresh run (pipeline arm, workers=3)
+    timeout 560 bash scripts/r6_run_dev7.sh pipeline 3 --repeat 1
+  ~5-7 min. Each launch prints its run id (the unique root under
+  eval/runs/<commit>/); note it for the report. Then snapshot the
+  per-problem walls + completion from THAT root:
     python3 -c "import json,glob;
-    [print(p.split('/')[-2], json.load(open(p)).get('wall_s'),
+    [print(p.split('/')[-3], p.split('/')[-2], json.load(open(p)).get('wall_s'),
            json.load(open(p)).get('completed')) for p in
-    glob.glob('eval/runs/*/bench-*/pipeline_record.json')]"
+    glob.glob('eval/runs/*/*/bench-*/pipeline_record.json')]"
   Gate: median wall <= 120 s, worst <= 300 s (Task 7 instruments the
   repeats; this is repeat 1 of 3 on the final code).
 
-## Block B — baseline + judge arms (completes run #2)
-    timeout 560 bash scripts/r6_run_dev7.sh baseline,judge 3
-  ~3-5 min. Snapshot eval/score/SCORE_TABLE.json ->
-  ENGINE_RUNS/r6_fresh_run2_SCORE_TABLE.json afterwards.
+## Block B — baseline + judge arms (completes the scored root)
+    bash scripts/r6_run_dev7.sh baseline,judge 3 --repeat 1
+  ~3-5 min. The scored root (run id shown on stdout at launch, also in
+  SCORE_TABLE `run_id`) is IMMUTABLE from here on; later repeats get
+  their own roots and never rewrite it. Snapshot
+  eval/score/SCORE_TABLE.json afterwards. Judge arms need a CALIBRATED
+  judge route (run_judge_calibration passes on 24/30); while the
+  quota is 429 the arms run but scoring is NOT_MEASURED — do not
+  pretend a score exists.
 
-## Block C — fresh repeats #2 and #3 (pipeline arm only, Task 7)
-    timeout 560 bash scripts/r6_run_dev7.sh pipeline 3
-    (twice; the walls + completion of all three pipeline blocks are the
-    >=3-repeats speed measurement on the final code)
+## Block C — speed repeats (Task 7; the P0-10 protocol)
+  1-worker block, 3 repeats, each its OWN unique run root:
+    bash scripts/r6_run_dev7.sh pipeline 1 --repeat 1
+    bash scripts/r6_run_dev7.sh pipeline 1 --repeat 2
+    bash scripts/r6_run_dev7.sh pipeline 1 --repeat 3
+  3-worker block, 3 repeats, same discipline:
+    bash scripts/r6_run_dev7.sh pipeline 3 --repeat 1
+    bash scripts/r6_run_dev7.sh pipeline 3 --repeat 2
+    bash scripts/r6_run_dev7.sh pipeline 3 --repeat 3
+  Speed statistics (p50/p95/max, per worker count) are read from each
+  root's pipeline_record.json walls; per-problem stage_times are kept
+  on timeout (INCOMPLETE_INFRASTRUCTURE, not a speed sample beyond the
+  cutoff). Report both worker sets; one is not a speed claim.
+  Also run the call-budget instrument on EACH root (v2, ledger-
+  anchored) and commit the outputs with the table.
 
 ## Block D — composer-only ablation arm (Task 6)
     timeout 560 python3 scripts/r6_ablation.py arm composer_only
@@ -61,6 +120,10 @@ State when this runbook was staged (2026-11-11 ~14:20 UTC):
   Decision rule (pre-registered): stage proves value iff majority of
   pairs dQ > 0 AND CI lower bound > 0; else REMOVAL CANDIDATE. Every
   actual removal = one commit, constitution amended by deletion.
+  Audit P1-11: each ablation judgment is bound to its OWN calibration
+  record (route + rubric version + calibration sha); judgments from a
+  shared-family or uncalibrated judge route are labelled and can NOT
+  carry a REMOVAL_CANDIDATE verdict past the auditor's adjudication.
 
 ## Block H — seeded-defect sweep on the OWNER-HELD specimens
     python3 scripts/r6_seeded_sweep.py \
@@ -79,8 +142,10 @@ State when this runbook was staged (2026-11-11 ~14:20 UTC):
     >=10 pairs; report the gate status honestly)
 
 ## Final report
-  Commit every artifact (pairs, score tables, ablation tables, seeded
-  sweep) per the repo convention, then push ALL commits with the PAT:
+  Commit every artifact (per-run-root pairs + SCORE_TABLE, ablation
+  tables, call-budget v2 outputs, seeded sweep) per the repo
+  convention, then push ALL commits with the PAT:
     git push https://<PAT>@github.com/prateekm1007/discovery-evidence-fabric.git
   ...and write the owner report (committed pairs, my-judged win/tie/loss,
-  per-stage ablation table, speed, files changed, article per change).
+  per-stage ablation table, speed by worker count, LLM call budget v2
+  per run root, files changed, article per change).

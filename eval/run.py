@@ -1607,6 +1607,8 @@ def run_two_turn_problem(problem: Dict[str, Any], out_dir: Path,
            "--problems-file", str(pf2),
            "--root", str(RUNS_ROOT), "--commit", _commit,
            "--child", "--subdir", "pipeline_r2"]
+    if _run_ns:
+        cmd.extend(["--run-id", _run_ns[0]])
     if _HOLDOUT_MODE:
         cmd.append("--holdout-mode")
     _t0 = time.time()
@@ -1711,7 +1713,10 @@ def build_score_table(route_rec: Dict[str, Any],
                       subset_ids: Optional[List[str]] = None,
                       problems: Optional[List[Dict[str, Any]]] = None,
                       holdout: bool = False) -> Dict[str, Any]:
-    commit_dir = RUNS_ROOT / _commit
+    # audit P0-8: score THIS run's root, never the commit-level one —
+    # repeat r2 must not cross-wire r1's pipeline answer with r2's
+    # judge record
+    commit_dir = _run_dir()
     if problems is None:
         problems = json.loads(PROBLEMS.read_text(encoding="utf-8"))["problems"]
     if subset_ids is not None:
@@ -1728,6 +1733,12 @@ def build_score_table(route_rec: Dict[str, Any],
         base = _rec(d, "baseline_record.json")
         judge = _rec(d, "judge_record.json")
         snap_hash = (pipe.get("same_evidence") or {}).get("hash")
+        # audit P0-8: a judgment is only scoreable when it binds to the
+        # exact inputs it was made under (answer hashes, evidence hash,
+        # judge route, rubric version). Mismatch / legacy-unbound =>
+        # INCOMPLETE, excluded from scoring
+        binding = _judge_input_binding(judge, pipe, base, snap_hash,
+                                       judge_route)
         same = bool(snap_hash and snap_hash == base.get("same_evidence_hash"))
         completed = bool(pipe.get("completed"))
         if completed:
@@ -1807,7 +1818,9 @@ def build_score_table(route_rec: Dict[str, Any],
                 contestable and same
                 and answer_contract.get("valid") is True
                 and judge.get("outcome") == JUDGE_VALID
+                and binding.get("state") == "BOUND_OK"
                 and not nr),
+            "judge_input_binding": binding,
             "judge_outcome": judge.get("outcome"),
             "pipeline_final_status": pipe.get("final_status"),
             "pipeline_completed": completed,
@@ -1832,7 +1845,8 @@ def build_score_table(route_rec: Dict[str, Any],
             },
         }
         rows.append(row)
-        if completed and judge.get("usable_pair"):
+        if (completed and judge.get("usable_pair")
+                and binding.get("state") == "BOUND_OK"):
             usable += 1
         # conditional quality: over FULLY SCOREABLE pairs only
         # (full_scoreable controls the numerators here too)
@@ -1973,6 +1987,16 @@ def build_score_table(route_rec: Dict[str, Any],
         "criteria": CRITERIA,
         "commit": _commit,
         "dirty_tree": _dirty,
+        "run_id": _run_ns[0] if _run_ns else None,
+        "rubric_version": RUBRIC_VERSION,
+        "n_input_mismatches": sum(
+            1 for r in rows
+            if (r.get("judge_input_binding") or {}).get("state")
+            == "INCOMPLETE_INPUT_MISMATCH"),
+        "n_unbound_legacy": sum(
+            1 for r in rows
+            if (r.get("judge_input_binding") or {}).get("state")
+            == "UNBOUND_LEGACY"),
         "generated_at": utc_now(),
         "pipeline_completion": f"{n_completed}/{len(problems)}",
         "pipeline_completion_rate": round(n_completed / len(problems), 3) if problems else 0.0,
@@ -2178,9 +2202,73 @@ def write_table(table: Dict[str, Any]) -> None:
 _commit = git_short()
 _dirty = git_dirty()
 
+#: run-identity layer (audit P0-8): every measured attempt gets its own
+#: root — RUNS_ROOT/<commit>/<run-id>/<problem>. The run id carries
+#: repeat + arms + timestamp, so repeats NEVER overwrite an earlier
+#: run's pipeline/baseline/judge records, and a later score table can
+#: never cross-wire one repeat's pipeline answer with another's judge
+#: record. _run_ns is set in main(); child processes receive it
+#: verbatim via --run-id (they must write into the PARENT's root).
+_run_ns: List[str] = []
+
+
+def _run_dir() -> Path:
+    base = RUNS_ROOT / _commit
+    return base.joinpath(*_run_ns) if _run_ns else base
+
+
+#: the rubric generation a judge record is bound to (its prompt shape).
+#: A judgment made under a different rubric version is not comparable
+#: and must not be reused (audit P0-8: bind every judgment to the
+#: rubric version it was made under).
+RUBRIC_VERSION = "0-4-rubric/1"
+
+
+def _judge_input_binding(judge_rec: Dict[str, Any],
+                         pipe: Dict[str, Any],
+                         base: Dict[str, Any],
+                         pipe_ev_hash: Optional[str],
+                         route: Dict[str, Any]) -> Dict[str, Any]:
+    """Verify a judge record against the EXACT inputs it was made
+    under. Any mismatch -> the result is INCOMPLETE and excluded from
+    scoring (audit P0-8; Art. XXV: unknown stays unknown, never
+    silently reused)."""
+    b = judge_rec.get("bound_inputs")
+    if not isinstance(b, dict):
+        return {"state": "UNBOUND_LEGACY",
+                "why": "no input binding recorded (pre-P0-8 judge "
+                       "record) — a result whose inputs cannot be "
+                       "verified is INCOMPLETE, not a score"}
+    bad = []
+    p_sha = b.get("pipeline_answer_sha256")
+    if p_sha in (None, "ABSENT"):
+        if pipe.get("answer"):
+            bad.append("pipeline answer changed after the judgment")
+    elif p_sha != _sha(pipe.get("answer") or ""):
+        bad.append("pipeline answer hash mismatch")
+    b_sha = b.get("baseline_answer_sha256")
+    if b_sha in (None, "ABSENT"):
+        if base.get("answer"):
+            bad.append("baseline answer changed after the judgment")
+    elif b_sha != _sha(base.get("answer") or ""):
+        bad.append("baseline answer hash mismatch")
+    e_sha = b.get("evidence_sha256")
+    if e_sha:
+        if pipe_ev_hash != e_sha:
+            bad.append("evidence snapshot hash mismatch")
+    jr = b.get("judge_route") or {}
+    if (jr.get("provider") != (route or {}).get("provider")
+            or jr.get("model") != (route or {}).get("model")):
+        bad.append("judge route differs from the bound record")
+    if str(b.get("rubric_version") or "") != RUBRIC_VERSION:
+        bad.append("rubric version differs")
+    if bad:
+        return {"state": "INCOMPLETE_INPUT_MISMATCH", "why": "; ".join(bad)}
+    return {"state": "BOUND_OK", "why": ""}
+
 
 def _save(problem_id: str, name: str, rec: Dict[str, Any]) -> None:
-    d = RUNS_ROOT / _commit / problem_id
+    d = _run_dir() / problem_id
     d.mkdir(parents=True, exist_ok=True)
     (d / name).write_text(json.dumps(rec, indent=1, default=str) + "\n",
                           encoding="utf-8")
@@ -2250,6 +2338,8 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
                "--problems", pid, "--problems-file", problems_file,
                "--root", str(RUNS_ROOT), "--commit", _commit,
                "--child", "--subdir", "pipeline"]
+        if _run_ns:
+            cmd.extend(["--run-id", _run_ns[0]])
         if _HOLDOUT_MODE:
             cmd.append("--holdout-mode")
         t0 = time.time()
@@ -2275,7 +2365,7 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
             print(f"[eval] {_label(r['problem_id'])}: {r['state']} "
                   f"({r['wall_s']}s, rc={r['returncode']})", flush=True)
             if r["state"] == "TIMEOUT":
-                d = RUNS_ROOT / _commit / r["problem_id"] / "pipeline"
+                d = _run_dir() / r["problem_id"] / "pipeline"
                 rec = {
                     "answer": None, "completed": False,
                     "wall_s": r["wall_s"],
@@ -2289,10 +2379,10 @@ def _run_pipeline_parallel(problems: List[Dict[str, Any]], workers: int,
             elif r["returncode"] not in (0, None):
                 # the child crashed before writing its record: record the
                 # typed infrastructure failure instead of a silent gap
-                rec_p = (RUNS_ROOT / _commit / r["problem_id"]
+                rec_p = (_run_dir() / r["problem_id"]
                          / "pipeline_record.json")
                 if not rec_p.exists():
-                    d = RUNS_ROOT / _commit / r["problem_id"] / "pipeline"
+                    d = _run_dir() / r["problem_id"] / "pipeline"
                     _save(r["problem_id"], "pipeline_record.json", {
                         "answer": None, "completed": False,
                         "wall_s": r["wall_s"],
@@ -2345,13 +2435,30 @@ def main(argv=None) -> int:
                          "it verbatim instead of resolving HEAD "
                          "(prevents run-dir splitting when HEAD moves "
                          "mid-run)")
+    ap.add_argument("--repeat", type=int, default=1,
+                    help="which repeat of this (commit, arms, dataset) "
+                         "block this run is; every repeat gets its own "
+                         "run root (audit P0-8: no overwriting earlier "
+                         "records)")
+    ap.add_argument("--run-id", default=None,
+                    help="internal: the parent's run id; children reuse "
+                         "it verbatim so parent and child share ONE run "
+                         "root")
     args = ap.parse_args(argv)
-    global RUNS_ROOT, _commit, _HOLDOUT_MODE
+    global RUNS_ROOT, _commit, _HOLDOUT_MODE, _run_ns
     arms = [a.strip().lower() for a in args.arms.split(",") if a.strip()]
     if args.root:
         RUNS_ROOT = Path(args.root)
     if args.commit:
         _commit = args.commit
+    # run identity (audit P0-8): parent mints a fresh run id; children
+    # inherit it. The id carries repeat + arms + timestamp, so this
+    # attempt's records can never overwrite an earlier attempt's.
+    if args.run_id:
+        _run_ns = [args.run_id]
+    else:
+        _ts = utc_now().replace("T", "").replace("+", "").replace(":", "")
+        _run_ns = [f"r{args.repeat}-{'+'.join(arms) or 'run'}-{_ts[:19]}"]
     _HOLDOUT_MODE = bool(args.holdout) or bool(getattr(args, "holdout_mode", False))
     PRE_REGISTERED_SELECTION_SHA256 = (
         "57be8218d1fa681c972ff80d084f55666a53a640b3aa4aeb6c02be5ce9c6b107")
@@ -2409,11 +2516,18 @@ def main(argv=None) -> int:
 
     RUNS_ROOT.mkdir(parents=True, exist_ok=True)
     (RUNS_ROOT / _commit).mkdir(parents=True, exist_ok=True)
+    _run_dir().mkdir(parents=True, exist_ok=True)
     # children inherit explicit holdout state and NEVER overwrite the
-    # parent's canonical metadata; only the parent (non-child) writes it
+    # parent's canonical metadata; only the parent (non-child) writes it.
+    # The run-scoped meta carries the run identity (audit P0-8): no two
+    # attempts share a root, and each root's meta says which repeat of
+    # which arms block it belongs to.
     if not args.child:
-        (RUNS_ROOT / _commit / "_run_meta.json").write_text(
+        (_run_dir() / "_run_meta.json").write_text(
             json.dumps({"commit": _commit, "dirty_tree": _dirty,
+                        "run_id": _run_ns[0] if _run_ns else None,
+                        "repeat": args.repeat,
+                        "arms": args.arms,
                         "dont_write_bytecode": bool(sys.dont_write_bytecode),
                         "executable": sys.executable,
                         "argv": list(argv or []),
@@ -2492,7 +2606,7 @@ def main(argv=None) -> int:
 
     for p in problems:
         pid = p["problem_id"]
-        d = RUNS_ROOT / _commit / pid
+        d = _run_dir() / pid
         print(f"[eval] {_label(pid)}: start", flush=True)
         if "pipeline" in arms:
             _rec_name = ("pipeline_record.json" if args.subdir == "pipeline"
@@ -2530,14 +2644,29 @@ def main(argv=None) -> int:
                 continue
             pv = (json.loads(pr.read_text(encoding="utf-8")) or {}).get("answer")
             bv = (json.loads(ba.read_text(encoding="utf-8")) or {}).get("answer")
+            # audit P0-8: every judge record binds to the EXACT inputs it
+            # was made under (answer hashes, evidence hash, judge route,
+            # rubric version) so a later scoring pass can verify — or
+            # exclude — the judgment. The skip path binds what it has.
+            _bound = {
+                "pipeline_answer_sha256": _sha(pv) if pv else "ABSENT",
+                "baseline_answer_sha256": _sha(bv) if bv else "ABSENT",
+                "evidence_sha256": None,
+                "judge_route": {"provider": judge_route.get("provider"),
+                                 "model": judge_route.get("model")},
+                "rubric_version": RUBRIC_VERSION,
+            }
             # never hand a refusal to the judge: only completed pipeline pairs
             pipe_completed = (json.loads(pr.read_text(encoding="utf-8")) or {}).get("completed")
             if not pipe_completed:
                 _save(pid, "judge_record.json", {"usable_pair": False,
-                        "why": "pipeline did not release an answer"})
+                        "why": "pipeline did not release an answer",
+                        "bound_inputs": _bound})
                 print(f"[eval] {_label(pid)}: judge skipped (pipeline not completed)", flush=True)
                 continue
             snap = _evidence_snapshot(Path(d) / "pipeline")
+            # bind this judgment to the evidence snapshot it actually saw
+            _bound["evidence_sha256"] = (snap or {}).get("hash")
             # round-1 pair is judged WITHOUT the follow-up finding; the
             # finding belongs only to round 2 (run_two_turn_problem)
             q1 = _intake_problem({k: v for k, v in p.items()
@@ -2560,6 +2689,7 @@ def main(argv=None) -> int:
             elif judge2_route.get("provider"):
                 rec["second_judge"] = {"provider": judge2_route.get("provider"),
                                        "state": "skipped (first-judge pair unusable)"}
+            rec["bound_inputs"] = _bound
             _save(pid, "judge_record.json", rec)
             # raw pair for independent audit (Art. XII custody): both
             # answers, the evidence ids, the judge output — never edited
@@ -2574,12 +2704,14 @@ def main(argv=None) -> int:
                 pair = {
                     "problem_id": pid,
                     "commit": _commit,
+                    "run_id": _run_ns[0] if _run_ns else None,
                     "dirty_tree": _dirty,
                     "question": p.get("question"),
                     "clarification_answer": p.get("clarification_answer"),
                     "baseline_answer": bv,
                     "pipeline_answer": pv,
                     "evidence_ids": (snap or {}).get("ids"),
+                    "bound_inputs": _bound,
                     "judge_record": rec,
                     "baseline_same_evidence_hash": (
                         ((json.loads((d / "baseline_record.json").read_text(
@@ -2604,7 +2736,7 @@ def main(argv=None) -> int:
         else:
             for p in problems:
                 pid = p["problem_id"]
-                d = RUNS_ROOT / _commit / pid
+                d = _run_dir() / pid
                 r = run_two_turn_problem(p, d, route_rec, judge_route,
                                          timeout_s=args.timeout)
                 print(f"[two-turns] {pid}: round2 "

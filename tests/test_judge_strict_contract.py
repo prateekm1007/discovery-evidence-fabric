@@ -7,9 +7,21 @@ network, no LLM.
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import eval.run as R
+
+#: cross-file hygiene: these tests install fakes on R._transport_call
+#: without restoring it; a later module (test_transport_budget) then
+#: inherits a fake whose stub pairs/args don't fit it. Restore the
+#: real transport after every test in this file.
+@pytest.fixture(autouse=True)
+def _restore_real_transport():
+    _real = R._transport_call
+    yield
+    R._transport_call = _real
 
 PROBLEM = {"problem_id": "unit-p01", "device": "bearing",
            "failure": "bearing seal lip drift",

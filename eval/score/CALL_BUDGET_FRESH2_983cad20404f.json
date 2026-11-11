@@ -1,8 +1,10 @@
 {
  "commit": "983cad20404f",
- "instrument": "scripts/r6_call_budget.py (deterministic; zero LLM)",
- "source": "fresh-run-2 (983cad20404f, clean tree, workers=3); commit source is the gitignored local run root; the four committed pairs carry answer/evidence hashes",
+ "instrument": "scripts/r6_call_budget.py v2 (audit P0-9 repair): ledger-anchored distinct attempts by generate_call_id; retries, transport failures and provider fallbacks INCLUDED; missing stage evidence is NOT_MEASURED, never zero; RETRIEVE measured from the ledger, never assumed",
+ "supersedes": "the v1 artifact of the same name committed in f61b24a6 (v1 deduplicated identical metadata, excluded retries, zeroed missing envelopes and assumed RETRIEVE=0 from the transport type \u2014 all undercount, now fixed)",
+ "source": "fresh-run-2 (983cad20404f, clean tree, workers=3); gitignored local run root; the four committed pairs carry the answer/evidence hashes",
  "target_max_per_problem": 12,
+ "disclosure": "completed problems measure 31-40 LLM attempts each (ATTACK carries the provider retry storm of this window: 15-18 distinct attempts incl. 12-18 retries/fallbacks). The twelve-call target is NOT met on this run \u2014 disclosed, Art. XXV; the 3 timeout problems carry no routing ledger -> NOT_MEASURED totals (honest, Art. LXI)",
  "problems": {
   "bench-p02-leadacid-grid-corrosion": {
    "outcome": "SCORED",
@@ -10,139 +12,129 @@
    "stages": {
     "MECHANISM_SPACE": {
      "llm_calls": 4,
-     "parts": {
-      "operator_calls": 3,
-      "funnel_calls": 1
-     }
+     "basis": "engine stage attribution"
     },
     "SYNTHESIZE": {
      "llm_calls": 1,
-     "parts": {
-      "n_llm_chat_calls": 1
-     }
+     "basis": "engine stage attribution"
     },
     "COMPOSE": {
      "llm_calls": "NOT_MEASURED",
-     "parts": {
-      "composer_n_llm_calls": null
-     },
-     "error": "composer record absent (MS-starved runs never reach COMPOSE \u2014 that is the honest state, not zero)"
+     "basis": "ANSWER_COMPOSED.json absent \u2014 no composer measurement (not a zero)"
     },
     "ATTACK": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": "NOT_MEASURED",
+     "basis": "missing stage evidence (envelope/ledger/stage record absent) \u2014 never scored as zero"
     },
     "COLLISION": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "deterministic execution recorded, no LLM evidence for this stage"
     },
     "VERIFY": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": "NOT_MEASURED",
+     "basis": "missing stage evidence (envelope/ledger/stage record absent) \u2014 never scored as zero"
     },
     "PHYSICS": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "deterministic execution recorded, no LLM evidence for this stage"
     },
     "RANK": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": "NOT_MEASURED",
+     "basis": "missing stage evidence (envelope/ledger/stage record absent) \u2014 never scored as zero"
     },
     "RETRIEVE": {
-     "llm_calls": 0,
-     "parts": {
-      "note": "retrieval lanes are HTTP vendors; search-job walls reported by the run"
-     }
+     "llm_calls": "NOT_MEASURED",
+     "basis": "no ledger and no retrieval LLM evidence \u2014 the transport type is NOT a basis for a zero (audit P0-9)"
     }
    },
    "total_llm_calls": "NOT_MEASURED",
    "stages_not_measured": [
-    "COMPOSE"
+    "COMPOSE",
+    "ATTACK",
+    "VERIFY",
+    "RANK",
+    "RETRIEVE"
    ],
    "target_max_per_problem": 12,
    "within_target": null,
-   "global_call_provenance_markers": 1,
-   "llm_retries_note": "llm_retries fields reported by the run artifacts; retries are NOT included in the lean-path total above"
+   "run_ledger_summary": {
+    "present": false
+   },
+   "note": "total = sum of measured stage rows only; NOT_MEASURED rows block a total (a partial measurement must not certify the target). The run ledger summary reports every distinct attempt \u2014 including retries, transport failures and provider fallbacks \u2014 so the reconciler sees what the stage rows did not"
   },
   "bench-p05-bridge-bearing-aging": {
    "outcome": "SCORED",
    "run_dir": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\opencode\\runs_r6_fresh2\\983cad20404f\\bench-p05-bridge-bearing-aging",
    "stages": {
     "MECHANISM_SPACE": {
-     "llm_calls": 0,
-     "parts": {
-      "operator_calls": 0,
-      "funnel_calls": 0
+     "llm_calls": 2,
+     "basis": "run routing ledger (distinct attempts)",
+     "cross_check": {
+      "retries": 0,
+      "failures": 0
      }
     },
     "SYNTHESIZE": {
      "llm_calls": 2,
-     "parts": {
-      "n_llm_chat_calls": 2
+     "basis": "engine stage attribution",
+     "cross_check": {
+      "ledger_lines": 10,
+      "reconciled": false
      }
     },
     "COMPOSE": {
-     "llm_calls": "NOT_MEASURED",
-     "parts": {
-      "composer_n_llm_calls": null
-     },
-     "error": "composer record absent (MS-starved runs never reach COMPOSE \u2014 that is the honest state, not zero)"
+     "llm_calls": 2,
+     "basis": "ANSWER_COMPOSED.json n_llm_calls (repair calls included)"
     },
     "ATTACK": {
-     "llm_calls": 1,
-     "parts": {
-      "call_provenance_markers": 1
+     "llm_calls": 17,
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included)",
+     "cross_check": {
+      "envelope_marker_occurrences": 1,
+      "reconciled": false
      }
     },
     "COLLISION": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included); deterministic execution, no LLM calls recorded"
     },
     "VERIFY": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": 1,
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included)"
     },
     "PHYSICS": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included); deterministic execution, no LLM calls recorded"
     },
     "RANK": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": 8,
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included)"
     },
     "RETRIEVE": {
      "llm_calls": 0,
-     "parts": {
-      "note": "retrieval lanes are HTTP vendors; search-job walls reported by the run"
-     }
+     "basis": "run routing ledger \u2014 retrieval LLM calls measured end to end (no LLM calls recorded for retrieval)"
     }
    },
-   "total_llm_calls": "NOT_MEASURED",
-   "stages_not_measured": [
-    "COMPOSE"
-   ],
+   "total_llm_calls": 32,
+   "stages_not_measured": [],
    "target_max_per_problem": 12,
-   "within_target": null,
-   "global_call_provenance_markers": 1,
-   "llm_retries_note": "llm_retries fields reported by the run artifacts; retries are NOT included in the lean-path total above"
+   "within_target": false,
+   "run_ledger_summary": {
+    "present": true,
+    "run_owned_distinct_attempts": 27,
+    "run_owned_lines": 38,
+    "retries_included": 19,
+    "failures_included": 12,
+    "fallbacks_included": 12,
+    "per_stage_lines": {
+     "SYNTHESIZE": 10,
+     "MECHANISM_SPACE": 2,
+     "ATTACK": 17,
+     "RANK": 8,
+     "VERIFY": 1
+    }
+   },
+   "note": "total = sum of measured stage rows only; NOT_MEASURED rows block a total (a partial measurement must not certify the target). The run ledger summary reports every distinct attempt \u2014 including retries, transport failures and provider fallbacks \u2014 so the reconciler sees what the stage rows did not"
   },
   "bench-p09-packaging-barrier": {
    "outcome": "SCORED",
@@ -150,141 +142,125 @@
    "stages": {
     "MECHANISM_SPACE": {
      "llm_calls": 4,
-     "parts": {
-      "operator_calls": 3,
-      "funnel_calls": 1
-     }
+     "basis": "engine stage attribution"
     },
     "SYNTHESIZE": {
      "llm_calls": 1,
-     "parts": {
-      "n_llm_chat_calls": 1
-     }
+     "basis": "engine stage attribution"
     },
     "COMPOSE": {
      "llm_calls": "NOT_MEASURED",
-     "parts": {
-      "composer_n_llm_calls": null
-     },
-     "error": "composer record absent (MS-starved runs never reach COMPOSE \u2014 that is the honest state, not zero)"
+     "basis": "ANSWER_COMPOSED.json absent \u2014 no composer measurement (not a zero)"
     },
     "ATTACK": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": "NOT_MEASURED",
+     "basis": "missing stage evidence (envelope/ledger/stage record absent) \u2014 never scored as zero"
     },
     "COLLISION": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "deterministic execution recorded, no LLM evidence for this stage"
     },
     "VERIFY": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": "NOT_MEASURED",
+     "basis": "missing stage evidence (envelope/ledger/stage record absent) \u2014 never scored as zero"
     },
     "PHYSICS": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "deterministic execution recorded, no LLM evidence for this stage"
     },
     "RANK": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": "NOT_MEASURED",
+     "basis": "missing stage evidence (envelope/ledger/stage record absent) \u2014 never scored as zero"
     },
     "RETRIEVE": {
-     "llm_calls": 0,
-     "parts": {
-      "note": "retrieval lanes are HTTP vendors; search-job walls reported by the run"
-     }
+     "llm_calls": "NOT_MEASURED",
+     "basis": "no ledger and no retrieval LLM evidence \u2014 the transport type is NOT a basis for a zero (audit P0-9)"
     }
    },
    "total_llm_calls": "NOT_MEASURED",
    "stages_not_measured": [
-    "COMPOSE"
+    "COMPOSE",
+    "ATTACK",
+    "VERIFY",
+    "RANK",
+    "RETRIEVE"
    ],
    "target_max_per_problem": 12,
    "within_target": null,
-   "global_call_provenance_markers": 1,
-   "llm_retries_note": "llm_retries fields reported by the run artifacts; retries are NOT included in the lean-path total above"
+   "run_ledger_summary": {
+    "present": false
+   },
+   "note": "total = sum of measured stage rows only; NOT_MEASURED rows block a total (a partial measurement must not certify the target). The run ledger summary reports every distinct attempt \u2014 including retries, transport failures and provider fallbacks \u2014 so the reconciler sees what the stage rows did not"
   },
   "eval-new02-slipring-predictor": {
    "outcome": "SCORED",
    "run_dir": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\opencode\\runs_r6_fresh2\\983cad20404f\\eval-new02-slipring-predictor",
    "stages": {
     "MECHANISM_SPACE": {
-     "llm_calls": "NOT_MEASURED",
-     "parts": {
-      "operator_calls": 0,
-      "funnel_calls": null
-     },
-     "error": "missing MECHANISM_SPACE envelope or attribution"
+     "llm_calls": 1,
+     "basis": "run routing ledger (distinct attempts)",
+     "cross_check": {
+      "retries": 0,
+      "failures": 0
+     }
     },
     "SYNTHESIZE": {
-     "llm_calls": "NOT_MEASURED",
-     "parts": {},
-     "error": "no synthesis_span_timings.n_llm_chat_calls"
+     "llm_calls": 7,
+     "basis": "run routing ledger (distinct attempts)",
+     "cross_check": {
+      "retries": 3,
+      "failures": 1
+     }
     },
     "COMPOSE": {
-     "llm_calls": "NOT_MEASURED",
-     "parts": {
-      "composer_n_llm_calls": null
-     },
-     "error": "composer record absent (MS-starved runs never reach COMPOSE \u2014 that is the honest state, not zero)"
+     "llm_calls": 2,
+     "basis": "ANSWER_COMPOSED.json n_llm_calls (repair calls included)"
     },
     "ATTACK": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": 18,
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included)"
     },
     "COLLISION": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included); deterministic execution, no LLM calls recorded"
     },
     "VERIFY": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included); deterministic execution, no LLM calls recorded"
     },
     "PHYSICS": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included); deterministic execution, no LLM calls recorded"
     },
     "RANK": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": 12,
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included)"
     },
     "RETRIEVE": {
      "llm_calls": 0,
-     "parts": {
-      "note": "retrieval lanes are HTTP vendors; search-job walls reported by the run"
-     }
+     "basis": "run routing ledger \u2014 retrieval LLM calls measured end to end (no LLM calls recorded for retrieval)"
     }
    },
-   "total_llm_calls": "NOT_MEASURED",
-   "stages_not_measured": [
-    "MECHANISM_SPACE",
-    "SYNTHESIZE",
-    "COMPOSE"
-   ],
+   "total_llm_calls": 40,
+   "stages_not_measured": [],
    "target_max_per_problem": 12,
-   "within_target": null,
-   "global_call_provenance_markers": 0,
-   "llm_retries_note": "llm_retries fields reported by the run artifacts; retries are NOT included in the lean-path total above"
+   "within_target": false,
+   "run_ledger_summary": {
+    "present": true,
+    "run_owned_distinct_attempts": 29,
+    "run_owned_lines": 41,
+    "retries_included": 17,
+    "failures_included": 12,
+    "fallbacks_included": 12,
+    "per_stage_lines": {
+     "SYNTHESIZE": 7,
+     "MECHANISM_SPACE": 1,
+     "ATTACK": 18,
+     "RANK": 12,
+     "POST_RANK_EVOLUTION": 3
+    }
+   },
+   "note": "total = sum of measured stage rows only; NOT_MEASURED rows block a total (a partial measurement must not certify the target). The run ledger summary reports every distinct attempt \u2014 including retries, transport failures and provider fallbacks \u2014 so the reconciler sees what the stage rows did not"
   },
   "eval-new06-bearing-vibration-predictor": {
    "outcome": "SCORED",
@@ -292,69 +268,76 @@
    "stages": {
     "MECHANISM_SPACE": {
      "llm_calls": 4,
-     "parts": {
-      "operator_calls": 3,
-      "funnel_calls": 1
+     "basis": "engine stage attribution",
+     "cross_check": {
+      "ledger_lines": 1,
+      "reconciled": false
      }
     },
     "SYNTHESIZE": {
      "llm_calls": 1,
-     "parts": {
-      "n_llm_chat_calls": 1
+     "basis": "engine stage attribution",
+     "cross_check": {
+      "ledger_lines": 7,
+      "reconciled": false
      }
     },
     "COMPOSE": {
-     "llm_calls": "NOT_MEASURED",
-     "parts": {
-      "composer_n_llm_calls": null
-     },
-     "error": "composer record absent (MS-starved runs never reach COMPOSE \u2014 that is the honest state, not zero)"
+     "llm_calls": 1,
+     "basis": "ANSWER_COMPOSED.json n_llm_calls (repair calls included)"
     },
     "ATTACK": {
-     "llm_calls": 1,
-     "parts": {
-      "call_provenance_markers": 1
+     "llm_calls": 15,
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included)",
+     "cross_check": {
+      "envelope_marker_occurrences": 1,
+      "reconciled": false
      }
     },
     "COLLISION": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included); deterministic execution, no LLM calls recorded"
     },
     "VERIFY": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included); deterministic execution, no LLM calls recorded"
     },
     "PHYSICS": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included); deterministic execution, no LLM calls recorded"
     },
     "RANK": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": 10,
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included)"
     },
     "RETRIEVE": {
      "llm_calls": 0,
-     "parts": {
-      "note": "retrieval lanes are HTTP vendors; search-job walls reported by the run"
-     }
+     "basis": "run routing ledger \u2014 retrieval LLM calls measured end to end (no LLM calls recorded for retrieval)"
     }
    },
-   "total_llm_calls": "NOT_MEASURED",
-   "stages_not_measured": [
-    "COMPOSE"
-   ],
+   "total_llm_calls": 31,
+   "stages_not_measured": [],
    "target_max_per_problem": 12,
-   "within_target": null,
-   "global_call_provenance_markers": 2,
-   "llm_retries_note": "llm_retries fields reported by the run artifacts; retries are NOT included in the lean-path total above"
+   "within_target": false,
+   "run_ledger_summary": {
+    "present": true,
+    "run_owned_distinct_attempts": 37,
+    "run_owned_lines": 54,
+    "retries_included": 28,
+    "failures_included": 17,
+    "fallbacks_included": 17,
+    "per_stage_lines": {
+     "SYNTHESIZE": 7,
+     "MECHANISM_SPACE": 1,
+     "ATTACK": 15,
+     "RANK": 10,
+     "POST_RANK_ENSEMBLE": 3,
+     "POST_RANK_GAUNTLET": 9,
+     "IMPROVE": 1,
+     "POST_RANK_IMPROVEMENT": 8
+    }
+   },
+   "note": "total = sum of measured stage rows only; NOT_MEASURED rows block a total (a partial measurement must not certify the target). The run ledger summary reports every distinct attempt \u2014 including retries, transport failures and provider fallbacks \u2014 so the reconciler sees what the stage rows did not"
   },
   "eval-new09-hvac-filter-predictor": {
    "outcome": "SCORED",
@@ -362,69 +345,78 @@
    "stages": {
     "MECHANISM_SPACE": {
      "llm_calls": 4,
-     "parts": {
-      "operator_calls": 3,
-      "funnel_calls": 1
+     "basis": "engine stage attribution",
+     "cross_check": {
+      "ledger_lines": 1,
+      "reconciled": false
      }
     },
     "SYNTHESIZE": {
      "llm_calls": 2,
-     "parts": {
-      "n_llm_chat_calls": 2
+     "basis": "engine stage attribution",
+     "cross_check": {
+      "ledger_lines": 10,
+      "reconciled": false
      }
     },
     "COMPOSE": {
-     "llm_calls": "NOT_MEASURED",
-     "parts": {
-      "composer_n_llm_calls": null
-     },
-     "error": "composer record absent (MS-starved runs never reach COMPOSE \u2014 that is the honest state, not zero)"
+     "llm_calls": 2,
+     "basis": "ANSWER_COMPOSED.json n_llm_calls (repair calls included)"
     },
     "ATTACK": {
-     "llm_calls": 1,
-     "parts": {
-      "call_provenance_markers": 1
+     "llm_calls": 18,
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included)",
+     "cross_check": {
+      "envelope_marker_occurrences": 1,
+      "reconciled": false
      }
     },
     "COLLISION": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included); deterministic execution, no LLM calls recorded"
     },
     "VERIFY": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": 1,
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included)"
     },
     "PHYSICS": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included); deterministic execution, no LLM calls recorded"
     },
     "RANK": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": 5,
+     "basis": "run routing ledger (distinct attempts; retries, failures and fallbacks included)"
     },
     "RETRIEVE": {
      "llm_calls": 0,
-     "parts": {
-      "note": "retrieval lanes are HTTP vendors; search-job walls reported by the run"
-     }
+     "basis": "run routing ledger \u2014 retrieval LLM calls measured end to end (no LLM calls recorded for retrieval)"
     }
    },
-   "total_llm_calls": "NOT_MEASURED",
-   "stages_not_measured": [
-    "COMPOSE"
-   ],
+   "total_llm_calls": 32,
+   "stages_not_measured": [],
    "target_max_per_problem": 12,
-   "within_target": null,
-   "global_call_provenance_markers": 2,
-   "llm_retries_note": "llm_retries fields reported by the run artifacts; retries are NOT included in the lean-path total above"
+   "within_target": false,
+   "run_ledger_summary": {
+    "present": true,
+    "run_owned_distinct_attempts": 39,
+    "run_owned_lines": 56,
+    "retries_included": 32,
+    "failures_included": 18,
+    "fallbacks_included": 18,
+    "per_stage_lines": {
+     "SYNTHESIZE": 10,
+     "MECHANISM_SPACE": 1,
+     "ATTACK": 18,
+     "POST_RANK_ENSEMBLE": 3,
+     "POST_RANK_GAUNTLET": 9,
+     "IMPROVE": 2,
+     "POST_RANK_IMPROVEMENT": 6,
+     "VERIFY": 1,
+     "RANK": 5,
+     "POST_RANK_EVOLUTION": 1
+    }
+   },
+   "note": "total = sum of measured stage rows only; NOT_MEASURED rows block a total (a partial measurement must not certify the target). The run ledger summary reports every distinct attempt \u2014 including retries, transport failures and provider fallbacks \u2014 so the reconciler sees what the stage rows did not"
   },
   "eval-sofc-thermal-cycling": {
    "outcome": "SCORED",
@@ -432,69 +424,54 @@
    "stages": {
     "MECHANISM_SPACE": {
      "llm_calls": 4,
-     "parts": {
-      "operator_calls": 3,
-      "funnel_calls": 1
-     }
+     "basis": "engine stage attribution"
     },
     "SYNTHESIZE": {
      "llm_calls": 1,
-     "parts": {
-      "n_llm_chat_calls": 1
-     }
+     "basis": "engine stage attribution"
     },
     "COMPOSE": {
      "llm_calls": "NOT_MEASURED",
-     "parts": {
-      "composer_n_llm_calls": null
-     },
-     "error": "composer record absent (MS-starved runs never reach COMPOSE \u2014 that is the honest state, not zero)"
+     "basis": "ANSWER_COMPOSED.json absent \u2014 no composer measurement (not a zero)"
     },
     "ATTACK": {
      "llm_calls": 1,
-     "parts": {
-      "call_provenance_markers": 1
-     }
+     "basis": "envelope call_provenance occurrences (ledger absent; each occurrence counted, no content-dedup)"
     },
     "COLLISION": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "deterministic execution recorded, no LLM evidence for this stage"
     },
     "VERIFY": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": "NOT_MEASURED",
+     "basis": "missing stage evidence (envelope/ledger/stage record absent) \u2014 never scored as zero"
     },
     "PHYSICS": {
      "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "basis": "deterministic execution recorded, no LLM evidence for this stage"
     },
     "RANK": {
-     "llm_calls": 0,
-     "parts": {
-      "call_provenance_markers": 0
-     }
+     "llm_calls": "NOT_MEASURED",
+     "basis": "missing stage evidence (envelope/ledger/stage record absent) \u2014 never scored as zero"
     },
     "RETRIEVE": {
-     "llm_calls": 0,
-     "parts": {
-      "note": "retrieval lanes are HTTP vendors; search-job walls reported by the run"
-     }
+     "llm_calls": "NOT_MEASURED",
+     "basis": "no ledger and no retrieval LLM evidence \u2014 the transport type is NOT a basis for a zero (audit P0-9)"
     }
    },
    "total_llm_calls": "NOT_MEASURED",
    "stages_not_measured": [
-    "COMPOSE"
+    "COMPOSE",
+    "VERIFY",
+    "RANK",
+    "RETRIEVE"
    ],
    "target_max_per_problem": 12,
    "within_target": null,
-   "global_call_provenance_markers": 2,
-   "llm_retries_note": "llm_retries fields reported by the run artifacts; retries are NOT included in the lean-path total above"
+   "run_ledger_summary": {
+    "present": false
+   },
+   "note": "total = sum of measured stage rows only; NOT_MEASURED rows block a total (a partial measurement must not certify the target). The run ledger summary reports every distinct attempt \u2014 including retries, transport failures and provider fallbacks \u2014 so the reconciler sees what the stage rows did not"
   }
  }
 }
