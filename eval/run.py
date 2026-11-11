@@ -95,7 +95,7 @@ def _label(pid: str) -> str:
 # Fast DEV subset (directive: replace the long inner loop; a 6-problem
 # subset mixing intervention and predictor types, full 25 only at
 # checkpoints). Pre-registered ids, never chosen after seeing results.
-DEV6 = [
+DEV7 = [
     "bench-p02-leadacid-grid-corrosion",   # intervention; contamination
     "bench-p05-bridge-bearing-aging",      # intervention; contamination
     "bench-p09-packaging-barrier",         # intervention; contamination
@@ -211,16 +211,21 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
     A/B comparison each arm must genuinely re-run the pipeline; stale
     artifacts from a different A/B toggle leaking in would fabricate
     results."""
-    final_state = out_dir / "final_state.json"
-    t0 = time.time()
-    status, err = None, None
+    # Establish a clean out_dir. If we cannot, this measured arm must
+    # produce a typed INCOMPLETE record — it must NEVER reuse stale
+    # artifacts from an earlier arm (the defect that zeroed the A/B).
+    stale_error: Optional[str] = None
     try:
         import shutil
-        if out_dir.exists() and any(out_dir.iterdir()):
-            shutil.rmtree(out_dir, ignore_errors=True)
-    except Exception:  # noqa: BLE001
-        pass
-    if not final_state.exists():
+        if out_dir.exists():
+            shutil.rmtree(out_dir)   # fail-closed: raise on error
+        out_dir.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:  # noqa: BLE001 — fail closed, never fall through
+        stale_error = f"FRESH_RUN_UNESTABLISHABLE: {type(exc).__name__}: {exc}"[:400]
+    final_state = out_dir / "final_state.json"
+    t0 = time.time()
+    status, err = stale_error, None
+    if stale_error is None:
         try:
             from discovery_fabric.engine.run import EngineRun
             run = EngineRun(
@@ -234,8 +239,11 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
             status = manifest.get("final_status") if isinstance(manifest, dict) else None
         except Exception as exc:  # noqa: BLE001
             err = f"{type(exc).__name__}: {exc}"[:400]
-    completed = (out_dir / "final_state.json").exists() and \
-        json.loads((out_dir / "final_state.json").read_text(encoding="utf-8")).get("final_status") in COMPLETED_STATUSES
+    if stale_error is not None:
+        err = stale_error
+    completed = (stale_error is None
+                 and (out_dir / "final_state.json").exists()
+                 and json.loads((out_dir / "final_state.json").read_text(encoding="utf-8")).get("final_status") in COMPLETED_STATUSES)
     _ans = _extract_pipeline_answer(out_dir)
     _avr = _attack_overall(out_dir)
     record: Dict[str, Any] = {
@@ -250,10 +258,13 @@ def run_pipeline_problem(problem: Dict[str, Any], out_dir: Path) -> Dict[str, An
                          if (_avr == "KILLED" and _ans)
                          else ("RELEASED" if _ans else "NO_ANSWER")),
     }
-    if final_state.exists():
+    if final_state.exists() and stale_error is None:
         fs = json.loads(final_state.read_text(encoding="utf-8"))
         record["final_status"] = fs.get("final_status")
         record["reason"] = fs.get("reason")
+    elif stale_error is not None:
+        record["final_status"] = "INCOMPLETE_INFRASTRUCTURE"
+        record["reason"] = stale_error
     return record
 
 
@@ -1473,36 +1484,43 @@ def build_score_table(route_rec: Dict[str, Any],
     judge_valid = bool(calib.get("calibrated"))
     import math
 
-    def _wilson_95(pw: float, n: int):
-        if n == 0:
-            return None
-        z = 1.959964
-        p = pw / n
-        denom = 1 + z * z / n
-        centre = (p + z * z / (2 * n)) / denom
-        half = (z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))) / denom
-        return (round(centre - half, 3), round(centre + half, 3))
+    def _per_problem_score(w: int, t: int):
+        scores = [1.0] * w + [0.5] * t + [0.0] * (len(problems) - w - t)
+        mean = sum(scores) / len(scores) if scores else 0.0
+        if len(scores) < 2:
+            var = 0.0
+        else:
+            var = sum((s - mean) ** 2 for s in scores) / (len(scores) - 1)
+        se = math.sqrt(var / len(scores)) if scores else 0.0
+        half = round(1.959964 * se, 3)
+        ci = (round(max(0.0, mean - half), 3),
+              round(min(1.0, mean + half), 3))
+        return mean, ci
 
     n_full = sum(1 for r in rows if r["full_scoreable"])
-    # system metric: denominator is ALL N pre-registered problems;
-    # full_scoreable controls the numerators; an answered-but-contract-failing,
-    # evidence-mismatched, refusal, or infrastructure-blocked problem is a
-    # loss. If the judge is not valid: NOT_MEASURED — never 0 or 0.5.
+    # system metric: denominator is ALL N problems; full_scoreable
+    # controls the numerators. A missing/infrastructure-blocked answer
+    # is a loss. Judge invalid => NOT_MEASURED, never 0 or 0.5.
     system_pw = system_wins + 0.5 * system_ties
-    system_score = (round(system_pw / len(problems), 3)
-                    if judge_valid else None)
+    system_score, system_ci = ((round(system_pw / len(problems), 3),
+                                _per_problem_score(system_wins,
+                                                  system_ties)[1])
+                               if judge_valid else (None, None))
     system_losses = (len(problems) - system_wins - system_ties
                      if judge_valid else None)
-    # conditional quality: denominator strictly the fully scoreable pairs
+    full_scoreable_baseline_wins = (
+        n_full - wins - ties
+        if judge_valid else None)
+    # conditional quality: strictly fully scoreable pairs
     cond_pw = wins + 0.5 * ties
     conditional_quality = (round(cond_pw / n_full, 3)
                            if (judge_valid and n_full) else "NOT_MEASURED")
     conditional_losses = (n_full - wins - ties
                           if judge_valid else None)
-    win_rate = conditional_quality  # legacy alias, same gating
-    ci = _wilson_95(system_pw, len(problems))  # N denominator, declared method
-    ci_method = "wilson_score_95"
-    system_wilson = _wilson_95(system_pw, len(problems))
+    win_rate = conditional_quality
+    ci = system_ci                          # normal-approx interval
+    ci_method = "normal_approx_0_0.5_1"
+    system_wilson = None
     # fresh vs contaminated split
     def _split(tag_val):
         sub = [r for r in rows if r.get("contamination_tag") == tag_val]
@@ -1597,8 +1615,8 @@ def build_score_table(route_rec: Dict[str, Any],
         "judge_calibration": calib,
         "n_problems": len(problems),
         "subset": ("holdout:" + str(len(problems))) if holdout else
-                  ("dev6" if subset_ids is not None
-                   and set(subset_ids) == set(DEV6) else
+                  ("dev7" if subset_ids is not None
+                   and set(subset_ids) == set(DEV7) else
                    ("all" if subset_ids is None else f"custom:{len(subset_ids)}")),
         "n_completed_pipeline": n_completed,
         "n_usable_pairs": usable,
@@ -1618,7 +1636,8 @@ def build_score_table(route_rec: Dict[str, Any],
                 for r in rows)
             / max(1, sum(1 for r in rows
                          if (r.get("numbers_fabricated") or {}).get("baseline"))), 3),
-        "pipeline_wins": wins, "baseline_wins": usable - wins - ties,
+        "pipeline_wins": wins,
+        "baseline_wins": full_scoreable_baseline_wins,
         "ties": ties,
         # R5 P0-2 metric block: system = unconditional, N denominator;
         # conditional = strictly fully scoreable pairs; both NOT_MEASURED
@@ -1628,7 +1647,7 @@ def build_score_table(route_rec: Dict[str, Any],
         "system_wins": system_wins,
         "system_ties": system_ties,
         "system_losses": system_losses,
-        "system_ci_wilson_95": system_wilson,
+        "system_ci_95": system_ci,
         "conditional_quality": conditional_quality,
         "conditional_wins": wins,
         "conditional_ties": ties,
@@ -1636,7 +1655,7 @@ def build_score_table(route_rec: Dict[str, Any],
         "conditional_quality_pairs": n_full,
         "BLIND_PAIRWISE_WIN_RATE": win_rate,
         "ci_method": ci_method,
-        "ci_wilson_95": ci,
+        "ci_95": ci,
         "second_judge": {
             "agree": sum(1 for r in rows
                          if r.get("second_judge") == "AGREE"),
@@ -1728,7 +1747,7 @@ def write_table(table: Dict[str, Any]) -> None:
         f"{table.get('conditional_losses')}L over {table.get('full_scoreable_pairs')} pairs)",
         "",
         f"system losses (infrastructure/refusal/contract-invalid, N={table['n_problems']}): "
-        f"{table.get('system_losses')};  Wilson95 CI on N: {table.get('system_ci_wilson_95')} "
+        f"{table.get('system_losses')};  normal-approx CI on N: {table.get('ci_95')} "
         f"(method {table.get('ci_method')})",
         f"judge outcomes: {json.dumps(table.get('judge_outcomes'), default=str)}",
         f"second judge: {json.dumps(table.get('second_judge'), default=str)}",
@@ -1902,8 +1921,11 @@ def main(argv=None) -> int:
     ap.add_argument("--root", default=None,
                     help="explicit run-root for this process (used by "
                          "child workers; the parent passes its own)")
+    ap.add_argument("--pairs-out", default=None,
+                    help="directory for raw pair files (ordinary runs; "
+                         "arms of an A/B block pass separate dirs)")
     ap.add_argument("--subset", default="all",
-                    choices=["all", "dev6"])
+                    choices=["all", "dev7"])
     ap.add_argument("--workers", type=int, default=1,
                     help="parallel pipeline workers (process per problem)")
     ap.add_argument("--timeout", type=int, default=300,
@@ -1982,8 +2004,8 @@ def main(argv=None) -> int:
     else:
         problems = json.loads(
             Path(args.problems_file).read_text(encoding="utf-8"))["problems"]
-    if args.subset == "dev6" and args.problems == "all":
-        problems = [p for p in problems if p["problem_id"] in DEV6]
+    if args.subset == "dev7" and args.problems == "all":
+        problems = [p for p in problems if p["problem_id"] in DEV7]
     if args.problems != "all":
         want = {p.strip() for p in args.problems.split(",") if p.strip()}
         problems = [p for p in problems if p["problem_id"] in want]
@@ -2125,7 +2147,9 @@ def main(argv=None) -> int:
                 if args.holdout:
                     pairs_dir = HOLDOUT_ROOT / _commit / "_pairs"
                 else:
-                    pairs_dir = Path(__file__).resolve().parent / "pairs"
+                    pairs_dir = (Path(args.pairs_out) if args.pairs_out
+                                 else Path(__file__).resolve().parent
+                                      / "pairs")
                 pairs_dir.mkdir(parents=True, exist_ok=True)
                 pair = {
                     "problem_id": pid,
@@ -2187,7 +2211,7 @@ def main(argv=None) -> int:
                       ("commit", "dirty_tree", "pipeline_completion",
                        "yield_funnel_DEV", "wall_time", "speed",
                        "system_score", "system_wins", "system_ties",
-                       "system_losses", "system_ci_wilson_95",
+                       "system_losses", "system_ci_95",
                        "conditional_quality", "conditional_wins",
                        "conditional_ties", "conditional_losses",
                        "ci_method",
