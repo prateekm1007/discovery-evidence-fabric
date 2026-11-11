@@ -260,7 +260,7 @@ class A2RetrievalAdapter(BaseAdapter):
         items, report = fabric.retrieve(env.problem)
         # R3: abstract coverage — fetch missing abstracts (bounded)
         try:
-            items, _abf = _backfill_abstracts(items, budget_s=25.0)
+            items, _abf = _backfill_abstracts(items, budget_s=6.0)
             report["abstract_backfill"] = _abf
         except Exception as _abf_exc:  # noqa: BLE001 — infra, not verdict
             report["abstract_backfill"] = {
@@ -828,16 +828,18 @@ def _bounded_call(fn, arg, budget_s: float):
     return box.get("value"), False
 
 
-def _backfill_abstracts(items, budget_s: float = 25.0):
-    """R3: fetch missing abstracts for doi-identified items.
+def _backfill_abstracts(items, budget_s: float = 6.0):
+    """R5: CONCURRENT abstract backfill with a hard <=6 s wall-clock cap.
 
-    Bounded wall-clock and call count (infra, not verdict); records a
-    typed coverage record. Items already custodied are never reworded —
-    an absent abstract is filled from the provider's own text only.
-    """
+    Six missing abstracts are fetched in parallel (max 6 network calls),
+    results merge deterministically in input order; on cap expiry the
+    in-flight fetches are abandoned (never verdict-bearing). Items
+    already custodied are never reworded — an absent abstract is filled
+    from the provider's own text only."""
     import time as _t
     import urllib.parse as _up
     import urllib.request as _ur
+    import concurrent.futures as _cf
 
     def _doi_of(item):
         doi = str(item.get("doi") or "").strip()
@@ -850,36 +852,61 @@ def _backfill_abstracts(items, budget_s: float = 25.0):
     empt = [i for i in items if not str(i.get("abstract") or "").strip()]
     stats = {"n_items": len(items), "n_empty_before": len(empt),
              "n_fetched": 0, "n_filled": 0, "failed": [],
-             "source": "semantic_scholar"}
+             "source": "semantic_scholar",
+             "concurrent": True, "cap_s": budget_s}
     if not empt:
         return items, stats
     deadline = _t.monotonic() + budget_s
+    candidates = []
     for it in empt:
-        if stats["n_fetched"] >= 6 or _t.monotonic() > deadline:
-            break
         doi = _doi_of(it)
         if not doi:
             continue
+        candidates.append((doi, it))
+        if len(candidates) >= 6:
+            break
+    if not candidates:
+        stats["n_empty_after"] = len(empt)
+        return items, stats
+
+    def _fetch_one(doi):
+        url = ("https://api.semanticscholar.org/graph/v1/paper/"
+               f"DOI:{_up.quote(doi, safe='')}?fields=abstract")
         try:
-            url = ("https://api.semanticscholar.org/graph/v1/paper/"
-                   f"DOI:{_up.quote(doi, safe='')}?fields=abstract")
-            with _ur.urlopen(url, timeout=6) as r:
+            with _ur.urlopen(url, timeout=3) as r:
                 body = json.loads(r.read(200_000).decode("utf-8", "replace"))
+            abs_txt = (body or {}).get("abstract") if isinstance(
+                body, dict) else None
+            return doi, abs_txt, None
         except Exception as exc:  # noqa: BLE001 — infra, never verdict
-            stats["n_fetched"] += 1
-            stats["failed"].append(
-                {"doi": doi, "reason": f"{type(exc).__name__}: {exc}"[:120]})
+            return doi, None, f"{type(exc).__name__}: {exc}"[:120]
+
+    try:
+        with _cf.ThreadPoolExecutor(max_workers=6) as pool:
+            wall = list(_cf.as_completed(
+                [pool.submit(_fetch_one, doi) for doi, _ in candidates],
+                timeout=max(0.1, deadline - _t.monotonic())))
+    except _cf.TimeoutError:
+        wall = []  # cap: abandon in-flight fetches entirely
+        stats["abandoned_inflight"] = True
+    done = {res[0]: res for res in
+            (f.result() for f in wall if f.done())}
+    for doi, item in candidates:
+        if doi not in done:
+            stats["failed"].append({"doi": doi, "reason": "ABANDONED_AT_CAP"})
             continue
+        _, abs_txt, err = done[doi]
         stats["n_fetched"] += 1
-        abs_txt = (body or {}).get("abstract") if isinstance(body, dict) else None
+        if err is not None:
+            stats["failed"].append({"doi": doi, "reason": err})
+            continue
         if abs_txt and len(str(abs_txt).strip()) >= 40:
-            it["abstract"] = str(abs_txt).strip()[:2400]
-            it.setdefault("retrieval_backfill", []).append(
+            item["abstract"] = str(abs_txt).strip()[:2400]
+            item.setdefault("retrieval_backfill", []).append(
                 {"source": "semantic_scholar", "fetched_at": utc_now()})
             stats["n_filled"] += 1
         else:
-            stats["failed"].append(
-                {"doi": doi, "reason": "EMPTY_OR_NO_ABSTRACT"})
+            stats["failed"].append({"doi": doi, "reason": "EMPTY_OR_NO_ABSTRACT"})
     stats["n_empty_after"] = sum(
         1 for i in items if not str(i.get("abstract") or "").strip())
     return items, stats
