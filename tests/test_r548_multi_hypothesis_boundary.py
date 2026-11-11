@@ -346,7 +346,10 @@ class TestLeanPathMultiHypothesis(unittest.TestCase):
         # bar (2), never the old "at least 1" structural floor
         self.assertEqual(space["min_candidates_required"],
                          stage_entry.MINIMUM_DISTINCT_MECHANISMS)
-        self.assertEqual(space["min_candidates_required"], 2)
+        # R6 amendment (owner directive 2026-11-11; Art. LXXXIV floor
+        # superseded for R6 dev, amendment logged): the diversity floor
+        # is 3 — the min-candidates contract follows it.
+        self.assertEqual(space["min_candidates_required"], 3)
 
         # legacy block-1 top-level attempt fields stay byte-stable
         # against attribution[0] (existing readers unaffected)
@@ -417,9 +420,12 @@ class TestMinimumDiversityGate(unittest.TestCase):
         return env
 
     def test_minimum_is_two_and_never_lower(self):
-        """Art. XXVII: MINIMUM_DISTINCT_MECHANISMS is 2 — this pin
-        fails if anyone lowers it to make runs pass."""
-        self.assertEqual(stage_entry.MINIMUM_DISTINCT_MECHANISMS, 2)
+        """R6 amendment (owner directive 2026-11-11, item 4; Art. LXXXIV
+        floor superseded for R6 dev, amendment logged — commit
+        36ed4854c): MINIMUM_DISTINCT_MECHANISMS is 3. The pin keeps the
+        R548 intent — it fails if anyone LOWERS the floor to make runs
+        pass — at the amended value."""
+        self.assertEqual(stage_entry.MINIMUM_DISTINCT_MECHANISMS, 3)
 
     def test_starvation_at_one_distinct(self):
         env = self._env_with_ms({"state": "BUILT", "distinctness": {
@@ -427,16 +433,23 @@ class TestMinimumDiversityGate(unittest.TestCase):
         facts = stage_entry.mechanism_diversity_facts(env)
         self.assertTrue(facts["present"])
         self.assertEqual(facts["n_distinct"], 1)
-        self.assertEqual(facts["minimum_required"], 2)
+        self.assertEqual(facts["minimum_required"], 3)
         starved = stage_entry.mechanism_starved(env)
         self.assertIsNotNone(starved)
         self.assertEqual(starved["n_distinct"], 1)
 
     def test_not_starved_at_two_distinct(self):
+        # R6 floor is 3: two distinct candidates ARE starved (the old
+        # R548 pin asserted the opposite at the floor of 2 — amended,
+        # disclosed here; the amended discipline's catch-vs-starve
+        # boundary is exercised by the 3-distinct case below).
         env = self._env_with_ms({"state": "BUILT", "distinctness": {
             "n_distinct": 2, "instrument_version": "r402-v2"}})
         self.assertIsNotNone(stage_entry.mechanism_diversity_facts(env))
-        self.assertIsNone(stage_entry.mechanism_starved(env))
+        self.assertIsNotNone(stage_entry.mechanism_starved(env))
+        env3 = self._env_with_ms({"state": "BUILT", "distinctness": {
+            "n_distinct": 3, "instrument_version": "r402-v2"}})
+        self.assertIsNone(stage_entry.mechanism_starved(env3))
 
     def test_gate_silent_on_unknown_distinctness(self):
         # absent adjudication (legacy/empty envelope)
