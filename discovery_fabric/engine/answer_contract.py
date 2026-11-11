@@ -266,8 +266,11 @@ ANSWER_SHAPE_BLOCK = {
     "intervention-proposal": (
         "\nANSWER-SHAPE CONTRACT (intervention-proposal) — your answer MUST "
         "name concrete parameters and label EACH of them EVIDENCE-BACKED "
-        "(directly supported by a packet record) or ASSUMPTION (your "
+        "(directly supported by a packet record; the bracketed packet item "
+        "id MUST follow the label on the same line, e.g. "
+        "\"EVIDENCE-BACKED [item-id]\") or ASSUMPTION (your "
         "engineering assumption):\n"
-        "PARAMETER: <name> — <value with units> — EVIDENCE-BACKED | ASSUMPTION\n"
+        "PARAMETER: <name> — <value with units> — EVIDENCE-BACKED "
+        "[<packet item id>] | ASSUMPTION\n"
         "(one line per parameter)\n"),
 }

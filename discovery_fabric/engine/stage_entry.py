@@ -87,7 +87,13 @@ MINIMUM_DIVERSITY_STAGES = frozenset({"COLLISION", "ATTACK"})
 
 #: Art. LXXXIV: "fewer than 2 materially distinct candidate
 #: mechanisms (per the Art. XLII distinctness definition)".
-MINIMUM_DISTINCT_MECHANISMS = 2
+# R6 (owner directive 2026-11-11, item 4): the minimum-diversity floor
+# is raised 2 -> 3 distinct intervention candidates. Art. LXXXIV's
+# textual floor ("fewer than 2") is superseded for R6 dev measurement
+# by this recorded owner directive; the constitution amendment log
+# carries the change (the ablation commits amend the constitution where
+# stages are REMOVED — this constant is the floor's live instrument).
+MINIMUM_DISTINCT_MECHANISMS = 3
 
 # Evidence classes that count as a VERIFIED_EVIDENCE_ITEM: an item the
 # classification adjudicated as carrying mechanism support (R394 s5).

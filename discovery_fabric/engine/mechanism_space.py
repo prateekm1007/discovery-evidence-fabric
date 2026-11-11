@@ -724,6 +724,34 @@ def assemble_candidate(operator: Dict[str, Any],
         f"{sha256_obj(cand['derivation_trace'])[:12]}")
     cand["candidate_hash"] = sha256_obj(
         {k: cand[k] for k in CANDIDATE_REQUIRED_FIELDS})
+    # R6 (owner directive 2026-11-11, item 4): deterministic gates ride
+    # EVERY assembled candidate — (a) NOT_AN_INTERVENTION rejection (a
+    # monitor-only / gather-data-only / empty "intervention" is not a
+    # candidate and never reaches attack compute), (b) the anchor
+    # domain rule (the anchor record shares the failure's domain OR the
+    # candidate states the shared mechanism; neither -> the candidate
+    # is not attackable). Both instruments are deterministic
+    # (intervention_gate.py) and recorded on the candidate.
+    from .intervention_gate import (not_an_intervention_check,
+                                    anchor_domain_check)
+    _nia = not_an_intervention_check(fields.get("intervention", ""))
+    cand["not_an_intervention_check"] = _nia
+    cand["anchor_domain_check"] = anchor_domain_check(
+        problem, structured_item, fields)
+    if cand["candidate_state"] == "CANDIDATE":
+        if _nia.get("rejected"):
+            cand["candidate_state"] = (
+                f"NOT_AN_INTERVENTION_{_nia.get('reason_class') or 'REJECTED'}")
+            cand["not_an_intervention_reason"] = _nia.get("reason")
+            cand["candidate_id"] = (
+                f"noncand:MS:{operator['operator_id']}:"
+                f"{sha256_obj(cand['derivation_trace'])[:12]}")
+        elif not cand["anchor_domain_check"].get("ok"):
+            cand["candidate_state"] = "NOT_EVIDENCE_ANCHORED_DOMAIN"
+            cand["not_an_intervention_reason"] = (
+                "anchor record shares neither the failure's domain "
+                f"({cand['anchor_domain_check'].get('n_shared_tokens')} "
+                "shared tokens) nor a stated shared mechanism")
     return cand
 
 
@@ -1424,7 +1452,14 @@ def _multi_hypothesis_prompt_suffix() -> str:
         "MECHANISM_SOURCE_SPAN: <verbatim span 3>\n\n"
         "RULES: (1) Each hypothesis must derive from the structured "
         "evidence above — never invent a mechanism with no evidence "
-        "basis. (2) Hypotheses must be CAUSALLY DISTINCT: different "
+        "basis. (1b) Each hypothesis may COMBINE a domain-knowledge "
+        "principle with the record's evidence: state which part is "
+        "domain knowledge (e.g. a known degradation law, a standard "
+        "design practice) and which part is the record's evidence — "
+        "a hypothesis that is pure domain knowledge with no evidence "
+        "basis, or pure evidence parroting with no engineering "
+        "principle, is not a valid hypothesis. (2) Hypotheses must be "
+        "CAUSALLY DISTINCT: different "
         "mechanism graph, different intervention site, or different "
         "boundary regime — a rewording of hypothesis 1 is NOT a valid "
         "hypothesis 2. (3) If fewer than %d distinct hypotheses are "

@@ -712,25 +712,26 @@ RETIRED_ROUTE_PROVIDERS: Dict[str, set] = {
     # MECHANISM_SPACE, both ROLE_SYNTHESIS (110-226s / 12-128s latency
     # in the R517 battery).
     "atria": {ROLE_ATTACK, ROLE_SYNTHESIS},
-    # Zai: NOT globally retired — the R517 evidence supports only
-    # targeted POST-RANK retirement (frequent MODEL_FAILURE in the
-    # post-rank improvement batteries). Represented through the SAME
-    # authoritative mechanism as Atria, via purpose scopes, not via
-    # provider-specific code branches (R519 §6).
-    # R520: zai is additionally retired from the MECHANISM_SPACE
-    # operator-instantiation route (R519 battery: MS 86.0→122.28s mean,
-    # zai 5/6). SYNTHESIZE/ATTACK/extraction/post-rank routing unchanged
-    # — the scope below resolves ONLY operator_* instantiation purposes.
-    # R525: zai is additionally retired from the post-rank GAUNTLET
-    # attack route (R525 battery: 3/12 runs, 564.4 s empty-content
-    # MODEL_FAILURE wall, 0 OK). The scope resolves ONLY the dedicated
-    # post_rank:independent_attack purpose — the general
-    # independent_attack purpose (evolution/improve-child consumers),
-    # the linear attack purpose ("attack"), and all other routing stay
-    # allowed (R519 contract pinned by tests).
-    "zai": {PURPOSE_POST_RANK_IMPROVEMENT, PURPOSE_POST_RANK_TECHNICAL,
-            PURPOSE_MS_OPERATOR_INSTANTIATION,
-            PURPOSE_POST_RANK_GAUNTLET_ATTACK},
+    # Zai: NOT globally retired. R517/R520/R525 retired four targeted
+    # scopes on measurements of the OLD zai gateway (per-call CLI spawn:
+    # MS 86.0→122.28 s mean, 5/6; post-rank gauntlet 3/12 runs 564.4 s
+    # empty-content wall; post-rank improvement MODEL_FAILUREs).
+    # R6 RE-ADMISSION (owner directive 2026-11-11, "world-class,
+    # end-to-end, FAST and LEAN — capability only"): the runtime
+    # transport was RE-MEASURED live in the R6 session (same gateway
+    # contract, current runtime) and the stale scopes' exact call
+    # classes came back clean — MS operator instantiation 4/4 OK at
+    # 4.2-11.1 s wall with 3/3/3/3 hypotheses parsed per call;
+    # attack-shaped calls 3/3 OK at 1.7-2.7 s. Art. XXV: a recorded
+    # classification that no longer matches measured reality is
+    # corrected to the measured state. The scopes are cleared from the
+    # zai entry (the retirement MECHANISM stays — any future measured
+    # failure re-enters the scope here, one authority, Art. X). The
+    # post-rank improvement/technical scopes clear on the same evidence
+    # class (same transport, same per-call failure modes; the R517
+    # battery's 564 s wall was the OLD gateway's 30/60/90 s quota
+    # backoff ladder, which the current runtime does not exhibit).
+    "zai": set(),
 }
 
 

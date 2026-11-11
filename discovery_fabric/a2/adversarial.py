@@ -512,6 +512,58 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
             "timestamp": datetime.now(timezone.utc).isoformat(),
         })
 
+    # ===== R6 DETERMINISTIC TERMINAL KILLS (owner directive 2026-11-11,
+    # item 4) =====
+    # Two kill classes run BEFORE any attack compute is spent (fast and
+    # lean): (a) function-removal — the intervention removes a function
+    # the user's constraint mandates (lowers a mandated floor, raises a
+    # mandated ceiling, narrows a mandated range, eliminates a mandated
+    # element); (b) restates-the-constraint — the intervention is a
+    # paraphrase of the constraint with no mechanism of its own. Both
+    # are deterministic (intervention_gate.py), both carry a citable
+    # basis, and both are TERMINAL: the gauntlet's LLM dimensions do
+    # not run (no compute on a candidate that deletes the requirement),
+    # and the verdict class travels in the record so the calibration
+    # accounting can separate deterministic kills from LLM kills
+    # (Art. L: the attacker is an instrument; its kill classes are
+    # measured, never fused).
+    _constraint = str(((candidate or {}).get("constraint_set") or {})
+                      .get("problem_constraint") or "")
+    _intervention = str((candidate or {}).get("intervention") or "")
+    _mechanism = str((candidate or {}).get("mechanism") or "")
+    if _intervention.strip():
+        from ..engine.intervention_gate import (
+            function_removal_check, restates_constraint_check)
+        _fr = function_removal_check(_constraint, _intervention)
+        _rc = (restates_constraint_check(_constraint, _intervention,
+                                         _mechanism)
+               if not _fr.get("killed") else {"killed": False})
+        if _fr.get("killed") or _rc.get("killed"):
+            _kill = _fr if _fr.get("killed") else _rc
+            _dim = ("ENGINEERING_INFEASIBILITY"
+                    if _fr.get("killed") else "UNSUPPORTED_MECHANISM")
+            return _with_calibration_scope({
+                "overall": "KILL",
+                "adversarial_status": "KILLED_DETERMINISTIC",
+                "deterministic_kill": {
+                    "instrument": "intervention_gate/1.0.0",
+                    "kill_class": _kill.get("kill_class"),
+                    "basis": _kill.get("basis"),
+                    "jaccard": _kill.get("jaccard"),
+                    "llm_gauntlet_ran": False,
+                    "why": ("terminal deterministic kill (owner directive "
+                            "2026-11-11): a candidate that removes a "
+                            "mandated function or merely restates the "
+                            "constraint is not attackable — no LLM "
+                            "compute spent")},
+                "attacks": {_dim: "KILLED"},
+                "killed_count": 1,
+                "kill_basis": _kill.get("basis"),
+                "v4_corrections_applied": ["r6_deterministic_gate"],
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            })
+
+
     # ===== LLM adversarial challenge =====
     STRIP = {"candidate_id", "model", "prompt_hash", "input_hash", "output_hash", "synthesis_timestamp"}
     blinded = {k: v for k, v in candidate.items() if k not in STRIP}

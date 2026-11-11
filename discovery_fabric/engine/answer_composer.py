@@ -50,7 +50,11 @@ _COMPOSER_SYSTEM = (
     "say so and present the best surviving hypothesis as UNVERIFIED; "
     "(3) respect the user's stated variables exactly (a constraint the "
     "user fixed must stay fixed); (4) name the falsification test "
-    "concretely; (5) English only, no markdown headings, plain text.")
+    "concretely; (5) every EVIDENCE-BACKED label MUST be followed on the "
+    "SAME line by the bracketed packet item id that supports it, e.g. "
+    "\"EVIDENCE-BACKED [item-id]\" — a label with no bracketed id fails "
+    "the deterministic contract; (6) English only, no markdown headings, "
+    "plain text.")
 
 _COMPOSER_PROMPT = """Write the final engineering answer for this problem.
 
