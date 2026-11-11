@@ -1204,7 +1204,13 @@ def _operator_pair_prompt(op: Dict[str, Any], item: Dict[str, Any],
 # legacy path also remains the typed fallback, Art. LXIV disclosed).
 # ---------------------------------------------------------------------------
 _MS_BATCH_ENV = "MS_BATCH_INSTANTIATION"
-_MAX_BATCH_PAIRS = 6
+# 5 operators x per_operator_item_cap 2 = 10 pairs maximum — the batch
+# must cover the FULL plan, else the overflow pairs fall back to the
+# legacy per-pair path and re-expose the run to one 429-prone call each
+# (measured: the eval-* problems carry the most evidence items and were
+# the consistent 300 s INCOMPLETE_INFRASTRUCTURE kills; the bench
+# problems' smaller plans fit under the old cap and completed).
+_MAX_BATCH_PAIRS = 10
 _BATCH_QUEUES: Dict[str, List[Dict[str, Any]]] = {}
 
 
@@ -1279,7 +1285,7 @@ def _preflight_operator_batch(ops: List[Dict[str, Any]],
                "must derive from the given evidence. Answer every "
                "section in its exact requested format.",
         purpose="operator_batch_instantiation",
-        max_tokens=min(4000, 700 * len(served_pairs) + 300))
+        max_tokens=min(6000, 700 * len(served_pairs) + 300))
     record["batch_call"] = {
         "ok": bool(meta.get("ok")),
         "status": meta.get("status"),
