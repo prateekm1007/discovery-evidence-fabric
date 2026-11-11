@@ -11,19 +11,29 @@ these same functions):
      is rejected at assembly with a typed state, BEFORE any attack
      compute is spent on it.
 
-  2. function_removal_check — TERMINAL kill: the intervention removes
+  2. function_removal_check — kill class: the intervention removes
      a function the user's constraint mandates (lowers a mandated
      floor, raises a mandated ceiling, narrows a mandated operating
-     range, or explicitly eliminates a mandated element). The owner's
-     directive: these kills are terminal — a candidate that solves the
-     failure by deleting a requirement the user fixed has not solved
-     the problem the user has.
+     range, or explicitly eliminates a mandated element). P0-3
+     (Art. LXXXI): the class is deterministic and always FIRES, but
+     its TERMINAL authority is per-instrument — the check runs as
+     instrument version intervention_gate_function_removal/1.0.0
+     and issues a terminal KILL only when ITS OWN committed
+     calibration meets the sealed bars (attacker_calibration
+     registry); uncalibrated, it issues the typed
+     ESCALATED_OBJECTION (objection preserved, no negative
+     knowledge).
 
-  3. restates_constraint_check — TERMINAL kill: the intervention is a
+  3. restates_constraint_check — kill class: the intervention is a
      paraphrase of the constraint with no mechanism of its own
      (measured: token Jaccard against the constraint, no new
-     mechanism content). "Survive 500 cycles" is the requirement, not
-     the invention.
+     mechanism content). "Survive 500 cycles" is the requirement,
+     not the invention. P0-3 (Art. LXXXI): separate instrument
+     version intervention_gate_restates_constraint/1.0.0 — it
+     earns terminal authority independently (per-defect-class
+     calibration on independently authored specimens); until
+     then it issues the typed ESCALATED_OBJECTION, never a
+     terminal KILL.
 
   4. anchor_domain_check — the anchor evidence record must share the
      failure's domain OR the candidate must state the shared

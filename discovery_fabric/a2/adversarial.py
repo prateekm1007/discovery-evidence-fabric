@@ -512,21 +512,35 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
             "timestamp": datetime.now(timezone.utc).isoformat(),
         })
 
-    # ===== R6 DETERMINISTIC TERMINAL KILLS (owner directive 2026-11-11,
-    # item 4) =====
-    # Two kill classes run BEFORE any attack compute is spent (fast and
-    # lean): (a) function-removal — the intervention removes a function
-    # the user's constraint mandates (lowers a mandated floor, raises a
-    # mandated ceiling, narrows a mandated range, eliminates a mandated
-    # element); (b) restates-the-constraint — the intervention is a
-    # paraphrase of the constraint with no mechanism of its own. Both
-    # are deterministic (intervention_gate.py), both carry a citable
-    # basis, and both are TERMINAL: the gauntlet's LLM dimensions do
-    # not run (no compute on a candidate that deletes the requirement),
-    # and the verdict class travels in the record so the calibration
-    # accounting can separate deterministic kills from LLM kills
-    # (Art. L: the attacker is an instrument; its kill classes are
-    # measured, never fused).
+    # ===== R6 DETERMINISTIC KILL CLASSES (owner directive 2026-11-11,
+    # item 4; P0-3 per-instrument authority, directive item 3) =====
+    # Two kill classes run BEFORE any attack compute is spent (fast
+    # and lean): (a) function-removal — the intervention removes a
+    # function the user's constraint mandates (lowers a mandated
+    # floor, raises a mandated ceiling, narrows a mandated range,
+    # eliminates a mandated element); (b) restates-the-constraint —
+    # the intervention is a paraphrase of the constraint with no
+    # mechanism of its own. Both are deterministic (intervention_
+    # gate.py) and both carry a citable basis; the verdict class
+    # travels in the record so the calibration accounting can
+    # separate deterministic kills from LLM kills (Art. L: the
+    # attacker is an instrument; its kill classes are measured,
+    # never fused).
+    #
+    # P0-3 (Art. LXXXI): EACH check is a separate attacker instrument
+    # (intervention_gate_function_removal/1.0.0,
+    # intervention_gate_restates_constraint/1.0.0 — "the gate applies
+    # to every attacker instrument separately"). Terminal KILL
+    # authority is DERIVED from the instrument's OWN committed
+    # calibration (attacker_calibration.resolve_state — sealed bars,
+    # no threshold tuning here, Art. XXVII). A new instrument version
+    # starts UNCALIBRATED: with no committed measurement meeting the
+    # sealed FPR bar, the check fires its kill class but the record
+    # is a TYPED ESCALATED_OBJECTION — the objection and its
+    # deterministic basis are preserved verbatim, the candidate is
+    # NOT scientifically rejected (Art. LXI/XXV: no negative
+    # knowledge; classify maps the overall to UNKNOWN with
+    # adjudication blocked, rerunnable), and no LLM compute is spent.
     _constraint = str(((candidate or {}).get("constraint_set") or {})
                       .get("problem_constraint") or "")
     _intervention = str((candidate or {}).get("intervention") or "")
@@ -542,24 +556,91 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
             _kill = _fr if _fr.get("killed") else _rc
             _dim = ("ENGINEERING_INFEASIBILITY"
                     if _fr.get("killed") else "UNSUPPORTED_MECHANISM")
+            _instrument = ("intervention_gate_function_removal/1.0.0"
+                           if _fr.get("killed")
+                           else "intervention_gate_restates_constraint/1.0.0")
+            try:
+                from ..engine.attacker_calibration import (
+                    resolve_state as _resolve_instrument_state)
+                _ig_state = _resolve_instrument_state(
+                    instrument_version=_instrument)
+            except Exception:  # noqa: BLE001 — fail closed, never silent
+                _ig_state = {"state": "UNKNOWN_NOT_CALIBRATED",
+                             "terminal_kill_admissible": False,
+                             "reason": ("instrument state resolution "
+                                        "failed — fail closed (Art. L)")}
+            _ig_terminal = bool(_ig_state.get("terminal_kill_admissible"))
+            _ig_authority = {
+                "gate_version": _ig_state.get("gate_version"),
+                "instrument": _instrument,
+                "calibration_state": _ig_state.get("state"),
+                "terminal_kill_admissible": _ig_terminal,
+                "reason": _ig_state.get("reason"),
+                "reviewer_provenance": "AI_REVIEW (Art. LXVII)",
+            }
+            if _ig_terminal:
+                # the instrument EARNED terminal authority from its
+                # OWN committed calibration (measured within the
+                # sealed bars): the kill is terminal — no LLM
+                # compute on a candidate that deletes the requirement.
+                return _with_calibration_scope({
+                    "overall": "KILL",
+                    "adversarial_status": "KILLED_DETERMINISTIC",
+                    "deterministic_kill": {
+                        "instrument": _instrument,
+                        "calibration_state": _ig_authority,
+                        "kill_class": _kill.get("kill_class"),
+                        "basis": _kill.get("basis"),
+                        "jaccard": _kill.get("jaccard"),
+                        "llm_gauntlet_ran": False,
+                        "why": ("terminal deterministic kill — the "
+                                "instrument is measured calibrated "
+                                "within its sealed bars (Art. LXXXI); "
+                                "a candidate that removes a mandated "
+                                "function or merely restates the "
+                                "constraint is not attackable — no LLM "
+                                "compute spent")},
+                    "attacks": {_dim: "KILLED"},
+                    "killed_count": 1,
+                    "kill_basis": _kill.get("basis"),
+                    "v4_corrections_applied": ["r6_deterministic_gate"],
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                })
+            # UNCALIBRATED instrument (UNKNOWN_NOT_CALIBRATED /
+            # NOT_CALIBRATED): the kill class fires but carries no
+            # terminal authority — typed ESCALATED_OBJECTION, the
+            # objection preserved verbatim, never a terminal
+            # scientific rejection (Art. LXXXI/LXI/XXV).
             return _with_calibration_scope({
-                "overall": "KILL",
-                "adversarial_status": "KILLED_DETERMINISTIC",
-                "deterministic_kill": {
-                    "instrument": "intervention_gate/1.0.0",
+                "overall": "ESCALATED_OBJECTION",
+                "adversarial_status": "ESCALATED_OBJECTION",
+                "deterministic_objection": {
+                    "instrument": _instrument,
+                    "calibration_state": _ig_authority,
                     "kill_class": _kill.get("kill_class"),
                     "basis": _kill.get("basis"),
                     "jaccard": _kill.get("jaccard"),
                     "llm_gauntlet_ran": False,
-                    "why": ("terminal deterministic kill (owner directive "
-                            "2026-11-11): a candidate that removes a "
-                            "mandated function or merely restates the "
-                            "constraint is not attackable — no LLM "
-                            "compute spent")},
-                "attacks": {_dim: "KILLED"},
-                "killed_count": 1,
+                    "why": ("the deterministic check fired, but its "
+                            "instrument version is not calibrated "
+                            "within its sealed bars (Art. LXXXI: an "
+                            "attacker instrument with FPR above the "
+                            "sealed bar may issue ESCALATED_OBJECTION "
+                            "only, never a terminal KILL; an "
+                            "unmeasured version starts uncalibrated); "
+                            "the objection and its deterministic basis "
+                            "are preserved verbatim — the candidate is "
+                            "not rejected by it (Art. LXI/XXV: no "
+                            "negative knowledge; the LLM gauntlet "
+                            "dimensions do not run on a candidate "
+                            "that deletes the requirement, and the "
+                            "record says exactly why this was not a "
+                            "terminal verdict)")},
+                "attacks": {_dim: "ESCALATED_OBJECTION"},
+                "killed_count": 0,
                 "kill_basis": _kill.get("basis"),
-                "v4_corrections_applied": ["r6_deterministic_gate"],
+                "v4_corrections_applied":
+                    ["r6_deterministic_gate_escalated_uncalibrated"],
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             })
 

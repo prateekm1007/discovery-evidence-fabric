@@ -260,6 +260,39 @@ INSTRUMENT_MEASUREMENTS = {
         "measurement": _pinned_path("a2_gauntlet_v4_measurement.json"),
         "seal": _pinned_path("a2_gauntlet_v4_seal.json"),
     },
+    # R6 P0-3 (owner directive 2026-11-11, item 3; Art. LXXXI): the
+    # DETERMINISTIC INTERVENTION-GATE checks that a2/adversarial.py
+    # runs as kill classes BEFORE the LLM gauntlet enter the SAME
+    # measurement registry — as TWO SEPARATE instrument versions
+    # ("the gate applies to every attacker instrument separately").
+    # Each check is its own instrument because its defect class is
+    # different (function-removal kills: lowers a mandated floor,
+    # raises a mandated ceiling, narrows a mandated range, eliminates
+    # a mandated element; restates-the-constraint kills: paraphrase
+    # with no mechanism of its own) and Art. LXXXI requires each to
+    # earn deployment authority independently, with per-defect-class
+    # sensitivity + false-kill rates on independently authored
+    # specimens. NEITHER has a committed calibration yet: the pinned
+    # owner-held measurement + seal records are absent (synthetic
+    # fixtures may test the code but do not establish real
+    # calibration), so both entries resolve fail-closed TODAY:
+    # UNKNOWN_NOT_CALIBRATED, terminal_kill_admissible false — the
+    # checks may issue a typed objection, never a terminal KILL.
+    # The flip, when it comes, is DERIVED by resolve_state from the
+    # owner-held records shipped under these pinned names — never
+    # asserted here, never threshold-tuned (Art. XXVII).
+    "intervention_gate_function_removal/1.0.0": {
+        "measurement": _pinned_path(
+            "intervention_gate_function_removal_measurement.json"),
+        "seal": _pinned_path(
+            "intervention_gate_function_removal_seal.json"),
+    },
+    "intervention_gate_restates_constraint/1.0.0": {
+        "measurement": _pinned_path(
+            "intervention_gate_restates_constraint_measurement.json"),
+        "seal": _pinned_path(
+            "intervention_gate_restates_constraint_seal.json"),
+    },
 }
 
 

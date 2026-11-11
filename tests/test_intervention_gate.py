@@ -246,10 +246,12 @@ def test_assemble_candidate_anchor_domain_typed_state():
 
 
 # ---------------------------------------------------------------------------
-# 6. adversarial_challenge integration: deterministic terminal kill
-#    with NO LLM call
+# 6. adversarial_challenge integration: deterministic kill class —
+#    P0-3 (Art. LXXXI): with the instrument UNCALIBRATED (the default,
+#    fail-closed), the fired kill class is a typed ESCALATED_OBJECTION,
+#    never a terminal KILL; no LLM call in either case
 # ---------------------------------------------------------------------------
-def test_adversarial_challenge_function_removal_no_llm():
+def test_adversarial_challenge_function_removal_uncalibrated_no_llm():
     from discovery_fabric.a2 import adversarial as adv
     calls = {"n": 0}
     orig = adv.llm_chat
@@ -271,11 +273,21 @@ def test_adversarial_challenge_function_removal_no_llm():
         }
         res = adv.adversarial_challenge(cand, evidence_verified=True,
                                         prior_art_state="NO_MATCH_FOUND")
-        assert res.get("overall") == "KILL", res
-        assert res.get("adversarial_status") == "KILLED_DETERMINISTIC"
-        assert res["deterministic_kill"]["kill_class"] == \
-            "LOWERS_MANDATED_FLOOR"
-        assert res["deterministic_kill"]["llm_gauntlet_ran"] is False
+        # P0-3: the function_removal instrument is uncalibrated by
+        # default (pinned records absent -> UNKNOWN_NOT_CALIBRATED):
+        # the kill class FIRES but carries no terminal authority
+        assert res.get("overall") == "ESCALATED_OBJECTION", res
+        assert res.get("adversarial_status") == "ESCALATED_OBJECTION"
+        assert res.get("killed_count") == 0
+        obj = res["deterministic_objection"]
+        assert obj["instrument"] == \
+            "intervention_gate_function_removal/1.0.0"
+        assert obj["calibration_state"]["terminal_kill_admissible"] is False
+        assert obj["kill_class"] == "LOWERS_MANDATED_FLOOR"
+        assert obj["llm_gauntlet_ran"] is False
+        # the objection + deterministic basis are preserved verbatim
+        assert obj["basis"]
+        assert res.get("kill_basis")
         assert calls["n"] == 0, "no LLM compute may be spent on a " \
                                 "function-removal candidate"
     finally:
