@@ -1,23 +1,21 @@
 {
  "problem_id": "eval-sofc-thermal-cycling",
- "commit": "2505e43b9003",
- "dirty_tree": true,
+ "commit": "b7fdb2ccc944",
+ "dirty_tree": false,
  "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
- "question_type": "intervention-proposal",
  "clarification_answer": {
   "intergranular glass phase fraction": 0.15,
   "note": "user stated the seal's intergranular glass phase fraction is 0.15 (mass fraction) for this stack design"
  },
- "contamination_tag": null,
- "baseline_answer": "**Proposed Intervention: High-Friction Seal & Interface Constraint**\n\nImplement a composite seal design based on **La$_{2}$Zr$_{2}$O$_{7}$-based glass-ceramic** or a **perovskite-infiltrated seal**, and apply a **thermal preload constraint** at the cathode-electrolyte interface.\n\n1.  **Seal Modification:** Replace the current seal (intergranular glass phase fraction $f_g = 0.15$) with a modified composition where $f_g < 0.05$ at 800\u00b0C. This reduces the viscous flow of the seal during thermal cycling, allowing it to maintain clamping force rather than relaxing.\n2.  **Interface Constraint:** Introduce a thin, flexible interlayer (e.g., Pt/Ni or a sinterable Ni-YSZ cermet slurry) at the cathode-electrolyte interface to absorb differential strain. Alternatively, redesign the interconnector to apply a slight compressive preload at 25\u00b0C that remains compressive up to 800\u00b0C, keeping the cathode in tight contact with the electrolyte to prevent delamination and microcrack opening.\n\n**Expected Measurable Effects:**\n*   **Leakage:** Seal leakage will remain < 1% of fuel flow. The reduced $f_g$ prevents creep and viscous relaxation, maintaining the seal\u2019s integrity.\n*   **OHMIC Loss:** By preventing microcrack opening at the cathode-electrolyte interface, the effective contact area remains constant, preventing the rise in ohmic resistance.\n*   **Stack Mass:** No change in mass (0% increase). The intervention is purely mechanical/interfacial, not adding significant bulk material.\n*   **OCV:** OCV will remain > 1.0 V because gas crossover is minimized, preventing internal shorting and maintaining the Nernst potential.\n\n**Falsification Test:**\n1.  **Sample:** Fabricate 10 anode-supported YSZ-LSM cells with the *modified* seal ($f_g < 0.05$) and interfacial constraint.\n2.  **Protocol:** Subject cells to 500 thermal cycles: 25\u00b0C $\\leftrightarrow$ 800\u00b0C at 5\u00b0C/min.\n3.  **Measurement:** After every 50 cycles, measure:\n    *   Helium leak rate (must stay < 1% of nominal fuel flow).\n    *   Electrochemical Impedance Spectroscopy (EIS) to extract ohmic resistance ($R_{ohm}$).\n    *   Open-circuit voltage (OCV) under fuel/air flow.\n4.  **Falsification Criterion:** If after 500 cycles the leak rate exceeds 1% OR $R_{ohm}$ increases by > 5% OR OCV drops below 1.0 V, the hypothesis that reducing glass phase fraction and adding interfacial constraint prevents failure is **falsified**.\n\n**Evidence Support:**\n*   **[crossref: Yttria-stabilized zirconia solid oxide electrolyte fuel cells--- monolithic...]:** Supports the baseline YSZ-LSM architecture.\n*   **[core: Gas Flow and Heat Transfer Modeling...]:** Highlights that anode-supported designs face significant thermal stress; supporting the need for interfacial strain management.\n*   **[crossref: Development of lanthanum strunciate manganite based...]:** LSM cathodes are known for higher thermal expansion than YSZ; the interfacial constraint addresses this mismatch.\n*   **Note:** No retrieved evidence directly supports the specific $f_g < 0.05$ threshold for La$_{2}$Zr$_{2}$O$_{7}$ seals. This value is a domain engineering estimate based on general glass-ceramic seal behavior (lower glass fraction = higher modulus, less creep). If this specific material system is not available, the falsification test must first verify the seal's $f_g$ reduction capability.",
- "pipeline_answer": "The device utilizes an anode-supported solid oxide fuel cell configuration where a thin yttria-stabilized zirconia (YSZ) electrolyte film is spray-coated onto the anode substrate, a specific structural arrangement defined in the evidence.\n\nThe revision replaces the glass-ceramic seal and modular interconnect architecture with a design that relies on the inherent flexibility of the spray-coated YSZ electrolyte film and the anode-supported structure to accommodate thermal expansion mismatches.\n\nThis structural modification reduces differential thermal stress at the cathode-electrolyte interface by eliminating the rigid glass-ceramic seal component, thereby preventing the initiation of microcracks during thermal cycling.\n\nThe modified stack is subjected to 500 thermal cycles from 25 C to 800 C at 5 C/min; failure is recorded if the open-circuit voltage drops below 1.0 V or seal leakage exceeds 1 percent of fuel flow.\n\nThe elimination of the glass-ceramic seal allows the cell to maintain structural integrity and voltage stability through 500 cycles, keeping leakage below the specified threshold without increasing stack mass.",
+ "baseline_answer": "**Proposed Intervention:** Modify the glass-ceramic seal composition to increase its intergranular glass phase fraction from 0.15 to 0.25 (mass fraction). This higher glass content will enhance the seal's viscoelasticity, improving its ability to accommodate differential thermal expansion between the anode, YSZ electrolyte, and LSM cathode during cycling.  \n\n**Expected Effect:** The increased glass phase will reduce stress concentrations at the seal and cathode-electrolyte interfaces, mitigating microcrack formation after 500 thermal cycles (25\u00b0C\u2013800\u00b0C, 5\u00b0C/min). This should maintain seal leakage below 1% of fuel flow, open-circuit voltage above 1.0 V, and stack mass increase below 2%.  \n\n**Supporting Evidence:**  \n- The seal's current glass phase (0.15) is insufficient for thermal cycling stress relief, as evidenced by microcrack-driven failure [crossref: \"Effect of Cathode Microstructure...\"]. Higher glass fractions improve compliance in ceramic seals [semantic_scholar: \"Compilation of mechanical properties...\"].  \n- YSZ and LSM have mismatched thermal expansion coefficients (CTE), which exacerbate interfacial stresses. A more compliant seal can absorb these strains [semantic_scholar: \"Micro-tubular solid oxide fuel cell...\"].  \n\n**Falsification Test:** Subject the modified stack to the same 500 thermal cycles and measure seal leakage via helium mass spectrometry. If leakage exceeds 1% or voltage drops below 1.0 V, the intervention fails. Additionally, post-test SEM analysis must show no new microcracks at the seal/cathode interfaces.  \n\n**Limitations:** The evidence does not directly validate 0.25 as the optimal glass fraction; this value is inferred from studies on seal compliance. If the seal's creep resistance degrades at higher glass content, the test may fail due to excessive flow.",
+ "pipeline_answer": "CONTRACT-INVALID COMPOSITION (deterministic answer-shape contract violations: intervention contract: EVIDENCE-BACKED label without a referenced source id or evidence citation | intervention contract: EVIDENCE-BACKED label without a referenced source id or evidence citation | intervention contract: EVIDENCE-BACKED label without a referenced source id or evidence citation)\n\nPARAMETER: thermal management system activation temperature \u2014 400\u00b0C \u2014 EVIDENCE-BACKED [doi:10.1016/j.ceramint.2012.01.043]\nPARAMETER: active cooling rate \u2014 3\u00b0C/min \u2014 EVIDENCE-BACKED [doi:10.1017/s1431927608085942]\nPARAMETER: maximum thermal gradient \u2014 50\u00b0C/cm \u2014 EVIDENCE-BACKED [doi:10.1016/j.ceramint.2012.01.043]\nPARAMETER: seal intergranular glass phase fraction \u2014 0.15 \u2014 EVIDENCE-BACKED [user-stated clarification]\nPARAMETER: maximum allowable seal leakage \u2014 1% of fuel flow \u2014 EVIDENCE-BACKED [user constraint]\nPARAMETER: target open-circuit voltage \u2014 >1.0 V \u2014 EVIDENCE-BACKED [user constraint]\nPARAMETER: maximum stack mass increase \u2014 2% \u2014 EVIDENCE-BACKED [user constraint]\n\nIntervention: Implement a thermal management system with active cooling during heating phases and controlled heating rates to minimize thermal gradients between components. The system will activate at 400\u00b0C and maintain a cooling rate of 3\u00b0C/min during heating phases, while limiting the maximum thermal gradient to 50\u00b0C/cm across the stack. This approach directly addresses differential expansion by reducing thermal stress at critical interfaces.\n\nExpected effect: Reduced microcrack formation at the cathode-electrolyte interface and seal regions, maintaining seal integrity and gas crossover below 1% of fuel flow. The system should preserve open-circuit voltage above 1.0 V and limit stack mass increase to below 2% after 500 thermal cycles.\n\nConstraint compliance: The intervention respects all user constraints by targeting the specific failure mechanism (thermal cycling fatigue) without adding significant mass. The controlled thermal gradient directly addresses the differential expansion issue while maintaining the required seal leakage and voltage specifications.\n\nFalsification test: Perform 500 thermal cycles between 25\u00b0C and 800\u00b0C at 5\u00b0C/min heating rate with the thermal management system active. Measure seal leakage (must remain below 1% of fuel flow), open-circuit voltage (must remain above 1.0 V), and stack mass increase (must remain below 2%) after each 100 cycles. Failure is defined as any measurement exceeding these thresholds during the test.\n\nSupporting evidence: The thermal gradient parameter is supported by mechanical property data for SOFC materials [doi:10.1016/j.ceramint.2012.01.043], while the cathode performance impact is supported by studies on lanthanum strontium manganite microstructure [doi:10.1017/s1431927608085942]. The user constraints are directly incorporated as design targets.",
  "evidence_ids": [
   "doi:10.1017/s1431927608085942",
   "doi:10.1016/j.ssi.2008.01.094",
   "doi:10.1115/1.4028947",
   "doi:10.1016/j.electacta.2016.01.035",
-  "doi:10.1038/s41467-026-69110-y",
-  "doi:10.1021/acsomega.5c12945",
+  "doi:10.1007/s42452-025-07318-1",
+  "doi:10.3390/catal16110938",
   "doi:10.58837/chula.the.2006.1579",
   "doi:10.3990/1.9788755026056",
   "doi:10.58837/chula.the.2000.861",
@@ -25,1009 +23,96 @@
   "doi:10.48550/arxiv.1411.4413",
   "doi:10.48550/arxiv.2508.18081",
   "doi:10.2172/5521909",
-  "title:4b3d71d5937bc9a4",
-  "title:c43921ce044a658d",
-  "title:5f79d122e1739b1a",
-  "title:5f8407c03b7e7220"
+  "doi:10.1016/j.ceramint.2012.01.043",
+  "doi:10.1038/srep05754",
+  "doi:10.1149/200116.0311pv"
  ],
- "evidence": [
-  {
-   "id": "doi:10.1017/s1431927608085942",
-   "source_type": "scientific_paper",
-   "source": "crossref",
-   "source_id": "crossref:doi:10.1017/s1431927608085942",
-   "source_uri": "https://doi.org/10.1017/s1431927608085942",
-   "title": "Effect of Cathode Microstructure on the Cathode Polarization in the Sintered Strontium-Doped Lanthanum Manganite/Yttria Stabilized Zirconia Solid Oxide Fuel Cells",
-   "abstract": "",
-   "doi": "10.1017/s1431927608085942",
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": "2008",
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "94a3b046a44027135ea107ce4597578eda0fc14a415a0d41b03d620710c4b3c8",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "crossref",
-    "indexing_sources": [
-     "crossref"
-    ],
-    "record_ids_by_source": {
-     "crossref": "doi:10.1017/s1431927608085942"
-    },
-    "queries_by_source": {
-     "crossref": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "doi_registrant_crossref",
-    "identity_basis": "DOI",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [
-     "type=journal-article"
-    ],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "PEER_REVIEWED",
-   "document_type": "",
-   "evidence_lane": "SCHOLARLY",
-   "source_family": "doi_registrant_crossref",
-   "canonical_id": "doi:10.1017/s1431927608085942",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue",
-   "source_rank": 0,
-   "fulltext_url": null,
-   "authors": [],
-   "raw_record_hash": "",
-   "limitations": [
-    "Metadata-only; no abstracts for many records"
-   ]
-  },
-  {
-   "id": "doi:10.1016/j.ssi.2008.01.094",
-   "source_type": "scientific_paper",
-   "source": "crossref",
-   "source_id": "crossref:doi:10.1016/j.ssi.2008.01.094",
-   "source_uri": "https://doi.org/10.1016/j.ssi.2008.01.094",
-   "title": "An anode-supported solid oxide fuel cell with spray-coated yttria-stabilized zirconia (YSZ) electrolyte film",
-   "abstract": "",
-   "doi": "10.1016/j.ssi.2008.01.094",
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": "2008",
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "211f94f6c3c17361d97ef4b01dab31debefb4ab7e31c1fe656d1e34818c54223",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "crossref",
-    "indexing_sources": [
-     "crossref"
-    ],
-    "record_ids_by_source": {
-     "crossref": "doi:10.1016/j.ssi.2008.01.094"
-    },
-    "queries_by_source": {
-     "crossref": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "doi_registrant_crossref",
-    "identity_basis": "DOI",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [
-     "type=journal-article"
-    ],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "PEER_REVIEWED",
-   "document_type": "",
-   "evidence_lane": "SCHOLARLY",
-   "source_family": "doi_registrant_crossref",
-   "canonical_id": "doi:10.1016/j.ssi.2008.01.094",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue",
-   "source_rank": 1,
-   "fulltext_url": null,
-   "authors": [],
-   "raw_record_hash": "",
-   "limitations": [
-    "Metadata-only; no abstracts for many records"
-   ]
-  },
-  {
-   "id": "doi:10.1115/1.4028947",
-   "source_type": "scientific_paper",
-   "source": "crossref",
-   "source_id": "crossref:doi:10.1115/1.4028947",
-   "source_uri": "https://doi.org/10.1115/1.4028947",
-   "title": "Fabrication and Performance of La0.6Sr0.4Co0.2Fe0.8O3\u2212\u03b4 Infiltrated-Yttria-Stabilized Zirconia Cathode on Anode-Supported Solid Oxide Fuel Cell",
-   "abstract": "",
-   "doi": "10.1115/1.4028947",
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": "2015",
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "ba970061b7e64e78af3ab7fd0638935c169bf79f3e2152f8438c5e54bbf9c2bb",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "crossref",
-    "indexing_sources": [
-     "crossref"
-    ],
-    "record_ids_by_source": {
-     "crossref": "doi:10.1115/1.4028947"
-    },
-    "queries_by_source": {
-     "crossref": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "doi_registrant_crossref",
-    "identity_basis": "DOI",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [
-     "type=journal-article"
-    ],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "PEER_REVIEWED",
-   "document_type": "",
-   "evidence_lane": "SCHOLARLY",
-   "source_family": "doi_registrant_crossref",
-   "canonical_id": "doi:10.1115/1.4028947",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue",
-   "source_rank": 2,
-   "fulltext_url": null,
-   "authors": [],
-   "raw_record_hash": "",
-   "limitations": [
-    "Metadata-only; no abstracts for many records"
-   ]
-  },
-  {
-   "id": "doi:10.1016/j.electacta.2016.01.035",
-   "source_type": "scientific_paper",
-   "source": "crossref",
-   "source_id": "crossref:doi:10.1016/j.electacta.2016.01.035",
-   "source_uri": "https://doi.org/10.1016/j.electacta.2016.01.035",
-   "title": "Composition optimization of samarium strontium manganite-yttria stabilized zirconia cathode for high performance intermediate temperature solid oxide fuel cells",
-   "abstract": "",
-   "doi": "10.1016/j.electacta.2016.01.035",
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": "2016",
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "6c3356eab36892e5539bfe767a8cf6b1bb60d5a84d21414667eb5c8de4fb1b9e",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "crossref",
-    "indexing_sources": [
-     "crossref"
-    ],
-    "record_ids_by_source": {
-     "crossref": "doi:10.1016/j.electacta.2016.01.035"
-    },
-    "queries_by_source": {
-     "crossref": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "doi_registrant_crossref",
-    "identity_basis": "DOI",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [
-     "type=journal-article"
-    ],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "PEER_REVIEWED",
-   "document_type": "",
-   "evidence_lane": "SCHOLARLY",
-   "source_family": "doi_registrant_crossref",
-   "canonical_id": "doi:10.1016/j.electacta.2016.01.035",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue",
-   "source_rank": 3,
-   "fulltext_url": null,
-   "authors": [],
-   "raw_record_hash": "",
-   "limitations": [
-    "Metadata-only; no abstracts for many records"
-   ]
-  },
-  {
-   "id": "doi:10.1038/s41467-026-69110-y",
-   "source_type": "scientific_paper",
-   "source": "europepmc",
-   "source_id": "europepmc:europepmc:41651819",
-   "source_uri": "https://doi.org/10.1038/s41467-026-69110-y",
-   "title": "Scalable modular design of solid oxide fuel cell systems for enhanced large-scale power generation.",
-   "abstract": "The increasing demand for renewable energy integration and scalable power generation highlights the need for efficient and cost-effective solid oxide fuel cell systems. In this study, we present a modular hybrid design framework that enables flexible solid oxide fuel cell scale-up by interconnecting standardized component modules. We introduce a series-parallel configuration that strategically leverages anode and cathode off-gas recirculation to enhance both electrical and thermal efficiency. Through a detailed case study, we demonstrate that the hybrid design achieves 66.3% electrical efficiency while reducing external water use by 59.9% and fresh air demand by 22%, outperforming conventional system designs. We further conducted a techno-economic analysis across four scale-up strategies and found that the hybrid design delivers the lowest levelized cost of electricity at 0.155 $/kWh. Through this work, we have highlighted the critical trade-offs between centralization and decentralization, high- and low-technology readiness level technologies, and economies of scale versus manufacturing capacity. We believe our findings underscore the potential of modular and standardized systems to provide scalable, efficient, and economically viable solutions for future low-carbon energy infrastructures.",
-   "doi": "10.1038/s41467-026-69110-y",
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": "2026-02-06",
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "a0d8b2e73824d3d08e794c8751be77442b4f5d14f593cf20230ab61f87bd2383",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "europepmc",
-    "indexing_sources": [
-     "europepmc"
-    ],
-    "record_ids_by_source": {
-     "europepmc": "europepmc:41651819"
-    },
-    "queries_by_source": {
-     "europepmc": "anode-supported solid oxide fuel cell stack experimental comparison"
-    },
-    "query_variant_derivation": "COMPARISON_TARGETED",
-    "source_family": "biomedical_pubmed_line",
-    "identity_basis": "DOI",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "PEER_REVIEWED",
-   "document_type": "",
-   "evidence_lane": "SCHOLARLY",
-   "source_family": "biomedical_pubmed_line",
-   "canonical_id": "doi:10.1038/s41467-026-69110-y",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack experimental comparison",
-   "source_rank": 4,
-   "fulltext_url": null,
-   "authors": [],
-   "raw_record_hash": "",
-   "limitations": [
-    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
-    "Publication existence is not clinical evidence of safety or effectiveness",
-    "Citation counts are bibliometric signals, not validity measures"
-   ]
-  },
-  {
-   "id": "doi:10.1021/acsomega.5c12945",
-   "source_type": "scientific_paper",
-   "source": "europepmc",
-   "source_id": "europepmc:europepmc:41726709",
-   "source_uri": "https://doi.org/10.1021/acsomega.5c12945",
-   "title": "Steady-State Characteristic Assessment and Dynamic Performance Testing for a Metal-Supported Solid Oxide Fuel Cell Auxiliary Power Unit with Methanol On-Board Reforming.",
-   "abstract": "The highly efficient and low-pollution solid oxide fuel cell (SOFC) power generation system offers a clean energy supply solution, playing a significant role in promoting energy transformation and accelerating the development of low-carbon energy. Safe and portable liquid fuels have received extensive attention in mobile SOFC applications due to their excellent fuel versatility. However, the overall performance of the SOFC system is highly dependent on reforming options and operating strategies. In this study, a novel methanol-reforming on-board SOFC auxiliary power unit (APU) system is proposed. The performance of SOFC with methanol under steam and autothermal reforming is evaluated by thermodynamic analysis at 550 \u00b0C with 0.3 A/cm 2 current density for a metal-supported SOFC stack. The methanol autothermal reforming (ATR) consumes less heat and shows better start-up performance compared with steam reforming, making it more suitable for the SOFC-APU system. The maximum electrical efficiency of the SOFC system can reach 47.5% with methanol ATR. By optimizing the reforming strategy and operating parameters, the conceptual design of the SOFC-APU system achieves a balance between system efficiency and methanol consumption during the steady operation phase. The simulation results showed that the electrical efficiency of the system reached 52.1% with a 0.46 g/s methanol flow rate at a 70% anode gas recirculation ratio. Based on the above SOFC-APU system, a dynamic series hybrid system with a battery as the main driving power source and an SOFC as an auxiliary power source was designed and simulated. The hybrid system can meet the dynamic and economic requirements, making up for the short mileage and endurance of the electric vehicle. Meanwhile, it reduces the peak power demand of the battery system and prolongs the battery life, showing the development potential of an SOFC in the future transportation field.",
-   "doi": "10.1021/acsomega.5c12945",
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": "2026-02-04",
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "0894d318c409bc1e69bc9c88bdb8ddb564601f3a3d36c8f4fab1373e89404052",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "europepmc",
-    "indexing_sources": [
-     "europepmc"
-    ],
-    "record_ids_by_source": {
-     "europepmc": "europepmc:41726709"
-    },
-    "queries_by_source": {
-     "europepmc": "anode-supported solid oxide fuel cell stack experimental comparison"
-    },
-    "query_variant_derivation": "COMPARISON_TARGETED",
-    "source_family": "biomedical_pubmed_line",
-    "identity_basis": "DOI",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [],
-    "oa_resolution": {
-     "provider": "unpaywall",
-     "resolved_at": "2026-11-10T16:56:49.621593+00:00",
-     "is_oa": true,
-     "oa_status": "gold",
-     "host_type": "publisher",
-     "repository_institution": null
-    }
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "PEER_REVIEWED",
-   "document_type": "",
-   "evidence_lane": "SCHOLARLY",
-   "source_family": "biomedical_pubmed_line",
-   "canonical_id": "doi:10.1021/acsomega.5c12945",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack experimental comparison",
-   "source_rank": 5,
-   "fulltext_url": "https://pubs.acs.org/doi/pdf/10.1021/acsomega.5c12945?ref=article_openPDF",
-   "authors": [],
-   "raw_record_hash": "",
-   "limitations": [
-    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
-    "Publication existence is not clinical evidence of safety or effectiveness",
-    "Citation counts are bibliometric signals, not validity measures"
-   ]
-  },
-  {
-   "id": "doi:10.58837/chula.the.2006.1579",
-   "source_type": "scientific_paper",
-   "source": "crossref",
-   "source_id": "crossref:doi:10.58837/chula.the.2006.1579",
-   "source_uri": "https://doi.org/10.58837/chula.the.2006.1579",
-   "title": "Development of lanthanum strontium manganite based solid oxide fuel cell electrode by advanced mechanochemical process",
-   "abstract": "",
-   "doi": "10.58837/chula.the.2006.1579",
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": null,
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "92f697d9ec70a60d168abeefbbfe8f8015aa3ee860637a9a7ba5606a13f79938",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "crossref",
-    "indexing_sources": [
-     "crossref"
-    ],
-    "record_ids_by_source": {
-     "crossref": "doi:10.58837/chula.the.2006.1579"
-    },
-    "queries_by_source": {
-     "crossref": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "doi_registrant_crossref",
-    "identity_basis": "DOI",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [
-     "type=dissertation"
-    ],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "THESIS",
-   "document_type": "",
-   "evidence_lane": "THESIS",
-   "source_family": "doi_registrant_crossref",
-   "canonical_id": "doi:10.58837/chula.the.2006.1579",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue",
-   "source_rank": 0,
-   "fulltext_url": null,
-   "authors": [],
-   "raw_record_hash": "",
-   "limitations": [
-    "Metadata-only; no abstracts for many records"
-   ]
-  },
-  {
-   "id": "doi:10.3990/1.9788755026056",
-   "source_type": "scientific_paper",
-   "source": "crossref",
-   "source_id": "crossref:doi:10.3990/1.9788755026056",
-   "source_uri": "https://doi.org/10.3990/1.9788755026056",
-   "title": "Nickel/Yttria-stabilised zirconia cermet anodes for solid oxide fuel cells",
-   "abstract": "",
-   "doi": "10.3990/1.9788755026056",
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": null,
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "5b3af78d52146e44243ee04330a900dea37fb90ec15086e815bdfcb4ed93a931",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "crossref",
-    "indexing_sources": [
-     "crossref"
-    ],
-    "record_ids_by_source": {
-     "crossref": "doi:10.3990/1.9788755026056"
-    },
-    "queries_by_source": {
-     "crossref": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "doi_registrant_crossref",
-    "identity_basis": "DOI",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [
-     "type=dissertation"
-    ],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "THESIS",
-   "document_type": "",
-   "evidence_lane": "THESIS",
-   "source_family": "doi_registrant_crossref",
-   "canonical_id": "doi:10.3990/1.9788755026056",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue",
-   "source_rank": 1,
-   "fulltext_url": null,
-   "authors": [],
-   "raw_record_hash": "",
-   "limitations": [
-    "Metadata-only; no abstracts for many records"
-   ]
-  },
-  {
-   "id": "doi:10.58837/chula.the.2000.861",
-   "source_type": "scientific_paper",
-   "source": "crossref",
-   "source_id": "crossref:doi:10.58837/chula.the.2000.861",
-   "source_uri": "https://doi.org/10.58837/chula.the.2000.861",
-   "title": "Characteristics of lanthanum aluminate as an electrolyte in solid oxide fuel cell",
-   "abstract": "",
-   "doi": "10.58837/chula.the.2000.861",
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": null,
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "d3dcff6fb2f9beaa4143fab3bcee3ee527c3651f36c8a32798a571f6fc174a15",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "crossref",
-    "indexing_sources": [
-     "crossref"
-    ],
-    "record_ids_by_source": {
-     "crossref": "doi:10.58837/chula.the.2000.861"
-    },
-    "queries_by_source": {
-     "crossref": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "doi_registrant_crossref",
-    "identity_basis": "DOI",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [
-     "type=dissertation"
-    ],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "THESIS",
-   "document_type": "",
-   "evidence_lane": "THESIS",
-   "source_family": "doi_registrant_crossref",
-   "canonical_id": "doi:10.58837/chula.the.2000.861",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue",
-   "source_rank": 2,
-   "fulltext_url": null,
-   "authors": [],
-   "raw_record_hash": "",
-   "limitations": [
-    "Metadata-only; no abstracts for many records"
-   ]
-  },
-  {
-   "id": "doi:10.48550/arxiv.0901.0512",
-   "source_type": "scientific_paper",
-   "source": "arxiv",
-   "source_id": "arxiv:arxiv:0901.0512v4",
-   "source_uri": "https://doi.org/10.48550/arxiv.0901.0512",
-   "title": "Expected Performance of the ATLAS Experiment - Detector, Trigger and Physics",
-   "abstract": "A detailed study is presented of the expected performance of the ATLAS detector. The reconstruction of tracks, leptons, photons, missing energy and jets is investigated, together with the performance of b-tagging and the trigger. The physics potential for a variety of interesting physics processes, within the Standard Model and beyond, is examined. The study comprises a series of notes based on simulations of the detector and physics processes, with particular emphasis given to the data expected from the first years of operation of the LHC at CERN.",
-   "doi": "10.48550/arxiv.0901.0512",
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": null,
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "31003d25bdd33172ff1245ccfccedc4ed173af7ba5d31e722d7dae8273822cc6",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "arxiv",
-    "indexing_sources": [
-     "arxiv"
-    ],
-    "record_ids_by_source": {
-     "arxiv": "arxiv:0901.0512v4"
-    },
-    "queries_by_source": {
-     "arxiv": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "preprint_origin",
-    "identity_basis": "DOI",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "PREPRINT",
-   "document_type": "",
-   "evidence_lane": "PREPRINT",
-   "source_family": "preprint_origin",
-   "canonical_id": "doi:10.48550/arxiv.0901.0512",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue",
-   "source_rank": 0,
-   "fulltext_url": "http://arxiv.org/abs/0901.0512v4",
-   "authors": [
-    " The ATLAS Collaboration",
-    "G. Aad",
-    "E. Abat",
-    "B. Abbott",
-    "J. Abdallah",
-    "A. A. Abdelalim",
-    "A. Abdesselam",
-    "O. Abdinov",
-    "B. Abi",
-    "M. Abolins",
-    "H. Abramowicz",
-    "B. S. Acharya",
-    "D. L. Adams",
-    "T. N. Addy",
-    "C. Adorisio",
-    "P. Adragna",
-    "T. Adye",
-    "J. A. Aguilar-Saavedra",
-    "M. Aharrouche",
-    "S. P. Ahlen"
-   ],
-   "raw_record_hash": "",
-   "limitations": [
-    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
-    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed \u2014 absence of an arXiv record is not absence of the science"
-   ]
-  },
-  {
-   "id": "doi:10.48550/arxiv.1411.4413",
-   "source_type": "scientific_paper",
-   "source": "arxiv",
-   "source_id": "arxiv:arxiv:1411.4413v2",
-   "source_uri": "https://doi.org/10.48550/arxiv.1411.4413",
-   "title": "Observation of the rare $B^0_s\\to\u03bc^+\u03bc^-$ decay from the combined analysis of CMS and LHCb data",
-   "abstract": "A joint measurement is presented of the branching fractions $B^0_s\\to\u03bc^+\u03bc^-$ and $B^0\\to\u03bc^+\u03bc^-$ in proton-proton collisions at the LHC by the CMS and LHCb experiments. The data samples were collected in 2011 at a centre-of-mass energy of 7 TeV, and in 2012 at 8 TeV. The combined analysis produces the first observation of the $B^0_s\\to\u03bc^+\u03bc^-$ decay, with a statistical significance exceeding six standard deviations, and the best measurement of its branching fraction so far. Furthermore, evidence for the $B^0\\to\u03bc^+\u03bc^-$ decay is obtained with a statistical significance of three standard deviations. The branching fraction measurements are statistically compatible with SM predictions and impose stringent constraints on several theories beyond the SM.",
-   "doi": "10.48550/arxiv.1411.4413",
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": null,
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "765dec8a1dc2f1d21cda57487193e5aa915bb4ee63f068c5b5da5a7a1970c866",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "arxiv",
-    "indexing_sources": [
-     "arxiv"
-    ],
-    "record_ids_by_source": {
-     "arxiv": "arxiv:1411.4413v2"
-    },
-    "queries_by_source": {
-     "arxiv": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "preprint_origin",
-    "identity_basis": "DOI",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "PREPRINT",
-   "document_type": "",
-   "evidence_lane": "PREPRINT",
-   "source_family": "preprint_origin",
-   "canonical_id": "doi:10.48550/arxiv.1411.4413",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue",
-   "source_rank": 1,
-   "fulltext_url": "http://arxiv.org/abs/1411.4413v2",
-   "authors": [
-    "The CMS",
-    "LHCb Collaborations",
-    " :",
-    "V. Khachatryan",
-    "A. M. Sirunyan",
-    "A. Tumasyan",
-    "W. Adam",
-    "T. Bergauer",
-    "M. Dragicevic",
-    "J. Er\u00f6",
-    "M. Friedl",
-    "R. Fr\u00fchwirth",
-    "V. M. Ghete",
-    "C. Hartl",
-    "N. H\u00f6rmann",
-    "J. Hrubec",
-    "M. Jeitler",
-    "W. Kiesenhofer",
-    "V. Kn\u00fcnz",
-    "M. Krammer"
-   ],
-   "raw_record_hash": "",
-   "limitations": [
-    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
-    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed \u2014 absence of an arXiv record is not absence of the science"
-   ]
-  },
-  {
-   "id": "doi:10.48550/arxiv.2508.18081",
-   "source_type": "scientific_paper",
-   "source": "arxiv",
-   "source_id": "arxiv:arxiv:2508.18081v3",
-   "source_uri": "https://doi.org/10.48550/arxiv.2508.18081",
-   "title": "GWTC-4.0: Methods for Identifying and Characterizing Gravitational-wave Transients",
-   "abstract": "The Gravitational-Wave Transient Catalog (GWTC) is a collection of candidate gravitational-wave transient signals identified and characterized by the LIGO-Virgo-KAGRA Collaboration. Producing the contents of the GWTC from detector data requires complex analysis methods. These comprise techniques to model the signal; identify the transients in the data; evaluate the quality of the data and mitigate possible instrumental issues; infer the parameters of each transient; compare the data with the waveform models for compact binary coalescences; and handle the large amount of results associated with all these different analyses. In this paper, we describe the methods employed to produce the catalog's fourth release, GWTC-4.0, focusing on the analysis of the first part of the fourth observing run of Advanced LIGO, Advanced Virgo and KAGRA.",
-   "doi": "10.48550/arxiv.2508.18081",
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": null,
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "4b535d1709df5ecd2fbe107bdb3f446cf8bcd14e596d6d55bd9d2305afc6c885",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "arxiv",
-    "indexing_sources": [
-     "arxiv"
-    ],
-    "record_ids_by_source": {
-     "arxiv": "arxiv:2508.18081v3"
-    },
-    "queries_by_source": {
-     "arxiv": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "preprint_origin",
-    "identity_basis": "DOI",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "PREPRINT",
-   "document_type": "",
-   "evidence_lane": "PREPRINT",
-   "source_family": "preprint_origin",
-   "canonical_id": "doi:10.48550/arxiv.2508.18081",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue",
-   "source_rank": 2,
-   "fulltext_url": "http://arxiv.org/abs/2508.18081v3",
-   "authors": [
-    " The LIGO Scientific Collaboration",
-    " the Virgo Collaboration",
-    " the KAGRA Collaboration",
-    "A. G. Abac",
-    "I. Abouelfettouh",
-    "F. Acernese",
-    "K. Ackley",
-    "S. Adhicary",
-    "D. Adhikari",
-    "N. Adhikari",
-    "R. X. Adhikari",
-    "V. K. Adkins",
-    "S. Afroz",
-    "D. Agarwal",
-    "M. Agathos",
-    "M. Aghaei Abchouyeh",
-    "O. D. Aguiar",
-    "S. Ahmadzadeh",
-    "L. Aiello",
-    "A. Ain"
-   ],
-   "raw_record_hash": "",
-   "limitations": [
-    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
-    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed \u2014 absence of an arXiv record is not absence of the science"
-   ]
-  },
-  {
-   "id": "doi:10.2172/5521909",
-   "source_type": "scientific_paper",
-   "source": "crossref",
-   "source_id": "crossref:doi:10.2172/5521909",
-   "source_uri": "https://doi.org/10.2172/5521909",
-   "title": "Yttria-stabilized zirconia solid oxide electrolyte fuel cells--- monolithic solid oxide fuel cells",
-   "abstract": "",
-   "doi": "10.2172/5521909",
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": "1990",
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "0fd35de753bcf9fa74cf9bbdefdcb38c8f59eb5b67cce688ffc8961e14c8879f",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "crossref",
-    "indexing_sources": [
-     "crossref"
-    ],
-    "record_ids_by_source": {
-     "crossref": "doi:10.2172/5521909"
-    },
-    "queries_by_source": {
-     "crossref": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "doi_registrant_crossref",
-    "identity_basis": "DOI",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [
-     "type=report"
-    ],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "REPORT",
-   "document_type": "",
-   "evidence_lane": "TECHNICAL_REPORT",
-   "source_family": "doi_registrant_crossref",
-   "canonical_id": "doi:10.2172/5521909",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode thermal-cycling-fatigue",
-   "source_rank": 0,
-   "fulltext_url": null,
-   "authors": [],
-   "raw_record_hash": "",
-   "limitations": [
-    "Metadata-only; no abstracts for many records"
-   ]
-  },
-  {
-   "id": "title:4b3d71d5937bc9a4",
-   "source_type": "scientific_paper",
-   "source": "core",
-   "source_id": "core:core:15106231",
-   "source_uri": "",
-   "title": "A Portable Generator Incorporating Mini-Tubular Solid Oxide Fuel Cells",
-   "abstract": "Modern society has become reliant on battery powered electronic devices such as cell phones and laptop computers.  The standard way of recharging these devices is by connecting to a reticulated electricity supply.  In situations with no electricity supply some other recharging method is required.  Such a possibility is a small, portable, generator based on fuel cell technology, specifically mini-tubular solid\noxide fuel cells (MT-SOFC).  MT-SOFCs have been developed since the 1990s but there is limited analysis, discussion or research on developing and constructing a portable generator based on MT-SOFC technology.  Such a generator, running on a portable gas supply, requires combining the key aspects of cell performance, a heating and fuel reforming system, and cell manifolds.  Cell design, fuel type, fuel flow rate, current-collection method and operating temperature all greatly affected MT-SOFCs performance. Segmenting the cathode significantly increased the power output. Maximum power density from an electrolyte supported MT-SOFC was 140 mW/cm2.  The partial oxidation reactor (POR) developed provided the required heat to maintain the MT-SOFCs at an operating temperature suitable for generating electricity.  The exhaust gas from the POR was a suitable fuel for MT-SOFCs, having sufficient carbon monoxide and hydrogen to generate electricity.  Various manifold materials were evaluated including solid metal blocks and folded sheet metal.  It was found that manifolds made from easily worked alumina fibre board decreased the thermal stresses and therefore the fracture rate of the MT-SOFCs.  The final prototype developed comprised a partial oxidation reactor and MT-SOFCs mounted in alumina fibre board manifolds within a well-insulated enclosure, which could be run on LPG.  Calculated efficiency of the final prototype was 4%.  If all the carbon monoxide and hydrogen produced by the partial oxidation reactor were converted to electrical energy, efficiency would increase to 39%. Under ideal conditions, efficiency would be 78%.  Efficiency of the prototype can be improved by increasing the fuel and oxygen utilisation ratios, ensuring heat from the exhaust gases is transferred to the incoming gases, and improving the methods for collecting current at both the anode and cathode",
-   "doi": null,
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": null,
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "91bda7a6f4583c9f0ed72ccd74630891b462c5ed87ebdd530703728af8541e2a",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "core",
-    "indexing_sources": [
-     "core"
-    ],
-    "record_ids_by_source": {
-     "core": "core:15106231"
-    },
-    "queries_by_source": {
-     "core": "anode-supported solid oxide fuel cell stack yttria-stabilized zirconia electrolyte lanthanum"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "repository_aggregator_core",
-    "identity_basis": "TITLE_FINGERPRINT",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "UNKNOWN",
-   "document_type": "",
-   "evidence_lane": "REPOSITORY",
-   "source_family": "repository_aggregator_core",
-   "canonical_id": "title:4b3d71d5937bc9a4",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack yttria-stabilized zirconia electrolyte lanthanum",
-   "source_rank": 0,
-   "fulltext_url": null,
-   "authors": [
-    "Hyde, Andrew Justin"
-   ],
-   "raw_record_hash": "",
-   "limitations": [
-    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
-    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
-   ]
-  },
-  {
-   "id": "title:c43921ce044a658d",
-   "source_type": "scientific_paper",
-   "source": "core",
-   "source_id": "core:core:388272728",
-   "source_uri": "",
-   "title": "Solid oxide steam electrolysis for high temperature hydrogen production",
-   "abstract": "This study has focused on solid oxide electrolyser cells for high temperature steam electrolysis. Solid oxide electrolysis is the reverse operation of solid oxide fuel cells (SOFC), so many of the same component materials may be used. However, other electrode materials are of interest to improve performance and efficiency. \r\n\r\nIn this work anode materials were investigated for use in solid oxide electrolysers. Perovskite materials of the form L\u2081\u208b\uff58Sr\uff58MO\u2083 , where M is Mn, Co, or Fe. LSM is a well understood electrode material for the SOFC. Under electrolysis operation LSM performed well and no interface reactions were observed between the anode and YSZ electrolyte. LSM has a relatively low conductivity and the electrode reaction is limited to the triple phase boundary regions. Mixed ionic-electronic conductors of LSCo and LSF were investigated, with these materials the anode reaction is not limited to triple phase boundaries. The LSCo anode had adherence problems in the electrolysis cells due to the thermal expansion coefficient mismatch with the YSZ electrolyte. The LSCo reacted with the YSZ at the anode/electrolyte interface forming insulating zirconate phases. Due to these issues the LSCo anode cells performed the poorest of the three. The performance of electrolysis cells with LSF anode exceeded both LSM and LSCo, particularly under steam operation, although an interface reaction between the LSF anode and YSZ electrolyte was observed. \r\n\r\nIn addition to the anode material studies this work included the development of solid oxide electrolyser tubes from tape cast precursor materials. Tape casting is a cheap processing method, which allows for co-firing of all ceramic components. The design development resulted in a solid design, which can be fabricated reliably, and balances strength with performance. The design used LSM anode, YSZ electrolyte, and Ni-YSZ cathode materials but could easily be adapted for the use of other component materials. Proper sintering rates, cathode tape formulation, tube length, tape thickness, and electrolyte thickness were factors explored in this work to improve the electrolyser tubes",
-   "doi": null,
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": null,
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "9a9da67eafd34466201b1d9b314441aeef9c83c4143b57961a8b5e38235ad6f1",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "core",
-    "indexing_sources": [
-     "core"
-    ],
-    "record_ids_by_source": {
-     "core": "core:388272728"
-    },
-    "queries_by_source": {
-     "core": "anode-supported solid oxide fuel cell stack yttria-stabilized zirconia electrolyte lanthanum"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "repository_aggregator_core",
-    "identity_basis": "TITLE_FINGERPRINT",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "UNKNOWN",
-   "document_type": "",
-   "evidence_lane": "REPOSITORY",
-   "source_family": "repository_aggregator_core",
-   "canonical_id": "title:c43921ce044a658d",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack yttria-stabilized zirconia electrolyte lanthanum",
-   "source_rank": 1,
-   "fulltext_url": null,
-   "authors": [
-    "Eccleston, Kelcey L."
-   ],
-   "raw_record_hash": "",
-   "limitations": [
-    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
-    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
-   ]
-  },
-  {
-   "id": "title:5f79d122e1739b1a",
-   "source_type": "scientific_paper",
-   "source": "core",
-   "source_id": "core:core:290710932",
-   "source_uri": "",
-   "title": "Gas Flow and Heat Transfer Modeling of an Anode-Supported Solid Oxide Fuel Cell Duct",
-   "abstract": "The composite duct considered consists of a thick porous anode layer, the gas flow duct and a solid inter-connector. Unique fuel cell boundary conditions, such as combined thermal boundary conditions on solid walls, mass injection by electrochemical reaction and gas permeation across the interface, were applied in the analysis. The characteristics of gas flow and heat transfer were investigated and presented in terms of friction factor and Nusselt number. It has been revealed that a thick porous anode layer has significant effects on both gas flow and heat transfer of the anode-supported solid oxide fuel cell duc",
-   "doi": null,
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": null,
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "6acd57975eaf6f3246fdb43c50a7b4ff93d6b7b7535ff3a64dcda8ea9218482e",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "core",
-    "indexing_sources": [
-     "core"
-    ],
-    "record_ids_by_source": {
-     "core": "core:290710932"
-    },
-    "queries_by_source": {
-     "core": "anode-supported solid oxide fuel cell stack experimental comparison"
-    },
-    "query_variant_derivation": "COMPARISON_TARGETED",
-    "source_family": "repository_aggregator_core",
-    "identity_basis": "TITLE_FINGERPRINT",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "UNKNOWN",
-   "document_type": "",
-   "evidence_lane": "REPOSITORY",
-   "source_family": "repository_aggregator_core",
-   "canonical_id": "title:5f79d122e1739b1a",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack experimental comparison",
-   "source_rank": 2,
-   "fulltext_url": null,
-   "authors": [
-    "Rokni, Masoud,",
-    "Sund\u00e9n, Bengt,",
-    "Lund University.",
-    "Yuan, Jinliang,"
-   ],
-   "raw_record_hash": "",
-   "limitations": [
-    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
-    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
-   ]
-  },
-  {
-   "id": "title:5f8407c03b7e7220",
-   "source_type": "scientific_paper",
-   "source": "core",
-   "source_id": "core:core:386542340",
-   "source_uri": "",
-   "title": "Performance degradation and recovery of YSZ membrane under sulphuric acid thermal decomposition",
-   "abstract": "The effect of sulphur dioxide (SO2) present in the cathode feed stream on the \n\nperformance of a 8 mole% yttria-stabilized zirconia/platinum (8YSZ/Pt) cell was \n\nstudied. SO2 concentration of 30% in oxygen (5ml/min) and helium (30ml/min) was \n\nexposed to the cell applying an external dc voltage of 1.5V at 850\u02daC. Experiments showed \n\nthat the cell performance had a sharp degradation (type I degradation) followed by a \n\ngradual degradation (type II degradation) inferred from current and oxygen permeate \n\nflux changes. Type II degradation may be related to formation of sulphide on cathode of \n\nmembrane cell during the SO2 exposure period. Strong but short dc voltage pulses could \n\nreduce significantly membrane performance degradation impacting upon both charge \n\ntransfer and mass transfer properties. In this work, the optimum voltage pulse for \n\nachieving the most stable membrane performance in SO2 exposure time was 10V, 0.08s \n\nlength. High pulse frequency was helpful for achieving a high and stable membrane \n\nperformance SO2 exposure tests lasting up to 2 hours. An oxygen separation process \n\nbased on a YSZ tubular membrane was constructed and initial proof of concept \n\nexperiments performed. Performance degradation by sulphur poisoning and recovery by \n\nvoltage pulse of YSZ tubular membrane were also observed with this system. However, \n\nthe oxygen permeation flux of the YSZ tubular membrane was lower than that of YSZ \n\nplanar membrane, which may be related to YSZ thickness and the gas flow pattern. \n\nInitial experiments to integrate the membrane system into the thermal decomposition \n\nof H2SO4 to produce SO2 and O2 were carried out in a quartz tube reactor filled with an \n\nalumina supported Pt catalyst. A promising and feasible method of monitoring oxygen \n\nin-situ to determine acid conversion was proposed. Future work should concentrate on \n\nimprovement of YSZ tubular membrane configuration and deeper integration of \n\nmembrane operation and acid decomposition",
-   "doi": null,
-   "patent_number": null,
-   "publication_number": null,
-   "publication_date": null,
-   "retrieval_timestamp": "2026-11-10T16:56:50.747135+00:00",
-   "retrieval_method": "retrieval_fabric_v2",
-   "content_hash": "6e01fe8d8852b60daeda7e4314f0ccf533eb3979b39b4e82a3e2d4aae7abb0b8",
-   "provenance": {
-    "fabric_version": "V2",
-    "origin_source": "core",
-    "indexing_sources": [
-     "core"
-    ],
-    "record_ids_by_source": {
-     "core": "core:386542340"
-    },
-    "queries_by_source": {
-     "core": "anode-supported solid oxide fuel cell stack yttria-stabilized zirconia electrolyte lanthanum"
-    },
-    "query_variant_derivation": "PRIMARY",
-    "source_family": "repository_aggregator_core",
-    "identity_basis": "TITLE_FINGERPRINT",
-    "raw_payload_sha256": "",
-    "publication_status_evidence": [],
-    "oa_resolution": null
-   },
-   "epistemic_state": "OBSERVED",
-   "publication_status": "UNKNOWN",
-   "document_type": "",
-   "evidence_lane": "REPOSITORY",
-   "source_family": "repository_aggregator_core",
-   "canonical_id": "title:5f8407c03b7e7220",
-   "retrieval_status": "SUCCESS",
-   "query_variant": "anode-supported solid oxide fuel cell stack yttria-stabilized zirconia electrolyte lanthanum",
-   "source_rank": 3,
-   "fulltext_url": null,
-   "authors": [
-    "He, Guanghu"
-   ],
-   "raw_record_hash": "",
-   "limitations": [
-    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
-    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
-   ]
-  }
- ],
- "number_absent": {
-  "pipeline": [
-   "1.0",
-   "25",
-   "500",
-   "800"
+ "judge_record": {
+  "usable_pair": true,
+  "outcome": "JUDGE_VALID",
+  "passes": 2,
+  "pass_outcomes": [
+   "JUDGE_VALID",
+   "JUDGE_VALID"
   ],
-  "baseline": [
-   "0.05",
-   "1.0",
-   "25",
-   "500",
-   "800"
+  "scores": {
+   "a_answered": {
+    "pipeline_mean": 5.0,
+    "baseline_mean": 5.0,
+    "diff": 0.0
+   },
+   "b_user_vars": {
+    "pipeline_mean": 5.0,
+    "baseline_mean": 5.0,
+    "diff": 0.0
+   },
+   "c_prediction": {
+    "pipeline_mean": 5.0,
+    "baseline_mean": 5.0,
+    "diff": 0.0
+   },
+   "d_evidence": {
+    "pipeline_mean": 1.5,
+    "baseline_mean": 3.0,
+    "diff": -1.5
+   },
+   "e_clarification": {
+    "pipeline_mean": 5.0,
+    "baseline_mean": 5.0,
+    "diff": 0.0
+   },
+   "f_novelty": {
+    "pipeline_mean": 3.0,
+    "baseline_mean": 5.0,
+    "diff": -2.0
+   }
+  },
+  "winner": "baseline",
+  "pref_passes": [
+   "baseline",
+   "baseline"
+  ],
+  "number_absent": {
+   "pipeline": [
+    "0.15",
+    "100",
+    "400",
+    "50"
+   ],
+   "baseline": [
+    "0.15",
+    "0.25"
+   ]
+  },
+  "number_absent_detail": {
+   "pipeline": {
+    "all": 17,
+    "unverified": 4,
+    "assumption_labeled": 0,
+    "packet_bound": 11,
+    "user_variable_bound": 5,
+    "unbound": 4,
+    "fabricated_rate": 0.235
+   },
+   "baseline": {
+    "all": 9,
+    "unverified": 2,
+    "assumption_labeled": 0,
+    "packet_bound": 5,
+    "user_variable_bound": 5,
+    "unbound": 2,
+    "fabricated_rate": 0.222
+   }
+  },
+  "judge_content_len": [
+   81,
+   81
+  ],
+  "judge_latency_s": [
+   1.7,
+   1.3
   ]
  },
- "number_absent_detail": {
-  "pipeline": {
-   "all": 6,
-   "unverified": 4,
-   "assumption_labeled": 0,
-   "fabricated_rate": 0.667
-  },
-  "baseline": {
-   "all": 15,
-   "unverified": 5,
-   "assumption_labeled": 0,
-   "fabricated_rate": 0.333
-  }
- },
- "judge_record": {
-  "usable_pair": false,
-  "outcome": "JUDGE_TRANSPORT_FAILED",
-  "why": "no calibrated judge route (see judge selection record)",
-  "second_judge": {
-   "provider": "inception",
-   "state": "skipped (first-judge pair unusable)"
-  }
- },
- "baseline_same_evidence_hash": "ebd437d870e36295870aec6dd2be4c33093332ea36062202461e9c6bd7dd0054",
- "pipeline_same_evidence_hash": "ebd437d870e36295870aec6dd2be4c33093332ea36062202461e9c6bd7dd0054"
+ "baseline_same_evidence_hash": "5d0b802d8be26361f4f6af23069a2810692208c2ae1a24620962e55590d20488",
+ "pipeline_same_evidence_hash": "5d0b802d8be26361f4f6af23069a2810692208c2ae1a24620962e55590d20488"
 }

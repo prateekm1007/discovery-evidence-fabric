@@ -9,24 +9,32 @@
   "e_clarification": "uses the user's clarification answer correctly",
   "f_novelty": "gives a specific, non-obvious design (not the generic default)"
  },
- "commit": "2505e43b9003",
- "dirty_tree": true,
- "generated_at": "2026-11-11T03:25:43+00:00Z",
- "pipeline_completion": "7/7",
- "pipeline_completion_rate": 1.0,
+ "commit": "b7fdb2ccc944",
+ "dirty_tree": false,
+ "generated_at": "2026-11-11T10:41:50+00:00Z",
+ "pipeline_completion": "2/7",
+ "pipeline_completion_rate": 0.286,
  "yield_funnel_DEV": {
   "n": 7,
-  "completed": 7,
-  "mechanisms_found": 7,
-  "candidates_generated_distinct": 7,
-  "mechanisms_rate": 1.0,
-  "distinct_rate": 1.0,
-  "starved": [],
-  "starved_reasons": {}
+  "completed": 2,
+  "mechanisms_found": 4,
+  "candidates_generated_distinct": 4,
+  "mechanisms_rate": 0.571,
+  "distinct_rate": 0.571,
+  "starved": [
+   "bench-p02-leadacid-grid-corrosion",
+   "bench-p05-bridge-bearing-aging",
+   "bench-p09-packaging-barrier"
+  ],
+  "starved_reasons": {
+   "bench-p02-leadacid-grid-corrosion": null,
+   "bench-p05-bridge-bearing-aging": null,
+   "bench-p09-packaging-barrier": null
+  }
  },
  "yield_funnel_fresh": {
   "n": 4,
-  "completed": 4,
+  "completed": 2,
   "mechanisms_found": 4,
   "candidates_generated_distinct": 4,
   "mechanisms_rate": 1.0,
@@ -35,87 +43,345 @@
   "starved_reasons": {}
  },
  "wall_time": {
-  "sum_wall_s": 1510.1,
-  "mean_wall_s": 215.7,
-  "max_wall_s": 236.9,
+  "sum_wall_s": 1657.7,
+  "mean_wall_s": 236.8,
+  "max_wall_s": 300.0,
   "mean_stage_s": {
-   "ADJUDICATION": 0.03,
-   "ATTACK": 25.05,
-   "CLASSIFY": 0.03,
-   "COLLISION": 11.27,
-   "CONTRADICTION": 0.02,
-   "FREEZE": 0.04,
-   "KILLER_EXPERIMENT": 0.02,
-   "MECHANISM_SPACE": 42.37,
-   "NEXT_BEST_ACTION": 0.02,
-   "PHYSICS": 0.37,
-   "PREMISE_GATE": 0.01,
-   "RANK": 0.02,
-   "RETRIEVE": 80.26,
-   "SYNTHESIZE": 28.33,
-   "VERIFY": 0.04
+   "ADJUDICATION": 0.01,
+   "ATTACK": 2.59,
+   "CLASSIFY": 0.01,
+   "COLLISION": 23.62,
+   "CONTRADICTION": 0.0,
+   "FREEZE": 0.02,
+   "KILLER_EXPERIMENT": 0.01,
+   "MECHANISM_SPACE": 42.66,
+   "NEXT_BEST_ACTION": 0.01,
+   "PHYSICS": 0.2,
+   "PREMISE_GATE": 0.0,
+   "RANK": 0.01,
+   "RETRIEVE": 49.0,
+   "SYNTHESIZE": 63.86,
+   "VERIFY": 0.01
   }
  },
  "speed": {
   "n": 7,
-  "p50_wall_s": 236.1,
-  "p95_wall_s": 236.8,
-  "timeout_count": 0,
+  "p50_wall_s": 300.0,
+  "p95_wall_s": 300.0,
+  "timeout_count": 4,
   "budget_note": "owner budget: median ~120 s, worst ~300 s; timeouts are INCOMPLETE_INFRASTRUCTURE"
  },
  "baseline_route": {
-  "provider": null,
-  "model": null,
-  "state": null
+  "provider": "zai",
+  "model": "glm-4-plus",
+  "state": "OK"
  },
  "judge_route": {
-  "provider": null,
-  "model": null,
-  "independence": "different provider+family from baseline; not 1.7B"
+  "provider": "zai",
+  "model": "glm-4-plus",
+  "independence": "SHARED_FAMILY_DISCLOSED",
+  "disclosure": "the judge shares its provider and model family with the generator and baseline arms; accepted by the owner 2026-11-11 for this dev round, never used for the sealed holdout"
  },
  "judge_calibration": {
   "calibrated": false,
-  "why": "no judge route (pipeline-only run)"
+  "n_pairs": 30,
+  "corpus_sha256": "52e2e215915806d1d5513fbcfec20806d3a63a3bc14bbfce2cfe3e7db0effdff",
+  "n_valid": 26,
+  "correct": 22,
+  "accuracy": 0.733,
+  "threshold": 0.8,
+  "threshold_correct_pairs": 24,
+  "passed": false,
+  "answered_rate": 0.867,
+  "error_classes": {
+   "HTTP_500_UPSTREAM": 1,
+   "PARSE_FAILED": 3
+  },
+  "n_details_failed": 4,
+  "details": [
+   {
+    "problem_id": "bench-p01-pemfc-dehydration",
+    "order": "bad_first",
+    "latency_s": 180.2,
+    "outcome": "JUDGE_TRANSPORT_FAILED",
+    "error": "HTTP Error 500: Internal Server Error",
+    "http_class": "HTTP_500_UPSTREAM"
+   },
+   {
+    "problem_id": "bench-p02-leadacid-grid-corrosion",
+    "order": "good_first",
+    "latency_s": 181.1,
+    "outcome": "JUDGE_VALID",
+    "prefer": "A",
+    "picked_good": true
+   },
+   {
+    "problem_id": "bench-p04-pump-cavitation",
+    "order": "good_first",
+    "latency_s": 0.9,
+    "outcome": "JUDGE_VALID",
+    "prefer": "A",
+    "picked_good": true
+   },
+   {
+    "problem_id": "bench-p07-cgm-biofouling",
+    "order": "bad_first",
+    "latency_s": 0.9,
+    "outcome": "JUDGE_VALID",
+    "prefer": "B",
+    "picked_good": true
+   },
+   {
+    "problem_id": "bench-p08-mems-stiction",
+    "order": "good_first",
+    "latency_s": 0.9,
+    "outcome": "JUDGE_VALID",
+    "prefer": "TIE",
+    "picked_good": false
+   },
+   {
+    "problem_id": "bench-p10-pv-pid",
+    "order": "good_first",
+    "latency_s": 1.0,
+    "outcome": "JUDGE_VALID",
+    "prefer": "A",
+    "picked_good": true
+   },
+   {
+    "problem_id": "eval-sofc-redox",
+    "order": "good_first",
+    "latency_s": 0.9,
+    "outcome": "JUDGE_VALID",
+    "prefer": "A",
+    "picked_good": true
+   },
+   {
+    "problem_id": "eval-new02-slipring-predictor",
+    "order": "good_first",
+    "latency_s": 0.9,
+    "outcome": "JUDGE_VALID",
+    "prefer": "TIE",
+    "picked_good": false
+   },
+   {
+    "problem_id": "eval-new04-chiller-fouling-predictor",
+    "order": "good_first",
+    "latency_s": 0.8,
+    "outcome": "JUDGE_VALID",
+    "prefer": "A",
+    "picked_good": true
+   },
+   {
+    "problem_id": "eval-new05-liion-balance-drift",
+    "order": "bad_first",
+    "latency_s": 0.8,
+    "outcome": "JUDGE_VALID",
+    "prefer": "B",
+    "picked_good": true
+   },
+   {
+    "problem_id": "bench-p03-phe-biofouling",
+    "order": "good_first",
+    "latency_s": 0.9,
+    "outcome": "JUDGE_VALID",
+    "prefer": "A",
+    "picked_good": true
+   },
+   {
+    "problem_id": "bench-p05-bridge-bearing-aging",
+    "order": "good_first",
+    "latency_s": 0.9,
+    "outcome": "JUDGE_VALID",
+    "prefer": "A",
+    "picked_good": true
+   },
+   {
+    "problem_id": "bench-p06-water-biofilm",
+    "order": "bad_first",
+    "latency_s": 1.0,
+    "outcome": "JUDGE_VALID",
+    "prefer": "B",
+    "picked_good": true
+   },
+   {
+    "problem_id": "bench-p09-packaging-barrier",
+    "order": "good_first",
+    "latency_s": 1.0,
+    "outcome": "JUDGE_VALID",
+    "prefer": "A",
+    "picked_good": true
+   },
+   {
+    "problem_id": "bench-p11-spindle-thermal-drift",
+    "order": "bad_first",
+    "latency_s": 0.9,
+    "outcome": "JUDGE_VALID",
+    "prefer": "B",
+    "picked_good": true
+   },
+   {
+    "problem_id": "eval-sofc-thermal-cycling",
+    "order": "bad_first",
+    "latency_s": 1.1,
+    "outcome": "JUDGE_PARSE_FAILED",
+    "error": "missing/invalid required rubric fields"
+   },
+   {
+    "problem_id": "eval-new06-bearing-vibration-predictor",
+    "order": "good_first",
+    "latency_s": 1.0,
+    "outcome": "JUDGE_PARSE_FAILED",
+    "error": "missing/invalid required rubric fields"
+   },
+   {
+    "problem_id": "eval-new07-transformer-dga-predictor",
+    "order": "bad_first",
+    "latency_s": 0.9,
+    "outcome": "JUDGE_PARSE_FAILED",
+    "error": "missing/invalid required rubric fields"
+   },
+   {
+    "problem_id": "eval-new08-pipeline-leak-predictor",
+    "order": "good_first",
+    "latency_s": 1.0,
+    "outcome": "JUDGE_VALID",
+    "prefer": "A",
+    "picked_good": true
+   },
+   {
+    "problem_id": "eval-new09-hvac-filter-predictor",
+    "order": "good_first",
+    "latency_s": 0.9,
+    "outcome": "JUDGE_VALID",
+    "prefer": "A",
+    "picked_good": true
+   },
+   {
+    "problem_id": "bench-p02-leadacid-grid-corrosion",
+    "order": "bad_first",
+    "latency_s": 0.9,
+    "outcome": "JUDGE_VALID",
+    "prefer": "B",
+    "picked_good": true
+   },
+   {
+    "problem_id": "bench-p05-bridge-bearing-aging",
+    "order": "good_first",
+    "latency_s": 0.9,
+    "outcome": "JUDGE_VALID",
+    "prefer": "A",
+    "picked_good": true
+   },
+   {
+    "problem_id": "bench-p09-packaging-barrier",
+    "order": "good_first",
+    "latency_s": 0.9,
+    "outcome": "JUDGE_VALID",
+    "prefer": "A",
+    "picked_good": true
+   },
+   {
+    "problem_id": "eval-new02-slipring-predictor",
+    "order": "bad_first",
+    "latency_s": 0.9,
+    "outcome": "JUDGE_VALID",
+    "prefer": "B",
+    "picked_good": true
+   },
+   {
+    "problem_id": "eval-new06-bearing-vibration-predictor",
+    "order": "good_first",
+    "latency_s": 1.3,
+    "outcome": "JUDGE_VALID",
+    "prefer": "TIE",
+    "picked_good": false
+   },
+   {
+    "problem_id": "eval-new09-hvac-filter-predictor",
+    "order": "good_first",
+    "latency_s": 1.1,
+    "outcome": "JUDGE_VALID",
+    "prefer": "TIE",
+    "picked_good": false
+   },
+   {
+    "problem_id": "bench-p01-pemfc-dehydration",
+    "order": "bad_first",
+    "latency_s": 1.3,
+    "outcome": "JUDGE_VALID",
+    "prefer": "B",
+    "picked_good": true
+   },
+   {
+    "problem_id": "bench-p03-phe-biofouling",
+    "order": "good_first",
+    "latency_s": 1.0,
+    "outcome": "JUDGE_VALID",
+    "prefer": "A",
+    "picked_good": true
+   },
+   {
+    "problem_id": "bench-p04-pump-cavitation",
+    "order": "bad_first",
+    "latency_s": 1.0,
+    "outcome": "JUDGE_VALID",
+    "prefer": "B",
+    "picked_good": true
+   },
+   {
+    "problem_id": "eval-sofc-redox",
+    "order": "bad_first",
+    "latency_s": 1.0,
+    "outcome": "JUDGE_VALID",
+    "prefer": "B",
+    "picked_good": true
+   }
+  ]
  },
  "n_problems": 7,
- "subset": "dev6",
- "n_completed_pipeline": 7,
- "n_usable_pairs": 0,
+ "subset": "dev7",
+ "n_completed_pipeline": 2,
+ "n_usable_pairs": 2,
  "full_scoreable_pairs": 0,
- "n_numbers_unverified": 5,
- "n_numbers_unverified_baseline": 7,
- "fabricated_number_rate_pipeline": 0.29,
- "fabricated_number_rate_baseline": 0.32,
+ "n_numbers_unverified": 3,
+ "n_numbers_unverified_baseline": 4,
+ "fabricated_number_rate_pipeline": 0.449,
+ "fabricated_number_rate_baseline": 0.285,
+ "contract_valid_pipeline": 0,
+ "contract_valid_baseline": 0,
+ "contract_violations_pipeline": 17,
+ "contract_violations_baseline": 18,
+ "threshold_basis_pipeline": {
+  "packet_or_user_variable": 0,
+  "assumption": 0,
+  "calibration_rule": 0,
+  "unknown": 0,
+  "no_number": 1
+ },
  "pipeline_wins": 0,
- "baseline_wins": 0,
+ "baseline_wins": null,
  "ties": 0,
  "system_score": null,
  "system_wins": 0,
  "system_ties": 0,
  "system_losses": null,
- "system_ci_wilson_95": [
-  -0.0,
-  0.354
- ],
+ "system_ci_95": null,
  "conditional_quality": "NOT_MEASURED",
  "conditional_wins": 0,
  "conditional_ties": 0,
  "conditional_losses": null,
  "conditional_quality_pairs": 0,
  "BLIND_PAIRWISE_WIN_RATE": "NOT_MEASURED",
- "ci_method": "wilson_score_95",
- "ci_wilson_95": [
-  -0.0,
-  0.354
- ],
+ "ci_method": "normal_approx_0_0.5_1",
+ "ci_95": null,
  "second_judge": {
   "agree": 0,
   "disagree": 0,
   "no_route_or_invalid": 7
  },
  "judge_outcomes": {
-  "JUDGE_VALID": 0,
-  "JUDGE_TRANSPORT_FAILED": 7,
+  "JUDGE_VALID": 2,
+  "JUDGE_TRANSPORT_FAILED": 0,
   "JUDGE_EMPTY_OUTPUT": 0,
   "JUDGE_PARSE_FAILED": 0,
   "JUDGE_CALIBRATION_FAILED": 0
@@ -123,14 +389,14 @@
  "fresh_vs_contaminated": {
   "DEV_CONTAMINATED": {
    "n": 3,
-   "completed": 3,
+   "completed": 0,
    "usable": 0,
    "win_rate": "NOT_MEASURED"
   },
   "FRESH": {
    "n": 4,
-   "completed": 4,
-   "usable": 0,
+   "completed": 2,
+   "usable": 2,
    "win_rate": "NOT_MEASURED"
   }
  },
@@ -151,52 +417,49 @@
    "answer_contract": {
     "valid": false,
     "violations": [
-     "1 numeric token(s) absent from the evidence packet"
+     "intervention contract: concrete parameter not labeled EVIDENCE-BACKED or ASSUMPTION",
+     "intervention contract: no concrete numeric parameter",
+     "intervention contract: no concrete test/measure named"
     ],
-    "question_type": "intervention-proposal"
-   },
-   "n_numbers_unverified": 1,
-   "n_numbers_unverified_baseline": 3,
-   "numbers_fabricated": {
-    "pipeline": {
-     "all": 5,
-     "unverified": 1,
-     "assumption_labeled": 0,
-     "fabricated_rate": 0.2
-    },
-    "baseline": {
-     "all": 12,
-     "unverified": 3,
-     "assumption_labeled": 0,
-     "fabricated_rate": 0.25
+    "question_type": "intervention-proposal",
+    "bindings": {
+     "evidence_bound": 0,
+     "assumption": 0,
+     "unbound_numbers": 0,
+     "all_numbers": 0
     }
    },
-   "full_scoreable": false,
-   "judge_outcome": "JUDGE_TRANSPORT_FAILED",
-   "pipeline_final_status": "INVENTION_REQUIRES_EXPERIMENT",
-   "pipeline_completed": true,
-   "wall_s": 236.9,
-   "stage_times_s": {
-    "RETRIEVE": 81.486,
-    "FREEZE": 0.043,
-    "PREMISE_GATE": 0.006,
-    "SYNTHESIZE": 30.802,
-    "VERIFY": 0.016,
-    "MECHANISM_SPACE": 58.847,
-    "COLLISION": 14.36,
-    "PHYSICS": 0.234,
-    "ATTACK": 38.079,
-    "CONTRADICTION": 0.019,
-    "KILLER_EXPERIMENT": 0.023,
-    "ADJUDICATION": 0.026,
-    "CLASSIFY": 0.021,
-    "NEXT_BEST_ACTION": 0.022,
-    "RANK": 0.014
+   "baseline_answer_contract": {
+    "valid": false,
+    "violations": [
+     "intervention contract: concrete parameter not labeled EVIDENCE-BACKED or ASSUMPTION",
+     "intervention contract: no concrete numeric parameter",
+     "intervention contract: no concrete test/measure named"
+    ],
+    "question_type": "intervention-proposal",
+    "bindings": {
+     "evidence_bound": 0,
+     "assumption": 0,
+     "unbound_numbers": 0,
+     "all_numbers": 0
+    }
    },
+   "n_numbers_unverified": 0,
+   "n_numbers_unverified_baseline": 0,
+   "numbers_fabricated": {
+    "pipeline": {},
+    "baseline": {}
+   },
+   "full_scoreable": false,
+   "judge_outcome": null,
+   "pipeline_final_status": "INCOMPLETE_INFRASTRUCTURE",
+   "pipeline_completed": false,
+   "wall_s": 300.0,
+   "stage_times_s": {},
    "synthesis_fallback": null,
-   "n_evidence": 16,
-   "baseline_route": "agnes",
-   "same_evidence": true,
+   "n_evidence": 0,
+   "baseline_route": "zai",
+   "same_evidence": false,
    "usable_pair": false,
    "winner": null,
    "number_absent": null,
@@ -209,23 +472,23 @@
     "e_clarification": null,
     "f_novelty": null
    },
-   "notes": "",
+   "notes": "pipeline run produced no evidence snapshot",
    "funnel": {
-    "mechanisms_found": true,
-    "candidates_generated_distinct": true,
-    "n_generated": 9,
-    "n_distinct": 9,
-    "n_indeterminate": 0,
-    "n_input_to_distinctness": 9,
-    "n_retained": 9,
-    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "mechanisms_found": null,
+    "candidates_generated_distinct": null,
+    "n_generated": null,
+    "n_distinct": null,
+    "n_indeterminate": null,
+    "n_input_to_distinctness": null,
+    "n_retained": null,
+    "final_status": null,
     "failure_stage": null,
     "starved_reason": null,
-    "matcher": "mechanism_distinctness/2.0.0"
+    "matcher": null
    },
    "hashes": {
-    "pipeline_answer_sha": "2016b133c28a17a8",
-    "baseline_answer_sha": "fc4f94b6940fcc3d"
+    "pipeline_answer_sha": null,
+    "baseline_answer_sha": null
    }
   },
   {
@@ -237,52 +500,48 @@
     "valid": false,
     "violations": [
      "intervention contract: concrete parameter not labeled EVIDENCE-BACKED or ASSUMPTION",
-     "intervention contract: no concrete numeric parameter"
+     "intervention contract: no concrete numeric parameter",
+     "intervention contract: no concrete test/measure named"
     ],
-    "question_type": "intervention-proposal"
-   },
-   "n_numbers_unverified": 0,
-   "n_numbers_unverified_baseline": 6,
-   "numbers_fabricated": {
-    "pipeline": {
-     "all": 0,
-     "unverified": 0,
-     "assumption_labeled": 0,
-     "fabricated_rate": null
-    },
-    "baseline": {
-     "all": 15,
-     "unverified": 6,
-     "assumption_labeled": 0,
-     "fabricated_rate": 0.4
+    "question_type": "intervention-proposal",
+    "bindings": {
+     "evidence_bound": 0,
+     "assumption": 0,
+     "unbound_numbers": 0,
+     "all_numbers": 0
     }
    },
-   "full_scoreable": false,
-   "judge_outcome": "JUDGE_TRANSPORT_FAILED",
-   "pipeline_final_status": "INVENTION_REQUIRES_EXPERIMENT",
-   "pipeline_completed": true,
-   "wall_s": 236.4,
-   "stage_times_s": {
-    "RETRIEVE": 82.543,
-    "FREEZE": 0.045,
-    "PREMISE_GATE": 0.006,
-    "SYNTHESIZE": 72.535,
-    "VERIFY": 0.019,
-    "MECHANISM_SPACE": 40.048,
-    "COLLISION": 10.094,
-    "PHYSICS": 0.247,
-    "ATTACK": 17.552,
-    "CONTRADICTION": 0.01,
-    "KILLER_EXPERIMENT": 0.016,
-    "ADJUDICATION": 0.023,
-    "CLASSIFY": 0.014,
-    "NEXT_BEST_ACTION": 0.02,
-    "RANK": 0.019
+   "baseline_answer_contract": {
+    "valid": false,
+    "violations": [
+     "intervention contract: concrete parameter not labeled EVIDENCE-BACKED or ASSUMPTION",
+     "intervention contract: no concrete numeric parameter",
+     "intervention contract: no concrete test/measure named"
+    ],
+    "question_type": "intervention-proposal",
+    "bindings": {
+     "evidence_bound": 0,
+     "assumption": 0,
+     "unbound_numbers": 0,
+     "all_numbers": 0
+    }
    },
+   "n_numbers_unverified": 0,
+   "n_numbers_unverified_baseline": 0,
+   "numbers_fabricated": {
+    "pipeline": {},
+    "baseline": {}
+   },
+   "full_scoreable": false,
+   "judge_outcome": null,
+   "pipeline_final_status": "INCOMPLETE_INFRASTRUCTURE",
+   "pipeline_completed": false,
+   "wall_s": 300.0,
+   "stage_times_s": {},
    "synthesis_fallback": null,
-   "n_evidence": 17,
-   "baseline_route": "agnes",
-   "same_evidence": true,
+   "n_evidence": 0,
+   "baseline_route": "zai",
+   "same_evidence": false,
    "usable_pair": false,
    "winner": null,
    "number_absent": null,
@@ -295,23 +554,23 @@
     "e_clarification": null,
     "f_novelty": null
    },
-   "notes": "",
+   "notes": "pipeline run produced no evidence snapshot",
    "funnel": {
-    "mechanisms_found": true,
-    "candidates_generated_distinct": true,
-    "n_generated": 9,
-    "n_distinct": 9,
-    "n_indeterminate": 0,
-    "n_input_to_distinctness": 9,
-    "n_retained": 9,
-    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "mechanisms_found": null,
+    "candidates_generated_distinct": null,
+    "n_generated": null,
+    "n_distinct": null,
+    "n_indeterminate": null,
+    "n_input_to_distinctness": null,
+    "n_retained": null,
+    "final_status": null,
     "failure_stage": null,
     "starved_reason": null,
-    "matcher": "mechanism_distinctness/2.0.0"
+    "matcher": null
    },
    "hashes": {
-    "pipeline_answer_sha": "5b7f397e49b46251",
-    "baseline_answer_sha": "ace6aab76dbc3acd"
+    "pipeline_answer_sha": null,
+    "baseline_answer_sha": null
    }
   },
   {
@@ -322,52 +581,63 @@
    "answer_contract": {
     "valid": false,
     "violations": [
-     "intervention contract: concrete parameter not labeled EVIDENCE-BACKED or ASSUMPTION"
+     "intervention contract: concrete parameter not labeled EVIDENCE-BACKED or ASSUMPTION",
+     "intervention contract: no concrete numeric parameter",
+     "intervention contract: no concrete test/measure named"
     ],
-    "question_type": "intervention-proposal"
-   },
-   "n_numbers_unverified": 2,
-   "n_numbers_unverified_baseline": 3,
-   "numbers_fabricated": {
-    "pipeline": {
-     "all": 6,
-     "unverified": 2,
-     "assumption_labeled": 0,
-     "fabricated_rate": 0.333
-    },
-    "baseline": {
-     "all": 16,
-     "unverified": 3,
-     "assumption_labeled": 0,
-     "fabricated_rate": 0.188
+    "question_type": "intervention-proposal",
+    "bindings": {
+     "evidence_bound": 0,
+     "assumption": 0,
+     "unbound_numbers": 0,
+     "all_numbers": 0
     }
    },
+   "baseline_answer_contract": {
+    "valid": false,
+    "violations": [
+     "intervention contract: concrete parameter not labeled EVIDENCE-BACKED or ASSUMPTION",
+     "intervention contract: no concrete numeric parameter",
+     "intervention contract: no concrete test/measure named"
+    ],
+    "question_type": "intervention-proposal",
+    "bindings": {
+     "evidence_bound": 0,
+     "assumption": 0,
+     "unbound_numbers": 0,
+     "all_numbers": 0
+    }
+   },
+   "n_numbers_unverified": 0,
+   "n_numbers_unverified_baseline": 0,
+   "numbers_fabricated": {
+    "pipeline": {},
+    "baseline": {}
+   },
    "full_scoreable": false,
-   "judge_outcome": "JUDGE_TRANSPORT_FAILED",
-   "pipeline_final_status": "INVENTION_REQUIRES_EXPERIMENT",
-   "pipeline_completed": true,
-   "wall_s": 205.7,
+   "judge_outcome": null,
+   "pipeline_final_status": "INCOMPLETE_INFRASTRUCTURE",
+   "pipeline_completed": false,
+   "wall_s": 300.0,
    "stage_times_s": {
-    "RETRIEVE": 77.086,
-    "FREEZE": 0.035,
-    "PREMISE_GATE": 0.005,
-    "SYNTHESIZE": 13.607,
-    "VERIFY": 0.033,
-    "MECHANISM_SPACE": 22.59,
-    "COLLISION": 10.194,
-    "PHYSICS": 0.245,
-    "ATTACK": 33.95,
-    "CONTRADICTION": 0.013,
-    "KILLER_EXPERIMENT": 0.025,
-    "ADJUDICATION": 0.026,
-    "CLASSIFY": 0.031,
-    "NEXT_BEST_ACTION": 0.022,
-    "RANK": 0.018
+    "RETRIEVE": 67.611,
+    "FREEZE": 0.016,
+    "PREMISE_GATE": 0.002,
+    "SYNTHESIZE": 185.552,
+    "VERIFY": 0.009,
+    "MECHANISM_SPACE": 43.792,
+    "PHYSICS": 0.205,
+    "CONTRADICTION": 0.005,
+    "KILLER_EXPERIMENT": 0.009,
+    "ADJUDICATION": 0.01,
+    "CLASSIFY": 0.007,
+    "NEXT_BEST_ACTION": 0.005,
+    "RANK": 0.005
    },
    "synthesis_fallback": null,
-   "n_evidence": 16,
-   "baseline_route": "agnes",
-   "same_evidence": true,
+   "n_evidence": 0,
+   "baseline_route": "zai",
+   "same_evidence": false,
    "usable_pair": false,
    "winner": null,
    "number_absent": null,
@@ -380,23 +650,23 @@
     "e_clarification": null,
     "f_novelty": null
    },
-   "notes": "",
+   "notes": "pipeline run produced no evidence snapshot",
    "funnel": {
-    "mechanisms_found": true,
-    "candidates_generated_distinct": true,
-    "n_generated": 9,
-    "n_distinct": 9,
-    "n_indeterminate": 0,
-    "n_input_to_distinctness": 9,
-    "n_retained": 9,
-    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "mechanisms_found": null,
+    "candidates_generated_distinct": null,
+    "n_generated": null,
+    "n_distinct": null,
+    "n_indeterminate": null,
+    "n_input_to_distinctness": null,
+    "n_retained": null,
+    "final_status": null,
     "failure_stage": null,
     "starved_reason": null,
-    "matcher": "mechanism_distinctness/2.0.0"
+    "matcher": null
    },
    "hashes": {
-    "pipeline_answer_sha": "69f39946d30282ad",
-    "baseline_answer_sha": "a3ff8f5ca6f2bc41"
+    "pipeline_answer_sha": null,
+    "baseline_answer_sha": null
    }
   },
   {
@@ -407,81 +677,111 @@
    "answer_contract": {
     "valid": false,
     "violations": [
-     "4 numeric token(s) absent from the evidence packet"
+     "9 numeric token(s) absent from the evidence packet"
     ],
     "question_type": "intervention-proposal"
    },
-   "n_numbers_unverified": 4,
-   "n_numbers_unverified_baseline": 5,
+   "baseline_answer_contract": {
+    "valid": false,
+    "violations": [
+     "intervention contract: concrete parameter not labeled EVIDENCE-BACKED or ASSUMPTION"
+    ],
+    "question_type": "intervention-proposal",
+    "bindings": {
+     "evidence_bound": 7,
+     "assumption": 0,
+     "unbound_numbers": 2,
+     "all_numbers": 9
+    }
+   },
+   "n_numbers_unverified": 9,
+   "n_numbers_unverified_baseline": 2,
    "numbers_fabricated": {
     "pipeline": {
-     "all": 6,
-     "unverified": 4,
+     "all": 17,
+     "unverified": 9,
      "assumption_labeled": 0,
-     "fabricated_rate": 0.667
+     "packet_bound": 4,
+     "user_variable_bound": 3,
+     "unbound": 9,
+     "fabricated_rate": 0.529
     },
     "baseline": {
-     "all": 15,
-     "unverified": 5,
+     "all": 9,
+     "unverified": 2,
      "assumption_labeled": 0,
-     "fabricated_rate": 0.333
+     "packet_bound": 3,
+     "user_variable_bound": 3,
+     "unbound": 2,
+     "fabricated_rate": 0.222
     }
    },
    "full_scoreable": false,
-   "judge_outcome": "JUDGE_TRANSPORT_FAILED",
+   "judge_outcome": "JUDGE_VALID",
    "pipeline_final_status": "INVENTION_REQUIRES_EXPERIMENT",
    "pipeline_completed": true,
-   "wall_s": 236.1,
+   "wall_s": 170.1,
    "stage_times_s": {
-    "RETRIEVE": 80.135,
-    "FREEZE": 0.036,
-    "PREMISE_GATE": 0.004,
-    "SYNTHESIZE": 13.592,
-    "VERIFY": 0.02,
-    "MECHANISM_SPACE": 27.657,
-    "COLLISION": 10.893,
-    "PHYSICS": 0.893,
-    "ATTACK": 30.978,
-    "CONTRADICTION": 0.026,
-    "KILLER_EXPERIMENT": 0.034,
-    "ADJUDICATION": 0.055,
-    "CLASSIFY": 0.053,
-    "NEXT_BEST_ACTION": 0.023,
-    "RANK": 0.021
+    "RETRIEVE": 59.65,
+    "FREEZE": 0.017,
+    "PREMISE_GATE": 0.002,
+    "SYNTHESIZE": 32.358,
+    "VERIFY": 0.01,
+    "MECHANISM_SPACE": 42.122,
+    "COLLISION": 15.793,
+    "PHYSICS": 0.194,
+    "ATTACK": 2.711,
+    "CONTRADICTION": 0.004,
+    "KILLER_EXPERIMENT": 0.008,
+    "ADJUDICATION": 0.01,
+    "CLASSIFY": 0.006,
+    "NEXT_BEST_ACTION": 0.005,
+    "RANK": 0.005
    },
    "synthesis_fallback": null,
-   "n_evidence": 17,
-   "baseline_route": "agnes",
+   "n_evidence": 16,
+   "baseline_route": "zai",
    "same_evidence": true,
-   "usable_pair": false,
-   "winner": null,
-   "number_absent": null,
+   "usable_pair": true,
+   "winner": "baseline",
+   "number_absent": {
+    "pipeline": [
+     "0.15",
+     "100",
+     "400",
+     "50"
+    ],
+    "baseline": [
+     "0.15",
+     "0.25"
+    ]
+   },
    "second_judge": null,
    "criterion_diffs": {
-    "a_answered": null,
-    "b_user_vars": null,
-    "c_prediction": null,
-    "d_evidence": null,
-    "e_clarification": null,
-    "f_novelty": null
+    "a_answered": 0.0,
+    "b_user_vars": 0.0,
+    "c_prediction": 0.0,
+    "d_evidence": -1.5,
+    "e_clarification": 0.0,
+    "f_novelty": -2.0
    },
    "notes": "",
    "funnel": {
     "mechanisms_found": true,
     "candidates_generated_distinct": true,
     "n_generated": 9,
-    "n_distinct": 8,
-    "n_indeterminate": 1,
+    "n_distinct": 3,
+    "n_indeterminate": 3,
     "n_input_to_distinctness": 9,
-    "n_retained": 9,
+    "n_retained": 6,
     "final_status": "INVENTION_REQUIRES_EXPERIMENT",
     "failure_stage": null,
     "starved_reason": null,
     "matcher": "mechanism_distinctness/2.0.0"
    },
    "hashes": {
-    "pipeline_answer_sha": "c80db43cfbe67f7f",
-    "baseline_answer_sha": "9a52faed69e0c2fe"
+    "pipeline_answer_sha": "9508834f739573c6",
+    "baseline_answer_sha": "dd8366bf2d1467cd"
    }
   },
   {
@@ -492,53 +792,84 @@
    "answer_contract": {
     "valid": false,
     "violations": [
-     "predictor contract: no 'indicator' declared",
+     "predictor contract: no INDICATOR: declared",
+     "predictor contract: no THRESHOLD: declared",
+     "predictor contract: no VALIDATION PROTOCOL: declared",
+     "predictor contract: no numeric threshold with units",
      "predictor contract: no n=\u2026 sample-count stated"
     ],
-    "question_type": "predictor-design"
+    "question_type": "predictor-design",
+    "bindings": {
+     "evidence_bound": 0,
+     "assumption": 0,
+     "unbound_numbers": 0,
+     "all_numbers": 0,
+     "threshold_basis": "no_number"
+    }
+   },
+   "baseline_answer_contract": {
+    "valid": false,
+    "violations": [
+     "predictor contract: no VALIDATION PROTOCOL: declared",
+     "predictor contract: no n=\u2026 sample-count stated"
+    ],
+    "question_type": "predictor-design",
+    "bindings": {
+     "evidence_bound": 5,
+     "assumption": 0,
+     "unbound_numbers": 1,
+     "all_numbers": 6,
+     "threshold_basis": "packet_or_user_variable"
+    }
    },
    "n_numbers_unverified": 0,
-   "n_numbers_unverified_baseline": 4,
+   "n_numbers_unverified_baseline": 2,
    "numbers_fabricated": {
     "pipeline": {
-     "all": 2,
+     "all": 0,
      "unverified": 0,
      "assumption_labeled": 0,
-     "fabricated_rate": 0.0
+     "fabricated_rate": null,
+     "packet_bound": 0,
+     "user_variable_bound": 0,
+     "unbound": 0
     },
     "baseline": {
-     "all": 10,
-     "unverified": 4,
+     "all": 6,
+     "unverified": 2,
      "assumption_labeled": 0,
-     "fabricated_rate": 0.4
+     "packet_bound": 4,
+     "user_variable_bound": 2,
+     "unbound": 2,
+     "fabricated_rate": 0.333
     }
    },
    "full_scoreable": false,
-   "judge_outcome": "JUDGE_TRANSPORT_FAILED",
-   "pipeline_final_status": "INVENTION_REQUIRES_EXPERIMENT",
-   "pipeline_completed": true,
-   "wall_s": 207.7,
+   "judge_outcome": null,
+   "pipeline_final_status": "INCOMPLETE_INFRASTRUCTURE",
+   "pipeline_completed": false,
+   "wall_s": 300.0,
    "stage_times_s": {
-    "RETRIEVE": 79.026,
-    "FREEZE": 0.051,
-    "PREMISE_GATE": 0.005,
-    "SYNTHESIZE": 26.429,
-    "VERIFY": 0.058,
-    "MECHANISM_SPACE": 41.153,
-    "COLLISION": 10.693,
-    "PHYSICS": 0.324,
-    "ATTACK": 19.969,
-    "CONTRADICTION": 0.012,
-    "KILLER_EXPERIMENT": 0.017,
-    "ADJUDICATION": 0.026,
-    "CLASSIFY": 0.032,
-    "NEXT_BEST_ACTION": 0.012,
-    "RANK": 0.011
+    "RETRIEVE": 41.185,
+    "FREEZE": 0.017,
+    "PREMISE_GATE": 0.002,
+    "SYNTHESIZE": 33.455,
+    "VERIFY": 0.009,
+    "MECHANISM_SPACE": 43.92,
+    "COLLISION": 20.043,
+    "PHYSICS": 0.207,
+    "ATTACK": 3.183,
+    "CONTRADICTION": 0.004,
+    "KILLER_EXPERIMENT": 0.008,
+    "ADJUDICATION": 0.01,
+    "CLASSIFY": 0.009,
+    "NEXT_BEST_ACTION": 0.005,
+    "RANK": 0.005
    },
    "synthesis_fallback": null,
-   "n_evidence": 16,
-   "baseline_route": "agnes",
-   "same_evidence": true,
+   "n_evidence": 0,
+   "baseline_route": "zai",
+   "same_evidence": false,
    "usable_pair": false,
    "winner": null,
    "number_absent": null,
@@ -551,23 +882,23 @@
     "e_clarification": null,
     "f_novelty": null
    },
-   "notes": "",
+   "notes": "TIMEOUT",
    "funnel": {
     "mechanisms_found": true,
     "candidates_generated_distinct": true,
-    "n_generated": 5,
-    "n_distinct": 5,
-    "n_indeterminate": 0,
-    "n_input_to_distinctness": 5,
-    "n_retained": 5,
-    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "n_generated": 9,
+    "n_distinct": 4,
+    "n_indeterminate": 5,
+    "n_input_to_distinctness": 9,
+    "n_retained": 9,
+    "final_status": null,
     "failure_stage": null,
     "starved_reason": null,
     "matcher": "mechanism_distinctness/2.0.0"
    },
    "hashes": {
-    "pipeline_answer_sha": "03606526e887ec99",
-    "baseline_answer_sha": "8bc0a76861150225"
+    "pipeline_answer_sha": null,
+    "baseline_answer_sha": "581d941461be757d"
    }
   },
   {
@@ -578,51 +909,72 @@
    "answer_contract": {
     "valid": false,
     "violations": [
-     "1 numeric token(s) absent from the evidence packet"
+     "9 numeric token(s) absent from the evidence packet"
     ],
     "question_type": "predictor-design"
    },
-   "n_numbers_unverified": 1,
-   "n_numbers_unverified_baseline": 5,
+   "baseline_answer_contract": {
+    "valid": false,
+    "violations": [
+     "predictor contract: no INDICATOR: declared",
+     "predictor contract: no THRESHOLD: declared",
+     "predictor contract: no VALIDATION PROTOCOL: declared",
+     "predictor contract: no n=\u2026 sample-count stated"
+    ],
+    "question_type": "predictor-design",
+    "bindings": {
+     "evidence_bound": 3,
+     "assumption": 0,
+     "unbound_numbers": 0,
+     "all_numbers": 3,
+     "threshold_basis": "no_number"
+    }
+   },
+   "n_numbers_unverified": 9,
+   "n_numbers_unverified_baseline": 1,
    "numbers_fabricated": {
     "pipeline": {
-     "all": 2,
-     "unverified": 1,
-     "assumption_labeled": 0,
-     "fabricated_rate": 0.5
+     "all": 16,
+     "unverified": 9,
+     "assumption_labeled": 1,
+     "packet_bound": 6,
+     "user_variable_bound": 2,
+     "unbound": 9,
+     "fabricated_rate": 0.6
     },
     "baseline": {
-     "all": 12,
-     "unverified": 5,
+     "all": 3,
+     "unverified": 1,
      "assumption_labeled": 0,
-     "fabricated_rate": 0.417
+     "packet_bound": 2,
+     "user_variable_bound": 1,
+     "unbound": 1,
+     "fabricated_rate": 0.333
     }
    },
    "full_scoreable": false,
-   "judge_outcome": "JUDGE_TRANSPORT_FAILED",
-   "pipeline_final_status": "INVENTION_REQUIRES_EXPERIMENT",
-   "pipeline_completed": true,
-   "wall_s": 236.3,
+   "judge_outcome": null,
+   "pipeline_final_status": "MECHANISM_STARVED",
+   "pipeline_completed": false,
+   "wall_s": 125.5,
    "stage_times_s": {
-    "RETRIEVE": 78.957,
-    "FREEZE": 0.057,
-    "PREMISE_GATE": 0.005,
-    "SYNTHESIZE": 29.361,
-    "VERIFY": 0.094,
-    "MECHANISM_SPACE": 82.172,
-    "COLLISION": 12.441,
-    "PHYSICS": 0.299,
-    "ATTACK": 22.77,
-    "CONTRADICTION": 0.015,
-    "KILLER_EXPERIMENT": 0.019,
-    "ADJUDICATION": 0.028,
-    "CLASSIFY": 0.017,
-    "NEXT_BEST_ACTION": 0.017,
-    "RANK": 0.015
+    "RETRIEVE": 40.423,
+    "FREEZE": 0.018,
+    "PREMISE_GATE": 0.002,
+    "SYNTHESIZE": 32.781,
+    "VERIFY": 0.01,
+    "MECHANISM_SPACE": 42.315,
+    "PHYSICS": 0.185,
+    "CONTRADICTION": 0.004,
+    "KILLER_EXPERIMENT": 0.008,
+    "ADJUDICATION": 0.01,
+    "CLASSIFY": 0.007,
+    "NEXT_BEST_ACTION": 0.005,
+    "RANK": 0.005
    },
    "synthesis_fallback": null,
    "n_evidence": 16,
-   "baseline_route": "agnes",
+   "baseline_route": "zai",
    "same_evidence": true,
    "usable_pair": false,
    "winner": null,
@@ -641,18 +993,18 @@
     "mechanisms_found": true,
     "candidates_generated_distinct": true,
     "n_generated": 9,
-    "n_distinct": 9,
-    "n_indeterminate": 0,
+    "n_distinct": 2,
+    "n_indeterminate": 7,
     "n_input_to_distinctness": 9,
     "n_retained": 9,
-    "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+    "final_status": "MECHANISM_STARVED",
     "failure_stage": null,
     "starved_reason": null,
     "matcher": "mechanism_distinctness/2.0.0"
    },
    "hashes": {
-    "pipeline_answer_sha": "d1f67ec06675cc32",
-    "baseline_answer_sha": "c7ec8fbfcf489712"
+    "pipeline_answer_sha": "89fe67470df57ecf",
+    "baseline_answer_sha": "58754479e21ab3bd"
    }
   },
   {
@@ -663,71 +1015,95 @@
    "answer_contract": {
     "valid": false,
     "violations": [
-     "1 numeric token(s) absent from the evidence packet"
+     "8 numeric token(s) absent from the evidence packet"
     ],
     "question_type": "predictor-design"
    },
-   "n_numbers_unverified": 1,
-   "n_numbers_unverified_baseline": 4,
+   "baseline_answer_contract": {
+    "valid": false,
+    "violations": [
+     "predictor contract: no INDICATOR: declared",
+     "predictor contract: no n=\u2026 sample-count stated"
+    ],
+    "question_type": "predictor-design",
+    "bindings": {
+     "evidence_bound": 4,
+     "assumption": 0,
+     "unbound_numbers": 0,
+     "all_numbers": 4,
+     "threshold_basis": "packet_or_user_variable"
+    }
+   },
+   "n_numbers_unverified": 8,
+   "n_numbers_unverified_baseline": 1,
    "numbers_fabricated": {
     "pipeline": {
-     "all": 3,
-     "unverified": 1,
-     "assumption_labeled": 0,
-     "fabricated_rate": 0.333
+     "all": 13,
+     "unverified": 8,
+     "assumption_labeled": 1,
+     "packet_bound": 5,
+     "user_variable_bound": 2,
+     "unbound": 8,
+     "fabricated_rate": 0.667
     },
     "baseline": {
-     "all": 16,
-     "unverified": 4,
+     "all": 4,
+     "unverified": 1,
      "assumption_labeled": 0,
+     "packet_bound": 3,
+     "user_variable_bound": 1,
+     "unbound": 1,
      "fabricated_rate": 0.25
     }
    },
    "full_scoreable": false,
-   "judge_outcome": "JUDGE_TRANSPORT_FAILED",
+   "judge_outcome": "JUDGE_VALID",
    "pipeline_final_status": "INVENTION_REQUIRES_EXPERIMENT",
    "pipeline_completed": true,
-   "wall_s": 151.0,
+   "wall_s": 162.1,
    "stage_times_s": {
-    "RETRIEVE": 82.556,
-    "FREEZE": 0.037,
-    "PREMISE_GATE": 0.004,
-    "SYNTHESIZE": 11.958,
-    "VERIFY": 0.022,
-    "MECHANISM_SPACE": 24.097,
-    "COLLISION": 10.19,
-    "PHYSICS": 0.358,
-    "ATTACK": 12.077,
-    "CONTRADICTION": 0.029,
-    "KILLER_EXPERIMENT": 0.024,
-    "ADJUDICATION": 0.026,
-    "CLASSIFY": 0.033,
-    "NEXT_BEST_ACTION": 0.015,
-    "RANK": 0.014
+    "RETRIEVE": 36.113,
+    "FREEZE": 0.028,
+    "PREMISE_GATE": 0.003,
+    "SYNTHESIZE": 35.145,
+    "VERIFY": 0.009,
+    "MECHANISM_SPACE": 41.147,
+    "COLLISION": 35.019,
+    "PHYSICS": 0.188,
+    "ATTACK": 1.87,
+    "CONTRADICTION": 0.005,
+    "KILLER_EXPERIMENT": 0.009,
+    "ADJUDICATION": 0.01,
+    "CLASSIFY": 0.007,
+    "NEXT_BEST_ACTION": 0.005,
+    "RANK": 0.006
    },
    "synthesis_fallback": null,
    "n_evidence": 16,
-   "baseline_route": "agnes",
+   "baseline_route": "zai",
    "same_evidence": true,
-   "usable_pair": false,
-   "winner": null,
-   "number_absent": null,
+   "usable_pair": true,
+   "winner": "tie",
+   "number_absent": {
+    "pipeline": [],
+    "baseline": []
+   },
    "second_judge": null,
    "criterion_diffs": {
-    "a_answered": null,
-    "b_user_vars": null,
-    "c_prediction": null,
-    "d_evidence": null,
+    "a_answered": 0.0,
+    "b_user_vars": 0.0,
+    "c_prediction": 0.0,
+    "d_evidence": 0.0,
     "e_clarification": null,
-    "f_novelty": null
+    "f_novelty": 0.0
    },
    "notes": "",
    "funnel": {
     "mechanisms_found": true,
     "candidates_generated_distinct": true,
     "n_generated": 9,
-    "n_distinct": 9,
-    "n_indeterminate": 0,
+    "n_distinct": 6,
+    "n_indeterminate": 3,
     "n_input_to_distinctness": 9,
     "n_retained": 9,
     "final_status": "INVENTION_REQUIRES_EXPERIMENT",
@@ -736,8 +1112,8 @@
     "matcher": "mechanism_distinctness/2.0.0"
    },
    "hashes": {
-    "pipeline_answer_sha": "5db9cf64ab6778c7",
-    "baseline_answer_sha": "1d2b4a3ebb666a5f"
+    "pipeline_answer_sha": "fa406fbca163b044",
+    "baseline_answer_sha": "fd59f90a0578f54e"
    }
   }
  ]
