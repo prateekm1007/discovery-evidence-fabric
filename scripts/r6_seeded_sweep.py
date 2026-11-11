@@ -62,6 +62,125 @@ FORBIDDEN_FIELD_TOKENS = ("key", "rubric", "answer", "expected",
 GATE_CHECKS = ("not_an_intervention", "function_removal",
                "restates_constraint", "anchor_domain")
 
+# P1-8 (round-2 directive): the two P0-3 pinned intervention-gate
+# instruments each earn their calibration state from their OWN specimen
+# sweep — per-instrument (never pooled) denominators — and the sweep
+# emits a CANDIDATE measurement record under the pinned registry name
+# (the pinned filenames attacker_calibration.INSTRUMENT_MEASUREMENTS
+# reads), so the owner can ship it with an owner-authored seal. The
+# tuple is (gate_check, instrument_version, pinned_measurement_name).
+P18_INSTRUMENTS = (
+    ("function_removal",
+     "intervention_gate_function_removal/1.0.0",
+     "intervention_gate_function_removal_measurement.json"),
+    ("restates_constraint",
+     "intervention_gate_restates_constraint/1.0.0",
+     "intervention_gate_restates_constraint_measurement.json"),
+)
+
+
+def _p18_verdict(version: str, fpr, tpr, coverage, parse,
+                 owner_seals: dict | None) -> dict:
+    """Derive the threshold verdict for one emitted instrument record.
+
+    The verdict is DERIVED, never asserted (Art. X): it is computed
+    only against OWNER-authored pre-registered thresholds (a seal).
+    With no seal, the verdict is PENDING_OWNER_SEAL — the coder never
+    invents a threshold (Art. XXVII) and the gate fails closed to
+    UNKNOWN_NOT_CALIBRATED until the owner ships the record + seal.
+    An empty per-instrument denominator makes the metric
+    NOT_MEASURED (never a zero), so the verdict is NOT derived."""
+    bars = (owner_seals or {}).get(version)
+    if not bars:
+        return {"calibrated": None, "state": "PENDING_OWNER_SEAL",
+                "note": ("no owner-authored pre-registered thresholds "
+                         "shipped for this instrument; the verdict is "
+                         "NOT DERIVED here (the coder never invents a "
+                         "threshold, Art. XXVII). The gate resolves "
+                         "UNKNOWN_NOT_CALIBRATED (terminal_kill_ "
+                         "admissible false) until the owner ships the "
+                         "record + seal under the pinned names.")}
+    missing = [k for k, v in (
+        ("fpr", fpr), ("tpr", tpr), ("coverage", coverage),
+        ("parse", parse)) if not isinstance(v, (int, float))]
+    if missing:
+        return {"calibrated": False, "state": "NOT_MEASURED_DENOMINATOR",
+                "missing_metrics": missing,
+                "note": ("a per-instrument denominator is empty; the "
+                         "metric is NOT_MEASURED (never a zero), so "
+                         "the verdict is NOT derived — fail-closed.")}
+    ok = (fpr <= bars.get("fpr_max") and tpr >= bars.get("tpr_min")
+          and coverage >= bars.get("coverage_min")
+          and parse >= bars.get("parse_completeness_min"))
+    return {"calibrated": bool(ok), "state": "DERIVED_FROM_OWNER_SEAL",
+            "sealed_bars": bars,
+            "note": ("derived from the owner-sealed pre-registered "
+                     "thresholds against this sweep's measured "
+                     "per-instrument numbers; a NOT_CALIBRATED verdict "
+                     "is recorded and the gate keeps terminal KILL "
+                     "inadmissible — never a fabricated pass.")}
+
+
+def _p18_emit_record(check: str, version: str, pinned_name: str,
+                     per_instrument: dict, meas_counts: dict,
+                     n_specimens: int, complete_rows: int,
+                     owner_seals: dict | None, integrity: dict,
+                     synthetic: bool) -> dict:
+    """One P1-8 candidate measurement record (the pinned measurement
+    schema the gate's resolve_state consumes), built from that
+    instrument's OWN per-instrument denominators:
+      - FKR denominator = the instrument's MEASURED clean-control rows
+      - TPR denominator = the instrument's MEASURED seeded rows
+      - coverage / parse  = the fraction of all rows the instrument was
+        measurable on (an unmeasured row is excluded, never a non-kill)
+    A synthetic-fixture run is flagged and can never establish
+    calibration (P0-3)."""
+    s = (per_instrument.get(check) or {}).get("seeded") or {}
+    c = (per_instrument.get(check) or {}).get("control") or {}
+    fpr = c.get("rate")
+    tpr = s.get("rate")
+    n_meas = meas_counts.get(check, 0)
+    coverage = (round(n_meas / n_specimens, 3) if n_specimens else None)
+    parse = coverage  # deterministic gate: input presence == measurability
+    metrics = {"false_kill_rate_on_known_good": fpr,
+               "coverage": coverage,
+               "parse_completeness": parse,
+               "fpr_denominator": c.get("n_complete"),
+               "tpr_denominator": s.get("n_complete"),
+               "denominator_note": ("per-instrument: FKR over this "
+                                    "instrument's MEASURED clean-control "
+                                    "rows only; TPR over this "
+                                    "instrument's MEASURED seeded rows "
+                                    "only — rows the instrument could not "
+                                    "measure are excluded, never counted "
+                                    "as non-kills (pooled denominators "
+                                    "are never used here)")}
+    return {"instrument": version,
+            "gate_check": check,
+            "pinned_measurement_name": pinned_name,
+            "metrics": metrics,
+            "scoped_tpr_diagnostic": {"tpr": tpr,
+                                      "scope": ("seeded defect classes "
+                                                "where this instrument "
+                                                "was measured "
+                                                "(per-instrument "
+                                                "denominator)")},
+            "n_cases_attacked": n_specimens,
+            "n_complete_rows": complete_rows,
+            "integrity": dict(integrity),
+            "SYNTHETIC_FIXTURE": bool(synthetic),
+            "threshold_verdict": _p18_verdict(
+                version, fpr, tpr, coverage, parse, owner_seals),
+            "authority_note": (
+                "candidate measurement emitted by the sweep; it carries "
+                "no terminal authority by itself. The OWNER ships this "
+                "record under the pinned registry name together with an "
+                "OWNER-authored seal (pre-registered thresholds); the "
+                "gate derives calibration state from the owner-held "
+                "record + seal (Art. X, LXXXI, fail-closed). A "
+                "SYNTHETIC_FIXTURE-flagged run can NEVER establish "
+                "calibration (P0-3).")}
+
 
 def _sha256_bytes(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
@@ -124,7 +243,8 @@ def _load_specimens(path: Path):
 
 
 def run_sweep(specimens_path: Path, expected_full: str | None,
-              prefix_mode: bool, synthetic_fixture: bool) -> dict:
+              prefix_mode: bool, synthetic_fixture: bool,
+              owner_seals: dict | None = None) -> dict:
     blocker = None
     if not specimens_path.is_file():
         blocker = f"specimens file absent at owner-held path: {specimens_path}"
@@ -309,6 +429,30 @@ def run_sweep(specimens_path: Path, expected_full: str | None,
                         "rate": (round(c_killed / c_n, 3)
                                  if c_n else None)}}
 
+    # P1-8: per-instrument MEASUREMENT coverage — for each gate check,
+    # how many of ALL rows (every class) the instrument could actually
+    # measure. An unmeasurable row is excluded from that instrument's
+    # denominators; it is never a non-kill and never a clean control.
+    instrument_meas_counts = {check: 0 for check in GATE_CHECKS}
+    for r in rows:
+        cm = r.get("checks_measured") or {}
+        for check in GATE_CHECKS:
+            if cm.get(check):
+                instrument_meas_counts[check] += 1
+    n_complete_rows = sum(1 for r in rows if r.get("complete"))
+    # P1-8: the per-instrument intervention-gate calibration emit — the
+    # two P0-3 pinned instruments each get a CANDIDATE measurement
+    # record under its pinned registry name, on its OWN denominators,
+    # with the verdict derived only from an owner-supplied seal (none
+    # yet: PENDING_OWNER_SEAL). Never written into the pinned shipment
+    # directory — the owner ships it.
+    calibration_emit = {
+        version: _p18_emit_record(
+            check, version, pinned, per_instrument,
+            instrument_meas_counts, len(specs), n_complete_rows,
+            owner_seals, integrity, synthetic_fixture)
+        for check, version, pinned in P18_INSTRUMENTS}
+
     seeded = {"n": 0, "killed": 0, "incomplete": 0}
     control = {"n": 0, "killed": 0, "incomplete": 0}
     unknown = {"n": 0, "killed": 0}
@@ -356,6 +500,7 @@ def run_sweep(specimens_path: Path, expected_full: str | None,
             "n_killed": n_kills_total,
             "per_class_aggregates": per_class_out,
             "per_instrument": per_instrument,
+            "calibration_emit": calibration_emit,
             "unknown_class_bucket": {"n": unknown["n"],
                                      "note": ("classes typed UNMEASURED "
                                                "(unknown/unlabeled) — "
@@ -384,6 +529,13 @@ def main() -> int:
     ap.add_argument("--synthetic-fixture", action="store_true",
                     help="dev/test only; marks output SYNTHETIC_FIXTURE")
     ap.add_argument("--output-dir", default=str(REPO / "ENGINE_RUNS"))
+    ap.add_argument("--owner-seals", default=None,
+                   help="P1-8: owner-held JSON mapping "
+                        "instrument_version -> pre_registered_"
+                        "thresholds (fpr_max, tpr_min, coverage_min, "
+                        "parse_completeness_min). Absent -> every "
+                        "emitted verdict is PENDING_OWNER_SEAL (the "
+                        "coder never invents a threshold, Art. XXVII)")
     args = ap.parse_args()
 
     import os
@@ -402,8 +554,24 @@ def main() -> int:
               f"owner-declared {DECLARED_PREFIX}; refusing", flush=True)
         return 2
 
+    # P1-8: the owner-sealed pre-registered thresholds (optional; the
+    # verdicts are DERIVED against them, never asserted — Art. X).
+    owner_seals = None
+    if args.owner_seals:
+        try:
+            owner_seals = json.loads(
+                Path(args.owner_seals).read_text(encoding="utf-8"))
+            if not isinstance(owner_seals, dict):
+                raise ValueError("the owner seals file must be a JSON "
+                                  "object (instrument_version -> "
+                                  "pre_registered_thresholds)")
+        except Exception as exc:  # noqa: BLE001 — typed, fail-closed
+            print(f"[sweep] BLOCKED_OWNER_SEALS_UNREADABLE: {exc}",
+                  flush=True)
+            return 2
+
     res = run_sweep(Path(sp), prefix, args.prefix_match,
-                    args.synthetic_fixture)
+                    args.synthetic_fixture, owner_seals)
     out_dir = Path(args.output_dir)
     try:
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -421,6 +589,19 @@ def main() -> int:
     out_json = out_dir / "r6_seeded_sweep.json"
     out_json.write_text(json.dumps(res, indent=1, default=str) + "\n",
                         encoding="utf-8")
+
+    # P1-8: the per-instrument calibration emit records — CANDIDATE
+    # measurements, written under their pinned registry names in the
+    # (gitignored) scratch output dir. The owner ships them into the
+    # pinned shipment directory WITH the owner-authored seals; this
+    # runner never writes into the shipment directory (the authority
+    # flip stays an owner act, Art. X/LXXXI, fail-closed).
+    emit_names = []
+    for version, rec in (res.get("calibration_emit") or {}).items():
+        ep = out_dir / rec["pinned_measurement_name"]
+        ep.write_text(json.dumps(rec, indent=1, default=str) + "\n",
+                      encoding="utf-8")
+        emit_names.append(ep.name)
 
     lines = ["# R6 seeded-defect catch vs false kills (owner-held specimens)",
              "", f"- outcome: {res.get('outcome')}",
@@ -448,11 +629,30 @@ def main() -> int:
                      f"(rate {s.get('rate')}) | control false-kills "
                      f"{c.get('false_kills')}/{c.get('n_complete')} "
                      f"(rate {c.get('rate')})")
+    lines.append("")
+    lines.append("## P1-8 per-instrument calibration emit (candidate "
+                 "records — owner ships them under the pinned registry "
+                 "names with the owner-authored seals)")
+    for version, rec in (res.get("calibration_emit") or {}).items():
+        m = rec.get("metrics") or {}
+        t = (rec.get("scoped_tpr_diagnostic") or {}).get("tpr")
+        v = rec.get("threshold_verdict") or {}
+        syn = (" [SYNTHETIC_FIXTURE — never establishes calibration]"
+               if rec.get("SYNTHETIC_FIXTURE") else "")
+        lines.append(
+            f"- {version} ({rec.get('gate_check')}): FKR "
+            f"{m.get('false_kill_rate_on_known_good')} over "
+            f"{m.get('fpr_denominator')} measured clean controls | "
+            f"TPR {t} over {m.get('tpr_denominator')} measured seeded | "
+            f"verdict {v.get('state')} "
+            f"(calibrated={v.get('calibrated')}){syn}")
     (out_dir / "r6_seeded_sweep.md").write_text("\n".join(lines) + "\n",
                                                 encoding="utf-8")
     print("\n".join(lines), flush=True)
     print(f"[sweep] -> {out_json.name}, r6_seeded_sweep.md, "
-          f"{scratch.name} (gitignored scratch)", flush=True)
+          f"{scratch.name} (gitignored scratch)"
+          + (f", P1-8 emit: {', '.join(emit_names)}"
+             if emit_names else ""), flush=True)
     if str(res.get("outcome", "")).startswith("BLOCKED"):
         return 2
     return 0
