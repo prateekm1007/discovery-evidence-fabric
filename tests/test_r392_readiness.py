@@ -106,8 +106,11 @@ class TestProbeHonesty:
         # hermetic conftest stripped keys; set one to force a REAL
         # (failing) HTTP path against the public endpoint
         out = gw.preflight_probe()
+        # POLICY_BLOCKED is an honest outcome too (R6 route wiring):
+        # a paid rung refused by the active cost policy before any HTTP
+        # call is a real refusal, never a faked result.
         assert out["status"] in ("CALL_FAILED", "PROVIDER_UNAVAILABLE",
-                                 "OK")  # network-dependent; must be honest
+                                 "OK", "POLICY_BLOCKED")
         cached = gw.last_probe()
         assert cached["status"] == out["status"]
         assert cached["at"] is not None

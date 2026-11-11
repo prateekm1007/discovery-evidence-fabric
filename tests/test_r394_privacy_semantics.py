@@ -170,7 +170,14 @@ def test_false_premise_is_not_rejected():
     v = us.user_state_view(s)
     assert v["user_state"] == "COMPLETED_FALSE_PREMISE"
     assert "physically/scientifically incoherent" in v["meaning"]
-    assert v["finished"] is True
+    # R543-R548 authority (measured R6): MALFORMED_OR_FALSE_PREMISE is a
+    # typed scientific terminal — the premise check IS the run's answer,
+    # but no finished DISCOVERY was produced, so finished answers False
+    # from the typed terminal's own record (never a second-Boolean
+    # upgrade). The user-visible STATE stays the non-confusing
+    # COMPLETED_FALSE_PREMISE label; the R394 intent (never a bare
+    # REJECTED) is unchanged.
+    assert v["finished"] is False
     assert v["found_something"] is False
     assert v["rejected"] is False  # NOT a candidate rejection
 

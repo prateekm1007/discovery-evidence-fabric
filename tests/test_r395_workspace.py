@@ -326,7 +326,12 @@ class TestUserStateIntegration(unittest.TestCase):
         # not failed, and never the banned dead-end sentence
         self.assertEqual(user_state(s), "COMPLETED_UNDER_DEVELOPMENT")
         v = user_state_view(s)
-        self.assertTrue(v["finished"])
+        # R545/R546 authority (measured R6): REJECTED is a typed
+        # scientific non-completion terminal — the label stays the R416
+        # non-dead-end COMPLETED_UNDER_DEVELOPMENT, but the finished
+        # flag answers False from the typed terminal (no finished
+        # discovery was produced).
+        self.assertFalse(v["finished"])
         # R416: the product surface never renders a bare reject
         # dead-end; challenge losses live on the generation records
         self.assertFalse(v["rejected"])
