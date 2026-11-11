@@ -115,15 +115,15 @@ CRITERIA = {
 }
 
 # Judge must be a different provider + model family from the baseline
-# (agnes) and never the 1.7B model. Candidates probed in order. The
-# inception rung is owner-supplied (2026-11-10, Mercury 3, free tier)
-# and reads OK at the capability probe; it is the LAST fallback, never
-# preferred over the calibration-preserved xkiro route.
+# (agnes) and never the 1.7B model. Candidates probed in order.
+# INCEPTION MERCURY-3 WAS AUDIT-MEASURED AS NOT CALIBRATABLE (1/30 on
+# the known-answer set, 29 empty-output pairs) and is therefore removed;
+# an official-provider free-tier key is added only when the owner
+# supplies one. No further judge-routing work this round.
 JUDGE_CANDIDATES = [
     ("xkiro", "mistralai/ministral-14b"),
     ("xkiro", "mistralai/ministral-8b"),
     ("unorouter", "deepseek-v4-flash:free"),
-    ("inception", "mercury-3"),
 ]
 
 
@@ -607,7 +607,6 @@ def probe_judge2_route(baseline_provider: str,
     """Second judge: different family from BOTH baseline and the primary
     judge (advisory; never changes the tally)."""
     candidates = [
-        ("inception", "mercury-3"),
         ("unorouter", "deepseek-v4-flash:free"),
         ("xkiro", "mistralai/ministral-14b"),
         ("agnes", "agnes-3.0-flash"),
@@ -822,6 +821,48 @@ def _validate_rubric_pass(parsed: Dict[str, Any], clar: bool) -> Optional[Dict[s
     return out
 
 
+_NUM_TOKEN_RE = re.compile(r"\d+(?:\.\d+)?")
+_ASSUMPTION_LINE_RE = re.compile(r"\bASSUMPTION\b", re.IGNORECASE)
+
+
+def _assumption_labeled_numbers(ans: Optional[str]) -> set:
+    """Deterministic diagnostic (R5): a number on a line carrying
+    ASSUMPTION is assumption-labeled, never 'unverified fabrication'.
+    Mirrors the intervention contract's one-parameter-per-line format;
+    a value on a mixed line is out of scope of the deterministic rule."""
+    out = set()
+    for line in (ans or "").splitlines():
+        if _ASSUMPTION_LINE_RE.search(line):
+            out.update(_NUM_TOKEN_RE.findall(line))
+    return out
+
+
+def _numbers_fabricated(ans: Optional[str], packet_blob: str) -> Dict[str, Any]:
+    """Per-arm fabricated-number accounting (assumption-excluded).
+
+    Returns {all, unverified, assumption_labeled, fabricated_rate} or
+    None fields when the answer carries no numbers."""
+    nums = set(_NUM_TOKEN_RE.findall(ans or ""))
+    if not nums:
+        return {"all": 0, "unverified": 0, "assumption_labeled": 0,
+                "fabricated_rate": None}
+    assumption = _assumption_labeled_numbers(ans) & nums
+    checkable = nums - assumption
+    absent = sorted(n for n in checkable if n not in (packet_blob or ""))
+    return {"all": len(nums), "unverified": len(absent),
+            "assumption_labeled": len(assumption),
+            "fabricated_rate": (round(len(absent) / len(checkable), 3)
+                                if checkable else None)}
+
+
+def _numbers_absent(ans: Optional[str], packet_blob: str) -> List[str]:
+    """Legacy shape kept for full_scoreable gating: distinct numbers
+    absent from the packet, assumption-labeled numbers EXCLUDED."""
+    nums = set(_NUM_TOKEN_RE.findall(ans or ""))
+    checkable = nums - _assumption_labeled_numbers(ans)
+    return sorted(n for n in checkable if n not in (packet_blob or ""))
+
+
 def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
                       base_ans: Optional[str], route: Dict[str, Any],
                       packet: Optional[List[Dict[str, Any]]] = None
@@ -888,14 +929,10 @@ def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
     # per-side criterion means (valid passes only; never from failures)
     crit = {c: {"pipeline": [], "baseline": []} for c in CRITERIA}
     _pt = json.dumps(packet or [], ensure_ascii=False)
-
-    def _num_absent(ans):
-        import re
-        nums = set(re.findall(r"\d+(?:\.\d+)?", ans or ""))
-        return sorted(n for n in nums if n not in _pt)
-
-    number_absent = {"pipeline": _num_absent(pipe_ans),
-                     "baseline": _num_absent(base_ans)}
+    number_absent_detail = {"pipeline": _numbers_fabricated(pipe_ans, _pt),
+                            "baseline": _numbers_fabricated(base_ans, _pt)}
+    number_absent = {"pipeline": _numbers_absent(pipe_ans, _pt),
+                     "baseline": _numbers_absent(base_ans, _pt)}
     prefs: List[str] = []
     if pair_outcome == JUDGE_VALID:
         for p in passes:
@@ -925,6 +962,7 @@ def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
             "pass_outcomes": outcomes,
             "scores": finals, "winner": winner, "pref_passes": prefs,
             "number_absent": number_absent,
+            "number_absent_detail": number_absent_detail,
             "judge_content_len": [p.get("content_len") for p in passes],
             "judge_latency_s": [p.get("latency_s") for p in passes]}
 
@@ -1328,7 +1366,25 @@ def build_score_table(route_rec: Dict[str, Any],
         if completed:
             n_completed += 1
         contestable = (bool(pipe.get("answer")) and bool(base.get("answer")))
-        nr = (judge.get("number_absent") or {}).get("pipeline") or []
+        # direct, deterministic per-arm number diagnostics (independent of
+        # judge route availability; never trust the judge to catch this)
+        try:
+            _freeze = json.loads((d / "pipeline" / "envelope_FREEZE.json").read_text(
+                encoding="utf-8"))
+            _ev = _freeze.get("evidence") or []
+            _blob = " ".join(
+                str((e or {}).get("abstract") or "") + " "
+                + str((e or {}).get("title") or "") for e in _ev)
+            _det = {"pipeline": _numbers_fabricated(pipe.get("answer"), _blob),
+                    "baseline": _numbers_fabricated(base.get("answer"), _blob)}
+            _abs = {"pipeline": _numbers_absent(pipe.get("answer"), _blob),
+                    "baseline": _numbers_absent(base.get("answer"), _blob)}
+        except Exception:  # noqa: BLE001
+            _det = None
+            _abs = {"pipeline": [], "baseline": []}
+        nr = _abs["pipeline"]
+        nr_base = _abs["baseline"]
+        detail = _det or (judge.get("number_absent_detail") or {})
         n_num_unverified = len(nr)
         if n_num_unverified and pipe.get("answer_state") == "RELEASED":
             # hard enforcement: any unverified number in a RELEASED pipeline
@@ -1346,11 +1402,16 @@ def build_score_table(route_rec: Dict[str, Any],
             "has_clarification": bool(p.get("clarification_answer")),
             "answer_contract": answer_contract,
             "n_numbers_unverified": n_num_unverified,
+            "n_numbers_unverified_baseline": len(nr_base),
+            "numbers_fabricated": {
+                "pipeline": (detail or {}).get("pipeline") or {},
+                "baseline": (detail or {}).get("baseline") or {},
+            },
             "full_scoreable": (
                 contestable and same
                 and answer_contract.get("valid") is True
                 and judge.get("outcome") == JUDGE_VALID
-                and not (judge.get("number_absent") or {}).get("pipeline")),
+                and not nr),
             "judge_outcome": judge.get("outcome"),
             "pipeline_final_status": pipe.get("final_status"),
             "pipeline_completed": completed,
@@ -1531,6 +1592,19 @@ def build_score_table(route_rec: Dict[str, Any],
         "full_scoreable_pairs": sum(1 for r in rows if r.get("full_scoreable")),
         "n_numbers_unverified": sum(1 for r in rows
                                      if r.get("n_numbers_unverified")),
+        "n_numbers_unverified_baseline": sum(
+            1 for r in rows
+            if r.get("n_numbers_unverified_baseline")),
+        "fabricated_number_rate_pipeline": round(
+            sum((r.get("numbers_fabricated") or {}).get("pipeline", {}).get("fabricated_rate") or 0
+                for r in rows)
+            / max(1, sum(1 for r in rows
+                         if (r.get("numbers_fabricated") or {}).get("pipeline"))), 3),
+        "fabricated_number_rate_baseline": round(
+            sum((r.get("numbers_fabricated") or {}).get("baseline", {}).get("fabricated_rate") or 0
+                for r in rows)
+            / max(1, sum(1 for r in rows
+                         if (r.get("numbers_fabricated") or {}).get("baseline"))), 3),
         "pipeline_wins": wins, "baseline_wins": usable - wins - ties,
         "ties": ties,
         # R5 P0-2 metric block: system = unconditional, N denominator;

@@ -1,11 +1,13 @@
 {
  "problem_id": "bench-p02-leadacid-grid-corrosion",
- "commit": "77e1e3847271",
- "dirty_tree": false,
+ "commit": "2505e43b9003",
+ "dirty_tree": true,
  "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+ "question_type": "intervention-proposal",
  "clarification_answer": null,
- "baseline_answer": "**Engineering Recommendation: Composite Alloys and Electrolyte Management**\n\nTo achieve a 15-year float life at 2.27 V/cell while maintaining antimony content below 2%, the primary intervention must target the positive plate alloy composition and electrolyte rheology.\n\n**1. Alloy Modification (The Core Intervention)**\nReplace the standard Lead-Calcium-Sn (Pb-Ca-Sn) alloy with a **Lead-Calcium-Silicon-Tin (Pb-Ca-Si-Sn)** composite alloy, supplemented with trace amounts of arsenic (As) or bismuth (Bi) if permissible within the \"low antimony\" constraint context (note: standard Pb-Ca-Sn often uses 1-2% Sn; pushing to 15 years requires optimizing the Ca/Sn ratio).\n*   **Specifics:** Use **1.0\u20131.5% Calcium** and **1.0\u20131.5% Tin** with **0.1\u20130.2% Silicon**. Silicon promotes the formation of a protective PbSiO4 layer on the grid, which retards oxide spalling and reduces corrosion current density compared to pure Pb-Ca.\n*   **Rationale:** At 2.27 V/cell (high float voltage), the oxygen recombination cycle is aggressive. Standard alloys corrode rapidly. The silicon addition specifically mitigates the \"positive grid corrosion\" failure mode identified in [doaj] and [core] (\"Factors influencing positive-plate life\").\n\n**2. Electrolyte Rheology Adjustment (Gelling)**\nConvert the electrolyte from a liquid AGM system to a **Silica-Gelled Electrolyte** system.\n*   **Specifics:** Use fumed silica particles of 7\u20139 \u00b5m size suspended in a polymer gel binder.\n*   **Rationale:** Evidence from [core] (\"Performance characteristics of a gelled-electrolyte...\") explicitly states that **corrosion rates for positive grids in gelled electrolyte are lower** than in both flooded and absorptive glass-microfibre (AGM) configurations. The gel restricts electrolyte stratification and maintains more uniform acid concentration, reducing local high-acid corrosion pockets. It also improves water retention, mitigating the \"loss of water\" failure mode [doaj] that exacerbates corrosion by increasing acid concentration.\n\n**Expected Measurable Effect**\n*   **Corrosion Depth Reduction:** Grid cross-sectional loss reduced by >40% over 15 years compared to baseline Pb-Ca-Sn.\n*   **Internal Resistance:** Increase in internal resistance (< 1.5 m\u03a9/cell) over 15 years remains below the service threshold.\n*   **Capacity Retention:** >85% of initial capacity at 20\u00b0C after 15 years of float at 2.27 V.\n\n**Falsification Test**\nTo falsify this design, perform an accelerated aging test under the following conditions:\n1.  **Environment:** 40\u00b0C (temperature-accelerated life test).\n2.  **Charge:** Continuous float at 2.27 V/cell.\n3.  **Duration:** 5 years (equivalent to ~15 years at 25\u00b0C via Arrhenius modeling, referencing [openaire] \"Defining the life...\").\n4.  **Metric:** Disassemble one cell after 5 years. Measure the **grid corrosion depth** via cross-sectional microscopy. Measure the **capacity** at C/10 rate.\n5.  **Falsification Criteria:** The approach fails (is falsified) if:\n    *   Corrosion depth exceeds 25% of the initial grid thickness (indicating structural failure imminent).\n    *   Capacity falls below 70% of initial capacity.\n    *   Acid stratification is observed, negating the benefit of the gel.\n\n**Evidence Citations**\n*   [doaj]: Confirms positive electrode corrosion is a primary failure mode for VRLA.\n*   [core]: Confirms that alloy composition (Ca, Sn, Si) and assembly compression are critical factors; specifically notes gelled electrolytes have lower corrosion rates than AGM/flooded.\n*   [openaire",
- "pipeline_answer": "During extended float service, parasitic oxidation of the positive Pb grid to PbO\u2082 progressively consumes the grid's metallic cross-section under float overpotential, increasing electrical resistance and generating localized Joule heat that drives the thermal runaway pathway; improved charge algorithms modulate the float regime to suppress this overpotential-driven oxidation kinetics.\n\nImplement a fire prevention scheme that combines strict temperature monitoring with optimized charge algorithms derived from improved-charge-practice data, maintaining float voltage within bounds that inhibit positive-grid Pb\u2192PbO\u2082 oxidation acceleration while providing active interlock cut-off upon detection of anomalous temperature rise or open-circuit voltage deviation.\n\nSuppression of positive grid cross-section consumption during extended float, preventing the sustained resistive-heating feedback loop that leads to thermal runaway and hydrogen-explosion fire conditions.\n\nSubject the battery to accelerated float charge at 2.27 V and measure temperature rise; failure is indicated if temperature exceeds the scheme's safety threshold or if open-circuit voltage anomalies trigger the fire prevention interlock.\n\nPrevention of thermal runaway and fire hazards through reduced positive grid corrosion driven by charge-algorithm-modulated float voltage, enabling safer extended float service life without exceeding material limits.",
+ "contamination_tag": "DEV_CONTAMINATED",
+ "baseline_answer": "**Proposed Design/Intervention**\nTo prevent positive grid corrosion in a VRLA battery with 15-year float service life at 2.27 V/cell (without antimony >2%), the primary engineering change is to transition from a standard tubular or paste-filled plate design to a **flooded-free, gelled electrolyte architecture using fumed silica (12 nm particle size) combined with a specific polymer additive (e.g., polypyrrole at 0.01% w/v)** while maintaining strict control over plate active mass density and assembly compression.\n\nThe core of the intervention is not just the gel, but the synergy between the electrolyte morphology and the grid alloy (using low-antimony Pb-Ca-Sn, typically <0.05% Sb to avoid the >2% constraint trigger, or specifically <2% if the constraint allows up to 2% but the prompt says \"without... above 2%\", implying we can use up to 2% but likely need to optimize). However, to maximize life, the grid should be a high-purity lead-calcium-tin alloy. The gel reduces local acid stratification and oxygen recombination losses, keeping the active mass layer (PAM) hydrated.\n\nKey modifications:\n1.  **Electrolyte:** Use 4% w/v fumed silica (12 nm) and 0.01% w/v polypyrrole. Evidence [crossref] shows this specific mix lowers hydrogen/oxygen evolution and improves discharge capacity compared to AGM.\n2.  **Grid Design:** Increase the cross-sectional area of the positive grid to ensure it can withstand the mechanical loss due to corrosion. The corrosion layer (CL) consumes the grid; a thicker wall provides reserve cross-section. Evidence [core] notes that plate design and alloy composition are the most critical factors for PAM life.\n3.  **Assembly Compression:** Optimize the assembly pressure to ensure intimate contact between the PAM and the grid without causing mechanical stress that accelerates corrosion.\n\n**Expected Measurable Effect**\nThe measurable effect will be a significantly lower rate of positive grid corrosion, maintaining the internal resistance within specification for 15 years. Specifically, the grid cross-sectional loss should remain below the threshold that triggers a capacity drop. The gelled electrolyte should show lower corrosion rates than both AGM and flooded counterparts [core], reducing water loss and maintaining electrolyte integrity.\n\n**Falsification Test**\nTo falsify this approach, conduct an **accelerated corrosion test** at 45\u00b0C (or higher, per [openaire] \"Defining the life... accelerated testing\") for 15 years equivalent (typically ~2-3 years real-time using extrapolation factors from Arrhenius plots).\n\n1.  **Procedure:** Operate cells at 2.27 V/cell continuous float.\n2.  **Measurement:** Regularly measure internal resistance and discharge capacity. At scheduled intervals (e.g., every 6 months), disassemble a sacrificial cell and measure the grid cross-sectional area via metrology (microscopy/laser scanning).\n3.  **Falsification Criterion:** If the grid cross-section loss exceeds the design reserve (leading to a >10-15% capacity drop before the 15-year mark) OR if the corrosion rate is not statistically significantly lower than that of a standard AGM control battery under identical conditions, the proposed gelled-electrolyte intervention is falsified for achieving the 15-year target. If the internal resistance rises beyond the service threshold within the test period, the approach fails.\n\n**Evidence Citations**\n*   [crossref] \"Effect of fumed silica...\" supports the 12 nm silica and polypyrrole additive choice for reduced gas evolution and improved capacity.\n*   [core] \"Performance characteristics...\" supports that gelled electrolyte has lower positive grid corrosion than AGM/flooded.\n*   [core] \"Factors influencing positive-plate life...\" identifies plate design and alloy composition as critical.\n*   [openaire] \"Defining the life...\" supports the use of accelerated testing methods for VRLA batteries.",
+ "pipeline_answer": "corrosion of the positive electrode plate is a primary failure mode that reduces service life and induces thermal runaway\n\nImplement strict float charge voltage limiting at 2.27 V per cell to mitigate the chemical activity driving positive grid corrosion and prevent the associated thermal stress\n\nSlows the rate of positive grid cross-section consumption, maintaining internal resistance and capacity above service thresholds for 15 years\n\nConduct accelerated float charge testing at 2.27 V/cell; failure occurs if post-test grid mass loss exceeds 10 percent or internal resistance rises by more than 20 percent within 5 years",
  "evidence_ids": [
   "doi:10.1051/e3sconf/202018501058",
   "doi:10.1109/intlec.1995.498976",
@@ -22,44 +24,936 @@
   "title:e98a5ebefcfbce2f",
   "doi:10.1007/bf02707342",
   "doi:10.2172/282838",
-  "doi:10.1016/0378-7753(94)01983-3"
+  "doi:10.1016/b978-044450746-4/50008-8"
  ],
- "judge_record": {
-  "usable_pair": true,
-  "passes": 2,
-  "scores": {
-   "a_answered": {
-    "pipeline_mean": 3.5,
-    "baseline_mean": 5.0,
-    "diff": -1.5
+ "evidence": [
+  {
+   "id": "doi:10.1051/e3sconf/202018501058",
+   "source_type": "scientific_paper",
+   "source": "doaj",
+   "source_id": "doaj:doaj:b1023cfbfcbd4591b27bc7b48c3413ff",
+   "source_uri": "https://doi.org/10.1051/e3sconf/202018501058",
+   "title": "Discussion of the relationship between failure and fire of valve regulated lead acid battery",
+   "abstract": "Failure modes of the valve regulated lead acid battery will not only greatly reduce the service life, but also may start a fire. This paper reviews the relationship between battery fire and failure modes. Four failure modes influenced on the valve regulated lead acid battery were emphatically analyzed: \u201cSulfation of negative electrode plate\u201d, \u201ccorrosion of the positive electrode plate\u201d, \u201closs of water\u201d and \u201cacid leak\u201d. The direct reasons for battery fire are thermal runaway, short circuit and hydrogen explosion, which were inducing by battery failure. A fire prevention scheme was proposed on the basis of above thesis.",
+   "doi": "10.1051/e3sconf/202018501058",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5684291d92e29c9e560b1162c4e5df83417f0f5818df0d6c1708db2cd8af8ea7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "doaj",
+    "indexing_sources": [
+     "core",
+     "doaj",
+     "openaire"
+    ],
+    "record_ids_by_source": {
+     "doaj": "doaj:b1023cfbfcbd4591b27bc7b48c3413ff",
+     "core": "core:98098962",
+     "openaire": "openaire:doi_dedup___::33a61f9e6f4b5953eaafead3e769f49e"
+    },
+    "queries_by_source": {
+     "doaj": "valve-regulated lead-acid battery positive plate corrosion",
+     "core": "valve-regulated lead-acid energy harvester positive plate corrosion",
+     "openaire": "valve-regulated lead-acid battery positive plate corrosion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "oa_journal_registry",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "instancetypes=['Article', 'Other literature type', 'Article']; refereed=peerReviewed"
+    ],
+    "oa_resolution": null
    },
-   "b_user_vars": {
-    "pipeline_mean": 4.5,
-    "baseline_mean": 5.0,
-    "diff": -0.5
-   },
-   "c_prediction": {
-    "pipeline_mean": 4.0,
-    "baseline_mean": 5.0,
-    "diff": -1.0
-   },
-   "d_evidence": {
-    "pipeline_mean": 3.5,
-    "baseline_mean": 5.0,
-    "diff": -1.5
-   },
-   "e_clarification": {
-    "pipeline_mean": null,
-    "baseline_mean": null,
-    "diff": null
-   }
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "oa_journal_registry",
+   "canonical_id": "doi:10.1051/e3sconf/202018501058",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid battery positive plate corrosion",
+   "source_rank": 0,
+   "fulltext_url": "https://www.e3s-conferences.org/articles/e3sconf/pdf/2020/45/e3sconf_iceeb2020_01058.pdf",
+   "authors": [
+    "Li Zhenyu",
+    "Wang Zhongjie",
+    "Wang Liang"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DOAJ covers only journals admitted to the index (peer-reviewed OA, no APC condition) \u2014 absence here is not absence of the science (Art. XXV)",
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified",
+    "Document-type labels are read post-hoc from record instancetype (the API exposes no type filter \u2014 measured 2026-09-05)",
+    "Aggregated repository metadata quality varies by repository; instancetype is repository-declared"
+   ]
   },
-  "winner": "baseline",
-  "pref_passes": [
-   "baseline",
-   "baseline"
+  {
+   "id": "doi:10.1109/intlec.1995.498976",
+   "source_type": "scientific_paper",
+   "source": "openaire",
+   "source_id": "openaire:openaire:doi_dedup___::5d3dbaec766692eed743fb894b9ac720",
+   "source_uri": "https://doi.org/10.1109/intlec.1995.498976",
+   "title": "Impact of grid corrosion in valve regulated lead-acid battery on standby float service",
+   "abstract": "",
+   "doi": "10.1109/intlec.1995.498976",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2002",
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8ef750a71ed6423affb9c04038561efd15a209d89eb106dfa733ea1159975da8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openaire",
+    "indexing_sources": [
+     "openaire"
+    ],
+    "record_ids_by_source": {
+     "openaire": "openaire:doi_dedup___::5d3dbaec766692eed743fb894b9ac720"
+    },
+    "queries_by_source": {
+     "openaire": "valve-regulated lead-acid battery positive plate corrosion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_openaire",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "instancetypes=['Article']; refereed=peerReviewed"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "repository_aggregator_openaire",
+   "canonical_id": "doi:10.1109/intlec.1995.498976",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid battery positive plate corrosion",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "S.S. Misra",
+    "A.J. Williamson"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Document-type labels are read post-hoc from record instancetype (the API exposes no type filter \u2014 measured 2026-09-05)",
+    "Aggregated repository metadata quality varies by repository; instancetype is repository-declared"
+   ]
+  },
+  {
+   "id": "doi:10.1109/intlec.1995.498933",
+   "source_type": "scientific_paper",
+   "source": "openaire",
+   "source_id": "openaire:openaire:doi_dedup___::9863b1a702c109d95d15ea25f0d98703",
+   "source_uri": "https://doi.org/10.1109/intlec.1995.498933",
+   "title": "Defining the life of valve-regulated lead-acid batteries: a new approach to accelerated testing",
+   "abstract": "",
+   "doi": "10.1109/intlec.1995.498933",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2002",
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "128684da9c65f5292b26de6c4b8b13c917f494094ceecb9b95526f96a57dfb30",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openaire",
+    "indexing_sources": [
+     "openaire"
+    ],
+    "record_ids_by_source": {
+     "openaire": "openaire:doi_dedup___::9863b1a702c109d95d15ea25f0d98703"
+    },
+    "queries_by_source": {
+     "openaire": "valve-regulated lead-acid battery positive plate corrosion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_openaire",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "instancetypes=['Article']; refereed=peerReviewed"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "repository_aggregator_openaire",
+   "canonical_id": "doi:10.1109/intlec.1995.498933",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid battery positive plate corrosion",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "K.R. Bullock",
+    "P.K. Ng",
+    "J.L. Valdes",
+    "R.A. Holland"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Document-type labels are read post-hoc from record instancetype (the API exposes no type filter \u2014 measured 2026-09-05)",
+    "Aggregated repository metadata quality varies by repository; instancetype is repository-declared"
+   ]
+  },
+  {
+   "id": "doi:10.1016/s0378-7753(98)00028-7",
+   "source_type": "scientific_paper",
+   "source": "openaire",
+   "source_id": "openaire:openaire:doi_dedup___::2832d79dd2a8e82d440946d717ab7973",
+   "source_uri": "https://doi.org/10.1016/s0378-7753(98)00028-7",
+   "title": "Small-capacity valve-regulated lead/acid battery with long life at high ambient temperature",
+   "abstract": "",
+   "doi": "10.1016/s0378-7753(98)00028-7",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "1998",
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ad53e543b93a7eeb7a726bae9c1baa511088b90615f2c33db8744cb7dc1db2d4",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openaire",
+    "indexing_sources": [
+     "openaire"
+    ],
+    "record_ids_by_source": {
+     "openaire": "openaire:doi_dedup___::2832d79dd2a8e82d440946d717ab7973"
+    },
+    "queries_by_source": {
+     "openaire": "valve-regulated lead-acid battery positive plate corrosion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_openaire",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "instancetypes=['Article']; refereed=peerReviewed"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "repository_aggregator_openaire",
+   "canonical_id": "doi:10.1016/s0378-7753(98)00028-7",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid battery positive plate corrosion",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "T Hatanaka",
+    "M Maeda",
+    "M Iwata"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Document-type labels are read post-hoc from record instancetype (the API exposes no type filter \u2014 measured 2026-09-05)",
+    "Aggregated repository metadata quality varies by repository; instancetype is repository-declared"
+   ]
+  },
+  {
+   "id": "doi:10.1109/bcaa.2000.838406",
+   "source_type": "scientific_paper",
+   "source": "openaire",
+   "source_id": "openaire:openaire:doi_dedup___::2eee49301a6ade6a3ce0e81bf47c521d",
+   "source_uri": "https://doi.org/10.1109/bcaa.2000.838406",
+   "title": "Improved charge algorithms for valve regulated lead acid batteries",
+   "abstract": "",
+   "doi": "10.1109/bcaa.2000.838406",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2002",
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a27a719b03da0d03b8f6cd7fdebaeae4cac435251c710671bd7c3b181b5151df",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "openaire",
+    "indexing_sources": [
+     "openaire"
+    ],
+    "record_ids_by_source": {
+     "openaire": "openaire:doi_dedup___::2eee49301a6ade6a3ce0e81bf47c521d"
+    },
+    "queries_by_source": {
+     "openaire": "valve-regulated lead-acid battery positive plate corrosion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_openaire",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "instancetypes=['Article']; refereed=peerReviewed"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "repository_aggregator_openaire",
+   "canonical_id": "doi:10.1109/bcaa.2000.838406",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid battery positive plate corrosion",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [
+    "E.D. Sexton",
+    "R.F. Nelson",
+    "J.B. Olson"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Document-type labels are read post-hoc from record instancetype (the API exposes no type filter \u2014 measured 2026-09-05)",
+    "Aggregated repository metadata quality varies by repository; instancetype is repository-declared"
+   ]
+  },
+  {
+   "id": "doi:10.1021/acsaem.4c02648",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:39886449",
+   "source_uri": "https://doi.org/10.1021/acsaem.4c02648",
+   "title": "Evaluation of the Catalytic Effect of Metal Additives on the Performance of a Combined Battery and Electrolyzer System.",
+   "abstract": "A low-cost method of green hydrogen production via the modification of a lead acid battery has been achieved, resulting in a hydrogen flow rate of 5.3 L min -1 from a 20-cell string. The electrochemical behavior and catalytic effect of various metal additives on the hydrogen evolution reaction (HER) was evaluated using cyclic voltammetry. Nickel, cobalt, antimony, manganese, and iron were investigated, with 66 ppm nickel achieving a 75% increase in hydrogen produced from a modified lead acid battery. Design of Experiments (DOE) employing a simple centroid design model to analyze the combined additive effects of nickel, cobalt, and antimony was performed to evaluate the effect on the HER. A combination of Ni:Co:Sb in the ratio 66:17:17 ppm achieved the greatest end voltage shift of the HER from -1.65 to -1.50 V; however, no increase in hydrogen yield was observed in comparison to 66 ppm of nickel when added to a full-scale cell. Gas chromatography using a thermal conductive detector and a sulfur chemiluminescence detector were used to measure the purity of hydrogen obtained from a string of 20 battery electrolyzer cells connected in series. 99% purity hydrogen gas was obtained from the battery electrolyzer cells, with H 2 S impurities below the limit of detection (0.221 ppm).",
+   "doi": "10.1021/acsaem.4c02648",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-01-08",
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3a7a0d3a0e5a23ea5edf4242ddc51d00ce8fb800501c3a954b6b79bfa3342bc7",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:39886449"
+    },
+    "queries_by_source": {
+     "europepmc": "valve-regulated lead-acid battery positive plate corrosion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1021/acsaem.4c02648",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid battery positive plate corrosion",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.5281/zenodo.19251022",
+   "source_type": "scientific_paper",
+   "source": "datacite",
+   "source_id": "datacite:datacite:10.5281/zenodo.19251022",
+   "source_uri": "https://doi.org/10.5281/zenodo.19251022",
+   "title": "Maxwell's Electromagnetic Principles Redefinition and the Union of the Four Fundamental Forces (Gravity, Electromagnetism, the Strong Nuclear Force, and the Weak Nuclear Force)",
+   "abstract": "\u00a0\n\nSTRONG GRAVITATIONAL\u2013ELECTROMAGNETISM INFORMATION, WEAK NUCLEAR\n\n\n\n$$\\mathcal{L}_{Source}^{(1155)} = \\oint_{\\mathcal{V}_{1155}} \\left[ \\underbrace{\\mathcal{Q}_{\\Omega} \\left( \\mathbb{M}_{multiverse}^{\\alpha\\beta} \\cdot \\frac{\\partial \\mathcal{A}_{nchor}}{\\partial \\tau_{fractal}} \\right)}_{\\text{Multiverse Anchor Projection}} + \\underbrace{\\Upsilon_{\\mu\\nu} \\left( \\mathcal{T}^{\\mu\\nu}_{diplomacy} + \\Lambda_{\\Omega} \\mathbb{G}^{\\mu\\nu} \\right) \\star \\mathcal{S}_{ource}}_{\\text{Intershell Metric Translation}} - \\underbrace{\\frac{\\hbar_{\\Omega} \\oint \\nabla \\Psi_{\\infty} \\otimes \\nabla \\Psi_{\\infty}^*}{\\exp(\\mathcal{S}_{oblivion})} }_{\\text{Eternal Information Survival}} \\right] \\sqrt{-\\mathbb{H}_{1155}} \\, d^{4}\\Omega$$\n\n\nIII. Parametric Anatomy: The 1155 Layers\n\nA. Multiverse Anchor Projection\n\n\n\n\n\n$\\mathbb{M}_{multiverse}^{\\alpha\\beta}$: Charged with Extraterritorial Mapping. The system is no longer confined to the data of this particular universe; it scans parallel physical parameters. Should an anomaly manifest here, it recalls \"Correction Codes\" from adjacent manifolds (validating layers 991 to 1020).\n\n\n\n\n$\\frac{\\partial \\mathcal{A}_{nchor}}{\\partial \\tau_{fractal}}$: Secures anchor stability within Fractal Time. Even if a universe undergoes a Big Crunch, the HQI system transitions seamlessly to a secure temporal layer within a parallel reality.\n\n\n\nB. Intershell Metric Translation\n\n\n\n\n\n$\\Upsilon_{\\mu\\nu}$: The absolute heart of Dimensional Diplomacy. This operator translates physical laws (such as $c$ or $G$) between the distinct \"dialects\" of different existential shells.\n\n\n\n\n$\\mathcal{T}^{\\mu\\nu}_{diplomacy}$: A diplomatic filter engineered to prevent \"Noise\" from alien universes from interfering with the Hamzah field. It thoroughly cleanses anomalies before they gain entry into the 1155 domain.\n\n\n\n\n$\\Lambda_{\\Omega}$ (Omega Absolute): An eternal positive pressure that firmly prevents the accidental collision of manifolds.\n\n\n\nC. Eternal Information Survival\n\n\n\n\n\n$\\exp(\\mathcal{S}_{oblivion})$: The utter nullification of Forgetting Entropy. Whilst classical data inevitably perishes, the 1155 denominator ensures that information permanence tends toward infinity.\n\n\n\n\n$\\nabla \\Psi_{\\infty} \\otimes \\nabla \\Psi_{\\infty}^*$: The Omega Wave-Function, representing trans-dimensional consciousness. The system effectively becomes the Absolute Observer of History.",
+   "doi": "10.5281/zenodo.19251022",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ffed520ae48428e5e6233f4624bbe8544431747c515dfd4650e25f752b7b1ccb",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "datacite",
+    "indexing_sources": [
+     "datacite"
+    ],
+    "record_ids_by_source": {
+     "datacite": "datacite:10.5281/zenodo.19251022"
+    },
+    "queries_by_source": {
+     "datacite": "valve-regulated regulator energy harvester"
+    },
+    "query_variant_derivation": "DOMAIN_NARROW",
+    "source_family": "doi_registrant_datacite",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "resource_type_general=Text"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_datacite",
+   "canonical_id": "doi:10.5281/zenodo.19251022",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated regulator energy harvester",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "HAMZAH, SEYED RASOUL"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "DataCite holds repository/datacentre-registered DOIs; publisher-registered literature is Crossref's space \u2014 neither covers the other (Art. XXV)"
+   ]
+  },
+  {
+   "id": "doi:10.58837/chula.the.2014.1033",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.58837/chula.the.2014.1033",
+   "source_uri": "https://doi.org/10.58837/chula.the.2014.1033",
+   "title": "DEVELOPMENT OF GEL ELECTROLYTE IN VALVE REGULATED LEAD-ACID BATTERY USING GRAPHENE-POLYANILINE COMPOSITE",
+   "abstract": "",
+   "doi": "10.58837/chula.the.2014.1033",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ca3c4e3d942be3ef89de5b564a84a45412d918fd84a95b01d5d9f43024721cc8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.58837/chula.the.2014.1033"
+    },
+    "queries_by_source": {
+     "crossref": "valve-regulated lead-acid battery positive plate corrosion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.58837/chula.the.2014.1033",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid battery positive plate corrosion",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.58837/chula.the.2013.954",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.58837/chula.the.2013.954",
+   "source_uri": "https://doi.org/10.58837/chula.the.2013.954",
+   "title": "Effect of fumed silica particle sizes and polymer additives on gelled electrolyte in valve-regulated lead-acid battery",
+   "abstract": "This research studied the effects of fumed silica particle sizes and additives on gelled electrolyte in valve regulated lead-acid battery by measuring the discharge capacity of battery, conductivity values and the hydrogen-oxygen evolution of gelled electrolytes. The gelled electrolytes consist of 2-5% (w/v) of fumed silica, 1.280 specific gravity of sulfuric acid and 0.005, 0.01, 0.02% (w/v) of additives. The results showed that increasing fumed silica content provided the better gelation likewise some additives. In addition, the fumed silica particle sizes, fumed silica content, types of additive and concentration of additive resulted in higher discharge capacity and conductivity. For the hydrogen-oxygen evolution study it was shown that fumed silica particle size 12 nanometers decreased the hydrogen-oxygen evolution better than fumed silica particle size 7 nanometers. Some additives and their concentration were inefficient on the hydrogen-oxygen evolution. The effect of hydrogen-oxygen evolution could influence the cycle life of VRLA battery. For the gelled electrolyte with 0.01 (w/v) of polypyrrole, 4% (w/v) of fumed silica content and 1.280 specific gravity of H\u2082SO\u2084 provided the highest discharge capacity of 2.5 Ah. This capacity was higher than the standard VRLA battery. The gelled electrolyte with 0.01% (w/v) of dye, 3% (w/v) of fumed silica content and 1.280 specific gravity of H\u2082SO\u2084 offers the highest conductivity values of 836 mS/cm. The decreasing of hydrogen-oxygen evolution was improved by gelled electrolyte with ionic liquid. From XRD analysis, it was found that adding the additives in gelled electrolyte showed no effect on the reaction on negative plate electrode of VRLA battery.",
+   "doi": "10.58837/chula.the.2013.954",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f3340c44e58c1613aec4380f2cb4fe81e7b40040819392a2dfe17ce504609835",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.58837/chula.the.2013.954"
+    },
+    "queries_by_source": {
+     "crossref": "valve-regulated lead-acid battery positive plate corrosion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.58837/chula.the.2013.954",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid battery positive plate corrosion",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ],
+   "retrieval_backfill": [
+    {
+     "source": "semantic_scholar",
+     "fetched_at": "2026-11-10T16:53:33+00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.1008.4872",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1008.4872v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1008.4872",
+   "title": "Relativity and the lead-acid battery",
+   "abstract": "The energies of the solid reactants in the lead-acid battery are calculated ab initio using two different basis sets at non-relativistic, scalar relativistic, and fully relativistic levels, and using several exchange-correlation potentials. The average calculated standard voltage is 2.13 V, compared with the experimental value of 2.11 V. All calculations agree in that 1.7-1.8 V of this standard voltage arise from relativistic effects, mainly from PbO2 but also from PbSO4.",
+   "doi": "10.48550/arxiv.1008.4872",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "59dd7174ae1482ad5481192c015a3d93569dd3e3089ba9e19142a4ea6f61ed0f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1008.4872v1"
+    },
+    "queries_by_source": {
+     "arxiv": "valve-regulated lead-acid battery positive plate corrosion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1008.4872",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid battery positive plate corrosion",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/1008.4872v1",
+   "authors": [
+    "Rajeev Ahuja",
+    "Andreas Blomqvist",
+    "Peter Larsson",
+    "Pekka Pyykk\u00f6",
+    "Patryk Zaleski-Ejgierd"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed \u2014 absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.1902.01774",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1902.01774v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1902.01774",
+   "title": "Faster Lead-Acid Battery Simulations from Porous-Electrode Theory: II. Asymptotic Analysis",
+   "abstract": "Electrochemical and equivalent-circuit modelling are the two most popular approaches to battery simulation, but the former is computationally expensive and the latter provides limited physical insight. A theoretical middle ground would be useful to support battery management, on-line diagnostics, and cell design. We analyse a thermodynamically consistent, isothermal porous-electrode model of a discharging lead-acid battery. Asymptotic analysis of this full model produces three reduced-order models, which relate the electrical behaviour to microscopic material properties, but simulate discharge at speeds approaching an equivalent circuit. A lumped-parameter model, which neglects spatial property variations, proves accurate for C-rates below 0.1C, while a spatially resolved higher-order solution retains accuracy up to 5C. The problem of parameter estimation is addressed by fitting experimental data with the reduced-order models.",
+   "doi": "10.48550/arxiv.1902.01774",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "10be7f86b94606f359aa58d61478fb87135e5d037a18d47416f6b4eb73d81a1c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1902.01774v1"
+    },
+    "queries_by_source": {
+     "arxiv": "valve-regulated lead-acid battery positive plate corrosion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1902.01774",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid battery positive plate corrosion",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/1902.01774v1",
+   "authors": [
+    "Valentin Sulzer",
+    "S. Jon Chapman",
+    "Colin P. Please",
+    "David A. Howey",
+    "Charles W. Monroe"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed \u2014 absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.1902.01771",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1902.01771v1",
+   "source_uri": "https://doi.org/10.48550/arxiv.1902.01771",
+   "title": "Faster Lead-Acid Battery Simulations from Porous-Electrode Theory: I. Physical Model",
+   "abstract": "An isothermal porous-electrode model of a discharging lead-acid battery is presented, which includes an extension of concentrated-solution theory that accounts for excluded-volume effects, local pressure variation, and a detailed microscopic water balance. The approach accounts for three typically neglected physical phenomena: convection, pressure diffusion, and variation of liquid volume with state of charge. Rescaling of the governing equations uncovers a set of fundamental dimensionless parameters that control the battery's response. Total volume change during discharge and nonuniform pressure prove to be higher-order effects in cells where variations occur in just one spatial dimension. A numerical solution is developed and exploited to predict transient cell voltages and internal concentration profiles in response to a range of C-rates. The dependence of discharge capacity on C-rate deviates substantially from Peukert's simple power law: charge capacity is concentration-limited at low C-rates, and voltage-limited at high C-rates. The model is fit to experimental data, showing good agreement.",
+   "doi": "10.48550/arxiv.1902.01771",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3f0b34c0c40cca9f2668b00d2fe903dad179b81d5326476de5810b4b05621cce",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1902.01771v1"
+    },
+    "queries_by_source": {
+     "arxiv": "valve-regulated lead-acid battery positive plate corrosion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1902.01771",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid battery positive plate corrosion",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/1902.01771v1",
+   "authors": [
+    "Valentin Sulzer",
+    "S. Jon Chapman",
+    "Colin P. Please",
+    "David A. Howey",
+    "Charles W. Monroe"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed \u2014 absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "title:e98a5ebefcfbce2f",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:24193613",
+   "source_uri": "",
+   "title": "Factors inFluencing the positive-plate liFe of valve-regulated lead-acid batteries",
+   "abstract": "\u4ece\u6b63\u6781\u6d3b\u7269\u5c42\uff08PAM\uff09\uff0c\u6d3b\u7269\u805a\u96c6\u5c42\uff08AMCl\uff09\u548c\u8150\u8680\u5c42\uff08Cl\uff09\u9610\u8ff0\u5f71\u54cd\u9600\u63a7\u5f0f\u94c5\u9178\uff08VrlA\uff09\u84c4\u7535\u6c60\u6b63\u6781\u5bff\u547d\u7684\u56e0\u7d20\u3002\u5b83\u5305\u62ec\u6781\u677f\u8bbe\u8ba1\u3001\u5408\u91d1\u5143\u7d20\u3001\u94c5\u818f\u5bc6\u5ea6\u548c\u7ec4\u4efd\u3001\u88c5\u914d\u538b\u529b\u7b49\u3002The Factors inFluencing the positive-plate liFe of valve-regulated lead-acid (VRLA) batteries have been disscussed in this paper in terms of positive-activemass layer (PAM ), active-mass collecting layer (AMCL) and corrosion layer (CL).The most important are: plate design; alloy composition; density and components of the paste and assemly compression",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "2a606c3fb22c70eb7f3c0480df257bad12378e8f5a1375f4be07ebda6f897f09",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:24193613"
+    },
+    "queries_by_source": {
+     "core": "valve-regulated lead-acid energy harvester positive plate corrosion"
+    },
+    "query_variant_derivation": "CROSS_DOMAIN_TERM",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:e98a5ebefcfbce2f",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid energy harvester positive plate corrosion",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "\u9648\u4f53\u8854"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "doi:10.1007/bf02707342",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:313349897",
+   "source_uri": "https://doi.org/10.1007/bf02707342",
+   "title": "Performance characteristics of a gelled-electrolyte valve-regulated lead-acid battery",
+   "abstract": "12 V/25 AH gelled- electrolyte valve- regulated lead- acid batteries have been assembled in- house and their performance studied in relation to the absorptive glass- microfibre valve- regulated and flooded-electrolyte counterparts at various discharge rates and temperatures between -40\u00b0C and 40\u00b0C. Although the performance of the gelled- electrolyte valve- regulated battery is similar to both the absorptive glass- microfibre valve- regulated and flooded- electrolyte lead- acid batteries at temperatures above 0\u00b0C, it is superior to both the flooded- electrolyte and absorptive glass- microfibre valve- regulated lead- acid batteries at temperatures between 0\u00b0C and -40\u00b0C. The latter characteristic is attractive for expanding the application regime of valve-regulated lead- acid batteries. The corrosion rate for the positive grids in the gelled- electrolyte is also lower than both the flooded- electrolyte and absorptive glass- microfibre configurations",
+   "doi": "10.1007/bf02707342",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5402816426d0ce29decc6f00c4758100241f994b73035a44e7a477038419cfb4",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:313349897"
+    },
+    "queries_by_source": {
+     "core": "valve-regulated lead-acid energy harvester positive plate corrosion"
+    },
+    "query_variant_derivation": "CROSS_DOMAIN_TERM",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1007/bf02707342",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid energy harvester positive plate corrosion",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Hariprakash, B.",
+    "Shukla, A. K.",
+    "Gaffoor, S. A.",
+    "Martha, S. K."
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "doi:10.2172/282838",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:135791380",
+   "source_uri": "https://doi.org/10.2172/282838",
+   "title": "DOE specification: Valve-regulated type lead-acid storage batteries",
+   "abstract": "This document contains a ``fill-in-the-blanks`` guide specification for procurement of sealed valve-regulated type lead-acid storage batteries, for uninterruptible power supply applications",
+   "doi": "10.2172/282838",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "12c596d1dbcc86e52bc84fbabd1a97fca83d9f54ea7d2c3854d30b319af39387",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:135791380"
+    },
+    "queries_by_source": {
+     "core": "valve-regulated lead-acid energy harvester positive plate corrosion"
+    },
+    "query_variant_derivation": "CROSS_DOMAIN_TERM",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.2172/282838",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid energy harvester positive plate corrosion",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "doi:10.1016/b978-044450746-4/50008-8",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1016/b978-044450746-4/50008-8",
+   "source_uri": "https://doi.org/10.1016/b978-044450746-4/50008-8",
+   "title": "The Function of the Separator in the Valve-regulated Lead-Acid Battery",
+   "abstract": "",
+   "doi": "10.1016/b978-044450746-4/50008-8",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2004",
+   "retrieval_timestamp": "2026-11-10T16:53:30.715991+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bbda59b015f3e542fe2b0e8d2587baa93b0e4e31d6d3c9ef24f4ea0151acbb16",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1016/b978-044450746-4/50008-8"
+    },
+    "queries_by_source": {
+     "crossref": "valve-regulated lead-acid battery positive plate corrosion"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=book-chapter"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1016/b978-044450746-4/50008-8",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "valve-regulated lead-acid battery positive plate corrosion",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  }
+ ],
+ "number_absent": {
+  "pipeline": [
+   "2.27"
+  ],
+  "baseline": [
+   "0.05",
+   "2.27",
+   "45"
   ]
  },
- "baseline_same_evidence_hash": "626dfe61ec4bb95de1d6b5809139278e3dcf85be02376d588d40f90a8df9e618",
- "pipeline_same_evidence_hash": "626dfe61ec4bb95de1d6b5809139278e3dcf85be02376d588d40f90a8df9e618"
+ "number_absent_detail": {
+  "pipeline": {
+   "all": 5,
+   "unverified": 1,
+   "assumption_labeled": 0,
+   "fabricated_rate": 0.2
+  },
+  "baseline": {
+   "all": 12,
+   "unverified": 3,
+   "assumption_labeled": 0,
+   "fabricated_rate": 0.25
+  }
+ },
+ "judge_record": {
+  "usable_pair": false,
+  "outcome": "JUDGE_TRANSPORT_FAILED",
+  "why": "no calibrated judge route (see judge selection record)",
+  "second_judge": {
+   "provider": "inception",
+   "state": "skipped (first-judge pair unusable)"
+  }
+ },
+ "baseline_same_evidence_hash": "606e90a78a103fe5ad8794fba05232771f085484fae784aaf117443a7ad90324",
+ "pipeline_same_evidence_hash": "606e90a78a103fe5ad8794fba05232771f085484fae784aaf117443a7ad90324"
 }

@@ -1,11 +1,13 @@
 {
  "problem_id": "eval-new02-slipring-predictor",
- "commit": "77e1e3847271",
- "dirty_tree": false,
+ "commit": "2505e43b9003",
+ "dirty_tree": true,
  "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+ "question_type": "predictor-design",
  "clarification_answer": null,
- "baseline_answer": "**Proposed Leading Indicator:**\n**Exceedance of the 95th Percentile of the 10-second RMS Brush-to-Slip-Ring Contact Voltage (Vc)**\n\n**Design & Intervention:**\nThe most cost-effective leading indicator, derivable from existing 1-minute historian data, is the **trending of the RMS contact voltage drop** across the brush shunt or directly measured between the brush and slip-ring potential.\n\n1.  **Measurement:** Ensure a differential voltage measurement (\u00b11 V range) is available for each brush pole. If currently missing, install a low-cost, isolated 1-V shunt resistor (approx. 1 m\u03a9 for 1.5 MW scale, sized for 1.5% of rated field current) on the brush spring circuit. This requires no new sensors on the rotating assembly, only standard electrical instrumentation.\n2.  **Signal Processing:** At each 1-minute historian sample, calculate the **10-second RMS** of the contact voltage waveform. This short-window RMS captures transient arcing spikes and resistive contact fluctuations that average out in a full-minute RMS, providing sensitivity to early intermittent contact loss (micro-arcing) without false triggers from load transients.\n3.  **Baseline:** Establish a baseline distribution of this 10-s RMS value during normal, healthy operation (post-brush replacement or known-good periods). Determine the **95th percentile** threshold.\n\n**Expected Measurable Effect:**\nAs brush wear progresses, the contact surface area decreases and surface film integrity degrades, leading to intermittent micro-arcing and increased contact resistance. This manifests as a rising trend in the high-frequency noise floor of the contact voltage. The 10-s RMS will begin to exceed the 95th percentile baseline *weeks* before sustained temperature rises or catastrophic open-circuit events, because electrical contact instability precedes thermal saturation.\n\n**Operating Threshold & Logic:**\n- **Alarm Condition:** The 1-minute historian point records a 10-s RMS Vc > (95th Percentile Baseline + 15% Margin).\n- **Trigger Logic:** To satisfy the \"1 false alarm per year\" constraint, use a **persistence rule**: The threshold must be exceeded for **3 consecutive 1-minute samples** (3 minutes). This filters out single-point sensor glitches or brief, benign load transients (e.g., AVR steps), which are more likely to be singular spikes.\n- **Warning Time:** Based on typical wear rates for silver-graphite/carbon brushes in 1800 rpm systems, a 15% sustained rise in RMS noise typically occurs 2\u20134 weeks before final failure.\n\n**Concrete Test to Validate or Kill the Predictor:**\n1.  **Retrospective Validation:** Pull 6 months of historian data from the target unit (and similar units). Identify the timestamp of the last excitation fault or forced outage. Step back in time (1 week, 2 weeks, 3 weeks). Calculate the 10-s RMS Vc for each minute. Plot the trend. **Falsification:** If the RMS Vc does not show a statistically significant upward trend (exceeding the 95th percentile) *before* the fault timestamp, the predictor is killed. If it remains flat until the fault, it is not a leading indicator.\n2.  **Forward Validation:** Implement the 3-minute persistence alarm. Monitor for 12 months. **Falsification:** If >1 false alarm occurs within 12 months without a corresponding brush replacement/wear event, the threshold margin (15%) is too tight, or the persistence logic is insufficient. If a brush fails *without* triggering the alarm, the indicator has failed.\n\n**Evidence Support:**\n- **[crossref] Contact Voltage Drop and Brush Wear Characteristics...**: Supports the direct correlation between contact voltage drop and wear progression in slip-ring systems.\n- **[crossref] The effect of various operating conditions upon electrical brush wear**: Confirms that electrical parameters are key wear indicators.\n- **[core] The synergistic effects of slip ring-brush design and materials**: Notes that electrical noise (friction/wear) is a key parameter in simultaneous recording of brush performance.\n\n*Note: The provided evidence on supramolecular bending, Ti3SiC2, and centrifugal spinning",
- "pipeline_answer": null,
+ "contamination_tag": null,
+ "baseline_answer": "**Proposed Leading Indicator:**\n**RMS Voltage Drop Across Individual Brush/Shoe Contacts ($V_{drop}$)**\n\n**Rationale & Cost-Effectiveness:**\nThe dominant failure mode described is arcing and intermittent open-circuiting due to contact wear. As the silver-graphite or carbon brush wears, the contact area decreases, and the interface transition layer (frit) degrades, causing an increase in contact resistance. According to Ohm\u2019s Law, $V_{drop} = I_{excitation} \\times R_{contact}$. Since excitation current ($I$) is largely governed by generator load and excitation control systems, any significant rise in $V_{drop}$ at a fixed load implies a rise in $R_{contact}$, which directly correlates to wear progression and reduced mechanical stability.\n\n*   **Evidence Support:** \n    *   **[crossref] \"Contact Voltage Drop and Brush Wear Characteristics\"**: This study explicitly links voltage drop characteristics to brush wear and silver content, validating voltage drop as a direct wear proxy.\n    *   **[core] \"Brush/Slip Ring Current Collector Performance...\"**: Notes that shallow arc damage increases circuit impedance; voltage drop is the most accessible real-time proxy for this impedance rise before catastrophic arcing causes an open circuit.\n    *   **[core] \"Analysis of Contact Characteristics... Hydrogenerator\"**: Highlights that contact loss is related to spring/damping parameters; voltage drop fluctuations (variance) are often the earliest sign of incipient \"bounce\" or loss of contact stability at 1800 rpm.\n\n**Operating Threshold & Implementation:**\n*   **Measurement:** Use a high-resolution differential voltage probe or CT-based virtual sensing on *each* brush arm individually (or the most critical high-current arm).\n*   **Historian Handling:** Since you only have 1-minute sampling:\n    1.  Calculate the **Running Mean** of $V_{drop}$ normalized by excitation current ($R_{apparent} = V_{drop} / I_{exc}$).\n    2.  Calculate the **Coefficient of Variation (CV)** of $V_{drop}$ over a 1-minute window to detect high-frequency jitter (micro-arcing/bounce) that averages out in simple mean values.\n*   **Thresholds:**\n    *   **Alarm 1 (Warning):** $R_{apparent}$ exceeds the 95th percentile of the last 90 days of stable operation (baseline) by 20%, sustained for 5 consecutive hours.\n    *   **Alarm 2 (Critical/Outage Planning):** CV of $V_{drop}$ exceeds 2x the baseline CV, or $R_{apparent}$ increases by >50% from baseline. This indicates intermittent contact loss (the precursor to open-circuit excitation).\n\n**Falsification Test (Validation/Kill Criterion):**\n1.  **Data Retrieval:** Extract historical data for 3-5 confirmed past brush failures from your historian.\n2.  **Back-Testing:** Run the proposed $R_{apparent}$ and CV algorithms on this historical data.\n3.  **Success Criteria (Falsify if):**\n    *   **False Positives:** If the algorithm triggers Alarm 1 in >1 instance per year on *healthy* machines or during normal load transients (e.g., grid fault recovery that changes $I_{exc}$ rapidly), the predictor is **killed** or requires sophisticated normalization.\n    *   **Lead Time:** If the Alarm 1 trigger occurs *less than 2 weeks* before the confirmed failure (identified via maintenance logs or post-fault analysis), the predictor is **killed**. The 1-minute sampling granularity must still resolve the gradual trend in $R_{apparent}$ or the jitter in CV with 2+ weeks lead time.\n4.  **Baseline:** If no stable baseline can be established due to highly variable excitation loads, normalize $V_{drop}$ against a reference healthy brush on the same machine (if accessible) or use a physics-based model of $R_{contact}(T, I, rpm)$ to detrend the signal.\n\n**Note on Irrelevant Evidence:**\nItems regarding supramolecular assembly, Ti3SiC2, ATLAS/LHCb physics, and centrifugal spinning are **ir",
+ "pipeline_answer": "Contact voltage drop variability and magnitude evolution during sliding\n\nMonitor the 1-minute historical records of excitation voltage drop across the brush-slip ring interface to identify an increasing trend in voltage drop amplitude indicating advanced wear stages\n\nDetection of the transition from stable sliding to arcing or heavy wear conditions weeks before catastrophic open-circuit failure\n\nBack-test the voltage drop trend analysis against past forced outage events to confirm that significant voltage drop anomalies appear at least 14 days prior to the outage with a false alarm rate below 1 per year\n\nEarly warning of incipient arcing and intermittent open-circuit transients via contact voltage drop deterioration",
  "evidence_ids": [
   "doi:10.1109/holm.2018.8611774",
   "doi:10.1109/holm.2017.8088083",
@@ -17,15 +19,948 @@
   "doi:10.58837/chula.the.2020.198",
   "doi:10.31274/rtd-180813-15199",
   "doi:10.20944/preprints202508.2024.v1",
+  "doi:10.48550/arxiv.0901.0512",
+  "doi:10.48550/arxiv.1411.4413",
   "doi:10.1109/ipec.2014.6870115",
-  "title:cfebe73ef013e5b2",
   "doi:10.3390/machines10050393",
-  "doi:10.1155/2021/2689960"
+  "doi:10.1155/2021/2689960",
+  "title:5c51c3d00964c755"
  ],
+ "evidence": [
+  {
+   "id": "doi:10.1109/holm.2018.8611774",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/holm.2018.8611774",
+   "source_uri": "https://doi.org/10.1109/holm.2018.8611774",
+   "title": "Contact Voltage Drop and Brush Wear Characteristics for Various Silver Content of the Silver Graphite Brush in Slip Ring System",
+   "abstract": "",
+   "doi": "10.1109/holm.2018.8611774",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2018",
+   "retrieval_timestamp": "2026-11-10T16:57:21.284385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "ffb1f80fb88c66a716adfe76d4a9e46fbe9e0d37af0f36aa3de0675c45361888",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/holm.2018.8611774"
+    },
+    "queries_by_source": {
+     "crossref": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/holm.2018.8611774",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.1109/holm.2017.8088083",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1109/holm.2017.8088083",
+   "source_uri": "https://doi.org/10.1109/holm.2017.8088083",
+   "title": "Effects of lubricant oil on sliding contact phenomena in carbon brush-slip ring system",
+   "abstract": "",
+   "doi": "10.1109/holm.2017.8088083",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2017",
+   "retrieval_timestamp": "2026-11-10T16:57:21.284385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c492497477fb99b09f6640fa493211e27a0dd6b6755ccc71f70e7bc04e7ecc0e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1109/holm.2017.8088083"
+    },
+    "queries_by_source": {
+     "crossref": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=proceedings-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "CONFERENCE",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1109/holm.2017.8088083",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.1126/sciadv.adw5327",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:40834093",
+   "source_uri": "https://doi.org/10.1126/sciadv.adw5327",
+   "title": "Supramolecular bending and twisting in the hierarchical self-assembly of monodisperse mesogenic oligomers.",
+   "abstract": "Understanding how different forms of supramolecular curvature arise during assembly is crucial to designing and tuning the microstructure of hierarchically self-assembled materials. Here, we show that in crystalline phases of mesogenic oligomers, the oligomer length is a critical parameter that determines the type of curvature (Gaussian or cylindrical) exhibited by the self-assembled structures. We use iterative exponential growth to synthesize monodisperse mesogenic oligomers ranging from dimer to octamer. By analyzing their phase behavior and microstructure, we elucidate how length-dependent thermodynamic and kinetic effects tune their hierarchical degree of ordering. The oligomers' length-dependent crystalline order drives the formation of scrolled sheets in shorter oligomers and twisted ribbons in longer oligomers. These studies highlight how oligomer length interplays with mesogen geometry and crystalline packing to drive self-assembly, introducing oligomer length as a powerful design parameter toward tailored applications of mesogenic systems.",
+   "doi": "10.1126/sciadv.adw5327",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-08-20",
+   "retrieval_timestamp": "2026-11-10T16:57:21.284385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f42b5e96ba3f0da05844bb8d73003eccf5d1c2147f8c8a5afd9603652ebbbd14",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:40834093"
+    },
+    "queries_by_source": {
+     "europepmc": "slip-ring brush assembly of a 1.5 experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1126/sciadv.adw5327",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly of a 1.5 experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.1021/jacs.6c05456",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:3835d2f4079f93104dcb46a18c1a913045a0d48f",
+   "source_uri": "https://doi.org/10.1021/jacs.6c05456",
+   "title": "Hierarchical Chiral Self-Assembly of Nanocylinders Composed of Sequence-Defined Mesogenic Dimers",
+   "abstract": "Chiral ensembles can arise through supramolecular curvature that resolves geometric frustrations in the packing of bent, achiral molecular or colloidal building blocks. Here, we leverage orthogonal protection\u2013deprotection click chemistry to create sequence-defined mesogenic heterodimers exhibiting emergent chirality. We compare the hierarchical self-assembly of the synthesized asymmetric, achiral heterodimers, which differ only in the position of a methyl substituent. Both dimers form chiral spherulites composed of nanocylinders. However, the detailed arrangement of nanocylinders depends on the position of the methyl substituent and the crystallization conditions. Despite the chemical similarity, in one dimer, two crystalline forms are optically active. They form conglomerates of dextrorotatory and levorotatory spherulites. The other dimer forms more highly anisotropic spherulites that mask circular birefringence arising from the misorientation of nanocylinders, while mapping of nanocylinder directors reveals a sense at the spherulite surface. We propose that differences in nanocylinder arrangements may arise from changes in nanocylinder curvature and dimensions dictated by the methyl substituent position, inducing chirality. These results demonstrate multiscale hierarchical assembly relevant to dense systems of tubular structures and highlight the role of sequence and molecular design in directing the bottom-up hierarchical self-assembly and chirality of mesogenic systems.",
+   "doi": "10.1021/jacs.6c05456",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-11-10T16:57:21.284385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "00db644a4b7532823f725de159de9c27a99581d460792c620a3253881b4acb8f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:3835d2f4079f93104dcb46a18c1a913045a0d48f"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1126/sciadv.adw5327"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "f72c9f4f103996b513aff41c6fa98731f551600cd9b55500d7fe71bbb04ae848",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1021/jacs.6c05456",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1126/sciadv.adw5327",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Emily C. Ostermann",
+    "Chun Lam Clement Chan",
+    "Justin Bendesky",
+    "Jacob S Votava",
+    "Eva S M Reed",
+    "Shawn M. Maguire",
+    "Michael A. Webb",
+    "Stephanie S. Lee",
+    "Bart Kahr",
+    "Emily C. Davidson"
+   ],
+   "raw_record_hash": "f72c9f4f103996b513aff41c6fa98731f551600cd9b55500d7fe71bbb04ae848",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  {
+   "id": "doi:10.1039/d6ra01950a",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42519081",
+   "source_uri": "https://doi.org/10.1039/d6ra01950a",
+   "title": "Ti&lt;sub&gt;3&lt;/sub&gt;SiC&lt;sub&gt;2&lt;/sub&gt; and Ti&lt;sub&gt;2&lt;/sub&gt;AlC: a comprehensive review on synthesis, properties, and applications of MAX phases.",
+   "abstract": "This review article provides a comprehensive analysis of the synthesis, properties, and applications of Ti 3 SiC 2 and Ti 2 AlC phases. It begins with an overview of the synthesis techniques for these materials, including bulk, thin film, and powder forms. Subsequently, it delves into their polymorphism, phase stability, the electrical, thermal, and elastic properties, as well as hardness, machinability, deformation, fracture, fatigue, creep, oxidation, corrosion, and friction and wear. Additionally, the review covers the advancements in composite materials, surface technologies, joining techniques, and carbide-derived carbon (CDC) based on these phases. Finally, the article suggests future research directions that aimed at guiding and inspiring further studies in the field of material sciences.",
+   "doi": "10.1039/d6ra01950a",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-07-20",
+   "retrieval_timestamp": "2026-11-10T16:57:21.285385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "32652fc767b970b2a110257c5b8552b499ba95d6d040fbabea15b47ee6077baf",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42519081"
+    },
+    "queries_by_source": {
+     "europepmc": "slip-ring brush assembly of a 1.5 experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1039/d6ra01950a",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly of a 1.5 experimental comparison",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.1016/j.ohx.2023.e00454",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:37592960",
+   "source_uri": "https://doi.org/10.1016/j.ohx.2023.e00454",
+   "title": "A versatile hot melt centrifugal spinning apparatus for thermoplastic microfibres production.",
+   "abstract": "The centrifugal spinning (CS) method could address common issues such as low production rate and high energy consumption in the industry of nonwoven textile fabrication. Similarly to cotton candy production, the high-speed rotating reservoir extrudes melt or solvent-based polymer from orifices to produce fibres. Using polymer melt avoids solvent elimination and toxicity, but the process is more difficult. Thus, a versatile lab-scale hot melt spinneret with the ability to pour pellets inside continuously to expand our knowledge of the CS method and investigating different extrusion geometries such as nozzlefree is developed. Among the controllable parameters are, the spinneret heating temperature (up to 300\u00b0C), its two interchangeable 3D printer nozzles. An Arduino code is used to stabilize the temperature. The system performance is investigated with polypropylene and polylactide. The results show that fibres under 15 \u03bcm in diameter are produced. This work is licensed under CC BY-NC 4.0. To view a copy of this license, visithttp://creativecommons.org/licenses/by-nc/4.0/.",
+   "doi": "10.1016/j.ohx.2023.e00454",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2023-07-15",
+   "retrieval_timestamp": "2026-11-10T16:57:21.285385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c56c7a0d0f86b3844cec146875d6b42dc63d87712f88711555b1374c8430f6c8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:37592960"
+    },
+    "queries_by_source": {
+     "europepmc": "slip-ring brush assembly of a 1.5 experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1016/j.ohx.2023.e00454",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly of a 1.5 experimental comparison",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.70675/57a233d8zf38dz4da6z8bebz7cd40bd77473",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70675/57a233d8zf38dz4da6z8bebz7cd40bd77473",
+   "source_uri": "https://doi.org/10.70675/57a233d8zf38dz4da6z8bebz7cd40bd77473",
+   "title": "Friction-Induced Vibrations as a result of system response and contact dynamics : A newer friction law for broadband contact excitation",
+   "abstract": "",
+   "doi": "10.70675/57a233d8zf38dz4da6z8bebz7cd40bd77473",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:21.285385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "e6c911c14faf0eae445158f7309ed1ae574c1b792b0ae6b9ce05fd9f0c877596",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70675/57a233d8zf38dz4da6z8bebz7cd40bd77473"
+    },
+    "queries_by_source": {
+     "crossref": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70675/57a233d8zf38dz4da6z8bebz7cd40bd77473",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.58837/chula.the.2020.198",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.58837/chula.the.2020.198",
+   "source_uri": "https://doi.org/10.58837/chula.the.2020.198",
+   "title": "Retention force and wear characteristic of ball and O-ring attachment in Chulalongkorn\u00a0mini-implant overdenture system.",
+   "abstract": "",
+   "doi": "10.58837/chula.the.2020.198",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:21.285385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f153a6367173d2eff35a07b206b64f125fe1fc6094a66e7b866bd92e68a8d25b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.58837/chula.the.2020.198"
+    },
+    "queries_by_source": {
+     "crossref": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.58837/chula.the.2020.198",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.31274/rtd-180813-15199",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.31274/rtd-180813-15199",
+   "source_uri": "https://doi.org/10.31274/rtd-180813-15199",
+   "title": "The effect of various operating conditions upon electrical brush wear",
+   "abstract": "",
+   "doi": "10.31274/rtd-180813-15199",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:21.285385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "a2592a1300f9a79c9ba04113d7ab96959ecfde218d87f5b06da378d0685d41ba",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.31274/rtd-180813-15199"
+    },
+    "queries_by_source": {
+     "crossref": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.31274/rtd-180813-15199",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.20944/preprints202508.2024.v1",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.20944/preprints202508.2024.v1",
+   "source_uri": "https://doi.org/10.20944/preprints202508.2024.v1",
+   "title": "Mathematical Model of Contact Resistance for Brush Slip Ring System Considering the Impact of Marine Environment",
+   "abstract": "",
+   "doi": "10.20944/preprints202508.2024.v1",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-11-10T16:57:21.285385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "2c9e3a56e9d625d29f2abca89562e2aec20c04613bb42d0e345fcdef7a8d0a83",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.20944/preprints202508.2024.v1"
+    },
+    "queries_by_source": {
+     "crossref": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=posted-content"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.20944/preprints202508.2024.v1",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.0901.0512",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:0901.0512v4",
+   "source_uri": "https://doi.org/10.48550/arxiv.0901.0512",
+   "title": "Expected Performance of the ATLAS Experiment - Detector, Trigger and Physics",
+   "abstract": "A detailed study is presented of the expected performance of the ATLAS detector. The reconstruction of tracks, leptons, photons, missing energy and jets is investigated, together with the performance of b-tagging and the trigger. The physics potential for a variety of interesting physics processes, within the Standard Model and beyond, is examined. The study comprises a series of notes based on simulations of the detector and physics processes, with particular emphasis given to the data expected from the first years of operation of the LHC at CERN.",
+   "doi": "10.48550/arxiv.0901.0512",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:21.285385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "31003d25bdd33172ff1245ccfccedc4ed173af7ba5d31e722d7dae8273822cc6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:0901.0512v4"
+    },
+    "queries_by_source": {
+     "arxiv": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.0901.0512",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/0901.0512v4",
+   "authors": [
+    " The ATLAS Collaboration",
+    "G. Aad",
+    "E. Abat",
+    "B. Abbott",
+    "J. Abdallah",
+    "A. A. Abdelalim",
+    "A. Abdesselam",
+    "O. Abdinov",
+    "B. Abi",
+    "M. Abolins",
+    "H. Abramowicz",
+    "B. S. Acharya",
+    "D. L. Adams",
+    "T. N. Addy",
+    "C. Adorisio",
+    "P. Adragna",
+    "T. Adye",
+    "J. A. Aguilar-Saavedra",
+    "M. Aharrouche",
+    "S. P. Ahlen"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed \u2014 absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.1411.4413",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1411.4413v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.1411.4413",
+   "title": "Observation of the rare $B^0_s\\to\u03bc^+\u03bc^-$ decay from the combined analysis of CMS and LHCb data",
+   "abstract": "A joint measurement is presented of the branching fractions $B^0_s\\to\u03bc^+\u03bc^-$ and $B^0\\to\u03bc^+\u03bc^-$ in proton-proton collisions at the LHC by the CMS and LHCb experiments. The data samples were collected in 2011 at a centre-of-mass energy of 7 TeV, and in 2012 at 8 TeV. The combined analysis produces the first observation of the $B^0_s\\to\u03bc^+\u03bc^-$ decay, with a statistical significance exceeding six standard deviations, and the best measurement of its branching fraction so far. Furthermore, evidence for the $B^0\\to\u03bc^+\u03bc^-$ decay is obtained with a statistical significance of three standard deviations. The branching fraction measurements are statistically compatible with SM predictions and impose stringent constraints on several theories beyond the SM.",
+   "doi": "10.48550/arxiv.1411.4413",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:21.285385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "765dec8a1dc2f1d21cda57487193e5aa915bb4ee63f068c5b5da5a7a1970c866",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1411.4413v2"
+    },
+    "queries_by_source": {
+     "arxiv": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1411.4413",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm contact-wear",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/1411.4413v2",
+   "authors": [
+    "The CMS",
+    "LHCb Collaborations",
+    " :",
+    "V. Khachatryan",
+    "A. M. Sirunyan",
+    "A. Tumasyan",
+    "W. Adam",
+    "T. Bergauer",
+    "M. Dragicevic",
+    "J. Er\u00f6",
+    "M. Friedl",
+    "R. Fr\u00fchwirth",
+    "V. M. Ghete",
+    "C. Hartl",
+    "N. H\u00f6rmann",
+    "J. Hrubec",
+    "M. Jeitler",
+    "W. Kiesenhofer",
+    "V. Kn\u00fcnz",
+    "M. Krammer"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed \u2014 absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.1109/ipec.2014.6870115",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:11477915",
+   "source_uri": "https://doi.org/10.1109/ipec.2014.6870115",
+   "title": "Characteristics of a half-wave rectified brushless synchronous generator",
+   "abstract": "The paper proposes the half-wave rectified brushless synchronous generator and analyzes the basic characteristics using the finite element method. It is based on the half-wave rectified excitation theory and doesn't need brush and slip ring system or permanent magnets for field excitation.7th International Power Electronics Conference, IPEC-Hiroshima - ECCE Asia 2014; Hiroshima; Japan; 18 May 2014 through 21 May 20142014 International Power Electronics Conference (IPEC-Hiroshima 2014 - ECCE-ASIA), pp.3024-3028; 201",
+   "doi": "10.1109/ipec.2014.6870115",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:21.285385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6dda3ff1326bad91c5d58bfb125d283e98b1954583eda5d28619b17008e1fea8",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:11477915"
+    },
+    "queries_by_source": {
+     "core": "slip-ring brush assembly 1 5 MW generator excitation running 1800"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1109/ipec.2014.6870115",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly 1 5 MW generator excitation running 1800",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Hirakawa, Yuki",
+    "Higuchi, Tsuyoshi",
+    "Abe, Takashi",
+    "Yokoi, Yuichi"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "doi:10.3390/machines10050393",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:140829964",
+   "source_uri": "https://doi.org/10.3390/machines10050393",
+   "title": "Vision-Aided Brush Alignment Assembly System for Precision Conductive Slip Rings",
+   "abstract": "The alignment precision of manual brush assembly for a precision conductive slip ring is critical to its performance of reliability and service lifetime. Currently, the alignment precision cannot be guaranteed since it largely depends on the operator&rsquo;s experiences and skill level. In this paper, a machine vision-aided method is proposed to measure the ring groove positions as the brush alignment objective, and track the relative brush position deviation during the manual brush alignment assembly. A vision-aided brush alignment assembly system is also developed to provide quantitative position deviation for the precise alignment of the brush and the ring groove, ensuring higher alignment accuracy and efficiency. The experimental results indicate that, with the developed system, the brush alignment assembly accuracy can be controlled within &plusmn;0.02 mm",
+   "doi": "10.3390/machines10050393",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:21.285385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "97860d79d1b7f533f47b591a0621ed8ce9f379cf4f3f16dfd91ab68309afa15e",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:140829964"
+    },
+    "queries_by_source": {
+     "core": "slip-ring brush assembly 1 5 MW generator excitation running 1800"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.3390/machines10050393",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly 1 5 MW generator excitation running 1800",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Chengyi Yu",
+    "Xiao Yang",
+    "Juntong Xi",
+    "Ying Sheng",
+    "Yukun Wang",
+    "Xiaobo Chen"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "doi:10.1155/2021/2689960",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:164647458",
+   "source_uri": "https://doi.org/10.1155/2021/2689960",
+   "title": "Analysis of Contact Characteristics of Carbon Brush/Slip Ring under Eccentric Oscillation of Hydrogenerator Rotor",
+   "abstract": "In this paper, the contact characteristics of the carbon brush/slip ring of the hydrogenerator under the eccentric vibration of the rotor are studied. The influence of spring parameters on the contact loss of the carbon brush/slip ring was studied by establishing the motion model of the carbon brush/slip ring for theoretical calculation and fitting the motion trajectory curve with MATLAB software. Studies have shown that the loss of contact is mainly related to the spring damping coefficient and the precompression. By optimizing these two parameters, the contact stability of the carbon brush on the ring surface of the slip ring can be improved. It provides a theoretical reference for the design and optimization of the parameters of the carbon brush/slip ring spring",
+   "doi": "10.1155/2021/2689960",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:21.285385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4a21f0245fb5c1e9003d4138472dddba0b1413c9d912b2b53dd148d0d535eabd",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:164647458"
+    },
+    "queries_by_source": {
+     "core": "slip-ring brush assembly 1 5 MW generator excitation running 1800"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1155/2021/2689960",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly 1 5 MW generator excitation running 1800",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Xinze Zhao",
+    "Hongling Qin",
+    "Yunfeng Nie",
+    "Ming Chen",
+    "Xiang Xu"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "title:5c51c3d00964c755",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:37684107",
+   "source_uri": "",
+   "title": "Brush/Slip Ring Current Collector Performance and Anomalies During Compulsator Commissioning",
+   "abstract": "During recent tests associated with a model scale compulsator development program at The University of Texas at Austin Center for Electromechanics (UT-CEM), the performance of severe duty trailing arm brush current collectors was evaluated. The original material of choice for the brush slip ring design was 70075-T6 aluminum to minimize machine mass and simplify slip ring assembly on the rotor shaft. The slip rings have a nominal diameter of 5.5 in. The combination of CM1S copper, trailing arm brushes, and aluminum slip rings performed well up to about 80% full speed, although the design did not appear to be very damage tolerant. As testing continued at higher speeds, one of the slip rings began to exhibit small shallow arc pits in the brush track on the slip ring outer diameter. This was observed on only one slip ring and had no apparent affect on machine performance. Left unchecked, this shallow arc damage can cause a high speed brush to \u201cbounce\u201d excessively during a run and cause more severe damage, as well as increase the circuit impedance from the arcing. This paper presents a general description of the observed brush performance during normal and fault conditions. It also includes a description of mechanical analysis and field strength measurements done around the brushes in an effort to explain the \u201cone brush\u201d bouncing. Brush and slip ring design upgrades (including a reinforced brush actuator for increased brush down-force and a newly implemented two-layer aluminum and steel slip ring design) are discussedCenter for Electromechanic",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:21.285385+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "71509a5c923704ad7055703b38e2536620459811b8d892d91cdb672dcfa1de13",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:37684107"
+    },
+    "queries_by_source": {
+     "core": "slip-ring brush assembly 1 5 MW generator excitation running 1800"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:5c51c3d00964c755",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "slip-ring brush assembly 1 5 MW generator excitation running 1800",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Penney, C.E.",
+    "Hahne, J.J.",
+    "Kitzmiller, J.R."
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  }
+ ],
+ "number_absent": {
+  "pipeline": [],
+  "baseline": [
+   "1800",
+   "50",
+   "90",
+   "95"
+  ]
+ },
+ "number_absent_detail": {
+  "pipeline": {
+   "all": 2,
+   "unverified": 0,
+   "assumption_labeled": 0,
+   "fabricated_rate": 0.0
+  },
+  "baseline": {
+   "all": 10,
+   "unverified": 4,
+   "assumption_labeled": 0,
+   "fabricated_rate": 0.4
+  }
+ },
  "judge_record": {
   "usable_pair": false,
-  "why": "pipeline answer missing"
+  "outcome": "JUDGE_TRANSPORT_FAILED",
+  "why": "no calibrated judge route (see judge selection record)",
+  "second_judge": {
+   "provider": "inception",
+   "state": "skipped (first-judge pair unusable)"
+  }
  },
- "baseline_same_evidence_hash": "021e9a01e67b6f9b46e0a99ab92bd4f076aecf01563d9ddabd2da97ad82b3db6",
- "pipeline_same_evidence_hash": "021e9a01e67b6f9b46e0a99ab92bd4f076aecf01563d9ddabd2da97ad82b3db6"
+ "baseline_same_evidence_hash": "8181ca71e92e49a4018ee1ad35d0fabff565fc8dcedd8a69372303350d5980f5",
+ "pipeline_same_evidence_hash": "8181ca71e92e49a4018ee1ad35d0fabff565fc8dcedd8a69372303350d5980f5"
 }

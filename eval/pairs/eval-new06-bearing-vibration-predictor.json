@@ -1,11 +1,13 @@
 {
  "problem_id": "eval-new06-bearing-vibration-predictor",
- "commit": "77e1e3847271",
- "dirty_tree": false,
+ "commit": "2505e43b9003",
+ "dirty_tree": true,
  "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+ "question_type": "predictor-design",
  "clarification_answer": null,
- "baseline_answer": "**Proposed Leading Indicator: High-Frequency Envelope Spectral Energy**\n\nSince your sensor is limited to 1 kHz (likely cutting off the classic high-frequency resonance bands where spalling impacts often live), and your SCADA logs only at 1 Hz, you cannot rely on raw RMS vibration or simple trend slopes, which often remain flat until the bearing is near failure. Instead, propose a **High-Frequency Envelope Spectral Energy (HFESE)** metric derived from the 1 kHz vibration data.\n\n**Design & Intervention:**\n1.  **Signal Processing:** Configure the vibration transmitter or downstream SCADA edge processor to perform demodulation (envelope detection) of the 1 kHz signal. Focus specifically on the frequency bands containing the bearing\u2019s characteristic fault frequencies (Inner Race Defect Frequency, $f_{ir} = \\frac{N}{2} n_b (1 - \\frac{d}{D}\\cos\\gamma)$) and their immediate harmonics, which will fall within the low end of your 1 kHz range for a large industrial fan bearing.\n2.  **Metric:** Calculate the root-mean-square (RMS) of the envelope spectrum within the $f_{ir}$ band for each 1 Hz SCADA sample. This \"demodulated RMS\" is far more sensitive to incipient spalling than total RMS because it isolates the impact signature of the spall hitting the ball/roller, filtering out background noise.\n3.  **Threshold:** Establish a dynamic baseline using the first 14 days of operation. Set the alarm threshold at **3x the baseline mean** of the HFESE metric. To meet the \"<2 false alarms/year\" constraint, implement a \"persistence filter\": the alarm only triggers if HFESE remains above threshold for **24 consecutive hours** (or 24 out of 30 logs). This filters out transient process upsets or thermal expansion effects.\n\n**Expected Measurable Effect:**\nIncipient inner-race spalling generates repetitive impacts that modulate the carrier wave. Even when total vibration RMS is negligible, the *envelope* of the vibration signal will show significant energy growth at the defect frequency and its harmonics well before structural collapse. Evidence from [core: \"Condition monitoring of slow-speed rolling element bearings\"] confirms that vibration analysis is effective for early detection, but [core: \"The application of spectral kurtosis...\"] suggests that specific statistical features (like kurtosis or envelope energy) are superior to raw amplitudes for early-stage defect isolation. By tracking the envelope energy, you should detect the spall progression **>14 days** before traditional RMS alarms trip, provided the spall is not fully submerged in lubricant or the surface is excessively smooth.\n\n**Validation Test (The \"Kill\" Test):**\nConduct a **controlled seeded-fault experiment** on an identical or similar test rig (or during the next scheduled maintenance window on the live bearing, if feasible and safe).\n1.  **Step 1:** Seed a microscopic spall (using a scribe or EDM) on the inner race of a test bearing identical to the production unit.\n2.  **Step 2:** Run the bearing under nominal load. Record 1 Hz SCADA-equivalent data from the 1 kHz sensor.\n3.  **Step 3:** Allow the spall to grow naturally (or artificially abrade it) over 3 weeks.\n4.  **Falsification Criteria:** If the HFESE metric does not exceed the 3x baseline threshold with 24-hour persistence at least 14 days before the spall reaches a critical size (defined by a separate, high-fidelity baseline, such as manual tribological inspection or high-frequency AE), **kill this predictor.**\n\n**Why this works within constraints:**\n*   **1 kHz Sensor:** Most large industrial fan bearings have low $f_{ir}$ (often < 200 Hz). The envelope of impacts will manifest as low-frequency modulation peaks, which are fully captured within 1 kHz. High-frequency resonances are lost, but the low-frequency impact envelope remains.\n*   **1 Hz SCADA:** Demodulation is computationally heavy. The 1 Hz logging rate is sufficient if the metric is the *time-averaged* envelope energy over each 1-second window",
- "pipeline_answer": null,
+ "contamination_tag": null,
+ "baseline_answer": "**Recommended Leading Indicator: Trending RMS Vibration in the Envelope Spectrum (or High-Frequency Envelope)**\n\n**Why this predictor:**\nInner-race spalling in rolling-element bearings generates impact signatures that are modulated by the bearing\u2019s rotational frequency. While high-frequency AE sensors are superior for very early detection, you are constrained to a **1 kHz vibration sensor** and **1 Hz SCADA logging**. A 1 kHz sensor captures the high-frequency resonances excited by spalling (typically >1 kHz), but the 1 Hz logging rate is too slow to capture the instantaneous impact peaks or complex time-frequency features (like those in [6] or [8]). Instead, you must use the SCADA data to track the **slow evolution** of the fault.\n\n1.  **Signal Processing:** Configure the 1 kHz vibration channel to output the **RMS (Root Mean Square) value of the High-Frequency Envelope (HFE)** or a specific band-passed RMS (e.g., 0.5\u20131 kHz band, demodulated). If the system only logs raw 1 kHz data, use the SCADA logging of a derived **Kurtosis** or **RMS** value in the high-frequency band.\n2.  **The Predictor:** The key is not the absolute value, but the **trend rate**. Inner-race spalling progresses over weeks. You are looking for a distinct upward inflection in the HFE-RMS or high-band RMS trend. This aligns with the \"weeks before alarm\" requirement. [8] and [9] confirm that vibration-based envelope/spectral analysis is the standard for rolling-element bearing diagnostics, even if slow-speed or specific waveforms are preferred, the *trending* aspect is critical for early-stage spalling in high-load industrial fans.\n\n**Operating Threshold:**\n*   **Baseline:** Establish a baseline RMS value during healthy operation for 3 months.\n*   **Alarm 1 (Trend):** Trigger a \"Monitor\" status when the weekly slope of the HFE-RMS exceeds **0.5 dB/week** (or a 5% relative increase per week) for **3 consecutive weeks**.\n*   **Alarm 2 (Absolute):** Trigger a \"Replace\" alarm when HFE-RMS exceeds **3 \u00d7 Baseline RMS**.\n*   **False Alarm Control:** By using a *trend* requirement (3 weeks of consistent increase) rather than a single absolute threshold, you filter out transient load spikes, ensuring <2 false alarms/year.\n\n**Expected Measurable Effect:**\nThis approach detects the slow growth of spalling pits (which scatter energy into high-frequency bands) **14+ days** before the total vibration level triggers a standard safety alarm. The lead time comes from monitoring the *progression* of the defect, not its final severity.\n\n**Concrete Validation Test (Falsification):**\n1.  **Accelerated Life Test:** Obtain a test rig with a 350 kW equivalent load and a rolling-element bearing.\n2.  **Instrumentation:** Install the 1 kHz vibration sensor. Log HFE-RMS at 1 Hz.\n3.  **Fault Injection:** Initiate controlled spalling (e.g., via wire EDM) on the inner race of the test bearing.\n4.  **Data Collection:** Run the fan at 100% load. Record HFE-RMS trends daily.\n5.  **Falsification Criteria:**\n    *   If the HFE-RMS trend does **not** show a distinct upward inflection at least 14 days before the total RMS vibration exceeds the standard safety threshold, the predictor is **killed**.\n    *   If the signal-to-noise ratio is too low for the 1 Hz logging to resolve the weekly trend clearly against background noise, the predictor is **invalid** for this constraint.\n\n**Evidence Support:**\n*   [8] \"Sparse representations in vibration-based rolling element bearing diagnostics\" supports using spectral features.\n*   [9] \"Detection and Diagnosis... using Time Encoded Signal Processing\" confirms vibration signals from inner-race faults are distinguishable but often require processing; here, we simplify to RMS-trending for the 1 Hz constraint.\n*   [5] \"Active vibration suppression... rotor system\" highlights vibration as a key diagnostic parameter",
+ "pipeline_answer": "Evaluation of stress distributions and structural integrity preservation via finite element and analytical comparison\n\nImplement a digital twin model of the bearing inner race that fuses high-frequency vibration micro-data with low-frequency SCADA thermal/load data to predict spalling progression by correlating evolving stress concentration signatures against the fatigue limit, allowing early detection long before critical vibration thresholds are reached.\n\nShifts maintenance from reactive (vibration alarm) to predictive (stress-state modeling), enabling intervention 14 days before failure while maintaining false alarm rate below 2/year.\n\nRun the predictive model on historical data where spalling occurred; verify if the model flags the anomaly >= 14 days prior to the vibration alarm trip with <2 false positives per annum.",
  "evidence_ids": [
   "doi:10.3390/ma19173622",
   "doi:10.3389/fpls.2025.1721367",
@@ -16,15 +18,986 @@
   "doi:10.22215/etd/2023-16010",
   "doi:10.70675/48397afbz9356z4014z838ez675820cf8b7d",
   "doi:10.22215/etd/2007-08311",
+  "doi:10.48550/arxiv.0901.0512",
+  "doi:10.48550/arxiv.1411.4413",
+  "doi:10.48550/arxiv.2508.18081",
   "doi:10.1016/j.ymssp.2010.06.010",
   "title:8b75f3807bb6507f",
   "doi:10.1108/13552510910961138",
   "title:e6559f91910c13d8"
  ],
+ "evidence": [
+  {
+   "id": "doi:10.3390/ma19173622",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:56c245e682727f5a9781186095d7428269d58810",
+   "source_uri": "https://doi.org/10.3390/ma19173622",
+   "title": "Upcycling of Decommissioned Wind Turbine Blades: An Investigation of Stress Distributions in Glass Fiber-Reinforced Polymers Beams",
+   "abstract": "Wind turbines are among the most widely adopted renewable energy systems, yet the end-of-life management of wind turbine blades remains a major challenge. The turbine blades are primarily made of glass fiber-reinforced polymers (GFRP), which are difficult to recycle without degrading their inherent structural integrity. Instead of shredding or downcycling, this study explores a reuse strategy that preserves intact laminate from decommissioned blades and repurposes them into structural beams via glue-laminated fiber-reinforced polymers (GL-FRP) assemblies. This concept was implemented using commercial GFRP for blade-derived laminates, focusing on the structural feasibility rather than material sourcing. Adhesive joints were designed as the key enabling mechanism for structural reuse and characterized under tensile loading. Building on this, the flexural performance of GL-FRP beams was investigated in horizontal and vertical configurations, yielding an ultimate load-bearing capacity of 8 kN and 20 kN, respectively. Furthermore, stress distributions obtained from experiments, finite element (FE) simulations, and analytical frameworks were evaluated and compared. The results highlight the governing role of interlaminar stress in determining structural performance and failure of the horizontal beam. The findings provide a foundational understanding of repurposing decommissioned wind turbine blades as structural elements, offering a novel strategy for material upcycling in wind energy sector and contributing to the development of circular construction solutions.",
+   "doi": "10.3390/ma19173622",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-11-10T16:57:23.976472+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "bba28d5c175def3198b1b2d808c8363fe79dc47a0b6c735da8030fc4853f12cf",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:56c245e682727f5a9781186095d7428269d58810"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.3390/polym18070892"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "63732471e8d4b8677e96ecece7d748b1cad67395c3d1f8957f2b8f71fbb7c224",
+    "publication_status_evidence": [
+     "publication_types=['JournalArticle']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.3390/ma19173622",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.3390/polym18070892",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Chang-Song Wu",
+    "J. Schmidt",
+    "Dario Parigi"
+   ],
+   "raw_record_hash": "63732471e8d4b8677e96ecece7d748b1cad67395c3d1f8957f2b8f71fbb7c224",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation CITATION_EXPANSION"
+   ]
+  },
+  {
+   "id": "doi:10.3389/fpls.2025.1721367",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41383944",
+   "source_uri": "https://doi.org/10.3389/fpls.2025.1721367",
+   "title": "Design and simulation of key components for mechanical transplanting of large pineapple seedlings.",
+   "abstract": "Pineapple is an important characteristic crop in tropical and subtropical regions of China. In production, the proportion of labor costs is high and the level of mechanization is low, which hinders the full play of the industrial potential. Mechanized production of pineapple is the fundamental path to improve economic benefits and promote high-quality development of the industry. Among them, transplanting is a key technical link in the mechanized production of pineapple. Therefore, in order to improve the mechanization level of pineapple seedling transplanting in China, this paper reviews the existing key transplanting technologies and pineapple planting technologies and equipment at home and abroad, studies and analyzes the planting mode and physical characteristics of pineapple seedlings, standardizes the treatment of pineapple seedlings, and designs a duckbill-type pineapple seedling transplanter that can perform membrane transplanting operations. This study expounds the overall structure and working principle of the duckbill-type transplanter, optimizes the design of the transmission system and planting components of the transplanter, uses SolidWorks to conduct 3D modeling and interference analysis of the whole machine, and combines the actual force conditions to conduct finite element analysis of the core components. The analysis results show that there is no interference in the 3D assembly model, which meets the design requirements; the maximum strain, maximum stress and maximum displacement of the frame, driving shaft and transplanting arm all meet the design requirements, and the maximum stress is 2.816e+07Pa, 5.387e+08Pa and 1.448e+08Pa respectively, which does not exceed the yield strength of 710MPa of the 40CrNiMoA material after normalizing, verifying the correctness of the structural design and the safety of the mechanism strength and deformation. The results of the field experiments show that the pineapple seedling transplanting machine has a good transplanting effect, significantly improves transplanting efficiency, effectively reduces labor intensity, and lowers labor costs.",
+   "doi": "10.3389/fpls.2025.1721367",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025-11-26",
+   "retrieval_timestamp": "2026-11-10T16:57:23.976472+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d5ec645be6881a9ba37d3cff772f86062f4fe668e570fc947d9245ae17150b3a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41383944"
+    },
+    "queries_by_source": {
+     "europepmc": "rolling-element bearing in a 350 kw experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-11-10T16:57:20.545862+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3389/fpls.2025.1721367",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rolling-element bearing in a 350 kw experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": "https://public-pages-files-2025.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2025.1721367/pdf",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.3390/ma19071284",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:41976573",
+   "source_uri": "https://doi.org/10.3390/ma19071284",
+   "title": "Study on the Relation Between Polished Surface Integrity and Fatigue Behavior of Low-Alloy Steel.",
+   "abstract": "The fatigue pitting model based on the minimum oil film thickness does not consider the influence of tooth surface roughness and residual stress, which limits the accuracy of predicting the fatigue pitting of the model. Micro pitting often initiates on the surface due to large external loads. Therefore, it is urgent to propose a new-micro pitting bearing capacity model based on gear surface integrity parameters. This paper studied a new fatigue pitting model considering surface integrity subjected to polishing processes. This model thoroughly analyzes the effects of teeth surface roughness dynamically on the oil film pressure and explores the complex mechanism of residual stress in the near-surface stress field of the gear teeth. The new model can more accurately simulate the micro-pitting bearing capacity under actual operating conditions by introducing teeth surface roughness and residual stress, and the prediction reliability of gear steel is greatly improved. This improved model provides a solid theoretical basis and technical support for optimizing gear transmission systems, accurate diagnosis of micro-pitting defects, and in-depth theoretical research in related fields.",
+   "doi": "10.3390/ma19071284",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-03-24",
+   "retrieval_timestamp": "2026-11-10T16:57:23.976472+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "fa0e027c3ab01b1513fe4002ff8af31e59283cbc5023e7454264e36da9eb6808",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:41976573"
+    },
+    "queries_by_source": {
+     "europepmc": "rolling-element bearing in a 350 kw experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/ma19071284",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rolling-element bearing in a 350 kw experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.1038/s41598-026-56333-8",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42243516",
+   "source_uri": "https://doi.org/10.1038/s41598-026-56333-8",
+   "title": "Active vibration suppression of a magnetic-ball bearing hybrid supported rotor system.",
+   "abstract": "The vibration problem caused by milling is a key factor restricting high-precision and high-efficiency machining. Traditional passive vibration suppression methods are limited by fixed structural parameters and lack sufficient adaptability to dynamic operating conditions, making it difficult to achieve effective broadband vibration control. Magnetic bearings, with their non-contact characteristics and active controllability, provide a new idea for milling vibration suppression. To overcome these limitations, this paper proposes a novel hybrid magnetic-ball-supported flexible rotor system that combines active magnetic bearings with mechanical ball bearings, thereby achieving both controllable dynamic stiffness and stable rigid support. Based on the milling force model and the hybrid support rotor dynamics model, a coupled mathematical model is established, and the vibration suppression effect of the magnetic bearing on milling induced vibration is investigated by magnetic force regulation under PID control. Furthermore, milling force signals were generated using a simulation platform and applied to the rotor test bench to conduct numerical simulations and experimental validation. The results demonstrate that the proposed hybrid support strategy can significantly reduce milling-induced vibration amplitude, improve rotor dynamic stability, and enhance vibration suppression performance over a wide operating range. This study proposes a new hybrid vibration control scheme for high-speed, high-precision milling systems and provides a method for intelligent vibration reduction in advanced machining equipment.",
+   "doi": "10.1038/s41598-026-56333-8",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-06-04",
+   "retrieval_timestamp": "2026-11-10T16:57:23.976472+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "14c7fa3e01362c6e6767ef651673595abf8a059d725193bf1b6b498a74dfbdba",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42243516"
+    },
+    "queries_by_source": {
+     "europepmc": "rolling-element bearing in a 350 kw experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1038/s41598-026-56333-8",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rolling-element bearing in a 350 kw experimental comparison",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.1093/9780191821677.001.0001",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:c725eb25111fa3c8aa9d91661e6560460c416333",
+   "source_uri": "https://doi.org/10.1093/9780191821677.001.0001",
+   "title": "Principles of Polymer Engineering",
+   "abstract": "\n Polymers are important engineering materials. This book introduces the reader to what polymers are and how they are structured, provides understanding of their engineering properties, and explains how products are designed and manufactured from them. It is a substantial revision of the previous edition. The new Introduction reviews the range of industrial applications of polymers and also addresses problems for the environment that can arise, and how these are managed sustainably. Chemical structures and physical microstructures of polymers are explained, especially aspects of special interest to the engineer: melting, crystallization, and the glass transition. Distinctive mechanical properties of polymers are highlighted\u2014rubber elasticity and viscoelasticity\u2014and analytical tools provided for predicting such responses. The reader also learns of polymer failure mechanisms under load, including their pressure-dependent yield and the distinctive crazing that sometimes accompanies fracture. Reinforced polymers contain stiffer, stronger fibres or other particles: the engineer must then be able to anticipate resulting mechanical properties. The reader is introduced to this task using an approximate but consistent three-dimensional approach to the micromechanics required. During product manufacture, polymers are shaped by flow in the liquid state followed by solidification by cooling or crosslinking. The principles of polymer processing are explained, together with the distinctive features of numerous forming processes, including extrusion, injection moulding, and the newer additive manufacturing processes. Finally, the reader learns how product design with polymers takes account of all the above, with the aim to achieve products that perform as required and are sustainable.",
+   "doi": "10.1093/9780191821677.001.0001",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026",
+   "retrieval_timestamp": "2026-11-10T16:57:23.976472+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "17e3bdb4a24ee30f5621746ecc4c48839bc457f051e03a823013c0b26a1e2adf",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:c725eb25111fa3c8aa9d91661e6560460c416333"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.3390/polym18070892"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "987f47a9992acc173cb240443700d65472ae00b2026a708f51fecdc24f424837",
+    "publication_status_evidence": [
+     "publication_types=['Book', 'Review']"
+    ],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-11-10T16:57:23.719468+00:00",
+     "is_oa": false,
+     "oa_status": "closed",
+     "host_type": null,
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1093/9780191821677.001.0001",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.3390/polym18070892",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [
+    "N. G. Mccrum",
+    "C. Buckley",
+    "C. Bucknall"
+   ],
+   "raw_record_hash": "987f47a9992acc173cb240443700d65472ae00b2026a708f51fecdc24f424837",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  },
+  {
+   "id": "doi:10.3390/s26206564",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42944427",
+   "source_uri": "https://doi.org/10.3390/s26206564",
+   "title": "A Novel Adaptive Synchrosqueezing Transform Based on Enhanced STFT Scheme for Wind Turbine Bearing Fault Diagnosis.",
+   "abstract": "Accurate estimation of the instantaneous frequency (IF) of multi-component non-stationary signals is crucial for the fault diagnosis of wind turbine transmission systems under variable speed. Current methodologies exhibit several key limitations, such as unsatisfied accuracy of instantaneous parameter estimation due to the inadequate time-frequency representation, poor time-frequency energy concentration and multimode separation effects caused by a single post-processing technique, and the inability of non-adaptative window parameters to dynamically accommodate the local time-varying frequency characteristics of signals. These deficiencies degrade time-frequency plane interpretability and the accuracy of extracting time-varying fault features. To address these challenges, this paper proposes a novel Improved Short-Time Fourier Transform-based Adaptive Synchrosqueezing Transform (ISTFT-ASST) and demonstrates its application in wind turbine bearing fault diagnosis. Firstly, to achieve the precisely parameter estimation of multi-component non-stationary signals, an improved Short-Time Fourier Transform (STFT) sparse observation model integrated with the Finite Rate of Innovation (FRI) is innovatively constructed. Secondly, Synchrosqueezing Extraction Transform (SET), a time-frequency post-processing technique, is incorporated to further enhance the time-frequency concentration. Finally, drawing on the idea of local R\u00e9nyi entropy-based window parameter estimation, an adaptive Synchrosqueezing algorithm is designed to dynamically accommodate the time-varying frequency characteristics. Through the analysis of numerical simulation signals and measured wind turbine vibration signals, the effectiveness of the proposed ISTFT-ASST in extracting time-varying features is verified, establishing a novel approach for wind turbine fault diagnosis.",
+   "doi": "10.3390/s26206564",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-10-16",
+   "retrieval_timestamp": "2026-11-10T16:57:23.976472+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c12974e0f07a38e3fb3c47d30191fca92303579a16c3e4f679c30b7f532fe213",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42944427"
+    },
+    "queries_by_source": {
+     "europepmc": "rolling-element bearing in a 350 kw experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-11-10T16:57:22.695918+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.3390/s26206564",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rolling-element bearing in a 350 kw experimental comparison",
+   "source_rank": 5,
+   "fulltext_url": "https://doi.org/10.3390/s26206564",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.22215/etd/2023-16010",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.22215/etd/2023-16010",
+   "source_uri": "https://doi.org/10.22215/etd/2023-16010",
+   "title": "Industrial Scalable Rolling Element Bearing Diagnostic and Prognostic Modelling",
+   "abstract": "",
+   "doi": "10.22215/etd/2023-16010",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:23.976472+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5fc1b5d597271ef1a394733e53e811339395d404c4a61c4b96e6cc32582a6c7d",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.22215/etd/2023-16010"
+    },
+    "queries_by_source": {
+     "crossref": "rolling-element bearing in a 350 kW industrial fan drive incipient-spalling"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.22215/etd/2023-16010",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rolling-element bearing in a 350 kW industrial fan drive incipient-spalling",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.70675/48397afbz9356z4014z838ez675820cf8b7d",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70675/48397afbz9356z4014z838ez675820cf8b7d",
+   "source_uri": "https://doi.org/10.70675/48397afbz9356z4014z838ez675820cf8b7d",
+   "title": "Sparse representations in vibration-based rolling element bearing diagnostics",
+   "abstract": "",
+   "doi": "10.70675/48397afbz9356z4014z838ez675820cf8b7d",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:23.976472+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "81b573abcbdfb0a7cd6afea3321e60f3d1ece6cf830465a7ba4003be6010777f",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70675/48397afbz9356z4014z838ez675820cf8b7d"
+    },
+    "queries_by_source": {
+     "crossref": "rolling-element bearing in a 350 kW industrial fan drive incipient-spalling"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70675/48397afbz9356z4014z838ez675820cf8b7d",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rolling-element bearing in a 350 kW industrial fan drive incipient-spalling",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.22215/etd/2007-08311",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.22215/etd/2007-08311",
+   "source_uri": "https://doi.org/10.22215/etd/2007-08311",
+   "title": "Fault detection and diagnosis on the rolling element bearing",
+   "abstract": "",
+   "doi": "10.22215/etd/2007-08311",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:23.976472+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "8ce6f7ae3dc4065b8d234c1e7867c8001181cb6abd2e9db0c9c8a53036162b26",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.22215/etd/2007-08311"
+    },
+    "queries_by_source": {
+     "crossref": "rolling-element bearing in a 350 kW industrial fan drive incipient-spalling"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.22215/etd/2007-08311",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rolling-element bearing in a 350 kW industrial fan drive incipient-spalling",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.0901.0512",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:0901.0512v4",
+   "source_uri": "https://doi.org/10.48550/arxiv.0901.0512",
+   "title": "Expected Performance of the ATLAS Experiment - Detector, Trigger and Physics",
+   "abstract": "A detailed study is presented of the expected performance of the ATLAS detector. The reconstruction of tracks, leptons, photons, missing energy and jets is investigated, together with the performance of b-tagging and the trigger. The physics potential for a variety of interesting physics processes, within the Standard Model and beyond, is examined. The study comprises a series of notes based on simulations of the detector and physics processes, with particular emphasis given to the data expected from the first years of operation of the LHC at CERN.",
+   "doi": "10.48550/arxiv.0901.0512",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:23.976472+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "31003d25bdd33172ff1245ccfccedc4ed173af7ba5d31e722d7dae8273822cc6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:0901.0512v4"
+    },
+    "queries_by_source": {
+     "arxiv": "rolling-element bearing in a 350 kW industrial fan drive incipient-spalling"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.0901.0512",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rolling-element bearing in a 350 kW industrial fan drive incipient-spalling",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/0901.0512v4",
+   "authors": [
+    " The ATLAS Collaboration",
+    "G. Aad",
+    "E. Abat",
+    "B. Abbott",
+    "J. Abdallah",
+    "A. A. Abdelalim",
+    "A. Abdesselam",
+    "O. Abdinov",
+    "B. Abi",
+    "M. Abolins",
+    "H. Abramowicz",
+    "B. S. Acharya",
+    "D. L. Adams",
+    "T. N. Addy",
+    "C. Adorisio",
+    "P. Adragna",
+    "T. Adye",
+    "J. A. Aguilar-Saavedra",
+    "M. Aharrouche",
+    "S. P. Ahlen"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed \u2014 absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.1411.4413",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1411.4413v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.1411.4413",
+   "title": "Observation of the rare $B^0_s\\to\u03bc^+\u03bc^-$ decay from the combined analysis of CMS and LHCb data",
+   "abstract": "A joint measurement is presented of the branching fractions $B^0_s\\to\u03bc^+\u03bc^-$ and $B^0\\to\u03bc^+\u03bc^-$ in proton-proton collisions at the LHC by the CMS and LHCb experiments. The data samples were collected in 2011 at a centre-of-mass energy of 7 TeV, and in 2012 at 8 TeV. The combined analysis produces the first observation of the $B^0_s\\to\u03bc^+\u03bc^-$ decay, with a statistical significance exceeding six standard deviations, and the best measurement of its branching fraction so far. Furthermore, evidence for the $B^0\\to\u03bc^+\u03bc^-$ decay is obtained with a statistical significance of three standard deviations. The branching fraction measurements are statistically compatible with SM predictions and impose stringent constraints on several theories beyond the SM.",
+   "doi": "10.48550/arxiv.1411.4413",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:23.976472+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "765dec8a1dc2f1d21cda57487193e5aa915bb4ee63f068c5b5da5a7a1970c866",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1411.4413v2"
+    },
+    "queries_by_source": {
+     "arxiv": "rolling-element bearing in a 350 kW industrial fan drive incipient-spalling"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1411.4413",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rolling-element bearing in a 350 kW industrial fan drive incipient-spalling",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/1411.4413v2",
+   "authors": [
+    "The CMS",
+    "LHCb Collaborations",
+    " :",
+    "V. Khachatryan",
+    "A. M. Sirunyan",
+    "A. Tumasyan",
+    "W. Adam",
+    "T. Bergauer",
+    "M. Dragicevic",
+    "J. Er\u00f6",
+    "M. Friedl",
+    "R. Fr\u00fchwirth",
+    "V. M. Ghete",
+    "C. Hartl",
+    "N. H\u00f6rmann",
+    "J. Hrubec",
+    "M. Jeitler",
+    "W. Kiesenhofer",
+    "V. Kn\u00fcnz",
+    "M. Krammer"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed \u2014 absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.2508.18081",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2508.18081v3",
+   "source_uri": "https://doi.org/10.48550/arxiv.2508.18081",
+   "title": "GWTC-4.0: Methods for Identifying and Characterizing Gravitational-wave Transients",
+   "abstract": "The Gravitational-Wave Transient Catalog (GWTC) is a collection of candidate gravitational-wave transient signals identified and characterized by the LIGO-Virgo-KAGRA Collaboration. Producing the contents of the GWTC from detector data requires complex analysis methods. These comprise techniques to model the signal; identify the transients in the data; evaluate the quality of the data and mitigate possible instrumental issues; infer the parameters of each transient; compare the data with the waveform models for compact binary coalescences; and handle the large amount of results associated with all these different analyses. In this paper, we describe the methods employed to produce the catalog's fourth release, GWTC-4.0, focusing on the analysis of the first part of the fourth observing run of Advanced LIGO, Advanced Virgo and KAGRA.",
+   "doi": "10.48550/arxiv.2508.18081",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:23.976472+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4b535d1709df5ecd2fbe107bdb3f446cf8bcd14e596d6d55bd9d2305afc6c885",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2508.18081v3"
+    },
+    "queries_by_source": {
+     "arxiv": "rolling-element bearing in a 350 kW industrial fan drive incipient-spalling"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2508.18081",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rolling-element bearing in a 350 kW industrial fan drive incipient-spalling",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2508.18081v3",
+   "authors": [
+    " The LIGO Scientific Collaboration",
+    " the Virgo Collaboration",
+    " the KAGRA Collaboration",
+    "A. G. Abac",
+    "I. Abouelfettouh",
+    "F. Acernese",
+    "K. Ackley",
+    "S. Adhicary",
+    "D. Adhikari",
+    "N. Adhikari",
+    "R. X. Adhikari",
+    "V. K. Adkins",
+    "S. Afroz",
+    "D. Agarwal",
+    "M. Agathos",
+    "M. Aghaei Abchouyeh",
+    "O. D. Aguiar",
+    "S. Ahmadzadeh",
+    "L. Aiello",
+    "A. Ain"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed \u2014 absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.1016/j.ymssp.2010.06.010",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:279288",
+   "source_uri": "https://doi.org/10.1016/j.ymssp.2010.06.010",
+   "title": "The application of spectral kurtosis on Acoustic Emission and vibrations from a defective bearing",
+   "abstract": "The application of Acoustic Emission (AE) technology for machine health monitoring is gaining ground as power tool for health diagnostic of rolling element bearing. This paper provides an investigation that compares the applicability of AE and vibration technologies in monitoring a naturally degraded roller bearing. This research is the first known attempt investigating the comparative effectiveness of applying the Kurtogram to both vibration and AE data from a defective bearing",
+   "doi": "10.1016/j.ymssp.2010.06.010",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:23.976472+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "eb53e616dd036c1bf24ffd4a5fd989393d7b3ca989d1297da47c71a81ead06e2",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:279288"
+    },
+    "queries_by_source": {
+     "core": "rolling-element bearing in a 350 kw experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1016/j.ymssp.2010.06.010",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rolling-element bearing in a 350 kw experimental comparison",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "Mba, David",
+    "M.R. Carrasco",
+    "B. Charnley",
+    "Carrasco, M. R.",
+    "Eftekharnejad, Babak",
+    "D. Mba",
+    "B. Eftekharnejad",
+    "Charnley, Bernard A."
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "title:8b75f3807bb6507f",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:332641122",
+   "source_uri": "",
+   "title": "Condition monitoring of slow-speed rolling element bearings using stress waves",
+   "abstract": "Condition monitoring of rolling element bearings through the use of vibration\r\nanalysis is an established technique for detecting early stages of component\r\ndegradation. However, this success is not mirrored at rotational speeds below\r\n16r/min. At such speeds the energy generated from bearing defects might not show\r\nas an obvious change in signature and thus becomes undetectable using\r\nconventional vibration measuring equipment. This paper presents an investigation\r\ninto the applicability of stress wave analysis for detecting early stages of\r\nbearing damage at a rotational speed of 1.12r/min (0.0187 Hz). Furthermore, it\r\nreviews work undertaken in monitoring bearings rotating at speeds below 16r/min",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:23.976472+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "3080ac725336f086e105ce4cb9f3694b8628ef578f366b9f39890d5a7f2cc502",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:332641122"
+    },
+    "queries_by_source": {
+     "core": "rolling-element bearing in a 350 kw experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:8b75f3807bb6507f",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rolling-element bearing in a 350 kw experimental comparison",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Mba, David",
+    "Jamaludin, N.",
+    "Bannister, R. H."
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "doi:10.1108/13552510910961138",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:279375",
+   "source_uri": "https://doi.org/10.1108/13552510910961138",
+   "title": "Observations of acoustic emission in a hydrodynamic bearing",
+   "abstract": "Purpose - Numerous studies have been conducted in the field of acoustic emission (AE) technology applied to rotating machine fault diagnosis.\r\nPrincipally, most of the work to date has been focused on correlating AE\r\nactivity to the defect condition on rolling element bearings with limited\r\ninvestigations on hydrodynamic bearings. This paper aims to address this issue.\r\nDesign/methodology/approach - This paper presents experimental tests\r\naimed at understanding the influence of speed and load on generation of AE in a\r\nhydrodynamic bearing. Findings - The research presented shows that the\r\npower losses associated which hydrodynamic bearing has a direct influence on the\r\ngeneration of AE. Research limitations/implications - Further research\r\nshould include the application of the proposed methodology on a broad range of\r\noperational machines employing hydrodynamic bearings. Practical implications - In developing the AE technology for monitoring hydrodynamic\r\nbearings operated under variable speed and load conditions, it is essential that\r\na relationship between the operational variables and the generation of AE is\r\nestablished, and this paper explores such a relationship. Originality/value - The paper presents the first known correlation between AEs and the\r\noperating parameters of a hydrodynamic bearing",
+   "doi": "10.1108/13552510910961138",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:23.977470+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "061a9ab412db1e46d0da64930d897b186b0eab11af01d7aa3ea368df4c10ac8c",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:279375"
+    },
+    "queries_by_source": {
+     "core": "rolling-element bearing in a 350 kw experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "doi:10.1108/13552510910961138",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rolling-element bearing in a 350 kw experimental comparison",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [
+    "Mba, David",
+    "Mirhadizadeh, S. A."
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  },
+  {
+   "id": "title:e6559f91910c13d8",
+   "source_type": "scientific_paper",
+   "source": "core",
+   "source_id": "core:core:5704076",
+   "source_uri": "",
+   "title": "Detection and Diagnosis of Rolling Element Bearing Faults Using Time Encoded Signal Processing and Recognition",
+   "abstract": "This thesis presents a systematic study of using TESPAR (Time Encoded Signal Processing and Recognition), which presently is in use as an effective tool for speech recognition and shows great advantages in computational demands and accuracy, to develop a new technique for rolling element bearing fault detection and diagnosis.\n\n\n\n\n\nThe fundamentals of rolling element bearings are presented in line with different failure modes and relevant monitoring methods in the time domain, the frequency domain, the envelope spectrum and the wavelet analysis. These reviews show that vibration measurements are a proven and widely accepted data source for bearing monitoring of machinery.\n\n\n\n\n\nThis research thus has focused on developing TESPAR based approaches using vibration signals which are generated from bearings under different severities of faults located at the outer race, the inner race and the roller element. It firstly examines the theoretical basis of TESPAR and examines the diagnosis performance with a number of different simulated signals, which confirms that TESPAR based methods are able to resolve different signals by using their statistics including S-matrix, A-matrix and epoch duration, which paves a frame work to process and interpolate the bearing signal.\n\n\n\n\n\nWith understandings of the insights of bearing vibrations and TESPAR approaches a signal processing framework is then suggested to analyse bearing vibration signals. It consists of a pre-processing step which removes possible noise in the signal, a TESPAR coding step which converts the signal into TESPAR representations-TESPAR streams, a feature calculation step, which produces different TESPAR statistic parameters, and finally a diagnosis step which applies common statistics to TESPAR statistic parameters to obtain required results.\n\n\n\n\n\nThe TESPAR solution proposed in this thesis shows that discrimination between different bearing signal waveforms has been implemented successfully. TESPAR S- and A-Matrices were constructed for the cases tested and used together with statistical correlation to differentiate between the types of faults. However, the severities of bearing faults have been identified using another TESPAR feature called the mean absolute magnitude value calculated using epoch durations.\n\n\n\n\n\nThe performance of the TESPAR approach was then evaluated against the envelope spectrum; this be",
+   "doi": null,
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T16:57:23.977470+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "16ff793bbf135a7921401e788bf7dde68d158a512625fe811dd296cee55ef362",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "core",
+    "indexing_sources": [
+     "core"
+    ],
+    "record_ids_by_source": {
+     "core": "core:5704076"
+    },
+    "queries_by_source": {
+     "core": "rolling-element bearing 350 kW industrial fan drive incipient-spalling"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "repository_aggregator_core",
+    "identity_basis": "TITLE_FINGERPRINT",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "repository_aggregator_core",
+   "canonical_id": "title:e6559f91910c13d8",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "rolling-element bearing 350 kW industrial fan drive incipient-spalling",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Abdusslam, Shukri Ali"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "Anonymous tier measured live 2026-09-05; per-query quotas may rate-limit without notice (recorded honestly when measured)",
+    "Aggregated repository metadata quality varies; document_type is repository-declared and unverified"
+   ]
+  }
+ ],
+ "number_absent": {
+  "pipeline": [
+   "14"
+  ],
+  "baseline": [
+   "0.5",
+   "100",
+   "14",
+   "350",
+   "9"
+  ]
+ },
+ "number_absent_detail": {
+  "pipeline": {
+   "all": 2,
+   "unverified": 1,
+   "assumption_labeled": 0,
+   "fabricated_rate": 0.5
+  },
+  "baseline": {
+   "all": 12,
+   "unverified": 5,
+   "assumption_labeled": 0,
+   "fabricated_rate": 0.417
+  }
+ },
  "judge_record": {
   "usable_pair": false,
-  "why": "pipeline answer missing"
+  "outcome": "JUDGE_TRANSPORT_FAILED",
+  "why": "no calibrated judge route (see judge selection record)",
+  "second_judge": {
+   "provider": "inception",
+   "state": "skipped (first-judge pair unusable)"
+  }
  },
- "baseline_same_evidence_hash": "cacc638cfe72ee51a74fad4d659bd6e81a26a626e2c254d8f2653fe81941ffbc",
- "pipeline_same_evidence_hash": "cacc638cfe72ee51a74fad4d659bd6e81a26a626e2c254d8f2653fe81941ffbc"
+ "baseline_same_evidence_hash": "5e312bf864a44af8376210b387a12751edeb2ed883138ad5a7b76225a542d76e",
+ "pipeline_same_evidence_hash": "5e312bf864a44af8376210b387a12751edeb2ed883138ad5a7b76225a542d76e"
 }

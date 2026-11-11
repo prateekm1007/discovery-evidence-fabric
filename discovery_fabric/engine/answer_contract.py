@@ -11,10 +11,15 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List
 
-_UNIT = (r"(?:mA|A|kA|mV|V|kV|kW|W|kJ|J|Hz|rpm|°C|C|K|Pa|kPa|MPa|GPa|"
-         r"N|kN|mm|cm|m|µm|nm|g|kg|mg|t|L|mL|%|ppm|mol|mol/L|s|ms|h|days?|"
-         r"cycles?)\b")
-_NUM_WITH_UNIT = re.compile(r"\d+(?:\.\d+)?\s*" + _UNIT)
+# Unit alternation: word-boundary units plus bare percent. "10%"
+# cannot match a \b-guarded `%` (space or EOL follows %, both are
+# non-word chars), so percent rides its own alternation.
+_UNIT_WORD = (r"(?:mA|A|kA|mV|V|kV|kW|W|kJ|J|Hz|rpm|°C|C|K|Pa|kPa|MPa|GPa|"
+              r"N|kN|mm|cm|m|µm|nm|g|kg|mg|t|L|mL|ppm|mol|mol/L|s|ms|h|"
+              r"days?|cycles?|percent)\b")
+_UNIT = r"(?:" + _UNIT_WORD + r"|%)"
+_NUM_WITH_UNIT = re.compile(
+    r"(?:\d+(?:\.\d+)?\s*(?:-|–|—|to)\s*)?\d+(?:\.\d+)?\s*" + _UNIT)
 
 
 def _has_number_with_unit(text: str) -> bool:

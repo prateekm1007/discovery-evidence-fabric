@@ -63,3 +63,34 @@ def test_intervention_contract_rejects_unlabeled_generic_answer():
 def test_unknown_type_is_rejected():
     res = validate_answer("whatever", "something-else")
     assert res["valid"] is False
+
+
+PERCENT_CASE = (
+    "PARAMETER: creep-rate alert — 10 percent of rated deflection — ASSUMPTION. "
+    "Test in the creep rig; falsify if deflection exceeds 5-10 percent before "
+    "500 cycles; accept if below threshold."
+)
+
+
+def test_intervention_contract_accepts_percent_and_range():
+    # R5 P0-2: "10%" and ranges like "5-10 percent" must satisfy the
+    # numeric-with-units floor (\b after % never matched)
+    res = validate_answer(PERCENT_CASE, "intervention-proposal")
+    assert res["valid"] is True, res["violations"]
+
+
+def test_intervention_contract_accepts_percent_symbol():
+    ans = ("PARAMETER: creep-rate alert — 10% of rated deflection — "
+           "ASSUMPTION. Test in the rig; falsify if deflection exceeds "
+           "5-10% before 500 cycles; accept if below threshold.")
+    res = validate_answer(ans, "intervention-proposal")
+    assert res["valid"] is True, res["violations"]
+
+
+def test_predictor_contract_accepts_percent_threshold():
+    ans = ("INDICATOR: dropout fraction of laser diodes. "
+           "THRESHOLD: dropout fraction > 2% of fleet; baseline 0.4%. "
+           "PROTOCOL: n=80 devices, 180 days; pass if dropout exceeds 2% "
+           "before end of service; fail otherwise.")
+    res = validate_answer(ans, "predictor-design")
+    assert res["valid"] is True, res["violations"]

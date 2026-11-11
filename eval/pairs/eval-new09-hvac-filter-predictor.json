@@ -1,11 +1,13 @@
 {
  "problem_id": "eval-new09-hvac-filter-predictor",
- "commit": "77e1e3847271",
- "dirty_tree": false,
+ "commit": "2505e43b9003",
+ "dirty_tree": true,
  "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+ "question_type": "predictor-design",
  "clarification_answer": null,
- "baseline_answer": "**Proposed Design/Intervention:**\nImplement a **Pressure Drop (\u0394P) Monitored Predictive Maintenance Protocol** using existing BMS points.\n\n1.  **Leading Indicator:** The **rate of change in filter bank pressure drop (d\u0394P/dt)**, normalized for airflow. While absolute \u0394P is common, it is non-linear relative to loading and sensitive to fan speed variations. The *slope* of the \u0394P curve over time is a more stable indicator of particulate accumulation for pleated filters.\n2.  **Operating Threshold:** Replace filters when the **30-day rolling average d\u0394P/dt exceeds 0.15 Pa/hour** (or equivalent in inches of water column per day, approx. 0.0006 in./h), **OR** when the absolute \u0394P reaches **0.8 inches of water column (approx. 200 Pa)**, whichever occurs first. This threshold represents the point where fan energy penalties begin to outweigh the cost of a new filter bank, and pre-maturity for MERV-13 pleated media.\n3.  **Implementation:** Use the BMS to log \u0394P across the filter bank and mixed-air fan amps (proxy for airflow) at **1-week resolution**. Calculate the weekly delta. If the weekly \u0394P increase is >0.5 in.wc for two consecutive weeks, trigger the \"High Rate\" flag. If cumulative \u0394P hits 0.8 in.wc, trigger the \"Absolute Limit\" flag.\n\n**Expected Measurable Effect:**\n*   **Cost Reduction:** By decoupling replacement from the fixed 90-day calendar, you will extend filter life in low-dust seasons/periods and accelerate replacement in high-dust periods. This directly targets the \"unnecessary replacements\" waste.\n*   **Target:** Achieve a **>20% reduction in total filter units consumed annually** compared to the fixed schedule baseline, while maintaining indoor air quality (IAQ) and limiting fan energy penalties to <5% above design.\n\n**Validation Test (Falsification Protocol):**\nTo validate or kill this predictor, run a **controlled A/B test** over one full heating/cooling season (approx. 6 months) on identical AHUs in the same building:\n\n1.  **Group A (Control):** Fixed 90-day replacement schedule.\n2.  **Group B (Test):** \u0394P-based replacement using the thresholds above.\n3.  **Data Collection:**\n    *   Log BMS \u0394P and fan amps weekly for both.\n    *   Record date of replacement for each.\n    *   Measure post-filter particle concentration (using a portable counter at the supply diffuser) at replacement time for both groups to ensure IAQ equivalence.\n4.  **Success Criteria:**\n    *   Group B uses **\u226480%** of the filter count of Group A.\n    *   Average fan energy in Group B is within **5%** of Group A.\n    *   Post-filter particle counts in Group B are not statistically significantly higher than Group A at the time of replacement.\n5.  **Falsification:**\n    *   If Group B uses more filters than Group A, the threshold is too aggressive.\n    *   If Group B fan energy exceeds Group A by >5%, the threshold is too loose (filters running too dirty).\n    *   If Group B IAQ metrics degrade significantly, the \u0394P threshold is insufficient for MERV-13 performance in this specific dust environment, and the predictor is invalid for this application.\n\n**Evidence Support:**\n*   **[openalex] (Swine Filter Testing):** Confirms that filter end-of-life is determined by pressure drop and airflow reduction, and that on-site testing of \u0394P is a valid method for determining replacement need in commercial/agricultural contexts.\n*   **[core] (Pleat Geometry/\u0394P):** Validates that \u0394P is the primary measurable parameter affecting fan energy and airflow in pleated filters.\n*   **[europepmc] (Singapore Filter DNA):** While this study tracks biological accumulation, it confirms that filter loading is monotonic and measurable over time, supporting the use of temporal trends (slope) rather than static schedules. Note: It does not directly support \u0394P as a proxy",
- "pipeline_answer": "Empirical evaluation of alternative control sequences in a hardware-in-the-loop testbed\u2014before live deployment\u2014enables replacing legacy fixed logic with validated, condition-responsive operational rules.\n\nDevelop a condition-based filter-replacement rule triggered by BMS-logged signals (pressure-drop rise if available, supply/return fan power trend, occupancy-weighted runtime) and validate it by replaying 12 months of historical logged data in a simulation harness analogous to the VCBT-IBAL platform before enabling it in the live controller.\n\nReplaces the fixed 90-day schedule with a state-driven trigger, cutting premature replacements by at least 20% and flagging filter change-of-state within 1 week of overload onset, preserving fan energy and indoor air quality.\n\nRetrospective back-test on 12 months of retained BMS data: the rule fails if any verified actual filter change is flagged more than 7 days after its true load-onset date, or if the rule triggers more than 80% of the replacements the legacy schedule would have called premature.",
+ "contamination_tag": null,
+ "baseline_answer": "**Proposed Intervention: Condition-Based Filter Replacement via Static Pressure Differential (\u0394P)**\n\n**Leading Indicator:**\nThe most cost-effective measurable predictor is the **static pressure differential (\u0394P) across the MERV-13 filter bank**, measured in inches of water column (in w.c.), logged at weekly intervals by the Building Management System (BMS).\n\nUnlike fixed-time schedules, \u0394P directly correlates with filter loading (dust accumulation). As particle mass accumulates in the pleats, air resistance increases linearly. This indicator is already available via existing BMS points if pressure sensors are installed at the filter rack; if not, it is a low-cost retrofit (two differential pressure sensors and a transmitter).\n\n**Operating Threshold:**\nEstablish a dynamic threshold based on the **rate of change of \u0394P**, not just the absolute value.\n1.  **Baseline:** Record the clean-filter \u0394P ($P_0$) upon installation.\n2.  **Warning Threshold:** Set an alarm at $P_0 + \\Delta P_{limit}$. For MERV-13 pleated filters in commercial AHUs, a common delta limit is **1.5 to 2.0 in w.c.** above clean.\n3.  **Slope Check:** To avoid false positives from seasonal occupancy spikes, require that the weekly slope of \u0394P ($\\Delta P_{week}/\\Delta P_{prev\\_week}$) remains >0.5 inw.c/week for three consecutive weeks before triggering a replacement. This distinguishes steady loading from transient spikes.\n\n**Evidence Support:**\n*   **Direct Correlation:** The study *\"Viral surveillance in building zones via air handling unit filter forensics\"* and *\"Exploring temporal patterns of bacterial and fungal DNA accumulation on a ventilation system filter\"* confirm that particle accumulation on filters is monotonic and measurable over time (citing europepmc evidence of monotonic DNA rise over 21 weeks). While these studies measure biological load, the physical mechanism\u2014mass accumulation increasing resistance\u2014is the basis for \u0394P monitoring.\n*   **Operational Context:** The *\"Experimental Comparison of Guideline 36...\"* study highlights the value of hardware-in-the-loop testing for AHU controls, supporting the feasibility of integrating such logic into existing BMS sequences without major equipment upgrades.\n*   **Limitation Note:** The provided evidence does *not* contain a specific paper proving that \u0394P thresholds reduce replacement costs by >20%. This claim is based on standard HVAC engineering practice and the physics of pleated filter loading, not the retrieved citations. The retrieved evidence supports the *measurability* of filter loading, not the specific economic savings metric.\n\n**Concrete Test to Validate or Kill the Predictor:**\n\n**Hypothesis:** Implementing a \u0394P-based replacement protocol will reduce unnecessary filter replacements by \u226520% compared to the 90-day schedule, without increasing fan energy consumption by >5% or causing indoor air quality (IAQ) violations.\n\n**Test Protocol:**\n1.  **Split-System Design:** Select two identical AHUs in the same building serving similar loads.\n    *   *AHU-A (Control):* Continue 90-day fixed replacement.\n    *   *AHU-B (Test):* Replace filters only when \u0394P exceeds the threshold (1.5\u20132.0 in w.c. above clean) AND the slope check is met.\n2.  **Data Collection (12 months):** Log weekly \u0394P, fan power, and replacement dates for both AHUs. Use BMS points to track fan amps/energy.\n3.  **Analysis:**\n    *   Calculate **Replacements Per Year** for both AHUs.\n    *   Calculate **Average Fan Power** during high-load periods to ensure no excessive pressure drop occurred before replacement.\n4.  **Falsification Criteria:**\n    *   The test **kills** the predictor if AHU-B shows *no* reduction in replacement count (i.e., \u0394P thresholds are rarely reached by day 90, indicating the fixed schedule was already optimal or conservative).\n    *   The test **fails** if AHU-B shows a >10% increase in fan energy consumption relative to AHU-A, indicating filters were running too overloaded, causing inefficient airflow.\n    *  ",
+ "pipeline_answer": "Hardware-in-the-loop evaluation of control sequences using a platform that isolates equipment upgrades from load and weather variations to validate operations impact before deployment.\n\nDevelop a filter-loading predictor using only BMS points (fan power, dP, OAF, occupancy) and validate it in a hardware-in-the-loop simulation of the AHU before changing the 90-day schedule.\n\nNecessary filter replacements reduced by 20 percent by identifying early failures and preventing premature changes.\n\nSimulate a dirty-filter scenario; if the predictor fails to alert within 7 days of the state change or does not reduce replacement frequency by 20 percent in the model, the design is rejected.",
  "evidence_ids": [
   "doi:10.1080/23744731.2026.2663718",
   "doi:10.1016/j.buildenv.2025.113414",
@@ -16,46 +18,990 @@
   "doi:10.17918/etd-3205",
   "doi:10.31274/etd-180810-6099",
   "doi:10.70675/73f1d585za5b8z4419zab9ez73b53234bef9",
-  "doi:10.13031/aim.201701639",
-  "title:15097f9ea0fd689c",
-  "doi:10.1016/j.seppur.2017.02.034",
-  "doi:10.3390/agriengineering1020022"
+  "doi:10.48550/arxiv.0901.0512",
+  "doi:10.48550/arxiv.1411.4413",
+  "doi:10.48550/arxiv.2508.18081",
+  "doi:10.1016/j.jaerosci.2020.105624",
+  "doi:10.1080/09613218.2020.1804314",
+  "doi:10.1016/j.seppur.2020.116964",
+  "doi:10.1016/0140-6736(92)91983-f"
  ],
- "judge_record": {
-  "usable_pair": true,
-  "passes": 2,
-  "scores": {
-   "a_answered": {
-    "pipeline_mean": 4.5,
-    "baseline_mean": 5.0,
-    "diff": -0.5
+ "evidence": [
+  {
+   "id": "doi:10.1080/23744731.2026.2663718",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:42657032",
+   "source_uri": "https://doi.org/10.1080/23744731.2026.2663718",
+   "title": "Experimental Comparison of Guideline 36 and Legacy Controller Sequences of Operation using Commercial-off-the-shelf Control Software.",
+   "abstract": "In this study, we test the performance of Guideline 36-compliant sequences of operation for the air system relative to sequences of operation that predate Guideline 36. For this study, the air system comprises air handling units (AHUs) that serve variable air volume terminal units (VAVs). We present a platform that can be used to study the impact on building operations of changing the control system in a building, while holding constant any other aspect of that building, such as equipment upgrades, internal load variations, and changes to weather. We use the Virtual Cybernetic Building Testbed (VCBT), which contains commercial BACnet-enabled controllers and an operator workstation, as well as the Intelligent Building Agents Laboratory (IBAL), which uses chillers to meet the loads in the AHU-VAV system and can generate repeatable weather conditions and zone loads. These facilities use a hardware-in-the-loop approach, which combines a simulation of a building with hardware. This is the first demonstration of the combined VCBT-IBAL platform, which provides a method to evaluate potential sequences of operation in hardware before deploying them in real buildings.",
+   "doi": "10.1080/23744731.2026.2663718",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2026-01-01",
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "9d29b18f851d5c523965a04f064e22835e0e1db558831cff2a853218927fd875",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:42657032"
+    },
+    "queries_by_source": {
+     "europepmc": "commercial building air-handling unit with a experimental comparison"
+    },
+    "query_variant_derivation": "COMPARISON_TARGETED",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
    },
-   "b_user_vars": {
-    "pipeline_mean": 5.0,
-    "baseline_mean": 5.0,
-    "diff": 0.0
-   },
-   "c_prediction": {
-    "pipeline_mean": 4.5,
-    "baseline_mean": 5.0,
-    "diff": -0.5
-   },
-   "d_evidence": {
-    "pipeline_mean": 3.5,
-    "baseline_mean": 4.5,
-    "diff": -1.0
-   },
-   "e_clarification": {
-    "pipeline_mean": null,
-    "baseline_mean": null,
-    "diff": null
-   }
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1080/23744731.2026.2663718",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "commercial building air-handling unit with a experimental comparison",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
   },
-  "winner": "baseline",
-  "pref_passes": [
-   "baseline"
+  {
+   "id": "doi:10.1016/j.buildenv.2025.113414",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1016/j.buildenv.2025.113414",
+   "source_uri": "https://doi.org/10.1016/j.buildenv.2025.113414",
+   "title": "Viral surveillance in building zones via air handling unit filter forensics: A multi-story residential case study",
+   "abstract": "",
+   "doi": "10.1016/j.buildenv.2025.113414",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2025",
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "688ce9a57e694d25f1f1d88254fcc2d8d81015ca646b3e4df72f87c854815948",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1016/j.buildenv.2025.113414"
+    },
+    "queries_by_source": {
+     "crossref": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1016/j.buildenv.2025.113414",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.3390/buildings13051174",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.3390/buildings13051174",
+   "source_uri": "https://doi.org/10.3390/buildings13051174",
+   "title": "Potential Cooling Energy Savings of Economizer Control and Artificial-Neural-Network-Based Air-Handling Unit Discharge Air Temperature Control for Commercial Building",
+   "abstract": "",
+   "doi": "10.3390/buildings13051174",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2023",
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4f291a7bf7272d35654bba2a079a392b69dadbef87c773c100967b20bda97320",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.3390/buildings13051174"
+    },
+    "queries_by_source": {
+     "crossref": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.3390/buildings13051174",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.1371/journal.pone.0200820",
+   "source_type": "scientific_paper",
+   "source": "europepmc",
+   "source_id": "europepmc:europepmc:30020972",
+   "source_uri": "https://doi.org/10.1371/journal.pone.0200820",
+   "title": "Exploring temporal patterns of bacterial and fungal DNA accumulation on a ventilation system filter for a Singapore university library.",
+   "abstract": "Introduction Ventilation system filters process recirculated indoor air along with outdoor air. This function inspires the idea of using the filter as an indoor bioaerosol sampler. While promising, there remains a need to investigate several factors that could limit the accuracy of such a sampling approach. Among the important factors are the dynamics of microbial assemblages on filter surfaces over time and the differential influence of outdoor versus recirculated indoor air. Methods This study collected ventilation system filter samples from an air handling unit on a regular schedule over a 21-week period and analyzed the accumulation patterns of biological particles on the filter both quantitatively (using fluorometry and qPCR) and in terms of microbial diversity (using 16S rDNA and ITS sequencing). Results The quantitative result showed that total and bacterial DNA accumulated monotonically, rising to 41 ng/cm2 for total DNA and to 2.8 ng/cm2 for bacterial DNA over the 21-week period. The accumulation rate of bacterial DNA correlated with indoor occupancy level. Fungal DNA first rose to 4.0 ng/cm2 before showing a dip to 1.4 ng/cm2 between weeks 6 and 10. The dip indicated a possible artifact of this sampling approach for quantitative analysis as DNA may not be conserved on the filter over the months-long service period. The sequencing results indicate major contributions from outdoor air for fungi and from recirculated indoor air for bacteria. Despite the quantitative changes, the community structure of the microbial assemblages was stable throughout the 21-week sampling period, highlighting the robustness of this sampling method for microbial profiling. Conclusion This study supports the use of ventilation system filters as indoor bioaerosol samplers, but with caveats: 1) an outdoor reference is required to properly understand the contribution of outdoor bioaerosols; and 2) there is a need to better understand the persistence and durability of the targeted organisms on ventilation system filters.",
+   "doi": "10.1371/journal.pone.0200820",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2018-07-18",
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f8118e90cefa8423aed6863efcce22d190668914a838949974a51021a526877a",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "europepmc",
+    "indexing_sources": [
+     "europepmc"
+    ],
+    "record_ids_by_source": {
+     "europepmc": "europepmc:30020972"
+    },
+    "queries_by_source": {
+     "europepmc": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "biomedical_pubmed_line",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-11-10T17:00:47.012699+00:00",
+     "is_oa": true,
+     "oa_status": "gold",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "biomedical_pubmed_line",
+   "canonical_id": "doi:10.1371/journal.pone.0200820",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading",
+   "source_rank": 3,
+   "fulltext_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0200820&type=printable",
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Abstract-level evidence: full text may contain methods and constraints not present in the abstract",
+    "Publication existence is not clinical evidence of safety or effectiveness",
+    "Citation counts are bibliometric signals, not validity measures"
+   ]
+  },
+  {
+   "id": "doi:10.1016/s0015-1882(04)00227-7",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.1016/s0015-1882(04)00227-7",
+   "source_uri": "https://doi.org/10.1016/s0015-1882(04)00227-7",
+   "title": "Robust pleated air filter",
+   "abstract": "",
+   "doi": "10.1016/s0015-1882(04)00227-7",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2004",
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "6a0a40a8adf839c7c76449f251c32a49d0e03289cc1fc2789e072306a9cef271",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.1016/s0015-1882(04)00227-7"
+    },
+    "queries_by_source": {
+     "crossref": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=journal-article"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.1016/s0015-1882(04)00227-7",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading",
+   "source_rank": 4,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.1016/j.ijft.2020.100045",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:3ff1c10108224b73109fc1da556b00bd1cd1597c",
+   "source_uri": "https://doi.org/10.1016/j.ijft.2020.100045",
+   "title": "Review of ventilation strategies to reduce the risk of disease transmission in high occupancy buildings",
+   "abstract": "An unforeseen pandemic is facing the world caused by a corona virus known as SARS-CoV-2. Numerous measures are being put in place to try and reduce the spread of this deadly disease, with the most effective response to the outbreak being mass quarantines, a public health technique borrowed from the Middle Ages. The widely accepted main transmission mechanism is through droplet borne pathways. However, many researchers and studies are considering that this virus can also spread via the airborne route and remain for up to three hours in the air. This is leading to questions as to whether enough is being done regarding ventilation to reduce the risk of the spread of this or other diseases that may be air borne. Ventilation and air conditioning systems are the main focus when it comes to the transmission of such deadly pathogens and should be appropriately designed and operated. This paper reviews and critically evaluates the current ventilation strategies used in buildings to assess the state of the art and elaborates if there is room for further development, especially for high occupancy buildings, to reduce or eradicate the risk of pathogen transmission and adapt ventilation measures to new threats posed by pandemics.",
+   "doi": "10.1016/j.ijft.2020.100045",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c8b49dd64f3c980bf5c1d433f20d668c42b714452dceb69a1fa95c460808b242",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:3ff1c10108224b73109fc1da556b00bd1cd1597c"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1016/j.envres.2021.111314"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "42d05a175156ac53aaeb3d9c8b63edd27dd0f9fa3dc8726f38f56d78b28820b5",
+    "publication_status_evidence": [
+     "publication_types=['Review']"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PEER_REVIEWED",
+   "document_type": "",
+   "evidence_lane": "SCHOLARLY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1016/j.ijft.2020.100045",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1016/j.envres.2021.111314",
+   "source_rank": 5,
+   "fulltext_url": null,
+   "authors": [
+    "T. Lipi\u0144ski",
+    "Darem Ahmad",
+    "Nicolas Serey",
+    "H. Jouhara"
+   ],
+   "raw_record_hash": "42d05a175156ac53aaeb3d9c8b63edd27dd0f9fa3dc8726f38f56d78b28820b5",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  },
+  {
+   "id": "doi:10.17918/etd-3205",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.17918/etd-3205",
+   "source_uri": "https://doi.org/10.17918/etd-3205",
+   "title": "The extraction of a Bacillus anthracis surrogate from pleated HVAC filter samples",
+   "abstract": "",
+   "doi": "10.17918/etd-3205",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "5cb4b91cf98d293db819dd06b069b774d875433e65f9e80e57a766825101e4e3",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.17918/etd-3205"
+    },
+    "queries_by_source": {
+     "crossref": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.17918/etd-3205",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.31274/etd-180810-6099",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.31274/etd-180810-6099",
+   "source_uri": "https://doi.org/10.31274/etd-180810-6099",
+   "title": "Development of a mobile air filter testing laboratory and filter assessment procedure for pig production systems",
+   "abstract": "",
+   "doi": "10.31274/etd-180810-6099",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "d105506ec0207567127e845796e44436fa7cf17ca089f4f07f22cc6335f62e50",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.31274/etd-180810-6099"
+    },
+    "queries_by_source": {
+     "crossref": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.31274/etd-180810-6099",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.70675/73f1d585za5b8z4419zab9ez73b53234bef9",
+   "source_type": "scientific_paper",
+   "source": "crossref",
+   "source_id": "crossref:doi:10.70675/73f1d585za5b8z4419zab9ez73b53234bef9",
+   "source_uri": "https://doi.org/10.70675/73f1d585za5b8z4419zab9ez73b53234bef9",
+   "title": "OFDM Precoding for Filter-Bank based Waveforms",
+   "abstract": "",
+   "doi": "10.70675/73f1d585za5b8z4419zab9ez73b53234bef9",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4b5f98f88d3cbb40f0ac7a143efab2c9b3b7804126f5a5125ae9d456e0c86a53",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "crossref",
+    "indexing_sources": [
+     "crossref"
+    ],
+    "record_ids_by_source": {
+     "crossref": "doi:10.70675/73f1d585za5b8z4419zab9ez73b53234bef9"
+    },
+    "queries_by_source": {
+     "crossref": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "doi_registrant_crossref",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [
+     "type=dissertation"
+    ],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "THESIS",
+   "document_type": "",
+   "evidence_lane": "THESIS",
+   "source_family": "doi_registrant_crossref",
+   "canonical_id": "doi:10.70675/73f1d585za5b8z4419zab9ez73b53234bef9",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading",
+   "source_rank": 2,
+   "fulltext_url": null,
+   "authors": [],
+   "raw_record_hash": "",
+   "limitations": [
+    "Metadata-only; no abstracts for many records"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.0901.0512",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:0901.0512v4",
+   "source_uri": "https://doi.org/10.48550/arxiv.0901.0512",
+   "title": "Expected Performance of the ATLAS Experiment - Detector, Trigger and Physics",
+   "abstract": "A detailed study is presented of the expected performance of the ATLAS detector. The reconstruction of tracks, leptons, photons, missing energy and jets is investigated, together with the performance of b-tagging and the trigger. The physics potential for a variety of interesting physics processes, within the Standard Model and beyond, is examined. The study comprises a series of notes based on simulations of the detector and physics processes, with particular emphasis given to the data expected from the first years of operation of the LHC at CERN.",
+   "doi": "10.48550/arxiv.0901.0512",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "31003d25bdd33172ff1245ccfccedc4ed173af7ba5d31e722d7dae8273822cc6",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:0901.0512v4"
+    },
+    "queries_by_source": {
+     "arxiv": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.0901.0512",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading",
+   "source_rank": 0,
+   "fulltext_url": "http://arxiv.org/abs/0901.0512v4",
+   "authors": [
+    " The ATLAS Collaboration",
+    "G. Aad",
+    "E. Abat",
+    "B. Abbott",
+    "J. Abdallah",
+    "A. A. Abdelalim",
+    "A. Abdesselam",
+    "O. Abdinov",
+    "B. Abi",
+    "M. Abolins",
+    "H. Abramowicz",
+    "B. S. Acharya",
+    "D. L. Adams",
+    "T. N. Addy",
+    "C. Adorisio",
+    "P. Adragna",
+    "T. Adye",
+    "J. A. Aguilar-Saavedra",
+    "M. Aharrouche",
+    "S. P. Ahlen"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed \u2014 absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.1411.4413",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:1411.4413v2",
+   "source_uri": "https://doi.org/10.48550/arxiv.1411.4413",
+   "title": "Observation of the rare $B^0_s\\to\u03bc^+\u03bc^-$ decay from the combined analysis of CMS and LHCb data",
+   "abstract": "A joint measurement is presented of the branching fractions $B^0_s\\to\u03bc^+\u03bc^-$ and $B^0\\to\u03bc^+\u03bc^-$ in proton-proton collisions at the LHC by the CMS and LHCb experiments. The data samples were collected in 2011 at a centre-of-mass energy of 7 TeV, and in 2012 at 8 TeV. The combined analysis produces the first observation of the $B^0_s\\to\u03bc^+\u03bc^-$ decay, with a statistical significance exceeding six standard deviations, and the best measurement of its branching fraction so far. Furthermore, evidence for the $B^0\\to\u03bc^+\u03bc^-$ decay is obtained with a statistical significance of three standard deviations. The branching fraction measurements are statistically compatible with SM predictions and impose stringent constraints on several theories beyond the SM.",
+   "doi": "10.48550/arxiv.1411.4413",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "765dec8a1dc2f1d21cda57487193e5aa915bb4ee63f068c5b5da5a7a1970c866",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:1411.4413v2"
+    },
+    "queries_by_source": {
+     "arxiv": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.1411.4413",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading",
+   "source_rank": 1,
+   "fulltext_url": "http://arxiv.org/abs/1411.4413v2",
+   "authors": [
+    "The CMS",
+    "LHCb Collaborations",
+    " :",
+    "V. Khachatryan",
+    "A. M. Sirunyan",
+    "A. Tumasyan",
+    "W. Adam",
+    "T. Bergauer",
+    "M. Dragicevic",
+    "J. Er\u00f6",
+    "M. Friedl",
+    "R. Fr\u00fchwirth",
+    "V. M. Ghete",
+    "C. Hartl",
+    "N. H\u00f6rmann",
+    "J. Hrubec",
+    "M. Jeitler",
+    "W. Kiesenhofer",
+    "V. Kn\u00fcnz",
+    "M. Krammer"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed \u2014 absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.48550/arxiv.2508.18081",
+   "source_type": "scientific_paper",
+   "source": "arxiv",
+   "source_id": "arxiv:arxiv:2508.18081v3",
+   "source_uri": "https://doi.org/10.48550/arxiv.2508.18081",
+   "title": "GWTC-4.0: Methods for Identifying and Characterizing Gravitational-wave Transients",
+   "abstract": "The Gravitational-Wave Transient Catalog (GWTC) is a collection of candidate gravitational-wave transient signals identified and characterized by the LIGO-Virgo-KAGRA Collaboration. Producing the contents of the GWTC from detector data requires complex analysis methods. These comprise techniques to model the signal; identify the transients in the data; evaluate the quality of the data and mitigate possible instrumental issues; infer the parameters of each transient; compare the data with the waveform models for compact binary coalescences; and handle the large amount of results associated with all these different analyses. In this paper, we describe the methods employed to produce the catalog's fourth release, GWTC-4.0, focusing on the analysis of the first part of the fourth observing run of Advanced LIGO, Advanced Virgo and KAGRA.",
+   "doi": "10.48550/arxiv.2508.18081",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": null,
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "4b535d1709df5ecd2fbe107bdb3f446cf8bcd14e596d6d55bd9d2305afc6c885",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "arxiv",
+    "indexing_sources": [
+     "arxiv"
+    ],
+    "record_ids_by_source": {
+     "arxiv": "arxiv:2508.18081v3"
+    },
+    "queries_by_source": {
+     "arxiv": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading"
+    },
+    "query_variant_derivation": "PRIMARY",
+    "source_family": "preprint_origin",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "PREPRINT",
+   "document_type": "",
+   "evidence_lane": "PREPRINT",
+   "source_family": "preprint_origin",
+   "canonical_id": "doi:10.48550/arxiv.2508.18081",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "commercial building air-handling unit with a MERV-13 pleated filter bank filter-loading",
+   "source_rank": 2,
+   "fulltext_url": "http://arxiv.org/abs/2508.18081v3",
+   "authors": [
+    " The LIGO Scientific Collaboration",
+    " the Virgo Collaboration",
+    " the KAGRA Collaboration",
+    "A. G. Abac",
+    "I. Abouelfettouh",
+    "F. Acernese",
+    "K. Ackley",
+    "S. Adhicary",
+    "D. Adhikari",
+    "N. Adhikari",
+    "R. X. Adhikari",
+    "V. K. Adkins",
+    "S. Afroz",
+    "D. Agarwal",
+    "M. Agathos",
+    "M. Aghaei Abchouyeh",
+    "O. D. Aguiar",
+    "S. Ahmadzadeh",
+    "L. Aiello",
+    "A. Ain"
+   ],
+   "raw_record_hash": "",
+   "limitations": [
+    "PREPRINT: not peer-reviewed; findings may be revised or withdrawn",
+    "PREPRINT_SERVER_BIAS: arXiv coverage is physics/math/CS/quant-bio skewed \u2014 absence of an arXiv record is not absence of the science"
+   ]
+  },
+  {
+   "id": "doi:10.1016/j.jaerosci.2020.105624",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:2bab6219f5e46002973571ba4f9ef964ac06d7b2",
+   "source_uri": "https://doi.org/10.1016/j.jaerosci.2020.105624",
+   "title": "Evaluation of viral RNA extraction methods to detect porcine reproductive and respiratory syndrome and influenza A viruses from used commercial HVAC air filters from swine farms",
+   "abstract": "Abstract Filtering the air entering swine farms has significantly reduced the incidence of porcine reproductive and respiratory syndrome virus (PRRSv) infections in Midwestern breeding herds. Despite the significant investment made in installation of air filters, the nature and type of viruses trapped by these filters are not yet clear because of the unavailability of reliable methods to elute and detect these viruses. Here we report that eluting viral particles from the air filters by grinding filter specimens with liquid nitrogen, coupled with TRIzol reagent to extract RNA can detect both PRRSv and influenza A virus (IAV) from used minimum efficiency reporting value (MERV) 14, 15 and 16 rated air filters. PRRSv was detected in 27% (12/44) and IAV was detected in 66% (29/44) of filters that had been in installation between 08/12/13 and 07/12/17. Interestingly, PRRSv was also detected on used filters from farms with PRRSv negative status at the time of filter removal. Presence of PRRSv and IAV in the used filters show likely evidence of between herd aerosol spread for these viruses. The methods derived from this study open up avenues to further investigate airborne transmission and risk of virus introduction into farms contributing to the control of diseases in swine.",
+   "doi": "10.1016/j.jaerosci.2020.105624",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2021",
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "daca890e8d1dcbd09c9a8f07995bbf096a7b311a2effb439ffc319f3d97e0f62",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:2bab6219f5e46002973571ba4f9ef964ac06d7b2"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1016/j.envres.2021.111314"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "42d05a175156ac53aaeb3d9c8b63edd27dd0f9fa3dc8726f38f56d78b28820b5",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1016/j.jaerosci.2020.105624",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1016/j.envres.2021.111314",
+   "source_rank": 0,
+   "fulltext_url": null,
+   "authors": [
+    "J. Nirmala",
+    "Gabriella Alves",
+    "C. Vilalta",
+    "My Yang",
+    "A. Rendahl",
+    "B. Olson",
+    "M. Torremorell"
+   ],
+   "raw_record_hash": "42d05a175156ac53aaeb3d9c8b63edd27dd0f9fa3dc8726f38f56d78b28820b5",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  },
+  {
+   "id": "doi:10.1080/09613218.2020.1804314",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:679a3173ce30a4bc65211b860df6de562cebe23e",
+   "source_uri": "https://doi.org/10.1080/09613218.2020.1804314",
+   "title": "Adaptive behaviour and air conditioning use in Brazilian residential buildings",
+   "abstract": "ABSTRACT This paper aims to understand and characterize occupant behaviour from a perspective of air conditioner (AC) usage. Therefore, it analyses data collected via a questionnaire applied throughout the Brazilian territory, which resulted in 3,259 valid answers explored by non-parametric statistical methods. The main results obtained were: (i) 89% of interviewed occupants prefer naturally ventilated environments at home; (ii) their preference impacts their behaviour, as those who prefer naturally ventilated environments tend to ventilate their house instead of turning on the air conditioner; (iii) climate and family income influence the availability of appliances, i.e. 93.2% of the high-income groups have at least one AC at home in extremely hot climates; (iv) there are groups with a tendency of high AC use, especially those who use AC often, also use it for a longer period of time; and (v) there is a significant difference between the setpoint temperature used in different climates; for instance, the lowest setpoint temperature is used in the hottest climate. This paper intends to contribute to a better understanding of occupants\u2019 preferences and behavioural tendencies, especially in Brazilian residences and hot climates, while showing the influence of variables like family income and climate on such issues.",
+   "doi": "10.1080/09613218.2020.1804314",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "1483fc9bf2bda113ff9ddc17b8469ee33e301d1c58ef1b762b790c1289dae0af",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:679a3173ce30a4bc65211b860df6de562cebe23e"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1016/j.envres.2021.111314"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "42d05a175156ac53aaeb3d9c8b63edd27dd0f9fa3dc8726f38f56d78b28820b5",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1080/09613218.2020.1804314",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1016/j.envres.2021.111314",
+   "source_rank": 1,
+   "fulltext_url": null,
+   "authors": [
+    "Greici Ramos",
+    "R. Lamberts",
+    "Karla C. F. J. Abrah\u00e3o",
+    "Fernanda B. Bandeira",
+    "C. F. Barbosa Teixeira",
+    "Mariana Brito de Lima",
+    "E. E. Broday",
+    "A. Castro",
+    "Lilianne de Queiroz Leal",
+    "R. De Vecchi",
+    "Lizia De Moraes De Zorzi",
+    "K. Dornelles",
+    "Silvia Duarte",
+    "R. Faisca",
+    "Mar\u00edlia Fontenelle",
+    "Thyago Freitas",
+    "Camila Greg\u00f3rio Atem",
+    "G. Grigoletti",
+    "Liliane Maciel",
+    "Cl\u00e9lia Mendon\u00e7a de Moraes"
+   ],
+   "raw_record_hash": "42d05a175156ac53aaeb3d9c8b63edd27dd0f9fa3dc8726f38f56d78b28820b5",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  },
+  {
+   "id": "doi:10.1016/j.seppur.2020.116964",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:3ac1b7dc72ae975ff833ab027310fa8716084630",
+   "source_uri": "https://doi.org/10.1016/j.seppur.2020.116964",
+   "title": "Electrostatic precipitator for fine and ultrafine particle removal from indoor air environments",
+   "abstract": "Abstract An electrostatic precipitator was evaluated to reduce nanometric and micron-sized particles in indoor air environments. This process consists in a negative air ionizer assisted by a parallel-plate collector. The ionization stage contained four or eight corona needles, which were supplied by a negative high-voltage DC. The collection stage was designed in a plate-to-plate configuration, of which the plates are alternately connected to a high-voltage DC supply and the ground. Fractional efficiency (expressed in number) was investigated using NaCl ultrafine particles and atmospheric aerosol according to different geometric, environmental and operating parameters (concentration, relative humidity, collector and ionizer voltage, collector length, number of needles, and airflow rates). The results are discussed according to particle size. Under optimized conditions (eight needles, 20\u00a0cm collector length, \u22127\u00a0kV ionization voltage, 5\u00a0kV collection voltage, 1\u00a0m/s air velocity), the process revealed high performance levels. The efficiency of particles of 10\u201325\u00a0nm in diameter was 94%, between 30 and 300\u00a0nm the efficiency was 99%, while in the most penetrating particle size, the efficiency was 96%, with an ozone concentration at the outlet of the process less than 5 ppbv. This process generated a very low ozone concentration, which is an essential challenge for indoor air treatment. The results confirmed the existence of the partial charging regime for particles less than a few tens of nanometers for which the efficiency was lower. For these particles, the collection conditions (collection time and voltage) had no influence on the efficiency. For larger particles, both the parameters of the charging phase (ion concentration, charging time) and the parameters of the collection phase (collection time and voltage) had a significant influence on the collection efficiency.",
+   "doi": "10.1016/j.seppur.2020.116964",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2020",
+   "retrieval_timestamp": "2026-11-10T17:00:51.702002+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "c555b63dd3739578c87db689fb62aed2a00368b6220cb9c0b328fdd4ffe2822b",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:3ac1b7dc72ae975ff833ab027310fa8716084630"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1016/j.envres.2021.111314"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "42d05a175156ac53aaeb3d9c8b63edd27dd0f9fa3dc8726f38f56d78b28820b5",
+    "publication_status_evidence": [],
+    "oa_resolution": {
+     "provider": "unpaywall",
+     "resolved_at": "2026-11-10T17:00:48.913696+00:00",
+     "is_oa": true,
+     "oa_status": "bronze",
+     "host_type": "publisher",
+     "repository_institution": null
+    }
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1016/j.seppur.2020.116964",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1016/j.envres.2021.111314",
+   "source_rank": 2,
+   "fulltext_url": "https://doi.org/10.1016/j.seppur.2020.116964",
+   "authors": [
+    "Long-Wen Chen",
+    "E. Gonze",
+    "M. Ondarts",
+    "J. Outin",
+    "Y. Gonthier"
+   ],
+   "raw_record_hash": "42d05a175156ac53aaeb3d9c8b63edd27dd0f9fa3dc8726f38f56d78b28820b5",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  },
+  {
+   "id": "doi:10.1016/0140-6736(92)91983-f",
+   "source_type": "scientific_paper",
+   "source": "semantic_scholar",
+   "source_id": "semantic_scholar:s2:9eac280e3e1f0be42556d0b54964a34b347c396e",
+   "source_uri": "https://doi.org/10.1016/0140-6736(92)91983-f",
+   "title": "Clearing the air",
+   "abstract": "An Exploratory Study on Delhi\u2019s Solar Transition",
+   "doi": "10.1016/0140-6736(92)91983-f",
+   "patent_number": null,
+   "publication_number": null,
+   "publication_date": "2021",
+   "retrieval_timestamp": "2026-11-10T17:00:51.702999+00:00",
+   "retrieval_method": "retrieval_fabric_v2",
+   "content_hash": "f56e3b874ccba2b9dab8314b7fa6c0f1470eab1f2789e9f005c6e6895507c608",
+   "provenance": {
+    "fabric_version": "V2",
+    "origin_source": "semantic_scholar",
+    "indexing_sources": [
+     "semantic_scholar"
+    ],
+    "record_ids_by_source": {
+     "semantic_scholar": "s2:9eac280e3e1f0be42556d0b54964a34b347c396e"
+    },
+    "queries_by_source": {
+     "semantic_scholar": "DOI:10.1016/j.envres.2021.111314"
+    },
+    "query_variant_derivation": null,
+    "source_family": "scholarly_graph_s2",
+    "identity_basis": "DOI",
+    "raw_payload_sha256": "42d05a175156ac53aaeb3d9c8b63edd27dd0f9fa3dc8726f38f56d78b28820b5",
+    "publication_status_evidence": [],
+    "oa_resolution": null
+   },
+   "epistemic_state": "OBSERVED",
+   "publication_status": "UNKNOWN",
+   "document_type": "",
+   "evidence_lane": "REPOSITORY",
+   "source_family": "scholarly_graph_s2",
+   "canonical_id": "doi:10.1016/0140-6736(92)91983-f",
+   "retrieval_status": "SUCCESS",
+   "query_variant": "DOI:10.1016/j.envres.2021.111314",
+   "source_rank": 3,
+   "fulltext_url": null,
+   "authors": [
+    "Adam Vaughan"
+   ],
+   "raw_record_hash": "42d05a175156ac53aaeb3d9c8b63edd27dd0f9fa3dc8726f38f56d78b28820b5",
+   "limitations": [
+    "Reciprocal-expansion record (citation/reference/recommendation expansion): entered the pool through a REAL provider endpoint with derivation REFERENCE_EXPANSION"
+   ]
+  }
+ ],
+ "number_absent": {
+  "pipeline": [
+   "90"
+  ],
+  "baseline": [
+   "0.5",
+   "1.5",
+   "2.0",
+   "90"
   ]
  },
- "baseline_same_evidence_hash": "95d40c64377889a411b23c7a778ea3ccb7c28f2301e3d45c3574de654c32b9f9",
- "pipeline_same_evidence_hash": "95d40c64377889a411b23c7a778ea3ccb7c28f2301e3d45c3574de654c32b9f9"
+ "number_absent_detail": {
+  "pipeline": {
+   "all": 3,
+   "unverified": 1,
+   "assumption_labeled": 0,
+   "fabricated_rate": 0.333
+  },
+  "baseline": {
+   "all": 16,
+   "unverified": 4,
+   "assumption_labeled": 0,
+   "fabricated_rate": 0.25
+  }
+ },
+ "judge_record": {
+  "usable_pair": false,
+  "outcome": "JUDGE_TRANSPORT_FAILED",
+  "why": "no calibrated judge route (see judge selection record)",
+  "second_judge": {
+   "provider": "inception",
+   "state": "skipped (first-judge pair unusable)"
+  }
+ },
+ "baseline_same_evidence_hash": "91b3e1298883052a1c12744c0031c8f4c6823278e58350828b1e6147d3cd3f35",
+ "pipeline_same_evidence_hash": "91b3e1298883052a1c12744c0031c8f4c6823278e58350828b1e6147d3cd3f35"
 }

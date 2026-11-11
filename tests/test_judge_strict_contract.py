@@ -132,6 +132,42 @@ def test_out_of_range_score_rejects_pass():
     assert out["usable_pair"] is False
 
 
+# ---------------------------------------------------------------------------
+# R5 P0-2: assumption-labeled numbers are never counted as unverified
+# fabrication; both arms are accounted symmetrically
+# ---------------------------------------------------------------------------
+def test_assumption_labeled_numbers_excluded_from_unverified():
+    ans = ("PARAMETER: seal glass fraction — 0.15 — ASSUMPTION\n"
+           "PARAMETER: 500 cycles — EVIDENCE-BACKED.")
+    packet = '{"abstract": "500 cycles reported"}'
+    out = R._numbers_fabricated(ans, packet)
+    assert out["assumption_labeled"] == 1
+    assert out["unverified"] == 0
+    assert R._numbers_absent(ans, packet) == []
+
+
+def test_contradicting_packet_numbers_counted():
+    ans = "drift stays below 12.8 mA in 240 trials"
+    packet = '{"abstract": "set at 5 mA and validated on 24 samples"}'
+    out = R._numbers_fabricated(ans, packet)
+    assert out["all"] >= 2
+    assert out["unverified"] == 2          # 12.8, 240 neither in packet
+    assert out["fabricated_rate"] == 1.0
+
+
+def test_baseline_arm_same_rule():
+    # symmetric accounting is the point of the R5 P0-2 metric fix
+    ans = "use 99.9% pure alumina"
+    out = R._numbers_fabricated(ans, '{"abstract": "6061-T6 alloy"}')
+    assert out["unverified"] == 1           # 99.9 is not in the packet
+    assert out["fabricated_rate"] == 1.0
+    # and assumption-labeled numbers stay excluded in this arm too:
+    ans2 = "PARAMETER: purity — 99.9 — ASSUMPTION"
+    out2 = R._numbers_fabricated(ans2, '{"abstract": "6061-T6 alloy"}')
+    assert out2["unverified"] == 0
+    assert out2["assumption_labeled"] == 1
+
+
 def _calib_fake(n_good: int, n_empty: int):
     """Deterministic calibration stub: n_good valid picks of the good
     answer, n_empty empty responses, rest valid but WRONG."""
