@@ -62,9 +62,16 @@ State when this runbook was staged (2026-11-11 ~14:20 UTC):
   pairs dQ > 0 AND CI lower bound > 0; else REMOVAL CANDIDATE. Every
   actual removal = one commit, constitution amended by deletion.
 
-## Block H — seeded-defect sweep on the FINAL run's envelopes
-    python3 scripts/r6_seeded_defects.py <final-commit12>
-  (expect 21/21 caught, 0 false kills)
+## Block H — seeded-defect sweep on the OWNER-HELD specimens
+    python3 scripts/r6_seeded_sweep.py \
+        --specimens <owner-held path to seeded_specimens_v1.json> \
+        --expected-selection-sha256 <full-64-hex> [--prefix-match]
+  (FAIL-CLOSED on absent file or hash mismatch; the sweep is
+  DETERMINISTIC — zero LLM calls — and reports per-class catch and
+  false-kill AGGREGATES only; per-specimen rows go to gitignored
+  ENGINE_RUNS scratch, never committed, never pasted into the report.
+  The R6 circular sweep (self-authored defects scored by the same
+  hand) was retired, not repaired. Art. XIX, XXV, LXIV.)
 
 ## Block I — two-turn token test + holdout gate statement
     timeout 300 python -m pytest tests/test_two_turn_no_leak.py -q
