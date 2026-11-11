@@ -865,30 +865,59 @@ def _assumption_labeled_numbers(ans: Optional[str]) -> set:
     return out
 
 
-def _numbers_fabricated(ans: Optional[str], packet_blob: str) -> Dict[str, Any]:
+def _num_re(n: str):
+    """Whole-number match with digit-boundary lookarounds (no digit on
+    either side of the token)."""
+    return re.compile(r"(?<!\d)" + re.escape(n) + r"(?!\d)")
+
+
+def _numbers_fabricated(ans: Optional[str], packet_blob: str,
+                        user_variables: Optional[List[str]] = None) -> Dict[str, Any]:
     """Per-arm fabricated-number accounting (assumption-excluded).
 
-    Returns {all, unverified, assumption_labeled, fabricated_rate} or
-    None fields when the answer carries no numbers."""
+    Digit-boundary binding only: an answer number must appear as a
+    whole token in the packet or in a user variable; substring does NOT
+    match. Returns counts per binding source plus pooled counts."""
     nums = set(_NUM_TOKEN_RE.findall(ans or ""))
     if not nums:
         return {"all": 0, "unverified": 0, "assumption_labeled": 0,
-                "fabricated_rate": None}
+                "fabricated_rate": None,
+                "packet_bound": 0, "user_variable_bound": 0,
+                "unbound": 0}
     assumption = _assumption_labeled_numbers(ans) & nums
+    pb = packet_blob or ""
+    ub = " ".join(user_variables or [])
+    p_rx = {n: _num_re(n) for n in nums}
+    packet_bound = {n for n in nums if p_rx[n].search(pb)}
+    user_bound = {n for n in packet_bound if p_rx[n].search(ub)}
     checkable = nums - assumption
-    absent = sorted(n for n in checkable if n not in (packet_blob or ""))
-    return {"all": len(nums), "unverified": len(absent),
+    absent = sorted(n for n in checkable
+                    if not p_rx[n].search(pb) and not p_rx[n].search(ub))
+    return {"all": len(nums),
+            "unverified": len(absent),
             "assumption_labeled": len(assumption),
+            "packet_bound": len(nums & (packet_bound | assumption)),
+            "user_variable_bound": len(user_bound),
+            "unbound": len(absent),
             "fabricated_rate": (round(len(absent) / len(checkable), 3)
                                 if checkable else None)}
 
 
-def _numbers_absent(ans: Optional[str], packet_blob: str) -> List[str]:
-    """Legacy shape kept for full_scoreable gating: distinct numbers
-    absent from the packet, assumption-labeled numbers EXCLUDED."""
+def _numbers_absent(ans: Optional[str], packet_blob: str,
+                    user_variables: Optional[List[str]] = None
+                    ) -> List[str]:
+    """Legacy shape kept for full_scoreable gating, now with
+    digit-boundary matching."""
     nums = set(_NUM_TOKEN_RE.findall(ans or ""))
     checkable = nums - _assumption_labeled_numbers(ans)
-    return sorted(n for n in checkable if n not in (packet_blob or ""))
+    pb = packet_blob or ""
+    ub = " ".join(user_variables or [])
+    out = []
+    for n in checkable:
+        rx = re.compile(r"(?<!\d)" + re.escape(n) + r"(?!\d)")
+        if not rx.search(pb) and not rx.search(ub):
+            out.append(n)
+    return sorted(out)
 
 
 def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
@@ -957,10 +986,14 @@ def run_judge_problem(problem: Dict[str, Any], pipe_ans: Optional[str],
     # per-side criterion means (valid passes only; never from failures)
     crit = {c: {"pipeline": [], "baseline": []} for c in CRITERIA}
     _pt = json.dumps(packet or [], ensure_ascii=False)
-    number_absent_detail = {"pipeline": _numbers_fabricated(pipe_ans, _pt),
-                            "baseline": _numbers_fabricated(base_ans, _pt)}
-    number_absent = {"pipeline": _numbers_absent(pipe_ans, _pt),
-                     "baseline": _numbers_absent(base_ans, _pt)}
+    number_absent_detail = {"pipeline": _numbers_fabricated(pipe_ans, _pt,
+                                                           problem.get("user_variables")),
+                            "baseline": _numbers_fabricated(base_ans, _pt,
+                                                           problem.get("user_variables"))}
+    number_absent = {"pipeline": _numbers_absent(pipe_ans, _pt,
+                                                 problem.get("user_variables")),
+                     "baseline": _numbers_absent(base_ans, _pt,
+                                                 problem.get("user_variables"))}
     prefs: List[str] = []
     if pair_outcome == JUDGE_VALID:
         for p in passes:
@@ -1410,10 +1443,14 @@ def build_score_table(route_rec: Dict[str, Any],
             _blob = " ".join(
                 str((e or {}).get("abstract") or "") + " "
                 + str((e or {}).get("title") or "") for e in _ev)
-            _det = {"pipeline": _numbers_fabricated(pipe.get("answer"), _blob),
-                    "baseline": _numbers_fabricated(base.get("answer"), _blob)}
-            _abs = {"pipeline": _numbers_absent(pipe.get("answer"), _blob),
-                    "baseline": _numbers_absent(base.get("answer"), _blob)}
+            _det = {"pipeline": _numbers_fabricated(pipe.get("answer"), _blob,
+                                                    p.get("user_variables")),
+                    "baseline": _numbers_fabricated(base.get("answer"), _blob,
+                                                    p.get("user_variables"))}
+            _abs = {"pipeline": _numbers_absent(pipe.get("answer"), _blob,
+                                                p.get("user_variables")),
+                    "baseline": _numbers_absent(base.get("answer"), _blob,
+                                                p.get("user_variables"))}
         except Exception:  # noqa: BLE001
             _det = None
             _abs = {"pipeline": [], "baseline": []}
