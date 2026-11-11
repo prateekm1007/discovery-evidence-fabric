@@ -77,6 +77,24 @@ def test_binding_state_reuse_rules():
         == "INCOMPLETE_INPUT_MISMATCH"
 
 
+def test_no_hardcoded_gateway_key_fallback():
+    # P1-9 hygiene pin: the hard-coded loopback-credential fallback is
+    # gone from the R6 script set — a measured run or ablation arm with
+    # no operator-declared ZAI_API_KEY fails typed (fail-closed), it
+    # never silently re-keys the gateway. (The string check is the
+    # mechanical regression pin for the removal itself; no new
+    # governance layer.)
+    import pathlib
+    root = pathlib.Path(__file__).resolve().parents[1]
+    offenders = []
+    for f in ("scripts/r6_run_dev7.sh", "scripts/r6_ablation.py",
+              "scripts/r6_seeded_sweep.py", "scripts/r6_call_budget.py"):
+        p = root / f
+        if p.exists() and "r6session-key" in p.read_text(encoding="utf-8"):
+            offenders.append(f)
+    assert offenders == [], offenders
+
+
 def test_collect_answers_types_the_missing_full_reference(tmp_path,
                                                          monkeypatch):
     monkeypatch.setattr(AB, "_commit", lambda: "abc12345")

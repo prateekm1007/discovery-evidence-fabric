@@ -251,8 +251,12 @@ def run_arm(arm: str, problems=None, workers: int = 3) -> int:
         assert stage in ABLATION_STAGES, f"unknown stage {stage}"
         disabled = stage
     harness_arms = _allowed_harness_arms(harness_arms)
+    # P1-9 hygiene: ZAI_API_KEY is pure operator pass-through — it rides
+    # in via the os.environ spread above. The previously hard-coded
+    # gateway-key fallback is REMOVED (directive item 9): an arm run
+    # with no operator-declared credential now fails typed at the
+    # provider, it is never silently re-keyed.
     env = {**os.environ,
-           "ZAI_API_KEY": os.environ.get("ZAI_API_KEY", "r6session-key-2026"),
            "ZAI_MODEL": "glm-4-plus",
            "ENGINE_MODEL_COST_POLICY": "UNRESTRICTED",
            "EVAL_JUDGE_ALLOW_SHARED_FAMILY": "1",

@@ -17,8 +17,24 @@
 # Usage: bash scripts/r6_run_dev7.sh <arms> <workers> <extra args...>
 #   e.g. bash scripts/r6_run_dev7.sh pipeline,baseline,judge 3
 set -u
-REPO=/home/z/my-project/discovery-evidence-fabric
-KEY="${ZAI_API_KEY:-r6session-key-2026}"
+# P1-9 hygiene (directive 2026-11-11, item 9): the repo root is derived
+# from this file - the hard-coded sandbox path made the script unusable
+# on any other checkout (and a silent cross-host write hazard). The
+# BASH_SOURCE form is caller-cwd independent (it resolves the script's
+# OWN location, not the invocation directory).
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+REPO="$(cd "$SCRIPT_DIR/.." && pwd)"
+# The measured run's credential is OPERATOR-DECLARED (ZAI_API_KEY, the
+# sandbox rung's loopback credential). The hard-coded gateway-key
+# fallback is REMOVED (directive item 9): an undeclared credential
+# silently re-keying the loopback gateway was a typed-honesty defect -
+# unset means fail closed, never a fallback.
+if [ -z "${ZAI_API_KEY:-}" ]; then
+  echo "[r6] BLOCKED_NO_ZAI_API_KEY: the loopback credential must be
+operator-declared (ZAI_API_KEY); there is no hard-coded fallback" >&2
+  exit 5
+fi
+KEY="$ZAI_API_KEY"
 
 # --- gateway: reuse the session gateway if alive, else start one that
 # shares this command's lifetime (processes are reaped at the tool-call
