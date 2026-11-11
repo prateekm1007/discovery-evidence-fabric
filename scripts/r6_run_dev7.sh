@@ -46,6 +46,12 @@ export ENGINE_MODEL_COST_POLICY=UNRESTRICTED
 export EVAL_JUDGE_ALLOW_SHARED_FAMILY=1
 export ENGINE_NO_PACKAGE=1          # lean: no package tail in measured runs
 export ENGINE_SECOND_JUDGE=0        # one judge; the second judge has no route
+export MS_BATCH_INSTANTIATION=1     # R6 item 1: ONE batched operator-
+                                    # instantiation call per problem (the
+                                    # owner's "batch multi-operator
+                                    # generation into fewer calls"); the
+                                    # batch record rides the space and the
+                                    # typed legacy fallback is unchanged
 ARMS="${1:-pipeline,baseline,judge}"
 WORKERS="${2:-3}"
 shift 2 2>/dev/null || shift $#

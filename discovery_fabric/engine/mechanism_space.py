@@ -656,6 +656,11 @@ def assemble_candidate(operator: Dict[str, Any],
         "call_provenance": llm_meta.get("call_provenance"),
         "task_degradation": llm_meta.get("task_degradation"),
         "cost_provenance": llm_meta.get("cost_provenance"),
+        # R6 item 1: when this candidate's first instantiation was
+        # served from the ONE batched operator call, the batch label
+        # rides the record (provider/model/prompt_hash above are the
+        # REAL batch call's — never mistakable for N separate calls).
+        "batch_served": llm_meta.get("batch_served"),
         "source_item_id": structured_item.get("item_id"),
         "derived_at": utc_now(),
     }
@@ -1127,6 +1132,236 @@ OPERATOR_IDS = tuple(op["operator_id"] for op in TRANSFORMATION_OPERATORS)
 OPERATOR_INSTANTIATION_MAX_TOKENS = 2800
 
 
+def _select_for_operator(op: Dict[str, Any],
+                         structured_evidence: List[Dict[str, Any]],
+                         problem: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """The deterministic selection contract of an operator — ONE
+    authority shared by the per-pair path and the R6 batch preflight
+    (the batch plan must select EXACTLY what the per-pair path would
+    select, or the served sections would misalign)."""
+    selected = []
+    for item in structured_evidence:
+        contract = op["input_contract"](item, problem)
+        if contract["satisfied"]:
+            item["_selection"] = {"selected_by": op["operator_id"],
+                                  "contract": contract}
+            selected.append(item)
+        else:
+            item.setdefault("_selection_rejections", []).append(
+                {"operator": op["operator_id"],
+                 "contract": contract})
+    return selected
+
+
+def _operator_pair_prompt(op: Dict[str, Any], item: Dict[str, Any],
+                          problem: Dict[str, Any]) -> str:
+    """The EXACT prompt the per-pair path builds for one (operator,
+    item) pair — the batch transport concatenates these verbatim, so a
+    batch-served pair receives the identical instruction text."""
+    return _OPERATOR_INSTANTIATION_PROMPTS[op["operator_id"]].format(
+        system=_field_val(item, "system") or "(unextracted)",
+        mechanism=_field_val(item, "mechanism") or "(unextracted)",
+        observed_effect=_field_val(item, "observed_effect")
+        or "(unextracted)",
+        evidence_intervention=_field_val(item, "intervention")
+        or "(unextracted)",
+        boundary_conditions=_field_val(item, "boundary_conditions")
+        or "(unextracted)",
+        constraints=_field_val(item, "constraints") or "(unextracted)",
+        failure_mode=_field_val(item, "failure_mode")
+        or "(unextracted)",
+        device=problem.get("device", ""),
+        failure=problem.get("failure", ""),
+        constraint=problem.get("constraint", ""),
+        record_text=_item_abstract(item)[:2600] or
+        "(record text unavailable)")
+
+
+# ---------------------------------------------------------------------------
+# R6 item 1 (owner directive: "Batch multi-operator generation into fewer
+# calls"): ONE LLM call instantiates EVERY applicable (operator, item)
+# pair instead of one call per pair. Measured basis (fresh run 2,
+# b5ea85e9): a completed problem spends ~6 LLM calls of which the MS
+# operator-instantiation family is 3-5 — and the upstream quota (~3-5
+# calls/60 s, flapping 429) makes EVERY extra call a pacing+backoff wall
+# (the two 300 s INCOMPLETE_INFRASTRUCTURE kills spent their cap in 429
+# storms). The batch prompt concatenates the per-pair prompts VERBATIM
+# under typed section headers; the response is split back into per-pair
+# sections; each section flows through the UNCHANGED validation pipeline
+# (parse -> span binding -> assemble -> operator semantics -> recorded
+# corrective retry). Failure behavior is typed and honest:
+#   - batch CALL fails (429/timeout) -> the queue stays empty and every
+#     pair falls through to the legacy per-pair path (status quo — the
+#     run degrades to today's behavior, never to silence);
+#   - a SECTION is missing/unparseable in an otherwise OK response ->
+#     that ONE pair records OPERATOR_INSTANTIATION_FAILED with the batch
+#     basis (no hidden per-pair recovery calls — the count stays 1);
+#   - provenance: every batch-served candidate carries the REAL batch
+#     call meta (provider/model/prompt_hash/cost) + batch_served labeling
+#     + the per-section output hash — never mistakable for N calls.
+# Env: MS_BATCH_INSTANTIATION=1 enables (the run driver sets it; default
+# off keeps every existing test and the legacy path at status quo — the
+# legacy path also remains the typed fallback, Art. LXIV disclosed).
+# ---------------------------------------------------------------------------
+_MS_BATCH_ENV = "MS_BATCH_INSTANTIATION"
+_MAX_BATCH_PAIRS = 6
+_BATCH_QUEUES: Dict[str, List[Dict[str, Any]]] = {}
+
+
+def _batch_enabled() -> bool:
+    import os
+    return os.environ.get(_MS_BATCH_ENV, "0").strip() == "1"
+
+
+def _batch_reset() -> None:
+    _BATCH_QUEUES.clear()
+
+
+def _batch_pair_header(index: int, op_id: str, item_id: Any) -> str:
+    return f"### PAIR {index} OPERATOR {op_id} ITEM {item_id}"
+
+
+_PAIR_HEADER_RE = re.compile(
+    r"^###\s+PAIR\s+(\d+)\s+OPERATOR\s+(\S+)\s+ITEM\s+(\S+)",
+    re.MULTILINE)
+
+
+def _preflight_operator_batch(ops: List[Dict[str, Any]],
+                              structured_evidence: List[Dict[str, Any]],
+                              problem: Dict[str, Any],
+                              per_operator_item_cap: int,
+                              ) -> Dict[str, Any]:
+    """Build the batch plan, make the ONE batch instantiation call, and
+    fill the per-purpose section queues apply_operator consumes. Returns
+    the honest batch record (plan + outcome) for the space."""
+    pairs = []
+    for op in ops:
+        selected = _select_for_operator(op, structured_evidence, problem)
+        for item in selected[:max(0, per_operator_item_cap)]:
+            pairs.append({"op": op, "item": item,
+                          "purpose": f"operator_{op['operator_id']}",
+                          "prompt": _operator_pair_prompt(op, item,
+                                                          problem)})
+    record: Dict[str, Any] = {
+        "instrument": "operator_batch_instantiation/1.0.0",
+        "env": _MS_BATCH_ENV,
+        "n_pairs_planned": len(pairs),
+        "n_pairs_served": 0,
+        "n_sections_missing": 0,
+        "n_pairs_fallback": 0,
+        "batch_call": None,
+    }
+    _batch_reset()
+    if len(pairs) < 2:
+        record["note"] = ("fewer than 2 applicable pairs — batching has "
+                          "nothing to merge (honest no-op)")
+        return record
+    served_pairs = pairs[:_MAX_BATCH_PAIRS]
+    overflow_pairs = pairs[_MAX_BATCH_PAIRS:]
+    record["n_pairs_overflow_legacy"] = len(overflow_pairs)
+    sections = "\n\n".join(
+        f"{_batch_pair_header(i, p['op']['operator_id'], p['item'].get('item_id'))}\n"
+        f"{p['prompt']}"
+        for i, p in enumerate(served_pairs))
+    batch_prompt = (
+        "You will complete " + str(len(served_pairs)) + " INDEPENDENT "
+        "mechanism-instantiation tasks below. Each task is under a "
+        "section header of the form:\n"
+        "### PAIR <i> OPERATOR <operator_id> ITEM <item_id>\n"
+        "Answer EVERY section. Keep each answer in EXACTLY the field "
+        "format its section asks for (same field lines, same rules), "
+        "and repeat the section header line VERBATIM before each "
+        "answer block. Do not merge sections, do not add commentary "
+        "between them.\n\n" + sections)
+    meta = llm_generate(
+        batch_prompt,
+        system="You are a rigorous mechanism engineer. Every claim "
+               "must derive from the given evidence. Answer every "
+               "section in its exact requested format.",
+        purpose="operator_batch_instantiation",
+        max_tokens=min(4000, 700 * len(served_pairs) + 300))
+    record["batch_call"] = {
+        "ok": bool(meta.get("ok")),
+        "status": meta.get("status"),
+        "provider": meta.get("provider"),
+        "model": meta.get("model"),
+        "prompt_sha256": meta.get("prompt_hash"),
+        "purpose": "operator_batch_instantiation",
+        "n_sections_requested": len(served_pairs),
+    }
+    if not meta.get("ok"):
+        record["note"] = ("batch call failed typed — every pair falls "
+                          "back to the legacy per-pair path (status "
+                          "quo behavior, honest, Art. XXV)")
+        record["n_pairs_fallback"] = len(pairs)
+        return record
+    content = meta.get("content") or ""
+    matches = list(_PAIR_HEADER_RE.finditer(content))
+    slices = []
+    for i, m in enumerate(matches):
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(content)
+        slices.append((int(m.group(1)), m.group(2), m.group(3),
+                       content[m.end():end]))
+    section_meta_base = {k: meta.get(k) for k in (
+        "provider", "model", "call_provenance", "task_degradation",
+        "cost_provenance", "provider_route", "route")}
+    served = 0
+    for p_index, p in enumerate(served_pairs):
+        sec = next((s for s in slices if s[0] == p_index), None)
+        purpose_key = p["purpose"]
+        if sec is None:
+            _BATCH_QUEUES.setdefault(purpose_key, []).append({
+                "ok": False, "status": "BATCH_SECTION_MISSING",
+                "error": ("the batch response carried no section for "
+                          f"pair {p_index} "
+                          f"({p['op']['operator_id']}) — typed missing, "
+                          "no hidden recovery call")})
+            record["n_sections_missing"] += 1
+            continue
+        body = sec[3]
+        out_hash = None
+        try:
+            from hashlib import sha256 as _s2
+            out_hash = _s2(body.encode("utf-8")).hexdigest()[:16]
+        except Exception:  # noqa: BLE001
+            out_hash = None
+        fake_meta = dict(section_meta_base)
+        fake_meta.update({
+            "ok": True, "status": "OK", "content": body,
+            "prompt_hash": meta.get("prompt_hash"),
+            "output_hash": out_hash or meta.get("output_hash"),
+            "purpose": purpose_key,
+            "batch_served": {
+                "note": ("R6 item 1: ONE batched operator-"
+                         "instantiation call served this pair's first "
+                         "attempt; validation + corrective retry "
+                         "unchanged"),
+                "pair_index": p_index,
+                "operator": p["op"]["operator_id"],
+                "n_pairs_in_batch": len(served_pairs),
+                "batch_status": meta.get("status"),
+            },
+        })
+        _BATCH_QUEUES.setdefault(purpose_key, []).append(fake_meta)
+        served += 1
+    record["n_pairs_served"] = served
+    return record
+
+
+def _first_instantiation_call(prompt: str, system: str, purpose: str,
+                              op_id: str) -> Dict[str, Any]:
+    """The pair's FIRST instantiation call: batch-served when a section
+    rides the queue, otherwise the legacy per-pair llm_generate (also
+    the typed fallback when the batch call failed wholesale)."""
+    queue = _BATCH_QUEUES.get(purpose)
+    if _batch_enabled() and queue:
+        entry = queue.pop(0)
+        if not _BATCH_QUEUES.get(purpose):
+            _BATCH_QUEUES.pop(purpose, None)
+        return entry
+    return llm_generate(prompt, system=system, purpose=purpose)
+
+
 def apply_operator(op: Dict[str, Any],
                    structured_evidence: List[Dict[str, Any]],
                    problem: Dict[str, Any],
@@ -1141,17 +1376,7 @@ def apply_operator(op: Dict[str, Any],
     Failure states: NO_APPLICABLE_EVIDENCE (no item satisfied the
     contract), OPERATOR_LLM_UNAVAILABLE, and per-candidate
     NOT_A_CANDIDATE states — all honest, all recorded."""
-    selected = []
-    for item in structured_evidence:
-        contract = op["input_contract"](item, problem)
-        if contract["satisfied"]:
-            item["_selection"] = {"selected_by": op["operator_id"],
-                                  "contract": contract}
-            selected.append(item)
-        else:
-            item.setdefault("_selection_rejections", []).append(
-                {"operator": op["operator_id"],
-                 "contract": contract})
+    selected = _select_for_operator(op, structured_evidence, problem)
     result: Dict[str, Any] = {
         "operator": op["operator_id"],
         "operator_version": op["version"],
@@ -1173,27 +1398,12 @@ def apply_operator(op: Dict[str, Any],
         if used >= per_operator_item_cap:
             break
         used += 1
-        prompt = _OPERATOR_INSTANTIATION_PROMPTS[op["operator_id"]].format(
-            system=_field_val(item, "system") or "(unextracted)",
-            mechanism=_field_val(item, "mechanism") or "(unextracted)",
-            observed_effect=_field_val(item, "observed_effect")
-            or "(unextracted)",
-            evidence_intervention=_field_val(item, "intervention")
-            or "(unextracted)",
-            boundary_conditions=_field_val(item, "boundary_conditions")
-            or "(unextracted)",
-            constraints=_field_val(item, "constraints") or "(unextracted)",
-            failure_mode=_field_val(item, "failure_mode")
-            or "(unextracted)",
-            device=problem.get("device", ""),
-            failure=problem.get("failure", ""),
-            constraint=problem.get("constraint", ""),
-            record_text=_item_abstract(item)[:2600] or
-            "(record text unavailable)")
-        meta = llm_generate(
+        prompt = _operator_pair_prompt(op, item, problem)
+        meta = _first_instantiation_call(
             prompt, system="You are a rigorous mechanism engineer. "
             "Every claim must derive from the given evidence.",
-            purpose=f"operator_{op['operator_id']}")
+            purpose=f"operator_{op['operator_id']}",
+            op_id=op["operator_id"])
         if not meta.get("ok"):
             result["candidates"].append({
                 "state": "OPERATOR_INSTANTIATION_FAILED",
@@ -2567,6 +2777,15 @@ def build_mechanism_space(problem: Dict[str, Any],
     # the five operators
     all_candidates: List[Dict[str, Any]] = []
     operator_results = []
+    # R6 item 1 (owner directive: batch multi-operator generation into
+    # fewer calls): when enabled, ONE batch instantiation call serves
+    # every applicable (operator, item) pair's first attempt; the
+    # per-pair validation pipeline and the typed legacy fallback are
+    # unchanged. The batch record rides the space honestly.
+    if _batch_enabled():
+        space["operator_batch"] = _preflight_operator_batch(
+            TRANSFORMATION_OPERATORS, structured_items, problem,
+            per_operator_item_cap)
     for op in TRANSFORMATION_OPERATORS:
         res = apply_operator(op, structured_items, problem,
                              per_operator_item_cap=per_operator_item_cap)
@@ -2575,6 +2794,12 @@ def build_mechanism_space(problem: Dict[str, Any],
             if isinstance(c, dict) and c.get("candidate_state") == \
                     "CANDIDATE":
                 all_candidates.append(c)
+    if _batch_enabled():
+        # hygiene: an unconsumed section (an operator selected fewer
+        # items at apply time than at plan time can never happen — the
+        # selection is deterministic and shared — but a queued entry
+        # must never leak across problems or into a run's later stages)
+        _batch_reset()
     space["operator_results"] = [
         {k: v for k, v in r.items() if k != "candidates"}
         for r in operator_results]
