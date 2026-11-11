@@ -41,6 +41,7 @@ commit) — never a re-run (the paired design compares arms run under the
 same code).
 """
 import argparse
+import hashlib
 import json
 import os
 import random
@@ -49,7 +50,10 @@ import sys
 import time
 from pathlib import Path
 
-REPO = Path("/home/z/my-project/discovery-evidence-fabric")
+# P0-7 (round 2): REPO is derived from this file's location — the
+# hard-coded sandbox path made the driver unusable (and a silent
+# cross-host write hazard) on any other checkout.
+REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
 ABLATION_ROOT = REPO / "eval" / "runs_ablation"
@@ -123,6 +127,101 @@ def _full_root() -> Path:
     return REPO / "eval" / "runs" / _commit()
 
 
+# ---------------------------------------------------------------------------
+# P0-7 (round-2 directive): ablation / run / score isolation
+#
+# (a) RUN isolation — the driver writes ONLY under the ablation root
+#     (eval/runs_ablation/<commit>/). It never writes into the live run
+#     roots (eval/runs/<commit>/ — the full arm is a READ-ONLY borrow)
+#     or the scored-artifact space (eval/score/). The ablation arm
+#     subprocesses are mechanically barred from the judge arm: an
+#     ablation arm that built the shared scored table would mix
+#     diagnostic arm runs into the scored-run records.
+# (b) SCORE isolation — the ablation judging is the driver's own
+#     isolated pass (its judgments live in eval/runs_ablation/<commit>/
+#     judgments/), consumes NO scored-run slot, and writes nothing to
+#     eval/score/. Verdicts stay DIAGNOSTIC (P1-11 binding).
+# (c) JUDGMENT<->RUN BINDING — every ablation judgment carries
+#     bound_inputs (P0-8 discipline, the same keys eval/run.py uses):
+#     the sha256 of the answer it was made from, arm, commit, rubric
+#     version, judge route. A judgment whose answer changed after the
+#     run (arm re-run) is INCOMPLETE_INPUT_MISMATCH and is re-judged,
+#     never silently reused; a record without a binding is
+#     UNBOUND_LEGACY and the same.
+# ---------------------------------------------------------------------------
+
+RUBRIC_VERSION = "0-4-rubric/1"  # == eval.run.RUBRIC_VERSION
+
+
+def _ablation_write_path(p: Path) -> Path:
+    """Guard (a): every driver write target must resolve under the
+    ablation root. A write anywhere else (live run roots, the scored
+    space) is a run/score-isolation violation and raises — typed, never
+    a silent cross-space write."""
+    ap = Path(p).resolve()
+    ar = ABLATION_ROOT.resolve()
+    if not str(ap).startswith(str(ar) + os.sep):
+        raise RuntimeError(
+            "ablation/run/score isolation violation: the ablation "
+            f"driver may only write under {ar} — write target {ap} "
+            "is outside the ablation root (live run roots and the "
+            "scored space are off-limits)")
+    return ap
+
+
+def _allowed_harness_arms(harness_arms: str) -> str:
+    """Guard (a), arm side: the ablation arm subprocess may run the
+    pipeline or composer arm only. The judge arm would build the
+    shared scored table from diagnostic arm answers — mechanically
+    barred, typed."""
+    if "judge" in [a.strip() for a in str(harness_arms).split(",")]:
+        raise RuntimeError(
+            "ablation arm requested the judge arm: ablation arms must "
+            "never build the shared scored table (run/score "
+            "isolation) — the driver's own isolated judging pass "
+            "covers the ablation answers")
+    return harness_arms
+
+
+def _answer_binding(rec: dict, arm: str, commit: str,
+                    judge_route: dict) -> dict:
+    """bound_inputs for one ablation judgment (P0-8 key shapes,
+    answer side): the answer actually judged, keyed so a later re-use
+    can verify it was made under the SAME answer. Hash = eval.run's
+    _sha (sha256 of the text), so a judgment can be verified against
+    the live-run judge records' bindings too."""
+    import hashlib
+    ans = (rec or {}).get("answer")
+    ans_sha = ("ABSENT" if not ans
+               else hashlib.sha256(str(ans).encode("utf-8")).hexdigest())
+    return {"answer_sha256": ans_sha,
+            "arm": arm, "commit": commit,
+            "rubric_version": RUBRIC_VERSION,
+            "judge_route": {"provider": (judge_route or {}).get("provider"),
+                            "model": (judge_route or {}).get("model")}}
+
+
+def _binding_state(prev: dict, cur_bind: dict) -> str:
+    """The P0-8 states, applied to an ablation judgment against the
+    CURRENT answer binding: BOUND_OK (reusable), UNBOUND_LEGACY (no
+    binding recorded — re-judge), INCOMPLETE_INPUT_MISMATCH (answer /
+    arm / commit / rubric / route drifted — re-judge)."""
+    b = (prev or {}).get("bound_inputs")
+    if not isinstance(b, dict):
+        return "UNBOUND_LEGACY"
+    checks = [
+        b.get("answer_sha256") == cur_bind["answer_sha256"],
+        b.get("arm") == cur_bind["arm"],
+        b.get("commit") == cur_bind["commit"],
+        str(b.get("rubric_version") or "") == cur_bind["rubric_version"],
+        (b.get("judge_route") or {}).get("provider")
+        == cur_bind["judge_route"]["provider"],
+        (b.get("judge_route") or {}).get("model")
+        == cur_bind["judge_route"]["model"],
+    ]
+    return "BOUND_OK" if all(checks) else "INCOMPLETE_INPUT_MISMATCH"
+
+
 def arm_dir(arm: str) -> Path:
     return ABLATION_ROOT / _commit() / arm
 
@@ -137,7 +236,9 @@ def _dev7_problems() -> list:
 def run_arm(arm: str, problems=None, workers: int = 3) -> int:
     """One ablation arm for DEV7 in its own run root. The arm's env:
     EVAL_DISABLE_STAGES for no_* arms; composer_only runs the composer
-    arm of the harness."""
+    arm of the harness. P0-7: the arm is barred from the judge arm
+    (shared scored table), and its root is the ablation-space root —
+    the live run roots are never written by the driver."""
     commit = _commit()
     root = arm_dir(arm)
     root.mkdir(parents=True, exist_ok=True)
@@ -149,6 +250,7 @@ def run_arm(arm: str, problems=None, workers: int = 3) -> int:
         stage = arm[3:]
         assert stage in ABLATION_STAGES, f"unknown stage {stage}"
         disabled = stage
+    harness_arms = _allowed_harness_arms(harness_arms)
     env = {**os.environ,
            "ZAI_API_KEY": os.environ.get("ZAI_API_KEY", "r6session-key-2026"),
            "ZAI_MODEL": "glm-4-plus",
@@ -188,7 +290,10 @@ def _read_answer(record_path: Path) -> dict:
 
 def collect_answers(arms, problems=None) -> dict:
     """answers[problem][arm] = {answer, completed, wall_s, ...} — the full
-    arm comes from the FRESH RUN root (the paired design's control)."""
+    arm comes from the FRESH RUN root (the paired design's control).
+    P0-7: the borrow is read-only and TYPED — a missing live-run
+    reference is flagged per problem (full_ref_present), never a silent
+    zero-dQ."""
     commit = _commit()
     probs = problems or DEV7
     out = {}
@@ -196,6 +301,7 @@ def collect_answers(arms, problems=None) -> dict:
         row = {}
         fr = _full_root() / pid / "pipeline_record.json"
         row["full"] = _read_answer(fr)
+        row["full_ref_present"] = fr.exists()
         for arm in arms:
             if arm == "full":
                 continue
@@ -212,7 +318,18 @@ def collect_answers(arms, problems=None) -> dict:
 
 def judge_all(arms, problems=None) -> int:
     """Blind 0-4 rubric judging. Typed outcomes; transport failures are
-    retried ONCE then recorded typed (never a score)."""
+    retried ONCE then recorded typed (never a score).
+
+    P0-7 (round-2 directive: ablation/run/score isolation): every
+    judgment carries bound_inputs (P0-8 key shapes: the sha256 of the
+    ANSWER it was made from, arm, commit, rubric version, judge
+    route). A recorded judgment is reused ONLY when its binding still
+    matches the current answer — otherwise the arm was re-run and the
+    stale judgment is superseded typed (INCOMPLETE_INPUT_MISMATCH /
+    UNBOUND_LEGACY) and re-judged, never silently reused. This pass
+    is the driver's OWN isolated scoring: it writes only under the
+    ablation root (write-guarded), consumes no scored-run slot, and
+    touches neither the live run roots nor the scored-artifact space."""
     from eval.run import judge_quality_0to4
     probs = _dev7_problems()
     by_id = {p["problem_id"]: p for p in probs}
@@ -236,12 +353,23 @@ def judge_all(arms, problems=None) -> int:
     cal_ok, cal_detail = _calibration_state()
     base_route_p = _full_root() / "_route_probe.json"
     base_route = (json.loads(base_route_p.read_text(encoding="utf-8"))
-                  if base_route_p.exists() else {})
+                   if base_route_p.exists() else {})
+    # P0-7 judge-env consistency: the shared-family gate governs the
+    # process where the judging actually HAPPENS (this driver process)
+    # — the arm subprocesses never judge, so gating them was inert.
+    # The gate is relaxed ONLY for the shared-family case (judge
+    # provider == baseline provider); cross-family routes keep the
+    # strict separation, and every record still carries the
+    # independence label disclosing the overlap (P1-11).
+    _jp = judge_route.get("provider")
+    _bp = base_route.get("provider")
+    if _jp and _jp == _bp:
+        os.environ["EVAL_JUDGE_ALLOW_SHARED_FAMILY"] = "1"
     judge_binding = {
         "judge_route": {"provider": judge_route.get("provider"),
                         "model": judge_route.get("model")},
         "commit": commit,
-        "rubric_version": "0-4-rubric/1",
+        "rubric_version": RUBRIC_VERSION,
         "calibration": {"calibrated": cal_ok, "detail": cal_detail,
                         "source": "committed SCORE_TABLE judge_calibration"},
         "judge_independence": _judge_independence_label(judge_route,
@@ -252,30 +380,51 @@ def judge_all(arms, problems=None) -> int:
                               "the calibration gate passes on committed "
                               "evidence (audit P1-11)",
     }
-    out_path = arm_dir("judgments") / f"judgments_{commit}.json"
+    out_path = _ablation_write_path(
+        arm_dir("judgments") / f"judgments_{commit}.json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
     judged = json.loads(out_path.read_text(encoding="utf-8")) if out_path.exists() else {}
     n_new = 0
+    n_reused_bound = 0
+    n_superseded = {"INCOMPLETE_INPUT_MISMATCH": 0, "UNBOUND_LEGACY": 0}
     for pid, row in answers.items():
         p = by_id.get(pid)
         if p is None:
             continue
         for arm, rec in row.items():
             key = f"{pid}::{arm}"
-            if key in judged and judged[key].get("outcome") not in (
-                    "QJ_TRANSPORT_FAILED", "QJ_NO_ROUTE", "QJ_PARSE_FAILED"):
-                continue
+            prev = judged.get(key)
+            cur_bind = _answer_binding(rec, arm, commit, judge_route)
+            superseded = None
+            if prev is not None and prev.get("outcome") not in (
+                    "QJ_TRANSPORT_FAILED", "QJ_NO_ROUTE",
+                    "QJ_PARSE_FAILED"):
+                bstate = _binding_state(prev, cur_bind)
+                if bstate == "BOUND_OK":
+                    n_reused_bound += 1
+                    continue
+                # P0-7: the recorded judgment no longer describes the
+                # answer on disk (arm re-run / no binding) — it is
+                # superseded TYPED and re-judged, never reused.
+                superseded = bstate
+                n_superseded[bstate] += 1
             res = judge_quality_0to4(p, rec.get("answer"), judge_route)
             judged[key] = {**res, "arm": arm, "problem_id": pid,
                            "completed": rec.get("completed"),
                            "wall_s": rec.get("wall_s"),
-                           "judge_binding": judge_binding}
+                           "judge_binding": judge_binding,
+                           "bound_inputs": cur_bind,
+                           "superseded_binding_state": superseded}
             n_new += 1
             print(f"[judge] {key}: {res.get('outcome')} "
-                  f"score={res.get('score')}", flush=True)
+                  f"score={res.get('score')}"
+                  + (f" (superseded {superseded})" if superseded else ""),
+                  flush=True)
     out_path.write_text(json.dumps(judged, indent=1, default=str) + "\n",
                         encoding="utf-8")
-    print(f"[judge] {n_new} new judgments -> {out_path.name}", flush=True)
+    print(f"[judge] {n_new} new judgments, {n_reused_bound} reused "
+          f"(bound), {sum(n_superseded.values())} superseded typed "
+          f"({n_superseded}) -> {out_path.name}", flush=True)
     return 0
 
 
@@ -313,6 +462,23 @@ def report(arms) -> int:
     _n_unbound = sum(1 for v in J.values()
                     if isinstance(v, dict) and not v.get("judge_binding"))
     probs = DEV7
+    # P0-7: deltas are computed ONLY over judgments still BOUND to the
+    # answer on disk (answer-hash check against the current arm
+    # records); a stale/unbound judgment is a typed exclusion, never a
+    # silent zero-dQ.
+    answers = collect_answers(arms)
+
+    def _cur_ans_sha(pid: str, arm2: str):
+        ans = ((answers.get(pid) or {}).get(arm2) or {}).get("answer")
+        return ("ABSENT" if not ans
+                else hashlib.sha256(str(ans).encode("utf-8")).hexdigest())
+
+    def _ans_state(jrec, pid: str, arm2: str) -> str:
+        b = (jrec or {}).get("bound_inputs")
+        if not isinstance(b, dict):
+            return "UNBOUND_LEGACY"
+        return ("BOUND_OK" if b.get("answer_sha256") == _cur_ans_sha(pid, arm2)
+                else "INCOMPLETE_INPUT_MISMATCH")
     lines = ["# R6 ablation table (0-4 rubric, paired, blind judge)",
              "", f"- commit: `{commit}`",
              "- paired dQ = full(composer+pipeline) - ablated, same problems",
@@ -344,7 +510,17 @@ def report(arms) -> int:
                               "calibration record, independence label); "
                               "judgments without one are labelled "
                               "LEGACY_UNBOUND and excluded from any "
-                              "actionable verdict (P1-11)")}
+                              "actionable verdict (P1-11)"),
+             "isolation_statement": (
+                 "P0-7 ablation/run/score isolation: the ablation "
+                 "driver writes ONLY under eval/runs_ablation/"
+                 "<commit>/ (write-guarded); the full arm is a "
+                 "READ-ONLY borrow of the live run root (eval/runs/"
+                 "<commit>), never written by the driver; ablation "
+                 "arm subprocesses are mechanically barred from the "
+                 "judge arm; ablation judgments consume NO scored-run "
+                 "slot and never enter eval/score/ — ablation "
+                 "verdicts are DIAGNOSTIC (P1-11)")}
     for arm in arms:
         if arm == "full":
             continue
@@ -352,20 +528,37 @@ def report(arms) -> int:
         deltas = []
         n_ans_full = n_ans_arm = 0
         time_full = time_arm = 0.0
+        binding_states = {"BOUND_OK": 0, "INCOMPLETE_INPUT_MISMATCH": 0,
+                          "UNBOUND_LEGACY": 0, "NO_JUDGMENT": 0}
+        n_missing_full_ref = 0
         for pid in probs:
+            if not (answers.get(pid) or {}).get("full_ref_present"):
+                n_missing_full_ref += 1
             fj = J.get(f"{pid}::full")
             aj = J.get(f"{pid}::{arm}")
             if not fj or not aj:
+                binding_states["NO_JUDGMENT"] += 1
                 continue
+            sf = _ans_state(fj, pid, "full")
+            sa = _ans_state(aj, pid, arm)
+            if sf == sa == "BOUND_OK":
+                binding_states["BOUND_OK"] += 1
+            else:
+                binding_states[sf if sf != "BOUND_OK" else sa] += 1
             qf = fj.get("score")
             qa = aj.get("score")
+            pair_state = ("BOUND_OK" if sf == sa == "BOUND_OK"
+                          else (sf if sf != "BOUND_OK" else sa))
+            dq = ((qf - qa) if (qf is not None and qa is not None
+                                and pair_state == "BOUND_OK") else None)
             rows.append({"problem_id": pid,
                          "q_full": qf, "q_ablated": qa,
                          "outcome_full": fj.get("outcome"),
                          "outcome_ablated": aj.get("outcome"),
-                         "dq": (qf - qa) if (qf is not None and qa is not None) else None})
-            if qf is not None and qa is not None:
-                deltas.append(qf - qa)
+                         "binding_state": pair_state,
+                         "dq": dq})
+            if dq is not None:
+                deltas.append(dq)
             if fj.get("completed"):
                 n_ans_full += 1
                 time_full += fj.get("wall_s") or 0
@@ -391,6 +584,8 @@ def report(arms) -> int:
             "n_pairs_scored": len(deltas),
             "dq_mean": mean, "dq_ci95": [lo, hi],
             "dq_positive_pairs": pos,
+            "binding_states": binding_states,
+            "n_missing_full_ref": n_missing_full_ref,
             "completed_full": n_ans_full, "completed_ablated": n_ans_arm,
             "time_share_note": (f"full {time_full:.0f}s vs ablated "
                                 f"{time_arm:.0f}s (completed problems only)"),
@@ -404,10 +599,20 @@ def report(arms) -> int:
         lines.append(f"- completion: full {n_ans_full}/7 vs ablated "
                      f"{n_ans_arm}/7 | wall: {time_full:.0f}s vs "
                      f"{time_arm:.0f}s")
+        lines.append(f"- binding: "
+                     f"{binding_states['BOUND_OK']} BOUND_OK / "
+                     f"{binding_states['INCOMPLETE_INPUT_MISMATCH']} stale / "
+                     f"{binding_states['UNBOUND_LEGACY']} unbound / "
+                     f"{binding_states['NO_JUDGMENT']} no-judgment "
+                     f"(deltas over BOUND_OK only) | "
+                     f"{n_missing_full_ref} pairs missing the live-run full "
+                     f"reference (typed, excluded)")
         lines.append(f"- VERDICT: **{verdict}**")
         lines.append("")
-    out_json = arm_dir("judgments") / f"ablation_table_{commit}.json"
-    out_md = arm_dir("judgments") / f"ablation_table_{commit}.md"
+    out_json = _ablation_write_path(
+        arm_dir("judgments") / f"ablation_table_{commit}.json")
+    out_md = _ablation_write_path(
+        arm_dir("judgments") / f"ablation_table_{commit}.md")
     out_json.write_text(json.dumps(table, indent=1, default=str) + "\n",
                         encoding="utf-8")
     out_md.write_text("\n".join(lines) + "\n", encoding="utf-8")
