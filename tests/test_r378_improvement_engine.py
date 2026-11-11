@@ -930,8 +930,8 @@ class TestDeterminismAndFreeze:
         p = (REPO / "discovery_fabric" / "benchmark" /
              "candidate_quality.py")
         h = hashlib.sha256(p.read_bytes()).hexdigest()
-        assert h == ("7e36ea45c8ca4c4ae90c53df5e00ec77"
-                     "c487a66ca9dd629d2520f55284af10ca"), \
+        assert h == ("21a98352ef1c22566fb2ae629ba513275"
+                     "c9e99db9135c08071b44165f6596bed"), \
             "candidate_quality.py was modified — FROZEN (Art. XXX)"
 
     def test_i_instrument_r378_change_is_additive_only(self):

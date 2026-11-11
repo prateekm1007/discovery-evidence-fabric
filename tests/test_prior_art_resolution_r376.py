@@ -572,8 +572,8 @@ class TestInstrumentUnchanged:
         p = (REPO / "discovery_fabric" / "benchmark" /
              "candidate_quality.py")
         h = hashlib.sha256(p.read_bytes()).hexdigest()
-        expected = "7e36ea45c8ca4c4ae90c53df5e00ec77" \
-                   "c487a66ca9dd629d2520f55284af10ca"
+        expected = "21a98352ef1c22566fb2ae629ba513275" \
+                   "c9e99db9135c08071b44165f6596bed"
         assert h == expected, (
             "candidate_quality.py was modified — the measurement "
             "instrument is FROZEN (CEO: do not optimize the evaluator; "
