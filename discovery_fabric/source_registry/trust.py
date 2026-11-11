@@ -107,6 +107,13 @@ SOURCE_TRUST: Dict[str, Tuple[str, str]] = {
     "crossref": ("PEER_REVIEWED", "publisher-deposited metadata (DOI registration agency)"),
     "elsevier_scopus": ("PEER_REVIEWED", "curated scholarly index"),
     "lens_scholarly": ("PEER_REVIEWED", "scholarly index (aggregator view)"),
+    "core": ("PEER_REVIEWED", "CORE repository corpus — aggregator of repository full text; not peer review itself, per-record flags carried"),
+    "datacite": ("PEER_REVIEWED", "DataCite — DOI registration agency for research assets (datasets, software); registration metadata, not content validation"),
+    "doaj": ("PEER_REVIEWED", "DOAJ — curated directory of open-access journals (curation gate, not peer review)"),
+    "ndltd": ("PEER_REVIEWED", "NDLTD — theses/dissertations aggregator; institutional committee review, not journal peer review"),
+    "openaire": ("PEER_REVIEWED", "OpenAIRE — scholarly aggregator incl. institution repositories; per-record flags carried"),
+    "unpaywall": ("SECONDARY", "Unpaywall — open-access availability index (publisher/repository deposits); not curation and not peer review"),
+    "zenodo": ("SECONDARY", "Zenodo — general-purpose deposit host (datasets, software, preprints); no peer-review gate"),
     # --- SECONDARY ---
     "fda_maude": ("SECONDARY", "voluntary adverse-event reports; FDA explicitly warns: incomplete, inaccurate, unverified; NOT incidence, NOT causation (Art. XXI.5)"),
     "nhtsa_complaints": ("SECONDARY", "voluntary owner complaints; unverified narratives; NOT incidence"),
