@@ -14,9 +14,19 @@ directive 2026-11-11 — packet traceability is NO LONGER required):
 A bare unlabeled threshold number with none of the three is a
 violation. Intervention-proposal answers MUST name concrete parameters,
 each labeled EVIDENCE-BACKED or ASSUMPTION; EVIDENCE-BACKED parameters
-must bind to a source id present in the packet. The check is
-deterministic and runs against the answer text the judge sees
-(Art. XXIV).
+bind to a source id present in the packet. P0-5 (owner directive
+2026-11-11, item 5) — CLAIM-LEVEL PROVENANCE: the binding is joint,
+quantity + value + unit checked against the EXACT supporting span
+(the cited packet record, or the specific user-variable /
+clarification entry that carries it); a number elsewhere in the span
+is not support (adversarial classes: same_number_wrong_quantity,
+wrong_unit, unrelated_source, substring_number, value_not_in_source);
+recorded conversions / derivations are admitted and recorded in
+bindings["claims"]. The predictor's packet_or_user_variable threshold
+basis was tightened the same way: the threshold number AND its unit
+must co-occur in the blob (a bare number elsewhere is unknown). The
+check is deterministic and runs against the answer text the judge
+sees (Art. XXIV).
 """
 from __future__ import annotations
 
@@ -86,6 +96,266 @@ def _line_of(text: str, pos: int) -> str:
     return text[s:e]
 
 
+# ---------------------------------------------------------------------
+# P0-5 (owner directive 2026-11-11, item 5): claim-level provenance.
+# For every quantitative claim, quantity + value + unit are checked
+# JOINTLY against the exact supporting span (the cited packet record,
+# or the exact user-variable / clarification entry that carries it).
+# A number appearing elsewhere in the source text is NOT support for a
+# different parameter (the directive's adversarial classes:
+# same-number/wrong-quantity, wrong-unit, unrelated source,
+# substring-number). ASSUMPTION stays available for honest,
+# explicitly unverified engineering assumptions.
+# ---------------------------------------------------------------------
+
+_CLAIM_STOP = {
+    "parameter", "evidence", "backed", "assumption", "value", "values",
+    "unit", "units", "label", "labels", "with", "without", "that",
+    "this", "these", "from", "into", "over", "under", "per", "and",
+    "the", "must", "should", "stated", "states", "state", "carry",
+    "holds", "held", "target", "rated", "rating", "spec", "specified",
+    "specify", "specified", "concrete", "design", "named", "following",
+    "each", "both", "same", "one", "two", "three", "percent",
+}
+
+_CONV_MARKER = re.compile(
+    r"(?:conver\w*|equiv\w*|deri\w*|→|≈|\bi\.e\.\b|\bwhich\s+is\b|"
+    r"\bthat\s+is\b)", re.IGNORECASE)
+
+
+def _value_unit_pairs(seg: str) -> List[Dict[str, str]]:
+    """The segment's quantitative claims: every value+unit pair in the
+    stated order (the _NUM_WITH_UNIT class)."""
+    out: List[Dict[str, str]] = []
+    for m in _NUM_WITH_UNIT.finditer(seg or ""):
+        txt = m.group(0).strip()
+        m2 = re.match(r"(\d+(?:\.\d+)?)\s*([^\d\s]+)$", txt)
+        if m2:
+            out.append({"value": m2.group(1),
+                       "unit": m2.group(2).lower()})
+    return out
+
+
+def _quantity_tokens(seg: str) -> set:
+    """The quantity/metric words of a claim line — content words,
+    minus numbers, unit words and scaffolding. These name WHICH
+    physical quantity the value attaches to."""
+    toks = re.findall(r"[a-zA-Z]{4,}", seg or "")
+    units = set(re.findall(
+        r"\b(?:mA|kA|A|mV|V|kV|kW|W|kJ|J|Hz|rpm|°C|K|Pa|kPa|MPa|GPa|"
+        r"N|kN|mm|cm|m|µm|nm|g|kg|mg|t|L|mL|ppm|mol|mol/L|ms|"
+        r"weeks|months|years|shifts|samples)\b",
+        seg or "", re.IGNORECASE))
+    out = set()
+    for t in toks:
+        tl = t.lower()
+        if tl in _CLAIM_STOP or tl in units:
+            continue
+        out.add(tl)
+    return out
+
+
+def _qty_overlap(tokens, src_tokens) -> bool:
+    """Quantity-word overlap: exact token match, or a STEM relation —
+    one token contained in the other with stem length >= 5 ("cycle"
+    in "cycling"/"cycles", "glass" in "glasses"). Deterministic; no
+    new thresholds, just token containment."""
+    for t in tokens:
+        for s in src_tokens:
+            if t == s:
+                return True
+            shorter, longer = (t, s) if len(t) <= len(s) else (s, t)
+            if len(shorter) >= 5 and shorter in longer:
+                return True
+    return False
+
+
+def _joint_support(claim_seg: str, source_seg: str) -> Dict[str, Any]:
+    """P0-5: does the source span support the claim with quantity,
+    value AND unit jointly?
+
+      value_unit_supported — a claim value immediately followed by its
+          unit (<= 4 chars gap, digit-guarded on both sides) occurs in
+          the source span;
+      quantity_supported   — at least one of the claim's quantity
+          words occurs in the source span (stem relation admitted:
+          "cycle" <-> "cycles"/"cycling");
+      joint_supported      — both (or the claim's numbers are all
+          covered: every stated pair, a claim with no pair, or a
+          recorded conversion/derivation the claim itself names).
+
+    A number elsewhere in the source span (wrong quantity, wrong
+    unit, or a longer number it is a substring of) returns None of
+    these — that is the P0-5 adversarial class the check exists to
+    catch (Art. II/VI: exact evidence beats semantic plausibility;
+    never manufacture provenance)."""
+    pairs = _value_unit_pairs(claim_seg)
+    qty = _quantity_tokens(claim_seg)
+    src_l = (source_seg or "").lower()
+    res: Dict[str, Any] = {
+        "pairs": pairs,
+        "quantity": sorted(qty),
+        "value_unit_supported": False,
+        "quantity_supported": False,
+        "joint_supported": False,
+        "conversion_recorded": False}
+    src_qty = _quantity_tokens(src_l)
+    if not pairs:
+        # no value+unit pair in the claim. Either a purely qualitative
+        # claim (the quantity words alone carry the check) or a numeric
+        # claim whose unit is not in the word list — for the latter the
+        # stated value must still appear (digit-guarded) in the span,
+        # otherwise the span names the quantity but not THIS value
+        # (value_not_in_source). A qualitative claim with no number at
+        # all falls back to the quantity-word check.
+        res["quantity_supported"] = _qty_overlap(qty, src_qty)
+        nums = _numbers(claim_seg)
+        if nums:
+            res["value_in_span"] = any(
+                re.search(r"(?<!\d)" + re.escape(n) + r"(?!\d)", src_l)
+                for n in nums)
+            res["joint_supported"] = (res["quantity_supported"]
+                                      and res["value_in_span"])
+        else:
+            res["joint_supported"] = res["quantity_supported"]
+        return res
+    supported_pairs = 0
+    for p in pairs:
+        # the value (digit-guarded: never a substring of a longer
+        # number) followed immediately (<= 4 chars) by its unit —
+        # the co-occurrence that says "this value of this quantity"
+        if re.search(r"(?<!\d)" + re.escape(p["value"])
+                     + r"\s{0,4}" + re.escape(p["unit"]), src_l):
+            supported_pairs += 1
+    res["value_unit_supported"] = supported_pairs > 0
+    res["quantity_supported"] = _qty_overlap(qty, src_qty)
+    res["conversion_recorded"] = bool(_CONV_MARKER.search(
+        claim_seg or ""))
+    if res["value_unit_supported"] and res["quantity_supported"]:
+        res["joint_supported"] = True
+    elif (res["conversion_recorded"] and res["quantity_supported"]
+          and supported_pairs == 0 and _NUM_WITH_UNIT.search(
+              source_seg or "")):
+        # the claim names its own conversion (the source carries the
+        # quantity and a number+unit, the claim records the
+        # derivation) — admitted, and the record says so (Art. XXVII)
+        res["joint_supported"] = True
+        res["by"] = "recorded_conversion"
+    return res
+
+
+def _user_entries(user_variables: Optional[List[str]],
+                  clarification: Optional[str]) -> List[str]:
+    """The EXACT user-stated spans the answer may cite: each user
+    variable entry + the clarification text, as separately stated
+    spans (a number in entry A is not support for a quantity entry A
+    never names)."""
+    entries: List[str] = []
+    for v in (user_variables or []):
+        s = str(v or "").strip()
+        if s:
+            entries.append(s)
+    c = str(clarification or "").strip()
+    if c:
+        entries.append(c)
+    return entries
+
+
+def _parameter_segment(text: str, label_pos: int) -> str:
+    """P0-5: the PARAMETER claim the EVIDENCE-BACKED label attaches
+    to — the text from the nearest PARAMETER marker before the label
+    up to the label (the answer's own parameter claim: quantity name
+    + value + unit, never the following validation sentences)."""
+    marks = [mm.start() for mm in re.finditer(
+        r"\bPARAMETER\b", text[:label_pos], re.IGNORECASE)]
+    if marks:
+        return text[marks[-1]:label_pos]
+    return _line_of(text, label_pos)[:label_pos]
+
+
+def _joint_violation_class(sup: Dict[str, Any], source: str) -> str:
+    """P0-5: which adversarial class the failed joint check is.
+
+    same_number_wrong_quantity — the value is in the source span but
+      the span never names the claim's quantity (the number belongs
+      to something else);
+    wrong_unit                 — value + quantity present, but the
+      claim's unit is not;
+    unrelated_source           — neither the number nor the quantity
+      appears in the cited span;
+    substring_number           — the claim's number occurs only as a
+      substring of a longer number in the span;
+    value_not_in_source        — the span names the quantity but not
+      this value (for user entries: no single entry carries both).
+
+    The class is read off the FIRST pair whose value is relevant to
+    the span (guarded/substring present) — the claim's other pairs
+    (other parameters' numbers that merely share the line prefix)
+    never mask a missing one (the same_number_wrong_quantity trap)."""
+    src_l = (source or "").lower()
+    pairs = sup.get("pairs") or []
+    qty_supported = bool(sup.get("quantity_supported"))
+    if not pairs:
+        return ("value_not_in_source" if qty_supported
+                else "unrelated_source")
+    relevant = None
+    for p in pairs:
+        val = p["value"]
+        if re.search(r"(?<!\d)" + re.escape(val) + r"(?!\d)", src_l):
+            relevant = p
+            break
+        if val in src_l:
+            relevant = p
+            break
+    if relevant is None:
+        if qty_supported:
+            return "value_not_in_source"
+        return "unrelated_source"
+    val, unit = relevant["value"], relevant["unit"]
+    val_guarded = bool(re.search(
+        r"(?<!\d)" + re.escape(val) + r"(?!\d)", src_l))
+    if not val_guarded:
+        return "substring_number"
+    if not qty_supported:
+        return "same_number_wrong_quantity"
+    unit_present = bool(re.search(re.escape(unit), src_l))
+    if not unit_present:
+        return "wrong_unit"
+    # value + quantity both present but the value is not tied to the
+    # unit in the span: the number belongs to another quantity/unit in
+    # that span
+    return "same_number_wrong_quantity"
+
+
+def _user_entries_class(segment: str, entries: List[str]) -> str:
+    """P0-5 class across the user's stated entries (the citation may
+    bind to ONE specific entry; a value in entry A is not support for
+    a quantity entry A never names — the value_not_in_source class):
+    an entry that jointly supports the segment wins; otherwise the
+    class is read off the entry that names the quantity (if any),
+    else the first entry."""
+    per_entry = [(i, _joint_support(segment, e))
+                 for i, e in enumerate(entries)]
+    for i, r in per_entry:
+        if r["joint_supported"]:
+            return ""  # supported
+    named = [r for r in per_entry if r[1]["quantity_supported"]]
+    rep = named[0][1] if named else per_entry[0][1]
+    src = entries[named[0][0]] if named else entries[0]
+    return _joint_violation_class(rep, src)
+
+
+def _threshold_unit(text: str, thr_num: Optional[str]) -> Optional[str]:
+    """P0-5: the unit that co-occurs with the THRESHOLD number on the
+    threshold line (value + unit stated together in the answer)."""
+    if not thr_num:
+        return None
+    for p in _value_unit_pairs(_threshold_region(text)):
+        if p["value"] == thr_num:
+            return p["unit"]
+    return None
+
+
 def _distinctive_tokens(s: str) -> set:
     return {w for w in re.findall(r"[a-z]{4,}", (s or "").lower())
             if w not in {"evidence", "backed", "assumption", "parameter",
@@ -122,15 +392,20 @@ def _numbers(text: str) -> List[str]:
 def _threshold_number(text: str) -> Optional[str]:
     m = re.search(r"THRESHOLD\s*:\s*(\d+(?:\.\d+)?)", text or "",
                   re.IGNORECASE)
-    if not m:
-        m2 = re.search(r"THRESHOLD\s*:\s*([^\n.]{1,80})", text or "",
-                       re.IGNORECASE)
-        if not m2:
-            return None
-        # take first number match inside the line
-        mm = re.search(r"\d+(?:\.\d+)?", m2.group(1))
-        return mm.group(0) if mm else None
-    return m.group(1)
+    if m:
+        return m.group(1)
+    # P0-5: the number the threshold carries is the one that CO-OCCURS
+    # with its unit in the threshold region — "THRESHOLD: RMS > 4.5
+    # mm/s" is 4.5, never the truncation "4" (the old [^\\n.]{1,80}
+    # fallback cut "4.5" at the decimal point). A bare number with no
+    # unit in the region falls back to the first number in the region.
+    region = _threshold_region(text)
+    if not region:
+        return None
+    for p in _value_unit_pairs(region):
+        return p["value"]
+    mm = re.search(r"\d+(?:\.\d+)?", region)
+    return mm.group(0) if mm else None
 
 
 def _threshold_region(text: str) -> str:
@@ -241,10 +516,19 @@ def _threshold_basis(text: str, thr_num: Optional[str],
     if _CALIB_REF.search(region) and _CALIB_DEV.search(region):
         return "calibration_rule"
     if blob:
-        if re.search(r"(?<!\d)" + re.escape(thr_num) + r"(?!\d)",
-                     blob, re.IGNORECASE):
-            # present in packet and/or user variables (one pooled base —
-            # the split is a diagnostic, not a gate)
+        # P0-5: a bare number elsewhere in the packet/user blob is NOT
+        # support — the threshold's value AND its unit must CO-OCCUR
+        # in the blob ("4.5 mm/s" in the record, not "4.5" next to a
+        # kW duty figure). The unit is the one the answer itself
+        # states with the number (no unit stated -> no co-occurrence
+        # can be established -> unknown, never a manufactured basis;
+        # Art. XXVII).
+        thr_unit = _threshold_unit(text, thr_num)
+        if thr_unit and re.search(
+                r"(?<!\d)" + re.escape(thr_num) + r"\s{0,4}"
+                + re.escape(thr_unit), blob, re.IGNORECASE):
+            # value+unit co-occur in packet and/or user entries (one
+            # pooled base — the split is a diagnostic, not a gate)
             return "packet_or_user_variable"
     return "unknown"
 
@@ -272,7 +556,7 @@ def validate_answer(answer: str, question_type: str,
     blob = (_packet_blob(packet) + " " + " ".join(user_variables or [])
             + " " + _clar).lower()
     bindings = {"evidence_bound": 0, "assumption": 0, "unbound_numbers": 0,
-                "all_numbers": 0}
+                "all_numbers": 0, "claims": []}
 
     if question_type == "predictor-design":
         if not re.search(r"INDICATOR\s*:", text, re.IGNORECASE):
@@ -358,27 +642,25 @@ def validate_answer(answer: str, question_type: str,
         pb = _packet_blob(packet).lower() if packet else ""
         src_map = _source_map(packet)
         for m in _EVIDENCE_BACKED.finditer(text):
-            # look at the 200-char window before the label, or the same
-            # line after it, for an id — bracketed packet ids carry the
-            # doi: scheme, so the id class admits ':' (R6: the
-            # composer's own contract-valid output was being rejected
-            # because [doi:10.1051/...] contains a colon). R6 measured
-            # follow-up (fresh-run 1, sofc): the composer's citations of
-            # USER-stated grounds — [user constraint], [user-stated
-            # clarification] — were rejected for the same class of
-            # reason twice over: (a) the bracket contents contain
-            # SPACES, which the packet-id class refuses, and (b) a
-            # user citation can never appear in the packet blob. A
-            # user constraint is legitimate provenance — the same
-            # principle the predictor branch already encodes as the
-            # packet_or_user_variable threshold basis (Task 2). The
-            # id class now admits bracketed citations with spaces and
-            # the hit check accepts user-/clarification-sourced
-            # citations alongside packet ids.
-            win = text[max(0, m.start() - 200):m.start() + 120]
+            # P0-5 (owner directive 2026-11-11, item 5): the cited
+            # source of THIS label is the first bracketed id that
+            # follows the label on the SAME line (the composer's own
+            # rule: "the bracketed packet item id MUST follow the
+            # label on the same line"). A citation attached to a
+            # different label/claim (an earlier label's [doi:...])
+            # never binds this one — exact spans, not a pooled window
+            # (Art. II/VI). History: R6 fresh-run 1 sofc — bracketed
+            # ids carry the doi: scheme, so the id class admits ':';
+            # user citations — [user constraint], [user-stated
+            # clarification] — contain spaces (admitted) and are
+            # legitimate provenance (the user's stated grounds are the
+            # ground truth of the request, as the predictor branch
+            # encodes as the packet_or_user_variable threshold basis).
+            line_start = text.rfind("\n", 0, m.start()) + 1
             ids = re.findall(r"\[[\w][\w./: -]*?\]|https?://\S+|"
                              r"(?:paper|study|record|survey)-?\d+",
-                             win, re.IGNORECASE)
+                             text[line_start:][m.start() - line_start:],
+                             re.IGNORECASE)
             if not ids:
                 violations.append(
                     "intervention contract: EVIDENCE-BACKED label "
@@ -401,47 +683,86 @@ def validate_answer(answer: str, question_type: str,
                     violations.append(
                         "intervention contract: EVIDENCE-BACKED source id "
                         "not found in evidence packet")
-            # the cited record must LEXICALLY SUPPORT the parameter on
-            # the same line (a constitutional floor for exact binding,
-            # Art. II): a source that supports *some* parameter of the
-            # line must share the parameter's number or at least two
-            # distinctive tokens with it.
+            # P0-5 (owner directive 2026-11-11, item 5): the cited
+            # source must JOINTLY support the parameter claim —
+            # quantity + value + unit checked against the EXACT
+            # supporting span (the cited packet record, or the
+            # specific user-variable / clarification entry that
+            # carries it). A number elsewhere in the span is not
+            # support (the adversarial classes:
+            # same_number_wrong_quantity, wrong_unit,
+            # unrelated_source, substring_number,
+            # value_not_in_source). ASSUMPTION labels stay available —
+            # they are honest unverified bases, not evidence claims.
             src_text = None
-            for i in ids:
-                _k = i.lower().strip("[]\n \t")
-                cand = src_map.get(_k) or src_map.get(
-                    _k.removeprefix("doi:"))
-                if cand:
-                    src_text = cand
-                    break
+            src_entry: Optional[int] = None
+            if ids:
+                for i in ids:
+                    _k = i.lower().strip("[]\n \t")
+                    cand = src_map.get(_k) or src_map.get(
+                        _k.removeprefix("doi:"))
+                    if cand:
+                        src_text = cand
+                        break
+            segment = _parameter_segment(text, m.start())
             if src_text is not None:
-                param_line = _line_of(text, m.start())
-                line_nums = set(_numbers(param_line))
-                srcl = src_text.lower()
-                num_hit = any(re.search(r"(?<!\d)" + re.escape(n) +
-                                        r"(?!\d)", srcl)
-                              for n in line_nums)
-                tok_hit = len(_distinctive_tokens(param_line)
-                              & _distinctive_tokens(src_text)) >= 2
-                if line_nums and not (num_hit or tok_hit):
+                sup = _joint_support(segment, src_text)
+                if sup["joint_supported"]:
+                    bindings["claims"].append({
+                        "parameter": segment.strip()[:200],
+                        "label": "evidence-backed",
+                        "cited": ids[0],
+                        "source_kind": "packet_record",
+                        "quantity": sup["quantity"],
+                        "pairs": sup["pairs"],
+                        "conversion_recorded":
+                            bool(sup.get("conversion_recorded"))})
+                else:
                     violations.append(
                         "intervention contract: EVIDENCE-BACKED source "
-                        f"{ids[0]} does not lexically support its "
-                        "parameter (no shared number or distinctive "
-                        "token)")
+                        f"{ids[0]} does not jointly support its "
+                        "parameter "
+                        f"({_joint_violation_class(sup, src_text)})")
             elif ids and _is_user_citation(ids[0].lower().strip("[]\n \t")):
-                # user citations: the value on the parameter line must
-                # appear in the user's stated variables / clarification
-                param_line = _line_of(text, m.start())
-                line_nums = set(_numbers(param_line))
-                u_blob = _user_blob(user_variables, clarification)
-                if line_nums and not any(re.search(r"(?<!\d)" +
-                                                   re.escape(n) +
-                                                   r"(?!\d)", u_blob)
-                                         for n in line_nums):
+                # user citations: the specific user-variable /
+                # clarification entry that carries the quantity must
+                # carry the value+unit too (a number in entry A is
+                # not support for a quantity entry A never names)
+                entries = _user_entries(user_variables, clarification)
+                if not entries:
                     violations.append(
-                        "intervention contract: user citation value not "
-                        "present in the user variables / clarification")
+                        "intervention contract: EVIDENCE-BACKED user "
+                        f"citation {ids[0]} has no user-stated "
+                        "variable or clarification to bind to")
+                else:
+                    per = [(i, _joint_support(segment, e))
+                           for i, e in enumerate(entries)]
+                    ok = [r for r in per if r[1]["joint_supported"]]
+                    if ok:
+                        _sup = ok[0][1]
+                        src_entry = ok[0][0]
+                        bindings["claims"].append({
+                            "parameter": segment.strip()[:200],
+                            "label": "evidence-backed",
+                            "cited": ids[0],
+                            "source_kind": "user_entry",
+                            "entry_index": src_entry,
+                            "quantity": _sup["quantity"],
+                            "pairs": _sup["pairs"],
+                            "conversion_recorded":
+                                bool(_sup.get("conversion_recorded"))})
+                    else:
+                        _named = [r for r in per
+                                  if r[1]["quantity_supported"]]
+                        _rep = (_named[0][1] if _named
+                                else per[0][1])
+                        _src = (entries[_named[0][0]]
+                                if _named else entries[0])
+                        violations.append(
+                            "intervention contract: EVIDENCE-BACKED "
+                            f"user citation {ids[0]} does not jointly "
+                            "support its parameter "
+                            f"({_joint_violation_class(_rep, _src)})")
         # every PARAMETER segment that carries a number must itself carry
         # a label — one labelled parameter does not licence unlabeled
         # neighbours (the label binds the parameter it sits on, not the
@@ -454,7 +775,22 @@ def validate_answer(answer: str, question_type: str,
             _se = (_seg_starts[_si + 1]
                    if _si + 1 < len(_seg_starts) else len(text))
             _seg = text[_ss:_se]
-            if re.search(r"\d", _seg) and not re.search(
+            if re.search(r"\bASSUMPTION\b", _seg, re.IGNORECASE) \
+                    and not re.search(r"EVIDENCE-BACKED",
+                                      _seg, re.IGNORECASE):
+                # P0-5: honest assumption parameters stay admissible —
+                # recorded as ASSUMPTION claims (explicitly unverified
+                # bases), never manufactured into evidence claims
+                bindings["claims"].append({
+                    "parameter": _seg.strip()[:200],
+                    "label": "assumption",
+                    "cited": None,
+                    "source_kind": None,
+                    "quantity": sorted(_quantity_tokens(_seg)),
+                    "pairs": _value_unit_pairs(_seg),
+                    "conversion_recorded":
+                        bool(_CONV_MARKER.search(_seg))})
+            elif re.search(r"\d", _seg) and not re.search(
                     r"EVIDENCE-BACKED|ASSUMPTION", _seg, re.IGNORECASE):
                 _n_unlab += 1
         if _n_unlab:

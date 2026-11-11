@@ -189,7 +189,12 @@ PACKET_DOI_ONLY = [{"id": "ev-1", "doi": "10.1016/j.ceramint.2012.01.043",
                                 "electrolyte stacks",
                     "title": "SOFC thermal cycling and seal activation"}]
 
-USER_VARS = ["maintain OCV above 1.0 V", "seal glass fraction 0.15",
+# P0-5 amendment (disclosed): entry 0 reads the quantity in full words —
+# the bare "OCV" abbreviation cannot lexically bind the claim's quantity
+# words ("open-circuit voltage"), which is exactly the joint-provenance
+# class P0-5 targets.
+USER_VARS = ["maintain open-circuit voltage above 1.0 V",
+             "seal glass fraction 0.15",
              "activation temperature 400 °C"]
 
 

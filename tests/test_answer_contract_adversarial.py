@@ -13,9 +13,15 @@ sys.path.insert(0, str(REPO))
 
 from discovery_fabric.engine.answer_contract import validate_answer
 
+# P0-5 amendment (disclosed): src-4 carries "over 500 cycles" so the
+# all-labeled positive control's cited number actually appears in the
+# cited record (joint provenance); the "500 cycles" number the labeled
+# parameter claims was previously supported only by a bare number
+# elsewhere in the line — the defect P0-5 targets.
 PKT = [{"id": "src-4", "doi": "10.1055/src-4",
         "abstract": "glass-ceramic seal activation temperature 400 °C; "
-                    "thermal cycling of electrolyte stacks at 25-800 °C",
+                    "thermal cycling of electrolyte stacks at 25-800 °C "
+                    "over 500 cycles",
         "title": "SOFC seal activation"},
        {"id": "src-9",
         "abstract": "refractive index of borosilicate glasses; "
@@ -101,7 +107,7 @@ def test_evidence_backed_against_unrelated_source_rejected():
     res = validate_answer(ans, "intervention-proposal",
                           packet=PKT_OPTICAL_ONLY)
     assert res["valid"] is False
-    assert any("does not lexically support" in v or
+    assert any("does not jointly support" in v or
                "not found in evidence packet" in v
                for v in res["violations"])
 
@@ -114,7 +120,7 @@ def test_user_citation_value_must_exist_in_user_variables():
                           packet=PKT,
                           user_variables=["500 cycles thermal cycling"])
     assert res["valid"] is False
-    assert any("user citation value not present" in v
+    assert any("does not jointly support" in v
                for v in res["violations"])
 
 
