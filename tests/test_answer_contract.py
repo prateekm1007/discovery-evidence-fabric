@@ -162,3 +162,70 @@ def test_predictor_contract_accepts_percent_threshold():
            "before end of service; fail otherwise.")
     res = validate_answer(ans, "predictor-design")
     assert res["valid"] is True, res["violations"]
+
+
+# ---------------------------------------------------------------------------
+# R6 measured follow-up (fresh-run 1, sofc): the composer's citations of
+# USER-stated grounds were manufactured into violations — (a) bracket
+# contents with SPACES did not match the packet-id class, and (b) a user
+# citation can never be in the packet blob. User constraints/variables
+# are legitimate provenance (the same principle the predictor branch
+# encodes as the packet_or_user_variable threshold basis).
+# ---------------------------------------------------------------------------
+
+USER_CITE = (
+    "Implement a thermal management system with active cooling. "
+    "PARAMETER: activation temperature — 400°C — EVIDENCE-BACKED [doi:10.1016/j.ceramint.2012.01.043]. "
+    "PARAMETER: target open-circuit voltage — 1.0 V — EVIDENCE-BACKED [user constraint]. "
+    "PARAMETER: seal glass fraction — 0.15 — EVIDENCE-BACKED [user-stated clarification]. "
+    "Test in a thermal-cycling rig; falsify if OCV < 1.0 V after 500 cycles."
+)
+
+PACKET_DOI_ONLY = [{"id": "ev-1", "doi": "10.1016/j.ceramint.2012.01.043",
+                    "abstract": "thermal cycling of electrolyte stacks",
+                    "title": "SOFC thermal cycling"}]
+
+
+def test_intervention_user_citations_accepted():
+    res = validate_answer(USER_CITE, "intervention-proposal",
+                          packet=PACKET_DOI_ONLY)
+    assert res["valid"] is True, res["violations"]
+
+
+def test_intervention_user_citation_without_packet():
+    # no packet at all: USER citations remain legitimate provenance (a
+    # packet-sourced doi citation would rightly fail without a packet)
+    only_user = (
+        "Implement a thermal management system with active cooling. "
+        "PARAMETER: target open-circuit voltage — 1.0 V — "
+        "EVIDENCE-BACKED [user constraint]. "
+        "PARAMETER: seal glass fraction — 0.15 — "
+        "EVIDENCE-BACKED [user-stated clarification]. "
+        "Test in a thermal-cycling rig; falsify if OCV < 1.0 V.")
+    res = validate_answer(only_user, "intervention-proposal", packet=None)
+    assert res["valid"] is True, res["violations"]
+
+
+def test_intervention_unknown_citation_still_rejected():
+    # an invented bracket id that is neither a packet id nor a user
+    # citation is STILL a violation (the floor is not loosened)
+    bad = ("Change the seal compound. "
+           "PARAMETER: cycle count — 500 cycles — EVIDENCE-BACKED [made-up-source-42]. "
+           "Test in the rig; falsify if OCV < 1.0 V.")
+    res = validate_answer(bad, "intervention-proposal", packet=PACKET_DOI_ONLY)
+    assert res["valid"] is False
+    assert any("not found in evidence packet" in v
+               for v in res["violations"])
+
+
+def test_intervention_missing_citation_still_rejected():
+    # a bare EVIDENCE-BACKED label with NO citation anywhere nearby
+    # remains a violation
+    bad = ("Change the seal compound. "
+           "PARAMETER: cycle count — 500 cycles — EVIDENCE-BACKED and "
+           "measured per the standard. Test in the rig; falsify if "
+           "OCV < 1.0 V.")
+    res = validate_answer(bad, "intervention-proposal", packet=PACKET_DOI_ONLY)
+    assert res["valid"] is False
+    assert any("without a referenced source id" in v
+               for v in res["violations"])

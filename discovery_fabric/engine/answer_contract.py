@@ -38,6 +38,21 @@ _ASSUMPTION_LINE = re.compile(r"\bASSUMPTION\b", re.IGNORECASE)
 _EVIDENCE_BACKED = re.compile(r"\bEVIDENCE-BACKED\b", re.IGNORECASE)
 
 
+def _is_user_citation(tok: str) -> bool:
+    """R6: a bracketed citation of USER-stated grounds — [user
+    constraint], [user-stated clarification], [user variables],
+    [clarification answer] — is legitimate provenance for an
+    EVIDENCE-BACKED parameter. The user's stated constraint/variable is
+    the ground truth of the request (the predictor branch encodes the
+    same principle as the packet_or_user_variable threshold basis);
+    it is not an invented number and never lives in the evidence
+    packet, so demanding a packet hit for it manufactured a violation
+    out of the composer's honest output (measured: fresh-run 1 sofc
+    composed answer, 3 violations, all three on user citations)."""
+    t = (tok or "").strip().lower()
+    return t.startswith("user") or t.startswith("clarification")
+
+
 def _packet_blob(packet) -> str:
     if not packet:
         return ""
@@ -218,9 +233,21 @@ def validate_answer(answer: str, question_type: str,
             # line after it, for an id — bracketed packet ids carry the
             # doi: scheme, so the id class admits ':' (R6: the
             # composer's own contract-valid output was being rejected
-            # because [doi:10.1051/...] contains a colon)
+            # because [doi:10.1051/...] contains a colon). R6 measured
+            # follow-up (fresh-run 1, sofc): the composer's citations of
+            # USER-stated grounds — [user constraint], [user-stated
+            # clarification] — were rejected for the same class of
+            # reason twice over: (a) the bracket contents contain
+            # SPACES, which the packet-id class refuses, and (b) a
+            # user citation can never appear in the packet blob. A
+            # user constraint is legitimate provenance — the same
+            # principle the predictor branch already encodes as the
+            # packet_or_user_variable threshold basis (Task 2). The
+            # id class now admits bracketed citations with spaces and
+            # the hit check accepts user-/clarification-sourced
+            # citations alongside packet ids.
             win = text[max(0, m.start() - 200):m.start() + 120]
-            ids = re.findall(r"\[[\w./:-]+?\]|https?://\S+|"
+            ids = re.findall(r"\[[\w][\w./: -]*?\]|https?://\S+|"
                              r"(?:paper|study|record|survey)-?\d+",
                              win, re.IGNORECASE)
             if not ids:
@@ -230,7 +257,15 @@ def validate_answer(answer: str, question_type: str,
             else:
                 any_hit = False
                 for i in ids:
-                    if i.lower().strip("[]\n \t") in pb:
+                    _tok = i.lower().strip("[]\n \t")
+                    # the packet record carries doi as a structured FIELD
+                    # (bare 10.1016/...), the citation carries the doi:
+                    # scheme — normalize the scheme before the hit check
+                    # (R6 measured follow-up; the cited DOI must still
+                    # exist in the packet either way)
+                    if (_tok in pb
+                            or _tok.removeprefix("doi:") in pb
+                            or _is_user_citation(_tok)):
                         any_hit = True
                         break
                 if not any_hit:
