@@ -109,17 +109,47 @@ export function nextPacing(curS, is429) {
 }
 const pacing = { intervalS: PACING_START_S, lastStartMs: 0 };
 
-/** Serialize call STARTS: wait until pacing.intervalS has elapsed since
- *  the previous call's start (global across callers — the upstream quota
- *  is global). Resolves with the waited ms (0 if none) for the log. */
+/** Serialize call STARTS atomically (audit P1-12): a FIFO queue of
+ *  call slots. The old defect: the delay was computed BEFORE the slot
+ *  was reserved — two concurrent callers each read the same stale
+ *  lastStartMs, so caller B started `intervalS` after ITS OWN enqueue
+ *  moment, not after caller A's start: overlapping starts, quota
+ *  pressure. Now: a slot's start is computed against the PREVIOUS
+ *  slot's reserved start (lastStartMs), and lastStartMs is written AT
+ *  SCHEDULE TIME (atomic with the queue step), never at timer fire.
+ *  Two concurrent callers can never schedule overlapping starts.
+ *  A 429 that doubles intervalS takes effect from the NEXT slot on. */
+const pacingQueue = [];
+let pacingPump = false;
+function _pumpPacing() {
+  if (pacingPump || !pacingQueue.length) return;
+  pacingPump = true;
+  const resolve = pacingQueue.shift();
+  const now = Date.now();
+  const gap = pacing.intervalS * 1000 - (now - pacing.lastStartMs);
+  const waitMs = gap > 0 ? gap : 0;
+  pacing.lastStartMs = now + waitMs; // reserve the slot NOW
+  setTimeout(() => {
+    pacingPump = false;
+    resolve(waitMs);
+    _pumpPacing();
+  }, waitMs);
+}
 function waitPacing() {
-  const gap = pacing.intervalS * 1000 - (Date.now() - pacing.lastStartMs);
-  const wait = gap > 0 ? gap : 0;
-  return new Promise(resolve =>
-    setTimeout(() => {
-      pacing.lastStartMs = Date.now();
-      resolve(wait);
-    }, wait));
+  return new Promise(resolve => {
+    pacingQueue.push(resolve);
+    _pumpPacing();
+  });
+}
+/** Test hook (P1-12 concurrency test): schedule a FIFO slot without
+ *  running a call; resolves the waited ms. */
+export function reservePacingSlot() {
+  return waitPacing();
+}
+/** Test hook: set the pacing interval for the queue. */
+export function _withPacingIntervalForTest(intervalS) {
+  pacing.intervalS = intervalS;
+  return pacing;
 }
 
 function zaiComplete(messages, timeoutMs, thinkingMode = false) {

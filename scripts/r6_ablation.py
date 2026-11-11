@@ -103,6 +103,22 @@ def _calibration_state() -> tuple:
     return (n_ok, detail)
 
 
+def _judge_independence_label(judge_route: dict, base_route: dict) -> str:
+    """Label the judge's family relationship to the baseline route
+    (audit P1-11: shared-family must be LABELLED, never silent).
+    The label rides every judgment record and the ablation table."""
+    label = (judge_route.get("judge_independence")
+             or judge_route.get("disclosure"))
+    jp = str(judge_route.get("provider") or "")
+    bp = str(base_route.get("provider") or "")
+    if label:
+        return f"{label} (provider overlap: {bool(jp and jp == bp)})"
+    if jp and jp == bp:
+        return ("SAME_PROVIDER (disclosed via EVAL_JUDGE_ALLOW_SHARED_"
+                "FAMILY; NOT independent — diagnostic only)")
+    return "CROSS_PROVIDER (no baseline route evidence recorded)"
+
+
 def _full_root() -> Path:
     return REPO / "eval" / "runs" / _commit()
 
@@ -213,6 +229,29 @@ def judge_all(arms, problems=None) -> int:
               flush=True)
         return 3
     answers = collect_answers(arms, problems)
+    # P1-11 (audit H): every ablation judgment binds to its OWN
+    # calibration record + independence label. A shared-family judge is
+    # LABELLED, never silently mixed, and no verdict is actionable
+    # until the auditor adjudicates — the binding rides each record.
+    cal_ok, cal_detail = _calibration_state()
+    base_route_p = _full_root() / "_route_probe.json"
+    base_route = (json.loads(base_route_p.read_text(encoding="utf-8"))
+                  if base_route_p.exists() else {})
+    judge_binding = {
+        "judge_route": {"provider": judge_route.get("provider"),
+                        "model": judge_route.get("model")},
+        "commit": commit,
+        "rubric_version": "0-4-rubric/1",
+        "calibration": {"calibrated": cal_ok, "detail": cal_detail,
+                        "source": "committed SCORE_TABLE judge_calibration"},
+        "judge_independence": _judge_independence_label(judge_route,
+                                                         base_route),
+        "actionable": False,
+        "actionability_note": "no verdict is actionable until the "
+                              "auditor adjudicates the DEV pairs and "
+                              "the calibration gate passes on committed "
+                              "evidence (audit P1-11)",
+    }
     out_path = arm_dir("judgments") / f"judgments_{commit}.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     judged = json.loads(out_path.read_text(encoding="utf-8")) if out_path.exists() else {}
@@ -229,7 +268,8 @@ def judge_all(arms, problems=None) -> int:
             res = judge_quality_0to4(p, rec.get("answer"), judge_route)
             judged[key] = {**res, "arm": arm, "problem_id": pid,
                            "completed": rec.get("completed"),
-                           "wall_s": rec.get("wall_s")}
+                           "wall_s": rec.get("wall_s"),
+                           "judge_binding": judge_binding}
             n_new += 1
             print(f"[judge] {key}: {res.get('outcome')} "
                   f"score={res.get('score')}", flush=True)
@@ -265,6 +305,13 @@ def report(arms) -> int:
         return 2
     cal_ok, cal_detail = _calibration_state()
     J = json.loads(jp.read_text(encoding="utf-8"))
+    # P1-11: the table carries the binding its judgments were made
+    # under; records predating the binding are labelled, not mixed
+    _sample_binding = next((v.get("judge_binding") for v in J.values()
+                            if isinstance(v, dict)
+                            and v.get("judge_binding")), None)
+    _n_unbound = sum(1 for v in J.values()
+                    if isinstance(v, dict) and not v.get("judge_binding"))
     probs = DEV7
     lines = ["# R6 ablation table (0-4 rubric, paired, blind judge)",
              "", f"- commit: `{commit}`",
@@ -289,7 +336,15 @@ def report(arms) -> int:
                                   "auditor-judged DEV pairs (Art. XXVI)",
                                   "one commit per removal, constitution by deletion"],
              "decision_rule":
-             "prove value iff majority(dQ>0) AND CI_lo > 0; else removal candidate"}
+             "prove value iff majority(dQ>0) AND CI_lo > 0; else removal candidate",
+             "judge_binding": _sample_binding,
+             "judgments_missing_binding": _n_unbound,
+             "binding_note": ("every judgment carries judge_binding "
+                              "(route, commit, rubric version, its own "
+                              "calibration record, independence label); "
+                              "judgments without one are labelled "
+                              "LEGACY_UNBOUND and excluded from any "
+                              "actionable verdict (P1-11)")}
     for arm in arms:
         if arm == "full":
             continue
@@ -321,12 +376,17 @@ def report(arms) -> int:
         pos = sum(1 for d in deltas if d > 0)
         proves = bool(deltas) and pos > len(deltas) / 2 and lo is not None and lo > 0
         if proves and cal_ok:
-            verdict = "PROVES_VALUE"
+            verdict = "PROVES_VALUE_PENDING_AUDITOR (calibrated judge; " \
+                     "auditor adjudication still required — P1-11)"
         elif proves:
             verdict = "DIAGNOSTIC_ONLY_PROVES_VALUE (judge below 24/30 — not actionable)"
+        elif cal_ok:
+            verdict = ("REMOVAL_CANDIDATE_PENDING_AUDITOR (calibrated "
+                       "judge; no actionable removal until the auditor "
+                       "adjudicates the DEV pairs — P1-11)")
         else:
-            verdict = ("DIAGNOSTIC_ONLY_REMOVAL_CANDIDATE"
-                       if not cal_ok else "REMOVAL_CANDIDATE")
+            verdict = ("DIAGNOSTIC_REMOVAL_CANDIDATE (uncalibrated "
+                       "judge — diagnostic only, P1-11)")
         table["arms"][arm] = {
             "n_pairs_scored": len(deltas),
             "dq_mean": mean, "dq_ci95": [lo, hi],

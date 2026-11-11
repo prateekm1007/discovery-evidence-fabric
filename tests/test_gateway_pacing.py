@@ -59,3 +59,60 @@ def test_gateway_aimd_pacing():
                     continue  # the gateway's own startup log lines ([zai-gateway] ...)
                 out = cand
         assert out == EXPECTED, out
+
+
+# ---------------------------------------------------------------------------
+# P1-12 (audit J): the pacing queue must RESERVE slots atomically —
+# concurrent callers can never schedule overlapping call starts.
+# Scenario: 3 slots enqueued simultaneously at a 200 ms interval;
+# measured resolution must be spaced ~200 ms apart, never overlapping.
+# ---------------------------------------------------------------------------
+_JS_PACE = """
+process.argv[2] = '%d';
+import(%s).then(async m => {
+  const p = m._withPacingIntervalForTest(0.2);
+  p.lastStartMs = 0; // fresh state
+  const t0 = Date.now();
+  const p1 = m.reservePacingSlot();
+  const p2 = m.reservePacingSlot();
+  const p3 = m.reservePacingSlot();
+  const r1 = await p1; const t1 = Date.now();
+  const r2 = await p2; const t2 = Date.now();
+  const r3 = await p3; const t3 = Date.now();
+  console.log(JSON.stringify({
+    gaps_ms: [t1 - t0, t2 - t1, t3 - t2],
+    waits_ms: [r1, r2, r3]
+  }));
+  process.exit(0);
+}).catch(e => { console.error(e); process.exit(1); });
+"""
+
+
+def test_gateway_pacing_concurrent_no_overlapping_starts():
+    with tempfile.TemporaryDirectory() as td:
+        proc = subprocess.run(
+            ["node", "-e", _JS_PACE % (18878,
+                                       json.dumps(os.path.abspath(SCRIPT)))],
+            capture_output=True, text=True, timeout=60,
+            env={**os.environ,
+                 "ZAI_GATEWAY_KEY": "selftest-key",
+                 "ZAI_GATEWAY_LOG": os.path.join(td, "calls.jsonl")},
+        )
+        assert proc.returncode == 0, proc.stderr[-500:]
+        out = None
+        for line in proc.stdout.splitlines():
+            line = line.strip()
+            if line.startswith("{") and "gaps_ms" in line:
+                out = json.loads(line)
+                break
+        assert out is not None, proc.stdout[-500:]
+        g = out["gaps_ms"]
+        w = out["waits_ms"]
+        # slot 1 goes out immediately (fresh state)
+        assert g[0] <= 100, g
+        # slots 2 and 3 wait for ~one 200 ms interval each: NO overlap
+        # (old defect: both computed their gap from the same stale
+        # lastStartMs and started together)
+        assert 120 <= g[1] <= 320, g
+        assert 120 <= g[2] <= 320, g
+        assert w[0] < 50 and 100 <= w[1] <= 300 and 100 <= w[2] <= 300, w
