@@ -128,6 +128,15 @@ JUDGE_CANDIDATES = [
     ("xkiro", "mistralai/ministral-8b"),
     ("unorouter", "deepseek-v4-flash:free"),
 ]
+#: R6: the operator-accepted LAST-RESORT judge. When NO independent
+#: candidate is reachable, the shared-family judge may serve ONLY when
+#: the operator explicitly sets EVAL_JUDGE_ALLOW_SHARED_FAMILY=1 (the
+#: owner's 2026-11-11 directive accepts a my-judged win/tie/loss for
+#: the R6 dev round). The disclosure travels on EVERY judge record and
+#: in SCORE_TABLE.judge_independence — a reader can never mistake a
+#: shared-family verdict for an independent one (Art. XXVII: recorded,
+#: never silent).
+JUDGE_LAST_RESORT = ("zai", "glm-4-plus")
 
 
 def utc_now() -> str:
@@ -598,8 +607,17 @@ def _transport_call(provider: str, model: str, prompt: str, system: str,
 
 
 def probe_zero_paid_route() -> Dict[str, Any]:
-    """Strongest directly reachable zero-paid rung (probe, then return).
-    Tries candidate (provider, model) pairs in quality order."""
+    """Strongest directly reachable rung (probe, then return). Tries
+    candidate (provider, model) pairs in quality order.
+
+    R6 (owner directive 2026-11-11, "world-class, end-to-end"): the
+    sandbox's own rung (zai/glm-4-plus, cost basis ENVIRONMENT_GRANT —
+    recorded honestly, never claimed free-tier or self-hosted) is the
+    LAST candidate: reachable only when the operator sets
+    ENGINE_MODEL_COST_POLICY=UNRESTRICTED for this measurement round
+    (recorded per run in _run_meta.json; the ZERO_PAID_COST policy
+    refuses it fail-closed — the refusal, not a silent widening, is the
+    default)."""
     try:
         from discovery_fabric.engine import adapters as _ad
         _ad.load_credentials()
@@ -612,6 +630,7 @@ def probe_zero_paid_route() -> Dict[str, Any]:
         ("unorouter", "deepseek-v4-flash:free"),
         ("agnes", "agnes-2.5-flash"),
         ("unorouter", "qwen3.8-27b:free"),
+        ("zai", "glm-4-plus"),
     ]
     attempts = []
     for prov, model in candidates:
@@ -698,8 +717,62 @@ def probe_judge_route(baseline_provider: str) -> Dict[str, Any]:
         if rec["eligible"]:
             return {"provider": prov, "model": model, "state": "OK",
                     "selection": "calibration-gated",
+                    "judge_independence": "INDEPENDENT_PROVIDER",
                     "candidates": results,
                     "at": utc_now()}
+    # ---- R6 LAST RESORT: the operator-accepted shared-family judge ----
+    # Serves ONLY when (a) no independent candidate was reachable, and
+    # (b) the operator explicitly set EVAL_JUDGE_ALLOW_SHARED_FAMILY=1.
+    # The 30-pair calibration gate still applies in full — a shared-family
+    # judge that cannot separate known-good from known-bad is not a judge.
+    # The disclosure travels on the route record and on every judgment.
+    _allow_shared = (os.environ.get("EVAL_JUDGE_ALLOW_SHARED_FAMILY", "")
+                     .strip().lower() in ("1", "true", "yes"))
+    _prov, _model = JUDGE_LAST_RESORT
+    rec = {"provider": _prov, "model": _model,
+           "reference": "R6 operator-accepted last-resort judge "
+                        "(owner directive 2026-11-11: my-judged "
+                        "win/tie/loss accepted for the dev round)",
+           "shared_family": True}
+    if not _allow_shared:
+        rec.update({"eligible": False,
+                    "decision": "SHARED_FAMILY_NOT_AUTHORIZED "
+                                "(set EVAL_JUDGE_ALLOW_SHARED_FAMILY=1)",
+                    "capability": {"state": "SKIPPED"}})
+        results.append(rec)
+    else:
+        _cap = _probe_rung_detailed(_prov, _model)
+        rec["capability"] = _cap
+        if not _cap.get("ok"):
+            rec["eligible"] = False
+            rec["decision"] = (f"CAPABILITY_FAILED:"
+                               f"{_cap.get('http_class') or _cap.get('failure_class') or 'UNKNOWN'}")
+            results.append(rec)
+        else:
+            _calib = run_judge_calibration({"provider": _prov,
+                                            "model": _model})
+            rec["calibration"] = {k: _calib.get(k) for k in
+                                  ("calibrated", "n_pairs", "correct",
+                                   "accuracy", "threshold", "passed",
+                                   "corpus_sha256", "n_valid")}
+            rec["eligible"] = bool(_calib.get("passed"))
+            rec["decision"] = ("ELIGIBLE_SHARED_FAMILY_DISCLOSED"
+                               if rec["eligible"]
+                               else "CALIBRATION_FAILED")
+            results.append(rec)
+            if rec["eligible"]:
+                return {"provider": _prov, "model": _model, "state": "OK",
+                        "selection": "last-resort shared-family "
+                                     "(operator-accepted, disclosed)",
+                        "judge_independence": "SHARED_FAMILY_DISCLOSED",
+                        "disclosure": ("the judge shares its provider and "
+                                       "model family with the generator "
+                                       "and baseline arms; accepted by the "
+                                       "owner 2026-11-11 for this dev "
+                                       "round, never used for the sealed "
+                                       "holdout"),
+                        "candidates": results,
+                        "at": utc_now()}
     return {"provider": None, "model": None,
             "state": "NO_CALIBRATED_JUDGE_ROUTE",
             "selection": "calibration-gated",
@@ -1872,7 +1945,12 @@ def build_score_table(route_rec: Dict[str, Any],
         "baseline_route": {"provider": route_rec.get("provider"), "model": route_rec.get("model"),
                            "state": route_rec.get("state")},
         "judge_route": {"provider": judge_route.get("provider"), "model": judge_route.get("model"),
-                        "independence": "different provider+family from baseline; not 1.7B"},
+                        "independence": (judge_route.get("judge_independence")
+                                         or ("different provider+family from "
+                                             "baseline; not 1.7B"
+                                             if judge_route.get("provider")
+                                             else "NO_ROUTE")),
+                        "disclosure": judge_route.get("disclosure")},
         "judge_calibration": calib,
         "n_problems": len(problems),
         "subset": ("holdout:" + str(len(problems))) if holdout else
