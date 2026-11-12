@@ -380,9 +380,21 @@ class A2RetrievalAdapter(BaseAdapter):
             if _out_dir:
                 _p2 = Path(_out_dir)
                 _p2.mkdir(parents=True, exist_ok=True)
+                # R6 owner round 2026-11-12 (directive: per-problem
+                # packet stats on disk): the retrieval report's
+                # abstract_coverage block (packet floor / widening /
+                # packet_stats n_emitted/n_textful/n_on_domain_textful)
+                # folds into the SAME custody file — the report object
+                # itself is consumed and discarded after synthesis, so
+                # without this fold the per-problem packet stats exist
+                # only in memory.
                 (_p2 / "RETRIEVAL_ATTRIBUTION.json").write_text(
-                    _json2.dumps(report.get("retrieval_attribution", {}),
-                                 indent=1, ensure_ascii=False, default=str), encoding="utf-8")
+                    _json2.dumps(
+                        {**report.get("retrieval_attribution", {}),
+                         "abstract_coverage":
+                             report.get("abstract_coverage", {})},
+                        indent=1, ensure_ascii=False, default=str),
+                    encoding="utf-8")
         except Exception:  # noqa: BLE001 — best-effort persistence
             pass
         # R517 Phase 1: per-operation retrieval attribution is
@@ -1048,6 +1060,36 @@ def _lean_select_operator(items, problem, all_matches: bool = False):
                                 "one instantiation call downstream)")}
 
 
+def _lean_pair_prompt(op, item, problem):
+    """The lean (item, operator) pair's instantiation prompt, built ONCE
+    and shared by the batch preflight and the attempt itself, so the
+    section the model answers and the fields the attempt parses carry
+    the SAME contract (the full-path discipline: deterministic and
+    shared — never two prompt builders)."""
+    from discovery_fabric.engine import mechanism_space as _ms
+    sel_id = op["operator_id"]
+    prompt = _ms._OPERATOR_INSTANTIATION_PROMPTS[sel_id].format(
+        system=item["fields"].get("system") or "(unextracted)",
+        mechanism=_ms._field_val(item, "mechanism") or "(unextracted)",
+        observed_effect=_ms._field_val(item, "observed_effect")
+        or "(unextracted)",
+        evidence_intervention=_ms._field_val(item, "intervention")
+        or "(unextracted)",
+        boundary_conditions=_ms._field_val(item, "boundary_conditions")
+        or "(unextracted)",
+        constraints=_ms._field_val(item, "constraints")
+        or "(unextracted)",
+        failure_mode=_ms._field_val(item, "failure_mode")
+        or "(unextracted)",
+        device=problem.get("device", ""),
+        failure=problem.get("failure", ""),
+        constraint=problem.get("constraint", ""),
+        record_text=_ms._item_abstract(item)[:2600]
+        or "(record text unavailable)")
+    prompt += _ms._multi_hypothesis_prompt_suffix()
+    return prompt
+
+
 def _lean_operator_attempt(items, problem, item, op, contract):
     """One (item, operator) instantiation attempt for parallel
     multi-operator generation. Pure generation + deterministic
@@ -1063,31 +1105,23 @@ def _lean_operator_attempt(items, problem, item, op, contract):
     err = ""
     state = "OPERATOR_INSTANTIATION_FAILED"
     try:
-        prompt = _ms._OPERATOR_INSTANTIATION_PROMPTS[sel_id].format(
-            system=item["fields"].get("system") or "(unextracted)",
-            mechanism=_ms._field_val(item, "mechanism") or "(unextracted)",
-            observed_effect=_ms._field_val(item, "observed_effect")
-            or "(unextracted)",
-            evidence_intervention=_ms._field_val(item, "intervention")
-            or "(unextracted)",
-            boundary_conditions=_ms._field_val(item, "boundary_conditions")
-            or "(unextracted)",
-            constraints=_ms._field_val(item, "constraints")
-            or "(unextracted)",
-            failure_mode=_ms._field_val(item, "failure_mode")
-            or "(unextracted)",
-            device=problem.get("device", ""),
-            failure=problem.get("failure", ""),
-            constraint=problem.get("constraint", ""),
-            record_text=_ms._item_abstract(item)[:2600]
-            or "(record text unavailable)")
-        prompt += _ms._multi_hypothesis_prompt_suffix()
-        meta = _ms.llm_generate(
+        prompt = _lean_pair_prompt(op, item, problem)
+        # R6 owner round 2026-11-12: the pair's FIRST instantiation call
+        # goes through the ONE batch consumer (same mechanism as the
+        # full path) — batch-served when a section rides the queue, the
+        # legacy per-pair llm_generate otherwise (also the typed
+        # fallback when the batch call failed wholesale). expected_item
+        # pins the pop to THIS pair's section: the pairs dispatch
+        # concurrently and a same-operator second pair must never
+        # cross-assign another pair's section.
+        meta = _ms._first_instantiation_call(
             prompt,
             system="You are a rigorous mechanism engineer. Every "
                    "claim must derive from the given evidence.",
             purpose="operator_%s" % sel_id,
-            max_tokens=_ms.OPERATOR_INSTANTIATION_MAX_TOKENS)
+            op_id=sel_id,
+            max_tokens=_ms.OPERATOR_INSTANTIATION_MAX_TOKENS,
+            expected_item=item.get("item_id"))
         if meta.get("ok"):
             field_blocks = _ms._parse_multi_candidate_fields(
                 meta.get("content") or "")
@@ -1417,6 +1451,26 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                "n_satisfied": len(sel_all.get("matches") or []),
                "n_operators_run": len(matched),
                "selected_operators": [m[1]["operator_id"] for m in matched]})
+    # R6 owner round 2026-11-12 (the evaluator-starve fix, measured):
+    # every parallel per-pair call consumed a healthy call; on the
+    # serving ring the synthesis + pairs + attack + evaluator + composer
+    # demand exceeded the owner's <=8-healthy-call cap BEFORE the
+    # evaluator ran (smoke: EVALUATOR_CALL_FAILED -> composer
+    # NO_ADMISSIBLE_CANDIDATES -> answer=None -> judge "pipeline answer
+    # missing"). The committed batch mechanism lived only on the full
+    # path; the lean path now preflights the SAME one-call batch over
+    # ITS OWN deterministic pairs (same queue, same section parsing,
+    # same typed fallbacks; the record rides the space honestly).
+    # Status quo fallbacks: batch disabled / <2 pairs / batch call
+    # failed typed => the legacy per-pair calls run unchanged.
+    if _ms._batch_enabled() and len(matched) >= 2:
+        _batch_pairs = [{"op": _m[1], "item": _m[0],
+                         "purpose": "operator_%s" % _m[1]["operator_id"],
+                         "prompt": _lean_pair_prompt(_m[1], _m[0],
+                                                     problem)}
+                        for _m in matched]
+        space["operator_batch"] = _ms._preflight_operator_batch(
+            None, None, problem, 0, pairs=_batch_pairs)
     sel = dict(sel_all)
     if matched:
         sel.update({"operator": matched[0][1], "item": matched[0][0],
@@ -1462,6 +1516,12 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             for _m in matched:
                 attempts.append(_failed_attempt(
                     _m[1]["operator_id"], f"{type(_exc).__name__}: {_exc}"))
+
+    if _ms._batch_enabled():
+        # hygiene (the full path's identical post-loop reset): an
+        # unconsumed queued entry must never leak across problems or
+        # into the knowledge-first call below
+        _ms._batch_reset()
 
     # ---- OWNER AUDIT ROUND 2026-11-12, DIRECTIVE 3: the KNOWLEDGE-
     #      FIRST candidate — ALWAYS generated next to the evidence-

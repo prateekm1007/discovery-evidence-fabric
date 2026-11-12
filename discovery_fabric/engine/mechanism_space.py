@@ -37,6 +37,7 @@ from __future__ import annotations
 import hashlib
 import os
 import re
+import threading
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -1384,6 +1385,10 @@ _MS_BATCH_ENV = "MS_BATCH_INSTANTIATION"
 # problems' smaller plans fit under the old cap and completed).
 _MAX_BATCH_PAIRS = 10
 _BATCH_QUEUES: Dict[str, List[Dict[str, Any]]] = {}
+# R6 owner round 2026-11-12: the LEAN multi-operator path dispatches its
+# pair attempts CONCURRENTLY; the queue pop must be atomic so two pairs
+# of the same operator-purpose can never cross-assign sections.
+_BATCH_LOCK = threading.Lock()
 
 
 def _batch_enabled() -> bool:
@@ -1408,21 +1413,34 @@ def _preflight_operator_batch(ops: List[Dict[str, Any]],
                               structured_evidence: List[Dict[str, Any]],
                               problem: Dict[str, Any],
                               per_operator_item_cap: int,
+                              pairs: Optional[List[Dict[str, Any]]] = None,
                               ) -> Dict[str, Any]:
     """Build the batch plan, make the ONE batch instantiation call, and
     fill the per-purpose section queues apply_operator consumes. Returns
-    the honest batch record (plan + outcome) for the space."""
-    pairs = []
-    for op in ops:
-        selected = _select_for_operator(op, structured_evidence, problem)
-        for item in selected[:max(0, per_operator_item_cap)]:
-            pairs.append({"op": op, "item": item,
-                          "purpose": f"operator_{op['operator_id']}",
-                          "prompt": _operator_pair_prompt(op, item,
-                                                          problem)})
+    the honest batch record (plan + outcome) for the space.
+
+    R6 owner round 2026-11-12: `pairs` (optional) supplies PRE-PLANNED
+    pairs from a caller that owns its own deterministic selection (the
+    lean multi-operator dispatcher: its items, its prompt builder, the
+    same purpose keying). ONE batch mechanism, two planning fronts —
+    the queue fill, the section parsing, the typed fallbacks and this
+    record are UNCHANGED. None (default) plans the full-path pairs
+    exactly as before."""
+    _caller_pairs = pairs is not None
+    if not _caller_pairs:
+        pairs = []
+        for op in ops:
+            selected = _select_for_operator(op, structured_evidence, problem)
+            for item in selected[:max(0, per_operator_item_cap)]:
+                pairs.append({"op": op, "item": item,
+                              "purpose": f"operator_{op['operator_id']}",
+                              "prompt": _operator_pair_prompt(op, item,
+                                                              problem)})
     record: Dict[str, Any] = {
         "instrument": "operator_batch_instantiation/1.0.0",
         "env": _MS_BATCH_ENV,
+        "planned_by": ("caller-provided pairs" if _caller_pairs
+                       else "full-path plan"),
         "n_pairs_planned": len(pairs),
         "n_pairs_served": 0,
         "n_sections_missing": 0,
@@ -1490,6 +1508,7 @@ def _preflight_operator_batch(ops: List[Dict[str, Any]],
         if sec is None:
             _BATCH_QUEUES.setdefault(purpose_key, []).append({
                 "ok": False, "status": "BATCH_SECTION_MISSING",
+                "queued_item_id": p["item"].get("item_id"),
                 "error": ("the batch response carried no section for "
                           f"pair {p_index} "
                           f"({p['op']['operator_id']}) — typed missing, "
@@ -1509,6 +1528,7 @@ def _preflight_operator_batch(ops: List[Dict[str, Any]],
             "prompt_hash": meta.get("prompt_hash"),
             "output_hash": out_hash or meta.get("output_hash"),
             "purpose": purpose_key,
+            "queued_item_id": p["item"].get("item_id"),
             "batch_served": {
                 "note": ("R6 item 1: ONE batched operator-"
                          "instantiation call served this pair's first "
@@ -1527,17 +1547,46 @@ def _preflight_operator_batch(ops: List[Dict[str, Any]],
 
 
 def _first_instantiation_call(prompt: str, system: str, purpose: str,
-                              op_id: str) -> Dict[str, Any]:
+                              op_id: str,
+                              max_tokens: Optional[int] = None,
+                              expected_item: Any = None,
+                              ) -> Dict[str, Any]:
     """The pair's FIRST instantiation call: batch-served when a section
     rides the queue, otherwise the legacy per-pair llm_generate (also
-    the typed fallback when the batch call failed wholesale)."""
-    queue = _BATCH_QUEUES.get(purpose)
-    if _batch_enabled() and queue:
-        entry = queue.pop(0)
-        if not _BATCH_QUEUES.get(purpose):
-            _BATCH_QUEUES.pop(purpose, None)
-        return entry
-    return llm_generate(prompt, system=system, purpose=purpose)
+    the typed fallback when the batch call failed wholesale).
+
+    R6 owner round 2026-11-12: the LEAN multi-operator path dispatches
+    its (item, operator) pairs CONCURRENTLY, so a same-purpose second
+    pair could pop another pair's section under plain FIFO.
+    expected_item pins the pop to the entry queued FOR THAT ITEM (a
+    match miss falls through to the live call — never a cross-pair
+    candidate); the sequential full path keeps FIFO (expected_item
+    None). max_tokens passes through ONLY when the caller sets it: the
+    full path's status-quo default (llm_generate's own) must not
+    change. The pop is atomic under _BATCH_LOCK."""
+    with _BATCH_LOCK:
+        queue = _BATCH_QUEUES.get(purpose)
+        if _batch_enabled() and queue:
+            entry = None
+            if expected_item is not None:
+                _idx = next((i for i, e in enumerate(queue)
+                             if e.get("queued_item_id") == expected_item),
+                            None)
+                if _idx is not None:
+                    entry = queue.pop(_idx)
+            else:
+                entry = queue.pop(0)
+            if entry is not None:
+                if not _BATCH_QUEUES.get(purpose):
+                    _BATCH_QUEUES.pop(purpose, None)
+                return entry
+            # no entry queued for THIS item: fall through to the live
+            # call (the queued entries belong to this purpose's other
+            # pairs; the post-run hygiene reset clears leftovers)
+    if max_tokens is None:
+        return llm_generate(prompt, system=system, purpose=purpose)
+    return llm_generate(prompt, system=system, purpose=purpose,
+                        max_tokens=max_tokens)
 
 
 def apply_operator(op: Dict[str, Any],
