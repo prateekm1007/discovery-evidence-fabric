@@ -350,4 +350,8 @@ def test_mechanism_rerank_prefers_problem_relevant_records():
     on = next(s for s in with_rel["all_scores"]
               if s["record_id"] == "doi:10.1016/j.jsv.2026.120074")
     assert on["n_relevance_hits"] >= 3, on
-    assert "1.1.0" in with_rel["reranker_version"]
+    # R6 A2 (owner 2026-11-12): the problem-given rerank adds the
+    # capped BM25 component and bumps the version; the bare-call pin
+    # (1.0.0, asserted just above via `bare`) is unchanged.
+    assert "1.2.0" in with_rel["reranker_version"]
+    assert "bm25" in with_rel["policy"].lower()

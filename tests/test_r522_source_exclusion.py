@@ -214,6 +214,12 @@ def _run_retrieve(monkeypatch, exclude):
                         _connector_for_openalex_only)
     monkeypatch.setattr(fabric_pipeline, "fetch_patent_claims_custoied",
                         lambda pid: _StubClaim())
+    # R6 A1 (owner 2026-11-12): the keyless abstract-enrichment
+    # stage is a live-network path — hermetic exclusion runs
+    # disable it (typed, recorded), suite stays host-independent.
+    monkeypatch.setattr(fabric_pipeline, "_abstract_enrichment",
+                        lambda c, ls: {"enabled": False,
+                                       "note": "disabled in hermetic runs"})
     items, report = fabric_pipeline.retrieve_fabric(
         PROBLEM, enable_reciprocal=False, enable_unpaywall=False)
     return items, report

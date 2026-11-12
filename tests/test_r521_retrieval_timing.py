@@ -172,6 +172,12 @@ def test_phase_s_present_and_bounded(monkeypatch):
                         _stub_connector_for)
     monkeypatch.setattr(fabric_pipeline, "fetch_patent_claims_custoied",
                         _stub_claim_fetch)
+    # R6 A1 (owner 2026-11-12): the keyless abstract-enrichment
+    # stage is a live-network path — hermetic timing runs disable it
+    # (typed, recorded) so the suite stays host-independent (A3).
+    monkeypatch.setattr(fabric_pipeline, "_abstract_enrichment",
+                        lambda c, ls: {"enabled": False,
+                                       "note": "disabled in hermetic runs"})
     items, report = fabric_pipeline.retrieve_fabric(
         PROBLEM, enable_reciprocal=False, enable_unpaywall=False)
     att = report["retrieval_attribution"]
@@ -195,6 +201,9 @@ def test_hermetic_retrieve_deterministic_ignoring_timing(monkeypatch):
                         _stub_connector_for)
     monkeypatch.setattr(fabric_pipeline, "fetch_patent_claims_custoied",
                         _stub_claim_fetch)
+    monkeypatch.setattr(fabric_pipeline, "_abstract_enrichment",
+                        lambda c, ls: {"enabled": False,
+                                       "note": "disabled in hermetic runs"})
     _, rep1 = fabric_pipeline.retrieve_fabric(
         PROBLEM, enable_reciprocal=False, enable_unpaywall=False)
     _, rep2 = fabric_pipeline.retrieve_fabric(

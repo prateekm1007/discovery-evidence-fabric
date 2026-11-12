@@ -135,6 +135,16 @@ def _stub_pool(monkeypatch, connector_map: Dict[str, StubConnector],
         lambda *a, **k: {"records": [], "calls": [],
                          "budget": {"max": 4, "used": 0},
                          "retrieved_at": utc_now()})
+    # R6 A1 (owner 2026-11-12): the keyless abstract-enrichment stage is
+    # a LIVE-network path (OpenAlex batch + arXiv + Europe PMC + S2).
+    # Hermetic stub runs disable it (typed, recorded in the report) so
+    # the suite stays deterministic across hosts (owner A3); live
+    # coverage is measured by the r6 round runs, not by these pins.
+    monkeypatch.setattr(
+        fabric_pipeline, "_abstract_enrichment",
+        lambda canonicalizer, lane_states: {
+            "enabled": False,
+            "note": "disabled in hermetic stub runs (live-network stage)"})
     return captured
 
 

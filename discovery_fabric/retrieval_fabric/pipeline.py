@@ -134,6 +134,21 @@ RETRIEVE_FANOUT_MAX_WORKERS_CEILING = 16
 #: lane state (recorded, deterministic plan position) — never silent
 #: absence, never a fabricated failure. The resolved set is recorded
 #: verbatim in the attribution record.
+def _textless_policy() -> str:
+    """R6 A1 (owner round 2026-11-12): the textless-packet policy.
+
+    RETRIEVE_TEXTLESS_POLICY: 'drop' (default — records with neither
+    abstract nor full text are excluded from the engine packet,
+    recorded with ids) or 'demote' (legacy: they may fill packet
+    slots after the text-bearing records). Never a third value; an
+    unrecognized value falls back to the default (recorded, Art. VI).
+    The canonical pool is untouched by either (provenance preserved,
+    Art. XXV)."""
+    p = (os.environ.get("RETRIEVE_TEXTLESS_POLICY", "drop")
+         or "drop").strip().lower()
+    return p if p in ("drop", "demote") else "drop"
+
+
 def excluded_sources() -> List[str]:
     raw = (os.environ.get("ENGINE_RETRIEVE_EXCLUDE_SOURCES", "") or "")
     return sorted({s.strip().lower() for s in raw.split(",") if s.strip()})
@@ -839,6 +854,20 @@ def _abstract_backfill(canonicalizer: Any,
             "enriched": enriched, "failed": failed, "lookups": lookups}
 
 
+def _abstract_enrichment(canonicalizer: Any,
+                         lane_states: List[LaneRunState]) -> Dict[str, Any]:
+    """R6 A1 (owner round 2026-11-12): keyless abstract enrichment.
+
+    Thin wrapper delegating to the dedicated module (the instrument is
+    testable standalone; the wrapper keeps this pipeline's lane-state
+    ownership). See abstract_enrichment.py for the pass order and the
+    typing/custody discipline (Art. XXV / XXI.3 / VI)."""
+    from discovery_fabric.retrieval_fabric.abstract_enrichment import (
+        enrich_missing_abstracts,
+    )
+    return enrich_missing_abstracts(canonicalizer, lane_states)
+
+
 def retrieve_fabric(problem: Dict[str, Any],
                     lane_caps: Optional[Dict[str, int]] = None,
                     llm_generate: Optional[Callable[[str], str]] = None,
@@ -967,6 +996,17 @@ def retrieve_fabric(problem: Dict[str, Any],
     _enrich_t0 = time.perf_counter()
     abstract_backfill_report = _abstract_backfill(canonicalizer, lane_states)
     _enrich_s["abstract_backfill"] = time.perf_counter() - _enrich_t0
+    # ---- 4.6 KEYLESS ABSTRACT ENRICHMENT (R6 A1, owner 2026-11-12) ---
+    # The backfill above is bounded top-6 S2 (measured: rate-limited,
+    # 0 enriched in the live baseline). This layer adds the keyless
+    # OpenAlex abstract_inverted_index BATCH reconstruction (up to 50
+    # DOIs/call) + arXiv / Europe PMC / S2 fallbacks, every attempt
+    # typed and custody-logged; provenance recorded on each enriched
+    # record (never a silent rewrite, Art. VI/XXV).
+    _enrich_t0 = time.perf_counter()
+    abstract_enrichment_report = _abstract_enrichment(canonicalizer,
+                                                      lane_states)
+    _enrich_s["abstract_enrichment"] = time.perf_counter() - _enrich_t0
 
     # ---- 5. Unpaywall full-text resolution (resolution, not discovery) -
     _enrich_t0 = time.perf_counter()
@@ -1089,8 +1129,30 @@ def retrieve_fabric(problem: Dict[str, Any],
     def _sem_key(rec: CanonicalRecord) -> float:
         return sem_scores.get(rec.canonical_id, 0.0)
 
+    # R6 A2 (owner round 2026-11-12): deterministic BM25 relevance —
+    # each record's title+abstract scored against the problem's OWN
+    # failure + constraint text (bm25.py: whole-token discipline,
+    # zero LLM, k1=1.2/b=0.75, recorded constants). It joins the lane
+    # sort as the PRIMARY lexical key: within a relevance tier,
+    # text-bearing records come first, and among them the BM25 score
+    # orders the packet — the measured defect (a highly-cited off-domain
+    # review burying the relevant record) is fixed at the source, not
+    # relabeled. No problem text -> all-zero BM25 -> the pre-A2 keys
+    # with the has_text tier promoted (disclosed in the report).
+    from discovery_fabric.retrieval_fabric import bm25 as _bm25
+    _rel_text = _bm25.problem_relevance_text(problem)
     for lane, pool in lane_pools.items():
-        def _score(rec: CanonicalRecord) -> Tuple[int, int, int]:
+        doc_texts = [
+            _bm25.record_text({"title": rec.title,
+                               "abstract": (rec.best_record.get("abstract")
+                                             or rec.best_record.get("summary")
+                                             or "")})
+            for rec in pool]
+        bm_scores = (_bm25.BM25(doc_texts).scores(_rel_text)
+                     if pool else [])
+
+        def _score(rec: CanonicalRecord, bm: float
+                   ) -> Tuple[int, int, float, int]:
             adj = adjudicate_record(
                 {"title": rec.title,
                  "normalized": rec.best_record,
@@ -1105,28 +1167,63 @@ def retrieve_fabric(problem: Dict[str, Any],
             abstract_len = len((rec.best_record.get("abstract") or ""))
             has_text = 1 if abstract_len >= 50 or \
                 rec.best_record.get("claim_text_available") else 0
-            return (1 if adj.get("relevant") else 0, overlap, has_text)
-        pool.sort(key=lambda rec: (
-                      # R456: semantic proximity is the PRIMARY key when
-                      # the engine is on (sem_scores empty -> 0.0 for
-                      # every record -> this key is a no-op and the
-                      # lexical ordering below is byte-identical)
-                      round(_sem_key(rec), 3),
-                      _score(rec)[0], _score(rec)[1],
-                      _score(rec)[2],
-                      -len((rec.best_record.get("abstract") or ""))),
-                  reverse=True)
+            return (1 if adj.get("relevant") else 0, has_text,
+                    round(bm, 4), overlap)
+        # R456: semantic proximity is the PRIMARY key when the engine is
+        # on (sem_scores empty -> 0.0 for every record -> that key is a
+        # no-op and the deterministic ordering below applies). The
+        # canonical_id tail makes the order total — byte-identical on
+        # any host (Art. LXXXV).
+        keys = [(round(_sem_key(rec), 3), *_score(rec, bm_scores[i]),
+                 -len((rec.best_record.get("abstract") or "")),
+                 rec.canonical_id)
+                for i, rec in enumerate(pool)]
+        pool[:] = [pool[i] for i in
+                   sorted(range(len(pool)), key=lambda i: keys[i],
+                          reverse=True)]
 
     # ---- 9. engine evidence items (a2-compatible + fabric fields) ----
     items: List[Dict[str, Any]] = []
     lane_item_counts: Dict[str, int] = {}
+    # R6 A1 (owner round 2026-11-12): the textless-packet policy. A
+    # record with neither abstract nor full text CANNOT feed SYNTHESIZE
+    # (evidence[0].abstract is the mechanism-bearing input): 'drop'
+    # (default, the owner's directive) excludes it from the engine
+    # packet; 'demote' keeps the legacy fill (text-bearing first within
+    # the tier, textless may fill remaining slots). The canonical pool
+    # and the report are NEVER pruned — every dropped id is recorded
+    # (Art. XXV: unknown stays unknown; Art. VI: recorded, not silent).
+    textless_policy = _textless_policy()
+
+    def _has_text(rec: CanonicalRecord) -> bool:
+        br = rec.best_record
+        return (len((br.get("abstract") or "")) >= 50
+                or bool(br.get("claim_text_available"))
+                or bool(rec.fulltext_url))
+
+    _emitted_recs: List[CanonicalRecord] = []
+    _pre_drop_recs: List[CanonicalRecord] = []
+    textless_dropped: Dict[str, Any] = {"policy": textless_policy,
+                                        "per_lane": {}, "ids": []}
     for lane in ("SCHOLARLY", "PATENT", "THESIS", "PREPRINT",
                  "TECHNICAL_REPORT", "REPOSITORY", "DATASET"):
         pool = lane_pools.get(lane, [])
         cap = lane_caps.get(lane, 3)
-        for rank, rec in enumerate(pool[:cap]):
+        _pre_drop_recs.extend(pool[:cap])
+        if textless_policy == "drop":
+            text_recs = [r for r in pool if _has_text(r)]
+            dropped = [r for r in pool if not _has_text(r)]
+            if dropped:
+                textless_dropped["per_lane"][lane] = len(dropped)
+                textless_dropped["ids"].extend(
+                    r.canonical_id for r in dropped[:20])
+            emit = text_recs
+        else:  # demote — legacy behavior, textless may fill slots
+            emit = pool
+        for rank, rec in enumerate(emit[:cap]):
             items.append(_to_engine_item(rec, rank, lane))
             lane_item_counts[lane] = lane_item_counts.get(lane, 0) + 1
+            _emitted_recs.append(rec)
     _phase_s["ranking_item_assembly"] = round(
         time.perf_counter() - _phase_t0, 3)
     _phase_s["phase_accounting_note"] = (
@@ -1151,17 +1248,18 @@ def retrieve_fabric(problem: Dict[str, Any],
             if len((r.best_record.get("abstract") or "")) >= 50)
         return {"records": n, "with_abstract_ge50": with_abs,
                 "coverage": (round(with_abs / n, 3) if n else None)}
-    _evid_recs: List[CanonicalRecord] = []
-    for lane in ("SCHOLARLY", "PATENT", "THESIS", "PREPRINT",
-                 "TECHNICAL_REPORT", "REPOSITORY", "DATASET"):
-        pool = lane_pools.get(lane, [])
-        cap = lane_caps.get(lane, 3)
-        _evid_recs.extend(pool[:cap])
+    # R6 A1: coverage measured over the EMITTED items (post textless
+    # policy) AND over the pre-drop legacy packet — the two numbers
+    # must both be visible (Art. XXV: a drop is a recorded decision,
+    # the pre-drop pool stays the disclosed baseline).
     abstract_coverage = {
-        "instrument": "abstract_coverage/1.0 (R6 A3/A4)",
+        "instrument": "abstract_coverage/1.1 (R6 A1/A2, owner 2026-11-12)",
         "canonical_pool": _cov(canonicalizer.canonical_records()),
-        "evidence_pool": _cov(_evid_recs),
+        "evidence_pool": _cov(_emitted_recs),
+        "evidence_pool_pre_textless_drop": _cov(_pre_drop_recs),
+        "textless_packet": textless_dropped,
         "abstract_backfill": abstract_backfill_report,
+        "abstract_enrichment": abstract_enrichment_report,
     }
     fabric_report = {
         "fabric_version": FABRIC_VERSION_STRING,
@@ -1195,6 +1293,21 @@ def retrieve_fabric(problem: Dict[str, Any],
         "unpaywall_resolution": unpaywall_report,
         "retrieval_attribution": _retrieval_attribution,
         "abstract_coverage": abstract_coverage,
+        "retrieval_relevance": {
+            "instrument": ("bm25_relevance/1.0 (R6 A2, owner "
+                           "2026-11-12: deterministic per-record "
+                           "relevance to failure + constraint)"),
+            "k1": _bm25.BM25_K1, "b": _bm25.BM25_B,
+            "query_basis": ("problem device+failure+failure_mode+"
+                             "constraint (problem facts only, Art. "
+                             "XLIII; whole-token discipline)"),
+            "order_key": ("semantic -> relevance tier -> text-bearing "
+                          "-> bm25 -> lexical overlap -> abstract "
+                          "length -> canonical_id (total, host-"
+                          "independent, Art. LXXXV)"),
+            "anchor_domain_match_top6": _bm25.anchor_domain_match_rate(
+                problem, [r.to_dict() for r in canonical_records], 6),
+        },
         "evidence_pool": {"items_by_lane": lane_item_counts,
                           "total_items": len(items),
                           "lane_caps": lane_caps,

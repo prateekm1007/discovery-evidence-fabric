@@ -165,6 +165,16 @@ def _stub_pool(monkeypatch, pool):
         lambda *a, **k: {"records": [], "calls": [],
                          "budget": {"max": 4, "used": 0},
                          "retrieved_at": utc_now()})
+    # R6 A1 (owner 2026-11-12): the keyless abstract-enrichment stage is
+    # a LIVE-network path (OpenAlex batch + arXiv + Europe PMC + S2).
+    # Hermetic stub runs disable it (typed, recorded in the report) so
+    # the suite stays deterministic across hosts (owner A3); live
+    # coverage is measured by the r6 round runs, not by these pins.
+    monkeypatch.setattr(
+        fabric_pipeline, "_abstract_enrichment",
+        lambda canonicalizer, lane_states: {
+            "enabled": False,
+            "note": "disabled in hermetic stub runs (live-network stage)"})
 
 
 def _run(monkeypatch, mode=None, workers=None):
@@ -264,8 +274,12 @@ def test_attribution_record_complete(monkeypatch):
     # R6 A3 (b5ab81bf3) added the abstract_backfill enrichment stage —
     # the pin includes it (superseded pin updated in the same change
     # discipline, Art. LXIV)
+    # R6 A1 (owner 2026-11-12): the keyless abstract-enrichment
+    # stage added a 5th enrichment sub-phase (superseded pin
+    # updated in the same change, Art. LXIV)
     assert set(a["enrichment_s"]) == {"patent_claims", "reciprocal",
-                                      "unpaywall", "abstract_backfill"}
+                                      "unpaywall", "abstract_backfill",
+                                      "abstract_enrichment"}
     # failure taxonomy preserved: the stubbed failures ride the jobs
     by_src = {j["source_id"]: j for j in a["jobs"]}
     assert by_src["doaj"]["outcome"] == "unavailable"
@@ -433,7 +447,13 @@ def _fanout_lanes(lanes):
         if isinstance(s, tuple):
             return s[1]
         return s.source_id
-    return [s for s in lanes if _src(s) != "semantic_scholar_metadata"]
+    # R6 A1 (owner 2026-11-12): the keyless abstract-enrichment
+    # stage appended its own post-fan-out lane — same parity
+    # class as the backfill lane: filtered on BOTH sides so the
+    # frozen copy stays byte-frozen (Art. LXIV).
+    return [s for s in lanes
+            if _src(s) not in ("semantic_scholar_metadata",
+                               "abstract_enrichment")]
 
 
 def _serial_reference_frozen(all_variants, canonicalizer, lane_states):

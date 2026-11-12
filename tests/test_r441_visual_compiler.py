@@ -333,11 +333,20 @@ class TestRendererEnvBoundary:
             assert self.SECRETS[k] not in json.dumps(env)
 
     def test_chrome_resolution_fails_closed(self, monkeypatch, tmp_path):
+        # HOST-INDEPENDENT (owner round 2026-11-12, item A3): the old
+        # pin asserted "no Chrome exists on this host", which is a
+        # property of the AUDITOR's machine, not of the resolution
+        # contract. Hermetically remove every documented discovery
+        # plane (operator override, puppeteer cache, PATH, fixed system
+        # locations) and pin the fail-closed behavior itself.
         monkeypatch.delenv("CHROME_PATH", raising=False)
         monkeypatch.setenv("HOME", str(tmp_path))  # empty puppeteer cache
+        monkeypatch.setattr(render_worker.shutil, "which", lambda _name: None)
+        monkeypatch.setattr(render_worker, "_SYSTEM_CHROME_FIXED_PATHS", ())
         assert render_worker.find_chrome() is None
         trail = render_worker.last_resolution()
         assert trail["accepted_chrome"] is None
+        assert trail["chrome_candidates"] == []
 
     def test_memory_guard_is_cgroup_aware(self, monkeypatch):
         monkeypatch.setattr(render_worker, "_cgroup_avail_mb", lambda: 90)
