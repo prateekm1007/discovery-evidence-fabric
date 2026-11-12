@@ -1214,6 +1214,21 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
     # the pre-R469 read — one key-selection authority, Art. X)
     key = active_key_value(spec)
     model = model_override or spec.model_for_call()
+    # R6 A1/A2 (owner round 2026-11-12): breaker check -> cache read ->
+    # governed attempts -> cache write. Order matters: an OPEN breaker
+    # refuses before anything else (typed BreakerOpen, zero requests); a
+    # cache hit serves the recorded content with ZERO provider spend (the
+    # hit is logged, the finish-reason signal is restored so downstream
+    # truncation-retry logic behaves identically); live attempts are
+    # counted by the per-problem governor (<=12 healthy + <=6 retries).
+    from . import llm_economy as _econ
+    _econ.breaker_check(spec.provider_id)
+    _ck = _econ.llm_cache_key(spec.provider_id, model, messages,
+                              max_tokens, spec.extra_body)
+    _cached = _econ.cache_get(_ck)
+    if _cached is not None:
+        _record_finish_reason(_cached.get("finish_reason") or "stop")
+        return _cached["content"]
     payload: Dict[str, Any] = {"model": model, "messages": messages,
                                "temperature": 0.0,
                                # bounded generation: the structured FIELD-line outputs are short;
@@ -1237,17 +1252,29 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
     _TRANSIENT = (429, 502, 503, 504)
     last_exc = None
     for attempt in range(3):
+        # A2 governor: ONE provider request = ONE count; re-attempts of the
+        # same logical call are RETRIES, capped per problem (default 6).
+        _econ.governor_attempt(_ck)
         try:
             data = _post_json(
                 spec.url_for_call(), payload, headers, timeout)
             break
         except urllib.error.HTTPError as he:
+            if he.code in _TRANSIENT:
+                # A2 breaker: count the transient failure; if the breaker
+                # JUST opened, abort the ladder IMMEDIATELY — the measured
+                # retry storm (31-40 provider attempts per problem) stops
+                # here instead of hammering through the sleep ladder.
+                if _econ.breaker_failure(spec.provider_id):
+                    raise
             if he.code in _TRANSIENT and attempt < 2:
                 time.sleep(5 * (3 ** attempt))
                 last_exc = he
                 continue
             raise
         except (urllib.error.URLError, TimeoutError, ConnectionError) as ne:
+            if _econ.breaker_failure(spec.provider_id):
+                raise
             if attempt < 2:
                 time.sleep(5 * (3 ** attempt))
                 last_exc = ne
@@ -1256,6 +1283,7 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
     else:
         if last_exc is not None:
             raise last_exc
+    _econ.breaker_success(spec.provider_id)
     if "error" in data:
         err = data["error"]
         msg = err.get("message", str(err)) if isinstance(err, dict) else str(err)
@@ -1271,7 +1299,15 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
     # the typed truncation signal for a NON-empty completion (the
     # empty-content case above raises before it): recorded thread-
     # locally, consumed by generate() into the LLMCallResult
-    _record_finish_reason(_finish_from_openai(choice.get("finish_reason")))
+    _finish = _finish_from_openai(choice.get("finish_reason"))
+    _record_finish_reason(_finish)
+    # A1 record: the successful call is cached for replay (rw mode only;
+    # an empty-content or API-error result never reaches here, so the
+    # composer's larger-budget truncation retry keeps its own distinct
+    # cache key via max_tokens)
+    _econ.cache_put(_ck, {"content": content, "finish_reason": _finish,
+                          "model": model, "provider_id": spec.provider_id,
+                          "max_tokens": max_tokens})
     return content
 
 
@@ -1298,11 +1334,27 @@ def _call_anthropic_flavor(spec: ProviderSpec, messages: List[dict],
             system = m["content"]
         else:
             msgs.append(m)
-    data = _post_json(
-        spec.url_for_call(),
-        {"model": model, "max_tokens": max_tokens,
-         "messages": msgs, **({"system": system} if system else {})},
-        {"x-api-key": key, "anthropic-version": "2023-06-01"}, timeout)
+    # A1/A2 hooks on the anthropic flavor (single-shot): breaker -> cache
+    # -> governed attempt -> cache write (same contract as the openai
+    # flavor above)
+    from . import llm_economy as _econ
+    _econ.breaker_check(spec.provider_id)
+    _ck = _econ.llm_cache_key(spec.provider_id, model, msgs, max_tokens, None)
+    _cached = _econ.cache_get(_ck)
+    if _cached is not None:
+        _record_finish_reason(_cached.get("finish_reason") or "stop")
+        return _cached["content"]
+    _econ.governor_attempt(_ck)
+    try:
+        data = _post_json(
+            spec.url_for_call(),
+            {"model": model, "max_tokens": max_tokens,
+             "messages": msgs, **({"system": system} if system else {})},
+            {"x-api-key": key, "anthropic-version": "2023-06-01"}, timeout)
+    except Exception:
+        _econ.breaker_failure(spec.provider_id)
+        raise
+    _econ.breaker_success(spec.provider_id)
     content = "".join(b.get("text", "") for b in data.get("content", []))
     if not content:
         raise RuntimeError(f"{spec.provider_id} returned empty content")
@@ -1310,6 +1362,10 @@ def _call_anthropic_flavor(spec: ProviderSpec, messages: List[dict],
     # recorded thread-locally, consumed by generate() into the
     # LLMCallResult
     _record_finish_reason(_finish_from_anthropic(data.get("stop_reason")))
+    _econ.cache_put(_ck, {"content": content, "finish_reason":
+                          _finish_from_anthropic(data.get("stop_reason")),
+                          "model": model, "provider_id": spec.provider_id,
+                          "max_tokens": max_tokens})
     return content
 
 

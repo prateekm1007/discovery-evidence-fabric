@@ -936,6 +936,10 @@ def probe_judge2_route(baseline_provider: str,
 # ---------------------------------------------------------------------------
 def run_baseline_problem(problem: Dict[str, Any], out_dir: Path,
                          route: Dict[str, Any]) -> Dict[str, Any]:
+    # R6 A2: each baseline arm invocation is its own governor scope —
+    # counters from probing or a previous problem never leak in
+    from discovery_fabric.engine import llm_economy as _econ
+    _econ.reset_governor(f"baseline:{problem.get('problem_id')}")
     snap = _evidence_snapshot(out_dir / "pipeline")
     if not snap or not snap.get("items"):
         return {"answer": None, "blocked": "pipeline run produced no evidence snapshot"}
@@ -1443,6 +1447,11 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
             continue
         good = entry["good_answer"]
         bad = entry["bad_answer"]
+        # R6 A2: each judged pair is its own governor scope — the
+        # calibration loop runs up to 30 pairs in ONE process and would
+        # otherwise trip the per-problem healthy-call cap at pair 13
+        from discovery_fabric.engine import llm_economy as _econ
+        _econ.reset_governor(f"judge:{entry['problem_id']}:{idx}")
         # deterministic, pre-registered order (no RNG in a measurement)
         order = ("good_first"
                  if int(_sha(f"{entry['problem_id']}:{idx}")[:8], 16) % 2 == 0

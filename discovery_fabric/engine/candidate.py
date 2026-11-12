@@ -13,11 +13,14 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import inspect
 import json
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
+
+from . import llm_economy as _econ
 
 ENVELOPE_FIELDS = [
     "candidate_id", "problem_id", "problem",
@@ -119,8 +122,38 @@ class Candidate:
         Captures before/after hashes, computes delta keys mechanically and
         appends a stage_log entry. Exceptions become explicit FAILED states —
         never silent skips (Art. IV) and never fabricated success (Art. VI).
+
+        R6 A1 stage memoization (owner round 2026-11-12): when the cache
+        store is enabled (FABRIC_LLM_CACHE=rw|ro), a stage whose canonical
+        upstream state (envelope snapshot, volatile stamps stripped, the
+        stage's own code identity included) was already executed is served
+        from the gitignored memo store with ZERO re-execution — the
+        leave-one-out and A/B ablation arms recompute only the stages
+        downstream of what actually changed. A memo hit is RECORDED
+        (memo_hit=true on the stage_log entry, an events.jsonl line) — never
+        a silent reuse (Art. XXV). Memo misses execute the normal path; the
+        replay contract (unrecorded LLM calls fail typed in ro mode) is
+        enforced at the flavor-transport layer, not here.
         """
         before = self.envelope_hash()
+        # A1: memo lookup BEFORE any execution (zero spend on a hit)
+        _memo_key: Optional[str] = None
+        if _econ.cache_mode() != "off":
+            try:
+                _fn_src = inspect.getsource(getattr(fn, "__func__", fn))
+            except (OSError, TypeError):
+                _fn_src = None  # un-sourceable fn: no memo for this stage
+            if _fn_src is not None:
+                _snap = {k: getattr(self, k) for k in ENVELOPE_FIELDS
+                         if k != "stage_log"}
+                _memo_key = _econ.stage_memo_key(
+                    stage_name, capability_id, module_path, fn_name,
+                    _fn_src, _econ.strip_volatile(_snap))
+                _memo = _econ.stage_memo_lookup(_memo_key)
+                if _memo is not None:
+                    return self._apply_memo_hit(
+                        stage_name, capability_id, module_path, fn_name,
+                        before, _memo_key, _memo)
         # Monotonic high-resolution stage timing (dry-run performance
         # measurement; Art. LXXXIII funnel durations). ADDITIVE ONLY:
         # started_at/finished_at provenance timestamps are unchanged.
@@ -172,6 +205,52 @@ class Candidate:
             "delta_real": after != before,
             "result_meta": result_meta,
         })
+        self.stage_log.append(entry)
+        # A1 record: the stage's apply_to + result_meta are memoized under
+        # the canonical upstream key (rw mode only; only successful
+        # executions are recorded)
+        if _memo_key is not None and isinstance(result, dict) \
+                and result.get("_engine_result") is True:
+            _econ.stage_memo_put(_memo_key, {
+                "apply_to": result.get("apply_to") or {},
+                "result_meta": {
+                    k2: v2 for k2, v2 in result_meta.items()
+                    if k2 != "raw_return_type"}})
+        return entry
+
+    def _apply_memo_hit(self, stage_name: str, capability_id: str,
+                        module_path: str, fn_name: str, before: str,
+                        memo_key: str, memo: Dict[str, Any]) -> Dict[str, Any]:
+        """Restore a memoized stage output: apply the recorded apply_to
+        block, compute the delta keys mechanically (the same rule as the
+        live path) and log the entry with memo_hit=true — the reuse is
+        recorded, never silent (Art. XXV)."""
+        _t0 = time.perf_counter()
+        applied = memo.get("apply_to") or {}
+        delta_keys: List[str] = []
+        for k, v in applied.items():
+            before_val = canonical_json(getattr(self, k))
+            setattr(self, k, copy.deepcopy(v))
+            if canonical_json(getattr(self, k)) != before_val:
+                delta_keys.append(k)
+        after = self.envelope_hash()
+        entry: Dict[str, Any] = {
+            "stage": stage_name,
+            "capability_id": capability_id,
+            "module_path": module_path,
+            "function": fn_name,
+            "started_at": utc_now(),
+            "before_envelope_hash": before,
+            "status": "OK",
+            "finished_at": utc_now(),
+            "duration_monotonic_s": time.perf_counter() - _t0,
+            "after_envelope_hash": after,
+            "candidate_delta": delta_keys,
+            "delta_real": after != before,
+            "result_meta": memo.get("result_meta") or {},
+            "memo_hit": True,
+            "memo_key": memo_key[:16],
+        }
         self.stage_log.append(entry)
         return entry
 

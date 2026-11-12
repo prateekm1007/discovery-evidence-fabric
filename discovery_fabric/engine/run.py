@@ -300,6 +300,13 @@ class EngineRun:
 
     # ------------------------------------------------------------------
     def run(self) -> Dict[str, Any]:
+        # R6 A2 (owner round 2026-11-12): the per-problem call governor
+        # scope starts HERE — one EngineRun is one problem's measured
+        # attempt; its provider attempts are capped (<=12 healthy logical
+        # calls + <=6 retries, typed stops, logged). The LLM-economy
+        # counters are fresh per run; the on-disk cache store persists.
+        from . import llm_economy as _econ
+        _econ.reset_run_counters(f"engine:{self.run_id}")
         if not self.resume:
             self._persist("problem.json", self.problem)
         manifest: Dict[str, Any] = {
@@ -811,6 +818,14 @@ class EngineRun:
 
         final = self._final_state()
         self._persist("final_state.json", final)
+        # R6 A1/A2: the run's LLM-economy record (cache hits/writes, stage
+        # memo hits, governor tally incl. typed stops, breaker states) is
+        # persisted beside the final state and travels on the manifest —
+        # every saved call and every typed stop is measurable per run
+        # (Art. XXV: measured, disclosed).
+        _econ_snap = _econ.snapshot()
+        self._persist("LLM_ECONOMY.json", _econ_snap)
+        manifest["llm_economy"] = _econ_snap
         # the PRE-evolution final state is preserved for the cemetery
         # decision (Art. X: GEN-1's own verdict is the negative-knowledge
         # event; the evolution outcome below is the product-level state)
