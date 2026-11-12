@@ -94,8 +94,12 @@ def registry_external_transport() -> dict | None:
     """R392: ask the EXISTING provider abstraction which provider the
     engine would actually call under the default selection policy
     (availability -> quality -> cost -> latency). If that provider has a
-    usable credential and a public (non-loopback) endpoint, the engine is
-    in EXTERNAL transport mode and the returned dict describes it.
+    usable credential, a public (non-loopback) endpoint, AND is
+    RUNTIME-ADMISSIBLE under C1.3-1 (active cost policy admits it AND a
+    CURRENT measured capability probe — PROBE_OK within TTL — exists for
+    the (provider, model) rung; a credential alone is NOT admissibility),
+    the engine is in EXTERNAL transport mode and the returned dict
+    describes it.
 
     This adds NO new LLM architecture: it reuses select_provider() exactly
     as generate() does, so the transport the health endpoint reports is

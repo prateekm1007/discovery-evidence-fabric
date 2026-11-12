@@ -68,17 +68,53 @@ class TestTransportSnapshot:
         snap = gw.transport_snapshot()
         assert snap["status"] == "NO_TRANSPORT"
 
-    def test_public_provider_key_is_external(self, gw, monkeypatch):
+    def test_public_provider_key_is_external(self, gw, monkeypatch,
+                                             tmp_path):
+        # STALE-PIN UPDATE (owner capability round 2026-11-12, item 5):
+        # pre-R6 a public provider key alone meant EXTERNAL. C1.3-1
+        # (R6 runtime admission) changed the documented semantics: a
+        # CREDENTIAL present is NOT runtime-admissibility — the provider
+        # additionally needs a CURRENT measured capability probe
+        # (PROBE_OK within TTL) for the (provider, model) rung, and the
+        # active cost policy must admit it. Pin both documented states,
+        # hermetically, against a REDIRECTED capability store (Art. IX:
+        # the production store is never touched by tests):
+        import discovery_fabric.engine.runtime_admission as ra
+        import discovery_fabric.engine.llm_registry as reg
         monkeypatch.delenv("ZAI_BASE_URL", raising=False)
         monkeypatch.delenv("ZAI_API_KEY", raising=False)
-        monkeypatch.setenv("NVIDIA_API_KEY", "nvapi-test")
+        monkeypatch.delenv("HF_BASE_URL", raising=False)
+        for k in ("INCEPTION_API_KEY", "AGNES_API_KEY", "OPENROUTER_API_KEY",
+                  "NVIDIA_API_KEY", "GEMINI_API_KEY"):
+            monkeypatch.delenv(k, raising=False)
+        monkeypatch.setattr(ra, "_STATE_PATH_OVERRIDE",
+                            tmp_path / "capability_state.json")
+        monkeypatch.setenv("HF_TOKEN", "hf-router-test")
+        spec = reg._SPEC_BY_ID["hf"]
+        # (a) key ALONE, no measured capability probe: the provider is
+        #     NOT runtime-admissible -> an honest NO_TRANSPORT, never an
+        #     unmeasured EXTERNAL claim (C1.3-1)
+        snap = gw.transport_snapshot()
+        assert snap["status"] == "NO_TRANSPORT"
+        # (b) key + a measured successful probe on the default rung:
+        #     the registry transport is EXTERNAL
+        ra.record_capability("hf", spec.model_for_call(), ok=True,
+                             source="probe")
         snap = gw.transport_snapshot()
         assert snap["status"] == "EXTERNAL"
-        assert snap["provider"] == "nvidia"
-        # model override honored (explicit, recorded)
-        monkeypatch.setenv("NVIDIA_MODEL", "openai/gpt-oss-120b")
+        assert snap["provider"] == "hf"
+        assert snap["model"] == spec.default_model
+        # (c) the model override is honored (explicit, recorded) — and
+        #     the capability record must ride the SAME rung: a new
+        #     model is NOT_PROBED until measured for ITS OWN rung
+        monkeypatch.setenv("HF_MODEL", "zai-org/GLM-5.3")
         snap = gw.transport_snapshot()
-        assert snap["model"] == "openai/gpt-oss-120b"
+        assert snap["status"] == "NO_TRANSPORT"
+        ra.record_capability("hf", "zai-org/GLM-5.3", ok=True,
+                             source="probe")
+        snap = gw.transport_snapshot()
+        assert snap["status"] == "EXTERNAL"
+        assert snap["model"] == "zai-org/GLM-5.3"
 
     def test_zai_external_url_wins(self, gw, monkeypatch):
         monkeypatch.setenv("ZAI_BASE_URL",
@@ -425,7 +461,33 @@ class TestLiveServer:
         port = _free_port()
         env["PORT"] = str(port)
         env["ENGINE_HOST"] = "127.0.0.1"
+        # R548-class Windows case-shim + fake fcntl, replicated for the
+        # SUBPROCESS (a `python -c` server lacks tests/conftest.py, where
+        # the dev-checkout shim lives — on a case-insensitive checkout the
+        # physical dir is TOSCANINI, so bare `import toscanini` dies with
+        # ModuleNotFoundError and every /api probe is connection-refused;
+        # the Linux CI topology imports fine and the shim is a no-op):
         hermetic_wrapper = (
+            "import sys\n"
+            "if sys.platform == 'win32':\n"
+            "    import importlib.util as _ilu, types as _types\n"
+            "    import importlib.machinery as _ilm\n"
+            "    if _ilu.find_spec('toscanini') is None:\n"
+            "        import TOSCANINI as _T\n"
+            "        sys.modules['toscanini'] = _T\n"
+            "        _T.__name__ = 'toscanini'\n"
+            "        _T.__package__ = 'toscanini'\n"
+            "        _spec = _ilm.ModuleSpec('toscanini', _T.__spec__.loader,\n"
+            "                                is_package=True)\n"
+            "        _spec.submodule_search_locations = list(_T.__path__)\n"
+            "        _T.__spec__ = _spec\n"
+            "    try:\n"
+            "        import fcntl  # noqa: F401\n"
+            "    except ImportError:\n"
+            "        _ff = _types.ModuleType('fcntl')\n"
+            "        _ff.LOCK_SH, _ff.LOCK_EX, _ff.LOCK_NB, _ff.LOCK_UN = 1, 2, 4, 8\n"
+            "        _ff.flock = lambda *a, **k: None\n"
+            "        sys.modules['fcntl'] = _ff\n"
             "import discovery_fabric.engine.adapters as _a; "
             "_a.load_credentials = lambda *x, **k: {}; "
             "import toscanini.gateway as _g; "
@@ -687,7 +749,18 @@ class TestWebappSecretScan:
         for token in os.environ.get("R392_LEAK_SCAN_TOKENS", "").split(","):
             if len(token.strip()) > 12:
                 secrets.append(token.strip())
-        assert secrets, "no known secrets to scan against"
+        # owner capability round 2026-11-12, item 5: a leak scan with an
+        # EMPTY scan set is vacuous — it asserted "no known secrets",
+        # which fails on any checkout without .env.keys (the hermetic
+        # dev shape). A scan is only meaningful against known secrets:
+        # skip typed when there is nothing to scan against. The leak
+        # CLASS stays pinned independently by the literal-marker guard
+        # (test_dockerfile_and_entrypoint_have_no_literal_token).
+        if not secrets:
+            pytest.skip("no known secrets to scan against (.env.keys "
+                        "absent and R392_LEAK_SCAN_TOKENS unset) — "
+                        "vacuous scan; the literal-marker guard still "
+                        "pins the leak class")
         scanned = 0
         for f in export.rglob("*"):
             if f.is_file() and f.suffix in (".html", ".js", ".css",

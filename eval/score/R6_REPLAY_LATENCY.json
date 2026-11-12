@@ -1,0 +1,43 @@
+{
+ "instrument": "r6_replay_latency/1.0 — local lookup microbenchmark; zero LLM spend",
+ "machine": {
+  "platform": "win32",
+  "python": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]"
+ },
+ "cache_mode": "rw",
+ "measurements": {
+  "llm_cache_key": {
+   "n": 2000,
+   "p50_us": 10.9,
+   "p95_us": 25.9,
+   "p99_us": 51.1,
+   "mean_us": 13.707
+  },
+  "cache_get_hit": {
+   "n": 2000,
+   "p50_us": 1059.8,
+   "p95_us": 2548.7,
+   "p99_us": 3055.0,
+   "mean_us": 1249.689
+  },
+  "stage_memo_key": {
+   "n": 200,
+   "p50_us": 34665.8,
+   "p95_us": 49615.8,
+   "p99_us": 62509.4,
+   "mean_us": 37069.154
+  },
+  "stage_memo_lookup_hit": {
+   "n": 2000,
+   "p50_us": 1374.8,
+   "p95_us": 2048.6,
+   "p99_us": 4576.1,
+   "mean_us": 1450.41
+  }
+ },
+ "disclosures": [
+  "These are LOCAL lookup costs on the reporting machine, not live end-to-end run latency. Provider round-trip time is not measured here.",
+  "A replay hit spends zero provider calls; the cache_get measurement is the local price paid instead of a provider request.",
+  "stage_memo_key includes the engine/retrieval code+JSON digest; the digest is process-cached and refreshed only when a file size/mtime changes."
+ ]
+}

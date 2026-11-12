@@ -65,11 +65,8 @@ RULES = {
     "node_identity_required": True,      # R443: raw-document identity
     "source_agreement_required": True,   # R443: wrong-source witness
     "material_distinction_min_de00": 10.0,  # R443: CIEDE2000, see thresholds
-    "single_viewer_required": True,
     "poster_parity_min_corr": 0.90,
 }
-
-WEBAPP = Path(__file__).resolve().parents[3] / "TOSCANINI_UI" / "webapp"
 
 
 # ---------------------------------------------------------------------------
@@ -199,17 +196,16 @@ def poster_parity(hero_rgba: np.ndarray, poster_rgba: np.ndarray,
             "pass": bool(corr >= RULES["poster_parity_min_corr"])}
 
 
-def check_single_viewer() -> Dict[str, Any]:
-    """Static scan of the webapp's primary technology surface: exactly
-    ONE <ModelViewer> hero instance per technology page (the R432 §14
-    single-viewer contract, re-verified from source at gate time)."""
-    tech_stage = WEBAPP / "components" / "TechStage.tsx"
-    if not tech_stage.is_file():
-        return {"pass": False, "reason": "TechStage.tsx missing"}
-    src = tech_stage.read_text(encoding="utf-8")
-    # one imported component, rendered exactly once in the stage
-    count = src.count("<ModelViewer")
-    return {"pass": count == 1, "primary_surface_viewers": count}
+# RETIRED (owner capability round 2026-11-12, item 5): the R432 §14
+# single-viewer check scanned webapp/components/TechStage.tsx — the
+# technology page RETIRED with R453-C2 (the old webapp is not shipped;
+# the product surface is the TOSCANINI_UI conversational app, where the
+# viewer lives inside InventionStage/Workspace components, not a
+# static tech stage). The check scanned a file that no longer exists,
+# so it could only ever fail — a dead instrument with no shipped
+# behavior to pin (Art. LXIV: deletion, no silent re-targeting). The
+# historical R443/R447 run records keep their single_viewer entries
+# verbatim (run records are exempt).
 
 
 # ---------------------------------------------------------------------------
@@ -784,12 +780,10 @@ def evaluate(out_dir: str,
         reasons.append("poster.png missing — the PDF constitution "
                        "requires it")
 
-    # 7. duplicate viewers (the website constitution)
-    sv = check_single_viewer()
-    checks["single_viewer"] = sv
-    if not sv.get("pass"):
-        reasons.append("single-viewer rule failed on the primary "
-                       "technology surface")
+    # 7. (RETIRED, 2026-11-12 owner round item 5) the single-viewer
+    #    static scan — its subject (the R432 §14 tech page) was deleted
+    #    with R453-C2; see the RETIRED note at check_single_viewer's
+    #    former site. No checks key, no reason entry.
 
     # 8. R443 material distinction: measured rendered separation of
     #    the semantic classes (the probe render + saved pixels)

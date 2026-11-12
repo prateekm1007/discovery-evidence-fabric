@@ -278,10 +278,16 @@ class TestVisualGate:
         assert gate["verdict"] == "FAIL"
         assert gate["hero_suppressed"] is True
 
-    def test_single_viewer_static_scan(self):
-        res = visual_gate.check_single_viewer()
-        assert res["pass"] is True
-        assert res["primary_surface_viewers"] == 1
+    def test_single_viewer_check_retired_with_its_subject(self):
+        # RETIRED 2026-11-12 owner round item 5 (Art. LXIV two-step):
+        # the R432 §14 single-viewer contract scanned
+        # webapp/components/TechStage.tsx — the technology page deleted
+        # with R453-C2 (the old webapp is not shipped; the product
+        # surface is the TOSCANINI_UI conversational app, where the
+        # viewer lives inside InventionStage/Workspace). The check
+        # could only ever fail, so it is deleted, explicitly:
+        assert not hasattr(visual_gate, "check_single_viewer")
+        assert "single_viewer_required" not in visual_gate.RULES
 
 
 # ---------------------------------------------------------------------------

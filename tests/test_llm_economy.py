@@ -168,6 +168,54 @@ def test_stage_memo_off_mode_never_caches(econ_env):
     assert not (econ.econ_root() / "stages").exists()
 
 
+def test_stage_memo_invalidated_by_semantic_config(econ_env, monkeypatch):
+    """An A/B arm that changes a semantic ENGINE_* knob must NOT reuse
+    the base arm's memoized stage output. Returning to the base config
+    must hit the original entry again (the key is deterministic)."""
+    _mkcache(econ_env, monkeypatch, "rw")
+    monkeypatch.setenv("ENGINE_R6_MEMO_CONFIG_PROBE", "A")
+    calls = {"n": 0}
+
+    def fn(env):
+        calls["n"] += 1
+        return _stage_fn(env, "mechanism_map")
+
+    c = _cand()
+    c.run_stage("MECHANISM_SPACE", "cap/1.0", "mod.py", "fn", fn, c)
+    assert calls["n"] == 1
+
+    monkeypatch.setenv("ENGINE_R6_MEMO_CONFIG_PROBE", "B")
+    c2 = _cand()
+    e2 = c2.run_stage("MECHANISM_SPACE", "cap/1.0", "mod.py", "fn", fn, c2)
+    assert "memo_hit" not in e2
+    assert calls["n"] == 2  # config changed -> honest re-execution
+
+    monkeypatch.setenv("ENGINE_R6_MEMO_CONFIG_PROBE", "A")
+    c3 = _cand()
+    e3 = c3.run_stage("MECHANISM_SPACE", "cap/1.0", "mod.py", "fn", fn, c3)
+    assert e3["memo_hit"] is True
+    assert calls["n"] == 2  # base config hit, no third execution
+
+
+def test_stage_memo_survives_cache_mode_switch(econ_env, monkeypatch):
+    """The memo store mode (rw -> ro) is economy mechanics, not stage
+    semantics: switching to replay must not invalidate a recorded stage."""
+    _mkcache(econ_env, monkeypatch, "rw")
+    calls = {"n": 0}
+
+    def fn(env):
+        calls["n"] += 1
+        return _stage_fn(env, "mechanism_map")
+
+    c = _cand()
+    c.run_stage("S", "cap", "m", "f", fn, c)
+    monkeypatch.setenv("FABRIC_LLM_CACHE", "ro")
+    c2 = _cand()
+    e2 = c2.run_stage("S", "cap", "m", "f", fn, c2)
+    assert e2["memo_hit"] is True
+    assert calls["n"] == 1
+
+
 # ---------------------------------------------------------------------------
 # A2: per-problem call governor
 
@@ -293,7 +341,9 @@ def test_flavor_breaker_aborts_storm_and_refuses_next_call(
 
     monkeypatch.setattr(lr, "_post_json", fake_post)
     spec = _Spec()
-    with pytest.raises(urllib.error.HTTPError):
+    # the threshold-crossing failure is re-raised as the TYPED breaker
+    # state (the caller/generate walk records CIRCUIT_BREAKER_OPEN)
+    with pytest.raises(econ.BreakerOpen):
         lr._call_openai_flavor(spec, [{"role": "user", "content": "p"}],
                                5, 64)
     # the breaker opens ON the threshold-th consecutive failure and the
@@ -362,6 +412,178 @@ def test_flavor_cache_hit_serves_with_zero_provider_requests(
     # different params -> different key -> a real provider request
     lr._call_openai_flavor(spec, msgs, 5, 128)
     assert posted["n"] == 2
+
+
+class _HTTP401(urllib.error.HTTPError):
+    def __init__(self):
+        super().__init__("url", 401, "unauthorized", None, None)
+
+
+class _AnthropicSpec(_Spec):
+    flavor = "anthropic"
+
+
+def _anthropic_ok(text="A"):
+    return {"content": [{"text": text}], "stop_reason": "end_turn"}
+
+
+def test_anthropic_cache_key_includes_system_prompt(econ_env, monkeypatch):
+    """The anthropic flavor splits the system turn out of messages; the
+    cache key must still carry it, or two different prompts collide."""
+    monkeypatch.setenv("FABRIC_LLM_CACHE", "rw")
+    monkeypatch.setenv("R6_TEST_PROVIDER_KEY", "test-key")
+    econ.reset_run_counters("anth-system")
+    posted = {"n": 0}
+
+    def fake_post(url, payload, headers, timeout):
+        posted["n"] += 1
+        return _anthropic_ok(f"A{posted['n']}")
+
+    monkeypatch.setattr(lr, "_post_json", fake_post)
+    spec = _AnthropicSpec()
+    user = [{"role": "user", "content": "same user turn"}]
+    out_a = lr._call_anthropic_flavor(
+        spec, [{"role": "system", "content": "SYSTEM A"}] + user, 5, 64)
+    out_b = lr._call_anthropic_flavor(
+        spec, [{"role": "system", "content": "SYSTEM B"}] + user, 5, 64)
+    assert (out_a, out_b) == ("A1", "A2")
+    assert posted["n"] == 2  # different system prompt = different call
+    # replay of SYSTEM A hits its own recorded entry, zero new spend
+    out_a2 = lr._call_anthropic_flavor(
+        spec, [{"role": "system", "content": "SYSTEM A"}] + user, 5, 64)
+    assert out_a2 == "A1" and posted["n"] == 2
+
+
+def test_anthropic_breaker_ignores_permanent_failures(econ_env, monkeypatch):
+    """A 401 is a permanent auth failure, not congestion: it must never
+    open the retry-storm breaker (Art. LXI counts infrastructure only)."""
+    monkeypatch.setenv("R6_TEST_PROVIDER_KEY", "test-key")
+    econ.reset_run_counters("anth-auth")
+    posted = {"n": 0}
+
+    def fake_post(url, payload, headers, timeout):
+        posted["n"] += 1
+        raise _HTTP401()
+
+    monkeypatch.setattr(lr, "_post_json", fake_post)
+    spec = _AnthropicSpec()
+    msgs = [{"role": "system", "content": "S"},
+            {"role": "user", "content": "Q"}]
+    for _ in range(5):
+        with pytest.raises(urllib.error.HTTPError):
+            lr._call_anthropic_flavor(spec, msgs, 5, 64)
+    st = econ.breaker_state("prov-a")
+    assert st["open"] is False
+    assert st["consecutive_transient_failures"] == 0
+
+
+def _install_single_rung(monkeypatch, provider="localqwen",
+                         model="qwen3-1.7b"):
+    """A one-provider generate() walk with zero network/probe work, so
+    the typed-stop route is tested in isolation."""
+    from discovery_fabric.engine import model_cost_policy as mcp
+    from discovery_fabric.engine import model_routing as mr
+    from discovery_fabric.engine import provider_health as ph
+    from discovery_fabric.engine import runtime_admission as ra
+
+    monkeypatch.setenv("LOCAL_QWEN_BASE_URL",
+                       "http://127.0.0.1:8790/v1/chat/completions")
+    row = {
+        "provider_id": provider, "env_var": "LOCAL_QWEN_BASE_URL",
+        "available": True, "cost_policy_eligible": True,
+        "cost_policy_note": "", "model": model,
+        "quality_tier": 4, "cost_tier": 1, "latency_tier": 4,
+        "context_capacity_tokens": 32768,
+        "cost_basis": "ZERO_PAID_COST_SELF_HOSTED",
+        "locality": "LOCAL", "license": "apache-2.0",
+        "model_revision": "test", "account_domain": "LOCAL_COMPUTE",
+        "capability_state": "PROBE_OK", "policy_note": "",
+    }
+    monkeypatch.setattr(lr, "availability_matrix", lambda: [row])
+    monkeypatch.setattr(ph, "order_for_role",
+                        lambda *a, **k: [provider])
+    monkeypatch.setattr(ph, "apply_route_retirement",
+                        lambda chain, **k: (list(chain), []))
+    monkeypatch.setattr(mcp, "filter_chain",
+                        lambda chain, specs, policy=None: (list(chain), []))
+    monkeypatch.setattr(mcp, "provider_eligibility",
+                        lambda spec, policy=None: (True, "test"))
+    monkeypatch.setattr(mr, "build_ladder", lambda *a, **k: {
+        "rungs": [{"provider": provider, "model": model,
+                   "band": "TEST",
+                   "task_capabilities": [mr.TASK_STRONG]}]})
+    monkeypatch.setattr(mr, "is_model_gone", lambda *a, **k: False)
+    monkeypatch.setattr(ra, "requires_probe", lambda *a, **k: False)
+    monkeypatch.setattr(ra, "runtime_admission",
+                        lambda *a, **k: (True, "", {}))
+    monkeypatch.setattr(ra, "ladder_capability_evidence",
+                        lambda rungs, **k: [])
+    return provider, model
+
+
+@pytest.mark.parametrize("exc_type,state,scope", [
+    (econ.BreakerOpen, "CIRCUIT_BREAKER_OPEN", "RUNG"),
+    (econ.HealthyCallCapExceeded, "HEALTHY_CALL_CAP_EXCEEDED", "WALK"),
+    (econ.RetryCapExceeded, "RETRY_CAP_EXCEEDED", "WALK"),
+    (econ.TypedCacheMiss, "REPLAY_CACHE_MISS", "WALK"),
+])
+def test_generate_records_typed_economy_stop_without_retry(
+        econ_env, monkeypatch, exc_type, state, scope):
+    provider, _model = _install_single_rung(monkeypatch)
+    calls = {"n": 0}
+
+    def fake_flavor(*args, **kwargs):
+        calls["n"] += 1
+        raise exc_type("typed stop under test")
+
+    monkeypatch.setattr(lr, "_call_openai_flavor", fake_flavor)
+    out = lr.generate("probe", max_retries=2)
+    assert calls["n"] == 1, "a typed stop is never retried on the rung"
+    assert out.status == lr.ST_CALL_FAILED
+    assert out.failure_type == state
+    typed = [h for h in (out.route or [])
+             if h.get("status") == "ABORTED_TYPED"]
+    assert len(typed) == 1
+    assert typed[0]["failure_type"] == state
+    assert typed[0]["typed_state"] == state
+    assert typed[0]["provider_attempted"] == provider
+    # these fakes refuse BEFORE a provider request: zero spend is recorded
+    assert typed[0]["capability_state"] == "NOT_ATTEMPTED"
+    assert typed[0]["attempts"] == 0
+
+
+def test_breaker_threshold_request_is_still_an_attempt(econ_env, monkeypatch):
+    """The request that CROSSES the breaker threshold is a real provider
+    attempt. The typed stop must not erase it from the route, provider
+    health, or the routing ledger (Art. XXV: a request that happened is
+    never silently dropped)."""
+    provider, _model = _install_single_rung(monkeypatch)
+    from discovery_fabric.engine import model_routing as mr
+    from discovery_fabric.engine import provider_health as ph
+    seen = {"health": [], "ledger": []}
+    monkeypatch.setattr(ph.HEALTH, "record_failure",
+                        lambda *a, **k: seen["health"].append((a, k)))
+    monkeypatch.setattr(mr, "record_call_outcome",
+                        lambda *a, **k: seen["ledger"].append((a, k)))
+
+    def fake_flavor(*args, **kwargs):
+        raise econ.BreakerOpen("threshold crossed", request_made=True) \
+            from TimeoutError("provider timed out")
+
+    monkeypatch.setattr(lr, "_call_openai_flavor", fake_flavor)
+    out = lr.generate("probe", max_retries=2)
+    assert out.failure_type == "CIRCUIT_BREAKER_OPEN"
+    typed = [h for h in (out.route or [])
+             if h.get("status") == "FAILED_BREAKER_OPEN"]
+    assert len(typed) == 1
+    assert typed[0]["provider_attempted"] == provider
+    assert typed[0]["provider_failure_type"] == "TIMEOUT"
+    assert typed[0]["capability_state"] == "PROBE_OK"
+    assert typed[0]["attempts"] == 1
+    assert seen["health"], "provider health must see the threshold request"
+    assert any(k.get("failure_type") == "TIMEOUT"
+               for _, k in seen["ledger"]), \
+        "the routing ledger must keep the request that opened the breaker"
 
 
 def test_events_log_records_economy_decisions(econ_env):

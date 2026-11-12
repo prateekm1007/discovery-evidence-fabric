@@ -1266,7 +1266,11 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
                 # retry storm (31-40 provider attempts per problem) stops
                 # here instead of hammering through the sleep ladder.
                 if _econ.breaker_failure(spec.provider_id):
-                    raise
+                    raise _econ.BreakerOpen(
+                        f"CIRCUIT_BREAKER_OPEN: provider "
+                        f"'{spec.provider_id}' hit the transient-failure "
+                        f"threshold; the same-rung retry ladder aborts "
+                        f"(Art. LXI)", request_made=True) from he
             if he.code in _TRANSIENT and attempt < 2:
                 time.sleep(5 * (3 ** attempt))
                 last_exc = he
@@ -1274,7 +1278,11 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
             raise
         except (urllib.error.URLError, TimeoutError, ConnectionError) as ne:
             if _econ.breaker_failure(spec.provider_id):
-                raise
+                raise _econ.BreakerOpen(
+                    f"CIRCUIT_BREAKER_OPEN: provider "
+                    f"'{spec.provider_id}' hit the transient-failure "
+                    f"threshold; the same-rung retry ladder aborts "
+                    f"(Art. LXI)", request_made=True) from ne
             if attempt < 2:
                 time.sleep(5 * (3 ** attempt))
                 last_exc = ne
@@ -1339,7 +1347,10 @@ def _call_anthropic_flavor(spec: ProviderSpec, messages: List[dict],
     # flavor above)
     from . import llm_economy as _econ
     _econ.breaker_check(spec.provider_id)
-    _ck = _econ.llm_cache_key(spec.provider_id, model, msgs, max_tokens, None)
+    # the system prompt was split out of `msgs` above: it MUST ride the
+    # cache key or two different prompts would share one recorded answer
+    _ck = _econ.llm_cache_key(spec.provider_id, model, msgs, max_tokens,
+                              None, system=system)
     _cached = _econ.cache_get(_ck)
     if _cached is not None:
         _record_finish_reason(_cached.get("finish_reason") or "stop")
@@ -1351,8 +1362,16 @@ def _call_anthropic_flavor(spec: ProviderSpec, messages: List[dict],
             {"model": model, "max_tokens": max_tokens,
              "messages": msgs, **({"system": system} if system else {})},
             {"x-api-key": key, "anthropic-version": "2023-06-01"}, timeout)
-    except Exception:
-        _econ.breaker_failure(spec.provider_id)
+    except Exception as exc:
+        # transient 429/timeout/5xx/network failures feed the breaker;
+        # permanent auth/model failures are typed provider failures and
+        # must never open a congestion breaker (a bad key is not a storm)
+        if _econ.is_transient_provider_failure(exc):
+            if _econ.breaker_failure(spec.provider_id):
+                raise _econ.BreakerOpen(
+                    f"CIRCUIT_BREAKER_OPEN: provider "
+                    f"'{spec.provider_id}' hit the transient-failure "
+                    f"threshold (Art. LXI)", request_made=True) from exc
         raise
     _econ.breaker_success(spec.provider_id)
     content = "".join(b.get("text", "") for b in data.get("content", []))
@@ -1458,6 +1477,7 @@ def generate(prompt: str, system: str = "",
                                   order_for_role, role_for_purpose,
                                   apply_route_retirement)
     from . import model_routing as mr
+    from . import llm_economy as _econ
 
     # R445-C transport override: ENGINE_LLM_TIMEOUT_S bounds the per-call
     # socket timeout (the R391/R418 operator-override class — explicit,
@@ -2231,6 +2251,12 @@ def generate(prompt: str, system: str = "",
         retries_used = 0
         key_rotations = 0
         attempt = 0
+        # R6 A2 correctness: an economy refusal (open breaker, exhausted
+        # healthy/retry budget, replay-cache miss) is a TYPED stop — it
+        # must never be retried inside the same-rung ladder. RUNG scope
+        # advances to the next provider rung; WALK scope ends the stage.
+        _typed_stop: Optional[str] = None
+        _typed_stop_scope: Optional[str] = None
         while attempt < max_attempts:
             t0 = time.time()
             # R526 Q-A: attempt record opens here (budget = the cap THIS
@@ -2452,6 +2478,110 @@ def generate(prompt: str, system: str = "",
                     _att, time.perf_counter(), 0.0)
             except Exception as exc:  # noqa: BLE001 — recorded, retried
                 last_err = f"{type(exc).__name__}: {exc}"
+                _typed = _econ.typed_state(exc)
+                if _typed:
+                    # TYPED ECONOMY STOP (Art. XXI.3 / LXI): close the
+                    # attempt honestly, record the typed route state, and
+                    # do NOT retry the same rung. A healthy/retry cap or
+                    # a replay-cache miss ends the whole walk (no live
+                    # spend is permitted); a provider breaker only ends
+                    # this provider's rung and the cascade may advance.
+                    # A breaker can stop a rung BEFORE any request (already
+                    # open) or ON the request that crossed the threshold.
+                    # Only the latter is a provider attempt: record it as
+                    # such so the route, health table and routing ledger
+                    # never lose a request that actually happened.
+                    _request_made = bool(
+                        getattr(exc, "request_made", False))
+                    _provider_ftype = None
+                    if _request_made and exc.__cause__ is not None:
+                        _provider_ftype = classify_failure(exc.__cause__)
+                    _att["dispatch_s"] = round(time.time() - t0, 3)
+                    _att["end_utc"] = utc_now()
+                    _att["failure_type"] = _typed
+                    _att["outcome"] = ("FAILED_BREAKER_OPEN"
+                                       if _request_made
+                                       else "ABORTED_TYPED")
+                    _hop["attempts"].append(_att)
+                    _prev_att, _prev_end, _prev_sleep = (
+                        _att, time.perf_counter(), 0.0)
+                    route.append({
+                        "provider_attempted": spec.provider_id,
+                        "model": model_id,
+                        "status": ("FAILED_BREAKER_OPEN" if _request_made
+                                   else "ABORTED_TYPED"),
+                        "failure_type": _typed,
+                        "typed_state": _typed,
+                        "provider_failure_type": _provider_ftype,
+                        "timestamp": utc_now(),
+                        "retry_count": retries_used,
+                        "attempts": attempt + (1 if _request_made else 0),
+                        "key_rotations": key_rotations,
+                        "latency_ms": int((time.time() - t0) * 1000),
+                        "error": str(last_err)[:300],
+                        "fallback_provider": next_provider,
+                        "fallback_model": next_model,
+                        "fallback_reason": (
+                            f"{_typed}: the economy governor stopped "
+                            f"this rung immediately (no same-rung retry); "
+                            f"next={next_provider or 'none (last rung)'}"),
+                        "cost_class": spec.cost_basis,
+                        "account_domain": spec.account_domain,
+                        "selected": False,
+                        "rung_band": rung_meta.get("band"),
+                        "task": task,
+                        "capability_state": ("PROBE_OK" if _request_made
+                                             else "NOT_ATTEMPTED"),
+                    })
+                    if _request_made and _provider_ftype:
+                        # the provider DID answer (transiently failed):
+                        # keep its health + durable ledger line even though
+                        # the typed stop bypasses the ordinary failure path
+                        HEALTH.record_failure(
+                            spec.provider_id, _provider_ftype,
+                            purpose=purpose_tag, model=model_id,
+                            error=str(last_err))
+                        try:
+                            mr.record_call_outcome(
+                                provider_id, model_id, ok=False,
+                                latency_ms=int((time.time() - t0) * 1000),
+                                failure_type=_provider_ftype, task=task,
+                                stage=purpose_tag,
+                                run_id=call_prov["run_id"],
+                                attempt=attempt + 1,
+                                session_id=call_prov["session_id"],
+                                engine_stage=call_prov["engine_stage"],
+                                call_class=call_prov["call_class"],
+                                account_domain=spec.account_domain,
+                                task_degradation=degradation,
+                                capability_state="PROBE_OK",
+                                fallback_from=(provider_id
+                                               if next_provider else None),
+                                fallback_to=next_provider,
+                                error=str(last_err),
+                                cost_class=spec.cost_basis, selected=False,
+                                fallback_reason=(
+                                    f"{_provider_ftype} opened the "
+                                    f"circuit breaker -> fallback to "
+                                    f"{next_provider or 'none (last rung)'}"),
+                                request_id=_gen_call_id,
+                                generate_spans=_gen_span_snapshot(
+                                    final=(next_provider is None)))
+                        except Exception:  # noqa: BLE001 — telemetry
+                            pass
+                    last_failure_type = _typed
+                    _typed_stop = _typed
+                    # a per-problem budget refusal (healthy OR retry cap)
+                    # and a replay miss end the whole walk — advancing to
+                    # another provider rung would spend attempts the cap
+                    # forbids / diverge from the recording. Only a
+                    # provider breaker is scoped to its own rung.
+                    _typed_stop_scope = (
+                        "WALK" if isinstance(
+                            exc, (_econ.CallBudgetExceeded,
+                                  _econ.TypedCacheMiss))
+                        else "RUNG")
+                    break
                 ftype = classify_failure(exc)
                 # R526 Q-A: failed dispatch wall ends here (same rule as
                 # the empty-content path above).
@@ -2587,6 +2717,15 @@ def generate(prompt: str, system: str = "",
                     _prev_att, _prev_end, _prev_sleep = (
                         _att, _prev_end_presleep, _att["retry_sleep_s"])
                     continue
+            # R6 A2 correctness: a typed economy stop bypasses the
+            # provider-failure bookkeeping below (the provider did not
+            # fail — the budget/breaker did). WALK scope ends the stage
+            # with the typed failure_type; RUNG scope advances honestly.
+            if _typed_stop is not None:
+                _hop["note"] = f"typed economy stop: {_typed_stop}"
+                if _typed_stop_scope == "WALK":
+                    break
+                continue
             # R526 Q-A: fall-through (dead identifier or retries
             # exhausted) — the attempt failed; the hop recording below
             # closes the rung.

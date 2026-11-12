@@ -12,8 +12,11 @@ sys.modules):
   * importing the bridge (the module chain every conceptual-class run
     loads) does NOT import cadquery or OCP — the ~500 MB boundary is
     not crossed;
-  * an actual engineering build DOES load cadquery (the positive
-    control — Art. V: not a universal avoider).
+  * the first engineering-geometry access DOES import cadquery and
+    rebinds the lazy global to the real module (the positive control —
+    Art. V: the lazy loader is not a universal avoider). The probe uses
+    a synthetic `cadquery` module on sys.path, so it measures the
+    loader boundary without installing OCP or loading ~500 MB.
 """
 from __future__ import annotations
 
@@ -41,23 +44,34 @@ _BRIDGE_IMPORT_PROBE = (
     "'OCP': 'OCP' in sys.modules}}))"
 ).format(repo=str(REPO))
 
-_ENGINEERING_BUILD_PROBE = (
-    "import sys, json; "
+_ENGINEERING_LAZY_PROBE = (
+    "import sys, json, os; "
     "sys.path.insert(0, {repo!r}); "
-    "sys.path.insert(0, {tests!r}); "
-    "from test_r452_engineering_geometry_is_reachable import ("
-    "_dimension_env, _producer_chain); "
+    "sys.path.insert(0, {fake!r}); "
     "from discovery_fabric.engine.invention_bridge import bridge as b; "
-    "import tempfile; "
-    "env = _dimension_env(); "
-    "_, _, run_result = _producer_chain(env); "
-    "out = b.bridge(run_result, None, tempfile.mkdtemp(), "
-    "build_generation_models=False, build_renders=False); "
+    "import discovery_fabric.engine.invention_bridge.engineering_geometry "
+    "as eg; "
+    "before = os.path.exists({marker!r}); "
+    "wp = eg.cq.Workplane; "
+    "import cadquery as cq; "
     "print(json.dumps({{"
-    "'class': out['visualizability']['visualizability_class'], "
-    "'cadquery_after_build': __import__('sys').modules.get('cadquery') "
-    "is not None}}))"
-).format(repo=str(REPO), tests=str(REPO / "tests"))
+    "'lazy_before_access': not before, "
+    "'imported_on_access': os.path.exists({marker!r}), "
+    "'module_is_fake': bool(getattr(cq, 'FAKE_CADQUERY', False)), "
+    "'rebound': eg.cq is cq}}))"
+)
+
+_FAKE_CADQUERY = '''\
+from pathlib import Path
+Path(__file__).with_suffix(".imported").write_text("1", encoding="utf-8")
+
+
+FAKE_CADQUERY = True
+
+
+class Workplane:
+    pass
+'''
 
 
 def _run_probe(code: str) -> dict:
@@ -80,13 +94,30 @@ class TestLazyOcpMemoryGuard:
             "would pay the ~500 MB OCP import (audit C2)")
         assert state["OCP"] is False
 
-    def test_engineering_build_does_load_cadquery(self):
-        """The positive control (Art. V): when the warrant says
-        ENGINEERING_3D and the build runs, cadquery IS loaded — the
-        lazy loader is not a universal avoider."""
-        state = _run_probe(_ENGINEERING_BUILD_PROBE)
-        assert state["class"] == "ENGINEERING_3D"
-        assert state["cadquery_after_build"] is True
+    def test_engineering_loader_imports_cadquery_on_first_access(
+            self, tmp_path):
+        """The positive control (Art. V): the lazy loader is not an
+        avoider. Importing the bridge and the engineering module crosses
+        no cadquery boundary; the FIRST engineering-geometry attribute
+        access imports cadquery and rebinds the global to the real
+        module. A synthetic cadquery module makes this measurable
+        without installing OCP or paying ~500 MB RSS."""
+        fake_dir = tmp_path / "fake"
+        fake_dir.mkdir()
+        (fake_dir / "cadquery.py").write_text(_FAKE_CADQUERY,
+                                              encoding="utf-8")
+        marker = fake_dir / "cadquery.imported"
+        state = _run_probe(_ENGINEERING_LAZY_PROBE.format(
+            repo=str(REPO), fake=str(fake_dir), marker=str(marker)))
+        assert state["lazy_before_access"] is True, (
+            "importing the bridge/engineering module imported cadquery — "
+            "the lazy boundary leaked")
+        assert state["imported_on_access"] is True, (
+            "first engineering-geometry access did not import cadquery — "
+            "the positive control would be vacuous")
+        assert state["module_is_fake"] is True
+        assert state["rebound"] is True, (
+            "the lazy loader did not rebind `cq` to the imported module")
 
 
 if __name__ == "__main__":

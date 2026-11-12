@@ -12,9 +12,11 @@ origin, never presented as UI-generated.
 """
 from __future__ import annotations
 
+import ctypes
 import fcntl
 import json
 import os
+import sys
 import time
 import uuid
 from pathlib import Path
@@ -179,13 +181,53 @@ RETRYABLE_STATUSES = ERROR_STATUSES + (
 #   re-enters the same worker path (the problem is saved, never lost)
 
 
-def _proc_stat_starttime(pid: int) -> Optional[str]:
-    """Linux /proc/<pid>/stat field 22 (starttime, clock ticks since boot).
+def _windows_creation_ticks(pid: int) -> Optional[str]:
+    """Windows: the process CreationTime from the documented public
+    kernel32.GetProcessTimes (FILETIME = 100-ns ticks since 1601-01-01)
+    — the platform's equivalent of the /proc starttime: stable for the
+    life of the process, CHANGED when the pid is reused. None when the
+    handle cannot be opened (dead pid, or a process we may not query —
+    access-denied is honestly undecidable, not a guessed live) — the
+    same not-alive semantics /proc gives (never a guessed value)."""
+    try:
+        from ctypes import wintypes
+        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        PROCESS_QUERY_INFORMATION = 0x0400
+        h = k32.OpenProcess(PROCESS_QUERY_INFORMATION, False, int(pid))
+        if not h:
+            return None
+        try:
+            creation, _exit = wintypes.FILETIME(), wintypes.FILETIME()
+            _kernel, _user = (wintypes.LARGE_INTEGER(),
+                              wintypes.LARGE_INTEGER())
+            ok = k32.GetProcessTimes(
+                h, ctypes.byref(creation), ctypes.byref(_exit),
+                ctypes.byref(_kernel), ctypes.byref(_user))
+            if not ok:
+                return None
+            return str((creation.dwHighDateTime << 32)
+                       | creation.dwLowDateTime)
+        finally:
+            k32.CloseHandle(h)
+    except Exception:  # noqa: BLE001
+        return None
 
-    Recorded when a worker is spawned and compared on liveness checks so
-    a REUSED pid can never masquerade as the original worker (Art. XVII:
-    every control gets an attempted bypass). Returns None when the pid is
-    not alive (or /proc is unavailable, e.g. non-Linux hosts)."""
+
+def _proc_stat_starttime(pid: int) -> Optional[str]:
+    """The stable per-process creation-time identity, recorded when a
+    worker is spawned and compared on liveness checks so a REUSED pid can
+    never masquerade as the original worker (Art. XVII: every control
+    gets an attempted bypass).
+
+    Linux: /proc/<pid>/stat field 22 (clock ticks since boot).
+    Windows: the GetProcessTimes CreationTime (see
+    _windows_creation_ticks) — the R392 readiness suite runs on both
+    platforms, and a /proc-only reader returned None for EVERY pid on
+    Windows, mis-typing live workers as INTERRUPTED.
+    None when the pid is not alive (or the reader is unavailable) —
+    never a guessed value (Art. XXV)."""
+    if sys.platform.startswith("win"):
+        return _windows_creation_ticks(pid)
     try:
         stat = Path(f"/proc/{int(pid)}/stat").read_text(encoding="utf-8")
         # field 2 (comm) may contain spaces inside parens — split after ')'

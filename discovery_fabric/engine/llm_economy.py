@@ -43,8 +43,10 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import ssl
 import threading
 import time
+import urllib.error
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -61,16 +63,67 @@ class TypedCacheMiss(CallEconomyError):
     fail-closed (no silent live spend)."""
 
 
-class HealthyCallCapExceeded(CallEconomyError):
+class CallBudgetExceeded(CallEconomyError):
+    """A per-problem attempt budget was exhausted (typed base class)."""
+
+
+class HealthyCallCapExceeded(CallBudgetExceeded):
     """Per-problem healthy-call cap reached (default 12)."""
 
 
-class RetryCapExceeded(CallEconomyError):
+class RetryCapExceeded(CallBudgetExceeded):
     """Per-problem retry cap reached (default 6)."""
 
 
 class BreakerOpen(CallEconomyError):
-    """Provider breaker open: consecutive transient failures exhausted."""
+    """Provider breaker open: consecutive transient failures exhausted.
+
+    `request_made` distinguishes the two honest cases the route records:
+    a PRE-request refusal (the breaker was already open; zero provider
+    spend) from the THRESHOLD-CROSSING request (the provider was called
+    and its transient failure opened the breaker). The latter must still
+    reach provider health + the routing ledger — a request that happened
+    is never erased by the typed stop (Art. XXV)."""
+
+    def __init__(self, message: str, request_made: bool = False):
+        super().__init__(message)
+        self.request_made = bool(request_made)
+
+
+def typed_state(exc: BaseException) -> Optional[str]:
+    """The closed typed-state vocabulary a generate() walk records for an
+    economy refusal. Ordinary provider failures return None — they keep
+    the provider-health taxonomy (RATE_LIMITED, AUTH_FAILURE, ...)."""
+    if isinstance(exc, BreakerOpen):
+        return "CIRCUIT_BREAKER_OPEN"
+    if isinstance(exc, HealthyCallCapExceeded):
+        return "HEALTHY_CALL_CAP_EXCEEDED"
+    if isinstance(exc, RetryCapExceeded):
+        return "RETRY_CAP_EXCEEDED"
+    if isinstance(exc, CallBudgetExceeded):
+        return "ATTEMPT_BUDGET_EXHAUSTED"
+    if isinstance(exc, TypedCacheMiss):
+        return "REPLAY_CACHE_MISS"
+    return None
+
+
+#: HTTP statuses that mean "the provider is busy / the transport failed",
+#: never "your request was wrong". 401/403/404/410/422 are PERMANENT and
+#: must never feed the retry-storm breaker (a bad key is not congestion).
+_TRANSIENT_HTTP_CODES = frozenset({408, 425, 429, 500, 502, 503, 504})
+
+
+def is_transient_provider_failure(exc: BaseException) -> bool:
+    """Infrastructure-class failure: 429/timeout/5xx/network. The breaker
+    counts ONLY these; a permanent auth/model error is a typed failure
+    that the health taxonomy records, not a reason to stop the provider."""
+    if isinstance(exc, urllib.error.HTTPError):
+        try:
+            return int(getattr(exc, "code", 0) or 0) in _TRANSIENT_HTTP_CODES
+        except (TypeError, ValueError):
+            return False
+    return isinstance(exc, (urllib.error.URLError, TimeoutError,
+                            ConnectionError, ssl.SSLError))
 
 
 # ---------------------------------------------------------------------------
@@ -179,13 +232,18 @@ _counters: Dict[str, Any] = {
 
 def llm_cache_key(provider_id: str, model: str, messages: List[dict],
                   max_tokens: int, extra_body: Optional[dict] = None,
-                  temperature: float = 0.0) -> str:
-    """hash(prompt, model, params) — the owner's A1 key basis. The system
-    prompt travels inside messages (the callers pass it as a message)."""
+                  temperature: float = 0.0, system: str = "") -> str:
+    """hash(prompt, model, params) — the owner's A1 key basis.
+
+    The openai flavor carries the system prompt inside `messages`; the
+    anthropic flavor splits it out of the message list before the HTTP
+    body, so its cache key MUST carry the extracted `system` separately
+    (two calls with the same user turn but different system directives
+    are different prompts and must never share a cache entry)."""
     canon = json.dumps(
         {"provider": provider_id, "model": model, "messages": messages,
          "max_tokens": max_tokens, "temperature": temperature,
-         "extra_body": extra_body or {}},
+         "extra_body": extra_body or {}, "system": system},
         sort_keys=True, ensure_ascii=False, default=str)
     return hashlib.sha256(canon.encode("utf-8")).hexdigest()
 
@@ -278,13 +336,123 @@ def strip_volatile(obj: Any) -> Any:
     return obj
 
 
+#: Environment variables that can change a STAGE'S OUTPUT. FABRIC_* is
+#: deliberately excluded: every FABRIC_* knob is economy/store mechanics
+#: (cache mode, store root, breaker/call caps), so flipping the memo from
+#: rw to ro or changing a budget must not invalidate a memoized stage.
+#: EVAL_DISABLE_STAGES is excluded for the same reason: it is the
+#: ablation ORCHESTRATION switch, not a semantic input — including it
+#: would make every leave-one-out arm invalidate its own upstream reuse,
+#: defeating the purpose of the stage memo. Secrets are never hashed.
+_CONFIG_ENV_PREFIXES = (
+    "ENGINE_", "EVAL_", "MODEL_", "EVIDENCE_", "TOSCANINI_",
+    "LOCAL_QWEN_", "MAX_OP_CALLS",
+)
+_CONFIG_ENV_SUFFIXES = (
+    "_MODEL", "_PROVIDER", "_BASE_URL", "_BACKEND", "_TIMEOUT_S",
+)
+_CONFIG_ENV_EXCLUDE = {
+    "EVAL_DISABLE_STAGES",       # ablation orchestration, not semantics
+    "FABRIC_LLM_CACHE",          # store mechanics
+    "FABRIC_LLM_ECONOMY_DIR",
+}
+_SECRET_MARKERS = ("KEY", "TOKEN", "SECRET", "PASSWORD", "CREDENTIAL",
+                   "AUTH")
+
+
+def _is_secret_name(name: str) -> bool:
+    up = name.upper()
+    return any(marker in up for marker in _SECRET_MARKERS)
+
+
+def semantic_config_identity() -> str:
+    """Deterministic identity of the operator-declared semantic config:
+    routing pins, cost policy, retrieval/render switches, model pins.
+    A/B/LOO arms that change one of these must never reuse a stage output
+    computed under a different configuration (the memo is a cache of
+    BEHAVIOR, not merely of bytes)."""
+    picked: Dict[str, str] = {}
+    for name, value in os.environ.items():
+        if name in _CONFIG_ENV_EXCLUDE or name.startswith("FABRIC_"):
+            continue
+        if _is_secret_name(name):
+            continue
+        if not (name.startswith(_CONFIG_ENV_PREFIXES)
+                or name.endswith(_CONFIG_ENV_SUFFIXES)):
+            continue
+        picked[name] = str(value)
+    canon = json.dumps(picked, sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(canon.encode("utf-8")).hexdigest()
+
+
+#: Package roots whose code can influence a stage's output. The stage's
+#: own source is already in the key; this wider fingerprint closes the
+#: imported-module blind spot (a threshold constant or helper in a
+#: sibling module changes the stage's behavior without changing the
+#: adapter function's own source).
+_CODE_ROOTS = ("engine", "retrieval_fabric")
+_code_identity_cache: Dict[str, Any] = {"sig": None, "identity": None}
+
+
+def _engine_code_files() -> List[Path]:
+    base = Path(__file__).resolve().parents[1]
+    out: List[Path] = []
+    for root_name in _CODE_ROOTS:
+        root = base / root_name
+        if not root.is_dir():
+            continue
+        for p in root.rglob("*"):
+            if not p.is_file() or p.suffix not in (".py", ".json"):
+                continue
+            if "__pycache__" in p.parts or "node_modules" in p.parts:
+                continue
+            out.append(p)
+    return sorted(out)
+
+
+def engine_code_identity() -> str:
+    """Stable digest of the engine/retrieval source + declared JSON
+    config. Cached per process and refreshed only when a file's size or
+    mtime changes."""
+    files = _engine_code_files()
+    sig = hashlib.sha256(json.dumps(
+        [[str(p), p.stat().st_size, p.stat().st_mtime_ns] for p in files],
+        sort_keys=True).encode("utf-8")).hexdigest()
+    with _lock:
+        if _code_identity_cache["sig"] == sig:
+            return _code_identity_cache["identity"]
+    h = hashlib.sha256()
+    base = Path(__file__).resolve().parents[1]
+    for p in files:
+        h.update(p.relative_to(base).as_posix().encode("utf-8"))
+        h.update(b"\0")
+        h.update(p.read_bytes())
+        h.update(b"\0")
+    identity = h.hexdigest()
+    with _lock:
+        _code_identity_cache["sig"] = sig
+        _code_identity_cache["identity"] = identity
+    return identity
+
+
 def stage_memo_key(stage_name: str, capability_id: str, module_path: str,
                    fn_name: str, fn_source: str,
-                   upstream_snapshot: Any) -> str:
+                   upstream_snapshot: Any,
+                   config_identity: Optional[str] = None,
+                   code_identity: Optional[str] = None) -> str:
+    """Memo key = stage identity + source + semantic config + engine code
+    + canonical upstream state. Every component that can change a stage's
+    output is present, so an ablated/config-changed arm cannot falsely
+    hit a memoized stage from the base run."""
     canon = json.dumps(
         {"stage": stage_name, "cap": capability_id, "mod": module_path,
          "fn": fn_name, "code": hashlib.sha256(
              fn_source.encode("utf-8")).hexdigest(),
+         "config": (config_identity
+                    if config_identity is not None
+                    else semantic_config_identity()),
+         "engine_code": (code_identity if code_identity is not None
+                         else engine_code_identity()),
          "upstream": upstream_snapshot},
         sort_keys=True, ensure_ascii=False, default=str)
     return hashlib.sha256(canon.encode("utf-8")).hexdigest()
