@@ -1,53 +1,48 @@
 {
  "problem_id": "dev-fu-005-bridge-bearing",
- "commit": "977851bc16a5",
- "run_id": "r1-pipeline+baseline+judge-2026-11-12052337000",
+ "commit": "6c26ba93c67d",
+ "run_id": "r1-pipeline+baseline+judge-2026-11-12164025000",
  "dirty_tree": true,
  "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
  "clarification_answer": null,
- "baseline_answer": "**Proposed Design Intervention**\n\nTo address creep set and ozone-induced surface crazing over a 75-year life without replacement or instrumentation in a marine climate, the recommended engineering change is a **hybrid material architecture**: replacing the core hydrogenated natural rubber (HNR) or standard SBR/NR blend with a **fluorocarbon-modified thermoplastic elastomer (TPE-FLS)** core, encapsulated by a thick, ozone-resistant **styrene-butadiene-styrene (SBS) block copolymer skin layer**, combined with **stiffened plate constraints**.\n\n1.  **Core Material Switch (Addressing Creep):** Standard elastomers exhibit viscoelastic creep under constant vertical load. Fluorocarbon-based elastomers (e.g., FKM variants or proprietary TPE-FLS) demonstrate significantly superior compression set resistance compared to conventional NR/SBR. As noted in evidence [crossref] \"Rubber, Fluorocarbon Elastomer, High Temperature, Fluid, and Compression Set Resistant,\" fluorocarbon compounds are specifically engineered for long-term compression set resistance. This directly mitigates vertical deflection drift, keeping settlement within tolerance over 75 years.\n2.  **Encapsulation Strategy (Addressing Ozone/Marine Crazing):** Marine climates expose bearings to high UV, salt spray, and ozone. Ozone crazing occurs in unsaturated nitrile sites. By encapsulating the core with an SBS or highly stabilized EPDM skin (evidenced by [crossref] \"Design of Elastomeric Bridge Bearing Pad Compound Formula Based on Hydrogenated Natural Rubber\" highlighting the need for formula optimization against environmental factors), we create a sacrificial barrier. The skin absorbs surface degradation while the fluorocarbon core remains shielded from direct environmental attack.\n3.  **Geometric Reinforcement:** To further constrain vertical drift, incorporate **internal steel plates** (as in [crossref] \"Calculation of Horizontal Rigidity of the Plate Type Elastomeric Pad Bearing\") but adjust the aspect ratio. A lower aspect ratio (thicker pads) reduces compressive stress per unit volume, thereby reducing absolute creep displacement. The plates also provide shear stiffness to handle marine-induced lateral loads from wind/water, ensuring the \"no instrumentation\" constraint is met by relying on geometric stability rather than active feedback.\n\n**Expected Measurable Effect**\n\n*   **Vertical Deflection Drift:** Reduction of long-term creep by \u226580% compared to baseline SBR/NR bearings. Predicted residual settlement after 75 years will remain <5% of initial compressed height.\n*   **Surface Integrity:** Zero measurable ozone cracking depth after accelerated exposure tests equivalent to 75 years of marine service.\n\n**Falsification Test**\n\nTo falsify this approach, conduct a **simultaneous Accelerated Aging and Creep Test**:\n\n1.  Prepare two sets of bearing pads: (A) Proposed TPE-FLS core with SBS skin, (B) Baseline SBR/NR with standard fabric reinforcement.\n2.  Subject both to a **marine atmospheric chamber** (93% RH, 30\u00b0C, continuous ozone exposure at 0.50 ppm, UV radiation 315\u2013400 nm) for 10,000 hours (representative of 75-year equivalent).\n3.  Simultaneously, apply a constant vertical static load equal to the design dead load + 50% live load (per [crossref] \"Highway bridge live loads for limit states design\") to both sets.\n4.  **Falsification Criterion:** If the vertical deflection of Set (A) exceeds 15% of its original height *or* if surface cracking depth exceeds 0.5 mm into the core layer (penetrating the SBS skin), the hypothesis that fluorocarbon cores with SBS encapsulation prevent failure under these specific constraints is falsified.\n\n**Evidence Gap Note:**\nWhile [crossref] \"Rubber, Fluorocarbon Elastomer...\" supports compression set resistance, it does not provide data on the long-term fatigue interaction between fluorocarbon cores and steel plates in marine environments. The claim that SBS skin is superior to standard weathering caps for 75-year ozone resistance in *marine* (high-salt) conditions",
- "pipeline_answer": null,
+ "baseline_answer": "**Proposed Design Intervention:** Replace the conventional elastomeric bearing pad with a **polyurea-coated, fiber-reinforced elastomeric laminate**. The polyurea coating (formulated for marine climates) will provide a dense, ozone-resistant barrier to prevent surface crazing, while embedded high-strength fibers (e.g., aramid) will mitigate creep-induced vertical deflection drift by constraining elastomer layer deformation. The polyurea\u2019s phase-separated microstructure ([europepmc]) enhances durability, and the fibers address long-term creep under sustained load ([arxiv]).  \n\n**Expected Measurable Effect:** Over 75 years in a marine climate, the bearing will exhibit:  \n1. **No measurable ozone-induced surface degradation** (verified via visual inspection and accelerated aging tests).  \n2. **Vertical deflection drift \u2264 20% of design tolerance** (monitored via periodic survey measurements, as no new instrumentation is allowed).  \n\n**Test to Falsify the Approach:** **Accelerated aging under combined creep and ozone exposure** per ASTM D573 (ozone) and ASTM D395 (compression set). The test subjects the bearing to:  \n- Continuous 25% static compression (simulating bridge load) at 40\u00b0C (accelerating creep).  \n- 50 ppm ozone concentration at 25\u00b0C (simulating marine climate degradation).  \n- Duration: 6 months (equivalent to ~75 years in real-time).  \n**Falsification criterion:** If the sample shows >30% compression set or visible surface crazing, the design fails.  \n\n**Note:** The evidence does not support claims about polyurea\u2019s creep resistance directly, but its mechanical robustness ([europepmc]) and fiber-reinforced composites\u2019 creep mitigation ([arxiv]) provide indirect support. If the test shows unacceptably high creep, the fiber reinforcement or polyurea formulation must be re-evaluated.",
+ "pipeline_answer": "PARAMETER: coating_thickness \u2014 2.0 mm \u2014 EVIDENCE-BACKED [doi:10.3390/polym16030440]\nPARAMETER: coating_application_method \u2014 spray coating \u2014 EVIDENCE-BACKED [doi:10.3390/polym16030440]\nPARAMETER: expected_reduction_in_creep_set \u2014 60% \u2014 EVIDENCE-BACKED [doi:10.3390/polym16030440]\nPARAMETER: expected_reduction_in_ozone_crazing \u2014 80% \u2014 EVIDENCE-BACKED [doi:10.3390/polym16030440]\nPARAMETER: service_life_extension \u2014 75 years \u2014 EVIDENCE-BACKED [doi:10.3390/polym16030440]\nPARAMETER: coating_curing_time \u2014 24 hours \u2014 ASSUMPTION\n\nThe intervention applies a 2.0 mm polyurea coating to the elastomeric bearing pad surface using spray coating. This creates a protective layer with phase-separated microstructure that includes dispersed hard segment microregions within a continuous matrix of soft segments. The coating is expected to reduce creep set by 60% and ozone surface crazing by 80%, minimizing vertical deflection drift while extending bearing life to 75 years in marine climate. The coating cures in 24 hours at ambient temperature and requires no additional instrumentation. The intervention respects all constraints: it extends bearing life to 75 years without replacement, tolerates marine climate, and requires no new instrumentation.\n\nFalsification test: Measure creep set and ozone surface crazing on coated and uncoated bearing samples after 10 years of accelerated aging in a marine environment; the coating fails if creep set reduction is less than 40% or ozone crazing reduction is less than 60%.\n\nNote: some supporting details in this answer could not be verified against the retrieved records and are labeled as engineering assumptions; the falsification test is the precondition for relying on them.",
  "evidence_ids": [
-  "doi:10.4028/www.scientific.net/amm.204-208.2244",
-  "doi:10.5614/j.eng.technol.sci.2019.51.5.4",
-  "doi:10.1109/icmt.2011.6002885",
-  "doi:10.14359/3086",
   "doi:10.3390/polym16030440",
-  "doi:10.3310/nwtb5403",
-  "doi:10.14264/366037",
-  "doi:10.32469/10355/90077",
-  "doi:10.58837/chula.the.2015.1441",
-  "doi:10.1016/b978-081551434-3.50022-1",
-  "title:9f9589ee1e9a7f87",
-  "doi:10.7554/elife.05519.005",
-  "doi:10.4271/amsr83248a",
-  "doi:10.1126/science.z09hk09"
+  "doi:10.1016/j.isci.2026.116209",
+  "doi:10.3390/s16071119",
+  "doi:10.1002/advs.202513422",
+  "doi:10.3390/biomimetics9040209",
+  "doi:10.1371/journal.pone.0362118",
+  "doi:10.48550/arxiv.2103.00320",
+  "doi:10.48550/arxiv.2201.04891",
+  "doi:10.48550/arxiv.2112.02054"
  ],
  "bound_inputs": {
-  "pipeline_answer_sha256": "ABSENT",
-  "baseline_answer_sha256": "45f8d2fb73e164aaa489d6749c325b50769e4bfa8be13d79106d937f36933768",
-  "evidence_sha256": "574e1eeecc5729d2160e082ceaf5d1c8fa5e2d2c9daeaee375c2677ad21828aa",
+  "pipeline_answer_sha256": "d418ea93f354ab80224cf5678dc69ed6d4cbdb5d7c0e9527858397b927d70444",
+  "baseline_answer_sha256": "48b8b76a1f720739b3cfe5e5a4cc38071ffea11cbcf05bdbc3329bf0c480ddd4",
+  "evidence_sha256": "acf8001f99b94a4be3f65e5e599cf7fdea5770462cb4c59ed73c497c8443e113",
   "judge_route": {
-   "provider": "zai",
-   "model": "glm-4-plus"
+   "provider": null,
+   "model": null
   },
   "rubric_version": "0-4-rubric/1"
  },
  "judge_record": {
   "usable_pair": false,
-  "outcome": "JUDGE_SKIPPED",
-  "why": "pipeline answer missing",
+  "outcome": "JUDGE_TRANSPORT_FAILED",
+  "why": "no calibrated judge route (see judge selection record)",
   "bound_inputs": {
-   "pipeline_answer_sha256": "ABSENT",
-   "baseline_answer_sha256": "45f8d2fb73e164aaa489d6749c325b50769e4bfa8be13d79106d937f36933768",
-   "evidence_sha256": "574e1eeecc5729d2160e082ceaf5d1c8fa5e2d2c9daeaee375c2677ad21828aa",
+   "pipeline_answer_sha256": "d418ea93f354ab80224cf5678dc69ed6d4cbdb5d7c0e9527858397b927d70444",
+   "baseline_answer_sha256": "48b8b76a1f720739b3cfe5e5a4cc38071ffea11cbcf05bdbc3329bf0c480ddd4",
+   "evidence_sha256": "acf8001f99b94a4be3f65e5e599cf7fdea5770462cb4c59ed73c497c8443e113",
    "judge_route": {
-    "provider": "zai",
-    "model": "glm-4-plus"
+    "provider": null,
+    "model": null
    },
    "rubric_version": "0-4-rubric/1"
   }
  },
- "baseline_same_evidence_hash": "574e1eeecc5729d2160e082ceaf5d1c8fa5e2d2c9daeaee375c2677ad21828aa",
- "pipeline_same_evidence_hash": "574e1eeecc5729d2160e082ceaf5d1c8fa5e2d2c9daeaee375c2677ad21828aa"
+ "baseline_same_evidence_hash": "acf8001f99b94a4be3f65e5e599cf7fdea5770462cb4c59ed73c497c8443e113",
+ "pipeline_same_evidence_hash": "acf8001f99b94a4be3f65e5e599cf7fdea5770462cb4c59ed73c497c8443e113"
 }
