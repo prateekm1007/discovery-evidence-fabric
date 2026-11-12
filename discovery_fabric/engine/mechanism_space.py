@@ -573,21 +573,14 @@ def mechanism_signal_rerank(records: List[Dict[str, Any]],
     deterministic, and recorded per record; without a problem the
     behavior is byte-unchanged (the replay-set pins call it bare).
 
-    R6 A2 (owner round 2026-11-12): the relevance component gains a
-    DETERMINISTIC BM25 term — the record's title+abstract scored
-    against the problem's failure+constraint text (bm25.py: whole-
-    token discipline, zero LLM, k1=1.2/b=0.75, recorded constants).
-    Contribution is capped (min(bm25, 20.0) * 0.25, max 5.0) so a
-    single off-domain high-score record cannot outrun the density
-    basis (Art. L: the instrument stays calibrated). The bare-call
-    replay pins are untouched (no problem -> no BM25, version 1.0.0)."""
+    R6 A2 REVERT (owner round 2026-11-12, measured): the A2 capped-BM25
+    term is REMOVED from the decision — the anchor-domain match rate
+    measured WORSE than the legacy rule on the same packet (0.666 vs
+    0.75, committed retrieval JSON), and the round directive is to
+    revert until the instrument matches the legacy control. The
+    problem-fact lexical relevance component stays unchanged; bm25.py
+    remains available as a disclosed non-decisional metric only."""
     rel_terms = _problem_relevance_terms(problem)
-    bm_scores: List[float] = []
-    if rel_terms:
-        from ..retrieval_fabric import bm25 as _bm25
-        bm_scores = _bm25.BM25([_bm25.record_text(r) for r in records]
-                               ).scores(
-            _bm25.problem_relevance_text(problem))
     scored = []
     for i, r in enumerate(records):
         s = mechanism_signal_score(r)
@@ -599,19 +592,14 @@ def mechanism_signal_rerank(records: List[Dict[str, Any]],
             rel_hits = sorted(t for t in rel_terms if t in text)
             s["relevance_hits"] = rel_hits[:10]
             s["n_relevance_hits"] = len(rel_hits)
-            s["bm25_score"] = round(bm_scores[i], 3)
-            s["score"] = round(
-                s["score"] + 0.5 * len(rel_hits)
-                + min(bm_scores[i], 20.0) * 0.25, 2)
+            s["score"] = round(s["score"] + 0.5 * len(rel_hits), 2)
         scored.append(s)
     order = sorted(range(len(records)),
                    key=lambda i: (-scored[i]["score"], scored[i].get(
                        "record_id") or ""))
     top = order[:max(0, top_k)]
     return {
-        "reranker_version": ("mechanism_signal_rerank/1.2.0"
-                             if rel_terms else
-                             "mechanism_signal_rerank/1.0.0"),
+        "reranker_version": "mechanism_signal_rerank/1.0.0",
         "n_input": len(records), "top_k": top_k,
         "selected_indexes": top,
         "selected_ids": [scored[i].get("record_id") for i in top],
@@ -619,10 +607,9 @@ def mechanism_signal_rerank(records: List[Dict[str, Any]],
         "policy": ("deterministic vocabulary-class density; recorded "
                    "basis per record; NOT a relevance verdict (Art. XXI)"
                    + (" + relevance component: 0.5/problem-fact term "
-                      "+ capped BM25 (min(bm25,20)*0.25) over "
-                      "failure+constraint vs title+abstract (R6 A2, "
-                      "owner 2026-11-12; constants k1=1.2 b=0.75 "
-                      "recorded in bm25.py)"
+                      "(R6 A2 BM25 term REVERTED 2026-11-12: anchor-"
+                      "domain match measured worse than the legacy "
+                      "control on the same packet, 0.666 vs 0.75)"
                       if rel_terms else "")),
     }
 

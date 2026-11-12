@@ -353,5 +353,10 @@ def test_mechanism_rerank_prefers_problem_relevant_records():
     # R6 A2 (owner 2026-11-12): the problem-given rerank adds the
     # capped BM25 component and bumps the version; the bare-call pin
     # (1.0.0, asserted just above via `bare`) is unchanged.
-    assert "1.2.0" in with_rel["reranker_version"]
-    assert "bm25" in with_rel["policy"].lower()
+    # R6 A2 revert (measured 2026-11-12: the BM25 anchor order scored
+    # WORSE than the legacy control on the same packet, 0.666 vs 0.75 —
+    # the round directive is revert-until-matched; the rerank pins the
+    # reverted 1.0.0 semantics with the lexical relevance component).
+    assert "1.0.0" in with_rel["reranker_version"]
+    assert "reverted" in with_rel["policy"].lower()
+    assert "relevance component" in with_rel["policy"].lower()

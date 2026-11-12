@@ -1129,30 +1129,19 @@ def retrieve_fabric(problem: Dict[str, Any],
     def _sem_key(rec: CanonicalRecord) -> float:
         return sem_scores.get(rec.canonical_id, 0.0)
 
-    # R6 A2 (owner round 2026-11-12): deterministic BM25 relevance —
-    # each record's title+abstract scored against the problem's OWN
-    # failure + constraint text (bm25.py: whole-token discipline,
-    # zero LLM, k1=1.2/b=0.75, recorded constants). It joins the lane
-    # sort as the PRIMARY lexical key: within a relevance tier,
-    # text-bearing records come first, and among them the BM25 score
-    # orders the packet — the measured defect (a highly-cited off-domain
-    # review burying the relevant record) is fixed at the source, not
-    # relabeled. No problem text -> all-zero BM25 -> the pre-A2 keys
-    # with the has_text tier promoted (disclosed in the report).
+    # R6 A2 REVERT (owner round 2026-11-12, measured): the A2 lane sort
+    # made BM25 the primary lexical key; the anchor-domain match rate
+    # MEASURED WORSE than the legacy rule on the SAME packet (0.666
+    # median / 0.333 min vs legacy control 0.75 — committed retrieval
+    # JSON). The sort reverts to the pre-A2 tuple (the legacy control);
+    # bm25.py stays as a disclosed NON-decisional metric — the
+    # anchor_domain_match_top6 envelope field keeps measuring both
+    # sides (Art. XXV: measured reality recorded over the aspiration;
+    # the revert decision rides this comment, never silent).
     from discovery_fabric.retrieval_fabric import bm25 as _bm25
     _rel_text = _bm25.problem_relevance_text(problem)
     for lane, pool in lane_pools.items():
-        doc_texts = [
-            _bm25.record_text({"title": rec.title,
-                               "abstract": (rec.best_record.get("abstract")
-                                             or rec.best_record.get("summary")
-                                             or "")})
-            for rec in pool]
-        bm_scores = (_bm25.BM25(doc_texts).scores(_rel_text)
-                     if pool else [])
-
-        def _score(rec: CanonicalRecord, bm: float
-                   ) -> Tuple[int, int, float, int]:
+        def _score(rec: CanonicalRecord) -> Tuple[int, int, int]:
             adj = adjudicate_record(
                 {"title": rec.title,
                  "normalized": rec.best_record,
@@ -1167,20 +1156,18 @@ def retrieve_fabric(problem: Dict[str, Any],
             abstract_len = len((rec.best_record.get("abstract") or ""))
             has_text = 1 if abstract_len >= 50 or \
                 rec.best_record.get("claim_text_available") else 0
-            return (1 if adj.get("relevant") else 0, has_text,
-                    round(bm, 4), overlap)
+            return (1 if adj.get("relevant") else 0, overlap, has_text)
         # R456: semantic proximity is the PRIMARY key when the engine is
         # on (sem_scores empty -> 0.0 for every record -> that key is a
-        # no-op and the deterministic ordering below applies). The
-        # canonical_id tail makes the order total — byte-identical on
-        # any host (Art. LXXXV).
-        keys = [(round(_sem_key(rec), 3), *_score(rec, bm_scores[i]),
-                 -len((rec.best_record.get("abstract") or "")),
-                 rec.canonical_id)
-                for i, rec in enumerate(pool)]
-        pool[:] = [pool[i] for i in
-                   sorted(range(len(pool)), key=lambda i: keys[i],
-                          reverse=True)]
+        # no-op and the deterministic ordering below applies). Python's
+        # sort is stable and the canonicalizer's record order is
+        # deterministic — the order stays host-reproducible (Art. LXXXV).
+        pool.sort(key=lambda rec: (
+                      round(_sem_key(rec), 3),
+                      _score(rec)[0], _score(rec)[1],
+                      _score(rec)[2],
+                      -len((rec.best_record.get("abstract") or ""))),
+                  reverse=True)
 
     # ---- 9. engine evidence items (a2-compatible + fabric fields) ----
     items: List[Dict[str, Any]] = []
@@ -1210,20 +1197,65 @@ def retrieve_fabric(problem: Dict[str, Any],
         pool = lane_pools.get(lane, [])
         cap = lane_caps.get(lane, 3)
         _pre_drop_recs.extend(pool[:cap])
-        if textless_policy == "drop":
-            text_recs = [r for r in pool if _has_text(r)]
-            dropped = [r for r in pool if not _has_text(r)]
-            if dropped:
-                textless_dropped["per_lane"][lane] = len(dropped)
-                textless_dropped["ids"].extend(
-                    r.canonical_id for r in dropped[:20])
-            emit = text_recs
-        else:  # demote — legacy behavior, textless may fill slots
-            emit = pool
-        for rank, rec in enumerate(emit[:cap]):
-            items.append(_to_engine_item(rec, rank, lane))
-            lane_item_counts[lane] = lane_item_counts.get(lane, 0) + 1
-            _emitted_recs.append(rec)
+
+    # R6 B-round packet floor (owner directive 2026-11-12): the packet
+    # must carry >= 8 records WITH text — starving below it narrows the
+    # synthesis surface the textless policy just cleaned. Widening
+    # escalates the per-lane caps over the ALREADY-RETRIEVED pools
+    # (zero extra transport, zero fabrication — the records exist in
+    # the pool, the cap was the only gate). If even the retrieved pools
+    # hold fewer than 8 text-bearing records, the unmet floor is
+    # recorded TYPED with the honest counts — never padded with
+    # textless records (Art. XXV: unknown stays unknown).
+    _PACKET_FLOOR = 8
+    _LANES = ("SCHOLARLY", "PATENT", "THESIS", "PREPRINT",
+              "TECHNICAL_REPORT", "REPOSITORY", "DATASET")
+
+    def _emit_packet(mult: int) -> int:
+        items.clear()
+        lane_item_counts.clear()
+        _emitted_recs.clear()
+        textless_dropped["per_lane"].clear()
+        textless_dropped["ids"].clear()
+        for lane in _LANES:
+            pool = lane_pools.get(lane, [])
+            cap = lane_caps.get(lane, 3)
+            if mult == 0:  # uncapped: every already-retrieved record is
+                eff = len(pool)  # admissible (the cap was the only gate)
+            elif mult == 1:
+                eff = cap
+            else:
+                eff = min(cap * mult, max(cap, len(pool)))
+            if textless_policy == "drop":
+                text_recs = [r for r in pool if _has_text(r)]
+                dropped = [r for r in pool if not _has_text(r)]
+                if dropped:
+                    textless_dropped["per_lane"][lane] = len(dropped)
+                    textless_dropped["ids"].extend(
+                        r.canonical_id for r in dropped[:20])
+                emit = text_recs
+            else:  # demote — legacy behavior, textless may fill slots
+                emit = pool
+            for rank, rec in enumerate(emit[:eff]):
+                items.append(_to_engine_item(rec, rank, lane))
+                lane_item_counts[lane] = lane_item_counts.get(lane, 0) + 1
+                _emitted_recs.append(rec)
+        return sum(1 for r in _emitted_recs if _has_text(r))
+
+    n_textful = _emit_packet(1)
+    packet_widening: Dict[str, Any] = {"floor": _PACKET_FLOOR,
+                                       "applied": False,
+                                       "textful_emitted": n_textful}
+    if textless_policy == "drop":
+        for mult in (2, 4, 0):  # 0 = uncapped over the retrieved pools
+            if n_textful >= _PACKET_FLOOR:
+                break
+            n_textful = _emit_packet(mult)
+            packet_widening["applied"] = True
+            packet_widening.setdefault("cap_multipliers_tried",
+                                       []).append(mult or "uncapped")
+        packet_widening["textful_emitted_final"] = n_textful
+        packet_widening["floor_met"] = bool(n_textful >= _PACKET_FLOOR)
     _phase_s["ranking_item_assembly"] = round(
         time.perf_counter() - _phase_t0, 3)
     _phase_s["phase_accounting_note"] = (
@@ -1253,11 +1285,26 @@ def retrieve_fabric(problem: Dict[str, Any],
     # must both be visible (Art. XXV: a drop is a recorded decision,
     # the pre-drop pool stays the disclosed baseline).
     abstract_coverage = {
-        "instrument": "abstract_coverage/1.1 (R6 A1/A2, owner 2026-11-12)",
+        "instrument": ("abstract_coverage/1.2 (R6 A1/A2 + B-round packet "
+                       "floor, owner 2026-11-12)"),
         "canonical_pool": _cov(canonicalizer.canonical_records()),
         "evidence_pool": _cov(_emitted_recs),
         "evidence_pool_pre_textless_drop": _cov(_pre_drop_recs),
         "textless_packet": textless_dropped,
+        "packet_widening": packet_widening,
+        # owner directive 2026-11-12: per-problem packet stats. The
+        # on-domain count uses the ENGINE GATE's own domain match
+        # (intervention_gate.anchor_domain_check semantics in bm25.py)
+        # over the EMITTED packet — the honest denominator for
+        # "records the synthesis can actually use".
+        "packet_stats": {
+            "n_emitted": len(_emitted_recs),
+            "n_textful": n_textful,
+            "n_on_domain_textful": sum(
+                1 for r in _emitted_recs
+                if _has_text(r) and
+                _bm25.anchor_domain_match(problem, r.to_dict())["match"]),
+        },
         "abstract_backfill": abstract_backfill_report,
         "abstract_enrichment": abstract_enrichment_report,
     }

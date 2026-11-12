@@ -6,133 +6,36 @@
 # (pipeline,baseline,judge arms together — the pair needs both answers
 # on the SAME evidence snapshot, same invocation) and exits.
 #
-# Env contract:
-#   .env.keys (gitignored vault)  AGNES_API_KEY, INCEPTION_API_KEY,
-#                                 OPENROUTER_API_KEY (exported here;
-#                                 never echoed). Probe record for the
-#                                 owner-supplied round: agnes ALIVE,
-#                                 inception ALIVE, openrouter 401
-#                                 "User not found" (re-probe of the
-#                                 measured-dead key; scripts/
-#                                 r6_probe_provider_keys.py).
-#   LLM route (owner round 2026-11-12, the ZAI-free path):
-#   R6_LLM_ROUTE  auto (default) | zai | owner-keys
-#     auto        zai when ZAI_API_KEY is present, else owner-keys
-#     zai         legacy loopback gateway (ZAI_API_KEY + gateway)
-#     owner-keys  owner-supplied .env.keys rungs: synthesis pinned to
-#                 AGNES (the R539 default pin), attack pinned to
-#                 INCEPTION (independent account domain, Art. XLV),
-#                 judge last-resort named AGNES via
-#                 EVAL_JUDGE_LAST_RESORT (shared-family, disclosed;
-#                 the calibration gate still applies in full)
-#   R6_FABRIC_CACHE  rw (default, the committed B6 behavior) | off |
-#                    ro — B6-as-restated and B10 run with off
+# Env contract (B-round rewrite, owner directives 1+4 — measured basis:
+# this host's bash layer is WSL and its exports DO NOT cross into
+# native .exe children, reproduced 2026-11-12; PowerShell does):
+#   NO shell exports for engine env. Every engine env var rides
+#   --engine-env KEY=VALUE on the python argv (eval/run.py applies it
+#   to os.environ and merges it into every child env explicitly).
+#   The launcher echoes the applied keys — the effective-env record
+#   (Art. XXVII). LLM_ECONOMY.json remains the post-run check for the
+#   EFFECTIVE cache_mode and healthy_call_cap.
+#   .env.keys sourcing REMOVED: every key it held (AGNES/INCEPTION/
+#   OPENROUTER) is measured-retired this window (agnes 429 quota,
+#   openrouter 401); no engine env derives from it.
+#   LLM route: ONE table, recorded once —
+#   discovery_fabric/engine/model_routing.py ROUTE_TABLE (queried
+#   here, never duplicated). zai for synthesis/attack/composer/bulk,
+#   judge xkiro/ministral-14b, last-resort zai (committed constants
+#   already match). On a host without the z-ai CLI the zai rung is
+#   PROVIDER_UNAVAILABLE (typed skip; no ZAI_* env rides) and the
+#   cascade resolves the role on the next serving rung — recorded
+#   per call, never silent (Art. XXV).
+#   R6_FABRIC_CACHE  rw (default) | off | ro — B6-as-restated and B10
+#                    run with off ('off' omits the var from engine-env
+#                    AND unsets it here so a Windows-side value cannot
+#                    leak through the WSL->.exe hop)
 #
 # Usage: bash scripts/r6_run_dev12.sh <comma-separated problem ids>
 set -u
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 REPO="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$REPO" || exit 4
-
-# vault: export provider keys (never printed)
-if [ -f .env.keys ]; then
-  set -a; source .env.keys; set +a
-fi
-
-# --- LLM route selection --------------------------------------------------
-ROUTE="${R6_LLM_ROUTE:-auto}"
-if [ "$ROUTE" = "auto" ]; then
-  if [ -n "${ZAI_API_KEY:-}" ]; then ROUTE=zai; else ROUTE=owner-keys; fi
-fi
-echo "[r6dev12] route: $ROUTE"
-
-if [ "$ROUTE" = "zai" ]; then
-  if [ -z "${ZAI_API_KEY:-}" ]; then
-    echo "[r6dev12] BLOCKED_NO_ZAI_API_KEY: the loopback credential must
-be operator-declared (ZAI_API_KEY); there is no hard-coded fallback" >&2
-    exit 5
-  fi
-  KEY="$ZAI_API_KEY"
-
-  # gateway: reuse a live one, else start one sharing this command's
-  # lifetime (in-command lifetime per the runbook sandbox rule)
-  if ! curl -sf http://127.0.0.1:8787/healthz >/dev/null 2>&1; then
-    ZAI_GATEWAY_KEY="$KEY" node "$REPO/scripts/zai_gateway.mjs" 8787 \
-      >> "$REPO/ENGINE_RUNS/zai_gateway.stdout.log" 2>&1 &
-    GW_PID=$!
-    trap 'kill "$GW_PID" 2>/dev/null' EXIT
-    for _ in $(seq 1 30); do
-      curl -sf http://127.0.0.1:8787/healthz >/dev/null 2>&1 && break
-      sleep 0.5
-    done
-    curl -sf http://127.0.0.1:8787/healthz >/dev/null 2>&1 || {
-      echo "gateway failed to become healthy" >&2; exit 3; }
-    echo "[r6dev12] gateway started (in-command lifetime)"
-  else
-    echo "[r6dev12] reusing live session gateway on 8787"
-  fi
-
-  export ZAI_API_KEY="$KEY"
-  export ZAI_MODEL="glm-4-plus"
-else
-  # owner-keys (ZAI-free): fail-closed on the synthesis head
-  if [ -z "${AGNES_API_KEY:-}" ]; then
-    echo "[r6dev12] BLOCKED_NO_AGNES_API_KEY: the owner-keys route
-requires AGNES_API_KEY (.env.keys vault); there is no hard-coded
-fallback" >&2
-    exit 7
-  fi
-  # recorded operator overrides (the ENGINE_*_PROVIDER class, Art. XXVII)
-  export ENGINE_SYNTHESIS_PROVIDER=agnes
-  # judge: the independent JUDGE_CANDIDATES (xkiro/unorouter) have no
-  # credentials in this vault, and the committed zai last-resort rung has
-  # no ZAI_API_KEY here — the operator (owner round 2026-11-12) names the
-  # shared-family last-resort judge explicitly. The 30-pair calibration
-  # gate still applies in full; the source of the name is recorded on the
-  # route record + every judgment it produces (SHARED_FAMILY_DISCLOSED,
-  # never the gate — Art. XXV/XXVII).
-  export EVAL_JUDGE_LAST_RESORT=agnes,agnes-3.0-flash
-  if [ -n "${INCEPTION_API_KEY:-}" ]; then
-    export ENGINE_ATTACK_PROVIDER=inception
-  else
-    # disclosed shared-family fallback (never silent, Art. VI)
-    export ENGINE_ATTACK_PROVIDER=agnes
-    echo "[r6dev12] NOTE: INCEPTION_API_KEY absent; the attack evaluator
-falls to agnes (shared-family route, disclosed in the round record)"
-  fi
-  echo "[r6dev12] owner-keys: synthesis=agnes attack=${ENGINE_ATTACK_PROVIDER}"
-fi
-
-export ENGINE_MODEL_COST_POLICY=UNRESTRICTED   # owner operator action 2026-11-11
-export EVAL_JUDGE_ALLOW_SHARED_FAMILY=1        # owner operator action 2026-11-11
-export ENGINE_NO_PACKAGE=1
-export ENGINE_SECOND_JUDGE=0
-export MS_BATCH_INSTANTIATION=1
-# cache mode (owner B protocol): B5/B7 use rw; B6-as-restated and B10
-# use off. 'off' is the code default (llm_economy), so off unsets the
-# variable rather than exporting a sentinel.
-R6_CACHE="${R6_FABRIC_CACHE:-rw}"
-case "$R6_CACHE" in
-  off) unset FABRIC_LLM_CACHE ;;
-  rw|ro) export FABRIC_LLM_CACHE="$R6_CACHE" ;;
-  *) echo "[r6dev12] bad R6_FABRIC_CACHE '$R6_CACHE' (rw|off|ro)" >&2
-     exit 8 ;;
-esac
-echo "[r6dev12] fabric_llm_cache: ${FABRIC_LLM_CACHE:-off}"
-export RETRIEVE_JOB_BUDGET_S=20                # R6 retrieval job budget (committed)
-# MEASURED CAP CORRECTION (disclosed, Art. XXV): the first composer-era
-# chunk hit the 12-healthy cap with the pipeline still pending (5 typed
-# HEALTHY_CALL_CAP_EXCEEDED stops per problem) — the stopped calls were
-# the ATTACK stage, one operator, and the candidate EVALUATOR; the
-# evaluator cut left every candidate unadjudicated and the composer
-# typed-refused (NO_ADMISSIBLE_CANDIDATES) on ALL 3 problems. Measured
-# composer-era healthy demand: 15-17 calls/problem. Cap 18 = demand +
-# headroom; the RETRY-STORM controls are unchanged (retry cap 6, breaker
-# threshold 3, AIMD pacing) — the ≤12 directive bounded ATTEMPTS, and
-# attempts stay bounded by the retry cap + breaker, not by starving the
-# evaluator. Disclosed in the round report; the economy record carries
-# the per-problem counters as evidence.
-export FABRIC_PROBLEM_CALL_CAP=18
 
 # --- python resolution (host-independent, the A3 discipline) -----------
 # the codebase uses PEP 701 f-strings (eval/run.py: multi-line f-string
@@ -175,11 +78,125 @@ fi
   echo "[r6dev12] python source: R6_PYTHON (operator-named, Art. XXVII)"
 echo "[r6dev12] python: $PY ($($PY -B --version 2>&1))"
 
+# --- engine env: the explicit argv dict (directive 1) ------------------
+# every value rides --engine-env KEY=VALUE; NOTHING is exported here.
+ENGINE_ENV_ARGS=()
+add_env() { ENGINE_ENV_ARGS+=(--engine-env "$1"); }
+
+# cache mode (owner B protocol): B5/B7 use rw; B6-as-restated and B10
+# use off. 'off' omits the var from engine-env (the llm_economy code
+# default is off) AND unsets it here so a Windows-side value cannot
+# leak through the WSL->.exe hop.
+R6_CACHE="${R6_FABRIC_CACHE:-rw}"
+case "$R6_CACHE" in
+  off) unset FABRIC_LLM_CACHE ;;
+  rw|ro) add_env "FABRIC_LLM_CACHE=$R6_CACHE" ;;
+  *) echo "[r6dev12] bad R6_FABRIC_CACHE '$R6_CACHE' (rw|off|ro)" >&2
+     exit 8 ;;
+esac
+echo "[r6dev12] fabric_llm_cache: ${R6_CACHE} (via --engine-env; off = omitted)"
+
+# --- route: ONE table, recorded once (directive 4) ----------------------
+# The committed ROUTE_TABLE is QUERIED, not restated: the values below
+# come from discovery_fabric/engine/model_routing.py at run time, so
+# the launcher can never drift from the recorded table.
+ROUTE_JSON="$("$PY" -B -c 'import json; from discovery_fabric.engine.model_routing import ROUTE_TABLE as T; print(json.dumps(T))')" || {
+  echo "[r6dev12] BLOCKED_ROUTE_TABLE_UNREADABLE: model_routing.ROUTE_TABLE failed to import" >&2
+  exit 6; }
+SYNTH_PROV="$("$PY" -B -c 'import json,sys; print(json.loads(sys.argv[1])["synthesis"][0])' "$ROUTE_JSON")"
+ATTACK_PROV="$("$PY" -B -c 'import json,sys; print(json.loads(sys.argv[1])["attack"][0])' "$ROUTE_JSON")"
+COMPOSE_PROV="$("$PY" -B -c 'import json,sys; print(json.loads(sys.argv[1])["composer"][0])' "$ROUTE_JSON")"
+SYNTH_MODEL="$("$PY" -B -c 'import json,sys; print(json.loads(sys.argv[1])["synthesis"][1])' "$ROUTE_JSON")"
+JUDGE_PROV="$("$PY" -B -c 'import json,sys; print(json.loads(sys.argv[1])["judge"][0])' "$ROUTE_JSON")"
+JUDGE_MODEL="$("$PY" -B -c 'import json,sys; print(json.loads(sys.argv[1])["judge"][1])' "$ROUTE_JSON")"
+echo "[r6dev12] ROUTE_TABLE: synthesis=$SYNTH_PROV/$SYNTH_MODEL attack=$ATTACK_PROV composer=$COMPOSE_PROV judge=$JUDGE_PROV/$JUDGE_MODEL"
+
+# recorded operator overrides (the ENGINE_*_PROVIDER class, Art. XXVII):
+# the roles resolve through the committed table; the envs make the
+# selection explicit and ride the engine's per-call records.
+add_env "ENGINE_SYNTHESIS_PROVIDER=$SYNTH_PROV"
+add_env "ENGINE_ATTACK_PROVIDER=$ATTACK_PROV"
+add_env "ZAI_MODEL=$SYNTH_MODEL"
+# operator actions carried from 2026-11-11 (unchanged owner directives)
+add_env "ENGINE_MODEL_COST_POLICY=UNRESTRICTED"
+add_env "EVAL_JUDGE_ALLOW_SHARED_FAMILY=1"
+add_env "ENGINE_NO_PACKAGE=1"
+add_env "ENGINE_SECOND_JUDGE=0"
+add_env "MS_BATCH_INSTANTIATION=1"
+add_env "RETRIEVE_JOB_BUDGET_S=20"
+# owner directive 2026-11-12: <= 8 healthy calls per problem. The
+# economy record carries the per-problem counters as evidence; the
+# retry-storm controls are unchanged (retry cap 6, breaker threshold 3).
+add_env "FABRIC_PROBLEM_CALL_CAP=8"
+
+# --- zai transport probe (typed availability, never silent) ------------
+# MEASURED this host: the z-ai CLI is absent (WSL PATH, Windows npm
+# dir, npm registry 404) — the loop-local gateway CANNOT serve here and
+# the cascade resolves zai roles on the next serving rung (xkiro
+# keyless, measured live). On a host WITH the CLI: start the gateway
+# loop-local (binds 127.0.0.1, bearer = the loop-local constant) and
+# admit the ZAI_* envs ONLY after ONE real 1-call transport probe
+# passes — a healthy healthz alone never certifies transport.
+GW_KEY="r6-loopback-local"   # loop-LOCAL only; the gateway binds 127.0.0.1
+GW_STARTED=0
+if command -v z-ai >/dev/null 2>&1; then
+  mkdir -p "$REPO/ENGINE_RUNS"
+  if ! curl -sf http://127.0.0.1:8787/healthz >/dev/null 2>&1; then
+    ZAI_GATEWAY_KEY="$GW_KEY" \
+    ZAI_GATEWAY_LOG="$REPO/ENGINE_RUNS/zai_gateway_calls.jsonl" \
+      node "$REPO/scripts/zai_gateway.mjs" 8787 \
+      >> "$REPO/ENGINE_RUNS/zai_gateway.stdout.log" 2>&1 &
+    GW_PID=$!
+    trap 'kill "$GW_PID" 2>/dev/null' EXIT
+    for _ in $(seq 1 30); do
+      curl -sf http://127.0.0.1:8787/healthz >/dev/null 2>&1 && break
+      sleep 0.5
+    done
+    curl -sf http://127.0.0.1:8787/healthz >/dev/null 2>&1 || {
+      echo "[r6dev12] ZAI_GATEWAY_UNHEALTHY: gateway never became healthy
+(typed unavailable; no ZAI_* env rides, cascade resolves)" >&2
+      kill "$GW_PID" 2>/dev/null
+      GW_STARTED=0
+    }
+    if [ "$GW_STARTED" = "1" ]; then
+      echo "[r6dev12] gateway started (in-command lifetime, loop-local)"
+    fi
+  else
+    GW_STARTED=1
+    echo "[r6dev12] reusing live session gateway on 8787"
+  fi
+  # ONE 1-call transport probe decides ZAI_* admission
+  if [ "$GW_STARTED" = "1" ]; then
+    PROBE_HTTP=$(curl -s -m 45 -o /tmp/zai_probe_body.json -w '%{http_code}' \
+      -X POST http://127.0.0.1:8787/v1/chat/completions \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer $GW_KEY" \
+      -d '{"model":"glm-4-plus","messages":[{"role":"user","content":"Reply with exactly: READY"}],"max_tokens":8}' \
+      2>/dev/null || echo 000)
+    if [ "$PROBE_HTTP" = "200" ] && grep -q '"content"' /tmp/zai_probe_body.json 2>/dev/null; then
+      add_env "ZAI_API_KEY=$GW_KEY"
+      add_env "ZAI_GATEWAY_KEY=$GW_KEY"
+      echo "[r6dev12] ZAI_TRANSPORT_PROBE: 200 OK, non-empty content -> ZAI_* envs ride engine-env"
+    else
+      echo "[r6dev12] ZAI_TRANSPORT_PROBE: http=$PROBE_HTTP (typed unavailable; ZAI_* envs omitted, cascade resolves)" >&2
+      [ -n "${GW_PID:-}" ] && kill "$GW_PID" 2>/dev/null
+    fi
+    rm -f /tmp/zai_probe_body.json
+  fi
+else
+  echo "[r6dev12] ZAI_TRANSPORT_ABSENT: no z-ai CLI on this host (measured
+2026-11-12: WSL PATH, Windows npm, npm registry 404) — the zai rung is
+PROVIDER_UNAVAILABLE and the cascade resolves the role on the next
+serving rung (xkiro, keyless, measured live); no ZAI_* env rides" >&2
+fi
+
+echo "[r6dev12] engine-env keys: $(printf '%s ' "${ENGINE_ENV_ARGS[@]}" | sed 's/--engine-env //' | cut -d= -f1 | sort -u | tr '\n' ' ')"
 PROBLEMS="${1:?usage: r6_run_dev12.sh <comma-separated problem ids>}"
 echo "[r6dev12] chunk: $PROBLEMS"
-$PY -B eval/run.py \
+"$PY" -B eval/run.py \
   --arms pipeline,baseline,judge \
   --problems-file eval/problems_dev12.json \
   --problems "$PROBLEMS" \
   --workers 1 --timeout 300 \
+  "${ENGINE_ENV_ARGS[@]}" \
   --pairs-out eval/pairs/dev12_fresh

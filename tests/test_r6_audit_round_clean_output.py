@@ -40,6 +40,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 REPO = Path(__file__).resolve().parents[1]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
@@ -589,7 +591,26 @@ class TestAblationArmFlags:
 # DIRECTIVE 6 — kill records + hypothesis delivery
 # =====================================================================
 
+# The five tests below pin the AUDIT ROUND'S LIVE RUN ARTIFACTS
+# (candidate_envelope.json under eval/runs/<commit>/...). eval/runs is
+# GITIGNORED (hashes-only rule): the artifacts exist ONLY on the host
+# that ran that round, immediately after it ran (the sandbox rule
+# wipes run dirs between invocations). On any other host — or after
+# any later invocation — they are ABSENT BY CONSTRUCTION, not by a
+# code regression. A live-artifact pin must degrade to a TYPED SKIP
+# when its artifacts are absent (the same class as the engine's
+# typed-unavailable rung skips), never a silent pass and never a red
+# suite everywhere but the host that produced the artifacts (Art. XXV:
+# measured reality over aspiration; Art. XXVII: recorded, never
+# silent).
 RUNS = REPO / "eval" / "runs" / "977851bc16a5"
+_AUDIT_ARTIFACTS_PRESENT = RUNS.exists()
+
+requires_audit_artifacts = pytest.mark.skipif(
+    not _AUDIT_ARTIFACTS_PRESENT,
+    reason=("audit-round live artifacts absent: eval/runs is gitignored "
+            "and the pinned run belongs to the audit round's host — "
+            "host/run-bound verification, not a regression"))
 
 
 def _gauntlet(attack_results):
@@ -600,6 +621,7 @@ def _gauntlet(attack_results):
 
 
 class TestKillCauseClassification:
+    @requires_audit_artifacts
     def test_p09_all_kills_not_in_record(self):
         d = json.loads((RUNS / ("r1-pipeline+baseline+judge-2026-11-"
                                 "12050540000/bench-p09-packaging-"
@@ -611,6 +633,7 @@ class TestKillCauseClassification:
         assert all(k["cause"] == KILL_CAUSE_NOT_IN_RECORD
                    for k in kc["per_kill"])
 
+    @requires_audit_artifacts
     def test_fu005_all_kills_not_in_record(self):
         d = json.loads((RUNS / ("r1-pipeline+baseline+judge-2026-11-"
                                 "12052337000/dev-fu-005-bridge-bearing/"
@@ -619,6 +642,7 @@ class TestKillCauseClassification:
         kc = kill_cause_record(d["attack_results"])
         assert kc["all_not_in_record"] is True
 
+    @requires_audit_artifacts
     def test_new07_physics_kill_keeps_the_kill(self):
         d = json.loads((RUNS / ("r1-pipeline+baseline+judge-2026-11-"
                                 "12051342000/eval-new07-transformer-"
@@ -633,6 +657,7 @@ class TestKillCauseClassification:
 
 
 class TestHypothesisDelivery:
+    @requires_audit_artifacts
     def test_not_in_record_kills_admit_flagged_hypothesis(self):
         # p09's actual gauntlet record: every kill is a record-
         # availability kill -> the candidate is admissible as a
@@ -652,6 +677,7 @@ class TestHypothesisDelivery:
         assert c["hypothesis_unverified"] is True
         assert c["admission"]["reason"] == "ALL_KILLS_NOT_IN_RECORD"
 
+    @requires_audit_artifacts
     def test_scientific_kill_stays_a_no_answer(self):
         # new07's physics-invalid mechanism kill: NO hypothesis
         # admission — the typed no-answer stands (never manufacture an

@@ -201,16 +201,17 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
     # wrong-modality for text tasks — catalog discovery can only
     # route to the measured flash rungs; a topped-up account
     "inception": [
-        r"^mercury-3$",
-        r"^mercury-2\.5$",
-        r"^mercury-2$",
-        # R6 audit round 2026-11-12 (measured, Art. XXV/XXVII):
-        # mercury-decide REMOVED — live probe 2026-11-12: GET
-        # /v1/models lists it, but chat/completions returns 400 Bad
-        # Request on the standard params every registry call sends
-        # (mercury-3 answers 200 OK at 0.45 s in the same probe). A
-        # measured non-serving id never becomes a rung silently (the
-        # premium-precedent rule above). Recorded in the round LOG.
+        # R6 route round 2026-11-12 (measured, owner directive: remove
+        # mercury from EVERY ladder role): all mercury ids removed.
+        # mercury-decide — chat/completions 400 Bad Request on the
+        # standard params (audit-round live probe; /v1/models lists
+        # it). mercury-3/2.5/2 — 0 content chars at long-form budgets
+        # (finish_reason=length at 420 AND 1000 max_tokens; the
+        # diffusion model starves on verdict/compose generation). An
+        # id that cannot serve the role never holds a ladder slot
+        # (the premium-precedent rule). ProviderSpecs stay registered
+        # (Art. LXIV: mark, never delete); the ladder is the routing
+        # authority. Recorded in the round LOG.
     ],
     # re-admits pro ids with a one-line extension, never silently.
     "agnes": [
@@ -218,6 +219,52 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
         r"^agnes-2\.5-flash$",
         r"^agnes-2\.0-flash$",
     ],
+}
+
+#: R6 ROUTE TABLE (owner directive 2026-11-12: ONE route table, recorded
+#: ONCE — every role resolves through it; Art. XXVII recorded, never
+#: silent). The audit round measured the serving rungs live:
+#:   zai    loop-local gateway (scripts/zai_gateway.mjs) over the
+#:          sandbox z-ai CLI embedded model — MEASURED SERVING (attack
+#:          PASS served, judge OK, chunk-1 rerun). ZAI_MODEL names the
+#:          per-call id (glm-4-plus; recorded upstream drift: the CLI
+#:          routed glm-4-plus to zai-org/GLM-5.3 on some calls —
+#:          disclosed, not silent).
+#:   xkiro  free-tier remote router, KEYLESS serving measured live on
+#:          the coder host (30-pair judge calibration 27/30 = 0.90,
+#:          ELIGIBLE 2026-11-12); judge independence: different
+#:          provider+family from the synthesis head.
+ROUTE_TABLE: Dict[str, Tuple[str, str]] = {
+    "synthesis": ("zai", "glm-4-plus"),
+    "attack": ("zai", "glm-4-plus"),
+    "composer": ("zai", "glm-4-plus"),
+    # bulk = the fast LOCAL rung for the high-volume short steps
+    "bulk": ("zai", "glm-4-plus"),
+    "judge": ("xkiro", "mistralai/ministral-14b"),
+    "judge_last_resort": ("zai", "glm-4-plus"),
+}
+#: Retirement/availability notes THIS WINDOW (measured; the routing
+#: authority is provider_health.RETIRED_ROUTE_PROVIDERS + the spec
+#: allowlists above — these notes are the recorded basis, Art. XXV).
+ROUTE_TABLE_NOTES: Dict[str, str] = {
+    "agnes": ("429 RATE_LIMITED 'used up today's text quota ... 1 "
+              "request every 3 minutes' (probe record 2026-11-12; "
+              "unusable as a synthesis/attack head this window)"),
+    "inception/mercury-*": ("mercury-decide 400 on standard params; "
+                            "mercury-3/2.5/2 0 content chars at "
+                            "long-form budgets (removed from every "
+                            "ladder role, owner directive)"),
+    "openrouter": ("owner key 401 'User not found' on chat (probe); "
+                   "catalog names are not servability"),
+    "attack independence": ("the attack role SHARES the synthesis head "
+                            "this window (agnes 429-dead, mercury "
+                            "unusable) — Art. XLV independence is "
+                            "unavailable this window; the shared-family "
+                            "serving is recorded per call, never silent"),
+    "zai transport": ("the loop-local gateway needs the z-ai CLI; on a "
+                      "host without it the rung is PROVIDER_UNAVAILABLE "
+                      "and the cascade resolves the role on the next "
+                      "serving rung — typed per call, never silent"),
 }
 
 # Pinned DEFAULT models (the standing fallback set when the live catalog

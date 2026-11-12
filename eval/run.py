@@ -852,6 +852,11 @@ def probe_judge_route(baseline_provider: str) -> Dict[str, Any]:
                               ("calibrated", "n_pairs", "correct",
                                "accuracy", "threshold", "passed",
                                "corpus_sha256", "n_valid")}
+        # R6 B-round calibration reuse: the FULL probe result rides the
+        # candidate record (provenance) AND the returned route dict
+        # (build_score_table reuses it commit-bound + corpus-bound,
+        # saving a second live 30-pair replay per scoring pass).
+        rec["calibration_full"] = calib
         rec["calibration_wall_s"] = round(time.time() - t1, 1)
         err_classes: Dict[str, int] = {}
         lat = []
@@ -882,6 +887,7 @@ def probe_judge_route(baseline_provider: str) -> Dict[str, Any]:
             return {"provider": prov, "model": model, "state": "OK",
                     "selection": "calibration-gated",
                     "judge_independence": "INDEPENDENT_PROVIDER",
+                    "calibration_full": calib,
                     "candidates": results,
                     "at": utc_now()}
     # ---- R6 LAST RESORT: the operator-accepted shared-family judge ----
@@ -936,6 +942,9 @@ def probe_judge_route(baseline_provider: str) -> Dict[str, Any]:
                                   ("calibrated", "n_pairs", "correct",
                                    "accuracy", "threshold", "passed",
                                    "corpus_sha256", "n_valid")}
+            # R6 B-round calibration reuse: same full-store as the
+            # independent branch (provenance on the candidate record).
+            rec["calibration_full"] = _calib
             rec["eligible"] = bool(_calib.get("passed"))
             rec["decision"] = ("ELIGIBLE_SHARED_FAMILY_DISCLOSED"
                                if rec["eligible"]
@@ -953,6 +962,7 @@ def probe_judge_route(baseline_provider: str) -> Dict[str, Any]:
                                        "owner 2026-11-11 for this dev "
                                        "round, never used for the sealed "
                                        "holdout"),
+                        "calibration_full": _calib,
                         "candidates": results,
                         "at": utc_now()}
     return {"provider": None, "model": None,
@@ -2051,9 +2061,35 @@ def build_score_table(route_rec: Dict[str, Any],
     # Calibration first: a judge that cannot separate good from bad
     # cannot certify a win (Art. LXI). No calibrated route =>
     # NOT_MEASURED for BOTH judgments; never 0 or 0.5.
-    calib = (run_judge_calibration(judge_route)
-             if judge_route.get("provider") else
-             {"calibrated": False, "why": "no judge route (pipeline-only run)"})
+    #
+    # R6 B-round calibration reuse (owner directive 2026-11-12,
+    # measured: B5's 25-minute non-exit was THIS site re-running the
+    # live 30-pair calibration that probe_judge_route had already run
+    # once). The probe's live calibration is REUSED only when it is
+    # bound to (a) THIS commit (the route probe is cross-commit
+    # forbidden — the audit verified shadowed-route reuse) and (b) the
+    # BYTE-IDENTICAL corpus — the corpus sha256 is recomputed from
+    # eval/judge_calibration.json bytes here, so any corpus edit
+    # forces a fresh live calibration. Any mismatch => live replay,
+    # never stale reuse (Art. XXV: measured reality over aspiration).
+    import hashlib
+    if judge_route.get("provider"):
+        _full = judge_route.get("calibration_full") or {}
+        _corpus_p = Path(__file__).resolve().parent / "judge_calibration.json"
+        _corpus_sha = (hashlib.sha256(_corpus_p.read_bytes()).hexdigest()
+                       if _corpus_p.exists() else None)
+        if (_full.get("corpus_sha256") == _corpus_sha
+                and judge_route.get("commit") == _commit
+                and _corpus_sha):
+            calib = dict(_full)
+            calib["calibration_source"] = "commit-bound-probe-reuse"
+        else:
+            calib = run_judge_calibration(judge_route)
+            calib["calibration_source"] = "live-replay"
+    else:
+        calib = {"calibrated": False,
+                 "why": "no judge route (pipeline-only run)",
+                 "calibration_source": "none"}
     judge_valid = bool(calib.get("calibrated"))
     import math
 
@@ -2398,6 +2434,15 @@ _dirty = git_dirty()
 #: verbatim via --run-id (they must write into the PARENT's root).
 _run_ns: List[str] = []
 
+#: R6 B-round engine-env handoff (owner directive 2026-11-12): the
+#: launcher passes engine env as an EXPLICIT argv dict (--engine-env
+#: KEY=VALUE); no shell exports. Measured basis: this host's bash layer
+#: is WSL and its exports do not cross into native .exe children (the
+#: B5 smoke ran on the code defaults cache-off/cap-12 while the launcher
+#: echoed rw/18). Argv crosses; _spawn_child merges this dict into every
+#: child env explicitly, so parent and children share one effective env.
+_ENGINE_ENV_OVERRIDES: Dict[str, str] = {}
+
 
 def _run_dir() -> Path:
     base = RUNS_ROOT / _commit
@@ -2471,6 +2516,9 @@ def _spawn_child(cmd: List[str], timeout_s: int,
     import subprocess
     import threading
     env = dict(os.environ)
+    if _ENGINE_ENV_OVERRIDES:
+        # explicit engine-env dict (argv handoff; never shell exports)
+        env.update(_ENGINE_ENV_OVERRIDES)
     if env_extra:
         env.update(env_extra)
     _killed = {"fired": False}
@@ -2631,8 +2679,36 @@ def main(argv=None) -> int:
                     help="internal: the parent's run id; children reuse "
                          "it verbatim so parent and child share ONE run "
                          "root")
+    ap.add_argument("--engine-env", action="append", default=None,
+                    metavar="KEY=VALUE",
+                    help="R6 B-round env handoff: pass ONE engine env "
+                         "var EXPLICITLY on argv (repeatable; no shell "
+                         "exports — measured on this host: the WSL bash "
+                         "layer's exports do not cross into native .exe "
+                         "children). Applied to os.environ before any "
+                         "launch and merged into every child env by "
+                         "_spawn_child, so parent and children share "
+                         "ONE effective engine env")
     args = ap.parse_args(argv)
     global RUNS_ROOT, _commit, _HOLDOUT_MODE, _run_ns
+    if args.engine_env:
+        # R6 B-round env handoff (owner directive 2026-11-12): the
+        # explicit argv dict is the ONLY mechanism that sets engine
+        # env this round. Measured basis: WSL exports do not reach
+        # the native .exe children (reproduced: bash one-liner ->
+        # python.exe sees None). Every value rides argv -> os.environ
+        # -> _ENGINE_ENV_OVERRIDES -> every child env, and the echo
+        # below is the effective-env record (Art. XXVII: recorded,
+        # never silent).
+        for _ee in args.engine_env:
+            _k, _sep, _v = _ee.partition("=")
+            if not _sep or not _k:
+                raise SystemExit(
+                    f"--engine-env expects KEY=VALUE, got {_ee!r}")
+            os.environ[_k] = _v
+            _ENGINE_ENV_OVERRIDES[_k] = _v
+        print(f"[engine-env] applied {len(_ENGINE_ENV_OVERRIDES)} keys "
+              f"on argv: {sorted(_ENGINE_ENV_OVERRIDES)}", flush=True)
     arms = [a.strip().lower() for a in args.arms.split(",") if a.strip()]
     if args.root:
         RUNS_ROOT = Path(args.root)

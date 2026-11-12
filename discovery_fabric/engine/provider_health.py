@@ -652,15 +652,17 @@ ROLE_TRANSFORM = "transform"        # simple JSON shaping (prefer no LLM)
 # high latency). Default pin cleared to prevent silent re-promotion.
 # R539 (2026-09-16+2026-09-26): the operator's number-1-API directive
 # (verbatim 2026-09-26): "put this as the number 1 api, so
-# infrastucture failure doesnt happen again" — the pin now names
-# agnes (apihub.agnes-ai.com), measured live 2026-09-26 (catalog 200
-# with 12 models; flash rungs 200 OK + 3/3 FIELD-line compliant; pro
-# rungs 403-gated). Agnes is NOT in RETIRED_ROUTE_PROVIDERS, so the
-# pin holds on every role; the two standing rules still take
-# precedence (Art. XLV attack-independence, Art. V cooldown demotion).
+# R6 route round 2026-11-12 (owner directive: one route table, recorded
+# once — model_routing.ROUTE_TABLE): the pin follows the table's
+# synthesis head, zai (the loop-local gateway over the sandbox z-ai CLI;
+# MEASURED SERVING in the audit-round chunk-1 rerun). Measured basis for
+# the change: agnes 429 RATE_LIMITED "used up today's text quota ...
+# 1 request every 3 minutes" (probe record — unusable as ANY head this
+# window). The two standing rules still take precedence over any pin
+# (Art. XLV attack-independence, Art. V cooldown demotion).
 # ENGINE_DEFAULT_PROVIDER (env) still overrides or disables ("" = no
 # pin) — the ENGINE_* operator-override class.
-_DEFAULT_PROVIDER_PIN = "agnes"
+_DEFAULT_PROVIDER_PIN = "zai"
 
 # R518/R519: THE single routing-retirement authority (Art. X: one
 # canonical state; R519 §5-6: no scattered hard-coded retirement tuples
