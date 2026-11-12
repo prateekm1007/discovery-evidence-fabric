@@ -103,7 +103,7 @@ from typing import Any, Dict, List, Optional
 #       impossibility), the record-bound raw candidate is admissible
 #       as a clearly flagged UNVERIFIED hypothesis — one plain-language
 #       line, never a typed no-answer, never internal jargon.
-ANSWER_COMPOSER_VERSION = "answer_composer/1.3.0"
+ANSWER_COMPOSER_VERSION = "answer_composer/1.4.0"
 
 #: bounded repair loop (compose -> validate -> repair until valid or
 #: cap). Calls per composition: 1 compose + <=1 truncation retry
@@ -150,7 +150,10 @@ _COMPOSER_SYSTEM = (
     "bracketed record id that supports it, e.g. \"EVIDENCE-BACKED "
     "[record-id]\" — a label with no bracketed id fails the "
     "deterministic contract; (6) English only, no markdown headings, "
-    "plain text.")
+    "plain text; (7) END your response with the required "
+    "CONSTRAINT-CHECK block (the specification below) — it is "
+    "machine-stripped before delivery and is your own audit of the "
+    "answer you just wrote: audit honestly, quote exactly.")
 
 _COMPOSER_PROMPT = """Write the final engineering answer for this problem.
 
@@ -159,8 +162,12 @@ PROBLEM:
 - Failure: {failure}
 - Failure mode: {failure_mode}
 
-USER'S STATED CONSTRAINTS AND VARIABLES (must be respected exactly):
+USER'S STATED CONSTRAINTS AND VARIABLES (must be respected exactly;
+numbered for the audit block):
 {variables_block}
+
+NUMBERED USER CONSTRAINTS (audit units — one verdict line each):
+{numbered_constraints}
 
 TOP CANDIDATES FROM THE PIPELINE (with verification verdicts):
 {candidates_block}
@@ -176,26 +183,33 @@ recommended intervention/design with concrete parameter values, the
 expected measurable effect, how it respects each stated constraint, the
 falsification test, and which evidence items support it. Answer-shape
 contract{shape_hint}:
-{shape_block}"""
+{shape_block}
+
+{constraint_check_spec}"""
 
 _REPAIR_PROMPT = """Your previous answer violated the deterministic
-answer-shape contract:
+answer-shape contract or the constraint audit:
 
 VIOLATIONS:
 {violations}
 
-PREVIOUS ANSWER:
+PREVIOUS ANSWER (with its constraint-audit block):
 {previous}
 
 PROBLEM (for context): {device} — {failure}
 USER'S STATED CONSTRAINTS AND VARIABLES:
 {variables_block}
 
+NUMBERED USER CONSTRAINTS (audit units — one verdict line each):
+{numbered_constraints}
+
 Rewrite the FULL answer fixing every violation. Same rules as before:
 numbers come from packet/candidates or carry ASSUMPTION or a defined
 calibration rule; respect the user's variables; name the falsification
 test. Contract{shape_hint}:
-{shape_block}"""
+{shape_block}
+
+{constraint_check_spec}"""
 
 
 def _utc_now() -> str:
@@ -513,6 +527,10 @@ def compose_answer(problem: Dict[str, Any],
     selection; None defers to the ENGINE_TECH_SANITY env flag
     (default off)."""
     from .answer_contract import validate_answer, ANSWER_SHAPE_BLOCK
+    from .constraint_audit import (
+        CONSTRAINT_CHECK_BLOCK_SPEC, strip_constraint_check,
+        parse_constraint_check, merge_constraint_check,
+        numbered_constraints_block)
     if llm_generate is None:
         from .mechanism_space import llm_generate
     # item 2: the flag-controlled deterministic tech-sanity
@@ -540,6 +558,7 @@ def compose_answer(problem: Dict[str, Any],
                 _dict_lines.append(f"{_k}: {_v}")
         _clar_text = "; ".join(_dict_lines)
     _clarification = _clar_text or None
+    _ncons = numbered_constraints_block(problem)
     shape = ANSWER_SHAPE_BLOCK.get(question_type, "")
     shape_hint = "" if shape else " (none — unknown question type)"
     prompt = _COMPOSER_PROMPT.format(
@@ -547,10 +566,12 @@ def compose_answer(problem: Dict[str, Any],
         failure=problem.get("failure", ""),
         failure_mode=problem.get("failure_mode", ""),
         variables_block=_variables_block(problem),
+        numbered_constraints=_ncons,
         candidates_block=_candidates_block(candidates or []),
         packet_block=_packet_block(packet),
         verification_block=_verification_block(verification),
-        shape_hint=shape_hint, shape_block=shape)
+        shape_hint=shape_hint, shape_block=shape,
+        constraint_check_spec=CONSTRAINT_CHECK_BLOCK_SPEC)
     rec: Dict[str, Any] = {
         "composer_version": ANSWER_COMPOSER_VERSION,
         "n_llm_calls": 0,
@@ -571,6 +592,11 @@ def compose_answer(problem: Dict[str, Any],
         rec["finished_at"] = _utc_now()
         return rec
     answer = res["content"].strip()
+    # DIRECTIVE 1 (R6 auditor round 2026-11-12): the structured
+    # constraint check RIDES THIS CALL — the block is machine-stripped
+    # from the delivered text and parsed into typed verdicts (no extra
+    # call, Art. X: one check shape on every compose path).
+    answer, _ck_block = strip_constraint_check(answer)
     rec["output_sha256"] = res.get("output_hash")
     # ---- typed truncation detection + ONE larger-budget retry
     # (owner round 2026-11-12 item 1): the typed finish-reason
@@ -615,11 +641,35 @@ def compose_answer(problem: Dict[str, Any],
             rec["finished_at"] = _utc_now()
             return rec
         answer = res2["content"].strip()
+        answer, _ck_block = strip_constraint_check(answer)
         trunc["retry_truncated"] = _is_answer_truncated(answer, res2)
         if trunc["retry_truncated"]:
-            # never ship a truncated answer — the typed no-answer
-            # state (the typed detail stays in the truncation
-            # metadata; the plain-language caveat above)
+            # DOWNGRADE, DON'T DISCARD (owner directive 2): a truncated
+            # draft delivered at the last complete sentence with ONE
+            # plain caveat beats a blank (the typed detail rides the
+            # truncation metadata; never a banner, never internal
+            # narration). The downgrade pass still runs so the shipped
+            # text carries no unsupported certainty.
+            from .answer_downgrade import (downgrade_answer,
+                                           DOWNGRADE_CAVEAT_LINE,
+                                           truncate_at_sentence)
+            dg_t = downgrade_answer(answer, [], packet)
+            _cut = truncate_at_sentence(dg_t["answer"])
+            if _cut.strip():
+                rec["state"] = "COMPOSED_TRUNCATED_DELIVERED"
+                rec["answer"] = _cut
+                rec["downgrade"] = {
+                    "applied": True,
+                    "n_relabels": dg_t["n_relabels"],
+                    "n_citations_dropped": dg_t["n_citations_dropped"],
+                    "n_jargon_stripped": dg_t["n_jargon_stripped"],
+                    "valid_after_downgrade": False}
+                rec["caveats"] = [
+                    DOWNGRADE_CAVEAT_LINE,
+                    "Note: this answer was shortened at the model's "
+                    "output budget and may be incomplete."]
+                rec["finished_at"] = _utc_now()
+                return rec
             rec["state"] = "COMPOSE_TRUNCATED"
             rec["answer"] = None
             rec["caveats"] = [
@@ -646,6 +696,13 @@ def compose_answer(problem: Dict[str, Any],
     _ca_on = os.environ.get("FABRIC_CONSTRAINT_AUDIT", "1") != "0"
     rec["constraint_audit_arm"] = "on" if _ca_on else "off"
     _uvs = list(problem.get("user_variables") or [])
+    # the check parsed from THIS response (compose or truncation retry)
+    ck = parse_constraint_check(_ck_block, answer)
+    rec["constraint_check_first_pass"] = {
+        "state": ck.get("state"), "n_violations": ck.get("n_violations"),
+        "verdicts": ck.get("verdicts"),
+        "restates_device": ck.get("restates_device"),
+        "restates_constraint": ck.get("restates_constraint")}
     contract = validate_answer(answer, question_type,
                                packet=packet or [],
                                user_variables=_uvs,
@@ -655,6 +712,8 @@ def compose_answer(problem: Dict[str, Any],
                     "state": "CONSTRAINT_AUDIT_PASS",
                     "violations": [], "n_violations": 0,
                     "allowed_measurements": {"mode": "arm_off"}})
+    # the floor stays; the LLM check MERGES into the same typed list
+    caudit = merge_constraint_check(caudit, ck) if _ca_on else caudit
     rec["contract_first_pass"] = {"valid": contract.get("valid"),
                                   "violations": contract.get("violations")}
     rec["constraint_audit_first_pass"] = {
@@ -687,7 +746,9 @@ def compose_answer(problem: Dict[str, Any],
             device=problem.get("device", ""),
             failure=problem.get("failure", ""),
             variables_block=_variables_block(problem),
-            shape_hint=shape_hint, shape_block=shape)
+            numbered_constraints=_ncons,
+            shape_hint=shape_hint, shape_block=shape,
+            constraint_check_spec=CONSTRAINT_CHECK_BLOCK_SPEC)
         res3 = llm_generate(repair_prompt, system=_COMPOSER_SYSTEM,
                             max_tokens=max_tokens,
                             purpose="answer_composer_repair")
@@ -696,11 +757,15 @@ def compose_answer(problem: Dict[str, Any],
             trunc["repair_transport_failed"] = True
             break
         answer3 = res3["content"].strip()
+        answer3, _ck_block3 = strip_constraint_check(answer3)
         contract3 = validate_answer(answer3, question_type,
                                     packet=packet or [],
                                     user_variables=_uvs,
                                     clarification=_clarification)
+        ck3 = parse_constraint_check(_ck_block3, answer3)
         caudit3 = audit_constraints(problem, answer3)
+        caudit3 = merge_constraint_check(caudit3, ck3) if _ca_on \
+            else caudit3
         # a truncated repair is NEVER adopted (never ship a
         # truncated answer): the pre-existing improvement rule
         # applies to COMPLETE repairs only
@@ -733,6 +798,42 @@ def compose_answer(problem: Dict[str, Any],
                     and caudit.get("state") == "CONSTRAINT_AUDIT_PASS"):
                 break
     rec["repair_rounds_used"] = rec.get("repair_rounds_used", _repair_round)
+    # ---- DOWNGRADE, DON'T DISCARD (owner directive 2, 2026-11-12):
+    # a contract-invalid composition is no longer discarded into a
+    # typed no-answer. Deterministic relabel: failing EVIDENCE-BACKED
+    # claims become ASSUMPTION, invalid citations drop, internal
+    # candidate ids strip; the downgraded text re-validates and SHIPS
+    # with ONE plain-language caveat. Typed no-answer stays only for
+    # transport failure and the composer's scientific refusals.
+    from .answer_downgrade import (downgrade_answer,
+                                   DOWNGRADE_CAVEAT_LINE,
+                                   truncate_at_sentence)
+    _delivered_note: Optional[str] = None
+    if contract.get("valid") is not True:
+        dg = downgrade_answer(answer, contract.get("violations") or [],
+                              packet)
+        contract_dg = validate_answer(dg["answer"], question_type,
+                                      packet=packet or [],
+                                      user_variables=_uvs,
+                                      clarification=_clarification)
+        caudit_dg = (audit_constraints(problem, dg["answer"])
+                     if _ca_on else caudit)
+        rec["downgrade"] = {
+            "applied": True,
+            "n_relabels": dg["n_relabels"],
+            "n_citations_dropped": dg["n_citations_dropped"],
+            "n_jargon_stripped": dg["n_jargon_stripped"],
+            "relabels": dg["relabels"],
+            "citations_dropped": dg["citations_dropped"],
+            "valid_after_downgrade": contract_dg.get("valid") is True}
+        answer = dg["answer"]
+        if (contract_dg.get("valid") is True
+                and (caudit_dg.get("n_violations") or 0)
+                <= (caudit.get("n_violations") or 0)):
+            contract = contract_dg
+            caudit = caudit_dg
+        else:
+            caudit = caudit_dg
     rec["answer"] = answer
     rec["contract"] = {"valid": contract.get("valid"),
                        "violations": contract.get("violations"),
@@ -745,9 +846,16 @@ def compose_answer(problem: Dict[str, Any],
     rec["constraint_audit"] = {"state": caudit.get("state"),
                                "n_violations": caudit.get("n_violations"),
                                "violations": caudit.get("violations")}
-    rec["state"] = ("COMPOSED_CONTRACT_VALID"
-                    if contract.get("valid") is True
-                    else "COMPOSED_CONTRACT_INVALID")
+    rec["constraint_check"] = ck
+    if contract.get("valid") is True:
+        rec["state"] = "COMPOSED_CONTRACT_VALID"
+    elif rec.get("downgrade", {}).get("applied"):
+        # delivered at the last complete sentence; the typed detail
+        # (open violations) rides rec["contract"], never a banner
+        rec["state"] = "COMPOSED_CONTRACT_DOWNGRADED"
+        _delivered_note = DOWNGRADE_CAVEAT_LINE
+    else:
+        rec["state"] = "COMPOSED_CONTRACT_INVALID"
     # item 2: the deterministic tech-sanity record (typed detail;
     # NEVER a gate — the state above stays contract-only)
     _ts_final = (_tech_sanity_findings(
@@ -760,6 +868,8 @@ def compose_answer(problem: Dict[str, Any],
     # plain-language caveats (the typed detail stays in the
     # truncation / contract / tech_sanity metadata above — Art. XXV)
     _caveats: List[str] = []
+    if _delivered_note:
+        _caveats.append(_delivered_note)
     if trunc["n_truncation_retries"]:
         _caveats.append(
             "The first draft was cut off at the model's output "
@@ -771,12 +881,6 @@ def compose_answer(problem: Dict[str, Any],
             "budget and was not used; the answer above is the "
             "complete pre-repair draft, still carrying its open "
             "contract violations.")
-    if rec["state"] == "COMPOSED_CONTRACT_INVALID":
-        _viols = contract.get("violations") or []
-        _caveats.append(
-            "The answer did not fully pass the deterministic format "
-            "check; open violations: "
-            + ("; ".join(_viols) if _viols else "(none recorded)") + ".")
     for _f in _ts_final:
         _caveats.append(_f["plain"])
     if _caveats:
@@ -815,6 +919,23 @@ _ADMISSIBLE_SURVIVED = frozenset({"PASS", "SURVIVED", "SURVIVE"})
 _HYPOTHESIS_STATES = frozenset({"ESCALATED_OBJECTION",
                                 "UNVERIFIED_HYPOTHESIS",
                                 "HYPOTHESIS", "SURVIVED_UNVERIFIED"})
+
+
+def _is_infrastructure_verdict(v: str) -> bool:
+    """Art. LXI typed classes: an evaluator / evaluation / transport
+    failure or an INCOMPLETE_* state is INFRASTRUCTURE, never a
+    scientific rejection. Directive 2 (owner audit round 2026-11-12):
+    the typed no-answer is reserved for scientific kills — an
+    infrastructure-typed verdict on the record-bound raw candidate
+    delivers as a clearly flagged UNVERIFIED hypothesis instead."""
+    u = str(v or "").strip().upper()
+    if not u:
+        return False
+    if u in ("EVALUATOR_CALL_FAILED", "EVALUATION_FAILED",
+             "PROVIDER_UNAVAILABLE", "PENDING"):
+        return True
+    return (u.startswith("EVALUATOR_") or u.startswith("EVALUATION_")
+            or u.startswith("INCOMPLETE_") or u.startswith("PENDING_"))
 
 
 def _non_admissible_reason(v: str) -> str:
@@ -986,28 +1107,34 @@ def _admission_analysis(env_dict: Dict[str, Any],
                 "kill_cause_record": kc}
             rec2["hypothesis_unverified"] = True
             rec2["kill_cause_record"] = kc
-            # the candidate's OWN recorded evidence / contradiction /
-            # technical-gate states, reported (never assumed):
-            ev = ((env_dict.get("adjudication") or {}).get(
-                "evidence_verification") or {})
-            if isinstance(ev, dict) and "verified" in ev:
-                ev_state = "VERIFIED" if ev.get("verified") \
-                    else "NOT_VERIFIED"
-            else:
-                ev_state = "NOT_RECORDED"
-            cons = env_dict.get("contradictions") or {}
-            cons_state = str(cons.get("overall") or cons.get("status")
-                             or "NO_CONTRADICTIONS_RECORDED")
+            cands.append(rec2)
+            return cands, reasons
+        # DIRECTIVE 2 (owner audit round 2026-11-12): the typed
+        # no-answer is reserved for SCIENTIFIC kills. An
+        # infrastructure-typed verdict (evaluator / evaluation /
+        # transport failure, INCOMPLETE_*) on the record-bound raw
+        # candidate is Art. LXI infrastructure — it delivers as a
+        # clearly flagged UNVERIFIED hypothesis (one plain-language
+        # line, never silence, never a scientific claim).
+        if _is_infrastructure_verdict(att) and binding is None:
+            rec2 = dict(raw)
+            rec2["attack_verdict"] = att
+            rec2["verdict"] = att
+            rec2["admission"] = {
+                "class": "HYPOTHESIS",
+                "hypothesis": True,
+                "reason": "VERDICT_IS_INFRASTRUCTURE_NOT_SCIENTIFIC",
+                "binding": "attack_record_bound"}
+            rec2["hypothesis_unverified"] = True
             rec2["own_recorded_states"] = {
-                "evidence_verification": ev_state,
-                "contradictions": cons_state,
+                "evidence_verification": "NOT_RECORDED",
+                "contradictions": "NOT_RECORDED",
                 "technical_gates": {
                     "not_an_intervention":
                         raw.get("not_an_intervention_check",
                                 "NOT_RECORDED"),
                     "anchor_domain":
-                        raw.get("anchor_domain_check", "NOT_RECORDED"),
-                },
+                        raw.get("anchor_domain_check", "NOT_RECORDED")},
             }
             cands.append(rec2)
             return cands, reasons

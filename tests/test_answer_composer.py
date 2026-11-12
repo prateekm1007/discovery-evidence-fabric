@@ -101,8 +101,12 @@ def test_composer_contract_invalid_recorded_honestly():
     # repair still violates: the record says so (never fake-valid).
     # OWNER AUDIT ROUND 2026-11-12, DIRECTIVE 1: compose -> validate ->
     # REPAIR UNTIL VALID — the loop is bounded at MAX_REPAIR_ROUNDS
-    # repairs (call governor <=12 healthy calls/problem); a final
-    # invalid composition is recorded honestly and never delivered.
+    # repairs. DIRECTIVE 2 (same round, DOWNGRADE DON'T DISCARD): a
+    # still-invalid composition is DOWNGRADED (failing EVIDENCE-BACKED
+    # relabeled ASSUMPTION, invalid citations dropped) and DELIVERED
+    # with one plain caveat — the typed violations stay recorded
+    # honestly (never fake-valid), the state is
+    # COMPOSED_CONTRACT_DOWNGRADED.
     from discovery_fabric.engine.answer_composer import MAX_REPAIR_ROUNDS
     bad1 = ("Do maintenance sometimes. "
             "INDICATOR: something vague. THRESHOLD: 9.9 mm/s plain. "
@@ -116,10 +120,12 @@ def test_composer_contract_invalid_recorded_honestly():
     rec = compose_answer(PROBLEM, PACKET, [], None,
                          "predictor-design", llm_generate=llm)
     assert calls["n"] == 1 + MAX_REPAIR_ROUNDS
-    assert rec["state"] == "COMPOSED_CONTRACT_INVALID"
+    assert rec["state"] == "COMPOSED_CONTRACT_DOWNGRADED"
     assert rec["contract"]["valid"] is False
     assert rec["contract"]["violations"]
     assert rec["repair_rounds_used"] == MAX_REPAIR_ROUNDS
+    assert rec["downgrade"]["applied"] is True
+    assert isinstance(rec["answer"], str) and rec["answer"].strip()
 
 
 def test_composer_killed_candidate_never_endorsed():

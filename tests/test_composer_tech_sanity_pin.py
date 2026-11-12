@@ -292,10 +292,12 @@ class TestNeverAGate(unittest.TestCase):
         rec = compose_answer(PROBLEM, PACKET, [], None,
                              "predictor-design", llm_generate=llm,
                              tech_sanity=True)
-        self.assertEqual(rec["state"], "COMPOSE_TRUNCATED")
+        # DIRECTIVE 2 (2026-11-12): a still-truncated draft is
+        # delivered at the last sentence (COMPOSED_TRUNCATED_DELIVERED)
+        self.assertEqual(rec["state"], "COMPOSED_TRUNCATED_DELIVERED")
         self.assertNotIn("tech_sanity", rec,
-                         "no composition -> no check record (the "
-                         "typed detail is the truncation record)")
+                         "no completed composition -> no check record "
+                         "(the typed detail is the truncation record)")
 
 
 if __name__ == "__main__":

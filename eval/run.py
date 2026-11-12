@@ -56,6 +56,41 @@ sys.path.insert(0, str(REPO))
 # AFTER the sys.path insert (the direct-invocation entry point).
 from discovery_fabric.engine.answer_composer import HYPOTHESIS_CAVEAT_LINE
 
+# DIRECTIVE 2 (owner audit round 2026-11-12): the composer states that
+# DELIVER text (each with at most one plain-language caveat). Every
+# other state is the typed no-answer — the delivery rate counts the
+# ratio of these states (+ the flagged-hypothesis deliveries) over all
+# problems (target >= 90%).
+_COMPOSED_DELIVERED_STATES = frozenset({
+    "COMPOSED_CONTRACT_VALID",
+    "COMPOSED_CONTRACT_DOWNGRADED",
+    "COMPOSED_TRUNCATED_DELIVERED",
+})
+
+
+def delivery_rate_from_dirs(pipeline_dirs):
+    """Delivery rate over a run's pipeline dirs: delivered / total.
+    Delivered = the composer record carries a non-empty answer in a
+    _COMPOSED_DELIVERED_STATES state. Typed no-answer (scientific
+    refusals, transport failure) counts as NOT delivered — directive 2
+    keeps the number honest, never gamed (Art. XIX)."""
+    delivered = total = 0
+    for d in pipeline_dirs:
+        total += 1
+        p = Path(d) / "ANSWER_COMPOSED.json"
+        if not p.exists():
+            continue
+        try:
+            rec = json.loads(p.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            continue
+        ans = rec.get("answer")
+        if isinstance(ans, str) and ans.strip() \
+                and rec.get("state") in _COMPOSED_DELIVERED_STATES:
+            delivered += 1
+    return {"delivered": delivered, "total": total,
+            "rate": round(delivered / total, 4) if total else None}
+
 
 def _answer_contract(answer, question_type, packet=None,
                      user_variables=None, clarification=None):
@@ -550,14 +585,16 @@ def _extract_pipeline_answer(out_dir: Path,
     if comp is not None:
         _c_ans = comp.get("answer")
         if _c_ans and str(_c_ans).strip():
-            if comp.get("state") == "COMPOSED_CONTRACT_VALID":
-                # DIRECTIVE 1 (owner audit round 2026-11-12): the
-                # delivered text is CLEAN — no internal state names,
-                # no pipeline-history narration, ONE plain-language
-                # caveat line at most; the typed states (contract
-                # violations, constraint-audit findings, repair
-                # history) ride the record metadata, never the
-                # delivered text (Art. XXV).
+            # DIRECTIVE 2 (owner audit round 2026-11-12): the delivered
+            # classes are the composer's DELIVERED states — valid,
+            # downgraded (unsupported certainty relabeled ASSUMPTION,
+            # invalid citations dropped), or a truncated draft cut at
+            # the last complete sentence. Each ships with at most ONE
+            # plain-language caveat line; the typed states (open
+            # violations, repair history, constraint-audit findings)
+            # ride the record metadata, never the delivered text
+            # (Art. XXV; Art. LXI: infrastructure is never silence).
+            if comp.get("state") in _COMPOSED_DELIVERED_STATES:
                 _delivered = str(_c_ans)
                 _cav = [str(c) for c in (comp.get("caveats") or [])
                         if isinstance(c, str) and c.strip()]
@@ -571,14 +608,11 @@ def _extract_pipeline_answer(out_dir: Path,
                 if _plain:
                     _delivered = _delivered.rstrip() + "\n\n" + _plain[0]
                 return _delivered[:6000]
-            # DIRECTIVE 1 (owner audit round 2026-11-12): a
-            # contract-invalid composition is NEVER delivered — not
-            # with a banner, not bare. The banner the auditor saw
-            # shipped ("CONTRACT-INVALID COMPOSITION (...)") is
-            # retired (Art. LXIV); the typed state rides the record
-            # and the delivered answer is the typed no-answer (an
-            # answer that fails its own checker is not an answer).
-            return None
+            # a state with no delivered text (transport failure, the
+            # composer's typed scientific refusals) is the typed
+            # no-answer: the label names the actual delivery (Art. X)
+            return ("typed_no_answer:"
+                    + str(comp.get("state") or "FAILED_EXPLICIT"))
         if not legacy_diagnostic:
             # P0-4 normal path: the composer ran and produced no
             # admissible answer — typed no-answer state, NEVER a
@@ -3023,10 +3057,23 @@ def main(argv=None) -> int:
     if args.child:
         return 0
 
+    # DIRECTIVE 2 (owner audit round 2026-11-12): the delivery rate
+    # rides the run summary — delivered / total pipeline problems for
+    # THIS run (the composer's delivered states + hypothesis-class
+    # deliveries over every problem attempted; never recomputed from
+    # memory — read from the durable ANSWER_COMPOSED.json records).
+    _drate = None
+    try:
+        _dirs = [p for p in _run_dir().glob("*") if p.is_dir()
+                 and (p / "ANSWER_COMPOSED.json").exists()]
+        _drate = delivery_rate_from_dirs(_dirs)
+    except Exception as _exc:  # noqa: BLE001 — never fatal
+        _drate = {"error": str(_exc)[:120]}
     table = build_score_table(route_rec or {}, judge_route or {},
                               [p["problem_id"] for p in problems],
                               problems=problems,
                               holdout=bool(args.holdout))
+    table["delivery_rate"] = _drate
     if args.holdout:
         # sealed outputs never touch the repo: table lives inside the
         # gitignored holdout run dir

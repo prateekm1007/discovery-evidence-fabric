@@ -198,6 +198,19 @@ class TestCleanOutput:
         assert rec["valid"] is True, rec["violations"]
 
     def test_contract_invalid_never_delivered(self):
+        # AMENDED R6 auditor round 2026-11-12 (owner directive 2,
+        # DOWNGRADE DON'T DISCARD): the composer now runs the
+        # deterministic downgrade on EVERY contract-invalid
+        # composition, so the state "COMPOSED_CONTRACT_INVALID" is
+        # never emitted by the current engine — the delivered classes
+        # are COMPOSED_CONTRACT_VALID / COMPOSED_CONTRACT_DOWNGRADED /
+        # COMPOSED_TRUNCATED_DELIVERED, and a typed no-answer is
+        # reserved for scientific refusals + transport failure. The
+        # legacy state (pre-downgrade records only) reads back as the
+        # typed label naming the actual delivery, never silently
+        # blank; the downgraded + truncated classes DELIVER with the
+        # one plain caveat (Art. XXV: the reader matches the
+        # composer's state machine, it does not rewrite history).
         import eval.run as er
         import tempfile
         with tempfile.TemporaryDirectory() as td:
@@ -207,7 +220,51 @@ class TestCleanOutput:
                 "state": "COMPOSED_CONTRACT_INVALID",
                 "answer": "SOME TEXT",
                 "contract": {"violations": ["v1"]}}), encoding="utf-8")
-            assert er._extract_pipeline_answer(d) is None
+            assert er._extract_pipeline_answer(d) == \
+                "typed_no_answer:COMPOSED_CONTRACT_INVALID"
+
+    def test_downgraded_composition_delivers_with_one_caveat(self):
+        # directive 2 (DOWNGRADE DON'T DISCARD): a composition whose
+        # failing EVIDENCE-BACKED claims were relabeled ASSUMPTION and
+        # whose invalid citations were dropped SHIPS with the one
+        # plain-language caveat — it is never discarded into a blank.
+        import eval.run as er
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            d = Path(td) / "run"
+            d.mkdir()
+            (d / "ANSWER_COMPOSED.json").write_text(json.dumps({
+                "state": "COMPOSED_CONTRACT_DOWNGRADED",
+                "answer": "INDICATOR: x 4.5 mm/s — ASSUMPTION",
+                "caveats": ["Note: some supporting details in this "
+                            "answer could not be verified against the "
+                            "retrieved records and are labeled as "
+                            "engineering assumptions; the "
+                            "falsification test is the precondition "
+                            "for relying on them."],
+                "downgrade": {"applied": True, "n_relabels": 1},
+                "contract": {"valid": True, "violations": []}}),
+                encoding="utf-8")
+            out = er._extract_pipeline_answer(d)
+            assert out is not None and "ASSUMPTION" in out
+            assert out.count("Note:") == 1
+
+    def test_truncated_delivered_state_ships(self):
+        # directive 2: a truncated draft cut at the last complete
+        # sentence SHIPS (one plain caveat) — the blank is gone.
+        import eval.run as er
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            d = Path(td) / "run"
+            d.mkdir()
+            (d / "ANSWER_COMPOSED.json").write_text(json.dumps({
+                "state": "COMPOSED_TRUNCATED_DELIVERED",
+                "answer": "INDICATOR: x 4.5 mm/s — ASSUMPTION.",
+                "caveats": ["Note: this answer was shortened at the "
+                            "model's output budget and may be "
+                            "incomplete."]}), encoding="utf-8")
+            out = er._extract_pipeline_answer(d)
+            assert out is not None and "ASSUMPTION" in out
 
     def test_repair_loop_is_bounded_until_valid(self):
         # compose -> validate -> repair UNTIL valid: the loop ends on

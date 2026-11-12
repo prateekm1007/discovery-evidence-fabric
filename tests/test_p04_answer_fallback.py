@@ -60,15 +60,21 @@ def test_composed_answer_is_the_normal_path_answer(tmp_path):
 def test_contract_invalid_composition_never_delivered(tmp_path):
     # OWNER AUDIT ROUND 2026-11-12, DIRECTIVE 1 (Art. LXIV retire-
     # superseded): the "CONTRACT-INVALID COMPOSITION (...)" banner the
-    # auditor saw shipped in 4 of 9 pairs is RETIRED — a composition
-    # that fails its own deterministic checker is NEVER delivered, not
-    # with a banner and not bare; the typed state rides the record and
-    # the delivered answer is the typed no-answer.
+    # auditor saw shipped in 4 of 9 pairs is RETIRED — never delivered
+    # with a banner.
+    # AMENDED same round, owner directive 2 (DOWNGRADE DON'T DISCARD):
+    # the composer now runs the deterministic downgrade on every
+    # contract-invalid composition (failing EVIDENCE-BACKED claims
+    # relabeled ASSUMPTION, invalid citations dropped) and SHIPS the
+    # result with one plain caveat as COMPOSED_CONTRACT_DOWNGRADED —
+    # so this legacy state is never emitted by the current engine.
+    # The reader still reports it truthfully: the typed label names
+    # the actual delivery (never a blank, never the old banner).
     d = _mk_run(tmp_path, {"state": "COMPOSED_CONTRACT_INVALID",
                            "answer": "COMPOSED ANSWER",
                            "contract": {"violations": ["v1", "v2"]}})
     ans = er._extract_pipeline_answer(d)
-    assert ans is None
+    assert ans == "typed_no_answer:COMPOSED_CONTRACT_INVALID", ans
     src = er._answer_source(d)
     assert src.startswith("typed_no_answer:COMPOSED_CONTRACT_INVALID"), src
 

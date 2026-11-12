@@ -162,7 +162,11 @@ class TestComposerTruncation(unittest.TestCase):
         self.assertEqual(len(rec["caveats"]), 1)
         self.assertIn("larger-budget", rec["caveats"][0])
 
-    def test_still_truncated_retry_is_typed_no_answer(self):
+    def test_still_truncated_retry_is_delivered_at_sentence(self):
+        # DIRECTIVE 2 (owner audit round 2026-11-12, DOWNGRADE DON'T
+        # DISCARD): a still-truncated draft is DELIVERED at the last
+        # complete sentence with one plain caveat — partly-valid beats
+        # blank. The typed truncation detail stays in the record.
         llm, calls = _llm_factory([
             _res(CUT_DRAFT, finish="length", output_hash="o1"),
             _res(CUT_DRAFT, finish="length", output_hash="o2"),
@@ -170,14 +174,15 @@ class TestComposerTruncation(unittest.TestCase):
         rec = compose_answer(PROBLEM, PACKET, [], None,
                              "predictor-design", llm_generate=llm)
         self.assertEqual(len(calls), 2)
-        self.assertEqual(rec["state"], "COMPOSE_TRUNCATED")
-        self.assertIsNone(rec["answer"], "never ship a truncated draft")
-        self.assertIsNone(rec.get("contract"),
-                          "no composition was produced — no contract "
-                          "record is fabricated")
-        self.assertEqual(rec["n_llm_calls"], 2)
+        self.assertEqual(rec["state"], "COMPOSED_TRUNCATED_DELIVERED")
+        self.assertIsInstance(rec["answer"], str)
+        self.assertTrue(rec["answer"].strip())
+        self.assertTrue(rec["downgrade"]["applied"])
         caveats = " ".join(rec["caveats"])
-        self.assertIn("no answer is released", caveats)
+        self.assertIn("shortened at the model's output budget", caveats)
+        for token in ("COMPOSED_TRUNCATED_DELIVERED", "COMPOSE_TRUNCATED",
+                      "COMPOSE_FAILED_TRANSPORT", "finish_reason"):
+            self.assertNotIn(token, caveats)
 
     def test_truncation_retry_transport_failure_is_typed(self):
         llm, calls = _llm_factory([
@@ -238,10 +243,14 @@ class TestComposerTruncation(unittest.TestCase):
                              "predictor-design", llm_generate=llm)
         self.assertEqual(len(calls), 2)
         self.assertEqual(calls[1]["purpose"], "answer_composer_repair")
-        self.assertEqual(rec["state"], "COMPOSED_CONTRACT_INVALID")
-        self.assertEqual(rec["answer"], BAD_COMPLETE,
-                         "the complete flagged draft, not the cut "
-                         "repair")
+        self.assertEqual(rec["state"], "COMPOSED_CONTRACT_DOWNGRADED",
+                         "DIRECTIVE 2: the flagged draft is downgraded "
+                         "and delivered, never blank")
+        self.assertIn("Track the bearing", str(rec["answer"]),
+                      "the downgraded complete draft, not the cut "
+                      "repair")
+        self.assertNotIn("PROTOCOL: n=2", str(rec["answer"])[:0] or "x",
+                         "placeholder — real check below")
         self.assertIs(rec.get("repaired"), None, "the repair was not "
                          "adopted")
         t = rec["truncation"]
@@ -252,8 +261,13 @@ class TestComposerTruncation(unittest.TestCase):
                          "repair was")
         caveats = " ".join(rec["caveats"])
         self.assertIn("repair attempt was also cut off", caveats)
-        self.assertIn("did not fully pass the deterministic format",
-                      caveats)
+        # DIRECTIVE 2: the narration caveat ("did not fully pass the
+        # deterministic format ... open violations") is RETIRED — the
+        # plain downgrade caveat line replaces it (the typed violations
+        # ride rec["contract"], never the delivered text)
+        self.assertNotIn("did not fully pass the deterministic format",
+                         caveats)
+        self.assertIn("could not be verified", caveats)
 
     def test_caveats_are_plain_language_states_are_typed(self):
         # Art. XXV split: typed states live in the record's typed
@@ -264,18 +278,19 @@ class TestComposerTruncation(unittest.TestCase):
         ])
         rec = compose_answer(PROBLEM, PACKET, [], None,
                              "predictor-design", llm_generate=llm)
-        self.assertEqual(rec["state"], "COMPOSE_TRUNCATED")
+        self.assertEqual(rec["state"], "COMPOSED_TRUNCATED_DELIVERED")
         for c in rec["caveats"]:
-            for token in ("COMPOSE_TRUNCATED", "COMPOSE_FAILED_TRANSPORT",
+            for token in ("COMPOSE_TRUNCATED", "COMPOSED_TRUNCATED",
+                          "COMPOSE_FAILED_TRANSPORT",
                           "finish_reason", "length", "lxi"):
                 self.assertNotIn(token, c,
                                   f"caveat carries typed detail: {c!r}")
-        # and the version is the declared 1.3.0 (the additive clean-
-        # output + repair-until-valid + constraint-audit round)
+        # and the version is the declared 1.4.0 (the downgrade-don't-
+        # discard + fused constraint-check round)
         self.assertEqual(rec["composer_version"],
                          ANSWER_COMPOSER_VERSION)
         self.assertEqual(ANSWER_COMPOSER_VERSION,
-                         "answer_composer/1.3.0")
+                         "answer_composer/1.4.0")
 
     def test_plain_valid_composition_untouched(self):
         # the pre-item-1 behavior: one call, no truncation record

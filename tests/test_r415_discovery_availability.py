@@ -73,6 +73,16 @@ def hermetic(monkeypatch, tmp_path):
     without this pin the default policy would rightly refuse every paid
     rung and the ladder mechanics could never be exercised)."""
     monkeypatch.setenv("ENGINE_MODEL_COST_POLICY", "UNRESTRICTED")
+    # R6 (2026-11-12, Art. IX hermeticity): eval.run's module import
+    # does os.environ.setdefault("LOCAL_QWEN_BASE_URL", ...) — once any
+    # test in the session imports it (the R6 clean-output battery,
+    # p04, ...), the KEYLESS localqwen rung becomes ADMITTED for every
+    # later hermetic routing test: the GONE failover battery measured
+    # 4 attempts instead of 3 (the extra qwen3-1.7b attempt). The
+    # localqwen availability IS that env (llm_registry: "No
+    # credential: availability is the LOCAL_QWEN_BASE_URL"), so the
+    # fixture scrubs it exactly like the provider keys below.
+    monkeypatch.delenv("LOCAL_QWEN_BASE_URL", raising=False)
     tmp = Path(tmp_path)
     monkeypatch.setattr(mr, "LEDGER", mr.RoutingLedger(
         path=tmp / "ledger.jsonl"))

@@ -914,3 +914,253 @@ def independent_attack(candidate: Dict[str, Any],
         "ABSTAIN_DEMOTED": len(demoted),
         "INVALID": len(invalids)}
     return record
+
+
+# ---------------------------------------------------------------------------
+# BATCH ATTACK (owner audit round 2026-11-12, directive 3: "batch the
+# attack across candidates in ONE call") — one adversarial call carries
+# EVERY candidate the gauntlet would have attacked separately. The
+# verdict contract, the grounding check, the anchor + accommodation
+# discipline, and the record shape are IDENTICAL per candidate (each
+# candidate's record is the same shape independent_attack() returns, so
+# downstream consumers — kill-cause classification, admission analysis,
+# resume reuse — cannot tell the transport apart except by the batch
+# marker). Independence: one attacker reasoning context for the batch,
+# disclosed per record (the generator context never attacks — Art. XLV
+# is preserved: the attacker is a different reasoning context; on one
+# rung it is SEPARATE_CONTEXT, recorded, never claimed as
+# provider separation).
+ATTACK_BATCH_VERSION = "independent_attack_batch/1.0.0"
+
+_ATTACK_BATCH_HEADER = """You are a hostile independent reviewer attacking {n} engineering invention candidates. You did NOT propose any of them and you owe them nothing. Find the strongest reasons EACH fails.
+
+Attack EACH candidate independently below, in order. For candidate i, output the section header
+== CANDIDATE {i_fmt} ==
+followed by the SAME six verdict lines you would produce for a single candidate:
+
+MECHANISM_FAILURE: <KILL, RISK, or SURVIVE> — <specific basis> GROUNDED_IN: <binding>
+BOUNDARY_CONDITION_FAILURE: <KILL, RISK, or SURVIVE> — <specific basis> GROUNDED_IN: <binding>
+EVIDENCE_CONTRADICTION: <KILL, RISK, or SURVIVE> — <specific basis> GROUNDED_IN: <binding>
+BASELINE_EQUIVALENCE: <KILL, RISK, or SURVIVE> — <specific basis> GROUNDED_IN: <binding>
+IMPLEMENTATION_IMPOSSIBILITY: <KILL, RISK, or SURVIVE> — <specific basis> GROUNDED_IN: <binding>
+MEASUREMENT_AMBIGUITY: <KILL, RISK, or SURVIVE> — <specific basis> GROUNDED_IN: <binding>
+
+A KILL verdict MUST cite a specific, concrete failure basis AND bind it to something checkable, stated at the end of the line as:
+GROUNDED_IN: EVIDENCE <record id from the bundle> | RECORD "<exact quoted span from the candidate's own claims>" | COMPUTATION <the numbers and the comparison between them> | SCOPE <the boundary condition clause violated>
+A KILL grounded only in the ABSENCE of evidence is invalid: absence of evidence is uncertainty, not failure. Speculative objections (may / might / could, without a bound ground) are RISK, not KILL.
+THE KILL STANDARD (burden of proof): a KILL is warranted only if the candidate's own record cannot be true as stated — the defect is demonstrable from the candidate's own claims or held evidence. An objection the record already accommodates is RISK, never KILL: a failure mode the candidate itself discloses and disposes of; a quantity the record itself hedges (roughly, approximately, a band); an element the record never claimed to carry; a demand beyond the declared boundary conditions; a premise resting on what is merely typical in practice rather than on the record or the evidence. State the strongest objection you can WITHIN that standard, for every candidate.
+"""
+
+_ATTACK_BATCH_CAND = """== CANDIDATE {idx} == (id: {cid})
+- Mechanism: {mechanism}
+- Intervention: {intervention}
+- Predicted effect: {predicted_effect}
+- Testable prediction: {testable_prediction}
+- Known failure modes (claimed by the generator): {known_failure_modes}
+"""
+
+
+def independent_attack_batch(candidates: List[Dict[str, Any]],
+                             problem: Dict[str, Any],
+                             evidence: List[Dict[str, Any]],
+                             generator_provider: Optional[str],
+                             attack_purpose: str = "independent_attack",
+                             llm_generate=None,
+                             ) -> Dict[str, Any]:
+    """ONE adversarial call for ALL candidates (directive 3).
+
+    `llm_generate` is injectable for tests (the engine's
+    mechanism_space.llm_generate by default — ONE transport path,
+    Art. X — the same injection contract as compose_answer).
+
+    Returns {batch: True, batch_version, n_candidates, transport: {...},
+             records: {candidate_id: <the independent_attack-shaped
+             record>}, unparsed: [candidate_id, ...]}.
+
+    A candidate whose section is missing or unparseable gets the typed
+    ATTACK_INCOMPLETE record (never killed by an attack that did not
+    read it — Art. XXIX, unchanged)."""
+    from .mechanism_space import utc_now
+    if llm_generate is None:
+        from .mechanism_space import llm_generate as _lg
+    else:
+        _lg = llm_generate
+    ev_lines = []
+    for e in (evidence or [])[:5]:
+        ev_lines.append(
+            f"- [{e.get('id') or e.get('item_id')}] "
+            f"{str(e.get('title') or '')[:110]}")
+    evidence_text = "\n".join(ev_lines) if ev_lines else "(none held)"
+    prompt = _ATTACK_BATCH_HEADER.format(
+        n=len(candidates), i_fmt="<i>") + "\n".join(
+        _ATTACK_BATCH_CAND.format(
+            idx=i, cid=str(c.get("candidate_id") or f"cand{i}"),
+            mechanism=str(c.get("mechanism") or "")[:600],
+            intervention=str(c.get("intervention") or "")[:600],
+            predicted_effect=str(c.get("predicted_effect") or "")[:400],
+            testable_prediction=str(
+                c.get("testable_prediction") or "")[:400],
+            known_failure_modes="; ".join(
+                c.get("known_failure_modes") or [])[:400] or "(none)")
+        for i, c in enumerate(candidates, 1))
+    prompt += (f"\n\nPROBLEM:\n- Device: {problem.get('device', '')}\n"
+               f"- Failure: {problem.get('failure', '')}\n"
+               f"- Baseline (the un-invented standard): "
+               f"{_baseline_text(problem)}\n\nEVIDENCE HELD (the "
+               "candidates' own evidence bundle):\n" + evidence_text)
+    meta = _lg(
+        prompt,
+        system="You are a hostile independent engineering reviewer. "
+               "Attack every candidate as instructed. Every KILL must "
+               "cite a specific concrete basis and bind it (GROUNDED_"
+               "IN: evidence id, quoted record span, the numbers, or "
+               "the violated boundary clause).",
+        purpose=attack_purpose, exclude_providers=[generator_provider]
+        if generator_provider else None,
+        max_tokens=min(1600 * max(1, len(candidates)), 4000))
+    transport = {
+        "batch_version": ATTACK_BATCH_VERSION,
+        "n_candidates": len(candidates),
+        "attacker_provider": meta.get("provider"),
+        "attacker_model": meta.get("model"),
+        "prompt_hash": meta.get("prompt_hash"),
+        "output_hash": meta.get("output_hash"),
+        "llm_status": meta.get("status"),
+        "independence_mode": (
+            "SEPARATE_PROVIDER"
+            if (generator_provider and meta.get("provider")
+                and meta.get("provider") != generator_provider)
+            else "SEPARATE_CONTEXT"),
+        "attacked_at": utc_now(),
+    }
+    out: Dict[str, Any] = {"batch": True, "batch_version":
+                           ATTACK_BATCH_VERSION,
+                           "n_candidates": len(candidates),
+                           "transport": transport, "records": {},
+                           "unparsed": []}
+    if not isinstance(meta, dict) or not meta.get("ok"):
+        for c in candidates:
+            cid = str(c.get("candidate_id") or "")
+            rec = {
+                "attack_version": ATTACK_VERSION,
+                "attack_batch": {"batch_version": ATTACK_BATCH_VERSION,
+                                 "transport": transport},
+                "attack_purpose": attack_purpose,
+                "candidate_id": cid,
+                "generator_provider": generator_provider,
+                "attacker_provider": transport["attacker_provider"],
+                "attacker_model": transport["attacker_model"],
+                "independence_mode": transport["independence_mode"],
+                "llm_status": transport["llm_status"],
+                "state": "ATTACK_INCOMPLETE",
+                "items": [], "overall": "ATTACK_INCOMPLETE",
+                "attacked_at": transport["attacked_at"],
+                "note": ("the batched independent attack could not run "
+                         f"(LLM unavailable: {transport['llm_status']}) "
+                         "— the candidate is NOT killed by an attack "
+                         "that did not execute (Art. XXIX)")}
+            out["records"][cid] = rec
+        return out
+    content = meta.get("content") or ""
+    # split the response into per-candidate sections
+    sections: Dict[str, str] = {}
+    cur = None
+    buf: List[str] = []
+    import re as _re
+    for ln in content.split("\n"):
+        m = _re.match(r"^\s*==\s*CANDIDATE\s+(\S+)\s*==", ln)
+        if m:
+            if cur is not None:
+                sections[cur] = "\n".join(buf)
+            cur = m.group(1).strip()
+            buf = []
+        elif cur is not None:
+            buf.append(ln)
+    if cur is not None:
+        sections[cur] = "\n".join(buf)
+    for i, c in enumerate(candidates, 1):
+        cid = str(c.get("candidate_id") or "")
+        sec = sections.get(cid) or sections.get(str(i)) or ""
+        if not sec.strip():
+            out["unparsed"].append(cid)
+            out["records"][cid] = {
+                "attack_version": ATTACK_VERSION,
+                "attack_batch": {"batch_version": ATTACK_BATCH_VERSION,
+                                 "transport": transport},
+                "attack_purpose": attack_purpose,
+                "candidate_id": cid,
+                "generator_provider": generator_provider,
+                "attacker_provider": transport["attacker_provider"],
+                "attacker_model": transport["attacker_model"],
+                "independence_mode": transport["independence_mode"],
+                "llm_status": transport["llm_status"],
+                "state": "ATTACK_INCOMPLETE",
+                "items": [], "overall": "ATTACK_INCOMPLETE",
+                "attacked_at": transport["attacked_at"],
+                "note": ("the batched attack returned no readable "
+                         "section for this candidate — typed "
+                         "ATTACK_INCOMPLETE, never a kill (Art. XXIX)")}
+            continue
+        items = _validate_parsed(_parse_attack(sec), c, evidence or [])
+        interventions = _adjudicate_interventions(
+            _parse_interventions(sec), c, evidence or [])
+        valid = [x for x in items if x["verdict"] in VALID_CLASS_VERDICTS]
+        kills = [x for x in valid if x["verdict"] == "KILL"]
+        demoted = [x for x in items
+                   if x["verdict"] == DEMOTED_CLASS_VERDICT]
+        risks = [x for x in valid if x["verdict"] == "RISK"]
+        invalids = [x for x in items if x["verdict"] == "INVALID"]
+        rec: Dict[str, Any] = {
+            "attack_version": ATTACK_VERSION,
+            "attack_batch": {"batch_version": ATTACK_BATCH_VERSION,
+                             "transport": transport},
+            "attack_purpose": attack_purpose,
+            "candidate_id": cid,
+            "generator_provider": generator_provider,
+            "attacker_provider": transport["attacker_provider"],
+            "attacker_model": transport["attacker_model"],
+            "independence_mode": transport["independence_mode"],
+            "independence_note": (
+                "the batched attacker ran in an independent reasoning "
+                "context (fresh adversarial conversation, generator "
+                "reasoning never shown)" if
+                transport["independence_mode"] == "SEPARATE_CONTEXT"
+                else "the attacker ran on a different provider than "
+                     "the candidate's generator"),
+            "prompt_hash": transport["prompt_hash"],
+            "output_hash": transport["output_hash"],
+            "llm_status": transport["llm_status"],
+            "ring_pin": {"requested": None, "mode": "PRODUCTION_CASCADE",
+                         "served_provider": transport["attacker_provider"],
+                         "served_model": transport["attacker_model"],
+                         "pin_status": None,
+                         "note": ("production attacks keep the "
+                                  "availability cascade")},
+            "attacked_at": transport["attacked_at"],
+            "items": items,
+            "intervention_suggestions": interventions,
+            "counts": {"KILL": len(kills), "RISK": len(risks),
+                       "SURVIVE": len([x for x in valid
+                                       if x["verdict"] == "SURVIVE"]),
+                       "ABSTAIN_DEMOTED": len(demoted),
+                       "INVALID": len(invalids)}}
+        if kills:
+            rec["state"] = "ATTACK_RUN"
+            rec["overall"] = "KILLED"
+            rec["kill_basis"] = [
+                {"attack_class": k["attack_class"], "basis": k["basis"],
+                 "grounding": k.get("grounding")} for k in kills]
+        elif demoted:
+            rec["state"] = "ATTACK_RUN"
+            rec["overall"] = OVERALL_ESCALATED
+            rec["preserved_objections"] = [
+                {"attack_class": d["attack_class"], "basis": d["basis"],
+                 "grounding": d.get("grounding")} for d in demoted]
+        elif risks or invalids:
+            rec["state"] = "ATTACK_RUN"
+            rec["overall"] = "UNCERTAIN"
+        else:
+            rec["state"] = "ATTACK_RUN"
+            rec["overall"] = "SURVIVED"
+        out["records"][cid] = rec
+    return out
