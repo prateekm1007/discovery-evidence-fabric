@@ -1647,6 +1647,24 @@ def generate(prompt: str, system: str = "",
     _explicit_override = bool(
         hard_pin_provider
         or getattr(policy, "operator_override", False))
+    # R6 owner round 2026-11-12 (measured 2026-11-12, the fu-001
+    # successor smoke): with an ENGINE_*_PROVIDER pin naming provider A
+    # while A is PROVIDER_UNAVAILABLE on the host, the cost-policy
+    # extension AND the rung filter kept RETIRED providers the operator
+    # never named — agnes (429 "1 request per 3 minutes") served the
+    # synthesis live (14:55:26), broke the per-problem healthy cap, and
+    # the evaluator was then refused (EVALUATOR_CALL_FAILED -> composer
+    # NO_ADMISSIBLE_CANDIDATES -> answer=None -> "pipeline answer
+    # missing"). The R519 §5 explicit-override KEEP is now SCOPED to
+    # the operator-NAMED providers themselves (the policy preferred
+    # list ∪ the hard pin): every other candidate — including the
+    # whole cost-policy extension and the ladder's LAST_RESORT band —
+    # gets ORDINARY retirement semantics. A named retired pin still
+    # rides (recorded, never silent); a never-named retired member is
+    # never re-admitted.
+    _named_keep = set(getattr(policy, "preferred_providers", None) or [])
+    if hard_pin_provider:
+        _named_keep.add(hard_pin_provider)
     retirement_events: List[Dict[str, Any]] = []
     # R530 §3 subspan B: chain construction (policy preferred list
     # or role order + cooldown demotion). The nested
@@ -1707,19 +1725,27 @@ def generate(prompt: str, system: str = "",
     if cost_policy_chain_extension:
         # R530 §3: the extension block is subspan D exclusive of the
         # nested subspan-C retirement call (same exclusive pattern
-        # as B).
+        # as B). R6 owner round 2026-11-12: the extension's retirement
+        # filter uses the SCOPED keep (named providers only) — never
+        # the blanket explicit_override keep (see _named_keep above).
         _tD1 = time.perf_counter()
         _cD1 = _sC_retirement_s
-        # R519 §7: the cost extension also passes through the single
-        # authority so an exhausted ordinary chain cannot silently
-        # re-promote a retired provider. Under an explicit override the
-        # retired provider is kept and the kept event is recorded.
         _chain_role = role or role_for_purpose(
             _purpose_tag0) or ROLE_SYNTHESIS
         _tC0 = time.perf_counter()
-        cost_policy_chain_extension, _rr = apply_route_retirement(
-            cost_policy_chain_extension, role=_chain_role,
-            purpose=_purpose_tag0, explicit_override=_explicit_override)
+        if _explicit_override and _named_keep:
+            _named_ext = [p for p in cost_policy_chain_extension
+                          if p in _named_keep]
+            _rest_ext = [p for p in cost_policy_chain_extension
+                         if p not in _named_keep]
+            _rest_ext, _rr = apply_route_retirement(
+                _rest_ext, role=_chain_role, purpose=_purpose_tag0,
+                explicit_override=False)
+            cost_policy_chain_extension = _named_ext + _rest_ext
+        else:
+            cost_policy_chain_extension, _rr = apply_route_retirement(
+                cost_policy_chain_extension, role=_chain_role,
+                purpose=_purpose_tag0, explicit_override=False)
         _sC_retirement_s += time.perf_counter() - _tC0
         retirement_events.extend(_rr)
         chain = list(cost_policy_chain_extension)
@@ -1813,11 +1839,11 @@ def generate(prompt: str, system: str = "",
     rungs = _rungs_kept
     ladder.setdefault("cost_policy", _cost_policy.active_policy())
     ladder.setdefault("cost_policy_rung_refusals", _rung_refusals)
-    # R519 §7: the rung list is ALSO routed through the single authority.
-    # The ladder's LAST_RESORT band can add a retired provider the chain
-    # never asked for; ordinary routing must not reach it. Under an
-    # explicit override (hard_pin_provider / operator_override / env pin)
-    # the retired provider is kept and the kept event is recorded.
+    # R519 §7 (R6 owner round 2026-11-12): the rung list passes through
+    # the same SCOPED keep — the ladder's LAST_RESORT band can add a
+    # retired provider the chain never asked for; ordinary routing must
+    # not reach it. Only the operator-NAMED providers ride the keep
+    # (recorded); everyone else gets ordinary retirement.
     _retire_role = role or role_for_purpose(purpose_tag) or ROLE_SYNTHESIS
     _rung_provider_order: List[str] = []
     for provider_id, _model_id, _r in rungs:
@@ -1825,9 +1851,18 @@ def generate(prompt: str, system: str = "",
             _rung_provider_order.append(provider_id)
     # R530 §3 subspan C (site 3): rung-list retirement filter.
     _tC0 = time.perf_counter()
-    _allowed_providers, _rr = apply_route_retirement(
-        _rung_provider_order, role=_retire_role, purpose=purpose_tag,
-        explicit_override=bool(hard_pin_provider) or _explicit_override)
+    if _explicit_override and _named_keep:
+        _named_r = [p for p in _rung_provider_order if p in _named_keep]
+        _rest_r = [p for p in _rung_provider_order
+                   if p not in _named_keep]
+        _rest_r, _rr = apply_route_retirement(
+            _rest_r, role=_retire_role, purpose=purpose_tag,
+            explicit_override=False)
+        _allowed_providers = _named_r + _rest_r
+    else:
+        _allowed_providers, _rr = apply_route_retirement(
+            _rung_provider_order, role=_retire_role, purpose=purpose_tag,
+            explicit_override=bool(hard_pin_provider) or _explicit_override)
     _sC_retirement_s += time.perf_counter() - _tC0
     retirement_events.extend(_rr)
     _allowed_set = set(_allowed_providers)

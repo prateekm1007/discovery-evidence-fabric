@@ -1484,6 +1484,13 @@ def _preflight_operator_batch(ops: List[Dict[str, Any]],
         "prompt_sha256": meta.get("prompt_hash"),
         "purpose": "operator_batch_instantiation",
         "n_sections_requested": len(served_pairs),
+        # R6 owner round 2026-11-12: the failure TYPE and the per-hop
+        # route ride the record (typed visibility) — an empty/refused
+        # call is the one fact the next decision depends on (batch on
+        # the stem vs the legacy per-pair path), and it must never
+        # need a journal dive. REAL to_meta() keys only.
+        "failure_type": meta.get("failure_type"),
+        "provider_route": meta.get("provider_route"),
     }
     if not meta.get("ok"):
         record["note"] = ("batch call failed typed — every pair falls "
