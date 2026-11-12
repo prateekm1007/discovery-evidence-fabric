@@ -144,7 +144,7 @@ class TestComposerTruncation(unittest.TestCase):
         self.assertEqual(calls[0]["max_tokens"], ac.COMPOSE_MAX_TOKENS)
         self.assertEqual(calls[1]["purpose"],
                          "answer_composer_truncation")
-        self.assertEqual(calls[1]["max_tokens"], 2000,
+        self.assertEqual(calls[1]["max_tokens"], ac.COMPOSE_MAX_TOKENS * ac._TRUNCATION_BUDGET_MULTIPLIER,
                          "the recorded 2x larger budget")
         self.assertEqual(rec["state"], "COMPOSED_CONTRACT_VALID")
         self.assertEqual(rec["answer"], VALID_ANSWER)
@@ -154,7 +154,9 @@ class TestComposerTruncation(unittest.TestCase):
         self.assertEqual(t["first_call_finish_reason"], "length")
         self.assertIs(t["first_call_truncated"], True)
         self.assertEqual(t["n_truncation_retries"], 1)
-        self.assertEqual(t["retry_max_tokens"], 2000)
+        self.assertEqual(t["retry_max_tokens"],
+                         ac.COMPOSE_MAX_TOKENS
+                         * ac._TRUNCATION_BUDGET_MULTIPLIER)
         self.assertIs(t["retry_truncated"], False)
         self.assertEqual(rec["n_llm_calls"], 2)
         self.assertEqual(len(rec["caveats"]), 1)
