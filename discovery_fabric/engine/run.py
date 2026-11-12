@@ -823,6 +823,7 @@ class EngineRun:
         # persisted beside the final state and travels on the manifest —
         # every saved call and every typed stop is measurable per run
         # (Art. XXV: measured, disclosed).
+        from . import llm_economy as _econ
         _econ_snap = _econ.snapshot()
         self._persist("LLM_ECONOMY.json", _econ_snap)
         manifest["llm_economy"] = _econ_snap
