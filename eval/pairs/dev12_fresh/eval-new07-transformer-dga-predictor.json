@@ -1,55 +1,51 @@
 {
  "problem_id": "eval-new07-transformer-dga-predictor",
- "commit": "977851bc16a5",
- "run_id": "r1-pipeline+baseline+judge-2026-11-12051342000",
+ "commit": "1fcf5fe53a49",
+ "run_id": "r1-pipeline+baseline+judge-2026-11-12165424000",
  "dirty_tree": true,
  "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
  "clarification_answer": null,
- "baseline_answer": "**Proposed Leading Indicator:**\nThe most cost-effective predictor is the **Rate of Change of Top-Oil Temperature (\u0394T/\u0394t) normalized by Load Current**, specifically analyzing the **thermal time-constant shift** over a 24-hour rolling window.\n\n**Rationale & Evidence:**\n1.  **Sensor Availability & Cost:** The user already has top-oil temperature, load current, and ambient temperature sensors. No new hardware is required. This is significantly cheaper than installing online Partial Discharge (PD) sensors or DGA sensors.\n2.  **Physics of the Fault:** Incipient thermal faults (e.g., loose connections, hotspot formation) or progressive partial discharges cause localized heating. While the bulk oil temperature may remain stable due to large thermal mass, the *response lag* (time constant) between load changes and temperature changes will alter if the internal cooling efficiency drops due to blockages, sludge, or hotspots acting as heat sources.\n3.  **Literature Support:**\n    *   **[crossref: Predicting transformer incipient faults by dissolved gas in oil analysis]** confirms that gas accumulation is the lagging indicator. The goal is to detect the *cause* (thermal/electrical stress) before gas reaches detection limits.\n    *   **[europepmc: Advancing Power Transformer Cooling...]** highlights that fluid degradation reduces thermal conductivity and increases viscosity, which alters cooling dynamics. A change in the oil\u2019s thermal response to load is a direct proxy for fluid aging or internal hotspots.\n    *   **[crossref: Condition monitoring of biodegradable oil filled transformer]** supports using dynamic thermal parameters as key health indicators, especially when static parameters are insufficient.\n\n**Operating Threshold:**\nDefine the baseline thermal model: $T_{oil}(t) = T_{amb} + R_{thermal} \\cdot P_{load}(t) * e^{-t/\\tau}$.\n*   **Baseline:** Establish the 90th percentile of the rolling 30-day thermal time constant ($\\tau$) and residual heat retention during light-load periods.\n*   **Alert Threshold:** A sustained deviation of **>15% increase in $\\tau$** (slower cooling/heating) or a **>5\u00b0C increase in off-load residual temperature** (temperature remains elevated after load reduction, indicating internal heat sources or poor circulation) for **>48 consecutive hours**.\n\n**Validation Test (Falsification):**\nTo validate this predictor and determine if it provides 30 days warning:\n1.  **Retrospective Cohort Analysis:** Pull 5 years of 15-minute data from a fleet of 10\u201320 similar 132/33 kV transformers.\n2.  **Labeling:** Identify all historical DGA results where critical gas levels (per IEC 60599) were reached.\n3.  **Test:** For each positive DGA event, back-calculate the thermal anomaly using the proposed threshold.\n4.  **Falsification Criterion:** If the thermal deviation threshold is crossed **less than 30 days** before the critical DGA result in **>80% of cases**, the predictor is **falsified** (insufficient lead time). If the thermal change is not significantly different from normal seasonal/load variation (p-value > 0.05 in a t-test against healthy transformers), the predictor is **invalid**.\n\n**Note:** The provided evidence on nanofluids and ester retrofilling ([europepmc] items) is not directly applicable to *detecting* faults in standard mineral-oil-filled 132/33 kV units unless those fluids were retrofitted. The recommendation assumes standard mineral oil, where thermal degradation dynamics are well-documented but often ignored in favor of static DGA.",
- "pipeline_answer": null,
+ "baseline_answer": "**Proposed Design:** Implement a real-time monitoring system that tracks the **rate of change of dissolved gas concentration** (specifically hydrogen, H\u2082, and methane, CH\u2084) using an online gas-in-oil sensor (e.g., micro-gas chromatograph or electrochemical sensor) with 15-minute resolution. This predictor will flag incipient faults by detecting accelerating gas generation rates, which precede absolute concentration thresholds used in traditional DGA.\n\n**Expected Measurable Effect:** A sustained increase in the slope (d[Gas]/dt) of H\u2082 or CH\u2084 over 7\u201310 days, providing at least 30 days of warning before the next DGA sample. This early detection is cost-effective because it leverages existing online sensors (top-oil temp, load current) to correlate gas rate changes with thermal/partial discharge events, without requiring new invasive hardware.\n\n**Validation Test:**  \n1. **Accelerated Aging Test:** Subject a laboratory-scale transformer to controlled thermal stress (e.g., 120\u00b0C top-oil temp) and partial discharge (using a needle electrode). Measure gas generation rates (H\u2082/CH\u2084) every 15 minutes alongside DGA samples.  \n2. **Falsification Condition:** If the gas rate change fails to precede DGA-confirmed faults by at least 30 days in \u226590% of test cases, the predictor is invalid. Alternatively, if no significant rate increase is observed during known fault conditions, the hypothesis is rejected.  \n\n**Evidence Support:**  \n- [core] shows furanic compounds (from paper degradation) and gases (H\u2082/CH\u2084) are key indicators of insulation degradation, validating their relevance as predictors.  \n- [europepmc] (nanofluids) notes that partial discharge inception voltage (PDIV) decreases with degradation, implying gas generation accelerates as faults progress.  \n- [semantic_scholar] (liquid-metal networks) supports the use of real-time, high-resolution sensors for detecting subtle changes, though not directly applicable here.  \n\n**Cost-Effectiveness:** This approach avoids expensive nanofluid retrofits ([europepmc]) or invasive sensors by repurposing existing data streams. It addresses the user\u2019s constraint of quarterly DGA sampling by enabling continuous, low-cost monitoring.",
+ "pipeline_answer": "INDICATOR: Rate of change in top-oil temperature normalized by load current\nTHRESHOLD: 0.05 \u00b0C/A/hour ASSUMPTION \u2014 based on typical transformer thermal response rates and the need to detect anomalies before conventional DGA\nPROTOCOL: Collect 15-minute resolution data for 30 days. Calculate the indicator value for each 24-hour period. Flag if any 24-hour period exceeds threshold. Pass criterion: sustained threshold crossing for at least 72 hours confirms fault detection capability.\n\nThis implementation uses only the top-oil temperature and load current sensors (C2) at 15-minute resolution (C3). By monitoring the normalized rate of change, it detects abnormal thermal conditions that may indicate insulation degradation, providing at least 30 days warning before the next DGA sample (C1). The nanofluid enhancement improves sensitivity to these early indicators, allowing detection of incipient faults that would otherwise be missed.\n\nEVIDENCE-BACKED [doi:10.3390/nano11112885] shows nanofluids enhance dielectric properties and thermal stability in transformer oils, improving sensor sensitivity to early fault indicators. EVIDENCE-BACKED [doi:10.3390/ma18050923] demonstrates that nanofluids can improve transformer cooling efficiency and detection capabilities.\n\nFalsification test: Compare indicator performance on transformers with and without nanofluid enhancement during controlled fault injection tests. Nanofluid-enhanced transformers should detect faults at least 30 days earlier than conventional transformers.\n\nNote: some supporting details in this answer could not be verified against the retrieved records and are labeled as engineering assumptions; the falsification test is the precondition for relying on them.",
  "evidence_ids": [
-  "doi:10.1109/eic.1979.7461075",
-  "doi:10.1109/icdl63868.2025.11068231",
   "doi:10.3390/nano11112885",
   "doi:10.3390/ma18050923",
   "doi:10.3390/molecules25173901",
-  "doi:10.1109/eic.1979.7461059",
-  "doi:10.70675/abdd3fefzec02z43dcz8a4czc4872c72d874",
-  "doi:10.14264/uql.2016.276",
-  "doi:10.14264/106359",
-  "doi:10.2139/ssrn.4344852",
-  "doi:10.2139/ssrn.6222022",
-  "doi:10.55277/researchhub.rn7q7k5t.1",
-  "doi:10.3403/30293685u",
-  "doi:10.3403/30362543",
+  "doi:10.3390/toxins18060241",
+  "doi:10.1002/smll.76561",
+  "doi:10.1111/psyp.70285",
+  "doi:10.48550/arxiv.2604.03270",
+  "doi:10.48550/arxiv.1907.01069",
+  "doi:10.48550/arxiv.2111.09854",
+  "title:ebf9926eeb9fac19",
   "doi:10.1038/s41528-022-00215-2",
   "doi:10.1117/12.3014485"
  ],
  "bound_inputs": {
-  "pipeline_answer_sha256": "ABSENT",
-  "baseline_answer_sha256": "8ab75d0ed0ed5c2f7a594916ec54d57655ef8c0895694c12400940dadbf26d1b",
-  "evidence_sha256": "49628639872766d12d70324c0604ed2b8963c4982418ea2166b32f11271765e6",
+  "pipeline_answer_sha256": "f51f90520bc4a9f9e9e77641c30dbf2c790902c0524fb7609ddffda1836f3738",
+  "baseline_answer_sha256": "526e18ee4625a5ef77eb9ff5b401744320a6ef097f6ceaafdf0f639e2f0e6927",
+  "evidence_sha256": "7cbb98d66e38759dd63b8144231b70f747faee1db67a8be184bdd396f6eba55f",
   "judge_route": {
-   "provider": "zai",
-   "model": "glm-4-plus"
+   "provider": null,
+   "model": null
   },
   "rubric_version": "0-4-rubric/1"
  },
  "judge_record": {
   "usable_pair": false,
-  "outcome": "JUDGE_SKIPPED",
-  "why": "pipeline answer missing",
+  "outcome": "JUDGE_TRANSPORT_FAILED",
+  "why": "no calibrated judge route (see judge selection record)",
   "bound_inputs": {
-   "pipeline_answer_sha256": "ABSENT",
-   "baseline_answer_sha256": "8ab75d0ed0ed5c2f7a594916ec54d57655ef8c0895694c12400940dadbf26d1b",
-   "evidence_sha256": "49628639872766d12d70324c0604ed2b8963c4982418ea2166b32f11271765e6",
+   "pipeline_answer_sha256": "f51f90520bc4a9f9e9e77641c30dbf2c790902c0524fb7609ddffda1836f3738",
+   "baseline_answer_sha256": "526e18ee4625a5ef77eb9ff5b401744320a6ef097f6ceaafdf0f639e2f0e6927",
+   "evidence_sha256": "7cbb98d66e38759dd63b8144231b70f747faee1db67a8be184bdd396f6eba55f",
    "judge_route": {
-    "provider": "zai",
-    "model": "glm-4-plus"
+    "provider": null,
+    "model": null
    },
    "rubric_version": "0-4-rubric/1"
   }
  },
- "baseline_same_evidence_hash": "49628639872766d12d70324c0604ed2b8963c4982418ea2166b32f11271765e6",
- "pipeline_same_evidence_hash": "49628639872766d12d70324c0604ed2b8963c4982418ea2166b32f11271765e6"
+ "baseline_same_evidence_hash": "7cbb98d66e38759dd63b8144231b70f747faee1db67a8be184bdd396f6eba55f",
+ "pipeline_same_evidence_hash": "7cbb98d66e38759dd63b8144231b70f747faee1db67a8be184bdd396f6eba55f"
 }
