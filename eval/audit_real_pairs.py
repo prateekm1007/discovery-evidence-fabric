@@ -51,36 +51,58 @@ ALL_JUDGED = TARGETS_MUST_FLAG + TARGETS_MUST_PASS
 
 
 def _audited_answer(runs_root: Path, pid: str):
-    """The committed audited answer for a problem: prefer the run-tree
-    ANSWER_COMPOSED.json records (the auditor's judged bytes); fall
-    back to the committed pair files."""
-    best = None
-    for f in sorted(glob.glob(str(
-            runs_root / "*" / "*" / "pipeline" / "ANSWER_COMPOSED.json"))):
-        if pid not in f:
-            continue
+    """The committed audited answer for a problem — the REAL pair bytes,
+    never hand fixtures. Resolution order (deterministic, disclosed on
+    the row):
+      1. The committed pair file eval/pairs/dev12_fresh/<pid>.json —
+         the audited bytes the auditor judged (byte-restored at
+         af7e2a03f). The RETIRED banner text ("CONTRACT-INVALID
+         COMPOSITION ...") is NOT a proposal: when the pair file
+         carries only the banner (p02, sofc), fall through to (2) —
+         the constraint audit runs on the composition, not on the
+         delivery wrapper.
+      2. The AUDITED run tree eval/runs/977851bc16a5 (the runs the
+         af7e2a03f pairs were built from — the kill records cite these
+         run dirs): the problem's latest record with a non-empty
+         answer. Measured identity: the fu-004 record here is
+         byte-identical to the af7e2a03f pair answer (sha f691cd9101dd);
+         the fu-001/new01/new02/new04 records are byte-identical to the
+         committed pair answers.
+      3. Any other run tree (DISCLOSED as non-audited — never used for
+         the acceptance verdict without note)."""
+    pair_p = REPO / "eval" / "pairs" / "dev12_fresh" / f"{pid}.json"
+    if pair_p.exists():
         try:
-            d = json.loads(Path(f).read_text(encoding="utf-8"))
+            d = json.loads(pair_p.read_text(encoding="utf-8"))
+            ans = d.get("pipeline_answer")
+            if isinstance(ans, str) and ans.strip() \
+                    and not ans.lstrip().startswith(
+                        "CONTRACT-INVALID COMPOSITION"):
+                return {"answer": ans, "source": str(pair_p),
+                        "state": "pair_bytes(committed)"}
         except Exception:  # noqa: BLE001
-            continue
-        ans = d.get("answer")
-        if isinstance(ans, str) and ans.strip():
-            if best is None or f > best[0]:
-                best = (f, ans, d.get("state"))
-    if best:
-        return {"answer": best[1], "source": best[0],
-                "state": best[2]}
-    for base in ("pairs/dev12_fresh", "pairs"):
-        p = REPO / base / f"{pid}.json"
-        if p.exists():
+            pass
+    audited = runs_root / "977851bc16a5"
+    for root in (audited, runs_root):
+        best = None
+        for f in sorted(glob.glob(str(
+                root / "*" / "*" / "pipeline" / "ANSWER_COMPOSED.json"))):
+            if f"/{pid}/" not in f:
+                continue
             try:
-                d = json.loads(p.read_text(encoding="utf-8"))
+                d = json.loads(Path(f).read_text(encoding="utf-8"))
             except Exception:  # noqa: BLE001
                 continue
-            ans = d.get("pipeline_answer")
-            if isinstance(ans, str) and ans.strip():
-                return {"answer": ans, "source": str(p),
-                        "state": "pair_bytes"}
+            ans = d.get("answer")
+            if isinstance(ans, str) and ans.strip() \
+                    and not ans.lstrip().startswith(
+                        "CONTRACT-INVALID COMPOSITION"):
+                if best is None or f > best[0]:
+                    best = (f, ans, d.get("state"))
+        if best:
+            return {"answer": best[1], "source": best[0],
+                    "state": best[2],
+                    "audited_tree": str(root) == str(audited)}
     return None
 
 

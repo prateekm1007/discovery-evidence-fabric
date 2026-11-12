@@ -449,11 +449,25 @@ RESTATES-DEVICE: YES "<quoted text>" | NO
 RESTATES-CONSTRAINT: YES "<quoted text>" | NO
 Rules: VIOLATES means the answer's proposal depends on, measures, or
 fixes something that constraint forbids or does not allow, or misses
-what it requires. Quote the offending words EXACTLY as they appear in
-your answer. RESTATES-DEVICE is YES only when the answer proposes, as
-its change, a state the given device already has. RESTATES-CONSTRAINT
-is YES only when a design parameter line merely echoes a user
-constraint instead of changing something."""
+what it requires. When a constraint enumerates the allowed
+measurement points / instruments / data sources, the check is LEXICAL:
+every input, measurement or derived quantity the proposal names must
+be traceable to a listed point — a renamed, abbreviated or derived
+variant that is not itself listed (e.g. a thermodynamic quantity like
+a "saturated condensing temperature" when the list names specific
+logged sensor points) is VIOLATES. VERIFY THE ANSWER'S OWN CLAIM: an
+answer that says it "uses only the listed points" while its
+INDICATOR/PARAMETER definitions or formulas compute from an unlisted
+quantity is VIOLATES — the formula is the proposal, the claim is not
+evidence. Quote the offending words EXACTLY as they appear in your
+answer. RESTATES-DEVICE is YES only when the answer proposes, as its
+change, a state the given device already has.
+RESTATES-CONSTRAINT is YES only when a design parameter line merely
+echoes a user constraint instead of changing something — the required
+"how it respects each stated constraint" discussion is NOT a
+restatement. For both RESTATES lines, quote the offending words
+VERBATIM from YOUR answer's proposal lines (never from the problem
+statement, never a paraphrase)."""
 
 
 _CK_BLOCK_RE = re.compile(r"^\s*CONSTRAINT-CHECK\s*:?\s*$", re.IGNORECASE)
@@ -611,7 +625,23 @@ def parse_constraint_check(block_text: str,
 
 def llm_check_violations(parsed: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Typed violations from a parsed check (same shape as the floor's
-    violations; types prefixed LLM_ so the source is never ambiguous)."""
+    violations; types prefixed LLM_ so the source is never ambiguous).
+
+    MEASURED GUARDS (R6 real-pairs acceptance run, same round — the
+    audited real bytes decide, never hand fixtures):
+      - A RESTATES-* YES whose quote does not verify against the ANSWER
+        is recorded, never counted: the measured false positive quoted
+        the PROBLEM's own device descriptor ("rolling-element bearing
+        in a 350 kW industrial fan drive", fu-001) — a description of
+        the given device is not a proposed state.
+      - A RESTATES-* YES counts only when the verified quote names a
+        PROPOSAL line (PARAMETER:/INTERVENTION:/RECOMMENDED/THRESHOLD:
+        /INDICATOR:): the measured fu-001 "echo" was the answer's
+        REQUIRED constraint-compliance explanation ("It satisfies the
+        ... constraint"), which the answer-shape contract demands and
+        which the owner ruled a PASS; the audited new01/sofc echoes
+        are PARAMETER lines whose values ARE the constraints.
+        """
     out: List[Dict[str, Any]] = []
     if parsed.get("state") != "PARSED":
         return out
@@ -632,20 +662,26 @@ def llm_check_violations(parsed: Dict[str, Any]) -> List[Dict[str, Any]]:
                         ("restates_constraint",
                          "LLM_RESTATES_USER_CONSTRAINT")):
         r = parsed.get(kind)
-        if isinstance(r, dict) and r.get("yes"):
-            out.append({
-                "type": vtype,
-                "detail": ("the structured constraint check flags "
-                           + ("a proposal that restates a state the "
-                              "given device already has"
-                              if kind == "restates_device"
-                              else "a parameter line that only echoes "
-                                   "a user constraint")
-                           + (" — text located" if r.get("quote_verified")
-                              else " — quoted text not located "
-                              "(disclosed, unverified)")),
-                "context": str(r.get("quote") or "")[:200],
-                "source": "constraint_check"})
+        if not (isinstance(r, dict) and r.get("yes")):
+            continue
+        if not r.get("quote_verified"):
+            # measured guard 1: an unlocatable quote never counts (the
+            # quote may be problem text or a paraphrase — fu-001)
+            continue
+        if not _RESTATES_PROPOSAL_MARKER.search(str(r.get("quote") or "")):
+            # measured guard 2: a compliance explanation is not an echo
+            continue
+        out.append({
+            "type": vtype,
+            "detail": ("the structured constraint check flags "
+                       + ("a proposal that restates a state the "
+                          "given device already has"
+                          if kind == "restates_device"
+                          else "a parameter line that only echoes "
+                               "a user constraint")
+                       + " — proposal line located in the answer"),
+            "context": str(r.get("quote") or "")[:200],
+            "source": "constraint_check"})
     return out
 
 
@@ -665,6 +701,15 @@ def merge_constraint_check(audit: Dict[str, Any],
     return merged
 
 
+#: a RESTATES-* verdict counts only when its verified quote names a
+#: PROPOSAL line of the answer (the answer-shape contract's own line
+#: classes) — a compliance explanation or the problem's device text is
+#: never an echo (measured guard, real-pairs acceptance run)
+_RESTATES_PROPOSAL_MARKER = re.compile(
+    r"\b(PARAMETER|INTERVENTION|RECOMMENDED|THRESHOLD|INDICATOR)\s*:",
+    re.IGNORECASE)
+
+
 #: the judge-side prompt for a STANDALONE check of a pre-existing answer
 #: (the acceptance harness on the committed real pairs; the same verdict
 #: contract the composer's fused block obeys — one check shape, Art. X).
@@ -675,6 +720,29 @@ measures, or fixes something the constraint forbids or does not allow,
 or misses what it requires. An answer that only restates the given
 device's existing state, or lists the user's constraints as its design
 parameters without changing anything, violates the restatement rule.
+
+MEASUREMENT-POINT CONSTRAINTS: when a constraint enumerates the
+allowed measurement points / instruments / data sources, the check is
+LEXICAL: every input, measurement or derived quantity the answer's
+proposal names must be traceable to a listed point. A renamed,
+abbreviated or derived variant that is not itself listed (for example
+a thermodynamic quantity like a "saturated condensing temperature"
+when the list names specific logged sensor points) is VIOLATES — quote
+the offending span from the answer. VERIFY THE ANSWER'S OWN CLAIM:
+an answer that SAYS it "uses only the listed points" while its
+INDICATOR/PARAMETER definitions or formulas actually compute from an
+unlisted quantity (e.g. "ΔT = A − B" where B is not a listed point)
+VIOLATES — the formula is the proposal, the claim is not evidence.
+
+COMPLIANCE EXPLANATIONS ARE NOT RESTATEMENTS: the answer's required
+"how it respects each stated constraint" discussion never counts as
+restating. RESTATES-CONSTRAINT is YES only when a PARAMETER,
+INTERVENTION or RECOMMENDED line's content is itself the user's
+constraint (a value copied from the constraint instead of a change).
+RESTATES-DEVICE is YES only when the answer PROPOSES, as its change, a
+state the given device already has. For both: quote the offending
+words VERBATIM from the answer's proposal lines (never from the
+problem statement, never a paraphrase).
 
 DEVICE: {device}
 FAILURE: {failure}

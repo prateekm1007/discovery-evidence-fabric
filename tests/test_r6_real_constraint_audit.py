@@ -65,13 +65,32 @@ def test_unlocatable_quote_still_counts_and_discloses():
 
 
 def test_restates_flags_merge_as_typed_violations():
+    # AMENDED R6 real-pairs acceptance round (measured guards): a
+    # RESTATES-* YES counts ONLY when (a) its quote verifies against
+    # the answer AND (b) the quote names a PROPOSAL line — the
+    # measured fu-001 false positives (problem-text quote,
+    # compliance-explanation "echo") must stay uncounted, while the
+    # audited new01/sofc PARAMETER-line echoes must count.
     block = ("C1: COMPLIES | \"\"\n"
              "RESTATES-DEVICE: YES \"anode-supported cell\"\n"
              "RESTATES-CONSTRAINT: YES \"2.7 V per cell\"\n")
     p = parse_constraint_check(block, ANSWER)
-    types = [v["type"] for v in llm_check_violations(p)]
-    assert types == ["LLM_RESTATES_GIVEN_DEVICE",
-                     "LLM_RESTATES_USER_CONSTRAINT"]
+    # neither quote names a proposal line -> recorded, not counted
+    assert llm_check_violations(p) == []
+    # the problem-text quote class (fu-001 device false positive)
+    p2 = parse_constraint_check(
+        "RESTATES-DEVICE: YES \"rolling-element bearing in a 350 kW "
+        "industrial fan drive\"\n", ANSWER)
+    assert llm_check_violations(p2) == []
+    # the audited echo class: a verified PARAMETER-line quote counts
+    echo_answer = ("PARAMETER: Operating Voltage — 2.7 V per cell — "
+                   "ASSUMPTION (User Constraint)\n"
+                   "Falsification test: 500 cycles.")
+    p3 = parse_constraint_check(
+        "RESTATES-CONSTRAINT: YES \"PARAMETER: Operating Voltage — 2.7 "
+        "V per cell — ASSUMPTION (User Constraint)\"\n", echo_answer)
+    types = [v["type"] for v in llm_check_violations(p3)]
+    assert types == ["LLM_RESTATES_USER_CONSTRAINT"]
 
 
 def test_merge_keeps_floor_and_appends_check():

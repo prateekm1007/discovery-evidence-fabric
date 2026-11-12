@@ -590,10 +590,19 @@ def discover_catalog(provider_id: str,
         # directive 4 (2026-11-12): a 401/403 on the enumeration is the
         # typed credential-death evidence — cache it so later catalog
         # reads skip the GET (the key that failed the probe is never
-        # re-enumerated inside the TTL window)
-        if "401" in _err or "403" in _err or "Unauthorized" in _err \
-                or "Unauthorized" in str(exc) or "not found" in \
-                str(exc).lower():
+        # re-enumerated inside the TTL window).
+        # MEASURED CORRECTION (R6 live audit-harness run, same round):
+        # the string catch-all "not found" ALSO matched the gateway's
+        # plain HTTP 404 on /models (scripts/zai_gateway.mjs exposes no
+        # catalog route — a MISSING ROUTE, not a credential death);
+        # the poisoned mark emptied the zai ladder (eligible_models
+        # yields zero rungs for the skipped status) and every zai
+        # call typed PROVIDER_UNAVAILABLE. Only an AUTH-class response
+        # (401/403/Unauthorized — the measured openrouter "401 User
+        # not found" rides its 401) proves the credential dead; a 404
+        # is UNDISCOVERED and the pinned defaults stand in.
+        if "401" in _err or "403" in _err \
+                or "unauthorized" in _err.lower():
             try:
                 CATALOG_DIR.mkdir(parents=True, exist_ok=True)
                 cred_cache.write_text(json.dumps({
@@ -1299,6 +1308,11 @@ def eligible_models(provider_id: str, task: str,
     pinned = _operator_pinned_model(provider_id)
     if catalog:
         cat_state = discover_catalog(provider_id).get("status")
+        # CATALOG_SKIPPED_CREDENTIAL_DEAD rides the else-branch like
+        # UNDISCOVERED (pinned defaults stand in, disclosed — measured
+        # live: a non-DISCOVERED, non-UNDISCOVERED status must NEVER
+        # yield an empty eligible set; the zai gateway's routeless
+        # /models is UNDISCOVERED, never a credential death).
         recs = _catalog_records(provider_id) \
             if cat_state == "DISCOVERED" else _pinned_records(provider_id)
     else:
