@@ -138,6 +138,20 @@ JUDGE_CANDIDATES = [
 #: shared-family verdict for an independent one (Art. XXVII: recorded,
 #: never silent).
 JUDGE_LAST_RESORT = ("zai", "glm-4-plus")
+#: R6 owner round 2026-11-12 (operator-override class, Art. XXVII —
+#: recorded, never silent; the same class as the ENGINE_*_PROVIDER pins):
+#: when the zai loopback-gateway rung has no operator credential
+#: (owner-supplied key rounds: AGNES/INCEPTION only), the operator may
+#: name the shared-family last-resort judge explicitly:
+#:   EVAL_JUDGE_LAST_RESORT=provider,model
+#: The name is recorded on the route record AND on every judgment it
+#: produces (the disclosure machinery below is unchanged); the 30-pair
+#: calibration gate still applies in full — a named shared-family judge
+#: that cannot separate known-good from known-bad is still not a judge
+#: (Art. XXV), and the route stays NO_CALIBRATED_JUDGE_ROUTE typed. No
+#: new gate, no new report: an operator-named rung, exactly like the
+#: pins above.
+_ENV_JUDGE_LAST_RESORT = "EVAL_JUDGE_LAST_RESORT"
 
 
 def utc_now() -> str:
@@ -827,11 +841,28 @@ def probe_judge_route(baseline_provider: str) -> Dict[str, Any]:
     _allow_shared = (os.environ.get("EVAL_JUDGE_ALLOW_SHARED_FAMILY", "")
                      .strip().lower() in ("1", "true", "yes"))
     _prov, _model = JUDGE_LAST_RESORT
+    # Art. XXVII recorded-override class (owner round 2026-11-12): the
+    # operator may name the shared-family last-resort rung explicitly.
+    # The 30-pair calibration gate below still applies in full; the
+    # source of the name is recorded on the candidate AND on the route
+    # record every judgment carries (never silent).
+    _ovr = os.environ.get(_ENV_JUDGE_LAST_RESORT, "").strip()
+    _lrs = "committed JUDGE_LAST_RESORT"
+    if _ovr:
+        _parts = [s.strip() for s in _ovr.split(",", 1)]
+        if _parts[0]:
+            _prov = _parts[0]
+        if len(_parts) > 1 and _parts[1]:
+            _model = _parts[1]
+        _lrs = (f"operator-named {_ENV_JUDGE_LAST_RESORT}={_ovr} "
+                "(owner round 2026-11-12; the zai loopback rung has no "
+                "operator credential in this round)")
     rec = {"provider": _prov, "model": _model,
            "reference": "R6 operator-accepted last-resort judge "
                         "(owner directive 2026-11-11: my-judged "
                         "win/tie/loss accepted for the dev round)",
-           "shared_family": True}
+           "shared_family": True,
+           "last_resort_source": _lrs}
     if not _allow_shared:
         rec.update({"eligible": False,
                     "decision": "SHARED_FAMILY_NOT_AUTHORIZED "
@@ -863,6 +894,7 @@ def probe_judge_route(baseline_provider: str) -> Dict[str, Any]:
                         "selection": "last-resort shared-family "
                                      "(operator-accepted, disclosed)",
                         "judge_independence": "SHARED_FAMILY_DISCLOSED",
+                        "last_resort_source": _lrs,
                         "disclosure": ("the judge shares its provider and "
                                        "model family with the generator "
                                        "and baseline arms; accepted by the "

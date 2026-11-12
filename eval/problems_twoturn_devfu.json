@@ -1,0 +1,115 @@
+{
+ "_provenance": {
+  "builder": "scripts/r6_build_twoturn_devfu.py",
+  "inputs": [
+   "eval/problems_dev12.json",
+   "eval/pairs/two_turn_dev-fu-001-bearing-spalling.json",
+   "eval/pairs/two_turn_dev-fu-003-motor-insulation.json",
+   "eval/pairs/two_turn_dev-fu-004-fouling.json",
+   "eval/pairs/two_turn_dev-fu-005-bridge-bearing.json"
+  ],
+  "note": "deterministic merge: dev12 base fields byte-verified against the committed pair records, followup_finding taken from the committed pair (the only recoverable source). Round 1 of a --two-turns run sees exactly the dev12 base (_round1_problem strips followup_finding); round 2 ingests it on the same frozen evidence (ENGINE_EVIDENCE_CACHE, Art. LI).",
+  "not_run": [
+   {
+    "problem_id": "dev-fu-002",
+    "status": "NOT_RUN_UNRECOVERABLE",
+    "why": "full definition + followup finding unrecoverable from the committed records (the dev-fu-002 base is absent from eval/problems_dev12.json by design); typed, disclosed, never invented (Art. XXV)"
+   },
+   {
+    "problem_id": "dev-fu-006",
+    "status": "NOT_RUN_UNRECOVERABLE",
+    "why": "full definition unrecoverable (same basis as dev-fu-002; recorded in the builder script)"
+   }
+  ],
+  "six_cases_disclosure": "B8 is 'round 2 on six DEV cases': 4 of 6 have a recoverable followup_finding (the committed two_turn pair records) and run; 2 of 6 are NOT_RUN_UNRECOVERABLE (recorded above, not scored)"
+ },
+ "problems": [
+  {
+   "problem_id": "dev-fu-001-bearing-spalling",
+   "device": "rolling-element bearing in a 350 kW industrial fan drive",
+   "failure": "inner-race spalling progresses for weeks before the vibration alarm trips; by then the bearing is past repair",
+   "failure_mode": "bearing-spalling",
+   "constraint": "predictor must use existing 1 kHz vibration sensor and 1 Hz SCADA logging only, fire at least 14 days warning, produce no more than 2 false alarms per year",
+   "domain": "rotating-machinery",
+   "source": "dev-fu",
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "1 kHz vibration sensor only",
+    "1 Hz SCADA logging",
+    "at least 14 days warning",
+    "at most 2 false alarms per year"
+   ],
+   "clarification_answer": null,
+   "contamination_tag": null,
+   "split": "DEV",
+   "reconstructed": true,
+   "followup_finding": "We re-analyzed the last 12 months: bearing fault-frequency harmonics appear 19 days before the alarm in our worst case, and the 80th percentile was 16 days. The 5 dB band above BPFI sidebands overlaps with the gearbox defect signature."
+  },
+  {
+   "problem_id": "dev-fu-003-motor-insulation",
+   "device": "4.16 kV induction motor driving a boiler feed pump",
+   "failure": "stator winding insulation degrades through partial discharge; ground fault cascade brings the motor down and damages the drive train",
+   "failure_mode": "motor-insulation",
+   "constraint": "predictor must use offline PD testing during scheduled outages only, detect degradation at least 6 months before ground fault, require no continuous monitoring hardware",
+   "domain": "electrical-machine",
+   "source": "dev-fu",
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "offline PD testing only",
+    "no continuous monitoring hardware",
+    "at least 6 months before ground fault",
+    "no emergency shutdowns triggered falsely"
+   ],
+   "clarification_answer": null,
+   "contamination_tag": null,
+   "split": "DEV",
+   "reconstructed": true,
+   "followup_finding": "Offline PD measurements on the last three failed motors showed partial discharge magnitude rising above 200 pC at 6-9 months before failure. Two of those had proven 100% replacement accuracy with a 150 pC threshold."
+  },
+  {
+   "problem_id": "dev-fu-004-fouling",
+   "device": "shell-and-tube condenser on a steam turbine exhaust, 300 MW unit",
+   "failure": "tube-side biofouling accumulates over weeks; heat transfer degrades causing turbine back-pressure rise and derating",
+   "failure_mode": "biofouling",
+   "constraint": "predictor must use existing temperature and flow measurements only, fire at least 3 weeks before back-pressure hits the derating limit, no requirement for new instrumentation",
+   "domain": "thermal-fluid-process",
+   "source": "dev-fu",
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "existing instrumentation only",
+    "at least 3 weeks before derating",
+    "no false trips during load swings"
+   ],
+   "clarification_answer": null,
+   "contamination_tag": null,
+   "split": "DEV",
+   "reconstructed": true,
+   "followup_finding": "The condenser U-coefficient fell 18% from baseline 22 days before the last back-pressure derate. Tube-bundle fouling resistance was confirmed at 0.0012 m2K/W by the subsequent cleaning inspection."
+  },
+  {
+   "problem_id": "dev-fu-005-bridge-bearing",
+   "device": "laminated elastomeric bridge bearing pad on a 75-year-design-life highway bridge",
+   "failure": "elastomer layers develop creep set and ozone surface crazing over decades; vertical deflection drift exceeds design tolerance",
+   "failure_mode": "bridge-bearing-aging",
+   "constraint": "intervention must extend bearing life to 75 years without replacing the bearing; no new instrumentation required; must tolerate marine climate",
+   "domain": "civil-infrastructure",
+   "source": "dev-fu",
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "75-year service life",
+    "no bearing replacement",
+    "marine climate",
+    "no new instrumentation"
+   ],
+   "clarification_answer": null,
+   "contamination_tag": null,
+   "split": "DEV",
+   "reconstructed": true,
+   "followup_finding": "The last 4 bearing pad replacements on this bridge class showed the inside layers failing first — ozone exposure is limited to the exterior layers where crazing starts. The failed pads had no exterior surface protection."
+  }
+ ]
+}
