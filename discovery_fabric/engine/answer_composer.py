@@ -1138,6 +1138,45 @@ def _admission_analysis(env_dict: Dict[str, Any],
             }
             cands.append(rec2)
             return cands, reasons
+        # DIRECTIVE 2+6 (owner audit round 2026-11-12, measured on the
+        # fu-005 live run of this round): a run that STARVES BEFORE THE
+        # ATTACK (typed MECHANISM_STARVED at the mechanism-space
+        # distinctness gate) leaves the envelope's evidence-SUPPORTED
+        # raw candidate NEVER ADJUDICATED (binding = ATTACK_RECORD_
+        # ABSENT). That is an adjudication-infrastructure absence, not
+        # a scientific kill and not a binding break: the record-bound
+        # raw candidate delivers as a clearly flagged UNVERIFIED
+        # hypothesis (one plain-language caveat line) — the same
+        # FLAGGED_UNVERIFIED_HYPOTHESIS_DELIVERED semantics the
+        # committed kill record for this problem pre-approves
+        # (eval/kills/r6_dev12/), never an endorsement. Guards: the
+        # binding must be exactly the never-adjudicated class (a broken
+        # binding still refuses), and the envelope's own evidence
+        # verification must have SUPPORTED the candidate (an
+        # evidence-failed candidate is never delivered).
+        if binding is not None \
+                and binding.startswith("ATTACK_RECORD_ABSENT"):
+            ev = ((env_dict.get("adjudication") or {}).get(
+                "evidence_verification") or {})
+            if ev.get("verified") is True:
+                rec2 = dict(raw)
+                rec2["attack_verdict"] = att
+                rec2["verdict"] = att
+                rec2["admission"] = {
+                    "class": "HYPOTHESIS",
+                    "hypothesis": True,
+                    "reason": "ATTACK_NEVER_ADJUDICATED_STARVED_RUN",
+                    "binding": "raw_candidate_record_bound",
+                    "delivery_semantics":
+                        "FLAGGED_UNVERIFIED_HYPOTHESIS_DELIVERED"}
+                rec2["hypothesis_unverified"] = True
+                rec2["own_recorded_states"] = {
+                    "evidence_verification": "VERIFIED",
+                    "attack_record": "ABSENT (the run starved before "
+                                     "the attack stage — never "
+                                     "adjudicated, never endorsed)"}
+                cands.append(rec2)
+                return cands, reasons
         return [], reasons
     rec = dict(raw)
     rec["attack_verdict"] = att

@@ -750,6 +750,50 @@ class TestHypothesisDelivery:
             "candidates_from_state"](env, top_n=5)
         assert not cands
 
+    def test_starved_run_never_adjudicated_delivers_hypothesis(self):
+        # R6 live run of this round (fu-005 @57e076077cc0, measured):
+        # a run that types MECHANISM_STARVED at the mechanism-space
+        # distinctness gate leaves the envelope's evidence-SUPPORTED
+        # raw candidate NEVER ADJUDICATED (ATTACK_RECORD_ABSENT) —
+        # the same FLAGGED_UNVERIFIED_HYPOTHESIS_DELIVERED semantics
+        # the committed fu-005 kill record pre-approves. Hermetic
+        # fixture: the exact measured envelope shape (empty
+        # attack_results, verified evidence, raw_candidate present).
+        env = {
+            "attack_results": {},
+            "adjudication": {"evidence_verification": {
+                "verified": True, "evidence_class": "SUPPORTED"}},
+            "mechanism_map": {
+                "mechanism": "hypothesis mechanism",
+                "raw_candidate": {
+                    "candidate_id": "cand:A2:test:deadbeef",
+                    "mechanism": "hypothesis mechanism",
+                    "intervention": "swap the seal compound"}}}
+        cands = compose_if_admissible.__globals__[
+            "candidates_from_state"](env, top_n=5)
+        assert cands, "the never-adjudicated supported candidate " \
+            "delivers as a flagged hypothesis"
+        c = cands[0]
+        assert c["admission"]["class"] == "HYPOTHESIS"
+        assert c["hypothesis_unverified"] is True
+        assert c["admission"]["reason"] == \
+            "ATTACK_NEVER_ADJUDICATED_STARVED_RUN"
+        assert c["admission"]["delivery_semantics"] == \
+            "FLAGGED_UNVERIFIED_HYPOTHESIS_DELIVERED"
+        # the evidence-failed class is NEVER delivered
+        env_bad = json.loads(json.dumps(env))
+        env_bad["adjudication"]["evidence_verification"]["verified"] = False
+        assert not compose_if_admissible.__globals__[
+            "candidates_from_state"](env_bad, top_n=5)
+        # a BROKEN attack binding (a record that belongs to another
+        # candidate) still refuses — never promote an unbound record
+        env_broken = json.loads(json.dumps(env))
+        env_broken["attack_results"] = {"overall": "SURVIVED",
+                                        "revision": "r1"}
+        env_broken["mechanism_map"]["revision"] = "r2"
+        assert not compose_if_admissible.__globals__[
+            "candidates_from_state"](env_broken, top_n=5)
+
     def test_hypothesis_answer_carries_one_plain_caveat(self):
         import eval.run as er
         import tempfile
