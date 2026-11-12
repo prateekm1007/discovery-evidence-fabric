@@ -518,13 +518,15 @@ def _answer_source(out_dir: Path, legacy_diagnostic: bool = False) -> str:
     if comp is not None:
         _a = comp.get("answer")
         if _a and str(_a).strip():
-            if comp.get("state") == "COMPOSED_CONTRACT_VALID":
+            if comp.get("state") in _COMPOSED_DELIVERED_STATES:
+                # DIRECTIVE 2 (DOWNGRADE DON'T DISCARD): the delivered
+                # classes are VALID / DOWNGRADED / TRUNCATED_DELIVERED
+                # — the label names the actual delivery (Art. X), the
+                # typed detail rides the record metadata
                 return (f"composer_llm_call:{comp.get('state') or '?'}")
-            # DIRECTIVE 1: a contract-invalid composition is never
-            # delivered — the delivered answer is the typed no-answer
-            # (the record still carries the invalid text + violations
-            # for diagnostics; the DELIVERED outcome is what the label
-            # names, Art. X: the label describes the actual delivery)
+            # a state with no delivered text (transport failure, the
+            # composer's typed scientific refusals) is the typed
+            # no-answer: the label names the actual delivery (Art. X)
             return ("typed_no_answer:"
                     + str(comp.get("state") or "FAILED_EXPLICIT"))
         if not legacy_diagnostic:
@@ -2967,8 +2969,22 @@ def main(argv=None) -> int:
                                  "model": judge_route.get("model")},
                 "rubric_version": RUBRIC_VERSION,
             }
-            # never hand a refusal to the judge: only completed pipeline pairs
-            pipe_completed = (json.loads(pr.read_text(encoding="utf-8")) or {}).get("completed")
+            # never hand a refusal to the judge: only completed pipeline
+            # pairs — PLUS the directive-2 delivered classes (the
+            # flagged-hypothesis / downgraded / truncated deliveries):
+            # a DELIVERED answer with a plain caveat is a real answer
+            # (never a refusal), judgeable even when the engine's
+            # epistemic final_status is a typed starvation — the pair's
+            # judge record binds the exact answer hashes either way
+            # (audit P0-8), and the delivery state rides the record
+            _pr_rec = json.loads(pr.read_text(encoding="utf-8")) or {}
+            pipe_completed = _pr_rec.get("completed")
+            if not pipe_completed and pv \
+                    and not str(pv).startswith("typed_no_answer:"):
+                pipe_completed = True
+                print(f"[eval] {_label(pid)}: judge on the DELIVERED "
+                      "composition (directive-2 delivered class on a "
+                      "typed-starved run)", flush=True)
             if not pipe_completed:
                 _save(pid, "judge_record.json", {"usable_pair": False,
                         "why": "pipeline did not release an answer",
