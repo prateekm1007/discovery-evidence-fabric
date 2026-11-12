@@ -132,9 +132,17 @@ def _run_adapter(env, fake):
 
 def _strip_volatile(obj):
     if isinstance(obj, dict):
-        return {k: _strip_volatile(v) for k, v in obj.items()
-                if k not in VOLATILE_KEYS
-                and k != "runtime_attribution"}
+        out = {}
+        for k, v in obj.items():
+            if k in VOLATILE_KEYS or k == "runtime_attribution":
+                continue
+            # wall-clock durations are never structurally deterministic
+            # (R6 audit round: mechanism_space_wall_s rides the attempt
+            # record; the STRUCTURE is what must be stable here)
+            if (k.endswith("_s")) and isinstance(v, (int, float)):
+                continue
+            out[k] = _strip_volatile(v)
+        return out
     if isinstance(obj, list):
         return [_strip_volatile(v) for v in obj]
     return obj
@@ -309,9 +317,13 @@ class TestNoSemanticChange(unittest.TestCase):
     def test_call_count_unchanged_by_instrumentation(self):
         calls = []
         _run_adapter(_verified_env(), _fake_llm(calls))
+        # R6 OWNER AUDIT ROUND 2026-11-12 (directive 3): the evidence-
+        # anchored call + the always-generated knowledge-first call —
+        # the attribution instrument itself introduces none.
         self.assertLessEqual(
-            len(calls), 1,
-            "the instrument must not introduce LLM calls")
+            len(calls), 2,
+            "the instrument must not introduce LLM calls beyond the "
+            "owner-mandated knowledge-first call")
 
 
 class TestProductionPathIsolation(unittest.TestCase):

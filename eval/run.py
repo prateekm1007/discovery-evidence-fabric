@@ -47,6 +47,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+# DIRECTIVE 1 (owner audit round 2026-11-12): the ONE plain-language
+# hypothesis caveat line the harness may append to a delivered answer
+# (the composer's own constant — one authority, Art. X).
+from discovery_fabric.engine.answer_composer import HYPOTHESIS_CAVEAT_LINE
+
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
@@ -402,6 +407,25 @@ def _attack_overall(out_dir: Path) -> str:
     return "UNKNOWN"
 
 
+#: DIRECTIVE 1 (owner audit round 2026-11-12): caveat lines that
+#: narrate pipeline history / truncation repair are NEVER delivered to
+#: the judge — only plain-language engineering caveats ride the answer.
+_PIPELINE_NARRATION_CAVEAT_MARKERS = (
+    "cut off at the model's output budget",
+    "larger-budget recomposition",
+    "repair attempt was also cut off",
+    "pre-repair draft",
+    "open contract violations",
+    "deterministic format check",
+)
+
+
+def _is_pipeline_narration_caveat(caveat: str) -> bool:
+    low = str(caveat or "").lower()
+    return any(m in low
+               for m in _PIPELINE_NARRATION_CAVEAT_MARKERS)
+
+
 def _best_flagged_answer(out_dir: Path) -> Optional[str]:
     """Deliver the best flagged hypothesis honestly labeled UNVERIFIED
     (Art. XI/LXI). Never presents a killed candidate as an invention;
@@ -427,10 +451,12 @@ def _best_flagged_answer(out_dir: Path) -> Optional[str]:
         if not parts:
             return None
         body = "\n\n".join(parts)[:6000]
-        return ("UNVERIFIED HYPOTHESIS — this candidate was NOT endorsed by "
-                "the adversarial gauntlet (it was revised once and rejected "
-                "again). It is delivered as a hypothesis requiring the "
-                "falsification test below; it is NOT an invention claim.\n\n"
+        # DIRECTIVE 1 (owner audit round 2026-11-12): plain language,
+        # one line, no internal state names or process narration.
+        return ("UNVERIFIED HYPOTHESIS — this proposal is delivered as "
+                "an engineering hypothesis: it requires the stated "
+                "falsification test before adoption and is not an "
+                "endorsed recommendation.\n\n"
                 + body)
     except Exception:
         return None
@@ -456,7 +482,15 @@ def _answer_source(out_dir: Path, legacy_diagnostic: bool = False) -> str:
     if comp is not None:
         _a = comp.get("answer")
         if _a and str(_a).strip():
-            return (f"composer_llm_call:{comp.get('state') or '?'}")
+            if comp.get("state") == "COMPOSED_CONTRACT_VALID":
+                return (f"composer_llm_call:{comp.get('state') or '?'}")
+            # DIRECTIVE 1: a contract-invalid composition is never
+            # delivered — the delivered answer is the typed no-answer
+            # (the record still carries the invalid text + violations
+            # for diagnostics; the DELIVERED outcome is what the label
+            # names, Art. X: the label describes the actual delivery)
+            return ("typed_no_answer:"
+                    + str(comp.get("state") or "FAILED_EXPLICIT"))
         if not legacy_diagnostic:
             return ("typed_no_answer:"
                     + str(comp.get("state") or "FAILED_EXPLICIT"))
@@ -516,17 +550,34 @@ def _extract_pipeline_answer(out_dir: Path,
         _c_ans = comp.get("answer")
         if _c_ans and str(_c_ans).strip():
             if comp.get("state") == "COMPOSED_CONTRACT_VALID":
-                return str(_c_ans)[:6000]
-            # contract-invalid composition: keep it but flag it —
-            # the flag text makes the violation visible to the judge
-            # and to every downstream diagnostic (honesty over
-            # tidiness, Art. XXV)
-            viols = " | ".join(
-                (comp.get("contract") or {}).get("violations") or [])
-            flag = ("CONTRACT-INVALID COMPOSITION (deterministic "
-                    "answer-shape contract violations: "
-                    f"{viols[:300]})\n\n")
-            return (flag + str(_c_ans))[:6000]
+                # DIRECTIVE 1 (owner audit round 2026-11-12): the
+                # delivered text is CLEAN — no internal state names,
+                # no pipeline-history narration, ONE plain-language
+                # caveat line at most; the typed states (contract
+                # violations, constraint-audit findings, repair
+                # history) ride the record metadata, never the
+                # delivered text (Art. XXV).
+                _delivered = str(_c_ans)
+                _cav = [str(c) for c in (comp.get("caveats") or [])
+                        if isinstance(c, str) and c.strip()]
+                _plain = [c for c in _cav
+                          if not _is_pipeline_narration_caveat(c)]
+                if comp.get("admitted_candidates") and any(
+                        c.get("hypothesis") for c in
+                        comp.get("admitted_candidates")
+                        if isinstance(c, dict)):
+                    _plain.insert(0, HYPOTHESIS_CAVEAT_LINE)
+                if _plain:
+                    _delivered = _delivered.rstrip() + "\n\n" + _plain[0]
+                return _delivered[:6000]
+            # DIRECTIVE 1 (owner audit round 2026-11-12): a
+            # contract-invalid composition is NEVER delivered — not
+            # with a banner, not bare. The banner the auditor saw
+            # shipped ("CONTRACT-INVALID COMPOSITION (...)") is
+            # retired (Art. LXIV); the typed state rides the record
+            # and the delivered answer is the typed no-answer (an
+            # answer that fails its own checker is not an answer).
+            return None
         if not legacy_diagnostic:
             # P0-4 normal path: the composer ran and produced no
             # admissible answer — typed no-answer state, NEVER a

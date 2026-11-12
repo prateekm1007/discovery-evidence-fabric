@@ -811,6 +811,18 @@ def assemble_candidate(operator: Dict[str, Any],
     cand["not_an_intervention_check"] = _nia
     cand["anchor_domain_check"] = anchor_domain_check(
         problem, structured_item, fields)
+    # OWNER AUDIT ROUND 2026-11-12, DIRECTIVE 3: the mechanism-to-
+    # failure link check — rejects GIMMICK ANCHORS (a technique dressed
+    # onto an anchor record that never mentions the failure
+    # phenomenon: tanh-weighted pressure error for condenser fouling,
+    # magnetic-flux asymmetry for partial discharge, graphene-
+    # polyaniline binder for grid corrosion, wavelet+RF with no
+    # labeled data). Deterministic, zero-LLM; typed verdict rides the
+    # candidate either way (never a silent drop, Art. XXI.3).
+    from .mechanism_link import mechanism_to_failure_link_check
+    _ml = mechanism_to_failure_link_check(problem, structured_item, fields,
+                                          operator_id=operator["operator_id"])
+    cand["mechanism_link_check"] = _ml
     if cand["candidate_state"] == "CANDIDATE":
         if _nia.get("rejected"):
             cand["candidate_state"] = (
@@ -825,6 +837,17 @@ def assemble_candidate(operator: Dict[str, Any],
                 "anchor record shares neither the failure's domain "
                 f"({cand['anchor_domain_check'].get('n_shared_tokens')} "
                 "shared tokens) nor a stated shared mechanism")
+        elif _ml.get("verdict") in ("NO_FAILURE_PHENOMENON",
+                                    "ANCHOR_OFF_DOMAIN",
+                                    "GIMMICK_ANCHOR_NO_LINK"):
+            cand["candidate_state"] = (
+                f"NOT_EVIDENCE_ANCHORED_{_ml.get('verdict')}")
+            cand["not_an_intervention_reason"] = (
+                "mechanism-to-failure link check: "
+                f"{_ml.get('reason')}")
+            cand["candidate_id"] = (
+                f"noncand:MS:{operator['operator_id']}:"
+                f"{sha256_obj(cand['derivation_trace'])[:12]}")
     return cand
 
 
@@ -893,6 +916,24 @@ def _contract_cross_domain_analogy(item: Dict[str, Any],
             "basis": "system is foreign to the problem domain while the "
                      "mechanism/failure vocabulary overlaps — analogy "
                      "material, never direct support"}
+
+
+def _contract_knowledge_first(item: Dict[str, Any],
+                              problem: Dict[str, Any]) -> Dict[str, Any]:
+    """DOMAIN_KNOWLEDGE_FIRST input contract: the anchor IS the user's
+    problem statement (the synthetic knowledge-first item), which the
+    P0-5 ruling already admits as citable provenance. Always satisfied
+    when the problem statement is non-trivial — the operator explores
+    the domain-knowledge region of the mechanism space (what an
+    experienced engineer would do), never evidence-dressed."""
+    ok = (item.get("_knowledge_first") is True
+          and bool(str(problem.get("failure") or "").strip()))
+    return {"operator": "DOMAIN_KNOWLEDGE_FIRST",
+            "satisfied": bool(ok),
+            "basis": "anchor is the user's problem statement (citable "
+                     "provenance per the P0-5 ruling); the candidate "
+                     "is standard domain-knowledge engineering, "
+                     "flagged as such and judged by the same gauntlet"}
 
 
 _GEOMETRY_VOCAB = None
@@ -1117,6 +1158,24 @@ TESTABLE_PREDICTION: <a falsifiable prediction: measurable quantity + direction 
 KNOWN_FAILURE_MODES: <how this design fails, one clause per failure separated by semicolons>
 BOUNDARY_CONDITIONS: <operating envelope where the inversion holds>
 MECHANISM_SOURCE_SPAN: <verbatim substring from the source abstract documenting the failure mechanism>""",
+    "DOMAIN_KNOWLEDGE_FIRST": """You are an experienced senior field engineer with deep domain knowledge. A discovery pipeline is exploring mechanism candidates anchored to retrieved records; YOUR job is the KNOWLEDGE-FIRST candidate: the intervention an experienced engineer would propose from domain knowledge ALONE for this failure — the standard, proven engineering practice for this failure mode, possibly refined to the stated constraints. This candidate is deliberately NOT evidence-anchored: it will be flagged UNVERIFIED and judged by the same adversarial gauntlet, so do not pretend a record supports it.
+
+PROBLEM STATEMENT (the user's own words — the ONLY admissible source for MECHANISM_SOURCE_SPAN; quote your span VERBATIM from here):
+- Device: {device}
+- Failure: {failure}
+- Failure mode: {failure_mode}
+- Constraint: {constraint}
+- Stated context record: {record_text}
+
+Respond in EXACTLY this format (each field on ONE line):
+MECHANISM: <the standard physical mechanism by which this failure mode is mitigated in this domain>
+INTERVENTION: <the specific design change an experienced engineer would make>
+PREDICTED_EFFECT: <the measurable effect on the failure quantity>
+NOVEL_DESIGN_VARIABLE: <the ONE design variable the engineer sets>
+TESTABLE_PREDICTION: <a falsifiable prediction: measurable quantity + direction + conditions>
+KNOWN_FAILURE_MODES: <how this design fails, one clause per failure separated by semicolons>
+BOUNDARY_CONDITIONS: <operating envelope where the practice holds>
+MECHANISM_SOURCE_SPAN: <verbatim substring from the problem statement supporting the mechanism>""",
 }
 
 
@@ -1176,8 +1235,66 @@ TRANSFORMATION_OPERATORS: List[Dict[str, Any]] = [
         "reuse)",
         "the failure-pathway dimension of the mechanism space (negative "
         "knowledge as design material)"),
+    # OWNER AUDIT ROUND 2026-11-12, DIRECTIVE 3: the KNOWLEDGE-FIRST
+    # candidate — ALWAYS generated next to the evidence-anchored ones
+    # (what an experienced engineer would do from domain knowledge),
+    # anchored to the user's problem statement (citable provenance,
+    # P0-5 ruling), flagged UNVERIFIED, judged by the same gauntlet.
+    _operator(
+        "DOMAIN_KNOWLEDGE_FIRST",
+        _contract_knowledge_first,
+        "generate the standard domain-knowledge intervention an "
+        "experienced engineer would propose for this failure mode, "
+        "refined to the stated constraints; never evidence-dressed — "
+        "delivered (when it survives) as a clearly flagged unverified "
+        "hypothesis",
+        "the domain-knowledge region of the mechanism space (the "
+        "engineer's standard practice; anchor = the user's problem "
+        "statement)"),
 ]
 OPERATOR_IDS = tuple(op["operator_id"] for op in TRANSFORMATION_OPERATORS)
+
+
+def knowledge_first_item(problem: Dict[str, Any]) -> Dict[str, Any]:
+    """The synthetic DOMAIN_KNOWLEDGE_FIRST anchor: the USER'S PROBLEM
+    STATEMENT (owner audit round 2026-11-12, directive 3). The user's
+    own words are citable provenance (the P0-5 ruling admits them as a
+    citation class), so the knowledge-first candidate is honestly
+    anchored — to the request itself, never to a retrieved record it
+    does not actually rest on. `_knowledge_first` exempts it from the
+    anchor-side gimmick checks by construction (the problem statement
+    carries the phenomenon by definition)."""
+    device = str(problem.get("device") or "")
+    failure = str(problem.get("failure") or "")
+    constraint = str(problem.get("constraint") or "")
+    failure_mode = str(problem.get("failure_mode") or "")
+    record_text = ". ".join(x for x in (
+        f"Device: {device}" if device else "",
+        f"Failure: {failure}" if failure else "",
+        f"Failure mode: {failure_mode}" if failure_mode else "",
+        f"Constraint: {constraint}" if constraint else "",
+    ) if x)
+    import hashlib as _h
+    return {
+        "item_id": "knowledge_first_problem_statement",
+        "structured_hash": _h.sha256(
+            record_text.encode("utf-8", "replace")).hexdigest(),
+        "fields": {
+            "system": {"value": device or "(unstated)"},
+            "mechanism": {"value": failure or "(unstated)"},
+            "observed_effect": {"value": failure or "(unstated)"},
+            "intervention": {"value": ""},
+            "boundary_conditions": {"value": constraint},
+            "constraints": {"value": constraint},
+            "failure_mode": {"value": failure_mode},
+        },
+        "source": "user_problem_statement",
+        "provenance": {
+            "construction": "KNOWLEDGE_FIRST_PROBLEM_STATEMENT",
+        },
+        "_record_text": record_text,
+        "_knowledge_first": True,
+    }
 
 #: R516D (auditor directive Part D — the ONE measured optimization).
 #: Initial token budget for operator instantiation calls.
@@ -3227,6 +3344,41 @@ def operator_semantic_check(op_id: str,
             "counter...) against the documented failure pathway — "
             "describing the same failure differently is not an "
             "inversion")
+
+    elif op_id == "DOMAIN_KNOWLEDGE_FIRST":
+        # R6 OWNER AUDIT ROUND 2026-11-12 (directive 3): the
+        # knowledge-first candidate's anchor IS the problem statement
+        # (M1 = the user's own words). INVARIANT: the candidate's
+        # mechanism speaks to the stated failure vocabulary — a
+        # knowledge-first candidate that ignores the stated failure is
+        # not an answer to it. REQUIRED CHANGE: the intervention adds
+        # engineering content BEYOND the problem restatement (a design
+        # variable, or prediction/intervention vocabulary the problem
+        # statement never used) — restating the constraints is not an
+        # intervention (the audited new01/sofc failure).
+        shared_mech = _shared(m1_mech, m2_mech | m2_int)
+        invariant = len(shared_mech) >= 1
+        m2_all = _terms(" ".join(str(candidate.get(k) or "") for k in
+                                 ("mechanism", "intervention",
+                                  "predicted_effect",
+                                  "testable_prediction",
+                                  "novel_design_variable")))
+        beyond = m2_all - (m1_mech | m1_sys | m1_bc | m1_int | m1_fm)
+        required = bool(m2_dv & beyond) or len(beyond) >= 2
+        out["checked_fields"] = {
+            "failure_addressed": {"shared_failure_terms": shared_mech},
+            "engineering_content_beyond_restatement": {
+                "new_terms": sorted(beyond)[:10]}}
+        out["invariant_held"] = invariant
+        out["required_change_present"] = required
+        out["invariant_basis"] = ("the knowledge-first candidate's "
+                                  "mechanism speaks to the stated "
+                                  "failure (the anchor is the problem "
+                                  "statement itself)")
+        out["required_change_basis"] = (
+            "the intervention adds engineering content beyond the "
+            "problem restatement (a design variable or new "
+            "intervention/prediction vocabulary)")
 
     else:
         out["invariant_held"] = False

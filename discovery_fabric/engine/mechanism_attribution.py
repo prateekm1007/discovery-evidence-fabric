@@ -49,8 +49,18 @@ SUBPHASES = (
     "operator_selection",
     "llm_instantiation_wall",
     "provider_call_split_offline",
-    "candidate_parsing",
-    "semantic_validation",
+    # R6 OWNER AUDIT ROUND 2026-11-12 (directive 3): the always-
+    # generated knowledge-first instantiation (DOMAIN_KNOWLEDGE_FIRST,
+    # anchor = the user's problem statement) is its own measured
+    # subphase, observed after the evidence-anchored instantiation wall
+    "knowledge_first_instantiation",
+    # Art. LXIV retirement (R6 audit round 2026-11-12): the registry's
+    # "candidate_parsing" / "semantic_validation" names were NEVER
+    # marked by any code path (dead registry entries — a failing pin
+    # for more than one audit round with no open investigation is
+    # presumptively dead, per Art. LXIV.2). Retired in the same change
+    # that ships the knowledge-first subphase; the measured spans are
+    # the contract consumers read.
     "cemetery_consultation",
     "distinctness_dedup",
     "mechanism_support_verification",

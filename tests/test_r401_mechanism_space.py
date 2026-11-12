@@ -317,17 +317,21 @@ class TestOperatorsAndDistinctness:
         # the directive's core demand: not five prompts. The input
         # contracts must differ STRUCTURALLY (different predicates with
         # different vocabularies) and the search constraints differ.
+        # R6 OWNER AUDIT ROUND 2026-11-12 AMENDMENT (disclosed,
+        # directive 3): the sixth operator DOMAIN_KNOWLEDGE_FIRST — the
+        # ALWAYS-generated knowledge-first candidate (anchor = the
+        # user's problem statement; same output schema, same gauntlet).
         ids = [o["operator_id"] for o in ms.TRANSFORMATION_OPERATORS]
         assert set(ids) == {
             "DIRECT_TRANSFER", "CROSS_DOMAIN_ANALOGY",
             "GEOMETRIC_TRANSFORMATION", "BOUNDARY_CONDITION_CHANGE",
-            "FAILURE_PATH_INVERSION"}
+            "FAILURE_PATH_INVERSION", "DOMAIN_KNOWLEDGE_FIRST"}
         contracts = [o["input_contract"].__code__.co_code
                      for o in ms.TRANSFORMATION_OPERATORS]
-        assert len(set(contracts)) == 5  # five distinct predicates
+        assert len(set(contracts)) == 6  # six distinct predicates
         constraints = [o["search_constraint"]
                        for o in ms.TRANSFORMATION_OPERATORS]
-        assert len(set(constraints)) == 5
+        assert len(set(constraints)) == 6
 
     def test_direct_transfer_contract_same_system(self, medical_item):
         c = ms._contract_direct_transfer(medical_item, PROBLEM)

@@ -157,9 +157,14 @@ def test_valid_bearing_evidence_admitted_with_graph():
     res, calls = _run(env, _good_llm())
     space = res["apply_to"]["mechanism_space"]
     assert space["state"] == "BUILT", space.get("state")
-    assert len(calls) == 1, "exactly one operator call, got %r" % calls
-    assert space["n_candidates_generated"] == 1
-    assert space["n_candidates_retained"] == 1
+    # R6 OWNER AUDIT ROUND 2026-11-12 (directive 3): one evidence-
+    # anchored operator call PLUS the always-generated knowledge-first
+    # call (same canned response -> a wording-duplicate candidate the
+    # distinctness instrument merges).
+    assert calls == ["operator_DIRECT_TRANSFER",
+                     "operator_DOMAIN_KNOWLEDGE_FIRST"], calls
+    assert space["n_candidates_generated"] == 2
+    assert space["n_candidates_retained"] >= 1
     cand = space["candidates"][0]
     nodes = (cand.get("mechanism_graph") or {}).get("nodes") or {}
     assert nodes, "graph must be produced from evidence-bearing fields"
@@ -241,8 +246,20 @@ def test_unrelated_refused_zero_calls():
     env = _env([rec], [_cls("r7", "PARTIAL_SUPPORT")])
     res, calls = _run(env, _good_llm())
     space = res["apply_to"]["mechanism_space"]
-    assert space["state"] == "NO_CANDIDATES", space.get("state")
-    assert calls == [], "refusal must precede any LLM call"
+    # R6 OWNER AUDIT ROUND 2026-11-12 (directive 3): the refusal
+    # governs the EVIDENCE-ANCHORED path — zero evidence-operator
+    # calls; the knowledge-first generator is evidence-INDEPENDENT and
+    # always runs (its anchor is the user's problem statement), so the
+    # space carries the domain-knowledge candidate even when the
+    # records are unrelated. The evidence-side starved cause stays
+    # recorded (Art. LXI typing of the evidence leg).
+    assert space["state"] == "BUILT", space.get("state")
+    assert [c for c in calls
+            if c != "operator_DOMAIN_KNOWLEDGE_FIRST"] == [], (
+        "the evidence-anchored refusal precedes any evidence call")
+    assert calls == ["operator_DOMAIN_KNOWLEDGE_FIRST"], calls
+    assert space.get("starved_cause", {}).get(
+        "label") == "NO_APPLICABLE_EVIDENCE", space.get("starved_cause")
 
 
 # 8. missing record honest NO_EVIDENCE ---------------------------------

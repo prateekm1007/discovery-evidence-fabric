@@ -1,0 +1,93 @@
+{
+ "instrument": "R6_KILL_RECORD/1.0.0",
+ "owner_directive": "owner audit round 2026-11-12 item 6 (commit candidate + kill rationale + record text; deliver flagged hypothesis where every kill cause is KILL_CAUSE_NOT_IN_RECORD)",
+ "problem_id": "bench-p09-packaging-barrier",
+ "run_id": "r1-pipeline+baseline+judge-2026-11-12050540000",
+ "commit": "977851bc16a5",
+ "candidate": {
+  "candidate_id": "cand:A2:bench-p09-packaging-barrier:e14e62a573717265",
+  "mechanism": "Incorporation of thermally stable, low-volatility plant phenolics into polyolefin matrices via melt-blending to maintain active properties during high-temperature processing.",
+  "intervention": "Melt-blend a thermally stable, low-volatility phenolic antioxidant (e.g., isobutyl-4-hydroxybenzoate) into the ethylene-vinyl alcohol (EVOH) layer at 2 wt% to act as a scavenger for oxidative radical species that accelerate moisture-induced plasticization and chain scission, thereby stabilizing the polymer matrix against humidity degradation.",
+  "expected_effect": "The phenolic additive will inhibit the oxidative degradation pathways triggered by moisture absorption, preserving the crystalline structure and free volume of the EVOH layer, thereby maintaining the water vapor transmission rate below 0.5 g/m2/day for 18 months.",
+  "falsification_test": "Measure the Water Vapor Transmission Rate (WVTR) of films with and without 2 wt% phenolic additive at 25 C and 65% RH over 18 months; failure is defined as WVTR exceeding 0.5 g/m2/day in the additive-containing sample or no significant improvement in barrier stability compared to the control."
+ },
+ "gauntlet": {
+  "overall": "KILLED",
+  "gauntlet_version": "a2_adversarial_gauntlet/2.1.0",
+  "killed_count": 2,
+  "attack_classes": {
+   "unsupported_mechanism": "KILLED - claimed \"water vapor transmission rate below 0.5 g/m2/day\" but the record's specific value 0.5 g/m2/day (approx 0.21 g/m2/day in standard humidity units if meant as g/m2/day or 0.5 g/m2/24h) is physically invalid for \"dry\" moisture barrier; typical high-barrier films have WVTR <0.1 g/m2/24h; however, more critically, the mechanism claims the phenolic scavenger stabilizes the polymer against \"moisture-induced plasticization\" to maintain barrier, but moisture plasticization of EVOH is a hygroscopic swelling effect (free volume increase) not primarily driven by oxidative radical chain scission that a small antioxidant would prevent to such a degree to maintain the target barrier level against the \"low 0.5 g/m2/day\" threshold; the causal chain that oxidative degradation is the primary driver of *plasticization* that leads to WVTR failure is unsupported; oxidative degradation causes embrittlement/chain scission (loss of integrity), while plasticization is driven by water absorption kinetics and Tg drop; stabilizing against oxidation does not necessarily stop water plasticization from increasing free volume if the water absorption capacity is intrinsic.",
+   "weak_transfer": "KILLED - the source evidence explicitly reports IBHB was mixed into \"3 polyolefins: EVA..., LLDPE..., and PP\", not EVOH; the source span \"addition of plant phenolics... to different polyolefins\" in the record refers to EVA (Ethylene-Vinyl Acetate), which is distinct from EVOH (Ethylene-Vinyl Alcohol); the transfer from EVA/PE/PP (the actual sources) to EVOH (the candidate) is an unsupported extrapolation to a copolymer with vastly different hydrophilicity and processing window (EVOH is hygroscopic and processed at low temps/dry conditions, unlike the 75-170C melt blending of PE/PP/EVA in the source).",
+   "obvious_combination": "RISK (burden-of-proof: memory_claim) — the record itself combines \"melt-blending\" (a standard technique cited in source: \"processed by usual plastic compounding\") with \"antioxidants/phenolics\" (standard additives) for barrier films; the source explicitly lists IBHB in EVA/LLDPE/PP; applying it to EVOH",
+   "prior_art": "",
+   "contradiction": "",
+   "boundary_failure": "",
+   "engineering_infeasibility": "",
+   "regulatory_incompatibility": ""
+  }
+ },
+ "kill_cause_classification": {
+  "instrument_version": "mechanism_link/1.0.0",
+  "n_kills": 2,
+  "per_kill": [
+   {
+    "source": "gauntlet_attacks",
+    "attack_class": "unsupported_mechanism",
+    "cause": "KILL_CAUSE_NOT_IN_RECORD",
+    "cause_window": "degradation causes embrittlement/chain scission (loss of integrity), while plasticization is driven by water absorption kinetics and Tg drop; stabilizing against oxidation does not necessarily stop water plasticization from increasing free volume if the water absorption capacity is intrinsic.",
+    "scientific_marker": null,
+    "record_marker": null
+   },
+   {
+    "source": "gauntlet_attacks",
+    "attack_class": "weak_transfer",
+    "cause": "KILL_CAUSE_NOT_IN_RECORD",
+    "cause_window": "from EVA/PE/PP (the actual sources) to EVOH (the candidate) is an unsupported extrapolation to a copolymer with vastly different hydrophilicity and processing window (EVOH is hygroscopic and processed at low temps/dry conditions, unlike the 75-170C melt blending of PE/PP/EVA in the source).",
+    "scientific_marker": null,
+    "record_marker": "unsupported extrapolation"
+   }
+  ],
+  "all_not_in_record": true,
+  "mixed": false,
+  "scientific_kill_classes": []
+ },
+ "delivery_semantics": "FLAGGED_UNVERIFIED_HYPOTHESIS_DELIVERED",
+ "record_texts": [
+  {
+   "id": "doi:10.3389/fchem.2019.00148",
+   "title": "Potential of Incorporation of Antimicrobial Plant Phenolics Into Polyolefin-Based Food Contact Materials to Produce Active Packaging by Melt-Blending: Proof of Concept With Isobutyl-4-Hydroxybenzoate",
+   "abstract": "There is an increasing interest for active food packaging incorporated with natural antimicrobial agents rather than synthetic preservatives. However, most of plastics for direct contact with food are made of polyolefins, usually processed by extrusion, injection, or blow-molding methods while most of natural antimicrobial molecules are thermolabile compounds (e.g., essential oils). Therefore, addition of plant phenolics (with low volatility) to different polyolefins might be promising to design active controlled release packaging processed by usual plastic compounding and used for direct contact with food products. Therefore, up to 2% (wt/wt) of isobutyl-4-hydroxybenzoate (IBHB) was mixed with 3 polyolefins: EVA poly(ethylene-co-vinyl acetate), LLDPE (Linear Low Density Polyethylene), and PP (PolyPropylene) by melt-blending from 75 to 170°C and then pelletized in order to prepare heat-pressed films. IBHB was chosen as an antibacterial phenolic active model molecule against Staphylococcus aureus to challenge the entire processing. Antibacterial activity of films against S. aureus (procedure adapted from ISO 22196 standard) were 4, 6, and 1 decimal reductions in 24 h for EVA, LLDPE, and PP films, respectively, demonstrating the preservation of the antibacterial activity after melt processing. For food contact materials, the efficacy of antimicrobial packaging depends on the release of the antimicrobial molecules. Therefore, the three types of films were placed at 23°C in 95% (v/v) ethanol and the release rates of IBHB were monitored: 101 ± 1%, 32 ± 7%, and 72 ± 9% at apparent equilibrium for EVA, LLDPE, and PP films, respectively. The apparent diffusion coefficients of IBHB in EVA and PP films were 2.8 ± 0.3 × 10−12 and 4.0 ± 1.0 × 10−16 m2s−1. For LLDPE films, IBHB crystals were observed on the surface of films by SEM (Scanning Electron Microscopy): this blooming effect was due the partial incompatibility of IBHB in LLDPE and its fast diffusion out of the polymer matrix onto the film surface. In conclusion, none of these three materials was suitable for a relevant controlled release packaging targeting the preservation of fresh food, but a combination of two of them is promising by the design of a multilayer packaging: the release could result from permeation through an inner PE layer combined with an EVA one acting as a reservoir.",
+   "source": "doaj"
+  },
+  {
+   "id": "doi:10.3390/nano16150934",
+   "title": "Recent Advances in Barrier Property Enhancement of Biodegradable Polymer Films: Strategies and Challenges.",
+   "abstract": "Over the past decades, biodegradable polymer films have gained significant attention owing to their environmental friendliness and abundant raw material availability. However, the barrier properties of biodegradable polymers as packaging materials remain inferior to those of traditional petroleum-based plastic films, limiting their suitability for applications sensitive to oxygen or moisture such as food preservation, pharmaceutical packaging, and electronic device protection. In this paper, we summarize effective strategies to enhance the barrier properties of biodegradable polymer packaging films, such as surface coating, polymer blending, multilayer compounding, copolymerization and modification, nanocomposite technology, and filler reinforcement. Subsequently, we discuss the application of these strategies to biodegradable polymers, including both natural and synthetic varieties. A central focus is elucidating the relationship between the modification approaches, molecular structure, and oxygen/water barrier properties in high-barrier biodegradable polymer materials, aiming to provide valuable guidance for the development of advanced biodegradable polymer packaging materials. Finally, we present the existing challenges and future prospects for the development of high-barrier biodegradable polymer packaging materials.",
+   "source": "europepmc"
+  },
+  {
+   "id": "doi:10.3390/polym18121500",
+   "title": "Engineering Breathable Biodegradable Multilayers via Solution Blow Spinning for Sustainable Food Packaging.",
+   "abstract": "This study investigated porous materials based on cellulose acetate (CA), poly(lactic acid) (PLA), and their multilayer combinations fabricated by solution blow spinning (SBS) for potential food packaging applications. Single-layer neat polymers and multilayer structures (CA/PLA, CA/PLA/CA, and PLA/CA/PLA) were produced through sequential deposition, enabling control of layer arrangement while preserving high porosity. Attenuated total reflectance Fourier-transformed infrared spectroscopy, differential scanning calorimetry, and thermogravimetric analysis showed negligible polymer interdiffusion or specific intermolecular interactions, indicating that layer integration occurs mainly through physical contact and void filling rather than molecular mixing. Scanning electron microscopy analysis revealed that cellulose acetate possesses a highly porous, interconnected structure, whereas poly(lactic acid) exhibits a predominantly fibrous morphology with clearly distinguishable layers in multilayer systems. Mechanical testing demonstrated that poly(lactic acid) mats had higher stiffness and tensile strength, while cellulose acetate films were more flexible and compliant. Multilayer systems showed complex tensile behavior characterized by interfacial failure and limited load transfer, indicating no synergistic mechanical reinforcement between layers. Water vapor permeability remained high and narrowly distributed for all configurations (890-920 g·m -2 ·day -1 ), independent of layer sequence, reflecting the porous morphology. These values exceed those of conventional polymer packaging films, highlighting the suitability of the materials for breathable packaging. Overall, solution blow spinning enables scalable fabrication of biodegradable multilayer materials with tunable mechanical performance for sustainable food packaging applications requiring controlled moisture exchange.",
+   "source": "europepmc"
+  },
+  {
+   "id": "doi:10.3390/polym18162031",
+   "title": "Recycling of Flexible Plastic Films: Emergent Technologies.",
+   "abstract": "Plastic is a valuable material for packaging of food and pharmaceuticals, protective wrappings in construction and agriculture, and fluid storage. Flexible plastic or plastic film waste from packaging, agriculture, and construction applications grows at a rate of at least 92 million metric tons a year, is considered challenging to recycle, and is typically landfilled. In recent years, there have been great advancements in plastic recycling technology in order to deal with the global challenge of plastic waste buildup and support legislation from a local to national level to implement recycling. This work highlights the most recent advancements in plastic film recycling. Plastic films are mono- or multilayered based on what their applications will be, with multilayer multimaterial films being the more challenging feedstock for recycling. Mechanical recycling cannot easily process flexible films. Pyrolysis can use polyolefin-based film as feedstock but is not practiced at scale to match the rate of plastic film waste generation, and incineration can recover energy from film feedstock but is not recycling plastic. This has motivated the development of new recycling technologies designed around plastic films. Better characterization technologies to identify film compositions in municipal waste streams have been key to sorting out film feedstock for mechanical recycling and the baling of flexible plastic waste, but they struggle with multilayer films and black plastic. Compatibilization enables the recycling of mixed plastic waste but requires polymer compositions for selecting specific compatibilizers. Dissolution-precipitation recovers individual types of polymers from multilayer films and, at the same time, can purify polymers from additives or contaminants, but requires intense solvent processing and associated energy. Delamination of multilayer films can separate and recover solid films of polyolefins at relatively low amounts of solvent but requires quality feedstock to be efficient. Both dissolution-precipitation and delamination recycling of films recover the original polymer molecules and maintain their embodied energy, hence support circularity. In the case of PET-containing films, depolymerization to recover PET monomers offers opportunities to recycle challenging film feedstock.",
+   "source": "europepmc"
+  },
+  {
+   "id": "doi:10.1016/j.profoo.2011.09.037",
+   "title": "Life Cycle Assessment of multilayer polymer film used on food packaging field",
+   "abstract": "",
+   "source": "crossref"
+  },
+  {
+   "id": "doi:10.3390/molecules31183317",
+   "title": "Bioactive Compounds from Seaweeds as Natural Preservatives for Seafood.",
+   "abstract": "Escalating environmental concerns over petroleum-based plastics have driven growing interest in seaweed-derived polysaccharides and bioactive compounds as sustainable alternatives for biodegradable packaging. This review synthesizes recent advances in seaweed-based packaging, particularly related to seafood preservation. It covers the development of edible films and coatings, innovations in active and smart packaging, and the creation of multilayer multifunctional systems. The review highlights key applications that demonstrate the effectiveness of seaweed-based materials in delaying microbial spoilage, reducing lipid oxidation, preserving sensory quality, and extending the shelf life of seafood. Additionally, this review addresses food safety and regulatory considerations and provides a detailed examination of major barriers to commercial adoption, particularly variability in composition depending on environmental, physiological, extraction, and geographical factors, high production costs associated with polysaccharide extraction and purification, insufficient pilot- and industrial-scale validation, and the lack of standardized processing protocols.",
+   "source": "europepmc"
+  }
+ ]
+}

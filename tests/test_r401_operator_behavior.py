@@ -478,4 +478,6 @@ def test_operator_semantic_checks_are_operator_specific():
         out = ms.operator_semantic_check(op_id, M1_MEDICAL, m2_stub,
                                          PROBLEM)
         field_sets.append(tuple(sorted(out["checked_fields"])))
-    assert len(set(field_sets)) == 5  # five distinct structural checks
+    # R6 OWNER AUDIT ROUND 2026-11-12 (directive 3): the sixth
+    # operator DOMAIN_KNOWLEDGE_FIRST carries its own structural check
+    assert len(set(field_sets)) == 6  # six distinct structural checks

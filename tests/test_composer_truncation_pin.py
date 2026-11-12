@@ -263,12 +263,12 @@ class TestComposerTruncation(unittest.TestCase):
                           "finish_reason", "length", "lxi"):
                 self.assertNotIn(token, c,
                                   f"caveat carries typed detail: {c!r}")
-        # and the version is the declared 1.1.0 (the additive state +
-        # truncation record)
+        # and the version is the declared 1.3.0 (the additive clean-
+        # output + repair-until-valid + constraint-audit round)
         self.assertEqual(rec["composer_version"],
                          ANSWER_COMPOSER_VERSION)
         self.assertEqual(ANSWER_COMPOSER_VERSION,
-                         "answer_composer/1.2.0")
+                         "answer_composer/1.3.0")
 
     def test_plain_valid_composition_untouched(self):
         # the pre-item-1 behavior: one call, no truncation record

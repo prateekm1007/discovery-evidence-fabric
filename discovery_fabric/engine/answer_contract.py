@@ -541,6 +541,52 @@ def _count_matches(pattern: str, text: str) -> int:
     return len(re.findall(pattern, text or "", re.IGNORECASE))
 
 
+#: CLEAN-OUTPUT contract (owner audit round 2026-11-12, directive 1):
+#: internal state names and pipeline-history narration are FORBIDDEN in
+#: the engineer-facing answer text. Typed states live in the record
+#: metadata (Art. XXV); the answer reads as an engineer's
+#: recommendation. Each token is a phrase the auditor saw shipped or an
+#: internal typed-state family. "UNVERIFIED" is deliberately ABSENT:
+#: an honestly flagged hypothesis keeps its plain-language label.
+INTERNAL_NARRATION_TOKENS = (
+    "contract-invalid", "contract_invalid", "composed_contract",
+    "compose_truncated", "compose_failed",
+    "no admissible", "no_admissible", "no surviving", "all killed",
+    "automated_invention_candidate", "invention_requires_experiment",
+    "invention_under_development", "mechanism_starved",
+    "incomplete_infrastructure", "incomplete_data", "skipped_no_packet",
+    "cand:ms:", "cand:a", "[cand:", "noncand:",
+    "the adversarial gauntlet", "the gauntlet", "gauntlet killed",
+    "the verification gate", "the evidence gate", "the attack gate",
+    "the pipeline", "pipeline data", "the previous attempt",
+    "the provided pipeline", "the frozen evidence packet",
+    "packet item", "the packet record", "the evidence packet",
+    "verification verdict", "attack verdict", "attack record",
+    "the admission gate", "mechanism_map", "candidate envelope",
+    "envelope engine", "routing ledger", "stage_log",
+)
+
+
+def internal_narration_tokens(text: str) -> List[str]:
+    """The internal-state / narration tokens present in the answer
+    text (deterministic, zero-LLM; case-insensitive, word-boundary
+    for short tokens; id-like tokens containing ':' match as PREFIX —
+    "cand:a" catches "cand:A2")."""
+    low = str(text or "").lower()
+    hits = []
+    for tok in INTERNAL_NARRATION_TOKENS:
+        if ":" in tok:
+            if tok in low:
+                hits.append(tok)
+        elif len(tok) <= 8:
+            if re.search(r"(?<![\w:])" + re.escape(tok) + r"(?![\w:])",
+                         low):
+                hits.append(tok)
+        elif tok in low:
+            hits.append(tok)
+    return hits
+
+
 def validate_answer(answer: str, question_type: str,
                     packet: Optional[List[Dict[str, Any]]] = None,
                     user_variables: Optional[List[str]] = None,
@@ -800,6 +846,15 @@ def validate_answer(answer: str, question_type: str,
                 "label")
     else:
         violations.append(f"unknown question_type {question_type!r}")
+    # CLEAN-OUTPUT contract (owner audit round 2026-11-12, directive 1;
+    # applies to EVERY question type): internal state names and
+    # pipeline-history narration never ship in the answer text — the
+    # typed states live in the record metadata (Art. XXV), the answer
+    # reads as an engineer's recommendation.
+    for tok in internal_narration_tokens(text):
+        violations.append(
+            "clean-output contract: internal state/narration token "
+            f"{tok!r} present in the answer text")
     # numbers in answer not always from packet or user vars -> assumption or unbound
     for n in set(_numbers(text)):
         bindings["all_numbers"] += 1

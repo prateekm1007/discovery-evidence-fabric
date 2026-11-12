@@ -1463,6 +1463,32 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                 attempts.append(_failed_attempt(
                     _m[1]["operator_id"], f"{type(_exc).__name__}: {_exc}"))
 
+    # ---- OWNER AUDIT ROUND 2026-11-12, DIRECTIVE 3: the KNOWLEDGE-
+    #      FIRST candidate — ALWAYS generated next to the evidence-
+    #      anchored ones (what an experienced engineer would do from
+    #      domain knowledge). ONE additional instantiation call; the
+    #      anchor is the user's problem statement (citable provenance
+    #      per the P0-5 ruling); the candidate faces the SAME
+    #      deterministic validation tail and the SAME gauntlet as the
+    #      evidence-anchored candidates — nothing about it is
+    #      privileged, it is only not evidence-dressed.
+    _kf_op = next((o for o in _ms.TRANSFORMATION_OPERATORS
+                   if o["operator_id"] == "DOMAIN_KNOWLEDGE_FIRST"), None)
+    _kf_contract = {"operator": "DOMAIN_KNOWLEDGE_FIRST",
+                    "satisfied": bool(str(problem.get("failure") or "").strip()),
+                    "basis": "anchor is the user's problem statement"}
+    _kf_item = _ms.knowledge_first_item(problem)
+    _kf_ran = False
+    if _kf_op and _kf_contract.get("satisfied"):
+        try:
+            attempts.append(_lean_operator_attempt(
+                [_kf_item], problem, _kf_item, _kf_op, _kf_contract))
+            _kf_ran = True
+        except Exception as _exc:  # noqa: BLE001 — typed, never silent
+            attempts.append(_failed_attempt(
+                "DOMAIN_KNOWLEDGE_FIRST",
+                f"{type(_exc).__name__}: {_exc}"))
+
     field_blocks: List[Dict[str, str]] = []
     _cands: List[Dict[str, Any]] = []
     all_operator_results: List[Dict[str, Any]] = []
@@ -1481,6 +1507,11 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                               {"provider": _llm_meta.get("provider"),
                                "model": _llm_meta.get("model"),
                                "transport_status": _llm_meta.get("status")})
+    # R6 OWNER AUDIT ROUND 2026-11-12 (directive 3): the knowledge-
+    # first instantiation rides the attribution funnel as its own
+    # subphase, observed after the evidence-anchored wall
+    _clk.mark("knowledge_first_instantiation",
+              {"ran": _kf_ran, "operator": "DOMAIN_KNOWLEDGE_FIRST"})
     cand = _cands[0] if _cands else None
     _n_fields_nonempty = (sum(1 for v in field_blocks[0].values()
                               if str(v or ""))
@@ -1707,6 +1738,22 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
         # honest record of every parsed hypothesis's own outcome).
         "hypothesis_blocks_parsed": len(field_blocks),
         "hypothesis_attribution": _hyp_attribution,
+        # R6 OWNER AUDIT ROUND 2026-11-12 (directive 3, additive —
+        # existing readers unaffected): the knowledge-first generator
+        # is a SECOND instantiation call, disclosed here (never merged
+        # into the evidence-anchored call's identity; Art. X — the
+        # record names the real transport).
+        "knowledge_first_attempt": {
+            "attempted": _kf_ran,
+            "operator": "DOMAIN_KNOWLEDGE_FIRST",
+            "anchor": "user_problem_statement",
+            "n_hypotheses_parsed": sum(
+                len((_a.get("operator_result") or {}).get("candidates")
+                    or [])
+                for _a in attempts
+                if (_a.get("operator_result") or {}).get("operator")
+                == "DOMAIN_KNOWLEDGE_FIRST"),
+        },
     }
     space["instantiation_attempts"] = [_att_entry]
     # R516 Part A: the candidate funnel + LLM detail, all counts and

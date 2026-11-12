@@ -1,0 +1,95 @@
+{
+ "instrument": "R6_KILL_RECORD/1.0.0",
+ "owner_directive": "owner audit round 2026-11-12 item 6 (commit candidate + kill rationale + record text; deliver flagged hypothesis where every kill cause is KILL_CAUSE_NOT_IN_RECORD)",
+ "problem_id": "eval-new07-transformer-dga-predictor",
+ "run_id": "r1-pipeline+baseline+judge-2026-11-12051342000",
+ "commit": "977851bc16a5",
+ "candidate": {
+  "candidate_id": "cand:A2:eval-new07-transformer-dga-predictor:c229a6248e2251d7",
+  "mechanism": "Nanoparticle-enhanced dielectric fluids improve thermal conductivity and dielectric strength, which can facilitate heat dissipation and inhibit partial discharge initiation by modifying the local electric field and thermal gradients within the oil.",
+  "intervention": "Implement an online soft sensor model that uses top-oil temperature, load current, and ambient temperature to estimate the effective thermal resistance and insulation health. The model infers the presence of nanofluid-like thermal stability or degrades to standard oil baselines; flag deviations in the temperature-load hysteresis that indicate the onset of thermal faults or partial discharge heating, leveraging the principle that modified fluids alter heat transfer rates.",
+  "expected_effect": "Detection of incipient thermal or partial discharge faults at least 30 days before the next scheduled DGA sample by identifying characteristic shifts in the correlation between top-oil temperature and load current, which reflect changes in dielectric fluid properties or internal fault heating.",
+  "falsification_test": "Inject a controlled thermal fault (e.g., a small winding hot spot) into a test transformer filled with standard mineral oil and with nanoparticle-enhanced oil. The soft sensor must detect the temperature-response anomaly in the standard oil case as a \"fault\" (high thermal resistance signal) and in the nanofluid case as a \"stable/healthy\" signal (if the nanofluid effectively dissipates the heat), or vice versa depending on the baseline model. If the model cannot distinguish the two thermal behaviors using only online sensors, the mechanism is falsified."
+ },
+ "gauntlet": {
+  "overall": "KILLED",
+  "gauntlet_version": "a2_adversarial_gauntlet/2.1.0",
+  "killed_count": 2,
+  "attack_classes": {
+   "unsupported_mechanism": "KILLED - the causal chain is physically invalid because the mechanism claims that standard mineral oil will exhibit a \"high thermal resistance signal\" upon heating, whereas the fundamental physics of a thermal fault implies that heat generation from the defect will drive temperature up regardless of the bulk oil's thermal conductivity, making the claimed inverse relationship between fault heating and thermal resistance detection nonsensical.",
+   "weak_transfer": "KILLED - the source paper discusses the static improvement of dielectric properties in lab-scale nanofluids, which fails to transfer to the dynamic, field-level inference problem of distinguishing transient thermal faults from normal load-dependent temperature variations using only top-oil sensors over a 30-day window.",
+   "obvious_combination": "PASS - the record contains only one source (the nanofluid review) which does not contain the known techniques of \"online soft sensors\" or \"temperature-load hysteresis monitoring,\" so a kill for obviousness cannot be grounded in the provided record bytes.",
+   "prior_art": "PASS - no prior disclosure of this specific 30-day predictive soft-sensor model using only top-oil/load/ambient data is named in the provided record, and external literature cannot be used as grounding for a kill.",
+   "contradiction": "PASS - the source evidence describes general property improvements of nanofluids but does not provide specific conflicting numerical values that contradict the candidate's claimed detection latency or sensor resolution.",
+   "boundary_failure": "PASS - the record defines a specific operating boundary (132/33 kV, 40 MVA, 15-min resolution) and does not declare a violation of a physical limit within that boundary that can be computed from the record's own numbers.",
+   "engineering_infeasibility": "RISK - while distinguishing a small, incipient partial discharge hotspot from the bulk top-oil temperature (which has significant thermal lag and volume averaging effects) within a 30-day window is highly questionable, the record provides no specific heat transfer coefficients or fault power values from which a KILL can be computationally derived via arithmetic.",
+   "regulatory_incompatibility": "PASS - no specific regulatory regime or clause (e.g., IEC 60076, IEEE C57) is cited in the record as being violated by the proposed sensor installation or fluid modification."
+  }
+ },
+ "kill_cause_classification": {
+  "instrument_version": "mechanism_link/1.0.0",
+  "n_kills": 2,
+  "per_kill": [
+   {
+    "source": "gauntlet_attacks",
+    "attack_class": "unsupported_mechanism",
+    "cause": "KILL_CAUSE_SCIENTIFIC",
+    "cause_window": "upon heating, whereas the fundamental physics of a thermal fault implies that heat generation from the defect will drive temperature up regardless of the bulk oil's thermal conductivity, making the claimed inverse relationship between fault heating and thermal resistance detection nonsensical.",
+    "scientific_marker": "fundamental physics",
+    "record_marker": null
+   },
+   {
+    "source": "gauntlet_attacks",
+    "attack_class": "weak_transfer",
+    "cause": "KILL_CAUSE_NOT_IN_RECORD",
+    "cause_window": "discusses the static improvement of dielectric properties in lab-scale nanofluids, which fails to transfer to the dynamic, field-level inference problem of distinguishing transient thermal faults from normal load-dependent temperature variations using only top-oil sensors over a 30-day window.",
+    "scientific_marker": null,
+    "record_marker": "fails to transfer"
+   }
+  ],
+  "all_not_in_record": false,
+  "mixed": true,
+  "scientific_kill_classes": [
+   "unsupported_mechanism"
+  ]
+ },
+ "delivery_semantics": "TYPED_NO_ANSWER_STANDS (a scientific kill is never manufactured into an endorsement)",
+ "record_texts": [
+  {
+   "id": "doi:10.1109/eic.1979.7461075",
+   "title": "Tube aging of oil-filled transformer electrical insulation system and aging of oil-filled distribution transformer",
+   "abstract": "",
+   "source": "crossref"
+  },
+  {
+   "id": "doi:10.1109/icdl63868.2025.11068231",
+   "title": "Assessment of Natural Ester Retrofilling Effects on Transformer Lighting Impulse Behaviour Regarding to Safety Margins of Transformer Insulation: A Case Study on a 180 MVA, 400/36 kV Power Transformer",
+   "abstract": "",
+   "source": "crossref"
+  },
+  {
+   "id": "doi:10.3390/nano11112885",
+   "title": "Dielectric Fluids for Power Transformers with Special Emphasis on Biodegradable Nanofluids.",
+   "abstract": "This review is focused on the research of dielectric fluids, especially commonly used power transformer oils enhanced by nanoparticles, i.e., nanofluids. There are differences between various combinations of base fluids and nanoparticles prepared in different ways. The main goal of this review was to present recent research in this field sorted by the used nanoparticles. Nanofluids based on mineral oils, natural, or synthetic esters were investigated in terms of the nature of nanoparticles, particularly Al 2 O 3 , TiO 2 , Fe 2 O 3 , Fe 3 O 4 , graphene, fullerene, and others. The combinations of environmentally friendly oils and nanoparticles were presented. Finally, the article focused on the description of current dielectric fluids usable in power transformers and the possibilities of improving new and existing fluids with nanoparticles, especially their physical, dielectric, and chemical properties, but with regard to environmental aspects.",
+   "source": "europepmc"
+  },
+  {
+   "id": "doi:10.3390/ma18050923",
+   "title": "Advancing Power Transformer Cooling: The Role of Fluids and Nanofluids-A Comprehensive Review.",
+   "abstract": "The ongoing pursuit of enhanced efficiency and sustainability in power transformer cooling systems has spurred extensive research into the properties and performance of insulating fluids. This review explores the evolution of transformer cooling technologies, focusing on traditional mineral oils and the emerging roles of alternative fluids, such as natural and synthetic esters, and nanofluids. Mineral oils, though widely used, degrade over time, leading to a reduction in breakdown voltage (BDV) from 46 kV to 30 kV, exhibiting low fire resistance. Natural and synthetic esters provide improved biodegradability, fire safety but have higher viscosities-potentially limiting convective cooling. Nanofluids, have demonstrated BDV enhancements of up to 47.8%, reaching 88.7 kV in optimised formulations, alongside increases in partial discharge inception voltage (PDIV) of 20-23%. Additionally, thermal conductivity improvements of 5-20% contribute to enhanced heat dissipation. Moreover, it addresses challenges such as nanoparticle agglomeration, sedimentation, ageing, and compatibility with transformer materials. The analysis provides critical insights into the trade-offs between technical performance and economic feasibility. Concluding with an outlook on future research directions, the review identifies key parameters across various categories, establishing a roadmap for nanofluid integration with existing transformer systems.",
+   "source": "europepmc"
+  },
+  {
+   "id": "doi:10.3390/molecules25173901",
+   "title": "Sustainable, Renewable and Environmental-Friendly Insulation Systems for High Voltages Applications.",
+   "abstract": "With the inception of high voltage (HV), requisites on the insulating permanence of HV equipment is becoming increasingly crucial. Mineral/synthetic oil liquid insulation-together with solid insulation materials (paper, pressboard)-is the fundamental insulation constituent in HV apparatuses; their insulation attributes perform a substantial part in a reliable and steady performance. Meanwhile, implications on the environment, scarcity of petroleum oil supplies and discarding complications with waste oil have stimulated investigators to steer their attention towards sustainable, renewable, biodegradable and environmentally friendly insulating substances. The contemporary insulating constituent's evolution is driven by numerous dynamics-in particular, environmental obligations and other security and economic issues. Consequently, HV equipment manufacturers must address novel specifications concerning to these new standards. Renewable, sustainable and environmentally friendly insulating materials are continuously substituting conventional insulating items in the market place. These are favorable to traditional insulating materials, due to their superior functionality. The also offer explicit security and eco-friendly advantages. This article discusses cutting-edge technology of environmentally friendly insulating materials, including their fabrication, processing and characterization. The new renewable, insulating systems used in HV equipment are submitted and their fundamental gains stated in comparison with conventional insulating materials. Several experimental efforts carried out in various parts of the world are presented, offering an outline of the existing research conducted on renewable insulating systems. The significance of this article lies in summarizing prior investigations, classifying research essence, inducements and predicting forthcoming research trends. Furthermore, opportunities and constraints being experienced in the field of exploration are evidently reported. Last but not least, imminent research proposals and applications are recommended.",
+   "source": "europepmc"
+  },
+  {
+   "id": "doi:10.1109/eic.1979.7461059",
+   "title": "Predicting transformer incipient faults by dissolved gas in oil analysis",
+   "abstract": "",
+   "source": "crossref"
+  }
+ ]
+}

@@ -108,8 +108,18 @@ def _strip_volatile(obj):
     skip = {"built_at", "derived_at", "extracted_at", "recorded_at",
             "started_at", "finished_at", "runtime_attribution"}
     if isinstance(obj, dict):
-        return {k: _strip_volatile(v) for k, v in obj.items()
-                if k not in skip}
+        out = {}
+        for k, v in obj.items():
+            if k in skip:
+                continue
+            # wall-clock durations are never structurally deterministic
+            # (R6 audit round: the knowledge-first subphase adds
+            # measured spans; the structure is what must be stable)
+            if (k.endswith("_s") or k.endswith("_wall_s")) \
+                    and isinstance(v, (int, float)):
+                continue
+            out[k] = _strip_volatile(v)
+        return out
     if isinstance(obj, list):
         return [_strip_volatile(v) for v in obj]
     return obj
@@ -121,9 +131,13 @@ class TestBudgetIsTheMeasuredPath(unittest.TestCase):
     def test_operator_call_receives_2800(self):
         calls = []
         _run(calls)
-        self.assertEqual(len(calls), 1)
-        self.assertEqual(calls[0]["max_tokens"], 2800)
-        self.assertTrue(calls[0]["purpose"].startswith("operator_"))
+        # R6 OWNER AUDIT ROUND 2026-11-12 (directive 3): the evidence-
+        # anchored operator call PLUS the always-generated knowledge-
+        # first call — both carry the same measured 2800 budget.
+        self.assertEqual(len(calls), 2)
+        self.assertEqual([c["max_tokens"] for c in calls], [2800, 2800])
+        self.assertTrue(all(c["purpose"].startswith("operator_")
+                            for c in calls))
 
     def test_budget_constant_has_measured_provenance(self):
         self.assertEqual(ms.OPERATOR_INSTANTIATION_MAX_TOKENS, 2800)
@@ -218,16 +232,21 @@ class TestNoNewMachinery(unittest.TestCase):
     def test_exactly_one_llm_call(self):
         calls = []
         _run(calls)
-        self.assertEqual(len(calls), 1,
-                         "the budget change must not add calls")
+        # R6 OWNER AUDIT ROUND 2026-11-12 (directive 3): one evidence-
+        # anchored operator call + one knowledge-first call (the owner
+        # directive mandates the always-generated knowledge-first
+        # candidate; the budget change itself adds no calls beyond it).
+        self.assertEqual(len(calls), 2,
+                         "one evidence call + one knowledge-first call")
 
     def test_no_hidden_retry_on_valid_output(self):
-        # a valid first output resolves in one call (the pre-existing
-        # recorded corrective retry only fires on span/semantic
+        # a valid first output resolves in one evidence-anchored call +
+        # one knowledge-first call, NO corrective retry (the pre-
+        # existing recorded corrective retry only fires on span/semantic
         # defects — exercised by the r401 battery, unchanged here)
         calls = []
         _run(calls)
-        self.assertEqual(len(calls), 1)
+        self.assertEqual(len(calls), 2)
 
     def test_resume_discipline_untouched(self):
         # the lean builder takes no resume state; re-execution is

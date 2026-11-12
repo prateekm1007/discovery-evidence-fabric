@@ -236,8 +236,21 @@ class TestProductionPathsRecordCause(unittest.TestCase):
         res, calls = _execute(env)
         space = res["apply_to"]["mechanism_space"]
         self.assertEqual(space["state"], "NO_CANDIDATES")
-        self.assertEqual(space["operator_results"], [])
-        self.assertEqual(calls, [], "zero operator calls on no-match")
+        # R6 OWNER AUDIT ROUND 2026-11-12 (directive 3): zero
+        # EVIDENCE-anchored operator calls on no-match; the knowledge-
+        # first generator (evidence-independent, anchor = the user's
+        # problem statement) always runs — the canned empty response
+        # parses zero blocks, so no candidate is fabricated.
+        evidence_calls = [c for c in calls
+                          if c != "operator_DOMAIN_KNOWLEDGE_FIRST"]
+        self.assertEqual(evidence_calls, [],
+                         "zero evidence-anchored operator calls on "
+                         "no-match")
+        self.assertEqual(calls, ["operator_DOMAIN_KNOWLEDGE_FIRST"])
+        evidence_results = [o for o in space["operator_results"]
+                            if o.get("operator")
+                            != "DOMAIN_KNOWLEDGE_FIRST"]
+        self.assertEqual(evidence_results, [])
         cause = space["starved_cause"]
         self.assertEqual(cause["label"], "NO_APPLICABLE_EVIDENCE")
         self.assertEqual(cause["lxi_class"], "REJECTED_EVIDENCE")

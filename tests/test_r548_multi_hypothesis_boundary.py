@@ -311,16 +311,35 @@ class TestLeanPathMultiHypothesis(unittest.TestCase):
     def test_one_call_parses_three_blocks_and_attributes_each(self):
         fake = _FakeLLM(THREE_BLOCKS)
         space = _run(fake)
-        self.assertEqual(len(fake.prompts), 1,
-                         "R453/R548: ONE instantiation call — N "
-                         "hypotheses never cost a second call")
+        # R6 OWNER AUDIT ROUND 2026-11-12 (directive 3): the evidence-
+        # anchored call stays ONE call for N hypotheses — the second
+        # prompt is the owner-mandated ALWAYS-generated knowledge-first
+        # call (a different generator, not a retry of the evidence
+        # call).
+        self.assertEqual(len(fake.prompts), 2,
+                         "one evidence-anchored call for N hypotheses "
+                         "+ the knowledge-first call")
         self.assertIn("HYPOTHESIS 3:", fake.prompts[0])
+        self.assertIn("senior field engineer", fake.prompts[1])
         self.assertEqual(fake.kwargs[0].get("max_tokens"),
                          ms.OPERATOR_INSTANTIATION_MAX_TOKENS)
 
         att = space["instantiation_attempts"][0]
-        self.assertEqual(att["hypothesis_blocks_parsed"], 3)
-        self.assertEqual(len(att["hypothesis_attribution"]), 3)
+        # R6 OWNER AUDIT ROUND 2026-11-12: the aggregate attempt record
+        # attributes every parsed block from BOTH calls; the additive
+        # knowledge_first_attempt field discloses the second call
+        self.assertEqual(att["knowledge_first_attempt"][
+            "attempted"], True)
+        self.assertEqual(att["knowledge_first_attempt"][
+            "n_hypotheses_parsed"], 3)
+        self.assertEqual(att["hypothesis_blocks_parsed"], 6)
+        self.assertEqual(len(att["hypothesis_attribution"]), 6)
+        # R6 OWNER AUDIT ROUND 2026-11-12: blocks 1-3 = the evidence-
+        # anchored call; blocks 4-6 = the knowledge-first call's
+        # re-parse of the same canned response
+        self.assertEqual(
+            [e["hypothesis_index"] for e in att["hypothesis_attribution"]],
+            [1, 2, 3, 4, 5, 6])
         for i, entry in enumerate(att["hypothesis_attribution"], 1):
             self.assertEqual(entry["hypothesis_index"], i)
             self.assertEqual(entry["n_fields_nonempty"], 8)
@@ -330,10 +349,13 @@ class TestLeanPathMultiHypothesis(unittest.TestCase):
                            "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
                            "NOT_A_CANDIDATE_TEXTUAL_REWRITE",
                            "NOT_A_CANDIDATE_SEMANTIC_INVARIANT_BROKEN"))
+        # R6 OWNER AUDIT ROUND 2026-11-12: the mechanism sequence is
+        # the canned response's three mechanisms TWICE (evidence call,
+        # then the knowledge-first call's re-parse)
         self.assertEqual(
             [e["mechanism"] for e in att["hypothesis_attribution"]],
             [blocks["mechanism"] for blocks in
-             ms._parse_multi_candidate_fields(THREE_BLOCKS)])
+             ms._parse_multi_candidate_fields(THREE_BLOCKS)] * 2)
 
         # every assembled candidate carries its own index
         cands = space["operator_candidates_full"][0]["candidates"]
@@ -363,7 +385,11 @@ class TestLeanPathMultiHypothesis(unittest.TestCase):
     def test_cemetery_and_distinctness_cover_every_block(self):
         space = _run(_FakeLLM(THREE_BLOCKS))
         generated = space["n_candidates_generated"]
-        self.assertEqual(generated, 3,
+        # R6 OWNER AUDIT ROUND 2026-11-12 (directive 3): the
+        # knowledge-first attempt assembles the same canned blocks —
+        # 3 evidence-anchored + 3 knowledge-first = 6 generated; the
+        # distinctness instrument merges the wording duplicates
+        self.assertEqual(generated, 6,
                          "all three blocks must assemble as CANDIDATE "
                          "state (fixture content is fully testable)")
         cem = space["cemetery_consumption"] or {}
@@ -398,8 +424,14 @@ class TestLeanPathMultiHypothesis(unittest.TestCase):
     def test_legacy_single_block_response_still_builds(self):
         space = _run(_FakeLLM(_BLOCK_1))
         att = space["instantiation_attempts"][0]
-        self.assertEqual(att["hypothesis_blocks_parsed"], 1)
-        self.assertEqual(len(att["hypothesis_attribution"]), 1)
+        # R6 OWNER AUDIT ROUND 2026-11-12: the knowledge-first call
+        # re-parses the same single canned block (aggregate = 2)
+        self.assertEqual(att["hypothesis_blocks_parsed"], 2)
+        self.assertEqual(att["knowledge_first_attempt"][
+            "n_hypotheses_parsed"], 1)
+        self.assertEqual(len(att["hypothesis_attribution"]), 2)
+        # R6 OWNER AUDIT ROUND 2026-11-12: block 2 = the knowledge-
+        # first call's re-parse of the same canned block
         self.assertEqual(
             space["operator_results"][0]["n_hypotheses_parsed"], 1)
         self.assertEqual(space["state"], "BUILT")

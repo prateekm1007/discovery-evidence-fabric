@@ -80,26 +80,76 @@ from typing import Any, Dict, List, Optional
 # sensor) as a FLAG-CONTROLLED A/B ablation candidate inside the
 # composer — never a gate: it changes no state, adds no call; the
 # ablation arm decides on/off.
-ANSWER_COMPOSER_VERSION = "answer_composer/1.2.0"
+# 1.3.0 (owner AUDIT round 2026-11-12, directives 1/2/4/6):
+#   (a) CLEAN OUTPUT — the composer system prompt forbids internal
+#       state names and pipeline-history narration; the deterministic
+#       contract now rejects them (answer_contract.
+#       INTERNAL_NARRATION_TOKENS), so a narrating composition is
+#       repaired, never shipped;
+#   (b) COMPOSE -> VALIDATE -> REPAIR UNTIL VALID — the one repair
+#       retry became a bounded loop (max MAX_REPAIR_ROUNDS) that ends
+#       early on validity; the harness never prepends a
+#       contract-invalid banner and never ships a final invalid
+#       composition (the typed no-answer state replaces it);
+#   (c) the CONSTRAINT-COMPLIANCE AUDIT (constraint_audit.py) runs on
+#       every pass; its typed violations join the repair prompt (same
+#       call, no added calls);
+#   (d) dict-valued clarification_answer records (sofc's 0.15 glass
+#       phase fraction) render into the constraint context instead of
+#       being dropped;
+#   (e) HYPOTHESIS DELIVERY per the approved attack semantics: when
+#       every recorded kill's typed cause is KILL_CAUSE_NOT_IN_RECORD
+#       (the evidence coverage of THIS retrieval, not a physical
+#       impossibility), the record-bound raw candidate is admissible
+#       as a clearly flagged UNVERIFIED hypothesis — one plain-language
+#       line, never a typed no-answer, never internal jargon.
+ANSWER_COMPOSER_VERSION = "answer_composer/1.3.0"
+
+#: bounded repair loop (compose -> validate -> repair until valid or
+#: cap). Calls per composition: 1 compose + <=1 truncation retry
+#: + <= MAX_REPAIR_ROUNDS repairs. The cap keeps the composer inside
+#: the per-problem call governor (<=12 healthy calls).
+MAX_REPAIR_ROUNDS = 2
+
+#: the ONE plain-language caveat the composer may add for a
+#: hypothesis-class delivery (directive 1: one plain-language caveat
+#: line at most; typed detail stays in metadata)
+HYPOTHESIS_CAVEAT_LINE = (
+    "Note: this proposal is delivered as an unverified engineering "
+    "hypothesis — the retrieved record does not directly support it, "
+    "so treat the stated falsification test as a precondition, not a "
+    "validated recommendation.")
 
 _COMPOSER_SYSTEM = (
-    "You write the final engineer-facing answer of a discovery pipeline. "
-    "You receive the problem's constraints, the user's stated variables, "
-    "the pipeline's top intervention candidates WITH their attack and "
-    "verification verdicts, the frozen evidence packet, and a verification "
+    "You write the final engineer-facing answer for an engineering "
+    "discovery request. You receive the problem's constraints, the "
+    "user's stated variables, candidate intervention proposals with "
+    "their support status, the supporting records, and a support "
     "summary. You write ONE complete, specific, testable engineering "
     "answer. Rules: (1) every number you state either comes from the "
-    "packet/user variables/candidates, or is labeled ASSUMPTION on the "
-    "same line, or is given as a defined calibration rule (e.g. baseline "
-    "+ 3 sigma from 14 days of healthy data); (2) a killed candidate is "
-    "NEVER presented as the recommendation — if everything was killed, "
-    "say so and present the best surviving hypothesis as UNVERIFIED; "
-    "(3) respect the user's stated variables exactly (a constraint the "
-    "user fixed must stay fixed); (4) name the falsification test "
-    "concretely; (5) every EVIDENCE-BACKED label MUST be followed on the "
-    "SAME line by the bracketed packet item id that supports it, e.g. "
-    "\"EVIDENCE-BACKED [item-id]\" — a label with no bracketed id fails "
-    "the deterministic contract; (6) English only, no markdown headings, "
+    "supporting records or the user's variables, or is labeled "
+    "ASSUMPTION on the same line, or is given as a defined calibration "
+    "rule (e.g. baseline + 3 sigma from 14 days of healthy data); "
+    "(2) CLEAN OUTPUT: the reader sees only engineering content — NO "
+    "internal state names, NO process narration. Never write phrases "
+    "like \"CONTRACT-INVALID\", \"NO SURVIVING CANDIDATES\", \"ALL "
+    "KILLED\", \"the previous attempt\", \"the pipeline\", \"the "
+    "gauntlet\", \"verification verdict\", \"packet\", \"candidate "
+    "envelope\", \"AUTOMATED_INVENTION_CANDIDATE\", or candidate ids "
+    "like \"[cand:A2]\". If the supporting evidence is not strong "
+    "enough to endorse the proposal confidently, present the best "
+    "engineering proposal and state plainly in ONE sentence that it is "
+    "UNVERIFIED and needs the stated test — nothing about internal "
+    "processing; (3) respect the user's stated variables exactly (a "
+    "constraint the user fixed must stay fixed; the proposal's "
+    "measurements, inputs and dimensions must be inside the allowed "
+    "set, and the proposal must CHANGE something relative to the given "
+    "device — never restate the given design or the constraints as the "
+    "answer); (4) name the falsification test concretely; (5) every "
+    "EVIDENCE-BACKED label MUST be followed on the SAME line by the "
+    "bracketed record id that supports it, e.g. \"EVIDENCE-BACKED "
+    "[record-id]\" — a label with no bracketed id fails the "
+    "deterministic contract; (6) English only, no markdown headings, "
     "plain text.")
 
 _COMPOSER_PROMPT = """Write the final engineering answer for this problem.
@@ -176,17 +226,26 @@ def _candidates_block(cands: List[Dict[str, Any]]) -> str:
     for i, c in enumerate(cands[:5], 1):
         if not isinstance(c, dict):
             continue
-        cid = str(c.get("candidate_id") or f"candidate{i}")
+        # CLEAN OUTPUT (directive 1): the prompt feeds neutral proposal
+        # labels and plain-language status — never internal candidate
+        # ids (the audited answers leaked "[cand:A2]" verbatim) and
+        # never internal verdict state names.
         verdict = str(c.get("attack_verdict") or c.get("verdict")
                       or c.get("state") or "NO_VERDICT")
         if c.get("hypothesis_unverified") or _is_hypothesis_verdict(verdict):
-            verdict = f"UNVERIFIED_HYPOTHESIS({verdict})"
+            status = ("status: UNVERIFIED — the supporting record does "
+                      "not directly support this proposal; the answer "
+                      "must say plainly that it is unverified and needs "
+                      "the stated test")
+        else:
+            status = ("status: supported — it survived the adversarial "
+                      "check")
         mech = str(c.get("mechanism") or "")[:280]
         interv = str(c.get("intervention") or "")[:280]
         eff = str(c.get("expected_effect") or c.get("predicted_effect")
                   or "")[:200]
         lines.append(
-            f"{i}. {cid} verdict={verdict}\n"
+            f"Proposal {i}. {status}\n"
             f"   mechanism: {mech}\n"
             f"   intervention: {interv}\n"
             f"   expected effect: {eff}")
@@ -200,6 +259,15 @@ def _variables_block(problem: Dict[str, Any]) -> str:
     if problem.get("clarification_text"):
         rows.append(f"- USER-STATED CLARIFICATION: "
                     f"{problem['clarification_text']}")
+    # 1.3.0: dict-valued clarification records render too (the stated
+    # variable must be usable in the design — directive 4)
+    _ca = problem.get("clarification_answer")
+    if isinstance(_ca, dict):
+        for _k, _v in _ca.items():
+            if _k == "note":
+                rows.append(f"- USER-STATED CLARIFICATION NOTE: {_v}")
+            else:
+                rows.append(f"- USER-STATED VARIABLE: {_k} = {_v}")
     for v in problem.get("user_variables") or []:
         rows.append(f"- {v}")
     return "\n".join(rows) or "(none stated)"
@@ -445,11 +513,23 @@ def compose_answer(problem: Dict[str, Any],
     # text is a citable provenance span for the contract — it travels
     # into validate_answer on BOTH compose paths (compose + repair),
     # as its own entry (a number in the clarification is not support
-    # for a quantity it never names, and vice versa)
+    # for a quantity it never names, and vice versa).
+    # 1.3.0: a dict-valued clarification_answer (sofc's
+    # {"intergranular glass phase fraction": 0.15, "note": ...})
+    # renders into the context instead of being silently dropped
+    # (directive 4: the stated variable must be usable in the design).
     _clar_text = str(problem.get("clarification_text") or "").strip()
     _clar_ans = problem.get("clarification_answer")
     if not _clar_text and isinstance(_clar_ans, str):
         _clar_text = _clar_ans.strip()
+    elif isinstance(_clar_ans, dict):
+        _dict_lines = []
+        for _k, _v in _clar_ans.items():
+            if _k == "note" and isinstance(_v, str):
+                _dict_lines.append(f"note: {_v}")
+            else:
+                _dict_lines.append(f"{_k}: {_v}")
+        _clar_text = "; ".join(_dict_lines)
     _clarification = _clar_text or None
     shape = ANSWER_SHAPE_BLOCK.get(question_type, "")
     shape_hint = "" if shape else " (none — unknown question type)"
@@ -544,25 +624,48 @@ def compose_answer(problem: Dict[str, Any],
         rec["model"] = res2.get("model")
         rec["provider_route"] = res2.get("provider_route") \
             or res2.get("provider")
+    # ---- the deterministic contract + the constraint-compliance
+    # audit, then the bounded COMPOSE -> VALIDATE -> REPAIR UNTIL
+    # VALID loop (directive 1 + 2). Every round feeds back the
+    # contract violations AND the constraint-audit violations (and
+    # the tech-sanity lines when the flag is on) into the SAME repair
+    # call shape; the loop ends early on a valid-and-clean pass and
+    # never ships a truncated repair.
+    from .constraint_audit import audit_constraints
+    _uvs = list(problem.get("user_variables") or [])
     contract = validate_answer(answer, question_type,
                                packet=packet or [],
-                               user_variables=list(
-                                   problem.get("user_variables") or []),
-                            clarification=_clarification)
+                               user_variables=_uvs,
+                               clarification=_clarification)
+    caudit = audit_constraints(problem, answer)
     rec["contract_first_pass"] = {"valid": contract.get("valid"),
                                   "violations": contract.get("violations")}
-    if contract.get("valid") is not True:
-        # ONE deterministic repair retry: the violations travel back in
+    rec["constraint_audit_first_pass"] = {
+        "state": caudit.get("state"),
+        "n_violations": caudit.get("n_violations"),
+        "violations": caudit.get("violations")}
+    _repair_round = 0
+    while _repair_round < MAX_REPAIR_ROUNDS:
+        _contract_bad = contract.get("valid") is not True
+        _audit_bad = caudit.get("state") == "CONSTRAINT_VIOLATIONS"
+        if not (_contract_bad or _audit_bad):
+            break
+        _repair_round += 1
+        # deterministic feedback: contract violations + constraint
+        # violations travel back in (no gate widening, Art. VII)
         _viol_lines = list(contract.get("violations") or [])
-        if _ts_on:
-            # item 2: the plain tech-sanity lines ride the SAME
-            # scheduled repair call (no added call, no gate)
+        _viol_lines += [
+            ("CONSTRAINT VIOLATION [" + v.get("type", "") + "]: "
+             + v.get("detail", ""))
+            for v in (caudit.get("violations") or [])]
+        if _ts_on and _repair_round == 1:
+            # item 2 (2026-11-12): the plain tech-sanity lines ride the
+            # SAME scheduled repair call (no added call, no gate)
             _viol_lines += ["TECH SANITY: " + f["plain"]
                             for f in _tech_sanity_findings(
-                                answer, problem.get("user_variables")
-                                or [])]
+                                answer, _uvs)]
         repair_prompt = _REPAIR_PROMPT.format(
-            violations="\n".join(f"- {v}" for v in _viol_lines),
+            violations="\n".join(f"- {v}" for v in _viol_lines[:12]),
             previous=answer[:3000],
             device=problem.get("device", ""),
             failure=problem.get("failure", ""),
@@ -572,35 +675,59 @@ def compose_answer(problem: Dict[str, Any],
                             max_tokens=max_tokens,
                             purpose="answer_composer_repair")
         rec["n_llm_calls"] += 1
-        if res3.get("ok") and (res3.get("content") or "").strip():
-            answer3 = res3["content"].strip()
-            contract3 = validate_answer(answer3, question_type,
-                                        packet=packet or [],
-                                        user_variables=list(
-                                            problem.get("user_variables")
-                                            or []),
-                                            clarification=_clarification)
-            rec["contract_after_repair"] = {
-                "valid": contract3.get("valid"),
-                "violations": contract3.get("violations")}
-            # a truncated repair is NEVER adopted (never ship a
-            # truncated answer): the pre-existing improvement rule
-            # applies to COMPLETE repairs only
-            trunc["repair_finish_reason"] = _recorded_finish_reason(res3)
-            trunc["repair_truncated"] = _is_answer_truncated(answer3, res3)
-            if (not trunc["repair_truncated"]
-                    and (contract3.get("valid") is True or (
-                        len(contract3.get("violations") or []) <
-                        len(contract.get("violations") or [])))):
-                answer = answer3
-                contract = contract3
-                rec["output_sha256"] = res3.get("output_hash")
-                rec["repaired"] = True
+        if not (res3.get("ok") and (res3.get("content") or "").strip()):
+            trunc["repair_transport_failed"] = True
+            break
+        answer3 = res3["content"].strip()
+        contract3 = validate_answer(answer3, question_type,
+                                    packet=packet or [],
+                                    user_variables=_uvs,
+                                    clarification=_clarification)
+        caudit3 = audit_constraints(problem, answer3)
+        # a truncated repair is NEVER adopted (never ship a
+        # truncated answer): the pre-existing improvement rule
+        # applies to COMPLETE repairs only
+        trunc["repair_finish_reason"] = _recorded_finish_reason(res3)
+        trunc["repair_truncated"] = _is_answer_truncated(answer3, res3)
+        rec[f"contract_after_repair_{_repair_round}"] = {
+            "valid": contract3.get("valid"),
+            "violations": contract3.get("violations")}
+        rec[f"constraint_audit_after_repair_{_repair_round}"] = {
+            "state": caudit3.get("state"),
+            "n_violations": caudit3.get("n_violations")}
+        if trunc["repair_truncated"]:
+            break
+        # adopt only a COMPLETE repair that does not regress (the
+        # improvement rule: fewer contract violations, or valid, and
+        # no worse on the constraint audit)
+        _improved = (contract3.get("valid") is True
+                     or (len(contract3.get("violations") or [])
+                         < len(contract.get("violations") or [])))
+        _audit_not_worse = (caudit3.get("n_violations") or 0) <= (
+            caudit.get("n_violations") or 0)
+        if _improved and _audit_not_worse:
+            answer = answer3
+            contract = contract3
+            caudit = caudit3
+            rec["output_sha256"] = res3.get("output_hash")
+            rec["repaired"] = True
+            rec["repair_rounds_used"] = _repair_round
+            if (contract.get("valid") is True
+                    and caudit.get("state") == "CONSTRAINT_AUDIT_PASS"):
+                break
+    rec["repair_rounds_used"] = rec.get("repair_rounds_used", _repair_round)
     rec["answer"] = answer
     rec["contract"] = {"valid": contract.get("valid"),
                        "violations": contract.get("violations"),
                        "bindings": contract.get("bindings"),
                        "question_type": question_type}
+    # directive 2: the constraint audit's final state rides the record
+    # (typed metadata — the shipped text itself must be clean;
+    # constraint violations that survived every bounded repair are
+    # delivered with ONE plain-language caveat line by the harness)
+    rec["constraint_audit"] = {"state": caudit.get("state"),
+                               "n_violations": caudit.get("n_violations"),
+                               "violations": caudit.get("violations")}
     rec["state"] = ("COMPOSED_CONTRACT_VALID"
                     if contract.get("valid") is True
                     else "COMPOSED_CONTRACT_INVALID")
@@ -815,6 +942,58 @@ def _admission_analysis(env_dict: Dict[str, Any],
                         "candidate_id": str(raw.get("candidate_id") or ""),
                         "verdict": att or "NO_VERDICT",
                         "reason": binding or cls["reason"]})
+        # 3. DIRECTIVE 6 (owner audit round 2026-11-12) — the approved
+        #    attack semantics for "not in the record" kills: when the
+        #    ONLY recorded kills are typed KILL_CAUSE_NOT_IN_RECORD
+        #    (the retrieved evidence does not contain the support the
+        #    candidate claimed — an evidence-coverage limitation of
+        #    THIS retrieval, never a physical impossibility), the
+        #    record-bound raw candidate is admissible as a clearly
+        #    flagged UNVERIFIED hypothesis instead of a typed
+        #    no-answer. The typed kill-cause classification rides the
+        #    record (never self-judged: the auditor reads the class).
+        #    ANY scientific kill keeps the kill (no delivery).
+        from .mechanism_link import kill_cause_record
+        kc = kill_cause_record(env_dict.get("attack_results") or {})
+        if (att in _KILL_STATES or "KILL" in att) \
+                and kc.get("all_not_in_record") \
+                and binding is None:
+            rec2 = dict(raw)
+            rec2["attack_verdict"] = att
+            rec2["verdict"] = att
+            rec2["admission"] = {
+                "class": "HYPOTHESIS",
+                "hypothesis": True,
+                "reason": "ALL_KILLS_NOT_IN_RECORD",
+                "binding": "attack_record_bound",
+                "kill_cause_record": kc}
+            rec2["hypothesis_unverified"] = True
+            rec2["kill_cause_record"] = kc
+            # the candidate's OWN recorded evidence / contradiction /
+            # technical-gate states, reported (never assumed):
+            ev = ((env_dict.get("adjudication") or {}).get(
+                "evidence_verification") or {})
+            if isinstance(ev, dict) and "verified" in ev:
+                ev_state = "VERIFIED" if ev.get("verified") \
+                    else "NOT_VERIFIED"
+            else:
+                ev_state = "NOT_RECORDED"
+            cons = env_dict.get("contradictions") or {}
+            cons_state = str(cons.get("overall") or cons.get("status")
+                             or "NO_CONTRADICTIONS_RECORDED")
+            rec2["own_recorded_states"] = {
+                "evidence_verification": ev_state,
+                "contradictions": cons_state,
+                "technical_gates": {
+                    "not_an_intervention":
+                        raw.get("not_an_intervention_check",
+                                "NOT_RECORDED"),
+                    "anchor_domain":
+                        raw.get("anchor_domain_check", "NOT_RECORDED"),
+                },
+            }
+            cands.append(rec2)
+            return cands, reasons
         return [], reasons
     rec = dict(raw)
     rec["attack_verdict"] = att

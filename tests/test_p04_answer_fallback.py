@@ -57,14 +57,20 @@ def test_composed_answer_is_the_normal_path_answer(tmp_path):
     assert er._answer_source(d) == "composer_llm_call:COMPOSED_CONTRACT_VALID"
 
 
-def test_contract_invalid_composition_delivered_flagged(tmp_path):
+def test_contract_invalid_composition_never_delivered(tmp_path):
+    # OWNER AUDIT ROUND 2026-11-12, DIRECTIVE 1 (Art. LXIV retire-
+    # superseded): the "CONTRACT-INVALID COMPOSITION (...)" banner the
+    # auditor saw shipped in 4 of 9 pairs is RETIRED — a composition
+    # that fails its own deterministic checker is NEVER delivered, not
+    # with a banner and not bare; the typed state rides the record and
+    # the delivered answer is the typed no-answer.
     d = _mk_run(tmp_path, {"state": "COMPOSED_CONTRACT_INVALID",
                            "answer": "COMPOSED ANSWER",
                            "contract": {"violations": ["v1", "v2"]}})
     ans = er._extract_pipeline_answer(d)
-    assert ans and "CONTRACT-INVALID COMPOSITION" in ans
-    assert "COMPOSED ANSWER" in ans
-    assert er._answer_source(d) == "composer_llm_call:COMPOSED_CONTRACT_INVALID"
+    assert ans is None
+    src = er._answer_source(d)
+    assert src.startswith("typed_no_answer:COMPOSED_CONTRACT_INVALID"), src
 
 
 def test_no_admission_is_typed_no_answer_never_legacy(tmp_path):

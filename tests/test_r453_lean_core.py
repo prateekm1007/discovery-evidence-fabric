@@ -348,9 +348,23 @@ class TestEmptyPathNoGenerateCalls(unittest.TestCase):
             res = adapters.MechanismSpaceAdapter().execute(
                 env, {"run_id": "r453"})
         space = res["apply_to"]["mechanism_space"]
-        self.assertEqual(len(calls), 1,
-                         "the lean path makes EXACTLY ONE operator "
-                         f"generation call (made {len(calls)})")
+        # R6 OWNER AUDIT ROUND 2026-11-12 AMENDMENT (disclosed,
+        # directive 3): the lean path makes EXACTLY ONE evidence-
+        # anchored operator call PLUS the ALWAYS-generated knowledge-
+        # first call (DOMAIN_KNOWLEDGE_FIRST, anchor = the user's
+        # problem statement, judged by the same gauntlet). The
+        # extraction fan-out ban is untouched: still zero extraction
+        # calls. The evidence-anchored prompt is the mechanism-engineer
+        # one; the knowledge-first prompt opens with the senior-field-
+        # engineer role.
+        self.assertEqual(len(calls), 2,
+                         "one evidence-anchored operator call + one "
+                         "knowledge-first call (owner audit directive "
+                         f"3; made {len(calls)})")
+        kf = [c for c in calls
+              if "senior field engineer" in c or "field engineer" in c]
+        self.assertEqual(len(kf), 1,
+                         f"exactly one knowledge-first call ({calls})")
         self.assertEqual(space["construction"][:9], "R453_LEAN")
         self.assertIn("R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
                       space["structured_evidence"]["construction"])
@@ -651,7 +665,34 @@ class TestDeletionAccounting(unittest.TestCase):
                     # threshold, probe, or admission semantics touched.
                     # Pinned by tests/test_composer_truncation_pin.py
                     # (16 hermetic zero-LLM pins).
-                    "discovery_fabric/engine/answer_composer.py"),
+                    "discovery_fabric/engine/answer_composer.py",
+                    # R6 OWNER AUDIT ROUND 2026-11-12 AMENDMENT
+                    # (disclosed, directives 1/2/3/4/6): two NEW
+                    # deterministic, ZERO-LLM instruments —
+                    # engine/mechanism_link.py (the mechanism-to-failure
+                    # link check that rejects gimmick anchors, directive
+                    # 3, + the typed kill-cause classifier for the
+                    # approved "not in the record" delivery semantics,
+                    # directive 6) and engine/constraint_audit.py (the
+                    # constraint-compliance audit that runs in the
+                    # composer's repair step, directive 2, + the stated-
+                    # variable usage check, directive 4). Neither adds a
+                    # transport, a gate, a threshold, or an LLM call;
+                    # their verdicts ride the candidate/answer records
+                    # and feed the EXISTING repair prompt. Pinned by
+                    # tests/test_r6_audit_round_clean_output.py
+                    # (28 hermetic zero-LLM pins).
+                    "discovery_fabric/engine/mechanism_link.py",
+                    "discovery_fabric/engine/constraint_audit.py",
+                    # R6 OWNER AUDIT ROUND 2026-11-12 AMENDMENT
+                    # (disclosed, directive 1): the CLEAN-OUTPUT
+                    # contract rule (internal state names + pipeline
+                    # narration rejected by the deterministic answer
+                    # contract) lives in engine/answer_contract.py
+                    # (the verifier's own rule list — the verifier is
+                    # never weakened: the rule ADDS a rejection class).
+                    # Pinned by tests/test_r6_audit_round_clean_output.py.
+                    "discovery_fabric/engine/answer_contract.py"),
                 f"the mandate's file list is exhaustive: {f} is outside "
                 "run.py/stage_entry.py/adapters.py/llm_registry.py")
 

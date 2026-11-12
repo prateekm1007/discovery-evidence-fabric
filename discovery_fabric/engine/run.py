@@ -3686,7 +3686,8 @@ class EngineRun:
                     "question_type") or "intervention-proposal"))
             status = rec.get("state") or "FAILED_EXPLICIT"
         except Exception as exc:  # noqa: BLE001 — typed, never silent
-            rec = {"composer_version": "answer_composer/1.2.0",
+            from .answer_composer import ANSWER_COMPOSER_VERSION
+            rec = {"composer_version": ANSWER_COMPOSER_VERSION,
                    "state": "COMPOSE_FAILED_TRANSPORT",
                    "error": f"{type(exc).__name__}: {exc}"[:300],
                    "answer": None, "started_at": _t0,

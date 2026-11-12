@@ -98,24 +98,37 @@ def test_composer_transport_failure_is_typed():
 
 
 def test_composer_contract_invalid_recorded_honestly():
-    # repair still violates: the record says so (never fake-valid)
+    # repair still violates: the record says so (never fake-valid).
+    # OWNER AUDIT ROUND 2026-11-12, DIRECTIVE 1: compose -> validate ->
+    # REPAIR UNTIL VALID — the loop is bounded at MAX_REPAIR_ROUNDS
+    # repairs (call governor <=12 healthy calls/problem); a final
+    # invalid composition is recorded honestly and never delivered.
+    from discovery_fabric.engine.answer_composer import MAX_REPAIR_ROUNDS
     bad1 = ("Do maintenance sometimes. "
             "INDICATOR: something vague. THRESHOLD: 9.9 mm/s plain. "
             "PROTOCOL: n=6 drives; pass if fine.")
     bad2 = ("Still vague. INDICATOR: nothing. THRESHOLD: 3.3 mm/s plain. "
             "PROTOCOL: n=2 drives.")
-    llm, calls = _llm_factory([{"content": bad1}, {"content": bad2}])
+    bad3 = ("Still vague again. INDICATOR: nothing. "
+            "THRESHOLD: 3.3 mm/s plain. PROTOCOL: n=2 drives.")
+    llm, calls = _llm_factory([{"content": bad1}, {"content": bad2},
+                               {"content": bad3}])
     rec = compose_answer(PROBLEM, PACKET, [], None,
                          "predictor-design", llm_generate=llm)
-    assert calls["n"] == 2
+    assert calls["n"] == 1 + MAX_REPAIR_ROUNDS
     assert rec["state"] == "COMPOSED_CONTRACT_INVALID"
     assert rec["contract"]["valid"] is False
     assert rec["contract"]["violations"]
+    assert rec["repair_rounds_used"] == MAX_REPAIR_ROUNDS
 
 
 def test_composer_killed_candidate_never_endorsed():
     # the prompt must tell the composer a killed candidate is never the
-    # recommendation (the rule rides in the system prompt)
+    # recommendation and the text stays CLEAN (owner audit round
+    # 2026-11-12, directive 1: no internal state names, no pipeline
+    # narration; the unverified proposal is plainly flagged)
     from discovery_fabric.engine.answer_composer import _COMPOSER_SYSTEM
-    assert "killed candidate is" in _COMPOSER_SYSTEM
-    assert "NEVER presented as the recommendation" in _COMPOSER_SYSTEM
+    assert "UNVERIFIED" in _COMPOSER_SYSTEM
+    assert "NO internal state names" in _COMPOSER_SYSTEM
+    assert "NO SURVIVING CANDIDATES" in _COMPOSER_SYSTEM
+    assert "needs the stated test" in _COMPOSER_SYSTEM
