@@ -226,6 +226,51 @@ def arm_dir(arm: str) -> Path:
     return ABLATION_ROOT / _commit() / arm
 
 
+def _python_argv() -> list:
+    """The interpreter argv head ([interpreter (+ -3 for py), -B]) that
+    can PARSE eval/run.py. PEP 701 f-strings need 3.12-class syntax; a
+    PATH 'python3'/'python' may be older (measured this host: the git-
+    bash PATH has BOTH python3 and python at 3.10.12 -> SyntaxError,
+    while the system 3.12 parses). Candidate order: R6_PYTHON (operator-
+    named, Art. XXVII recorded override, no-spaces convention: 8.3 short
+    name on Windows), then PATH python3, python, py -3. The probe file
+    arg is the RELATIVE 'eval/run.py' with cwd=REPO: a Windows-native
+    python CANNOT open POSIX /mnt/... paths (measured false-negative
+    mode), and unix-style interpreters handle the relative form. The
+    round-2 two-turn child inherits sys.executable from its parent, so
+    this one resolution governs every engine subprocess spawned."""
+    import shutil
+    probe_code = ("import sys; compile(open(sys.argv[1], "
+                  "encoding='utf-8').read(), 'eval/run.py', 'exec')")
+    cands = []
+    ovr = os.environ.get("R6_PYTHON", "").strip()
+    if ovr:
+        cands.append(ovr)
+    cands += ["python3", "python", "py"]
+    for cand in cands:
+        if cand == "py":
+            p = shutil.which("py")
+            if not p:
+                continue
+            head = [p, "-3"]
+        elif any(sep in cand for sep in ("/", "\\", ":")):
+            head = [cand]          # operator-named absolute path
+        else:
+            p = shutil.which(cand)
+            if not p:
+                continue
+            head = [p]
+        probe = head + ["-B", "-c", probe_code, "eval/run.py"]
+        if subprocess.run(probe, cwd=REPO,
+                          capture_output=True).returncode == 0:
+            return head + ["-B"]
+    raise RuntimeError("no candidate interpreter can parse eval/run.py "
+                      "(PEP 701 f-strings: 3.12-class syntax required; "
+                      "measured this host: PATH python3/python are "
+                      "3.10). Set R6_PYTHON to a 3.12+ interpreter "
+                      "path (no spaces: 8.3 short name on Windows)")
+
+
 def _dev7_problems() -> list:
     from eval.run import DEV7 as D7
     probs = json.loads((REPO / "eval" / "problems.json").read_text(
@@ -264,7 +309,9 @@ def run_arm(arm: str, problems=None, workers: int = 3) -> int:
            "ENGINE_SECOND_JUDGE": "0"}
     if disabled:
         env["EVAL_DISABLE_STAGES"] = disabled
-    args = ["python3", "-B", "eval/run.py",
+    # _python_argv(): the first PATH python that can PARSE eval/run.py
+    # (PEP 701 f-strings — a PATH python3 may be 3.10; measured, typed)
+    args = _python_argv() + ["eval/run.py",
             "--arms", harness_arms,
             "--subset", "dev7",
             "--workers", str(workers),

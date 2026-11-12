@@ -134,9 +134,50 @@ export RETRIEVE_JOB_BUDGET_S=20                # R6 retrieval job budget (commit
 # the per-problem counters as evidence.
 export FABRIC_PROBLEM_CALL_CAP=18
 
+# --- python resolution (host-independent, the A3 discipline) -----------
+# the codebase uses PEP 701 f-strings (eval/run.py: multi-line f-string
+# expressions) — 3.12-class syntax. Measured this host: the PATH
+# 'python3' AND 'python' are BOTH 3.10.12 (git-bundled; SyntaxError on
+# import) while the system 3.12 parses. Deterministic selection: the
+# first candidate that can COMPILE the source (no execution), in order:
+#   1. R6_PYTHON — operator-named interpreter (the recorded-override
+#      class, Art. XXVII; echoed below, never silent). No spaces in
+#      the value: on Windows use the 8.3 short name when the install
+#      dir has spaces (measured: /mnt/c/PROGRA~1/Python312/python.exe
+#      works; C:/Users/... with spaces does not survive the bash layer).
+#   2. PATH candidates: python3, python, then py -3 (Windows launcher)
+# The file arg is the RELATIVE 'eval/run.py' (we are cd'd into the
+# repo): a Windows python.exe CANNOT open POSIX /mnt/c paths (measured
+# false-negative mode — it reported 3.12 'cannot parse' on the POSIX
+# absolute form and parses the relative one), while unix-style
+# interpreters handle the relative form fine.
+_PY_PROBE='import sys; compile(open(sys.argv[1], encoding="utf-8").read(), "eval/run.py", "exec")'
+PY=""
+for _cand in ${R6_PYTHON:-} python3 python; do
+  [ -n "$_cand" ] || continue
+  if "$_cand" -B -c "$_PY_PROBE" eval/run.py >/dev/null 2>&1; then
+    PY="$_cand"
+    break
+  fi
+done
+if [ -z "$PY" ] && command -v py >/dev/null 2>&1 && \
+   py -3 -B -c "$_PY_PROBE" eval/run.py >/dev/null 2>&1; then
+  PY="py -3"
+fi
+if [ -z "$PY" ]; then
+  echo "[r6dev12] BLOCKED_NO_PYTHON: no candidate interpreter can parse
+eval/run.py (PEP 701 f-strings: 3.12-class syntax required; measured
+this host: PATH python3/python are 3.10). Set R6_PYTHON to a 3.12+
+interpreter path (8.3 short name if it contains spaces)" >&2
+  exit 9
+fi
+[ -n "${R6_PYTHON:-}" ] && \
+  echo "[r6dev12] python source: R6_PYTHON (operator-named, Art. XXVII)"
+echo "[r6dev12] python: $PY ($($PY -B --version 2>&1))"
+
 PROBLEMS="${1:?usage: r6_run_dev12.sh <comma-separated problem ids>}"
 echo "[r6dev12] chunk: $PROBLEMS"
-python3 -B eval/run.py \
+$PY -B eval/run.py \
   --arms pipeline,baseline,judge \
   --problems-file eval/problems_dev12.json \
   --problems "$PROBLEMS" \
