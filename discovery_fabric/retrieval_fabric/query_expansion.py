@@ -115,6 +115,77 @@ def mechanism_query(problem: Dict[str, Any]) -> str:
     return " ".join(q.split())
 
 
+_STOPWORDS = frozenset(
+    "a an the and or of to in on for with by from as at is are was were be "
+    "been being that this these those it its into over under must shall "
+    "should may can will would than then so such not no nor only same "
+    "their there when where which while who whom why how all any both each "
+    "few more most other some own s t just don now during before after "
+    "above below up down out off very using use used new existing via per"
+    .split())
+
+
+def _content_terms(text: str, exclude: str = "") -> List[str]:
+    """Deterministic content-term extraction: lowercase tokens, stopwords
+    and pure numbers dropped, hyphenated compounds kept whole, tokens
+    already present in `exclude` (the primary query) dropped, order =
+    first occurrence. Zero LLM, zero tables — the problem's OWN words
+    (Art. XLIII: problem facts only, never solution-class injection)."""
+    excl = frozenset((exclude or "").lower().replace("-", " ").split())
+    seen: set = set()
+    out: List[str] = []
+    for raw in (text or "").lower().replace("_", " ").split():
+        tok = raw.strip(",.;:()[]\"'?!/*")
+        if not tok:
+            continue
+        base = tok.replace("-", " ")
+        if tok in seen or base in excl or tok in _STOPWORDS:
+            continue
+        if not any(ch.isalpha() for ch in tok):
+            continue  # pure numbers/units are search-hostile noise
+        if len(tok) < 3 and "-" not in tok:
+            continue
+        seen.add(tok)
+        out.append(tok)
+    return out
+
+
+def failure_constraint_variants(problem: Dict[str, Any],
+                                primary: str) -> List[Dict[str, Any]]:
+    """R6 A4 (owner round 2026-11-12): queries refined from the failure
+    text and the user constraint — the measured starvation cause.
+
+    The primary query is `device + failure_mode` only; measured on the
+    committed DEV pairs this is too thin: new02's failure_mode
+    ('contact-wear') + a device string carrying search-hostile tokens
+    ('1.5 MW', '1800 rpm') never surfaces the failure text's own
+    mechanism vocabulary ('brush wear', 'arcing', 'open-circuit
+    excitation'), and p05's failure_mode ('degradation') never carries
+    'creep' / 'ozone cracking'. The failure and constraint texts ARE
+    problem facts (Art. XLIII scope: problem facts, still no
+    solution-class injection), so their content terms become explicit
+    variants. Deterministic, zero LLM."""
+    out: List[Dict[str, Any]] = []
+    failure = (problem or {}).get("failure", "") or ""
+    constraint = (problem or {}).get("constraint", "") or ""
+    fterms = _content_terms(failure, exclude=primary)[:8]
+    if fterms:
+        out.append({"query": " ".join(fterms),
+                    "derivation_class": "FAILURE_TEXT_TERMS",
+                    "derivation_basis":
+                        "content terms of the problem's own failure text "
+                        "(not already in the primary query; Art. XLIII "
+                        "problem facts)"})
+    cterms = _content_terms(constraint, exclude=f"{primary} {failure}")[:8]
+    if cterms:
+        out.append({"query": " ".join(cterms),
+                    "derivation_class": "CONSTRAINT_TARGETED",
+                    "derivation_basis":
+                        "content terms of the user constraint (the "
+                        "measurable bound the evidence must speak to)"})
+    return out
+
+
 def expand_query(primary: str,
                  problem: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
     """Generate query variants. Each variant is a dict:
@@ -122,6 +193,12 @@ def expand_query(primary: str,
 
     derivation_class vocabulary (honest, machine-checkable):
       PRIMARY               — problem facts verbatim (Art. XLIII)
+      FAILURE_TEXT_TERMS    — content terms of the problem's failure text
+                              (R6 A4: the measured starvation cause — the
+                              primary is device+failure_mode only, too
+                              thin on the committed DEV pairs)
+      CONSTRAINT_TARGETED   — content terms of the user constraint (R6 A4:
+                              the measurable bound the evidence must speak to)
       FUNCTION_EQUIV        — deterministic functional-equivalence table
       CROSS_DOMAIN_TERM     — cross-domain/historical terminology table
       ADJACENT_INDUSTRY     — cross-domain industry transfer
@@ -153,6 +230,11 @@ def expand_query(primary: str,
                          "derivation_basis": basis})
 
     _add(primary, "PRIMARY", "problem facts: device + failure_mode")
+
+    # R6 A4: failure-text and constraint-derived variants (problem facts,
+    # Art. XLIII — measured starvation fix on the committed DEV pairs)
+    for v in failure_constraint_variants(problem or {}, primary):
+        _add(v["query"], v["derivation_class"], v["derivation_basis"])
 
     # FUNCTION_EQUIV expansions on the primary string
     equiv_hits = _keyword_hits(primary, FUNCTION_EQUIV_EXPANSION)

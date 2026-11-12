@@ -720,6 +720,97 @@ def _ingest_s2_record(rec: Dict[str, Any], canonicalizer: Canonicalizer,
         fabric_health="AVAILABLE", record_count=1))
 
 
+def _abstract_backfill(canonicalizer: Any,
+                       lane_states: List[LaneRunState],
+                       top_k: Optional[int] = None) -> Dict[str, Any]:
+    """R6 A3 (owner round 2026-11-12): starvation at the source.
+
+    Measured cause (committed DEV envelope evidence, eval-new02): the
+    on-domain records arrived METADATA-ONLY (abstract "") because the
+    title-only lane (IEEE/Holm via crossref) carries no abstract —
+    SYNTHESIZE consumes evidence[0].abstract, so the evidence plane is
+    textually empty and the mechanism-space chain is cut BEFORE any
+    operator runs. Fix the CAUSE, not the label: for bounded top-K
+    metadata-only records (env RETRIEVE_ABSTRACT_BACKFILL_K, default 6,
+    0 disables), fetch the abstract from the abstract-bearing S2
+    metadata lane keyed by DOI. Every attempt is typed and custody-
+    logged (retrieval_log); an enrichment is RECORDED on the record
+    (abstract_backfilled_from + content sha256) — never a silent
+    rewrite of provenance (Art. XXV/XXI.7). Deterministic order:
+    citation-count desc, then canonical_id."""
+    from urllib.parse import quote as _quote
+    from discovery_fabric.retrieval_fabric import reciprocal as _recip
+    from discovery_fabric.source_registry.retrieval_log import append_entry
+    if top_k is None:
+        try:
+            top_k = int(float((os.environ.get(
+                "RETRIEVE_ABSTRACT_BACKFILL_K", "") or "6").strip() or 6))
+        except (TypeError, ValueError):
+            top_k = 6
+    if top_k <= 0:
+        return {"enabled": False, "attempted": 0, "enriched": 0,
+                "failed": 0, "note":
+                    "disabled by RETRIEVE_ABSTRACT_BACKFILL_K<=0"}
+    candidates = [r for r in canonicalizer.canonical_records()
+                  if r.doi
+                  and len((r.best_record.get("abstract") or "")) < 50
+                  and r.evidence_lane in ("SCHOLARLY", "PREPRINT")]
+    candidates.sort(key=lambda r: (
+        -(r.best_record.get("citation_count")
+          or r.best_record.get("cited_by_count") or 0),
+        r.canonical_id))
+    attempted = enriched = failed = 0
+    lookups: List[Dict[str, Any]] = []
+    for rec in candidates[:top_k]:
+        doi = rec.doi
+        url = (f"{_recip._S2_GRAPH}/paper/DOI:{_quote(doi)}"
+               "?fields=title,abstract,externalIds")
+        attempted += 1
+        r = _recip._s2_get(url)
+        ok = False
+        if r.get("status") == "OK" and isinstance(r.get("data"), dict):
+            abs_text = (r["data"].get("abstract") or "")
+            if len(abs_text) > len((rec.best_record.get("abstract") or "")):
+                rec.best_record["abstract"] = abs_text[:4000]
+                rec.best_record["abstract_backfilled_from"] = \
+                    "semantic_scholar_metadata"
+                rec.best_record["abstract_backfill_sha256"] = hashlib.sha256(
+                    abs_text.encode("utf-8")).hexdigest()
+                ok = True
+                enriched += 1
+        if not ok:
+            failed += 1
+        lookups.append({"doi": doi,
+                        "canonical_id": rec.canonical_id,
+                        "status": r.get("status"), "enriched": ok,
+                        "error": r.get("error")})
+        append_entry(
+            source_id="semantic_scholar_metadata",
+            query=f"abstract-backfill:doi:{doi}", url=url,
+            status=("OK" if ok else str(r.get("status") or "SEARCH_FAILED")),
+            http_status=r.get("http_status"),
+            latency_ms=r.get("latency_ms"),
+            record_count=(1 if ok else 0),
+            raw_payload_sha256=r.get("raw_payload_sha256"),
+            error=(None if ok else
+                   (str(r.get("error"))[:300] or
+                    "no abstract available from the metadata lane "
+                    "(typed, never absence)")))
+    lane_states.append(LaneRunState(
+        lane="SCHOLARLY", source_id="semantic_scholar_metadata",
+        queries=[f"abstract-backfill for {attempted} metadata-only "
+                 "records"],
+        status=("OK" if enriched else
+                ("EMPTY" if attempted else "NOT_RUN")),
+        record_count=enriched,
+        error=(None if not failed else
+               f"{failed} of {attempted} backfill attempts returned no "
+               "abstract (typed per-lookup in the report)")))
+    return {"enabled": True, "top_k": top_k,
+            "candidates": len(candidates), "attempted": attempted,
+            "enriched": enriched, "failed": failed, "lookups": lookups}
+
+
 def retrieve_fabric(problem: Dict[str, Any],
                     lane_caps: Optional[Dict[str, int]] = None,
                     llm_generate: Optional[Callable[[str], str]] = None,
@@ -836,8 +927,20 @@ def retrieve_fabric(problem: Dict[str, Any],
                     "retrieved_at": rr["retrieved_at"],
                 }
 
-    # ---- 5. Unpaywall full-text resolution (resolution, not discovery) -
+    # ---- 4.5 ABSTRACT BACKFILL (R6 A3: starvation at the source) ------
+    # Measured starvation cause (committed DEV envelopes, new02): the
+    # on-domain records arrived METADATA-ONLY (abstract "") because the
+    # IEEE/Holm lane returns title-only metadata — SYNTHESIZE consumes
+    # evidence[0].abstract, so an abstract-less evidence plane cuts the
+    # chain before any operator runs. Fix the CAUSE, not the label: fetch
+    # the missing abstracts from an abstract-bearing lane (S2 metadata by
+    # DOI), bounded, typed failures, attribution recorded.
     _enrich_s["reciprocal"] = time.perf_counter() - _enrich_t0
+    _enrich_t0 = time.perf_counter()
+    abstract_backfill_report = _abstract_backfill(canonicalizer, lane_states)
+    _enrich_s["abstract_backfill"] = time.perf_counter() - _enrich_t0
+
+    # ---- 5. Unpaywall full-text resolution (resolution, not discovery) -
     _enrich_t0 = time.perf_counter()
     unpaywall_report: Dict[str, Any] = {"enabled": enable_unpaywall,
                                         "resolved": 0, "oa_found": 0,
@@ -1008,6 +1111,30 @@ def retrieve_fabric(problem: Dict[str, Any],
     _retrieval_attribution["phase_s"] = {
         k: (round(v, 3) if isinstance(v, float) else v)
         for k, v in _phase_s.items()}
+    # R6 A4: abstract coverage per problem — the starvation metric the
+    # owner asked to see. Measured over BOTH the canonical pool and the
+    # assembled evidence items (an abstract-less item cannot feed
+    # SYNTHESIZE; the ratio is the honest coverage number, never
+    # fabricated).
+    def _cov(records: List[CanonicalRecord]) -> Dict[str, Any]:
+        n = len(records)
+        with_abs = sum(
+            1 for r in records
+            if len((r.best_record.get("abstract") or "")) >= 50)
+        return {"records": n, "with_abstract_ge50": with_abs,
+                "coverage": (round(with_abs / n, 3) if n else None)}
+    _evid_recs: List[CanonicalRecord] = []
+    for lane in ("SCHOLARLY", "PATENT", "THESIS", "PREPRINT",
+                 "TECHNICAL_REPORT", "REPOSITORY", "DATASET"):
+        pool = lane_pools.get(lane, [])
+        cap = lane_caps.get(lane, 3)
+        _evid_recs.extend(pool[:cap])
+    abstract_coverage = {
+        "instrument": "abstract_coverage/1.0 (R6 A3/A4)",
+        "canonical_pool": _cov(canonicalizer.canonical_records()),
+        "evidence_pool": _cov(_evid_recs),
+        "abstract_backfill": abstract_backfill_report,
+    }
     fabric_report = {
         "fabric_version": FABRIC_VERSION_STRING,
         "fabric_name": "RETRIEVAL_FABRIC_V2",
@@ -1039,6 +1166,7 @@ def retrieve_fabric(problem: Dict[str, Any],
         "reciprocal_expansion": reciprocal_report,
         "unpaywall_resolution": unpaywall_report,
         "retrieval_attribution": _retrieval_attribution,
+        "abstract_coverage": abstract_coverage,
         "evidence_pool": {"items_by_lane": lane_item_counts,
                           "total_items": len(items),
                           "lane_caps": lane_caps,
