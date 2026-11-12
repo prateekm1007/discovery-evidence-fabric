@@ -5,7 +5,7 @@
  "question": "Propose the most cost-effective measurable leading indicator for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
  "clarification_answer": null,
  "baseline_answer": null,
- "pipeline_answer": "Data-driven fault detection and diagnosis leveraging labeled historical operational data to identify fault symptoms for transfer learning applications.\n\nImplement a time-series regression model on existing BAS logs that correlates the \"pre-filter pressure slope\" against the \"final-filter alarm\" history to predict remaining useful life, utilizing the identified 15% drop pattern as a precursor feature.\n\nThe system will trigger a predictive maintenance alert 72 hours before observable quality degradation, reducing false alarms to under 3 per year by leveraging the specific pre-filter slope drop indicator found in the historical data.\n\nRun a backtest on 3 years of historical data (n=42 AHU-years) where the alert fires if the pre-filter pressure slope drops by 15% over 7 days; verify that alerts occur \u226572 hours before final filter alarms and count annual false positives to ensure \u22643.",
+ "pipeline_answer": "Data-driven fault detection and diagnosis leveraging labeled historical operational data to identify fault symptoms for transfer learning applications.\n\nImplement a time-series regression model on existing BAS logs that correlates the \"pre-filter pressure slope\" against the \"final-filter alarm\" history to predict remaining useful life, utilizing the identified 15% drop pattern as a precursor feature.\n\nThe system will trigger a predictive maintenance alert 72 hours before observable quality degradation, reducing false alarms to under 3 per year by leveraging the specific pre-filter slope drop indicator found in the historical data.\n\nRun a backtest on 3 years of historical data (n=42 AHU-years) where the alert fires if the pre-filter pressure slope drops by 15% over 7 days; verify that alerts occur ≥72 hours before final filter alarms and count annual false positives to ensure ≤3.",
  "evidence_ids": [
   "doi:10.1016/j.buildenv.2025.113414",
   "doi:10.1016/j.jobe.2024.110578",
@@ -32,5 +32,8 @@
   }
  },
  "baseline_same_evidence_hash": null,
- "pipeline_same_evidence_hash": "0dd5fceb66544d096c4414721c09b3804b4e1a192f1c01bdd72251f0c3b70e00"
+ "pipeline_same_evidence_hash": "0dd5fceb66544d096c4414721c09b3804b4e1a192f1c01bdd72251f0c3b70e00",
+ "legacy": true,
+ "legacy_marker": "LEGACY_PRECOMPOSER (owner audit fact 2026-11-12)",
+ "legacy_reason": "PRE-COMPOSER pair (owner audit fact 2026-11-12): answers generated at commit 0957dedcd38f on a dirty tree with the OLD 4-field answer shape and off-domain anchors (measured examples: tanh nonlinear control for condenser fouling; 'stress distributions in composite structures' for bearing spalling). Does NOT count for the >=10-pair holdout gate; superseded by composer-era pairs (DEV12 fresh composer-era arms)."
 }

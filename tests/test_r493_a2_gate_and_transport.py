@@ -163,7 +163,15 @@ class TestGauntletRingPin(unittest.TestCase):
         with mock.patch.object(real_reg, "generate", _FakeReg.generate):
             a2.llm_chat("p")
         pol = captured["policy"]
-        self.assertIn("atria", pol.preferred_providers)
+        # R6 A5 suite hygiene (retired-subject red): this pin asserted
+        # 'atria' in the production preferred list — but R518 MEASURED
+        # atria out of the attack ring (5/5 first-hop failures;
+        # Art. LI: negative knowledge changes future code) and the
+        # shipped list no longer carries it. The shipped invariant is
+        # the CASCADE SHAPE: a multi-rung preferred list, NO hard pin,
+        # and no ring_pin in the attack-provider meta. The exact rung
+        # list is shipped/operational state (the R518 retirement +
+        # Art. X key-selection authority), never re-pinned here.
         self.assertGreater(len(pol.preferred_providers), 1)
         self.assertIsNone(captured["hard_pin_provider"])
         self.assertNotIn("ring_pin", a2._LAST_ATTACK_PROVIDER_META)

@@ -408,7 +408,11 @@ def test_expansion_produces_genuinely_different_terms():
         assert v["derivation_class"] in (
             "FUNCTION_EQUIV", "CROSS_DOMAIN_TERM", "ADJACENT_INDUSTRY",
             "DOMAIN_NARROW", "COMPARISON_TARGETED",
-            "EXPLORATORY_HYPOTHESIS", "LLM_PROPOSED")
+            "EXPLORATORY_HYPOTHESIS", "LLM_PROPOSED",
+            # R6 A4 (owner round 2026-11-12): failure-text and
+            # constraint-derived variants — problem facts (Art. XLIII),
+            # the measured starvation fix on the committed DEV pairs
+            "FAILURE_TEXT_TERMS", "CONSTRAINT_TARGETED")
         assert v["derivation_basis"]
 
 

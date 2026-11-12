@@ -1054,9 +1054,13 @@ def test_d1_resume_continues_killed_run_without_rerunning_stages():
         # path - R515: the chain is 15 stages (the IMPROVE linear
         # placeholder is removed; documented change). Only the
         # Directive-1 kill-point execution lands an IMPROVE entry
-        # (NO_KILL_EVIDENCE in this fixture - nothing died; +1) -
-        # the total is +9 vs the pre-R515 count of +10.
-        assert len(run2.env.stage_log) == done_before + 9
+        # (NO_KILL_EVIDENCE in this fixture - nothing died; +1).
+        # R6 (owner directive 2026-11-11 item 3): the ANSWER COMPOSER
+        # executes on the survivor tail of the resumed run too — ONE
+        # COMPOSE stage entry (+1; shipped behavior since the composer
+        # landed; this pin's +9 predates it and was red since) — the
+        # total is +10.
+        assert len(run2.env.stage_log) == done_before + 10
         # the automatic survivor -> package pipeline ran in phase 2
         assert (td / "INVENTION_SPECIFICATION.json").exists()
         assert (td / "ENGINEERING_SPECIFICATION.json").exists()
