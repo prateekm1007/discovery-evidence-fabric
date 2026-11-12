@@ -90,14 +90,22 @@ SOURCE_VARIANT_POLICY = {
     # bearing reference gap (europepmc 9 / core 3 of the 12 unmatched
     # records) additionally receive the COMPARISON_TARGETED variant —
     # ADDITIVE to their existing selection, never replacing it.
-    "europepmc": "PRIMARY_AND_COMPARISON",
+    # R6 A4 follow-up (measured 2026-11-12, composer-era DEV12 chunk 1):
+    # the sentence-form PRIMARY retrieved 0 records on europepmc and
+    # semantic_scholar (live probe: the full sentence -> 0; a 4-5 term
+    # form -> 10 on-domain records). The failure/constraint term
+    # variants ARE the measured-effective form, so the scholarly
+    # keyword sources receive them ADDITIVELY
+    # (PRIMARY_AND_FAILURE_TEXT[...]); europepmc keeps its R417
+    # COMPARISON variant (PRIMARY_AND_FAILURE_TEXT_AND_COMPARISON).
+    "europepmc": "PRIMARY_AND_FAILURE_TEXT_AND_COMPARISON",
     "openalex": "KEYWORD_FORM",
-    "semantic_scholar": "PRIMARY",
-    "crossref": "PRIMARY",
-    "doaj": "PRIMARY",
-    "arxiv": "PRIMARY",
+    "semantic_scholar": "PRIMARY_AND_FAILURE_TEXT",
+    "crossref": "PRIMARY_AND_FAILURE_TEXT",
+    "doaj": "PRIMARY_AND_FAILURE_TEXT",
+    "arxiv": "PRIMARY_AND_FAILURE_TEXT",
     "datacite": "NARROW_OR_PRIMARY",
-    "openaire": "PRIMARY",
+    "openaire": "PRIMARY_AND_FAILURE_TEXT",
     "core": "NARROW_AND_COMPARISON",
     "google_patents": "PRIMARY_AND_CROSS_DOMAIN",
 }
@@ -200,6 +208,26 @@ def _select_variants(variants: List[Dict[str, Any]],
           "derivation_basis": "keyword-form of the primary query"}
     if policy == "PRIMARY":
         return [primary] if primary else []
+    # R6 A4 follow-up (measured 2026-11-12): the scholarly keyword
+    # sources receive the failure/constraint term variants ADDITIVELY
+    # — the sentence-form primary retrieved 0 records on these APIs
+    # (measured live); the 5-term problem-fact variants are the
+    # measured-effective form. Additive: the primary stays first.
+    if policy == "PRIMARY_AND_FAILURE_TEXT":
+        out = [primary] if primary else []
+        for cls in ("FAILURE_TEXT_TERMS", "CONSTRAINT_TARGETED"):
+            v = by_class.get(cls)
+            if v:
+                out.append(v)
+        return out
+    if policy == "PRIMARY_AND_FAILURE_TEXT_AND_COMPARISON":
+        out = [primary] if primary else []
+        for cls in ("FAILURE_TEXT_TERMS", "CONSTRAINT_TARGETED",
+                    "COMPARISON_TARGETED"):
+            v = by_class.get(cls)
+            if v:
+                out.append(v)
+        return out
     if policy == "KEYWORD_FORM":
         return [kw] if primary else []
     if policy == "DOMAIN_NARROW":

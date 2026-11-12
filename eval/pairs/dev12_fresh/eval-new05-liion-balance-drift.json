@@ -1,0 +1,133 @@
+{
+ "problem_id": "eval-new05-liion-balance-drift",
+ "commit": "977851bc16a5",
+ "run_id": "r1-pipeline+baseline+judge-2026-11-12050540000",
+ "dirty_tree": true,
+ "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+ "clarification_answer": null,
+ "baseline_answer": "**Engineering Recommendation: Active Thermal Homogenization via Phase-Change Material (PCM) Integration**\n\nThe primary driver of your imbalance failure is the **15\u00b0C top-to-bottom thermal gradient** causing differential self-discharge and aging rates across the 13-cell NMC-811 stack. NMC-811 is highly temperature-sensitive; a 15\u00b0C spread creates voltage offsets far exceeding the 35 mV rest-spread constraint, and 1 A balancing current is kinetically insufficient to correct these drifts over a 10-year lifespan. The existing passive balancer cannot compensate for thermally induced capacity divergence.\n\n**Proposed Intervention:**\nIntegrate a **high-conductivity Phase-Change Material (PCM) composite** into the module\u2019s void spaces between cells and the cabinet walls.\n1.  **Material:** Use a paraffin-based PCM with a melting point tuned to the module\u2019s nominal operating temperature (e.g., 30\u201335\u00b0C).\n2.  **Enhancement:** Infuse the PCM with a 3D graphene aerogel or expanded graphite matrix. This creates a high effective thermal conductivity (>0.5 W/m\u00b7K) without increasing footprint (utilizing existing dead volume).\n3.  **Mechanism:** The enhanced thermal path equalizes the temperature distribution, reducing the top-to-bottom gradient from 15\u00b0C to <2\u00b0C. By keeping all cells within a narrow isothermal band, the differential self-discharge rates and aging asymmetries are minimized. The existing 1 A balancer can then effectively maintain the 35 mV rest-spread constraint because the underlying electrochemical drift is thermally suppressed.\n\n**Expected Measurable Effect:**\n-   **Thermal Gradient:** Reduction of max \u0394T to \u22642\u00b0C under worst-case loading.\n-   **Rest Voltage Spread:** Stabilization of cell-to-cell rest voltage spread <35 mV after 1,000 cycles at 45\u00b0C.\n-   **Derate Events:** 90% reduction in BMS thermal derate/shutdown incidents over the first year.\n\n**Falsification Test:**\nConduct a **Thermal Step-Response Balancing Test**:\n1.  Place the modified module in a chamber with a 15\u00b0C vertical temperature gradient (simulating the failure condition).\n2.  Charge to 90% SoC, rest for 24 hours, and measure cell voltage spread.\n3.  **Falsification Criterion:** If the post-rest voltage spread exceeds 35 mV, or if the thermal mapping shows any two cells differing by >3\u00b0C during a 1 C discharge pulse, the intervention has failed. A successful design will show <5\u00b0C max difference between top and bottom cells and rest spread <35 mV.\n\n**Evidence & Constraints Analysis:**\n-   **NMC Specificity:** The provided evidence on **[europepmc] Interparticle Communication... in NMC Cathodes** highlights that NMC materials have complex lithium diffusion behaviors. Thermal gradients exacerbate these kinetic differences, making thermal management critical for consistency.\n-   **Thermal Safety:** **[crossref] Modeling and Simulation... Thermal Runaway** supports the need for thermal mitigation in module-scale designs, though this intervention is for stability, not runaway.\n-   **Footprint Constraint:** The use of **PCM composites** leverages existing volume, satisfying the \"no increase in module footprint\" constraint.\n-   **Balancing Constraint:** We do **not** increase balancing current. Instead, we reduce the *need* for high-current balancing by reducing the *rate* of drift.\n-   **Irrelevant Evidence:** The references to **[semantic_scholar] Lithium-Sulfur** and **[openaire] Immune System** are not relevant to NMC-811 module design and are disregarded. The **[crossref] 3.2 KWH... 18 Army Standard** reference confirms that modular designs often rely on standard cell configurations, but does not address the thermal imbalance issue.\n\n**Conclusion:** The 1 A balancer is the limiting factor, but it is a symptom, not the root cause. The root cause is thermal asymmetry. By engineering the thermal path to isothermality, the existing 1 A",
+ "pipeline_answer": "CONTRACT-INVALID COMPOSITION (deterministic answer-shape contract violations: intervention contract: EVIDENCE-BACKED label without a referenced source id or evidence citation)\n\nNo surviving intervention candidates exist in the provided pipeline data that satisfy the deterministic evidence contract. The previous attempt relied on sources that failed verification for specific parameter values (value_not_in_source, substring_number), rendering those claims invalid. Therefore, I am presenting the best surviving hypothesis as UNVERIFIED, strictly separating supported facts from assumptions and explicitly flagging the lack of direct packet support for the core mechanism.\n\nUNVERIFIED RECOMMENDED INTERVENTION:\nImplement a facet-aware thermal correction factor in the BMS State-Of-Charge (SOC) estimator to decouple temperature-induced drift from true capacity imbalance. Instead of using a uniform electrochemical model, the BMS will apply a position-dependent offset to the self-discharge rate calculation, accounting for the 15 C thermal gradient across the 13-cell series string. This allows the existing 1 A balancer to target cells with genuine capacity deficit rather than cells merely experiencing thermal-induced voltage depression, thereby maintaining the 35 mV rest-spread threshold without hardware changes.\n\nPARAMETERS:\nPARAMETER: Maximum Cell-to-Cell Voltage Spread \u2014 <35 mV at rest \u2014 ASSUMPTION (User-stated fixed constraint)\nPARAMETER: Calendar Life Target \u2014 10 years \u2014 ASSUMPTION (User-stated fixed constraint)\nPARAMETER: Thermal Gradient \u2014 15 C top-to-bottom \u2014 ASSUMPTION (User-stated fixed constraint)\nPARAMETER: Balancing Current Limit \u2014 1 A \u2014 ASSUMPTION (User-stated fixed constraint)\nPARAMETER: Module Footprint Increase \u2014 0 cm3 \u2014 ASSUMPTION (User-stated fixed constraint)\nPARAMETER: Thermal Offset Calibration \u2014 Defined rule: Linear voltage coefficient of temperature (V/K) derived from 14 days of healthy resting data at each cell position, updated quarterly \u2014 ASSUMPTION\nPARAMETER: BMS Sampling Frequency \u2014 1 Hz \u2014 ASSUMPTION\n\nEXPECTED MEASURABLE EFFECT:\nThe BMS will correct for temperature-dependent voltage depression in the top (warmer) cells versus bottom (cooler) cells. By accurately separating thermal drift from true SOC imbalance, the 1 A balancer will spend less time correcting false positives caused by the 15 C gradient. This should reduce the observed maximum rest voltage spread, keeping it below the 35 mV threshold during the 10-year life cycle, thereby preventing unnecessary module derating or shutdown despite available aggregate energy.\n\nCONSTRAINT COMPLIANCE:\nAll user-fixed constraints are respected: the solution uses only software (BMS algorithm update) and existing hardware (1 A balancer). No footprint is added. The target spread (<35 mV) and life (10 years) are maintained by improving the accuracy of the balancer's targeting logic.\n\nFALSIFICATION TEST:\nA/B test the baseline BMS versus the BMS with the thermal correction factor on an identical module pair subjected to a controlled 15 C vertical gradient. Measure the time-to-threshold for the maximum cell-to-cell rest voltage spread to reach 35 mV over a 6-month aging period. If the improved BMS does not delay the threshold crossing by a statistically significant margin (defined as >20% longer time-to-threshold compared to baseline) or if the balancer activity increases by >50% without a corresponding reduction in spread, the hypothesis is falsified. Additionally, verify that the calculated thermal offset matches the measured voltage depression within a 5 mV error band; if the offset exceeds 5 mV error at any cell position, the calibration rule is invalid.\n\nEVIDENCE SUPPORT:\nUNVERIFIED \u2014 The specific claim that facet-anisotropic diffusion in NMC-811 dominates the drift mechanism is NOT supported by a surviving packet item. The previous sources [doi:10.1021/jacs.5c15171], [doi:10.4271/2006-01-3099], and [doi:10.1016/j.fub.2026.100159] were rejected in the pipeline verification due to failure to jointly support their assigned parameters. Consequently, this intervention rests on engineering assumption regarding thermal-voltage coupling rather than verified packet evidence. No EVIDENCE-BACKED labels are assigned because no packet item survived verification.",
+ "evidence_ids": [
+  "doi:10.1016/j.fub.2026.100159",
+  "doi:10.1021/jacs.5c15171",
+  "doi:10.1016/j.est.2024.112224",
+  "doi:10.1002/adma.202407738",
+  "doi:10.4271/2006-01-3099",
+  "doi:10.4271/2017-01-1217",
+  "doi:10.70675/8ef561cbz6f1dz4ff1z9616z3a130229801e",
+  "doi:10.70675/c565ec3czd3d2z4e62z9bb5z2dd0f2358a7b",
+  "doi:10.37099/mtu.dc.etdr/2192",
+  "doi:10.5281/zenodo.21505238",
+  "doi:10.4271/j3303_202510",
+  "doi:10.1007/springerreference_4733",
+  "doi:10.5281/zenodo.19251022",
+  "doi:10.5281/zenodo.19251023"
+ ],
+ "bound_inputs": {
+  "pipeline_answer_sha256": "2b00644f033513277b35a47fbfae5da8ff4f336725bc70032691d05b7d2e2a1c",
+  "baseline_answer_sha256": "8b27dae1c659dd238e6eb6240c8a23cd379c9e1ceeb603d257bf39f6f113d8de",
+  "evidence_sha256": "15060ab53da795f43de79ed5dcc9eb97db5ea878d144455589bc4474cb091d8b",
+  "judge_route": {
+   "provider": "zai",
+   "model": "glm-4-plus"
+  },
+  "rubric_version": "0-4-rubric/1"
+ },
+ "judge_record": {
+  "usable_pair": true,
+  "outcome": "JUDGE_VALID",
+  "passes": 2,
+  "pass_outcomes": [
+   "JUDGE_VALID",
+   "JUDGE_VALID"
+  ],
+  "scores": {
+   "a_answered": {
+    "pipeline_mean": 3.0,
+    "baseline_mean": 5.0,
+    "diff": -2.0
+   },
+   "b_user_vars": {
+    "pipeline_mean": 5.0,
+    "baseline_mean": 5.0,
+    "diff": 0.0
+   },
+   "c_prediction": {
+    "pipeline_mean": 4.5,
+    "baseline_mean": 5.0,
+    "diff": -0.5
+   },
+   "d_evidence": {
+    "pipeline_mean": 1.0,
+    "baseline_mean": 3.5,
+    "diff": -2.5
+   },
+   "e_clarification": {
+    "pipeline_mean": null,
+    "baseline_mean": null,
+    "diff": null
+   },
+   "f_novelty": {
+    "pipeline_mean": 3.0,
+    "baseline_mean": 4.5,
+    "diff": -1.5
+   }
+  },
+  "winner": "baseline",
+  "pref_passes": [
+   "baseline",
+   "baseline"
+  ],
+  "number_absent": {
+   "pipeline": [
+    "20"
+   ],
+   "baseline": [
+    "0.5",
+    "000",
+    "30",
+    "45"
+   ]
+  },
+  "number_absent_detail": {
+   "pipeline": {
+    "all": 21,
+    "unverified": 1,
+    "assumption_labeled": 17,
+    "packet_bound": 20,
+    "user_variable_bound": 3,
+    "unbound": 1,
+    "fabricated_rate": 0.25
+   },
+   "baseline": {
+    "all": 17,
+    "unverified": 4,
+    "assumption_labeled": 0,
+    "packet_bound": 12,
+    "user_variable_bound": 3,
+    "unbound": 4,
+    "fabricated_rate": 0.235
+   }
+  },
+  "judge_content_len": [
+   69,
+   69
+  ],
+  "judge_latency_s": [
+   1.3,
+   3.8
+  ],
+  "bound_inputs": {
+   "pipeline_answer_sha256": "2b00644f033513277b35a47fbfae5da8ff4f336725bc70032691d05b7d2e2a1c",
+   "baseline_answer_sha256": "8b27dae1c659dd238e6eb6240c8a23cd379c9e1ceeb603d257bf39f6f113d8de",
+   "evidence_sha256": "15060ab53da795f43de79ed5dcc9eb97db5ea878d144455589bc4474cb091d8b",
+   "judge_route": {
+    "provider": "zai",
+    "model": "glm-4-plus"
+   },
+   "rubric_version": "0-4-rubric/1"
+  }
+ },
+ "baseline_same_evidence_hash": "15060ab53da795f43de79ed5dcc9eb97db5ea878d144455589bc4474cb091d8b",
+ "pipeline_same_evidence_hash": "15060ab53da795f43de79ed5dcc9eb97db5ea878d144455589bc4474cb091d8b"
+}

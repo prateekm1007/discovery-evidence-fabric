@@ -540,29 +540,69 @@ def mechanism_signal_score(record: Dict[str, Any]) -> Dict[str, Any]:
             "term_density": density, "score": round(score, 2)}
 
 
+def _problem_relevance_terms(problem: Optional[Dict[str, Any]]
+                             ) -> List[str]:
+    """R6 A4 (measured 2026-11-12): the problem's OWN content terms —
+    device + failure + failure_mode + constraint — as lowercase whole
+    tokens (the query_expansion whole-token discipline). Deterministic,
+    zero LLM, problem facts only (Art. XLIII). Empty when no problem is
+    given (the rerank keeps its pure density semantics)."""
+    if not problem:
+        return []
+    from ..retrieval_fabric.query_expansion import _content_terms
+    text = " ".join(str(problem.get(k) or "") for k in
+                    ("device", "failure", "failure_mode", "constraint"))
+    terms = _content_terms(text)
+    return sorted(set(terms))[:14]
+
+
 def mechanism_signal_rerank(records: List[Dict[str, Any]],
-                            top_k: int = 6
+                            top_k: int = 6,
+                            problem: Optional[Dict[str, Any]] = None,
                             ) -> Dict[str, Any]:
     """Rank records by mechanism-signal density; return the top-k with
-    the full recorded basis (every record's score, kept or dropped)."""
+    the full recorded basis (every record's score, kept or dropped).
+
+    R6 A4 follow-up (measured 2026-11-12, composer-era DEV12 chunk 1):
+    with a problem given, a PROBLEM-RELEVANCE component rides the score
+    (0.5 per shared problem-fact term). The measured defect: density
+    alone selected mechanism-dense OFF-DOMAIN records (a composite-beams
+    fatigue paper) for a bearing problem, and the anchor-domain gate
+    then rejected every candidate built on them -> MECHANISM_STARVED
+    with 0-1 distinct mechanisms. Relevance is problem-fact-lexical,
+    deterministic, and recorded per record; without a problem the
+    behavior is byte-unchanged (the replay-set pins call it bare)."""
+    rel_terms = _problem_relevance_terms(problem)
     scored = []
     for r in records:
         s = mechanism_signal_score(r)
         s["record_id"] = r.get("id") or r.get("record_id") or ""
         s["title"] = (r.get("title") or "")[:120]
+        if rel_terms:
+            text = " ".join(str(r.get(k) or "") for k in
+                            ("title", "abstract", "snippet")).lower()
+            rel_hits = sorted(t for t in rel_terms if t in text)
+            s["relevance_hits"] = rel_hits[:10]
+            s["n_relevance_hits"] = len(rel_hits)
+            s["score"] = round(s["score"] + 0.5 * len(rel_hits), 2)
         scored.append(s)
     order = sorted(range(len(records)),
                    key=lambda i: (-scored[i]["score"], scored[i].get(
                        "record_id") or ""))
     top = order[:max(0, top_k)]
     return {
-        "reranker_version": "mechanism_signal_rerank/1.0.0",
+        "reranker_version": ("mechanism_signal_rerank/1.1.0"
+                             if rel_terms else
+                             "mechanism_signal_rerank/1.0.0"),
         "n_input": len(records), "top_k": top_k,
         "selected_indexes": top,
         "selected_ids": [scored[i].get("record_id") for i in top],
         "all_scores": scored,
         "policy": ("deterministic vocabulary-class density; recorded "
-                   "basis per record; NOT a relevance verdict (Art. XXI)"),
+                   "basis per record; NOT a relevance verdict (Art. XXI)"
+                   + (" + 0.5/problem-fact-term relevance component "
+                      "(R6 A4 follow-up, measured 2026-11-12)"
+                      if rel_terms else "")),
     }
 
 
@@ -2545,7 +2585,8 @@ def build_structured_evidence(problem: Dict[str, Any],
         it["_retrieval_role"] = "DISCOVERY_EXPANSION"
         expansion_stamped.append(it)
     combined = frozen_stamped + expansion_stamped
-    rerank = mechanism_signal_rerank(combined, top_k=top_k)
+    rerank = mechanism_signal_rerank(combined, top_k=top_k,
+                                     problem=problem)
     selected = [combined[i] for i in rerank["selected_indexes"]]
     items = []
     for rec in selected:

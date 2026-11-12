@@ -1,0 +1,137 @@
+{
+ "problem_id": "eval-sofc-thermal-cycling",
+ "commit": "977851bc16a5",
+ "run_id": "r1-pipeline+baseline+judge-2026-11-12051342000",
+ "dirty_tree": true,
+ "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+ "clarification_answer": {
+  "intergranular glass phase fraction": 0.15,
+  "note": "user stated the seal's intergranular glass phase fraction is 0.15 (mass fraction) for this stack design"
+ },
+ "baseline_answer": "**Proposed Design Intervention: High-Tetragon (HT) Zirconia Anode Support with Compliant Cathode-Electrolyte Interface**\n\nTo mitigate thermal shock failure driven by differential expansion, the core design change is to transition from a standard dense YSZ anode support to a **high-tetragon zirconia (HT-ZrO\u2082) anode support** combined with a **mechanically compliant, infiltrated LCMY cathode layer**.\n\n**Rationale and Engineering Logic:**\n1.  **CTE Matching:** The primary driver of seal fatigue and interfacial delamination is the coefficient of thermal expansion (CTE) mismatch between the YSZ electrolyte (~10\u201312 \u00d7 10\u207b\u2076 K\u207b\u00b9) and typical Ni-YSZ anodes or seals. While the user specified a YSZ electrolyte, the anode is currently implied to be a standard ceramic or Ni-cermet. By adopting an anode support composed of tetragon ZrO\u2082 (with CTE ~14\u201315 \u00d7 10\u207b\u2076 K\u207b\u00b9), we align the anode\u2019s expansion behavior more closely with the glass-ceramic seal and the cathode (LSM/LCM), reducing the shear stress at the cathode-electrolyte interface during 25\u00b0C to 800\u00b0C cycling. This reduces the driving force for microcrack initiation at the interface.\n2.  **Seal Stress Relaxation:** The glass-ceramic seal has an intergranular glass phase fraction of 0.15. This viscous phase allows for some stress relaxation but contributes to viscoelastic flow at high temperatures, leading to creep and eventual leakage. By reducing the CTE mismatch at the electrode-electrolyte boundaries, the thermal load on the seal interface is lowered, suppressing the viscous flow of the 0.15 mass fraction glass phase. This directly addresses the seal leakage constraint (<1% fuel crossover).\n3.  **Compliant Cathode:** Using an infiltrated LCMY (La-Ca-Mn-Y) cathode on the YSZ electrolyte, as supported by recent studies on intermediate-temperature SOFCs, provides a graded microstructure. The porosity in the infiltrated layer acts as a stress buffer, preventing catastrophic delamination during 500 cycles. The CTE of LCMY is typically ~15\u201316 \u00d7 10\u207b\u2076 K\u207b\u00b9, which is closer to the HT anode support than to dense YSZ, further mitigating interfacial stress.\n\n**Expected Measurable Effects:**\n*   **Seal Leakage:** Reduced interfacial stress will decrease glass phase creep, keeping leakage below 1% of fuel flow after 500 cycles.\n*   **Ohmic Loss:** Preserved interfacial integrity prevents delamination-induced resistance spikes, maintaining low ohmic loss.\n*   **OCV:** Maintained structural integrity prevents gas crossover and leakage paths that reduce OCV, ensuring OCV remains above 1.0 V at open circuit (theoretical Nernst potential at 800\u00b0C is ~1.1\u20131.2 V depending on gas composition).\n*   **Mass Increase:** No additional material mass is added; only compositional/microstructural changes to the anode and cathode are made. Stack mass increase will be <0.1%, well below the 2% limit.\n\n**Falsification Test:**\nPerform accelerated thermal cycling on two prototype stacks: one with standard Ni-YSZ anode, one with HT-ZrO\u2082 anode + infiltrated LCMY cathode. Cycle both at 5 C/min between 25\u00b0C and 800\u00b0C for 500 cycles. Monitor seal leakage (via mass spectrometry of exhaust gases) and interfacial resistance (via EIS). **The proposal is falsified if** the HT-ZrO\u2082 stack shows:\n1.  Seal leakage >1% of fuel flow after 500 cycles.\n2.  OCV drop below 1.0 V at open circuit post-cycling.\n3.  Measurable increase in interfacial ohmic resistance relative to the control stack.\n4. ",
+ "pipeline_answer": "CONTRACT-INVALID COMPOSITION (deterministic answer-shape contract violations: intervention contract: 7 numeric parameter(s) without an EVIDENCE-BACKED or ASSUMPTION label)\n\nTHERE ARE NO SURVIVING INTERVENTION CANDIDATES \u2014 ALL KILLED. PRESENTING BEST UNVERIFIED HYPOTHESIS.\n\nPARAMETER: Electrolyte material \u2014 Yttria-stabilized zirconia (YSZ) \u2014 ASSUMPTION\nPARAMETER: Electrolyte thickness \u2014 10\u201320 \u00b5m \u2014 ASSUMPTION\nPARAMETER: Electrolyte deposition method \u2014 Spray-coating \u2014 ASSUMPTION\nPARAMETER: Anode support thickness \u2014 500\u2013700 \u00b5m \u2014 ASSUMPTION\nPARAMETER: Cathode material \u2014 Lanthanum strontium manganite (LSM) \u2014 ASSUMPTION\nPARAMETER: Cathode thickness \u2014 50\u2013100 \u00b5m \u2014 ASSUMPTION\nPARAMETER: Seal glass-ceramic intergranular glass phase fraction \u2014 0.15 mass fraction \u2014 USER-STATED CONSTRAINT\nPARAMETER: Heating/cooling rate \u2014 5 C/min \u2014 USER-STATED CONSTRAINT\nPARAMETER: Thermal cycle range \u2014 25 C to 800 C \u2014 USER-STATED CONSTRAINT\nPARAMETER: Cycle count requirement \u2014 500 cycles \u2014 USER-STATED CONSTRAINT\nPARAMETER: Target open-circuit voltage \u2014 > 1.0 V \u2014 USER-STATED CONSTRAINT\nPARAMETER: Target seal leakage \u2014 < 1% of fuel flow \u2014 USER-STATED CONSTRAINT\nPARAMETER: Maximum stack mass increase \u2014 < 2% \u2014 USER-STATED CONSTRAINT\n\nThe recommended intervention is to transition the stack architecture to an anode-supported configuration with a thin, spray-coated yttria-stabilized zirconia (YSZ) electrolyte film. This design shifts the structural load to the anode, drastically reducing the differential thermal expansion strain at the cathode-electrolyte interface and the seal, thereby preventing microcrack initiation during 25-800 C cycling. UNVERIFIED\n\nThe expected measurable effect is a reduction in interfacial stress at the cathode-electrolyte boundary, maintaining gas-tight seal integrity and low ohmic loss over 500 cycles. By using the anode as the structural support and thinning the electrolyte, the strain mismatch between the rigid YSZ and the glass-ceramic seal is mitigated. The spray-coated YSZ film ensures uniform density and eliminates defects that would act as crack initiation sites. The 15% glass phase fraction in the seal is maintained as a fixed design variable, balancing creep resistance against thermal shock susceptibility. The anode-supported architecture typically adds less than 2% mass compared to symmetric or electrolyte-supported cells by optimizing the anode substrate dimensions and minimizing auxiliary sealant volume.\n\nTo respect the constraint of keeping seal leakage below 1%, the interfacial stress must remain below the fatigue threshold of the glass-ceramic. The thin YSZ electrolyte reduces the thermal strain delta between the ceramic electrolyte and the glass-ceramic seal during the 775 C temperature swing. The 5 C/min heating rate limits the thermal gradient within the cell, preventing transient thermal shocks that accelerate crack propagation.\n\nThe falsification test is a 500-cycle thermal fatigue experiment under the specified conditions (25-800 C, 5 C/min). The stack is monitored for open-circuit voltage (OCV) and seal leakage. Failure is defined as OCV dropping below 1.0 V or seal leakage exceeding 1% of fuel flow.",
+ "evidence_ids": [
+  "doi:10.1017/s1431927608085942",
+  "doi:10.1016/j.ssi.2008.01.094",
+  "doi:10.1115/1.4028947",
+  "doi:10.1016/j.electacta.2016.01.035",
+  "doi:10.1038/s41467-026-69110-y",
+  "doi:10.1021/acsomega.5c12945",
+  "doi:10.58837/chula.the.2006.1579",
+  "doi:10.3990/1.9788755026056",
+  "doi:10.58837/chula.the.2000.861",
+  "doi:10.2172/5521909",
+  "doi:10.1016/b978-008043339-4/50015-8",
+  "doi:10.4271/j3012_202002",
+  "doi:10.2307/j.ctt1d4v0kg.11",
+  "doi:10.2307/j.ctt1d4v0kg.12"
+ ],
+ "bound_inputs": {
+  "pipeline_answer_sha256": "ec3f632b8d8e842fe91950270854c9f0d6b4f7ad0e944bf79bf8885edfbaf0fa",
+  "baseline_answer_sha256": "deff59b4b63bb62e3704a8b1f3a4fc62d22a69c7d407e6500d3ebcbf02042c81",
+  "evidence_sha256": "cb9115704912621d1f0cb444f9f8c3f726b433c7205deb9a92952fefb0eb8ced",
+  "judge_route": {
+   "provider": "zai",
+   "model": "glm-4-plus"
+  },
+  "rubric_version": "0-4-rubric/1"
+ },
+ "judge_record": {
+  "usable_pair": true,
+  "outcome": "JUDGE_VALID",
+  "passes": 2,
+  "pass_outcomes": [
+   "JUDGE_VALID",
+   "JUDGE_VALID"
+  ],
+  "scores": {
+   "a_answered": {
+    "pipeline_mean": 2.5,
+    "baseline_mean": 5.0,
+    "diff": -2.5
+   },
+   "b_user_vars": {
+    "pipeline_mean": 4.0,
+    "baseline_mean": 5.0,
+    "diff": -1.0
+   },
+   "c_prediction": {
+    "pipeline_mean": 3.5,
+    "baseline_mean": 5.0,
+    "diff": -1.5
+   },
+   "d_evidence": {
+    "pipeline_mean": 1.5,
+    "baseline_mean": 2.5,
+    "diff": -1.0
+   },
+   "e_clarification": {
+    "pipeline_mean": 1.5,
+    "baseline_mean": 5.0,
+    "diff": -3.5
+   },
+   "f_novelty": {
+    "pipeline_mean": 1.5,
+    "baseline_mean": 5.0,
+    "diff": -3.5
+   }
+  },
+  "winner": "baseline",
+  "pref_passes": [
+   "baseline",
+   "baseline"
+  ],
+  "number_absent": {
+   "pipeline": [
+    "0.15",
+    "775"
+   ],
+   "baseline": [
+    "0.1",
+    "0.15",
+    "1.1",
+    "1.2"
+   ]
+  },
+  "number_absent_detail": {
+   "pipeline": {
+    "all": 16,
+    "unverified": 2,
+    "assumption_labeled": 7,
+    "packet_bound": 11,
+    "user_variable_bound": 3,
+    "unbound": 2,
+    "fabricated_rate": 0.222
+   },
+   "baseline": {
+    "all": 18,
+    "unverified": 4,
+    "assumption_labeled": 0,
+    "packet_bound": 10,
+    "user_variable_bound": 3,
+    "unbound": 4,
+    "fabricated_rate": 0.222
+   }
+  },
+  "judge_content_len": [
+   81,
+   81
+  ],
+  "judge_latency_s": [
+   3.6,
+   2.0
+  ],
+  "bound_inputs": {
+   "pipeline_answer_sha256": "ec3f632b8d8e842fe91950270854c9f0d6b4f7ad0e944bf79bf8885edfbaf0fa",
+   "baseline_answer_sha256": "deff59b4b63bb62e3704a8b1f3a4fc62d22a69c7d407e6500d3ebcbf02042c81",
+   "evidence_sha256": "cb9115704912621d1f0cb444f9f8c3f726b433c7205deb9a92952fefb0eb8ced",
+   "judge_route": {
+    "provider": "zai",
+    "model": "glm-4-plus"
+   },
+   "rubric_version": "0-4-rubric/1"
+  }
+ },
+ "baseline_same_evidence_hash": "cb9115704912621d1f0cb444f9f8c3f726b433c7205deb9a92952fefb0eb8ced",
+ "pipeline_same_evidence_hash": "cb9115704912621d1f0cb444f9f8c3f726b433c7205deb9a92952fefb0eb8ced"
+}

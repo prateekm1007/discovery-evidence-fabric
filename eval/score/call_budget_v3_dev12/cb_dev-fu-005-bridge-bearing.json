@@ -1,0 +1,114 @@
+{
+ "outcome": "SCORED",
+ "instrument": "scripts/r6_call_budget.py v3 (canonical ledger; logical vs provider measures separated)",
+ "run_dir": "eval/runs/977851bc16a5/r1-pipeline+baseline+judge-2026-11-12052337000/dev-fu-005-bridge-bearing",
+ "stages": {
+  "RETRIEVE": {
+   "provider_attempts": 0,
+   "provider_attempts_basis": "run routing ledger (no provider lines for this stage)",
+   "logical_calls": 0,
+   "logical_calls_basis": "run routing ledger (provider attempts grouped into logical call intents; deterministic sequential rule)"
+  },
+  "MECHANISM_SPACE": {
+   "provider_attempts": "NOT_MEASURED",
+   "provider_attempts_basis": "run routing ledger carries no line for this stage while envelope engine attribution records 4 call(s) \u2014 provenance incomplete, never scored as zero",
+   "logical_calls": 4,
+   "logical_calls_basis": "envelope engine attribution (ledger has no lines for this stage though attribution records 4 \u2014 provenance incomplete)",
+   "cross_check": {
+    "envelope_counter": 4,
+    "ledger_lines": 0,
+    "reconciled": false
+   }
+  },
+  "SYNTHESIZE": {
+   "provider_attempts": 1,
+   "provider_attempts_basis": "run routing ledger (one line per provider request; retries, transport failures and provider fallbacks included)",
+   "logical_calls": 1,
+   "logical_calls_basis": "run routing ledger (provider attempts grouped into logical call intents; deterministic sequential rule); 1 chain(s) with unrecorded head",
+   "cross_check": {
+    "envelope_counter": 2,
+    "reconciled": false
+   }
+  },
+  "COMPOSE": {
+   "provider_attempts": 2,
+   "provider_attempts_basis": "run routing ledger (one line per provider request; retries, transport failures and provider fallbacks included)",
+   "logical_calls": 1,
+   "logical_calls_basis": "run routing ledger (provider attempts grouped into logical call intents; deterministic sequential rule)",
+   "cross_check": {
+    "envelope_counter": 0,
+    "reconciled": false
+   }
+  },
+  "ATTACK": {
+   "provider_attempts": 2,
+   "provider_attempts_basis": "run routing ledger (one line per provider request; retries, transport failures and provider fallbacks included)",
+   "logical_calls": 3,
+   "logical_calls_basis": "run routing ledger (provider attempts grouped into logical call intents; deterministic sequential rule); 1 chain(s) with unrecorded head",
+   "cross_check": {
+    "envelope_counter": 1,
+    "reconciled": false
+   }
+  },
+  "COLLISION": {
+   "provider_attempts": 0,
+   "provider_attempts_basis": "deterministic execution recorded, no provider call by design",
+   "logical_calls": 0,
+   "logical_calls_basis": "deterministic execution recorded, no logical call by design"
+  },
+  "VERIFY": {
+   "provider_attempts": 1,
+   "provider_attempts_basis": "run routing ledger (one line per provider request; retries, transport failures and provider fallbacks included)",
+   "logical_calls": 1,
+   "logical_calls_basis": "run routing ledger (provider attempts grouped into logical call intents; deterministic sequential rule)"
+  },
+  "PHYSICS": {
+   "provider_attempts": 0,
+   "provider_attempts_basis": "deterministic execution recorded, no provider call by design",
+   "logical_calls": 0,
+   "logical_calls_basis": "deterministic execution recorded, no logical call by design"
+  },
+  "RANK": {
+   "provider_attempts": 2,
+   "provider_attempts_basis": "run routing ledger (one line per provider request; retries, transport failures and provider fallbacks included)",
+   "logical_calls": 3,
+   "logical_calls_basis": "run routing ledger (provider attempts grouped into logical call intents; deterministic sequential rule); 1 chain(s) with unrecorded head"
+  },
+  "POST_RANK_EVOLUTION": {
+   "provider_attempts": 2,
+   "provider_attempts_basis": "run routing ledger (one line per provider request; retries, transport failures and provider fallbacks included)",
+   "logical_calls": 2,
+   "logical_calls_basis": "run routing ledger (provider attempts grouped into logical call intents; deterministic sequential rule); 1 chain(s) with unrecorded head"
+  }
+ },
+ "total_logical_calls": 15,
+ "total_provider_attempts": "NOT_MEASURED",
+ "logical_stages_not_measured": [],
+ "provider_stages_not_measured": [
+  "MECHANISM_SPACE"
+ ],
+ "target_max_per_problem": 12,
+ "target_applies_to": "logical_calls",
+ "target_scope": "all expected pre-rank stages + COMPOSE + every observed post-rank stage",
+ "metric_definitions": {
+  "logical_calls": "one per LLM call INTENT the run spends: retries of one intent and provider fallbacks within one intent group into a single logical call (deterministic sequential rule over the ordered ledger lines of a stage+task key; chains with an unrecorded head are one call, flagged)",
+  "provider_attempts": "one per provider REQUEST: retries, transport failures and provider fallbacks each count \u2014 quota cost, NOT the design budget"
+ },
+ "target_statement": "the twelve-call target is the pipeline's DESIGN call budget and applies to the LOGICAL-CALLS measure only; provider attempts (429-storm retries, fallbacks) are reported separately under total_provider_attempts and are never certified against the target",
+ "run_ledger_summary": {
+  "present": true,
+  "run_owned_lines": 15,
+  "run_owned_distinct_attempts": 10,
+  "retries_included": 8,
+  "failures_included": 7,
+  "fallbacks_included": 7,
+  "logical_groups_total": 11,
+  "unrecorded_chain_heads": 4
+ },
+ "total_llm_calls": 15,
+ "within_target": false,
+ "stages_not_measured": [
+  "MECHANISM_SPACE"
+ ],
+ "note": "P0-6 canonical ledger: logical_calls and provider_attempts are SEPARATE measures. The target certifies the LOGICAL measure only; a NOT_MEASURED expected stage blocks its measure's total (a partial measurement must not certify compliance); observed post-rank stages (the engine's POST_RANK_* / IMPROVE ledger stages) are included in the totals"
+}

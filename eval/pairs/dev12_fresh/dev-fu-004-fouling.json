@@ -1,0 +1,131 @@
+{
+ "problem_id": "dev-fu-004-fouling",
+ "commit": "977851bc16a5",
+ "run_id": "r1-pipeline+baseline+judge-2026-11-12045822000",
+ "dirty_tree": true,
+ "question": "Propose the most cost-effective measurable leading indicator for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+ "clarification_answer": null,
+ "baseline_answer": "**Leading Indicator:**\n**Condenser Vacuum (End-Condensation Pressure) vs. Heat Exchanger Performance Index (HPI)**\n\n**Rationale & Evidence:**\nBiofouling on the tube-side restricts flow and increases thermal resistance. This manifests not as an immediate pressure spike, but as a gradual rise in condenser back-pressure for a given heat load. While [crossref] \"Low Pressure Steam Turbine Exhaust Flow\" confirms the coupling between LP exhaust and condenser neck, the most sensitive *measurable* proxy using *existing instrumentation* is the **Condenser Vacuum**.\n\nMost 300 MW units already have multiple RTDs for cooling water inlet temperature, steam flow, and condenser vacuum (pressure). You do not need new hardware. You need a *derived* metric.\n\n### 1. Proposed Design: The Performance Index (PI)\n\nUse existing signals to calculate a **Condenser Performance Index**:\n$$ PI = \\frac{Q_{exhaust}}{A \\cdot LMTD} $$\nWhere:\n- $Q_{exhaust}$ is derived from steam flow and enthalpy drop (existing flow/heat meters).\n- $LMTD$ (Log Mean Temperature Difference) is calculated from existing condenser vacuum (converted to saturation temperature) and average cooling water inlet/outlet temperatures.\n- $A$ is the known surface area.\n\n**Alternative Simpler Proxy (If PI is too complex for DCS):**\nMonitor the **Slope of Condenser Vacuum vs. Cooling Water Flow** at constant heat load. Biofouling reduces the overall heat transfer coefficient ($U$). For a fixed $U$, a reduction in $U$ requires a larger LMTD to remove the same heat. This translates to a **higher condenser vacuum** (lower pressure) for the same cooling water flow and heat load.\n\n**Operating Threshold:**\nDefine a baseline PI (or Vacuum) during clean periods (post-chemical cleaning or start-of-season).\n- **Alarm Threshold:** PI drops by **10%** from baseline, OR Vacuum rises by **5\u201310 mbar** (unit-specific) above predicted performance for the current ambient temperature and load.\n- **Derating Trigger:** 3 weeks before critical failure, the trend should cross this 10% degradation mark.\n\n**Why this works with constraints:**\n- **No false trips during load swings:** Use a **slow-moving average** (e.g., 1-hour moving average) of the PI or Vacuum. Load swings cause transient changes in steam flow, but fouling is a slow, irreversible drift. A slow filter removes high-frequency noise from load changes, preventing false positives.\n- **Existing instrumentation:** Uses only P, T, and Flow signals already on the DCS.\n\n### 2. The Concrete Test to Falsify\n\n**Test Protocol:**\n1.  **Baseline:** Establish \"Clean\" PI baseline during spring/summer when biological activity is low.\n2.  **Monitoring:** Track the PI trend weekly for the next 6\u20138 weeks.\n3.  **Falsification Condition:**\n    -   **If the hypothesis is correct (Biofouling is the cause):** The PI will show a *monotonic, slow degradation* over weeks, independent of load fluctuations (once filtered). The correlation between $U_{eff}$ (derived from PI) and time should be strong ($R^2 > 0.8$).\n    -   **If the hypothesis is incorrect (e.g., Air Binding is the cause):** The PI will show *irregular, step-changes* correlated with pump operations or venting, rather than a smooth drift. Additionally, air leakage tests would show high air flow rates, which *would not* be indicated by the tube-side fouling signature.\n    -   **Kill Signal:** If the PI remains flat (within 5% noise) for 4 weeks while cooling water chemistry indicates high biological activity, *or* if a chemical cleaning restores PI to baseline within 48 hours with no performance loss in between, the \"slow biofouling\" leading indicator is invalid for this specific unit\u2019s operation (i.e., the failure mode is not gradual tube fouling but rather something else, like air in-leakage or condenser neck blockage).\n\n",
+ "pipeline_answer": "INDICATOR: The mean absolute smoothed condenser pressure error (defined as the moving average of |turbine exhaust pressure setpoint \u2212 measured exhaust pressure| over a 1-hour window, weighted by a hyperbolic tangent function to amplify small deviations). This metric isolates performance degradation from load swings by normalizing against the expected pressure response at the current steam flow rate.\n\nTHRESHOLD: 2.5 kPa sustained absolute pressure error deviation from the healthy baseline. Basis: ASSUMPTION derived from standard derating thresholds where back-pressure rise of ~5 kPa triggers derating; the 3-week lead time requirement implies detecting trends at ~50% of the failure delta. Alternatively, defined calibration rule: baseline healthy error + 3 sigma (calculated from 14 days of stable, load-matched data).\n\nPROTOCOL: To validate this predictor, run a 30-day shadow mode alongside standard operations. Collect daily maximum absolute pressure error values. Pass criterion: The indicator must exceed the 2.5 kPa threshold at T-21 days (3 weeks) prior to any historical or simulated derating event in n=5 representative biofouling accumulation cycles or load-step tests. Fail criterion: If the threshold is crossed only <10 days before derating, or if it trips during load swings >50 MW without subsequent return to baseline within 4 hours.\n\nRecommended Intervention:\nImplement a real-time calculation of the tanh-weighted moving average of the pressure error. Use the existing turbine exhaust pressure transmitter and steam flow meter. The formula is P_error_smooth = (1/N) * \u03a3 [tanh(k * |P_set - P_meas|) * W_load], where W_load normalizes for steam flow changes to prevent false trips during load swings. The key innovation from the top candidate [cand:A2] is the use of tanh modulation, which provides smooth nonlinear gain: it is less sensitive to noise when errors are near zero, but amplifies small but persistent errors indicative of fouling. This allows detection when the fouling layer is thin enough that temperature-based methods (which rely on log-mean temperature difference) are still within normal operational variance.\n\nExpected Measurable Effect:\nDetection of tube-side biofouling 21 days (3 weeks) before the back-pressure hits the derating limit. The signal will show a gradual, monotonic increase in the smoothed error absolute value corresponding to the reduction in heat transfer coefficient, manifesting as higher condenser pressure for a given steam flow.\n\nConstraint Compliance:\n1. Uses existing temperature and flow measurements: The protocol relies on standard exhaust pressure and steam flow measurements, which are standard sensors. Temperature (exhaust saturation temp) is used to verify if deviations are due to cooling water issues vs. fouling, but the primary predictor is pressure error.\n2. Fires at least 3 weeks before derating: The threshold of 2.5 kPa is calibrated to provide this lead time based on the assumed accumulation rate of biofouling (typically 1-2 kPa/week during heavy fouling).\n3. No new instrumentation: No new sensors are required. The calculation is performed on the existing DCS/SCADA system.\n4. No false trips during load swings: The use of load-normalized error and the moving average window (1 hour) filters out transient pressure spikes associated with load changes. The tanh function further dampens the response to minor, non-persistent fluctuations.\n\nFalsification Test:\nIntroduce a controlled \"fouling equivalent\" by adding a known thermal resistance to the heat balance model (or wait for a natural fouling event). The test fails if the indicator does not cross the 2.5 kPa threshold at least 21 days before the pressure reaches the derating limit, or if the indicator remains flat during a documented biofouling incident.\n\nEvidence Support:\nThe tanh-PID controller concept and its ability to handle nonlinear condenser dynamics is EVIDENCE-BACKED [doi:10.1038/s41598-025-34740-7]. The feasibility of monitoring 300 MW units and the specific pressure characteristics are EVIDENCE-BACKED [doi:10.1109/ccdc49329.2020.9164500]. The relationship between tube-side fouling and heat transfer degradation is EVIDENCE-BACKED [doi:10.1115/gt2016-57149] and [doi:10.22541/essoar.172801451.11489302/v1]. The biofouling detection challenge is contextually supported by [doi:10.70675/8013cf7ez8323z4e34zb29azb0fbb7a1a903].",
+ "evidence_ids": [
+  "doi:10.1038/s41598-025-34740-7",
+  "doi:10.1109/ccdc49329.2020.9164500",
+  "doi:10.1115/gt2016-57149",
+  "doi:10.1115/gt2018-75248",
+  "doi:10.2991/iccelst-st-19.2019.13",
+  "doi:10.1038/s41598-025-90005-3",
+  "doi:10.5281/zenodo.5287539",
+  "doi:10.70675/8013cf7ez8323z4e34zb29azb0fbb7a1a903",
+  "doi:10.31979/etd.ard4-ytth",
+  "doi:10.22541/essoar.172801451.11489302/v1",
+  "doi:10.22541/essoar.172801451.11489302/v2",
+  "doi:10.1109/tase.2023.3293843/mm1",
+  "doi:10.5281/zenodo.20534827",
+  "doi:10.1201/b15094-4",
+  "doi:10.1007/978-3-319-30172-3_9"
+ ],
+ "bound_inputs": {
+  "pipeline_answer_sha256": "f691cd9101ddd00fb51d8e2f173c0003783969fca55feff1a758ea1397b6b434",
+  "baseline_answer_sha256": "d4986fb655f7b4cfe5c85ccc734ade1517cd9ecfe295df17007ddfcce42f076e",
+  "evidence_sha256": "f708869619ea7b1e88d00e430323fea4d39ed1313e878dc2f187eb52d9e55d02",
+  "judge_route": {
+   "provider": "zai",
+   "model": "glm-4-plus"
+  },
+  "rubric_version": "0-4-rubric/1"
+ },
+ "judge_record": {
+  "usable_pair": true,
+  "outcome": "JUDGE_VALID",
+  "passes": 2,
+  "pass_outcomes": [
+   "JUDGE_VALID",
+   "JUDGE_VALID"
+  ],
+  "scores": {
+   "a_answered": {
+    "pipeline_mean": 5.0,
+    "baseline_mean": 5.0,
+    "diff": 0.0
+   },
+   "b_user_vars": {
+    "pipeline_mean": 5.0,
+    "baseline_mean": 5.0,
+    "diff": 0.0
+   },
+   "c_prediction": {
+    "pipeline_mean": 4.5,
+    "baseline_mean": 5.0,
+    "diff": -0.5
+   },
+   "d_evidence": {
+    "pipeline_mean": 2.0,
+    "baseline_mean": 3.5,
+    "diff": -1.5
+   },
+   "e_clarification": {
+    "pipeline_mean": null,
+    "baseline_mean": null,
+    "diff": null
+   },
+   "f_novelty": {
+    "pipeline_mean": 3.5,
+    "baseline_mean": 4.0,
+    "diff": -0.5
+   }
+  },
+  "winner": "tie",
+  "pref_passes": [
+   "pipeline",
+   "baseline"
+  ],
+  "number_absent": {
+   "pipeline": [
+    "30"
+   ],
+   "baseline": [
+    "0.8"
+   ]
+  },
+  "number_absent_detail": {
+   "pipeline": {
+    "all": 32,
+    "unverified": 1,
+    "assumption_labeled": 5,
+    "packet_bound": 31,
+    "user_variable_bound": 1,
+    "unbound": 1,
+    "fabricated_rate": 0.037
+   },
+   "baseline": {
+    "all": 11,
+    "unverified": 1,
+    "assumption_labeled": 0,
+    "packet_bound": 10,
+    "user_variable_bound": 1,
+    "unbound": 1,
+    "fabricated_rate": 0.091
+   }
+  },
+  "judge_content_len": [
+   69,
+   69
+  ],
+  "judge_latency_s": [
+   1.5,
+   3.8
+  ],
+  "bound_inputs": {
+   "pipeline_answer_sha256": "f691cd9101ddd00fb51d8e2f173c0003783969fca55feff1a758ea1397b6b434",
+   "baseline_answer_sha256": "d4986fb655f7b4cfe5c85ccc734ade1517cd9ecfe295df17007ddfcce42f076e",
+   "evidence_sha256": "f708869619ea7b1e88d00e430323fea4d39ed1313e878dc2f187eb52d9e55d02",
+   "judge_route": {
+    "provider": "zai",
+    "model": "glm-4-plus"
+   },
+   "rubric_version": "0-4-rubric/1"
+  }
+ },
+ "baseline_same_evidence_hash": "f708869619ea7b1e88d00e430323fea4d39ed1313e878dc2f187eb52d9e55d02",
+ "pipeline_same_evidence_hash": "f708869619ea7b1e88d00e430323fea4d39ed1313e878dc2f187eb52d9e55d02"
+}

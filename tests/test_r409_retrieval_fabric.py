@@ -434,15 +434,29 @@ def test_comparison_targeted_variant_is_the_measured_form():
     assert v_tokens - base_tokens == {"experimental", "comparison"}
     assert "GATE_FAIL_DECOMPOSITION" in v["derivation_basis"]
 
-    # policy routing: additive on the measured sources
+    # policy routing: additive on the measured sources. R6 A4 follow-up
+    # (measured 2026-11-12): europepmc's policy was extended additively
+    # with the failure-text variants (PRIMARY_AND_FAILURE_TEXT_AND_
+    # COMPARISON) — the sentence-form primary retrieved 0 records live;
+    # the R417 COMPARISON variant is retained (superseded pin retired
+    # in the same change, Art. LXIV).
     from discovery_fabric.retrieval_fabric.pipeline import (
         SOURCE_VARIANT_POLICY, _select_variants)
-    assert SOURCE_VARIANT_POLICY["europepmc"] == "PRIMARY_AND_COMPARISON"
+    assert SOURCE_VARIANT_POLICY["europepmc"] == (
+        "PRIMARY_AND_FAILURE_TEXT_AND_COMPARISON")
     assert SOURCE_VARIANT_POLICY["core"] == "NARROW_AND_COMPARISON"
+    assert SOURCE_VARIANT_POLICY["semantic_scholar"] == (
+        "PRIMARY_AND_FAILURE_TEXT")
     by_class = {v2["derivation_class"]: v2 for v2 in variants}
-    sel = _select_variants(variants, "PRIMARY_AND_COMPARISON")
+    sel = _select_variants(variants, "PRIMARY_AND_FAILURE_TEXT_AND_COMPARISON")
     classes = [x["derivation_class"] for x in sel]
-    assert classes == ["PRIMARY", "COMPARISON_TARGETED"], classes
+    # the R417 learning stays additive and last; the A4 term variants
+    # ride between the primary and the comparison form when present
+    assert classes[0] == "PRIMARY", classes
+    assert classes[-1] == "COMPARISON_TARGETED", classes
+    a4 = [c for c in classes if c in ("FAILURE_TEXT_TERMS",
+                                      "CONSTRAINT_TARGETED")]
+    assert classes[1:1 + len(a4)] == a4, classes
     sel_core = _select_variants(variants, "NARROW_AND_COMPARISON")
     classes_core = [x["derivation_class"] for x in sel_core]
     assert "COMPARISON_TARGETED" in classes_core, classes_core

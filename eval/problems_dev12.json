@@ -1,0 +1,261 @@
+{
+ "problems": [
+  {
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "device": "valve-regulated lead-acid battery positive plate",
+   "failure": "positive grid corrosion during extended float charge consumes grid cross-section, raising internal resistance until capacity falls below service threshold",
+   "failure_mode": "corrosion",
+   "constraint": "achieve 15-year float service life at 2.27 V per cell continuous charge without antimony content above 2 percent",
+   "domain": "electrochemical-materials",
+   "source": "wc2_frozen",
+   "contamination_tag": "DEV_CONTAMINATED",
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "achieve 15-year float service life at 2.27 V per cell continuous charge without antimony content above 2 percent",
+    "device of record: valve-regulated lead-acid battery positive plate",
+    "failure to address: corrosion"
+   ],
+   "clarification_answer": null,
+   "split": "DEV",
+   "_origin": "eval/problems.json verbatim"
+  },
+  {
+   "problem_id": "bench-p09-packaging-barrier",
+   "device": "multilayer polymer food packaging film",
+   "failure": "moisture and oxygen barrier properties of the ethylene-vinyl alcohol layer degrade during distribution as humidity plasticizes the polymer matrix",
+   "failure_mode": "permeation",
+   "constraint": "hold water vapor transmission rate below 0.5 g/m2/day over 18 months of shelf life at 25 C and 65 percent relative humidity",
+   "domain": "materials-food",
+   "source": "wc2_frozen",
+   "contamination_tag": "DEV_CONTAMINATED",
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "hold water vapor transmission rate below 0.5 g/m2/day over 18 months of shelf life at 25 C and 65 percent relative humidity",
+    "device of record: multilayer polymer food packaging film",
+    "failure to address: permeation"
+   ],
+   "clarification_answer": null,
+   "split": "DEV",
+   "_origin": "eval/problems.json verbatim"
+  },
+  {
+   "problem_id": "eval-new01-supercap-dryout",
+   "device": "electric double-layer supercapacitor module in an automotive under-hood 12 V stop-start system",
+   "failure": "Electrolyte dry-out: sustained operation at high temperature drives solvent evaporation and seal permeation, collapsing the effective ion transport so equivalent series resistance climbs until the module can no longer source the cold-crank assist pulse.",
+   "failure_mode": "electrolyte-dryout",
+   "constraint": "keep capacitance loss below 10 percent over a 10-year life at up to 2.7 V rated cell voltage and 65 C maximum ambient, without adding more than 1 mm of module height",
+   "domain": "energy-storage",
+   "source": "new_r1",
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "10-year life target",
+    "2.7 V rated cell voltage",
+    "65 C maximum ambient",
+    "capacitance loss below 10 percent",
+    "no more than 1 mm added module height"
+   ],
+   "clarification_answer": null,
+   "contamination_tag": null,
+   "split": "DEV",
+   "_origin": "eval/problems.json verbatim"
+  },
+  {
+   "problem_id": "eval-new02-slipring-predictor",
+   "device": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm",
+   "failure": "Brush and slip-ring contact wear progresses to arcing and intermittent open-circuit excitation transients weeks before the classical media (vibration, temperature) alarms rise, so operators learn of the failure from the excitation fault itself rather than from a leading indicator.",
+   "failure_mode": "contact-wear",
+   "constraint": "the predictor must rely only on data already collected by the plant historian at a 1-minute sampling interval, must fire at least 2 weeks before a forced outage would otherwise occur, and must not raise more than 1 false alarm per year per machine",
+   "domain": "electrical-machine",
+   "source": "new_r1",
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "historian data at 1-minute sampling interval only",
+    "at least 2 weeks warning before forced outage",
+    "no more than 1 false alarm per year per machine",
+    "1800 rpm operating speed"
+   ],
+   "clarification_answer": null,
+   "contamination_tag": null,
+   "split": "DEV",
+   "_origin": "eval/problems.json verbatim"
+  },
+  {
+   "problem_id": "eval-new04-chiller-fouling-predictor",
+   "device": "water-cooled centrifugal chiller condenser tube bank in a district cooling plant using an open cooling tower loop",
+   "failure": "Condenser tube fouling accumulates silently: the fouling layer raises condenser approach temperature and pressure schedules, but operators clean on a fixed monthly cadence rather than on measured need, so tubes spend part of the month fouled early in the season and the cleaning cadence wastes labor later.",
+   "failure_mode": "condenser-fouling",
+   "constraint": "the predictor must use only BMS points already logged (chilled water supply/return temperature, condenser water supply/return temperature, compressor power, pump speed, outdoor wet-bulb), must resolve fouling state changes within 3 days at full load, and must produce a cleaning trigger that reduces total compressor energy by at least 3 percent versus the fixed monthly cadence",
+   "domain": "thermal-fluid-process",
+   "source": "new_r1",
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "BMS points already logged (listed in constraint)",
+    "fouling state resolved within 3 days at full load",
+    "at least 3 percent compressor energy reduction vs the fixed monthly cadence"
+   ],
+   "clarification_answer": null,
+   "contamination_tag": null,
+   "split": "DEV",
+   "_origin": "eval/problems.json verbatim"
+  },
+  {
+   "problem_id": "eval-new05-liion-balance-drift",
+   "device": "13-cell series NMC-811 lithium-ion battery module for a 3 kWh stationary-storage cabinet",
+   "failure": "Series string imbalance drift: cell-to-cell capacity and self-discharge spread grows with cycling and temperature gradient across the module, so the balancer cannot keep spread under the trip threshold; the BMS derates or shuts the module off early although the pack's aggregate energy is still serviceable.",
+   "failure_mode": "series-imbalance",
+   "constraint": "hold maximum cell-to-cell voltage spread below 35 mV at rest across a 10-year calendar life in a module that sees a 15 C top-to-bottom thermal gradient, without increasing the module footprint, and using only the existing 1 A balancing current",
+   "domain": "energy-storage",
+   "source": "new_r1",
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "maximum cell-to-cell voltage spread below 35 mV at rest",
+    "10-year calendar life",
+    "15 C top-to-bottom thermal gradient",
+    "only the existing 1 A balancing current",
+    "no increase in module footprint"
+   ],
+   "clarification_answer": null,
+   "contamination_tag": null,
+   "split": "DEV",
+   "_origin": "eval/problems.json verbatim"
+  },
+  {
+   "problem_id": "eval-new07-transformer-dga-predictor",
+   "device": "oil-filled power transformer (132/33 kV, 40 MVA)",
+   "failure": "Dissolved-gas analysis is sampled quarterly, so an incipient partial-discharge or thermal fault can grow for months between samples and only be found at the next outage window.",
+   "failure_mode": "insulation-degradation",
+   "constraint": "predictor must infer fault onset from the online sensors already installed (top-oil temperature, load current, ambient temperature, tank pressure) at 15-minute resolution, and must flag a developing fault at least 30 days before the next scheduled DGA sample",
+   "domain": "electrical-power",
+   "source": "new_r1",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "online sensors: top-oil temp, load current, ambient temp, tank pressure",
+    "15-minute resolution",
+    "at least 30 days warning before next DGA sample"
+   ],
+   "clarification_answer": null,
+   "split": "DEV",
+   "_origin": "eval/problems.json verbatim"
+  },
+  {
+   "problem_id": "eval-sofc-thermal-cycling",
+   "device": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode",
+   "failure": "Thermal cycling between 25 C and 800 C during start/stop drives differential expansion between the electrolyte, the anode, and the glass-ceramic seal; repeated cycles open microcracks in the seal and at the cathode-electrolyte interface, raising gas crossover and ohmic loss until the stack fails to reach operating voltage.",
+   "failure_mode": "thermal-cycling-fatigue",
+   "constraint": "survive 500 thermal cycles from 25 C to 800 C at 5 C/min heating rate while holding open-circuit voltage above 1.0 V and keeping seal leakage below 1 percent of fuel flow, without increasing stack mass above 2 percent",
+   "domain": "energy-conversion",
+   "source": "sofc_case_r548",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "500 thermal cycles from 25 C to 800 C",
+    "5 C/min heating rate",
+    "open-circuit voltage above 1.0 V",
+    "seal leakage below 1 percent of fuel flow",
+    "stack mass increase below 2 percent"
+   ],
+   "clarification_answer": {
+    "intergranular glass phase fraction": 0.15,
+    "note": "user stated the seal's intergranular glass phase fraction is 0.15 (mass fraction) for this stack design"
+   },
+   "split": "DEV",
+   "_origin": "eval/problems.json verbatim"
+  },
+  {
+   "problem_id": "dev-fu-001-bearing-spalling",
+   "device": "rolling-element bearing in a 350 kW industrial fan drive",
+   "failure": "inner-race spalling progresses for weeks before the vibration alarm trips; by then the bearing is past repair",
+   "failure_mode": "bearing-spalling",
+   "constraint": "predictor must use existing 1 kHz vibration sensor and 1 Hz SCADA logging only, fire at least 14 days warning, produce no more than 2 false alarms per year",
+   "domain": "rotating-machinery",
+   "source": "dev-fu",
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "1 kHz vibration sensor only",
+    "1 Hz SCADA logging",
+    "at least 14 days warning",
+    "at most 2 false alarms per year"
+   ],
+   "clarification_answer": null,
+   "contamination_tag": null,
+   "split": "DEV",
+   "_origin": "reconstructed from eval/pairs/two_turn_dev-fu-001-bearing-spalling.json (base round-1 problem; followup_finding excluded by design)",
+   "reconstructed": true
+  },
+  {
+   "problem_id": "dev-fu-003-motor-insulation",
+   "device": "4.16 kV induction motor driving a boiler feed pump",
+   "failure": "stator winding insulation degrades through partial discharge; ground fault cascade brings the motor down and damages the drive train",
+   "failure_mode": "motor-insulation",
+   "constraint": "predictor must use offline PD testing during scheduled outages only, detect degradation at least 6 months before ground fault, require no continuous monitoring hardware",
+   "domain": "electrical-machine",
+   "source": "dev-fu",
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "offline PD testing only",
+    "no continuous monitoring hardware",
+    "at least 6 months before ground fault",
+    "no emergency shutdowns triggered falsely"
+   ],
+   "clarification_answer": null,
+   "contamination_tag": null,
+   "split": "DEV",
+   "_origin": "reconstructed from eval/pairs/two_turn_dev-fu-003-motor-insulation.json (base round-1 problem; followup_finding excluded by design)",
+   "reconstructed": true
+  },
+  {
+   "problem_id": "dev-fu-004-fouling",
+   "device": "shell-and-tube condenser on a steam turbine exhaust, 300 MW unit",
+   "failure": "tube-side biofouling accumulates over weeks; heat transfer degrades causing turbine back-pressure rise and derating",
+   "failure_mode": "biofouling",
+   "constraint": "predictor must use existing temperature and flow measurements only, fire at least 3 weeks before back-pressure hits the derating limit, no requirement for new instrumentation",
+   "domain": "thermal-fluid-process",
+   "source": "dev-fu",
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "existing instrumentation only",
+    "at least 3 weeks before derating",
+    "no false trips during load swings"
+   ],
+   "clarification_answer": null,
+   "contamination_tag": null,
+   "split": "DEV",
+   "_origin": "reconstructed from eval/pairs/two_turn_dev-fu-004-fouling.json (base round-1 problem; followup_finding excluded by design)",
+   "reconstructed": true
+  },
+  {
+   "problem_id": "dev-fu-005-bridge-bearing",
+   "device": "laminated elastomeric bridge bearing pad on a 75-year-design-life highway bridge",
+   "failure": "elastomer layers develop creep set and ozone surface crazing over decades; vertical deflection drift exceeds design tolerance",
+   "failure_mode": "bridge-bearing-aging",
+   "constraint": "intervention must extend bearing life to 75 years without replacing the bearing; no new instrumentation required; must tolerate marine climate",
+   "domain": "civil-infrastructure",
+   "source": "dev-fu",
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "75-year service life",
+    "no bearing replacement",
+    "marine climate",
+    "no new instrumentation"
+   ],
+   "clarification_answer": null,
+   "contamination_tag": null,
+   "split": "DEV",
+   "_origin": "reconstructed from eval/pairs/two_turn_dev-fu-005-bridge-bearing.json (base round-1 problem; followup_finding excluded by design)",
+   "reconstructed": true
+  }
+ ]
+}

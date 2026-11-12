@@ -261,8 +261,11 @@ def test_attribution_record_complete(monkeypatch):
         assert j["search_call_ms"] >= 0
         total += j["records_returned"]
     assert total == a["records_returned"]
+    # R6 A3 (b5ab81bf3) added the abstract_backfill enrichment stage —
+    # the pin includes it (superseded pin updated in the same change
+    # discipline, Art. LXIV)
     assert set(a["enrichment_s"]) == {"patent_claims", "reciprocal",
-                                      "unpaywall"}
+                                      "unpaywall", "abstract_backfill"}
     # failure taxonomy preserved: the stubbed failures ride the jobs
     by_src = {j["source_id"]: j for j in a["jobs"]}
     assert by_src["doaj"]["outcome"] == "unavailable"
@@ -413,6 +416,26 @@ def test_durable_keep_list_covers_attribution_sidecars(tmp_path):
 #    commit 47b60e73 — FROZEN; do not "fix" it to match new code)
 # ---------------------------------------------------------------------------
 
+def _fanout_lanes(lanes):
+    """Lanes in the FANOUT-PARITY subject only.
+
+    R6 A3 (commit b5ab81bf3) appended a post-fan-out abstract-backfill
+    metadata lane (semantic_scholar_metadata) to the CURRENT path —
+    the frozen pre-R512 reference predates it and MUST NOT be 'fixed'
+    to match (its own header says so). The backfill lane is covered by
+    the A3 tests (test_r6_starvation_source.py); the parity assertions
+    here filter it on BOTH sides, keeping the frozen copy byte-frozen
+    (Art. LXIV: the superseded path stays retired; the parity subject
+    is the fan-out, not the post-fan-out enrichment)."""
+    def _src(s):
+        if isinstance(s, dict):
+            return s.get("source_id")
+        if isinstance(s, tuple):
+            return s[1]
+        return s.source_id
+    return [s for s in lanes if _src(s) != "semantic_scholar_metadata"]
+
+
 def _serial_reference_frozen(all_variants, canonicalizer, lane_states):
     """Verbatim copy of the pre-R512 lane fan-out loop
     (47b60e73:discovery_fabric/retrieval_fabric/pipeline.py, the
@@ -536,10 +559,12 @@ def test_parallel_matches_frozen_reference(monkeypatch):
                            sort_keys=True, default=str)
     assert ref_canon == new_canon, \
         "parallel canonical pool differs from frozen reference"
-    ref_lanes = json.dumps([s.to_dict() for s in lane_states],
-                           sort_keys=True, default=str)
-    new_lanes = json.dumps(report["retrieval_stats"]["lane_states"],
-                           sort_keys=True, default=str)
+    ref_lanes = json.dumps(
+        [s.to_dict() for s in _fanout_lanes(lane_states)],
+        sort_keys=True, default=str)
+    new_lanes = json.dumps(
+        _fanout_lanes(report["retrieval_stats"]["lane_states"]),
+        sort_keys=True, default=str)
     assert new_lanes == ref_lanes, \
         "parallel lane states differ from frozen reference"
     # engine items likewise (minus call-time timestamps)
@@ -563,11 +588,12 @@ def test_missing_connector_ordering_parity(monkeypatch):
         monkeypatch.setenv("ENGINE_RETRIEVE_FANOUT", mode)
         _, rep = fabric_pipeline.retrieve_fabric(
             PROBLEM, enable_reciprocal=False, enable_unpaywall=False)
-        got[mode] = [(s["lane"], s["source_id"], s["status"])
-                     for s in rep["retrieval_stats"]["lane_states"]]
+        got[mode] = _fanout_lanes([
+            (s["lane"], s["source_id"], s["status"])
+            for s in rep["retrieval_stats"]["lane_states"]])
     canonicalizer, lane_states = _reference_run(monkeypatch, pool)
-    got["reference"] = [(s.lane, s.source_id, s.status)
-                        for s in lane_states]
+    got["reference"] = _fanout_lanes([
+        (s.lane, s.source_id, s.status) for s in lane_states])
     assert got["parallel"] == got["serial"] == got["reference"], \
         "lane-state ordering diverged across executions"
     sch_names = [s for l, s, _ in got["parallel"] if l == "SCHOLARLY"]
@@ -670,6 +696,6 @@ def test_exception_contract_adversarial(monkeypatch):
     monkeypatch.setenv("ENGINE_RETRIEVE_FANOUT", "serial")
     _, rep = fabric_pipeline.retrieve_fabric(
         PROBLEM, enable_reciprocal=False, enable_unpaywall=False)
-    got = [(s["lane"], s["source_id"])
-           for s in rep["retrieval_stats"]["lane_states"]]
+    got = _fanout_lanes([(s["lane"], s["source_id"])
+                         for s in rep["retrieval_stats"]["lane_states"]])
     assert got == order

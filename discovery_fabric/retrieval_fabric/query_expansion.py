@@ -124,14 +124,41 @@ _STOPWORDS = frozenset(
     "above below up down out off very using use used new existing via per"
     .split())
 
+#: R6 A4 follow-up (measured 2026-11-12, live europepmc probes during the
+#: composer-era DEV12 chunk 1 diagnosis): narrative PROGRESSION/temporal
+#: prose words are weak search terms — the scholarly APIs AND every
+#: term, and 'inner-race spalling progresses weeks vibration alarm trips
+#: past repair' retrieved 0 records where 'inner-race spalling vibration
+#: alarm' retrieved 10 (same failure text, junk verbs removed). Same
+#: instrument class as _STOPWORDS / FUNCTION_EQUIV_EXPANSION (recorded
+#: policy input, Art. XXVII); only verb/temporal forms measured harmful
+#: are listed — equipment/mechanism nouns stay.
+WEAK_QUERY_TERMS = frozenset(
+    "progresses progressed progressing trips tripped "
+    "weeks months past least"
+    .split())
+
 
 def _content_terms(text: str, exclude: str = "") -> List[str]:
     """Deterministic content-term extraction: lowercase tokens, stopwords
     and pure numbers dropped, hyphenated compounds kept whole, tokens
     already present in `exclude` (the primary query) dropped, order =
     first occurrence. Zero LLM, zero tables — the problem's OWN words
-    (Art. XLIII: problem facts only, never solution-class injection)."""
-    excl = frozenset((exclude or "").lower().replace("-", " ").split())
+    (Art. XLIII: problem facts only, never solution-class injection).
+
+    R6 A4 follow-up (measured 2026-11-12, chunk 1 of the composer-era
+    DEV12 run): the exclusion matches WHOLE tokens only. The old rule
+    hyphen-split the exclude string, so the primary's compound
+    'bearing-spalling' hid the failure text's own strongest predictor
+    term 'spalling' from the FAILURE_TEXT_TERMS variant — and the
+    sentence-form primary retrieves 0 records on the scholarly APIs
+    (measured live: the full sentence -> 0 on europepmc; 'inner race
+    spalling vibration alarm' -> 10 on-domain records), so the hidden
+    term was lost from EVERY effective query. A compound in the
+    primary is a different search token from its parts; only a whole
+    match excludes."""
+    excl = frozenset(w.strip(",.;:()[]\"'?!/*")
+                     for w in (exclude or "").lower().split())
     seen: set = set()
     out: List[str] = []
     for raw in (text or "").lower().replace("_", " ").split():
@@ -141,6 +168,8 @@ def _content_terms(text: str, exclude: str = "") -> List[str]:
         base = tok.replace("-", " ")
         if tok in seen or base in excl or tok in _STOPWORDS:
             continue
+        if tok in WEAK_QUERY_TERMS:
+            continue  # measured 0-record killer (see WEAK_QUERY_TERMS)
         if not any(ch.isalpha() for ch in tok):
             continue  # pure numbers/units are search-hostile noise
         if len(tok) < 3 and "-" not in tok:
@@ -168,15 +197,35 @@ def failure_constraint_variants(problem: Dict[str, Any],
     out: List[Dict[str, Any]] = []
     failure = (problem or {}).get("failure", "") or ""
     constraint = (problem or {}).get("constraint", "") or ""
-    fterms = _content_terms(failure, exclude=primary)[:8]
+    # R6 A4 follow-up (measured 2026-11-12 on the live europepmc API):
+    # the term-count cliff is FIVE — 'inner race spalling vibration'
+    # (4 terms) -> 10 records, '... alarm' (5) -> 10, a 6th term -> 0
+    # (the scholarly APIs AND every term; the 8-term variant built
+    # before this measurement returned 0 on every lane). Variants are
+    # capped at the measured cliff, never past it.
+    # Within the cap, DIGIT-BEARING terms sort first (stable): the
+    # constraint's measurable bound ('75-year service life') is the
+    # search-critical content and must never be the cap's casualty —
+    # measured 2026-11-12 on bench-p05: first-occurrence order capped
+    # the variant at 'hold vertical deflection percent design' and cut
+    # the bound the variant exists to surface.
+    def _digit_first(terms: List[str]) -> List[str]:
+        return (sorted(terms, key=lambda t: (0 if any(
+            ch.isdigit() for ch in t) else 1)) if terms else terms)
+
+    fterms = _digit_first(_content_terms(failure, exclude=primary))[:5]
     if fterms:
         out.append({"query": " ".join(fterms),
                     "derivation_class": "FAILURE_TEXT_TERMS",
                     "derivation_basis":
                         "content terms of the problem's own failure text "
-                        "(not already in the primary query; Art. XLIII "
+                        "(not already in the primary query as whole "
+                        "tokens; digit-bearing measurable terms first, "
+                        "capped at the measured 5-term cliff; Art. XLIII "
                         "problem facts)"})
-    cterms = _content_terms(constraint, exclude=f"{primary} {failure}")[:8]
+    cterms = _digit_first(
+        _content_terms(constraint,
+                       exclude=f"{primary} {failure}"))[:5]
     if cterms:
         out.append({"query": " ".join(cterms),
                     "derivation_class": "CONSTRAINT_TARGETED",

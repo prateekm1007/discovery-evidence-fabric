@@ -1,0 +1,55 @@
+{
+ "problem_id": "eval-new07-transformer-dga-predictor",
+ "commit": "977851bc16a5",
+ "run_id": "r1-pipeline+baseline+judge-2026-11-12051342000",
+ "dirty_tree": true,
+ "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+ "clarification_answer": null,
+ "baseline_answer": "**Proposed Leading Indicator:**\nThe most cost-effective predictor is the **Rate of Change of Top-Oil Temperature (\u0394T/\u0394t) normalized by Load Current**, specifically analyzing the **thermal time-constant shift** over a 24-hour rolling window.\n\n**Rationale & Evidence:**\n1.  **Sensor Availability & Cost:** The user already has top-oil temperature, load current, and ambient temperature sensors. No new hardware is required. This is significantly cheaper than installing online Partial Discharge (PD) sensors or DGA sensors.\n2.  **Physics of the Fault:** Incipient thermal faults (e.g., loose connections, hotspot formation) or progressive partial discharges cause localized heating. While the bulk oil temperature may remain stable due to large thermal mass, the *response lag* (time constant) between load changes and temperature changes will alter if the internal cooling efficiency drops due to blockages, sludge, or hotspots acting as heat sources.\n3.  **Literature Support:**\n    *   **[crossref: Predicting transformer incipient faults by dissolved gas in oil analysis]** confirms that gas accumulation is the lagging indicator. The goal is to detect the *cause* (thermal/electrical stress) before gas reaches detection limits.\n    *   **[europepmc: Advancing Power Transformer Cooling...]** highlights that fluid degradation reduces thermal conductivity and increases viscosity, which alters cooling dynamics. A change in the oil\u2019s thermal response to load is a direct proxy for fluid aging or internal hotspots.\n    *   **[crossref: Condition monitoring of biodegradable oil filled transformer]** supports using dynamic thermal parameters as key health indicators, especially when static parameters are insufficient.\n\n**Operating Threshold:**\nDefine the baseline thermal model: $T_{oil}(t) = T_{amb} + R_{thermal} \\cdot P_{load}(t) * e^{-t/\\tau}$.\n*   **Baseline:** Establish the 90th percentile of the rolling 30-day thermal time constant ($\\tau$) and residual heat retention during light-load periods.\n*   **Alert Threshold:** A sustained deviation of **>15% increase in $\\tau$** (slower cooling/heating) or a **>5\u00b0C increase in off-load residual temperature** (temperature remains elevated after load reduction, indicating internal heat sources or poor circulation) for **>48 consecutive hours**.\n\n**Validation Test (Falsification):**\nTo validate this predictor and determine if it provides 30 days warning:\n1.  **Retrospective Cohort Analysis:** Pull 5 years of 15-minute data from a fleet of 10\u201320 similar 132/33 kV transformers.\n2.  **Labeling:** Identify all historical DGA results where critical gas levels (per IEC 60599) were reached.\n3.  **Test:** For each positive DGA event, back-calculate the thermal anomaly using the proposed threshold.\n4.  **Falsification Criterion:** If the thermal deviation threshold is crossed **less than 30 days** before the critical DGA result in **>80% of cases**, the predictor is **falsified** (insufficient lead time). If the thermal change is not significantly different from normal seasonal/load variation (p-value > 0.05 in a t-test against healthy transformers), the predictor is **invalid**.\n\n**Note:** The provided evidence on nanofluids and ester retrofilling ([europepmc] items) is not directly applicable to *detecting* faults in standard mineral-oil-filled 132/33 kV units unless those fluids were retrofitted. The recommendation assumes standard mineral oil, where thermal degradation dynamics are well-documented but often ignored in favor of static DGA.",
+ "pipeline_answer": null,
+ "evidence_ids": [
+  "doi:10.1109/eic.1979.7461075",
+  "doi:10.1109/icdl63868.2025.11068231",
+  "doi:10.3390/nano11112885",
+  "doi:10.3390/ma18050923",
+  "doi:10.3390/molecules25173901",
+  "doi:10.1109/eic.1979.7461059",
+  "doi:10.70675/abdd3fefzec02z43dcz8a4czc4872c72d874",
+  "doi:10.14264/uql.2016.276",
+  "doi:10.14264/106359",
+  "doi:10.2139/ssrn.4344852",
+  "doi:10.2139/ssrn.6222022",
+  "doi:10.55277/researchhub.rn7q7k5t.1",
+  "doi:10.3403/30293685u",
+  "doi:10.3403/30362543",
+  "doi:10.1038/s41528-022-00215-2",
+  "doi:10.1117/12.3014485"
+ ],
+ "bound_inputs": {
+  "pipeline_answer_sha256": "ABSENT",
+  "baseline_answer_sha256": "8ab75d0ed0ed5c2f7a594916ec54d57655ef8c0895694c12400940dadbf26d1b",
+  "evidence_sha256": "49628639872766d12d70324c0604ed2b8963c4982418ea2166b32f11271765e6",
+  "judge_route": {
+   "provider": "zai",
+   "model": "glm-4-plus"
+  },
+  "rubric_version": "0-4-rubric/1"
+ },
+ "judge_record": {
+  "usable_pair": false,
+  "outcome": "JUDGE_SKIPPED",
+  "why": "pipeline answer missing",
+  "bound_inputs": {
+   "pipeline_answer_sha256": "ABSENT",
+   "baseline_answer_sha256": "8ab75d0ed0ed5c2f7a594916ec54d57655ef8c0895694c12400940dadbf26d1b",
+   "evidence_sha256": "49628639872766d12d70324c0604ed2b8963c4982418ea2166b32f11271765e6",
+   "judge_route": {
+    "provider": "zai",
+    "model": "glm-4-plus"
+   },
+   "rubric_version": "0-4-rubric/1"
+  }
+ },
+ "baseline_same_evidence_hash": "49628639872766d12d70324c0604ed2b8963c4982418ea2166b32f11271765e6",
+ "pipeline_same_evidence_hash": "49628639872766d12d70324c0604ed2b8963c4982418ea2166b32f11271765e6"
+}

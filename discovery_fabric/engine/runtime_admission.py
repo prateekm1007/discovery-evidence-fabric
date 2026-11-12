@@ -123,6 +123,18 @@ RUNTIME_ADMISSION_VERSION = "runtime_admission/1.1.0"
 #: the ATTACK stage's evaluator call).
 PROBE_FAILURE_FLOOR_S = 30.0
 
+#: R6 A2 follow-up (measured 2026-11-12): the PERMANENT probe-failure
+#: classes — the same vocabulary the walk-level rule above names. A
+#: dead key, a gone model, a credit gate, or a region gate answers
+#: IDENTICALLY on every retry: the measured defect was 13 AUTH_FAILURE
+#: probes on one dead rung inside a single 3-problem chunk (each
+#: ladder walk re-probed at the 30 s floor). A permanent-class probe
+#: failure now HOLDS for the record's TTL; TTL expiry re-probes (an
+#: operator key fix is picked up within PROBE_TTL_S, never silently
+#: never). Transient classes keep the 30 s floor unchanged.
+PERMANENT_PROBE_CLASSES = ("AUTH_FAILURE", "GONE", "MODEL_NOT_FOUND",
+                           "CREDIT_EXHAUSTED", "REGION_NOT_SERVED")
+
 #: transient failure classes (the provider-health taxonomy's own
 #: vocabulary): a probe failing with one of these may be RETRIED within
 #: the SAME bounded walk (the old cascade's transient absorption,
@@ -283,6 +295,13 @@ def requires_probe(provider: str, model: str,
         return True
     if st == ST_PROBE_FAILED:
         rec = cap.get("record") or {}
+        if rec.get("failure_class") in PERMANENT_PROBE_CLASSES:
+            # R6 A2 follow-up (measured 2026-11-12): a permanent-class
+            # probe failure answers identically on every retry — the
+            # 30 s floor was a measured 13-probe storm on one dead
+            # rung. The failure holds for the record's TTL; expiry
+            # re-probes (operator key fix picked up within TTL).
+            return False
         age = now - float(rec.get("at_epoch") or 0)
         return age > PROBE_FAILURE_FLOOR_S
     return False

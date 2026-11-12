@@ -63,9 +63,16 @@ def test_a4_new02_failure_terms_surface_mechanism_vocabulary():
     fterms = set(fvar["query"].split())
     # the mechanism vocabulary from the failure text is now IN a query
     # ('brush'/'wear' are already in the primary; 'arcing' and the
-    # open-circuit transient vocabulary are what the primary MISSED)
+    # slip-ring contact vocabulary are what the primary MISSED)
     assert "arcing" in fterms
-    assert "open-circuit" in fterms
+    assert "slip-ring" in fterms
+    assert "wear" in fterms
+    # R6 A4 follow-up (measured 2026-11-12): the variant is capped at
+    # the measured 5-term cliff (6+ ANDed terms -> 0 records live), so
+    # 'open-circuit' (the 6th+ first-occurrence term) no longer rides
+    # the FAILURE_TEXT variant — breadth past the cliff is worthless;
+    # the strongest terms (slip-ring, contact, wear, arcing) stay.
+    assert "open-circuit" not in fterms
 
 
 def test_a4_p05_failure_terms_surface_creep_and_ozone():
@@ -224,3 +231,123 @@ def test_a3_backfill_skips_records_that_already_have_abstracts(tmp_path):
             report = rfp._abstract_backfill(canon, [])
     assert report["attempted"] == 0 and report["candidates"] == 0
     assert fake_get.call_count == 0
+
+
+# ---------------------------------------------------------------------------
+# R6 A4 follow-up (owner round 2026-11-12, measured on the composer-era
+# DEV12 chunk 1 + live europepmc probes): the term-count cliff and the
+# whole-token exclusion — the two measured retrieval defects behind the
+# dev-fu-001 MECHANISM_STARVED (all 9 candidates rejected
+# NOT_EVIDENCE_ANCHORED_DOMAIN because every scholarly query was a
+# sentence or a 6+ term AND-chain that retrieves 0).
+# ---------------------------------------------------------------------------
+
+def test_a4_whole_token_exclusion_keeps_split_compound_terms():
+    """The primary's hyphenated compound ('bearing-spalling') must NOT
+    hide the failure text's own term ('spalling') from the variant —
+    the measured 0-record sentence primary carries the term only inside
+    the compound, so excluding by parts starves every effective query."""
+    from discovery_fabric.retrieval_fabric.query_expansion import (
+        _content_terms)
+    failure = ("inner-race spalling progresses for weeks before the "
+               "vibration alarm trips; by then the bearing is past repair")
+    primary = ("rolling-element bearing in a 350 kW industrial fan drive "
+               "bearing-spalling")
+    terms = _content_terms(failure, exclude=primary)
+    assert "spalling" in terms, terms
+    # 'bearing' IS a whole token of the primary -> still excluded
+    assert "bearing" not in terms, terms
+
+
+def test_a4_variant_cap_at_measured_term_cliff():
+    """Live-measured europepmc cliff (2026-11-12): 4-5 ANDed terms -> 10
+    records; a 6th term -> 0. Both A4 variants are capped at 5 terms."""
+    from discovery_fabric.retrieval_fabric.query_expansion import (
+        failure_constraint_variants, mechanism_query)
+    problem = {
+        "problem_id": "dev-fu-001-bearing-spalling",
+        "device": "rolling-element bearing in a 350 kW industrial fan drive",
+        "failure_mode": "bearing-spalling",
+        "failure": ("inner-race spalling progresses for weeks before the "
+                    "vibration alarm trips; by then the bearing is past "
+                    "repair and must be replaced"),
+        "constraint": ("predictor must use the existing 1 kHz vibration "
+                       "sensor and 1 Hz SCADA logging, fire at least 14 "
+                       "days early, at most 2 false alarms per year"),
+    }
+    primary = mechanism_query(problem)
+    variants = failure_constraint_variants(problem, primary)
+    by_class = {v["derivation_class"]: v for v in variants}
+    for cls in ("FAILURE_TEXT_TERMS", "CONSTRAINT_TARGETED"):
+        q = by_class[cls]["query"]
+        assert len(q.split()) <= 5, (cls, q)
+
+
+def test_a4_variants_routed_to_scholarly_keyword_sources():
+    """The measured 0-record sentence primary means the scholarly
+    keyword sources need the A4 term variants ADDITIVELY (measured:
+    4-5 term forms retrieve 10 on-domain records where the sentence
+    retrieves 0)."""
+    from discovery_fabric.retrieval_fabric.pipeline import (
+        SOURCE_VARIANT_POLICY, _select_variants)
+    for src in ("semantic_scholar", "crossref", "doaj", "arxiv",
+                "openaire"):
+        assert SOURCE_VARIANT_POLICY[src] == "PRIMARY_AND_FAILURE_TEXT", src
+    variants = [
+        {"query": "primary form", "derivation_class": "PRIMARY"},
+        {"query": "spalling vibration alarm", "derivation_class":
+         "FAILURE_TEXT_TERMS"},
+        {"query": "predictor khz scada", "derivation_class":
+         "CONSTRAINT_TARGETED"},
+    ]
+    sel = _select_variants(variants, "PRIMARY_AND_FAILURE_TEXT")
+    classes = [v["derivation_class"] for v in sel]
+    assert classes == ["PRIMARY", "FAILURE_TEXT_TERMS",
+                       "CONSTRAINT_TARGETED"], classes
+
+
+def test_mechanism_rerank_prefers_problem_relevant_records():
+    """R6 A4 follow-up (measured 2026-11-12, dev-fu-001 chunk 1): the
+    density-only rerank selected a mechanism-dense OFF-DOMAIN composite
+    beams paper for a bearing problem; the anchor gate then rejected
+    every candidate -> MECHANISM_STARVED. With the problem given, the
+    relevance component (0.5 per shared problem-fact term) puts the
+    on-domain record first; without a problem the order is unchanged."""
+    from discovery_fabric.engine import mechanism_space as ms
+    problem = {
+        "problem_id": "dev-fu-001-bearing-spalling",
+        "device": "rolling-element bearing in a 350 kW industrial fan drive",
+        "failure_mode": "bearing-spalling",
+        "failure": ("inner-race spalling progresses for weeks before the "
+                    "vibration alarm trips"),
+        "constraint": ("predictor must use the existing 1 kHz vibration "
+                       "sensor"),
+    }
+    off_domain = {
+        "id": "doi:10.3390/ma19173622",
+        "title": "Interlaminar stress in composite beams",
+        "abstract": ("The governing role of interlaminar stress in "
+                     "determining structural performance and failure; "
+                     "fatigue crack growth, delamination, stress "
+                     "distribution, fracture, load transfer, stiffness "
+                     "degradation, matrix cracking, shear stress."),
+    }
+    on_domain = {
+        "id": "doi:10.1016/j.jsv.2026.120074",
+        "title": "Bearing fault diagnosis via vibration monitoring",
+        "abstract": ("Rolling element bearing spalling on the inner race "
+                     "produces characteristic vibration signatures; the "
+                     "alarm threshold fires weeks before replacement."),
+    }
+    bare = ms.mechanism_signal_rerank([off_domain, on_domain], top_k=2)
+    assert bare["selected_ids"][0] == "doi:10.3390/ma19173622", (
+        "fixture precondition: the off-domain record is denser (this is "
+        "the measured defect)")
+    with_rel = ms.mechanism_signal_rerank([off_domain, on_domain],
+                                          top_k=2, problem=problem)
+    assert with_rel["selected_ids"][0] == "doi:10.1016/j.jsv.2026.120074", (
+        with_rel["policy"])
+    on = next(s for s in with_rel["all_scores"]
+              if s["record_id"] == "doi:10.1016/j.jsv.2026.120074")
+    assert on["n_relevance_hits"] >= 3, on
+    assert "1.1.0" in with_rel["reranker_version"]
