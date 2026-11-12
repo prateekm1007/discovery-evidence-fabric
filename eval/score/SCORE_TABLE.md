@@ -1,4 +1,4 @@
-# eval score table (commit a11ed5a4890b, dirty_tree=False, 2026-11-12T08:15:47+00:00Z)
+# eval score table (commit 22cb7f5cde83, dirty_tree=True, 2026-11-12T08:39:47+00:00Z)
 
 metric: blind pairwise win-rate (pipeline vs strongest zero-paid single-shot baseline)
 KPI: R506 yield funnel on DEV: mechanisms_found + candidates_generated_distinct
@@ -8,9 +8,9 @@ pipeline completion: 2/2
 subset: custom:2 (n=2)
 yield funnel (DEV): {"n": 2, "completed": 2, "mechanisms_found": 2, "candidates_generated_distinct": 2, "mechanisms_rate": 1.0, "distinct_rate": 1.0, "starved": [], "starved_reasons": {}}
 yield funnel (fresh): {"n": 2, "completed": 2, "mechanisms_found": 2, "candidates_generated_distinct": 2, "mechanisms_rate": 1.0, "distinct_rate": 1.0, "starved": [], "starved_reasons": {}}
-wall time: {"sum_wall_s": 317.5, "mean_wall_s": 158.8, "max_wall_s": 175.4, "mean_stage_s": {"ADJUDICATION": 0.01, "ATTACK": 5.55, "CLASSIFY": 0.01, "COLLISION": 10.01, "CONTRADICTION": 0.0, "FREEZE": 0.02, "KILLER_EXPERIMENT": 0.01, "MECHANISM_SPACE": 36.39, "NEXT_BEST_ACTION": 0.0, "PHYSICS": 0.19, "PREMISE_GATE": 0.0, "RANK": 0.01, "RETRIEVE": 46.25, "SYNTHESIZE": 54.55, "VERIFY": 0.01}}
-speed: {"n": 2, "p50_wall_s": 158.8, "p95_wall_s": 173.7, "timeout_count": 0, "budget_note": "owner budget: median ~120 s, worst ~300 s; timeouts are INCOMPLETE_INFRASTRUCTURE"}
-baseline route: zai / glm-4-plus (OK)
+wall time: {"sum_wall_s": 357.4, "mean_wall_s": 178.7, "max_wall_s": 180.4, "mean_stage_s": {"ADJUDICATION": 0.01, "ATTACK": 11.69, "CLASSIFY": 0.01, "COLLISION": 9.95, "CONTRADICTION": 0.01, "FREEZE": 0.02, "KILLER_EXPERIMENT": 0.01, "MECHANISM_SPACE": 63.21, "NEXT_BEST_ACTION": 0.01, "PHYSICS": 0.19, "PREMISE_GATE": 0.0, "RANK": 0.01, "RETRIEVE": 46.26, "SYNTHESIZE": 19.33, "VERIFY": 0.01}}
+speed: {"n": 2, "p50_wall_s": 178.7, "p95_wall_s": 180.2, "timeout_count": 0, "budget_note": "owner budget: median ~120 s, worst ~300 s; timeouts are INCOMPLETE_INFRASTRUCTURE"}
+baseline route: agnes / agnes-3.0-flash (OK)
 judge route: zai / glm-4-plus (SHARED_FAMILY_DISCLOSED)
 judge calibration: 0.833 (n=30, passed=True)
 
@@ -33,5 +33,5 @@ answer-shape contract: [{"problem_id": "eval-sofc-thermal-cycling", "valid": fal
 
 | problem | tag | type | final_status | completed | wall_s | mech | distinct | starved_reason | winner | crit diffs |
 |---|---|---|---|---|---|---|---|---|---|---|
-| eval-sofc-thermal-cycling | None | intervention-proposal | INVENTION_REQUIRES_EXPERIMENT | True | 142.1 | True | True | None | None | {"a_answered": null, "b_user_vars": null, "c_prediction": null, "d_evidence": null, "e_clarification": null, "f_novelty" |
-| dev-fu-004-fouling | None | predictor-design | INVENTION_REQUIRES_EXPERIMENT | True | 175.4 | True | True | None | None | {"a_answered": null, "b_user_vars": null, "c_prediction": null, "d_evidence": null, "e_clarification": null, "f_novelty" |
+| eval-sofc-thermal-cycling | None | intervention-proposal | INVENTION_REQUIRES_EXPERIMENT | True | 180.4 | True | True | None | None | {"a_answered": null, "b_user_vars": null, "c_prediction": null, "d_evidence": null, "e_clarification": null, "f_novelty" |
+| dev-fu-004-fouling | None | predictor-design | INVENTION_REQUIRES_EXPERIMENT | True | 177.0 | True | True | None | None | {"a_answered": null, "b_user_vars": null, "c_prediction": null, "d_evidence": null, "e_clarification": null, "f_novelty" |

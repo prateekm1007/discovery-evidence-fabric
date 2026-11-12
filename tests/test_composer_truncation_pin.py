@@ -136,7 +136,11 @@ class TestComposerTruncation(unittest.TestCase):
                              "predictor-design", llm_generate=llm)
         self.assertEqual(len(calls), 2, "one truncation retry, no more")
         self.assertEqual(calls[0]["purpose"], "answer_composer")
-        self.assertEqual(calls[0]["max_tokens"], 1000)
+        # R6 live round 2026-11-12: the composition budget is the
+        # measured 3000 constant (the 1000 default cut BOTH drafts on
+        # the predictor shape; budget is ENGINEERING class, call count
+        # unchanged)
+        self.assertEqual(calls[0]["max_tokens"], ac.COMPOSE_MAX_TOKENS)
         self.assertEqual(calls[1]["purpose"],
                          "answer_composer_truncation")
         self.assertEqual(calls[1]["max_tokens"], 2000,

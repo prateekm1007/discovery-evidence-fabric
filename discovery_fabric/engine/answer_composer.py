@@ -469,15 +469,24 @@ def _tech_sanity_findings(text: str,
     return findings
 
 
+#: the composition generation budget (ENGINEERING class, Art. XXVII —
+#: a generation budget, never a verdict gate; measured live 2026-11-12:
+#: glm-4-plus cut at 1000 tokens AND at the 2000-token truncation retry
+#: on the predictor answer shape; the call COUNT is unchanged).
+COMPOSE_MAX_TOKENS = 3000
+
+
 def compose_answer(problem: Dict[str, Any],
                    packet: Optional[List[Dict[str, Any]]],
                    candidates: List[Dict[str, Any]],
                    verification: Optional[Dict[str, Any]],
                    question_type: str,
                    llm_generate=None,
-                   max_tokens: int = 1000,
+                   max_tokens: Optional[int] = None,
                    tech_sanity: Optional[bool] = None,
                    ) -> Dict[str, Any]:
+    if max_tokens is None:
+        max_tokens = COMPOSE_MAX_TOKENS
     """ONE LLM call writes the full engineer-facing answer; when the
     transport's typed finish-reason report says the draft was
     truncated at the token budget — or, when no finish reason was
