@@ -204,7 +204,13 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
         r"^mercury-3$",
         r"^mercury-2\.5$",
         r"^mercury-2$",
-        r"^mercury-decide$",
+        # R6 audit round 2026-11-12 (measured, Art. XXV/XXVII):
+        # mercury-decide REMOVED — live probe 2026-11-12: GET
+        # /v1/models lists it, but chat/completions returns 400 Bad
+        # Request on the standard params every registry call sends
+        # (mercury-3 answers 200 OK at 0.45 s in the same probe). A
+        # measured non-serving id never becomes a rung silently (the
+        # premium-precedent rule above). Recorded in the round LOG.
     ],
     # re-admits pro ids with a one-line extension, never silently.
     "agnes": [

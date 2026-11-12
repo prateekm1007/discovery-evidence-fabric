@@ -3053,7 +3053,13 @@ def _public_candidate(c: Dict[str, Any]) -> Dict[str, Any]:
         "derivation_trace", "falsification_test", "expected_effect",
         "mechanism_source_span", "span_binding", "extraction_confidence",
         "mechanism_support", "distinctness_verdict",
-        "distinctness_basis")}
+        "distinctness_basis",
+        # R6 audit round 2026-11-12 (directive 3): the gimmick-anchor
+        # instrument's typed verdict travels with the candidate — the
+        # auditor reads the PUBLIC envelope, not just the full records
+        # (Art. XXV: the typed state is visible, never buried).
+        "not_an_intervention_check", "anchor_domain_check",
+        "mechanism_link_check")}
     return out
 
 
