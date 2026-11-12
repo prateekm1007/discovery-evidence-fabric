@@ -43,6 +43,7 @@ if str(REPO) not in sys.path:
 
 from discovery_fabric.engine import llm_registry as lr  # noqa: E402
 from discovery_fabric.engine import mechanism_space as _ms  # noqa: E402
+from discovery_fabric.engine import answer_composer as ac  # noqa: E402
 from discovery_fabric.engine.answer_composer import (  # noqa: E402
     ANSWER_COMPOSER_VERSION, compose_answer)
 
