@@ -371,6 +371,20 @@ _NOT_IN_RECORD_MARKERS = (
     "no specific prior disclosure", "cannot be grounded in",
 )
 
+#: MEASURED (R6 live, new07 @341c8fde9 window): a DOMAIN-TRANSFER
+#: rejection ("this technique is for language model KV caches, not for
+#: power transformer sensor data") is a SCIENTIFIC invalidity — the
+#: mechanism as stated cannot serve the problem's device domain — NOT
+#: an evidence-coverage gap. The record-support language that rides the
+#: same sentence ("from the source evidence") must not downgrade it:
+#: the structural template "X is for <foreign domain>, not for <this
+#: domain>" is the transfer-rejection signature, typed SCIENTIFIC like
+#: the committed new07 kill record (KILL_CAUSE_SCIENTIFIC for the
+#: physics-invalid mechanism — never manufactured into an endorsement).
+_DOMAIN_TRANSFER_RE = re.compile(
+    r"\b(is|are|was|were)\s+for\b[^.;]{0,160}\,\s*not\s+for\b",
+    re.IGNORECASE)
+
 
 def _cause_window(basis: str, chars: int = 300) -> str:
     """The cause tail: the attacker's DECISIVE assertion sits at the
@@ -395,6 +409,17 @@ def classify_kill_basis(basis: str) -> Dict[str, Any]:
     sci_hit = next((m for m in _SCIENTIFIC_MARKERS if m in window), None)
     rec_hit = next((m for m in _NOT_IN_RECORD_MARKERS
                     if m in window), None)
+    # MEASURED upgrade (new07 live, this round): the structural
+    # domain-transfer rejection types SCIENTIFIC regardless of the
+    # record-support language in the same tail (Art. XXV: the measured
+    # kill class over the older marker precedence)
+    dom_match = _DOMAIN_TRANSFER_RE.search(window)
+    if dom_match:
+        return {"cause": KILL_CAUSE_SCIENTIFIC,
+                "cause_window": _cause_window(b)[:300],
+                "scientific_marker": (f"domain-transfer rejection "
+                                      f"({dom_match.group(0)[:60]}...)"),
+                "record_marker": rec_hit}
     if rec_hit and not sci_hit:
         cause = KILL_CAUSE_NOT_IN_RECORD
     elif sci_hit and not rec_hit:

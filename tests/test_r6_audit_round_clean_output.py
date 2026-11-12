@@ -712,6 +712,33 @@ class TestKillCauseClassification:
             k["cause"] for k in kc["per_kill"]}
         assert "unsupported_mechanism" in kc["scientific_kill_classes"]
 
+    def test_domain_transfer_rejection_types_scientific(self):
+        # MEASURED R6 live (new07 @341c8fde9 window): the attacker's
+        # domain-transfer rejection — "this technique is for language
+        # model KV caches, not for power transformer sensor data" —
+        # rode record-support language ("from the source evidence")
+        # and was mis-typed KILL_CAUSE_NOT_IN_RECORD; the killed
+        # candidate was then wrongly delivered as a hypothesis. The
+        # structural transfer-rejection template types SCIENTIFIC (a
+        # mechanism that cannot serve the device domain is wrong, not
+        # merely unrecorded — the committed new07 kill record's class).
+        from discovery_fabric.engine.mechanism_link import (
+            classify_kill_basis, KILL_CAUSE_NOT_IN_RECORD)
+        basis = ('The mechanism relies on "contrastive deltas on '
+                 'cached values can nudge model behavior" from the '
+                 'source evidence, but this technique is for language '
+                 'model KV caches, not for power transformer sensor '
+                 'data.')
+        r = classify_kill_basis(basis)
+        assert r["cause"] == KILL_CAUSE_SCIENTIFIC, r
+        assert "domain-transfer rejection" in r["scientific_marker"]
+        # the genuine record-availability class stays NOT_IN_RECORD
+        r2 = classify_kill_basis(
+            "The causal chain leading to the predicted 14-day warning "
+            "is unsupported; the record contains only generic "
+            "corrosion rates.")
+        assert r2["cause"] == KILL_CAUSE_NOT_IN_RECORD
+
 
 class TestHypothesisDelivery:
     @requires_audit_artifacts
