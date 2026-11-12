@@ -128,7 +128,6 @@ add_env "RETRIEVE_JOB_BUDGET_S=20"
 # economy record carries the per-problem counters as evidence; the
 # retry-storm controls are unchanged (retry cap 6, breaker threshold 3).
 add_env "FABRIC_PROBLEM_CALL_CAP=8"
-
 # --- zai transport probe (typed availability, never silent) ------------
 # MEASURED this host: the z-ai CLI is absent (WSL PATH, Windows npm
 # dir, npm registry 404) — the loop-local gateway CANNOT serve here and
@@ -139,6 +138,7 @@ add_env "FABRIC_PROBLEM_CALL_CAP=8"
 # passes — a healthy healthz alone never certifies transport.
 GW_KEY="r6-loopback-local"   # loop-LOCAL only; the gateway binds 127.0.0.1
 GW_STARTED=0
+ZAI_OK=0
 if command -v z-ai >/dev/null 2>&1; then
   mkdir -p "$REPO/ENGINE_RUNS"
   if ! curl -sf http://127.0.0.1:8787/healthz >/dev/null 2>&1; then
@@ -176,6 +176,7 @@ if command -v z-ai >/dev/null 2>&1; then
     if [ "$PROBE_HTTP" = "200" ] && grep -q '"content"' /tmp/zai_probe_body.json 2>/dev/null; then
       add_env "ZAI_API_KEY=$GW_KEY"
       add_env "ZAI_GATEWAY_KEY=$GW_KEY"
+      ZAI_OK=1
       echo "[r6dev12] ZAI_TRANSPORT_PROBE: 200 OK, non-empty content -> ZAI_* envs ride engine-env"
     else
       echo "[r6dev12] ZAI_TRANSPORT_PROBE: http=$PROBE_HTTP (typed unavailable; ZAI_* envs omitted, cascade resolves)" >&2
@@ -190,13 +191,38 @@ PROVIDER_UNAVAILABLE and the cascade resolves the role on the next
 serving rung (xkiro, keyless, measured live); no ZAI_* env rides" >&2
 fi
 
+# Judge last-resort naming (the recorded-override class, Art. XXVII):
+# the committed JUDGE_LAST_RESORT (route table judge_last_resort = zai)
+# is correct ON A HOST WITH THE ZAI TRANSPORT. Measured on THIS host
+# (zai absent): the judge probe then has no eligible candidate (the
+# baseline resolves to xkiro -> same-provider rejection; unorouter
+# calibrated 0/30 TRANSPORT_OTHER), so the operator names the SERVING
+# rung as the shared-family last resort. The 30-pair calibration gate
+# still applies IN FULL and the SHARED_FAMILY_DISCLOSED class rides
+# the route record + every judgment (automated score only; the holdout
+# gate stays auditor-judged).
+if [ "$ZAI_OK" != "1" ]; then
+  add_env "EVAL_JUDGE_LAST_RESORT=$JUDGE_PROV,$JUDGE_MODEL"
+  echo "[r6dev12] EVAL_JUDGE_LAST_RESORT=$JUDGE_PROV,$JUDGE_MODEL (zai transport absent; operator names the serving rung, calibration gate in full, disclosed)"
+fi
+
 echo "[r6dev12] engine-env keys: $(printf '%s ' "${ENGINE_ENV_ARGS[@]}" | sed 's/--engine-env //' | cut -d= -f1 | sort -u | tr '\n' ' ')"
+# --timeout: MEASURED (owner round 2026-11-12, fu-001 smokes x2): on the
+# zai-CLI host the pipeline fits the owner's 300 s worst-case (2 s
+# calls); on THIS host the cascade serves xkiro free-tier long-form
+# MEASURED ~150 s/call (SYNTHESIZE 19:09:14 -> 19:11:47) + retrieval
+# fanout ~150 s (several sources hit the 20 s job budget) — a 300 s
+# wall cannot fit the pipeline shape and produced INCOMPLETE_
+# INFRASTRUCTURE on both smokes. 900 s = retrieval + 3 synthesis-class
+# calls + headroom. The B10 speed protocol measures the real walls
+# separately; the owner budget note stays the zai-host measurement.
+TIMEOUT_S="${R6_TIMEOUT:-900}"
 PROBLEMS="${1:?usage: r6_run_dev12.sh <comma-separated problem ids>}"
-echo "[r6dev12] chunk: $PROBLEMS"
+echo "[r6dev12] chunk: $PROBLEMS (timeout ${TIMEOUT_S}s)"
 "$PY" -B eval/run.py \
   --arms pipeline,baseline,judge \
   --problems-file eval/problems_dev12.json \
   --problems "$PROBLEMS" \
-  --workers 1 --timeout 300 \
+  --workers 1 --timeout "$TIMEOUT_S" \
   "${ENGINE_ENV_ARGS[@]}" \
   --pairs-out eval/pairs/dev12_fresh

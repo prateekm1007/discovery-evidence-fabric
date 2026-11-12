@@ -796,8 +796,22 @@ def probe_zero_paid_route() -> Dict[str, Any]:
         ("unorouter", "qwen3.8-27b:free"),
         ("zai", "glm-4-plus"),
     ]
+    # R6 owner round 2026-11-12 (measured): consult the ONE retirement
+    # gate before probing. The baseline is a synthesis-class call (the
+    # same long-form shape as SYNTHESIZE), so a provider retired from
+    # ROLE_SYNTHESIS is skipped BEFORE the probe — a single probe call
+    # can still pass inside a quota window (agnes: 1 request per 3
+    # minutes passed the probe, then the real baseline call burned the
+    # breaker). The blocked state rides the attempts record (Art.
+    # XXVII: recorded, never silent).
+    from discovery_fabric.engine.provider_health import (
+        ROLE_SYNTHESIS as _ROLE_SYNTHESIS, is_route_retired)
     attempts = []
     for prov, model in candidates:
+        if is_route_retired(prov, role=_ROLE_SYNTHESIS):
+            attempts.append({"provider": prov, "model": model,
+                             "state": "RETIRED_ROUTE_BLOCKED"})
+            continue
         ok = _probe_rung(prov, model)
         attempts.append({"provider": prov, "model": model, "state": "OK" if ok else "FAIL"})
         if ok:

@@ -714,6 +714,34 @@ RETIRED_ROUTE_PROVIDERS: Dict[str, set] = {
     # MECHANISM_SPACE, both ROLE_SYNTHESIS (110-226s / 12-128s latency
     # in the R517 battery).
     "atria": {ROLE_ATTACK, ROLE_SYNTHESIS},
+    # Agnes: retired from EVERY engine role this window (R6 owner
+    # round 2026-11-12, MEASURED — audit facts + the fu-001 smoke):
+    # the upstream enforces "used up today's text quota ... 1 request
+    # every 3 minutes" (429 RATE_LIMITED probe record). A SINGLE
+    # capability probe still passes (the smoke's baseline probe
+    # returned OK) — which is exactly the trap: real demand burns the
+    # retry budget on 429s until the breaker opens (measured: the
+    # smoke's baseline arm ended CIRCUIT_BREAKER_OPEN, and the
+    # SYNTHESIZE stage resolved agnes through the post-zai cascade;
+    # the problem timed out at the 300 s wall). One call per 3 minutes
+    # serves NO role. Reversible: re-enter on a measured quota reset
+    # (Art. XXV — recorded reality over aspiration).
+    "agnes": {ROLE_SYNTHESIS, ROLE_EXTRACTION, ROLE_ATTACK,
+              ROLE_TRANSFORM},
+    # Openrouter: retired from EVERY engine role this window (R6 owner
+    # round 2026-11-12, MEASURED — audit facts + the fu-001 smoke 3):
+    # the owner key is 401 "User not found" on chat (probe record), and
+    # the PUBLIC /models catalog still lists premium ids — the catalog-
+    # poisoning flaw the audit round recorded (catalog proves NAMES,
+    # not SERVABILITY for the key). Measured consequence in the smoke:
+    # the MS operator instantiation cascade walked into openrouter,
+    # catalog-discovered `z-ai/glm-5.3-flashx-legal`, burned a 67.4 s
+    # retry wall on the dead key (CALL_FAILED runtime-admission
+    # refused) and all 4 operators instantiated 0 candidates ->
+    # MECHANISM_STARVED. A keyless-dead provider never holds a serving
+    # slot. Reversible: re-enter when the owner replaces the key.
+    "openrouter": {ROLE_SYNTHESIS, ROLE_EXTRACTION, ROLE_ATTACK,
+                   ROLE_TRANSFORM},
     # Zai: NOT globally retired. R517/R520/R525 retired four targeted
     # scopes on measurements of the OLD zai gateway (per-call CLI spawn:
     # MS 86.0→122.28 s mean, 5/6; post-rank gauntlet 3/12 runs 564.4 s
