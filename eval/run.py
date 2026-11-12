@@ -47,13 +47,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# DIRECTIVE 1 (owner audit round 2026-11-12): the ONE plain-language
-# hypothesis caveat line the harness may append to a delivered answer
-# (the composer's own constant — one authority, Art. X).
-from discovery_fabric.engine.answer_composer import HYPOTHESIS_CAVEAT_LINE
-
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
+
+# DIRECTIVE 1 (owner audit round 2026-11-12): the ONE plain-language
+# hypothesis caveat line the harness may append to a delivered answer
+# (the composer's own constant — one authority, Art. X). Imported
+# AFTER the sys.path insert (the direct-invocation entry point).
+from discovery_fabric.engine.answer_composer import HYPOTHESIS_CAVEAT_LINE
 
 
 def _answer_contract(answer, question_type, packet=None,
