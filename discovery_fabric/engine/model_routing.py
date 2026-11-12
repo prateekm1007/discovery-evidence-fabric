@@ -506,6 +506,42 @@ def discover_catalog(provider_id: str,
         key_var = _provider_env_key(provider_id)
         key = (os.environ.get(key_var, "").strip()) if key_var else ""
     url = base.rstrip("/") + "/models"
+    # R6 AUDIT ROUND 2026-11-12 (directive 4): STOP ENUMERATING
+    # /models FOR KEYS THAT FAIL THE PROBE. A credential that answered
+    # 401/403 ("User not found", insufficient quota) poisons the
+    # catalog: the listing either fails or returns a catalog the chat
+    # endpoint will never serve — and the failed enumeration re-pays
+    # on every routing decision. The typed credential-death is cached
+    # on disk (24 h TTL): the FIRST auth failure records it; later
+    # catalog reads skip the GET and report CATALOG_SKIPPED_CREDENTIAL_
+    # DEAD (the pinned defaults stand in, disclosed — never silent,
+    # Art. XXV). A catalog refresh (force=True or TTL expiry) re-probes
+    # the key once and clears the mark on success.
+    cred_cache = CATALOG_DIR / f"{provider_id}.credential.json"
+    if not force and cred_cache.exists():
+        try:
+            _cred = json.loads(cred_cache.read_text(encoding="utf-8"))
+            if (time.time() - float(_cred.get("at_epoch") or 0)
+                    < 86400.0) and _cred.get("status") == \
+                    "CREDENTIAL_DEAD":
+                _SELECTION_DIAG["discover_catalog_calls"] += 1
+                _SELECTION_DIAG["discover_catalog_s"] += (
+                    time.perf_counter() - _dc0)
+                return {
+                    "provider": provider_id,
+                    "status": "CATALOG_SKIPPED_CREDENTIAL_DEAD",
+                    "fetched_at_epoch": time.time(),
+                    "error": (f"credential probe previously failed "
+                              f"({_cred.get('detail')}) — /models "
+                              "enumeration skipped; pinned defaults "
+                              "stand in (disclosed)"),
+                    "catalog_size": 0,
+                    "eligible_count": 0,
+                    "models": [],
+                    "discovered_via": None,
+                }
+        except Exception:  # noqa: BLE001 — corrupt cache re-probes
+            pass
     # R456-A3: the spec's transport headers ride catalog discovery too
     # (the CF browser-UA requirement — ONE transport authority)
     extra_headers = None
@@ -540,16 +576,36 @@ def discover_catalog(provider_id: str,
         # record the recovery (deterministic, append-only state).
         _clear_known_dead_if_relisted(provider_id, raw)
     except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
+        _err = f"{type(exc).__name__}: {exc}"[:200]
         out = {
             "provider": provider_id,
             "status": "UNDISCOVERED",
             "fetched_at_epoch": time.time(),
-            "error": f"{type(exc).__name__}: {exc}"[:200],
+            "error": _err,
             "catalog_size": 0,
             "eligible_count": 0,
             "models": [],
             "discovered_via": url,
         }
+        # directive 4 (2026-11-12): a 401/403 on the enumeration is the
+        # typed credential-death evidence — cache it so later catalog
+        # reads skip the GET (the key that failed the probe is never
+        # re-enumerated inside the TTL window)
+        if "401" in _err or "403" in _err or "Unauthorized" in _err \
+                or "Unauthorized" in str(exc) or "not found" in \
+                str(exc).lower():
+            try:
+                CATALOG_DIR.mkdir(parents=True, exist_ok=True)
+                cred_cache.write_text(json.dumps({
+                    "provider": provider_id,
+                    "status": "CREDENTIAL_DEAD",
+                    "detail": _err[:160],
+                    "at_epoch": time.time(),
+                    "at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                        time.gmtime()),
+                }, indent=1), encoding="utf-8")
+            except Exception:  # noqa: BLE001 — best-effort cache
+                pass
     try:
         CATALOG_DIR.mkdir(parents=True, exist_ok=True)
         cache.write_text(json.dumps(out, indent=1, sort_keys=True), encoding="utf-8")

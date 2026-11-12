@@ -100,15 +100,51 @@ NON_ADMISSIBLE_VERDICTS = [
     "", "NO_VERDICT",
 ]
 
+# DIRECTIVE 2 (owner audit round 2026-11-12): the typed no-answer is
+# reserved for SCIENTIFIC kills — infrastructure-typed verdicts
+# (Art. LXI classes) deliver the record-bound raw candidate as a
+# clearly flagged UNVERIFIED hypothesis instead of silence.
+INFRASTRUCTURE_DELIVERED_VERDICTS = [
+    "EVALUATOR_CALL_FAILED", "EVALUATION_FAILED",
+    "PROVIDER_UNAVAILABLE", "INCOMPLETE_EVIDENCE",
+    "INCOMPLETE_INFRASTRUCTURE", "INCOMPLETE_DATA", "PENDING",
+    "PENDING_CORROBORATION",
+]
+STRICT_NON_ADMISSIBLE_VERDICTS = [
+    v for v in NON_ADMISSIBLE_VERDICTS
+    if v not in INFRASTRUCTURE_DELIVERED_VERDICTS]
+
+
+def _compose_llm(prompt, system="", timeout=240, max_tokens=700,
+                 purpose="", **kw):
+    return {"ok": True, "content": (
+        "PARAMETER: sealed joint — compliant buffer — ASSUMPTION\n"
+        "INDICATOR: buffer strain. THRESHOLD: 40 MPa — ASSUMPTION. "
+        "PROTOCOL: 100 cycles; fail if delamination before 500."),
+        "prompt_hash": "p" * 8, "output_hash": "o" * 8}
+
+
 ADMISSIBLE_VERDICTS = ["PASS", "SURVIVED", "SURVIVE"]
 HYPOTHESIS_VERDICTS = ["ESCALATED_OBJECTION", "UNVERIFIED_HYPOTHESIS",
                        "HYPOTHESIS", "SURVIVED_UNVERIFIED"]
 
 
-@pytest.mark.parametrize("v", NON_ADMISSIBLE_VERDICTS)
+@pytest.mark.parametrize("v", STRICT_NON_ADMISSIBLE_VERDICTS)
 def test_non_admissible_verdicts_produce_no_candidates(v):
     cands = candidates_from_state(_env(v))
     assert cands == []
+
+
+@pytest.mark.parametrize("v", INFRASTRUCTURE_DELIVERED_VERDICTS)
+def test_infrastructure_verdicts_admit_flagged_hypothesis_candidate(v):
+    # DIRECTIVE 2 (2026-11-12): infrastructure-typed verdicts (Art. LXI)
+    # deliver the record-bound raw candidate as a flagged hypothesis —
+    # never silence, never an endorsed claim.
+    cands = candidates_from_state(_env(v))
+    assert len(cands) == 1, (v, cands)
+    assert cands[0]["admission"]["class"] == "HYPOTHESIS"
+    assert cands[0]["admission"]["reason"] == \
+        "VERDICT_IS_INFRASTRUCTURE_NOT_SCIENTIFIC"
 
 
 @pytest.mark.parametrize("v", NON_ADMISSIBLE_VERDICTS)
@@ -144,24 +180,41 @@ def test_classify_evaluator_call_failed_is_evaluator_failure():
                    "reason": "EVALUATOR_FAILURE"}
 
 
-def test_evaluator_call_failed_zero_composer_calls():
-    # the exact defect from the audit: the evaluator transport failure
-    # verdict must NOT admit the raw candidate; the state is typed
-    # NO_ADMISSIBLE with ZERO composer LLM calls
-    def _boom(*a, **k):
-        raise AssertionError("composer must not run on no-admission")
+def test_evaluator_call_failed_delivers_flagged_hypothesis():
+    # UPDATED by DIRECTIVE 2 (owner audit round 2026-11-12): the typed
+    # no-answer is reserved for SCIENTIFIC kills. The evaluator
+    # transport failure (the exact defect from the earlier audit) is
+    # Art. LXI INFRASTRUCTURE — the record-bound raw candidate now
+    # delivers as a clearly flagged UNVERIFIED hypothesis (the user
+    # gets a partly-verified answer with one plain caveat, never
+    # silence); the infrastructure verdict rides the admission record.
     rec = compose_if_admissible(_env("EVALUATOR_CALL_FAILED"),
                                 {"device": "d", "failure": "f"},
                                 [{"id": "e1", "title": "t"}],
                                 None, "intervention-proposal",
-                                llm_generate=_boom)
-    assert rec["state"] == "NO_ADMISSIBLE_CANDIDATES"
-    assert rec["n_llm_calls"] == 0
-    assert rec["answer"] is None
-    assert rec["non_admissible_reasons"][0]["reason"] == "EVALUATOR_FAILURE"
+                                llm_generate=_compose_llm)
+    assert rec["admitted_candidates"][0]["hypothesis"] is True
+    assert rec["admitted_candidates"][0]["attack_verdict"] == \
+        "EVALUATOR_CALL_FAILED"
+    assert rec["state"] != "NO_ADMISSIBLE_CANDIDATES"
+    assert isinstance(rec["answer"], str) and rec["answer"].strip()
+    assert rec["n_llm_calls"] == 1
 
 
-@pytest.mark.parametrize("v", NON_ADMISSIBLE_VERDICTS)
+@pytest.mark.parametrize("v", INFRASTRUCTURE_DELIVERED_VERDICTS)
+def test_infrastructure_verdict_delivers_flagged_hypothesis(v):
+    rec = compose_if_admissible(_env(v), {"device": "d", "failure": "f"},
+                                [{"id": "e1", "title": "t"}], None,
+                                "intervention-proposal",
+                                llm_generate=_compose_llm)
+    assert rec["admitted_candidates"][0]["hypothesis"] is True, (v, rec)
+    assert rec["state"] in ("COMPOSED_CONTRACT_VALID",
+                            "COMPOSED_CONTRACT_DOWNGRADED",
+                            "COMPOSED_CONTRACT_INVALID"), (v, rec["state"])
+    assert isinstance(rec["answer"], str) and rec["answer"].strip()
+
+
+@pytest.mark.parametrize("v", STRICT_NON_ADMISSIBLE_VERDICTS)
 def test_non_admission_zero_composer_calls(v):
     def _boom(*a, **k):
         raise AssertionError("composer must not run on no-admission")

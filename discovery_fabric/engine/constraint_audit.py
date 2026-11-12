@@ -1,7 +1,33 @@
 """discovery_fabric/engine/constraint_audit.py — the CONSTRAINT-
 COMPLIANCE AUDIT (owner audit round 2026-11-12, directive 2 + 4;
-deterministic, zero-LLM; Art. XXVII no threshold invention, Art.
-XXV unknown stays unknown, Art. LXXVII the answer is the deliverable).
+Art. XXVII no threshold invention, Art. XXV unknown stays unknown,
+Art. LXXVII the answer is the deliverable).
+
+R6 auditor round 2026-11-12 (directive 1, the REAL CONSTRAINT AUDIT):
+the deterministic matcher alone is OVERFIT to its regression fixtures —
+measured on the committed real pairs it missed 3 of 4 audited defects
+(fu-004 pressure setpoint, new04 "Saturated Condensing Temp" — the
+lexicon's "temperature" noun never matches the abbreviated "Temp",
+new01 constraint echoes composed of re-ordered constraint tokens). The
+audit is now TWO-LAYER:
+
+  1. DETERMINISTIC FLOOR (unchanged, zero-LLM): the typed checks below
+     stay exactly as they were — they trigger repair on what they can
+     prove and remain the floor under every arm.
+
+  2. THE STRUCTURED LLM CHECK (directive 1: "add one structured LLM
+     check in the existing repair call (no extra call)"): the model
+     that composes/repairs the answer ALSO outputs a trailing
+     CONSTRAINT-CHECK block — one verdict line per user constraint
+     (COMPLIES / VIOLATES + quoted offending text) plus RESTATES-DEVICE
+     / RESTATES-CONSTRAINT. The block rides the EXISTING compose and
+     repair calls (zero added calls); it is stripped from the delivered
+     text, parsed, its quoted spans are deterministically verified
+     against the answer, and every VIOLATES / RESTATES-YES verdict
+     joins the SAME repair loop as the deterministic violations. An
+     LLM check that could not run or could not be parsed is typed
+     CHECK_ABSENT / CHECK_UNPARSEABLE in the record (Art. XXV: the
+     unknown check state is never read as a pass).
 
 The R6 auditor found shipped answers that violate the user's own
 constraints and restate the problem as the answer:
@@ -399,3 +425,327 @@ def audit_constraints(problem: Dict[str, Any],
             "violations": violations,
             "n_violations": len(violations),
             "allowed_measurements": allowed}
+
+
+# ---------------------------------------------------------------------------
+# THE STRUCTURED LLM CHECK (R6 auditor round 2026-11-12, directive 1)
+# ---------------------------------------------------------------------------
+# One structured check that RIDES THE EXISTING compose/repair calls (no
+# extra call): the model ends its response with a CONSTRAINT-CHECK block
+# that is stripped before delivery and parsed into typed verdicts. The
+# deterministic floor above is unchanged; the LLM verdicts MERGE into the
+# same typed violation list and feed the SAME bounded repair loop.
+
+CONSTRAINT_CHECK_VERSION = "constraint_check/1.0.0"
+
+CONSTRAINT_CHECK_BLOCK_SPEC = """CONSTRAINT-CHECK (required last block, plain text):
+After the answer, append EXACTLY this block and nothing after it. It is
+machine-stripped before the answer is delivered; it is an audit, not
+part of the answer.
+CONSTRAINT-CHECK:
+<for EACH numbered user constraint below, one line>:
+C<i>: COMPLIES | VIOLATES | "<the exact offending text quoted from YOUR answer, or the empty string when COMPLIES>"
+RESTATES-DEVICE: YES "<quoted text>" | NO
+RESTATES-CONSTRAINT: YES "<quoted text>" | NO
+Rules: VIOLATES means the answer's proposal depends on, measures, or
+fixes something that constraint forbids or does not allow, or misses
+what it requires. Quote the offending words EXACTLY as they appear in
+your answer. RESTATES-DEVICE is YES only when the answer proposes, as
+its change, a state the given device already has. RESTATES-CONSTRAINT
+is YES only when a design parameter line merely echoes a user
+constraint instead of changing something."""
+
+
+_CK_BLOCK_RE = re.compile(r"^\s*CONSTRAINT-CHECK\s*:?\s*$", re.IGNORECASE)
+_CK_VERDICT_RE = re.compile(
+    r"^\s*C\s*(\d+)\s*:\s*"
+    r"(COMPLIES|VIOLATES)\s*(.*)$", re.IGNORECASE)
+_CK_RESTATES_RE = re.compile(
+    r"^\s*(RESTATES-DEVICE|RESTATES-CONSTRAINT)\s*:\s*"
+    r"(YES|NO)\s*(.*)$", re.IGNORECASE)
+
+
+def strip_constraint_check(text: str) -> tuple:
+    """Split a composed response into (clean_answer, block_text).
+
+    The block starts at the line 'CONSTRAINT-CHECK:' (case-insensitive)
+    and runs to the end. When the marker is absent the whole text is
+    the answer and the block is typed absent by the caller (Art. XXV)."""
+    text = str(text or "")
+    lines = text.split("\n")
+    for i, ln in enumerate(lines):
+        if _CK_BLOCK_RE.match(ln):
+            answer = "\n".join(lines[:i]).rstrip()
+            block = "\n".join(lines[i + 1:])
+            return answer, block
+    return text.rstrip(), None
+
+
+def _norm_quote(s: str) -> str:
+    """Normalization for quote verification: lowercase, collapse all
+    whitespace and strip quote glyphs/punctuation-only noise."""
+    s = str(s or "").lower().strip()
+    s = s.strip("\"'\u201c\u201d\u2018\u2019` ")
+    s = re.sub(r"[\s\-_\u2010-\u2015]+", " ", s)
+    s = re.sub(r"[.,;:!()\[\]{}]", "", s)
+    return re.sub(r"\s+", " ", s).strip()
+
+
+def _quote_in_answer(quote: str, answer: str) -> bool:
+    """Deterministic quote verification. The exact normalized span must
+    appear in the normalized answer; when it does not, a sliding
+    6-token window overlap (>= 0.6 of window tokens present) still
+    verifies — the model may quote across a hyphenation or numeral
+    formatting difference. Unverifiable quotes stay recorded (the
+    verdict rides the record either way) but carry verified=False."""
+    q = _norm_quote(quote)
+    if not q:
+        return False
+    a = _norm_quote(answer)
+    if q in a:
+        return True
+    q_toks = q.split()
+    if len(q_toks) < 3:
+        return False
+    a_toks = a.split()
+    if not a_toks:
+        return False
+    w = min(len(q_toks), 8)
+    for i in range(0, max(1, len(a_toks) - w + 1)):
+        window = a_toks[i:i + w]
+        hit = sum(1 for t in window if t in q_toks or any(
+            t.startswith(tk[:6]) and len(t) >= 4 and len(tk) >= 4
+            for tk in q_toks))
+        if hit / w >= 0.6:
+            return True
+    return False
+
+
+def parse_constraint_check(block_text: str,
+                           answer: str) -> Dict[str, Any]:
+    """Parse the block into typed verdicts. Returns
+    {state: PARSED|UNPARSEABLE, n_constraints, verdicts: [...],
+     restates_device: {...}, restates_constraint: {...},
+     n_violations, verified_quotes, n_unverified_quotes}.
+
+    A parsed-but-quote-unverified VIOLATES verdict still counts (the
+    model named the constraint and the failure; the unlocatable quote
+    is disclosed on the verdict) — repair feedback is bounded and
+    non-gating, so a paraphrased quote can never strand a real defect
+    (Art. VII: feedback, never a gate)."""
+    if not block_text or not str(block_text).strip():
+        return {"check_version": CONSTRAINT_CHECK_VERSION,
+                "state": "CHECK_ABSENT", "n_constraints": 0,
+                "verdicts": [], "restates_device": None,
+                "restates_constraint": None, "n_violations": 0,
+                "verified_quotes": 0, "n_unverified_quotes": 0}
+    verdicts: List[Dict[str, Any]] = []
+    rest_dev = rest_con = None
+    n_viol = 0
+    verified = unverified = 0
+    parsed_any = False
+    for raw in str(block_text).split("\n"):
+        ln = raw.strip()
+        if not ln:
+            continue
+        m = _CK_VERDICT_RE.match(ln)
+        if m:
+            parsed_any = True
+            idx = int(m.group(1))
+            verdict = m.group(2).upper()
+            tail = m.group(3).strip()
+            quote = ""
+            qm = re.search(r'"([^"]*)"', tail)
+            if qm:
+                quote = qm.group(1).strip()
+            if verdict == "VIOLATES":
+                ok = bool(quote) and _quote_in_answer(quote, answer)
+                if quote and ok:
+                    verified += 1
+                else:
+                    unverified += 1
+                n_viol += 1
+            verdicts.append({"constraint_index": idx, "verdict": verdict,
+                             "quote": quote[:300],
+                             "quote_verified": (
+                                 bool(quote)
+                                 and _quote_in_answer(quote, answer))
+                             if verdict == "VIOLATES" else None})
+            continue
+        m = _CK_RESTATES_RE.match(ln)
+        if m:
+            parsed_any = True
+            kind = m.group(1).upper()
+            yes = m.group(2).upper() == "YES"
+            quote = ""
+            qm = re.search(r'"([^"]*)"', m.group(3) or "")
+            if qm:
+                quote = qm.group(1).strip()
+            entry = {"yes": yes, "quote": quote[:300],
+                     "quote_verified": (bool(quote) and
+                                        _quote_in_answer(quote, answer))
+                     if yes else None}
+            if yes and quote:
+                if _quote_in_answer(quote, answer):
+                    verified += 1
+                else:
+                    unverified += 1
+            if yes:
+                n_viol += 1
+            if kind == "RESTATES-DEVICE":
+                rest_dev = entry
+            else:
+                rest_con = entry
+    if not parsed_any:
+        return {"check_version": CONSTRAINT_CHECK_VERSION,
+                "state": "CHECK_UNPARSEABLE", "n_constraints": 0,
+                "verdicts": [], "restates_device": None,
+                "restates_constraint": None, "n_violations": 0,
+                "verified_quotes": 0, "n_unverified_quotes": 0}
+    return {"check_version": CONSTRAINT_CHECK_VERSION,
+            "state": "PARSED", "n_constraints": len(verdicts),
+            "verdicts": verdicts, "restates_device": rest_dev,
+            "restates_constraint": rest_con, "n_violations": n_viol,
+            "verified_quotes": verified, "n_unverified_quotes": unverified}
+
+
+def llm_check_violations(parsed: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Typed violations from a parsed check (same shape as the floor's
+    violations; types prefixed LLM_ so the source is never ambiguous)."""
+    out: List[Dict[str, Any]] = []
+    if parsed.get("state") != "PARSED":
+        return out
+    for v in parsed.get("verdicts") or []:
+        if v.get("verdict") == "VIOLATES":
+            out.append({
+                "type": "LLM_CONSTRAINT_VIOLATES",
+                "detail": (f"the structured constraint check flags "
+                           f"constraint {v.get('constraint_index')} as "
+                           "VIOLATES"
+                           + (" — offending text located in the answer"
+                              if v.get("quote_verified")
+                              else " — quoted text not located "
+                              "(disclosed, unverified)")),
+                "context": str(v.get("quote") or "")[:200],
+                "source": "constraint_check"})
+    for kind, vtype in (("restates_device", "LLM_RESTATES_GIVEN_DEVICE"),
+                        ("restates_constraint",
+                         "LLM_RESTATES_USER_CONSTRAINT")):
+        r = parsed.get(kind)
+        if isinstance(r, dict) and r.get("yes"):
+            out.append({
+                "type": vtype,
+                "detail": ("the structured constraint check flags "
+                           + ("a proposal that restates a state the "
+                              "given device already has"
+                              if kind == "restates_device"
+                              else "a parameter line that only echoes "
+                                   "a user constraint")
+                           + (" — text located" if r.get("quote_verified")
+                              else " — quoted text not located "
+                              "(disclosed, unverified)")),
+                "context": str(r.get("quote") or "")[:200],
+                "source": "constraint_check"})
+    return out
+
+
+def merge_constraint_check(audit: Dict[str, Any],
+                           parsed: Dict[str, Any]) -> Dict[str, Any]:
+    """Merge the parsed LLM check into a deterministic audit result.
+    The floor's violations stay; LLM violations append; the state and
+    n_violations recompute; the check rides the merged record."""
+    merged = dict(audit or {})
+    viols = list(merged.get("violations") or [])
+    viols.extend(llm_check_violations(parsed))
+    merged["violations"] = viols
+    merged["n_violations"] = len(viols)
+    merged["state"] = ("CONSTRAINT_VIOLATIONS" if viols
+                       else "CONSTRAINT_AUDIT_PASS")
+    merged["constraint_check"] = parsed
+    return merged
+
+
+#: the judge-side prompt for a STANDALONE check of a pre-existing answer
+#: (the acceptance harness on the committed real pairs; the same verdict
+#: contract the composer's fused block obeys — one check shape, Art. X).
+LLM_CONSTRAINT_CHECK_PROMPT = """You audit one engineering answer
+against the user's stated constraints. Be adversarial and precise: a
+constraint is VIOLATED when the answer's proposal depends on,
+measures, or fixes something the constraint forbids or does not allow,
+or misses what it requires. An answer that only restates the given
+device's existing state, or lists the user's constraints as its design
+parameters without changing anything, violates the restatement rule.
+
+DEVICE: {device}
+FAILURE: {failure}
+
+USER'S STATED CONSTRAINTS (numbered):
+{numbered_constraints}
+
+ANSWER UNDER AUDIT:
+{answer}
+
+Output ONLY this block:
+CONSTRAINT-CHECK:
+C1: COMPLIES | VIOLATES | "<exact offending quote from the answer, or empty>"
+C2: COMPLIES | VIOLATES | "<...>"
+(for every numbered constraint)
+RESTATES-DEVICE: YES "<quote>" | NO
+RESTATES-CONSTRAINT: YES "<quote>" | NO
+"""
+
+
+def numbered_constraints_block(problem: Dict[str, Any]) -> str:
+    """The user's constraints as a numbered list (the check's units).
+    user_variables are the constraint statements the run recorded; the
+    free-text constraint is always line 1 when present."""
+    lines: List[str] = []
+    c = str(problem.get("constraint") or "").strip()
+    if c:
+        lines.append(c)
+    for uv in problem.get("user_variables") or []:
+        u = str(uv or "").strip()
+        if u and u not in lines:
+            lines.append(u)
+    ca = problem.get("clarification_answer")
+    if isinstance(ca, dict):
+        for k, v in ca.items():
+            if k == "note":
+                continue
+            lines.append(f"{k}: {v}")
+    return "\n".join(f"C{i+1}: {ln[:220]}" for i, ln in enumerate(lines)) \
+        or "(no stated constraints recorded)"
+
+
+def llm_constraint_check(problem: Dict[str, Any], answer: str,
+                         llm_generate) -> Dict[str, Any]:
+    """STANDALONE structured check of a pre-existing answer (ONE LLM
+    call, the acceptance-harness shape of the fused block). Uses the
+    SAME verdict contract and the SAME parser — one check shape, two
+    transports (fused into compose/repair in the pipeline; standalone
+    here). `llm_generate` is the engine's injectable transport."""
+    prompt = LLM_CONSTRAINT_CHECK_PROMPT.format(
+        device=str(problem.get("device") or "")[:300],
+        failure=str(problem.get("failure") or "")[:300],
+        numbered_constraints=numbered_constraints_block(problem),
+        answer=str(answer or "")[:4500])
+    res = llm_generate(prompt, system=(
+        "You are a precise, adversarial constraint auditor for "
+        "engineering proposals. Output only the required block."),
+        max_tokens=700, purpose="constraint_check")
+    if not isinstance(res, dict) or not res.get("ok") \
+            or not (res.get("content") or "").strip():
+        return {"check_version": CONSTRAINT_CHECK_VERSION,
+                "state": "CHECK_TRANSPORT_FAILED",
+                "error": str((res or {}).get("error")
+                             or (res or {}).get("status"))[:200],
+                "n_constraints": 0, "verdicts": [],
+                "restates_device": None, "restates_constraint": None,
+                "n_violations": 0, "verified_quotes": 0,
+                "n_unverified_quotes": 0}
+    _ans, block = strip_constraint_check(res["content"])
+    parsed = parse_constraint_check(block, str(answer or ""))
+    parsed["standalone"] = True
+    parsed["provider"] = res.get("provider_route") or res.get("provider")
+    parsed["model"] = res.get("model")
+    return parsed

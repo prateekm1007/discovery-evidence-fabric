@@ -1771,6 +1771,91 @@ class EngineRun:
             evaluated: List[Dict[str, Any]] = []
             _cctx.set_stage("POST_RANK_GAUNTLET")
             _pra_start("GAUNTLET")
+            # DIRECTIVE 3 (owner audit round 2026-11-12): BATCH THE
+            # ATTACK ACROSS CANDIDATES IN ONE CALL. The independent
+            # adversarial attack for every mech-/grid- candidate that
+            # lacks a persisted record runs HERE, in ONE batched call
+            # (independent_attack_batch — the same verdict contract,
+            # grounding check, and record shape per candidate); the
+            # loop below then REUSES the persisted per-candidate
+            # records through its existing resume-cache path — the
+            # gauntlet's per-candidate semantics are untouched, only
+            # the transport is batched (Art. X: one transport shape).
+            # FABRIC_ATTACK_BATCH=0 restores the per-candidate calls
+            # for the ablation arm (explicit arm selection, default
+            # batched).
+            if os.environ.get("FABRIC_ATTACK_BATCH", "1") != "0":
+                try:
+                    _batch_pending = []
+                    for c in pool:
+                        _k = c["key"]
+                        if not (_k.startswith("mech-")
+                                or _k.startswith("grid-")):
+                            continue
+                        if (self.out /
+                                f"INDEPENDENT_ATTACK_{_k}.json").exists():
+                            continue
+                        _ms_cand = (c.get("mechanism_space_candidate")
+                                    or {})
+                        _batch_pending.append((
+                            c, _ms_cand if _ms_cand else {
+                                "candidate_id": c["candidate_id"],
+                                "mechanism": (c.get("env_view")
+                                              .mechanism_map.get(
+                                                  "mechanism", "")),
+                                "intervention": (c.get("env_view")
+                                                 .mechanism_map.get(
+                                                     "intervention", "")),
+                                "predicted_effect": (
+                                    c.get("env_view").mechanism_map.get(
+                                        "expected_effect", "")),
+                                "testable_prediction": (
+                                    c.get("env_view").mechanism_map.get(
+                                        "falsification_test", "")),
+                                "novel_design_variable": "",
+                                "known_failure_modes": [],
+                                "constraint_set": {}}))
+                    if _batch_pending:
+                        from .independent_attack import (
+                            independent_attack_batch,
+                            POST_RANK_ATTACK_PURPOSE as _BATCH_PURPOSE)
+                        _gens = []
+                        for _c, _mc in _batch_pending:
+                            _gp = (((_c.get("mechanism_space_candidate")
+                                     or {}).get("derivation_trace") or {})
+                                   .get("llm_provider")
+                                   or _c.get("exploration_provider"))
+                            if _gp and _gp not in _gens:
+                                _gens.append(_gp)
+                        _t0b = _ptime.perf_counter()
+                        _batch = independent_attack_batch(
+                            [_mc for _c, _mc in _batch_pending],
+                            self.problem, self.env.evidence or [],
+                            _gens[0] if _gens else None,
+                            attack_purpose=_BATCH_PURPOSE)
+                        for _c, _mc in _batch_pending:
+                            _rec = (_batch.get("records") or {}).get(
+                                str(_c["candidate_id"]))
+                            if _rec is None:
+                                continue
+                            self._persist(
+                                f"INDEPENDENT_ATTACK_{_c['key']}.json",
+                                _rec)
+                        _pra["phase_s"]["BATCH_INDEPENDENT_ATTACK"] = {
+                            "wall_s": round(_ptime.perf_counter()
+                                            - _t0b, 3),
+                            "n_candidates": len(_batch_pending),
+                            "n_unparsed": len(_batch.get("unparsed")
+                                              or []),
+                            "transport": (_batch.get("transport")
+                                          or {}).get("attacker_provider")}
+                except Exception as _bexc:  # noqa: BLE001 — the batch
+                    # transport failure is NOT a kill path: the loop
+                    # below falls back to the per-candidate calls
+                    # (typed, never silent — the note rides the record)
+                    print(f"[gauntlet] batch attack unavailable "
+                          f"({_bexc}); per-candidate fallback",
+                          file=sys.stderr)
             # R526 Q-B (behavior-neutral phase spans): gauntlet phase
             # entry, durably recorded on the proven model_routing ledger
             # channel (run-dir sidecars are demonstrably absent
