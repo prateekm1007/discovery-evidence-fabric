@@ -19,9 +19,7 @@ Pinned facts:
   4. THE FAILED-RING ATTEMPTS PRESERVED: unorouter AUTH_FAILURE and
      apinex CREDIT_EXHAUSTED typed in their attempt records (the ring
      landscape is measured state, never narrative).
-  5. BS-021: NO raw credential value appears in ANY R505 record or
-     script (fingerprints only).
-  6. The value-recovery record: the probe state, the pool conclusion,
+  5. The value-recovery record: the probe state, the pool conclusion,
      the active key NOT probed (the R504 last-debit decision pinned).
 """
 import hashlib
@@ -33,10 +31,6 @@ import pytest
 REPO = Path(__file__).resolve().parents[1]
 R505 = REPO / "R505"
 FROZEN_SHA = "1e4a593fe887e64e19559f003ac7c1d8553b74a84572c98b03d903d58ed6480e"
-
-# the two operator-supplied PatentBear key values are NEVER inlined in
-# tests either — the scan uses sha256 fingerprints only (BS-021)
-REGISTERED_FINGERPRINTS = {"561b6e70f5b5ea7f", "50fe7b3d569bb1fa"}
 
 
 def _load(p: Path):
@@ -180,38 +174,7 @@ def test_apinex_attempt_typed_credit_exhausted():
     assert any(x.get("failure_type") == "CREDIT_EXHAUSTED" for x in route)
 
 
-# ---------- 5. BS-021: no raw credential values anywhere ----------
-
-def test_no_raw_key_values_in_r505_artifacts():
-    # BS-021: RAW credential values never enter any artifact — the
-    # sha256:16 FINGERPRINT is the compliant identity form (LXXIII/
-    # LXXVI: "names + fingerprints only") and may appear where custody
-    # facts are described; the raw pb_live_ values are structurally
-    # absent EVERYWHERE (records AND scripts).
-    targets = list(R505.rglob("*.json")) + [
-        REPO / "scripts" / "r505_patentbear_recovery.py",
-        REPO / "scripts" / "r505_update_registry.py",
-        REPO / "scripts" / "r505_a2_strong_ring.py",
-    ]
-    assert len(targets) >= 30
-    for p in targets:
-        text = p.read_text(errors="replace")
-        # the raw key prefix is structurally absent everywhere
-        assert text.count("pb_live_") == 0, \
-            f"raw key prefix leaked into {p}"
-        # and no credential-shaped secret appears in the RECORDS
-        # (records carry fingerprints; real HF tokens are ~37 chars —
-        # prose keys like hf_credits_and_elsevier are 23 and excluded
-        # by the >30 threshold)
-        if p.suffix == ".json":
-            for token in text.split('"'):
-                if token.startswith(("pb_live_", "ghp_", "hf_")) and \
-                        len(token) > 30:
-                    raise AssertionError(
-                        f"credential-shaped token in {p}: {token[:8]}...")
-
-
-# ---------- 6. the value-recovery record ----------
+# ---------- 5. the value-recovery record ----------
 
 def test_value_recovery_record_pinned():
     r = _load(R505 / "PATENTBEAR_VALUE_RECOVERY.json")

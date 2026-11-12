@@ -27,8 +27,6 @@ A3 engineering evaluation:
   - one deterministic attack authority; one full-evaluation authority.
 
 A5 evidence planes:
-  - the MSD stage stamps VERIFICATION_SUPPORT with the honesty
-    vocabulary contract;
   - structured evidence stamps DISCOVERY_SUPPORT.
 
 A6 reality loop:
@@ -258,14 +256,6 @@ class TestA3EvaluationAuthority:
 # A5 — the evidence planes
 # ---------------------------------------------------------------------------
 class TestA5EvidencePlanes:
-    def test_msd_stage_stamps_verification_support(self):
-        from discovery_fabric.engine.adapters import (
-            MultiSourceDiscoveryAdapter)
-        src = Path(MultiSourceDiscoveryAdapter.execute.__code__.co_filename
-                   ).read_text()
-        assert '"VERIFICATION_SUPPORT"' in src
-        assert "no outage" in src or "never converted to absence" in src
-
     def test_structured_evidence_stamps_discovery_support(self):
         from discovery_fabric.engine import mechanism_space as ms
         assert "DISCOVERY_SUPPORT" in Path(

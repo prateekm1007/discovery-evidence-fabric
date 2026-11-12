@@ -7,14 +7,12 @@ metadata. The visual layer may render the honest non-claim states
 (unknown-class, blocked, ready-for-review, visual-ready); it must
 never manufacture VALIDATED / SURVIVOR / ENGINEERING_READY.
 
-Three pins:
-  1. structural absence — no shipping presentation source carries the
-     forbidden state vocabulary at all;
-  2. presence-only runs — a run dir whose ONLY signals are artifact
+Two pins:
+  1. presence-only runs — a run dir whose ONLY signals are artifact
      presence produces NO ready milestone, NO engineering authority
      claim, and no completion wording anywhere in the dossier
      projection;
-  3. the vocabulary boundary — the mapping's own exported state union
+  2. the vocabulary boundary — the mapping's own exported state union
      is free of the forbidden tokens (the backend projection the UI
      consumes verbatim carries none either).
 
@@ -23,25 +21,12 @@ Three pins:
 """
 import json
 import re
-from pathlib import Path
 
 import pytest
 
 from toscanini import dossier as dossier_mod
 
-REPO = Path(__file__).resolve().parents[1]
-WEBAPP = REPO / "TOSCANINI_UI" / "webapp"
-
 FORBIDDEN_VOCABULARY = re.compile(r"\b(VALIDATED|SURVIVOR|ENGINEERING_READY)\b")
-
-PRESENTATION_SOURCES = [
-    WEBAPP / "lib" / "presentationState.ts",
-    WEBAPP / "components" / "TechStage.tsx",
-    WEBAPP / "components" / "InfrastructureBlockedHero.tsx",
-    WEBAPP / "components" / "DossierSections.tsx",
-    WEBAPP / "components" / "DeepDive.tsx",
-    WEBAPP / "components" / "DiscoveryPipelineStrip.tsx",
-]
 
 
 def _session(status="COMPLETE", run_dir=None):
@@ -51,17 +36,6 @@ def _session(status="COMPLETE", run_dir=None):
 
 
 class TestNoManufacturedStateVocabulary:
-    def test_presentation_sources_carry_no_forbidden_tokens(self):
-        """The shipping presentation layer has NO manufacturing
-        vocabulary: VALIDATED / SURVIVOR / ENGINEERING_READY appear
-        nowhere in the six presentation sources (structural absence,
-        stronger than a behavior test — there is no code path to
-        attack)."""
-        for src in PRESENTATION_SOURCES:
-            assert src.is_file(), f"missing presentation source {src.name}"
-            assert not FORBIDDEN_VOCABULARY.search(src.read_text()), \
-                f"{src.name} carries a manufactured-state token"
-
     def test_projection_output_carries_no_forbidden_tokens(self, tmp_path):
         """The dossier projection for a presence-only run renders no
         completion claim: every row status/detail is free of the

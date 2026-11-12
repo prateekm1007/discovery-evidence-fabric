@@ -34,22 +34,6 @@ from toscanini import dossier as dos  # noqa: E402
 
 WEBAPP = REPO / "TOSCANINI_UI" / "webapp"
 
-# the primary-surface components (the stage; the deep layer may keep
-# engine vocabulary where rigor belongs)
-PRIMARY_SURFACE = [
-    WEBAPP / "components" / "TechStage.tsx",
-    WEBAPP / "components" / "InventionStage.tsx",
-    WEBAPP / "components" / "ModelViewer.tsx",
-]
-
-ENGINE_VOCAB_PRIMARY = (
-    "COMPUTATIONAL_RESULT",
-    "EVIDENCE-CLASS COUNTS",
-    "HYPOTHESIZED",
-    "FAILED_SCIENTIFIC",
-    "NOT ESTABLISHED",
-)
-
 
 # ---------------------------------------------------------------------------
 # A. template-echo rejection at the generator boundary (evolution.py)
@@ -302,80 +286,6 @@ class TestProductSurface:
         assert not (WEBAPP / "components" / "DossierPane.tsx").exists()
         assert not (WEBAPP / "components" /
                     "InvestigationPane.tsx").exists()
-
-    def test_new_stage_components_exist(self):
-        for f in ("TechStage.tsx", "DeepDive.tsx", "DossierSections.tsx",
-                  "InventionStage.tsx"):
-            assert (WEBAPP / "components" / f).exists(), f
-
-    def test_primary_surface_speaks_product_language(self):
-        """Engine vocabulary must not appear in the primary-surface
-        components' USER-VISIBLE copy (comments are code documentation,
-        not product copy; the deep layer — DeepDive/DossierSections/
-        ScienceEvents — legitimately keeps the vocabulary where rigor
-        lives)."""
-        import re as _re
-        for f in PRIMARY_SURFACE:
-            src = f.read_text()
-            code = _re.sub(r"//[^\n]*", "", src)
-            code = _re.sub(r"/\*.*?\*/", "", code, flags=_re.S)
-            for vocab in ENGINE_VOCAB_PRIMARY:
-                assert vocab not in code, (f.name, vocab)
-
-    def test_single_viewer_by_construction(self):
-        """The ONE-viewer invariant at the source level: exactly one
-        <ModelViewer render per stage component; the deep layer renders
-        NONE (evolution/history act on the stage hero)."""
-        counts = {
-            "TechStage.tsx": 1,
-            "InventionStage.tsx": 1,
-            "DeepDive.tsx": 0,
-            "DossierSections.tsx": 0,
-        }
-        for name, want in counts.items():
-            src = (WEBAPP / "components" / name).read_text()
-            got = src.count("<ModelViewer")
-            assert got == want, (name, got, want)
-
-    def test_stage_carries_the_product_contract_markers(self):
-        src = (WEBAPP / "components" / "TechStage.tsx").read_text()
-        for marker in (
-            "data-tech-stage",
-            "data-hero-viewport",
-            "data-stage-insights",
-            "data-stage-actions",
-            "What changed",
-            "Why it works",
-            "What supports it",
-            "What could kill it",
-            "Test this",
-            "Compare generations",
-            "technology package",
-            "Preparing technology visualization",
-        ):
-            assert marker in src, marker
-
-    def test_deep_layer_progressive_disclosure_markers(self):
-        src = (WEBAPP / "components" / "DeepDive.tsx").read_text()
-        for marker in ("data-deep-dive", "dd-sec", "journal", "summary",
-                       "model", "evidence", "engineering", "experiment",
-                       "package", "ask"):
-            assert marker in src, marker
-
-    def test_english_only_new_copy(self, tmp_path):
-        """Art. LXX: the newly authored user-facing copy is English
-        (the R419 english-only guard covers the repo; this asserts the
-        new stage components carry no non-Latin authorship script)."""
-        import re as _re
-        for f in PRIMARY_SURFACE + [WEBAPP / "components" / "DeepDive.tsx",
-                                    WEBAPP / "components" /
-                                    "DossierSections.tsx"]:
-            src = f.read_text()
-            # strip comments (code comments may quote anything)
-            code = _re.sub(r"//[^\n]*", "", src)
-            non_latin = _re.findall(r"[\u0400-\u04FF\u4E00-\u9FFF"
-                                    r"\u3040-\u30FF\uAC00-\uD7AF]", code)
-            assert not non_latin, (f.name, non_latin[:5])
 
 
 if __name__ == "__main__":

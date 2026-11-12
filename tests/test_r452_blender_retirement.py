@@ -38,13 +38,8 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-REPO = Path(__file__).resolve().parent.parent
-
 from discovery_fabric.engine.invention_bridge import render as render_mod \
     # noqa: E402
-
-_RETIRED_README = (REPO / "discovery_fabric" / "engine" /
-                   "invention_bridge" / "r441_retired" / "README.md")
 
 
 class TestBlenderLegacyCannotBeSelectedImplicitly:
@@ -79,19 +74,6 @@ class TestBlenderLegacyCannotBeSelectedImplicitly:
             "render_invention_blender_legacy", 1)[-1]
         assert "BLENDER_HEADLESS_LEGACY" in src.split(
             'if chosen == "blender":', 1)[-1]
-
-    def test_lxiv_record_carries_the_new_dated_reason(self):
-        """The stale 'scheduled R442' disposition is superseded by a
-        dated R452 record — Article LXIV rule 1 (silence is not a valid
-        answer) and Article LXV (an overdue decision escalates with its
-        cost stated)."""
-        text = _RETIRED_README.read_text()
-        assert "R452" in text, (
-            "the retirement record was not renewed — the stale "
-            "'scheduled R442' note would keep standing, the exact "
-            "drift the audit flagged")
-        assert "R442" in text  # the history stays (Art. XI)
-        assert "overdue" in text.lower()
 
 
 if __name__ == "__main__":

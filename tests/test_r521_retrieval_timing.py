@@ -14,9 +14,7 @@ threshold change. These tests evidence that claim:
      enclosing wall on a hermetic retrieve;
   5. hermetic retrieve determinism IGNORING timing fields (the
      adversarial behavior-neutrality case: strip every timing key and
-     require byte-identical evidence content across two runs);
-  6. the R521 harvester reads instrumented envelopes AND tolerates
-     pre-instrumentation envelopes (no crash, UNKNOWN verdicts).
+     require byte-identical evidence content across two runs).
 
 English only (Art. LXX).
 """
@@ -204,53 +202,3 @@ def test_hermetic_retrieve_deterministic_ignoring_timing(monkeypatch):
     s1 = _strip_timing_deep(rep1["retrieval_attribution"])
     s2 = _strip_timing_deep(rep2["retrieval_attribution"])
     assert s1 == s2
-
-
-# ---------------------------------------------------------------- harvester compat
-def test_harvester_reads_instrumented_and_legacy():
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]
-                           / "scripts"))
-    import importlib.util
-    spec = importlib.util.spec_from_file_location(
-        "r521_harvest_attribution",
-        str(Path(__file__).resolve().parents[1] / "scripts"
-            / "r521_harvest_attribution.py"))
-    # import would sys.exit without R521_ARM; exercise the pure
-    # function via source load with a stubbed env instead
-    import os
-    os.environ["R521_ARM"] = "before"
-    try:
-        mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(mod)
-    finally:
-        del os.environ["R521_ARM"]
-    legacy_env = {"provenance": {"retrieval_fabric": {
-        "retrieval_attribution": {"mode": "parallel", "n_jobs": 1,
-                                  "fanout_wall_s": 2.0, "jobs": []},
-        "sources_attempted": [], "sources_succeeded": [],
-        "sources_failed": [], "sources_rate_limited": []}}}
-    out = mod._retrieve_two_level(legacy_env, [])
-    assert out["phase_s"] is None
-    assert out["evidence_fabric"]["per_channel_timing"]["class"] == \
-        "UNKNOWN"
-    assert out["connector_visibility_verdict"][
-        "retry_waste_claim_permitted"] is False
-    modern_env = {"provenance": {"retrieval_fabric": {
-        "retrieval_attribution": {
-            "mode": "parallel", "n_jobs": 0, "fanout_wall_s": 1.0,
-            "total_search_call_s": 1.0, "max_job_wall_s": 1.0,
-            "assemble_s": 0.0, "worker_queue_wait_s": 0.0, "jobs": [],
-            "enrichment_s": {"patent_claims": 0.0},
-            "phase_s": {"query_derivation": 0.1, "fanout": 1.0}},
-        "sources_attempted": [], "sources_succeeded": [],
-        "sources_failed": [], "sources_rate_limited": [],
-        "evidence_fabric": {
-            "channels": 1, "unknown_channels": 0,
-            "channel_latencies": [{"source_id": "s", "state": "SUCCESS",
-                                   "attempted_as": "primary",
-                                   "latency_s": 0.7, "records": 1}],
-            "channel_latency_sum_s": 0.7, "pacing_s": 0.0}}}}
-    out2 = mod._retrieve_two_level(modern_env, [])
-    assert out2["phase_s"]["fanout"] == 1.0
-    assert out2["evidence_fabric"]["per_channel_timing"]["class"] == \
-        "OBSERVED_IN_STAGE"

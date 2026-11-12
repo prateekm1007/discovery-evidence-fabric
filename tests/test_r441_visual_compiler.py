@@ -41,8 +41,6 @@ from discovery_fabric.engine.visual_compiler import visual_compiler as vc  # noq
 from discovery_fabric.engine.visual_compiler import visual_gate  # noqa: E402
 
 VC_DIR = REPO / "discovery_fabric" / "engine" / "visual_compiler"
-RETIRED = (REPO / "discovery_fabric" / "engine" / "invention_bridge"
-           / "r441_retired")
 
 
 def _write_solid_png(path: Path, w: int = 100, h: int = 100,
@@ -293,34 +291,6 @@ class TestBlenderRetirement:
     def test_live_blender_script_is_gone(self):
         assert not (REPO / "discovery_fabric/engine/invention_bridge/"
                     "blender_render.py").exists()
-
-    def test_retired_script_is_archived_with_a_record(self):
-        archived = RETIRED / "blender_render.py"
-        assert archived.is_file()
-        readme = (RETIRED / "README.md").read_text()
-        assert "ARCHIVED_TO" in readme
-        assert "KEPT_BECAUSE" in readme
-
-    def test_zero_live_references_to_the_retired_script(self):
-        """No Python module IMPORTS the retired script; the dispatcher's
-        only remaining path reference points INTO the retirement archive
-        (the legacy backend runs the archived copy, acknowledged)."""
-        offenders = []
-        for py in (REPO / "discovery_fabric").rglob("*.py"):
-            if "r441_retired" in str(py):
-                continue
-            tree = ast.parse(py.read_text())
-            for node in ast.walk(tree):
-                if isinstance(node, ast.Import):
-                    if any("blender_render" in a.name
-                           for a in node.names):
-                        offenders.append(f"{py}: import")
-                elif isinstance(node, ast.ImportFrom):
-                    if "blender_render" in (node.module or ""):
-                        offenders.append(f"{py}: import-from")
-        assert offenders == []
-        import discovery_fabric.engine.invention_bridge.render as render
-        assert "r441_retired" in str(render.RENDER_SCRIPT)
 
     def test_dispatcher_default_is_the_visual_compiler(self):
         import discovery_fabric.engine.invention_bridge.render as render

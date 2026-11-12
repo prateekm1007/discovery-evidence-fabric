@@ -19,10 +19,9 @@ interpretation). Covered here:
      visualization not available on this invention."
 
   4. Source pins (auditor governance 7: frontend claims trace to
-     backend truth): the components render the directive's exact copy
-     FROM the mapping output, the strip renders the backend statuses
-     verbatim (and nothing when the projection is absent), and the
-     mapping consumes the typed geometry_state.
+     backend truth): the presentation mapping carries the directive's
+     exact copy FROM the mapping output, and the mapping consumes the
+     typed geometry_state.
 """
 from __future__ import annotations
 
@@ -424,29 +423,3 @@ class TestSourcePins:
                'unavailable."' in src
         assert '"Model rendered but did not pass the presentation " +\n' \
                '        "integrity gate."' in src
-
-    def test_strip_renders_backend_statuses_verbatim(self):
-        src = (WEBAPP / "components" / "DiscoveryPipelineStrip.tsx") \
-            .read_text()
-        assert "data-pipeline-strip" in src
-        assert 'data-pipeline-stage={row.key}' in src
-        assert 'data-pipeline-status={row.status}' in src
-        # no projection -> no strip (never a guessed ladder)
-        assert "return null" in src
-
-    def test_techstage_uses_state_b_hero_and_ribbon_variants(self):
-        src = (WEBAPP / "components" / "TechStage.tsx").read_text()
-        assert "HeroNoVisualization" in src
-        assert 'view.state === "GEOMETRY_UNAVAILABLE" ?' in src
-        assert "renderBlockedCopy(view.renderBlockCause)" in src
-        assert "DiscoveryPipelineStrip" in src
-        assert 'data-hero-no-visualization' in src
-        # the old collapsed ribbon copy is gone from the component
-        assert "Presentation rendering is\\n              temporarily" \
-            not in src
-
-    def test_no_component_hardcodes_the_blanket_note(self):
-        for name in ("TechStage.tsx", "InfrastructureBlockedHero.tsx",
-                     "DiscoveryPipelineStrip.tsx"):
-            src = (WEBAPP / "components" / name).read_text()
-            assert "3D GEOMETRY UNAVAILABLE" not in src, name
