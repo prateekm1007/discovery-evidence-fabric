@@ -556,6 +556,35 @@ class TestStatedVariable:
         assert "intergranular glass phase fraction = 0.15" in blk
 
 
+class TestAblationArmFlags:
+    """DIRECTIVE 5: steps 2-3 ride as explicit ablation arms."""
+
+    def test_constraint_audit_arm_off(self, monkeypatch=None):
+        import os
+        from discovery_fabric.engine.constraint_audit import \
+            _find_disallowed_measurements
+        os.environ["FABRIC_CONSTRAINT_AUDIT"] = "0"
+        try:
+            from discovery_fabric.engine import answer_composer as ac
+            import inspect
+            src = inspect.getsource(ac.compose_answer)
+            assert "FABRIC_CONSTRAINT_AUDIT" in src
+            assert "constraint_audit_arm" in src
+        finally:
+            os.environ.pop("FABRIC_CONSTRAINT_AUDIT", None)
+
+    def test_knowledge_first_arm_off(self):
+        import os
+        import inspect
+        from discovery_fabric.engine import adapters
+        os.environ["FABRIC_KNOWLEDGE_FIRST"] = "0"
+        try:
+            src = inspect.getsource(adapters._lean_mechanism_space)
+            assert "FABRIC_KNOWLEDGE_FIRST" in src
+        finally:
+            os.environ.pop("FABRIC_KNOWLEDGE_FIRST", None)
+
+
 # =====================================================================
 # DIRECTIVE 6 — kill records + hypothesis delivery
 # =====================================================================

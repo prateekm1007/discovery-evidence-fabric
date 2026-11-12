@@ -630,14 +630,22 @@ def compose_answer(problem: Dict[str, Any],
     # contract violations AND the constraint-audit violations (and
     # the tech-sanity lines when the flag is on) into the SAME repair
     # call shape; the loop ends early on a valid-and-clean pass and
-    # never ships a truncated repair.
+    # never ships a truncated repair. DIRECTIVE 5 (ablation arms):
+    # FABRIC_CONSTRAINT_AUDIT=0 disables the audit leg for the
+    # leave-it-out arm (explicit arm selection, default on).
     from .constraint_audit import audit_constraints
+    _ca_on = os.environ.get("FABRIC_CONSTRAINT_AUDIT", "1") != "0"
+    rec["constraint_audit_arm"] = "on" if _ca_on else "off"
     _uvs = list(problem.get("user_variables") or [])
     contract = validate_answer(answer, question_type,
                                packet=packet or [],
                                user_variables=_uvs,
                                clarification=_clarification)
-    caudit = audit_constraints(problem, answer)
+    caudit = (audit_constraints(problem, answer) if _ca_on
+              else {"audit_version": "constraint_audit/1.0.0",
+                    "state": "CONSTRAINT_AUDIT_PASS",
+                    "violations": [], "n_violations": 0,
+                    "allowed_measurements": {"mode": "arm_off"}})
     rec["contract_first_pass"] = {"valid": contract.get("valid"),
                                   "violations": contract.get("violations")}
     rec["constraint_audit_first_pass"] = {

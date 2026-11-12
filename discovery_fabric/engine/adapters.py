@@ -1472,10 +1472,16 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     #      deterministic validation tail and the SAME gauntlet as the
     #      evidence-anchored candidates — nothing about it is
     #      privileged, it is only not evidence-dressed.
+    # DIRECTIVE 5 (ablation arms): FABRIC_KNOWLEDGE_FIRST=0 disables
+    # the knowledge-first generator for the leave-it-out arm (explicit
+    # arm selection, default on — the owner directive says ALWAYS).
+    _kf_enabled = os.environ.get("FABRIC_KNOWLEDGE_FIRST", "1") != "0"
     _kf_op = next((o for o in _ms.TRANSFORMATION_OPERATORS
                    if o["operator_id"] == "DOMAIN_KNOWLEDGE_FIRST"), None)
     _kf_contract = {"operator": "DOMAIN_KNOWLEDGE_FIRST",
-                    "satisfied": bool(str(problem.get("failure") or "").strip()),
+                    "satisfied": bool(
+                        _kf_enabled
+                        and str(problem.get("failure") or "").strip()),
                     "basis": "anchor is the user's problem statement"}
     _kf_item = _ms.knowledge_first_item(problem)
     _kf_ran = False
@@ -1511,7 +1517,8 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     # first instantiation rides the attribution funnel as its own
     # subphase, observed after the evidence-anchored wall
     _clk.mark("knowledge_first_instantiation",
-              {"ran": _kf_ran, "operator": "DOMAIN_KNOWLEDGE_FIRST"})
+              {"ran": _kf_ran, "operator": "DOMAIN_KNOWLEDGE_FIRST",
+               "arm": ("on" if _kf_enabled else "off")})
     cand = _cands[0] if _cands else None
     _n_fields_nonempty = (sum(1 for v in field_blocks[0].values()
                               if str(v or ""))
