@@ -152,6 +152,37 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
     return res
 
 
+def _project_route_hops(route: list) -> list:
+    """R10 (owner latency item): the per-hop projection used by every
+    meta builder. Extracted as a helper so the TTFB propagation is
+    PINNABLE: the route hop records TTFB under ttfb_ms (the serving
+    transport's own unit) while the projection normalizes to ttfb_s —
+    the R10 measured defect was that the projection read ONLY ttfb_s,
+    so every A0+ timeline showed ttfb null although the transport HAD
+    measured it. Missing stays None (NOT_MEASURED, never zero)."""
+    out = []
+    for h in (route or []):
+        if not isinstance(h, dict):
+            continue
+        ttfb = h.get("ttfb_s")
+        if not isinstance(ttfb, (int, float)):
+            ttfb = (h.get("ttfb_ms") / 1000.0
+                    if isinstance(h.get("ttfb_ms"), (int, float))
+                    else None)
+        out.append({"provider": h.get("provider_attempted"),
+                    "provider_attempted": h.get("provider_attempted"),
+                    "model": h.get("model"),
+                    "status": h.get("status"),
+                    "attempts": h.get("attempts"),
+                    "retry_count": h.get("retry_count"),
+                    "latency_ms": h.get("latency_ms"),
+                    "ttfb_s": ttfb,
+                    "gateway_hang": h.get("gateway_hang"),
+                    "failure_type": h.get("failure_type"),
+                    "fallback_provider": h.get("fallback_provider")})
+    return out
+
+
 def _llm_generate_impl(prompt: str, system: str = "", timeout: int = 240,
                  max_tokens: int = 700, purpose: str = "mechanism_space",
                  exclude_providers: Optional[List[str]] = None,
@@ -347,26 +378,7 @@ def _llm_generate_impl(prompt: str, system: str = "", timeout: int = 240,
         "fallback_to_excluded": bool(
             exclude_providers and not remaining) if exclude_providers
         else False,
-        "provider_route": [
-            # R9 P0 (owner round 2026-11-13 item 5): the projection
-            # carries the FULL per-attempt accounting (provider, model,
-            # status, attempts, retries, latency, ttfb, hang) — the old
-            # 3-key reduction made every arm's timeline lose the
-            # transport measurement and report NOT-MEASURED work as
-            # zero seconds (the A0+ 1.0.0 measured defect). Additive:
-            # the original 3 keys keep their names and meanings.
-            {"provider": h.get("provider_attempted"),
-             "provider_attempted": h.get("provider_attempted"),
-             "model": h.get("model"),
-             "status": h.get("status"),
-             "attempts": h.get("attempts"),
-             "retry_count": h.get("retry_count"),
-             "latency_ms": h.get("latency_ms"),
-             "ttfb_s": h.get("ttfb_s"),
-             "gateway_hang": h.get("gateway_hang"),
-             "failure_type": h.get("failure_type"),
-             "fallback_provider": h.get("fallback_provider")}
-            for h in (res.route or [])],
+        "provider_route": _project_route_hops(res.route),
         "failure_type": res.failure_type,
         # R6 owner round 2026-11-12 item 1: the typed truncation
         # signal (the transport's normalized finish-reason report —

@@ -1413,6 +1413,25 @@ class EmptyContentWithFinish(RuntimeError):
         self.finish_reason = finish_reason
 
 
+def _retry_sleep_s(retries_used: int) -> float:
+    """R10 P0-2 (owner): the same-model retry pacing is a TYPED knob —
+    ENGINE_LLM_RETRY_SLEEP_S overrides the historical exponential
+    backoff (2 s after the first retry, 4 s after the second). The
+    unattended arms set it to 0 (NO fixed sleeps on the active path:
+    the schedule is the pacing, and a live process parked in sleep()
+    burns wall time without work). Default keeps the measured history
+    (2*retries) — behavior-identical when the knob is absent."""
+    raw = os.environ.get("ENGINE_LLM_RETRY_SLEEP_S", "").strip()
+    if raw:
+        try:
+            v = float(raw)
+            if v >= 0:
+                return v
+        except (TypeError, ValueError):
+            pass
+    return 2.0 * retries_used
+
+
 def _call_anthropic_flavor(spec: ProviderSpec, messages: List[dict],
                            timeout: int, max_tokens: int,
                            model_override: Optional[str] = None) -> str:
@@ -2463,8 +2482,14 @@ def generate(prompt: str, system: str = "",
                                     if _ok_slot is not None else None),
                     "key_rotations": key_rotations,
                     "latency_ms": latency_ms,
-                    "ttfb_ms": (int((_pt.get("ttfb_s") or 0) * 1000)
-                                if isinstance(_pt, dict) else None),
+                    # R10 (owner latency item): TTFB is a MEASUREMENT or
+                    # None — never 0. The previous `or 0` converted a
+                    # transport that did not record ttfb into a zero-
+                    # millisecond claim (the banned missing->0 class).
+                    "ttfb_ms": (int(_pt["ttfb_s"] * 1000)
+                                if (isinstance(_pt, dict)
+                                    and isinstance(_pt.get("ttfb_s"),
+                                                   (int, float))) else None),
                     "gateway_hang": (bool(_pt.get("gateway_hang"))
                                      if isinstance(_pt, dict) else False),
                     "error": None,
@@ -2577,7 +2602,7 @@ def generate(prompt: str, system: str = "",
                         # exclusive component, never subtracted twice).
                         _prev_end_presleep = time.perf_counter()
                         _t_rsl0 = time.perf_counter()
-                        time.sleep(2 * retries_used)
+                        time.sleep(_retry_sleep_s(retries_used))
                         _att["retry_sleep_s"] = round(
                             time.perf_counter() - _t_rsl0, 6)
                         _att["outcome"] = "RETRIED_ESCALATED"
@@ -2843,9 +2868,10 @@ def generate(prompt: str, system: str = "",
                     _prev_end_presleep = time.perf_counter()
                     # R526 Q-A: retry-transition sleep, measured where
                     # taken (cooldown-class waiting, never folded into
-                    # the dispatch wall).
+                    # the dispatch wall). R10: routed through the typed
+                    # pacing helper (ENGINE_LLM_RETRY_SLEEP_S knob).
                     _t_rsl0 = time.perf_counter()
-                    time.sleep(2 * retries_used)
+                    time.sleep(_retry_sleep_s(retries_used))
                     _att["retry_sleep_s"] = round(
                         time.perf_counter() - _t_rsl0, 6)
                     _att["outcome"] = "RETRIED"
