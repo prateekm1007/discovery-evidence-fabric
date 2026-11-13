@@ -330,9 +330,13 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
     # fallback (2 papers bound), never a 3-call rotation — the third
     # attempt starved the evaluator under the cap (Art. XXVII).
     _ROTATION_PAPERS = 2          # operational bound, disclosed here
-    _ROTATION_BACKOFF_S = (0, 8, 20)  # MODEL_DERIVED operational bound:
-    #  the measured flap window is ~1-4 min; 0/8/20 s spreads three real
-    #  attempts across it without stretching a run's wall time
+    # owner round 2026-11-13 item 2: the fixed inter-attempt backoff
+    # (0/8/20 s) is REMOVED — rotation attempts run IMMEDIATELY (the
+    # measured wall spent 8-20 s per rotation asleep while the ring
+    # recovered; the rotate IS the recovery, and the gateway AIMD plus
+    # the chunk pacing own the cooldown, Art. LXI: infrastructure
+    # absence is typed, never slept through)
+    _ROTATION_BACKOFF_S = (0, 0, 0)
 
     # R483 (the measured production blocker — THREE consecutive runs
     # ended honestly typed INCOMPLETE_INFERENCE_FAILURE but were
