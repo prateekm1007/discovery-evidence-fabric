@@ -56,40 +56,45 @@ class TestRotation(unittest.TestCase):
         self.assertIsNotNone(cand)
         self.assertEqual(cand["source_evidence"]["source_id"], "ev_0")
         self.assertNotIn("synthesis_rotation", cand)
-        self.assertEqual(chat.call_count, 1)
+        # MEASURED (owner round 2026-11-13): 1 main attempt + the R483
+        # span corrective retries — GOOD_RESPONSE's span is not a
+        # verbatim window of the fixture abstract, so the recorded
+        # same-provider corrective retry fires (the R483 hardening);
+        # the rotation record stays absent (no rotation happened)
+        self.assertEqual(chat.call_count, 3)
 
     def test_transport_failure_rotates_to_second_paper(self):
-        responses = [None, GOOD_RESPONSE]
+        # [paper0 transport fail, paper1 main OK, paper1 span corrective
+        # retry — the corrective retry re-asks the SAME prompt and its
+        # recorded answer is the same GOOD_RESPONSE]
+        responses = [None, GOOD_RESPONSE, GOOD_RESPONSE]
         with mock.patch.object(synth, "llm_chat",
                                side_effect=responses) as chat:
             cand = synth.synthesize(PROBLEM, [_paper(0), _paper(1),
                                               _paper(2)])
         self.assertIsNotNone(cand)
         self.assertEqual(cand["source_evidence"]["source_id"], "ev_1")
-        self.assertEqual(chat.call_count, 2)
+        # 2 rotation calls + the R483 span corrective retry on the
+        # served paper (measured; see first_paper_success pin)
+        self.assertEqual(chat.call_count, 3)
         rot = cand.get("synthesis_rotation")
         self.assertIsNotNone(rot)
         self.assertEqual(rot["attempt_index"], 1)
         self.assertEqual(rot["papers_tried"], ["ev_0", "ev_1"])
         self.assertEqual(rot["evidence_available"], 3)
 
-    def test_format_failure_rotates_to_third_paper(self):
+    def test_format_then_transport_failure_honest_none(self):
         # paper 0: transport OK but format-hostile (no INTERVENTION line)
-        # paper 1: transport failure
-        # paper 2: good
-        responses = ["I cannot follow your format.",
-                     None,
-                     GOOD_RESPONSE]
+        # paper 1: transport failure — the 2-paper rotation bound (the
+        # R6 owner directive) means NO third paper: the honest None
+        # stands (INCOMPLETE, never a fabricated candidate)
+        responses = ["I cannot follow your format.", None]
         with mock.patch.object(synth, "llm_chat",
                                side_effect=responses) as chat:
             cand = synth.synthesize(PROBLEM, [_paper(0), _paper(1),
                                               _paper(2)])
-        self.assertIsNotNone(cand)
-        self.assertEqual(cand["source_evidence"]["source_id"], "ev_2")
-        self.assertEqual(chat.call_count, 3)
-        rot = cand.get("synthesis_rotation")
-        self.assertEqual(rot["attempt_index"], 2)
-        self.assertEqual(rot["papers_tried"], ["ev_0", "ev_1", "ev_2"])
+        self.assertIsNone(cand)
+        self.assertEqual(chat.call_count, 2)
 
     def test_all_failures_return_none_honestly(self):
         with mock.patch.object(synth, "llm_chat", return_value=None):
@@ -97,11 +102,14 @@ class TestRotation(unittest.TestCase):
                                               _paper(2)])
         self.assertIsNone(cand)
 
-    def test_rotation_is_bounded_at_three_papers(self):
+    def test_rotation_is_bounded_at_two_papers(self):
+        # R6 owner directive: the synthesis rotation is ONE call with a
+        # single typed-failure fallback (3 -> 2; the third attempt
+        # starved the evaluator under the cap)
         evidence = [_paper(i) for i in range(6)]
         with mock.patch.object(synth, "llm_chat", return_value=None) as chat:
             synth.synthesize(PROBLEM, evidence)
-        self.assertEqual(chat.call_count, 3)
+        self.assertEqual(chat.call_count, 2)
 
     def test_single_evidence_paper_still_retries_none(self):
         # degenerate case: one paper, one real attempt (no rotation
@@ -111,12 +119,14 @@ class TestRotation(unittest.TestCase):
         self.assertIsNone(cand)
         self.assertEqual(chat.call_count, 1)
 
-    def test_backoff_is_applied_between_attempts(self):
+    def test_no_fixed_backoff_between_attempts(self):
+        # owner round 2026-11-13 item 2: the fixed 8/20 s inter-attempt
+        # sleeps are REMOVED — rotation attempts run immediately; no
+        # sleep call happens in the synthesize critical path
         with mock.patch.object(synth, "llm_chat", return_value=None), \
                 mock.patch.object(synth.time, "sleep") as tsleep:
             synth.synthesize(PROBLEM, [_paper(0), _paper(1), _paper(2)])
-        sleeps = [c.args[0] for c in tsleep.call_args_list]
-        self.assertEqual(sleeps, [8, 20])
+        self.assertEqual(tsleep.call_args_list, [])
 
     def test_candidate_provenance_fields_unchanged(self):
         with mock.patch.object(synth, "llm_chat",

@@ -41,6 +41,8 @@ from discovery_fabric.engine.answer_downgrade import (  # noqa: E402
     strict_provenance_downgrade)
 from discovery_fabric.engine.answer_composer import (  # noqa: E402
     _candidates_block, _kf_fallback_candidate, candidates_from_state)
+from discovery_fabric.engine.answer_contract import (  # noqa: E402
+    validate_answer)
 from discovery_fabric.engine.constraint_audit import audit_constraints  \
     # noqa: E402
 
@@ -66,6 +68,23 @@ def _packet(*keys: str) -> list:
              "abstract": RECORDS[k]["abstract"]} for k in keys]
 
 
+def _fixture() -> dict:
+    return json.loads((REPO / "tests" / "fixtures" / "r7_owner_round"
+                       / "new07_candidates.json").read_text(
+                           encoding="utf-8"))
+
+
+def _real_candidate(pid: str, substr: str) -> dict:
+    """A VERBATIM real candidate record from the run tree (owner
+    directive 2026-11-13 item 3: fixtures derive from real run
+    records, never hand-built dicts)."""
+    fx = _fixture()[pid]["candidates"]
+    for c in fx:
+        if substr.lower() in str(c.get("intervention", "")).lower():
+            return c
+    raise AssertionError(f"no real candidate matching {substr!r} in {pid}")
+
+
 # =====================================================================
 # D1 — ONE PRIMARY CANDIDATE + the design-consistency check
 # =====================================================================
@@ -78,39 +97,63 @@ class TestOnePrimaryCandidate:
         # conventional transformers — it does not test the indicator
         pair = _pair("eval-new07-transformer-dga-predictor")
         ans = pair["pipeline_answer"]
-        # the composer's candidates for that run: the nanofluid raw
-        # candidate (recorded in the committed kill/pair lineage) —
-        # reconstructed verbatim from the audited envelope fields
-        nanofluid = {
-            "mechanism": ("Nanoparticles enhance dielectric properties "
-                          "and chemical stability of transformer oils"),
-            "intervention": ("Implement nanofluid (Al2O3, TiO2, Fe2O3, "
-                             "Fe3O4, graphene, or fullerene enhanced) in "
-                             "the transformer oil to improve sensitivity "
-                             "of existing sensors to early fault "
-                             "detection"),
-            "expected_effect": ("Enhanced sensitivity of online sensors "
-                                "(temperature, pressure) to detect "
-                                "incipient faults at least 30 days "
-                                "before next DGA sample"),
-        }
+        # the REAL nanofluid candidate of that run, verbatim from the
+        # run tree envelope (no hand-built dict — owner item 3)
+        nanofluid = _real_candidate(
+            "eval-new07-transformer-dga-predictor",
+            "nanofluid containing Al2O3")
         prob = _problem("eval-new07-transformer-dga-predictor")
         chk = consistency_check(ans, [nanofluid], prob)
         assert chk["state"] == "CONSISTENCY_VIOLATIONS", chk
         types = {v["type"] for v in chk["violations"]}
         assert "TWO_DESIGNS_IN_PROPOSAL" in types, types
 
+    def test_new07_committed_pair_fails_WITHOUT_candidates(self):
+        # owner item 3, measured: the old check called with NO
+        # candidates returned PASS on the committed new07 bytes (every
+        # design rule lived inside `if cands:`); the answer must stand
+        # on its own bytes — the candidate-free factor-variation rule
+        # catches the same defect
+        pair = _pair("eval-new07-transformer-dga-predictor")
+        prob = _problem("eval-new07-transformer-dga-predictor")
+        for cands in (None, []):
+            chk = consistency_check(pair["pipeline_answer"], cands, prob)
+            assert chk["state"] == "CONSISTENCY_VIOLATIONS", (cands, chk)
+            types = {v["type"] for v in chk["violations"]}
+            assert "TEST_FACTOR_MISMATCH" in types, types
+
+    def test_factor_mismatch_pin_nanofluid_test_vs_thermal_indicator(
+            self):
+        # the REAL pair: the thermal-indicator candidate's design vs
+        # the nanofluid candidate's falsification test — the test
+        # varies a different factor than the indicator states
+        fx = _fixture()["eval-new07-transformer-dga-predictor"][
+            "candidates"]
+        thermal = next(c for c in fx if "top-oil temperature" in
+                       str(c.get("intervention", "")))
+        nanofluid = next(c for c in fx if "nanofluid containing Al2O3"
+                         in str(c.get("intervention", "")))
+        # the nanofluid candidate's OWN test tests nanofluid (factor
+        # consistent); the measured defect is the MIXED answer, so the
+        # pin composes the mixed shape the way the run did: indicator
+        # lead + the nanofluid test section (with the contract's own
+        # markers — the composed answer always carries them)
+        mixed = ("INDICATOR: " + str(thermal.get("intervention"))
+                 + "\n\nFalsification test: "
+                 + str(nanofluid.get("falsification_test")))
+        prob = _problem("eval-new07-transformer-dga-predictor")
+        chk = consistency_check(mixed, None, prob)
+        assert chk["state"] == "CONSISTENCY_VIOLATIONS", chk
+        assert {v["type"] for v in chk["violations"]} == {
+            "TEST_FACTOR_MISMATCH"}
+
     def test_repaired_indicator_only_answer_passes(self):
         # the repaired answer contains ONLY the indicator design: the
         # mechanism, the indicator and the falsification test describe
         # one and the same thing
-        nanofluid = {
-            "mechanism": ("Nanoparticles enhance dielectric properties "
-                          "and chemical stability of transformer oils"),
-            "intervention": ("Implement nanofluid in the transformer "
-                             "oil to improve sensor sensitivity"),
-            "expected_effect": "Earlier fault detection",
-        }
+        nanofluid = _real_candidate(
+            "eval-new07-transformer-dga-predictor",
+            "nanofluid containing Al2O3")
         prob = _problem("eval-new07-transformer-dga-predictor")
         repaired = (
             "INDICATOR: Rate of change in top-oil temperature "
@@ -143,31 +186,16 @@ class TestOnePrimaryCandidate:
     ])
     def test_committed_single_design_answers_pass(self, pid):
         pair = _pair(pid)
-        # their recorded primary candidates (the polyurea coating /
-        # the EVOH additive design), reconstructed verbatim from the
-        # audited envelopes
-        cands = {
-            "dev-fu-005-bridge-bearing": {
-                "mechanism": ("Polyurea phase-separated microstructure "
-                              "with hard segment microregions disperses "
-                              "compressive strain and slows creep set"),
-                "intervention": ("Apply a 2.0 mm polyurea coating to "
-                                 "the elastomeric bearing pad surface"),
-                "expected_effect": ("Reduced creep set and ozone "
-                                    "crazing over decades"),
-            },
-            "bench-p09-packaging-barrier": {
-                "mechanism": ("Isobutyl-4-hydroxybenzoate migrates to "
-                              "the EVOH layer surface and scavenenges "
-                              "permeating water"),
-                "intervention": ("Melt compound isobutyl-4-"
-                                 "hydroxybenzoate into the ethylene-"
-                                 "vinyl alcohol barrier layer"),
-                "expected_effect": ("Lower water vapor transmission "
-                                    "through the package wall"),
-            },
+        # the REAL primary candidate of the audited run, verbatim from
+        # the run tree envelope (no hand-built dict — owner item 3)
+        substr = {
+            "dev-fu-005-bridge-bearing":
+                "polyurea coating on elastomeric bearing surfaces",
+            "bench-p09-packaging-barrier":
+                "isobutyl-4-hydroxybenzoate (IBHB) into ethylene-vinyl",
         }[pid]
-        chk = consistency_check(pair["pipeline_answer"], [cands],
+        cands = [_real_candidate(pid, substr)]
+        chk = consistency_check(pair["pipeline_answer"], cands,
                                 _problem(pid))
         assert chk["state"] in ("CONSISTENCY_PASS", "CHECK_ABSENT"), chk
 
@@ -217,9 +245,9 @@ class TestStrictProvenance:
         # the relabeled text carries no EVIDENCE-BACKED for those lines
         assert "60% — EVIDENCE-BACKED" not in res["answer"] and \
             "60% - EVIDENCE-BACKED" not in res["answer"]
-        assert "75 years — ASSUMPTION (User Constraint)" in \
-            res["answer"] or "75 years - ASSUMPTION (User " \
-            "Constraint)" in res["answer"]
+        # owner item 5: the relabel carries its RATIONALE in the text
+        assert "75 years — ASSUMPTION (User Constraint; the user's " \
+            "own stated value, not evidence)" in res["answer"]
 
     def test_p09_honest_labels_survive_unsupported_relabel(self):
         # the additive identity IS in the record (IBHB, melt, 2% wt/wt
@@ -520,3 +548,81 @@ class TestCommittedBytesSelfContained:
                                    "eval-sofc-thermal-cycling")
         assert sofc is not None
         assert "constraint_audit_input" in sofc["state"]
+
+
+# =====================================================================
+# D5 (owner round 2026-11-13 item 5) — the falsification-test SPEC
+# (temperature, duration, n, numeric pass/fail) + the ASSUMPTION
+# rationale. Regression on the committed r7 p02 bytes (auditor-judged
+# a BASELINE win: "no test temperature, no n and no pass numbers").
+# =====================================================================
+
+class TestTestSpec:
+    def _r7_p02_pair(self) -> dict:
+        f = (REPO / "eval" / "pairs" / "dev12_r7"
+             / "bench-p02-leadacid-grid-corrosion.json")
+        return json.loads(f.read_text(encoding="utf-8"))
+
+    def test_committed_r7_p02_fails_the_test_spec(self):
+        ans = self._r7_p02_pair()["pipeline_answer"]
+        v = validate_answer(ans, "intervention-proposal")
+        assert not v["valid"], v
+        spec_bad = [x for x in v["violations"] if "falsification test "
+                    "states no" in x]
+        joined = " ".join(spec_bad)
+        assert "no test temperature" in joined, joined
+        assert "no sample size n" in joined, joined
+
+    def test_repaired_p02_with_protocol_fields_passes(self):
+        # the repaired shape: the same design with the four protocol
+        # fields stated — the repair loop's target
+        ans = self._r7_p02_pair()["pipeline_answer"]
+        repaired = ans.replace(
+            "The falsification test involves accelerated aging of "
+            "cells under continuous float charge at 2.27 V per cell",
+            "The falsification test involves accelerated aging of 8 "
+            "cells (n = 8) under continuous float charge at 2.27 V per "
+            "cell and 60 C ambient for 6 months")
+        v = validate_answer(repaired, "intervention-proposal")
+        spec_bad = [x for x in v["violations"] if "falsification test "
+                    "states no" in x]
+        assert spec_bad == [], spec_bad
+
+    def test_relabel_carries_rationale_in_answer_text(self):
+        # a bare ASSUMPTION tells the reader nothing (owner item 5):
+        # the relabel must carry its rationale in the delivered text
+        packet = [{"id": "doi:10.test/polym", "title": "polyurea review",
+                   "abstract": "phase-separated microstructure study"}]
+        prob = {"user_variables": ["75-year design life"]}
+        ans = ("PARAMETER: coating thickness — 2.0 mm — EVIDENCE-BACKED "
+               "[doi:10.test/polym]\n"
+               "PARAMETER: service life target — 75 years — "
+               "EVIDENCE-BACKED [doi:10.test/polym]")
+        res = strict_provenance_downgrade(ans, packet, prob)
+        assert res["n_relabels"] == 2, res["relabels"]
+        assert "ASSUMPTION (value not stated in the cited record)" \
+            in res["answer"]
+        assert "ASSUMPTION (User Constraint; the user's own stated " \
+            "value, not evidence)" in res["answer"]
+        # the machine-readable record keeps the stable label classes
+        by_param = {r["parameter"]: r["new_label"]
+                    for r in res["relabels"]}
+        assert by_param["coating thickness"] == "ASSUMPTION"
+        assert by_param["service life target"] == \
+            "ASSUMPTION (User Constraint)"
+
+    def test_predictor_protocol_duration_required(self):
+        # predictor protocols must state the data window (the committed
+        # predictor shapes carry "for 30 days" and pass)
+        good = ("INDICATOR: rate of change of tank pressure\n"
+                "THRESHOLD: above 0.5 kPa/hour — ASSUMPTION\n"
+                "VALIDATION PROTOCOL: collect data for 30 days with "
+                "n = 6 transformers; flag if the rate exceeds 0.5 "
+                "kPa/hour.\n")
+        v = validate_answer(good, "predictor-design")
+        assert not any("no duration" in x
+                       for x in v["violations"]), v["violations"]
+        bad = good.replace("for 30 days", "for the trial period")
+        v2 = validate_answer(bad, "predictor-design")
+        assert any("no duration" in x
+                   for x in v2["violations"]), v2["violations"]

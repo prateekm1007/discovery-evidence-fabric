@@ -169,6 +169,17 @@ def _lead_segment(text: str) -> str:
     return (m.group(0) + seg).strip()
 
 
+def _test_factor_toks(text: str) -> set:
+    """The COMPARED factor vocabulary of the falsification-test section:
+    what the test actually varies/compares (the A-vs-B subjects). The
+    measured new07 shape: the test compares nanofluid-enhanced vs
+    conventional transformers while the proposal's factor is a thermal
+    indicator — the test varies a DIFFERENT factor than the design
+    states (owner directive 2026-11-13, item 3)."""
+    _, test = _split_test(text)
+    return _content_tokens(test)
+
+
 def _split_test(answer: str) -> Tuple[str, str]:
     """(proposal_section, test_section) split at the falsification-test
     marker; when no COLON marker exists, the sentence that ANNOUNCES
@@ -213,6 +224,39 @@ def consistency_check(answer: str,
     ans_toks = _content_tokens(text)
     prop_toks = _content_tokens(proposal)
     test_toks = _content_tokens(test)
+
+    # ---- CANDIDATE-FREE RULES (run with or without candidates; the
+    # owner's measured defect: called with none, the old check returned
+    # PASS on the committed new07 bytes because EVERY design rule lived
+    # inside `if cands:` — the answer must stand on its own bytes).
+    lead = _lead_segment(proposal)
+    if lead:
+        lead_toks = _content_tokens(lead)
+        test_toks_f = _test_factor_toks(text)
+        # the factor-variation check: the falsification test must vary
+        # the SAME factor the INDICATOR/INTERVENTION line states. RAW
+        # content-token comparison (generic scaffolding already
+        # excluded): the problem's own constraint/user_variables are
+        # NOT subtracted — the new07 problem statement itself hands the
+        # thermal indicator to the pipeline, so subtracting the
+        # problem's vocabulary erased the design's factor words and
+        # hid the defect (measured 2026-11-13); an honest test names
+        # the indicator quantity it tests, so an honest answer shares
+        # the factor token and passes (all 11 committed single-design
+        # answers measured PASS under the raw rule).
+        if lead_toks and test_toks_f and not (lead_toks & test_toks_f):
+            violations.append({
+                "type": "TEST_FACTOR_MISMATCH",
+                "detail": ("the falsification test varies a DIFFERENT "
+                           "factor than the stated design: the "
+                           "INDICATOR/INTERVENTION factor vocabulary "
+                           f"({', '.join(sorted(lead_toks)[:5])}) and the "
+                           "test's compared-factor vocabulary "
+                           f"({', '.join(sorted(test_toks_f)[:5])}) share "
+                           "nothing — the test does not test the "
+                           "stated factor"),
+                "lead_tokens": sorted(lead_toks)[:6],
+                "test_tokens": sorted(test_toks_f)[:6]})
 
     if cands:
         primary = cands[0]
@@ -260,10 +304,9 @@ def consistency_check(answer: str,
         #    PARAMETER lines are deliberately NOT lead segments: a
         #    quantity line is the design's own spec, never a second
         #    design (the measured live p02 shape).
-        lead = _lead_segment(proposal)
         if lead:
-            lead_toks = _content_tokens(lead)
-            if lead_toks and not (lead_toks & p_toks) \
+            lead_toks2 = _content_tokens(lead)
+            if lead_toks2 and not (lead_toks2 & p_toks) \
                     and (p_toks & prop_toks):
                 violations.append({
                     "type": "TWO_DESIGNS_IN_PROPOSAL",

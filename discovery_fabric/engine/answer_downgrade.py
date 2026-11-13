@@ -380,8 +380,17 @@ def strict_provenance_downgrade(
                     + ("; the value is the user's own stated "
                        "constraint" if in_user else ""))})
         tail = "" if not cite else " "
+        # owner round 2026-11-13 item 5: the relabel carries its own
+        # RATIONALE in the answer text — a bare ASSUMPTION told the
+        # reader nothing about WHY certainty was removed (the measured
+        # p02 shape: invented antimony/nickel values arrived as bare
+        # ASSUMPTION lines, Art. XXV: the unknown stays named)
+        rationale = ("ASSUMPTION (User Constraint; the user's own "
+                     "stated value, not evidence)" if in_user
+                     else "ASSUMPTION (value not stated in the cited "
+                          "record)")
         return (m.group("head") + m.group("sep") + " " + value
-                + " " + m.group("sep") + " " + new_label)
+                + " " + m.group("sep") + " " + rationale)
 
     new_text = _PARAM_EB_LINE_RE.sub(_sub, text)
     new_text = re.sub(r"[ \t]{2,}", " ", new_text)

@@ -533,6 +533,59 @@ def _threshold_basis(text: str, thr_num: Optional[str],
     return "unknown"
 
 
+# ---------------------------------------------------------------------------
+# OWNER ROUND 2026-11-13, ITEM 5 — the falsification-test SPEC check.
+# The measured defect (the committed r7 p02 pair, auditor-judged a
+# BASELINE win): the pipeline's test named a threshold and a duration
+# but NO test temperature and NO sample size n, while the baseline
+# specified "60 C / 6-month test with numeric criteria". A real test
+# protocol states its conditions; their absence is not a style nit, it
+# is what made the answer lose (Art. LXXVII: the deliverable is judged,
+# not the pipeline). Deterministic, zero-LLM; violations join the SAME
+# repair call (no added calls, no new gate).
+_TEMP_RE = re.compile(
+    r"\d+(?:\.\d+)?\s*(?:deg(?:rees)?\s*(?:C|F|K)|°\s*[CFK]|\b[CFK]\b)",
+    re.IGNORECASE)
+_DURATION_RE = re.compile(
+    r"\d+(?:\.\d+)?[\s-]*(?:min(?:ute)?s?|h(?:ours?|rs?)|days?|weeks?|"
+    r"months?|years?|cycles?)\b", re.IGNORECASE)
+_SAMPLE_N_RE = re.compile(
+    r"n\s*=\s*\d+|\d+\s*(?:cells?|samples?|specimens?|devices?|units?|"
+    r"machines?|pumps?|bearings?|fans?|vehicles?|transformers?|plates?|"
+    r"cases|fleets?)\b", re.IGNORECASE)
+
+
+def _test_spec_violations(test_section: str,
+                          require_temperature: bool) -> List[str]:
+    """The four protocol fields (temperature / duration / n / numeric
+    pass-fail) required in the falsification-test section. Temperature
+    is required for physical intervention tests (every physical test
+    HAS a temperature — ambient is a valid statement); predictor
+    validation protocols carry duration/n/numeric but not a lab
+    temperature (a monitoring protocol runs on recorded data)."""
+    seg = str(test_section or "")
+    if len(seg.strip()) < 20:
+        return []
+    out: List[str] = []
+    if require_temperature and not _TEMP_RE.search(seg):
+        out.append("intervention contract: falsification test states "
+                   "no test temperature (a real protocol states its "
+                   "conditions, e.g. 60 C ambient or the operating "
+                   "temperature)")
+    if not _DURATION_RE.search(seg):
+        out.append("intervention contract: falsification test states "
+                   "no test duration")
+    if not _SAMPLE_N_RE.search(seg):
+        out.append("intervention contract: falsification test states "
+                   "no sample size n")
+    if not (_has_number_with_unit(seg)
+            or re.search(r"\d+(?:\.\d+)?\s*(?:%|mm|kV|MPa|ppm|mg|mV|A|W|"
+                         r"Hz|ratio)", seg, re.IGNORECASE)):
+        out.append("intervention contract: falsification test states "
+                   "no numeric pass/fail criterion")
+    return out
+
+
 def _has_number_with_unit(text: str) -> bool:
     return bool(_NUM_WITH_UNIT.search(text or ""))
 
@@ -622,6 +675,21 @@ def validate_answer(answer: str, question_type: str,
                          r"cases)", text, re.IGNORECASE):
             violations.append(
                 "predictor contract: no n=\u2026 sample-count stated")
+        # OWNER ROUND 2026-11-13 item 5: the validation protocol must
+        # state its duration (the data window or trial length) — a
+        # protocol without a duration cannot state a detection-lead
+        # claim. The window may be stated in the THRESHOLD's
+        # calibration clause ("3σ measured from 21 days of healthy-fleet
+        # telemetry") — that IS the protocol's data window; a duration
+        # in either segment satisfies the rule.
+        _psec = (_marker_segment(text, "VALIDATION")
+                 or _marker_segment(text, "PROTOCOL") or text)
+        if not (_DURATION_RE.search(_psec)
+                or _DURATION_RE.search(_marker_segment(text,
+                                                       "THRESHOLD"))):
+            violations.append(
+                "predictor contract: VALIDATION PROTOCOL states no "
+                "duration (the data window or trial length)")
         # THRESHOLD must be tied to the named indicator: the indicator's
         # quantity word must appear in the threshold segment OR in the
         # protocol that applies the threshold (a protocol that measures a
@@ -684,6 +752,13 @@ def validate_answer(answer: str, question_type: str,
                          r"A/B|protocol)", text, re.IGNORECASE):
             violations.append(
                 "intervention contract: no concrete test/measure named")
+        # OWNER ROUND 2026-11-13 item 5: the test section must state a
+        # real protocol's four fields (temperature, duration, n, numeric
+        # pass/fail) — the measured defect that lost p02 to the baseline
+        from .answer_consistency import _split_test as _cons_split
+        _tsec = _cons_split(text)[1]
+        violations.extend(_test_spec_violations(_tsec,
+                                                require_temperature=True))
         # every EVIDENCE-BACKED parameter must bind to a packet source id
         pb = _packet_blob(packet).lower() if packet else ""
         src_map = _source_map(packet)
@@ -880,8 +955,8 @@ ANSWER_SHAPE_BLOCK = {
         "line: an evidence-sourced number (from the packet or the user's "
         "variables), an ASSUMPTION label, or a defined calibration rule "
         "(e.g. baseline + 3 sigma from 14 days of healthy data)\n"
-        "PROTOCOL: <how you validate; state n (sample count) and the "
-        "pass/fail criterion>\n"),
+        "PROTOCOL: <how you validate; state n (sample count), the data "
+        "window or trial duration, and the pass/fail criterion>\n"),
     "intervention-proposal": (
         "\nANSWER-SHAPE CONTRACT (intervention-proposal) — your answer MUST "
         "name concrete parameters and label EACH of them EVIDENCE-BACKED "
@@ -891,5 +966,9 @@ ANSWER_SHAPE_BLOCK = {
         "engineering assumption):\n"
         "PARAMETER: <name> — <value with units> — EVIDENCE-BACKED "
         "[<packet item id>] | ASSUMPTION\n"
-        "(one line per parameter)\n"),
+        "(one line per parameter)\n"
+        "The falsification test MUST state a real protocol's four fields: "
+        "the test temperature (e.g. 60 C ambient or the operating "
+        "temperature), the duration, the sample size n, and numeric "
+        "pass/fail criteria.\n"),
 }

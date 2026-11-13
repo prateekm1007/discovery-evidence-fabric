@@ -1155,8 +1155,29 @@ def _post_json(url: str, payload: dict, headers: Dict[str, str],
     req = urllib.request.Request(
         url, data=json.dumps(payload).encode("utf-8"),
         headers={"Content-Type": "application/json", **headers}, method="POST")
+    # OWNER ROUND 2026-11-13 item 2 — the per-call timeline: time-to-
+    # first-response-byte (headers received; the honest TTFT proxy for
+    # a non-streaming call, never estimated) and the total attempt wall,
+    # recorded THREAD-LOCALLY and consumed by generate() into the same
+    # attempt record (same-thread read immediately after the call, like
+    # the finish-reason signal). A hang is measured, not guessed:
+    # ttfb consuming >= 90% of the attempt's socket timeout means the
+    # gateway accepted the request and produced nothing — hang time is
+    # EXCLUDED from work-time sums (the owner's rule: no gateway hangs
+    # counted as work), while the attempt stays typed infrastructure.
+    _t0 = time.perf_counter()
     with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return json.loads(resp.read())
+        _ttfb = time.perf_counter() - _t0
+        data = json.loads(resp.read())
+    _post_timing.last = {
+        "ttfb_s": round(_ttfb, 3),
+        "total_s": round(time.perf_counter() - _t0, 3),
+        "timeout": timeout,
+        "gateway_hang": bool(_ttfb >= 0.9 * timeout)}
+    return data
+
+
+_post_timing = threading.local()
 
 
 # --------------------------------------------------------------------------
@@ -1245,13 +1266,19 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
     if spec.extra_headers:
         headers.update(spec.extra_headers)
     # R1 infra fix (Art. LXI): transient overload / rate-limit responses
-    # (429, 502, 503, 504) are infrastructure, not verdicts. Retry with
-    # exponential backoff before surfacing the typed failure, so a busy
-    # free-tier pool does not poison the admission cache for the whole
-    # TTL. Bounded (3 attempts); never retries auth/quota (401/403/402).
+    # (429, 502, 503, 504) are infrastructure, not verdicts. ONE
+    # immediate retry before surfacing the typed failure (owner round
+    # 2026-11-13 item 2: no fixed backoff sleep); never retries
+    # auth/quota (401/403/402).
     _TRANSIENT = (429, 502, 503, 504)
     last_exc = None
-    for attempt in range(3):
+    # OWNER ROUND 2026-11-13 item 2: the same-rung retry ladder is ONE
+    # IMMEDIATE retry (no fixed sleep) — the measured wall spent 5-20 s
+    # per failed attempt asleep while the ring recovered; the
+    # rotate-to-next-rung cascade is the real resilience, and the A2
+    # breaker still aborts a genuine storm (Art. LXI: infrastructure
+    # absence is typed, never slept through)
+    for attempt in range(2):
         # A2 governor: ONE provider request = ONE count; re-attempts of the
         # same logical call are RETRIES, capped per problem (default 6).
         _econ.governor_attempt(_ck)
@@ -1264,15 +1291,14 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
                 # A2 breaker: count the transient failure; if the breaker
                 # JUST opened, abort the ladder IMMEDIATELY — the measured
                 # retry storm (31-40 provider attempts per problem) stops
-                # here instead of hammering through the sleep ladder.
+                # here instead of hammering through the retry ladder.
                 if _econ.breaker_failure(spec.provider_id):
                     raise _econ.BreakerOpen(
                         f"CIRCUIT_BREAKER_OPEN: provider "
                         f"'{spec.provider_id}' hit the transient-failure "
                         f"threshold; the same-rung retry ladder aborts "
                         f"(Art. LXI)", request_made=True) from he
-            if he.code in _TRANSIENT and attempt < 2:
-                time.sleep(5 * (3 ** attempt))
+            if he.code in _TRANSIENT and attempt < 1:
                 last_exc = he
                 continue
             raise
@@ -1283,8 +1309,7 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
                     f"'{spec.provider_id}' hit the transient-failure "
                     f"threshold; the same-rung retry ladder aborts "
                     f"(Art. LXI)", request_made=True) from ne
-            if attempt < 2:
-                time.sleep(5 * (3 ** attempt))
+            if attempt < 1:
                 last_exc = ne
                 continue
             raise
@@ -2201,9 +2226,9 @@ def generate(prompt: str, system: str = "",
             while (_tries < max_retries
                    and _ra.probe_failure_is_transient(
                        provider_id, model_id)):
-                _t_ps0 = time.perf_counter()
-                time.sleep(2 * (_tries + 1))
-                _probe_retry_sleep_s += time.perf_counter() - _t_ps0
+                # owner round 2026-11-13 item 2: the probe re-try is
+                # IMMEDIATE (no fixed sleep) — the admission probe is
+                # a lightweight capability check, not a generation
                 _t_adm0 = time.perf_counter()
                 _ra.probe_capability(provider_id, model_id,
                                      timeout_s=min(timeout, 30))
@@ -2310,6 +2335,7 @@ def generate(prompt: str, system: str = "",
                     "start_utc": utc_now(),
                     "dispatch_s": None, "retry_sleep_s": 0.0,
                     "transition_to_next_s": None,
+                    "ttfb_s": None, "gateway_hang": False,
                     "outcome": None, "failure_type": None,
                     "end_utc": None}
             # R526 Q-A (S4): the transition computation is placed here
@@ -2334,6 +2360,15 @@ def generate(prompt: str, system: str = "",
                         spec, messages, timeout, attempt_budget,
                         model_override=model_id)
                 latency_ms = int((time.time() - t0) * 1000)
+                # owner round 2026-11-13 item 2: the per-call timeline —
+                # the serving transport recorded ttfb/total thread-locally
+                # moments above (same thread); a hang is measured, never
+                # estimated, and hang walls are excluded from work sums
+                _pt = getattr(_post_timing, "last", None)
+                if isinstance(_pt, dict) and _pt.get("ttfb_s") is not None:
+                    _att["ttfb_s"] = _pt["ttfb_s"]
+                    _att["total_s"] = _pt.get("total_s")
+                    _att["gateway_hang"] = bool(_pt.get("gateway_hang"))
                 # R6 item 1: the typed finish-reason recorded by the
                 # serving transport on THIS thread (the flavor call
                 # returned moments above, same thread; a failed rung's
@@ -2373,6 +2408,10 @@ def generate(prompt: str, system: str = "",
                                     if _ok_slot is not None else None),
                     "key_rotations": key_rotations,
                     "latency_ms": latency_ms,
+                    "ttfb_ms": (int((_pt.get("ttfb_s") or 0) * 1000)
+                                if isinstance(_pt, dict) else None),
+                    "gateway_hang": (bool(_pt.get("gateway_hang"))
+                                     if isinstance(_pt, dict) else False),
                     "error": None,
                     "fallback_provider": None,
                     "fallback_model": None,

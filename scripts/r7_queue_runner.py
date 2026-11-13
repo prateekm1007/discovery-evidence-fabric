@@ -118,9 +118,20 @@ def _pair_has_answer(pid: str, pairs_dir: Path) -> bool:
 
 def build_plan() -> list:
     """The full work plan (idempotent: built fresh each run; per-item
-    status lives in the state file)."""
+    status lives in the state file). ORDER is the owner's round
+    2026-11-13 directive 4: A0+ FIRST (the decisive cheap-arm
+    experiment), then the full-pipeline pairs, then ablation arms,
+    two-turn, speed."""
     items: list = []
     ids = _dev12_ids()
+    # 0. A0+ (owner directive 1: the simple arm BEFORE the 48-item
+    #    ablation — if A0+ ties or beats the full pipeline, the heavy
+    #    stages are not earning their cost)
+    for pid in ids:
+        if (REPO / "eval" / "pairs" / "r7_a0plus" / f"{pid}.json").exists():
+            continue
+        items.append({"kind": "a0plus", "problem": pid,
+                      "pairs_out": "eval/pairs/r7_a0plus"})
     # 1. dev12 remaining (main arm -> dev12_r7)
     for pid in ids:
         if _pair_has_answer(pid, PAIRS_R7):
@@ -253,10 +264,44 @@ def _run_seeded_sweep(item: dict) -> dict:
             "wall_s": round(time.time() - t0, 1), "tail": tail[-2000:]}
 
 
+def _run_a0plus(item: dict) -> dict:
+    """ONE A0+ invocation: the committed baseline -> constraint audit
+    (1 call) -> strict relabel (0 calls) -> ONE repair (0-1 calls).
+    The 40 s per-call timeout rides (the owner's latency budget).
+    """
+    env = dict(os.environ)
+    env.setdefault("ENGINE_LLM_TIMEOUT_S", "40")
+    cmd = [os.environ.get("R6_PYTHON") or sys.executable, "-B",
+           "scripts/r7_a0plus.py", item["problem"]]
+    t0 = time.time()
+    try:
+        proc = subprocess.run(cmd, cwd=str(REPO), env=env,
+                              capture_output=True, text=True,
+                              timeout=900)
+    except subprocess.TimeoutExpired as te:
+        return {"exit_code": 124, "wall_s": round(time.time() - t0, 1),
+                "tail": "TIMEOUT (typed; re-plans next chunk) "
+                        + ((te.stdout or b"").decode("utf-8",
+                                                     "replace")[-400:])}
+    tail = (proc.stdout or "") + "\n--stderr--\n" + (proc.stderr or "")
+    return {"exit_code": proc.returncode,
+            "wall_s": round(time.time() - t0, 1), "tail": tail[-1200:]}
+
+
 def _classify_result(item: dict, res: dict) -> str:
     """Typed post-run classification: DONE | RETRY_PENDING | EXHAUSTED-
     INPUT (the launcher's typed failures ride the exit code + output)."""
     tail = res.get("tail") or ""
+    if item["kind"] == "a0plus":
+        f = REPO / "eval" / "pairs" / "r7_a0plus" / \
+            f"{item['problem']}.json"
+        if res.get("exit_code") == 0 and f.exists():
+            return "DONE"
+        if res.get("exit_code") == 2:
+            # typed skip: no committed baseline bytes — retrying the
+            # same invocation cannot produce them (fail-closed)
+            return "VERIFY_FAIL (typed skip: no committed baseline bytes)"
+        return "RETRY_PENDING (no A0+ pair after run)"
     if item["kind"] == "seeded":
         agg = REPO / SEEDED_OUT / "r6_seeded_sweep.json"
         if res.get("exit_code") == 0 and agg.exists():
@@ -427,6 +472,8 @@ def run_one() -> int:
     print(f"[r7queue] RUN {key} (attempt {att + 1}/{MAX_ATTEMPTS})")
     if it["kind"] == "seeded":
         res = _run_seeded_sweep(it)
+    elif it["kind"] == "a0plus":
+        res = _run_a0plus(it)
     else:
         res = _run_launcher(it)
     it = dict(it)

@@ -138,6 +138,14 @@ add_env "RETRIEVE_JOB_BUDGET_S=20"
 # the evidence the cap fits (a typed HEALTHY_CALL_CAP_EXCEEDED stop on
 # any queued problem reopens this constant with the measured number).
 add_env "FABRIC_PROBLEM_CALL_CAP=10"
+# OWNER ROUND 2026-11-13 ITEM 2 (latency): hard 40 s per-call socket
+# timeout with ONE immediate retry, then rotate to the next rung — the
+# measured p02 wall was ~75 s/call with 240 s default attempts and
+# 5-20 s fixed retry sleeps; the owner's budget is <=120 s median /
+# <=300 s worst per problem. A gateway that accepts and stalls is
+# measured as a hang (ttfb_s) and rotates — no hang is counted as work.
+# Overridable per invocation (ENGINE_LLM_TIMEOUT_S env wins).
+add_env "ENGINE_LLM_TIMEOUT_S=${ENGINE_LLM_TIMEOUT_S:-40}"
 # --- zai transport probe (typed availability, never silent) ------------
 # MEASURED this host: the z-ai CLI is absent (WSL PATH, Windows npm
 # dir, npm registry 404) — the loop-local gateway CANNOT serve here and
