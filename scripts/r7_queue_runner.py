@@ -211,6 +211,15 @@ def _classify_result(item: dict, res: dict) -> str:
         return "DONE"
     if "ZAI_TRANSPORT_PROBE" in tail and "200 OK" not in tail:
         return "RETRY_PENDING (zai transport down this window)"
+    # a 401 auth rejection is a LONGER window than a 429 burst storm —
+    # the probe said OK but the generation call was rejected (measured
+    # 2026-11-13 08:57Z: probe OK, baseline call HTTP 401); the note
+    # must not call an auth window a burst storm (Art. XXV: the typed
+    # note names the measured failure class)
+    for tok in ("HTTP Error 401", "401 Unauthorized", "HTTP_401_AUTH",
+                "Unauthorized"):
+        if tok in tail:
+            return "RETRY_PENDING (zai auth rejected this window)"
     for tok in ("INCOMPLETE_INFRASTRUCTURE", "429", "quota",
                 "RATE_LIMITED", "BREAKER_OPEN"):
         if tok in tail:
@@ -245,11 +254,53 @@ def _speed_verify(item: dict) -> str:
     return "DONE"
 
 
+def _table_dirty(rel: str) -> bool:
+    p = subprocess.run(["git", "status", "--porcelain", "--", rel],
+                       cwd=str(REPO), capture_output=True, text=True)
+    return bool(p.stdout.strip())
+
+
+def _restore_score_table(st: dict, note: str) -> None:
+    """Restore the committed SCORE_TABLE bytes the launcher rewrote.
+
+    The launcher regenerates eval/score/SCORE_TABLE.{json,md} from ONLY
+    the current invocation's problems (measured: a 1-problem storm run
+    replaced the committed multi-problem table, -509 lines). The runner
+    runs ONE item per invocation, so without this every chunk would
+    thrash the committed table. Restore is gated on the persistent
+    clean-flag: dirt is restored only while the flag says the files
+    were clean at the last observation (the dirt then came from the
+    launcher — the only writer between chunks), never over an edit that
+    predates the runner's first observation (Art. XXXIX: audited bytes
+    are never overwritten).
+    """
+    flag = st.setdefault("_score_table_clean", True)
+    changed = False
+    for rel in ("eval/score/SCORE_TABLE.json",
+                "eval/score/SCORE_TABLE.md"):
+        if not (REPO / rel).exists():
+            continue
+        if _table_dirty(rel):
+            if flag:
+                subprocess.run(["git", "checkout", "--", rel],
+                               cwd=str(REPO), capture_output=True,
+                               text=True)
+                print(f"[r7queue] restored {rel} ({note}; committed "
+                      "bytes kept)")
+            # flag False: pre-existing dirt we must not touch
+        elif not flag:
+            flag = True
+            changed = True
+    if flag != st.get("_score_table_clean", True) or changed:
+        st["_score_table_clean"] = flag
+
+
 def run_one() -> int:
     st = load_state()
     plan = build_plan()
     st["plan"] = plan
     status = st.setdefault("status", {})
+    _restore_score_table(st, "chunk start")
     # the first item that is not DONE and not EXHAUSTED
     target = None
     for it in plan:
@@ -269,6 +320,13 @@ def run_one() -> int:
         save_state(st)
         return 0
     key, it, s = target
+    # ATTACH the entry: for a first-attempt item, status.get(key, {})
+    # above returned a DETACHED dict — without this, every mutation
+    # below (attempts/state/verdict) is lost and save_state persists an
+    # empty status: retries never accumulate, MAX_ATTEMPTS never fires,
+    # the item loops forever on a persistent storm. Measured defect on
+    # the first live invocation (2026-11-13, p09 transport storm).
+    status[key] = s
     att = int(s.get("attempts", 0))
     if att >= MAX_ATTEMPTS:
         s["state"] = "EXHAUSTED"
@@ -316,6 +374,7 @@ def run_one() -> int:
         s["note"] = verdict
     st["last_item"] = key
     save_state(st)
+    _restore_score_table(st, "after item")
     print(f"[r7queue] {key}: {verdict} (wall {res['wall_s']}s, "
           f"exit {res['exit_code']})")
     if COOLDOWN_S > 0 and verdict != "DONE":
