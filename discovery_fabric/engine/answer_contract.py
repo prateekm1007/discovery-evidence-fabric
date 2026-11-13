@@ -220,19 +220,42 @@ def _joint_support(claim_seg: str, source_seg: str) -> Dict[str, Any]:
             res["joint_supported"] = res["quantity_supported"]
         return res
     supported_pairs = 0
+    # R9 P1 item 7 (owner round 2026-11-13): the audited weakness — a
+    # claim with MULTIPLE numeric pairs passed when ONE pair matched,
+    # and the quantity vocabulary could sit ANYWHERE in the source (a
+    # value+unit in one passage licensing a quantity named paragraphs
+    # away). The joint rule is now PER PAIR and ALL pairs must hold:
+    # each value+unit occurrence must carry a quantity word of the
+    # claim in the SAME PASSAGE (a +-120-char window around the
+    # value+unit — the co-occurrence that says "this value of this
+    # quantity"), and EVERY pair in the claim must be so supported.
+    pair_details = []
     for p in pairs:
-        # the value (digit-guarded: never a substring of a longer
-        # number) followed immediately (<= 4 chars) by its unit —
-        # the co-occurrence that says "this value of this quantity"
-        if re.search(r"(?<!\d)" + re.escape(p["value"])
-                     + r"\s{0,4}" + re.escape(p["unit"]), src_l):
+        pat = (r"(?<!\d)" + re.escape(p["value"]) + r"\s{0,4}"
+               + re.escape(p["unit"]))
+        m = re.search(pat, src_l)
+        if m:
+            window = src_l[max(0, m.start() - 120):m.end() + 120]
+            qty_near = _qty_overlap(qty, set(_quantity_tokens(window)))
             supported_pairs += 1
-    res["value_unit_supported"] = supported_pairs > 0
+            pair_details.append({
+                "pair": f"{p['value']} {p['unit']}",
+                "value_unit_found": True, "quantity_in_passage": qty_near})
+        else:
+            pair_details.append({
+                "pair": f"{p['value']} {p['unit']}",
+                "value_unit_found": False, "quantity_in_passage": False})
+    res["pairs_detail"] = pair_details
+    res["value_unit_supported"] = (
+        bool(pair_details) and supported_pairs == len(pairs))
     res["quantity_supported"] = _qty_overlap(qty, src_qty)
     res["conversion_recorded"] = bool(_CONV_MARKER.search(
         claim_seg or ""))
-    if res["value_unit_supported"] and res["quantity_supported"]:
-        res["joint_supported"] = True
+    res["joint_supported"] = (
+        res["value_unit_supported"]
+        and all(d["quantity_in_passage"] for d in pair_details))
+    if res["joint_supported"]:
+        pass
     elif (res["conversion_recorded"] and res["quantity_supported"]
           and supported_pairs == 0 and _NUM_WITH_UNIT.search(
               source_seg or "")):

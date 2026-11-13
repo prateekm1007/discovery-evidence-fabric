@@ -116,6 +116,11 @@ def _dev12_ids() -> list:
 
 
 def _pair_has_answer(pid: str, pairs_dir: Path) -> bool:
+    """R9 P1 item 8.3: existence-only completion is retired — a pair
+    counts as completed ONLY when its bytes carry a valid schema: a
+    nonempty pipeline answer AND the execution record (engine identity
+    + input hashes) a scored pair must carry. A truncated or
+    schema-less file is typed incomplete (re-planned, never trusted)."""
     f = pairs_dir / f"{pid}.json"
     if not f.exists():
         return False
@@ -123,8 +128,22 @@ def _pair_has_answer(pid: str, pairs_dir: Path) -> bool:
         d = json.loads(f.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001
         return False
+    if not isinstance(d, dict):
+        return False
     pa = d.get("pipeline_answer")
-    return isinstance(pa, str) and bool(pa.strip())
+    if not (isinstance(pa, str) and pa.strip()):
+        return False
+    # a typed marker is not an answer (the measured p02 shape: a
+    # CONTRACT-INVALID marker string where the answer bytes should be)
+    if pa.startswith("CONTRACT-INVALID") or pa.startswith("INCOMPLETE_"):
+        return False
+    # the execution record: the engine identity and the input binding
+    # a scored pair carries (the run that produced it is named)
+    if not (d.get("run_id") or d.get("commit")):
+        return False
+    if not (d.get("bound_inputs") or {}).get("baseline_answer_sha256"):
+        return False
+    return True
 
 
 def build_plan() -> list:
@@ -187,19 +206,43 @@ def _twoturn_ids() -> list:
 
 
 def load_state() -> dict:
+    """R9 P1 item 8.5: a corrupt state file must NEVER silently reset
+    the queue to empty (the measured hazard: json.loads fails -> the
+    old loader returned the EMPTY skeleton and the next save overwrote
+    the plan — every remaining item forgotten). The corrupt bytes are
+    moved aside (typed, dated) and the loader EXITS TYPED — the
+    operator fixes or restores, nothing is silently lost."""
     if STATE.exists():
         try:
             return json.loads(STATE.read_text(encoding="utf-8"))
-        except Exception:  # noqa: BLE001
-            pass
+        except Exception as exc:  # noqa: BLE001 — typed, never silent
+            quarantine = STATE.with_suffix(
+                f".corrupt-{time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())}"
+                f".json")
+            try:
+                STATE.replace(quarantine)
+            except Exception:  # noqa: BLE001
+                quarantine = None
+            _q = str(quarantine) if quarantine else \
+                "(rename failed - file left in place)"
+            print(f"[r7queue] TYPED: state file corrupt ({exc}); the "
+                  f"bytes were quarantined to {_q}; NO silent reset - "
+                  "fix or restore the file and re-run", file=sys.stderr)
+            sys.exit(5)
     return {"plan": [], "status": {}, "updated_at": None, "pointer": 0}
 
 
 def save_state(st: dict) -> None:
+    """R9 P1 item 8.5: ATOMIC state writes — the state lands via a
+    same-directory tmp file + os.replace (rename is atomic on POSIX):
+    a crash mid-write can never leave a half-written state for the
+    next invocation to choke on."""
     STATE.parent.mkdir(parents=True, exist_ok=True)
     st["updated_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                      time.gmtime())
-    STATE.write_text(json.dumps(st, indent=1), encoding="utf-8")
+    tmp = STATE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(st, indent=1), encoding="utf-8")
+    os.replace(tmp, STATE)
 
 
 def _run_launcher(item: dict) -> dict:
@@ -460,7 +503,15 @@ def _speed_verify(item: dict) -> str:
         "wall_s": item.get("_wall_s"), "cache_hits": hits,
         "protocol": "workers=1 cache=off fresh-store"}, indent=1),
         encoding="utf-8")
-    if hits not in (0, None):
+    if hits is None:
+        # R9 P1 item 8.6: MISSING measurement is incomplete, never a
+        # success — the old `hits not in (0, None)` check passed a
+        # MISSING cache record as DONE (the None-pass defect): B10 is
+        # complete only when the actual cache record exists and
+        # confirms zero hits
+        return "VERIFY_FAIL (MISSING_CACHE_EVIDENCE: no LLM_ECONOMY " \
+            "record carries counters.cache_hits — B10 incomplete)"
+    if hits != 0:
         return f"VERIFY_FAIL (cache_hits={hits})"
     return "DONE"
 
