@@ -254,14 +254,23 @@ def _joint_support(claim_seg: str, source_seg: str) -> Dict[str, Any]:
     res["joint_supported"] = (
         res["value_unit_supported"]
         and all(d["quantity_in_passage"] for d in pair_details))
+    _fully_supported = sum(1 for d in pair_details
+                           if d["value_unit_found"]
+                           and d["quantity_in_passage"])
     if res["joint_supported"]:
         pass
     elif (res["conversion_recorded"] and res["quantity_supported"]
-          and supported_pairs == 0 and _NUM_WITH_UNIT.search(
+          and _fully_supported >= 1 and _NUM_WITH_UNIT.search(
               source_seg or "")):
-        # the claim names its own conversion (the source carries the
-        # quantity and a number+unit, the claim records the
-        # derivation) — admitted, and the record says so (Art. XXVII)
+        # the claim names its own conversion: the source-side anchor
+        # pair is fully supported in the record (value+unit AND the
+        # quantity in the same passage — the measured p05 shape: the
+        # claim quotes '750 mA' from the record and bridges to the
+        # converted '0.75 A'), and the record carries a number+unit.
+        # An UNSUPPORTED conversion (no anchor pair, no number+unit in
+        # the source — the directive's named rejection class) never
+        # admits: no anchor -> no admission (Art. XXVII: the record
+        # says so)
         res["joint_supported"] = True
         res["by"] = "recorded_conversion"
     return res

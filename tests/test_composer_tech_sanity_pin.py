@@ -75,7 +75,7 @@ VALID_ANSWER = (
     "INDICATOR: bearing vibration RMS in the spalling band. "
     "THRESHOLD: 4.5 mm/s — ASSUMPTION (alert level, to be calibrated "
     "on the first 30 days of healthy data).\n"
-    "PROTOCOL: n=6 fan drives monitored 180 days; pass if the alert "
+    "VALIDATION PROTOCOL: n=6 fan drives monitored 180 days; pass if the alert "
     "fires before visible spalling; fail otherwise.\n"
     "Falsify if a drive reaches spalling with no prior alert.")
 
@@ -90,7 +90,7 @@ VALID_UNIT_MISMATCH = (
 # no ASSUMPTION label) + an efficiency above the physical bound
 BAD_EFF = ("Track the bearing. "
            "INDICATOR: vibration. THRESHOLD: 9.9 mm/s plain. "
-           "PROTOCOL: n=6 drives, 180 days; pass if alert fires "
+           "VALIDATION PROTOCOL: n=6 drives, 180 days; pass if alert fires "
            "first. Efficiency 150% conversion loop."
            " Falsify if no alert precedes spalling.")
 
@@ -285,7 +285,7 @@ class TestNeverAGate(unittest.TestCase):
         # no check — the record is typed by ABSENCE of tech_sanity
         cut = ("Recommend a vibration-based predictor for the "
                "fan-drive bearing. INDICATOR: vibration RMS. "
-               "THRESHOLD: 4.5 mm/s — ASSUMPTION. PROTOCOL: n=6; "
+               "THRESHOLD: 4.5 mm/s — ASSUMPTION. VALIDATION PROTOCOL: n=6; "
                "pass if alert fires before")
         llm, calls = _llm_factory([_res(cut, finish="length"),
                                   _res(cut, finish="length")])

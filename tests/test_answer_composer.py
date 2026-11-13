@@ -41,8 +41,8 @@ VALID_ANSWER = (
     "INDICATOR: bearing vibration RMS in the spalling band. "
     "THRESHOLD: 4.5 mm/s — ASSUMPTION (alert level, to be calibrated "
     "on the first 30 days of healthy data).\n"
-    "PROTOCOL: n=6 fan drives monitored 180 days; pass if the alert "
-    "fires before visible spalling; fail otherwise.\n"
+    "VALIDATION PROTOCOL: n=6 fan drives monitored 180 days; pass if "
+    "the alert fires before visible spalling; fail otherwise.\n"
     "Falsify if a drive reaches spalling with no prior alert."
 )
 

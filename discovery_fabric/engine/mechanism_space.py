@@ -2556,7 +2556,7 @@ def _verbatim_eight_word_binding(mechanism_text: str,
             continue
         etext = " ".join(str(it.get(k) or "") for k in
                          ("title", "abstract", "text", "content",
-                          "summary"))
+                          "summary", "_record_text"))
         etoks = re.findall(r"[a-z0-9]+", etext.lower())
         if len(etoks) < n_words:
             continue

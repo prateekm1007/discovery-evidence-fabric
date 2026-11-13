@@ -71,7 +71,7 @@ VALID_ANSWER = (
     "INDICATOR: bearing vibration RMS in the spalling band. "
     "THRESHOLD: 4.5 mm/s — ASSUMPTION (alert level, to be calibrated "
     "on the first 30 days of healthy data).\n"
-    "PROTOCOL: n=6 fan drives monitored 180 days; pass if the alert "
+    "VALIDATION PROTOCOL: n=6 fan drives monitored 180 days; pass if the alert "
     "fires before visible spalling; fail otherwise.\n"
     "Falsify if a drive reaches spalling with no prior alert."
 )
@@ -82,7 +82,7 @@ CUT_DRAFT = (
     "INDICATOR: bearing vibration RMS in the spalling band. "
     "THRESHOLD: 4.5 mm/s — ASSUMPTION (alert level, to be calibrated "
     "on the first 30 days of healthy data).\n"
-    "PROTOCOL: n=6 fan drives monitored 180 days; pass if the alert "
+    "VALIDATION PROTOCOL: n=6 fan drives monitored 180 days; pass if the alert "
     "fires before visible spalling; fail otherwise. Falsify if a "
     "drive reaches spalling with no prior"
 )
@@ -90,7 +90,7 @@ CUT_DRAFT = (
 # complete (terminal period) but contract-invalid — the P0-4 shape
 BAD_COMPLETE = ("Track the bearing. "
                 "INDICATOR: vibration. THRESHOLD: 9.9 mm/s plain. "
-                "PROTOCOL: n=6 drives, 180 days; pass if alert "
+                "VALIDATION PROTOCOL: n=6 drives, 180 days; pass if alert "
                 "fires first.")
 
 
