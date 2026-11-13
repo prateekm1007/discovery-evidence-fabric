@@ -30,8 +30,16 @@ Plan stages, in the owner's order:
                     LLM_ECONOMY.json), 3 reps on a deterministic
                     3-problem sample; walls recorded to
                     eval/runs/r7_speed/.
-  5. seeded       — PENDING until the owner places the sweep file
-                    (typed, disclosed).
+  5. seeded       — auto-planned when BOTH eval/seeded_specimens_v1.json
+                    and the owner-supplied eval/seeded_specimens_v1.sha256
+                    exist (the integrity hash is never invented, Art.
+                    XXV): one deterministic LLM-free invocation of
+                    scripts/r6_seeded_sweep.py, artifacts to the
+                    gitignored scratch (per-specimen rows never enter
+                    tracked space). A typed blocker (exit 2: hash
+                    mismatch / bad prefix / unparseable spec) records
+                    EXHAUSTED — retrying the same bytes cannot heal it;
+                    the owner fixes the bytes and resets the state key.
 
 Retry/pacing policy (sleep-until-quota-window on 429 storms): an item
 whose run ends INCOMPLETE_INFRASTRUCTURE / 429-heavy / on a non-zai
@@ -67,6 +75,15 @@ PAIRS_R7 = REPO / "eval" / "pairs" / "dev12_r7"
 SPEED_DIR = REPO / "eval" / "runs" / "r7_speed"
 DEV12 = REPO / "eval" / "problems_dev12.json"
 TWOTURN_PAYLOAD = REPO / "eval" / "problems_twoturn_devfu.json"
+# directive 7: the seeded sweep. The owner places BOTH the specimens
+# file and the integrity hash (the sweep's own contract: the hash is
+# NEVER invented by this repository, Art. XXV). Output stays in the
+# gitignored scratch: per-specimen rows NEVER enter tracked space
+# (the sweep's never-read rule); publishing the aggregate is an
+# owner-session act.
+SEEDED_SPECIMENS = REPO / "eval" / "seeded_specimens_v1.json"
+SEEDED_HASHFILE = REPO / "eval" / "seeded_specimens_v1.sha256"
+SEEDED_OUT = "ENGINE_RUNS"
 
 ABLATION_ARMS = [
     ("no_constraint_audit", "FABRIC_CONSTRAINT_AUDIT=0"),
@@ -128,6 +145,11 @@ def build_plan() -> list:
         for pid in ids[:SPEED_SAMPLE]:
             items.append({"kind": "speed", "rep": rep, "problem": pid,
                           "pairs_out": f"eval/runs/r7_speed/rep{rep}"})
+    # 5. seeded sweep (directive 7): planned ONLY when BOTH the owner
+    #    specimens and the owner-supplied hash are in place
+    if SEEDED_SPECIMENS.exists() and SEEDED_HASHFILE.exists():
+        items.append({"kind": "seeded", "problem": "seeded_specimens_v1",
+                      "pairs_out": SEEDED_OUT})
     return items
 
 
@@ -200,10 +222,52 @@ def _run_launcher(item: dict) -> dict:
             + "\n--stderr--\n" + (proc.stderr or "")[-800:]}
 
 
+def _run_seeded_sweep(item: dict) -> dict:
+    """ONE deterministic sweep invocation (LLM-free: no quota cost, no
+    gateway contact). Returns the same typed shape as _run_launcher.
+    The sweep fail-closes typed (exit 2) on hash mismatch / bad prefix
+    / unparseable spec; rows + calibration emits stay in the gitignored
+    scratch dir.
+    """
+    py = os.environ.get("R6_PYTHON") or sys.executable
+    expected = SEEDED_HASHFILE.read_text(encoding="utf-8").strip()
+    cmd = [py, "-B", "scripts/r6_seeded_sweep.py",
+           "--specimens", "eval/seeded_specimens_v1.json",
+           "--expected-selection-sha256", expected,
+           "--output-dir", SEEDED_OUT]
+    if len(expected) != 64:
+        # a shorter owner-declared value is PREFIX mode — the sweep
+        # itself verifies the declared prefix and refuses otherwise
+        cmd.append("--prefix-match")
+    t0 = time.time()
+    try:
+        proc = subprocess.run(cmd, cwd=str(REPO), capture_output=True,
+                              text=True, timeout=900)
+    except subprocess.TimeoutExpired as te:
+        return {"exit_code": 124, "wall_s": round(time.time() - t0, 1),
+                "tail": "TIMEOUT (typed; re-plans next chunk) "
+                        + ((te.stdout or b"")[-400:].decode(
+                            "utf-8", "replace") if te.stdout else "")}
+    tail = (proc.stdout or "") + "\n--stderr--\n" + (proc.stderr or "")
+    return {"exit_code": proc.returncode,
+            "wall_s": round(time.time() - t0, 1), "tail": tail[-2000:]}
+
+
 def _classify_result(item: dict, res: dict) -> str:
     """Typed post-run classification: DONE | RETRY_PENDING | EXHAUSTED-
     INPUT (the launcher's typed failures ride the exit code + output)."""
     tail = res.get("tail") or ""
+    if item["kind"] == "seeded":
+        agg = REPO / SEEDED_OUT / "r6_seeded_sweep.json"
+        if res.get("exit_code") == 0 and agg.exists():
+            return "DONE"
+        if res.get("exit_code") == 2:
+            # typed blocker: hash mismatch / bad prefix / unparseable —
+            # retrying the same bytes cannot heal it (fail-closed)
+            return "VERIFY_FAIL (typed blocker: " \
+                   + (tail.strip().splitlines() or ["see tail"])[-1][:120] \
+                   + ")"
+        return "RETRY_PENDING (sweep produced no aggregate)"
     if res.get("exit_code") == 0 and _pair_has_answer(
             item["problem"], REPO / item["pairs_out"]):
         if item["kind"] == "speed":
@@ -355,8 +419,16 @@ def run_one() -> int:
             save_state(st)
             print(f"[r7queue] {key}: payload build FAILED typed")
             return 0
+    if SEEDED_SPECIMENS.exists() and not SEEDED_HASHFILE.exists():
+        print("[r7queue] seeded specimens present but the owner hash "
+              "file is absent (eval/seeded_specimens_v1.sha256) — the "
+              "sweep is NOT planned (the integrity hash is never "
+              "invented, Art. XXV)")
     print(f"[r7queue] RUN {key} (attempt {att + 1}/{MAX_ATTEMPTS})")
-    res = _run_launcher(it)
+    if it["kind"] == "seeded":
+        res = _run_seeded_sweep(it)
+    else:
+        res = _run_launcher(it)
     it = dict(it)
     it["_wall_s"] = res["wall_s"]
     verdict = _classify_result(it, res)
