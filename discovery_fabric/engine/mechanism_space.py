@@ -129,7 +129,8 @@ def stage_calls_snapshot() -> Dict[str, Dict[str, int]]:
 def llm_generate(prompt: str, system: str = "", timeout: int = 240,
                  max_tokens: int = 700, purpose: str = "mechanism_space",
                  exclude_providers: Optional[List[str]] = None,
-                 hard_pin_provider: Optional[str] = None
+                 hard_pin_provider: Optional[str] = None,
+                 max_retries: int = 2
                  ) -> Dict[str, Any]:
     """The ONE engine transport wrapper: per-stage call accounting
     (above) + the registry cascade (see _llm_generate_impl)."""
@@ -186,7 +187,8 @@ def _project_route_hops(route: list) -> list:
 def _llm_generate_impl(prompt: str, system: str = "", timeout: int = 240,
                  max_tokens: int = 700, purpose: str = "mechanism_space",
                  exclude_providers: Optional[List[str]] = None,
-                 hard_pin_provider: Optional[str] = None
+                 hard_pin_provider: Optional[str] = None,
+                 max_retries: int = 2
                  ) -> Dict[str, Any]:
     """Generate through the provider registry. exclude_providers removes
     providers from eligibility (used by the independent-attack separation
@@ -264,7 +266,7 @@ def _llm_generate_impl(prompt: str, system: str = "", timeout: int = 240,
             preferred_providers=[hard_pin_provider],
             max_preference_fallback=0, purpose=purpose)
         res = generate(prompt, system=system, timeout=timeout,
-                       max_retries=2, policy=policy, max_tokens=max_tokens,
+                       max_retries=max_retries, policy=policy, max_tokens=max_tokens,
                        max_provider_fallbacks=0,
                        hard_pin_provider=hard_pin_provider)
         # defense in depth: a pinned call that somehow reports a
@@ -359,7 +361,7 @@ def _llm_generate_impl(prompt: str, system: str = "", timeout: int = 240,
         purpose=purpose,
         operator_override=operator_override)
     res = generate(prompt, system=system, timeout=timeout,
-                   max_retries=2, policy=policy, max_tokens=max_tokens,
+                   max_retries=max_retries, policy=policy, max_tokens=max_tokens,
                    max_provider_fallbacks=2)
     return {
         "ok": res.ok, "status": res.status, "content": res.content,
