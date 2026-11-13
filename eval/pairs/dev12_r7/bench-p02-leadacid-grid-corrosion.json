@@ -1,0 +1,50 @@
+{
+ "problem_id": "bench-p02-leadacid-grid-corrosion",
+ "commit": "a8a01b1fd1c4",
+ "run_id": "r1-pipeline+baseline+judge-2026-11-13075852000",
+ "dirty_tree": true,
+ "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+ "clarification_answer": null,
+ "baseline_answer": "**Proposed Design/Intervention:**  \nModify the positive grid alloy by adding **tin (Sn) and calcium (Ca)** in optimized ratios (e.g., Sn: 0.5-1.5 wt%, Ca: 0.05-0.1 wt%) while keeping antimony \u22642 wt%. This alloy enhances grid corrosion resistance by forming a stable, passive oxide layer (SnO\u2082/CaO) that reduces electrochemical dissolution of lead under continuous float charging.  \n\n**Expected Measurable Effect:**  \nA 30-50% reduction in grid corrosion rate (measured via weight loss or cross-sectional area reduction after accelerated aging at 2.27 V/cell, 60\u00b0C for 6 months) compared to traditional Pb-Ca-Sb grids. This should maintain internal resistance <20% increase and capacity >80% of initial after 15 years of float service.  \n\n**Test to Falsify:**  \nAccelerated aging at 2.27 V/cell, 60\u00b0C for 6 months, followed by:  \n1. **Grid Corrosion Measurement:** Cross-sectional SEM/EDS analysis to quantify grid thinning and oxide layer integrity. If corrosion exceeds 20 \u00b5m/year or the oxide layer is non-uniform, the design fails.  \n2. **Capacity Retention Test:** Full-cycle discharge at 0.2C. If capacity falls below 80% of initial, the intervention is invalid.  \n3. **Internal Resistance Monitoring:** EIS to track resistance rise. If resistance increases by >25%, the alloy modification is ineffective.  \n\n**Evidence Support:**  \n- [doaj] Confirms positive grid corrosion as a key VRLA failure mode.  \n- [europepmc] Highlights alloying (e.g., Sn, Ca) for corrosion mitigation in lead-acid systems.  \n- [arxiv] Supports electrochemical modeling of grid degradation under float conditions.  \n\n**Limitation:**  \nNo direct evidence from the provided sources confirms Sn/Ca synergy in VRLA grids; validation requires empirical testing.",
+ "pipeline_answer": "PARAMETER: antimony content \u2014 1.8 percent \u2014 ASSUMPTION\nPARAMETER: nickel content \u2014 66 ppm \u2014 ASSUMPTION\nPARAMETER: continuous charge voltage \u2014 2.27 V per cell \u2014 ASSUMPTION\nPARAMETER: grid alloy composition \u2014 lead-antimony-nickel ternary alloy \u2014 EVIDENCE-BACKED [doi:10.1021/acsaem.4c02648]\nPARAMETER: expected grid cross-section consumption rate \u2014 0.015 mm/year \u2014 ASSUMPTION\nPARAMETER: service life target \u2014 15 years \u2014 ASSUMPTION (User Constraint)\n\nThe intervention proposes alloying the positive grid with a lead-antimony-nickel ternary composition, maintaining antimony below 2 percent (1.8 percent) and adding 66 ppm nickel to enhance corrosion resistance. This modification directly addresses the corrosion failure mode by reducing grid cross-section consumption during extended float charge at 2.27 V per cell. The expected effect is maintaining internal resistance below service threshold for 15 years, as the reduced corrosion rate preserves grid integrity. The design respects constraint C1 by achieving the required service life at the specified voltage with antimony content below 2 percent. It addresses constraint C3 by targeting the specific corrosion failure mode. The falsification test involves accelerated aging of cells under continuous float charge at 2.27 V per cell and measuring grid cross-section consumption rate over time; if the rate exceeds 0.015 mm/year after 15-year equivalent aging, the design fails.",
+ "evidence_ids": [
+  "doi:10.1051/e3sconf/202018501058",
+  "doi:10.1049/cp:20010587",
+  "doi:10.1021/acsaem.4c02648",
+  "doi:10.1038/s41467-026-78215-3",
+  "doi:10.1007/s40820-026-02178-9",
+  "doi:10.3390/s23198227",
+  "doi:10.5281/zenodo.19251022",
+  "doi:10.5281/zenodo.18233709",
+  "doi:10.48550/arxiv.1008.4872",
+  "doi:10.48550/arxiv.1902.01774",
+  "doi:10.48550/arxiv.1902.01771"
+ ],
+ "bound_inputs": {
+  "pipeline_answer_sha256": "2345b1aad25ecda58eac4e5ab85d1d378a8dec7b4899a8d030ba3af176a8c561",
+  "baseline_answer_sha256": "71c1527a135888abc6545f522c6cf25b9d9ebc4dc792d0b760ca1402480caf86",
+  "evidence_sha256": "725a36313f31e9f0b1dd6fa5593d4e09e82523632e6967074542239af8b274fb",
+  "judge_route": {
+   "provider": null,
+   "model": null
+  },
+  "rubric_version": "0-4-rubric/1"
+ },
+ "judge_record": {
+  "usable_pair": false,
+  "outcome": "JUDGE_TRANSPORT_FAILED",
+  "why": "no calibrated judge route (see judge selection record)",
+  "bound_inputs": {
+   "pipeline_answer_sha256": "2345b1aad25ecda58eac4e5ab85d1d378a8dec7b4899a8d030ba3af176a8c561",
+   "baseline_answer_sha256": "71c1527a135888abc6545f522c6cf25b9d9ebc4dc792d0b760ca1402480caf86",
+   "evidence_sha256": "725a36313f31e9f0b1dd6fa5593d4e09e82523632e6967074542239af8b274fb",
+   "judge_route": {
+    "provider": null,
+    "model": null
+   },
+   "rubric_version": "0-4-rubric/1"
+  }
+ },
+ "baseline_same_evidence_hash": "725a36313f31e9f0b1dd6fa5593d4e09e82523632e6967074542239af8b274fb",
+ "pipeline_same_evidence_hash": "725a36313f31e9f0b1dd6fa5593d4e09e82523632e6967074542239af8b274fb"
+}
