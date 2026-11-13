@@ -1833,20 +1833,38 @@ class EngineRun:
                         from .independent_attack import (
                             independent_attack_batch,
                             POST_RANK_ATTACK_PURPOSE as _BATCH_PURPOSE)
-                        _gens = []
+                        # R9 P0 item 4 (owner round 2026-11-13): the
+                        # 1.0.0 defect — ALL distinct generator providers
+                        # were collected but only _gens[0] reached the
+                        # batch, so candidates produced by other
+                        # generators inherited the wrong identity. v2
+                        # receives the FULL generator set (the attacker
+                        # is excluded from every one of them) and EACH
+                        # candidate carries its OWN generator provenance
+                        # (its independence is computed per candidate).
+                        _gen_of = {}
                         for _c, _mc in _batch_pending:
                             _gp = (((_c.get("mechanism_space_candidate")
                                      or {}).get("derivation_trace") or {})
                                    .get("llm_provider")
                                    or _c.get("exploration_provider"))
-                            if _gp and _gp not in _gens:
-                                _gens.append(_gp)
+                            _gen_of[str(_mc.get("candidate_id")
+                                        or _c["candidate_id"])] = _gp
+                        _mc_by_id = {
+                            str(_mc.get("candidate_id")
+                                or _c["candidate_id"]): _mc
+                            for _c, _mc in _batch_pending}
+                        for _cid, _gp in _gen_of.items():
+                            if _gp and _cid in _mc_by_id:
+                                _mc_by_id[_cid]["generator_provider"] = _gp
+                        _gens = sorted({g for g in _gen_of.values() if g})
                         _t0b = _ptime.perf_counter()
                         _batch = independent_attack_batch(
                             [_mc for _c, _mc in _batch_pending],
                             self.problem, self.env.evidence or [],
                             _gens[0] if _gens else None,
-                            attack_purpose=_BATCH_PURPOSE)
+                            attack_purpose=_BATCH_PURPOSE,
+                            generator_providers=_gens)
                         for _c, _mc in _batch_pending:
                             _rec = (_batch.get("records") or {}).get(
                                 str(_c["candidate_id"]))
