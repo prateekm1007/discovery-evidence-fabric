@@ -896,9 +896,31 @@ def validate_answer(answer: str, question_type: str,
             _se = (_seg_starts[_si + 1]
                    if _si + 1 < len(_seg_starts) else len(text))
             _seg = text[_ss:_se]
+            # R9 P0 (measured live shape, v2 p02 attempt 7): the prefix
+            # label form — 'ASSUMPTION PARAMETER: <name> = <value>' /
+            # 'EVIDENCE-BACKED PARAMETER: ...' — carries the label BEFORE
+            # the keyword, so the segment (which STARTS at 'PARAMETER')
+            # excludes its own line's label. The same-line prefix joins
+            # the segment's label test (a label on the parameter's own
+            # line labels that parameter — the rule's own words). The
+            # NEXT segment still starts at the next 'PARAMETER', so the
+            # one-label-per-line discipline is unchanged.
+            _line_start = text.rfind("\n", 0, _ss) + 1
+            _prefix = text[_line_start:_ss]
+            # the prefix label counts ONLY when it DIRECTLY precedes the
+            # keyword ('ASSUMPTION PARAMETER: ...' / 'EVIDENCE-BACKED
+            # PARAMETER: ...') — a bare label ending at the keyword. A
+            # label belonging to an EARLIER parameter on the same line
+            # ('... EVIDENCE-BACKED [src]. PARAMETER: ...') does not
+            # excuse this one (the rule's own discipline: the label
+            # binds the parameter it sits on)
+            _prefix_lab = re.search(
+                r"\b(ASSUMPTION|EVIDENCE[- ]BACKED)\s*$", _prefix,
+                re.IGNORECASE)
             if re.search(r"\bASSUMPTION\b", _seg, re.IGNORECASE) \
-                    and not re.search(r"EVIDENCE-BACKED",
-                                      _seg, re.IGNORECASE):
+                    or (_prefix_lab
+                        and _prefix_lab.group(1).upper().startswith(
+                            "ASSUMPTION")):
                 # P0-5: honest assumption parameters stay admissible —
                 # recorded as ASSUMPTION claims (explicitly unverified
                 # bases), never manufactured into evidence claims
@@ -911,8 +933,12 @@ def validate_answer(answer: str, question_type: str,
                     "pairs": _value_unit_pairs(_seg),
                     "conversion_recorded":
                         bool(_CONV_MARKER.search(_seg))})
-            elif re.search(r"\d", _seg) and not re.search(
-                    r"EVIDENCE-BACKED|ASSUMPTION", _seg, re.IGNORECASE):
+            elif re.search(r"\d", _seg) \
+                    and not re.search(r"EVIDENCE-BACKED|ASSUMPTION",
+                                      _seg, re.IGNORECASE) \
+                    and not (_prefix_lab
+                             and _prefix_lab.group(1).upper().startswith(
+                                 "EVIDENCE")):
                 _n_unlab += 1
         if _n_unlab:
             violations.append(

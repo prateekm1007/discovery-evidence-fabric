@@ -213,6 +213,29 @@ _PARAM_EB_LINE_RE = re.compile(
     r"(?P<label>\bEVIDENCE[- ]BACKED\b)"
     r"(?P<cite>(?:\s*\[[^\[\]\n]{1,120}\])?)", re.IGNORECASE)
 
+# R9 P0 (measured live shape, v2 p02 attempts 4-6): the A0+ repair's
+# LABEL TEMPLATE produces the label-FIRST form — 'EVIDENCE-BACKED
+# PARAMETER: <name> = <value> [doi:...]' — which the label-LAST regex
+# above never matched: the strict relabel reported 0 relabels while
+# the contract's joint-support check flagged the same lines
+# value_not_in_source x10 (the honesty net had a hole exactly where the
+# repair writes). The label-FIRST shape joins the relabel scan with
+# the SAME group names and the SAME _sub handler (one honesty rule,
+# two line shapes, Art. X).
+_PARAM_EB_LINE_FIRST_RE = re.compile(
+    r"(?P<label>\bEVIDENCE[- ]BACKED\b)\s*"
+    r"(?P<head>PARAMETER\s*:)"
+    # the value is the WHOLE parameter statement (prose or name=value)
+    # up to its citation bracket — tempered so it never swallows past
+    # the line's own citation or into the NEXT label-first parameter
+    # (measured live shape, v2 fu005: two labeled parameters on one
+    # line; the greedy value ran across and mis-scoped the honesty
+    # check)
+    r"(?P<value>(?:(?!\s*\[[^\[\]\n]{1,120}\])"
+    r"(?!\s*EVIDENCE[- ]BACKED\b)"
+    r"(?!\s*ASSUMPTION\b)[^\[\]\n])+)"
+    r"\s*(?P<cite>\[[^\[\]\n]{1,120}\])?", re.IGNORECASE)
+
 _NUM_UNIT_RE = re.compile(
     r"(\d+(?:[.,]\d+)?)\s*(?P<unit>%|percent|wt\s*%|wt%|mm|cm|µm|um|m\b|"
     r"years?|yrs?|yr|months?|days?|hours?|hrs?|h\b|minutes?|min\b|"
@@ -389,10 +412,28 @@ def strict_provenance_downgrade(
                      "stated value, not evidence)" if in_user
                      else "ASSUMPTION (value not stated in the cited "
                           "record)")
+        if m.group(0).upper().startswith("EVIDENCE"):
+            # label-FIRST shape ONLY (the matched text starts with the
+            # label): 'EVIDENCE-BACKED PARAMETER: <statement> [cite]' ->
+            # relabel in place. The label-LAST shape must keep its
+            # canonical output (the committed fu005 regression pins it)
+            # — both regexes' label group reads 'EVIDENCE-BACKED', so
+            # the matched text's first token is the only safe
+            # discriminator. The label-first value may be prose (no
+            # '=' separator — the measured v2 fu005 shape), so the
+            # rewrite does not reference the sep group.
+            return ("ASSUMPTION " + m.group("head") + " "
+                    + value.strip() + " " + (m.group("cite") or "")
+                    + " — " + rationale)
         return (m.group("head") + m.group("sep") + " " + value
                 + " " + m.group("sep") + " " + rationale)
 
     new_text = _PARAM_EB_LINE_RE.sub(_sub, text)
+    # the label-FIRST shape is scanned SECOND (the label-LAST regex
+    # cannot match it — different group order), on the intermediate
+    # text: a line the first pass already relabeled no longer carries
+    # the EVIDENCE-BACKED label, so it is never double-processed
+    new_text = _PARAM_EB_LINE_FIRST_RE.sub(_sub, new_text)
     new_text = re.sub(r"[ \t]{2,}", " ", new_text)
     n_user = sum(1 for r in relabels
                  if r["new_label"] == "ASSUMPTION (User Constraint)")

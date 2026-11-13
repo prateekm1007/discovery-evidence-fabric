@@ -749,7 +749,13 @@ def compose_answer(problem: Dict[str, Any],
     while _repair_round < MAX_REPAIR_ROUNDS:
         _contract_bad = contract.get("valid") is not True
         _audit_bad = caudit.get("state") == "CONSTRAINT_VIOLATIONS"
-        _cons_bad = cons.get("state") == "CONSISTENCY_VIOLATIONS"
+        # R9 P0 (owner round 2026-11-13): CHECK_ABSENT is NOT a pass —
+        # a missing falsification-test section must trigger the repair
+        # exactly like violations do (the measured defect: only
+        # CONSISTENCY_VIOLATIONS was treated as bad, so a missing check
+        # terminated the repair loop without the check having passed).
+        _cons_bad = cons.get("state") in ("CONSISTENCY_VIOLATIONS",
+                                          "CHECK_ABSENT")
         if not (_contract_bad or _audit_bad or _cons_bad):
             break
         _repair_round += 1
@@ -834,7 +840,10 @@ def compose_answer(problem: Dict[str, Any],
             rec["repair_rounds_used"] = _repair_round
             if (contract.get("valid") is True
                     and caudit.get("state") == "CONSTRAINT_AUDIT_PASS"
-                    and cons.get("state") != "CONSISTENCY_VIOLATIONS"):
+                    and cons.get("state") == "CONSISTENCY_PASS"):
+                # R9 P0: the post-repair break now demands the check
+                # PASSED — "not violations" (CHECK_ABSENT) is not a
+                # pass and never silently ends the loop as one.
                 break
     rec["repair_rounds_used"] = rec.get("repair_rounds_used", _repair_round)
     # ---- STRICT PROVENANCE DOWNGRADE (owner audit round 2026-11-13,
@@ -974,6 +983,15 @@ def compose_answer(problem: Dict[str, Any],
         from .answer_consistency import CONSISTENCY_CAVEAT_LINE
         if CONSISTENCY_CAVEAT_LINE not in _caveats:
             _caveats.append(CONSISTENCY_CAVEAT_LINE)
+    if cons_final.get("state") == "CHECK_ABSENT" \
+            and rec.get("state") in ("COMPOSED_CONTRACT_VALID",
+                                     "COMPOSED_CONTRACT_DOWNGRADED"):
+        # R9 P0: a check that could not run is delivered as exactly
+        # that — the answer carries the typed absent-caveat (never a
+        # silent pass, Art. XXV)
+        from .answer_consistency import CONSISTENCY_ABSENT_CAVEAT_LINE
+        if CONSISTENCY_ABSENT_CAVEAT_LINE not in _caveats:
+            _caveats.append(CONSISTENCY_ABSENT_CAVEAT_LINE)
     if _caveats:
         rec["caveats"] = _caveats
     rec["finished_at"] = _utc_now()

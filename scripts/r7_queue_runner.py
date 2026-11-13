@@ -139,10 +139,10 @@ def build_plan() -> list:
     #    ablation — if A0+ ties or beats the full pipeline, the heavy
     #    stages are not earning their cost)
     for pid in ids:
-        if (REPO / "eval" / "pairs" / "r7_a0plus" / f"{pid}.json").exists():
+        if _a0plus_v2_complete(pid):
             continue
         items.append({"kind": "a0plus", "problem": pid,
-                      "pairs_out": "eval/pairs/r7_a0plus"})
+                      "pairs_out": "eval/pairs/r9_a0plus"})
     # 1. dev12 remaining (main arm -> dev12_r7)
     for pid in ids:
         if _pair_has_answer(pid, PAIRS_R7):
@@ -275,6 +275,37 @@ def _run_seeded_sweep(item: dict) -> dict:
             "wall_s": round(time.time() - t0, 1), "tail": tail[-2000:]}
 
 
+def _a0plus_v2_complete(pid: str) -> bool:
+    """R9 P0 (owner round 2026-11-13 item 4): the A0+ stage's completion
+    test. A v2 record counts ONLY when it IS a 2.0.0 record for THIS
+    problem, binds the SAME frozen baseline identity, and carries
+    result=COMPLETE with its completion gate True — file existence is
+    never completion (the measured 1.0.0 defect: ten files existed, all
+    contract-invalid)."""
+    f = REPO / "eval" / "pairs" / "r9_a0plus" / f"{pid}.json"
+    if not f.exists():
+        return False
+    try:
+        rec = json.loads(f.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return False
+    if not (rec.get("a0plus_version") == "r7_a0plus/2.0.0"
+            and rec.get("problem_id") == pid
+            and rec.get("result") == "COMPLETE"
+            and rec.get("completion_gate", {}).get("complete") is True):
+        return False
+    fresh = REPO / "eval" / "pairs" / "dev12_fresh" / f"{pid}.json"
+    if not fresh.exists():
+        return False
+    try:
+        sha = str(json.loads(fresh.read_text(encoding="utf-8"))
+                  .get("bound_inputs", {}).get("baseline_answer_sha256")
+                  or "")
+    except Exception:  # noqa: BLE001
+        return False
+    return rec.get("baseline_sha_source") == sha
+
+
 def _run_a0plus(item: dict) -> dict:
     """ONE A0+ invocation: the committed baseline -> constraint audit
     (1 call) -> strict relabel (0 calls) -> ONE repair (0-1 calls).
@@ -333,14 +364,45 @@ def _classify_result(item: dict, res: dict) -> str:
     INPUT (the launcher's typed failures ride the exit code + output)."""
     tail = res.get("tail") or ""
     if item["kind"] == "a0plus":
-        f = REPO / "eval" / "pairs" / "r7_a0plus" / \
+        f = REPO / "eval" / "pairs" / "r9_a0plus" / \
             f"{item['problem']}.json"
         if res.get("exit_code") == 0 and f.exists():
-            return "DONE"
+            # R9 P0 (owner round 2026-11-13 item 4): DONE requires a
+            # GENUINE completed result — the record must carry
+            # result=COMPLETE with its completion gate True (contract
+            # valid + consistency PASSED + provenance resolved), not
+            # merely the file's existence (Art. XXV: the bytes, not
+            # the state, are the deliverable).
+            try:
+                rec = json.loads(f.read_text(encoding="utf-8"))
+                if (rec.get("a0plus_version") == "r7_a0plus/2.0.0"
+                        and rec.get("result") == "COMPLETE"
+                        and rec.get("completion_gate", {})
+                        .get("complete") is True):
+                    return "DONE"
+                return ("VERIFY_FAIL (v2 record not COMPLETE: "
+                        f"result={rec.get('result')}, "
+                        f"gate={rec.get('completion_gate')})")
+            except Exception as exc:  # noqa: BLE001 — typed, never silent
+                return f"VERIFY_FAIL (v2 record unparseable: {exc})"
         if res.get("exit_code") == 2:
             # typed skip: no committed baseline bytes — retrying the
             # same invocation cannot produce them (fail-closed)
             return "VERIFY_FAIL (typed skip: no committed baseline bytes)"
+        if res.get("exit_code") == 4:
+            # R9 P0 item 1: INCOMPLETE_PROVENANCE / INCOMPLETE_CONSISTENCY
+            # / INCOMPLETE_CONTRACT — typed incomplete, the record
+            # carries the states; the runner retries (a fresh repair
+            # call CAN heal contract/consistency; provenance heals when
+            # the run tree lands on this host)
+            m = ""
+            for tok in ("INCOMPLETE_PROVENANCE", "INCOMPLETE_CONTRACT",
+                        "INCOMPLETE_CONSISTENCY"):
+                if tok in tail:
+                    m = tok
+                    break
+            return f"RETRY_PENDING ({m or 'typed incomplete'} — " \
+                "completion gate not met; record carries the states)"
         return "RETRY_PENDING (no A0+ pair after run)"
     if item["kind"] == "seeded":
         agg = REPO / SEEDED_OUT / "r6_seeded_sweep.json"
@@ -459,11 +521,10 @@ def run_one() -> int:
         if s.get("state") == "DONE":
             if it["kind"] == "a0plus":
                 # the bytes are the truth (Art. XXV): a DONE state whose
-                # pair file is absent (bytes removed after the run)
-                # re-runs; the state alone is never the deliverable
-                f = REPO / "eval" / "pairs" / "r7_a0plus" / \
-                    f"{it['problem']}.json"
-                if f.exists():
+                # pair file is absent — or whose record is not an
+                # identity-valid COMPLETE v2 arm — re-runs; the state
+                # alone is never the deliverable
+                if _a0plus_v2_complete(it["problem"]):
                     continue
             else:
                 continue

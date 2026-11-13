@@ -348,7 +348,22 @@ def _llm_generate_impl(prompt: str, system: str = "", timeout: int = 240,
             exclude_providers and not remaining) if exclude_providers
         else False,
         "provider_route": [
+            # R9 P0 (owner round 2026-11-13 item 5): the projection
+            # carries the FULL per-attempt accounting (provider, model,
+            # status, attempts, retries, latency, ttfb, hang) — the old
+            # 3-key reduction made every arm's timeline lose the
+            # transport measurement and report NOT-MEASURED work as
+            # zero seconds (the A0+ 1.0.0 measured defect). Additive:
+            # the original 3 keys keep their names and meanings.
             {"provider": h.get("provider_attempted"),
+             "provider_attempted": h.get("provider_attempted"),
+             "model": h.get("model"),
+             "status": h.get("status"),
+             "attempts": h.get("attempts"),
+             "retry_count": h.get("retry_count"),
+             "latency_ms": h.get("latency_ms"),
+             "ttfb_s": h.get("ttfb_s"),
+             "gateway_hang": h.get("gateway_hang"),
              "failure_type": h.get("failure_type"),
              "fallback_provider": h.get("fallback_provider")}
             for h in (res.route or [])],

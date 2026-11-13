@@ -23,6 +23,7 @@ Hermetic (no LLM, no network, synthetic paths only).
 import importlib.util
 import inspect
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -92,17 +93,43 @@ def test_registry_reads_xkiro_key_at_call_time(monkeypatch):
     assert reg.active_key_value(s) == "sk_test_value"
 
 
+def test_tracked_sources_carry_no_credential_fragments():
+    # R9 P0 item 9 (owner round 2026-11-13): secret scanning must use
+    # SYNTHETIC sentinels and credential SHAPES, never the real values —
+    # embedding a real credential fragment in a test re-embeds the
+    # secret this test exists to prevent. The scan walks every TRACKED
+    # file (git ls-files) and fails on any credential-shaped string;
+    # the gitignored vault is out of scope by construction.
+    import subprocess
+    tracked = subprocess.run(
+        ["git", "ls-files"], cwd=str(REPO), capture_output=True,
+        text=True, timeout=30).stdout.split()
+    pat = re.compile(r"\bsk[-_][A-Za-z0-9]{16,}\b")
+    offenders = []
+    for rel in tracked:
+        p = REPO / rel
+        if not p.is_file() or p.stat().st_size > 4_000_000:
+            continue
+        try:
+            text = p.read_text(encoding="utf-8", errors="replace")
+        except Exception:
+            continue
+        for m in pat.finditer(text):
+            offenders.append(f"{rel}:{text[:m.start()].count(chr(10)) + 1}")
+    assert not offenders, (
+        "credential-shaped strings in tracked files (typed leak): "
+        + ", ".join(offenders[:8]))
+
+
 def test_route_notes_record_the_credential_resolution():
-    # RESOLUTION (same round): the SECOND owner credential (sk-xt- form)
-    # validated and the judge rung serves credentialed — the notes must
-    # record the serving state, not just the first credential's death.
-    # No credential material may appear in tracked bytes.
+    # RESOLUTION (same round): the SECOND owner credential validated and
+    # the judge rung serves credentialed — the recorded state must carry
+    # the serving resolution (probe ok=True) without ever carrying
+    # credential material (the scanner test above enforces the shape ban
+    # repo-wide; this pin enforces the recorded fact).
     note = mr.ROUTE_TABLE_NOTES.get("xkiro", "")
-    assert "sk-xt-" in note and "ok=True" in note
-    src = inspect.getsource(mr) + inspect.getsource(reg)
+    assert "ok=True" in note and "CREDENTIALED" in note
     assert "ok=True fields_ok=True 622 ms" in inspect.getsource(reg)
-    for forbidden in ("sk-xt-c3643", "sk_65c75153"):
-        assert forbidden not in src, "credential material leaked into tracked bytes"
 
 
 def test_vault_loader_names_only_and_env_wins(tmp_path, monkeypatch):

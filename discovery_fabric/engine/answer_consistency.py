@@ -43,9 +43,28 @@ ANSWER_CONSISTENCY_VERSION = "answer_consistency/1.0.0"
 #: the falsification-test marker vocabulary (mirrors the answer
 #: contract's own test detection — one split authority, Art. X)
 _TEST_MARKER_RE = re.compile(
-    r"(?:falsification\s+test|falsifies|kill\s+criteria?|"
-    r"validation\s+(?:protocol|test)|pass\s+criteria?)\s*:",
+    r"(?:falsification\s+\w+|kill\s+criteria?|"
+    r"validation\s+(?:protocol|test)|pass\s+criteria?|"
+    r"test\s+parameters?)\**\s*:",
     re.IGNORECASE)
+#: R9 P0 (measured live shape, v2 p02 attempt 3): the repair model
+#: writes the complete protocol under 'Falsification Criterion:' —
+#: temperature, duration, n and the numeric pass/fail all present —
+#: but the old marker set only recognized 'Falsification Test:' and
+#: reported CHECK_ABSENT on a COMPLETE section (a measurement defect
+#: masquerading as an answer defect). The marker set admits the
+#: MEASURED LIVE SHAPES: 'Falsification Criterion:' and 'Test
+#: Parameters:' (with optional markdown '**' before the colon);
+#: 'falsification\s+\w+' admits the family (test/criterion/criteria...).
+#: MEASURED EXCLUSION: a BARE 'protocol:' marker was also admitted for
+#: one p02 shape and it BROKE the committed new07 regression — the
+#: candidate-free factor-mismatch catch — by splitting the answer at
+#: the THRESHOLD's calibration protocol ('PROTOCOL: Collect 15-minute
+#: resolution data...'), which is not the falsification test. Bare
+#: 'protocol' is therefore NOT a marker (the arm's surgical mode
+#: writes the exact 'FALSIFICATION TEST:' heading it needs). The
+#: marker SPLITS the answer: everything after it is the test section
+#: the spec-check evaluates.
 #: the lead DESIGN segment markers (PARAMETER is deliberately absent:
 #: a quantity line is the design's own spec, never a second design)
 _LEAD_SEGMENT_RE = re.compile(
@@ -332,3 +351,14 @@ CONSISTENCY_CAVEAT_LINE = (
     "different proposals; verify that the mechanism, the measured "
     "quantity and the falsification test all describe one and the "
     "same design.")
+
+#: R9 P0 (owner round 2026-11-13): the companion caveat for CHECK_ABSENT
+#: — a missing falsification-test section is NOT a passed check, and an
+#: answer whose check could not run must carry that fact to the reader.
+#: CHECK_ABSENT must never silently become a pass (the measured defect:
+#: the composer loop treated only CONSISTENCY_VIOLATIONS as bad, so a
+#: missing check terminated the repair loop without the check passing).
+CONSISTENCY_ABSENT_CAVEAT_LINE = (
+    "Note: this answer carries no falsification-test section, so its "
+    "one-design consistency check could not run; the check is NOT a "
+    "pass — treat the design's internal consistency as unverified.")
