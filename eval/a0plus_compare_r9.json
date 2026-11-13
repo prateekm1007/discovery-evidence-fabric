@@ -1,0 +1,472 @@
+{
+ "record": "r9_a0plus_compare/1.0.0",
+ "commit": "c4c6f70d3ca0a65584297364a1fe228151b62033",
+ "at": "2026-11-13T13:55:58Z",
+ "judge": {
+  "provider": "xkiro",
+  "model": "mistralai/ministral-14b",
+  "selection": "calibration-gated",
+  "judge_independence": "INDEPENDENT_PROVIDER",
+  "calibration": {
+   "correct": 26,
+   "n_pairs": 30,
+   "accuracy": 0.867,
+   "threshold": 0.8,
+   "passed": true,
+   "corpus_sha256": "52e2e215915806d1d5513fbcfec20806d3a63a3bc14bbfce2cfe3e7db0effdff"
+  }
+ },
+ "blind_protocol": "side order randomized per pair by sha256(problem_id::pair) parity; the judge never sees the arm names",
+ "env_disclosure": {
+  "FABRIC_PROBLEM_CALL_CAP": "80",
+  "why": "the driver's workload is the 30-pair calibration + the comparison judgments \u2014 not one problem's pipeline stage chain the cap 12 protects"
+ },
+ "tally_vs_baseline": {
+  "wins_a0plus": 3,
+  "ties": 5,
+  "losses_a0plus": 2,
+  "n_valid": 10,
+  "parse_failed": 0,
+  "transport_failed": 0
+ },
+ "tally_vs_full_pipeline": {
+  "wins_a0plus": 4,
+  "ties": 0,
+  "losses_a0plus": 2,
+  "n_valid": 6,
+  "parse_failed": 2,
+  "transport_failed": 0
+ },
+ "exclusions": [
+  {
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "from": "a0plus_vs_full",
+   "why": "the committed full-pipeline bytes are a typed marker (CONTRACT-INVALID COMPOSITION (deterministic answer-shape con), not an answer \u2014 the compared object does not exist"
+  },
+  {
+   "problem_id": "eval-new05-liion-balance-drift",
+   "from": "a0plus_vs_full",
+   "why": "the committed full-pipeline bytes are a typed marker (CONTRACT-INVALID COMPOSITION (deterministic answer-shape con), not an answer \u2014 the compared object does not exist"
+  },
+  {
+   "problem_id": "eval-sofc-thermal-cycling",
+   "from": "both",
+   "why": "no COMPLETE v2 A0+ arm (typed)"
+  },
+  {
+   "problem_id": "dev-fu-004-fouling",
+   "from": "both",
+   "why": "no COMPLETE v2 A0+ arm (typed)"
+  }
+ ],
+ "n_judgment_calls": 18,
+ "wall_s": 21.9,
+ "judgments": [
+  {
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "pair": "a0plus_vs_baseline",
+   "order": "a0plus_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 0.1,
+   "prompt_hash": "958566df738ba5820d8c4cdd909e3d8fa87c5eb17cc27697adca0fb4e3cc40f3",
+   "output_hash": "5e35f79bb02e6945b369530cb1c8082c0f3fa24a91b39d7877c2ce39d852336b",
+   "outcome": "JUDGE_VALID",
+   "prefer": "TIE",
+   "picked": "tie",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 2,
+    "B1": 5,
+    "B2": 5,
+    "B3": 5,
+    "B4": 2,
+    "A6": 5,
+    "B6": 5
+   }
+  },
+  {
+   "problem_id": "bench-p09-packaging-barrier",
+   "pair": "a0plus_vs_baseline",
+   "order": "a0plus_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 0.1,
+   "prompt_hash": "89d8ec7d0057c539d10baed61614506084df1468ff5b8f3cf3940ac379501d25",
+   "output_hash": "935a2726661b050f9aafc3cc9c23ea17e3ca08ea7968e6f7c6c7ba604919b13a",
+   "outcome": "JUDGE_VALID",
+   "prefer": "TIE",
+   "picked": "tie",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 5,
+    "B1": 5,
+    "B2": 5,
+    "B3": 5,
+    "B4": 5,
+    "A6": 5,
+    "B6": 5
+   }
+  },
+  {
+   "problem_id": "bench-p09-packaging-barrier",
+   "pair": "a0plus_vs_full",
+   "order": "other_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 0.1,
+   "prompt_hash": "cf32efff17f905d3452a87b8c1ceea2f06558bbf0e5dc54fe6ce34e179d9bef0",
+   "output_hash": "132a587c8d37a40407db3a07fc20ee6c5ab4e88af14556d3ecacf0b0eb0b5283",
+   "outcome": "JUDGE_PARSE_FAILED",
+   "error": "missing/invalid required rubric fields"
+  },
+  {
+   "problem_id": "eval-new01-supercap-dryout",
+   "pair": "a0plus_vs_baseline",
+   "order": "other_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 0.1,
+   "prompt_hash": "3317fd96fc825d7551f406bef4c179b1f98dba588a96e8aacea03e2cf9fe53a4",
+   "output_hash": "6e5c4216e7ee6ffa69c5c84ca4d527fba9449babde160119cb91dac03e62e509",
+   "outcome": "JUDGE_VALID",
+   "prefer": "A",
+   "picked": "other",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 5,
+    "B1": 5,
+    "B2": 5,
+    "B3": 4,
+    "B4": 3,
+    "A6": 5,
+    "B6": 5
+   }
+  },
+  {
+   "problem_id": "eval-new01-supercap-dryout",
+   "pair": "a0plus_vs_full",
+   "order": "a0plus_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 0.1,
+   "prompt_hash": "da4ff862e6d7f79bb3e046f28cd825c8a2caadf313b2a2fd3ee23099cfff9ff6",
+   "output_hash": "517c42bfb0d5a5324660867560598d24a9836538a4a3b18a8e1ecc2bda0561e9",
+   "outcome": "JUDGE_VALID",
+   "prefer": "A",
+   "picked": "a0plus",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 3,
+    "B1": 5,
+    "B2": 5,
+    "B3": 5,
+    "B4": 1,
+    "A6": 5,
+    "B6": 3
+   }
+  },
+  {
+   "problem_id": "eval-new02-slipring-predictor",
+   "pair": "a0plus_vs_baseline",
+   "order": "a0plus_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 0.1,
+   "prompt_hash": "69926fbc01f13ef176c6af6ba22273dd6623cb8e5b37948ca354ebeff146fbd3",
+   "output_hash": "f8eff5d50a2ab9ecbb707c102892b20f12f5774448ea426ade9646decf768f2b",
+   "outcome": "JUDGE_VALID",
+   "prefer": "TIE",
+   "picked": "tie",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 4,
+    "B1": 5,
+    "B2": 5,
+    "B3": 5,
+    "B4": 4,
+    "A6": 5,
+    "B6": 5
+   }
+  },
+  {
+   "problem_id": "eval-new02-slipring-predictor",
+   "pair": "a0plus_vs_full",
+   "order": "other_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 0.1,
+   "prompt_hash": "321fa496ad48e5a3b03882f4ab69177bd3d3752870890d66c42df0f88e511741",
+   "output_hash": "073d2907b91f7b3fe832e6e0b0d8b4066a225e52087d91c00e3dcc922c40f472",
+   "outcome": "JUDGE_VALID",
+   "prefer": "A",
+   "picked": "other",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 5,
+    "B1": 4,
+    "B2": 4,
+    "B3": 3,
+    "B4": 3,
+    "A6": 5,
+    "B6": 3
+   }
+  },
+  {
+   "problem_id": "eval-new04-chiller-fouling-predictor",
+   "pair": "a0plus_vs_baseline",
+   "order": "other_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 0.1,
+   "prompt_hash": "e386ab65f25fda5e4df0f3e539a70520843e47d0e07d91d271b798df5239ca9c",
+   "output_hash": "8fb32ee1de3bee93ead6973e27bfd630771a69fde5f8f02089918ff7f6407775",
+   "outcome": "JUDGE_VALID",
+   "prefer": "TIE",
+   "picked": "a0plus",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 5,
+    "B1": 5,
+    "B2": 5,
+    "B3": 5,
+    "B4": 5,
+    "A6": 5,
+    "B6": 5
+   }
+  },
+  {
+   "problem_id": "eval-new04-chiller-fouling-predictor",
+   "pair": "a0plus_vs_full",
+   "order": "other_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 0.1,
+   "prompt_hash": "11c693c0aec0c480ad7dbcf48817936dd4db82911ae476b506973cbf01d36177",
+   "output_hash": "041b8de542ec0ce749fddc91bb5a0fb3aa40dedf47b04ee4d3d72ce1e76bae29",
+   "outcome": "JUDGE_PARSE_FAILED",
+   "error": "missing/invalid required rubric fields"
+  },
+  {
+   "problem_id": "eval-new05-liion-balance-drift",
+   "pair": "a0plus_vs_baseline",
+   "order": "other_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 0.1,
+   "prompt_hash": "64e7a68ac316d527e0e46067de39205139bc44881aff100578626520f876dc5b",
+   "output_hash": "ad38b5fe02c7c3c54ba85abfe67136498e2826fd166c450eb3d956545eb6869a",
+   "outcome": "JUDGE_VALID",
+   "prefer": "TIE",
+   "picked": "a0plus",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 5,
+    "B1": 5,
+    "B2": 5,
+    "B3": 4,
+    "B4": 5,
+    "A6": 5,
+    "B6": 5
+   }
+  },
+  {
+   "problem_id": "eval-new07-transformer-dga-predictor",
+   "pair": "a0plus_vs_baseline",
+   "order": "a0plus_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 0.1,
+   "prompt_hash": "1d1c571a00376c704d2598a01c8650aae17b6df72423a18e155b5ab02b745722",
+   "output_hash": "0d22173bf04a127bf63bcd58798c81b823045eaec88a401eda780a98c97451c6",
+   "outcome": "JUDGE_VALID",
+   "prefer": "TIE",
+   "picked": "tie",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 4,
+    "B1": 5,
+    "B2": 5,
+    "B3": 5,
+    "B4": 4,
+    "A6": 5,
+    "B6": 5
+   }
+  },
+  {
+   "problem_id": "eval-new07-transformer-dga-predictor",
+   "pair": "a0plus_vs_full",
+   "order": "a0plus_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 3.0,
+   "prompt_hash": "7db259c10969741996603d9ae0e092a425414bd252bb77e435f74b49d908d210",
+   "output_hash": "0f95c3583231ab749e0ad955ec3665b3dd98cfcd5e8a3193c5d0fc647ab2a847",
+   "outcome": "JUDGE_VALID",
+   "prefer": "A",
+   "picked": "a0plus",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 4,
+    "B1": 3,
+    "B2": 5,
+    "B3": 3,
+    "B4": 2,
+    "A6": 5,
+    "B6": 2
+   }
+  },
+  {
+   "problem_id": "dev-fu-001-bearing-spalling",
+   "pair": "a0plus_vs_baseline",
+   "order": "a0plus_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 2.9,
+   "prompt_hash": "f00c2a5edf1f802fde79b2f2bcee48af1580e47fd4410e6fb913d1cd0fe97225",
+   "output_hash": "6433891b9cfb5fe0e36775203ad81c1f84c2cc0c0dca05c2dc4eac149df7a8c5",
+   "outcome": "JUDGE_VALID",
+   "prefer": "TIE",
+   "picked": "tie",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 4,
+    "B1": 5,
+    "B2": 5,
+    "B3": 5,
+    "B4": 4,
+    "A6": 5,
+    "B6": 4
+   }
+  },
+  {
+   "problem_id": "dev-fu-001-bearing-spalling",
+   "pair": "a0plus_vs_full",
+   "order": "other_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 3.2,
+   "prompt_hash": "a58016f433b7c3ec0d88b19fc1f88efc2d7108a21d639664fd93cdc3c20870a5",
+   "output_hash": "425af5cfdf2c0ed93d135b8b1f41601eec7ff48ff30bbb21b7d7dde8573ea05f",
+   "outcome": "JUDGE_VALID",
+   "prefer": "TIE",
+   "picked": "a0plus",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 5,
+    "B1": 5,
+    "B2": 5,
+    "B3": 5,
+    "B4": 5,
+    "A6": 5,
+    "B6": 5
+   }
+  },
+  {
+   "problem_id": "dev-fu-003-motor-insulation",
+   "pair": "a0plus_vs_baseline",
+   "order": "other_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 3.1,
+   "prompt_hash": "fb3af5821ff8b1df2746f28c2566443f9663aff002c41d77c2abee696460c8a2",
+   "output_hash": "2e965bc66facceaf53c9e6c571481ccf15b53b168b0097653747f500d0ace43a",
+   "outcome": "JUDGE_VALID",
+   "prefer": "TIE",
+   "picked": "a0plus",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 5,
+    "B1": 5,
+    "B2": 5,
+    "B3": 5,
+    "B4": 5,
+    "A6": 5,
+    "B6": 4
+   }
+  },
+  {
+   "problem_id": "dev-fu-003-motor-insulation",
+   "pair": "a0plus_vs_full",
+   "order": "a0plus_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 3.1,
+   "prompt_hash": "923433acfd177ccdce68c0b87eb7c60ace9da12a2c08c42607b8ffe3eca327d2",
+   "output_hash": "da3c0351ffe7283668438c0231f36c23747511815935f60e7cdd5568250962fc",
+   "outcome": "JUDGE_VALID",
+   "prefer": "A",
+   "picked": "a0plus",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 4,
+    "B1": 4,
+    "B2": 4,
+    "B3": 4,
+    "B4": 3,
+    "A6": 5,
+    "B6": 3
+   }
+  },
+  {
+   "problem_id": "dev-fu-005-bridge-bearing",
+   "pair": "a0plus_vs_baseline",
+   "order": "other_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 2.7,
+   "prompt_hash": "5131f486320294b3efe7685a38df063def172b7b2d92cf09ca915e903943eb79",
+   "output_hash": "4afc5d0a01be59a69643be43e8c973b2d448550a430678e129fd4ba51f2d315f",
+   "outcome": "JUDGE_VALID",
+   "prefer": "A",
+   "picked": "other",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 4,
+    "B1": 5,
+    "B2": 1,
+    "B3": 1,
+    "B4": 1,
+    "A6": 5,
+    "B6": 5
+   }
+  },
+  {
+   "problem_id": "dev-fu-005-bridge-bearing",
+   "pair": "a0plus_vs_full",
+   "order": "other_first",
+   "judge": "xkiro/mistralai/ministral-14b",
+   "latency_s": 3.2,
+   "prompt_hash": "c3a348385eacc7daae94e78896ea4f9571d1c24bf0b190c9dd9b421bff790d1f",
+   "output_hash": "c1f7c515053b64810c236efd53c46ffed0f6c677cd64d45ebbf18487b40c9de8",
+   "outcome": "JUDGE_VALID",
+   "prefer": "A",
+   "picked": "other",
+   "axes": {
+    "A1": 5,
+    "A2": 5,
+    "A3": 5,
+    "A4": 4,
+    "B1": 5,
+    "B2": 5,
+    "B3": 3,
+    "B4": 2,
+    "A6": 4,
+    "B6": 5
+   }
+  }
+ ]
+}

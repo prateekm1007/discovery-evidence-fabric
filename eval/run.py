@@ -875,9 +875,27 @@ def probe_judge_route(baseline_provider: str) -> Dict[str, Any]:
     for prov, model in JUDGE_CANDIDATES:
         rec: Dict[str, Any] = {"provider": prov, "model": model,
                                "reference": (
-                                   "xkiro/ministral-14b historically "
-                                   "calibrated 30/30 (2026-11-10); record "
-                                   "preserved, never used as authorization"
+                                   # R9 P0 item 6 (owner round
+                                   # 2026-11-13): the historical
+                                   # references CONFLICTED (this file
+                                   # said 30/30 on 2026-11-10 while
+                                   # model_routing.py cites 27/30) —
+                                   # neither is the operative result.
+                                   # The LIVE measurement on the current
+                                   # commit is authoritative and its
+                                   # sanitized record is committed
+                                   # (eval/judge_calibration_live_r9.json,
+                                   # measured 2026-11-13: 28/30, corpus
+                                   # 52e2e215...); the historical numbers
+                                   # stay as history only, never as
+                                   # authorization.
+                                   "xkiro/ministral-14b historical "
+                                   "references conflict (30/30 on "
+                                   "2026-11-10 per the R5 record; "
+                                   "27/30 per model_routing) — history "
+                                   "is reference only; the OPERATIVE "
+                                   "calibration is the live record "
+                                   "eval/judge_calibration_live_r9.json"
                                    if (prov, model) ==
                                    ("xkiro", "mistralai/ministral-14b")
                                    else None)}
@@ -1611,7 +1629,16 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
                               "Follow the exact output lines.", max_tokens=300)
         lat = round(time.time() - t0, 1)
         _rec = {"problem_id": entry.get("problem_id"), "order": order,
-                "latency_s": lat}
+                "latency_s": lat,
+                # R9 P0 item 3 (owner round 2026-11-13): the per-case
+                # request/output hashes ride the calibration record —
+                # the judge's verdicts become re-verifiable byte-bound
+                # provenance (the corpus sha pins the INPUTS, the
+                # hashes pin each CASE's bytes). The transport returns
+                # bare content (the low-level flavor call), so the
+                # hashes are computed HERE over the exact bytes.
+                "prompt_hash": hashlib.sha256(
+                    (prompt or "").encode("utf-8")).hexdigest()}
         if res.get("status") != "OK":
             err = str(res.get("error") or "")
             cls = _classify_transport_fail(res)
@@ -1625,6 +1652,9 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
             details.append(_rec)
             continue
         content = res.get("content") or ""
+        if isinstance(content, str) and content:
+            _rec["output_hash"] = hashlib.sha256(
+                content.encode("utf-8")).hexdigest()
         if not content.strip():
             err_classes["EMPTY_OUTPUT"] = err_classes.get(
                 "EMPTY_OUTPUT", 0) + 1

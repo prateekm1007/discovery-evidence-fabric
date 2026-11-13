@@ -197,11 +197,17 @@ def main() -> int:
         results["records"].append({"step": "mercury", "verdict": "NO_MERCURY_ID_IN_CATALOG"})
         print("mercury: NO mercury id in catalog (typed)")
 
-    # --- 4. the committed judge rung, now credentialed --------------------
+    # --- 4. the committed judge rungs, credentialed: TINY + LONG-FORM
+    # (R9 P0 item 7: the prior probe tested ONLY tiny prompts here and
+    # sent its long-form calls at a discovered Mercury id — which does
+    # not exist on this gateway. The long-form measurement now targets
+    # BOTH committed Ministral rungs at 420 AND 1000 budgets — the
+    # exact protocol where mercury starved on the INCEPTION path.)
     for model in ("mistralai/ministral-14b", "mistralai/ministral-8b"):
         rec = _post("/chat/completions",
                     {"model": model,
-                     "messages": [{"role": "user", "content": TINY_PROMPT}],
+                     "messages": [{"role": "user",
+                                   "content": TINY_PROMPT}],
                      "max_tokens": 16, "temperature": 0.1})
         cc, fin = _content_chars(rec), _finish(rec)
         results["records"].append(
@@ -210,6 +216,48 @@ def main() -> int:
              "finish_reason": fin})
         print(f"{model}: http={rec.get('http')} wall={rec.get('wall_s')}s "
               f"content_chars={cc} finish={fin!r}")
+        for mtok in (420, 1000):
+            lrec = _post("/chat/completions",
+                         {"model": model,
+                          "messages": [{"role": "user",
+                                        "content": LONG_PROMPT}],
+                          "max_tokens": mtok, "temperature": 0.1},
+                         timeout=90.0)
+            lcc, lfin = _content_chars(lrec), _finish(lrec)
+            results["records"].append(
+                {"step": f"judge-rung {model} longform-{mtok}",
+                 "http": lrec.get("http"), "wall_s": lrec.get("wall_s"),
+                 "content_chars": lcc, "finish_reason": lfin})
+            print(f"  longform-{mtok}: http={lrec.get('http')} "
+                  f"wall={lrec.get('wall_s')}s content_chars={lcc} "
+                  f"finish={lfin!r}")
+
+    # --- 5. the ENGINE credential-loaded call path (R9 P0 item 7: the
+    # probe must exercise the admission path the engine actually uses,
+    # not only raw HTTP): the queue runner's vault loader feeds the
+    # registry, runtime_admission probes the rung, typed result.
+    try:
+        sys.path.insert(0, str(REPO / "scripts"))
+        from r7_queue_runner import _load_key_vault as _lv
+        vault_names = _lv()
+        from discovery_fabric.engine import runtime_admission as _ra
+        adm = _ra.probe_capability("xkiro",
+                                   model="mistralai/ministral-14b")
+        adm_d = adm if isinstance(adm, dict) else getattr(adm,
+                                                          "__dict__", {})
+        eng = {k: v for k, v in (adm_d.items()
+                                 if isinstance(adm_d, dict) else [])
+               if not isinstance(v, (dict, list)) and v is not None}
+        results["engine_path"] = {
+            "vault_names": sorted(vault_names),
+            "admission_probe": eng}
+        print(f"engine path: ok={eng.get('ok')} "
+              f"fields_ok={eng.get('fields_ok')} "
+              f"latency_ms={eng.get('latency_ms')} "
+              f"transport={eng.get('transport')}")
+    except Exception as exc:  # noqa: BLE001 — typed, never silent
+        results["engine_path"] = {"error": f"{type(exc).__name__}: {exc}"}
+        print(f"engine path: TYPED_ERROR {type(exc).__name__}: {exc}")
 
     # --- verdict (typed; the ladder decision is a separate act) -----------
     merc_recs = [r for r in results["records"]
