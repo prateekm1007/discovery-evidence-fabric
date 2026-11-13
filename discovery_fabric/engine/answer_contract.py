@@ -622,6 +622,127 @@ def _has_number_with_unit(text: str) -> bool:
     return bool(_NUM_WITH_UNIT.search(text or ""))
 
 
+# ---------------------------------------------------------------------------
+# OWNER ROUND R10 (2026-11-13), P0-5 — the EXPERIMENT CONTRACT. The
+# measured loose protocol shapes the audit rejected: new07 counted
+# 2,880 repeated measurements as `n`; new02 stated `n = 12 months`
+# (a DURATION, not a count of independent units); new04's `n = 1 full
+# season` is a single-unit pilot, not a validation set. A real
+# experiment states REAL experimental units with an independent n, a
+# numeric judgment criterion, and — for every ASSUMPTION value — the
+# engineering rationale or the calibration/sensitivity path that would
+# validate the choice. Deterministic, zero-LLM; rides the SAME
+# validate_answer gate (no new subsystem, Art. X).
+_TIME_UNIT_RE = re.compile(
+    r"(?<![a-zA-Z])n\s*=\s*[\d,\.]+\s*(?:months?|days?|weeks?|years?|"
+    r"hours?|hrs?|minutes?|mins?|seasons?)\b", re.IGNORECASE)
+_REPEAT_N_RE = re.compile(
+    r"(?<![a-zA-Z])n\s*=\s*[\d,\.]{3,}\s*(?:repeated\s+)?"
+    r"(?:measurements?|readings?|repeats?|replicates?|observations?)\b",
+    re.IGNORECASE)
+_SINGLE_UNIT_PILOT_RE = re.compile(
+    r"(?<![a-zA-Z])n\s*=\s*1\b[^.\n]{0,40}", re.IGNORECASE)
+_ASSUMPTION_PARAM_LINE = re.compile(
+    r"^\s*(?:ASSUMPTION(?:\s+PARAMETER)?|ASSUMED)\s*[:\-]\s*(.+)$",
+    re.IGNORECASE | re.MULTILINE)
+_RATIONALE_MARK_RE = re.compile(
+    r"because|basis|based on|per the|as per|typical|conservative|"
+    r"industry|standard|reference|chosen|selected|assumed from|"
+    r"default|recommended|guideline|handbook|prior |experience|"
+    r"engineering judgment|safety factor|literature|empirical|"
+    r"calibrat|sensitivity|from the record|from the packet",
+    re.IGNORECASE)
+_SENSITIVITY_PATH_RE = re.compile(
+    r"calibrat|sensitivity|sweep|parametric|re-calibrat|recalibrat|"
+    r"ablate|what-if|tolerance analysis", re.IGNORECASE)
+
+
+def _experiment_contract_violations(test_section: str,
+                                    require_temperature: bool
+                                    ) -> List[str]:
+    """The experiment-contract rules over the test/protocol section:
+    real units, independent n, numeric judgment — and an honest label
+    for what the numbers actually are (Art. XXV: the recorded state is
+    the measured state; a duration is never a sample count)."""
+    seg = str(test_section or "")
+    if len(seg.strip()) < 20:
+        return []
+    out: List[str] = []
+    # (1) n stated in TIME units: a duration is not a count of
+    # independent experimental units (the measured new02 `n = 12
+    # months` shape)
+    m = _TIME_UNIT_RE.search(seg)
+    if m:
+        out.append("experiment contract: n is stated in TIME units "
+                   f"('{m.group(0).strip()}') — n is the count of "
+                   "independent experimental units (cells, devices, "
+                   "vehicles, ...), never a duration; restate the real "
+                   "unit count and keep the duration as the test length")
+    # (2) repeated measurements counted as independent units (the
+    # measured new07 `n = 2,880 measurements` shape): repeats share
+    # the same unit; the independent-unit count is the device /
+    # failure-case count and must be stated as n
+    m = _REPEAT_N_RE.search(seg)
+    if m:
+        out.append("experiment contract: repeated measurements are "
+                   f"counted as n ('{m.group(0).strip()}') — repeats "
+                   "of the same unit are NOT independent experimental "
+                   "units; state the device/failure-case count as n "
+                   "and keep the repeat count as measurement density")
+    # (3) n = 1: a single-unit run is a PILOT — honest label required
+    m = _SINGLE_UNIT_PILOT_RE.search(seg)
+    if m:
+        out.append("experiment contract: n = 1 ('"
+                   + m.group(0).strip()[:44]
+                   + "') is a SINGLE-UNIT pilot — one unit cannot "
+                   "validate a population-level threshold; state it "
+                   "as a pilot and give the validation n, or raise n")
+    # (4) temperature validation (owner R10 '加温度校验'): presence
+    # itself is enforced by _test_spec_violations; here the hole is a
+    # BARE number with no scale ('at 60 for 3000 h') — a real protocol
+    # names its scale (C/F/K or 'ambient')
+    if require_temperature:
+        if _TEMP_RE.search(seg) is None and re.search(
+                r"\bat\s+\d+(?:\.\d+)?\s*(?:for|,|;|\n)", seg,
+                re.IGNORECASE):
+            out.append("experiment contract: test temperature stated "
+                       "without a unit ('at 60 for ...') — a real "
+                       "protocol names its scale (C/F/K or 'ambient')")
+    return out
+
+
+def _assumption_rationale_violations(text: str) -> List[str]:
+    """R10 P0-5: an ASSUMPTION value carries its engineering basis —
+    the rationale for the chosen value, or the calibration/sensitivity
+    path that would validate it (the measured audit case: p02's 70 C /
+    5000 h / 15% values labeled ASSUMPTION with no selection reason
+    and no sensitivity path). Violation only when BOTH are absent —
+    a rationale marker on the line OR a sensitivity/calibration path
+    anywhere in the answer satisfies the rule."""
+    out: List[str] = []
+    lines = str(text or "").splitlines()
+    for i, ln in enumerate(lines):
+        m = _ASSUMPTION_PARAM_LINE.match(ln)
+        if not m:
+            continue
+        seg = m.group(1)
+        # the rationale may ride the same line or the continuation
+        window = seg + " " + " ".join(lines[i + 1:i + 3])
+        if _RATIONALE_MARK_RE.search(window):
+            continue
+        if _SENSITIVITY_PATH_RE.search(str(text or "")):
+            continue
+        out.append("assumption contract: ASSUMPTION value ('"
+                   + seg.strip()[:60]
+                   + "') states no selection rationale and the answer "
+                   "offers no calibration/sensitivity path (owner R10 "
+                   "P0-5: an ASSUMPTION carries its engineering basis "
+                   "— why THIS value, or the path that calibrates it)")
+        if len(out) >= 4:
+            break
+    return out
+
+
 def _count_matches(pattern: str, text: str) -> int:
     return len(re.findall(pattern, text or "", re.IGNORECASE))
 
@@ -722,6 +843,11 @@ def validate_answer(answer: str, question_type: str,
             violations.append(
                 "predictor contract: VALIDATION PROTOCOL states no "
                 "duration (the data window or trial length)")
+        # OWNER ROUND R10 P0-5: the EXPERIMENT CONTRACT over the
+        # protocol segment — real units, independent n (never a
+        # duration, never raw repeats, never a lone single-unit pilot)
+        violations.extend(_experiment_contract_violations(_psec,
+                                                          False))
         # THRESHOLD must be tied to the named indicator: the indicator's
         # quantity word must appear in the threshold segment OR in the
         # protocol that applies the threshold (a protocol that measures a
@@ -791,6 +917,12 @@ def validate_answer(answer: str, question_type: str,
         _tsec = _cons_split(text)[1]
         violations.extend(_test_spec_violations(_tsec,
                                                 require_temperature=True))
+        # OWNER ROUND R10 P0-5: the EXPERIMENT CONTRACT over the test
+        # section (real units, independent n, honest single-unit pilot)
+        # + the ASSUMPTION rationale rule (every assumed value carries
+        # its engineering basis or the calibration/sensitivity path)
+        violations.extend(_experiment_contract_violations(_tsec, True))
+        violations.extend(_assumption_rationale_violations(text))
         # every EVIDENCE-BACKED parameter must bind to a packet source id
         pb = _packet_blob(packet).lower() if packet else ""
         src_map = _source_map(packet)

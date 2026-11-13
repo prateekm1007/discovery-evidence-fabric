@@ -85,9 +85,15 @@ def _evidence_grams(evidence_items: list) -> set:
     for it in (evidence_items or []):
         if not isinstance(it, dict):
             continue
+        # R10 P0-6 (owner): the structured-evidence build path carries
+        # the verbatim record text under _record_text — the canonical
+        # key (measured: the binding saw empty text on the build path
+        # while working on raw records). It is an EVIDENCE TEXT KEY,
+        # not an optional extra: missing it starves the gram set and
+        # every mechanism reads UNGROUNDED.
         etoks = _tokens(" ".join(str(it.get(k) or "") for k in
                                  ("title", "abstract", "text", "content",
-                                  "summary")))
+                                  "summary", "_record_text", "record_text")))
         n = SPAN_FLOOR_WORDS
         for i in range(max(0, len(etoks) - n + 1)):
             grams.add(" ".join(etoks[i:i + n]))
@@ -134,6 +140,12 @@ def build_funnel_row_v2(src, slug: str) -> dict:
     ev = lambda f, ptr: {"file": f, "pointer": ptr}  # noqa: E731
 
     # ---- (2) the Art. LXXXIV floor (read BEFORE the attack stage) ----
+    # R10 P0-6 (owner): a MISSING n_distinct is FLOOR_UNKNOWN — the
+    # floor is NOT demonstrably met, so the attack stage cannot count
+    # a survivor (the audited defect: n_distinct=None slipped past the
+    # starved check because `None < MIN` is False; an unmeasured floor
+    # never counts as met — Art. XXV: a missing observation is never a
+    # pass).
     n_distinct = None
     distinct_src = None
     ms_env = V1.load_envelopes(src, slug).get("MECHANISM_SPACE",
@@ -143,26 +155,35 @@ def build_funnel_row_v2(src, slug: str) -> dict:
         n_distinct = (ms.get("distinctness") or {}).get("n_distinct")
         distinct_src = ev("envelope_MECHANISM_SPACE.json",
                           "$.mechanism_space.distinctness.n_distinct")
-    starved = (n_distinct is not None
-               and n_distinct < MIN_DISTINCT_MECHANISMS)
+    if n_distinct is None:
+        floor_state = "FLOOR_UNKNOWN"
+    elif n_distinct < MIN_DISTINCT_MECHANISMS:
+        floor_state = "MECHANISM_STARVED"
+    else:
+        floor_state = "FLOOR_MET"
+    starved = floor_state in ("MECHANISM_STARVED", "FLOOR_UNKNOWN")
     row["mechanism_floor"] = {
         "n_distinct_mechanisms": n_distinct,
         "floor": MIN_DISTINCT_MECHANISMS,
-        "classified": ("MECHANISM_STARVED" if starved else
-                       None if n_distinct is None else "FLOOR_MET"),
+        "classified": floor_state,
         "evidence": distinct_src,
         "note": ("Art. LXXXIV: a run with fewer than 2 materially "
                  "distinct mechanisms may not report attack/"
                  "contradiction/experiment results as discovery "
-                 "evidence — the terminal state is MECHANISM_STARVED"),
+                 "evidence — the terminal state is MECHANISM_STARVED; "
+                 "an UNMEASURED floor (n_distinct missing) is "
+                 "FLOOR_UNKNOWN and likewise never admits a survivor"),
     }
     if starved:
         for st in ("attack_survivors", "contradiction_survivors"):
             if isinstance(row.get(st), dict):
                 row[st]["reached"] = False
-                row[st]["typed_drop_reason"] = "MECHANISM_STARVED_ART_LXXXIV"
+                row[st]["typed_drop_reason"] = (
+                    "MECHANISM_STARVED_ART_LXXXIV"
+                    if floor_state == "MECHANISM_STARVED"
+                    else "FLOOR_UNKNOWN_ART_LXXXIV")
         row.setdefault("extra_drops", []).append(
-            "MECHANISM_STARVED_ART_LXXXIV")
+            f"{floor_state}_ART_LXXXIV")
 
     # ---- (1) explicit-only attack survival ----
     atk_stage = row.get("attack_survivors") or {}
@@ -185,25 +206,47 @@ def build_funnel_row_v2(src, slug: str) -> dict:
     atk_stage["count"] = 1 if admissible else 0
 
     # ---- (3) candidate-level gate records ----
+    # R10 P0-6 (owner): a candidate counts as gate-complete ONLY when
+    # ALL FOUR gate verdict records exist (attack / evidence /
+    # contradiction / technical - Art. LXXVIII machine-checkable per
+    # candidate). A candidate missing any gate record is typed
+    # INCOMPLETE_GATE_RECORDS and CANNOT be counted a surviving
+    # candidate (an unverified gate is not a passed gate).
     sel, ssha = src.read_json(f"runs/{slug}/SURVIVOR_SELECTION.json")
     gates = []
+    n_gate_complete = 0
+    n_gate_incomplete = 0
+    _GATE_KEYS = ("attack_verdict", "evidence_verdict",
+                  "contradiction_verdict", "technical_verdict")
     if sel:
         for c in sel.get("ranked") or []:
+            present = {k: c.get(k) for k in _GATE_KEYS
+                       if c.get(k) not in (None, "")}
+            missing = [k for k in _GATE_KEYS if k not in present]
+            complete = not missing
+            n_gate_complete += 1 if complete else 0
+            n_gate_incomplete += 0 if complete else 1
             gates.append({
                 "candidate_id": c.get("candidate_id"),
                 "killed": c.get("killed"),
-                "gate_verdicts": {k: c.get(k) for k in
-                                  ("attack_verdict", "evidence_verdict",
-                                   "contradiction_verdict",
-                                   "technical_verdict") if k in c},
+                "gate_verdicts": present,
+                "missing_gate_records": missing,
+                "gate_state": ("GATE_RECORDS_COMPLETE" if complete
+                               else "INCOMPLETE_GATE_RECORDS"),
                 "bytes": ev("SURVIVOR_SELECTION.json",
                             f"$.ranked[?candidate_id="
                             f"{c.get('candidate_id')}]")})
     row["candidate_gate_records"] = {
-        "n_candidates": len(gates), "gates": gates,
+        "n_candidates": len(gates),
+        "n_gate_complete": n_gate_complete,
+        "n_gate_incomplete": n_gate_incomplete,
+        "gates": gates,
         "selection_sha256": ssha,
         "note": ("Art. LXXVIII: each gate's verdict must exist as a "
-                 "machine-checkable record attached to that candidate")}
+                 "machine-checkable record attached to that candidate "
+                 "- a candidate missing ANY of the four gate records "
+                 "is INCOMPLETE_GATE_RECORDS and never counts as a "
+                 "surviving candidate")}
 
     # ---- (4) the Article LXXX binding ----
     mechanisms = []
