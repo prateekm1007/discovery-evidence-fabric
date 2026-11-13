@@ -107,22 +107,37 @@ def _packet_by_id_from_run_tree(pair: dict) -> dict:
 
 def _timeline_from_result(res: dict, purpose: str) -> list:
     """The per-call timeline rows (owner directive 2): one row per
-    attempt the cascade made — rung, latency, ttfb, hang, retry."""
+    attempt the cascade made — rung, latency, ttfb, hang, retry. The
+    route may arrive as the raw list (llm_generate) or as the parsed
+    check's provider field (a list, a dict, or a provider string —
+    all three shapes are recorded honestly; None stays None)."""
     rows = []
-    for r in res.get("provider_route") or []:
-        if not isinstance(r, dict):
-            continue
-        rows.append({
-            "purpose": purpose,
-            "rung": f"{r.get('provider_attempted')}/{r.get('model')}",
-            "status": r.get("status"),
-            "attempts": r.get("attempts"),
-            "retry_count": r.get("retry_count"),
-            "latency_ms": r.get("latency_ms"),
-            "ttfb_ms": r.get("ttfb_ms"),
-            "gateway_hang": r.get("gateway_hang", False),
-            "failure_type": r.get("failure_type"),
-        })
+    route = res.get("provider_route")
+    if isinstance(route, list):
+        for r in route:
+            if not isinstance(r, dict):
+                continue
+            rows.append({
+                "purpose": purpose,
+                "rung": f"{r.get('provider_attempted')}/{r.get('model')}",
+                "status": r.get("status"),
+                "attempts": r.get("attempts"),
+                "retry_count": r.get("retry_count"),
+                "latency_ms": r.get("latency_ms"),
+                "ttfb_ms": r.get("ttfb_ms"),
+                "gateway_hang": r.get("gateway_hang", False),
+                "failure_type": r.get("failure_type")})
+        return rows
+    # a degraded route summary (the standalone check's provider field):
+    # one honest row without invented numbers
+    prov = route or res.get("provider") or res.get("model")
+    if prov:
+        rows.append({"purpose": purpose, "rung": str(prov)[:80],
+                     "status": "OK" if res.get("ok") else
+                     str(res.get("status") or "SERVED")[:40],
+                     "attempts": None, "retry_count": None,
+                     "latency_ms": None, "ttfb_ms": None,
+                     "gateway_hang": False, "failure_type": None})
     return rows
 
 
@@ -164,6 +179,15 @@ def run_a0plus(pid: str) -> int:
     # ---- leg 1: the LLM constraint audit (ONE call, quoted text)
     t0 = time.time()
     check = llm_constraint_check(prob, baseline, llm_generate)
+    if check.get("state") == "CHECK_TRANSPORT_FAILED":
+        # typed INCOMPLETE: an unaudited baseline is NOT an A0+ answer
+        # (the arm's whole point is the audit); deliver nothing, retry
+        # in a healthy window (Art. LXI: infrastructure absence is
+        # typed, never converted into a verdict)
+        print(f"[a0plus] {pid}: TYPED_TRANSPORT_FAILED (audit call "
+              f"failed: {str(check.get('error'))[:120]}) — no pair "
+              "emitted; retry in a healthy window")
+        return 3
     rec["constraint_audit"] = {
         "state": check.get("state"),
         "n_violations": check.get("n_violations"),
@@ -272,8 +296,12 @@ def run_a0plus(pid: str) -> int:
     rec["baseline_answer"] = baseline
     rec["a0plus_answer"] = answer
     rec["per_call_timeline"] = timeline
-    rec["n_llm_calls"] = sum(1 for t in timeline
-                             if t.get("status") == "OK")
+    # the honest call count: the audit leg counts when it SERVED (its
+    # state is anything but CHECK_TRANSPORT_FAILED); the repair leg
+    # counts when applied — the timeline enriches, never defines
+    rec["n_llm_calls"] = (1 if rec["constraint_audit"]["state"] !=
+                          "CHECK_TRANSPORT_FAILED" else 0) \
+        + (1 if rec["repair_call"].get("applied") else 0)
     rec["work_time_s"] = round(sum(
         (t.get("latency_ms") or 0) / 1000.0 for t in timeline
         if t.get("status") == "OK" and not t.get("gateway_hang")), 1)

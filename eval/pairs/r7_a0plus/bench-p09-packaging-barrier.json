@@ -1,0 +1,87 @@
+{
+ "a0plus_version": "r7_a0plus/1.0.0",
+ "problem_id": "bench-p09-packaging-barrier",
+ "baseline_source": "eval/pairs/dev12_fresh (committed audited bytes, unmodified)",
+ "baseline_sha_source": "858a7af6562dc8adcd6a7d6fa9d1179ddd6f46030dc3f89f9d49c345dcd93a3c",
+ "packet_records_resolved": 20,
+ "constraint_audit": {
+  "state": "PARSED",
+  "n_violations": 1,
+  "violations": [
+   {
+    "type": "LLM_CONSTRAINT_VIOLATES",
+    "detail": "the structured constraint check flags constraint 3 as VIOLATES \u2014 offending text located in the answer",
+    "context": "Replace the ethylene-vinyl alcohol (EVOH) layer with a nanocomposite layer incorporating hydrophobic nanofillers (e.g., cellulose nanocrystals or graphene oxide) into a polyolefin matrix (e.g., PP or ",
+    "source": "constraint_check"
+   }
+  ],
+  "wall_s": 4.9
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "n_user_constraint_relabels": 0,
+  "relabels": []
+ },
+ "repair_call": {
+  "wall_s": 6.2,
+  "applied": true
+ },
+ "post_repair_relabel": {
+  "n_relabels": 0,
+  "relabels": []
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CHECK_ABSENT",
+   "why": "no falsification-test marker found \u2014 the one-design check cannot run (never read as a pass)",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": false,
+   "violations": [
+    "intervention contract: concrete parameter not labeled EVIDENCE-BACKED or ASSUMPTION"
+   ],
+   "question_type": "intervention-proposal",
+   "bindings": {
+    "evidence_bound": 0,
+    "assumption": 0,
+    "unbound_numbers": 11,
+    "all_numbers": 11,
+    "claims": []
+   }
+  }
+ },
+ "full_pipeline_answer": "PARAMETER: ethylene-vinyl alcohol layer additive \u2014 isobutyl-4-hydroxybenzoate (IBHB) \u2014 EVIDENCE-BACKED [doi:10.3389/fchem.2019.00148]\nPARAMETER: additive concentration \u2014 5% by weight \u2014 EVIDENCE-BACKED [doi:10.3389/fchem.2019.00148] | ASSUMPTION\nPARAMETER: processing method \u2014 melt compounding during extrusion \u2014 EVIDENCE-BACKED [doi:10.3389/fchem.2019.00148]\nPARAMETER: expected moisture reduction \u2014 40% decrease in water vapor absorption \u2014 EVIDENCE-BACKED [doi:10.3390/polym18121500]\nPARAMETER: barrier maintenance \u2014 water vapor transmission rate below 0.4 g/m2/day after 18 months at 25\u00b0C and 65% RH \u2014 EVIDENCE-BACKED [doi:10.3390/polym18121500] | ASSUMPTION\n\nThis intervention incorporates IBHB into the ethylene-vinyl alcohol layer to reduce moisture absorption and prevent plasticization, thereby maintaining barrier properties. The hydrophobic phenolic compound reduces the polymer's affinity for water, directly addressing the permeation failure mode. The concentration of 5% by weight is based on typical effective loading ranges for phenolic additives in polyolefin systems. The processing method uses standard industrial extrusion techniques to ensure compatibility with existing manufacturing processes. This approach respects all constraints: it maintains the multilayer polymer structure (C2), directly targets permeation (C3), and is expected to keep water vapor transmission below 0.5 g/m2/day over 18 months at 25\u00b0C and 65% RH (C1).\n\nFalsification test: Accelerated aging test where samples are stored at 40\u00b0C and 75% RH for 90 days (equivalent to approximately 18 months at 25\u00b0C and 65% RH) and water vapor transmission rate is measured according to ASTM E96. If the transmission rate exceeds 0.5 g/m2/day, the intervention fails.\n\nNote: some supporting details in this answer could not be verified against the retrieved records and are labeled as engineering assumptions; the falsification test is the precondition for relying on them.",
+ "full_pipeline_source": "eval/pairs/dev12_fresh (committed)",
+ "baseline_answer": "**Proposed Design/Intervention:**  \nReplace the ethylene-vinyl alcohol (EVOH) layer with a nanocomposite layer incorporating hydrophobic nanofillers (e.g., cellulose nanocrystals or graphene oxide) into a polyolefin matrix (e.g., PP or LLDPE) to maintain barrier properties under humid conditions. This leverages evidence from [europepmc] on nanocomposite technology enhancing barrier properties and [datacite] on PP\u2019s recyclability.  \n\n**Expected Measurable Effect:**  \nThe nanocomposite layer will reduce water vapor transmission rate (WVTR) to <0.5 g/m\u00b2/day over 18 months at 25\u00b0C/65% RH, as the nanofillers create a tortuous path for moisture/oxygen, mitigating plasticization.  \n\n**Test to Falsify:**  \nAccelerated aging at 40\u00b0C/75% RH for 6 months (equivalent to 18 months at 25\u00b0C/65% RH), followed by WVTR testing (ASTM E96). If WVTR exceeds 0.5 g/m\u00b2/day, the design fails.  \n\n**Evidence Constraints:**  \nWhile [europepmc] supports nanocomposites for barrier enhancement, [datacite] mandates monomaterial PP films for recyclability, limiting filler compatibility. If nanofillers impede recycling (per EN 18120-7), the design is invalid. The [arxiv] study on poly-PDO shows promise for chemical recyclability but lacks validation for humidity resistance, making it a less viable alternative here.",
+ "a0plus_answer": "**Proposed Design/Intervention:** \nReplace the ethylene-vinyl alcohol (EVOH) layer with a nanocomposite layer incorporating hydrophobic nanofillers (e.g., cellulose nanocrystals or graphene oxide) into a polyolefin matrix (e.g., PP or LLDPE) to maintain barrier properties under humid conditions. This leverages evidence from [europepmc] on nanocomposite technology enhancing barrier properties and [datacite] on PP's recyclability. \n\n**Expected Measurable Effect:** \nThe nanocomposite layer will reduce water vapor transmission rate (WVTR) to <0.5 g/m\u00b2/day over 18 months at 25\u00b0C/65% RH, as the nanofillers create a tortuous path for moisture/oxygen, mitigating plasticization. \n\n**Test to Falsify:** \nAccelerated aging at 40\u00b0C/75% RH for 6 months (equivalent to 18 months at 25\u00b0C/65% RH), followed by WVTR testing (ASTM E96). If WVTR exceeds 0.5 g/m\u00b2/day for any of the 10 samples tested, the design fails. \n\n**Evidence Constraints:** \nWhile [europepmc] supports nanocomposites for barrier enhancement, [datacite] mandates monomaterial PP films for recyclability, limiting filler compatibility. If nanofillers impede recycling (per EN 18120-7), the design is invalid. The [arxiv] study on poly-PDO shows promise for chemical recyclability but lacks validation for humidity resistance, making it a less viable alternative here.",
+ "per_call_timeline": [
+  {
+   "purpose": "a0plus_constraint_audit",
+   "rung": "None/None",
+   "status": null,
+   "attempts": null,
+   "retry_count": null,
+   "latency_ms": null,
+   "ttfb_ms": null,
+   "gateway_hang": false,
+   "failure_type": null
+  },
+  {
+   "purpose": "a0plus_repair",
+   "rung": "None/None",
+   "status": null,
+   "attempts": null,
+   "retry_count": null,
+   "latency_ms": null,
+   "ttfb_ms": null,
+   "gateway_hang": false,
+   "failure_type": null
+  }
+ ],
+ "n_llm_calls": 2,
+ "work_time_s": 0,
+ "hang_time_s": 0
+}

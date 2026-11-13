@@ -267,10 +267,39 @@ def _run_seeded_sweep(item: dict) -> dict:
 def _run_a0plus(item: dict) -> dict:
     """ONE A0+ invocation: the committed baseline -> constraint audit
     (1 call) -> strict relabel (0 calls) -> ONE repair (0-1 calls).
-    The 40 s per-call timeout rides (the owner's latency budget).
-    """
+    The loop-local zai gateway is started-or-reused and PROBED first
+    (the launcher's own probe-before-admit rule, one script); a typed
+    probe failure is a RETRY_PENDING input, never a verdict."""
     env = dict(os.environ)
     env.setdefault("ENGINE_LLM_TIMEOUT_S", "40")
+    # the same transport env the launcher rides: the cost policy (the
+    # engine refuses every provider under the default ZERO_PAID_COST —
+    # measured typed refusal on the first live A0+ invocation)
+    env.setdefault("ENGINE_MODEL_COST_POLICY", "UNRESTRICTED")
+    gw = None
+    for _try in (1, 2):
+        gw = subprocess.run(["bash", "scripts/zai_gateway_env.sh"],
+                            cwd=str(REPO), capture_output=True, text=True,
+                            timeout=90)
+        has_env = any(l.startswith("export ") for l in
+                      (gw.stdout or "").splitlines())
+        if gw.returncode == 0 and has_env:
+            break
+        # the gateway start is flaky under a reaper race (measured:
+        # the probe passes, the background node dies with the script's
+        # session) — one immediate retry, no fixed sleep
+        time.sleep(1)
+    if gw is None or gw.returncode != 0 or not any(
+            l.startswith("export ") for l in (gw.stdout or "").splitlines()):
+        return {"exit_code": 0, "wall_s": 0.0,
+                "tail": "ZAI_TRANSPORT_PROBE: typed unavailable this "
+                        "window (" + ((gw.stderr if gw else "") or "")[-200:]
+                        + ")"}
+    for line in (gw.stdout or "").splitlines():
+        line = line.strip()
+        if line.startswith("export ") and "=" in line:
+            k, v = line[len("export "):].split("=", 1)
+            env[k] = v
     cmd = [os.environ.get("R6_PYTHON") or sys.executable, "-B",
            "scripts/r7_a0plus.py", item["problem"]]
     t0 = time.time()
@@ -417,7 +446,16 @@ def run_one() -> int:
               f"{it['problem']}"
         s = status.get(key, {})
         if s.get("state") == "DONE":
-            continue
+            if it["kind"] == "a0plus":
+                # the bytes are the truth (Art. XXV): a DONE state whose
+                # pair file is absent (bytes removed after the run)
+                # re-runs; the state alone is never the deliverable
+                f = REPO / "eval" / "pairs" / "r7_a0plus" / \
+                    f"{it['problem']}.json"
+                if f.exists():
+                    continue
+            else:
+                continue
         if s.get("state") == "EXHAUSTED":
             continue
         if s.get("state") == "SKIP":

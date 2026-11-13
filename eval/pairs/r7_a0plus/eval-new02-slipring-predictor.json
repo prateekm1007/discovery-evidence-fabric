@@ -1,0 +1,98 @@
+{
+ "a0plus_version": "r7_a0plus/1.0.0",
+ "problem_id": "eval-new02-slipring-predictor",
+ "baseline_source": "eval/pairs/dev12_fresh (committed audited bytes, unmodified)",
+ "baseline_sha_source": "e9186400d448e73479a31d8ecfffcb644d67093ec41bda216f22e3e7bd24adc5",
+ "packet_records_resolved": 30,
+ "constraint_audit": {
+  "state": "PARSED",
+  "n_violations": 2,
+  "violations": [
+   {
+    "type": "LLM_CONSTRAINT_VIOLATES",
+    "detail": "the structured constraint check flags constraint 1 as VIOLATES \u2014 offending text located in the answer",
+    "context": "The most cost-effective leading indicator is the **time-varying contact resistance ($R_c$) of the brush block, derived from the slip-ring terminal voltage and measured excitation current.",
+    "source": "constraint_check"
+   },
+   {
+    "type": "LLM_CONSTRAINT_VIOLATES",
+    "detail": "the structured constraint check flags constraint 2 as VIOLATES \u2014 offending text located in the answer",
+    "context": "derived from the slip-ring terminal voltage and measured excitation current.",
+    "source": "constraint_check"
+   }
+  ],
+  "wall_s": 4.9
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "n_user_constraint_relabels": 0,
+  "relabels": []
+ },
+ "repair_call": {
+  "wall_s": 10.4,
+  "applied": true
+ },
+ "post_repair_relabel": {
+  "n_relabels": 0,
+  "relabels": []
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CHECK_ABSENT",
+   "why": "no falsification-test marker found \u2014 the one-design check cannot run (never read as a pass)",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": false,
+   "violations": [
+    "predictor contract: no INDICATOR: declared",
+    "predictor contract: no THRESHOLD: declared",
+    "predictor contract: no VALIDATION PROTOCOL: declared",
+    "predictor contract: no n=\u2026 sample-count stated",
+    "predictor contract: the VALIDATION PROTOCOL does not name the INDICATOR quantity (no shared content word beyond protocol scaffolding) \u2014 the protocol must validate the same measure the threshold is declared on"
+   ],
+   "question_type": "predictor-design",
+   "bindings": {
+    "evidence_bound": 0,
+    "assumption": 0,
+    "unbound_numbers": 10,
+    "all_numbers": 10,
+    "claims": [],
+    "threshold_basis": "no_number"
+   }
+  }
+ },
+ "full_pipeline_answer": "INDICATOR: Phase-locked mean contact resistance (Rc) variance per brush track, calculated from 1-minute historian samples of track voltage (V) and excitation current (I), normalized to the 1800 rpm rotational frequency. The metric is the standard deviation of the residual contact voltage (V - I * R_baseline) after subtracting the inductive component, which isolates resistive impedance spikes caused by micro-separations and arc precursors.\n\nTHRESHOLD: Alert when the rolling 24-hour standard deviation of contact resistance exceeds baseline_mean + 3*sigma, where baseline_mean and sigma are calculated from a moving 14-day window of healthy data. This threshold corresponds to an incipient separation event where contact resistance rises by >15% (ASSUMPTION for typical silver-graphite brushes under 1.5 MW generator conditions, supported by [doi:10.1109/holm.2018.8611774]). This value is set to capture sub-threshold events that precede macroscopic temperature or vibration alarms, ensuring a 2-week lead time as required by the user. The threshold must be dynamically adjusted to avoid false alarms, with the \"no more than 1 false alarm per year\" constraint enforced by requiring two consecutive 24-hour periods to exceed the threshold before triggering a maintenance alert.\n\nPROTOCOL: To validate the predictor, we will use n=10 historical fault datasets from the plant historian (ASSUMPTION based on typical fleet size for this machine type). Pass criterion: For each of the 10 historical incidents, the alert must fire >=14 days before the recorded forced outage timestamp. Fail criterion: If the alert fires <14 days before outage in >=2 cases, or if the predictor triggers a false alarm >1 time per year in simulation across the historical window, the parameters (sigma multiplier or window size) must be recalibrated. The model must be tested on at least 500 days of combined historical data (ASSUMPTION) to verify the false-alarm rate constraint. This protocol respects the historian-only constraint (1-minute sampling) and the 2-week warning constraint.\n\nExpected measurable effect: The system will identify incipient brush-to-ring micro-separations and arc precursors [EVIDENCE-BACKED doi:10.3390/machines14060674] [EVIDENCE-BACKED doi:10.20944/preprints202508.2024.v1] by detecting stochastic impedance spikes correlated with rotational phase. This intervention enables maintenance intervention before the excitation fault self-reports, reducing unplanned downtime. The design is robust to normal wear rates, focusing on the *rate* of resistance change (variance) rather than absolute value, which accounts for natural drift [EVIDENCE-BACKED doi:10.31274/rtd-180813-15199].\n\nFalsification test: The specific falsification test is a \"silent failure\" scenario. We will construct a synthetic test dataset by taking 1 week of known-healthy historian data and injecting a simulated 20% step-increase in contact resistance noise with a diurnal cycle matching the 1800 rpm phase-locking artifact. The predictor must NOT trigger an alert on this synthetic dataset (as it lacks the stochastic arc-precursor signature [EVIDENCE-BACKED doi:10.1108/ilt-09-2023-0300/v3/review1]). Conversely, we inject a simulated 5% variance increase in resistance (representing early wear) and the predictor MUST trigger within 2 weeks. If the system fails to distinguish between steady drift and stochastic micro-separation events, the hypothesis is falsified. The key discriminator is the *stochasticity* and *phase-correlation* of the spikes, not just the mean value.",
+ "full_pipeline_source": "eval/pairs/dev12_fresh (committed)",
+ "baseline_answer": "**Proposed Design/Intervention**\n\nThe most cost-effective leading indicator is the **time-varying contact resistance ($R_c$) of the brush block, derived from the slip-ring terminal voltage and measured excitation current.**\n\nAt 1-minute historian sampling intervals, you cannot resolve the high-frequency arcing transients or micro-vibrations. However, contact resistance in a healthy slip ring is stable with low variance. As wear progresses and the interface moves from pure sliding contact toward intermittent separation (the precursors to arcing), the effective contact area decreases, causing $R_c$ to rise. This rise is not instantaneous; it follows a stochastic, upward-trending noise band that begins weeks before catastrophic arcing. The leading indicator is the **drift in the median value** of the calculated $R_c$ and the **expansion of its rolling standard deviation**.\n\n**Operating Threshold**\n\nTo satisfy the \"1 false alarm per year\" constraint while providing \"2 weeks warning,\" a simple static threshold is insufficient because $R_c$ is load-dependent. The threshold must be a **baseline deviation metric**:\n\n1.  **Baseline Establishment:** Calculate the 30-day rolling median ($M_{30}$) and standard deviation ($\\sigma_{30}$) of $R_c$ at a standardized reference current (normalized for load).\n2.  **Primary Alarm (2-week warning):** Trigger when the instantaneous $R_c$ exceeds $M_{30} + 3\\sigma_{30}$ for 5 consecutive 1-minute intervals. This catches the start of the wear-driven drift.\n3.  **Critical Alarm (Aring Precursor):** Trigger when the short-term variance ($\\sigma_{1h}$) exceeds $2 \\times \\sigma_{30}$ for 24 hours. This captures the increased instability/separation events that precede the major arcing faults.\n\nThis dual-threshold approach filters out transient load spikes (which increase $R_c$ but recover quickly) while catching the persistent, non-recoverable drift caused by physical brush wear and surface degradation.\n\n**Expected Measurable Effect**\n\n*   **Leading Time:** The physical progression from stable sliding to intermittent separation takes days to weeks. The median drift in $R_c$ should be detectable 14\u201321 days before the arcing frequency becomes high enough to cause thermal or vibration alarms.\n*   **False Alarm Rate:** The $3\\sigma$ deviation from a 30-day baseline is statistically robust against normal operational variability, maintaining the <1/year target.\n*   **Cost:** No new hardware is required. It uses existing voltage and current sensors already present in the excitation system control cabinet.\n\n**Validation/Kill Test**\n\nThe test to falsify this predictor is a **historical correlation study** using archived data:\n\n1.  **Data Mining:** Retrieve 12 months of 1-minute historian data for the 1.5 MW generator, including periods where brush replacement or minor arcing events were logged (maintenance records).\n2.  **Retrospective Analysis:** Overlay the calculated $R_c$ drift and $\\sigma$ expansion on the timeline of the logged maintenance events.\n3.  **Falsification Criteria:**\n    *   If the $R_c$ drift does **not** begin rising significantly (>3$\\sigma$) at least 14 days before the recorded arcing/wear faults, the predictor is **killed**.\n    *   If the false positive rate in the historical data (periods where $R_c$ breached the threshold but no fault occurred) exceeds 1 event per machine-year, the threshold sensitivity must be re-tuned or the predictor rejected.\n\n**Evidence Support**\n*   **[doaj] Surface-Resolved Multiphysics Modeling...** supports the mechanism: it explicitly models how mechanical contact dynamics and intermittent separation activate arc channels. This confirms that separation (leading to resistance changes) is the precursor to arcing.\n*   **[crossref] Fractal contact resistance model of wind pitch slip ring...** supports the measurability: it demonstrates that contact resistance is a fractal, variable signal correlated with wear and vibration, making its statistical drift a valid metric.\n*   **[europepmc/other] Irrelevant materials science papers** are noted as not directly supporting the electrical",
+ "a0plus_answer": "**Proposed Design/Intervention**\n\nThe most cost-effective leading indicator is the **time-varying contact resistance ($R_c$) of the brush block, derived from the slip-ring terminal voltage and measured excitation current.**\n\nAt 1-minute historian sampling intervals, you cannot resolve the high-frequency arcing transients or micro-vibrations. However, contact resistance in a healthy slip ring is stable with low variance. As wear progresses and the interface moves from pure sliding contact toward intermittent separation (the precursors to arcing), the effective contact area decreases, causing $R_c$ to rise. This rise is not instantaneous; it follows a stochastic, upward-trending noise band that begins weeks before catastrophic arcing. The leading indicator is the **drift in the median value** of the calculated $R_c$ and the **expansion of its rolling standard deviation**.\n\n**Operating Threshold**\n\nTo satisfy the \"1 false alarm per year\" constraint while providing \"2 weeks warning,\" a simple static threshold is insufficient because $R_c$ is load-dependent. The threshold must be a **baseline deviation metric**:\n\n1. **Baseline Establishment:** Calculate the 30-day rolling median ($M_{30}$) and standard deviation ($\\sigma_{30}$) of $R_c$ at a standardized reference current (normalized for load).\n2. **Primary Alarm (2-week warning):** Trigger when the instantaneous $R_c$ exceeds $M_{30} + 3\\sigma_{30}$ for 5 consecutive 1-minute intervals. This catches the start of the wear-driven drift.\n3. **Critical Alarm (Arcing Precursor):** Trigger when the short-term variance ($\\sigma_{1h}$) exceeds $2 \\times \\sigma_{30}$ for 24 hours. This captures the increased instability/separation events that precede the major arcing faults.\n\nThis dual-threshold approach filters out transient load spikes (which increase $R_c$ but recover quickly) while catching the persistent, non-recoverable drift caused by physical brush wear and surface degradation.\n\n**Expected Measurable Effect**\n\n* **Leading Time:** The physical progression from stable sliding to intermittent separation takes days to weeks. The median drift in $R_c$ should be detectable 14\u201321 days before the arcing frequency becomes high enough to cause thermal or vibration alarms.\n* **False Alarm Rate:** The $3\\sigma$ deviation from a 30-day baseline is statistically robust against normal operational variability, maintaining the <1/year target.\n* **Cost:** No new hardware is required. It uses existing voltage and current sensors already present in the excitation system control cabinet.\n\n**Validation/Kill Test**\n\nThe test to falsify this predictor is a **historical correlation study** using archived data:\n\n1. **Data Mining:** Retrieve 12 months of 1-minute historian data for the 1.5 MW generator, including periods where brush replacement or minor arcing events were logged (maintenance records).\n2. **Retrospective Analysis:** Overlay the calculated $R_c$ drift and $\\sigma$ expansion on the timeline of the logged maintenance events.\n3. **Falsification Criteria:**\n * If the $R_c$ drift does **not** begin rising significantly (>3$\\sigma$) at least 14 days before the recorded arcing/wear faults, the predictor is **killed**.\n * If the false positive rate in the historical data (periods where $R_c$ breached the threshold but no fault occurred) exceeds 1 event per machine-year, the threshold sensitivity must be re-tuned or the predictor rejected.\n\n**Evidence Support**\n* **[doaj] Surface-Resolved Multiphysics Modeling...** supports the mechanism: it explicitly models how mechanical contact dynamics and intermittent separation activate arc channels. This confirms that separation (leading to resistance changes) is the precursor to arcing.\n* **[crossref] Fractal contact resistance model of wind pitch slip ring...** supports the measurability: it demonstrates that contact resistance is a fractal, variable signal correlated with wear and vibration, making its statistical drift a valid metric.\n* **[europepmc/other] I",
+ "per_call_timeline": [
+  {
+   "purpose": "a0plus_constraint_audit",
+   "rung": "None/None",
+   "status": null,
+   "attempts": null,
+   "retry_count": null,
+   "latency_ms": null,
+   "ttfb_ms": null,
+   "gateway_hang": false,
+   "failure_type": null
+  },
+  {
+   "purpose": "a0plus_repair",
+   "rung": "None/None",
+   "status": null,
+   "attempts": null,
+   "retry_count": null,
+   "latency_ms": null,
+   "ttfb_ms": null,
+   "gateway_hang": false,
+   "failure_type": null
+  }
+ ],
+ "n_llm_calls": 2,
+ "work_time_s": 0,
+ "hang_time_s": 0
+}
