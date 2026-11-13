@@ -59,6 +59,17 @@ Serves: Art. LXXIV (observer-independent durable execution — the state
 file, not a held-open session, carries the work), Art. LXI (every
 incomplete run is typed and retried or exhausted, never silent),
 Art. XXXIX (the audited pair bytes are never overwritten).
+
+R8 credential round (owner message 2026-11-13: a fresh xkiro
+credential, "Mercury 3", for the measured MISTRAL FREE TIER on the
+xkiro gateway): the runner loads the gitignored vault (.env.keys,
+KEY=VALUE lines) into os.environ at startup — the registry reads keys
+at CALL time, so a credential becomes effective with ZERO further code
+change, and the launcher subprocesses inherit it through the normal
+env chain (the WSL->.exe hop that killed shell exports does not exist
+on this host). Names ride the log; VALUES are never printed, never
+copied into tracked files, never committed (the vault is gitignored;
+Art. XVIII-adjacent: credentials are transport, not epistemics).
 """
 from __future__ import annotations
 
@@ -540,7 +551,42 @@ def run_one() -> int:
     return 0
 
 
+def _load_key_vault() -> list:
+    """Load the gitignored credential vault (.env.keys) into os.environ.
+
+    Contract: KEY=VALUE lines, '#' comments skipped, EXPLICIT env wins
+    (setdefault — an operator-exported override is never clobbered),
+    missing file is fine (typed empty list), and the RETURN VALUE is
+    the list of loaded NAMES ONLY — the caller echoes names, never
+    values (no credential ever reaches a log, an artifact, or git).
+    Serves the R8 credential round: the registry reads provider keys at
+    CALL time from os.environ, so loading the vault here is the whole
+    wiring (Art. X: transport plumbing only, one transport path
+    unchanged).
+    """
+    vault = REPO / ".env.keys"
+    loaded: list = []
+    if not vault.exists():
+        return loaded
+    for line in vault.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        name, _, value = line.partition("=")
+        name, value = name.strip(), value.strip()
+        if not name or not value:
+            continue
+        if not os.environ.get(name, "").strip():
+            os.environ[name] = value
+            loaded.append(name)
+    return loaded
+
+
 def main() -> int:
+    _vault_names = _load_key_vault()
+    if _vault_names:
+        print("[r7queue] credential vault loaded (names only): "
+              + ", ".join(sorted(_vault_names)))
     if "--status" in sys.argv:
         st = load_state()
         done = sum(1 for v in st.get("status", {}).values()

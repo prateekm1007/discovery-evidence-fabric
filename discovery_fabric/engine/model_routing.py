@@ -230,10 +230,20 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
 #:          per-call id (glm-4-plus; recorded upstream drift: the CLI
 #:          routed glm-4-plus to zai-org/GLM-5.3 on some calls —
 #:          disclosed, not silent).
-#:   xkiro  free-tier remote router, KEYLESS serving measured live on
-#:          the coder host (30-pair judge calibration 27/30 = 0.90,
-#:          ELIGIBLE 2026-11-12); judge independence: different
-#:          provider+family from the synthesis head.
+#:   xkiro  free-tier remote router — the committed judge rung
+#:          (mistralai/ministral-14b, 30-pair judge calibration 27/30
+#:          = 0.90, ELIGIBLE 2026-11-12; judge independence: different
+#:          provider+family from the synthesis head). R8 re-measure
+#:          2026-11-13: AUTH IS NOW REQUIRED (the 2026-11-12 KEYLESS
+#:          serving is DEAD — every unauthenticated call answers 401
+#:          'Missing ClientApiKey'); the owner's supplied credential is
+#:          rejected by the validator itself ('Invalid or disabled
+#:          ClientApiKey', both hosts, both header schemes) — the rung
+#:          is credential-gated until a VALID key sits in XKIRO_API_KEY
+#:          (the runner loads the gitignored vault at startup; zero
+#:          code change on a valid key). No mercury id exists on this
+#:          gateway (69-model catalog, fetched live 2026-11-13); the
+#:          owner's 'Mercury 3' name resolves to nothing servable here.
 ROUTE_TABLE: Dict[str, Tuple[str, str]] = {
     "synthesis": ("zai", "glm-4-plus"),
     "attack": ("zai", "glm-4-plus"),
@@ -247,6 +257,15 @@ ROUTE_TABLE: Dict[str, Tuple[str, str]] = {
 #: authority is provider_health.RETIRED_ROUTE_PROVIDERS + the spec
 #: allowlists above — these notes are the recorded basis, Art. XXV).
 ROUTE_TABLE_NOTES: Dict[str, str] = {
+    "xkiro": ("R8 2026-11-13: auth now REQUIRED (keyless serving dead, "
+              "typed 401 'Missing ClientApiKey'); the supplied owner "
+              "credential is rejected by the validator ('Invalid or "
+              "disabled ClientApiKey') — typed AUTH_FAILURE, the rung "
+              "is credential-gated until a valid key lands in "
+              "XKIRO_API_KEY (vault-loaded by the runner, zero code "
+              "change then); no mercury id in the 69-model catalog; the "
+              "mistral free family is real per the gateway deals page "
+              "and stays one measurement away from the allowlist"),
     "agnes": ("429 RATE_LIMITED 'used up today's text quota ... 1 "
               "request every 3 minutes' (probe record 2026-11-12; "
               "unusable as a synthesis/attack head this window)"),

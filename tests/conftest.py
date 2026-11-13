@@ -83,11 +83,42 @@ if sys.platform == "win32":
         _fake_fcntl.flock = lambda *a, **k: None
         sys.modules["fcntl"] = _fake_fcntl
 
-PROVIDER_ENV_VARS = [
-    "OPENROUTER_API_KEY", "NVIDIA_API_KEY", "ANTHROPIC_API_KEY",
-    "GEMINI_API_KEY", "OPENAI_API_KEY", "QWEN_API_KEY", "DEEPSEEK_API_KEY",
-    "MISTRAL_API_KEY",
-]
+def _provider_env_vars():
+    """Derive the provider-credential surface from the ONE authoritative
+    table (llm_registry.PROVIDER_SPECS) — the hand-maintained list went
+    stale (R8 measured: XKIRO_API_KEY/AGNES_API_KEY/INCEPTION_API_KEY/
+    HF_TOKEN/UNOROUTER_API_KEY were missing, and a startup_validation
+    test legitimately loaded the real vault into the process env, so
+    the leak reached the 'no probe with empty credentials' contract).
+    LOCAL_QWEN_BASE_URL is a transport endpoint, not a secret — excluded.
+    The static fallback keeps the suite alive if the registry import
+    ever breaks (typed warning, never silent drift)."""
+    fallback = [
+        "OPENROUTER_API_KEY", "NVIDIA_API_KEY", "ANTHROPIC_API_KEY",
+        "GEMINI_API_KEY", "OPENAI_API_KEY", "QWEN_API_KEY",
+        "DEEPSEEK_API_KEY", "MISTRAL_API_KEY",
+    ]
+    try:
+        from discovery_fabric.engine.llm_registry import PROVIDER_SPECS
+        names = set()
+        for spec in PROVIDER_SPECS:
+            if spec.env_var and spec.env_var != "LOCAL_QWEN_BASE_URL":
+                names.add(spec.env_var)
+            for extra in (spec.key_env_vars or []):
+                if extra != "LOCAL_QWEN_BASE_URL":
+                    names.add(extra)
+        if names:
+            return sorted(names)
+        print("[conftest] registry returned no provider env vars; "
+              "using the static fallback list (typed)")
+        return fallback
+    except Exception as exc:  # noqa: BLE001 — typed, never silent
+        print(f"[conftest] provider-env derivation failed typed "
+              f"({type(exc).__name__}: {exc}); static fallback in use")
+        return fallback
+
+
+PROVIDER_ENV_VARS = _provider_env_vars()
 
 # Source-layer credentials (read from .env.keys, not env vars). Same
 # hermetic rule as the LLM keys above: provisioning a source key (e.g. the

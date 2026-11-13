@@ -308,17 +308,29 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "failure that advances the cascade — never a bill.")),
     ProviderSpec(
         "xkiro", "XKIRO_API_KEY",
-        "https://xkiro.com/v1/chat/completions",
-        "qwen/qwen3.8-max:free", "openai", 128_000,
+        # R8 credential round 2026-11-13: the DOCS-named OpenAI-SDK base
+        # is https://api.xkiro.com/v1; the legacy xkiro.com host answers
+        # the SAME validator (measured live: byte-identical 401 bodies
+        # on both hosts, both header schemes). The spec re-points to the
+        # documented host — recorded, never silent (Art. XXV).
+        "https://api.xkiro.com/v1/chat/completions",
+        # R8 re-point 2026-11-13: the 2026-09-14 default qwen/
+        # qwen3.8-max:free is NO LONGER in the catalog (fresh /v1/models
+        # = 69 models, ZERO qwen/*, minimax/* or z-ai/* namespaces — the
+        # catalog drifted); the default names the MEASURED serving rung
+        # instead (mistralai/ministral-14b: live 2026-11-10, judge
+        # calibration 27/30) — the owner's measured "mistral free tier"
+        # (all eight mistralai models free per the gateway's deals page,
+        # fetched 2026-11-13).
+        "mistralai/ministral-14b", "openai", 128_000,
         quality_tier=2, cost_tier=1, latency_tier=2,
         cost_basis="FREE_TIER_API", locality="REMOTE",
         license="provider serving terms (free tier, no deposit)",
         account_domain="OWNER_XKIRO_ACCOUNT",
-        model_revision="router free tier; qwen/qwen3.8-max:free and "
-                       "minimax/minimax-m3:free measured live 2026-09-14 "
-                       "(tiny completions 3.2 s / 3.4 s); no per-model "
-                       "revision pin exposed by the router — recorded "
-                       "honest (Art. VI)",
+        model_revision="router free tier; mistralai/ministral-14b is the "
+                       "measured serving rung (2026-11-10 live, judge "
+                       "calibration 27/30); no per-model revision pin "
+                       "exposed by the router — recorded honest (Art. VI)",
         extra_headers={
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                           "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -330,7 +342,35 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "banned (403 error 1010 on every endpoint) while a standard "
             "Chrome UA passes; the spec's extra_headers carries that UA "
             "on EVERY call, probe, and catalog fetch (transport plumbing "
-            "only). LIVE-MEASURED at registration: GET /v1/models -> 200 "
+            "only). R8 CREDENTIAL ROUND (measured live 2026-11-13, probe "
+            "record ENGINE_RUNS/r8_xkiro_mercury3_probe.json + curl "
+            "variants): (a) KEYLESS SERVING IS DEAD — the chat endpoint "
+            "answers 401 'Missing ClientApiKey. Send \"Authorization: "
+            "Bearer <key>\" or the x-api-key header.' on EVERY "
+            "unauthenticated call (the 2026-11-12 keyless measurement is "
+            "history, not current fact); (b) the owner's supplied "
+            "credential (dashboard key 'Mercury 3', named for the "
+            "mistral free tier the owner intends) answers 401 'Invalid "
+            "or disabled ClientApiKey' on BOTH hosts and BOTH documented "
+            "header schemes — the validator itself rejects it: the key "
+            "is disabled/invalid/incomplete dashboard-side and NOTHING "
+            "this repository can do heals that (typed AUTH_FAILURE, a "
+            "dashboard-side act, Art. LXI); (c) the fresh catalog is 69 "
+            "models — NO mercury id exists on this gateway at all (the "
+            "owner's 'Mercury 3' name resolves to nothing servable "
+            "here; the 2026-11-12 mercury removal on the INCEPTION path "
+            "stays scoped there); (d) the MISTRAL FREE TIER is real per "
+            "the gateway's own deals page ('All eight Mistral models "
+            "are free on xKiro: Mistral Large, Medium 3.5, Small, "
+            "Codestral, Devstral Medium and the Ministral 14B / 8B / 3B "
+            "family', fetched 2026-11-13; 500K tokens/day free plan) — "
+            "the moment a VALID credential sits in XKIRO_API_KEY the "
+            "registry picks it up at call time with ZERO code change "
+            "(the queue runner loads the gitignored vault at startup); "
+            "the allowlist is NOT extended to the unmeasured mistral "
+            "ids (premium-precedent: measured ids only — the whole free "
+            "family is one measurement away). "
+            "LIVE-MEASURED at registration: GET /v1/models -> 200 "
             "with 109 namespaced models (qwen/*, minimax/*, z-ai/*, "
             "deepseek/*, anthropic/*...); qwen/qwen3.8-max:free tiny "
             "completion -> 200 PROBE_OK 3.2 s; minimax/minimax-m3:free "
