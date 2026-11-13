@@ -181,9 +181,19 @@ def _run_launcher(item: dict) -> dict:
             f"FABRIC_LLM_ECONOMY_DIR={item['pairs_out']}/economy")
     cmd = ["bash", "scripts/r6_run_dev12.sh", ",".join(args)]
     t0 = time.time()
-    proc = subprocess.run(cmd, cwd=str(REPO), env=env,
-                          capture_output=True, text=True,
-                          timeout=1000 + 120)
+    try:
+        proc = subprocess.run(cmd, cwd=str(REPO), env=env,
+                              capture_output=True, text=True,
+                              timeout=1000 + 120)
+    except subprocess.TimeoutExpired as te:
+        # typed: the item stays unmarked (RETRY_PENDING classification
+        # below sees no committed pair) — the next chunk re-plans it
+        return {"exit_code": 124, "wall_s": round(time.time() - t0, 1),
+                "tail": "TIMEOUT after "
+                        f"{round(time.time() - t0, 1)}s (typed; the "
+                        "item re-plans on the next chunk) "
+                        + ((te.stdout or b"")[-400:].decode(
+                            "utf-8", "replace") if te.stdout else "")}
     wall = round(time.time() - t0, 1)
     return {"exit_code": proc.returncode, "wall_s": wall,
             "tail": (proc.stdout or "")[-1200:]
