@@ -127,7 +127,11 @@ add_env "RETRIEVE_JOB_BUDGET_S=20"
 # owner directive 2026-11-12: <= 8 healthy calls per problem. The
 # economy record carries the per-problem counters as evidence; the
 # retry-storm controls are unchanged (retry cap 6, breaker threshold 3).
-add_env "FABRIC_PROBLEM_CALL_CAP=8"
+# owner directive 2026-11-12: hard cap 14 UNTIL the demand
+# cuts land (synthesis one-call + fallback; KF fused into the
+# MS batch); measured demand 8-17 starved the evaluator at 8.
+# Lower back to 8 only when measured demand fits.
+add_env "FABRIC_PROBLEM_CALL_CAP=14"
 # --- zai transport probe (typed availability, never silent) ------------
 # MEASURED this host: the z-ai CLI is absent (WSL PATH, Windows npm
 # dir, npm registry 404) — the loop-local gateway CANNOT serve here and

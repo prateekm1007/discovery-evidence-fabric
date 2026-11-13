@@ -325,7 +325,11 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
             _spans["n_llm_chat_calls"] += 1
 
     fields = ["MECHANISM", "INTERVENTION", "EXPECTED_EFFECT", "FALSIFICATION_TEST", "MECHANISM_SOURCE_SPAN"]
-    _ROTATION_PAPERS = 3          # operational bound, disclosed here
+    # OWNER DIRECTIVE 2026-11-12 (measured demand 8-17 vs cap): the
+    # synthesis rotation is ONE call with a single typed-failure
+    # fallback (2 papers bound), never a 3-call rotation — the third
+    # attempt starved the evaluator under the cap (Art. XXVII).
+    _ROTATION_PAPERS = 2          # operational bound, disclosed here
     _ROTATION_BACKOFF_S = (0, 8, 20)  # MODEL_DERIVED operational bound:
     #  the measured flap window is ~1-4 min; 0/8/20 s spreads three real
     #  attempts across it without stretching a run's wall time

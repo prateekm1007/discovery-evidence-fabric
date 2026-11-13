@@ -208,14 +208,29 @@ class Candidate:
         self.stage_log.append(entry)
         # A1 record: the stage's apply_to + result_meta are memoized under
         # the canonical upstream key (rw mode only; only successful
-        # executions are recorded)
+        # executions are recorded). OWNER DIRECTIVE 2026-11-12 (measured
+        # defect: the replay served a frozen EVALUATOR_CALL_FAILED
+        # verbatim, so a pair could never form): a stage whose payload
+        # carries a TYPED INFRASTRUCTURE FAILURE is never memoized —
+        # an infrastructure failure is not a result (Art. LXI: the
+        # unknown stays unknown; the stage re-runs live). CONTENT
+        # outcomes (typed kills, starvations) stay memoizable: a typed
+        # loss is data (owner, same round).
         if _memo_key is not None and isinstance(result, dict) \
                 and result.get("_engine_result") is True:
-            _econ.stage_memo_put(_memo_key, {
-                "apply_to": result.get("apply_to") or {},
-                "result_meta": {
-                    k2: v2 for k2, v2 in result_meta.items()
-                    if k2 != "raw_return_type"}})
+            _payload = json.dumps(result.get("apply_to") or {},
+                                  default=str)
+            _infra = [s for s in _INFRASTRUCTURE_MEMO_STATES
+                      if s in _payload]
+            if _infra:
+                entry["memo_skipped"] = ("INFRASTRUCTURE_STATE:"
+                                         + sorted(_infra)[0])
+            else:
+                _econ.stage_memo_put(_memo_key, {
+                    "apply_to": result.get("apply_to") or {},
+                    "result_meta": {
+                        k2: v2 for k2, v2 in result_meta.items()
+                        if k2 != "raw_return_type"}})
         return entry
 
     def _apply_memo_hit(self, stage_name: str, capability_id: str,
@@ -266,3 +281,16 @@ class StageFailure(RuntimeError):
         super().__init__(f"stage {stage} failed: {error}")
         self.stage = stage
         self.error = error
+
+
+#: OWNER DIRECTIVE 2026-11-12: a stage whose payload carries one of
+#: these TYPED INFRASTRUCTURE states is never memoized (an
+#: infrastructure failure is not a result; the stage re-runs live).
+#: Content outcomes (typed kills, starvations) stay memoizable.
+_INFRASTRUCTURE_MEMO_STATES = (
+    "EVALUATOR_CALL_FAILED", "EVALUATION_FAILED",
+    "PROVIDER_UNAVAILABLE", "COMPOSE_FAILED_TRANSPORT",
+    "COMPOSE_TRUNCATED", "CALL_FAILED", "BREAKER_OPEN",
+    "HEALTHY_CALL_CAP_EXCEEDED", "RETRIEVE_JOB_BUDGET_EXCEEDED",
+    "AUTH_FAILURE", "RATE_LIMITED_RETRY", "INCOMPLETE_INFRASTRUCTURE",
+)

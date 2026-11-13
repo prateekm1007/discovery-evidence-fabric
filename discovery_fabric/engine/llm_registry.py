@@ -1312,10 +1312,14 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
     # A1 record: the successful call is cached for replay (rw mode only;
     # an empty-content or API-error result never reaches here, so the
     # composer's larger-budget truncation retry keeps its own distinct
-    # cache key via max_tokens)
-    _econ.cache_put(_ck, {"content": content, "finish_reason": _finish,
-                          "model": model, "provider_id": spec.provider_id,
-                          "max_tokens": max_tokens})
+    # cache key via max_tokens). OWNER DIRECTIVE 2026-11-12 (defect:
+    # the replay served a frozen failure): ONLY finish_reason=stop is
+    # a result — a "length" cut is an infrastructure truncation, never
+    # cached (the retry path's larger budget re-runs it live).
+    if _finish == "stop":
+        _econ.cache_put(_ck, {"content": content, "finish_reason": _finish,
+                              "model": model, "provider_id": spec.provider_id,
+                              "max_tokens": max_tokens})
     return content
 
 
@@ -1381,10 +1385,14 @@ def _call_anthropic_flavor(spec: ProviderSpec, messages: List[dict],
     # recorded thread-locally, consumed by generate() into the
     # LLMCallResult
     _record_finish_reason(_finish_from_anthropic(data.get("stop_reason")))
-    _econ.cache_put(_ck, {"content": content, "finish_reason":
-                          _finish_from_anthropic(data.get("stop_reason")),
-                          "model": model, "provider_id": spec.provider_id,
-                          "max_tokens": max_tokens})
+    # OWNER DIRECTIVE 2026-11-12: only a clean stop is a result — a
+    # max_tokens cut is infrastructure truncation, never cached
+    if _finish_from_anthropic(data.get("stop_reason")) == "stop":
+        _econ.cache_put(_ck, {"content": content, "finish_reason":
+                              _finish_from_anthropic(
+                                  data.get("stop_reason")),
+                              "model": model, "provider_id": spec.provider_id,
+                              "max_tokens": max_tokens})
     return content
 
 

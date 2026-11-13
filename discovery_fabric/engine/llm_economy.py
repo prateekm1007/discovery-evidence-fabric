@@ -282,6 +282,19 @@ def cache_get(key: str) -> Optional[Dict[str, Any]]:
 
 
 def cache_put(key: str, entry: Dict[str, Any]) -> None:
+    # OWNER DIRECTIVE 2026-11-12 (measured defect: the replay served a
+    # frozen failure): ONLY finish_reason=stop is a result. A "length"
+    # cut (or any non-stop finish) is infrastructure truncation — it is
+    # never stored, so no replay can ever serve it (the caller's
+    # larger-budget retry re-runs live). Enforced HERE, the single
+    # write authority, not only at the registry call sites (Art. X).
+    if str(entry.get("finish_reason") or "") != "stop":
+        with _lock:
+            _counters["cache_refused_nonstop"] = \
+                _counters.get("cache_refused_nonstop", 0) + 1
+        _log_event("cache_put_refused_nonstop",
+                   finish=str(entry.get("finish_reason")))
+        return
     if cache_mode() != "rw":
         return
     try:
