@@ -4,11 +4,11 @@
  "commit": "86cf6ab73 (the acceptance run executed at 7b34c6b91 lineage; this table compiles the measured rows)",
  "owner_acceptance": "must flag fu-004/new04/new01/sofc; must pass new02/fu-001/p02",
  "acceptance_result": "PASS (all 7 rows match the owner list)",
- "note": "the LLM check rode the zai loop-local rung (glm-4-plus), ONE call per problem; full verdict JSONs live in the gitignored run tree \u2014 THIS table is the committed acceptance evidence (owner directive 3: not gitignored)",
+ "note": "the LLM check rode the zai loop-local rung (glm-4-plus), ONE call per problem; full verdict JSONs live in the gitignored run tree — THIS table is the committed acceptance evidence (owner directive 3: not gitignored)",
  "rows": [
   {
    "problem_id": "dev-fu-004-fouling",
-   "answer_source": "audited run tree 977851bc16a5 (fu-004 byte-identity sha f691cd91 verified)",
+   "answer_source": "committed pair bytes since the 2026-11-13 restoration (answer sha f691cd91, byte-identical to the af7e2a03f pair answer and to run tree 977851bc16a5); BEFORE the restoration this row ran on the audited run tree because commit 22cb7f5cd had re-committed the pair with pipeline_answer: null (see fu_004_reconciliation)",
    "floor_verdict": "DISALLOWED_MEASUREMENT",
    "llm_check_verdict": "PARSED: PASS",
    "llm_model": "glm-4-plus",
@@ -21,7 +21,7 @@
    "floor_verdict": "PASS",
    "llm_check_verdict": "PARSED: LLM_CONSTRAINT_VIOLATES",
    "llm_model": "glm-4-plus",
-   "quoted_offending_text": "Deviation of the measured Condenser Approach Temperature (\u0394T_approach = Condenser Water Return Temp \u2212 Saturate",
+   "quoted_offending_text": "Deviation of the measured Condenser Approach Temperature (ΔT_approach = Condenser Water Return Temp − Saturate",
    "merged_flagged": true
   },
   {
@@ -30,16 +30,16 @@
    "floor_verdict": "PASS",
    "llm_check_verdict": "PARSED: LLM_RESTATES_USER_CONSTRAINT",
    "llm_model": "glm-4-plus",
-   "quoted_offending_text": "PARAMETER: Operating Voltage \u2014 2.7 V per cell \u2014 ASSUMPTION (User Constraint)",
+   "quoted_offending_text": "PARAMETER: Operating Voltage — 2.7 V per cell — ASSUMPTION (User Constraint)",
    "merged_flagged": true
   },
   {
    "problem_id": "eval-sofc-thermal-cycling",
-   "answer_source": "audited run tree 977851bc16a5 (fu-004 byte-identity sha f691cd91 verified)",
+   "answer_source": "committed pair bytes: the restored af7e2a03f BANNER (pipeline_answer, sha ec3f632b) + the audit-input COMPOSITION carried in the pair's restoration.constraint_audit_input (sha 6cb5453c) — the committed verdicts ran on the composition; the floor reruns from the pair file alone since this restoration",
    "floor_verdict": "RESTATES_USER_CONSTRAINT; RESTATES_USER_CONSTRAINT; RESTATES_USER_CONSTRAINT; RESTATES_GIVEN_DEVICE; STATED_VARIABLE_UNUSED",
    "llm_check_verdict": "PARSED: LLM_RESTATES_USER_CONSTRAINT",
    "llm_model": "glm-4-plus",
-   "quoted_offending_text": "PARAMETER: Seal glass-ceramic intergranular glass phase fraction \u2014 0.15 mass fraction \u2014 USER-STATED CONSTRAINT",
+   "quoted_offending_text": "PARAMETER: Seal glass-ceramic intergranular glass phase fraction — 0.15 mass fraction — USER-STATED CONSTRAINT",
    "merged_flagged": true
   },
   {
@@ -69,5 +69,13 @@
    "quoted_offending_text": "",
    "merged_flagged": false
   }
- ]
+ ],
+ "fu_004_reconciliation": {
+  "owner_observation": "the owner's deterministic-floor rerun on the COMMITTED pair bytes returns PASS; the verdict table shows DISALLOWED_MEASUREMENT",
+  "measured_explanation": "Both results are correct ON THEIR OWN INPUTS — the inputs differed. (a) The owner's rerun read eval/pairs/dev12_fresh/dev-fu-004-fouling.json as committed at 16f9d6a9d, whose pipeline_answer is NULL/ABSENT (commit 22cb7f5cd re-committed the pair from the later 083329 run that produced no pipeline answer; judge_record JUDGE_SKIPPED 'pipeline answer missing'). The floor on an ABSENT answer has nothing to flag -> CONSTRAINT_AUDIT_PASS (vacuous). (b) The verdict-table row ran on the auditor-judged answer bytes: sha f691cd9101dd (4391 chars, state COMPOSED_CONTRACT_VALID), byte-identical across the af7e2a03f pair answer and run tree 977851bc16a5/r1-...045822000. The floor on THOSE bytes returns DISALLOWED_MEASUREMENT: 'moving average of |turbine exhaust pressure setpoint - measured exhaust pressure|' — the pressure setpoint is not in the allowed measurement set (existing temperature and flow measurements only).",
+  "problem_definition": "eval/problems_dev12.json is BYTE-IDENTICAL between af7e2a03f and 16f9d6a9d (git diff empty) — the SAME committed DEV12 definition on both sides; only the ANSWER bytes differed.",
+  "fix": "the audited answer bytes are RESTORED into the committed pair (pipeline_answer, sha f691cd91) with full restoration provenance in the pair file (Art. LXIV: the null record is disclosed, never deleted). The owner's floor rerun on the restored committed bytes now returns DISALLOWED_MEASUREMENT - re-measured on this host before push.",
+  "sofc_row_artifact": "the sofc row's answer_source had a copy-paste artifact (it cited the fu-004 sha); corrected, and the sofc audit-input composition is now committed INSIDE the pair (restoration.constraint_audit_input, sha 6cb5453c) so its verdicts are also rerunnable from committed bytes alone",
+  "reverified": "floor reruns on the restored committed bytes: fu-004 CONSTRAINT_VIOLATIONS n=1 DISALLOWED_MEASUREMENT; sofc CONSTRAINT_VIOLATIONS n=5 (3x RESTATES_USER_CONSTRAINT, RESTATES_GIVEN_DEVICE, STATED_VARIABLE_UNUSED) - both match the committed rows exactly"
+ }
 }

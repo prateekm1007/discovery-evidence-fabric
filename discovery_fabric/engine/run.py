@@ -307,6 +307,11 @@ class EngineRun:
         # counters are fresh per run; the on-disk cache store persists.
         from . import llm_economy as _econ
         _econ.reset_run_counters(f"engine:{self.run_id}")
+        # OWNER AUDIT ROUND 2026-11-13, DIRECTIVE 4: the per-stage
+        # call counters reset with the governor (one EngineRun = one
+        # problem's measured demand, per stage).
+        from . import mechanism_space as _ms_r
+        _ms_r.reset_stage_calls()
         if not self.resume:
             self._persist("problem.json", self.problem)
         manifest: Dict[str, Any] = {
@@ -827,6 +832,15 @@ class EngineRun:
         _econ_snap = _econ.snapshot()
         self._persist("LLM_ECONOMY.json", _econ_snap)
         manifest["llm_economy"] = _econ_snap
+        # OWNER AUDIT ROUND 2026-11-13, DIRECTIVE 4: the per-stage
+        # healthy-call report (logical/served/failed per purpose) rides
+        # beside the economy record — the round table's measured demand
+        # per stage, the basis for the call-cap decision. Observation
+        # only: it gates nothing (Art. LXXVII).
+        from . import mechanism_space as _ms_sp
+        _stage_calls = _ms_sp.stage_calls_snapshot()
+        self._persist("STAGE_CALLS.json", _stage_calls)
+        manifest["stage_calls"] = _stage_calls
         # the PRE-evolution final state is preserved for the cemetery
         # decision (Art. X: GEN-1's own verdict is the negative-knowledge
         # event; the evolution outcome below is the product-level state)

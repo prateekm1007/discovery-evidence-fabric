@@ -103,7 +103,7 @@ from typing import Any, Dict, List, Optional
 #       impossibility), the record-bound raw candidate is admissible
 #       as a clearly flagged UNVERIFIED hypothesis — one plain-language
 #       line, never a typed no-answer, never internal jargon.
-ANSWER_COMPOSER_VERSION = "answer_composer/1.4.0"
+ANSWER_COMPOSER_VERSION = "answer_composer/1.5.0"
 
 #: bounded repair loop (compose -> validate -> repair until valid or
 #: cap). Calls per composition: 1 compose + <=1 truncation retry
@@ -236,14 +236,15 @@ def _candidates_block(cands: List[Dict[str, Any]]) -> str:
     if not cands:
         return "(no candidates reached this composition — compose from the "
         "constraints and state the evidence status honestly)"
-    lines = []
-    for i, c in enumerate(cands[:5], 1):
-        if not isinstance(c, dict):
-            continue
-        # CLEAN OUTPUT (directive 1): the prompt feeds neutral proposal
-        # labels and plain-language status — never internal candidate
-        # ids (the audited answers leaked "[cand:A2]" verbatim) and
-        # never internal verdict state names.
+    # OWNER AUDIT ROUND 2026-11-13, DIRECTIVE 1: ONE PRIMARY CANDIDATE.
+    # The FIRST candidate is THE proposal the composer writes; every
+    # other candidate is a NAMED ALTERNATIVE for context ONLY — its
+    # design must never be mixed into the answer (the measured new07
+    # defect: indicator lead design + nanofluid claims from a different
+    # candidate in one answer). Alternatives render as one-line names
+    # without their full design detail, so the composer cannot blend
+    # their mechanisms into the proposal.
+    def _one(c: Dict[str, Any]) -> str:
         verdict = str(c.get("attack_verdict") or c.get("verdict")
                       or c.get("state") or "NO_VERDICT")
         if c.get("hypothesis_unverified") or _is_hypothesis_verdict(verdict):
@@ -258,11 +259,26 @@ def _candidates_block(cands: List[Dict[str, Any]]) -> str:
         interv = str(c.get("intervention") or "")[:280]
         eff = str(c.get("expected_effect") or c.get("predicted_effect")
                   or "")[:200]
-        lines.append(
-            f"Proposal {i}. {status}\n"
-            f"   mechanism: {mech}\n"
-            f"   intervention: {interv}\n"
-            f"   expected effect: {eff}")
+        return (f"{status}\n"
+                f"   mechanism: {mech}\n"
+                f"   intervention: {interv}\n"
+                f"   expected effect: {eff}")
+
+    def _alt_line(c: Dict[str, Any]) -> str:
+        mech = str(c.get("mechanism") or "")[:90]
+        return f"   (alternative) {mech}"
+
+    lines = ["THE PROPOSAL TO ANSWER WITH (the ONE primary candidate "
+             "— the mechanism, the measured quantity and the "
+             "falsification test must ALL describe THIS ONE design):",
+             _one(cands[0])]
+    alts = [c for c in cands[1:5] if isinstance(c, dict)]
+    if alts:
+        lines.append("NAMED ALTERNATIVES (for context only — do NOT "
+                     "mix their designs into the proposal; at most, "
+                     "mention one by name in a single clause as an "
+                     "unexplored option):")
+        lines.extend(_alt_line(c) for c in alts)
     return "\n".join(lines)
 
 
@@ -714,6 +730,15 @@ def compose_answer(problem: Dict[str, Any],
                     "allowed_measurements": {"mode": "arm_off"}})
     # the floor stays; the LLM check MERGES into the same typed list
     caudit = merge_constraint_check(caudit, ck) if _ca_on else caudit
+    # OWNER AUDIT ROUND 2026-11-13, DIRECTIVE 1: the ONE-design
+    # consistency check (deterministic, zero-LLM) rides every pass;
+    # its typed violations join the SAME repair call (no added calls)
+    from .answer_consistency import consistency_check as _cons_check
+    cons = _cons_check(answer, candidates or [], problem)
+    rec["consistency_check_first_pass"] = {
+        "state": cons.get("state"),
+        "n_violations": cons.get("n_violations"),
+        "violations": cons.get("violations")}
     rec["contract_first_pass"] = {"valid": contract.get("valid"),
                                   "violations": contract.get("violations")}
     rec["constraint_audit_first_pass"] = {
@@ -724,16 +749,22 @@ def compose_answer(problem: Dict[str, Any],
     while _repair_round < MAX_REPAIR_ROUNDS:
         _contract_bad = contract.get("valid") is not True
         _audit_bad = caudit.get("state") == "CONSTRAINT_VIOLATIONS"
-        if not (_contract_bad or _audit_bad):
+        _cons_bad = cons.get("state") == "CONSISTENCY_VIOLATIONS"
+        if not (_contract_bad or _audit_bad or _cons_bad):
             break
         _repair_round += 1
         # deterministic feedback: contract violations + constraint
-        # violations travel back in (no gate widening, Art. VII)
+        # violations + consistency violations travel back in (no gate
+        # widening, Art. VII)
         _viol_lines = list(contract.get("violations") or [])
         _viol_lines += [
             ("CONSTRAINT VIOLATION [" + v.get("type", "") + "]: "
              + v.get("detail", ""))
             for v in (caudit.get("violations") or [])]
+        _viol_lines += [
+            ("DESIGN CONSISTENCY [" + v.get("type", "") + "]: "
+             + v.get("detail", ""))
+            for v in (cons.get("violations") or [])]
         if _ts_on and _repair_round == 1:
             # item 2 (2026-11-12): the plain tech-sanity lines ride the
             # SAME scheduled repair call (no added call, no gate)
@@ -766,6 +797,7 @@ def compose_answer(problem: Dict[str, Any],
         caudit3 = audit_constraints(problem, answer3)
         caudit3 = merge_constraint_check(caudit3, ck3) if _ca_on \
             else caudit3
+        cons3 = _cons_check(answer3, candidates or [], problem)
         # a truncated repair is NEVER adopted (never ship a
         # truncated answer): the pre-existing improvement rule
         # applies to COMPLETE repairs only
@@ -777,27 +809,70 @@ def compose_answer(problem: Dict[str, Any],
         rec[f"constraint_audit_after_repair_{_repair_round}"] = {
             "state": caudit3.get("state"),
             "n_violations": caudit3.get("n_violations")}
+        rec[f"consistency_after_repair_{_repair_round}"] = {
+            "state": cons3.get("state"),
+            "n_violations": cons3.get("n_violations")}
         if trunc["repair_truncated"]:
             break
         # adopt only a COMPLETE repair that does not regress (the
         # improvement rule: fewer contract violations, or valid, and
-        # no worse on the constraint audit)
+        # no worse on the constraint audit or the consistency check)
         _improved = (contract3.get("valid") is True
                      or (len(contract3.get("violations") or [])
                          < len(contract.get("violations") or [])))
         _audit_not_worse = (caudit3.get("n_violations") or 0) <= (
             caudit.get("n_violations") or 0)
-        if _improved and _audit_not_worse:
+        _cons_not_worse = (cons3.get("n_violations") or 0) <= (
+            cons.get("n_violations") or 0)
+        if _improved and _audit_not_worse and _cons_not_worse:
             answer = answer3
             contract = contract3
             caudit = caudit3
+            cons = cons3
             rec["output_sha256"] = res3.get("output_hash")
             rec["repaired"] = True
             rec["repair_rounds_used"] = _repair_round
             if (contract.get("valid") is True
-                    and caudit.get("state") == "CONSTRAINT_AUDIT_PASS"):
+                    and caudit.get("state") == "CONSTRAINT_AUDIT_PASS"
+                    and cons.get("state") != "CONSISTENCY_VIOLATIONS"):
                 break
     rec["repair_rounds_used"] = rec.get("repair_rounds_used", _repair_round)
+    # ---- STRICT PROVENANCE DOWNGRADE (owner audit round 2026-11-13,
+    # directive 2): an EVIDENCE-BACKED PARAMETER whose VALUE is not in
+    # the CITED record is relabeled ASSUMPTION — or ASSUMPTION (User
+    # Constraint) when the value IS the user's own stated text — even
+    # when the citation id itself is valid. Deterministic, zero-LLM,
+    # runs on EVERY delivered answer (the measured fu-005 defect shipped
+    # contract-VALID with false EVIDENCE-BACKED labels). The relabel
+    # only removes certainty, so the contract re-validation can only
+    # hold or improve; the typed detail rides rec["strict_provenance"].
+    from .answer_downgrade import strict_provenance_downgrade
+    _dg_on = os.environ.get("FABRIC_ANSWER_DOWNGRADE", "1") != "0"
+    rec["downgrade_arm"] = "on" if _dg_on else "off"
+    _strict = (strict_provenance_downgrade(answer, packet, problem)
+               if _dg_on else {"n_relabels": 0, "answer": answer,
+                               "relabels": [],
+                               "n_user_constraint_relabels": 0})
+    if _strict["n_relabels"]:
+        _sv = validate_answer(_strict["answer"], question_type,
+                              packet=packet or [],
+                              user_variables=_uvs,
+                              clarification=_clarification)
+        _sc = (audit_constraints(problem, _strict["answer"])
+               if _ca_on else caudit)
+        rec["strict_provenance"] = {
+            "applied": True,
+            "n_relabels": _strict["n_relabels"],
+            "n_user_constraint_relabels":
+                _strict["n_user_constraint_relabels"],
+            "relabels": _strict["relabels"],
+            "contract_valid_after": _sv.get("valid") is True}
+        answer = _strict["answer"]
+        if _sv.get("valid") is True and not contract.get("valid"):
+            contract = _sv
+        if (_sc.get("n_violations") or 0) <= (caudit.get("n_violations")
+                                              or 0):
+            caudit = _sc
     # ---- DOWNGRADE, DON'T DISCARD (owner directive 2, 2026-11-12):
     # a contract-invalid composition is no longer discarded into a
     # typed no-answer. Deterministic relabel: failing EVIDENCE-BACKED
@@ -809,7 +884,7 @@ def compose_answer(problem: Dict[str, Any],
                                    DOWNGRADE_CAVEAT_LINE,
                                    truncate_at_sentence)
     _delivered_note: Optional[str] = None
-    if contract.get("valid") is not True:
+    if contract.get("valid") is not True and _dg_on:
         dg = downgrade_answer(answer, contract.get("violations") or [],
                               packet)
         contract_dg = validate_answer(dg["answer"], question_type,
@@ -847,6 +922,16 @@ def compose_answer(problem: Dict[str, Any],
                                "n_violations": caudit.get("n_violations"),
                                "violations": caudit.get("violations")}
     rec["constraint_check"] = ck
+    # the consistency check's FINAL state rides the record (the check
+    # drove the repair loop above; a violation that survived every
+    # bounded repair ships with ONE plain caveat, typed detail in
+    # metadata — never silent, Art. XXV)
+    cons_final = _cons_check(answer, candidates or [], problem)
+    rec["consistency_check"] = {"state": cons_final.get("state"),
+                                "n_violations":
+                                    cons_final.get("n_violations"),
+                                "violations":
+                                    cons_final.get("violations")}
     if contract.get("valid") is True:
         rec["state"] = "COMPOSED_CONTRACT_VALID"
     elif rec.get("downgrade", {}).get("applied"):
@@ -883,6 +968,12 @@ def compose_answer(problem: Dict[str, Any],
             "contract violations.")
     for _f in _ts_final:
         _caveats.append(_f["plain"])
+    if cons_final.get("state") == "CONSISTENCY_VIOLATIONS" \
+            and rec.get("state") in ("COMPOSED_CONTRACT_VALID",
+                                     "COMPOSED_CONTRACT_DOWNGRADED"):
+        from .answer_consistency import CONSISTENCY_CAVEAT_LINE
+        if CONSISTENCY_CAVEAT_LINE not in _caveats:
+            _caveats.append(CONSISTENCY_CAVEAT_LINE)
     if _caveats:
         rec["caveats"] = _caveats
     rec["finished_at"] = _utc_now()
@@ -1018,6 +1109,31 @@ def _raw_attack_binding(env_dict: Dict[str, Any]) -> Optional[str]:
     return None
 
 
+def _kf_fallback_candidate(env_dict: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """A SURVIVING knowledge-first candidate from the recorded mechanism
+    space (owner audit round 2026-11-13, directive 3): transformation
+    operator DOMAIN_KNOWLEDGE_FIRST, state exactly CANDIDATE (it passed
+    the same deterministic gates as every other candidate), candidate
+    id not a noncand: rejection id. Returns the FIRST such candidate in
+    the space's recorded order (None when none survives) — the fallback
+    order authority: when the evidence-anchored candidates are killed,
+    the knowledge-first candidate is delivered; an evidence-anchored
+    killed candidate only when no knowledge-first candidate survives."""
+    ms = env_dict.get("mechanism_space") or {}
+    for c in (ms.get("candidates") or []) if isinstance(ms, dict) else []:
+        if not isinstance(c, dict):
+            continue
+        if str(c.get("transformation_operator") or "") \
+                != "DOMAIN_KNOWLEDGE_FIRST":
+            continue
+        if str(c.get("candidate_state") or "") != "CANDIDATE":
+            continue
+        if str(c.get("candidate_id") or "").startswith("noncand:"):
+            continue
+        return c
+    return None
+
+
 def _admission_analysis(env_dict: Dict[str, Any],
                        top_n: int = 5):
     """P0-2: one admission audit. Returns (admissible_cands, reasons):
@@ -1096,6 +1212,32 @@ def _admission_analysis(env_dict: Dict[str, Any],
         if (att in _KILL_STATES or "KILL" in att) \
                 and kc.get("all_not_in_record") \
                 and binding is None:
+            # OWNER AUDIT ROUND 2026-11-13, DIRECTIVE 3 (fallback
+            # order): when the evidence-anchored candidate is killed,
+            # deliver the SURVIVING knowledge-first candidate; the
+            # killed evidence-anchored candidate delivers only when no
+            # knowledge-first candidate survives. The KF candidate
+            # here is equally unadjudicated (ranked survivors were
+            # empty), so it ships as the same clearly flagged
+            # UNVERIFIED hypothesis class — never an endorsement.
+            kf = _kf_fallback_candidate(env_dict)
+            if kf is not None:
+                rec_kf = dict(kf)
+                rec_kf["attack_verdict"] = att
+                rec_kf["verdict"] = att
+                rec_kf["admission"] = {
+                    "class": "HYPOTHESIS",
+                    "hypothesis": True,
+                    "reason": "KF_FALLBACK_EVIDENCE_CANDIDATE_KILLED",
+                    "binding": "mechanism_space_record",
+                    "candidate_source": "DOMAIN_KNOWLEDGE_FIRST",
+                    "delivery_semantics":
+                        "FLAGGED_UNVERIFIED_HYPOTHESIS_DELIVERED",
+                    "kill_cause_record": kc}
+                rec_kf["hypothesis_unverified"] = True
+                rec_kf["candidate_source"] = "DOMAIN_KNOWLEDGE_FIRST"
+                cands.append(rec_kf)
+                return cands, reasons
             rec2 = dict(raw)
             rec2["attack_verdict"] = att
             rec2["verdict"] = att
@@ -1159,6 +1301,35 @@ def _admission_analysis(env_dict: Dict[str, Any],
             ev = ((env_dict.get("adjudication") or {}).get(
                 "evidence_verification") or {})
             if ev.get("verified") is True:
+                # OWNER AUDIT ROUND 2026-11-13, DIRECTIVE 3 (fallback
+                # order, the measured fu-005 case): the starved run
+                # left the evidence-anchored candidate NEVER
+                # ADJUDICATED; the surviving knowledge-first candidate
+                # is the preferred delivery (the killed/never-
+                # adjudicated evidence-anchored candidate delivers
+                # only when no knowledge-first candidate survives).
+                kf = _kf_fallback_candidate(env_dict)
+                if kf is not None:
+                    rec_kf = dict(kf)
+                    rec_kf["attack_verdict"] = att
+                    rec_kf["verdict"] = att
+                    rec_kf["admission"] = {
+                        "class": "HYPOTHESIS",
+                        "hypothesis": True,
+                        "reason":
+                            "KF_FALLBACK_EVIDENCE_CANDIDATE_KILLED",
+                        "binding": "mechanism_space_record",
+                        "candidate_source": "DOMAIN_KNOWLEDGE_FIRST",
+                        "delivery_semantics":
+                            "FLAGGED_UNVERIFIED_HYPOTHESIS_DELIVERED",
+                        "attack_record":
+                            "ABSENT (the run starved before the attack "
+                            "stage — the knowledge-first candidate is "
+                            "equally unadjudicated, never endorsed)"}
+                    rec_kf["hypothesis_unverified"] = True
+                    rec_kf["candidate_source"] = "DOMAIN_KNOWLEDGE_FIRST"
+                    cands.append(rec_kf)
+                    return cands, reasons
                 rec2 = dict(raw)
                 rec2["attack_verdict"] = att
                 rec2["verdict"] = att

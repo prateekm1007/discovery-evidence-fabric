@@ -692,7 +692,29 @@ class TestDeletionAccounting(unittest.TestCase):
                     # (the verifier's own rule list — the verifier is
                     # never weakened: the rule ADDS a rejection class).
                     # Pinned by tests/test_r6_audit_round_clean_output.py.
-                    "discovery_fabric/engine/answer_contract.py"),
+                    "discovery_fabric/engine/answer_contract.py",
+                    # R6 OWNER AUDIT ROUND 2026-11-12 AMENDMENT
+                    # (disclosed, directive 2 downgrade-don't-discard):
+                    # the deterministic relabel/reduced-certainty
+                    # delivery pass lives in engine/answer_downgrade.py
+                    # (zero LLM; it only REMOVES unsupported certainty).
+                    # NOTE: this file shipped in that round without its
+                    # mandate entry — the omission is disclosed here and
+                    # corrected by this amendment (Art. LXIV: state what
+                    # happens to the accounting, silence is not a valid
+                    # answer).
+                    "discovery_fabric/engine/answer_downgrade.py",
+                    # R7 OWNER AUDIT ROUND 2026-11-13 AMENDMENT
+                    # (disclosed, directive 1): the ONE-primary-
+                    # candidate design-consistency check lives in the
+                    # NEW engine/answer_consistency.py (deterministic,
+                    # zero-LLM; rides the existing compose->validate->
+                    # repair loop, adds no call, gates nothing). The
+                    # alternative — folding the check into
+                    # answer_composer.py — would blur the one-module-
+                    # one-instrument accounting this mandate keeps.
+                    # Pinned by tests/test_r7_owner_round.py.
+                    "discovery_fabric/engine/answer_consistency.py"),
                 f"the mandate's file list is exhaustive: {f} is outside "
                 "run.py/stage_entry.py/adapters.py/llm_registry.py")
 

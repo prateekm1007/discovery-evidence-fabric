@@ -98,7 +98,61 @@ def utc_now() -> str:
 # ---------------------------------------------------------------------------
 # 2. The LLM call site (ONE path; tests monkeypatch this function)
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# OWNER AUDIT ROUND 2026-11-13, DIRECTIVE 4: healthy calls per stage.
+# Every engine transport call flows through llm_generate carrying its
+# purpose; the per-purpose counter is the per-stage demand report the
+# round table needs (logical = calls the stage made; served = ok calls
+# incl. recorded-cache replays — zero provider spend; failed = typed
+# failures). Counting is pure observation: it NEVER gates, never
+# raises, never changes a verdict (Art. LXXVII: call counts are
+# inadmissible as discovery evidence — this is an ops report only).
+_STAGE_CALL_LOCK = threading.Lock()
+_STAGE_CALLS: Dict[str, Dict[str, int]] = {}
+
+
+def reset_stage_calls() -> None:
+    """Fresh per-problem stage-call counters (the run driver calls this
+    next to the governor reset)."""
+    with _STAGE_CALL_LOCK:
+        _STAGE_CALLS.clear()
+
+
+def stage_calls_snapshot() -> Dict[str, Dict[str, int]]:
+    """The per-stage call report: {purpose: {logical, served, failed}}.
+    `served` counts ok calls (recorded-cache replays included — the
+    healthy demand a capped provider never saw)."""
+    with _STAGE_CALL_LOCK:
+        return {k: dict(v) for k, v in sorted(_STAGE_CALLS.items())}
+
+
 def llm_generate(prompt: str, system: str = "", timeout: int = 240,
+                 max_tokens: int = 700, purpose: str = "mechanism_space",
+                 exclude_providers: Optional[List[str]] = None,
+                 hard_pin_provider: Optional[str] = None
+                 ) -> Dict[str, Any]:
+    """The ONE engine transport wrapper: per-stage call accounting
+    (above) + the registry cascade (see _llm_generate_impl)."""
+    res = _llm_generate_impl(prompt, system=system, timeout=timeout,
+                             max_tokens=max_tokens, purpose=purpose,
+                             exclude_providers=exclude_providers,
+                             hard_pin_provider=hard_pin_provider)
+    try:
+        with _STAGE_CALL_LOCK:
+            st = _STAGE_CALLS.setdefault(str(purpose),
+                                         {"logical": 0, "served": 0,
+                                          "failed": 0})
+            st["logical"] += 1
+            if res.get("ok"):
+                st["served"] += 1
+            else:
+                st["failed"] += 1
+    except Exception:  # noqa: BLE001 — accounting never breaks transport
+        pass
+    return res
+
+
+def _llm_generate_impl(prompt: str, system: str = "", timeout: int = 240,
                  max_tokens: int = 700, purpose: str = "mechanism_space",
                  exclude_providers: Optional[List[str]] = None,
                  hard_pin_provider: Optional[str] = None

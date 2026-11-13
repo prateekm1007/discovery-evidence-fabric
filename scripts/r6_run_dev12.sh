@@ -128,10 +128,16 @@ add_env "RETRIEVE_JOB_BUDGET_S=20"
 # economy record carries the per-problem counters as evidence; the
 # retry-storm controls are unchanged (retry cap 6, breaker threshold 3).
 # owner directive 2026-11-12: hard cap 14 UNTIL the demand
-# cuts land (synthesis one-call + fallback; KF fused into the
-# MS batch); measured demand 8-17 starved the evaluator at 8.
-# Lower back to 8 only when measured demand fits.
-add_env "FABRIC_PROBLEM_CALL_CAP=14"
+# cuts land. OWNER ROUND 2026-11-13 DIRECTIVE 4: the demand cuts
+# have LANDED (synthesis one-call + fallback; the knowledge-first
+# pair FUSED into the MS batch call — its healthy call IS the batch
+# call) and the fused demand is measured per stage in STAGE_CALLS.json
+# (batch 1 + synthesis 1 + attack 1 + evaluator 1 + compose 1 + <=2
+# repairs + <=1 truncation retry = 5-8 healthy logical calls).
+# CAP LOWERED 14 -> 10 per the owner's directive; STAGE_CALLS.json is
+# the evidence the cap fits (a typed HEALTHY_CALL_CAP_EXCEEDED stop on
+# any queued problem reopens this constant with the measured number).
+add_env "FABRIC_PROBLEM_CALL_CAP=10"
 # --- zai transport probe (typed availability, never silent) ------------
 # MEASURED this host: the z-ai CLI is absent (WSL PATH, Windows npm
 # dir, npm registry 404) — the loop-local gateway CANNOT serve here and
@@ -222,11 +228,38 @@ echo "[r6dev12] engine-env keys: $(printf '%s ' "${ENGINE_ENV_ARGS[@]}" | sed 's
 # separately; the owner budget note stays the zai-host measurement.
 TIMEOUT_S="${R6_TIMEOUT:-900}"
 PROBLEMS="${1:?usage: r6_run_dev12.sh <comma-separated problem ids>}"
-echo "[r6dev12] chunk: $PROBLEMS (timeout ${TIMEOUT_S}s)"
+# OWNER ROUND 2026-11-13 DIRECTIVE 5 (unattended queue runner): the
+# pairs directory is an env override (default unchanged — the audited
+# dev12_fresh files are NEVER redirected or overwritten by a runner;
+# the runner writes to eval/pairs/dev12_r7). R6_EXTRA_ENV carries the
+# ablation-arm engine env verbatim (space-separated KEY=VALUE list;
+# applied through the SAME argv channel — never exported, Art. XXVII).
+R6_PAIRS_OUT="${R6_PAIRS_OUT:-eval/pairs/dev12_fresh}"
+# OWNER ROUND 2026-11-13 DIRECTIVE 5: the queue runner also drives the
+# B8 two-turn round 2 and the arm selection through the SAME launcher
+# (one env channel, never exported):
+#   R6_PROBLEMS_FILE  the problems payload (default the committed DEV12)
+#   R6_TWO_TURNS=1    round-2 ingestion flag (--two-turns, Art. LI)
+#   R6_ARMS           the run arms (default pipeline,baseline,judge)
+R6_PROBLEMS_FILE="${R6_PROBLEMS_FILE:-eval/problems_dev12.json}"
+R6_ARMS="${R6_ARMS:-pipeline,baseline,judge}"
+_TWO_TURNS_ARGS=()
+if [ "${R6_TWO_TURNS:-0}" = "1" ]; then _TWO_TURNS_ARGS+=(--two-turns); fi
+if [ -n "${R6_EXTRA_ENV:-}" ]; then
+  for _kv in $R6_EXTRA_ENV; do
+    case "$_kv" in
+      *=*) add_env "$_kv" ;;
+      *) echo "[r6dev12] skipping malformed extra-env entry '$_kv' (want KEY=VALUE)" >&2 ;;
+    esac
+  done
+  echo "[r6dev12] extra engine-env: $R6_EXTRA_ENV"
+fi
+echo "[r6dev12] chunk: $PROBLEMS (timeout ${TIMEOUT_S}s, pairs-out $R6_PAIRS_OUT, file $R6_PROBLEMS_FILE, arms $R6_ARMS)"
 "$PY" -B eval/run.py \
-  --arms pipeline,baseline,judge \
-  --problems-file eval/problems_dev12.json \
+  --arms "$R6_ARMS" \
+  --problems-file "$R6_PROBLEMS_FILE" \
   --problems "$PROBLEMS" \
   --workers 1 --timeout "$TIMEOUT_S" \
+  "${_TWO_TURNS_ARGS[@]}" \
   "${ENGINE_ENV_ARGS[@]}" \
-  --pairs-out eval/pairs/dev12_fresh
+  --pairs-out "$R6_PAIRS_OUT"

@@ -55,12 +55,16 @@ def _audited_answer(runs_root: Path, pid: str):
     never hand fixtures. Resolution order (deterministic, disclosed on
     the row):
       1. The committed pair file eval/pairs/dev12_fresh/<pid>.json —
-         the audited bytes the auditor judged (byte-restored at
-         af7e2a03f). The RETIRED banner text ("CONTRACT-INVALID
-         COMPOSITION ...") is NOT a proposal: when the pair file
-         carries only the banner (p02, sofc), fall through to (2) —
-         the constraint audit runs on the composition, not on the
-         delivery wrapper.
+         the audited bytes the auditor judged (fu-004/sofc
+         byte-RESTORED 2026-11-13 after commit 22cb7f5cd had
+         re-committed them with pipeline_answer: null). The RETIRED
+         banner text ("CONTRACT-INVALID COMPOSITION ...") is NOT a
+         proposal: when the pair file carries only the banner, the
+         pair's committed restoration.constraint_audit_input (the
+         composition the verdicts ran on, sofc sha 6cb5453c) is the
+         audit input — COMMITTED bytes, no gitignored tree needed
+         (owner round 2026-11-13: the acceptance evidence must be
+         rerunnable from committed bytes alone).
       2. The AUDITED run tree eval/runs/977851bc16a5 (the runs the
          af7e2a03f pairs were built from — the kill records cite these
          run dirs): the problem's latest record with a non-empty
@@ -80,6 +84,17 @@ def _audited_answer(runs_root: Path, pid: str):
                         "CONTRACT-INVALID COMPOSITION"):
                 return {"answer": ans, "source": str(pair_p),
                         "state": "pair_bytes(committed)"}
+            # banner-only pair: the committed audit-input composition
+            # (restoration.constraint_audit_input) is the audit plane
+            r = d.get("restoration") or {}
+            cai = (r.get("constraint_audit_input") or {})
+            ctext = cai.get("text")
+            if isinstance(ctext, str) and ctext.strip():
+                return {"answer": ctext, "source": str(pair_p),
+                        "state": "pair_bytes(committed:"
+                                 "constraint_audit_input)",
+                        "audit_input_sha256_8":
+                            cai.get("sha256_8")}
         except Exception:  # noqa: BLE001
             pass
     audited = runs_root / "977851bc16a5"

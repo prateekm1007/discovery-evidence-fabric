@@ -1451,6 +1451,33 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                "n_satisfied": len(sel_all.get("matches") or []),
                "n_operators_run": len(matched),
                "selected_operators": [m[1]["operator_id"] for m in matched]})
+    # ---- OWNER AUDIT ROUND 2026-11-12, DIRECTIVE 3 + OWNER ROUND
+    #      2026-11-13 DIRECTIVE 4 (fusion): the KNOWLEDGE-FIRST
+    #      candidate — ALWAYS generated next to the evidence-anchored
+    #      ones (what an experienced engineer would do from domain
+    #      knowledge). Its (operator, item) pair now RIDES THE MS BATCH
+    #      CALL (one instantiation call for every pair, KF included)
+    #      instead of a separate call; the standalone KF call remains
+    #      the typed fallback when the batch is disabled or failed
+    #      wholesale (Art. LXIV: the fallback path stays, disclosed).
+    #      The anchor is the user's problem statement (citable
+    #      provenance per the P0-5 ruling); the candidate faces the
+    #      SAME deterministic validation tail and the SAME gauntlet as
+    #      the evidence-anchored candidates — nothing about it is
+    #      privileged, it is only not evidence-dressed.
+    # DIRECTIVE 5 (ablation arms): FABRIC_KNOWLEDGE_FIRST=0 disables
+    # the knowledge-first generator for the leave-it-out arm (explicit
+    # arm selection, default on — the owner directive says ALWAYS).
+    _kf_enabled = os.environ.get("FABRIC_KNOWLEDGE_FIRST", "1") != "0"
+    _kf_op = next((o for o in _ms.TRANSFORMATION_OPERATORS
+                   if o["operator_id"] == "DOMAIN_KNOWLEDGE_FIRST"), None)
+    _kf_contract = {"operator": "DOMAIN_KNOWLEDGE_FIRST",
+                    "satisfied": bool(
+                        _kf_enabled
+                        and str(problem.get("failure") or "").strip()),
+                    "basis": "anchor is the user's problem statement"}
+    _kf_item = _ms.knowledge_first_item(problem)
+    _kf_ready = bool(_kf_op and _kf_contract.get("satisfied"))
     # R6 owner round 2026-11-12 (the evaluator-starve fix, measured):
     # every parallel per-pair call consumed a healthy call; on the
     # serving ring the synthesis + pairs + attack + evaluator + composer
@@ -1463,12 +1490,20 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     # same typed fallbacks; the record rides the space honestly).
     # Status quo fallbacks: batch disabled / <2 pairs / batch call
     # failed typed => the legacy per-pair calls run unchanged.
-    if _ms._batch_enabled() and len(matched) >= 2:
+    # OWNER ROUND 2026-11-13 DIRECTIVE 4: the KF pair rides the SAME
+    # batch (its healthy call is the batch call, not a separate one).
+    if _ms._batch_enabled() and (len(matched) + (1 if _kf_ready else 0)) >= 2:
         _batch_pairs = [{"op": _m[1], "item": _m[0],
                          "purpose": "operator_%s" % _m[1]["operator_id"],
                          "prompt": _lean_pair_prompt(_m[1], _m[0],
                                                      problem)}
                         for _m in matched]
+        if _kf_ready:
+            _batch_pairs.append(
+                {"op": _kf_op, "item": _kf_item,
+                 "purpose": "operator_%s" % _kf_op["operator_id"],
+                 "prompt": _lean_pair_prompt(_kf_op, _kf_item, problem),
+                 "knowledge_first": True})
         space["operator_batch"] = _ms._preflight_operator_batch(
             None, None, problem, 0, pairs=_batch_pairs)
     sel = dict(sel_all)
@@ -1517,33 +1552,11 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                 attempts.append(_failed_attempt(
                     _m[1]["operator_id"], f"{type(_exc).__name__}: {_exc}"))
 
-    if _ms._batch_enabled():
-        # hygiene (the full path's identical post-loop reset): an
-        # unconsumed queued entry must never leak across problems or
-        # into the knowledge-first call below
-        _ms._batch_reset()
-
-    # ---- OWNER AUDIT ROUND 2026-11-12, DIRECTIVE 3: the KNOWLEDGE-
-    #      FIRST candidate — ALWAYS generated next to the evidence-
-    #      anchored ones (what an experienced engineer would do from
-    #      domain knowledge). ONE additional instantiation call; the
-    #      anchor is the user's problem statement (citable provenance
-    #      per the P0-5 ruling); the candidate faces the SAME
-    #      deterministic validation tail and the SAME gauntlet as the
-    #      evidence-anchored candidates — nothing about it is
-    #      privileged, it is only not evidence-dressed.
-    # DIRECTIVE 5 (ablation arms): FABRIC_KNOWLEDGE_FIRST=0 disables
-    # the knowledge-first generator for the leave-it-out arm (explicit
-    # arm selection, default on — the owner directive says ALWAYS).
-    _kf_enabled = os.environ.get("FABRIC_KNOWLEDGE_FIRST", "1") != "0"
-    _kf_op = next((o for o in _ms.TRANSFORMATION_OPERATORS
-                   if o["operator_id"] == "DOMAIN_KNOWLEDGE_FIRST"), None)
-    _kf_contract = {"operator": "DOMAIN_KNOWLEDGE_FIRST",
-                    "satisfied": bool(
-                        _kf_enabled
-                        and str(problem.get("failure") or "").strip()),
-                    "basis": "anchor is the user's problem statement"}
-    _kf_item = _ms.knowledge_first_item(problem)
+    # (owner round 2026-11-13, directive 4): the batch-queue hygiene
+    # reset MOVED below the knowledge-first attempt — the KF pair now
+    # rides the batch queue, so the reset must happen only AFTER that
+    # attempt has consumed its section; an unconsumed queued entry
+    # must never leak across problems or into unrelated calls.
     _kf_ran = False
     if _kf_op and _kf_contract.get("satisfied"):
         try:
@@ -1554,6 +1567,8 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             attempts.append(_failed_attempt(
                 "DOMAIN_KNOWLEDGE_FIRST",
                 f"{type(_exc).__name__}: {_exc}"))
+    if _ms._batch_enabled():
+        _ms._batch_reset()
 
     field_blocks: List[Dict[str, str]] = []
     _cands: List[Dict[str, Any]] = []
