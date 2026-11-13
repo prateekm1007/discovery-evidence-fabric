@@ -92,6 +92,19 @@ def test_registry_reads_xkiro_key_at_call_time(monkeypatch):
     assert reg.active_key_value(s) == "sk_test_value"
 
 
+def test_route_notes_record_the_credential_resolution():
+    # RESOLUTION (same round): the SECOND owner credential (sk-xt- form)
+    # validated and the judge rung serves credentialed — the notes must
+    # record the serving state, not just the first credential's death.
+    # No credential material may appear in tracked bytes.
+    note = mr.ROUTE_TABLE_NOTES.get("xkiro", "")
+    assert "sk-xt-" in note and "ok=True" in note
+    src = inspect.getsource(mr) + inspect.getsource(reg)
+    assert "ok=True fields_ok=True 622 ms" in inspect.getsource(reg)
+    for forbidden in ("sk-xt-c3643", "sk_65c75153"):
+        assert forbidden not in src, "credential material leaked into tracked bytes"
+
+
 def test_vault_loader_names_only_and_env_wins(tmp_path, monkeypatch):
     vault = tmp_path / ".env.keys"
     vault.write_text(

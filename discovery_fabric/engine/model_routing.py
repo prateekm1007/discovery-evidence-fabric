@@ -241,7 +241,13 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
 #:          ClientApiKey', both hosts, both header schemes) — the rung
 #:          is credential-gated until a VALID key sits in XKIRO_API_KEY
 #:          (the runner loads the gitignored vault at startup; zero
-#:          code change on a valid key). No mercury id exists on this
+#:          code change on a valid key). RESOLVED same round: the
+#:          owner's second dashboard credential (sk-xt- form) VALIDATES
+#:          — the rung serves CREDENTIALED (measured live 2026-11-13:
+#:          admission probe ok=True fields_ok=True 622 ms; long-form
+#:          1437-1510 chars at 420/1000 max_tokens, finish=stop, 5.7-
+#:          6.0 s — the exact protocol where mercury starved). No
+#:          mercury id exists on this
 #:          gateway (69-model catalog, fetched live 2026-11-13); the
 #:          owner's 'Mercury 3' name resolves to nothing servable here.
 ROUTE_TABLE: Dict[str, Tuple[str, str]] = {
@@ -258,14 +264,16 @@ ROUTE_TABLE: Dict[str, Tuple[str, str]] = {
 #: allowlists above — these notes are the recorded basis, Art. XXV).
 ROUTE_TABLE_NOTES: Dict[str, str] = {
     "xkiro": ("R8 2026-11-13: auth now REQUIRED (keyless serving dead, "
-              "typed 401 'Missing ClientApiKey'); the supplied owner "
-              "credential is rejected by the validator ('Invalid or "
-              "disabled ClientApiKey') — typed AUTH_FAILURE, the rung "
-              "is credential-gated until a valid key lands in "
-              "XKIRO_API_KEY (vault-loaded by the runner, zero code "
-              "change then); no mercury id in the 69-model catalog; the "
-              "mistral free family is real per the gateway deals page "
-              "and stays one measurement away from the allowlist"),
+              "typed 401 'Missing ClientApiKey'); the FIRST supplied "
+              "owner credential was rejected by the validator ('Invalid "
+              "or disabled ClientApiKey') — typed AUTH_FAILURE; the "
+              "SECOND (sk-xt- form) VALIDATES: the judge rung serves "
+              "CREDENTIALED (admission probe ok=True 622 ms; long-form "
+              "complete at 420/1000 max_tokens, finish=stop, 5.7-6.0 s) "
+              "— the vault-loaded key took effect with ZERO code change; "
+              "no mercury id in the 69-model catalog; the unmeasured "
+              "mistral free ids stay one measurement away from the "
+              "allowlist"),
     "agnes": ("429 RATE_LIMITED 'used up today's text quota ... 1 "
               "request every 3 minutes' (probe record 2026-11-12; "
               "unusable as a synthesis/attack head this window)"),
