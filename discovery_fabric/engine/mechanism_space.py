@@ -2532,6 +2532,46 @@ def verify_item_against_candidate(candidate: Dict[str, Any],
     }
 
 
+def _verbatim_eight_word_binding(mechanism_text: str,
+                                 evidence_items: List[Dict[str, Any]],
+                                 n_words: int = 8,
+                                 ) -> Dict[str, Any]:
+    """R9 P0 item 5 (owner round 2026-11-13): the Article LXXX
+    evidence-synthesis binding — the mechanism must contain at least
+    one verbatim span of >= 8 CONTIGUOUS words from a frozen evidence
+    record in the run's custody. Deterministic, zero-LLM: normalized
+    token 8-gram sets (lowercase, punctuation stripped), the exact
+    matched span + its evidence id recorded. A mechanism without one
+    is UNGROUNDED_SYNTHESIS (Art. LXXX: UNKNOWN, not REJECTED — it
+    may not advance to discovery candidates; the stage envelope
+    records span_verbatim_rate alongside every mechanism count)."""
+    text = str(mechanism_text or "")
+    toks = [t for t in re.findall(r"[a-z0-9]+", text.lower())]
+    grams = {" ".join(toks[i:i + n_words]): i
+             for i in range(0, max(0, len(toks) - n_words + 1))}
+    best: Dict[str, Any] = {"grounded": False, "evidence_id": None,
+                            "span": None, "word_count": 0}
+    for it in (evidence_items or []):
+        if not isinstance(it, dict):
+            continue
+        etext = " ".join(str(it.get(k) or "") for k in
+                         ("title", "abstract", "text", "content",
+                          "summary"))
+        etoks = re.findall(r"[a-z0-9]+", etext.lower())
+        if len(etoks) < n_words:
+            continue
+        eshop = set(" ".join(etoks[i:i + n_words])
+                    for i in range(len(etoks) - n_words + 1))
+        hit = grams.keys() & eshop
+        if hit:
+            span = max(hit, key=len)
+            best = {"grounded": True, "evidence_id": str(
+                        it.get("id") or it.get("item_id") or ""),
+                    "span": span, "word_count": n_words}
+            break
+    return best
+
+
 def verify_mechanism_support(candidate: Dict[str, Any],
                              structured_evidence: List[Dict[str, Any]],
                              problem: Dict[str, Any],
@@ -2557,9 +2597,18 @@ def verify_mechanism_support(candidate: Dict[str, Any],
         state = "PARTIALLY_SUPPORTED"
     else:
         state = "NOT_ENOUGH_EVIDENCE"
+    # R9 P0 item 5: the Article LXXX binding rides the CANONICAL
+    # verifier's verdict (one authority — every consumer of
+    # verify_mechanism_support gets the same grounding discipline; no
+    # second verification subsystem)
+    binding = _verbatim_eight_word_binding(
+        str(candidate.get("mechanism") or ""), structured_evidence)
     return {
         "candidate_id": candidate.get("candidate_id"),
         "mechanism_support_state": state,
+        "evidence_binding": binding,
+        "grounding_state": ("GROUNDED" if binding["grounded"]
+                            else "UNGROUNDED_SYNTHESIS"),
         "counts": counts,
         "n_items": len(verdicts),
         "verdicts": verdicts,
@@ -2571,7 +2620,9 @@ def verify_mechanism_support(candidate: Dict[str, Any],
                  "support (never absorbed); cross-system items cap at "
                  "PARTIALLY_SUPPORTS (analogy never becomes direct "
                  "support); phenomenon-only overlap is "
-                 "NOT_ENOUGH_EVIDENCE (never weak support)"),
+                 "NOT_ENOUGH_EVIDENCE (never weak support). Art. LXXX: "
+                 "UNGROUNDED_SYNTHESIS may not advance to discovery "
+                 "candidates (it is UNKNOWN, not REJECTED)."),
     }
 
 
@@ -3133,12 +3184,31 @@ def build_mechanism_space(problem: Dict[str, Any],
                      for c in retained]
     for c, v in zip(retained, verifications):
         c["mechanism_support"] = v
-    space["candidates"] = [
-        _public_candidate(c) for c in retained]
-    space["state"] = ("BUILT" if kept >= min_candidates else
-                      "BUILT_BELOW_MIN" if kept else "NO_CANDIDATES")
+    # R9 P0 item 5 (owner round 2026-11-13, Art. LXXX): NO PROGRESSION
+    # FROM UNGROUNDED SYNTHESIS — a retained candidate whose mechanism
+    # carries no >= 8-word verbatim span from a frozen evidence record
+    # is typed UNGROUNDED_SYNTHESIS (UNKNOWN, not REJECTED — Art. XXV)
+    # and does NOT advance to discovery candidates. The ungrounded are
+    # RECORDED (the envelope carries them with their typed state and
+    # the span check's bytes — nothing silently dropped), the span
+    # verbatim rate rides metrics alongside every count.
+    _grounded, _ungrounded = [], []
+    for c, v in zip(retained, verifications):
+        (_grounded if (v.get("evidence_binding") or {}).get("grounded")
+         else _ungrounded).append(c)
+    space["candidates"] = [_public_candidate(c) for c in _grounded]
+    space["ungrounded_synthesis"] = [
+        {"candidate_id": c.get("candidate_id"),
+         "grounding_state": "UNGROUNDED_SYNTHESIS",
+         "evidence_binding": (c.get("mechanism_support") or {})
+         .get("evidence_binding")}
+        for c in _ungrounded]
+    space["state"] = ("BUILT" if len(_grounded) >= min_candidates else
+                      "BUILT_BELOW_MIN" if _grounded
+                      else "NO_CANDIDATES")
     space["n_candidates_generated"] = len(all_candidates)
     space["n_candidates_retained"] = len(retained)
+    space["n_candidates_grounded"] = len(_grounded)
     space["min_candidates_required"] = min_candidates
     space["metrics"] = _metrics(space, all_candidates, retained,
                                  verifications, len(structured_items))
@@ -3215,6 +3285,10 @@ def _metrics(space: Dict[str, Any],
                 support_items += n
             elif rel == "CONTRADICTS":
                 contra_items += n
+    # R9 P0 item 5 (Art. LXXX): the grounding rate over RETAINED
+    # candidates (each verification carries evidence_binding)
+    n_grounded = sum(1 for v in verifications
+                     if (v.get("evidence_binding") or {}).get("grounded"))
     return {
         "mechanism_candidates_generated": n_gen,
         "mechanism_candidates_after_dedup": n_ret,
@@ -3230,6 +3304,13 @@ def _metrics(space: Dict[str, Any],
                      "— EQUIVALENT merges and INDETERMINATE referrals "
                      "are reported but never counted as distinct "
                      "mechanisms (Art. XLII/XXV)")},
+        # R9 P0 item 5 (Art. LXXX): span_verbatim_rate rides the stage
+        # envelope alongside every mechanism count — the rate of
+        # retained candidates carrying a >= 8-word verbatim span from a
+        # frozen evidence record. UNGROUNDED candidates never advance.
+        "span_verbatim_rate": (
+            round(n_grounded / n_ret, 3) if n_ret else None),
+        "n_ungrounded_synthesis": n_ret - n_grounded,
         "evidence_mechanism_support_rate": (
             round(support_items / adjudicated, 3) if adjudicated
             else None),
