@@ -323,6 +323,19 @@ def _spec(flavor):
 
 
 class TestTransportFinishReason(unittest.TestCase):
+    def setUp(self):
+        # R10 P1-8b (owner: fix the order-dependent truncation
+        # failures): the per-problem GOVERNOR is a runtime protection
+        # whose retry-cap state lives in a process-global. A prior test
+        # file's storm (measured: RETRY_CAP_EXCEEDED for the shared
+        # logical key) made these hermetic transport pins fail ONLY in
+        # full-suite order. A hermetic pin isolates its transport
+        # state: the governor is reset to this class's own scope in
+        # setUp (production behavior unchanged — the pins mock the
+        # HTTP boundary, never the governor).
+        from discovery_fabric.engine import llm_economy as _econ
+        _econ.reset_governor("test_composer_truncation_pin")
+
     def _run_flavor(self, flavor, payload):
         spec = _spec(flavor)
         fn = (lr._call_openai_flavor if flavor == "openai"

@@ -54,18 +54,24 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
 if "toscanini" not in sys.modules:
+    # R10 P1-8b (measured on this host): `import TOSCANINI` SUCCEEDS on
+    # a case-sensitive Linux checkout (both case-variants exist as real
+    # packages), so aliasing the uppercase module under the lowercase
+    # name SHADOWED the real package — `import toscanini.sessions` then
+    # failed with ModuleNotFoundError (the sessions module lives only
+    # in the lowercase directory). The canonical lowercase package is
+    # tried FIRST; the uppercase alias is the fallback for the win32
+    # case-tangle only (where find_spec('toscanini') is None).
     try:
-        import TOSCANINI as _T  # noqa: N813
-        sys.modules["toscanini"] = _T
+        import toscanini as _t  # noqa: N813 — the canonical package
     except Exception:  # noqa: BLE001
-        import importlib.util as _ilu
-        _spec = _ilu.spec_from_file_location(
-            "toscanini", str(REPO_ROOT / "TOSCANINI" / "__init__.py"),
-            submodule_search_locations=[str(REPO_ROOT / "TOSCANINI")])
-        _mod = _ilu.module_from_spec(_spec)
-        sys.modules["toscanini"] = _mod
-        _spec.loader.exec_module(_mod)
-
+        _t = None
+    if _t is None:
+        try:
+            import TOSCANINI as _T  # noqa: N813 — exact on-disk name
+            sys.modules["toscanini"] = _T
+        except Exception:  # noqa: BLE001
+            pass
 if sys.platform == "win32":
     try:
         import fcntl  # noqa: F401

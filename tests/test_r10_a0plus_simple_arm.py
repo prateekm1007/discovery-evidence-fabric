@@ -256,8 +256,13 @@ class TestRunnerChunkingAndRecords:
             assert g["allowed"] is False
             assert "blocked" in g["reason"]
 
-    def test_plan_carries_the_killed_problems(self):
-        runner = _load("runner_mod", "scripts/r7_queue_runner.py")
+    def test_plan_carries_the_killed_problems(self, monkeypatch, tmp_path):
+        """The planning CONTRACT: every DEV12 + killed problem with no
+        delivered 3.0.0 record is planned into r10_a0plus. Hermetic
+        against the live battery's bytes: the pair dir points at an
+        empty tmp dir (no delivered records -> everything planned)."""
+        runner = _load("runner_mod2", "scripts/r7_queue_runner.py")
+        monkeypatch.setattr(runner, "A0P_PAIRS", Path(tmp_path))
         plan = runner.build_plan()
         a0 = [i for i in plan if i["kind"] == "a0plus"]
         pids = {i["problem"] for i in a0}
@@ -267,6 +272,37 @@ class TestRunnerChunkingAndRecords:
         assert "eval-sofc-thermal-cycling" in pids
         assert all(i["pairs_out"] == "eval/pairs/r10_a0plus"
                    for i in a0)
+
+    def test_delivered_records_leave_the_plan(self, monkeypatch, tmp_path):
+        """The delivered-state policy in the plan: once a 3.0.0 record
+        with a typed result binds the baseline identity, the item is
+        NOT re-planned (the honest typed-INCOMPLETE arms are terminal;
+        re-running is an explicit operator act)."""
+        runner = _load("runner_mod3", "scripts/r7_queue_runner.py")
+        monkeypatch.setattr(runner, "A0P_PAIRS", Path(tmp_path))
+        import hashlib
+        rec = {"a0plus_version": runner.A0P_VERSION,
+               "problem_id": "dev-fu-003-motor-insulation",
+               "result": "INCOMPLETE_CONTRACT",
+               "baseline_sha_source": "deadbeef"}
+        (Path(tmp_path) / "dev-fu-003-motor-insulation.json").write_text(
+            json.dumps(rec), encoding="utf-8")
+        # bind the identity: the DEV12-fresh pair's bound sha
+        fresh = json.loads((REPO / "eval" / "pairs" / "dev12_fresh"
+                            / "dev-fu-003-motor-insulation.json")
+                           .read_text(encoding="utf-8"))
+        sha = str(fresh.get("bound_inputs", {}).get(
+            "baseline_answer_sha256") or "")
+        rec["baseline_sha_source"] = sha or hashlib.sha256(
+            str(fresh.get("baseline_answer") or "").encode("utf-8")) \
+            .hexdigest()
+        (Path(tmp_path) / "dev-fu-003-motor-insulation.json").write_text(
+            json.dumps(rec), encoding="utf-8")
+        assert runner._a0plus_v2_delivered(
+            "dev-fu-003-motor-insulation") is True
+        plan = runner.build_plan()
+        pids = {i["problem"] for i in plan if i["kind"] == "a0plus"}
+        assert "dev-fu-003-motor-insulation" not in pids
 
 
 class TestQueueDeliveredStatePolicy:

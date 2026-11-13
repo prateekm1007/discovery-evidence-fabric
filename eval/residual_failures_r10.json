@@ -1,0 +1,70 @@
+{
+ "record": "r10_residual_classification/1.0.0",
+ "at": "2026-11-13T19:30:51Z",
+ "head_commit": "11ea6cc60fd0cdb79f75723ab4b79d55ed3962da",
+ "base_commit": "2fc229ec1 (the R9 final; parent of the R10 rebuild)",
+ "method": "six CLI-order chunk runs at HEAD; per-file isolation at HEAD; per-file base runs in a temp worktree with the SAME fixed shims \u2014 a failure at BOTH trees is pre-existing at base, never attributed to R10 by hypothesis",
+ "preexisting_at_base": {
+  "tests/test_r392_readiness.py": 4,
+  "tests/test_r414_product_integration.py": 4,
+  "tests/test_r416_evolution.py": 3,
+  "tests/test_r423_async_render_gate.py": 5,
+  "tests/test_r468_secrets_registry.py": 1,
+  "tests/test_r506_yield_instrument.py": 2,
+  "tests/test_r510_production_bridge.py": 3,
+  "tests/test_r520_ms_route.py": 1,
+  "tests/test_r521_ef_switch.py": 3,
+  "tests/test_r523_ts_purpose_retirement.py": 1,
+  "tests/test_r525_gauntlet_purpose_retirement.py": 1,
+  "tests/test_r525_synth_span_neutrality.py": 2,
+  "tests/test_r531_memoization_identity.py": 1,
+  "tests/test_r542_finished_discovery_contract.py": 2,
+  "tests/test_r544_one_conversation_e2e.py": 2,
+  "tests/test_r549a_module_inventory_guard.py": 1,
+  "tests/test_r6_audit_round_clean_output.py": 1,
+  "tests/test_intervention_evidence_binding.py": 1,
+  "tests/test_p05_claim_provenance.py": 1,
+  "tests/test_patsnap_claims_regression.py": 1,
+  "tests/test_secret_scanning.py": 1,
+  "tests/test_source_maturity_model.py": 1
+ },
+ "n_preexisting_files": 22,
+ "n_preexisting_failures": 42,
+ "order_dependent": {
+  "tests/test_f_series_integration.py": {
+   "n_in_suite": 5,
+   "n_in_isolation": 0,
+   "mechanism": "pass in file isolation at HEAD and at base; fail only in full-suite order (the measured mode: PACKAGE_DEFERRED.json present where the pin expects a compiled package \u2014 the bridge gate's compiled-package state does not materialize under suite order); the R9 round classified the same five as its 'integration file failures' hypothesis \u2014 now measured as ORDER-DEPENDENT, not deterministic",
+   "disposition": "flagged for the auditor; not R10-caused"
+  }
+ },
+ "fixed_this_round": {
+  "truncation_finish_reason_2": {
+   "tests": [
+    "tests/test_composer_truncation_pin.py::TestTransportFinishReason::test_openai_stop_is_recorded",
+    "tests/test_composer_truncation_pin.py::TestTransportFinishReason::test_openai_unknown_raw_value_rides_verbatim"
+   ],
+   "root_cause": "the per-problem governor's retry-cap state is a process-global; a prior file's transport storm left RETRY_CAP_EXCEEDED for the shared logical key (measured: the flavor call raised before recording, _take_finish_reason read the stale value)",
+   "fix": "the pins reset the governor to their own scope in setUp (llm_economy.reset_governor) \u2014 hermetic isolation, production behavior unchanged; verified: the chunk re-run shows the two failures GONE"
+  },
+  "collection_errors_9": {
+   "files": [
+    "tests/test_r541_ranked_package_contract.py",
+    "tests/test_r542_finished_discovery_contract.py",
+    "tests/test_r543_backfill.py",
+    "tests/test_r543_finished_state_consistency.py",
+    "tests/test_r544_finished_state_rules.py",
+    "tests/test_r545_typed_terminal_finished.py"
+   ],
+   "root_cause": "the toscanini import shim bound the UPPERCASE package under the lowercase name; on this case-sensitive host `import TOSCANINI` succeeds and shadows the real lowercase package (sessions.py lives only there) \u2014 `import toscanini.sessions` raised ModuleNotFoundError at collection, so the whole files NEVER RAN (the R9 count never saw them)",
+   "fix": "the shim tries the canonical lowercase package FIRST and aliases only as the win32 fallback; verified: r541 collects and passes (22 tests), the previously hidden failures are exposed and falsified pre-existing at base"
+  },
+  "r10_plan_test_stale_assertion": {
+   "file": "tests/test_r10_a0plus_simple_arm.py",
+   "note": "the plan pin asserted the pre-battery planning state; the live battery's delivered records make the plan empty \u2014 the pin now tests the CONTRACT hermetically (an empty tmp pair dir -> everything planned; a delivered typed record -> not planned)"
+  }
+ },
+ "r10_caused_failures": [],
+ "r10_caused_note": "EVERY residual failure reproduces at the R9 base with the same shims \u2014 zero failures are attributable to the R10 round's code changes (the falsification is byte-measured, not a hypothesis)",
+ "auditor_note": "the 22 pre-existing files' failures are the R9-era fixture/behavior drift the R9 commit disclosed (the Art. LXXX grounding floor reaching fixture pipelines, the governor/admission process-globals under suite order, the inventory/scan guards); they are the queued fixture-sweep follow-up, unchanged in scope by R10"
+}
