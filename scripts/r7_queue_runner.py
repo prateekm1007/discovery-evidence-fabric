@@ -107,12 +107,62 @@ SPEED_SAMPLE = 3  # first 3 problem ids (deterministic, disclosed)
 MAX_ATTEMPTS = int(os.environ.get("R7_MAX_ATTEMPTS", "3"))
 COOLDOWN_S = int(os.environ.get("R7_COOLDOWN_S", "90"))
 
+# v3 output location — the 1.0.0/2.0.0 A0+ artifacts are preserved
+# audit evidence; the simple arm (at most ONE repair) writes r10.
+A0P_PAIRS = REPO / "eval" / "pairs" / "r10_a0plus"
+A0P_VERSION = "r7_a0plus/3.0.0"
+# R10 queue policy (owner directive 4): the arm's TYPED DELIVERED
+# states are TERMINAL for the queue. The R10 arm already spends its
+# at-most-one repair INSIDE the invocation; a re-invocation is a whole
+# new arm run (new audit + repair) and, under the 3x/day cron pacing,
+# an unbounded re-plan of honest typed-INCOMPLETE arms (or of the
+# typed skips whose baseline bytes can NEVER exist) is unbounded quota
+# burn. The delivered record — 3.0.0, same frozen baseline identity,
+# a typed result — is the deliverable (Art. XXV: the bytes, not the
+# state); an operator may still re-run any item explicitly (Art.
+# XXVII), which is a decision, never an automatic loop.
+A0P_TERMINAL_STATES = {
+    "COMPLETE", "INCOMPLETE_CONTRACT",
+    "INCOMPLETE_CONSISTENCY_VIOLATIONS", "INCOMPLETE_PROVENANCE",
+    "TYPED_SKIP_BASELINE_ABSENT", "TYPED_SKIP_NO_PAIR"}
+# P0-4 (owner R10): chunks are sized by OBSERVED WALL TIME, not a
+# fixed number of problems — one invocation processes items until the
+# budget is consumed (each item's measured wall feeds the next
+# chunk's decision; the cron interval remains the outer pacing).
+CHUNK_BUDGET_S = int(os.environ.get("R7_CHUNK_BUDGET_S", "600"))
+# durable invocation records (owner R10 P0: the scheduled execution is
+# verified FROM ITS INVOCATION RECORDS, never inferred from the
+# runner's presence)
+INVOCATIONS = REPO / "eval" / "runs" / "r7_queue_invocations.jsonl"
+KILL_DIR = REPO / "eval" / "kills"
+
 
 def _dev12_ids() -> list:
     d = json.loads(DEV12.read_text(encoding="utf-8"))
     plist = d if isinstance(d, list) else d.get("problems", [])
     ids = [str(p.get("problem_id") or p.get("id")) for p in plist]
     return sorted(i for i in ids if i)
+
+
+def _killed_problem_ids() -> list:
+    """R10 P0-1: the killed problems FROM THE COMMITTED KILL RECORDS
+    (eval/kills/*.json) — never guessed. DEV12 problems excluded (they
+    ride the main loop); the killed non-DEV12 problems (bench-p05,
+    eval-new06) are the extra A0+ arm inputs."""
+    out: list = []
+    dev12 = set(_dev12_ids())
+    if KILL_DIR.exists():
+        for f in sorted(KILL_DIR.glob("*.json")):
+            if f.is_dir():
+                continue
+            try:
+                d = json.loads(f.read_text(encoding="utf-8"))
+            except Exception:  # noqa: BLE001 — typed, never silent
+                continue
+            pid = str(d.get("problem_id") or "").strip()
+            if pid and pid not in dev12:
+                out.append(pid)
+    return sorted(out)
 
 
 def _pair_has_answer(pid: str, pairs_dir: Path) -> bool:
@@ -146,6 +196,34 @@ def _pair_has_answer(pid: str, pairs_dir: Path) -> bool:
     return True
 
 
+def _ablation_gate() -> dict:
+    """R10 (owner directive P1-8): the 48-item ablation and the
+    heavy-stage pruning stay BLOCKED until >= 10 valid A0+-vs-
+    full-pipeline judgments exist in the committed comparison record.
+    The gate reads the RECORD BYTES (never the runner's presence or a
+    session's memory) and fails closed typed."""
+    rec_p = REPO / "eval" / "a0plus_compare_r10.json"
+    if not rec_p.exists():
+        return {"allowed": False, "reason":
+                "no committed comparison record "
+                "(eval/a0plus_compare_r10.json) — ablation blocked "
+                "(owner R10 P1-8: >=10 valid full-pipeline judgments "
+                "required)"}
+    try:
+        d = json.loads(rec_p.read_text(encoding="utf-8"))
+        n_valid = int((d.get("tally_vs_full_pipeline") or {})
+                      .get("n_valid") or 0)
+    except Exception as exc:  # noqa: BLE001 — typed, never silent
+        return {"allowed": False, "reason":
+                f"comparison record unparseable ({exc}) — ablation "
+                "blocked (fail closed)"}
+    if n_valid < 10:
+        return {"allowed": False, "reason":
+                f"only {n_valid} valid A0+-vs-full judgments — "
+                "ablation blocked (owner R10 P1-8 threshold: >=10)"}
+    return {"allowed": True, "reason": f"{n_valid} valid judgments"}
+
+
 def build_plan() -> list:
     """The full work plan (idempotent: built fresh each run; per-item
     status lives in the state file). ORDER is the owner's round
@@ -153,15 +231,18 @@ def build_plan() -> list:
     experiment), then the full-pipeline pairs, then ablation arms,
     two-turn, speed."""
     items: list = []
-    ids = _dev12_ids()
-    # 0. A0+ (owner directive 1: the simple arm BEFORE the 48-item
-    #    ablation — if A0+ ties or beats the full pipeline, the heavy
-    #    stages are not earning their cost)
+    ids = _dev12_ids() + _killed_problem_ids()
+    # 0. A0+ (the SIMPLE arm: one audit + zero/one repair; the killed
+    #    problems ride the same plan — fu-004/sofc are typed skips by
+    #    the arm itself, the killed non-DEV12 problems run on their
+    #    committed baselines). R10 queue policy: a DELIVERED record
+    #    (typed COMPLETE or honest typed-INCOMPLETE/skip, identity-
+    #    bound) is terminal — never re-planned automatically.
     for pid in ids:
-        if _a0plus_v2_complete(pid):
+        if _a0plus_v2_delivered(pid):
             continue
         items.append({"kind": "a0plus", "problem": pid,
-                      "pairs_out": "eval/pairs/r9_a0plus"})
+                      "pairs_out": "eval/pairs/r10_a0plus"})
     # 1. dev12 remaining (main arm -> dev12_r7)
     for pid in ids:
         if _pair_has_answer(pid, PAIRS_R7):
@@ -170,8 +251,14 @@ def build_plan() -> list:
                       "pairs_out": "eval/pairs/dev12_r7"})
     # 2. ablation arms (each problem x arm; skipped when the main-arm
     #    pair for that problem does not exist yet — the arm needs the
-    #    same-era engine, and the main arm goes first)
-    for arm, envkv in ABLATION_ARMS:
+    #    same-era engine, and the main arm goes first). R10: the WHOLE
+    #    stage is gated on the >=10-valid-judgment comparison record
+    #    (owner directive P1-8) — blocked items are not planned, and
+    #    the typed reason is printed, never silent.
+    _abl = _ablation_gate()
+    if not _abl["allowed"]:
+        print("[r7queue] ablation BLOCKED (typed): " + _abl["reason"])
+    for arm, envkv in (ABLATION_ARMS if _abl["allowed"] else []):
         for pid in ids:
             items.append({"kind": "ablation", "arm": arm, "env": envkv,
                           "problem": pid,
@@ -318,50 +405,80 @@ def _run_seeded_sweep(item: dict) -> dict:
             "wall_s": round(time.time() - t0, 1), "tail": tail[-2000:]}
 
 
-def _a0plus_v2_complete(pid: str) -> bool:
-    """R9 P0 (owner round 2026-11-13 item 4): the A0+ stage's completion
-    test. A v2 record counts ONLY when it IS a 2.0.0 record for THIS
-    problem, binds the SAME frozen baseline identity, and carries
-    result=COMPLETE with its completion gate True — file existence is
-    never completion (the measured 1.0.0 defect: ten files existed, all
-    contract-invalid)."""
-    f = REPO / "eval" / "pairs" / "r9_a0plus" / f"{pid}.json"
+def _a0plus_v2_delivered(pid: str) -> bool:
+    """R10 queue policy: a record counts as DELIVERED when it IS a
+    3.0.0 record for THIS problem, binds the SAME frozen baseline
+    identity, and carries a TYPED result (COMPLETE with its gate True,
+    or an honest typed-INCOMPLETE state, or a typed skip). COMPLETE
+    additionally requires its completion gate. Delivered records are
+    terminal for the queue — the state file is reconciled to them, and
+    re-running one is an explicit operator act (Art. XXVII), never an
+    automatic re-plan loop."""
+    f = A0P_PAIRS / f"{pid}.json"
     if not f.exists():
         return False
     try:
         rec = json.loads(f.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001
         return False
-    if not (rec.get("a0plus_version") == "r7_a0plus/2.0.0"
+    if not (rec.get("a0plus_version") == A0P_VERSION
             and rec.get("problem_id") == pid
-            and rec.get("result") == "COMPLETE"
-            and rec.get("completion_gate", {}).get("complete") is True):
+            and rec.get("result") in A0P_TERMINAL_STATES):
+        return False
+    if rec.get("result") == "COMPLETE" and rec.get(
+            "completion_gate", {}).get("complete") is not True:
         return False
     fresh = REPO / "eval" / "pairs" / "dev12_fresh" / f"{pid}.json"
     if not fresh.exists():
-        return False
+        fresh = REPO / "eval" / "pairs" / f"{pid}.json"
+        if not fresh.exists():
+            # a typed skip may exist for a problem whose committed
+            # pair is itself absent — the skip IS the identity binding
+            return rec.get("result") in ("TYPED_SKIP_BASELINE_ABSENT",
+                                         "TYPED_SKIP_NO_PAIR")
     try:
         sha = str(json.loads(fresh.read_text(encoding="utf-8"))
                   .get("bound_inputs", {}).get("baseline_answer_sha256")
                   or "")
     except Exception:  # noqa: BLE001
+        sha = ""
+    if rec.get("baseline_sha_source") == sha and sha:
+        return True
+    # the killed non-DEV12 pairs predate the bound_inputs schema —
+    # their identity is the sha256 OF the baseline answer bytes (the
+    # arm's own _baseline_identity rule)
+    import hashlib
+    try:
+        baseline = str(json.loads(fresh.read_text(encoding="utf-8"))
+                       .get("baseline_answer") or "")
+    except Exception:  # noqa: BLE001
         return False
-    return rec.get("baseline_sha_source") == sha
+    if not baseline.strip():
+        return False
+    return rec.get("baseline_sha_source") == hashlib.sha256(
+        baseline.encode("utf-8")).hexdigest()
 
 
-def _run_a0plus(item: dict) -> dict:
+def _run_a0plus(item: dict, chunk_wait_s: float = 0.0) -> dict:
     """ONE A0+ invocation: the committed baseline -> constraint audit
-    (1 call) -> strict relabel (0 calls) -> ONE repair (0-1 calls).
-    The loop-local zai gateway is started-or-reused and PROBED first
-    (the launcher's own probe-before-admit rule, one script); a typed
-    probe failure is a RETRY_PENDING input, never a verdict."""
+    (1 call) -> strict relabel (0 calls) -> AT MOST ONE repair (0-1
+    calls). The loop-local zai gateway is started-or-reused and PROBED
+    first (the launcher's own probe-before-admit rule, one script); a
+    typed probe failure is a RETRY_PENDING input, never a verdict.
+    P0-4/P0-2 (owner R10): the hard transport bounds are SET (never
+    setdefault), and the measured queue wait + gateway setup ride the
+    subprocess env as INFRASTRUCTURE seconds the arm records separately
+    from model work."""
     env = dict(os.environ)
-    env.setdefault("ENGINE_LLM_TIMEOUT_S", "40")
+    env["ENGINE_LLM_TIMEOUT_S"] = "40"
+    env["ENGINE_LLM_RETRY_SLEEP_S"] = "0"
+    env["A0P_QUEUE_WAIT_S"] = f"{max(0.0, chunk_wait_s):.1f}"
     # the same transport env the launcher rides: the cost policy (the
     # engine refuses every provider under the default ZERO_PAID_COST —
     # measured typed refusal on the first live A0+ invocation)
     env.setdefault("ENGINE_MODEL_COST_POLICY", "UNRESTRICTED")
     gw = None
+    gw_t0 = time.time()
     for _try in (1, 2):
         gw = subprocess.run(["bash", "scripts/zai_gateway_env.sh"],
                             cwd=str(REPO), capture_output=True, text=True,
@@ -372,8 +489,10 @@ def _run_a0plus(item: dict) -> dict:
             break
         # the gateway start is flaky under a reaper race (measured:
         # the probe passes, the background node dies with the script's
-        # session) — one immediate retry, no fixed sleep
-        time.sleep(1)
+        # session) — ONE immediate retry, NO fixed sleep (owner R10
+        # P0: the process is never kept asleep; the retry is typed)
+    gw_setup_s = round(time.time() - gw_t0, 1)
+    env["A0P_GATEWAY_SETUP_S"] = f"{gw_setup_s:.1f}"
     if gw is None or gw.returncode != 0 or not any(
             l.startswith("export ") for l in (gw.stdout or "").splitlines()):
         return {"exit_code": 0, "wall_s": 0.0,
@@ -407,37 +526,57 @@ def _classify_result(item: dict, res: dict) -> str:
     INPUT (the launcher's typed failures ride the exit code + output)."""
     tail = res.get("tail") or ""
     if item["kind"] == "a0plus":
-        f = REPO / "eval" / "pairs" / "r9_a0plus" / \
-            f"{item['problem']}.json"
+        tail0 = res.get("tail") or ""
+        # the gateway probe failed BEFORE the arm ran (wall 0, exit 0,
+        # no record) — typed transport retry, never a verdict (the
+        # old fall-through called it 'no A0+ pair', hiding the cause)
+        if (res.get("exit_code") == 0 and res.get("wall_s") == 0.0
+                and "ZAI_TRANSPORT_PROBE" in tail0
+                and "200 OK" not in tail0):
+            return "RETRY_PENDING (zai transport down this window)"
+        f = A0P_PAIRS / f"{item['problem']}.json"
+        # R10 queue policy: the RECORD is read first, on every typed
+        # exit (0/2/4). A 3.0.0 record binding the same baseline with a
+        # typed result is DELIVERED — the honest typed-INCOMPLETE arm
+        # is the delivery (owner R10: keep the typed incomplete, never
+        # fabricate COMPLETE); re-running it automatically would be
+        # unbounded quota burn under the cron pacing.
+        if f.exists() and _a0plus_v2_delivered(item["problem"]):
+            try:
+                _rec = json.loads(f.read_text(encoding="utf-8"))
+                _r = _rec.get("result")
+            except Exception:  # noqa: BLE001 — typed, never silent
+                _r = "unreadable"
+            if _r == "COMPLETE":
+                return "DONE"
+            return f"DONE (a0plus delivered typed: {_r} — terminal, " \
+                "re-run is an explicit operator act)"
         if res.get("exit_code") == 0 and f.exists():
-            # R9 P0 (owner round 2026-11-13 item 4): DONE requires a
-            # GENUINE completed result — the record must carry
-            # result=COMPLETE with its completion gate True (contract
-            # valid + consistency PASSED + provenance resolved), not
-            # merely the file's existence (Art. XXV: the bytes, not
-            # the state, are the deliverable).
+            # DONE requires a GENUINE completed result — the record
+            # must carry result=COMPLETE with its completion gate True
+            # (contract valid + consistency PASSED + provenance
+            # resolved), not merely the file's existence (Art. XXV:
+            # the bytes, not the state, are the deliverable).
             try:
                 rec = json.loads(f.read_text(encoding="utf-8"))
-                if (rec.get("a0plus_version") == "r7_a0plus/2.0.0"
+                if (rec.get("a0plus_version") == A0P_VERSION
                         and rec.get("result") == "COMPLETE"
                         and rec.get("completion_gate", {})
                         .get("complete") is True):
                     return "DONE"
-                return ("VERIFY_FAIL (v2 record not COMPLETE: "
+                return ("VERIFY_FAIL (v3 record not COMPLETE: "
                         f"result={rec.get('result')}, "
                         f"gate={rec.get('completion_gate')})")
             except Exception as exc:  # noqa: BLE001 — typed, never silent
-                return f"VERIFY_FAIL (v2 record unparseable: {exc})"
+                return f"VERIFY_FAIL (v3 record unparseable: {exc})"
         if res.get("exit_code") == 2:
             # typed skip: no committed baseline bytes — retrying the
             # same invocation cannot produce them (fail-closed)
             return "VERIFY_FAIL (typed skip: no committed baseline bytes)"
         if res.get("exit_code") == 4:
-            # R9 P0 item 1: INCOMPLETE_PROVENANCE / INCOMPLETE_CONSISTENCY
-            # / INCOMPLETE_CONTRACT — typed incomplete, the record
-            # carries the states; the runner retries (a fresh repair
-            # call CAN heal contract/consistency; provenance heals when
-            # the run tree lands on this host)
+            # typed INCOMPLETE_* whose record did not land (or does not
+            # bind this baseline) — a transport-class retry: the arm
+            # wrote nothing durable this window
             m = ""
             for tok in ("INCOMPLETE_PROVENANCE", "INCOMPLETE_CONTRACT",
                         "INCOMPLETE_CONSISTENCY"):
@@ -557,110 +696,209 @@ def _restore_score_table(st: dict, note: str) -> None:
         st["_score_table_clean"] = flag
 
 
+def _append_invocation(key: str, it: dict, verdict: str, state: str,
+                       wall_s: float, exit_code: int, attempt: int) -> None:
+    """R10 P0-4 (owner): EVERY item execution appends a typed line to
+    the durable invocation record — the scheduled execution is verified
+    FROM THESE RECORDS, never inferred from the runner being present
+    (an invocation record at a cron window with a real verdict IS the
+    evidence that the schedule fired; no record, no claim)."""
+    try:
+        INVOCATIONS.parent.mkdir(parents=True, exist_ok=True)
+        with INVOCATIONS.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps({
+                "at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                    time.gmtime()),
+                "item": key, "kind": it.get("kind"),
+                "problem": it.get("problem"),
+                "arm": it.get("arm"), "rep": it.get("rep"),
+                "verdict": verdict[:160], "state": state,
+                "wall_s": wall_s, "exit_code": exit_code,
+                "attempt": attempt}) + "\n")
+    except Exception as exc:  # noqa: BLE001 — typed, never silent
+        print(f"[r7queue] TYPED: invocation record append failed ({exc})"
+              " — the run itself is unaffected; the record is evidence")
+
+
+def _reconcile_delivered_states(st: dict, plan: list) -> int:
+    """R10 queue policy: the state file is RECONCILED to the record
+    bytes (Art. XXV — a recorded state that no longer matches measured
+    reality is corrected to the measured state). A stale a0plus entry
+    (EXHAUSTED / RETRY_PENDING) whose record IS a delivered 3.0.0 arm
+    becomes DONE (delivered) — the measured R10 hazard: a chunk racing
+    the arm-script edits (0.1 s exit 1) leaves stale EXHAUSTED states
+    shadowing delivered pairs; the stale states must never shadow the
+    bytes. Returns the number of reconciled entries (never silent)."""
+    planned = {f"{it['kind']}:{it.get('arm') or it.get('rep') or ''}:"
+               f"{it['problem']}" for it in plan}
+    n = 0
+    for key, s in (st.get("status") or {}).items():
+        if not key.startswith("a0plus:") or key in planned:
+            continue
+        pid = key.split(":", 2)[2]
+        if _a0plus_v2_delivered(pid) and s.get("state") != "DONE":
+            try:
+                _r = json.loads((A0P_PAIRS / f"{pid}.json")
+                                .read_text(encoding="utf-8")).get("result")
+            except Exception:  # noqa: BLE001 — typed, never silent
+                _r = "unreadable"
+            s["reconciled_from"] = s.get("state")
+            s["state"] = "DONE"
+            s["note"] = (f"state reconciled to delivered record bytes "
+                         f"(result={_r}; Art. XXV) — stale entry from "
+                         "the exit-1 chunk race")
+            n += 1
+    return n
+
+
 def run_one() -> int:
+    """P0-4 (owner R10): process items until the CHUNK WALL BUDGET is
+    consumed — chunks are sized by observed wall time, not a fixed
+    number of problems. Every item execution appends a typed line to
+    the durable invocation record (the scheduled execution is verified
+    from its invocation records, never inferred from the runner being
+    present)."""
     st = load_state()
     plan = build_plan()
     st["plan"] = plan
+    _n_rec = _reconcile_delivered_states(st, plan)
+    if _n_rec:
+        print(f"[r7queue] reconciled {_n_rec} stale a0plus state "
+              "entr(ies) to delivered record bytes (Art. XXV)")
     status = st.setdefault("status", {})
     _restore_score_table(st, "chunk start")
-    # the first item that is not DONE and not EXHAUSTED
-    target = None
-    for it in plan:
-        key = f"{it['kind']}:{it.get('arm') or it.get('rep') or ''}:" \
-              f"{it['problem']}"
-        s = status.get(key, {})
-        if s.get("state") == "DONE":
-            if it["kind"] == "a0plus":
-                # the bytes are the truth (Art. XXV): a DONE state whose
-                # pair file is absent — or whose record is not an
-                # identity-valid COMPLETE v2 arm — re-runs; the state
-                # alone is never the deliverable
-                if _a0plus_v2_complete(it["problem"]):
+    chunk_t0 = time.time()
+    n_ran = 0
+    while True:
+        # the first item that is not DONE and not EXHAUSTED
+        target = None
+        for it in plan:
+            key = f"{it['kind']}:{it.get('arm') or it.get('rep') or ''}:" \
+                  f"{it['problem']}"
+            s = status.get(key, {})
+            if s.get("state") == "DONE":
+                if it["kind"] == "a0plus":
+                    # the bytes are the truth (Art. XXV): a DONE state
+                    # whose record is not a delivered identity-valid
+                    # arm re-runs; the state alone is never the
+                    # deliverable (delivered ⊇ COMPLETE: the honest
+                    # typed-INCOMPLETE arms are terminal, R10 queue
+                    # policy)
+                    if _a0plus_v2_delivered(it["problem"]):
+                        continue
+                else:
                     continue
-            else:
+            if s.get("state") == "EXHAUSTED":
                 continue
-        if s.get("state") == "EXHAUSTED":
-            continue
-        if s.get("state") == "SKIP":
-            continue
-        target = (key, it, s)
-        break
-    if target is None:
-        print("[r7queue] ALL ITEMS DONE OR EXHAUSTED — queue drained")
-        save_state(st)
-        return 0
-    key, it, s = target
-    # ATTACH the entry: for a first-attempt item, status.get(key, {})
-    # above returned a DETACHED dict — without this, every mutation
-    # below (attempts/state/verdict) is lost and save_state persists an
-    # empty status: retries never accumulate, MAX_ATTEMPTS never fires,
-    # the item loops forever on a persistent storm. Measured defect on
-    # the first live invocation (2026-11-13, p09 transport storm).
-    status[key] = s
-    att = int(s.get("attempts", 0))
-    if att >= MAX_ATTEMPTS:
-        s["state"] = "EXHAUSTED"
-        s["note"] = f"typed exhausted after {att} attempts"
-        print(f"[r7queue] {key}: EXHAUSTED after {att} attempts")
-        save_state(st)
-        return 0
-    # ablation arms need the main-arm pair first (same-era engine)
-    if it["kind"] == "ablation" and not _pair_has_answer(
-            it["problem"], PAIRS_R7):
-        s["state"] = "SKIP"
-        s["note"] = "main-arm pair absent this invocation; re-planned"
-        save_state(st)
-        print(f"[r7queue] {key}: SKIP (main-arm pair not yet in "
-              "dev12_r7; the dev12 item replans first)")
-        return 0
-    if it["kind"] == "twoturn" and not TWOTURN_PAYLOAD.exists():
-        # build the payload deterministically (typed fail-closed)
-        p = subprocess.run([sys.executable, "-B",
-                            "scripts/r6_build_twoturn_devfu.py"],
-                           cwd=str(REPO), capture_output=True, text=True)
-        if p.returncode != 0 or not TWOTURN_PAYLOAD.exists():
-            s["state"] = "EXHAUSTED"
-            s["note"] = ("two-turn payload build failed typed: "
-                         + (p.stderr or "")[-200:])
+            if s.get("state") == "SKIP":
+                continue
+            target = (key, it, s)
+            break
+        if target is None:
+            if n_ran == 0:
+                print("[r7queue] ALL ITEMS DONE OR EXHAUSTED — queue "
+                      "drained")
+            else:
+                print("[r7queue] chunk drained within budget ("
+                      f"{n_ran} item(s), "
+                      f"{round(time.time() - chunk_t0, 1)}s)")
             save_state(st)
-            print(f"[r7queue] {key}: payload build FAILED typed")
             return 0
-    if SEEDED_SPECIMENS.exists() and not SEEDED_HASHFILE.exists():
-        print("[r7queue] seeded specimens present but the owner hash "
-              "file is absent (eval/seeded_specimens_v1.sha256) — the "
-              "sweep is NOT planned (the integrity hash is never "
-              "invented, Art. XXV)")
-    print(f"[r7queue] RUN {key} (attempt {att + 1}/{MAX_ATTEMPTS})")
-    if it["kind"] == "seeded":
-        res = _run_seeded_sweep(it)
-    elif it["kind"] == "a0plus":
-        res = _run_a0plus(it)
-    else:
-        res = _run_launcher(it)
-    it = dict(it)
-    it["_wall_s"] = res["wall_s"]
-    verdict = _classify_result(it, res)
-    s["attempts"] = att + 1
-    s["last_verdict"] = verdict
-    s["last_wall_s"] = res["wall_s"]
-    s["last_exit_code"] = res["exit_code"]
-    if verdict == "DONE":
-        s["state"] = "DONE"
-    elif verdict.startswith("VERIFY_FAIL"):
-        s["state"] = "EXHAUSTED"
-        s["note"] = verdict
-    else:
-        s["state"] = "RETRY_PENDING"
-        s["note"] = verdict
-    st["last_item"] = key
-    save_state(st)
-    _restore_score_table(st, "after item")
-    print(f"[r7queue] {key}: {verdict} (wall {res['wall_s']}s, "
-          f"exit {res['exit_code']})")
-    if COOLDOWN_S > 0 and verdict != "DONE":
-        print(f"[r7queue] cooldown {COOLDOWN_S}s (quota window)")
-        time.sleep(COOLDOWN_S)
-    return 0
+        key, it, s = target
+        # WALL-BUDGET chunking (owner R10 P0-4): an item starts only
+        # when the REMAINING budget admits its worst case (a0plus is
+        # bounded to 300 s + slack; launchers run under the 1120 s
+        # subprocess cap). An item that cannot fit waits for the next
+        # chunk — typed, never a partial run.
+        elapsed = time.time() - chunk_t0
+        _worst = 320.0 if it["kind"] == "a0plus" else 1120.0
+        if n_ran > 0 and elapsed + _worst > CHUNK_BUDGET_S:
+            print(f"[r7queue] chunk budget consumed ({round(elapsed, 1)}s, "
+                  f"{n_ran} item(s)) — '{key}' waits for the next chunk")
+            save_state(st)
+            return 0
+        # ATTACH the entry: for a first-attempt item, status.get(key,
+        # {}) above returned a DETACHED dict — without this, every
+        # mutation below (attempts/state/verdict) is lost and
+        # save_state persists an empty status: retries never
+        # accumulate, MAX_ATTEMPTS never fires, the item loops forever
+        # on a persistent storm. Measured defect on the first live
+        # invocation (2026-11-13, p09 transport storm).
+        status[key] = s
+        att = int(s.get("attempts", 0))
+        if att >= MAX_ATTEMPTS:
+            s["state"] = "EXHAUSTED"
+            s["note"] = f"typed exhausted after {att} attempts"
+            print(f"[r7queue] {key}: EXHAUSTED after {att} attempts")
+            _append_invocation(key, it, "EXHAUSTED (attempt budget)",
+                               "EXHAUSTED", 0.0, 0, att)
+            save_state(st)
+            continue
+        # ablation arms need the main-arm pair first (same-era engine)
+        if it["kind"] == "ablation" and not _pair_has_answer(
+                it["problem"], PAIRS_R7):
+            s["state"] = "SKIP"
+            s["note"] = "main-arm pair absent this invocation; re-planned"
+            save_state(st)
+            print(f"[r7queue] {key}: SKIP (main-arm pair not yet in "
+                  "dev12_r7; the dev12 item replans first)")
+            continue
+        if it["kind"] == "twoturn" and not TWOTURN_PAYLOAD.exists():
+            # build the payload deterministically (typed fail-closed)
+            p = subprocess.run([sys.executable, "-B",
+                                "scripts/r6_build_twoturn_devfu.py"],
+                               cwd=str(REPO), capture_output=True, text=True)
+            if p.returncode != 0 or not TWOTURN_PAYLOAD.exists():
+                s["state"] = "EXHAUSTED"
+                s["note"] = ("two-turn payload build failed typed: "
+                             + (p.stderr or "")[-200:])
+                save_state(st)
+                print(f"[r7queue] {key}: payload build FAILED typed")
+                continue
+        if SEEDED_SPECIMENS.exists() and not SEEDED_HASHFILE.exists():
+            print("[r7queue] seeded specimens present but the owner hash "
+                  "file is absent (eval/seeded_specimens_v1.sha256) — the "
+                  "sweep is NOT planned (the integrity hash is never "
+                  "invented, Art. XXV)")
+        print(f"[r7queue] RUN {key} (attempt {att + 1}/{MAX_ATTEMPTS})")
+        if it["kind"] == "seeded":
+            res = _run_seeded_sweep(it)
+        elif it["kind"] == "a0plus":
+            res = _run_a0plus(it, chunk_wait_s=time.time() - chunk_t0)
+        else:
+            res = _run_launcher(it)
+        it = dict(it)
+        it["_wall_s"] = res["wall_s"]
+        verdict = _classify_result(it, res)
+        s["attempts"] = att + 1
+        s["last_verdict"] = verdict
+        s["last_wall_s"] = res["wall_s"]
+        s["last_exit_code"] = res["exit_code"]
+        if verdict == "DONE":
+            s["state"] = "DONE"
+        elif verdict.startswith("DONE (a0plus delivered"):
+            # R10 queue policy: an honest typed-INCOMPLETE arm IS a
+            # delivery — DONE with the typed state riding the verdict
+            s["state"] = "DONE"
+        elif verdict.startswith("VERIFY_FAIL"):
+            s["state"] = "EXHAUSTED"
+            s["note"] = verdict
+        else:
+            s["state"] = "RETRY_PENDING"
+            s["note"] = verdict
+        _append_invocation(key, it, verdict, s["state"], res["wall_s"],
+                           res["exit_code"], att + 1)
+        st["last_item"] = key
+        save_state(st)
+        _restore_score_table(st, "after item")
+        print(f"[r7queue] {key}: {verdict} (wall {res['wall_s']}s, "
+              f"exit {res['exit_code']})")
+        # R10 P0 (owner): NO fixed process sleeps — the schedule
+        # interval is the quota-window pacing (a cooldown sleep kept a
+        # live process parked for 90 s per item; the cron schedule
+        # already spaces chunks, and the wall budget bounds the chunk).
+        n_ran += 1
+    # unreachable
 
 
 def _load_key_vault() -> list:

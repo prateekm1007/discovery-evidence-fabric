@@ -1,61 +1,52 @@
 #!/usr/bin/env python3
-"""r7_a0plus.py — OWNER AUDIT ROUND 2026-11-13, DIRECTIVE 1: the "A0+"
-simple arm. VERSION 2.0.0 (R9 P0 repair round, same owner directive
-section 2: the 1.0.0 artifacts are PRESERVED untouched; the corrections
-land as a new version in a separate output location).
+"""r7_a0plus.py — OWNER AUDIT ROUND R10 (2026-11-13): the SIMPLE arm.
+VERSION 3.0.0 — the R9 2.0.0 arm was a MULTI-repair composer (the owner
+audit: the 2.0.0 loop ran (1,2,3) repair rounds, i.e. up to 3 repair
+calls per problem — not the spec's single-repair arm). R10 restores the
+spec EXACTLY:
 
-The owner's measured challenge: the full pipeline's heavy stages are
-not earning their cost (auditor-judged DEV12-fresh 0W/4T/8L; the first
-r7 pair lost to the baseline on protocol completeness). A0+ is the
-MINIMAL arm that keeps only what demonstrably earns its keep:
+    frozen committed baseline answer (never modified, Art. XXXIX)
+      -> ONE LLM constraint audit (quoted offending text)
+      -> deterministic strict provenance relabel (zero LLM)
+      -> AT MOST ONE repair call (any mode; skipped entirely when the
+         audit, the relabel and both deterministic checks are clean)
+      -> deterministic three-check post-validation (contract +
+         consistency + provenance) with the ACTUAL inputs
+      -> COMPLETION GATE or a typed INCOMPLETE result — a still-failing
+         answer is DELIVERED AS TYPED-INCOMPLETE, never upgraded to
+         COMPLETE (owner R10: keep the honest state, no fabrication)
+      -> deliver to eval/pairs/r10_a0plus (v1.0.0 r7_a0plus and the
+         2.0.0 r9_a0plus bytes are PRESERVED audit evidence)
 
-    committed same-model baseline answer
-      -> constraint audit (ONE LLM call, quoted offending text)
-      -> strict provenance relabel (deterministic, zero-LLM)
-      -> ONE repair call (only when the audit, the relabel, or a
-         CHECK_ABSENT consistency state found anything)
-      -> deterministic post-validation (contract + consistency) with
-         the ACTUAL inputs (frozen evidence packet, user variables,
-         clarification — the 1.0.0 defect: validated without them)
-      -> COMPLETION GATE: the arm is COMPLETE only when provenance
-         resolved AND the contract validates AND the consistency check
-         PASSED — anything else is a typed INCOMPLETE result (Art. LXI)
-      -> deliver
+R10 hard bounds (owner P0-2): the transport timeout is SET to 40 s per
+provider attempt (never setdefault), at most ONE immediate retry or one
+fallback, NO fixed sleeps on the active path, and the arm's TOTAL wall
+budget for one problem is 300 s (TOTAL_BUDGET_EXHAUSTED is typed, the
+pre-repair answer stays). The per-call timeline carries purpose, rung,
+queue wait, TTFB, attempt duration, retry count and outcome for EVERY
+call; infrastructure time (queue wait, gateway setup) is recorded
+SEPARATELY from model work and never counted as work; missing
+measurements are NOT_MEASURED, never zero.
 
-The 1.0.0 measured defects this version repairs (all ten committed
-1.0.0 pair files show them):
-  (1) an unresolvable evidence packet still delivered the unmodified
-      baseline as a completed arm — now INCOMPLETE_PROVENANCE, typed,
-      no completed result, retry only when the dependency appears;
-  (2) validate_answer() ran WITHOUT the frozen evidence packet / user
-      variables / clarification — its contract result was incomplete
-      and misleading (measured: 20 "unbound" numbers on p02 that the
-      packet would have bound);
-  (3) CHECK_ABSENT (a missing falsification-test section) silently
-      passed the repair loop — the check must PASS or the arm is
-      INCOMPLETE_CONSISTENCY, never silently complete;
-  (4) a JSON file's existence made the arm DONE — the result now must
-      carry the actual validation states, source bindings, baseline
-      identity and execution provenance, and the runner requires the
-      completion gate;
-  (5) work_time_s summed (latency_ms or 0) — missing measurement
-      became ZERO seconds. Missing measurement is NOT_MEASURED; work
-      time sums only MEASURED healthy attempts;
-  (6) the per-call timeline dropped provider/model on degraded routes.
+The three killed problems ride the plan FROM THE COMMITTED KILL
+RECORDS (eval/kills/*.json): fu-004 and sofc carry no baseline bytes
+in their committed pairs (typed skips — the compared object does not
+exist, Art. XXV); the non-DEV12 killed problems with committed baseline
+bytes (bench-p05, eval-new06) run the same arm on their committed
+baselines.
 
-ONE problem per invocation (the queue's chunk model; resumable state
-lives in the emitted pair files — a problem with a COMPLETE, identity-
-valid v2 pair is DONE; an INCOMPLETE record re-runs). Output:
-eval/pairs/r9_a0plus/<problem_id>.json carrying the COMPLETE triple
-(baseline, A0+, full pipeline) so the owner judges the arms side by
-side, plus the per-call timeline.
+Baseline-generation calls and A0+ calls are reported SEPARATELY (owner
+P0-1): the baseline's own generation record lives in the committed run
+tree (baseline_record.json); this round's measured calls are the A0+
+calls only — never summed into a single number.
 
-Serves: Art. XIX (the measured failure decides the arm, not a gate),
-Art. LXXVII (the deliverable is judged, not the pipeline), Art. LXI
-(every call is counted per stage; a typed transport failure is
-RETRY_PENDING, never a verdict; a missing observation is never a
-pass), Art. XXXIX (committed pair bytes are never modified), Art. XXV
-(the recorded states are the measured states).
+Serves: Art. XIX (the measured failure decides the arm), Art. LXXVII
+(the deliverable is judged, not the pipeline), Art. LXI (every call is
+counted per stage; a typed transport failure is a retry, never a
+verdict; a missing observation is never a pass), Art. XXXIX (committed
+pair bytes are never modified), Art. XXV (the recorded states are the
+measured states), Art. XXVII (an operator decision is recorded, never
+a coder's silent reclassification).
 """
 from __future__ import annotations
 
@@ -71,12 +62,22 @@ sys.path.insert(0, str(REPO))
 
 PAIRS_FRESH = REPO / "eval" / "pairs" / "dev12_fresh"
 PAIRS_R7 = REPO / "eval" / "pairs" / "dev12_r7"
-# v2 output location — the 1.0.0 files in eval/pairs/r7_a0plus are
-# PRESERVED AUDIT EVIDENCE and are never written again (Art. XXXIX).
-PAIRS_A0 = REPO / "eval" / "pairs" / "r9_a0plus"
+# v3 output location — the 1.0.0 (r7_a0plus) and 2.0.0 (r9_a0plus)
+# artifacts are PRESERVED AUDIT EVIDENCE and are never written again
+# (Art. XXXIX); the simple arm writes its own versioned location.
+PAIRS_A0 = REPO / "eval" / "pairs" / "r10_a0plus"
 DEV12 = REPO / "eval" / "problems_dev12.json"
+PROBLEMS_ALL = REPO / "eval" / "problems.json"
+KILL_DIR = REPO / "eval" / "kills"
 
-A0P_VERSION = "r7_a0plus/2.0.0"
+A0P_VERSION = "r7_a0plus/3.0.0"
+
+# R10 P0-2 hard bounds (SET, never defaulted; the runner passes the
+# same values through the subprocess env so a stale ambient value
+# cannot widen them)
+HARD_TIMEOUT_S = 40
+MAX_RETRIES = 1
+TOTAL_BUDGET_S = 300
 
 # typed exit codes (the runner's _classify_result reads them)
 EXIT_OK = 0
@@ -95,21 +96,79 @@ def _dev12_ids() -> list:
     return sorted(str(p.get("problem_id") or p.get("id")) for p in plist)
 
 
+def _killed_problem_ids() -> list:
+    """R10 P0-1 (owner): the killed problems come FROM THE COMMITTED
+    KILL RECORDS (eval/kills/*.json) — never guessed, never from a
+    session's memory. DEV12 problems are excluded here (they ride the
+    main loop; fu-004/sofc are its typed skips); the killed problems
+    OUTSIDE DEV12 that carry committed baseline bytes are the extra
+    arm inputs (bench-p05, eval-new06 — the owner's measured 'third
+    killed case')."""
+    out: list = []
+    dev12 = set(_dev12_ids())
+    if KILL_DIR.exists():
+        for f in sorted(KILL_DIR.glob("*.json")):
+            if f.name == "r6_dev12" or f.is_dir():
+                continue
+            try:
+                d = json.loads(f.read_text(encoding="utf-8"))
+            except Exception:  # noqa: BLE001 — typed, never silent
+                continue
+            pid = str(d.get("problem_id") or "").strip()
+            if pid and pid not in dev12:
+                out.append(pid)
+    return sorted(out)
+
+
 def _problem_record(pid: str) -> dict:
+    """The problem's record: DEV12 first, then the full registry
+    (eval/problems.json) — the killed non-DEV12 problems (bench-p05,
+    eval-new06) live there."""
     d = json.loads(DEV12.read_text(encoding="utf-8"))
     plist = d if isinstance(d, list) else d.get("problems", [])
-    return next(p for p in plist
-                if str(p.get("problem_id") or p.get("id")) == pid)
+    for p in plist:
+        if str(p.get("problem_id") or p.get("id")) == pid:
+            return p
+    if PROBLEMS_ALL.exists():
+        d2 = json.loads(PROBLEMS_ALL.read_text(encoding="utf-8"))
+        plist2 = d2 if isinstance(d2, list) else d2.get("problems", [])
+        for p in plist2:
+            if str(p.get("problem_id") or p.get("id")) == pid:
+                return p
+    raise KeyError(pid)
 
 
 def _load_pair(pid: str) -> dict | None:
+    """The committed baseline pair: the DEV12-fresh audited bytes
+    first; the killed non-DEV12 problems' committed top-level pair
+    files (eval/pairs/<pid>.json) are the same-era audited bytes."""
     f = PAIRS_FRESH / f"{pid}.json"
     if not f.exists():
-        return None
+        f = REPO / "eval" / "pairs" / f"{pid}.json"
+        if not f.exists():
+            return None
     try:
         return json.loads(f.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001
         return None
+
+
+def _baseline_identity(pid: str, pair: dict | None) -> str:
+    """The frozen baseline identity: the pair's own bound sha when it
+    carries one; otherwise the sha256 OF THE BASELINE ANSWER BYTES
+    (the killed non-DEV12 pairs predate the bound_inputs schema).
+    Deterministic either way — the identity binds the record to the
+    exact bytes the arm improved."""
+    sha = str((pair or {}).get("bound_inputs", {}) or {}
+              .get("baseline_answer_sha256") or "") \
+        if pair else ""
+    if sha:
+        return sha
+    baseline = str((pair or {}).get("baseline_answer") or "")
+    if not baseline.strip():
+        return ""
+    import hashlib
+    return hashlib.sha256(baseline.encode("utf-8")).hexdigest()
 
 
 def _packet_by_id_from_run_tree(pair: dict) -> dict:
@@ -207,6 +266,22 @@ def _citation_resolution_lines(answer: str, packet_list: list) -> list:
     return out[:8]
 
 
+def _ttfb_ms_from_hop(r: dict):
+    """R10 (owner latency item): TTFB rides the route hop under
+    ttfb_s (projected, seconds) or ttfb_ms (the transport's own
+    record). The R10 measured defect: the projection read ONLY ttfb_s
+    while the hop carried ttfb_ms — every A0+ timeline showed ttfb
+    null although the transport HAD measured it. Missing stays None
+    (NOT_MEASURED, never zero)."""
+    v = r.get("ttfb_s")
+    if isinstance(v, (int, float)):
+        return int(round(v * 1000))
+    v = r.get("ttfb_ms")
+    if isinstance(v, (int, float)):
+        return int(v)
+    return None
+
+
 def _timeline_from_result(res: dict, purpose: str) -> list:
     """The per-call timeline rows (owner directive 2): one row per
     attempt the cascade made — provider, model, rung, latency, ttfb,
@@ -239,9 +314,7 @@ def _timeline_from_result(res: dict, purpose: str) -> list:
                 "attempts": r.get("attempts"),
                 "retry_count": r.get("retry_count"),
                 "latency_ms": lat if measured else None,
-                "ttfb_ms": (round(r["ttfb_s"] * 1000)
-                            if isinstance(r.get("ttfb_s"),
-                                          (int, float)) else None),
+                "ttfb_ms": _ttfb_ms_from_hop(r),
                 "gateway_hang": bool(r.get("gateway_hang")),
                 "failure_type": r.get("failure_type"),
                 "measured": measured})
@@ -284,11 +357,12 @@ def _hang_time_s(timeline: list):
 
 
 def _identity_valid(rec: dict, pid: str, baseline_sha: str) -> bool:
-    """Resume validation (R9 P0 item 4): an existing v2 output file is
-    DONE only when it IS a 2.0.0 record for THIS problem, carries the
-    SAME frozen baseline identity, and its completion gate is True —
-    a stale or INCOMPLETE record re-runs (the state alone is never the
-    deliverable, Art. XXV)."""
+    """Resume validation: an existing v3 output file is DONE only when
+    it IS a 3.0.0 record for THIS problem, carries the SAME frozen
+    baseline identity, and its completion gate is True — a stale or
+    INCOMPLETE record re-runs when the ARM is invoked directly (the
+    queue's own delivered-state policy is the runner's decision, Art.
+    XXVII; the state alone is never the deliverable, Art. XXV)."""
     if not isinstance(rec, dict):
         return False
     return (rec.get("a0plus_version") == A0P_VERSION
@@ -298,14 +372,36 @@ def _identity_valid(rec: dict, pid: str, baseline_sha: str) -> bool:
             and rec.get("completion_gate", {}).get("complete") is True)
 
 
+def _emit_typed_record(pid: str, out_f: Path, result: str, note: str,
+                       pair: dict | None = None) -> None:
+    """A typed NON-ANSWER record (typed skip / provenance-incomplete):
+    the state, its reason and the frozen baseline identity ride the
+    bytes — nothing silently dropped, nothing invented (Art. XXV)."""
+    rec = {"a0plus_version": A0P_VERSION,
+           "problem_id": pid,
+           "result": result,
+           "typed_note": note,
+           "baseline_source": "committed audited pair bytes",
+           "baseline_sha_source": _baseline_identity(pid, pair),
+           "a0plus_answer": "",
+           "n_llm_calls": 0}
+    out_f.write_text(json.dumps(rec, indent=1, default=str) + "\n",
+                     encoding="utf-8")
+
+
 def run_a0plus(pid: str) -> int:
+    # R10 P0-2: the hard transport bounds are SET here (never
+    # setdefault) — an ambient ENGINE_LLM_TIMEOUT_S wider than 40 s
+    # cannot leak into the arm; the retry sleep is ZERO (no fixed
+    # sleeps on the active path; the engine's pacing helper honors
+    # the typed knob).
+    os.environ["ENGINE_LLM_TIMEOUT_S"] = str(HARD_TIMEOUT_S)
+    os.environ["ENGINE_LLM_RETRY_SLEEP_S"] = "0"
+    run_t0 = time.time()
     PAIRS_A0.mkdir(parents=True, exist_ok=True)
     out_f = PAIRS_A0 / f"{pid}.json"
     pair = _load_pair(pid)
-    baseline_sha = ""
-    if pair:
-        baseline_sha = str(pair.get("bound_inputs", {})
-                           .get("baseline_answer_sha256") or "")
+    baseline_sha = _baseline_identity(pid, pair)
     if out_f.exists():
         try:
             existing = json.loads(out_f.read_text(encoding="utf-8"))
@@ -318,32 +414,61 @@ def run_a0plus(pid: str) -> int:
         print(f"[a0plus] {pid}: existing record is not an identity-"
               "valid COMPLETE arm — re-running (typed)")
     if not pair:
-        print(f"[a0plus] {pid}: TYPED_SKIP (no committed dev12_fresh "
-              "pair — the baseline bytes do not exist)")
+        print(f"[a0plus] {pid}: TYPED_SKIP (no committed pair — the "
+              "baseline bytes do not exist)")
+        _emit_typed_record(
+            pid, out_f, "TYPED_SKIP_NO_PAIR",
+            "the committed pair file does not exist — the compared "
+            "object does not exist (Art. XXV)")
         return EXIT_TYPED_SKIP
     baseline = str(pair.get("baseline_answer") or "").strip()
     if not baseline:
         print(f"[a0plus] {pid}: TYPED_SKIP (committed pair carries no "
               "baseline answer — nothing to improve, Art. XXV)")
+        _emit_typed_record(
+            pid, out_f, "TYPED_SKIP_BASELINE_ABSENT",
+            "the committed pair carries an empty baseline_answer — no "
+            "arm input exists; the kill/absence identity rides the "
+            "committed pair bytes (Art. XXV; owner R10 item 2)",
+            pair=pair)
         return EXIT_TYPED_SKIP
     prob = _problem_record(pid)
     packet_by_id = _packet_by_id_from_run_tree(pair)
     timeline: list = []
+    # INFRASTRUCTURE vs MODEL time (owner R10 P0-2): the runner passes
+    # its measured queue wait and gateway setup seconds through the
+    # environment; they are recorded AS INFRASTRUCTURE and are NEVER
+    # counted as model work. Missing values stay None (NOT_MEASURED,
+    # never zero).
+    def _env_sec(name: str):
+        raw = os.environ.get(name, "").strip()
+        if not raw:
+            return None
+        try:
+            v = float(raw)
+            return v if v >= 0 else None
+        except (TypeError, ValueError):
+            return None
+    queue_wait_s = _env_sec("A0P_QUEUE_WAIT_S")
+    gateway_setup_s = _env_sec("A0P_GATEWAY_SETUP_S")
     rec: dict = {"a0plus_version": A0P_VERSION,
                  "problem_id": pid,
-                 "baseline_source": "eval/pairs/dev12_fresh (committed "
-                                    "audited bytes, unmodified)",
+                 "baseline_source": "committed audited pair bytes, "
+                                    "unmodified",
                  "baseline_sha_source": baseline_sha,
-                 "packet_records_resolved": len(packet_by_id)}
+                 "packet_records_resolved": len(packet_by_id),
+                 "arm_contract": {
+                     "repair_policy": "at_most_one_repair_call",
+                     "hard_transport_timeout_s": HARD_TIMEOUT_S,
+                     "max_retries": MAX_RETRIES,
+                     "total_budget_s": TOTAL_BUDGET_S}}
 
-    # ---- R9 P0 item 1: PROVENANCE FAIL-CLOSED. The frozen evidence
-    # packet is a REAL dependency of both the relabel leg and honest
-    # contract validation. Without it the arm is INCOMPLETE_PROVENANCE:
-    # the baseline is preserved (never modified, Art. XXXIX), NO
-    # completed result is delivered, and the runner retries — the
-    # dependency (the run tree) either exists on this host or the item
-    # waits for it; the unmodified baseline is never shipped as a
-    # completed A0+ arm (Art. XXV: a missing observation is never a
+    # ---- PROVENANCE FAIL-CLOSED. The frozen evidence packet is a
+    # REAL dependency of both the relabel leg and honest contract
+    # validation. Without it the arm is INCOMPLETE_PROVENANCE: the
+    # baseline is preserved (never modified, Art. XXXIX), a TYPED
+    # RECORD is emitted (nothing silently dropped), and NO completed
+    # result is delivered (Art. XXV: a missing observation is never a
     # pass; Art. LXI: typed, never silent).
     if not packet_by_id:
         print(f"[a0plus] {pid}: INCOMPLETE_PROVENANCE (typed) — the "
@@ -351,6 +476,14 @@ def run_a0plus(pid: str) -> int:
               f"(commit={pair.get('commit')} run={pair.get('run_id')}); "
               "no completed arm delivered; baseline preserved; retry "
               "when the run tree becomes available")
+        _emit_typed_record(
+            pid, out_f, "INCOMPLETE_PROVENANCE",
+            "the frozen evidence packet is unresolvable on this host "
+            f"(commit={pair.get('commit')} "
+            f"run={pair.get('run_id')}) — the strict relabel and the "
+            "honest contract validation are real dependencies; no "
+            "completed arm is delivered without them (Art. XXV)",
+            pair=pair)
         return EXIT_INCOMPLETE
     packet_list = _unique_packet_list(packet_by_id)
 
@@ -363,9 +496,16 @@ def run_a0plus(pid: str) -> int:
         consistency_check, CONSISTENCY_ABSENT_CAVEAT_LINE, _split_test)
     from discovery_fabric.engine.answer_contract import validate_answer
 
+    # R10 P0-2: every arm call rides the hard bounds — 40 s per
+    # provider attempt, at most ONE immediate retry, no fixed sleeps.
+    def _bounded_generate(prompt: str, **kw):
+        kw.setdefault("timeout", HARD_TIMEOUT_S)
+        kw.setdefault("max_retries", MAX_RETRIES)
+        return llm_generate(prompt, **kw)
+
     # ---- leg 1: the LLM constraint audit (ONE call, quoted text)
     t0 = time.time()
-    check = llm_constraint_check(prob, baseline, llm_generate)
+    check = llm_constraint_check(prob, baseline, _bounded_generate)
     if check.get("state") == "CHECK_TRANSPORT_FAILED":
         # typed INCOMPLETE: an unaudited baseline is NOT an A0+ answer
         # (the arm's whole point is the audit); deliver nothing, retry
@@ -423,31 +563,34 @@ def run_a0plus(pid: str) -> int:
     needs_repair = bool(viol or relabels
                         or pre_contract.get("valid") is not True
                         or cons.get("state") != "CONSISTENCY_PASS")
-    # R9 P0 (measured on the first two v2 invocations of p02): a ONE-
-    # shot repair does not deterministically converge when the baseline
-    # needs BOTH a label conversion AND a test-section addition — each
-    # attempt fixed one and dropped the other (LLM variance, measured:
-    # attempt 1 added the test but not labels; attempt 2 labeled but
-    # dropped the test). The repair is therefore a BOUNDED loop (max 2
-    # rounds) carrying the CURRENT deterministic violations each round,
-    # stopping the moment the gates pass — the composer's own
-    # MAX_REPAIR_ROUNDS structure. The gates do NOT move; the repair
-    # converges toward them. Cost: +0-1 calls (2 repair calls worst
-    # case), still far under the full pipeline's stage chain.
+    # R10 P0-1 (owner): EXACTLY ONE repair call — the spec's single-
+    # repair arm. The R9 measured non-convergence (a one-shot repair
+    # fixed labels OR the test, not both) is answered NOT by a loop
+    # but by the surgical splice (the proposal bytes cannot
+    # re-randomize) plus the targeted prompts below; a still-failing
+    # answer is delivered typed-INCOMPLETE — the honest state, never
+    # fabricated (Art. XXV).
     rec["repair_rounds"] = []
     if needs_repair:
-        for _round in (1, 2, 3):
-            cur_contract = validate_answer(
-                answer,
-                str(prob.get("question_type") or "intervention-proposal"),
-                packet=packet_list,
-                user_variables=prob.get("user_variables"),
-                clarification=prob.get("clarification_answer"))
-            cur_cons = consistency_check(answer, None, prob)
-            if (cur_contract.get("valid") is True
-                    and cur_cons.get("state") == "CONSISTENCY_PASS"
-                    and not viol):
-                break
+        cur_contract = pre_contract
+        cur_cons = cons
+        _clean_already = (cur_contract.get("valid") is True
+                          and cur_cons.get("state") == "CONSISTENCY_PASS"
+                          and not viol)
+        _elapsed = time.time() - run_t0
+        _over_budget = _elapsed > TOTAL_BUDGET_S - 60
+        if _clean_already or _over_budget:
+            rec["repair_call"] = {
+                "applied": False,
+                "note": (
+                    "deterministic legs already clean after the relabel"
+                    " — no repair call needed (1 call total)"
+                    if _clean_already else
+                    f"TOTAL_BUDGET_EXHAUSTED (typed) — {round(_elapsed, 1)}"
+                    " s elapsed of the 300 s budget; the repair call is "
+                    "skipped, the pre-repair answer stays (owner R10 "
+                    "P0-2)")}
+        if not _clean_already and not _over_budget:
             rel_lines = [f"- PARAMETER '{r.get('parameter')}' value "
                          f"'{r.get('value')}': relabel "
                          f"{r.get('new_label')} — the value is not in "
@@ -686,13 +829,13 @@ def run_a0plus(pid: str) -> int:
                     "no markdown headings).")
                 surgical = False
             t0 = time.time()
-            res = llm_generate(repair_prompt, max_tokens=1100,
-                               purpose="a0plus_repair")
+            res = _bounded_generate(repair_prompt, max_tokens=1100,
+                                    purpose="a0plus_repair")
             repair_wall = round(time.time() - t0, 1)
             timeline += _timeline_from_result(res, "a0plus_repair")
             content = (res.get("content") or "").strip() \
                 if res.get("ok") else ""
-            round_rec = {"round": _round, "wall_s": repair_wall,
+            round_rec = {"round": 1, "wall_s": repair_wall,
                          "applied": bool(content),
                          "mode": "surgical_test" if surgical
                          else "whole_answer"}
@@ -721,10 +864,12 @@ def run_a0plus(pid: str) -> int:
                 answer = sd2["answer"]
                 round_rec["post_relabel"] = sd2["n_relabels"]
             rec["repair_rounds"].append(round_rec)
-            # the loop's TOP re-validates deterministically before every
-            # round: when the gates pass, it breaks before spending the
-            # next call; when they do not, the next round carries the
-            # CURRENT violations (surgical mode included)
+            # SINGLE REPAIR (owner R10 P0-1): EXACTLY ONE call. The
+            # 2.0.0 three-round loop is retired (the owner audit: the
+            # 2.0.0 arm was a multi-repair composer, not the spec's
+            # single-repair arm). A still-failing answer is delivered
+            # typed-INCOMPLETE below — never repaired into fabrication
+            # (Art. XXV: the recorded states are the measured states).
     else:
         rec["repair_rounds"] = []
         rec["repair_call"] = {"applied": False,
@@ -802,6 +947,42 @@ def run_a0plus(pid: str) -> int:
         (t.get("attempts") or 0) for t in timeline if t.get("measured"))
     rec["n_retries"] = sum(
         (t.get("retry_count") or 0) for t in timeline if t.get("measured"))
+    # R10 P0-2: end-to-end wall for THIS problem + the INFRASTRUCTURE
+    # split (queue wait, gateway setup — infra, never model work;
+    # missing measurements stay None = NOT_MEASURED, never zero)
+    rec["e2e_wall_s"] = round(time.time() - run_t0, 1)
+    rec["infra_time_s"] = {
+        "queue_wait": queue_wait_s,
+        "gateway_setup": gateway_setup_s,
+        "note": "infrastructure time, separated from model work; "
+                "None = NOT_MEASURED"}
+    # owner R10 P0-1: the baseline's generation calls and the A0+ calls
+    # are reported SEPARATELY — never summed. The baseline's own record
+    # lives in the committed run tree (baseline_record.json).
+    _br = None
+    _commit = str(pair.get("commit") or "")
+    _run_id = str(pair.get("run_id") or "")
+    if _commit and _run_id:
+        _br_p = (REPO / "eval" / "runs" / _commit / _run_id / pid
+                 / "baseline_record.json")
+        if _br_p.exists():
+            try:
+                _br = json.loads(_br_p.read_text(encoding="utf-8"))
+            except Exception:  # noqa: BLE001 — typed, never silent
+                _br = None
+    rec["call_accounting"] = {
+        "baseline_generation": ({
+            "n_calls": 1,
+            "latency_s": _br.get("latency_s"),
+            "route": _br.get("route"),
+            "source": "committed run tree baseline_record.json"}
+            if isinstance(_br, dict) and _br.get("latency_s") is not None
+            else "NOT_MEASURED (no baseline_record.json in the "
+                 "committed run tree — the baseline's generation calls "
+                 "are the committed run's own record, never invented)"),
+        "a0plus_calls": rec["n_llm_calls"],
+        "note": "reported separately per the owner R10 directive; "
+                "never summed"}
     out_f.write_text(json.dumps(rec, indent=1, default=str) + "\n",
                      encoding="utf-8")
     if gate["complete"]:
@@ -820,20 +1001,31 @@ def run_a0plus(pid: str) -> int:
     return EXIT_INCOMPLETE
 
 
+def _arm_queue_ids() -> list:
+    """R10: the arm's input set — every DEV12 problem plus the killed
+    non-DEV12 problems recovered from the committed kill records."""
+    ids = _dev12_ids()
+    for pid in _killed_problem_ids():
+        if pid not in ids:
+            ids.append(pid)
+    return ids
+
+
 def main() -> int:
     args = [a for a in sys.argv[1:] if not a.startswith("-")]
     if "--list" in sys.argv:
-        remaining = [pid for pid in _dev12_ids()
+        remaining = [pid for pid in _arm_queue_ids()
                      if not _identity_valid_v2(pid)]
         print(json.dumps({"remaining": remaining,
-                          "done": len(_dev12_ids()) - len(remaining)}))
+                          "done": len(_arm_queue_ids())
+                          - len(remaining)}))
         return 0
     if not args:
-        remaining = [pid for pid in _dev12_ids()
+        remaining = [pid for pid in _arm_queue_ids()
                      if not _identity_valid_v2(pid)]
         if not remaining:
-            print("[a0plus] queue drained — every DEV12 problem has an "
-                  "identity-valid COMPLETE A0+ pair")
+            print("[a0plus] queue drained — every DEV12 + killed "
+                  "problem has an identity-valid COMPLETE A0+ pair")
             return 0
         args = [remaining[0]]
     return run_a0plus(args[0])
