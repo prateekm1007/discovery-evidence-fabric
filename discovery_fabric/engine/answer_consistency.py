@@ -46,11 +46,10 @@ _TEST_MARKER_RE = re.compile(
     r"(?:falsification\s+test|falsifies|kill\s+criteria?|"
     r"validation\s+(?:protocol|test)|pass\s+criteria?)\s*:",
     re.IGNORECASE)
-#: the lead design segment markers (predictor/intervention shapes)
-_LEAD_MARKERS = ("INDICATOR", "INTERVENTION", "PARAMETER", "MECHANISM",
-                 "PROPOSAL", "RECOMMENDATION")
+#: the lead DESIGN segment markers (PARAMETER is deliberately absent:
+#: a quantity line is the design's own spec, never a second design)
 _LEAD_SEGMENT_RE = re.compile(
-    r"\b(?:INDICATOR|INTERVENTION|PARAMETER|MECHANISM|PROPOSAL|"
+    r"\b(?:INDICATOR|INTERVENTION|MECHANISM|PROPOSAL|"
     r"RECOMMENDATION)\s*:", re.IGNORECASE)
 _THING_MARKERS_RE = re.compile(
     r"\b(?:INDICATOR|THRESHOLD|PROTOCOL|VALIDATION(?:\s+PROTOCOL)?|"
@@ -172,12 +171,21 @@ def _lead_segment(text: str) -> str:
 
 def _split_test(answer: str) -> Tuple[str, str]:
     """(proposal_section, test_section) split at the falsification-test
-    marker; the whole answer is the proposal when no test marker is
-    found (CHECK_ABSENT carries the typed note)."""
+    marker; when no COLON marker exists, the sentence that ANNOUNCES
+    the falsification test ("The falsification test involves ...") is
+    the boundary (the measured live shape — the contract requires the
+    test, its wording varies); the whole answer is the proposal when
+    neither exists (CHECK_ABSENT carries the typed note, never read
+    as a pass — Art. XXV)."""
     m = _TEST_MARKER_RE.search(answer)
-    if not m:
-        return answer, ""
-    return answer[:m.start()], answer[m.start():]
+    if m:
+        return answer[:m.start()], answer[m.start():]
+    m2 = re.search(r"(?:^|[.!?]\s+)(The\s+falsification\s+test|"
+                   r"A\s+falsification\s+test|To\s+falsify\b)",
+                   answer, re.IGNORECASE)
+    if m2:
+        return answer[:m2.start()], answer[m2.start():]
+    return answer, ""
 
 
 def consistency_check(answer: str,
@@ -242,13 +250,16 @@ def consistency_check(answer: str,
                            "proposal section never uses it — the test "
                            "does not test the described design"),
                 "tokens": sorted(p_in_test)[:6]})
-        # 3. the proposal mixes TWO designs: a lead design segment
+        # 3. the proposal mixes TWO designs: a lead DESIGN segment
         #    that shares NO design token with the primary candidate
         #    (RAW comparison — the lead segment legitimately reuses
         #    problem-stated quantities, so the problem-vocabulary
         #    exclusion does NOT apply here), while the proposal
         #    elsewhere carries the primary's design vocabulary (the
-        #    measured new07 shape: indicator lead + nanofluid body)
+        #    measured new07 shape: indicator lead + nanofluid body).
+        #    PARAMETER lines are deliberately NOT lead segments: a
+        #    quantity line is the design's own spec, never a second
+        #    design (the measured live p02 shape).
         lead = _lead_segment(proposal)
         if lead:
             lead_toks = _content_tokens(lead)
