@@ -1,0 +1,87 @@
+{
+ "record": "auditor_judgments_r11_r6/1.0.0",
+ "audited_commit": "e861acfc85669cce7a3edfa6314ec47871b63585",
+ "at": "2026-11-14T00:00:00Z",
+ "auditor": "session auditor (Claude)",
+ "scope": "R6: F24 resume script verified; F23 critic extension reproduced (LOGGED_RATE_NYQUIST + MODALITY_MISMATCH kill original drafts, repaired CLEAN); Q7 repaired drafts read in full + auditor-judged; vault custody + crowllm calibration + route order verified; delivery unchanged (drafts not yet promoted)",
+ "q7_repaired_drafts_judged": {
+  "dev-fu-001-bearing-spalling": {
+   "mechanism": "NASER (asymmetric sideband energy ratio) computed at sensor edge on existing 1 kHz waveform; derived 15-min scalar to 1 Hz SCADA; no new hardware",
+   "auditor_scores": {
+    "novelty": 3,
+    "feasibility": 3,
+    "testability": 3,
+    "constraint_compliance": 3
+   },
+   "feasible": true,
+   "constraint_compliant": true,
+   "novel": "PLAUSIBLY_NOVEL (related AM prior art disclosed)",
+   "critic": "CLEAN (reproduced); prerepair KILL LOGGED_RATE_NYQUIST (reproduced)",
+   "promotion": "AUTHORIZED"
+  },
+  "dev-fu-003-motor-insulation": {
+   "mechanism": "PDIV-PDEV hysteresis width (>0.04 pu or widening >0.01 pu between outage tests); offline ramped-voltage PD on standard outage test set; mechanical modal draft retired (MODALITY_MISMATCH)",
+   "auditor_scores": {
+    "novelty": 3,
+    "feasibility": 3,
+    "testability": 3,
+    "constraint_compliance": 3
+   },
+   "feasible": true,
+   "constraint_compliant": true,
+   "novel": "differential hysteresis-width trending vs absolute/PRPD",
+   "critic": "CLEAN (reproduced); prerepair KILL MODALITY_MISMATCH (reproduced)",
+   "promotion": "AUTHORIZED"
+  }
+ },
+ "delivery_gate": {
+  "n_pairs": 10,
+  "novelty_delta_mean": 0.4,
+  "novelty_ci95": [
+   -0.29,
+   1.09
+  ],
+  "feasibility_abs_gap_mean": 0.5,
+  "feasibility_ci95": [
+   0.12,
+   0.88
+  ],
+  "state": "NOT_MET (delivery unchanged; both clauses unresolved at n=10)"
+ },
+ "projected_gate_on_promotion": {
+  "novelty_delta_mean": 0.8,
+  "novelty_ci95": [
+   0.14,
+   1.46
+  ],
+  "feasibility_abs_gap_mean": 0.5,
+  "note": "fu-001 \u0394n -1->+1, fu-003 \u0394n 0->+2; point estimate passes 0.5 but CI still crosses 0.5 at n=10; 30-pair run decisive"
+ },
+ "holdout_precondition": {
+  "infeasible_or_invalid_count": 0,
+  "clean_count": 12,
+  "state": "MET"
+ },
+ "substance_tally": {
+  "a1": 7,
+  "baseline": 3,
+  "tie": 0,
+  "rater": "single, provisional",
+  "sign_test_p": 0.344
+ },
+ "vault_custody": {
+  "env_keys_gitignored": true,
+  "env_keys_tracked": false,
+  "crowllm_artifacts_secret_scan": 0,
+  "art12": "satisfied"
+ },
+ "crowllm": {
+  "role": "redundancy router #10",
+  "judge_calibration": "0.667 < 0.8 GATE FAIL (10/30 JUDGE_PARSE_FAILED = provider token corruption)",
+  "route_order": "xkiro/ministral-14b FIRST, crowllm behind (e861acfc8)",
+  "note": "5/min free cap structurally cannot meet <=3-min battery wall; redundancy only"
+ },
+ "gold_set_self_check": {
+  "result": "10/10 consistent (delivery); repaired Q7 drafts now pass"
+ }
+}
