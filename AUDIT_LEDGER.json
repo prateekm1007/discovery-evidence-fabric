@@ -1,0 +1,577 @@
+{
+ "record": "AUDIT_LEDGER/1.0.0",
+ "created": "2026-11-14",
+ "branch": "audit/r11-auditor-verdict-20261114",
+ "read_order": [
+  "EPISTEMIC_CONSTITUTION.md (builder, at audited SHA)",
+  "AUDITOR_CONSTITUTION.md",
+  "AUDIT_LEDGER.json"
+ ],
+ "audited_heads": {
+  "queue/dev12_r7": "5569ecba86fb536365eefc63ec994209e5815451",
+  "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
+ },
+ "findings": [
+  {
+   "id": "F1",
+   "severity": "CRITICAL",
+   "title": "Judge tally decoder converts TIE+other_first into x-arm wins",
+   "status": "OPEN",
+   "opened": "2026-11-14",
+   "last_checked": "5569ecba86fb536365eefc63ec994209e5815451",
+   "rounds_open": 2,
+   "evidence": [
+    {
+     "sha": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+     "path": "scripts/r11_a0plus_compare.py",
+     "note": "buggy expression ~line 240; corrected tallies: A0+ vs baseline 4W/6T/0L (reported 8W/2T/0L), A0+ vs full 5W/1T/2L, A1 vs A0+ 4W/5L/1T"
+    },
+    {
+     "sha": "5569ecba86fb536365eefc63ec994209e5815451",
+     "path": "scripts/r11_a0plus_compare.py",
+     "note": "re-verified STILL PRESENT at R2 HEAD"
+    }
+   ],
+   "articles": [
+    1,
+    3,
+    9
+   ]
+  },
+  {
+   "id": "F2",
+   "severity": "CRITICAL",
+   "title": "Judge equals A1 generator (xkiro/ministral-14b for all 36 generation calls and the judge)",
+   "status": "OPEN",
+   "opened": "2026-11-14",
+   "last_checked": "5569ecba86fb536365eefc63ec994209e5815451",
+   "rounds_open": 2,
+   "evidence": [
+    {
+     "sha": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+     "path": "eval/pairs/r11_a1/*.json per_call_timeline",
+     "note": "36/36 xkiro/ministral-14b"
+    },
+    {
+     "sha": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+     "path": "eval/a0plus_compare_r11.json",
+     "note": "judge block same provider+model; INDEPENDENT_PROVIDER label false for A1"
+    }
+   ],
+   "articles": [
+    3,
+    4
+   ]
+  },
+  {
+   "id": "F3",
+   "severity": "HIGH",
+   "title": "Novelty comparator circular: baseline pinned to 0 by construction (standard UNION baseline)",
+   "status": "CLOSED-RETIRED",
+   "opened": "2026-11-14",
+   "closed": "5569ecba86fb536365eefc63ec994209e5815451",
+   "last_checked": "5569ecba86fb536365eefc63ec994209e5815451",
+   "evidence": [
+    {
+     "sha": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+     "path": "discovery_fabric/engine/invention_rubric.py",
+     "note": "union comparator; baseline novelty==0 always"
+    },
+    {
+     "sha": "5569ecba86fb536365eefc63ec994209e5815451",
+     "path": "discovery_fabric/engine/invention_rubric.py",
+     "note": "retired with Art. LXIV accounting; lexical-overlap ceiling measured and disclosed"
+    }
+   ],
+   "successor": "F11",
+   "articles": [
+    3
+   ]
+  },
+  {
+   "id": "F4",
+   "severity": "HIGH",
+   "title": "A1 substance defects: fabricated DOIs/user-labels, physics errors, non-executable falsification tests",
+   "status": "OPEN-WORSENED",
+   "opened": "2026-11-14",
+   "last_checked": "5569ecba86fb536365eefc63ec994209e5815451",
+   "rounds_open": 2,
+   "evidence": [
+    {
+     "sha": "529b9ca8e17aee5ce0079ecd4ae925ba36f780cb",
+     "path": "eval/auditor_judgments_r11.json",
+     "note": "1.0.0: 5/12 infeasible-as-written; per-pair rationales"
+    },
+    {
+     "sha": "1d68be9ec224f64c39742a7d5e418d0287b96ef6",
+     "path": "eval/auditor_judgments_r11_r2.json",
+     "note": "R2: 9/12 infeasible or invalid; defect classes recurred"
+    }
+   ],
+   "articles": [
+    1,
+    2,
+    6
+   ]
+  },
+  {
+   "id": "F5",
+   "severity": "HIGH",
+   "title": "Judge instrument saturation (76% of axis values=5) + trivial good-vs-bad calibration corpus; no close pairs, no position swap",
+   "status": "OPEN",
+   "opened": "2026-11-14",
+   "last_checked": "5569ecba86fb536365eefc63ec994209e5815451",
+   "rounds_open": 2,
+   "evidence": [
+    {
+     "sha": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+     "path": "eval/a0plus_compare_r11.json",
+     "note": "38 judgments; 5 all-identical; axes decorative"
+    },
+    {
+     "sha": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+     "path": "eval/judge_calibration.json",
+     "note": "30 obvious good-vs-bad pairs"
+    }
+   ],
+   "articles": [
+    3
+   ]
+  },
+  {
+   "id": "F6",
+   "severity": "MEDIUM",
+   "title": "Measurement provenance: dirty-tree pins, parent-commit SHAs, rubric_version not bumped after comparator replacement",
+   "status": "OPEN",
+   "opened": "2026-11-14",
+   "last_checked": "5569ecba86fb536365eefc63ec994209e5815451",
+   "rounds_open": 2,
+   "evidence": [
+    {
+     "sha": "5569ecba86fb536365eefc63ec994209e5815451",
+     "path": "eval/invention_rubric_r11.json",
+     "note": "commit=eff419506, dirty_tree=true, rubric_version still 1.0.0"
+    },
+    {
+     "sha": "5569ecba86fb536365eefc63ec994209e5815451",
+     "path": "eval/novelty_search_r11.json",
+     "note": "pinned eff419506 after R2 regeneration"
+    }
+   ],
+   "articles": [
+    1,
+    3
+   ]
+  },
+  {
+   "id": "F7",
+   "severity": "MEDIUM",
+   "title": "Full pipeline arm hot-path dead weight (0 clean COMPLETE)",
+   "status": "OPEN-MITIGATED",
+   "opened": "2026-11-14",
+   "last_checked": "5569ecba86fb536365eefc63ec994209e5815451",
+   "rounds_open": 2,
+   "evidence": [
+    {
+     "sha": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+     "path": "eval/invention_rubric_r11.json",
+     "note": "8 NOT_SCORED, 3 CONTRACT_INVALID_MARKER"
+    },
+    {
+     "sha": "5569ecba86fb536365eefc63ec994209e5815451",
+     "path": "eval/triples/r11/*.json",
+     "note": "heavy_pipeline FROZEN_NO_NEW_WORK; deletion deferred to post-holdout (typed)"
+    }
+   ],
+   "articles": [
+    5
+   ]
+  },
+  {
+   "id": "F8",
+   "severity": "MEDIUM",
+   "title": "Transport: single free provider, no quota ledger/AIMD, serial execution; dead-rung cascade stall",
+   "status": "OPEN",
+   "opened": "2026-11-14",
+   "last_checked": "5569ecba86fb536365eefc63ec994209e5815451",
+   "rounds_open": 2,
+   "evidence": [
+    {
+     "sha": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+     "path": "eval/pairs/r11_a1/*.json",
+     "note": "100% xkiro; 12 items serial ~8.3 min"
+    },
+    {
+     "sha": "5569ecba86fb536365eefc63ec994209e5815451",
+     "path": "eval/pairs/r11_a1_r2/*.json",
+     "note": "R2 dead-rung stall; pin-override workaround; median 46.4 s"
+    }
+   ],
+   "articles": [
+    3,
+    11
+   ]
+  },
+  {
+   "id": "F9",
+   "severity": "LOW",
+   "title": "Novelty search is not prior-art search (16-record lexical pool; named-technique recall gaps)",
+   "status": "OPEN",
+   "opened": "2026-11-14",
+   "last_checked": "5569ecba86fb536365eefc63ec994209e5815451",
+   "rounds_open": 2,
+   "evidence": [
+    {
+     "sha": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+     "path": "eval/novelty_search_r11.json",
+     "note": "16-record pool, lexical overlap"
+    },
+    {
+     "sha": "5569ecba86fb536365eefc63ec994209e5815451",
+     "path": "eval/novelty_search_r11.json",
+     "note": "fu-004 NOVELTY_CLAIMED on self-declared industry-standard C70600"
+    }
+   ],
+   "articles": [
+    3
+   ]
+  },
+  {
+   "id": "F10",
+   "severity": "LOW",
+   "title": "No CI runs on audit branch; no direct unit tests for decoder/rubric/critic; order-dependent flake; 6 typed skips",
+   "status": "OPEN",
+   "opened": "2026-11-14",
+   "last_checked": "5569ecba86fb536365eefc63ec994209e5815451",
+   "rounds_open": 2,
+   "evidence": [
+    {
+     "sha": "5569ecba86fb536365eefc63ec994209e5815451",
+     "path": ".github/workflows/",
+     "note": "epistemic_certification.yml + epistemic_lightweight.yml exist; 0 check-runs on queue/dev12_r7"
+    }
+   ],
+   "articles": [
+    3,
+    6
+   ]
+  },
+  {
+   "id": "F11",
+   "severity": "HIGH",
+   "title": "Successor novelty instrument degenerate: named-technique KNOWN equalizes baseline and A1 (delta 0.0, both 2.1); KNOWN corpus recall gap",
+   "status": "OPEN",
+   "opened": "2026-11-14",
+   "last_checked": "5569ecba86fb536365eefc63ec994209e5815451",
+   "rounds_open": 1,
+   "successor_of": "F3",
+   "evidence": [
+    {
+     "sha": "5569ecba86fb536365eefc63ec994209e5815451",
+     "path": "eval/invention_rubric_r11.json",
+     "note": "gate_inputs_summary a1_novelty_delta_mean=0.0; machine feasibility 3.75 vs auditor 1.9"
+    }
+   ],
+   "articles": [
+    3
+   ]
+  },
+  {
+   "id": "F12",
+   "severity": "HIGH",
+   "title": "R2 full re-ideation discarded the credit-register leads (UV-EVOH, ZrO2 seal, IL-polymer); 'survivors intact' claim false (all 12 changed)",
+   "status": "OPEN",
+   "opened": "2026-11-14",
+   "last_checked": "5569ecba86fb536365eefc63ec994209e5815451",
+   "rounds_open": 1,
+   "evidence": [
+    {
+     "sha": "b487c7c5562062749fcaf77e0b9cd1b95ebb4300",
+     "path": "R11/audit/AUDITOR_VERDICT_R11_AMENDMENT_2_2026-11-14.md",
+     "note": "chosen-name + byte comparison; lead loss verified"
+    }
+   ],
+   "articles": [
+    1,
+    5,
+    10
+   ]
+  },
+  {
+   "id": "F13",
+   "severity": "HIGH",
+   "title": "Critic anchor-overfit: R2 reintroduces defect classes (Nyquist, question-type, labels, arithmetic); calibration labels sourced from superseded 2W/7T/3L audit",
+   "status": "OPEN",
+   "opened": "2026-11-14",
+   "last_checked": "5569ecba86fb536365eefc63ec994209e5815451",
+   "rounds_open": 1,
+   "evidence": [
+    {
+     "sha": "5569ecba86fb536365eefc63ec994209e5815451",
+     "path": "scripts/r11_critic_regression.py",
+     "note": "corpus docstring cites 2W/7T/3L; fu-001/fu-003 mislabeled known-good"
+    },
+    {
+     "sha": "1d68be9ec224f64c39742a7d5e418d0287b96ef6",
+     "path": "eval/auditor_judgments_r11_r2.json",
+     "note": "9/12 infeasible; authoritative labels are the auditor judgments files"
+    }
+   ],
+   "articles": [
+    6,
+    8,
+    3
+   ]
+  },
+  {
+   "id": "F14",
+   "severity": "MEDIUM",
+   "title": "LI learning-feed consumption unverified: inspected R2 records show empty prior_killed_classes",
+   "status": "OPEN",
+   "opened": "2026-11-14",
+   "last_checked": "5569ecba86fb536365eefc63ec994209e5815451",
+   "rounds_open": 1,
+   "evidence": [
+    {
+     "sha": "5569ecba86fb536365eefc63ec994209e5815451",
+     "path": "scripts/r11_a1.py",
+     "note": "killed_classes() wiring exists (lines ~313-342)"
+    },
+    {
+     "sha": "5569ecba86fb536365eefc63ec994209e5815451",
+     "path": "eval/pairs/r11_a1_r2/bench-p02-leadacid-grid-corrosion.json",
+     "note": "critic.prior_killed_classes == []"
+    }
+   ],
+   "articles": [
+    1
+   ]
+  }
+ ],
+ "amendments": [
+  {
+   "id": "AM1",
+   "date": "2026-11-14",
+   "status": "ADOPTED",
+   "reason": "owner review 8.5/10 accepted five critiques",
+   "changes": [
+    "A1 task-count ~90% WITHDRAWN; capability view; ~48% recorded OWNER_ASSESSED",
+    "A2 earned concurrency: ledger -> >=2-provider spread -> AIMD -> parallelism; single-provider burst prohibited",
+    "A3 invention credit register (UV-EVOH, ZrO2 seal + graded cathode, IL-polymer SALVAGE; fu-004 downgraded after byte verification)",
+    "A4 n=10 CIs: novelty +0.6 [-0.24,1.44] PROVISIONAL; feasibility 1.2 [0.75,1.65] ROBUST; ~31 pairs for 80% power",
+    "A5 shared Claude-family caveat; cross-family panel as bias-check input"
+   ],
+   "evidence": [
+    {
+     "sha": "01a7334c6fee41c8156df6f55f628bcf994c25f9",
+     "path": "R11/audit/AUDITOR_VERDICT_R11_AMENDMENT_1_2026-11-14.md",
+     "note": "amendment"
+    },
+    {
+     "sha": "3062317260d97b55e0a6913ebfa75c9197e45fc2",
+     "path": "eval/auditor_judgments_r11.json",
+     "note": "CIs + credit register + caveat added"
+    }
+   ]
+  },
+  {
+   "id": "AM2",
+   "date": "2026-11-14",
+   "status": "ISSUED",
+   "reason": "deep audit of R2 @5569ecba8",
+   "changes": [
+    "gate NOT_MET both clauses (dn +0.3, fg 1.0)",
+    "holdout precondition NOT_MET: 9/12 infeasible/invalid",
+    "'survivors intact' falsified; critic anchor-overfit root cause; F11-F14 opened; F3 closed-retired"
+   ],
+   "evidence": [
+    {
+     "sha": "b487c7c5562062749fcaf77e0b9cd1b95ebb4300",
+     "path": "R11/audit/AUDITOR_VERDICT_R11_AMENDMENT_2_2026-11-14.md",
+     "note": "amendment"
+    },
+    {
+     "sha": "1d68be9ec224f64c39742a7d5e418d0287b96ef6",
+     "path": "eval/auditor_judgments_r11_r2.json",
+     "note": "12 full judgments"
+    }
+   ]
+  }
+ ],
+ "audit_mistakes": [
+  {
+   "id": "M1",
+   "by": "owner prior audit session",
+   "mistake": "passed the inflated 8W/2T/0L tally without recomputing from raw judgments",
+   "caught_by_articles": [
+    1,
+    3
+   ],
+   "correction": "recomputed 4W/6T/0L from 38 committed judgments",
+   "evidence_sha": "280018c07ff43a8503027545cdd0d4369341e236"
+  },
+  {
+   "id": "M2",
+   "by": "owner prior audit session",
+   "mistake": "2W/7T/3L verdict from reading only the openings of 9 pairs",
+   "caught_by_articles": [
+    2
+   ],
+   "correction": "superseded by full-read 3W/6L/1T (owner declared superseding)",
+   "evidence_sha": "529b9ca8e17aee5ce0079ecd4ae925ba36f780cb"
+  },
+  {
+   "id": "M3",
+   "by": "owner prior audit session",
+   "mistake": "54% overall estimate counted tasks, not capability",
+   "caught_by_articles": [
+    10,
+    5
+   ],
+   "correction": "revised to ~48% OWNER_ASSESSED after corrected tallies + independence breach",
+   "evidence_sha": "01a7334c6fee41c8156df6f55f628bcf994c25f9"
+  },
+  {
+   "id": "M4",
+   "by": "this auditor (prior session)",
+   "mistake": "~90% done figure counted execution deliverables, not capability",
+   "caught_by_articles": [
+    10,
+    9
+   ],
+   "correction": "WITHDRAWN in Amendment 1 A1",
+   "evidence_sha": "01a7334c6fee41c8156df6f55f628bcf994c25f9"
+  },
+  {
+   "id": "M5",
+   "by": "this auditor (prior session)",
+   "mistake": "4-way parallelism direction without a 429-safety/provider-spread precondition",
+   "caught_by_articles": [
+    11,
+    3
+   ],
+   "correction": "earned-concurrency ordering, Amendment 1 A2",
+   "evidence_sha": "01a7334c6fee41c8156df6f55f628bcf994c25f9"
+  },
+  {
+   "id": "M6",
+   "by": "this auditor (prior session)",
+   "mistake": "under-credited real A1 ideas (UV-crosslinked EVOH, ZrO2 composite seal)",
+   "caught_by_articles": [
+    10,
+    2
+   ],
+   "correction": "invention credit register, Amendment 1 A3",
+   "evidence_sha": "01a7334c6fee41c8156df6f55f628bcf994c25f9"
+  },
+  {
+   "id": "M7",
+   "by": "this auditor (prior session)",
+   "mistake": "first verdict omitted n=10 smallness and CIs",
+   "caught_by_articles": [
+    3
+   ],
+   "correction": "CIs + power disclosure, Amendment 1 A4",
+   "evidence_sha": "01a7334c6fee41c8156df6f55f628bcf994c25f9"
+  },
+  {
+   "id": "M8",
+   "by": "this auditor (prior session)",
+   "mistake": "shared Claude-family blind spots not tracked",
+   "caught_by_articles": [
+    4
+   ],
+   "correction": "family caveat + cross-family panel directive, Amendment 1 A5",
+   "evidence_sha": "01a7334c6fee41c8156df6f55f628bcf994c25f9"
+  }
+ ],
+ "verdicts": [
+  {
+   "id": "V1",
+   "round": "R11 1.0.0",
+   "commit": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+   "gate": "NOT_MET",
+   "novelty_delta_mean": 0.6,
+   "novelty_ci95": [
+    -0.24,
+    1.44
+   ],
+   "feasibility_gap_mean": 1.2,
+   "feasibility_ci95": [
+    0.75,
+    1.65
+   ],
+   "n_pairs": 10,
+   "substance_tally": {
+    "a1": 3,
+    "baseline": 6,
+    "tie": 1
+   },
+   "evidence_sha": "529b9ca8e17aee5ce0079ecd4ae925ba36f780cb"
+  },
+  {
+   "id": "V2",
+   "round": "R11 R2 (1.1.0)",
+   "commit": "5569ecba86fb536365eefc63ec994209e5815451",
+   "gate": "NOT_MET",
+   "novelty_delta_mean": 0.3,
+   "feasibility_gap_mean": 1.0,
+   "n_pairs": 10,
+   "substance_tally": {
+    "a1": 3,
+    "baseline": 7,
+    "tie": 0
+   },
+   "holdout_precondition": {
+    "infeasible_or_invalid": 9,
+    "clean": 3,
+    "state": "NOT_MET"
+   },
+   "evidence_sha": "1d68be9ec224f64c39742a7d5e418d0287b96ef6"
+  }
+ ],
+ "gold_set": {
+  "path": "audit/gold_set/AUDITOR_GOLD_SET_v1.json",
+  "sha256_preregistered": "7541e2649548c865ede13529401ea7b7c3303e1b509ed725ddbca178da139a80",
+  "canonicalization": "json.dumps(sort_keys=True, separators=(',',':'))",
+  "n": 10,
+  "n_good": 4,
+  "n_bad": 6,
+  "last_self_check": null,
+  "burn_log": []
+ },
+ "owner_actions": [
+  {
+   "id": "OA1",
+   "action": "place seeded-specimen files (P6 seeded sweep)",
+   "state": "NOT_PLACED",
+   "rounds_open": 1,
+   "escalate_at": 3,
+   "evidence_sha": "5569ecba86fb536365eefc63ec994209e5815451"
+  }
+ ],
+ "pruning_review": {
+  "audits_completed": 2,
+  "catches_per_article": {
+   "1": 3,
+   "2": 1,
+   "3": 7,
+   "4": 2,
+   "5": 1,
+   "6": 1,
+   "7": 0,
+   "8": 1,
+   "9": 3,
+   "10": 3,
+   "11": 1,
+   "12": 0
+  },
+  "rule": "delete any article with 0 catches across 5 consecutive audits",
+  "at_risk_if_no_catch": [
+   "7",
+   "12"
+  ],
+  "next_review": "after audit #5"
+ },
+ "secret_policy": "PAT via env/header only; never committed; token-pattern grep of pushed files must be 0 (Art. 12)"
+}
