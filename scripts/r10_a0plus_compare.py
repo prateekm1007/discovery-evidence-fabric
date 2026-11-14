@@ -65,7 +65,8 @@ else:
           "runs against the remote cascade alone")
 
 from eval.run import (probe_judge_route, _rubric_prompt, _parse_rubric,  # noqa: E402
-                      _validate_rubric_pass, _transport_call)
+                      _validate_rubric_pass, _transport_call,
+                      _judge_judgment_call)
 
 route = probe_judge_route("zai")
 calib = route.get("calibration_full") or {}

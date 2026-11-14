@@ -646,11 +646,14 @@ _ASSUMPTION_PARAM_LINE = re.compile(
     r"^\s*(?:ASSUMPTION(?:\s+PARAMETER)?|ASSUMED)\s*[:\-]\s*(.+)$",
     re.IGNORECASE | re.MULTILINE)
 _RATIONALE_MARK_RE = re.compile(
-    r"because|basis|based on|per the|as per|typical|conservative|"
+    r"rationale|because|basis|based on|per the|as per|typical|"
+    r"conservative|"
     r"industry|standard|reference|chosen|selected|assumed from|"
     r"default|recommended|guideline|handbook|prior |experience|"
     r"engineering judgment|safety factor|literature|empirical|"
-    r"calibrat|sensitivity|from the record|from the packet",
+    r"calibrat|sensitivity|from the record|from the packet|"
+    r"user constraint|user's own|user-stated|user stated|"
+    r"user's stated",
     re.IGNORECASE)
 _SENSITIVITY_PATH_RE = re.compile(
     r"calibrat|sensitivity|sweep|parametric|re-calibrat|recalibrat|"

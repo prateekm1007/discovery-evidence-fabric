@@ -72,7 +72,10 @@ _LEAD_SEGMENT_RE = re.compile(
     r"RECOMMENDATION)\s*:", re.IGNORECASE)
 _THING_MARKERS_RE = re.compile(
     r"\b(?:INDICATOR|THRESHOLD|PROTOCOL|VALIDATION(?:\s+PROTOCOL)?|"
-    r"PARAMETER|INTERVENTION)\s*:", re.IGNORECASE)
+    r"PARAMETERS?|INTERVENTION|MECHANISM|"
+    r"DEPARTURE(?:\s+FROM\s+STANDARD)?|"
+    r"LABELED(?:\s+PARAMETERS)?|TEST(?:\s+PROTOCOL)?)\s*:",
+    re.IGNORECASE)
 
 #: generic engineering scaffolding — never a design discriminator
 _GENERIC_TOKENS = frozenset({
@@ -249,6 +252,19 @@ def consistency_check(answer: str,
     # PASS on the committed new07 bytes because EVERY design rule lived
     # inside `if cands:` — the answer must stand on its own bytes).
     lead = _lead_segment(proposal)
+    # R11 (the structured predictor shape, measured live on the A1
+    # arm): when the answer declares an explicit INDICATOR: line,
+    # THAT line is the design's stated monitored factor — the check
+    # reads the INDICATOR segment, not the first thing-marker (in the
+    # structured shape the MECHANISM section precedes it, and its
+    # vocabulary is the failure physics — the test legitimately tests
+    # the INDICATOR, not the physics prose). The intervention shape
+    # (no INDICATOR: line) keeps the current first-marker behavior.
+    _ind_m = re.search(r"\bINDICATOR\s*:", proposal, re.IGNORECASE)
+    if _ind_m:
+        _lead_ind = _lead_segment(proposal[_ind_m.start():])
+        if _lead_ind:
+            lead = _lead_ind
     if lead:
         lead_toks = _content_tokens(lead)
         test_toks_f = _test_factor_toks(text)

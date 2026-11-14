@@ -1212,15 +1212,17 @@ def _rubric_prompt(problem, a_text: str, b_text: str,
         "Grade strictly: vague/generic/number-ignoring/unverified claims "
         "score low; quantified, testable, package-grounded answers score "
         "high. If an answer carries a number absent from the packet, cap "
-        "that criterion at 2. Then state your overall preference. Answer "
-        "ONLY with these lines:",
-        "A1: <1-5>", "A2: <1-5>", "A3: <1-5>", "A4: <1-5>",
-        "B1: <1-5>", "B2: <1-5>", "B3: <1-5>", "B4: <1-5>",
+        "that criterion at 2. Then state your overall preference. "
+        "R11 JUDGE OUTPUT CONTRACT (owner item 5): respond with ONLY one "
+        "JSON object - no prose, no markdown fences - with exactly these "
+        "integer keys:",
+        '{"A1": <1-5>, "A2": <1-5>, "A3": <1-5>, "A4": <1-5>,',
     ]
     if clar:
-        lines += ["A5: <1-5>", "B5: <1-5>"]
-    lines += ["A6: <1-5>", "B6: <1-5>"]
-    lines.append("PREFER: A | B | TIE")
+        lines.append(' "A5": <1-5>, "B5": <1-5>,')
+    lines += ['"B1": <1-5>, "B2": <1-5>, "B3": <1-5>, "B4": <1-5>,',
+              '"A6": <1-5>, "B6": <1-5>,',
+              '"prefer": "A" | "B" | "TIE"}']
     return "\n".join(lines)
 
 
@@ -1560,19 +1562,123 @@ def _m(v: List[int]) -> float:
 
 
 def _parse_rubric(raw: str) -> Dict[str, Any]:
+    """R11 owner item 5: STRUCTURED-OUTPUT-FIRST parsing. The judge is
+    instructed to return ONE JSON object ({"A1": .., ..., "prefer":
+    "A"|"B"|"TIE"}); the JSON object is extracted (fence-tolerant) and
+    read directly. The legacy line format (A1: 4 / PREFER: A) remains
+    a FALLBACK so frozen corpora graded before the R11 contract still
+    parse. A malformed output parses to nothing (the caller types the
+    parse failure - never guessed)."""
     import re
     fields: Dict[str, str] = {}
+    s = str(raw or "")
+    # ---- JSON first (the R11 structured contract)
+    i, j = s.find("{"), s.rfind("}")
+    if 0 <= i < j:
+        try:
+            obj = json.loads(s[i:j + 1])
+            if isinstance(obj, dict):
+                for k, v in obj.items():
+                    ku = str(k).strip().upper()
+                    if ku == "PREFER":
+                        fields[ku] = str(v).strip()[:8]
+                    elif re.fullmatch(r"[AB][1-6]", ku):
+                        fields[ku] = str(v).strip()[:8]
+        except Exception:  # noqa: BLE001 - fall through to lines
+            pass
+    if fields:
+        prefer = fields.pop("PREFER", None)
+        for k, v in list(fields.items()):
+            try:
+                fields[k] = str(int(v))
+            except ValueError:
+                fields.pop(k, None)
+        return {**fields, "prefer": prefer}
+    # ---- legacy line-format fallback (frozen corpora)
     for m in re.finditer(r"^\s*([AB][1-6]|PREFER)\s*[:=]\s*(.+)$",
-                         raw or "", re.M):
+                         s, re.M):
         fields[m.group(1).upper()] = m.group(2).strip()[:8]
     prefer = fields.pop("PREFER", None)
     for k, v in list(fields.items()):
-        if k in {f"{s}{j}" for s in "AB" for j in range(1, 7)}:
+        if k in {f"{s2}{j2}" for s2 in "AB" for j2 in range(1, 7)}:
             try:
                 fields[k] = str(int(v))
             except ValueError:
                 fields.pop(k, None)
     return {**fields, "prefer": prefer}
+
+
+def _judge_judgment_call(provider: str, model: str, prompt: str,
+                         max_tokens: int = 300,
+                         clar: bool = False):
+    """R11 owner item 5: ONE judge call with ONE parse retry and the
+    RAW OUTPUT LOGGED. First attempt uses the structured-output
+    prompt; when the response fails the rubric contract, ONE retry
+    re-asks with the parse failure and the raw excerpt. Returns
+    {outcome, parsed, valid, raw, attempts, latencies, errors} - the
+    outcome is typed (JUDGE_VALID / JUDGE_TRANSPORT_FAILED /
+    JUDGE_EMPTY_OUTPUT / JUDGE_PARSE_FAILED), never converted."""
+    t0 = time.time()
+    res = _transport_call(provider, model, prompt,
+                          "You are a strict blind rubric judge. "
+                          "English only. Respond with ONLY the JSON "
+                          "object.", max_tokens=max_tokens)
+    lat1 = round(time.time() - t0, 1)
+    rec: Dict[str, Any] = {"attempts": [], "parsed": None,
+                           "valid": None, "raw": ""}
+    if res.get("status") != "OK":
+        rec["outcome"] = _classify_transport_fail(res)
+        rec["errors"] = [str(res.get("error"))[:200]]
+        rec["latencies"] = [lat1]
+        return rec
+    content1 = str(res.get("content") or "")
+    rec["raw"] = content1[:600]
+    rec["latencies"] = [lat1]
+    parsed = _parse_rubric(content1)
+    valid = _validate_rubric_pass(parsed, clar) if parsed else None
+    rec["attempts"].append({
+        "n": 1, "output_hash": hashlib.sha256(
+            content1.encode("utf-8")).hexdigest()[:16],
+        "parsed": bool(valid)})
+    if valid is not None:
+        rec["outcome"] = JUDGE_VALID
+        rec["parsed"], rec["valid"] = parsed, valid
+        return rec
+    if not content1.strip():
+        rec["outcome"] = JUDGE_EMPTY_OUTPUT
+        return rec
+    # ---- ONE parse retry (owner item 5): re-ask with the failure
+    retry_prompt = (prompt + "\n\nIMPORTANT: your previous response "
+                    "was not a parseable rubric judgment. Respond "
+                    "AGAIN with ONLY the JSON object with the integer "
+                    "keys A1-A6, B1-B6 (1-5) and 'prefer' "
+                    "(one of A, B, TIE). No other text.")
+    t1 = time.time()
+    res2 = _transport_call(provider, model, retry_prompt,
+                           "You are a strict blind rubric judge. "
+                           "English only. Respond with ONLY the JSON "
+                           "object.", max_tokens=max_tokens)
+    lat2 = round(time.time() - t1, 1)
+    rec["latencies"].append(lat2)
+    if res2.get("status") != "OK":
+        rec["outcome"] = _classify_transport_fail(res2)
+        rec["errors"] = [str(res2.get("error"))[:200]]
+        return rec
+    content2 = str(res2.get("content") or "")
+    rec["raw"] = (rec["raw"] + "\n--retry--\n" + content2[:600])[:1200]
+    rec["attempts"].append({
+        "n": 2, "output_hash": hashlib.sha256(
+            content2.encode("utf-8")).hexdigest()[:16],
+        "parsed": bool(_parse_rubric(content2))})
+    parsed2 = _parse_rubric(content2)
+    valid2 = _validate_rubric_pass(parsed2, clar) if parsed2 else None
+    if valid2 is not None:
+        rec["outcome"] = JUDGE_VALID
+        rec["parsed"], rec["valid"] = parsed2, valid2
+        return rec
+    rec["outcome"] = (JUDGE_EMPTY_OUTPUT if not content2.strip()
+                      else JUDGE_PARSE_FAILED)
+    return rec
 
 
 # ---------------------------------------------------------------------------
@@ -1623,13 +1729,21 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
         else:
             a, b, good_is = bad, good, "B"
         prompt = _rubric_prompt(_intake_problem(problem), a, b, packet=entry.get("evidence"))
-        t0 = time.time()
-        res = _transport_call(judge_route["provider"], judge_route["model"], prompt,
-                              "You are a strict blind rubric judge. English only. "
-                              "Follow the exact output lines.", max_tokens=300)
-        lat = round(time.time() - t0, 1)
+        # R11 owner item 5: ONE structured-output call + ONE parse
+        # retry, raw output logged per attempt (the helper returns the
+        # typed outcome; the calibration semantics below are unchanged
+        # - a pair that never parses counts as WRONG, Art. XXV).
+        _jc = _judge_judgment_call(judge_route["provider"],
+                                   judge_route["model"], prompt,
+                                   max_tokens=300,
+                                   clar=bool(
+                                       problem.get(
+                                           "clarification_answer")))
+        lat = round(sum(_jc.get("latencies") or [0]), 1)
         _rec = {"problem_id": entry.get("problem_id"), "order": order,
                 "latency_s": lat,
+                "parse_attempts": _jc.get("attempts") or [],
+                "raw_output": (_jc.get("raw") or "")[:400],
                 # R9 P0 item 3 (owner round 2026-11-13): the per-case
                 # request/output hashes ride the calibration record —
                 # the judge's verdicts become re-verifiable byte-bound
@@ -1639,40 +1753,25 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
                 # hashes are computed HERE over the exact bytes.
                 "prompt_hash": hashlib.sha256(
                     (prompt or "").encode("utf-8")).hexdigest()}
-        if res.get("status") != "OK":
-            err = str(res.get("error") or "")
-            cls = _classify_transport_fail(res)
-            hc = _http_class(err)
+        if _jc["outcome"] != JUDGE_VALID:
+            err = str((_jc.get("errors") or [""])[0])
+            cls = _jc["outcome"]
+            hc = _http_class(err) if err else None
             if hc:
                 err_classes[hc] = err_classes.get(hc, 0) + 1
+            elif cls == JUDGE_PARSE_FAILED:
+                err_classes["PARSE_FAILED"] = err_classes.get(
+                    "PARSE_FAILED", 0) + 1
+            elif cls == JUDGE_EMPTY_OUTPUT:
+                err_classes["EMPTY_OUTPUT"] = err_classes.get(
+                    "EMPTY_OUTPUT", 0) + 1
             else:
                 err_classes[cls] = err_classes.get(cls, 0) + 1
             _rec.update({"outcome": cls, "error": err[:200],
                          "http_class": hc})
             details.append(_rec)
             continue
-        content = res.get("content") or ""
-        if isinstance(content, str) and content:
-            _rec["output_hash"] = hashlib.sha256(
-                content.encode("utf-8")).hexdigest()
-        if not content.strip():
-            err_classes["EMPTY_OUTPUT"] = err_classes.get(
-                "EMPTY_OUTPUT", 0) + 1
-            _rec.update({"outcome": JUDGE_EMPTY_OUTPUT,
-                         "error": "empty content"})
-            details.append(_rec)
-            continue
-        parsed = _parse_rubric(content)
-        # calibration uses the same strict contract: all required rubric
-        # fields must parse (Art. XXV; a truncated answer is no answer)
-        valid = _validate_rubric_pass(parsed, bool(problem.get("clarification_answer")))
-        if valid is None:
-            err_classes["PARSE_FAILED"] = err_classes.get(
-                "PARSE_FAILED", 0) + 1
-            _rec.update({"outcome": JUDGE_PARSE_FAILED,
-                         "error": "missing/invalid required rubric fields"})
-            details.append(_rec)
-            continue
+        valid = _jc["valid"]
         pref = valid["prefer"]
         total += 1
         # map preference back to good/bad
