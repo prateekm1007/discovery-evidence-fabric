@@ -251,6 +251,16 @@ for pid in _arm_queue_ids():
         print(f"[r11cmp] {pid[:34]:36} {kind:20} "
               f"state={a0_state[:14]:16} prefer={prefer:4} "
               f"-> {picked} ({lat}s)")
+        # incremental partial record (R11 measured: the judge workload
+        # rides the cascade at ~10-20 s/call and a foreground window
+        # can end mid-run — the judgments already served stay on disk,
+        # never lost with the process, Art. XXV)
+        (REPO / "eval" / "a0plus_compare_r11.partial.json").write_text(
+            json.dumps({"judgments": judgments,
+                        "exclusions": exclusions,
+                        "n_judgment_calls": n_calls},
+                       indent=1, default=str) + "\n",
+            encoding="utf-8")
 
 wall = round(time.time() - t0, 1)
 
