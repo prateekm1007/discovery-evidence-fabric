@@ -191,8 +191,17 @@ JUDGE_CANDIDATES = [
     # (3/3 complete verdict JSONs on the real 7786-char judge prompt,
     # eval/crowllm_gate_r11.json; Chrome-UA transport requirement on
     # the spec) — DeepSeek family, a different provider AND family
-    # from the agnes generator rung; judge-eligibility currently
-    # calibration-FAILED (0.667, parse corruption) pending repair.
+    # from the agnes generator rung. JUDGE ROLE RETIRED (AM6 D4,
+    # documented: eval/builder_corrections/
+    # BC_CROWLLM_JUDGE_ROLE_RETIRED.json): three failure classes
+    # measured across three windows — breaker collapse (v1 0/30),
+    # PROVIDER_TOKEN_CORRUPTION parse failures (v2 0.667 < 0.8),
+    # transport 307-storms (v3 0/30 after the crowllm-only 2x
+    # parse-retry repair was implemented and re-run) — plus the 5/min
+    # free-tier cap that structurally blocks the battery wall target.
+    # REDUNDANCY/EMERGENCY-FALLBACK route only; re-qualification
+    # requires a new full-length gate + a 30-pair calibration on
+    # measured-good transport.
     ("crowllm", "deepseek-v4-flash:free"),
     # inception/mercury-3: the R4 lesson (judge_independent_rerun_
     # r11_r4.json) is that mercury-3 passed tiny probes AND compact

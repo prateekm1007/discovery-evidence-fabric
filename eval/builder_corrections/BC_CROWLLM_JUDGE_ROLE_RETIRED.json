@@ -1,0 +1,20 @@
+{
+  "record": "BUILDER_CORRECTION/BC_CROWLLM_JUDGE_ROLE_RETIRED/1.0.0",
+  "filed_by": "builder (coder session, 2026-11-14, queue/dev12_r7)",
+  "for": "auditor adoption into the ledger (AM6 D4)",
+  "decision": "the crowllm JUDGE ROLE is RETIRED to FALLBACK-ONLY — crowllm/deepseek-v4-flash:free stays REGISTERED (spec, allowlist, JUDGE_CANDIDATES entry) as a transport-redundancy and emergency-fallback route, and is NEVER a calibration-eligible judge on current evidence",
+  "evidence": [
+    {"record": "eval/crowllm_judge_calibration_r11.json (v1)", "result": "0/30 — breaker-killed (honest first measurement)"},
+    {"record": "eval/crowllm_judge_calibration_r11_v2.json", "result": "n_valid 20/30, correct 20/20 among valid, 10 JUDGE_PARSE_FAILED = PROVIDER_TOKEN_CORRUPTION, accuracy 0.667 < 0.8 — GATE FAIL (parallel session, a66ed5a38)"},
+    {"record": "eval/crowllm_judge_calibration_r11_v3.json equivalent (this session, after the AM6 D4 parse-retry 2x was implemented): n_valid 0/30, 30/30 JUDGE_TRANSPORT_FAILED (HTTP 307 Temporary Redirect storms exhausted the 3x25s driver ladder; wall 1773.4s) — GATE FAIL on transport, a THIRD failure class on the same rung"}
+  ],
+  "what_was_tried": "the c74790585 candidate repair (parse-retry ladder 1x->2x for this rung only, in _judge_judgment_call) was implemented and the 30-pair recalibration re-run paced (crowllm_calibration_v2.py) — the parse class never got the chance to matter because the transport layer collapsed (307 storms, ~20+ retries visible in the driver log)",
+  "why_retirement_not_repair": "three independent failure classes measured across three windows (breaker-collapse, parse token-corruption, transport 307-storms); the 5/min free-tier cap structurally blocks the battery wall target; the acceptance judge (xkiro/ministral-14b, 00:00Z) is unaffected — Art. LXI: typed, never silently wasted; further crowllm repair spend has no line of sight to the acceptance path",
+  "what_stays": [
+    "the ProviderSpec + allowlist + JUDGE_CANDIDATES entry (redundancy route)",
+    "the crowllm-only 2x parse-retry code (inactive for other rungs; active if the rung is ever re-probed)",
+    "the vaulted CROWLLM_API_KEY (Art. LXXXVII custody; usable by the operator/owner directly)"
+  ],
+  "requalification_bar": "a future session may re-probe the rung only with a NEW full-length gate + a 30-pair calibration on measured-good transport; the JUDGE_CANDIDATES order is revisited on those bytes (never on hope — Art. XXV)",
+  "articles": ["LXIV (superseded roles retired)", "XXV (typed, never manufactured)", "AM6 D4"]
+}
