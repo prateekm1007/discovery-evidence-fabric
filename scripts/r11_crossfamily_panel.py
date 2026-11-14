@@ -62,9 +62,24 @@ probs = {p.get("problem_id"): p for p in json.loads(
 
 #: the panel sits OUTSIDE the served generator/judge set: provider AND
 #: model must differ from every generator rung and from the primary
-#: judge route (read from the committed compare record when present)
-PANEL_CANDIDATES = [("agnes", "agnes-3.0-flash"),
-                    ("inception", "mercury-3")]
+#: judge route (read from the committed compare record when present).
+#: R4 (2026-11-14): the committed candidates (agnes generator-family +
+#: inception/mercury-3) measured 10/10 and 0/10 on the R4 window —
+#: mercury-3 has been dead since 2026-11-12 and agnes carries the
+#: PANEL_IS_GENERATOR_FAMILY bias. The owner-directed free-tier mistral
+#: window (xkiro, vaulted 2026-11-14) supplies BOTH panel auditors on
+#: rungs distinct from the D4 judge route (xkiro/ministral-14b) and
+#: cross-family vs the agnes generator: mistral-medium-3.5 and
+#: mistral-large-2512. Env-overridable (D5_PANEL_CANDIDATES=
+#: "prov,model;prov,model"); a candidate equal to the primary judge
+#: route is filtered below exactly as before (never silently added).
+PANEL_CANDIDATES = [
+    tuple(c.split(",", 1)) for c in
+    os.environ.get(
+        "D5_PANEL_CANDIDATES",
+        "xkiro,mistralai/mistral-medium-3.5;"
+        "xkiro,mistralai/mistral-large-2512").split(";") if c.strip()
+]
 
 
 def _primary_judge() -> tuple:
@@ -88,6 +103,11 @@ def main() -> int:
     # the per-axis agreement vs the committed primary judge is computed.
     cands = [(prov, model) for prov, model in PANEL_CANDIDATES
              if (prov, model) != (jp, jm)]
+    # R4 (2026-11-14): the D4 judge route is xkiro/ministral-14b — the
+    # mistral-medium/large panel rungs are distinct rungs on the same
+    # free-tier provider (both cross-family vs the agnes generator);
+    # the provider-equals-judge fact is TYPED on each auditor record
+    # (same-provider-different-rung, disclosed — Art. XXVII).
     out = {"record": "crossfamily_panel_r11/2.0.0",
            "article": ("Amendment 2 §5 P2-8 + Amendment 3 D5; "
                        "bias-check input only, the gate stays "
