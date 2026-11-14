@@ -34,6 +34,10 @@ jobs:
           python3 -B scripts/r11_decoder_retally.py
           python3 -B scripts/r11_critic_regression.py || true
           python3 -B scripts/r11_critic_regression_r2.py
+      - name: F21 integrity guard (audit-branch / auditor-namespace refusal)
+        run: |
+          set -e
+          python3 -m pytest tests/test_audit_branch_guard.py -q -p no:warnings
       - name: Pair guard behavior (typed refusal / unlock / new dir)
         run: |
           set -e

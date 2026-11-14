@@ -1,0 +1,11 @@
+#!/bin/sh
+# pre-commit — F21 integrity guard (R11, 2026-11-14).
+#
+# Every commit made by this clone passes the audit-branch guard: no
+# builder commits to audit/* branches, no builder edits to auditor-
+# namespace files. Operator override: AUDIT_NAMESPACE_UNLOCK=1.
+#
+# Discovery: if the guard script itself is missing (deleted, botched
+# checkout), FAIL CLOSED — an absent guard must not silently admit
+# auditor-namespace edits (Art. XVII).
+exec python3 "$(dirname "$0")/../discovery_fabric/audit_branch_guard.py"

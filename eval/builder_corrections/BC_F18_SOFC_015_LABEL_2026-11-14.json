@@ -1,0 +1,36 @@
+{
+ "record": "BUILDER_CORRECTION/1.0.0",
+ "correction_id": "BC-2026-11-14-01",
+ "filed_by": "builder (coder) — NOT an auditor record",
+ "filed_at": "2026-11-14",
+ "supersedes": "builder-authored eval/auditor_judgments_r11_r4.json @d41145d4a, R11/audit/AUDITOR_VERDICT_R11_AMENDMENT_4_2026-11-14.md @0744507be, AUDIT_LEDGER.json @d038b5c9c, audit/preflight/PREFLIGHT_2026-11-14_r4.md @ce88d429f (the four F21 commits — content correct, route wrong; superseded by the auditor's authoritative batch)",
+ "target_finding": "F18 residual / M9",
+ "type": "SUBSTANCE_CORRECTION_FILING",
+ "subject": "sofc-0.15 label legitimacy (withdrawn by auditor as M9; this filing carries the bytes the auditor verified)",
+ "correction": {
+  "claim_corrected": "AM3 F18's sofc item claimed the '0.15 intergranular glass phase fraction (User Constraint)' was fabricated. The auditor withdrew this as M9 (AM4 §0): eval/problems_dev12.json @ca17fd40a clarification_answer states the user said 0.15 (mass fraction). This filing carries those bytes for the record, per the D3 process change (builder files typed corrections, never authors auditor records).",
+  "evidence_bytes": {
+   "path": "eval/problems_dev12.json",
+   "commit": "ca17fd40af14a1b587e1d7310214c453f347272f",
+   "problem_id": "eval-sofc-thermal-cycling",
+   "clarification_answer": {
+    "intergranular glass phase fraction": 0.15,
+    "note": "user stated the seal's intergranular glass phase fraction is 0.15 (mass fraction) for this stack design"
+   }
+  },
+  "auditor_adoption": "ADOPTED as M9 in AM4 §0 (R11/audit/AUDITOR_VERDICT_R11_AMENDMENT_4_2026-11-14.md, authoritative AM4)"
+ },
+ "f21_process_change_implementation": {
+  "guard_module": "discovery_fabric/audit_branch_guard.py",
+  "pre_commit_hook": ".githooks/pre-commit (git config core.hooksPath .githooks)",
+  "ci_step": ".github/workflows/r11_queue_surface.yml — 'F21 integrity guard' step",
+  "test_battery": "tests/test_audit_branch_guard.py (24 pins: RULE 1 audit-branch refusal, RULE 2 auditor-namespace refusal, unlock path, fail-closed, live scratch-repo hook behavior, F21 closure condition)",
+  "rules": [
+   "RULE 1: any commit on an audit/* branch by this clone is refused — the audit branch is auditor territory",
+   "RULE 2: staging an auditor-namespace file (AUDIT_LEDGER.json, AUDITOR_CONSTITUTION.md, audit/preflight/PREFLIGHT_*.md, audit/gold_set/*, R11/audit/AUDITOR_VERDICT_*.md, eval/auditor_judgments_*.json) is refused without AUDIT_NAMESPACE_UNLOCK=1",
+   "builder corrections are filed under eval/builder_corrections/ — builder-authored, attributed, for auditor adoption"
+  ],
+  "ci_gate_check": "the guard battery runs on every queue/** push via r11_queue_surface.yml"
+ },
+ "reviewer_provenance": "AI_REVIEW"
+}
