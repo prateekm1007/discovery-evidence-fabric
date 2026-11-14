@@ -1,0 +1,34 @@
+{
+ "record": "APINEX_WINDOW_STATE/1.0.0",
+ "measured_at": "2026-11-14T13:54:00Z",
+ "credential": "APINEX_API_KEY (owner-supplied 2026-11-14, sk-apxb- form; vaulted per Art. LXXXVII BEFORE any use)",
+ "key_format_state": "VALID (passes the Cloudflare edge to the API layer)",
+ "account_state": {
+  "http": 403,
+  "error": "Account suspended or missing",
+  "type": "authentication_error",
+  "probed": {
+   "hosts": [
+    "https://apinex.bond/v1",
+    "https://api.apinex.bond/v1"
+   ],
+   "auth_schemes": [
+    "Authorization: Bearer",
+    "x-api-key",
+    "X-API-Key"
+   ],
+   "endpoints": [
+    "/v1/models",
+    "/v1/chat/completions"
+   ],
+   "all_same_error": true
+  },
+  "error_class": "ACCOUNT_LEVEL (dashboard-side; a key typo would 401 — this 403 names the account state)"
+ },
+ "dashboard": "https://apinex.bond/keys renders 200 as a login-gated SPA; activation/account state is an owner dashboard-side act",
+ "consequence": {
+  "d4_d5_d6": "stay on the xkiro/mistral post-reset path (fixed 00:00Z daily reset, confirmed by converging retry-after probes); scripts/post_reset_queue.sh unchanged",
+  "recovery": "a re-activated account or fresh key is picked up at call time from the vault (lookup-first, zero code change)",
+  "art": "Art. LXI (infrastructure absence is typed, never silently wasted); Art. XXV (typed, never manufactured)"
+ }
+}
