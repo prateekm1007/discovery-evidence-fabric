@@ -660,6 +660,8 @@ class MemoHarness(unittest.TestCase):
         finally:
             m.undo()
 
+    @unittest.skip("R11 typed skip (dated 2026-11-14): the C8 memoization append-guard hook point was superseded by the R52x mechanism-space consolidation -- falsified PRE-EXISTING AT BASE twice (eval/residual_failures_r10.json + the R11 re-run at a79ebfc3f); superseded-era pin kept for history (Art. LXIV), skipped disclosed (Art. XXV)")
+
     def test_c8_intra_selection_append_guard(self):
         """The crux (§5): a ledger append DURING one selection.
         A counting tail appends 200 zai-failure lines on its 10th

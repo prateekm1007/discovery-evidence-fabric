@@ -1719,11 +1719,17 @@ def apply_measured_statuses(measured: Dict[str, str]) -> Dict[str, Dict[str, Any
     source whose connector exists and passed the 7-step chain.
     """
     out = {}
+    # R11 (measured): the R399 W3 parked-source routing states are
+    # legitimate MEASURED health outcomes (the health check reports
+    # them WITHOUT probing — 'never a BLOCKED: the routing decision
+    # is the recorded fact'); the accepted vocabulary is the measured
+    # statuses + the routing states the health module itself emits.
+    _accepted = set(MEASURED_STATUSES) | set(ROUTING_STATES)
     for sid, status in measured.items():
         if sid not in SOURCE_REGISTRY:
             raise KeyError(f"measured status for unknown source {sid!r}")
-        if status not in MEASURED_STATUSES:
-            raise ValueError(f"status {status!r} not in {sorted(MEASURED_STATUSES)}")
+        if status not in _accepted:
+            raise ValueError(f"status {status!r} not in {sorted(_accepted)}")
         rec = dict(SOURCE_REGISTRY[sid])
         if status == "LIVE" and not rec["connector"]:
             raise ValueError(

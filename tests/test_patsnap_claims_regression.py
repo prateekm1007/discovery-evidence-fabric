@@ -111,7 +111,17 @@ class TestPatentBearRateLimit:
         statuses = check_all_sources()
         pb = next((s for s in statuses if s.source_id == "PATENT_BEAR"), None)
         if pb:
-            assert pb.status in ("RATE_LIMITED", "UNAVAILABLE", "AVAILABLE")
+            if pb.status == "NO_KEY":
+                # R11 disclosed: NO_KEY is a HOST-STATE outcome (the
+                # PATENT_BEAR credential is not present in this
+                # environment) — a typed skip, never a fabricated
+                # status assertion (Art. XXV: the unknown stays
+                # typed; Art. LXI: environment absence is not a
+                # scientific rejection)
+                pytest.skip("PATENT_BEAR key not present in this "
+                            "environment (typed NO_KEY)")
+            assert pb.status in ("RATE_LIMITED", "UNAVAILABLE",
+                                 "AVAILABLE")
 
 
 class TestSourceCapabilityMatrix:

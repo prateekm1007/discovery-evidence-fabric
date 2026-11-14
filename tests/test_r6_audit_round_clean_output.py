@@ -277,18 +277,24 @@ class TestCleanOutput:
             if purpose == "answer_composer":
                 return {"ok": True, "content": "bad draft THRESHOLD: 9",
                         "finish_reason": "stop"}
-            # every repair fixes it
+            # every repair fixes it (the marker the consistency
+            # instrument recognizes; the factor matches the candidate
+            # and the protocol names the indicator quantity)
             return {"ok": True, "content": (
-                "INDICATOR: vibration RMS\nTHRESHOLD: 4.5 mm/s — "
-                "ASSUMPTION\nPROTOCOL: n=6 fan drives monitored 180 "
-                "days by vibration RMS logging; pass if the alert "
-                "fires before visible spalling."), "finish_reason": "stop"}
+                "INDICATOR: condenser cooling-water temperature rise "
+                "versus flow\nTHRESHOLD: 2.5 C rise over the clean "
+                "baseline — ASSUMPTION (calibrated on 14 days of "
+                "healthy data)\nVALIDATION PROTOCOL: n=6 condenser "
+                "fouling cycles over 30 days; pass if the "
+                "cooling-water temperature rise indicator fires at "
+                "least 3 weeks before derating."),
+                "finish_reason": "stop"}
 
         rec = compose_if_admissible(
             {"mechanism_map": {}, "attack_results": {},
              "ranked_results": {"results": [{
                  "disposition": "SURVIVED", "attack_verdict": "SURVIVED",
-                 "mechanism": "m", "intervention": "i"}]}},
+                 "mechanism": "condenser cooling-water temperature rise versus flow drift", "intervention": "indicator: cooling-water temperature rise threshold"}]}},
             FU004, packet=[{"id": "p1", "title": "t",
                             "abstract": "vibration fouling"}],
             verification=None, question_type="predictor-design",
@@ -320,15 +326,17 @@ class TestCleanOutput:
                 "versus flow, from the existing temperature and flow "
                 "measurements\nTHRESHOLD: 2.5 C rise over the clean "
                 "baseline — ASSUMPTION (calibrated on 14 days of "
-                "healthy data)\nPROTOCOL: n=5 fouling cycles; pass if "
-                "the indicator fires at least 3 weeks before "
-                "derating."), "finish_reason": "stop"}
+                "healthy data)\nVALIDATION PROTOCOL: n=5 condenser "
+                "fouling cycles over 30 days; pass if the "
+                "cooling-water temperature rise indicator fires at "
+                "least 3 weeks before derating."),
+                "finish_reason": "stop"}
 
         rec = compose_if_admissible(
             {"mechanism_map": {}, "attack_results": {},
              "ranked_results": {"results": [{
                  "disposition": "SURVIVED", "attack_verdict": "SURVIVED",
-                 "mechanism": "m", "intervention": "i"}]}},
+                 "mechanism": "condenser cooling-water temperature rise versus flow drift", "intervention": "indicator: cooling-water temperature rise threshold"}]}},
             FU004, packet=[{"id": "p1", "title": "t",
                             "abstract": "fouling temperature"}],
             verification=None, question_type="predictor-design",

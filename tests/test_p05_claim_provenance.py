@@ -225,8 +225,8 @@ def test_clarification_entry_is_a_user_entry_with_index():
 # ---------------------------------------------------------------------
 _PDT = ("INDICATOR: bearing vibration RMS band excess. "
         "THRESHOLD: RMS 4.5 mm/s alert level. "
-        "PROTOCOL: n=12 machines; pass if RMS band excess rises above "
-        "threshold; fail otherwise.")
+        "VALIDATION PROTOCOL: n=12 machines monitored 90 days; pass "
+        "if RMS band excess rises above threshold; fail otherwise.")
 
 
 def test_predictor_bare_number_elsewhere_is_unknown():

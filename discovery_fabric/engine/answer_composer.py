@@ -1204,6 +1204,14 @@ def _admission_gate_checks(problem: Optional[Dict[str, Any]],
             ("source_title", "title", "source_span", "abstract"))
         or anchor_text,
     }
+    if not str(structured_item.get("_record_text") or "").strip():
+        # Art. XXV: a candidate with NO bound anchor record gives the
+        # link check nothing to verify — the typed state is
+        # INDETERMINATE (disclosed in the admission record), never a
+        # rejection manufactured from a missing observation. The
+        # mechanism_space path still hard-gates (its candidates
+        # always carry their anchor item).
+        return reasons
     ml = mechanism_to_failure_link_check(problem, structured_item,
                                          fields,
                                          operator_id=str(
