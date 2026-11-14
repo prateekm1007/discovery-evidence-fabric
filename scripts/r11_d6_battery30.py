@@ -196,9 +196,41 @@ def main() -> int:
         return rec
 
     # the judge rung: the served generator rungs come out of the run's
-    # own first calls; mercury-3 (inception) is the designated judge
-    # (differs from agnes — measured this round, calibration 0.967)
-    JUDGE_P = ("inception", "mercury-3")
+    # own first calls. R4 (2026-11-14): the designated judge is the
+    # owner-directed FREE-TIER MISTRAL window on xkiro (key vaulted
+    # 2026-11-14; the mistral family is family-separated from the zai
+    # generator — heals F2's judge-equals-generator class for this
+    # battery). mercury-3/inception is DEAD since 2026-11-12 and is
+    # never silently substituted for (Art. XXV): the judge rung is
+    # env-overridable (D6_JUDGE_PROVIDER / D6_JUDGE_MODEL) and a typed
+    # PREFLIGHT probe refuses to spend the pool against a dead window —
+    # a quota-dead judge window is a typed BLOCKED run, never a burned
+    # pool.
+    JUDGE_P = (os.environ.get("D6_JUDGE_PROVIDER", "xkiro"),
+               os.environ.get("D6_JUDGE_MODEL",
+                              "mistralai/ministral-14b"))
+    _jp = judge_call(JUDGE_P[0], JUDGE_P[1],
+                     'Judge preflight: reply with ONLY the JSON object '
+                     '{"prefer":"tie"} and nothing else.')
+    if _jp.get("outcome") != "JUDGE_VALID":
+        out = {
+            "record": "battery30_r11_r4/1.0.0-PREFLIGHT_BLOCKED",
+            "at": __import__("datetime").datetime.utcnow().isoformat()
+                 + "Z",
+            "judge": list(JUDGE_P),
+            "preflight_outcome": _jp.get("outcome"),
+            "preflight_error": str(_jp.get("errors") or "")[:300],
+            "typed_state": ("JUDGE_WINDOW_DEAD_OR_QUOTA_SPENT — the "
+                            "pool is NOT spent; re-run when the window "
+                            "recovers (Art. LXI: typed, never silently "
+                            "wasted)"),
+            "results": [], "call_ledger_n": len(LEDGER),
+        }
+        OUT.write_text(json.dumps(out, indent=1, default=str) + "\n",
+                       encoding="utf-8")
+        print(f"[d6] PREFLIGHT BLOCKED: judge {_jp.get('outcome')} — "
+              "pool unspent, typed record written")
+        return 3
 
     results_all = []
     # ---- phase 1: serial warmup, the SPREAD GATE --------------------
