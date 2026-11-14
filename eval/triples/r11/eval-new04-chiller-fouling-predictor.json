@@ -1,7 +1,7 @@
 {
  "record": "invention_triple/1.0.0",
  "problem_id": "eval-new04-chiller-fouling-predictor",
- "commit": "819bcbf2d5910e083df12501a275bbb679ca1b7e",
+ "commit": "3ad63e8c8e2a4774cb51863eaa74d0924d3aceab",
  "purpose": "the complete arm set for this problem, committed for the AUDITOR'S BLIND JUDGING (owner R11 item 2); the arm identities are declared here, the judging protocol anonymizes sides per its own record",
  "arms": {
   "baseline": {
@@ -23,16 +23,16 @@
    "source": "eval/pairs/dev12_fresh (committed)"
   },
   "a1": {
-   "answer": "PROPOSED INDICATOR AND THRESHOLD: An online fouling index calculated from BMS-logged condenser water supply temperature, chilled water return temperature, and outdoor wet-bulb temperature. The trigger initiates chemical cleaning when the index exceeds a threshold calibrated against the fixed monthly cadence baseline. This data-driven approach replaces the fixed schedule, reducing compressor energy waste from over-cleaning or under-cleaning.\n\nMECHANISM: Fouling layers increase thermal resistance, causing the condenser water supply temperature to rise for a given load. The predictor isolates this temperature drift from ambient effects using outdoor wet-bulb data. By triggering cleaning only when the temperature rise exceeds the energy penalty of a clean tube bank, the system eliminates the silent energy waste that occurs when operators clean on a calendar regardless of actual tube condition.\n\nDEPARTURE FROM STANDARD: Standard practice uses a fixed monthly cleaning cadence. The departure is an online leading indicator that triggers maintenance on measured thermal degradation rather than a calendar schedule.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: Sampling interval = 15 minutes (design choice to balance BMS load and resolution; no citation)\nASSUMPTION PARAMETER: Calibration load = 100% (design choice to ensure sensitivity to fouling state changes within the 3-day resolution constraint; no citation)\n\nINDICATOR: Fouling Temperature Deviation (K), calculated as the difference between the logged condenser water supply temperature and the baseline supply temperature predicted from outdoor wet-bulb and chilled water return temperature.\n\nTHRESHOLD: 0.5 K (ASSUMPTION based on the requirement to resolve state changes within 3 days at full load)\n\nVALIDATION PROTOCOL: Temperature: 15 degrees Celsius, Duration: 30 days, sample size n = 4 independent DEVICES. The data window is a rolling 4-week period. The detection criterion is a sustained Fouling Temperature Deviation (K) of at least 0.5 K for 72 hours.",
-   "sha256": "78ae1d933bfdfd8127be96b2e6d0c4c1fd972570acff3c47259b9a181b64f42e",
+   "answer": "PROPOSED INDICATOR AND THRESHOLD: Monitor the **condenser approach temperature (CAT) drift rate** (\u0394CAT/\u0394time) under full-load conditions. A cleaning trigger is issued when CAT exceeds its baseline by **0.5\u00b0C over 3 days** (resolved within the constraint) or when compressor power exceeds **97% of the fouling-free baseline** (calibrated to 3% energy reduction). This leverages existing BMS points without new sensors.\n\nMECHANISM: Fouling raises CAT by increasing thermal resistance; the rate of CAT rise correlates with fouling accumulation. Compressor power rises as the condenser struggles to reject heat, creating a secondary proxy for fouling severity. The 3-day window ensures resolution aligns with the constraint.\n\nDEPARTURE FROM STANDARD: Standard practice uses fixed monthly cleaning; this solution dynamically triggers cleaning based on **real-time CAT drift and compressor power**, eliminating wasted labor and ensuring fouling is addressed only when it impacts performance.\n\nLABELED PARAMETERS:\n ASSUMPTION PARAMETER: baseline CAT = 5\u00b0C (User Constraint: condenser water supply/return temperature is logged, and 5\u00b0C is a typical design approach for open-loop systems)\n ASSUMPTION PARAMETER: fouling-free compressor power baseline = 95% of max rated power (rationale: 5% headroom accounts for normal operational variance before fouling effects dominate)\n ASSUMPTION PARAMETER: \u0394CAT threshold = 0.5\u00b0C over 3 days (rationale: empirical studies show 0.5\u00b0C CAT rise correlates with ~3% compressor energy increase [doi:10.16962/elkapj/si.arimpie-2015.16])\n ASSUMPTION PARAMETER: compressor power trigger = 97% of baseline (rationale: 3% energy reduction target requires detecting fouling before power loss exceeds 3% of nominal)\n\nINDICATOR: condenser approach temperature drift rate (\u0394\u00b0C/day) and compressor power (% of baseline)\n\nTHRESHOLD: 0.5\u00b0C CAT rise over 3 days (ASSUMPTION) **OR** compressor power \u2265 97% of baseline (calibrated to 3% energy reduction)\n\nVALIDATION PROTOCOL: n = 3 independent chiller units; data window = 30 days of continuous full-load operation. The protocol validates **condenser approach temperature drift rate (\u0394\u00b0C/day) and compressor power (% of baseline)** by comparing triggered cleaning intervals to manual monthly cleaning energy use, ensuring \u22653% compressor energy reduction.",
+   "sha256": "91a915649b820ce0b90ad9ad0fb66ff0344d119cf072fd7ba4d0cb865195854d",
    "typed_state": "COMPLETE",
-   "source": "eval/pairs/r11_a1_r3 (the invention arm)"
+   "source": "eval/pairs/r11_a1 (the invention arm)"
   }
  },
  "delivery": {
-  "arm": "a1",
-  "typed_state": "A1_CRITIC_VALID",
-  "note": "A1 + plausibility critic passed validation \u2014 the delivery candidate"
+  "arm": null,
+  "typed_state": "NO_DELIVERY",
+  "note": "neither A1 nor A0+ validated on this window (Art. XXV: typed, never a silent gap)"
  },
  "heavy_pipeline": {
   "state": "FROZEN_NO_NEW_WORK",

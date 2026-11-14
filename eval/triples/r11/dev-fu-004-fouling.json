@@ -1,7 +1,7 @@
 {
  "record": "invention_triple/1.0.0",
  "problem_id": "dev-fu-004-fouling",
- "commit": "819bcbf2d5910e083df12501a275bbb679ca1b7e",
+ "commit": "3ad63e8c8e2a4774cb51863eaa74d0924d3aceab",
  "purpose": "the complete arm set for this problem, committed for the AUDITOR'S BLIND JUDGING (owner R11 item 2); the arm identities are declared here, the judging protocol anonymizes sides per its own record",
  "arms": {
   "baseline": {
@@ -23,16 +23,16 @@
    "source": "eval/pairs/dev12_fresh (committed)"
   },
   "a1": {
-   "answer": "PROPOSED INDICATOR AND THRESHOLD: Replace the retubing intervention with an online predictor that monitors the divergence between the condenser\u2019s actual coolant outlet temperature and a dynamic, flow-normalized baseline temperature predicted from existing temperature and flow measurements only. The predictor fires a maintenance alert when the temperature divergence exceeds a set threshold, ensuring detection at least three weeks before back-pressure hits the derating limit. This approach uses only existing instrumentation to avoid false trips during load swings by normalizing for flow variations.\n\nMECHANISM: Biofouling increases thermal resistance on the tube-side, causing the coolant outlet temperature to rise for a given heat duty. Since back-pressure is not an allowed signal, the predictor isolates the thermal degradation signature by comparing the measured coolant outlet temperature against a real-time baseline that accounts for steam exhaust heat duty (via flow measurements). This thermal drift serves as a leading indicator of heat transfer loss caused by biofilm formation.\n\nDEPARTURE FROM STANDARD: The standard solution is periodic retubing with copper-nickel alloys (e.g., C70600), which is a material intervention rather than a predictor. The genuine departure here is the implementation of a purely software-based, online leading indicator that leverages existing thermal data to predict fouling onset without new hardware or material changes.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: Baseline Calculation Method = Real-time flow-normalized heat duty correlation (your design choice; no citation, as no record specifies the exact baseline algorithm for this specific 300 MW unit)\nASSUMPTION PARAMETER: Sampling Rate = 1 Hz (your design choice; no citation, consistent with standard DCS capabilities)\n\nINDICATOR: Coolant Outlet Temperature Divergence ($\\Delta T_{dev}$) in \u00b0C\nTHRESHOLD: 1.5 \u00b0C (ASSUMPTION)\n\nVALIDATION PROTOCOL: Temperature, duration: 30-day data window, sample size: n = 5 independent DEVICES (condensers). The protocol validates the Coolant Outlet Temperature Divergence ($\\Delta T_{dev}$) by requiring a sustained threshold exceedance of 1.5 \u00b0C for 48 hours to confirm detection, filtering out transient load swing artifacts.",
-   "sha256": "b9c1fef33818356d87f4dd78f56c20648ffae259efb5b13b1556dfcc2ecdf4f4",
+   "answer": "PROPOSED INDICATOR AND THRESHOLD: Monitor the **exponential drift rate of the \u0394T/\u0394P ratio** across condenser tube passes. A threshold of **>3% weekly increase** in the ratio, sustained for 7 days, triggers a biofouling alert. This leverages existing temperature and pressure measurements to predict fouling 3+ weeks before derating by detecting early biofilm-induced thermal resistance. The threshold is calibrated to the 300 MW unit\u2019s derating limit (assumed at +5% back-pressure rise).\n\nMECHANISM: Biofouling increases thermal resistance in tubes, raising \u0394T for a given \u0394P. The \u0394T/\u0394P ratio (thermal resistance proxy) drifts exponentially as biofilm matures, creating a detectable trend before measurable back-pressure rise. Early-stage biofilm (low biomass) causes subtle but consistent ratio increases, while mature fouling triggers nonlinear growth.\n\nDEPARTURE FROM STANDARD: Standard solutions rely on **periodic chemical cleaning or mechanical scraping**, which are reactive and cause downtime. This method is **predictive, passive, and instrumentation-only**, using existing \u0394T/\u0394P data to flag fouling before derating.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: **Derating threshold** = +5% back-pressure rise (User Constraint: turbine derating limit)\nASSUMPTION PARAMETER: **\u0394T/\u0394P ratio baseline** = 0.0015 \u00b0C/Pa (rationale: typical clean condenser ratio for 300 MW units; validated via manufacturer specs or site history)\nASSUMPTION PARAMETER: **Alert threshold** = 3% weekly drift (rationale: empirical link to 3+ weeks lead time before 5% back-pressure rise, derived from fouling growth models in similar condensers)\nASSUMPTION PARAMETER: **Exponential fit window** = 21 days (rationale: balances noise rejection and early detection; aligns with 3-week lead-time requirement)\n\nINDICATOR: Exponential drift rate of \u0394T/\u0394P ratio across tube passes (% per week)\n\nTHRESHOLD: >3% weekly increase in \u0394T/\u0394P ratio (ASSUMPTION: calibrated to 3+ weeks before 5% back-pressure rise via fouling growth curves)\n\nVALIDATION PROTOCOL: temperature, duration: 90 days; sample size: n = 3 independent 300 MW condenser units. The protocol measures **exponential drift rate of \u0394T/\u0394P ratio across tube passes** over 21-day rolling windows. Detection criterion: \u22653% weekly drift sustained for 7 days in \u22652 of 3 tube passes.",
+   "sha256": "7492c4e79e3971cf2f844476dfb252c149d1a7db0174fa0f3be40b8ad2a13042",
    "typed_state": "COMPLETE",
-   "source": "eval/pairs/r11_a1_r3 (the invention arm)"
+   "source": "eval/pairs/r11_a1 (the invention arm)"
   }
  },
  "delivery": {
-  "arm": "a1",
-  "typed_state": "A1_CRITIC_VALID",
-  "note": "A1 + plausibility critic passed validation \u2014 the delivery candidate"
+  "arm": null,
+  "typed_state": "NO_DELIVERY",
+  "note": "neither A1 nor A0+ validated on this window (Art. XXV: typed, never a silent gap)"
  },
  "heavy_pipeline": {
   "state": "FROZEN_NO_NEW_WORK",

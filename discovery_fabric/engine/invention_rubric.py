@@ -37,6 +37,7 @@ a measured failure — the baseline-clone-passable gate — exposed it).
 """
 from __future__ import annotations
 
+import json
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -201,16 +202,29 @@ def score_answer(problem: Dict[str, Any], answer: str,
         # DISCLOSED secondary signal for the NOVEL path; the semantic
         # verdict is the auditor's + the judge's (Art. XXVI).
         try:
-            _pa_v = prior_art_verdict(a, problem)
+            # AM3 D3: the gate reads the IDEA — the proposal head
+            # (everything before the DEPARTURE-FROM-STANDARD contrast,
+            # which names the standard solution BY DESIGN) — with the
+            # problem's requirement vocabulary stripped, so KNOWN
+            # requires a mechanism-level anchor match in the idea's own
+            # words, not a material-family mention of the requirement
+            # nouns (the measured over-withdrawal: UV-EVOH, IL-polymer,
+            # ZrO2).
+            _idea_head = a.split("DEPARTURE FROM STANDARD")[0]
+            _pa_d = prior_art_verdict_detail(_idea_head, problem)
+            _pa_v = _pa_d["verdict"]
         except Exception:  # noqa: BLE001 — the anchor check failing
             _pa_v = "NO_REFERENCE"  # leaves the distance path intact
+            _pa_d = {"fired": []}
         if _pa_v == "KNOWN":
             scores["novelty"] = 1
             reasons["novelty"].append(
-                "KNOWN prior art: the idea explicitly names an "
-                "established technique of this domain "
-                "(named-technique anchor, measured false-novelty "
-                "instrument) — capped at 1")
+                "KNOWN prior art: the idea's own mechanism words name "
+                "an established technique of this domain "
+                f"(mechanism-level anchors fired: "
+                f"{[f['anchor'] for f in _pa_d['fired']] or '?'}; "
+                "named-technique instrument at mechanism precision, "
+                "Amendment 3 D3) — capped at 1")
         else:
             # R11 P2b, second measured correction (2026-11-14): sentence
             # COVERAGE of the answer still rewarded verbosity — the 3275-
@@ -549,7 +563,13 @@ _STANDARD_SOLUTIONS = {
         "resistance trend from differential-pressure and "
         "heat-transfer data, derate the exchanger when the fouling "
         "factor approaches the design margin, and clean on the "
-        "measured trend rather than a fixed calendar."),
+        "measured trend rather than a fixed calendar. For "
+        "chiller/condenser service the established indicators are "
+        "the fouling-resistance coefficient (Rf) computed from "
+        "BMS sensor logs, condenser approach temperature, cooling-"
+        "tower supply-temperature baselines, and capacity-delivery "
+        "trending (corpus expanded per Amendment 3 D3: measured "
+        "baseline-recall gap)."),
     "brush wear": (
         "The standard practice for brush and slip-ring wear: "
         "replace the brushes at the wear limit, set brush spring "
@@ -558,7 +578,13 @@ _STANDARD_SOLUTIONS = {
         "recommended band, and inspect wear and ring surface finish "
         "on a schedule. Select the brush grade for the current "
         "density and duty cycle, and correct ring runout or "
-        "vibration that accelerates wear."),
+        "vibration that accelerates wear. The established "
+        "predictors are the time-varying contact resistance from "
+        "slip-ring terminal voltage and measured excitation "
+        "current, brush-voltage-drop trending, current-variance "
+        "monitoring at historian sampling intervals, and ring "
+        "surface inspection (corpus expanded per Amendment 3 D3: "
+        "measured baseline-recall gap)."),
     "spalling": (
         "The standard practice for bearing spalling: replace the "
         "bearing when vibration or condition indicators reach the "
@@ -585,7 +611,14 @@ _STANDARD_SOLUTIONS = {
         "with shims, and inspect the bearings on a schedule for "
         "deformation, splitting, and hardening. Account for "
         "temperature effects in the measured deflection and keep "
-        "the load within the rated capacity."),
+        "the load within the rated capacity. Established bearing-"
+        "pad materials and protection: polyurea coatings, "
+        "fiber-reinforced elastomeric laminates (aramid fibers), "
+        "ozone-resistant elastomer compounds, and creep-deflection "
+        "drift trending (corpus expanded per Amendment 3 D3: the "
+        "R3 baseline's own standard-practice vocabulary measured "
+        "0.19 recall against the pre-expansion corpus — the "
+        "no-discrimination finding)."),
     "barrier": (
         "The standard practice for moisture and oxygen barrier in "
         "multilayer packaging: increase the barrier-layer thickness "
@@ -760,7 +793,8 @@ _PRIOR_ART_TECHNIQUES: Dict[str, List[Tuple[str, bool]]] = {
         (r"brush[ -]grade|ring[ -]surface|runout", False),
     ],
     "dry-out": [
-        (r"\bESR\b|equivalent[ -]series[ -]resistance", True),
+        # AM3 D3 demoted True->False: ESR is the measured quantity
+        (r"\bESR\b|equivalent[ -]series[ -]resistance", False),
         (r"capacitance[ -]trend|voltage[ -]derat|ripple[- ]current",
          False),
         (r"lifetime[ -]curves|thermal[ -]derat", False),
@@ -777,13 +811,16 @@ _PRIOR_ART_TECHNIQUES: Dict[str, List[Tuple[str, bool]]] = {
         (r"deflection[ -](monitor|limit)|shim|seat[ -]level", False),
     ],
     "barrier": [
-        (r"WVTR|OTR|seal[- ]integrity", True),
-        (r"nanoclay|nanocomposite[ -]?barrier|tortuosity", True),
+        # AM3 D3 demoted True->False: WVTR/OTR are measured quantities
+        # (requirement nouns), not technique names
+        (r"WVTR|OTR|seal[- ]integrity", False),
+        (r"nanoclay|nanocomposite|nanofiller|tortuosity", True),
         (r"metallized|foil[ -]lamination|SiOx|desiccant", False),
         (r"barrier[- ]layer[ -]thickness", False),
     ],
     "thermal cycling": [
-        (r"ramp[- ]rate|CTE|coefficient[ -]of[ -]thermal", True),
+        # AM3 D3 demoted True->False: ramp rate/CTE are requirement nouns
+        (r"ramp[- ]rate|CTE|coefficient[ -]of[ -]thermal", False),
         (r"buffer[ -]layer|interlayer|glass[- ]ceramic", False),
         (r"qualification[ -]test|cycle[ -]count", False),
     ],
@@ -797,26 +834,96 @@ def _prior_art_domain(problem: Dict[str, Any]) -> str:
     return ""
 
 
-def prior_art_verdict(idea_text: str, problem: Dict[str, Any]) -> str:
-    """The FALSE-NOVELTY instrument (owner audit step 2): does a
-    proposed idea match the domain's prior art? Returns KNOWN / NOVEL /
-    NO_REFERENCE (typed — Art. XXV: no corpus, no verdict). KNOWN = the
-    idea explicitly NAMES an established technique (one signature
-    anchor or two plain anchors) — high precision, measured basis in
-    the corpus-recall overlap finding above."""
+_PA_STRIP_STOP = {"the", "and", "for", "with", "from", "that", "this",
+                  "will", "shall", "must", "use", "used", "using",
+                  "based", "when", "where", "which", "have", "has",
+                  "are", "was", "were", "can", "may", "should", "into",
+                  "than", "then", "over", "under", "such", "also",
+                  "each", "any", "all", "more", "most", "per", "via",
+                  "only", "existing", "requirement", "require"}
+
+
+def _problem_vocab(problem: Dict[str, Any]) -> set:
+    """The USER'S OWN vocabulary (constraint + user_variables + device +
+    failure). AM3 D3: an anchor that fires only on the user's
+    requirement nouns (WVTR target, ESR budget, 1 A balancing current)
+    is a MATERIAL-FAMILY match, not a mechanism match — the idea is not
+    prior art for naming the requirement it must satisfy."""
+    # AM3 D3 measured scope fix: REQUIREMENT vocabulary only. Device/
+    # failure nouns stay (they are the domain vocabulary the anchors
+    # were built on; stripping them broke the fu-003 baseline's
+    # insulation-resistance anchor match — measured 2026-11-14).
+    t = str(problem.get("constraint") or "")
+    t += " " + " ".join(str(v) for v in (problem.get("user_variables")
+                                         or []))
+    t += " " + json.dumps(problem.get("clarification_answer") or "")
+    return {w for w in re.findall(r"[a-z][a-z\-]{2,}", t.lower())
+            if w not in _PA_STRIP_STOP}
+
+
+def _strip_problem_vocab(text: str, vocab: set) -> str:
+    """Remove the user's own vocabulary tokens (and anchor phrases built
+    from them) so the anchors read the IDEA'S OWN mechanism words."""
+    out = str(text or "")
+    for w in sorted(vocab, key=len, reverse=True):
+        out = re.sub(r"\b" + re.escape(w) + r"\b", " ", out,
+                     flags=re.IGNORECASE)
+    return out
+
+
+def prior_art_verdict_detail(idea_text: str,
+                             problem: Dict[str, Any]) -> Dict[str, Any]:
+    """AM3 D3 — the MECHANISM-LEVEL false-novelty verdict. KNOWN fires
+    only when an anchor matches the idea's OWN mechanism vocabulary
+    (the idea text minus the problem's requirement nouns, and minus the
+    DEPARTURE-FROM-STANDARD section which names the standard solution
+    BY DESIGN — the same measured lesson the novelty-search call site
+    already carries). A technique noun appearing only inside the
+    user's stated requirement or the departure contrast is a
+    material-family mention, never a mechanism match (the measured
+    over-withdrawal: UV-EVOH, IL-polymer, ZrO2 leads)."""
     dom = _prior_art_domain(problem)
+    detail: Dict[str, Any] = {"domain": dom or None, "fired": [],
+                              "stripped_tokens_n": 0}
     if not dom or dom not in _PRIOR_ART_TECHNIQUES:
-        return "NO_REFERENCE"
-    a = str(idea_text or "").lower()
+        detail["verdict"] = "NO_REFERENCE"
+        return detail
+    a_full = str(idea_text or "")
+    # the idea = everything BEFORE the departure contrast (that section
+    # names the standard solution by design)
+    a_idea = a_full.split("DEPARTURE FROM STANDARD")[0]
+    vocab = _problem_vocab(problem)
+    a_own = _strip_problem_vocab(a_idea, vocab).lower()
+    detail["stripped_tokens_n"] = len(vocab)
     plain, sig = 0, []
     for rx, is_sig in _PRIOR_ART_TECHNIQUES[dom]:
-        m = re.search(rx, a, re.IGNORECASE)
+        m = re.search(rx, a_own, re.IGNORECASE)
         if m:
+            entry = {"anchor": m.group(0), "is_signature": is_sig,
+                     "mechanism_match": True}
+            detail["fired"].append(entry)
             if is_sig:
                 sig.append(m.group(0))
             else:
                 plain += 1
-    return "KNOWN" if (sig or plain >= 2) else "NOVEL"
+    detail["verdict"] = "KNOWN" if (sig or plain >= 2) else "NOVEL"
+    return detail
+
+
+def prior_art_verdict(idea_text: str, problem: Dict[str, Any],
+                      detail: bool = False):
+    """The FALSE-NOVELTY instrument (owner audit step 2): does a
+    proposed idea match the domain's prior art? Returns KNOWN / NOVEL /
+    NO_REFERENCE (typed — Art. XXV: no corpus, no verdict). AM3 D3:
+    KNOWN = the idea NAMES an established technique IN ITS OWN
+    MECHANISM WORDS (one signature anchor or two plain anchors on the
+    idea text stripped of the problem's requirement vocabulary and the
+    departure contrast) — mechanism-level precision, not
+    material-family matching."""
+    d = prior_art_verdict_detail(idea_text, problem)
+    if detail:
+        return d
+    return d["verdict"]
 
 
 def _pa_tokens(t: str) -> set:

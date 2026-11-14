@@ -9,7 +9,11 @@ carry prefer/order/x_arm/y_arm — the decode is deterministic).
 Run: python3 scripts/r11_decoder_retally.py
 """
 import json
+import sys
 from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO))
 
 REPO = Path(__file__).resolve().parent.parent
 
@@ -102,7 +106,6 @@ def main() -> int:
     except Exception as _e:  # noqa: BLE001
         _cis = {"typed_state": f"CI_SKIP_{type(_e).__name__}"}
     (REPO / "eval" / "decoder_retally_r11.json").write_text(json.dumps({
-        "record": "decoder_retally_r11/1.0.0",
         "record": "decoder_retally_r11/1.0.0",
         "decoder_fix": "TIE decoded first from the judge verdict; the "
                        "old `(prefer=='A')==(order=='a0plus_first')` "

@@ -260,6 +260,32 @@ def main() -> int:
                              if _a1_deltas else "NOT_MEASURED"),
         "note": "machine-measured inputs to the item-9 holdout gate; "
                 "the gate is AUDITOR-judged on >=10 pairs"}
+    # F19 (AM3 D3): the gate record carries the 95% Wilson CIs for
+    # every proportion it reports — preference/wins proportions are
+    # binomial; the novelty-delta mean is continuous and carries no CI.
+    try:
+        sys.path.insert(0, str(REPO))
+        from discovery_fabric.engine.r11_stats import wilson_ci as _wc
+        _dr = {}
+        _drf = REPO / "eval" / "decoder_retally_r11.json"
+        if _drf.exists():
+            _dr = (json.loads(_drf.read_text()).get("redecoded") or {})
+        _cis: dict = {}
+        for _k, _v in _dr.items():
+            if not isinstance(_v, dict):
+                continue
+            _wins = _v.get("a1_wins_redecoded",
+                           _v.get("a0plus_wins_redecoded"))
+            _valid = _v.get("valid")
+            if _wins is None or not _valid:
+                continue
+            _cis[_k] = {"wins": _wins, "valid": _valid,
+                        "wilson_95": _wc(int(_wins), int(_valid))}
+        all_scores["wilson_95_ci"] = _cis or {
+            "typed_state": "NO_REDECODED_PROPORTIONS"}
+    except Exception as _e:  # noqa: BLE001 — typed, never silent
+        all_scores["wilson_95_ci"] = {"typed_state":
+                                      f"CI_SKIP_{type(_e).__name__}"}
     all_scores["n_triples"] = n_triples
     all_scores["wall_s"] = round(time.time() - t0, 1)
     OUT = REPO / "eval" / "invention_rubric_r11.json"
