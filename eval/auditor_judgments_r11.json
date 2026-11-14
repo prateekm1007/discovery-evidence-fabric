@@ -1,0 +1,360 @@
+{
+ "record": "auditor_judgments_r11/1.0.0",
+ "audited_commit": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+ "at": "2026-11-14T00:00:00Z",
+ "auditor": "session auditor LLM (Claude), independent of the xkiro/ministral-14b machine judge",
+ "blind_protocol": "X/Y presentation order randomized by sha256(problem_id) parity; arm identities withheld at reading time",
+ "independence_disclosure": "Auditor had prior exposure to the coder's arm-level summaries (mechanism names) before reading pairs; full content-blindness was therefore not achievable. Scores are content-anchored with per-axis rationales and diverge materially from the machine inputs (auditor novelty delta +0.6 vs machine +1.8), evidencing non-anchoring. Machine rubric/judge scores were NOT used as inputs to these scores.",
+ "exclusions": [
+  "dev-fu-004-fouling: baseline TYPED_SKIP_BASELINE_ABSENT, no answer bytes (Art. XXV)",
+  "eval-sofc-thermal-cycling: baseline TYPED_SKIP_BASELINE_ABSENT, no answer bytes (Art. XXV)"
+ ],
+ "pairs": [
+  {
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "arm_x": "a1",
+   "arm_y": "baseline",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 3,
+     "feasibility": 1,
+     "testability": 2,
+     "constraint_compliance": 2
+    },
+    "baseline": {
+     "novelty": 1,
+     "feasibility": 3,
+     "testability": 3,
+     "constraint_compliance": 3
+    }
+   },
+   "novelty_delta_a1_minus_baseline": 2,
+   "feasibility_abs_gap": 2,
+   "overall_substance_preference": "baseline",
+   "rationale_a1": "Graphene-CNT grid is a genuine departure but electrochemically unsound: carbon oxidizes at positive float potential; labeled conductivity 100-200 S/m contradicts 'comparable to lead' (~4.8e6 S/m); PbO2 is active material, not merely a corrosion product; 15-year real-time test is not an executable falsification.",
+   "rationale_baseline": "Pb-Ca-Si(+Bi/Te) + thicker grid + gel + charge control is near-standard VRLA practice and sound; control arm, EIS, capacity checks present; 131,400 h criterion also impractical but the protocol is concrete."
+  },
+  {
+   "problem_id": "bench-p09-packaging-barrier",
+   "arm_x": "a1",
+   "arm_y": "baseline",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 3,
+     "feasibility": 3,
+     "testability": 3,
+     "constraint_compliance": 2
+    },
+    "baseline": {
+     "novelty": 1,
+     "feasibility": 2,
+     "testability": 2,
+     "constraint_compliance": 2
+    }
+   },
+   "novelty_delta_a1_minus_baseline": 2,
+   "feasibility_abs_gap": 1,
+   "overall_substance_preference": "a1",
+   "rationale_a1": "UV-crosslinked EVOH attacks the plasticization root cause, keeps the barrier layer, line-compatible, correct sensitive method (ASTM F1249), n=10, exact constraint conditions; UV chemistry without photoinitiator unproven; '3x reduction' mislabeled as user-stated.",
+   "rationale_baseline": "Replacing EVOH with CNC/GO-filled polyolefin likely worsens WVTR (CNC hydrophilic); tortuous-path claim is standard literature; ASTM E96 marginal at <0.5 g/m2/day; 'EN 18120-7' suspect; no sample size; 6mo=18mo equivalence unjustified."
+  },
+  {
+   "problem_id": "dev-fu-001-bearing-spalling",
+   "arm_x": "a1",
+   "arm_y": "baseline",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 1,
+     "feasibility": 2,
+     "testability": 2,
+     "constraint_compliance": 1
+    },
+    "baseline": {
+     "novelty": 2,
+     "feasibility": 3,
+     "testability": 4,
+     "constraint_compliance": 3
+    }
+   },
+   "novelty_delta_a1_minus_baseline": -1,
+   "feasibility_abs_gap": 1,
+   "overall_substance_preference": "baseline",
+   "rationale_a1": "Envelope spectral kurtosis cannot be computed from 1 Hz SCADA logs without an unspecified edge-compute leg; 1 kHz bandwidth misses resonance bands; DOI suffix looks fabricated; 30-day window cannot validate 14-day lead or <=2 FA/year; spectral kurtosis is textbook, not a departure.",
+   "rationale_baseline": "SEC/power-to-speed drift is computable from existing historian points; correct Nyquist reasoning about the 1 kHz sensor; explicit 3-criterion retrospective kill test incl. noise-floor check; honest evidence limits."
+  },
+  {
+   "problem_id": "dev-fu-003-motor-insulation",
+   "arm_x": "a1",
+   "arm_y": "baseline",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 1,
+     "feasibility": 2,
+     "testability": 2,
+     "constraint_compliance": 2
+    },
+    "baseline": {
+     "novelty": 1,
+     "feasibility": 3,
+     "testability": 3,
+     "constraint_compliance": 2
+    }
+   },
+   "novelty_delta_a1_minus_baseline": 0,
+   "feasibility_abs_gap": 1,
+   "overall_substance_preference": "baseline",
+   "rationale_a1": "PRPD pattern analysis IS standard modern offline PD practice - the 'departure' claim is false; 10 kHz sampling inadequate for PD pulses; 1.5x rated mislabeled user-stated; 3 consecutive outages (~6-9 months) conflicts with the 6-month lead claim; cited DOIs dubious.",
+   "rationale_baseline": "IR/PI trending is the most standard offline test; honest about its PD blind spot with kill criteria; but IR/PI is not a PD test (constraint letter) and the IEC 60159 citation is wrong; no sample size."
+  },
+  {
+   "problem_id": "dev-fu-005-bridge-bearing",
+   "arm_x": "a1",
+   "arm_y": "baseline",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 2,
+     "feasibility": 2,
+     "testability": 2,
+     "constraint_compliance": 2
+    },
+    "baseline": {
+     "novelty": 2,
+     "feasibility": 3,
+     "testability": 2,
+     "constraint_compliance": 1
+    }
+   },
+   "novelty_delta_a1_minus_baseline": 0,
+   "feasibility_abs_gap": 1,
+   "overall_substance_preference": "a1",
+   "rationale_a1": "Polyurea encapsulation retrofit respects no-replacement; field adhesion to aged crazed elastomer unproven; 120 MPa shell vs 4 MPa core shear-compliance impact unaddressed; '75 years of accelerated exposure' incoherent; two fabricated user-constraint labels (2 mm drift, 0.05 ppm ozone).",
+   "rationale_baseline": "Same polyurea idea plus aramid fibers, but 'replace the bearing pad' violates the core no-replacement constraint; ASTM D573 is heat aging, not ozone (D1149); 6 months ~ 75 years equivalence unjustified; no n; honest evidence caveat."
+  },
+  {
+   "problem_id": "eval-new01-supercap-dryout",
+   "arm_x": "a1",
+   "arm_y": "baseline",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 2,
+     "feasibility": 2,
+     "testability": 2,
+     "constraint_compliance": 3
+    },
+    "baseline": {
+     "novelty": 1,
+     "feasibility": 2,
+     "testability": 2,
+     "constraint_compliance": 2
+    }
+   },
+   "novelty_delta_a1_minus_baseline": 1,
+   "feasibility_abs_gap": 0,
+   "overall_substance_preference": "a1",
+   "rationale_a1": "Ionic-liquid/polymer hybrid targets the volatility root cause; explicit 0.5 mm height budget; honest 'value not stated in the cited record' label; ESR penalty vs ACN unaddressed; covalent immobilization vs ion mobility tension; 10-year real-time test not executable.",
+   "rationale_baseline": "SPE conductivity too low for EDLC ESR; PCM buffers transients, useless against steady 65 C ambient; KOH mischaracterizes commercial EDLC chemistry; 1000 h @80 C as 10-year proxy has no Arrhenius basis; height claim unbudgeted."
+  },
+  {
+   "problem_id": "eval-new02-slipring-predictor",
+   "arm_x": "a1",
+   "arm_y": "baseline",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 1,
+     "feasibility": 1,
+     "testability": 2,
+     "constraint_compliance": 1
+    },
+    "baseline": {
+     "novelty": 2,
+     "feasibility": 3,
+     "testability": 4,
+     "constraint_compliance": 3
+    }
+   },
+   "novelty_delta_a1_minus_baseline": -1,
+   "feasibility_abs_gap": 2,
+   "overall_substance_preference": "baseline",
+   "rationale_a1": "'Ripple std' is not measurable at 1-minute sampling (HF content aliased/averaged out) - the core metric is invalid under the constraint; thesis DOI with precise 0.04-0.06 A_rms claim looks fabricated; brush-material change out of scope; validation has no lead-time or false-alarm kill criteria.",
+   "rationale_baseline": "Contact resistance Rc=V/I from existing sensors is computable; load-normalized dual threshold; 12-month retrospective kill test against BOTH constraints; honest evidence filtering."
+  },
+  {
+   "problem_id": "eval-new04-chiller-fouling-predictor",
+   "arm_x": "a1",
+   "arm_y": "baseline",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 1,
+     "feasibility": 2,
+     "testability": 2,
+     "constraint_compliance": 2
+    },
+    "baseline": {
+     "novelty": 1,
+     "feasibility": 3,
+     "testability": 4,
+     "constraint_compliance": 3
+    }
+   },
+   "novelty_delta_a1_minus_baseline": 0,
+   "feasibility_abs_gap": 1,
+   "overall_substance_preference": "baseline",
+   "rationale_a1": "CAT needs refrigerant saturation pressure - not in the allowed BMS list; 97%-of-95% baseline arithmetic muddled; 5 C baseline mislabeled user constraint; validation lacks wet-bulb/load normalization; approach monitoring is standard practice, not a departure.",
+   "rationale_baseline": "Fouling resistance R_f is standard but sound; split-season A/B with wet-bulb normalization; three explicit falsification criteria incl. 3% energy and cost payback; honest about irrelevant evidence and the part-load caveat."
+  },
+  {
+   "problem_id": "eval-new05-liion-balance-drift",
+   "arm_x": "a1",
+   "arm_y": "baseline",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 3,
+     "feasibility": 1,
+     "testability": 1,
+     "constraint_compliance": 2
+    },
+    "baseline": {
+     "novelty": 1,
+     "feasibility": 3,
+     "testability": 3,
+     "constraint_compliance": 3
+    }
+   },
+   "novelty_delta_a1_minus_baseline": 2,
+   "feasibility_abs_gap": 2,
+   "overall_substance_preference": "baseline",
+   "rationale_a1": "PEO-LiTFSI in the cathode (1e-5 S/cm) adds resistance, cannot homogenize transport; plating/stripping is an anode phenomenon mislocated in the cathode; test relaxes the MAX-spread constraint to '35% of cells'; 10-year real-time; novel but physically inverted.",
+   "rationale_baseline": "Attacks the thermal root cause; PCM alone is transient-only but the graphite conduction path legitimately reduces the gradient; executable gradient-chamber falsification with the exact 35 mV criterion; footprint/balancer constraints respected; honest evidence filtering."
+  },
+  {
+   "problem_id": "eval-new07-transformer-dga-predictor",
+   "arm_x": "a1",
+   "arm_y": "baseline",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 2,
+     "feasibility": 1,
+     "testability": 2,
+     "constraint_compliance": 1
+    },
+    "baseline": {
+     "novelty": 1,
+     "feasibility": 2,
+     "testability": 3,
+     "constraint_compliance": 1
+    }
+   },
+   "novelty_delta_a1_minus_baseline": 1,
+   "feasibility_abs_gap": 1,
+   "overall_substance_preference": "tie",
+   "rationale_a1": "Invents a second top-oil sensor and nanofluid oil - both violate 'existing sensors only'; 0.5 C/cm over 1 m = 50 C top-oil difference is physically absurd; PD micro-arc heat is undetectable in top-oil; claims 'no new hardware' falsely.",
+   "rationale_baseline": "Requires a NEW online gas sensor - violates the same constraint; but gas-rate physics is sound and the accelerated-aging lab falsification is concrete; claims 'repurposing existing data streams' falsely."
+  }
+ ],
+ "gate": {
+  "definition": "Art. LXXXVI: mean novelty delta >= 0.5 AND mean feasibility gap <= 0.25, auditor-judged on >= 10 pairs; format wins excluded",
+  "n_pairs": 10,
+  "novelty_delta_mean": 0.6,
+  "feasibility_abs_gap_mean": 1.2,
+  "novelty_clause": "PASS",
+  "feasibility_clause": "FAIL",
+  "state": "NOT_MET",
+  "decided_by": "auditor (this session), not the machine judge"
+ },
+ "arm_means_auditor": {
+  "a1": {
+   "novelty": 1.9,
+   "feasibility": 1.7,
+   "testability": 2.0,
+   "constraint_compliance": 1.8
+  },
+  "baseline": {
+   "novelty": 1.3,
+   "feasibility": 2.7,
+   "testability": 3.0,
+   "constraint_compliance": 2.3
+  }
+ },
+ "overall_tally": {
+  "a1_wins": 3,
+  "baseline_wins": 6,
+  "ties": 1
+ },
+ "small_sample_disclosure": {
+  "n_pairs": 10,
+  "n_is_owner_minimum": true,
+  "novelty_delta": {
+   "mean": 0.6,
+   "sd": 1.174,
+   "ci95": [
+    -0.24,
+    1.44
+   ],
+   "clause": "PASS_PROVISIONAL",
+   "note": "CI includes 0; ~31 pairs for 80% power at observed variance"
+  },
+  "feasibility_abs_gap": {
+   "mean": 1.2,
+   "sd": 0.632,
+   "ci95": [
+    0.75,
+    1.65
+   ],
+   "clause": "FAIL_ROBUST"
+  },
+  "gate_state_unchanged": "NOT_MET",
+  "next_round_min_pairs": 30
+ },
+ "invention_credit_register": [
+  {
+   "idea": "UV-crosslinked EVOH network",
+   "problem_id": "bench-p09-packaging-barrier",
+   "novelty": 3,
+   "pair_won": true,
+   "status": "SALVAGE",
+   "repair": "photoinitiator/functionalization chemistry spec; Peck/Arrhenius accelerated WVTR protocol"
+  },
+  {
+   "idea": "nano-ZrO2 glass-ceramic seal + graded LSM/YSZ cathode",
+   "problem_id": "eval-sofc-thermal-cycling",
+   "novelty": "credited_unjudged",
+   "pair_won": null,
+   "status": "SALVAGE",
+   "repair": "rule-of-mixtures CTE sign check; malformed DOI 10.1002/advs.77388; test must carry 500 cycles 25->800C at 5C/min, OCV>1.0V, leakage<1% fuel flow, mass +<=2%"
+  },
+  {
+   "idea": "ionic-liquid/polymer hybrid electrolyte",
+   "problem_id": "eval-new01-supercap-dryout",
+   "novelty": 2,
+   "pair_won": true,
+   "status": "SALVAGE",
+   "repair": "ESR budget vs ACN; immobilization-vs-mobility tension"
+  },
+  {
+   "idea": "DeltaT/DeltaP exponential-drift biofouling predictor",
+   "problem_id": "dev-fu-004-fouling",
+   "novelty": "credited_unjudged",
+   "pair_won": null,
+   "status": "FLAWED_AS_WRITTEN_SALVAGEABLE",
+   "repair": "verified: constraint allows temperature+flow only \u2014 DeltaP out of scope; '+5% back-pressure' user label fabricated; reformulate as DeltaT/flow-ratio drift with site-history derating reference"
+  },
+  {
+   "idea": "graphene-CNT grid",
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "novelty": 3,
+   "pair_won": false,
+   "status": "ARCHIVE",
+   "repair": "electrochemically unsound as written"
+  },
+  {
+   "idea": "PEO-LiTFSI in cathode",
+   "problem_id": "eval-new05-liion-balance-drift",
+   "novelty": 3,
+   "pair_won": false,
+   "status": "ARCHIVE",
+   "repair": "physically inverted"
+  }
+ ],
+ "auditor_family_caveat": "Auditor is a Claude session; shared-family blind spots with prior Claude audit sessions possible (owner review 2026-11-14). Cross-family second-auditor panel required as bias-check input; gate remains auditor-judged (Art. XXVI).",
+ "amendment": "R11/audit/AUDITOR_VERDICT_R11_AMENDMENT_1_2026-11-14.md"
+}
