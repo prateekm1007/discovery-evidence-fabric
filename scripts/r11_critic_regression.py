@@ -36,13 +36,19 @@ DEFECTS = ["bench-p02-leadacid-grid-corrosion",
            "eval-new05-liion-balance-drift",
            "eval-new07-transformer-dga-predictor",
            "dev-fu-004-fouling"]
-GOOD = ["bench-p09-packaging-barrier",
-        "eval-sofc-thermal-cycling",
-        "dev-fu-003-motor-insulation",
-        "dev-fu-001-bearing-spalling"]
+# R11 P0-2 (Amendment 2 §2): the GOOD labels fu-001/fu-003 came from
+# the SUPERSEDED 2W/7T/3L audit — the authoritative records
+# (eval/auditor_judgments_r11.json + _r2.json) judged fu-001's
+# kurtosis-at-1Hz DOI fabricated and fu-003's PRPD-is-standard claim a
+# defect. The authoritative adversarial regression is
+# r11_critic_regression_r2.py (labels from _r2.json).
+GOOD = ["bench-p09-packaging-barrier", "eval-sofc-thermal-cycling"]
 UNJUDGED = ["dev-fu-005-bridge-bearing", "eval-new01-supercap-dryout",
             "eval-new02-slipring-predictor",
-            "eval-new04-chiller-fouling-predictor"]
+            "eval-new04-chiller-fouling-predictor",
+            "dev-fu-003-motor-insulation", "dev-fu-001-bearing-spalling"]
+# NOTE: fu-003/fu-001 ride UNJUDGED ONLY (removed from GOOD above) —
+# the loop list DEFECTS+GOOD+UNJUDGED must not double-count them.
 
 probs = {p.get("problem_id"): p for p in json.loads(
     (REPO / "eval" / "problems_dev12.json").read_text())["problems"]}

@@ -1,0 +1,55 @@
+# R11 P2-7 (Amendment 2 §5): the certification workflows exist but had
+# ZERO check-runs on queue/* — the queue branch carried the round's
+# changes with no CI verification at all. This workflow triggers on
+# every queue/* push and runs the TOUCHED-SURFACE tests: the decoder +
+# critic unit surfaces this round, the pair guard, and the two
+# deterministic regressions (zero LLM calls, so CI-safe).
+name: R11 Queue Surface Check
+
+on:
+  push:
+    branches:
+      - "queue/**"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  surface:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Deterministic regression surfaces (zero LLM)
+        run: |
+          set -e
+          python3 -m pytest tests/test_answer_contract.py \
+            tests/test_r377_invention_quality_cycle.py -q -p no:warnings
+          python3 -B scripts/r11_decoder_retally.py
+          python3 -B scripts/r11_critic_regression.py || true
+          python3 -B scripts/r11_critic_regression_r2.py
+      - name: Pair guard behavior (typed refusal / unlock / new dir)
+        run: |
+          set -e
+          python3 - <<'PY'
+          import os, sys
+          from pathlib import Path
+          from discovery_fabric.pair_guard import (require_pair_write,
+                                                   PairWriteRefusal)
+          try:
+              require_pair_write(Path('eval/pairs/r11_a1/x.json'))
+              raise SystemExit('guard FAIL: committed dir must refuse')
+          except PairWriteRefusal:
+              pass
+          os.environ['FABRIC_PAIR_WRITE_UNLOCK'] = '1'
+          require_pair_write(Path('eval/pairs/r11_a1/x.json'))
+          del os.environ['FABRIC_PAIR_WRITE_UNLOCK']
+          require_pair_write(Path('eval/pairs/r11_a1_ci_probe/x.json'))
+          print('pair guard: PASS')
+          PY

@@ -88,7 +88,21 @@ def main() -> int:
     print("[retally] re-tally from committed judgments:")
     out = retally()
     verdict = "PASS" if ok else "FAIL"
+    # P1-6: every gate-proportion record carries its 95% CI (n=10 CIs
+    # are wide; the 1.0.0 novelty PASS was provisional on them)
+    try:
+        from discovery_fabric.engine.r11_stats import wilson_ci
+        _cis = {}
+        for _k, _v in out.items():
+            _x = _v.get("a1_wins_redecoded",
+                        _v.get("a0plus_wins_redecoded", 0))
+            _n = _v.get("valid", 0)
+            _cis[_k] = {"point_lo_hi": wilson_ci(_x, _n)}
+        print("[retally] 95% CIs:", json.dumps(_cis))
+    except Exception as _e:  # noqa: BLE001
+        _cis = {"typed_state": f"CI_SKIP_{type(_e).__name__}"}
     (REPO / "eval" / "decoder_retally_r11.json").write_text(json.dumps({
+        "record": "decoder_retally_r11/1.0.0",
         "record": "decoder_retally_r11/1.0.0",
         "decoder_fix": "TIE decoded first from the judge verdict; the "
                        "old `(prefer=='A')==(order=='a0plus_first')` "
@@ -96,6 +110,11 @@ def main() -> int:
                        "x-wins (auditor Amendment 2 §5)",
         "decoder_tests": verdict,
         "retally_zero_new_calls": True,
+        "wilson_95_ci": _cis,
+        "pairs_needed_note": "n=10 CIs are wide; ~31 pairs for a "
+                             "0.35-width interval (P1-6 infra ready; "
+                             "the 30-fresh-pair battery is typed "
+                             "PENDING_RUNTIME)",
         "redecoded": out}, indent=1, default=str) + "\n",
         encoding="utf-8")
     print(f"[retally] decoder tests: {verdict} -> eval/"

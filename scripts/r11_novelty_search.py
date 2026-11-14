@@ -193,6 +193,48 @@ def search_one(pid: str) -> dict:
         _pav_v = "NO_REFERENCE"
     if _pav_v == "KNOWN" and claim == "NOVELTY_CLAIMED":
         claim = "NOVELTY_WITHDRAWN_NAMED_PRIOR_ART"
+    # R11 P1-5 (Amendment 2 §5): LIVE prior-art retrieval before any
+    # NOVELTY_CLAIMED — the 16-record local pool + named anchors miss
+    # standard alloys (the measured C70600 recall gap). A Crossref
+    # query on the idea's mechanism tokens returns the top live hits;
+    # a match with >=0.4 token overlap against the idea's own
+    # mechanism text withdraws the claim (typed). Network absent ->
+    # typed LIVE_RETRIEVAL_ABSENT, the claim stands for the auditor
+    # (Art. XXV: the absent network is not evidence either way).
+    live = {"state": "LIVE_RETRIEVAL_ABSENT", "hits": []}
+    if claim == "NOVELTY_CLAIMED":
+        try:
+            import urllib.parse
+            import urllib.request
+            _qt = " ".join(sorted(_idea_tokens(rec, prob))[:8])
+            _u = ("https://api.crossref.org/works?query="
+                  + urllib.parse.quote(_qt)
+                  + "&rows=3&select=title,DOI,container-title")
+            _rq = urllib.request.Request(_u, headers={
+                "User-Agent": ("discovery-evidence-fabric/1.0 "
+                               "(mailto:audit@local)")})
+            with urllib.request.urlopen(_rq, timeout=10) as _resp:
+                _items = (json.loads(_resp.read().decode(
+                    "utf-8", "replace")).get("message") or {}).get(
+                    "items") or []
+            _idea_txt_l = (_idea_txt + " " + _head[:800]).lower()
+            _itoks = set(_toks(_idea_txt_l))
+            for _it in _items:
+                _tt = " ".join(str(t) for t in (
+                    _it.get("title") or []
+                    + _it.get("container-title") or [])).lower()
+                _ov = (len(_itoks & set(_toks(_tt)))
+                       / max(len(_itoks), 1)) if _itoks else 0.0
+                live["hits"].append({
+                    "title": _tt[:110], "doi": _it.get("DOI"),
+                    "token_overlap": round(_ov, 3)})
+            live["state"] = "LIVE_RETRIEVED"
+            live["query"] = _qt
+            if any(h["token_overlap"] >= 0.4 for h in live["hits"]):
+                claim = "NOVELTY_WITHDRAWN_LIVE_PRIOR_ART"
+        except Exception as e:  # noqa: BLE001 — network absent is
+            live = {"state": "LIVE_RETRIEVAL_ABSENT",   # typed, not
+                    "error": type(e).__name__}  # evidence (Art. XXV)
     return {
         "novelty_search_version": NOVELTY_VERSION,
         "problem_id": pid,
@@ -202,6 +244,7 @@ def search_one(pid: str) -> dict:
         "idea_distinctive_tokens": sorted(distinct)[:20],
         "prior_art_pool_n": len(packet),
         "nearest_prior_art_top5": top,
+        "live_prior_art": live,
         "nearest_verdict": nearest,
         "novelty_claim": claim,
         "rule": ("novelty is claimed ONLY when the nearest prior art "
