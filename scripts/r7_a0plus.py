@@ -453,9 +453,28 @@ def run_a0plus(pid: str) -> int:
     # the typed knob).
     os.environ["ENGINE_LLM_TIMEOUT_S"] = str(HARD_TIMEOUT_S)
     os.environ["ENGINE_LLM_RETRY_SLEEP_S"] = "0"
+    # R11 P1-7 (owner item 7, ABLATION cheap first): the arm runs its
+    # own ablation arms via typed env flags — A0+ minus the audit
+    # call, minus the relabel, minus the repair. Each variant writes
+    # its OWN versioned subdir (the main delivery is never
+    # overwritten) and every record carries its ablation_variant.
+    # The flags exist ONLY for the ablation measurement; the default
+    # path never sets them (the owner: ablation is the instrument,
+    # not the delivery).
+    _abl = []
+    if os.environ.get("FABRIC_A0P_SKIP_AUDIT") == "1":
+        _abl.append("minus_audit")
+    if os.environ.get("FABRIC_A0P_SKIP_RELABEL") == "1":
+        _abl.append("minus_relabel")
+    if os.environ.get("FABRIC_A0P_SKIP_REPAIR") == "1":
+        _abl.append("minus_repair")
+    ablation_variant = ("full" if not _abl else "+".join(_abl))
+    out_dir = PAIRS_A0
+    if _abl:
+        out_dir = PAIRS_A0.parent / "r11_ablation" / ablation_variant
     run_t0 = time.time()
-    PAIRS_A0.mkdir(parents=True, exist_ok=True)
-    out_f = PAIRS_A0 / f"{pid}.json"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_f = out_dir / f"{pid}.json"
     pair = _load_pair(pid)
     baseline_sha = _baseline_identity(pid, pair)
     if out_f.exists():
@@ -508,6 +527,7 @@ def run_a0plus(pid: str) -> int:
     queue_wait_s = _env_sec("A0P_QUEUE_WAIT_S")
     gateway_setup_s = _env_sec("A0P_GATEWAY_SETUP_S")
     rec: dict = {"a0plus_version": A0P_VERSION,
+                 "ablation_variant": ablation_variant,
                  "problem_id": pid,
                  "baseline_source": "committed audited pair bytes, "
                                     "unmodified",
@@ -559,9 +579,20 @@ def run_a0plus(pid: str) -> int:
         kw.setdefault("max_retries", MAX_RETRIES)
         return llm_generate(prompt, **kw)
 
-    # ---- leg 1: the LLM constraint audit (ONE call, quoted text)
-    t0 = time.time()
-    check = llm_constraint_check(prob, baseline, _bounded_generate)
+    # ---- leg 1: the LLM constraint audit (ONE call, quoted text);
+    # the R11 ablation flag skips it typed (the record carries the
+    # skipped state — never a silent omission, Art. XXV)
+    if os.environ.get("FABRIC_A0P_SKIP_AUDIT") == "1":
+        check = {"state": "SKIPPED_BY_ABLATION_FLAG",
+                 "n_violations": 0,
+                 "violations": [],
+                 "provider": [],
+                 "typed_note": ("the minus_audit ablation arm: the "
+                                "constraint-audit call is SKIPPED for "
+                                "the ablation measurement only")}
+    else:
+        t0 = time.time()
+        check = llm_constraint_check(prob, baseline, _bounded_generate)
     if check.get("state") == "CHECK_TRANSPORT_FAILED":
         # typed INCOMPLETE: an unaudited baseline is NOT an A0+ answer
         # (the arm's whole point is the audit); deliver nothing, retry
@@ -571,7 +602,9 @@ def run_a0plus(pid: str) -> int:
               f"failed: {str(check.get('error'))[:120]}) — no pair "
               "emitted; retry in a healthy window")
         return EXIT_TRANSPORT
-    audit_wall = round(time.time() - t0, 1)
+    audit_wall = (round(time.time() - t0, 1)
+                  if os.environ.get("FABRIC_A0P_SKIP_AUDIT") != "1"
+                  else 0.0)
     rec["constraint_audit"] = {
         "state": check.get("state"),
         "n_violations": check.get("n_violations"),
@@ -583,14 +616,26 @@ def run_a0plus(pid: str) -> int:
         "a0plus_constraint_audit")
 
     # ---- leg 2: the strict provenance relabel (deterministic; the
-    # packet is RESOLVED here — no typed-skip branch remains)
-    sd = strict_provenance_downgrade(baseline, [], prob,
-                                     packet_by_id=packet_by_id)
-    answer = sd["answer"]
-    rec["strict_relabel"] = {
-        "n_relabels": sd["n_relabels"],
-        "n_user_constraint_relabels": sd["n_user_constraint_relabels"],
-        "relabels": sd["relabels"]}
+    # packet is RESOLVED here — no typed-skip branch remains); the
+    # R11 ablation flag skips it typed
+    if os.environ.get("FABRIC_A0P_SKIP_RELABEL") == "1":
+        sd = {"answer": baseline, "n_relabels": 0,
+              "n_user_constraint_relabels": 0, "relabels": []}
+        answer = baseline
+        rec["strict_relabel"] = {
+            "n_relabels": 0, "n_user_constraint_relabels": 0,
+            "relabels": [],
+            "typed_note": "the minus_relabel ablation arm: the "
+                          "deterministic strict relabel is SKIPPED "
+                          "for the ablation measurement only"}
+    else:
+        sd = strict_provenance_downgrade(baseline, [], prob,
+                                         packet_by_id=packet_by_id)
+        answer = sd["answer"]
+        rec["strict_relabel"] = {
+            "n_relabels": sd["n_relabels"],
+            "n_user_constraint_relabels": sd["n_user_constraint_relabels"],
+            "relabels": sd["relabels"]}
 
     # ---- leg 2.5: the consistency state BEFORE any repair (R9 P0
     # item 3: the initial logic — CHECK_ABSENT is NOT a pass and MUST
@@ -627,6 +672,13 @@ def run_a0plus(pid: str) -> int:
     # answer is delivered typed-INCOMPLETE — the honest state, never
     # fabricated (Art. XXV).
     rec["repair_rounds"] = []
+    if os.environ.get("FABRIC_A0P_SKIP_REPAIR") == "1":
+        rec["repair_call"] = {
+            "applied": False,
+            "note": "the minus_repair ablation arm: the repair call "
+                    "is SKIPPED for the ablation measurement only"}
+        rec["repair_rounds"] = []
+        needs_repair = False
     if needs_repair:
         cur_contract = pre_contract
         cur_cons = cons
@@ -1001,8 +1053,9 @@ def run_a0plus(pid: str) -> int:
     rec["per_call_timeline"] = timeline
     # the honest call count: the audit leg counts when it SERVED; the
     # repair leg counts when applied
-    rec["n_llm_calls"] = (1 if rec["constraint_audit"]["state"] !=
-                          "CHECK_TRANSPORT_FAILED" else 0) \
+    rec["n_llm_calls"] = (1 if rec["constraint_audit"]["state"] not in
+                          ("CHECK_TRANSPORT_FAILED",
+                           "SKIPPED_BY_ABLATION_FLAG") else 0) \
         + sum(1 for r in rec.get("repair_rounds", [])
               if r.get("applied"))
     rec["work_time_s"] = _work_time_s(timeline)
