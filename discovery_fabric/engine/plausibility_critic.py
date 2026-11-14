@@ -655,7 +655,50 @@ def _check_nyquist(answer, prob_txt):
                 "provenance_class": "ENGINEERING",
                 "provenance": ("sampling theorem; the problem's own "
                                "declared sampling rates")}
+    # F23 (AM5) logged-rate class: a problem that declares BOTH a
+    # sensor-class rate and a historian/log-class rate stores only the
+    # LOGGED stream offline — spectral features above the logged
+    # rate's Nyquist are impossible from the historian UNLESS the
+    # answer explicitly declares an at-sensor/edge computation path on
+    # the high-rate stream (the repaired fu-001 shape). The pre-repair
+    # fu-001 NASER draft validated against the 1 kHz SENSOR rate while
+    # its offline path rode the 1 Hz SCADA logs (Nyquist 0.5 Hz) and
+    # passed CLEAN — the false-CLEAN the auditor reproduced (AM5 F23).
+    if len(rates) >= 2:
+        lo, hi = min(rates), max(rates)
+        if (hi >= 100.0 * lo and worst > 0.5 * lo * 1.05
+                and not _EDGE_COMPUTE.search(str(answer or ""))):
+            return {
+                "verdict": "KILL", "anchor": "LOGGED_RATE_NYQUIST",
+                "finding": (
+                    f"the problem declares a sensor-class rate "
+                    f"({_fmt_hz(hi)}) and a logging-class rate "
+                    f"({_fmt_hz(lo)}); the claimed band "
+                    f"({_fmt_hz(worst)}) exceeds the LOGGED stream's "
+                    f"Nyquist limit ({_fmt_hz(0.5 * lo)}) and the "
+                    "answer nowhere declares an at-sensor/edge "
+                    "computation path on the high-rate stream — the "
+                    "feature is not measurable offline from the "
+                    "logged data (AM5 F23 class)"),
+                "provenance_class": "ENGINEERING",
+                "provenance": ("sampling theorem on the historian "
+                               "stream; auditor AM5 F23 fu-001 "
+                               "reproduction")}
     return None
+
+
+#: an explicit declaration that the spectral computation runs AT the
+#: sensor, on the high-rate stream, BEFORE the historian — the only
+#: way a band above the logged Nyquist is measurable (AM5 F23 repair
+#: shape: 'computed at the sensor edge on the existing 1 kHz waveform')
+_EDGE_COMPUTE = re.compile(
+    r"at the sensor|sensor[- ]side|sensor edge|at[- ]source|"
+    r"edge (?:compute|computing|computation|dsp|processing|node)|"
+    r"on[- ]board (?:dsp|compute|processing|fft)|"
+    r"before the historian|"
+    r"on the (?:existing )?\d+\s?khz (?:stream|waveform|signal|channel)|"
+    r"comput(?:e|ed|ing) (?:at|on|from) the (?:sensor|existing "
+    r"\d+\s?khz|high[- ]rate)", re.IGNORECASE)
 
 
 def _fmt_hz(f):
@@ -1255,6 +1298,63 @@ def _check_offline_modality(answer, prob_txt):
     return None
 
 
+_PD_ONLY_CONSTRAINT = re.compile(
+    r"offline\s+PD\s+testing|PD\s+testing[^.]{0,50}\bonly\b|"
+    r"partial[- ]discharge\s+testing[^.]{0,50}\bonly\b", re.IGNORECASE)
+_MECH_MODAL_MECHANISM = re.compile(
+    r"natural frequenc|modal|tap[- ]?test|resonan\w+|stiffness",
+    re.IGNORECASE)
+_VIBRATION_MECHANISM = re.compile(r"\bvibrat", re.IGNORECASE)
+_THERMAL_MECHANISM = re.compile(
+    r"thermograph\w*|infrared|thermal imag", re.IGNORECASE)
+_OIL_MECHANISM = re.compile(
+    r"\bDGA\b|dissolved gas|oil (?:analysis|sample|test)", re.IGNORECASE)
+_PD_MECHANISM = re.compile(
+    r"partial[- ]discharge|\bPD\b|PRPD|PDIV|PDEV|"
+    r"discharge (?:magnitude|pattern|inception|extinction|activity)",
+    re.IGNORECASE)
+_MECH_NEGATION = re.compile(
+    r"\b(?:not|no|never|rather than|instead of|unlike|without|cannot|"
+    r"can't)\b", re.IGNORECASE)
+
+
+def _check_test_modality(answer, prob_txt):
+    """(h) the AM5 F23 fu-003 class: a proposal whose INDICATOR
+    mechanism belongs to a DIFFERENT physical test modality than the
+    one the constraint names ('offline PD testing ... only' answered
+    with a mechanical modal/tap-test natural-frequency shift). This is
+    a constraint violation even though the proposal stays offline —
+    the offline/online split (g) does not see it. A sentence that
+    disavows the foreign modality (negation window) or is itself
+    PD-scoped does not fire."""
+    pt = str(prob_txt or "")
+    if not _PD_ONLY_CONSTRAINT.search(pt):
+        return None  # the constraint never pinned the test modality
+    a = str(answer or "")
+    for s in re.split(r"(?<=[.!?])\s+|\n+", a):
+        foreign = (_MECH_MODAL_MECHANISM.search(s)
+                   or _VIBRATION_MECHANISM.search(s)
+                   or _THERMAL_MECHANISM.search(s)
+                   or _OIL_MECHANISM.search(s))
+        if not foreign:
+            continue
+        if _MECH_NEGATION.search(s) or _PD_MECHANISM.search(s):
+            continue  # disavowal window, or PD-scoped sentence
+        return {"verdict": "KILL", "anchor": "MODALITY_MISMATCH",
+                "finding": ("the constraint restricts the test modality "
+                            "to offline partial-discharge testing, but "
+                            "the proposed indicator is a different "
+                            f"physical modality ('{s.strip()[:110]}') — "
+                            "the deliverable violates the stated test "
+                            "modality (AM5 F23 fu-003 class)"),
+                "provenance_class": "BUYER_DEFINED",
+                "provenance": ("auditor AM5 F23: fu-003 modal-stiffness "
+                               "draft under the 'offline PD testing "
+                               "during scheduled outages only' "
+                               "constraint")}
+    return None
+
+
 _EXTRACT_HOT = re.compile(
     r"extract(?:s|ing)?[^.]{0,60}from[^.]{0,30}\bhot\b|"
     r"\bhot\b[^.]{0,40}cells?[^.]{0,60}extract|"
@@ -1385,11 +1485,12 @@ def check_answer_class_defects(answer, problem, prob_txt,
                _check_arithmetic, _check_mechanism_category,
                _check_copper_positive_potential,
                _check_electronic_seal, _check_offline_modality,
+               _check_test_modality,
                _check_energy_flow_direction, _check_test_duration):
         kw = {}
         if fn in (_check_nyquist, _check_answer_signals,
                   _check_arithmetic, _check_user_labels,
-                  _check_offline_modality):
+                  _check_offline_modality, _check_test_modality):
             kw["prob_txt"] = prob_txt
         if fn is _check_question_type:
             kw["qtype"] = problem.get("question_type")
