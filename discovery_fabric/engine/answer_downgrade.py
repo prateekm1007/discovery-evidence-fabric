@@ -236,6 +236,22 @@ _PARAM_EB_LINE_FIRST_RE = re.compile(
     r"(?!\s*ASSUMPTION\b)[^\[\]\n])+)"
     r"\s*(?P<cite>\[[^\[\]\n]{1,120}\])?", re.IGNORECASE)
 
+# R11 owner item 6 (the audited live regression, fu-004 bytes): the
+# CLAIM-level shape — 'Reduces overshoot by 40% (EVIDENCE-BACKED
+# [doi:...])' / '**Proportional gain (Kp):** 0.8 x baseline PID Kp
+# (EVIDENCE-BACKED [doi:...])' — an EVIDENCE-BACKED citation attached
+# to a NON-PARAMETER line. The strict value-level honesty scan is
+# extended to these lines: every number+unit stated in the claim
+# text BEFORE the citation must be found in the cited record; a
+# number the record never states relabels the claim ASSUMPTION and
+# DROPS the citation (the same rule as the PARAMETER lines, one
+# honesty rule, all line shapes).
+_EB_CLAIM_RE = re.compile(
+    r"(?P<claim>[^\[\]\n]{15,240}?)"
+    r"(?P<label>\((?:EVIDENCE[- ]BACKED)[^()\[\]\n]{0,60}\)"
+    r"|\bEVIDENCE[- ]BACKED\b)"
+    r"(?P<cite>\s*\[[^\[\]\n]{1,120}\]?\s*\)?)", re.IGNORECASE)
+
 _NUM_UNIT_RE = re.compile(
     r"(\d+(?:[.,]\d+)?)\s*(?P<unit>%|percent|wt\s*%|wt%|mm|cm|µm|um|m\b|"
     r"years?|yrs?|yr|months?|days?|hours?|hrs?|h\b|minutes?|min\b|"
@@ -258,12 +274,19 @@ _NUM_VARIANTS = {
 
 def _num_pattern(num: str) -> str:
     """The word-bounded regex variants for one number ("2.0" also
-    matches "2"; a plain integer matches itself)."""
+    matches "2"; a plain integer matches itself). R11 fix (measured
+    on the claim-level pass): a trailing ".0" is OPTIONAL, not
+    dropped — the old empty frac_alt made "2.0" match only the bare
+    "2" and then the unit pattern demanded ADJACENCY ("2mm"), so a
+    record stating "2.0 mm" never matched a value of "2.0 mm" (the
+    false-relabel class). "0.4" keeps its exact frac (a bare "0"
+    must not match "0.5")."""
     n = num.replace(",", ".")
     if "." in n:
         head, frac = n.split(".", 1)
-        frac_alt = "" if frac == "0" else f"\\.{frac}"
-        return rf"(?<![\d.]){re.escape(head)}(?:{frac_alt})(?![\d])"
+        if frac == "0":
+            return rf"(?<![\d.]){re.escape(head)}(?:\.{frac})?(?![\d])"
+        return rf"(?<![\d.]){re.escape(head)}\.{frac}(?![\d])"
     return rf"(?<![\d.]){re.escape(n)}(?![\d])"
 
 
@@ -313,7 +336,8 @@ def _value_membership(value: str, text: str) -> bool:
     nums = list(_NUM_UNIT_RE.finditer(v))
     if nums:
         for m in nums:
-            pat = _num_pattern(m.group(1)) + _unit_pattern(m.group("unit"))
+            pat = (_num_pattern(m.group(1)) + r"\s*"
+                   + _unit_pattern(m.group("unit")))
             if not re.search(pat, t, re.IGNORECASE):
                 return False
         return True
@@ -445,6 +469,59 @@ def strict_provenance_downgrade(
     # text: a line the first pass already relabeled no longer carries
     # the EVIDENCE-BACKED label, so it is never double-processed
     new_text = _PARAM_EB_LINE_FIRST_RE.sub(_sub, new_text)
+
+    # ---- R11 CLAIM-LEVEL pass (owner item 6): any remaining inline
+    # 'EVIDENCE-BACKED [cite]' claim whose stated numbers are not in
+    # the cited record is relabeled ASSUMPTION, citation dropped.
+    def _claim_sub(m: "re.Match") -> str:
+        cite = (m.group("cite") or "").strip()
+        _br = re.search(r"\[([^\[\]\n]{1,120})\]", cite)
+        cid = _br.group(1).strip().lower() if _br else ""
+        rec = records.get(cid) or records.get(cid.replace("doi:", ""))
+        if rec is None:
+            return m.group(0)  # invalid-id class: the 1.0 pass owns it
+        rec_text = " ".join(str(rec.get(k) or "") for k in
+                            ("title", "abstract", "text"))
+        claim_text = m.group("claim").strip()
+        nums = list(_NUM_UNIT_RE.finditer(claim_text))
+        if not nums:
+            # a word-only claim: at least one content word must hit
+            words = [w for w in re.findall(r"[a-z][a-z\-]{4,}",
+                                           claim_text.lower())
+                     if w not in _WORD_VALUE_STOP]
+            if words and any(re.search(rf"(?<![\w-]){re.escape(w)}"
+                                       rf"(?![\w-])", rec_text,
+                                       re.IGNORECASE)
+                             for w in words):
+                return m.group(0)
+        else:
+            ok = True
+            for nm in nums:
+                pat = (_num_pattern(nm.group(1)) + r"\s*"
+                       + _unit_pattern(nm.group("unit")))
+                if not re.search(pat, rec_text, re.IGNORECASE):
+                    ok = False
+                    break
+            if ok:
+                return m.group(0)
+        relabels.append({
+            "parameter": ("claim: " + claim_text[:70]),
+            "value": (", ".join(nm.group(0) for nm in nums))[:80]
+            if nums else claim_text[:80],
+            "new_label": "ASSUMPTION",
+            "cited_record": (cid or "")[:80],
+            "why": ("claim's stated value(s) not found in the cited "
+                    "record — the R11 claim-level honesty pass")})
+        # the relabel: the claim keeps its text, loses the label and
+        # the citation (an ASSUMPTION never carries one). The
+        # parenthetical shape's open paren rides the claim group —
+        # strip it so the rebuild is balanced.
+        if claim_text.endswith("("):
+            claim_text = claim_text[:-1].rstrip()
+        return (claim_text + " (ASSUMPTION — value not stated in the "
+                "cited record)")
+
+    new_text = _EB_CLAIM_RE.sub(_claim_sub, new_text)
     new_text = re.sub(r"[ \t]{2,}", " ", new_text)
     n_user = sum(1 for r in relabels
                  if r["new_label"] == "ASSUMPTION (User Constraint)")

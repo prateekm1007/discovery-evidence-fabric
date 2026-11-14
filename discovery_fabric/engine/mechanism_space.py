@@ -877,11 +877,19 @@ def assemble_candidate(operator: Dict[str, Any],
     # is not attackable). Both instruments are deterministic
     # (intervention_gate.py) and recorded on the candidate.
     from .intervention_gate import (not_an_intervention_check,
-                                    anchor_domain_check)
+                                    anchor_domain_check,
+                                    question_type_match_check)
     _nia = not_an_intervention_check(fields.get("intervention", ""))
     cand["not_an_intervention_check"] = _nia
     cand["anchor_domain_check"] = anchor_domain_check(
         problem, structured_item, fields)
+    # R11 owner item 6 (the audited live regression: fu-004, a
+    # PREDICTOR question, answered with a tanh-PID CONTROLLER): the
+    # question-type routing check rides EVERY assembled candidate —
+    # a predictor question's candidate must be an indicator, never
+    # a controller (deterministic, zero-LLM, recorded either way).
+    _qtm = question_type_match_check(problem, fields)
+    cand["question_type_match_check"] = _qtm
     # OWNER AUDIT ROUND 2026-11-12, DIRECTIVE 3: the mechanism-to-
     # failure link check — rejects GIMMICK ANCHORS (a technique dressed
     # onto an anchor record that never mentions the failure
@@ -895,7 +903,14 @@ def assemble_candidate(operator: Dict[str, Any],
                                           operator_id=operator["operator_id"])
     cand["mechanism_link_check"] = _ml
     if cand["candidate_state"] == "CANDIDATE":
-        if _nia.get("rejected"):
+        if _qtm.get("rejected"):
+            cand["candidate_state"] = (
+                f"NOT_THE_REQUESTED_ANSWER_CLASS_{_qtm.get('reason_class')}")
+            cand["not_an_intervention_reason"] = _qtm.get("reason")
+            cand["candidate_id"] = (
+                f"noncand:MS:{operator['operator_id']}:"
+                f"{sha256_obj(cand['derivation_trace'])[:12]}")
+        elif _nia.get("rejected"):
             cand["candidate_state"] = (
                 f"NOT_AN_INTERVENTION_{_nia.get('reason_class') or 'REJECTED'}")
             cand["not_an_intervention_reason"] = _nia.get("reason")

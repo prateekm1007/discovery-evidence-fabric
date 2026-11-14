@@ -606,3 +606,71 @@ def anchor_domain_check(problem: Dict[str, Any],
         "shared_mechanism_stated": stated,
         "ok": bool(shared_domain or stated),
     }
+
+
+# ---------------------------------------------------------------------------
+# R11 owner item 6 (2026-11-14): QUESTION-TYPE ROUTING. The audited live
+# regression: fu-004, a PREDICTOR question ("propose the most
+# cost-effective measurable leading indicator...") was answered with a
+# tanh-PID CONTROLLER (Kp/Ki/Kd gain factors modulating a valve). The
+# routing decision happens BEFORE any LLM call: a predictor question's
+# candidate must be an INDICATOR (a monitored quantity + threshold),
+# never a controller (a closed-loop actuator). Deterministic, zero-LLM,
+# recorded on the candidate either way (never a silent drop, Art.
+# XXI.3). Serves: Art. XIX (the measured regression decides the
+# instrument), Art. X (labels describe the actual delivery).
+# ---------------------------------------------------------------------------
+
+#: the controller signatures (the CORE actuation vocabulary — two or
+#: more co-occurring is a controller, not a monitored indicator)
+_CONTROLLER_CORE_SIGNS = (
+    r"\bPID\b", r"\bKp\b", r"\bKi\b", r"\bKd\b",
+    r"proportional\s+gain", r"integral\s+gain", r"derivative\s+gain",
+    r"gain\s+schedule", r"\bcontroller\b", r"control\s+loop",
+    r"control\s+valve", r"\bmodulat", r"\bactuator\b", r"closed[- ]loop",
+    r"\bsetpoint\b", r"control\s+algorithm", r"\bactu(at|ing)\b",
+)
+
+
+def question_type_match_check(
+        problem: Optional[Dict[str, Any]],
+        fields: Dict[str, Any]) -> Dict[str, Any]:
+    """A predictor-design question's candidate must propose an
+    INDICATOR (a monitored quantity, a threshold), never a CONTROLLER
+    (a closed-loop actuator with gains). Returns {checked,
+    rejected, reason_class, reason, n_controller_signatures,
+    matched_signatures} — the typed verdict rides the candidate or
+    the admission record either way."""
+    qtype = str((problem or {}).get("question_type") or "")
+    text = " ".join(str(fields.get(k) or "") for k in
+                    ("intervention", "mechanism", "expected_effect",
+                     "predicted_effect", "falsification_test"))
+    out: Dict[str, Any] = {
+        "instrument_version": INTERVENTION_GATE_VERSION,
+        "instrument": "question_type_match_check/1.0.0",
+        "question_type": qtype,
+        "checked": True,
+        "rejected": False,
+        "reason_class": None,
+        "reason": None,
+        "n_controller_signatures": 0,
+        "matched_signatures": []}
+    if qtype != "predictor-design":
+        out["checked"] = False
+        return out
+    matched = [p for p in _CONTROLLER_CORE_SIGNS
+               if re.search(p, text or "", re.IGNORECASE)]
+    out["n_controller_signatures"] = len(matched)
+    out["matched_signatures"] = matched[:6]
+    if len(matched) >= 2:
+        out.update({
+            "rejected": True,
+            "reason_class": "ROUTING_PREDICTOR_QUESTION_PROPOSED_CONTROLLER",
+            "reason": (
+                "a predictor question asks for a measurable leading "
+                "INDICATOR and its threshold; this candidate proposes "
+                "a CONTROLLER (actuation/gain signatures: "
+                f"{', '.join(m.strip('\\\\b') for m in matched[:4])}) — "
+                "the audited fu-004 regression class (owner R11 item "
+                "6); route to an indicator, never a controller")})
+    return out

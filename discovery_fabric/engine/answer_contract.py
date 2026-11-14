@@ -901,6 +901,30 @@ def validate_answer(answer: str, question_type: str,
                 "name the INDICATOR quantity (no shared content word "
                 "beyond protocol scaffolding) — the protocol must "
                 "validate the same measure the threshold is declared on")
+        # R11 owner item 6 (the audited live regression: fu-004, a
+        # predictor question, answered with a tanh-PID controller):
+        # the answer shape itself is routed — a predictor question's
+        # answer carries controller signatures (>= 2 core actuation
+        # markers) ONLY when the INDICATOR is absent; a monitored
+        # indicator that mentions a controller in passing is not
+        # routed, an actuation proposal is.
+        _ind_declared = re.search(r"INDICATOR\s*:", text, re.IGNORECASE)
+        _ctrl_signs = (r"\bPID\b", r"\bKp\b", r"\bKi\b", r"\bKd\b",
+                       r"proportional\s+gain", r"integral\s+gain",
+                       r"derivative\s+gain", r"gain\s+schedule",
+                       r"\bcontroller\b", r"control\s+loop",
+                       r"control\s+valve", r"\bmodulat", r"\bactuator\b")
+        _ctrl_matched = [s for s in _ctrl_signs
+                         if re.search(s, text, re.IGNORECASE)]
+        if (not _ind_declared and len(_ctrl_matched) >= 2) or \
+                (len(_ctrl_matched) >= 4 and _ind_declared):
+            violations.append(
+                "predictor contract: the answer proposes a CONTROLLER "
+                "(actuation signatures: "
+                + ", ".join(s.strip('\\b') for s in _ctrl_matched[:4])
+                + ") for a predictor question — a predictor question "
+                "produces an INDICATOR, never a controller (owner R11 "
+                "item 6, the audited fu-004 routing regression)")
     elif question_type == "intervention-proposal":
         if not re.search(r"EVIDENCE-BACKED|ASSUMPTION", text):
             violations.append(
@@ -1142,6 +1166,10 @@ ANSWER_SHAPE_BLOCK = {
     "predictor-design": (
         "\nANSWER-SHAPE CONTRACT (predictor-design) — your answer MUST state, "
         "explicitly and in this order:\n"
+        "ROUTING RULE (owner R11 item 6): a predictor question asks for an "
+        "INDICATOR — NEVER propose a controller, actuator, gain schedule "
+        "(Kp/Ki/Kd factors), or valve/setpoint modulation; those answer a "
+        "different question class\n"
         "INDICATOR: <the measurable quantity you will monitor>\n"
         "THRESHOLD: <number with units, the alert/failure level> — the "
         "threshold number MUST carry one honest basis, stated on the same "

@@ -1152,12 +1152,83 @@ def _kf_fallback_candidate(env_dict: Dict[str, Any]) -> Optional[Dict[str, Any]]
     return None
 
 
+def _admission_gate_checks(problem: Optional[Dict[str, Any]],
+                           cand: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """R11 owner item 6: the DETERMINISTIC pre-admission instruments,
+    run on EVERY candidate any admission branch would deliver (the
+    audited live regression: fu-004's tanh-PID controller shipped on
+    the infrastructure-verdict hypothesis path where NO deterministic
+    gate ran — the mechanism_space assembly checks never saw it).
+    Two instruments, zero LLM:
+      1. question_type_match_check — a predictor question's candidate
+         must be an indicator, never a controller;
+      2. mechanism_to_failure_link_check — the gimmick-anchor
+         rejection (the KF candidate is exempt: its anchor IS the
+         problem statement; the A2 raw candidate's anchor is its
+         source_evidence record).
+    Returns the typed rejection reasons (empty list = admitted)."""
+    if not problem:
+        return []
+    from .intervention_gate import question_type_match_check
+    from .mechanism_link import mechanism_to_failure_link_check
+    reasons: List[Dict[str, Any]] = []
+    fields = {
+        "intervention": str(cand.get("intervention") or ""),
+        "mechanism": str(cand.get("mechanism") or ""),
+        "expected_effect": str(cand.get("expected_effect") or ""),
+        "predicted_effect": str(cand.get("predicted_effect") or ""),
+        "falsification_test": str(cand.get("falsification_test")
+                                  or ""),
+    }
+    qtm = question_type_match_check(problem, fields)
+    if qtm.get("rejected"):
+        reasons.append({
+            "source": "admission_gate",
+            "candidate_id": str(cand.get("candidate_id") or ""),
+            "instrument": qtm.get("instrument"),
+            "reason": qtm.get("reason"),
+            "reason_class": qtm.get("reason_class"),
+            "n_controller_signatures":
+                qtm.get("n_controller_signatures")})
+        return reasons  # the routing failure is decisive on its own
+    if cand.get("candidate_source") == "DOMAIN_KNOWLEDGE_FIRST":
+        return reasons  # the KF anchor IS the problem statement
+    anchor_text = " ".join(str(cand.get(k) or "") for k in
+                           ("mechanism_source_span",))
+    se = cand.get("source_evidence") or {}
+    structured_item = {
+        "item_id": str(se.get("source_id")
+                       or cand.get("anchor_item_id") or ""),
+        "_record_text": " ".join(
+            str(se.get(k) or "") for k in
+            ("source_title", "title", "source_span", "abstract"))
+        or anchor_text,
+    }
+    ml = mechanism_to_failure_link_check(problem, structured_item,
+                                         fields,
+                                         operator_id=str(
+                                             cand.get("operator_id")
+                                             or "A2_RAW"))
+    if ml.get("verdict") in ("NO_FAILURE_PHENOMENON", "ANCHOR_OFF_DOMAIN",
+                             "GIMMICK_ANCHOR_NO_LINK"):
+        reasons.append({
+            "source": "admission_gate",
+            "candidate_id": str(cand.get("candidate_id") or ""),
+            "instrument": ml.get("instrument_version"),
+            "reason": ml.get("reason"),
+            "reason_class": ml.get("verdict")})
+    return reasons
+
+
 def _admission_analysis(env_dict: Dict[str, Any],
-                       top_n: int = 5):
+                       top_n: int = 5,
+                       problem: Optional[Dict[str, Any]] = None):
     """P0-2: one admission audit. Returns (admissible_cands, reasons):
     the gate-admissible candidates, and the typed reasons for every
     recorded verdict that FAILED the allowlist (recorded in the
-    NO_ADMISSIBLE state — Art. XXV)."""
+    NO_ADMISSIBLE state — Art. XXV). R11: `problem` enables the
+    deterministic pre-admission instruments (question-type routing +
+    the gimmick-anchor link check) on EVERY admission branch."""
     cands: List[Dict[str, Any]] = []
     reasons: List[Dict[str, Any]] = []
     ar = env_dict.get("attack_results") or {}
@@ -1193,6 +1264,11 @@ def _admission_analysis(env_dict: Dict[str, Any],
                            "reason": cls["reason"]}
         if cls["hypothesis"]:
             rr["hypothesis_unverified"] = True
+        _gate = _admission_gate_checks(problem, rr)
+        if _gate:
+            reasons.extend(_gate)
+            continue
+        rr["admission"]["gate_checks"] = "PASSED"
         cands.append(rr)
     if cands:
         return cands[:top_n], reasons
@@ -1254,6 +1330,10 @@ def _admission_analysis(env_dict: Dict[str, Any],
                     "kill_cause_record": kc}
                 rec_kf["hypothesis_unverified"] = True
                 rec_kf["candidate_source"] = "DOMAIN_KNOWLEDGE_FIRST"
+                _gate = _admission_gate_checks(problem, rec_kf)
+                if _gate:
+                    reasons.extend(_gate)
+                    return [], reasons
                 cands.append(rec_kf)
                 return cands, reasons
             rec2 = dict(raw)
@@ -1267,6 +1347,10 @@ def _admission_analysis(env_dict: Dict[str, Any],
                 "kill_cause_record": kc}
             rec2["hypothesis_unverified"] = True
             rec2["kill_cause_record"] = kc
+            _gate = _admission_gate_checks(problem, rec2)
+            if _gate:
+                reasons.extend(_gate)
+                return [], reasons
             cands.append(rec2)
             return cands, reasons
         # DIRECTIVE 2 (owner audit round 2026-11-12): the typed
@@ -1285,6 +1369,10 @@ def _admission_analysis(env_dict: Dict[str, Any],
                 "hypothesis": True,
                 "reason": "VERDICT_IS_INFRASTRUCTURE_NOT_SCIENTIFIC",
                 "binding": "attack_record_bound"}
+            _gate_early = _admission_gate_checks(problem, rec2)
+            if _gate_early:
+                reasons.extend(_gate_early)
+                return [], reasons
             rec2["hypothesis_unverified"] = True
             rec2["own_recorded_states"] = {
                 "evidence_verification": "NOT_RECORDED",
@@ -1403,7 +1491,9 @@ def _admission_analysis(env_dict: Dict[str, Any],
 
 
 def candidates_from_state(env_dict: Dict[str, Any],
-                          top_n: int = 5) -> List[Dict[str, Any]]:
+                          top_n: int = 5,
+                          problem: Optional[Dict[str, Any]] = None
+                          ) -> List[Dict[str, Any]]:
     """ADMISSIBLE candidates only — the composer is not an independent
     invention generator (P0-2 allowlist). Sources, in order:
 
@@ -1419,17 +1509,22 @@ def candidates_from_state(env_dict: Dict[str, Any],
     NO fallback to raw/unfiltered mechanism records without a
     recorded attack verdict. If nothing is admissible the caller
     must emit the typed NO_ADMISSIBLE state, never a composed
-    recommendation."""
-    return _admission_analysis(env_dict, top_n=top_n)[0]
+    recommendation. R11: `problem` enables the deterministic
+    pre-admission instruments on every branch."""
+    return _admission_analysis(env_dict, top_n=top_n,
+                               problem=problem)[0]
 
 
 def admission_reasons_from_state(env_dict: Dict[str, Any],
-                                 top_n: int = 5) -> List[Dict[str, Any]]:
+                                 top_n: int = 5,
+                                 problem: Optional[Dict[str, Any]] = None
+                                 ) -> List[Dict[str, Any]]:
     """P0-2: the typed reasons NO candidate is admissible (one entry
     per recorded verdict that failed the allowlist — recorded in the
     NO_ADMISSIBLE_CANDIDATES state; the unknown is typed, not
     buried; Art. XXV)."""
-    return _admission_analysis(env_dict, top_n=top_n)[1]
+    return _admission_analysis(env_dict, top_n=top_n,
+                               problem=problem)[1]
 
 
 def compose_if_admissible(env_dict: Dict[str, Any],
@@ -1450,7 +1545,8 @@ def compose_if_admissible(env_dict: Dict[str, Any],
     XVIII/XXV/LXI). No frozen packet with admissible candidates:
     the typed SKIPPED_NO_PACKET refusal, zero LLM calls.
     Otherwise: compose_answer over the ADMITTED candidates only."""
-    cands = candidates_from_state(env_dict, top_n=top_n)
+    cands = candidates_from_state(env_dict, top_n=top_n,
+                                  problem=problem)
     rec: Dict[str, Any] = {"composer_version": ANSWER_COMPOSER_VERSION,
                            "n_llm_calls": 0,
                            "question_type": question_type,
@@ -1465,7 +1561,8 @@ def compose_if_admissible(env_dict: Dict[str, Any],
                     "compose an endorsed recommendation from "
                     "unadjudicated state"),
             "non_admissible_reasons":
-                admission_reasons_from_state(env_dict, top_n=top_n),
+                admission_reasons_from_state(env_dict, top_n=top_n,
+                                             problem=problem),
             "answer": None,
             "finished_at": _utc_now()})
         return rec

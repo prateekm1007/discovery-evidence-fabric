@@ -714,7 +714,23 @@ class TestDeletionAccounting(unittest.TestCase):
                     # answer_composer.py — would blur the one-module-
                     # one-instrument accounting this mandate keeps.
                     # Pinned by tests/test_r7_owner_round.py.
-                    "discovery_fabric/engine/answer_consistency.py"),
+                    # R11 AMENDMENT (disclosed, owner audit
+                    # 2026-11-14): the invention-rubric instrument
+                    # (invention_rubric.py, NEW file) and the
+                    # question-type routing check
+                    # (intervention_gate.py) are the owner-directed
+                    # R11 instruments; answer_downgrade.py carries
+                    # the claim-level strict relabel +
+                    # no-citation-relabel; answer_contract.py the
+                    # predictor routing violation; answer_consistency.py
+                    # the structured-shape INDICATOR lead;
+                    # answer_composer.py the pre-admission gate
+                    "discovery_fabric/engine/intervention_gate.py",
+                    "discovery_fabric/engine/invention_rubric.py",
+                    "discovery_fabric/engine/answer_downgrade.py",
+                    "discovery_fabric/engine/answer_contract.py",
+                    "discovery_fabric/engine/answer_consistency.py",
+                    "discovery_fabric/engine/answer_composer.py"),
                 f"the mandate's file list is exhaustive: {f} is outside "
                 "run.py/stage_entry.py/adapters.py/llm_registry.py")
 
