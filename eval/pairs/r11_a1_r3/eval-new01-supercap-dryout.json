@@ -1,0 +1,345 @@
+{
+ "a1_version": "r11_a1/1.1.0",
+ "problem_id": "eval-new01-supercap-dryout",
+ "baseline_sha_source": "{'pipeline_answer_sha256': 'eb21492aacfcf80caa4a45f22706b3dd77d6dceb1532b82e51d6febb42be64c9', 'baseline_answer_sha256': '368c80c5a26ab7aab48fbee84e59063ae1ccf8782efe4768c39669d931e11581', 'evidence_sha256': '6f63b5b9ac5727b3411e0850fd94c45f9620625df54c00b107b8be1528e71a1e', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 36,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "repair_mode": {
+  "mode": "LEAD_PRESERVING_REPAIR",
+  "article": "Amendment 2 owner directive 2026-11-14 P0-1; Art. LXXXIV (re-ideate only on starvation), Art. LI (ledger consumption rides the record)",
+  "candidate_source": "credit-register lead (1.0.0; pair WINNER, restored per Amendment 2 P0-1)",
+  "candidate_frozen": {
+   "lever": "materials",
+   "name": "Ionic Liquid-Polymer Hybrid Electrolyte",
+   "mechanism": "Polymer matrix encapsulates ionic liquid to suppress solvent evaporation via covalent bonding.",
+   "failure_link": "Blocks solvent evaporation (primary dry-out driver) while maintaining ion mobility."
+  },
+  "critic_findings": {
+   "verdict": "FLAGGED",
+   "kills": [],
+   "flags": [
+    {
+     "flag": "SCOPE_AUDIT",
+     "finding": "the candidate changes cell-internal chemistry while the stated failure phenomenon is stated at module/pack level \u2014 the LLM critic must adjudicate whether a cell-level mechanism can act on the stated system-level phenomenon",
+     "provenance_class": "BUYER_DEFINED",
+     "provenance": "owner audit 2026-11-14 (new05: 'wrong scope \u2014 PEO-LiTFSI into the cathode to fix a module-level thermal gradient')"
+    }
+   ],
+   "basis": []
+  },
+  "repair_directives": [
+   "State the ESR budget against the acetonitrile baseline (Amendment 1 salvage)",
+   "Resolve the immobilization-vs-mobility tension: the polymer matrix must immobilize the ionic liquid against evaporation while the ions stay mobile enough to hold capacitance (Amendment 1 salvage)",
+   "The mechanism must NOT claim osmosis drives vapor transport \u2014 osmosis is liquid-phase transport across a semipermeable membrane (the R2 category error)"
+  ],
+  "prior_findings": [],
+  "byte_stability_rule": "everything not named by a finding stays as-is; every edit carries a diff + finding reference",
+  "class_defect_checks": {
+   "verdict": "CLEAN",
+   "kills": [],
+   "flags": []
+  }
+ },
+ "critic": {
+  "version": "plausibility_critic/1.0.0",
+  "per_candidate": [
+   {
+    "verdict": "FLAGGED",
+    "kills": [],
+    "flags": [
+     {
+      "flag": "SCOPE_AUDIT",
+      "finding": "the candidate changes cell-internal chemistry while the stated failure phenomenon is stated at module/pack level \u2014 the LLM critic must adjudicate whether a cell-level mechanism can act on the stated system-level phenomenon",
+      "provenance_class": "BUYER_DEFINED",
+      "provenance": "owner audit 2026-11-14 (new05: 'wrong scope \u2014 PEO-LiTFSI into the cathode to fix a module-level thermal gradient')"
+     }
+    ],
+    "basis": [],
+    "index": 0,
+    "lever": "materials",
+    "name": "Ionic Liquid-Polymer Hybrid Electrolyte"
+   }
+  ],
+  "vetoed_indexes": [],
+  "flagged_indexes": [
+   0
+  ]
+ },
+ "learning_feed": {
+  "article": "Art. LI \u2014 negative knowledge changes future search",
+  "prior_killed_classes": [],
+  "consumed": false
+ },
+ "chosen": {
+  "lever": "materials",
+  "name": "Ionic Liquid-Polymer Hybrid Electrolyte",
+  "mechanism": "Polymer matrix encapsulates ionic liquid to suppress solvent evaporation via covalent bonding.",
+  "failure_link": "Blocks solvent evaporation (primary dry-out driver) while maintaining ion mobility."
+ },
+ "compose": {
+  "wall_s": 10.3,
+  "transport_ok": true,
+  "answer_sha256": "36f227c26b7c2183"
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "downgrade": 0
+ },
+ "a1_answer": "PROPOSED DESIGN INTERVENTION: Replace the standard volatile amine-based organic solvent with a cross-linked polymer matrix that physically immobilizes an ionic liquid via non-covalent interactions. This cell-internal modification directly addresses the module-level dry-out failure by eliminating the solvent evaporation driver, thereby stabilizing the equivalent series resistance required for cold-crank assist pulses. The polymer network is designed to maintain sufficient ion mobility while preventing the ionic liquid from permeating seals or evaporating at 65\u00b0C.\n\nMECHANISM: The polymer matrix immobilizes the ionic liquid through steric entrapment and hydrophobic repulsion, suppressing solvent evaporation and seal permeation. By restricting the free volume available for ion migration beyond a minimal threshold, the matrix prevents the collapse of effective ion transport. This maintains the electric double-layer capacitance by ensuring ions remain mobile enough to adsorb/desorb at the electrode interface, avoiding the ESR climb that renders the module incapable of sourcing the assist pulse.\n\nDEPARTURE FROM STANDARD: The standard solution relies on volatile organic solvents with high vapor pressure and simple gelation; the difference here is the use of a high-temperature stable polymer host that chemically excludes evaporation rather than merely slowing it.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: Polymer cross-link density = 0.5 mol/L (design choice to balance mechanical stability with ion mobility; ensures <1 mm module height addition)\nASSUMPTION PARAMETER: ESR Budget = <5% increase over acetonitrile baseline (design choice based on maintaining cold-crank assist capability)\nASSUMPTION PARAMETER: Capacitance Loss Limit = <10% (User Constraint)\nASSUMPTION PARAMETER: Rated Cell Voltage = 2.7 V (User Constraint)\nASSUMPTION PARAMETER: Max Ambient Temperature = 65\u00b0C (User Constraint)\nASSUMPTION PARAMETER: Module Height Addition = <1 mm (User Constraint)\nASSUMPTION PARAMETER: Life Target = 10 years (User Constraint)\n\nFALSIFICATION TEST: Expose 50 independent cells (n = 50) containing the ionic liquid-polymer hybrid electrolyte to 65\u00b0C for 10 years. Pass criterion: Cell ESR remains within 5% of the acetonitrile baseline and capacitance loss stays below 10%. The test verifies that the polymer matrix immobilizes the ionic liquid against evaporation while maintaining the ion mobility required to hold capacitance.",
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "intervention-proposal",
+   "bindings": {
+    "evidence_bound": 6,
+    "assumption": 1,
+    "unbound_numbers": 0,
+    "all_numbers": 7,
+    "claims": [
+     {
+      "parameter": "PARAMETER: Polymer cross-link density = 0.5 mol/L (design choice to balance mechanical stability with ion mobility; ensures <1 mm module height addition)\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "addition",
+       "balance",
+       "choice",
+       "cross",
+       "density",
+       "ensures",
+       "height",
+       "link",
+       "mechanical",
+       "mobility",
+       "module",
+       "polymer",
+       "stability"
+      ],
+      "pairs": [
+       {
+        "value": "0.5",
+        "unit": "mol"
+       },
+       {
+        "value": "1",
+        "unit": "mm"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: ESR Budget = <5% increase over acetonitrile baseline (design choice based on maintaining cold-crank assist capability)\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "acetonitrile",
+       "assist",
+       "based",
+       "baseline",
+       "budget",
+       "capability",
+       "choice",
+       "cold",
+       "crank",
+       "increase",
+       "maintaining"
+      ],
+      "pairs": [
+       {
+        "value": "5",
+        "unit": "%"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: Capacitance Loss Limit = <10% (User Constraint)\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "capacitance",
+       "constraint",
+       "limit",
+       "loss",
+       "user"
+      ],
+      "pairs": [
+       {
+        "value": "10",
+        "unit": "%"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: Rated Cell Voltage = 2.7 V (User Constraint)\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "cell",
+       "constraint",
+       "user",
+       "voltage"
+      ],
+      "pairs": [
+       {
+        "value": "2.7",
+        "unit": "v"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: Max Ambient Temperature = 65\u00b0C (User Constraint)\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "ambient",
+       "constraint",
+       "temperature",
+       "user"
+      ],
+      "pairs": [
+       {
+        "value": "65",
+        "unit": "\u00b0c"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: Module Height Addition = <1 mm (User Constraint)\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "addition",
+       "constraint",
+       "height",
+       "module",
+       "user"
+      ],
+      "pairs": [
+       {
+        "value": "1",
+        "unit": "mm"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: Life Target = 10 years (User Constraint)\n\nFALSIFICATION TEST: Expose 50 independent cells (n = 50) containing the ionic liquid-polymer hybrid electrolyte to 65\u00b0C for 10 years. Pass criterio",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "acetonitrile",
+       "against",
+       "baseline",
+       "below",
+       "capacitance",
+       "cell",
+       "cells",
+       "constraint",
+       "containing",
+       "criterion",
+       "electrolyte",
+       "evaporation",
+       "expose",
+       "falsification",
+       "hold",
+       "hybrid",
+       "immobilizes",
+       "independent",
+       "ionic",
+       "life",
+       "liquid",
+       "loss",
+       "maintaining",
+       "matrix",
+       "mobility",
+       "pass",
+       "polymer",
+       "remains",
+       "required",
+       "stays",
+       "test",
+       "user",
+       "verifies",
+       "while",
+       "within"
+      ],
+      "pairs": [
+       {
+        "value": "65",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "5",
+        "unit": "%"
+       },
+       {
+        "value": "10",
+        "unit": "%"
+       }
+      ],
+      "conversion_recorded": false
+     }
+    ]
+   }
+  }
+ },
+ "n_llm_calls": 1,
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "class_defects": "CLEAN",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "INCOMPLETE_CONTRACT"
+ },
+ "typed_note": "lead-preserving repair delivery",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_compose",
+   "provider": "agnes",
+   "model": "agnes-3.0-flash",
+   "rung": "agnes",
+   "status": "OK",
+   "attempts": null,
+   "retry_count": null,
+   "latency_ms": null,
+   "ttfb_ms": null,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": false
+  }
+ ],
+ "e2e_wall_s": 10.4,
+ "infra_time_s": {
+  "queue_wait": null,
+  "gateway_setup": null,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}

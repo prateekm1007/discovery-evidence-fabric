@@ -1,0 +1,138 @@
+{
+ "a1_version": "r11_a1/1.1.0",
+ "problem_id": "eval-new07-transformer-dga-predictor",
+ "baseline_sha_source": "{'pipeline_answer_sha256': 'f51f90520bc4a9f9e9e77641c30dbf2c790902c0524fb7609ddffda1836f3738', 'baseline_answer_sha256': '526e18ee4625a5ef77eb9ff5b401744320a6ef097f6ceaafdf0f639e2f0e6927', 'evidence_sha256': '7cbb98d66e38759dd63b8144231b70f747faee1db67a8be184bdd396f6eba55f', 'judge_route': {'provider': None, 'model': None}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 23,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "learning_feed": {
+  "article": "Art. LI \u2014 negative knowledge changes future search",
+  "prior_killed_classes": [
+   "mechanism consuming a signal outside the user's allowed set (l', outside the user's allowed signal set ['current', 'pressure', 'temperature'])"
+  ],
+  "consumed": true
+ },
+ "repair_mode": {
+  "mode": "LEAD_PRESERVING_REPAIR",
+  "article": "Amendment 2 owner directive 2026-11-14 P0-1; Art. LXXXIV (re-ideate only on starvation), Art. LI (ledger consumption rides the record)",
+  "candidate_source": "R2 incumbent (frozen; repaired in place per Amendment 2 P0-1)",
+  "candidate_frozen": {
+   "lever": "controls",
+   "name": "Adaptive Load Current Harmonic Analysis",
+   "mechanism": "Increased high-frequency current harmonics (>1 kHz) indicate localized dielectric breakdown or corona.",
+   "failure_link": "Partial discharge generates harmonics detectable via current transformer (CT) before gas evolution."
+  },
+  "critic_findings": {
+   "verdict": "PASS",
+   "kills": [],
+   "flags": [],
+   "basis": []
+  },
+  "repair_directives": [
+   "fix exactly the listed findings IN PLACE; every aspect not named stays byte-stable"
+  ],
+  "prior_findings": [
+   "a 1.5-10 kHz indicator band from 15-minute averages is Nyquist-impossible (auditor R2)",
+   "PD detection from 0.1%-of-load current harmonics is physically absurd (auditor R2)"
+  ],
+  "byte_stability_rule": "everything not named by a finding stays as-is; every edit carries a diff + finding reference",
+  "class_defect_checks": {
+   "verdict": "CLEAN",
+   "kills": [],
+   "flags": []
+  }
+ },
+ "critic": {
+  "version": "plausibility_critic/1.0.0",
+  "per_candidate": [
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 0,
+    "lever": "controls",
+    "name": "Adaptive Load Current Harmonic Analysis"
+   }
+  ],
+  "vetoed_indexes": [],
+  "flagged_indexes": []
+ },
+ "chosen": {
+  "lever": "controls",
+  "name": "Adaptive Load Current Harmonic Analysis",
+  "mechanism": "Increased high-frequency current harmonics (>1 kHz) indicate localized dielectric breakdown or corona.",
+  "failure_link": "Partial discharge generates harmonics detectable via current transformer (CT) before gas evolution."
+ },
+ "compose": {
+  "wall_s": 6.2,
+  "transport_ok": true,
+  "answer_sha256": "b4f9345e6a0e85de"
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "downgrade": 0
+ },
+ "a1_answer": "PROPOSED INDICATOR AND THRESHOLD: Replace the Nyquist-impossible harmonic analysis with a load-normalized top-oil temperature (TOT) residual trend. This leverages the 15-minute sampling interval to isolate the slow thermal drift caused by incipient faults (partial discharge or localized heating) from normal load variations. The indicator is the deviation of the actual TOT from the predicted TOT baseline (adjusted for load current and ambient temperature) over a rolling window. A sustained positive deviation indicates insulation degradation before gas generation peaks.\n\nMECHANISM: Incipient partial discharge (PD) or thermal faults increase local heat generation and reduce oil convective efficiency. This causes the bulk top-oil temperature to rise faster than predicted by standard load and ambient models. Since 15-minute resolution captures sub-hourly thermal dynamics without exceeding the Nyquist limit for low-frequency drift, the temperature residual acts as a leading indicator. This avoids the physical absurdity of detecting micro-amperes of PD current harmonics (0.1% load) via standard CTs, instead relying on the macroscopic thermal signature that accumulates over days.\n\nDEPARTURE FROM STANDARD: Standard DGA relies on quarterly discrete gas sampling; this solution uses continuous online thermal anomaly detection to provide a 30-day warning window, shifting the intervention point from \"post-fault gas detection\" to \"pre-fault thermal isolation.\"\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: Sampling resolution = 15 min (User Constraint)\nASSUMPTION PARAMETER: Warning lead time = 30 days (User Constraint)\nASSUMPTION PARAMETER: Threshold deviation = +5\u00b0C (Design choice to exceed noise floor of typical TOT sensors)\nASSUMPTION PARAMETER: Rolling window = 4 hours (Design choice to smooth transient load spikes while retaining trend visibility)\nASSUMPTION PARAMETER: Baseline model = Linear regression of TOT vs. Load Current & Ambient Temp (Design choice for computability on edge devices)\n\nINDICATOR: Load-normalized top-oil temperature residual (\u00b0C)\nTHRESHOLD: +5\u00b0C sustained over 4 hours (ASSUMPTION based on typical sensor noise and fault heat generation margins)\n\nVALIDATION PROTOCOL: \nTemperature: 25\u00b0C ambient (standardized test bench condition) \nDuration: 72 hours continuous monitoring \nSample size: n = 3 independent DEVICES (transformers) \nData window: 7-day retrospective log per device \nDetection criterion: Flag issued if the load-normalized top-oil temperature residual exceeds +5\u00b0C for 4 consecutive hours. The protocol validates the same load-normalized top-oil temperature residual measure declared in the threshold.",
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "predictor-design",
+   "bindings": {
+    "evidence_bound": 8,
+    "assumption": 0,
+    "unbound_numbers": 1,
+    "all_numbers": 9,
+    "claims": [],
+    "threshold_basis": "assumption"
+   }
+  }
+ },
+ "n_llm_calls": 1,
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "class_defects": "CLEAN",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "COMPLETE"
+ },
+ "typed_note": "lead-preserving repair delivery",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_compose",
+   "provider": "agnes",
+   "model": "agnes-3.0-flash",
+   "rung": "agnes",
+   "status": "OK",
+   "attempts": null,
+   "retry_count": null,
+   "latency_ms": null,
+   "ttfb_ms": null,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": false
+  }
+ ],
+ "e2e_wall_s": 6.2,
+ "infra_time_s": {
+  "queue_wait": null,
+  "gateway_setup": null,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}

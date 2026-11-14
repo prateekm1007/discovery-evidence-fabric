@@ -1,0 +1,291 @@
+{
+ "a1_version": "r11_a1/1.1.0",
+ "problem_id": "eval-sofc-thermal-cycling",
+ "baseline_sha_source": "{'pipeline_answer_sha256': 'ABSENT', 'baseline_answer_sha256': 'ABSENT', 'evidence_sha256': 'dfe9aebc72bd1f8a46a5aa480b37e5f01388842e810c06daebccdcab6e1cca4d', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 18,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "repair_mode": {
+  "mode": "LEAD_PRESERVING_REPAIR",
+  "article": "Amendment 2 owner directive 2026-11-14 P0-1; Art. LXXXIV (re-ideate only on starvation), Art. LI (ledger consumption rides the record)",
+  "candidate_source": "credit-register lead (1.0.0; owner-cited win, restored per Amendment 2 P0-1)",
+  "candidate_frozen": {
+   "lever": "materials",
+   "name": "Glass-Ceramic Seal with Nanoscale Dispersed ZrO\u2082 Particles",
+   "mechanism": "Nanoscale ZrO\u2082 particles in glass-ceramic seal reduce thermal expansion mismatch via constrained sintering.",
+   "failure_link": "Mitigates microcrack initiation in seal by lowering differential expansion (thermal-cycling-fatigue)."
+  },
+  "critic_findings": {
+   "verdict": "PASS",
+   "kills": [],
+   "flags": [],
+   "basis": []
+  },
+  "repair_directives": [
+   "Run the rule-of-mixtures CTE SIGN CHECK on the ZrO2 dispersion (ZrO2 CTE ~10-11 ppm/K may RAISE the composite CTE) \u2014 anchor the mechanism on constrained sintering densification, not CTE reduction alone (Amendment 1 salvage)",
+   "Fix the malformed DOI 10.1002/advs.77388 or cite the packet records only (Amendment 1 salvage)",
+   "The falsification test MUST carry the constraint's own criteria: 500 thermal cycles 25->800 C at 5 C/min, OCV >1.0 V, seal leakage <1% of fuel flow, stack mass +<=2% (Amendment 1 salvage)",
+   "The seal is a GLASS-CERAMIC IONIC INSULATOR \u2014 never an electronic conductor (the R2 LSM substitution is the audited defect)"
+  ],
+  "prior_findings": [],
+  "byte_stability_rule": "everything not named by a finding stays as-is; every edit carries a diff + finding reference",
+  "class_defect_checks": {
+   "verdict": "FLAG",
+   "kills": [],
+   "flags": [
+    "USER_LABEL_MISMATCH"
+   ]
+  },
+  "contract_repair": {
+   "violations_in": [
+    "intervention contract: falsification test states no test duration"
+   ],
+   "applied": true
+  }
+ },
+ "critic": {
+  "version": "plausibility_critic/1.0.0",
+  "per_candidate": [
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 0,
+    "lever": "materials",
+    "name": "Glass-Ceramic Seal with Nanoscale Dispersed ZrO\u2082 Particles"
+   }
+  ],
+  "vetoed_indexes": [],
+  "flagged_indexes": []
+ },
+ "learning_feed": {
+  "article": "Art. LI \u2014 negative knowledge changes future search",
+  "prior_killed_classes": [],
+  "consumed": false
+ },
+ "chosen": {
+  "lever": "materials",
+  "name": "Glass-Ceramic Seal with Nanoscale Dispersed ZrO\u2082 Particles",
+  "mechanism": "Nanoscale ZrO\u2082 particles in glass-ceramic seal reduce thermal expansion mismatch via constrained sintering.",
+  "failure_link": "Mitigates microcrack initiation in seal by lowering differential expansion (thermal-cycling-fatigue)."
+ },
+ "compose": {
+  "wall_s": 5.7,
+  "transport_ok": true,
+  "answer_sha256": "08af8076c06690f3"
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "downgrade": 0
+ },
+ "a1_answer": "PROPOSED DESIGN INTERVENTION: Integrate nanoscale ZrO\u2082 particles into the existing glass-ceramic seal to enhance densification through constrained sintering. This modification targets the seal's structural integrity against thermal cycling fatigue while maintaining ionic insulation. The seal remains a glass-ceramic ionic insulator; no electronic conductors are introduced.\n\nMECHANISM: Nanoscale ZrO\u2082 particles facilitate constrained sintering densification, which suppresses microcrack initiation at the cathode-electrolyte interface and within the seal. By reducing porosity and stabilizing the glass-ceramic matrix against thermal shock, the seal maintains gas tightness. Note: ZrO\u2082 CTE is comparable to or higher than typical glass phases; the benefit is densification-driven mechanical strength, not CTE reduction.\n\nDEPARTURE FROM STANDARD: Standard approach adds bulk glass or changes seal chemistry for CTE matching. This design disperses nanoscale ZrO\u2082 to leverage sintering constraints for durability under rapid cycling without changing the seal's primary ionic insulation role.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: Seal intergranular glass phase fraction = 0.15 (User Constraint; maintains specified composition)\nASSUMPTION PARAMETER: ZrO\u2082 particle size = 50-100 nm (Design choice to ensure effective sintering constraint without grain boundary blocking)\nASSUMPTION PARAMETER: ZrO\u2082 volume fraction = 5 vol% (Design choice to minimize mass increase and maintain sealability)\nASSUMPTION PARAMETER: Target seal leakage = <1% of fuel flow (User Constraint; required for OCV retention)\n\nFALSIFICATION TEST: Expose n = 5 independent seal-cathode-electrolyte test cells to 500 thermal cycles from 25\u00b0C to 800\u00b0C at 5\u00b0C/min. Test duration: 30 days. Pass criterion: Open-circuit voltage remains >1.0 V and seal leakage stays below 1% of fuel flow after the 500th cycle, with total stack mass increase \u22642%.",
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "intervention-proposal",
+   "bindings": {
+    "evidence_bound": 11,
+    "assumption": 0,
+    "unbound_numbers": 0,
+    "all_numbers": 11,
+    "claims": [
+     {
+      "parameter": "PARAMETER: Seal intergranular glass phase fraction = 0.15 (User Constraint; maintains specified composition)\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "composition",
+       "constraint",
+       "fraction",
+       "glass",
+       "intergranular",
+       "maintains",
+       "phase",
+       "seal",
+       "user"
+      ],
+      "pairs": [],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: ZrO\u2082 particle size = 50-100 nm (Design choice to ensure effective sintering constraint without grain boundary blocking)\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "blocking",
+       "boundary",
+       "choice",
+       "constraint",
+       "effective",
+       "ensure",
+       "grain",
+       "particle",
+       "sintering",
+       "size"
+      ],
+      "pairs": [],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: ZrO\u2082 volume fraction = 5 vol% (Design choice to minimize mass increase and maintain sealability)\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "choice",
+       "fraction",
+       "increase",
+       "maintain",
+       "mass",
+       "minimize",
+       "sealability",
+       "volume"
+      ],
+      "pairs": [],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: Target seal leakage = <1% of fuel flow (User Constraint; required for OCV retention)\n\nFALSIFICATION TEST: Expose n = 5 independent seal-cathode-electrolyte test cells to 500 thermal cycles ",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "after",
+       "below",
+       "cathode",
+       "cells",
+       "circuit",
+       "constraint",
+       "criterion",
+       "cycle",
+       "cycles",
+       "days",
+       "duration",
+       "electrolyte",
+       "expose",
+       "falsification",
+       "flow",
+       "fuel",
+       "increase",
+       "independent",
+       "leakage",
+       "mass",
+       "open",
+       "pass",
+       "remains",
+       "required",
+       "retention",
+       "seal",
+       "stack",
+       "stays",
+       "test",
+       "thermal",
+       "total",
+       "user",
+       "voltage"
+      ],
+      "pairs": [
+       {
+        "value": "1",
+        "unit": "%"
+       },
+       {
+        "value": "25",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "800",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "5",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "30",
+        "unit": "days"
+       },
+       {
+        "value": "1.0",
+        "unit": "v"
+       },
+       {
+        "value": "1",
+        "unit": "%"
+       },
+       {
+        "value": "2",
+        "unit": "%"
+       }
+      ],
+      "conversion_recorded": false
+     }
+    ]
+   }
+  }
+ },
+ "n_llm_calls": 2,
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "class_defects": "FLAG",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "TYPED_SKIP_BASELINE_ABSENT"
+ },
+ "typed_note": "lead-preserving repair delivery",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_compose",
+   "provider": "agnes",
+   "model": "agnes-3.0-flash",
+   "rung": "agnes",
+   "status": "OK",
+   "attempts": null,
+   "retry_count": null,
+   "latency_ms": null,
+   "ttfb_ms": null,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": false
+  },
+  {
+   "purpose": "a1_repair",
+   "provider": "agnes",
+   "model": "agnes-3.0-flash",
+   "rung": "agnes",
+   "status": "OK",
+   "attempts": null,
+   "retry_count": null,
+   "latency_ms": null,
+   "ttfb_ms": null,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": false
+  }
+ ],
+ "e2e_wall_s": 10.5,
+ "infra_time_s": {
+  "queue_wait": null,
+  "gateway_setup": null,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}

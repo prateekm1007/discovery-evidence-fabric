@@ -138,6 +138,97 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
                              max_tokens=max_tokens, purpose=purpose,
                              exclude_providers=exclude_providers,
                              hard_pin_provider=hard_pin_provider)
+    # R11 P1-4 (Amendment 2 §5): the MEASURED dead-rung cascade stall —
+    # a walk whose hops are ALL SKIPPED_NOT_ADMITTED never actually
+    # attempted anything (the admission probe refused every rung; the
+    # provider ladder behind them was never reached — the r2 battery
+    # needed an operator pin to proceed, measured 2026-11-14). The
+    # refusal is a WINDOW state, not a scientific verdict (Art. LXI:
+    # infrastructure refusal is never rejection): ONE bypass pass
+    # excludes the refused providers from the walk entirely, so the
+    # eligible providers behind the dead rungs actually get attempted.
+    # Typed in the route meta; at most one extra pass per call.
+    if not res.get("ok"):
+        _route = res.get("provider_route") or []
+        _hops = [h for h in _route if isinstance(h, dict)]
+        _refused = [h for h in _hops
+                    if h.get("status") == "SKIPPED_NOT_ADMITTED"]
+        if _hops and len(_refused) == len(_hops):
+            _dead = sorted({str(h.get("provider_attempted"))
+                            for h in _refused
+                            if h.get("provider_attempted")})
+            _exc2 = list(exclude_providers or []) + _dead
+            res = _llm_generate_impl(
+                prompt, system=system, timeout=timeout,
+                max_tokens=max_tokens, purpose=purpose,
+                exclude_providers=_exc2,
+                hard_pin_provider=hard_pin_provider)
+            # the exclusion pass can STILL collapse to the same dead
+            # provider: the reconciled availability matrix inherits the
+            # probe-refusal state and may hide the healthy providers
+            # entirely (measured 2026-11-14: the exclusion pass
+            # re-served the same refused rungs). The bypass then pins
+            # the first POLICY-CHAIN provider outside the dead set —
+            # the hard-pin path is the measured-good route (the r2
+            # battery ran on it) and the impl types PIN failures, so a
+            # wrong candidate costs one typed attempt, never silence.
+            if not res.get("ok"):
+                _cands: List[str] = []
+                try:
+                    # candidates = the DEPLOYMENT's credentialed
+                    # providers outside the dead set, straight from the
+                    # availability matrix's key slots (declared
+                    # capability, Art. V): the bare SelectionPolicy
+                    # carries no chain (measured: preferred_providers
+                    # is empty until impl builds it), and the
+                    # reconciled `available` list is the very state
+                    # that hid the healthy providers. The matrix is
+                    # re-read here (it is impl-local upstream).
+                    from .llm_registry import availability_matrix as _am
+                    _cands = [m["provider_id"] for m in _am()
+                              if m.get("key_slots_present")
+                              and m["provider_id"] not in set(_dead)
+                              and m["provider_id"] not in
+                              set(exclude_providers or [])]
+                except Exception:  # noqa: BLE001 — the matrix read
+                    pass           # fails: the typed fallback runs
+                _bypass_note = ("all rungs were admission-refused "
+                                "(window state, Art. LXI) — the "
+                                "bypass pinned the first credentialed "
+                                "provider outside the dead set; the "
+                                "hard-pin path is the measured-good "
+                                "route")
+                for _pin2 in _cands[:2]:
+                    res = _llm_generate_impl(
+                        prompt, system=system, timeout=timeout,
+                        max_tokens=max_tokens, purpose=purpose,
+                        hard_pin_provider=_pin2)
+                    res["provider_route"] = (
+                        list(_route)
+                        + [{"status": "ADMISSION_REFUSAL_BYPASS_PASS",
+                            "pinned_provider": _pin2,
+                            "excluded_providers": _dead,
+                            "note": _bypass_note}]
+                        + list(res.get("provider_route") or []))
+                    if res.get("ok"):
+                        break
+            else:
+                res["provider_route"] = (list(_route)
+                                         + [{"status":
+                                             "ADMISSION_REFUSAL_BYPASS_PASS",
+                                             "excluded_providers": _dead,
+                                             "note": ("all rungs were "
+                                                      "admission-refused "
+                                                      "(window state, "
+                                                      "Art. LXI) — one "
+                                                      "bypass pass "
+                                                      "excluded them so "
+                                                      "the providers "
+                                                      "behind the dead "
+                                                      "rungs get "
+                                                      "attempted")}]
+                                         + list(res.get("provider_route")
+                                                or []))
     try:
         with _STAGE_CALL_LOCK:
             st = _STAGE_CALLS.setdefault(str(purpose),

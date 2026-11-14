@@ -208,8 +208,343 @@ def _salvage_candidates(raw: str):
     return uniq
 
 
+def _compose_structure(qtype: str) -> str:
+    """The delivered-answer structure — shared by the standard compose
+    stage and the lead-preserving repair path (one template, one
+    contract)."""
+    return (
+        "Write the answer with EXACTLY this structure:\n"
+        "PROPOSED " + ("INDICATOR AND THRESHOLD" if qtype ==
+                       "predictor-design" else "DESIGN INTERVENTION")
+        + ": <the core proposal, two to four sentences>\n"
+        "MECHANISM: <the physical mechanism on THIS failure>\n"
+        "DEPARTURE FROM STANDARD: <the standard solution in one "
+        "clause, then what is genuinely different here>\n"
+        "LABELED PARAMETERS: every concrete engineering parameter "
+        "as its own line, exactly one of:\n"
+        "  EVIDENCE-BACKED PARAMETER: <name> = <value> [<record id>] "
+        "— ONLY when the VALUE is stated in that record; the label "
+        "MUST carry its citation bracket — a value with no record "
+        "stating it is an ASSUMPTION, never EVIDENCE-BACKED\n"
+        "  ASSUMPTION PARAMETER: <name> = <value> (your design "
+        "choice; no citation)\n"
+        "  NEVER label a user-stated value EVIDENCE-BACKED — the "
+        "user's own stated values are ASSUMPTION (User Constraint), "
+        "never evidence\n"
+        + ("INDICATOR: <the monitored quantity, with units>\n"
+           "THRESHOLD: <numeric threshold> with ONE honest basis "
+           "('(ASSUMPTION)' or a defined calibration rule)\n"
+           if qtype == "predictor-design" else "")
+        + ("VALIDATION PROTOCOL: temperature, duration, sample "
+           "size literally as 'n = <number> <independent DEVICES>' "
+           "— n counts DEVICES (machines, cells, circuits), NEVER a "
+           "duration; state the data window separately — and the "
+           "numeric detection criterion"
+           if qtype == "predictor-design" else
+           "FALSIFICATION TEST: temperature, duration, sample size "
+           "literally as 'n = <number> <independent units>', and the "
+           "numeric pass/fail criterion")
+        + (" The protocol MUST name the INDICATOR quantity by the "
+           "SAME words the INDICATOR line uses — the protocol "
+           "validates the SAME measure the threshold is declared "
+           "on." if qtype == "predictor-design" else
+           " The test MUST act on the SAME factor the MECHANISM "
+           "names — reuse the mechanism's key nouns in the test "
+           "sentence (the validator compares the factor "
+           "vocabulary).") + "\n")
+
+
 def _budget_left(t0: float) -> float:
     return TOTAL_BUDGET_S - (time.time() - t0)
+
+
+
+def _run_a1_repair(pid: str, prob: dict, packet_by_id: dict,
+                   packet_list: list, user_txt: str, allowed_sigs,
+                   prior_killed: list, frozen: dict, qtype: str,
+                   rec: dict, out_f: Path, t0: float, timeline: list,
+                   infra: dict, _bounded) -> int:
+    """P0-1: the LEAD-PRESERVING repair path. The candidate is FROZEN
+    (a credit-register lead or the incumbent idea); the compose call
+    edits it IN PLACE against the critic findings and the auditor's
+    repair directives; the class-defect checks gate the FINAL answer
+    and one in-place repair call fixes exactly what they name.
+    Byte-stability: everything not named by a finding stays as-is, and
+    every edit is listed in a REPAIR DIFFS section with the finding it
+    addresses. No ideate call, no re-ideation (starvation only, and
+    starvation cannot happen here — there is always the frozen
+    candidate; if the compose dies the typed state says so, Art. LXI)."""
+    from discovery_fabric.engine.plausibility_critic import (
+        check_candidate, check_answer_class_defects, CRITIC_VERSION)
+    from discovery_fabric.engine.answer_downgrade import (
+        strict_provenance_downgrade, downgrade_answer)
+    from discovery_fabric.engine.answer_consistency import (
+        consistency_check, CONSISTENCY_ABSENT_CAVEAT_LINE)
+    from discovery_fabric.engine.answer_contract import validate_answer
+    import hashlib as _hl
+
+    def _fin(result: str, note: str) -> int:
+        rec["result"] = result
+        rec["typed_note"] = note
+        rec["per_call_timeline"] = timeline
+        rec["e2e_wall_s"] = round(time.time() - t0, 1)
+        rec["infra_time_s"] = infra
+        rec["n_llm_calls"] = sum(1 for t in timeline
+                                 if t.get("status") in ("OK", "RETRY"))
+        out_f.write_text(json.dumps(rec, indent=1, default=str) + "\n",
+                         encoding="utf-8")
+        return EXIT_OK if result == "COMPLETE" else EXIT_INCOMPLETE
+
+    # -- the deterministic critic on the FROZEN candidate -------------
+    fc = check_candidate(frozen, user_txt,
+                         failure_txt=str(prob.get("failure") or ""),
+                         allowed_signals=allowed_sigs)
+    rec["repair_mode"] = {
+        "mode": "LEAD_PRESERVING_REPAIR",
+        "article": ("Amendment 2 owner directive 2026-11-14 P0-1; "
+                    "Art. LXXXIV (re-ideate only on starvation), "
+                    "Art. LI (ledger consumption rides the record)"),
+        "candidate_source": frozen.get("source") or "frozen ledger",
+        "candidate_frozen": {"lever": frozen.get("lever"),
+                             "name": frozen.get("name"),
+                             "mechanism": frozen.get("mechanism"),
+                             "failure_link": frozen.get("failure_link")},
+        "critic_findings": fc,
+        "repair_directives": frozen.get("repair_directives") or [],
+        "prior_findings": frozen.get("prior_findings") or [],
+        "byte_stability_rule": "everything not named by a finding "
+                               "stays as-is; every edit carries a "
+                               "diff + finding reference"}
+    rec["critic"] = {"version": CRITIC_VERSION,
+                     "per_candidate": [dict(fc, index=0,
+                                            lever=frozen.get("lever"),
+                                            name=frozen.get("name"))],
+                     "vetoed_indexes": ([0] if fc["verdict"] == "VETOED"
+                                        else []),
+                     "flagged_indexes": ([0] if fc["verdict"] == "FLAGGED"
+                                         else [])}
+    rec["learning_feed"] = {
+        "article": "Art. LI — negative knowledge changes future search",
+        "prior_killed_classes": prior_killed,
+        "consumed": bool(prior_killed)}
+    rec["chosen"] = {"lever": frozen.get("lever"),
+                     "name": frozen.get("name"),
+                     "mechanism": frozen.get("mechanism"),
+                     "failure_link": frozen.get("failure_link")}
+
+    # -- compose: the frozen candidate, edited IN PLACE ---------------
+    directives = []
+    for k in fc.get("kills") or []:
+        directives.append("CRITIC KILL " + k.get("anchor", "") + ": "
+                          + k.get("finding", ""))
+    for k in fc.get("flags") or []:
+        directives.append("CRITIC FLAG " + k.get("flag", "") + ": "
+                          + k.get("finding", ""))
+    for d in frozen.get("repair_directives") or []:
+        directives.append("AUDITOR DIRECTIVE: " + str(d))
+    for d in frozen.get("prior_findings") or []:
+        directives.append("PRIOR ANSWER DEFECT: " + str(d))
+    ev_ids = [str(e.get("id") or e.get("source_id") or "")
+              for e in packet_list[:16]]
+    compose_prompt = (
+        "You are the repair stage of an engineering invention "
+        "pipeline. A chosen candidate is FROZEN — your job is to "
+        "write its DELIVERED ANSWER with the named defects FIXED IN "
+        "PLACE; every aspect NOT named by a finding stays exactly as "
+        "the candidate states it (byte-stability). Re-ideation is "
+        "FORBIDDEN.\n\n"
+        "DEVICE: " + str(prob.get("device") or "") + "\n"
+        "FAILURE: " + str(prob.get("failure") or "") + "\n"
+        "USER'S OWN STATED CONSTRAINTS (verbatim — comply, never "
+        "re-label them as evidence):\n" + user_txt[:1400] + "\n\n"
+        "FROZEN CANDIDATE:\n lever: " + str(frozen.get("lever"))
+        + "\n name: " + str(frozen.get("name"))
+        + "\n mechanism: " + str(frozen.get("mechanism"))
+        + "\n failure_link: " + str(frozen.get("failure_link"))
+        + "\n\nFINDINGS TO FIX (each edit must address exactly one "
+        "of these; do not change anything else):\n- "
+        + "\n- ".join(directives[:10]) + "\n\n"
+        "RETRIEVED EVIDENCE RECORDS (valid citation ids — cite ONLY "
+        "these, and ONLY for values the record actually states):\n"
+        + _packet_prompt_lines(packet_list, limit=10) + "\n\n"
+        + _compose_structure(qtype) + "\n"
+        "Every ASSUMPTION PARAMETER line MUST state its rationale "
+        "in-line. The answer MUST be arithmetically and dimensionally "
+        "consistent: recompute every product you state (A x ms -> "
+        "mAh; N cycles x ramp time) before writing it. An indicator "
+        "band must fit under HALF the fastest sampling rate the "
+        "problem's own bytes declare. A predictor-design question "
+        "gets an ONLINE leading indicator, never a maintenance rewind."
+        "\nKeep it under 450 words. "
+        "Output ONLY the answer text.\n\n"
+        "Valid ids: " + ", ".join(i for i in ev_ids if i))
+    t_co = time.time()
+    res_o = _bounded(compose_prompt, max_tokens=1100,
+                     purpose="a1_compose")
+    timeline += _timeline_from_result(res_o, "a1_compose")
+    answer = (res_o.get("content") or "").strip() if res_o.get("ok") \
+        else ""
+    rec["compose"] = {
+        "wall_s": round(time.time() - t_co, 1),
+        "transport_ok": bool(res_o.get("ok")),
+        "answer_sha256": _hl.sha256(answer.encode()).hexdigest()[:16]
+        if answer else None}
+    if not answer:
+        return _fin("INCOMPLETE_COMPOSE_TRANSPORT",
+                    "the repair compose call failed (typed transport) "
+                    "— the frozen candidate is preserved in the "
+                    "record (Art. LXI)")
+
+    # -- deterministic relabel/downgrade (same as the standard path) --
+    sd = strict_provenance_downgrade(answer, [], prob,
+                                     packet_by_id=packet_by_id)
+    answer = sd["answer"]
+    dg = downgrade_answer(answer, [], packet_list)
+    answer = dg["answer"]
+    rec["strict_relabel"] = {"n_relabels": sd.get("n_relabels"),
+                             "downgrade": dg.get("n_relabels")}
+
+    # -- CLASS-DEFECT CHECK on the final answer -----------------------
+    prob_txt = user_txt
+    cls = check_answer_class_defects(answer, prob, prob_txt)
+    repair_edits = []
+    if cls["verdict"] == "KILL":
+        # ONE in-place repair call against exactly the named findings
+        rep_prompt = (
+            "Fix ONLY what this defect list names in the engineering "
+            "answer below. Keep its substance, structure and every "
+            "aspect not named. Recompute every product you state."
+            "\n\nDEVICE: " + str(prob.get("device") or "") + "\n"
+            "DEFECTS TO FIX (fix exactly these):\n- "
+            + "\n- ".join(
+                f"[{k.get('anchor')}] {k.get('finding')}"
+                for k in cls["kills"][:6]) + "\n\n"
+            "USER'S STATED CONSTRAINTS:\n" + user_txt[:1000] + "\n\n"
+            "Valid evidence citation ids: "
+            + ", ".join(i for i in ev_ids if i) + "\n\n"
+            "ANSWER TO FIX:\n" + answer[:3600] + "\n\n"
+            "Output ONLY the fixed answer text.")
+        t_r = time.time()
+        res_r = _bounded(rep_prompt, max_tokens=1100,
+                         purpose="a1_repair")
+        timeline += _timeline_from_result(res_r, "a1_repair")
+        fix = (res_r.get("content") or "").strip() \
+            if res_r.get("ok") else ""
+        if fix:
+            answer = fix
+            sd2 = strict_provenance_downgrade(
+                answer, [], prob, packet_by_id=packet_by_id)
+            answer = sd2["answer"]
+        cls2 = check_answer_class_defects(answer, prob, prob_txt)
+        repair_edits = [{
+            "finding": k.get("anchor"),
+            "resolved": k.get("anchor") not in
+            [k2.get("anchor") for k2 in cls2.get("kills") or []]}
+            for k in cls.get("kills") or []]
+        rec["repair_mode"]["class_repair"] = {
+            "first_pass_kills": [k.get("anchor")
+                                 for k in cls.get("kills") or []],
+            "post_repair_kills": [k.get("anchor")
+                                  for k in cls2.get("kills") or []],
+            "edits": repair_edits}
+        cls = cls2
+    rec["repair_mode"]["class_defect_checks"] = {
+        "verdict": cls["verdict"],
+        "kills": [k.get("anchor") for k in cls.get("kills") or []],
+        "flags": [f.get("anchor") for f in cls.get("flags") or []]}
+
+    # -- contract-violation repair leg (same as the standard path) ----
+    cons_p = consistency_check(answer, None, prob)
+    contract_p = validate_answer(
+        answer, qtype, packet=packet_list,
+        user_variables=prob.get("user_variables"),
+        clarification=prob.get("clarification_answer"))
+    if contract_p.get("valid") is not True:
+        viol = [str(v) for v in contract_p.get("violations") or []][:6]
+        rep_prompt = (
+            "Fix ONLY what this contract audit lists in the "
+            "engineering answer below. Keep its substance, numbers "
+            "and structure; recompute every product you state."
+            "\n\nDEVICE: " + str(prob.get("device") or "") + "\n"
+            "CONTRACT VIOLATIONS (fix exactly these):\n- "
+            + "\n- ".join(viol) + "\n\n"
+            "Valid evidence citation ids: "
+            + ", ".join(i for i in ev_ids if i) + "\n\n"
+            "ANSWER TO FIX:\n" + answer[:3600] + "\n\n"
+            "Output ONLY the fixed answer text.")
+        t_r = time.time()
+        res_r = _bounded(rep_prompt, max_tokens=1100,
+                         purpose="a1_repair")
+        timeline += _timeline_from_result(res_r, "a1_repair")
+        fix = (res_r.get("content") or "").strip() \
+            if res_r.get("ok") else ""
+        if fix:
+            answer = fix
+            sd2 = strict_provenance_downgrade(
+                answer, [], prob, packet_by_id=packet_by_id)
+            answer = sd2["answer"]
+        rec["repair_mode"]["contract_repair"] = {
+            "violations_in": viol, "applied": bool(fix)}
+
+    # -- post-validation + gate (same contract as the standard path) --
+    cons_f = consistency_check(answer, None, prob)
+    contract_f = validate_answer(
+        answer, qtype, packet=packet_list,
+        user_variables=prob.get("user_variables"),
+        clarification=prob.get("clarification_answer"))
+    rec["a1_answer"] = answer  # recorded BEFORE the gate branches:
+    # a typed class-defect failure still carries the produced bytes
+    # (Art. XXV: the record shows what existed)
+    rec["post_validation"] = {"consistency": cons_f,
+                              "contract": contract_f}
+    rec["n_llm_calls"] = sum(1 for t in timeline
+                             if t.get("status") in ("OK", "RETRY"))
+    gate = {"contract_valid": contract_f.get("valid") is True,
+            "consistency_state": cons_f.get("state"),
+            "class_defects": cls["verdict"],
+            "provenance_resolved": True}
+    gate["complete"] = (gate["contract_valid"]
+                        and gate["consistency_state"]
+                        == "CONSISTENCY_PASS"
+                        and cls["verdict"] != "KILL")
+    rec["completion_gate"] = gate
+    if gate["complete"]:
+        rec["result"] = "COMPLETE"
+    else:
+        if cls["verdict"] == "KILL":
+            return _fin("INCOMPLETE_ANSWER_CLASS_DEFECTS",
+                        "the delivered answer still carries class-"
+                        "level defects after the in-place repair ("
+                        + ", ".join(k.get("anchor") for k in
+                                    cls.get("kills") or [])
+                        + ") — typed, no delivery (the frozen "
+                        "candidate is NOT discarded; the findings "
+                        "ride the record, Art. XXV)")
+        rec["result"] = ("INCOMPLETE_CONTRACT"
+                         if not gate["contract_valid"]
+                         else "INCOMPLETE_CONSISTENCY")
+        if cons_f.get("state") == "CHECK_ABSENT":
+            rec["consistency_caveat"] = CONSISTENCY_ABSENT_CAVEAT_LINE
+    rec["a1_answer"] = answer
+
+    # -- the A0+ pair binding (same as the standard path) -------------
+    a0p_f = REPO / "eval" / "pairs" / "r11_a0plus" / f"{pid}.json"
+    a0p = {}
+    if a0p_f.exists():
+        try:
+            a0p = json.loads(a0p_f.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            a0p = {}
+    rec["pair_against_a0plus"] = {
+        "a0plus_version": a0p.get("a0plus_version") or "NOT_RUN",
+        "a0plus_result": a0p.get("result") or "NOT_RUN"}
+    _calls = rec.get("n_llm_calls", 0)
+    _e2e = round(time.time() - t0, 1)
+    print(f"[a1] {pid}: {rec['result']} (repair mode, calls="
+          f"{_calls}, e2e={_e2e}s, frozen="
+          f"{str(frozen.get('name'))[:40]})")
+    return _fin(rec["result"], rec.get("typed_note")
+                or "lead-preserving repair delivery")
 
 
 def run_a1(pid: str) -> int:
@@ -341,6 +676,34 @@ def run_a1(pid: str) -> int:
                        "search",
             "prior_record": str(_prior_dir / f"{pid}.json"),
             "killed_classes": prior_killed}
+
+    # ---------------- (a-FROZEN) LEAD-PRESERVING REPAIR PATH ---------
+    # R11 P0-1 (Amendment 2, owner 2026-11-14): the measured capability
+    # regression was DESTRUCTION OF VALUE — full re-ideation discarded
+    # the credit-register leads (UV-EVOH p09, ZrO2 seal sofc, IL-polymer
+    # new01) and resampled the same defect classes in new forms. The
+    # delivery path now FREEZES the chosen candidate per problem: the
+    # critic's findings drive TARGETED IN-PLACE EDITS (the repair leg)
+    # on the SAME idea; re-ideation happens ONLY on all-candidates-
+    # vetoed starvation (Art. LXXXIV). Every edit carries a diff and a
+    # finding reference. The candidate ledger dir is
+    # A1_FROZEN_CANDIDATES_DIR; a problem without a frozen file falls
+    # through to the standard ideate path unchanged.
+    _fc_dir = os.environ.get("A1_FROZEN_CANDIDATES_DIR", "").strip()
+    if _fc_dir and Path(_fc_dir, f"{pid}.json").exists():
+        try:
+            frozen = json.loads((Path(_fc_dir) / f"{pid}.json")
+                                .read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001 — unreadable ledger falls
+            frozen = None  # through to the standard path, typed
+        if frozen:
+            return _run_a1_repair(
+                pid=pid, prob=prob, packet_by_id=packet_by_id,
+                packet_list=packet_list, user_txt=user_txt,
+                allowed_sigs=allowed_sigs, prior_killed=prior_killed,
+                frozen=frozen, qtype=qtype, rec=rec, out_f=out_f,
+                t0=t0, timeline=timeline, infra=infra,
+                _bounded=_bounded)
 
     # ---------------- (a) IDEATE — 6 candidates, one per lever -------
     ideate_prompt = (
@@ -636,45 +999,7 @@ def run_a1(pid: str) -> int:
         "RETRIEVED EVIDENCE RECORDS (valid citation ids — cite ONLY "
         "these, and ONLY for values the record actually states):\n"
         + _packet_prompt_lines(packet_list, limit=10) + "\n\n"
-        "Write the answer with EXACTLY this structure:\n"
-        "PROPOSED " + ("INDICATOR AND THRESHOLD" if qtype ==
-                       "predictor-design" else "DESIGN INTERVENTION")
-        + ": <the core proposal, two to four sentences>\n"
-        "MECHANISM: <the physical mechanism on THIS failure>\n"
-        "DEPARTURE FROM STANDARD: <the standard solution in one "
-        "clause, then what is genuinely different here>\n"
-        "LABELED PARAMETERS: every concrete engineering parameter "
-        "as its own line, exactly one of:\n"
-        "  EVIDENCE-BACKED PARAMETER: <name> = <value> [<record id>] "
-        "— ONLY when the VALUE is stated in that record; the label "
-        "MUST carry its citation bracket — a value with no record "
-        "stating it is an ASSUMPTION, never EVIDENCE-BACKED\n"
-        "  ASSUMPTION PARAMETER: <name> = <value> (your design "
-        "choice; no citation)\n"
-        "  NEVER label a user-stated value EVIDENCE-BACKED — the "
-        "user's own stated values are ASSUMPTION (User Constraint), "
-        "never evidence\n"
-        + ("INDICATOR: <the monitored quantity, with units>\n"
-           "THRESHOLD: <numeric threshold> with ONE honest basis "
-           "('(ASSUMPTION)' or a defined calibration rule)\n"
-           if qtype == "predictor-design" else "")
-        + ("VALIDATION PROTOCOL: temperature, duration, sample "
-           "size literally as 'n = <number> <independent DEVICES>' "
-           "— n counts DEVICES (machines, cells, circuits), NEVER a "
-           "duration; state the data window separately — and the "
-           "numeric detection criterion"
-           if qtype == "predictor-design" else
-           "FALSIFICATION TEST: temperature, duration, sample size "
-           "literally as 'n = <number> <independent units>', and the "
-           "numeric pass/fail criterion")
-        + (" The protocol MUST name the INDICATOR quantity by the "
-           "SAME words the INDICATOR line uses — the protocol "
-           "validates the SAME measure the threshold is declared "
-           "on." if qtype == "predictor-design" else
-           " The test MUST act on the SAME factor the MECHANISM "
-           "names — reuse the mechanism's key nouns in the test "
-           "sentence (the validator compares the factor "
-           "vocabulary).") + "\n"
+        + _compose_structure(qtype) + "\n"
         "Every ASSUMPTION PARAMETER line MUST state its rationale "
         "in-line: ASSUMPTION PARAMETER: <name> = <value> "
         "(rationale: <why this value, or the calibration/sensitivity "

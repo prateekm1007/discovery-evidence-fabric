@@ -84,9 +84,46 @@ if not route.get("provider") or not calib.get("passed"):
           "no comparison runs (Art. LXI)")
     sys.exit(3)
 prov, model = route["provider"], route["model"]
+
+# R11 P0-3 (Amendment 2 §5): JUDGE != GENERATOR, enforced on provider
+# AND model. The generator arms rode the cascade (per-call provider in
+# the arm records' timelines); a judge identical in provider AND model
+# to a served generator rung is the same model judging its own output
+# (Art. LXVII reviewer_provenance; Art. XXVI). The enforcement reads
+# the committed arm records' per_call timelines for the (provider,
+# model) pairs that GENERATED the answers being compared and refuses
+# the route if it collides with any of them — the typed skip beats a
+# self-judged comparison.
+def _generator_served() -> set:
+    served = set()
+    for d in (V3, V1A1):
+        if not d.exists():
+            continue
+        for f in d.glob("*.json"):
+            try:
+                r = json.loads(f.read_text(encoding="utf-8"))
+            except Exception:  # noqa: BLE001
+                continue
+            for t in r.get("per_call_timeline") or []:
+                pr = str(t.get("provider") or "")
+                mo = str(t.get("model") or "")
+                if pr and mo:
+                    served.add((pr, mo))
+    return served
+
+
+_served = _generator_served()
+if (prov, model) in _served:
+    print(f"[r11cmp] TYPED: judge route {prov}/{model} COLLIDES with "
+          "a generator rung that served these answers — judge != "
+          "generator (provider AND model) is not satisfiable this "
+          "window; no comparison runs (Art. XXVI/LXVII)")
+    sys.exit(3)
 print(f"[r11cmp] calibrated judge: {prov}/{model} "
       f"({calib.get('correct')}/{calib.get('n_pairs')}, "
-      f"corpus {str(calib.get('corpus_sha256'))[:12]}...)")
+      f"corpus {str(calib.get('corpus_sha256'))[:12]}...); judge != "
+      f"generator verified against {len(_served)} served generator "
+      "rungs")
 
 from r7_a0plus import _packet_by_id_from_run_tree, _unique_packet_list, \
     _load_pair, _arm_queue_ids  # noqa: E402
@@ -238,9 +275,18 @@ for pid in _arm_queue_ids():
         prefer = valid["prefer"]
         _x_name = "a1" if kind.startswith("a1_") else "a0plus"
         _y_name = other_name
-        picked = (_x_name if (prefer == "A") == (order == "a0plus_first")
-                  else _y_name if prefer in ("A", "B")
-                  else "tie")
+        # R11 P0-3 (Amendment 2 §5): the TIE->win decoder bug — the
+        # old expression `(prefer == "A") == (order == "a0plus_first")`
+        # is TRUE when BOTH sides are False, so a judge TIE decoded as
+        # a win for x whenever x was served second (measured: inflates
+        # the a1/a0plus win counts). Ties are decoded FIRST, from the
+        # judge's own verdict, never by falling through the equality.
+        if prefer not in ("A", "B"):
+            picked = "tie"
+        elif (prefer == "A") == (order == "a0plus_first"):
+            picked = _x_name
+        else:
+            picked = _y_name
         jrec.update({"outcome": "JUDGE_VALID", "prefer": prefer,
                      "x_arm": _x_name, "y_arm": _y_name,
                      "x_typed_state": x_state,

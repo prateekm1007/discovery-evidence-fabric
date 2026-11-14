@@ -40,7 +40,7 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
-INVENTION_RUBRIC_VERSION = "invention_rubric/1.0.0"
+INVENTION_RUBRIC_VERSION = "invention_rubric/2.0.0"  # 2.0.0: baseline-union retired, named-technique KNOWN gate, prior-art distance
 
 AXES = ("novelty", "feasibility", "testability", "constraint_compliance")
 
@@ -724,6 +724,9 @@ _PRIOR_ART_TECHNIQUES: Dict[str, List[Tuple[str, bool]]] = {
     # distinctive name; one signature or two plain anchors = KNOWN
     "spalling": [
         (r"spectral[ -]kurtosis|\bkurtosis\b", True),
+        (r"SCADA[ -]?(power|trend|based)[ -]?prognostic|machine[ -]"
+         r"learn(?:ing|ed)[ -]?(model|prognos)|gradient[ -]boosted",
+         True),
         (r"envelope[ -](demodulat|spectrum|analysis|detect)", False),
         (r"defect[ -]frequency|ISO[ ]?10816|ISO[ ]?20816", False),
         (r"acoustic[ -]emission|particle[ -]count|lubricant[ -]analysis",
@@ -747,7 +750,8 @@ _PRIOR_ART_TECHNIQUES: Dict[str, List[Tuple[str, bool]]] = {
     ],
     "fouling": [
         (r"chemical[ -]cleaning|biocide|backwash|pigging", True),
-        (r"side[- ]stream|chlorinat|copper[- ]nickel|antifoul", False),
+        (r"C70600|90Cu[ -]?10Ni|copper[- ]nickel|cupronickel", True),
+        (r"side[- ]stream|chlorinat|antifoul|tin[- ]copper", False),
         (r"differential[- ]pressure|heat[- ]transfer[- ]coefficient",
          False),
     ],
@@ -774,6 +778,7 @@ _PRIOR_ART_TECHNIQUES: Dict[str, List[Tuple[str, bool]]] = {
     ],
     "barrier": [
         (r"WVTR|OTR|seal[- ]integrity", True),
+        (r"nanoclay|nanocomposite[ -]?barrier|tortuosity", True),
         (r"metallized|foil[ -]lamination|SiOx|desiccant", False),
         (r"barrier[- ]layer[ -]thickness", False),
     ],

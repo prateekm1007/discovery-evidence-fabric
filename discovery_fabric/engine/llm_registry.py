@@ -1991,6 +1991,55 @@ def generate(prompt: str, system: str = "",
     # (the directive's LAST-RESORT rung); bound the walk:
     # 1 + max_provider_fallbacks + 2 model hops
     rungs = rungs[:max(3, 1 + max(0, max_provider_fallbacks) + 2)]
+    # R11 P1-4 (Amendment 2 §5): the MEASURED dead-rung cascade stall —
+    # the ladder collapsed to ONE provider exactly when that provider's
+    # admission probe refused, and the walk died on refused rungs with
+    # eligible providers behind it (measured 2026-11-14: the r2 battery
+    # needed an operator pin-override to proceed). The ladder now
+    # ENFORCES the >=2-provider spread: when the walk carries a single
+    # provider and the keyed chain holds another eligible one, that
+    # provider's best rung is appended (typed SPREAD_BACKFILL) so an
+    # admission refusal on one provider can never end the walk. This is
+    # the earned-concurrency precondition #2 (generator spread) as
+    # cascade hardening, not a policy change.
+    _spread_providers = {p for p, _m, _r in rungs}
+    _spread_added: List[List[str]] = []
+    if len(_spread_providers) < 2:
+        # backfill source = the POLICY CHAIN (declared providers), NOT
+        # the reconciled availability matrix: the matrix inherits the
+        # runtime classification of recent probe refusals, so it can
+        # hide exactly the healthy provider the stall needs (measured
+        # 2026-11-14: agnes was eligible on direct probe yet absent
+        # from the matrix the same window). Art. V as this file's own
+        # R530 note states: declared capability is probe-independent —
+        # the gate must never deadlock a route behind its own TTL.
+        _chain_ids = [p for p in (chain or [])
+                      if p not in _spread_providers]
+        _seen_rungs = {(p, m) for p, m, _r in rungs}
+        for _p2 in (_chain_ids + [p for p in avail_ids
+                                  if p not in _spread_providers]):
+            if _p2 in _spread_providers:
+                continue
+            _spec2 = _SPEC_BY_ID.get(_p2)
+            _ok2, _note2 = _cost_policy.provider_eligibility(_spec2) \
+                if _spec2 else (False, "unknown provider")
+            if not _ok2:
+                continue
+            for _m2 in (mr.eligible_models(_p2, task) or [])[:1]:
+                _mid2 = (_m2.get("model_id") if isinstance(_m2, dict)
+                         else getattr(_m2, "model_id", None))
+                if _mid2 and (_p2, str(_mid2)) not in _seen_rungs:
+                    rungs.append((_p2, str(_mid2),
+                                  {"provider": _p2, "model": str(_mid2),
+                                   "band": "SPREAD_BACKFILL",
+                                   "spread_backfill": True}))
+                    _spread_providers.add(_p2)
+                    _spread_added.append([_p2, str(_mid2)])
+                    break
+            if len(_spread_providers) >= 2:
+                break
+        if _spread_added:
+            ladder["spread_backfill"] = _spread_added
     # R491: the measurement ring pin — applied AFTER the floor so the
     # LAST_RESORT band and the max(3, ...) minimum can never widen a
     # pinned walk. A pin with no admissible rung fails closed here.
