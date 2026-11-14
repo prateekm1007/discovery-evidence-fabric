@@ -63,8 +63,11 @@ def test_lxxxv_chain_binds_and_links():
     rec = json.loads((R510C / "AMENDMENT_RECORD_LXXXV.json")
                      .read_text(encoding="utf-8"))
     assert rec["old"]["version"] == "2.10.0"
-    assert rec["new"]["version"] == "2.11.0"
-    assert rec["new"]["sha256"] == _live_sha()
+    # R11: the LXXXV record is HISTORICAL (its new = the 2.10.1 body
+    # sha); the live chain link is now R11's LXXXVI record.
+    assert rec["new"]["version"] == "2.10.1"
+    assert rec["new"]["sha256"] == \
+        "2ce42426662d6493f672cf5fd7256bf5c2b9c8412e369ee9032b253b80b6fc56"
     assert rec["reviewer_provenance"] == "AI_REVIEW"
 
 
