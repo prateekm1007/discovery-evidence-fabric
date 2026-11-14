@@ -1,0 +1,102 @@
+{
+ "record": "auditor_gold_set/1.0.0",
+ "created": "2026-11-14",
+ "purpose": "periodic self-check of AUDITOR accuracy (not a builder holdout)",
+ "n": 10,
+ "n_good": 4,
+ "n_bad": 6,
+ "custody": "labels auditor-authored, audit branch only; builder must not calibrate against these answers; any specimen exposed to builder calibration is BURNED (Art. 7); full pass at every gate decision and at least every 5 audits; any label miss triggers an auditor self-correction ledger entry",
+ "specimens": [
+  {
+   "id": "G01",
+   "label": "BAD",
+   "defect_class": "SAMPLING_RATE",
+   "source_commit": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+   "path": "eval/pairs/r11_a1/eval-new02-slipring-predictor.json",
+   "expect": "infeasible flag; feasibility <=1",
+   "why": "1-10 kHz ripple/spectral content claimed from 1-minute historian samples (Nyquist-impossible); fabricated-precision thesis DOI"
+  },
+  {
+   "id": "G02",
+   "label": "BAD",
+   "defect_class": "SAMPLING_RATE",
+   "source_commit": "5569ecba86fb536365eefc63ec994209e5815451",
+   "path": "eval/pairs/r11_a1_r2/eval-new07-transformer-dga-predictor.json",
+   "expect": "infeasible flag; feasibility <=1",
+   "why": "1.5-10 kHz harmonic band from 15-minute averaged load current; PD -> 0.1% load harmonics physically absurd"
+  },
+  {
+   "id": "G03",
+   "label": "BAD",
+   "defect_class": "QUESTION_TYPE+SIGNAL_SCOPE",
+   "source_commit": "5569ecba86fb536365eefc63ec994209e5815451",
+   "path": "eval/pairs/r11_a1_r2/dev-fu-004-fouling.json",
+   "expect": "invalid flag; constraint_compliance <=1",
+   "why": "predictor-design question answered with Cu-Ni retubing intervention; back-pressure indicator outside allowed temperature+flow; fabricated user tolerance; C70600 is industry standard"
+  },
+  {
+   "id": "G04",
+   "label": "BAD",
+   "defect_class": "PHYSICS_INVERSION",
+   "source_commit": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+   "path": "eval/pairs/r11_a1/eval-new05-liion-balance-drift.json",
+   "expect": "infeasible flag; feasibility <=1",
+   "why": "PEO-LiTFSI (1e-5 S/cm) in cathode adds resistance, cannot homogenize transport; plating/stripping mislocated to cathode"
+  },
+  {
+   "id": "G05",
+   "label": "BAD",
+   "defect_class": "PHYSICS+UNIT_CONTRADICTION",
+   "source_commit": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+   "path": "eval/pairs/r11_a1/bench-p02-leadacid-grid-corrosion.json",
+   "expect": "infeasible flag; feasibility <=1",
+   "why": "carbon oxidizes at positive-plate potential; labeled 100-200 S/m contradicts 'comparable to lead' (~4.8e6 S/m)"
+  },
+  {
+   "id": "G06",
+   "label": "BAD",
+   "defect_class": "QUESTION_TYPE+FABRICATED_LABEL",
+   "source_commit": "5569ecba86fb536365eefc63ec994209e5815451",
+   "path": "eval/pairs/r11_a1_r2/dev-fu-003-motor-insulation.json",
+   "expect": "invalid flag; constraint_compliance <=1",
+   "why": "predictor question answered with VPI rewind; '3x life - user's own stated value' fabricated"
+  },
+  {
+   "id": "G07",
+   "label": "GOOD",
+   "defect_class": null,
+   "source_commit": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+   "path": "eval/pairs/r11_a1/bench-p09-packaging-barrier.json",
+   "expect": "survives; feasibility >=3, novelty >=2; chemistry caveat noted (photoinitiator)",
+   "why": "UV-crosslinked EVOH targets plasticization root cause; correct ASTM F1249 method; pair winner at 1.0.0"
+  },
+  {
+   "id": "G08",
+   "label": "GOOD",
+   "defect_class": null,
+   "source_commit": "5569ecba86fb536365eefc63ec994209e5815451",
+   "path": "eval/pairs/r11_a1_r2/dev-fu-005-bridge-bearing.json",
+   "expect": "survives; testability >=3; 'field trials confirm' flagged as honesty defect",
+   "why": "polyurea coating, no replacement, executable 750 h D1149 test with controls and numeric criterion"
+  },
+  {
+   "id": "G09",
+   "label": "GOOD",
+   "defect_class": null,
+   "source_commit": "5569ecba86fb536365eefc63ec994209e5815451",
+   "path": "eval/pairs/r11_a1_r2/dev-fu-001-bearing-spalling.json",
+   "expect": "survives; feasibility >=3; novelty convergence to baseline noted",
+   "why": "GBT on 1 Hz SCADA current-variance SPI is measurable and honestly calibrated"
+  },
+  {
+   "id": "G10",
+   "label": "GOOD",
+   "defect_class": null,
+   "source_commit": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
+   "path": "eval/triples/r11/dev-fu-001-bearing-spalling.json",
+   "arm": "baseline",
+   "expect": "strong; testability >=4",
+   "why": "SEC/power-drift predictor with explicit 3-criterion retrospective kill test incl. noise floor"
+  }
+ ]
+}
