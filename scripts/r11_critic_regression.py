@@ -3,8 +3,10 @@
 plausibility critic's CALIBRATION REGRESSION on the committed A1 bytes.
 
 Art. L: the critic is an instrument, so it gets a calibration corpus and
-reports sensitivity by defect class + false-kill rate. The corpus IS the
-owner's blind audit of the committed A1 records (2W/7T/3L):
+reports sensitivity by defect class + false-kill rate. Labels source from
+the AUTHORITATIVE auditor records (eval/auditor_judgments_r11*.json);
+the superseded coder-side tally is retired (see
+eval/pipeline_retirement_r11.json) and its labels are purged:
   known-defect specimens (the audit's rejections — must be VETOED):
     bench-p02 (carbon grid at positive-plate potential),
     eval-new05 (PEO-LiTFSI cathode for a module-level gradient),

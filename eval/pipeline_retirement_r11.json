@@ -1,0 +1,32 @@
+{
+ "record": "pipeline_retirement_r11/1.0.0",
+ "at": "2026-11-14",
+ "article": "Art. LXIV \u2014 superseded implementations retire in the same change that ships their replacement; deletion is accounted, never silent",
+ "retired": {
+  "name": "the 1.0.0 heavy pre-critic generation pipeline (r11_a1/1.0.0: first-pass ideate -> critique -> compose, 3-4 LLM calls, 41-46 s e2e)",
+  "audited_state": "0 clean COMPLETE answers (auditor trajectory 1.0.0: 5/12 infeasible or invalid; the owner audit's rejection reasons are the critic's calibration corpus)",
+  "superseded_by": "A1+critic (r11_a1/1.2.0): the plausibility critic is load-bearing in BOTH paths (a0 CRITIC PREPARE in the fresh path; class-defect checks in the repair path) at 1-2 calls and ~6-13 s e2e (R3 measured, AM3 \u00a71)",
+  "code_path_evidence": "scripts/r11_a1.py \u2014 no critic-free generation path exists at 1.2.0 (grep: every generation leg imports and runs check_candidate / check_answer_class_defects); the 1.0.0 bytes remain recoverable at git history (ca17fd40a^ and earlier)",
+  "preserved_evidence_bytes": [
+   "eval/pairs/r11_a1 (1.0.0 battery records, typed SUPERSEDED)",
+   "eval/auditor_judgments_r11.json (the 1.0.0 audit)"
+  ]
+ },
+ "deleted_this_change": [
+  {
+   "file": "eval/pairs/LEGACY_PRECOMPOSER.json",
+   "why": "dead artifact: zero code references (grep across *.py/*.sh); the historical legacy_marker strings inside the audited pair records are PRESERVED (audited bytes are never edited)"
+  },
+  {
+   "file": "the '2W/7T/3L' corpus labels in scripts/r11_critic_regression.py",
+   "why": "superseded audit labels \u2014 the authoritative records are eval/auditor_judgments_r11.json / _r2.json / _r3.json (the scripts' GOOD label set was already re-sourced; the docstring now points there only)"
+  }
+ ],
+ "anchored_this_change": [
+  {
+   "item": "judge axes A1-A3/B1-B3 (answered / user-vars / prediction)",
+   "measured_saturation": "37/38, 37/38, 36/38 fives on the R3 judgment records (95-97%) \u2014 decorative",
+   "action": "binary compliance gates (0/1) in _rubric_prompt + _validate_rubric_pass; legacy 1-5 outputs normalized with a typed legacy_scale_normalized_keys flag; evidence/novelty axes stay 1-5 (informative: A4 spread 2-5, A6 24/38 fives)"
+  }
+ ]
+}

@@ -1199,10 +1199,17 @@ def _rubric_prompt(problem, a_text: str, b_text: str,
         "=== ANSWER B ===",
         b_text,
         "",
-        "Score BOTH answers on these criteria, 1 (bad) to 5 (excellent):",
+        # AM3 D8 (anchored axes): criteria 1-3 are BINARY compliance
+        # gates, 0 (fail) or 1 (pass) — measured saturation on the R3
+        # judgments was 95-97% fives for these three, which made them
+        # decorative. Evidence (c4), clarification (c5) and novelty
+        # (c6) stay 1-5.
+        "First, three YES/NO compliance gates for EACH answer "
+        "(0 = fails the gate, 1 = passes):",
         "1 " + CRITERIA["a_answered"],
         "2 " + CRITERIA["b_user_vars"],
         "3 " + CRITERIA["c_prediction"],
+        "Then score BOTH answers 1 (bad) to 5 (excellent) on:",
         "4 " + CRITERIA["d_evidence"],
     ]
     if clar:
@@ -1216,11 +1223,11 @@ def _rubric_prompt(problem, a_text: str, b_text: str,
         "R11 JUDGE OUTPUT CONTRACT (owner item 5): respond with ONLY one "
         "JSON object - no prose, no markdown fences - with exactly these "
         "integer keys:",
-        '{"A1": <1-5>, "A2": <1-5>, "A3": <1-5>, "A4": <1-5>,',
+        '{"A1": <0|1>, "A2": <0|1>, "A3": <0|1>, "A4": <1-5>,',
     ]
     if clar:
         lines.append(' "A5": <1-5>, "B5": <1-5>,')
-    lines += ['"B1": <1-5>, "B2": <1-5>, "B3": <1-5>, "B4": <1-5>,',
+    lines += ['"B1": <0|1>, "B2": <0|1>, "B3": <0|1>, "B4": <1-5>,',
               '"A6": <1-5>, "B6": <1-5>,',
               '"prefer": "A" | "B" | "TIE"}']
     return "\n".join(lines)
@@ -1275,6 +1282,8 @@ def _validate_rubric_pass(parsed: Dict[str, Any], clar: bool) -> Optional[Dict[s
     if clar:
         required += ["A5", "B5"]
     out: Dict[str, Any] = {}
+    legacy_normalized = 0
+    gate_keys = {f"{s}{j}" for s in "AB" for j in (1, 2, 3)}
     for k in required:
         v = parsed.get(k)
         if v is None:
@@ -1283,6 +1292,18 @@ def _validate_rubric_pass(parsed: Dict[str, Any], clar: bool) -> Optional[Dict[s
             iv = int(str(v).strip())
         except ValueError:
             return None
+        if k in gate_keys:
+            # AM3 D8: binary gates (0/1); a judge still on the legacy
+            # 1-5 scale is normalized (>=4 passes, else fails) and the
+            # normalization is typed on the record, never silent
+            if iv in (0, 1):
+                out[k] = iv
+            elif 2 <= iv <= 5:
+                out[k] = 1 if iv >= 4 else 0
+                legacy_normalized += 1
+            else:
+                return None
+            continue
         if not (1 <= iv <= 5):
             return None
         out[k] = iv
@@ -1290,6 +1311,8 @@ def _validate_rubric_pass(parsed: Dict[str, Any], clar: bool) -> Optional[Dict[s
     if prefer not in ("A", "B", "TIE"):
         return None
     out["prefer"] = prefer
+    if legacy_normalized:
+        out["legacy_scale_normalized_keys"] = legacy_normalized
     return out
 
 
