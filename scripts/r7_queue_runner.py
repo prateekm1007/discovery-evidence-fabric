@@ -107,10 +107,11 @@ SPEED_SAMPLE = 3  # first 3 problem ids (deterministic, disclosed)
 MAX_ATTEMPTS = int(os.environ.get("R7_MAX_ATTEMPTS", "3"))
 COOLDOWN_S = int(os.environ.get("R7_COOLDOWN_S", "90"))
 
-# v3 output location — the 1.0.0/2.0.0 A0+ artifacts are preserved
-# audit evidence; the simple arm (at most ONE repair) writes r10.
-A0P_PAIRS = REPO / "eval" / "pairs" / "r10_a0plus"
-A0P_VERSION = "r7_a0plus/3.0.0"
+# v3 output location — the 1.0.0/2.0.0/3.0.0 A0+ artifacts are
+# preserved audit evidence; the simple arm (at most ONE repair, the
+# R11 one-header default-path delivery) writes r11.
+A0P_PAIRS = REPO / "eval" / "pairs" / "r11_a0plus"
+A0P_VERSION = "r7_a0plus/3.1.0"
 # R10 queue policy (owner directive 4): the arm's TYPED DELIVERED
 # states are TERMINAL for the queue. The R10 arm already spends its
 # at-most-one repair INSIDE the invocation; a re-invocation is a whole
@@ -242,7 +243,7 @@ def build_plan() -> list:
         if _a0plus_v2_delivered(pid):
             continue
         items.append({"kind": "a0plus", "problem": pid,
-                      "pairs_out": "eval/pairs/r10_a0plus"})
+                      "pairs_out": "eval/pairs/r11_a0plus"})
     # 1. dev12 remaining (main arm -> dev12_r7)
     for pid in ids:
         if _pair_has_answer(pid, PAIRS_R7):

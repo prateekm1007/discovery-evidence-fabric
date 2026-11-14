@@ -48,11 +48,11 @@ class TestSimpleArmContract:
         assert "at_most_one_repair_call" in src
 
     def test_arm_contract_record_names_the_policy(self):
-        assert A0P.A0P_VERSION == "r7_a0plus/3.0.0"
+        assert A0P.A0P_VERSION == "r7_a0plus/3.1.0"
         assert A0P.HARD_TIMEOUT_S == 40
         assert A0P.MAX_RETRIES == 1
         assert A0P.TOTAL_BUDGET_S == 300
-        assert A0P.PAIRS_A0.name == "r10_a0plus"
+        assert A0P.PAIRS_A0.name == "r11_a0plus"
 
     def test_hard_bounds_are_set_not_defaulted(self):
         src = (REPO / "scripts" / "r7_a0plus.py").read_text(
@@ -270,7 +270,7 @@ class TestRunnerChunkingAndRecords:
         assert "bench-p05-bridge-bearing-aging" in pids
         assert "dev-fu-004-fouling" in pids
         assert "eval-sofc-thermal-cycling" in pids
-        assert all(i["pairs_out"] == "eval/pairs/r10_a0plus"
+        assert all(i["pairs_out"] == "eval/pairs/r11_a0plus"
                    for i in a0)
 
     def test_delivered_records_leave_the_plan(self, monkeypatch, tmp_path):

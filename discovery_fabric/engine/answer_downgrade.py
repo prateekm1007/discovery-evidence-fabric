@@ -412,6 +412,14 @@ def strict_provenance_downgrade(
                      "stated value, not evidence)" if in_user
                      else "ASSUMPTION (value not stated in the cited "
                           "record)")
+        # R11 (owner audit 2026-11-14, DEFAULT PATH item): the relabel
+        # means the cited record does NOT state the value — the DOI it
+        # carried is IRRELEVANT NOISE on an ASSUMPTION line and
+        # misleading (it reads as support for a value the record never
+        # states). The relabel rewrite DROPS the citation, both shapes,
+        # and carries the rationale exactly once (the R9 measured bytes:
+        # 'ASSUMPTION PARAMETER: float voltage = 2.27 V/cell [doi:...]
+        # — ASSUMPTION (value not stated...)' — DOI + doubled label).
         if m.group(0).upper().startswith("EVIDENCE"):
             # label-FIRST shape ONLY (the matched text starts with the
             # label): 'EVIDENCE-BACKED PARAMETER: <statement> [cite]' ->
@@ -421,10 +429,13 @@ def strict_provenance_downgrade(
             # the matched text's first token is the only safe
             # discriminator. The label-first value may be prose (no
             # '=' separator — the measured v2 fu005 shape), so the
-            # rewrite does not reference the sep group.
+            # rewrite does not reference the sep group. NO citation
+            # rides the relabeled line (the R11 owner directive).
             return ("ASSUMPTION " + m.group("head") + " "
-                    + value.strip() + " " + (m.group("cite") or "")
-                    + " — " + rationale)
+                    + value.strip() + " — "
+                    + ("user's own stated value, not evidence"
+                       if in_user
+                       else "value not stated in the cited record"))
         return (m.group("head") + m.group("sep") + " " + value
                 + " " + m.group("sep") + " " + rationale)
 

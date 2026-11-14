@@ -611,6 +611,36 @@ class TestTestSpec:
         assert by_param["service life target"] == \
             "ASSUMPTION (User Constraint)"
 
+    def test_relabel_drops_citation_both_shapes(self):
+        # R11 owner-audit DEFAULT PATH item: a relabel means the cited
+        # record does NOT state the value — the DOI it carried is
+        # noise and misleads (it reads as support for a value the
+        # record never states). NO relabeled line carries a citation,
+        # label-first AND label-last shapes.
+        packet = [{"id": "doi:10.test/polym", "title": "polyurea review",
+                   "abstract": "phase-separated microstructure study"}]
+        prob = {"user_variables": ["15-year float life"]}
+        ans_first = ("EVIDENCE-BACKED PARAMETER: float voltage = 2.27 "
+                     "V/cell [doi:10.test/polym]\n"
+                     "EVIDENCE-BACKED PARAMETER: target float life = "
+                     "15 years [doi:10.test/polym]")
+        res = strict_provenance_downgrade(ans_first, packet, prob)
+        assert res["n_relabels"] == 2, res["relabels"]
+        assert "[doi:" not in res["answer"], res["answer"]
+        assert "doi:10.test" not in res["answer"]
+        # exactly ONE ASSUMPTION word per relabeled line (no doubled
+        # 'ASSUMPTION ... ASSUMPTION' machinery)
+        for ln in res["answer"].splitlines():
+            if ln.strip():
+                assert ln.lower().count("assumption") == 1, ln
+        # the label-LAST shape keeps its pinned canonical form and
+        # also carries no citation
+        ans_last = ("PARAMETER: coating thickness — 2.0 mm — "
+                    "EVIDENCE-BACKED [doi:10.test/polym]")
+        res2 = strict_provenance_downgrade(ans_last, packet, prob)
+        assert res2["n_relabels"] == 1
+        assert "[doi:" not in res2["answer"]
+
     def test_predictor_protocol_duration_required(self):
         # predictor protocols must state the data window (the committed
         # predictor shapes carry "for 30 days" and pass)
