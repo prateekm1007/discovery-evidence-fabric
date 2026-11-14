@@ -59,9 +59,21 @@ for pid in ids:
             break
     env["A0P_GATEWAY_SETUP_S"] = f"{round(time.time() - gw_t0, 1):.1f}"
     if not gw_ok:
-        print(f"[r11a1bat] {pid}: TYPED gateway unavailable this window")
-        results[pid] = {"exit": 3, "state": "GATEWAY_UNAVAILABLE"}
-        continue
+        # R11 cascade fallback (measured 2026-11-14: the z.ai upstream
+        # quota window went 429-dead for 3+ hours after ~88 served
+        # calls — zai_gateway_env.sh cannot pass its transport probe).
+        # The registry cascade routes the slot to the next AVAILABLE
+        # free-tier provider (agnes / inception, keys from the vault);
+        # every served call records its provider + cost_provenance in
+        # the routing ledger, so the transport substitution is typed in
+        # the record, never silent (Art. XXV / XXVII). The gateway envs
+        # are NOT exported in this mode: the zai slot stays unavailable
+        # and the cascade decides, exactly as on a gateway-less host.
+        env.pop("ZAI_API_KEY", None)
+        env.pop("ZAI_BASE_URL", None)
+        env.pop("ZAI_GATEWAY_KEY", None)
+        print(f"[r11a1bat] {pid}: gateway unavailable -> REGISTRY CASCADE "
+              f"mode (transport recorded per call)")
     cmd = [sys.executable, "-B", "scripts/r11_a1.py", pid]
     proc = subprocess.run(cmd, cwd=str(REPO), env=env,
                           capture_output=True, text=True, timeout=900)

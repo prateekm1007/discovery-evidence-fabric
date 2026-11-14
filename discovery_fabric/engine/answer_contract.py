@@ -796,6 +796,34 @@ def internal_narration_tokens(text: str) -> List[str]:
     return hits
 
 
+def _flatten_vars(user_variables) -> str:
+    """R11 (measured on eval-sofc-thermal-cycling: the problem record
+    states the user's clarification as a STRUCTURED dict, and the str+
+    dict concat crashed validate_answer — an input shape the buyer
+    actually wrote must flatten, never crash the contract instrument,
+    Art. XXVII). Lists join as text; dicts flatten k=v pairs."""
+    if not user_variables:
+        return ""
+    if isinstance(user_variables, str):
+        return user_variables
+    if isinstance(user_variables, dict):
+        return "; ".join(f"{k}={v}" for k, v in user_variables.items())
+    return " ".join(str(v) for v in user_variables)
+
+
+def _flatten_clar(clarification) -> str:
+    """The same tolerance for the clarification: a dict clarification
+    flattens to 'k: v' text (the blob keeps the user's stated facts
+    for binding checks — no fact is dropped, no crash)."""
+    if not clarification:
+        return ""
+    if isinstance(clarification, str):
+        return clarification
+    if isinstance(clarification, dict):
+        return "; ".join(f"{k}: {v}" for k, v in clarification.items())
+    return str(clarification)
+
+
 def validate_answer(answer: str, question_type: str,
                     packet: Optional[List[Dict[str, Any]]] = None,
                     user_variables: Optional[List[str]] = None,
@@ -807,8 +835,8 @@ def validate_answer(answer: str, question_type: str,
     answers, and by the engine's answer-shape routing."""
     violations: List[str] = []
     text = answer or ""
-    _clar = clarification or ""
-    blob = (_packet_blob(packet) + " " + " ".join(user_variables or [])
+    _clar = _flatten_clar(clarification)
+    blob = (_packet_blob(packet) + " " + _flatten_vars(user_variables)
             + " " + _clar).lower()
     bindings = {"evidence_bound": 0, "assumption": 0, "unbound_numbers": 0,
                 "all_numbers": 0, "claims": []}

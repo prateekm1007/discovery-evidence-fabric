@@ -138,17 +138,74 @@ def _packet_prompt_lines(packet_list: list, limit: int = 8,
     return "\n".join(lines)
 
 
+def _loads_tolerant(s: str):
+    """json.loads, strict=False, then ONE escape-sanitize retry (R11
+    measured on dev-fu-005: the serving model emits INVALID escapes
+    like '$5K \\today' inside string values — strict json.loads raises
+    on the escape even with strict=False; the sanitize doubles the
+    backslash so the object the model actually emitted parses, never
+    an invented one)."""
+    try:
+        return json.loads(s, strict=False)
+    except Exception:  # noqa: BLE001
+        pass
+    import re as _re
+    fixed = _re.sub(r'\\(?![@"\\/bfnrtu])', r'\\\\', s)
+    try:
+        return json.loads(fixed, strict=False)
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def _extract_json(raw: str):
     """The tolerant JSON extractor: the first '{' to the last '}' of
-    the content. Returns None typed (never fabricates a parse)."""
+    the content. Returns None typed (never fabricates a parse).
+    strict=False (R11 measured on dev-fu-001: the serving model emits
+    RAW newlines INSIDE JSON string values — strict json.loads rejects
+    the whole object for a control character; strict=False parses the
+    object the model actually emitted, never a repaired invention)."""
     s = str(raw or "")
     i, j = s.find("{"), s.rfind("}")
     if i < 0 or j <= i:
         return None
-    try:
-        return json.loads(s[i:j + 1])
-    except Exception:  # noqa: BLE001
-        return None
+    return _loads_tolerant(s[i:j + 1])
+
+
+def _salvage_candidates(raw: str):
+    """R11 (measured on dev-fu-003/001, bench-p09: the ideate call hit
+    finish=length at max_tokens=1300 — the six-candidate JSON was cut
+    mid-object and NO parse recovered it). The salvage: scan for
+    BALANCED brace groups and keep every complete candidate object
+    that carries the required fields. A truncated candidate is never
+    invented (Art. XXV: the salvage keeps only what the model actually
+    emitted); the record carries the typed salvage note with the kept
+    count."""
+    s = str(raw or "")
+    out, depth, start = [], 0, -1
+    for k, ch in enumerate(s):
+        if ch == "{":
+            if depth == 0:
+                start = k
+            depth += 1
+        elif ch == "}" and depth > 0:
+            depth -= 1
+            if depth == 0 and start >= 0:
+                frag = s[start:k + 1]
+                obj = _loads_tolerant(frag)
+                if isinstance(obj, dict) and obj.get("lever") \
+                        and obj.get("name") \
+                        and obj.get("mechanism") \
+                        and obj.get("failure_link"):
+                    out.append(obj)
+                start = -1
+    # de-dup on (lever, name) — a re-emitted candidate is one candidate
+    seen, uniq = set(), []
+    for c in out:
+        key = (str(c.get("lever")), str(c.get("name")))
+        if key not in seen:
+            seen.add(key)
+            uniq.append(c)
+    return uniq
 
 
 def _budget_left(t0: float) -> float:
@@ -249,23 +306,38 @@ def run_a1(pid: str) -> int:
         "this failure that this candidate DEPARTS from\n"
         "  departure: what is actually different vs that standard\n"
         "The six candidates must be MATERIALLY DISTINCT mechanisms "
-        "(not six parameter settings of one idea). Output ONLY a "
-        "JSON object: {\"candidates\": [ ... six objects ... ]}")
+        "(not six parameter settings of one idea). BE TERSE: every "
+        "field under 22 words, the whole output must fit in 2400 "
+        "tokens. Output ONLY a JSON object: {\"candidates\": [ ... "
+        "six objects ... ]}")
     t_ide = time.time()
-    res_i = _bounded(ideate_prompt, max_tokens=1300,
+    res_i = _bounded(ideate_prompt, max_tokens=2600,
                      purpose="a1_ideate")
     timeline += _timeline_from_result(res_i, "a1_ideate")
     ide_raw = (res_i.get("content") or "") if res_i.get("ok") else ""
     ide_obj = _extract_json(ide_raw)
+    _ide_salvage = ""
+    if ide_obj is None:
+        _sal = _salvage_candidates(ide_raw)
+        if len(_sal) >= 3:
+            ide_obj = {"candidates": _sal}
+            _ide_salvage = ("IDEATE_TRUNCATED_SALVAGE (finish="
+                            + str(res_i.get("finish_reason"))
+                            + ", kept " + str(len(_sal)) + " of 6 "
+                            "complete candidates — the truncated "
+                            "remainder was never invented, Art. XXV)")
     rec["ideate"] = {
         "wall_s": round(time.time() - t_ide, 1),
         "transport_ok": bool(res_i.get("ok")),
         "json_parsed": ide_obj is not None,
+        "salvage_note": _ide_salvage or None,
         "n_candidates": len((ide_obj or {}).get("candidates") or []),
         "candidates": ((ide_obj or {}).get("candidates") or [])[:6],
+        "finish_reason": res_i.get("finish_reason"),
         "raw_sha256": __import__("hashlib").sha256(
             ide_raw.encode()).hexdigest()[:16],
-        "raw_excerpt": ide_raw[:600]}
+        "raw_excerpt": ide_raw[:600],
+        "raw_tail": ide_raw[-600:] if len(ide_raw) > 600 else ""}
     if not res_i.get("ok"):
         return _typed("INCOMPLETE_IDEATE_TRANSPORT",
                       "the ideate call failed (typed transport state) "
@@ -616,7 +688,30 @@ def main() -> int:
         if not args:
             print("[a1] queue drained")
             return 0
-    return run_a1(args[0])
+    try:
+        return run_a1(args[0])
+    except Exception as e:  # noqa: BLE001
+        # R11: an unexpected stage crash must STILL leave a typed
+        # record (never exit-1 with no record — Art. XXV: the unknown
+        # stays typed and dated; the battery can then retry it).
+        import traceback as _tb
+        PAIRS_A1.mkdir(parents=True, exist_ok=True)
+        (PAIRS_A1 / f"{args[0]}.json").write_text(json.dumps({
+            "a1_version": A1_VERSION,
+            "problem_id": args[0],
+            "result": "INCOMPLETE_STAGE_CRASH",
+            "typed_note": ("an unexpected exception escaped the stage "
+                           "pipeline — record written by the crash "
+                           "guard (Art. XXV); the traceback text is "
+                           "in the round log, the record stays "
+                           "structured"),
+            "exception_class": type(e).__name__,
+            "exception_text": str(e)[:300],
+            "traceback_tail": _tb.format_exc()[-900:]},
+            indent=1, default=str) + "\n", encoding="utf-8")
+        print(f"[a1] {args[0]}: INCOMPLETE_STAGE_CRASH "
+              f"({type(e).__name__}) — typed record written")
+        return EXIT_INCOMPLETE
 
 
 if __name__ == "__main__":

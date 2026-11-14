@@ -1,0 +1,214 @@
+{
+ "a1_version": "r11_a1/1.0.0",
+ "problem_id": "dev-fu-004-fouling",
+ "baseline_sha_source": "{'pipeline_answer_sha256': 'ABSENT', 'baseline_answer_sha256': 'ABSENT', 'evidence_sha256': '7667372edd948b9338ec430b38e668ea5eaade46d61ce77a07ce44310e8e7c53', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 24,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "ideate": {
+  "wall_s": 14.6,
+  "transport_ok": true,
+  "json_parsed": true,
+  "salvage_note": null,
+  "n_candidates": 6,
+  "candidates": [
+   {
+    "lever": "materials",
+    "name": "Antifouling Copper-Nickel Alloy Tubes",
+    "mechanism": "Copper-nickel alloys release ions that disrupt biofilm formation via oxidative stress on microbial membranes.",
+    "failure_link": "Biofouling (microbial adhesion \u2192 biofilm \u2192 heat transfer degradation) is suppressed by continuous ion release.",
+    "cost_to_test": "Replace 10% of tubes in one pass; 48h shutdown, $50k labor/materials, 1 week monitoring.",
+    "standard_solution": "Stainless steel or admiralty brass tubes (passive, no active fouling resistance).",
+    "departure": "Active biocide release via alloy corrosion (no chemical additives, no moving parts)."
+   },
+   {
+    "lever": "process",
+    "name": "Intermittent Chlorine Microdosing with Flow Pulsing",
+    "mechanism": "Low-concentration chlorine pulses (10 ppm, 1h every 48h) oxidize organic slime while flow pulsation shears loose debris.",
+    "failure_link": "Biofouling (slime layer \u2192 reduced heat transfer) is chemically disrupted before colonization matures.",
+    "cost_to_test": "Retrofit existing chemical feed system; 24h commissioning, $20k chemicals, 3-week trial.",
+    "standard_solution": "Continuous low-dose biocide (e.g., glutaraldehyde) or no chemical treatment.",
+    "departure": "Time-phased, high-efficiency oxidation + mechanical shear (no continuous chemical load)."
+   },
+   {
+    "lever": "design",
+    "name": "Spiral-Grooved Tube Inserts for Drag Reduction",
+    "mechanism": "Helical grooves induce swirl flow, increasing wall shear stress to physically strip biofilms from tube surfaces.",
+    "failure_link": "Biofouling (static boundary layer \u2192 microbial attachment) is prevented by turbulent disruption.",
+    "cost_to_test": "Install 5 grooved inserts in one pass; 72h shutdown, $30k inserts, 2-week heat transfer mapping.",
+    "standard_solution": "Smooth-bore tubes (laminar flow \u2192 fouling accumulation).",
+    "departure": "Passive geometric modification (no chemicals, no moving parts, no flow rate changes)."
+   },
+   {
+    "lever": "controls",
+    "name": "Dynamic Back-Pressure PID with Fouling Compensation",
+    "mechanism": "Adaptive PID controller adjusts turbine throttle based on real-time \u0394T/\u0394P trends, anticipating fouling-induced degradation.",
+    "failure_link": "Turbine derating (rising back-pressure \u2192 reduced efficiency) is mitigated by predictive throttling.",
+    "cost_to_test": "Tune existing DCS logic; 48h engineering, $15k software, 3-week validation under load swings.",
+    "standard_solution": "Fixed-setpoint back-pressure control (reactive, no fouling anticipation).",
+    "departure": "Model-based fouling compensation (uses existing \u0394T/\u0394P as leading indicators)."
+   },
+   {
+    "lever": "operations",
+    "name": "Condenser Flush-and-Refill with Hot Water",
+    "mechanism": "Weekly 1h flush at 80\u00b0C with softened water disrupts biofilms via thermal and osmotic shock.",
+    "failure_link": "Biofouling (mature biofilm \u2192 heat transfer loss) is physically removed before critical mass.",
+    "cost_to_test": "Pilot 1 flush cycle; 2h downtime, $10k water/energy, 3-week back-pressure trend analysis.",
+    "standard_solution": "Annual chemical cleaning or no proactive maintenance.",
+    "departure": "Frequent, low-energy thermal disruption (no harsh chemicals, minimal downtime)."
+   },
+   {
+    "lever": "measurement",
+    "name": "\u0394T/\u0394P Ratio Drift as Fouling Proxy",
+    "mechanism": "Exponential fit of \u0394T/\u0394P ratio across tube passes detects early biofilm growth via increasing thermal resistance.",
+    "failure_link": "Biofouling (increasing fouling factor \u2192 \u0394T rise) is flagged 3+ weeks before derating via ratio trend.",
+    "cost_to_test": "Retrofit DCS script; 16h programming, $5k, 4-week historical data calibration.",
+    "standard_solution": "Absolute \u0394T or \u0394P thresholds (reactive, ignores load swings).",
+    "departure": "Ratio-based drift detection (immune to flow/load variations, predictive)."
+   }
+  ],
+  "raw_sha256": "3d156135c0411e27",
+  "raw_excerpt": "```json\n{\n  \"candidates\": [\n    {\n      \"lever\": \"materials\",\n      \"name\": \"Antifouling Copper-Nickel Alloy Tubes\",\n      \"mechanism\": \"Copper-nickel alloys release ions that disrupt biofilm formation via oxidative stress on microbial membranes.\",\n      \"failure_link\": \"Biofouling (microbial adhesion \u2192 biofilm \u2192 heat transfer degradation) is suppressed by continuous ion release.\",\n      \"cost_to_test\": \"Replace 10% of tubes in one pass; 48h shutdown, $50k labor/materials, 1 week monitoring.\",\n      \"standard_solution\": \"Stainless steel or admiralty brass tubes (passive, no active fouling resi"
+ },
+ "critique": {
+  "wall_s": 16.8,
+  "transport_ok": true,
+  "json_parsed": true,
+  "n_critiques": 6,
+  "top3": [
+   {
+    "lever": "measurement",
+    "reason": "Predicts fouling 3+ weeks early using existing data, no false trips, zero downtime. Beats standard on cost, feasibility, and prediction."
+   },
+   {
+    "lever": "process",
+    "reason": "Prevents biofilm maturation with low-cost, existing infrastructure. Better than standard (chlorination) on corrosion risk and downtime."
+   },
+   {
+    "lever": "materials",
+    "reason": "Passive, long-term suppression. Better than standard (mechanical cleaning) on downtime, but higher upfront cost and no prediction."
+   }
+  ],
+  "standard_solution": "Periodic offline mechanical cleaning (rod cleaning) or continuous chlorination (corrosive, requires shutdowns). Both lack prediction and are high-cost/downtime.",
+  "raw_sha256": "8c881b6b47689b57",
+  "raw_excerpt": "```json\n{\n  \"critiques\": [\n    {\n      \"lever\": \"materials\",\n      \"plausibility\": \"Plausible. Cu-Ni alloys release biocidal ions, but efficacy degrades with biofilm thickness and water chemistry (e.g., high sulfides neutralize ions).\",\n      \"constraint_audit\": {\n        \"existing_instrumentation\": \"ok\",\n        \"3_weeks_lead_time\": \"ok (but no direct fouling prediction)\",\n        \"no_false_trips\": \"ok\",\n        \"biofouling\": \"ok (suppresses adhesion)\"\n      },\n      \"difference_from_standard\": \"Standard: mechanical cleaning (high downtime). This is passive, continuous, but requires alloy com"
+ },
+ "chosen": {
+  "lever": "measurement",
+  "name": "\u0394T/\u0394P Ratio Drift as Fouling Proxy",
+  "mechanism": "Exponential fit of \u0394T/\u0394P ratio across tube passes detects early biofilm growth via increasing thermal resistance.",
+  "failure_link": "Biofouling (increasing fouling factor \u2192 \u0394T rise) is flagged 3+ weeks before derating via ratio trend."
+ },
+ "compose": {
+  "wall_s": 12.8,
+  "transport_ok": true,
+  "answer_sha256": "7492c4e79e3971cf"
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "n_user_constraint_relabels": 0,
+  "relabels": [],
+  "n_label_hygiene_relabels": 0,
+  "n_invalid_citations_dropped": 0
+ },
+ "first_pass": {
+  "consistency_state": "CONSISTENCY_PASS",
+  "contract_valid": true,
+  "n_contract_violations": 0
+ },
+ "repair_call": {
+  "applied": false,
+  "mode": null,
+  "budget_guard_s": 26.8
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "predictor-design",
+   "bindings": {
+    "evidence_bound": 6,
+    "assumption": 1,
+    "unbound_numbers": 1,
+    "all_numbers": 8,
+    "claims": [],
+    "threshold_basis": "assumption"
+   }
+  }
+ },
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "TYPED_SKIP_BASELINE_ABSENT",
+  "a0plus_answer_sha256": null,
+  "note": "the A1 invention arm pairs against the A0+ default path for the same problem (owner R11 item 3)"
+ },
+ "a1_answer": "PROPOSED INDICATOR AND THRESHOLD: Monitor the **exponential drift rate of the \u0394T/\u0394P ratio** across condenser tube passes. A threshold of **>3% weekly increase** in the ratio, sustained for 7 days, triggers a biofouling alert. This leverages existing temperature and pressure measurements to predict fouling 3+ weeks before derating by detecting early biofilm-induced thermal resistance. The threshold is calibrated to the 300 MW unit\u2019s derating limit (assumed at +5% back-pressure rise).\n\nMECHANISM: Biofouling increases thermal resistance in tubes, raising \u0394T for a given \u0394P. The \u0394T/\u0394P ratio (thermal resistance proxy) drifts exponentially as biofilm matures, creating a detectable trend before measurable back-pressure rise. Early-stage biofilm (low biomass) causes subtle but consistent ratio increases, while mature fouling triggers nonlinear growth.\n\nDEPARTURE FROM STANDARD: Standard solutions rely on **periodic chemical cleaning or mechanical scraping**, which are reactive and cause downtime. This method is **predictive, passive, and instrumentation-only**, using existing \u0394T/\u0394P data to flag fouling before derating.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: **Derating threshold** = +5% back-pressure rise (User Constraint: turbine derating limit)\nASSUMPTION PARAMETER: **\u0394T/\u0394P ratio baseline** = 0.0015 \u00b0C/Pa (rationale: typical clean condenser ratio for 300 MW units; validated via manufacturer specs or site history)\nASSUMPTION PARAMETER: **Alert threshold** = 3% weekly drift (rationale: empirical link to 3+ weeks lead time before 5% back-pressure rise, derived from fouling growth models in similar condensers)\nASSUMPTION PARAMETER: **Exponential fit window** = 21 days (rationale: balances noise rejection and early detection; aligns with 3-week lead-time requirement)\n\nINDICATOR: Exponential drift rate of \u0394T/\u0394P ratio across tube passes (% per week)\n\nTHRESHOLD: >3% weekly increase in \u0394T/\u0394P ratio (ASSUMPTION: calibrated to 3+ weeks before 5% back-pressure rise via fouling growth curves)\n\nVALIDATION PROTOCOL: temperature, duration: 90 days; sample size: n = 3 independent 300 MW condenser units. The protocol measures **exponential drift rate of \u0394T/\u0394P ratio across tube passes** over 21-day rolling windows. Detection criterion: \u22653% weekly drift sustained for 7 days in \u22652 of 3 tube passes.",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_ideate",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 11245,
+   "ttfb_ms": 11245,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_critique",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 13360,
+   "ttfb_ms": 13360,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_compose",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 9359,
+   "ttfb_ms": 9359,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  }
+ ],
+ "n_llm_calls": 3,
+ "e2e_wall_s": 44.2,
+ "infra_time_s": {
+  "queue_wait": 0.0,
+  "gateway_setup": 0.0,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}
