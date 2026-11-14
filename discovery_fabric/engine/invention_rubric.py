@@ -38,7 +38,7 @@ a measured failure — the baseline-clone-passable gate — exposed it).
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 INVENTION_RUBRIC_VERSION = "invention_rubric/1.0.0"
 
@@ -167,46 +167,93 @@ def score_answer(problem: Dict[str, Any], answer: str,
 
     a_sents = _mech_sentences(a)
     comp_toks: set = set()
-    comp_name = "baseline"
+    comp_name = "standard reference"
+    # R11 P2b (owner audit step 2): the BASELINE-UNION comparator is
+    # RETIRED as evidence (Art. LXIV: the superseded comparator retires
+    # in the same change that ships its replacement). The measured
+    # defect: unioning the baseline answer made the baseline's novelty
+    # identity-zero BY CONSTRUCTION, so "novelty_delta +1.8" was
+    # trivially satisfied by ANY answer that differs from the baseline
+    # — the owner's verdict, verbatim. The comparator is now the
+    # STANDARD-PRACTICE UNIVERSE: the standard-solution reference plus
+    # the domain's PRIOR-ART corpus (_PRIOR_ART, below) — established
+    # techniques score KNOWN, genuine departures score distinct. The
+    # baseline arm is scored like any other arm (its honest lexical
+    # novelty against standard practice, usually low) — no identity
+    # assumptions. The baseline_answer parameter is retained in the
+    # signature for callers that explicitly want the diff but is no
+    # longer part of the novelty evidence.
     if baseline_answer:
-        comp_toks |= _mech_tokens(baseline_answer)
+        comp_name = ("baseline answer (disclosed comparator, not the "
+                     "novelty evidence)")
     if standard_answer:
         comp_toks |= _mech_tokens(standard_answer)
-        comp_name = "standard reference"
+    pa = prior_art_reference(problem)
+    if pa:
+        comp_toks |= _mech_tokens(pa)
+        comp_name = "standard reference + prior-art corpus"
     if a_sents and comp_toks:
-        covered = [s for s in a_sents
-                   if len(s & comp_toks) / max(len(s), 1) >= 0.30]
-        cov_ratio = len(covered) / len(a_sents)
-        if cov_ratio >= 0.90:
-            scores["novelty"] = 0
-            reasons["novelty"].append(
-                f"a clone of the {comp_name} body ({len(covered)} of "
-                f"{len(a_sents)} mechanism sentences covered by its "
-                "vocabulary)")
-        elif cov_ratio >= 0.75:
+        # the KNOWN gate first (named-technique anchors): an idea that
+        # explicitly names an established technique is prior art for
+        # the domain, whatever its lexical distance from the corpus —
+        # measured basis in the corpus-recall overlap finding (R11
+        # P2b, 2026-11-14). The lexical distance below stays as the
+        # DISCLOSED secondary signal for the NOVEL path; the semantic
+        # verdict is the auditor's + the judge's (Art. XXVI).
+        try:
+            _pa_v = prior_art_verdict(a, problem)
+        except Exception:  # noqa: BLE001 — the anchor check failing
+            _pa_v = "NO_REFERENCE"  # leaves the distance path intact
+        if _pa_v == "KNOWN":
             scores["novelty"] = 1
             reasons["novelty"].append(
-                f"a restatement of the {comp_name} with label/format "
-                f"differences ({len(covered)}/{len(a_sents)} "
-                "sentences covered)")
-        elif cov_ratio >= 0.55:
-            scores["novelty"] = 2
-            reasons["novelty"].append(
-                f"same mechanism family as the {comp_name} with "
-                f"material parameter/design differences "
-                f"({len(covered)}/{len(a_sents)} sentences covered)")
-        elif cov_ratio >= 0.30:
-            scores["novelty"] = 3
-            reasons["novelty"].append(
-                f"a clearly different mechanism from the {comp_name} "
-                f"with shared engineering vocabulary "
-                f"({len(covered)}/{len(a_sents)} sentences covered)")
+                "KNOWN prior art: the idea explicitly names an "
+                "established technique of this domain "
+                "(named-technique anchor, measured false-novelty "
+                "instrument) — capped at 1")
         else:
-            scores["novelty"] = 4
-            reasons["novelty"].append(
-                f"the mechanism sentences are largely uncovered by "
-                f"the {comp_name} vocabulary (only {len(covered)} of "
-                f"{len(a_sents)} sentences share it)")
+            # R11 P2b, second measured correction (2026-11-14): sentence
+            # COVERAGE of the answer still rewarded verbosity — the 3275-
+            # char baseline scored only 4/24 sentences covered and took
+            # novelty 4 again. The owner's axis is PRIOR-ART DISTANCE:
+            # corpus_recall = |corpus ∩ answer| / |corpus| — the fraction
+            # of the domain's established vocabulary the answer actually
+            # implements. Recall is normalized over the CORPUS, so a
+            # verbose standard-practice answer scores high recall (low
+            # novelty) and a genuine departure scores low recall (high
+            # novelty) regardless of answer length. Bands carry provenance
+            # in the rationale; the verdict stays the auditor's (Art. XXVI).
+            a_toks_all: set = set()
+            for st in a_sents:
+                a_toks_all |= st
+            recall = len(a_toks_all & comp_toks) / max(len(comp_toks), 1)
+            if recall >= 0.75:
+                scores["novelty"] = 0
+                reasons["novelty"].append(
+                    f"a clone of the {comp_name} body "
+                    f"(prior-art recall {recall:.2f})")
+            elif recall >= 0.50:
+                scores["novelty"] = 1
+                reasons["novelty"].append(
+                    f"implements the established techniques — "
+                    f"(prior-art recall {recall:.2f})")
+            elif recall >= 0.35:
+                scores["novelty"] = 2
+                reasons["novelty"].append(
+                    f"the standard mechanism family with material "
+                    f"parameter/design differences (prior-art recall "
+                    f"{recall:.2f})")
+            elif recall >= 0.20:
+                scores["novelty"] = 3
+                reasons["novelty"].append(
+                    f"a clearly different mechanism with shared "
+                    f"engineering vocabulary (prior-art distance "
+                    f"{1 - recall:.2f})")
+            else:
+                scores["novelty"] = 4
+                reasons["novelty"].append(
+                    f"a genuine departure from the {comp_name} "
+                    f"(prior-art distance {1 - recall:.2f})")
     else:
         scores["novelty"] = 0
         reasons["novelty"].append("no comparator available — scored "
@@ -263,6 +310,49 @@ def score_answer(problem: Dict[str, Any], answer: str,
                 "re-states the user's own constraint values "
                 "consistently")
     feas = max(0, min(4, feas))
+
+    # ---- R11 P2a (owner audit step 2): the PLAUSIBILITY GATE caps the
+    # feasibility axis. The measured defect: the scorer gave A1 a 4.0
+    # mean "despite p02 and new05" — resource realism words and
+    # constraint-number echoes say nothing about whether the mechanism
+    # SURVIVES the environment. The gate runs the SAME deterministic
+    # anchors the A1 critic uses (one source of truth,
+    # plausibility_critic) over the delivered answer: a KILL
+    # (environment incompatibility, magnitude contradiction, scope
+    # violation, premise violation under an installed-only premise,
+    # allowed-signal breach) caps feasibility at 2; a soft premise flag
+    # takes 1. Provenance rides the rationale (Art. XXVII); the
+    # threshold class is BUYER_DEFINED (the owner audit IS the
+    # calibration corpus) + ENGINEERING (the material rules).
+    try:
+        from discovery_fabric.engine.plausibility_critic import (
+            check_candidate as _plaus_check,
+            allowed_signals_from_constraint as _allowed_from)
+        _sigs, _ = _allowed_from(prob_txt)
+        _pa = _plaus_check({"mechanism": a[:1600]},
+                           prob_txt,
+                           failure_txt=str(problem.get("failure") or ""),
+                           allowed_signals=_sigs)
+        _plaus_kills = [k["anchor"] for k in _pa.get("kills") or []]
+        _plaus_flags = [f["flag"] for f in _pa.get("flags") or []]
+        if _plaus_kills:
+            feas = min(feas, 2)
+            reasons["feasibility"].append(
+                f"PLAUSIBILITY GATE cap (kills: {', '.join(_plaus_kills)}"
+                ") — the mechanism carries an anchor-killed "
+                "incompatibility/violation with recorded provenance "
+                "(owner-audit calibration corpus, Art. L/XXVII)")
+        if _plaus_flags and not _plaus_kills:
+            feas = max(1, feas - 1)
+            reasons["feasibility"].append(
+                f"premise flags ({', '.join(_plaus_flags)}) — the "
+                "mechanism assumes a component/fluid the stated device "
+                "does not carry (−1, not a kill; the critic "
+                "adjudicates)")
+    except Exception:  # noqa: BLE001 — a critic failure must not
+        pass           # silently change the score; absence is typed
+                       # by the score riding the uncapped value
+
     scores["feasibility"] = feas
 
     # ---- testability (0-4): the four protocol fields on THIS design
@@ -372,7 +462,10 @@ def score_triple(problem: Dict[str, Any], arms: Dict[str, Dict[str, Any]],
         # BOTH the generic standard practice and the problem's
         # specific standard delivery.
         s = score_answer(problem, ans,
-                         baseline_answer=base_ans,
+                         baseline_answer=None,  # R11 P2b: the
+                         # baseline-union comparator is RETIRED as
+                         # evidence — the comparator is the standard
+                         # reference + the prior-art corpus
                          standard_answer=std,
                          contract_state=rec.get("typed_state"))
         out["arms"][name] = {"typed_state": rec.get("typed_state")
@@ -514,6 +607,224 @@ _STANDARD_SOLUTIONS = {
         "campaign and retire the unit at the qualification "
         "margin."),
 }
+
+
+#: R11 P2b (owner audit step 2): the PRIOR-ART corpus per failure
+#: domain — established, standard-practice TECHNIQUES (not one-sentence
+#: policies). This is what the novelty comparator diffs against now
+#: that the baseline-union is retired, and what the false-novelty
+#: instrument checks ideas against: a proposed "novel" idea that
+#: matches an entry here is KNOWN, and the instrument says so.
+#: Provenance: established engineering practice (ENGINEERING class,
+#: Art. XXVII); the corpus grows when the owner's seeded specimens are
+#: placed (typed NOT_PLACED until then — Art. XXV).
+_PRIOR_ART: Dict[str, str] = {
+    "spalling": (
+        "Established bearing and spalling techniques: vibration "
+        "spectral analysis with acceleration sensors, envelope "
+        "demodulation of bearing defect frequencies, spectral "
+        "kurtosis for transient-bearing-impact detection, ISO "
+        "vibration-severity zone monitoring, lubricant analysis and "
+        "particle counting, thermography of the housing, acoustic "
+        "emission monitoring, replacement at the vibration alarm "
+        "limit, and scheduled preventive replacement."),
+    "partial discharge": (
+        "Established partial-discharge and insulation techniques: "
+        "offline PD measurement per IEC 60270, phase-resolved PD "
+        "pattern analysis (PRPD), online PD monitoring with coupling "
+        "capacitors, tan-delta (power factor) testing, insulation "
+        "resistance and polarization-index tests, dissolved-gas "
+        "analysis (DGA) trending per IEEE C57.104 with gas-ratio "
+        "methods such as Duval's triangle, acoustic PD detection, "
+        "and scheduled oil sampling."),
+    "grid corrosion": (
+        "Established grid-corrosion techniques: lead-calcium and "
+        "lead-calcium-tin grid alloys, antimony-free grids, grid "
+        "thickening and geometry redesign, temperature-compensated "
+        "float-voltage regulation, capacity discharge testing, "
+        "conductance and internal-resistance ohmic measurement, "
+        "electrolyte-level maintenance, and cell replacement at the "
+        "capacity threshold."),
+    "fouling": (
+        "Established fouling techniques: scheduled chemical cleaning "
+        "with suited solvents and biocide dosing, mechanical "
+        "backwash and rodding, side-stream filtration, increased "
+        "cooling-water velocity, differential-pressure monitoring, "
+        "heat-transfer-coefficient trending, tube pigging, antifoul "
+        "surface coatings, copper-nickel and other biofouling-"
+        "resistant tube alloys, and chlorination programs."),
+    "brush wear": (
+        "Established brush and slip-ring techniques: brush "
+        "replacement at the wear limit, spring-pressure setting to "
+        "the manufacturer band, brush bedding-in, ambient-humidity "
+        "control, brush-grade selection for current density, ring "
+        "surface re-machining, and scheduled inspection."),
+    "dry-out": (
+        "Established dry-out techniques: operating-voltage derating, "
+        "temperature control, equivalent-series-resistance (ESR) "
+        "trending, capacitance-loss trending, thermal-derating to "
+        "the rated lifetime curves, ripple-current limiting, and "
+        "pack replacement at the ESR limit."),
+    "imbalance": (
+        "Established cell-imbalance techniques: battery-management-"
+        "system balancing (passive bleeding resistors and active "
+        "charge transfer), capacity and impedance grading of cells "
+        "at assembly, per-cell state-of-charge monitoring, "
+        "impedance trending, replacement of the weakest cells, and "
+        "tight thermal management so cells age uniformly."),
+    "creep": (
+        "Established elastomeric-bearing creep techniques: "
+        "elastomer compound and hardness specification to the "
+        "governing bridge-bearing standards, deflection monitoring, "
+        "shim restoration of the seat level, pad replacement at the "
+        "deflection limit, and scheduled inspection for deformation "
+        "and hardening."),
+    "barrier": (
+        "Established packaging-barrier techniques: foil lamination "
+        "and metallized films, increased EVOH barrier-layer "
+        "thickness, silicon-oxide barrier coatings, desiccant "
+        " sachets, WVTR and OTR permeation testing, seal-integrity "
+        "testing, and humidity-controlled storage and distribution."),
+    "thermal cycling": (
+        "Established thermal-cycling techniques: controlled ramp-"
+        "rate profiles, compliant buffer and interlayer design, "
+        "coefficient-of-thermal-expansion matching, glass-ceramic "
+        "and compliant seal structures, standard thermal-cycling "
+        "qualification tests to a required cycle count, and "
+        "degradation-indicator monitoring across the campaign."),
+}
+
+
+def prior_art_reference(problem: Dict[str, Any]) -> str:
+    """The PRIOR-ART statement for the failure domain — deterministic
+    from the same domain matcher the standard reference uses. Reference
+    input for scoring, never a delivered answer."""
+    std = standard_solution_reference(problem)
+    dom = ""
+    if std.startswith("STANDARD ("):
+        dom = std[len("STANDARD ("):std.find(")")]
+    if dom and dom in _PRIOR_ART:
+        return f"PRIOR-ART ({dom}): {_PRIOR_ART[dom]}"
+    return ""
+
+
+#: R11 P2b, third measured correction (2026-11-14): the corpus-recall
+#: instrument has a MEASURED discrimination ceiling — known prior-art
+#: ideas scored recall 0.23-0.52 while baseline answers scored
+#: 0.00-0.43 (the distributions overlap; a band between them would be
+#: tuning-until-it-lands, the exact gaming the owner's audit ordered
+#: out). The KNOWN verdict therefore rides NAMED-TECHNIQUE anchors:
+#: an idea that explicitly NAMES an established technique IS prior
+#: art for that domain — high precision, no band tuning. The lexical
+#: corpus distance stays in the rubric as a DISCLOSED secondary
+#: signal; the semantic novelty verdict is the auditor's + the
+#: independent judge's (Art. XXVI).
+_PRIOR_ART_TECHNIQUES: Dict[str, List[Tuple[str, bool]]] = {
+    # (anchor regex, is_signature) — signature = the technique's
+    # distinctive name; one signature or two plain anchors = KNOWN
+    "spalling": [
+        (r"spectral[ -]kurtosis|\bkurtosis\b", True),
+        (r"envelope[ -](demodulat|spectrum|analysis|detect)", False),
+        (r"defect[ -]frequency|ISO[ ]?10816|ISO[ ]?20816", False),
+        (r"acoustic[ -]emission|particle[ -]count|lubricant[ -]analysis",
+         False),
+        (r"vibration[ -](monitor|program|alarm|zone)", False),
+    ],
+    "partial discharge": [
+        (r"PRPD|phase[- ]resolved", True),
+        (r"IEC[ ]?60270|C57\.104|\bDGA\b|dissolved[- ]gas|Duval", True),
+        (r"tan[- ]delta|polarization[ -]index|coupling[ -]capacitor",
+         False),
+        (r"acoustic[ -]PD|online[ -]PD[ -]monitor", False),
+        (r"insulation[- ]resistance|offline[ -]diagnostic", False),
+    ],
+    "grid corrosion": [
+        (r"lead[- ]calcium|antimony[- ]free", True),
+        (r"float[- ]voltage[ -](regulation|control)|capacity[ -]"
+         r"(discharge[ -])?test", False),
+        (r"conductance|internal[- ]resistance|ohmic", False),
+        (r"electrolyte[- ]level|recombination", False),
+    ],
+    "fouling": [
+        (r"chemical[ -]cleaning|biocide|backwash|pigging", True),
+        (r"side[- ]stream|chlorinat|copper[- ]nickel|antifoul", False),
+        (r"differential[- ]pressure|heat[- ]transfer[- ]coefficient",
+         False),
+    ],
+    "brush wear": [
+        (r"wear[ -]limit|spring[ -]pressure|bedding[- ]in", True),
+        (r"brush[ -]grade|ring[ -]surface|runout", False),
+    ],
+    "dry-out": [
+        (r"\bESR\b|equivalent[ -]series[ -]resistance", True),
+        (r"capacitance[ -]trend|voltage[ -]derat|ripple[- ]current",
+         False),
+        (r"lifetime[ -]curves|thermal[ -]derat", False),
+    ],
+    "imbalance": [
+        (r"\bBMS\b|battery[- ]management|cell[ -]balanc", True),
+        (r"passive[ -]balanc|active[ -](balanc|charge[ -]transfer)",
+         True),
+        (r"cell[ -]grading|grading[ -]at[ -]assembly", False),
+        (r"state[- ]of[- ]charge[ -]monitor|impedance[ -]trend", False),
+    ],
+    "creep": [
+        (r"EN[ ]?1337|AASHTO", True),
+        (r"deflection[ -](monitor|limit)|shim|seat[ -]level", False),
+    ],
+    "barrier": [
+        (r"WVTR|OTR|seal[- ]integrity", True),
+        (r"metallized|foil[ -]lamination|SiOx|desiccant", False),
+        (r"barrier[- ]layer[ -]thickness", False),
+    ],
+    "thermal cycling": [
+        (r"ramp[- ]rate|CTE|coefficient[ -]of[ -]thermal", True),
+        (r"buffer[ -]layer|interlayer|glass[- ]ceramic", False),
+        (r"qualification[ -]test|cycle[ -]count", False),
+    ],
+}
+
+
+def _prior_art_domain(problem: Dict[str, Any]) -> str:
+    std = standard_solution_reference(problem)
+    if std.startswith("STANDARD ("):
+        return std[len("STANDARD ("):std.find(")")]
+    return ""
+
+
+def prior_art_verdict(idea_text: str, problem: Dict[str, Any]) -> str:
+    """The FALSE-NOVELTY instrument (owner audit step 2): does a
+    proposed idea match the domain's prior art? Returns KNOWN / NOVEL /
+    NO_REFERENCE (typed — Art. XXV: no corpus, no verdict). KNOWN = the
+    idea explicitly NAMES an established technique (one signature
+    anchor or two plain anchors) — high precision, measured basis in
+    the corpus-recall overlap finding above."""
+    dom = _prior_art_domain(problem)
+    if not dom or dom not in _PRIOR_ART_TECHNIQUES:
+        return "NO_REFERENCE"
+    a = str(idea_text or "").lower()
+    plain, sig = 0, []
+    for rx, is_sig in _PRIOR_ART_TECHNIQUES[dom]:
+        m = re.search(rx, a, re.IGNORECASE)
+        if m:
+            if is_sig:
+                sig.append(m.group(0))
+            else:
+                plain += 1
+    return "KNOWN" if (sig or plain >= 2) else "NOVEL"
+
+
+def _pa_tokens(t: str) -> set:
+    stop = {"the", "and", "for", "with", "from", "that", "this",
+            "will", "shall", "must", "use", "used", "using",
+            "based", "when", "where", "which", "have", "has",
+            "are", "was", "were", "can", "may", "should", "into",
+            "than", "then", "over", "under", "such", "also",
+            "each", "any", "all", "more", "most", "per", "via",
+            "established", "techniques", "practice", "standard",
+            "scheduled", "monitoring", "testing"}
+    return {w for w in re.findall(r"[a-z][a-z\-]{3,}", (t or "").lower())
+            if w not in stop}
 
 
 def standard_solution_reference(problem: Dict[str, Any]) -> str:

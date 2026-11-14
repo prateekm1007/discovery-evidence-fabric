@@ -113,7 +113,9 @@ def _same_mechanism(distinct: set, rec_text_toks: set) -> dict:
 
 
 def search_one(pid: str) -> dict:
-    rec_f = PAIRS_A1 / f"{pid}.json"
+    import os as _os
+    _dir = _os.environ.get("A1_TRIPLES_DIR", "").strip()
+    rec_f = (Path(_dir) if _dir else PAIRS_A1) / f"{pid}.json"
     if not rec_f.exists():
         return {"problem_id": pid, "state": "NOT_MEASURED",
                 "why": "no A1 record (the arm has not run)"}
@@ -164,6 +166,33 @@ def search_one(pid: str) -> dict:
         claim = ("NOVELTY_CLAIMED"
                  if nearest["verdict"] == "PRIOR_ART_DIFFERENT_MECHANISM"
                  else "NOVELTY_WITHDRAWN_PRIOR_ART_SAME_MECHANISM")
+    # R11 P2b (owner audit step 2): the named-technique false-novelty
+    # instrument outranks the token verdict — an idea that explicitly
+    # NAMES an established technique of its domain (spectral kurtosis
+    # for bearings, PRPD, DGA per IEEE C57.104, ...) is KNOWN prior
+    # art and the claim is withdrawn regardless of token distance.
+    try:
+        from discovery_fabric.engine.invention_rubric import (
+            prior_art_verdict as _pav)
+        # the verdict reads the IDEA'S OWN mechanism text (name +
+        # mechanism + failure_link), never the whole composed answer:
+        # the answer's DEPARTURE FROM STANDARD section names the
+        # standard solution BY DESIGN, which would fire the anchors on
+        # every idea (measured: 7/12 withdrawn on the first pass)
+        _ch = rec.get("chosen") or {}
+        _idea_txt = " ".join(str(_ch.get(k) or "") for k in
+                             ("name", "mechanism", "failure_link"))
+        # plus the answer's PROPOSAL+MECHANISM head (everything before
+        # the DEPARTURE FROM STANDARD section — that section names the
+        # standard solution by design and would fire the anchors on
+        # every idea; measured: 12/12 claimed on candidate text alone
+        # after the first over-fire, 7/12 on the whole answer)
+        _head = ans.split("DEPARTURE FROM STANDARD")[0]
+        _pav_v = _pav(_idea_txt + " " + _head[:1200], prob)
+    except Exception:  # noqa: BLE001 — absent stays absent
+        _pav_v = "NO_REFERENCE"
+    if _pav_v == "KNOWN" and claim == "NOVELTY_CLAIMED":
+        claim = "NOVELTY_WITHDRAWN_NAMED_PRIOR_ART"
     return {
         "novelty_search_version": NOVELTY_VERSION,
         "problem_id": pid,

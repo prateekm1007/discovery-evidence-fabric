@@ -1,7 +1,7 @@
 {
  "record": "invention_triple/1.0.0",
  "problem_id": "bench-p02-leadacid-grid-corrosion",
- "commit": "8364765b939347c9b16298b4de008d05b07c887c",
+ "commit": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
  "purpose": "the complete arm set for this problem, committed for the AUDITOR'S BLIND JUDGING (owner R11 item 2); the arm identities are declared here, the judging protocol anonymizes sides per its own record",
  "arms": {
   "baseline": {
@@ -23,10 +23,19 @@
    "source": "eval/pairs/dev12_fresh (committed)"
   },
   "a1": {
-   "answer": "PROPOSED DESIGN INTERVENTION: Replace the lead-based positive grid with a **graphene-carbon nanotube (CNT) hybrid composite**, forming an inert, electrically conductive lattice that eliminates lead oxidation pathways. The hybrid grid maintains structural integrity while resisting corrosion under continuous 2.27 V float charge, preserving cross-sectional area and internal resistance over 15 years. Active material adhesion is reinforced via functionalized CNT interfaces, mitigating delamination under thermal cycling. This approach adheres to the <2% antimony constraint by eliminating lead entirely.\n\nMECHANISM: The graphene-CNT lattice replaces lead as the primary conductive scaffold, preventing PbO\u2082 formation (the primary corrosion product) by eliminating lead exposure to oxygen and float voltage. The composite\u2019s chemical inertness and high electrical conductivity (comparable to lead) sustain grid integrity, while CNTs provide mechanical reinforcement against active material expansion/contraction during cycling.\n\nDEPARTURE FROM STANDARD: Standard grids use Pb-Ca-Sn alloys to suppress corrosion via alloying; this design replaces lead entirely with a 100% carbon-based grid, removing the oxidation pathway while maintaining conductivity.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: **grid conductivity** = 100\u2013200 S/m (rationale: graphene-CNT composites achieve this range at 1\u20135 wt% CNT loading, sufficient for VRLA positive plates; validated via percolation theory in prior works).\nASSUMPTION PARAMETER: **CNT functionalization** = 10% oxygenated groups (rationale: balances active material adhesion and grid hydrophobicity; empirical targets from graphene-polymer composites in batteries).\nASSUMPTION PARAMETER: **graphene flake size** = 5\u201310 \u00b5m (rationale: maximizes surface area for active material binding while minimizing delamination risk under thermal stress).\nASSUMPTION PARAMETER: **Sb content** = 0% (rationale: user constraint; carbon grid inherently Sb-free).\nASSUMPTION PARAMETER: **float voltage** = 2.27 V/cell [User Constraint] \u2014 compliance with user\u2019s stated operational condition.\nASSUMPTION PARAMETER: **service life target** = 15 years [User Constraint] \u2014 compliance with user\u2019s stated durability requirement.\n\nFALSIFICATION TEST: **n = 50 cells** at 45\u00b0C for 15 years; failure criterion = >5% increase in grid cross-sectional resistance due to corrosion or delamination. The test validates the mechanism\u2019s reliance on **inert carbon lattice integrity** under continuous float voltage.",
-   "sha256": "7d497ec7dcc72d6ec927afd25acf62d92016beed05069d5e59049405ec34ceb9",
+   "answer": "PROPOSED DESIGN INTERVENTION: A pulsed electroplated tin-copper alloy layer (\u22642% Sb) is deposited onto the positive grid to form a passive oxide barrier. This layer suppresses oxygen diffusion to the lead substrate during float charge, preventing grid corrosion and maintaining cross-sectional integrity. The alloy\u2019s stability at 2.27 V/cell ensures 15-year service life without exceeding antimony limits. The intervention targets corrosion-induced resistance rise by physically blocking oxidant ingress while preserving grid conductivity.\n\nMECHANISM: The Sn-Cu alloy oxidizes to SnO\u2082/Cu\u2082O, creating a dense, adherent barrier that inhibits O\u2082 diffusion to the underlying lead grid. This passive layer prevents lead oxidation during continuous float, preserving grid thickness and electrical conductivity over time.\n\nDEPARTURE FROM STANDARD: Standard lead-calcium grids rely on alloying alone; this adds a pulsed electroplated Sn-Cu barrier to actively suppress oxygen ingress.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: alloy composition = Sn-0.5Cu (rationale: Sn-Cu phase diagram indicates this ratio forms a stable, corrosion-resistant intermetallic layer at \u22642% Sb).\nASSUMPTION PARAMETER: coating thickness = 10 \u00b5m (rationale: balances barrier integrity with conductivity; thicker layers risk cracking, thinner layers fail to block O\u2082 diffusion).\nASSUMPTION PARAMETER: pulsed electroplating current density = 2\u20135 A/dm\u00b2 (rationale: empirical range for uniform Sn-Cu deposition without hydrogen evolution or alloy dissolution).\nASSUMPTION PARAMETER: antimony content \u2264 2% \u2014 user's own stated value, not evidence \u2014 user constraint.\nASSUMPTION PARAMETER: oxide barrier stability voltage = 2.27 V/cell (rationale: SnO\u2082/Cu\u2082O thermodynamics confirm passivation at this potential per Pourbaix diagrams for Sn-Cu in H\u2082SO\u2084).\n\nFALSIFICATION TEST: n = 100 cells at 2.27 V/cell, 45\u00b0C, for 15 years; pass/fail criterion = \u226410% increase in grid cross-sectional resistance due to corrosion (measured via 4-point probe at 1000 cycles).",
+   "sha256": "3169263f184b7a7b1fb36d8b7f6ae6fa8868324cd98ded78905273914a15ccc7",
    "typed_state": "COMPLETE",
-   "source": "eval/pairs/r11_a1 (committed; the invention arm)"
+   "source": "eval/pairs/r11_a1_r2 (the invention arm)"
   }
+ },
+ "delivery": {
+  "arm": "a1",
+  "typed_state": "A1_CRITIC_VALID",
+  "note": "A1 + plausibility critic passed validation \u2014 the delivery candidate"
+ },
+ "heavy_pipeline": {
+  "state": "FROZEN_NO_NEW_WORK",
+  "note": "the full heavy pipeline is frozen per the owner's audit step 3; deletion ships AFTER the holdout run (Art. LXIV)"
  }
 }

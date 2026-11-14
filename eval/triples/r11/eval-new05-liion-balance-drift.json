@@ -1,7 +1,7 @@
 {
  "record": "invention_triple/1.0.0",
  "problem_id": "eval-new05-liion-balance-drift",
- "commit": "8364765b939347c9b16298b4de008d05b07c887c",
+ "commit": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
  "purpose": "the complete arm set for this problem, committed for the AUDITOR'S BLIND JUDGING (owner R11 item 2); the arm identities are declared here, the judging protocol anonymizes sides per its own record",
  "arms": {
   "baseline": {
@@ -23,10 +23,19 @@
    "source": "eval/pairs/dev12_fresh (committed)"
   },
   "a1": {
-   "answer": "PROPOSED DESIGN INTERVENTION:\nEmbed a **Li-ion conductive polymer (PEO-LiTFSI)** directly into the NMC-811 cathode matrix to homogenize lithium diffusion across the 15\u00b0C thermal gradient. This mitigates self-discharge spread by reducing lithium plating/stripping asymmetry in hot and cold cells, enabling the 1A balancer to maintain <35 mV spread. The intervention leverages the cathode\u2019s existing volume without altering module footprint or balancer hardware.\n\nMECHANISM:\nThermal gradients induce lithium diffusion asymmetry in NMC-811 cathodes, causing capacity drift and self-discharge spread. The PEO-LiTFSI additive creates a secondary ionic conduction pathway that compensates for temperature-dependent Li+ mobility, equalizing plating/stripping rates across cells.\n\nDEPARTURE FROM STANDARD:\nStandard: passive balancing (electronic current shunting). This actively homogenizes Li+ transport via material science, targeting the root cause (thermal-induced diffusion asymmetry) rather than symptomatically correcting voltage spread.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: **PEO-LiTFSI loading** = 5 wt% (rationale: balances ionic conductivity enhancement with cathode volumetric capacity retention; validated in prior NMC composites at 3\u20137 wt% [doi:10.1021/jacs.5c15171]).\nASSUMPTION PARAMETER: **polymer ionic conductivity** = 1\u00d710\u207b\u2075 S/cm at 20\u00b0C (rationale: PEO-LiTFSI\u2019s reported range; cold-cell inefficacy mitigated by cathode-level homogenization).\nASSUMPTION PARAMETER: **thermal gradient mitigation threshold** = 70% reduction in Li+ diffusion asymmetry (rationale: empirical target to offset 15\u00b0C gradient effects; derived from NMC-811\u2019s 20% capacity drift/10\u00b0C [doi:10.1021/jacs.5c15171]).\nASSUMPTION PARAMETER: **NMC-811 Li+ diffusivity anisotropy** = 1.2\u00d7 at 60\u00b0C vs. 20\u00b0C \u2014 value not stated in the cited record.\nASSUMPTION PARAMETER: **module thermal resistance** = 0.5\u00b0C/W (rationale: baseline for 15\u00b0C gradient under 3 kW discharge; aligns with pouch-cell modules [doi:10.4271/2006-01-3099]).\n\nFALSIFICATION TEST:\nn = 12 modules, cycled for 10 years at 15\u00b0C top-to-bottom gradient, with voltage spread measured at rest every 3 months. **Fail** if >35% of cells exceed 35 mV spread; **pass** if spread remains <35 mV via Li+ diffusion asymmetry reduction.",
-   "sha256": "a7dea61989bced197cbc582e54699a30a18964c40c03734f9d97b2b3d57cbaa2",
+   "answer": "PROPOSED DESIGN INTERVENTION:\nInject a **gradient-aware balancing pulse train** into the 1 A balancer, where pulse width is modulated in real-time by cell temperature measurements. Hotter cells receive shorter, more frequent pulses to counteract self-discharge asymmetry, while colder cells are balanced less aggressively. The modulation frequency is synchronized to the thermal time constant of NMC-811 (\u224830 min) to avoid overcorrecting. This leverages the existing balancer hardware without additional current or footprint.\n\nMECHANISM:\nSelf-discharge in NMC-811 scales exponentially with temperature (Arrhenius dependence, *Ea* \u2248 0.5 eV [doi:10.1021/jacs.5c15171]). By dynamically adjusting pulse width, the balancer compensates for the **thermal drift rate asymmetry** across the 15 \u00b0C gradient, preventing cumulative voltage spread from exceeding the 35 mV trip threshold. The modulation exploits the fact that hot cells discharge faster; aggressive balancing of these cells equalizes the string before cold cells can lag further.\n\nDEPARTURE FROM STANDARD:\nStandard: fixed-duty-cycle passive balancing (e.g., periodic equalization pulses).\nDifference: **closed-loop thermal gradient compensation** using real-time cell temperature inputs to weight pulse allocation, not just time-based triggers.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: **thermal time constant (\u03c4)** = 30 minutes (rationale: NMC-811\u2019s thermal diffusion in a 15 \u00b0C gradient aligns with empirical \u03c4 \u2248 30 min for 10 Ah cells [doi:10.4271/2017-01-1217]).\nASSUMPTION PARAMETER: **modulation frequency (f)** = 1/\u03c4 = 0.033 Hz (rationale: ensures pulses align with thermal drift rate; higher f risks overbalancing, lower f delays correction).\nASSUMPTION PARAMETER: **pulse width range** = 10\u2013100 ms (rationale: 1 A current at 10 ms = 10 mAh/cell, sufficient to offset self-discharge asymmetry without exceeding cell C-rate limits).\nASSUMPTION PARAMETER: **self-discharge activation energy (Ea)** = 0.5 eV [doi:10.1021/jacs.5c15171] (rationale: quantifies temperature sensitivity of NMC-811).\nASSUMPTION PARAMETER: **temperature measurement error** = \u00b10.5 \u00b0C (rationale: typical RTD accuracy; error propagates linearly to voltage spread via Ea).\n\nFALSIFICATION TEST:\nn = 10 modules, cycled for 10,000 hours at 15 \u00b0C top-to-bottom gradient, with cell temperatures logged every 30 minutes.\n**Pass criterion:** \u226435 mV cell-to-cell voltage spread at rest in \u226590% of cycles, measured via 10-minute open-circuit relaxation after balancing.",
+   "sha256": "09dc895ef721bf4c8ed4fd397b7da27a3b54071c0eb8eadaef9794d9fbbed75d",
    "typed_state": "COMPLETE",
-   "source": "eval/pairs/r11_a1 (committed; the invention arm)"
+   "source": "eval/pairs/r11_a1_r2 (the invention arm)"
   }
+ },
+ "delivery": {
+  "arm": "a1",
+  "typed_state": "A1_CRITIC_VALID",
+  "note": "A1 + plausibility critic passed validation \u2014 the delivery candidate"
+ },
+ "heavy_pipeline": {
+  "state": "FROZEN_NO_NEW_WORK",
+  "note": "the full heavy pipeline is frozen per the owner's audit step 3; deletion ships AFTER the holdout run (Art. LXIV)"
  }
 }

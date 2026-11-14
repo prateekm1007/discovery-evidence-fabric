@@ -1,7 +1,7 @@
 {
  "record": "invention_triple/1.0.0",
  "problem_id": "eval-new04-chiller-fouling-predictor",
- "commit": "8364765b939347c9b16298b4de008d05b07c887c",
+ "commit": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
  "purpose": "the complete arm set for this problem, committed for the AUDITOR'S BLIND JUDGING (owner R11 item 2); the arm identities are declared here, the judging protocol anonymizes sides per its own record",
  "arms": {
   "baseline": {
@@ -23,10 +23,19 @@
    "source": "eval/pairs/dev12_fresh (committed)"
   },
   "a1": {
-   "answer": "PROPOSED INDICATOR AND THRESHOLD: Monitor the **condenser approach temperature (CAT) drift rate** (\u0394CAT/\u0394time) under full-load conditions. A cleaning trigger is issued when CAT exceeds its baseline by **0.5\u00b0C over 3 days** (resolved within the constraint) or when compressor power exceeds **97% of the fouling-free baseline** (calibrated to 3% energy reduction). This leverages existing BMS points without new sensors.\n\nMECHANISM: Fouling raises CAT by increasing thermal resistance; the rate of CAT rise correlates with fouling accumulation. Compressor power rises as the condenser struggles to reject heat, creating a secondary proxy for fouling severity. The 3-day window ensures resolution aligns with the constraint.\n\nDEPARTURE FROM STANDARD: Standard practice uses fixed monthly cleaning; this solution dynamically triggers cleaning based on **real-time CAT drift and compressor power**, eliminating wasted labor and ensuring fouling is addressed only when it impacts performance.\n\nLABELED PARAMETERS:\n ASSUMPTION PARAMETER: baseline CAT = 5\u00b0C (User Constraint: condenser water supply/return temperature is logged, and 5\u00b0C is a typical design approach for open-loop systems)\n ASSUMPTION PARAMETER: fouling-free compressor power baseline = 95% of max rated power (rationale: 5% headroom accounts for normal operational variance before fouling effects dominate)\n ASSUMPTION PARAMETER: \u0394CAT threshold = 0.5\u00b0C over 3 days (rationale: empirical studies show 0.5\u00b0C CAT rise correlates with ~3% compressor energy increase [doi:10.16962/elkapj/si.arimpie-2015.16])\n ASSUMPTION PARAMETER: compressor power trigger = 97% of baseline (rationale: 3% energy reduction target requires detecting fouling before power loss exceeds 3% of nominal)\n\nINDICATOR: condenser approach temperature drift rate (\u0394\u00b0C/day) and compressor power (% of baseline)\n\nTHRESHOLD: 0.5\u00b0C CAT rise over 3 days (ASSUMPTION) **OR** compressor power \u2265 97% of baseline (calibrated to 3% energy reduction)\n\nVALIDATION PROTOCOL: n = 3 independent chiller units; data window = 30 days of continuous full-load operation. The protocol validates **condenser approach temperature drift rate (\u0394\u00b0C/day) and compressor power (% of baseline)** by comparing triggered cleaning intervals to manual monthly cleaning energy use, ensuring \u22653% compressor energy reduction.",
-   "sha256": "91a915649b820ce0b90ad9ad0fb66ff0344d119cf072fd7ba4d0cb865195854d",
+   "answer": "PROPOSED INDICATOR AND THRESHOLD: A **Condenser Fouling Index (CFI)** derived from a machine learning model trained on BMS data (chilled water \u0394T, condenser \u0394P, outdoor wet-bulb) predicts fouling state and triggers cleaning when CFI exceeds 0.75. This replaces fixed monthly cleaning with data-driven triggers, reducing energy waste from over- or under-cleaning.\n\nMECHANISM: Fouling raises condenser approach temperature and pressure drop, degrading heat transfer efficiency. The ML model correlates BMS signals (\u0394T, \u0394P, wet-bulb) with fouling severity, using compressor power as a proxy for energy penalty.\n\nDEPARTURE FROM STANDARD: Standard practice uses fixed monthly cleaning; this solution dynamically triggers cleaning based on real-time fouling prediction, optimizing energy use.\n\nLABELED PARAMETERS:\n ASSUMPTION PARAMETER: **CFI threshold** = 0.75 (rationale: calibrated to match 3% compressor energy reduction via ASHRAE RP-1622\u2019s ~5% energy gain from biofilm control).\n ASSUMPTION PARAMETER: **ML input features** = chilled water \u0394T, condenser \u0394P, outdoor wet-bulb (rationale: user-approved BMS signals).\n ASSUMPTION PARAMETER: **Detection window** = 3 days at full load (rationale: aligns with user\u2019s 3-day resolution constraint).\n ASSUMPTION PARAMETER: **Model training data** = 12 months of historical BMS logs (rationale: sufficient for seasonal fouling pattern capture).\n\nINDICATOR: Condenser Fouling Index (CFI), unitless.\n\nTHRESHOLD: 0.75 (ASSUMPTION).\n\nVALIDATION PROTOCOL: n = 3 independent chiller condenser tube banks; data window = 12 months of BMS logs; detection criterion = CFI \u2265 0.75 triggers cleaning within 3 days at full load.",
+   "sha256": "e911fdb5b471c65d66c2d0513dd81c48ffc9c8ff51f88f675bf9f3c31f9bdeb4",
    "typed_state": "COMPLETE",
-   "source": "eval/pairs/r11_a1 (committed; the invention arm)"
+   "source": "eval/pairs/r11_a1_r2 (the invention arm)"
   }
+ },
+ "delivery": {
+  "arm": "a1",
+  "typed_state": "A1_CRITIC_VALID",
+  "note": "A1 + plausibility critic passed validation \u2014 the delivery candidate"
+ },
+ "heavy_pipeline": {
+  "state": "FROZEN_NO_NEW_WORK",
+  "note": "the full heavy pipeline is frozen per the owner's audit step 3; deletion ships AFTER the holdout run (Art. LXIV)"
  }
 }

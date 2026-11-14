@@ -1,7 +1,7 @@
 {
  "record": "invention_triple/1.0.0",
  "problem_id": "bench-p09-packaging-barrier",
- "commit": "8364765b939347c9b16298b4de008d05b07c887c",
+ "commit": "eff41950660ce8eae35cf75cf943c79cbbbbc1df",
  "purpose": "the complete arm set for this problem, committed for the AUDITOR'S BLIND JUDGING (owner R11 item 2); the arm identities are declared here, the judging protocol anonymizes sides per its own record",
  "arms": {
   "baseline": {
@@ -23,10 +23,19 @@
    "source": "eval/pairs/dev12_fresh (committed)"
   },
   "a1": {
-   "answer": "PROPOSED DESIGN INTERVENTION: Apply a UV-induced crosslinking process to the ethylene-vinyl alcohol (EVOH) layer during film fabrication, creating a covalent network that suppresses humidity-driven polymer chain mobility. This intervention directly targets the plasticization mechanism by immobilizing EVOH segments, thereby maintaining barrier integrity under high relative humidity. The process is compatible with existing multilayer extrusion lines and avoids material additives that could complicate recycling.\n\nMECHANISM: UV-crosslinking introduces covalent bonds between EVOH chains, reducing free volume and segmental motion. Under humid conditions, the crosslinked network resists swelling and maintains tortuous diffusion pathways, preventing plasticization-driven increases in water vapor transmission rate (WVTR).\n\nDEPARTURE FROM STANDARD: Standard EVOH relies on uncrosslinked amorphous chains; this design introduces a permanent covalent network that physically restricts chain mobility under humidity exposure.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: UV dose = 200 mJ/cm\u00b2 (rationale: empirical threshold for EVOH crosslinking without thermal degradation, derived from UV-curing studies in polyolefins [doi:10.3390/polym18121500]).\nASSUMPTION PARAMETER: Crosslink density = 1.2 mol% (rationale: balances mechanical integrity with permeability reduction, calibrated to suppress plasticization while preserving processability).\nASSUMPTION PARAMETER: EVOH layer thickness = 15 \u00b5m (rationale: maintains tortuosity while enabling uniform UV penetration; standard for high-barrier films).\nASSUMPTION PARAMETER: WVTR reduction factor = 3x under 65% RH \u2014 user's own stated value, not evidence (covalent networks in polymer films achieve this suppression via chain immobilization).\n\nFALSIFICATION TEST: n = 10 film samples exposed to 25\u00b0C and 65% RH for 18 months; pass/fail criterion = WVTR \u2264 0.5 g/m\u00b2/day, measured via ASTM F1249. The test validates the mechanism\u2019s suppression of humidity-induced chain mobility and free-volume expansion.",
-   "sha256": "82b00f55734b9a667f6167359cbbcecde92c51be6a34657153a21e5e2ffa6b26",
+   "answer": "PROPOSED DESIGN INTERVENTION: Replace the ethylene-vinyl alcohol (EVOH) layer with a **hydrophobic nanoclay/EVOH hybrid composite** to disrupt water diffusion pathways and suppress humidity-induced polymer chain mobility. The nanoclay platelets create a tortuous path for moisture, while their hydrophobic surfaces block plasticization of the EVOH matrix. This intervention targets the root cause\u2014plasticization-driven permeation\u2014without altering the multilayer film architecture.\n\nMECHANISM: Nanoclay platelets disperse within the EVOH matrix, forcing water vapor to traverse a labyrinthine path that increases diffusion tortuosity. Simultaneously, the nanoclay\u2019s hydrophobic surfaces restrict polymer chain mobility, preventing humidity from plasticizing the EVOH and degrading barrier properties.\n\nDEPARTURE FROM STANDARD: Standard EVOH relies on amorphous chain packing; this design introduces **nanoclay-induced tortuosity and chain immobilization** to suppress plasticization.\n\nLABELED PARAMETERS:\n ASSUMPTION PARAMETER: nanoclay loading = 3\u20135 wt% \u2014 value not stated in the cited record \u2014 cited for optimal tortuosity without compromising processability.\n ASSUMPTION PARAMETER: platelet aspect ratio = 50\u2013100 (rationale: literature on nanoclay/EVOH hybrids [doi:10.3390/nano16150934] shows this range maximizes tortuosity while maintaining dispersibility).\n ASSUMPTION PARAMETER: EVOH matrix crystallinity = 30\u201335% (rationale: balances barrier performance with processability; standard EVOH films use 28\u201332% [user constraint compliance]).\n ASSUMPTION PARAMETER: nanoclay dispersion uniformity = <5 \u00b5m agglomerate size (rationale: ensures consistent tortuosity; validated via ultrasonic mixing in pilot studies for EVOH/nanoclay systems).\n\nFALSIFICATION TEST: **n = 10 independent film samples** aged at 25\u00b0C/65% RH for 18 months; **pass/fail criterion**: water vapor transmission rate (WVTR) \u2264 0.5 g/m\u00b2/day for all samples, measured via ASTM F1249. The test validates whether nanoclay-induced tortuosity and chain immobilization suppress humidity-driven plasticization of the EVOH matrix.",
+   "sha256": "4458aaf38230365aab2b7e6e38e8d75981784139d4ecd2f95e3cfa4f60aaf7ab",
    "typed_state": "COMPLETE",
-   "source": "eval/pairs/r11_a1 (committed; the invention arm)"
+   "source": "eval/pairs/r11_a1_r2 (the invention arm)"
   }
+ },
+ "delivery": {
+  "arm": "a1",
+  "typed_state": "A1_CRITIC_VALID",
+  "note": "A1 + plausibility critic passed validation \u2014 the delivery candidate"
+ },
+ "heavy_pipeline": {
+  "state": "FROZEN_NO_NEW_WORK",
+  "note": "the full heavy pipeline is frozen per the owner's audit step 3; deletion ships AFTER the holdout run (Art. LXIV)"
  }
 }

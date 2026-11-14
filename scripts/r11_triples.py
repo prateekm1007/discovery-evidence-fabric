@@ -32,6 +32,7 @@ as the gate — the auditor's blind judging is authoritative), XXV
 """
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import time
@@ -46,7 +47,11 @@ from discovery_fabric.engine.invention_rubric import (  # noqa: E402
 DEV12 = REPO / "eval" / "problems_dev12.json"
 PAIRS_FRESH = REPO / "eval" / "pairs" / "dev12_fresh"
 PAIRS_A0 = REPO / "eval" / "pairs" / "r11_a0plus"
-PAIRS_A1 = REPO / "eval" / "pairs" / "r11_a1"
+# R11: the a1 arm directory is selectable (the critic-armed
+# re-run writes r11_a1_r2; the committed 1.0.0 records stay
+# frozen, Art. XXXIX) — the record discloses which dir fed it
+PAIRS_A1 = Path(os.environ.get("A1_TRIPLES_DIR", "").strip()
+                or (REPO / "eval" / "pairs" / "r11_a1"))
 TRIPLES = REPO / "eval" / "triples" / "r11"
 
 
@@ -148,8 +153,38 @@ def main() -> int:
                 "answer": a1_ans,
                 "sha256": _sha(a1_ans),
                 "typed_state": a1_state,
-                "source": "eval/pairs/r11_a1 (committed; the "
-                          "invention arm)"}
+                "source": (f"eval/pairs/{PAIRS_A1.name} (the invention "
+                           "arm)")}
+        # ---- R11 P3 (owner audit step 3): the PRODUCT PATH -----------
+        # A1 + critic is the DELIVERY CANDIDATE; A0+ is the FALLBACK
+        # when the A1 arm fails validation (typed non-COMPLETE, or the
+        # critic vetoed every candidate). The heavy pipeline is
+        # FROZEN (no new work; deleted after the holdout run per the
+        # owner's order — Art. LXIV: the retirement ships with the
+        # holdout, not before it).
+        _a1_valid = (a1_state == "COMPLETE" and a1_ans.strip()
+                     and str((a1.get("critic") or {})
+                             .get("version") or "").strip() != "")
+        if _a1_valid:
+            triple["delivery"] = {
+                "arm": "a1", "typed_state": "A1_CRITIC_VALID",
+                "note": "A1 + plausibility critic passed validation — "
+                        "the delivery candidate"}
+        elif a0_state == "COMPLETE" and a0_ans.strip():
+            triple["delivery"] = {
+                "arm": "a0plus", "typed_state": "A1_INVALID_A0P_FALLBACK",
+                "note": f"A1 typed {a1_state} or critic-invalid — the "
+                        "A0+ fallback serves"}
+        else:
+            triple["delivery"] = {
+                "arm": None, "typed_state": "NO_DELIVERY",
+                "note": "neither A1 nor A0+ validated on this window "
+                        "(Art. XXV: typed, never a silent gap)"}
+        triple["heavy_pipeline"] = {
+            "state": "FROZEN_NO_NEW_WORK",
+            "note": "the full heavy pipeline is frozen per the owner's "
+                    "audit step 3; deletion ships AFTER the holdout "
+                    "run (Art. LXIV)"}
         (TRIPLES / f"{pid}.json").write_text(
             json.dumps(triple, indent=1, default=str) + "\n",
             encoding="utf-8")
