@@ -25,6 +25,10 @@ os.environ.setdefault("ENGINE_MODEL_COST_POLICY", "UNRESTRICTED")
 os.environ.setdefault("ENGINE_LLM_TIMEOUT_S", "40")
 os.environ.setdefault("ENGINE_LLM_RETRY_SLEEP_S", "0")
 
+from r7_queue_runner import _load_key_vault  # noqa: E402
+_vault_names = _load_key_vault()
+print("[panel] vault loaded (names only):", sorted(_vault_names))
+
 from eval.run import _rubric_prompt, _judge_judgment_call  # noqa: E402
 from r7_a0plus import (  # noqa: E402
     _packet_by_id_from_run_tree, _unique_packet_list, _load_pair)
@@ -167,6 +171,44 @@ def main() -> int:
                     axis_n[k] = axis_n.get(k, 0) + 1
                     axis_agree[k] = axis_agree.get(k, 0) + int(
                         v == ca[k])
+        # recovery laps (measured window behavior: a provider dies
+        # after ~8-12 served calls and recovers within minutes; the
+        # D4/D5 rounds both measured this): up to 2 laps, 180 s
+        # cooldown, ONE re-judgment per miss — every recovery typed.
+        for lap in (1, 2):
+            misses = [r for r in rows if r["outcome"] != "JUDGE_VALID"]
+            if not misses:
+                break
+            print(f"[panel] {prov}/{model} recovery lap {lap}: "
+                  f"{len(misses)} misses, cooldown 180 s")
+            time.sleep(180)
+            for r in misses:
+                pid = r["problem_id"]
+                rec = json.loads((A1_DIR / f"{pid}.json").read_text())
+                a1_ans = str(rec.get("a1_answer") or "")
+                fr = FRESH / f"{pid}.json"
+                base_ans = str(json.loads(fr.read_text()).get(
+                    "baseline_answer") or "") if fr.exists() else ""
+                if not a1_ans.strip() or not base_ans.strip():
+                    continue
+                prob = probs[pid]
+                pair = _load_pair(pid)
+                packet = (_unique_packet_list(
+                    _packet_by_id_from_run_tree(pair)) if pair else [])
+                prompt = _rubric_prompt(prob, base_ans, a1_ans, packet)
+                jc = _judge_judgment_call(prov, model, prompt,
+                                          max_tokens=4000)
+                time.sleep(5)
+                if jc.get("outcome") == "JUDGE_VALID":
+                    v = jc.get("valid") or {}
+                    r["outcome"] = "JUDGE_VALID"
+                    r["prefer"] = v.get("prefer")
+                    r["axes"] = {k: v[k] for k in
+                                 ("A1", "A2", "A3", "A4", "A6",
+                                  "B1", "B2", "B3", "B4", "B6")
+                                 if k in v}
+                    r["recovered_lap"] = lap
+                print(f"[panel]   {pid[:36]:38s} -> {r['outcome']}")
         out["panel_auditors"].append({
             "panel": [prov, model], "bias_position": bias,
             "judgments": rows,
