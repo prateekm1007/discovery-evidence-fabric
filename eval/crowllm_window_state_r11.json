@@ -1,0 +1,61 @@
+{
+ "record": "CROWLLM_WINDOW_STATE/1.0.0",
+ "measured_at": "2026-11-14T15:38:00Z",
+ "credential": "CROWLLM_API_KEY (operator-supplied 2026-11-14 mid-round; vaulted per Art. LXXXVII arrival custody BEFORE any use; fingerprint 2ed1295edb9abc3e prefix-only; one transient outer-workspace copy deleted after fingerprint match \u2014 single-store restored)",
+ "directive": "operator: 'you can also use deepseek v4.1 flash ... also save all keys in the VAULT' \u2014 rung deepseek-v4.1-flash:free, endpoint https://crowllm.com/v1/",
+ "probe": {
+  "models": {
+   "http": 200,
+   "n_models": 76,
+   "deepseek_ids": [
+    "deepseek-v4-flash-0731-thinking:free",
+    "deepseek-v4-flash-0731:free",
+    "deepseek-v4-flash-uncensored:free",
+    "deepseek-v4-flash:free",
+    "deepseek-v4.1-flash-uncensored:free",
+    "deepseek-v4.1-flash:free"
+   ]
+  },
+  "completion_200_ok": {
+   "http": 200,
+   "model": "DeepSeek-V4.1-Flash",
+   "content": "OK",
+   "finish_reason": "stop",
+   "transport": "urllib via _transport_call with spec extra_headers UA \u2014 wiring verified end-to-end"
+  },
+  "measured_failure_classes": [
+   {
+    "http": 403,
+    "class": "BOT_EDGE_UA_GATE \u2014 default python-urllib User-Agent blocked; a named UA passes (same class as the xkiro Cloudflare gate); fixed per-spec via extra_headers (llm_registry crowllm spec), shared flavor untouched"
+   },
+   {
+    "http": 503,
+    "class": "TRANSIENT_UPSTREAM \u2014 'An error occurred while communicating with the upstream'; intermittent, retry passes"
+   },
+   {
+    "http": 429,
+    "class": "HARD_RATE_LIMIT \u2014 'Rate limit reached: 5 requests per minute' (second variant string '10 requests per ...' also observed); the free tier's own cap"
+   },
+   {
+    "http": 307,
+    "class": "TRANSIENT_REDIRECT \u2014 intermittent; urllib POST does not auto-follow; a retry with identical bytes returned 200"
+   }
+  ],
+  "family_hazard": "the catalog ALSO serves agnes-2.5-flash:free and agnes-3.0-flash:free \u2014 crowllm/agnes-* is NEVER judge/panel-eligible while the served generator family is agnes (PANEL_IS_GENERATOR_FAMILY class); judge/panel use the DEEPSEEK rung only"
+ },
+ "wiring": {
+  "provider_spec": "llm_registry.PROVIDER_SPECS += crowllm (openai flavor, CROWLLM_API_KEY env, cost_basis FREE_TIER_API dated 2026-11-14, account_domain OWNER_CROWLLM_ACCOUNT \u2014 vocabulary extended)",
+  "judge_candidates": "eval/run.py JUDGE_CANDIDATES += ('crowllm','deepseek-v4.1-flash:free') LAST \u2014 the typed post-reset plan still selects xkiro/ministral-14b first; crowllm is the LIVE pre-reset fallback",
+  "vault_loader": "r7_queue_runner._load_key_vault loads .env.keys (all KEY=value) into env at import of the stage scripts"
+ },
+ "consequence": {
+  "d6_d4": "crowllm is the REDUNDANCY judge route, NOT the acceptance judge: the free tier's 5-requests-per-minute cap makes the D6 battery's <=3-min wall target structurally impossible on this rung, and burning the agnes generator pool on a structurally-limited run risks the 00:00Z acceptance run. The typed post-reset route stays xkiro/ministral-14b at 2026-11-15T00:00Z via scripts/post_reset_queue.sh; if that preflight is STILL dead, the queue exits typed 3 and the crowllm rung becomes the fallback judge (wall target superseded by the typed rate limit; builder correction filed to the auditor for reconciliation)",
+  "d5": "the typed mistral panel still runs at 00:00Z per AM5 acceptance; crowllm deepseek/qwen rungs are typed available as fallback panel candidates only if the mistral window fails",
+  "art": "Art. LXI (infrastructure typed, never silently wasted); Art. XXV (measured, never manufactured); Art. LXXXVII (vault custody); Art. LXIV (shared transport flavor NOT widened for a fallback route \u2014 per-spec extra_headers only)"
+ },
+ "parallel_session_reconciliation": {
+  "note": "a PARALLEL builder session (same operator directive) independently registered crowllm on the remote branch (commits 112cd3030 registration, a66ed5a38 30-pair calibration, c74790585 parse-failure diagnosis; merge bea2fa451). This record is the FIRST session's independent measurement, kept for the audit trail; the parallel session's registration is CANONICAL in code.",
+  "serving_rung_divergence": "FIRST session measured deepseek-v4.1-flash:free answering 200 OK (15:31-15:38Z, three probes); the parallel session measured v4.1 ids 503 DEAD_UPSTREAM in its window and registered deepseek-v4-flash:free as the serving rung (full-length gate PASS 3/3, calibration 20/30 valid, 20/20 correct among valid, 10 JUDGE_PARSE_FAILED = PROVIDER_TOKEN_CORRUPTION, accuracy 0.667 < 0.8 -> judge-eligibility GATE FAIL). Both measurements typed; the free pool is time-varying; nothing silently reconciled (Art. XXV).",
+  "consequence": "consistent with the parallel session's typed consequence: D4/D5/Q6 stay on the xkiro mistral post-00:00Z path (post_reset_queue.sh); crowllm stays REGISTERED as redundancy. Candidate repair left to the session that diagnosed it (parse-retry ladder 1x->2x for this rung, then recalibration)."
+ }
+}
