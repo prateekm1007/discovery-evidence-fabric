@@ -1758,6 +1758,44 @@ def _judge_judgment_call(provider: str, model: str, prompt: str,
         rec["outcome"] = JUDGE_VALID
         rec["parsed"], rec["valid"] = parsed2, valid2
         return rec
+    # ---- crowllm-only second parse retry (AM6 D4; c74790585
+    # diagnosis): the free pool's PROVIDER_TOKEN_CORRUPTION class
+    # injects literal '.src' markers into JSON values under load; the
+    # ONE retry already recovered a complete valid rubric JSON in the
+    # diagnosis sample, so THIS rung gets one further honest re-ask
+    # (attempt 3) before a parse failure is typed. Nothing is guessed
+    # client-side — corrupted output is never repaired into a verdict;
+    # a still-unparseable attempt 3 types JUDGE_PARSE_FAILED exactly
+    # as before (Art. XXV). Every other rung keeps the owner-directed
+    # ONE-retry ladder byte-identical.
+    if provider == "crowllm" and content2.strip():
+        t2 = time.time()
+        res3 = _transport_call(provider, model, retry_prompt,
+                               "You are a strict blind rubric judge. "
+                               "English only. Respond with ONLY the "
+                               "JSON object.", max_tokens=max_tokens)
+        lat3 = round(time.time() - t2, 1)
+        rec["latencies"].append(lat3)
+        if res3.get("status") != "OK":
+            rec["outcome"] = _classify_transport_fail(res3)
+            rec["errors"] = rec.get("errors", []) + [
+                str(res3.get("error"))[:200]]
+            return rec
+        content3 = str(res3.get("content") or "")
+        rec["raw"] = (rec["raw"] + "\n--retry2--\n"
+                      + content3[:600])[:1800]
+        rec["attempts"].append({
+            "n": 3, "output_hash": hashlib.sha256(
+                content3.encode("utf-8")).hexdigest()[:16],
+            "parsed": bool(_parse_rubric(content3)),
+            "note": "crowllm-only 2x parse-retry (AM6 D4)"})
+        parsed3 = _parse_rubric(content3)
+        valid3 = (_validate_rubric_pass(parsed3, clar)
+                  if parsed3 else None)
+        if valid3 is not None:
+            rec["outcome"] = JUDGE_VALID
+            rec["parsed"], rec["valid"] = parsed3, valid3
+            return rec
     rec["outcome"] = (JUDGE_EMPTY_OUTPUT if not content2.strip()
                       else JUDGE_PARSE_FAILED)
     return rec

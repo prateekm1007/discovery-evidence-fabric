@@ -1,0 +1,16 @@
+{
+  "record": "BUILDER_CORRECTION/BC_F25_SESSION_COORDINATION/1.0.0",
+  "filed_by": "builder (coder session, 2026-11-14, queue/dev12_r7)",
+  "for": "auditor adoption into the ledger (AM6 F25 LOW, mitigated)",
+  "finding": "two parallel builder sessions on one branch caused a non-fast-forward push; resolved cleanly (duplicates dropped, additive record kept, divergence typed — b916dc63e)",
+  "protocol": {
+    "1_fetch_before_push": "EVERY push is preceded by `git fetch origin queue/dev12_r7`; on divergence the session rebases/merges BEFORE pushing (practiced this session: a077ff2d2 diverged from the parallel crowllm registration round; resolved by resetting to their tip and re-committing only the additive record)",
+    "2_duplicate_supersession": "when a parallel session's deeper measurement exists on the remote, the later session DROPS its duplicate code edits and keeps only additive records — never both implementations (Art. LXIV: one live implementation per question)",
+    "3_credential_ownership": "the session that admits a credential to the vault owns its registration for that round (crowllm: the parallel session owned the ProviderSpec/allowlist/calibration; the first session owned the window-state record and the vault admission)",
+    "4_divergence_typing": "conflicting measurements between sessions are TYPED, never silently reconciled (the v4.1-flash 200-OK vs 503-dead divergence is kept in eval/crowllm_window_state_r11.json with both sessions attributed)",
+    "5_scope_stamps": "commit messages state which session owns which surface (llm_registry/model_routing/transport_capability/eval-run vs AM5 eval surfaces) so a merge reviewer can see non-overlap at a glance",
+    "6_audit_branch_untouched": "both builder sessions stay off audit/* (F21 guard) — the auditor writes via REST only"
+  },
+  "acceptance_tracking": "0 conflicting parallel pushes next round = the auditor's D5 acceptance; the fetch-before-push rule above is the mechanical safeguard",
+  "articles": ["LXIV", "XXVI", "AM6 F25"]
+}
