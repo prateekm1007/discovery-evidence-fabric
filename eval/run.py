@@ -174,6 +174,18 @@ JUDGE_CANDIDATES = [
     # agnes autoregressive rung). xkiro is 403-dead this window, kept
     # in the list with its typed record for the audit trail.
     ("inception", "mercury-3"),
+    # R11 credential round 2026-11-14 (crowllm, owner-supplied): FIRST
+    # in the list — the R4 lesson (judge_independent_rerun_r11_r4.json)
+    # is that mercury-3 passed tiny probes AND compact calibration
+    # (0.933) but failed 14/20 REAL full-length judgments
+    # (JUDGE_TRANSPORT_FAILED). crowllm/deepseek-v4-flash:free passed
+    # the FULL-LENGTH gate: 3/3 complete verdict JSONs on the real
+    # 7786-char judge prompt (eval/crowllm_gate_r11.json; 2.8-5.4 s
+    # wall; Chrome-UA transport requirement recorded on the spec; the
+    # 500/503/429 codes are measured bursty free-pool congestion —
+    # the caller's retry ladder clears them). DeepSeek family — a
+    # different provider AND family from the agnes generator rung.
+    ("crowllm", "deepseek-v4-flash:free"),
     ("xkiro", "mistralai/ministral-14b"),
     ("xkiro", "mistralai/ministral-8b"),
     ("unorouter", "deepseek-v4-flash:free"),

@@ -182,6 +182,16 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
         r"^mistralai/ministral-8b$",
         r"^mistralai/ministral-14b$",
     ],
+    # R11 credential round 2026-11-14 (crowllm.com, owner-supplied):
+    # the allowlist names EXACTLY the one measured serving rung —
+    # deepseek-v4-flash:free (tiny completion 200-OK 'OK' live
+    # 2026-11-14). The two v4.1 ids are 503 DEAD_UPSTREAM (measured,
+    # both stream and non-stream) and the premium/non-free ids are
+    # credit-gated — neither ever becomes a rung silently
+    # (xkiro/apinex premium-precedent; Art. XXVII).
+    "crowllm": [
+        r"^deepseek-v4-flash:free$",
+    ],
     # R461: the FIFTH router — bynara's -free family (the ids the
     # catalog actually serves; premium ids like glm-5.3, qwen3.8-max,
     # claude-opus-5, gpt-6-astra NEVER become rungs silently — the

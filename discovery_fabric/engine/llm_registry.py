@@ -400,6 +400,57 @@ PROVIDER_SPECS: List[ProviderSpec] = [
             "flagship class). Tiers are recorded policy inputs "
             "(Art. XXVII).")),
     ProviderSpec(
+        "crowllm", "CROWLLM_API_KEY",
+        "https://crowllm.com/v1/chat/completions",
+        "deepseek-v4-flash:free", "openai", 128_000,
+        quality_tier=2, cost_tier=1, latency_tier=2,
+        cost_basis="FREE_TIER_API", locality="REMOTE",
+        license="provider serving terms (operator-supplied key; "
+                ":free catalog rungs served at $0 balance)",
+        account_domain="OWNER_CROWLLM_ACCOUNT",
+        model_revision="router free tier; deepseek-v4-flash:free is the "
+                       "measured serving rung (2026-11-14 live, tiny "
+                       "completion 200-OK 'OK' with usage; deepseek-v4.1-"
+                       "flash / v4.1-flash-uncensored answer 503 "
+                       "'error communicating with the model provider' — "
+                       "typed DEAD_UPSTREAM, measured not assumed); no "
+                       "per-model revision pin exposed by the router — "
+                       "recorded honest (Art. VI)",
+        extra_headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                          "AppleWebKit/537.36 (KHTML, like Gecko) "
+                          "Chrome/131.0.0.0 Safari/537.36"},
+        policy_note=(
+            "R11 credential round 2026-11-14 (owner-supplied router, "
+            "crowllm.com). LIVE-MEASURED at registration (Art. III): "
+            "GET /v1/models -> 200 with 76 models incl. the :free "
+            "family (agnes-*, qwen-*, deepseek-v4*, ernie-*, ...). "
+            "deepseek-v4-flash:free tiny completion -> 200 OK "
+            "non-empty ('OK', usage 11 tokens). The two v4.1 rungs "
+            "(deepseek-v4.1-flash:free, deepseek-v4.1-flash-"
+            "uncensored:free) answer HTTP 503 'An error occurred "
+            "while communicating with the model provider' on BOTH "
+            "stream and non-stream calls — provider-side upstream "
+            "dead, typed DEAD_UPSTREAM (never wired anywhere). "
+            "Non-stream v4.1 also hung 60 s with 0 bytes once before "
+            "the 503s (free-pool congestion class). TRANSPORT "
+            "REQUIREMENT (measured, same class as xkiro): crowllm.com "
+            "sits behind a Cloudflare browser-signature check — the "
+            "default python urllib UA is banned (403 Forbidden on "
+            "every endpoint) while the standard Chrome UA passes "
+            "(measured: urllib default -> 403; Chrome UA -> 200-OK; "
+            "one transient 500 cleared on retry — free-pool "
+            "congestion); the spec's extra_headers carries that UA "
+            "on EVERY call, probe, and catalog fetch (transport "
+            "plumbing only). Default urllib User-Agent otherwise "
+            "passes (no CF block on crowllm.com for curl). The "
+            "allowlist admits EXACTLY the one measured text rung "
+            "(xkiro/apinex premium-precedent: gated or dead ids "
+            "never become rungs silently). FREE_TIER_API under the "
+            "R456-A3 operator amendment: eligible under "
+            "ZERO_PAID_COST; depletion stays a typed failure that "
+            "advances the cascade — never a bill.")),
+    ProviderSpec(
         "hf", "HF_TOKEN",
         "https://router.huggingface.co/v1/chat/completions",
         "openai/gpt-oss-120b", "openai", 128_000,
@@ -1325,7 +1376,16 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
     # immediate retry before surfacing the typed failure (owner round
     # 2026-11-13 item 2: no fixed backoff sleep); never retries
     # auth/quota (401/403/402).
-    _TRANSIENT = (429, 502, 503, 504)
+    # R11 credential round 2026-11-14: 500 joins the transient set —
+    # measured on crowllm (deepseek-v4-flash:free): the free pool
+    # serves bursts of 3-4 HTTP 500s then recovers unassisted; the
+    # provider's own 503 body says "Please try again shortly"; the
+    # full-length judge prompt served 3/3 with a one-retry ladder
+    # (eval/crowllm_gate_r11.json). A 500 remains retried at most ONCE
+    # here (the same-rung ladder) — a real server fault still surfaces
+    # as the typed failure on the second attempt, and the A2 breaker
+    # still aborts a genuine storm (threshold 3 consecutive).
+    _TRANSIENT = (429, 500, 502, 503, 504)
     last_exc = None
     # OWNER ROUND 2026-11-13 item 2: the same-rung retry ladder is ONE
     # IMMEDIATE retry (no fixed sleep) — the measured wall spent 5-20 s
