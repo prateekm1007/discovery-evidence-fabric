@@ -48,7 +48,7 @@ def _live_sha():
 # chain below is now HISTORICAL; the live chain is pinned after it.
 
 def test_constitution_version_2_10_1():
-    assert "**Version:** 2.10.1" in _body()
+    assert "**Version:** 2.11.0" in _body()
     assert "2.10.0 → v2.10.1" in _body() or "2.10.0 → 2.10.1" in _body()
 
 
@@ -63,7 +63,7 @@ def test_lxxxv_chain_binds_and_links():
     rec = json.loads((R510C / "AMENDMENT_RECORD_LXXXV.json")
                      .read_text(encoding="utf-8"))
     assert rec["old"]["version"] == "2.10.0"
-    assert rec["new"]["version"] == "2.10.1"
+    assert rec["new"]["version"] == "2.11.0"
     assert rec["new"]["sha256"] == _live_sha()
     assert rec["reviewer_provenance"] == "AI_REVIEW"
 
@@ -98,7 +98,7 @@ def test_r510_record_chain_binds_and_links():
 
 def test_acknowledgment_rebound_to_2_10_1():
     ack = json.loads(ACK.read_text(encoding="utf-8"))
-    assert ack["constitution_version"] == "2.10.1"
+    assert ack["constitution_version"] == "2.11.0"
     assert ack["constitution_hash"] == _live_sha()
     assert ack["session"] == "R510"
 

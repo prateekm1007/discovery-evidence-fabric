@@ -1,6 +1,6 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 2.10.1
+**Version:** 2.11.0
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
@@ -19,6 +19,7 @@
 **Amended:** 2026-09-18 (Articles LXXVII–LXXIX — the Discovery Yield Firewall: discovery performance is distinct from pipeline completion (the metric firewall); survivor quality with mechanically recorded gate verdicts; fresh-problem generalization with test-enforced blindness — per the operator's 2026-09-18 directive "Ratify the firewall first"; drafts `R506/constitution/` (PENDING package), enacted R507 with the two-line reading disclosed in `R507/constitution/AMENDMENT_RECORD.json`; see `R506/constitution/ARTICLE_LXXVII_DISCOVERY_PERFORMANCE_IS_NOT_PIPELINE_COMPLETION.md`, `ARTICLE_LXXVIII_SURVIVOR_QUALITY.md`, `ARTICLE_LXXIX_FRESH_PROBLEM_GENERALIZATION.md`)
 **Amended:** 2026-09-19 (Articles LXXX–LXXXIV — evidence-synthesis binding, attacker deployment gate, UNKNOWN dwell time, funnel as instrument, minimum diversity — plus amendments to Arts. L (ring-quality floor), XXI.3 (bounded inference), LXI (persistence gate), X (sidecar definition), and the narrowed scope law + funnel-anchored cliff-fix rule — per the operator's 2026-09-19 governance directive; see `R510/constitution/AMENDMENT_RECORD.json` and `R510/constitution/` article files)
 **Amended:** 2026-09-19 (Article LXXXV — Push for Auditability: completed work is pushed so auditors verify reachable bytes; unpushed commits are LOCAL_UNVERIFIED and cannot evidence completion — per the operator's 2026-09-19 directive "push the stack ... amend the constitution, so you push automatically in order to be audited"; article text coder-drafted, operator review requested; see `R510/constitution/ARTICLE_LXXXV_PUSH_FOR_AUDITABILITY.md` and `R510/constitution/AMENDMENT_RECORD_LXXXV.json`)
+**Amended:** 2026-11-14 (Article LXXXVI — The Invention Gate (Holdout): the clone-passable wins+ties gate is RETIRED; an arm must beat the baseline on invention-rubric NOVELTY by >= 0.5 with feasibility within 0.25, auditor-judged on >= 10 pairs — format wins do not count; per the operator's 2026-11-14 audit directive item 9; see `R11/constitution/ARTICLE_LXXXVI_THE_INVENTION_GATE.md` and `R11/constitution/AMENDMENT_RECORD_LXXXVI.json`)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself, AND — from v2.0.0 — what the machine may call a discovery or an invention
 
@@ -2474,6 +2475,31 @@ Push at minimum before any audit verdict is requested and before any round is re
 ### What this supersedes
 
 The prior working convention ("finish never implies push; pushes require the literal word") is retired for audit-driven work: the push is now part of completing the work, not a separate authorization. Destructive operations (force-push, history rewrites of published commits, branch deletion) remain forbidden without explicit operator words.
+
+
+---
+
+## Article LXXXVI — The Invention Gate (Holdout)
+
+**Ratified:** 2026-11-14 (Round R11)
+**Sponsor:** Operator audit directive, 2026-11-14, item 9 (verbatim: "NEW GATE FOR THE HOLDOUT: an arm must beat the baseline on invention-rubric NOVELTY by >=0.5 with feasibility within 0.25 of the baseline, auditor-judged on >=10 pairs. Beating the baseline on format does not count.")
+
+### The correction this article makes
+
+The previous holdout gate — wins+ties vs baseline >= 50% with >= 1 win — is PASSABLE BY A BASELINE CLONE. The owner's audit measured it: the A0+ arm's body was the baseline text verbatim with a contract header and relabels, and it cleared the old gate on format. A gate that a copy of the baseline can pass measures nothing about invention.
+
+### The rule
+
+> **The holdout gate is an INVENTION gate: an arm must beat the baseline on invention-rubric NOVELTY by >= 0.5 (mean over the judged pairs) with FEASIBILITY within 0.25 of the baseline, auditor-judged on >= 10 pairs. Beating the baseline on format does not count.**
+
+1. The invention rubric is the four-axis 0-4 instrument (novelty vs the standard solution / feasibility / testability / constraint compliance — `discovery_fabric/engine/invention_rubric.py`). Correctness scoring stays separate and keeps its own gates.
+2. The gate is AUDITOR-JUDGED. Machine judgments (the calibrated judge, the coder-deterministic rubric scores) are INPUTS and ride every record disclosed; they never constitute the gate verdict (Article XXVI: no self-certification).
+3. Threshold provenance (Article XXVII): both thresholds are the owner's directive (2026-11-14, item 9), class BUYER_DEFINED, disclosed with uncertainty (mean over >= 10 judged pairs).
+4. Until >= 10 auditor-judged pairs exist, the gate state is PENDING_AUDITOR_JUDGMENTS — never MET, never inferred (Article XXV).
+
+### Deletion accounting (Article LXIV)
+
+The replaced gate (wins+ties >= 50% with >= 1 win) is RETIRED, not silently dropped: its definition, its replacement, and the audited defect that retired it are recorded here and in `discovery_fabric/engine/holdout_gate.py` (the `replaced_gate` block rides every gate evaluation). Full text: `R11/constitution/ARTICLE_LXXXVI_THE_INVENTION_GATE.md`.
 
 ---
 
