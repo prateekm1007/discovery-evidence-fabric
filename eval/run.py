@@ -168,26 +168,38 @@ CRITERIA = {
 JUDGE_CANDIDATES = [
     # AM3 D4 (2026-11-14): the R3 generator served EXACTLY ONE rung
     # (agnes/agnes-3.0-flash, 17 calls, per_call_timeline) — the judge
-    # must differ in provider AND model. inception/mercury-3 is
-    # measured live (direct 200-OK 'OK', probe_capability ok) and is
-    # the diffusion-LM family (a genuinely different family from the
-    # agnes autoregressive rung). xkiro is 403-dead this window, kept
-    # in the list with its typed record for the audit trail.
-    ("inception", "mercury-3"),
-    # R11 credential round 2026-11-14 (crowllm, owner-supplied): FIRST
-    # in the list — the R4 lesson (judge_independent_rerun_r11_r4.json)
-    # is that mercury-3 passed tiny probes AND compact calibration
-    # (0.933) but failed 14/20 REAL full-length judgments
-    # (JUDGE_TRANSPORT_FAILED). crowllm/deepseek-v4-flash:free passed
-    # the FULL-LENGTH gate: 3/3 complete verdict JSONs on the real
-    # 7786-char judge prompt (eval/crowllm_gate_r11.json; 2.8-5.4 s
-    # wall; Chrome-UA transport requirement recorded on the spec; the
-    # 500/503/429 codes are measured bursty free-pool congestion —
-    # the caller's retry ladder clears them). DeepSeek family — a
-    # different provider AND family from the agnes generator rung.
-    ("crowllm", "deepseek-v4-flash:free"),
+    # must differ in provider AND model.
+    # R11 (2026-11-14, post-calibration reorder): the parallel crowllm
+    # session's OWN typed consequence is "D4/D5/Q6 stay on the xkiro
+    # mistral post-00:00Z path" — its 30-pair calibration MEASURED
+    # crowllm/deepseek-v4-flash:free at accuracy 0.667 < 0.8
+    # (10/30 JUDGE_PARSE_FAILED = PROVIDER_TOKEN_CORRUPTION,
+    # a66ed5a38/c74790585). run_judge_calibration re-measures LIVE with
+    # no cache, so a candidate ABOVE the acceptance judge costs its
+    # full paced calibration (~21 min wall at the measured 5-req/min
+    # free-tier cap) on EVERY route probe before the acceptance rung
+    # is reached. The acceptance judge therefore sits FIRST: the
+    # post-reset probe reaches xkiro/ministral-14b immediately
+    # (calibration previously measured 27/30-28/30 on this rung);
+    # crowllm stays registered as the redundancy rung behind it — when
+    # its parse-repair recalibration (c74790585's candidate repair)
+    # re-qualifies it, this order is revisited on measured bytes, not
+    # on hope (Art. XXV).
     ("xkiro", "mistralai/ministral-14b"),
     ("xkiro", "mistralai/ministral-8b"),
+    # crowllm/deepseek-v4-flash:free passed the FULL-LENGTH gate
+    # (3/3 complete verdict JSONs on the real 7786-char judge prompt,
+    # eval/crowllm_gate_r11.json; Chrome-UA transport requirement on
+    # the spec) — DeepSeek family, a different provider AND family
+    # from the agnes generator rung; judge-eligibility currently
+    # calibration-FAILED (0.667, parse corruption) pending repair.
+    ("crowllm", "deepseek-v4-flash:free"),
+    # inception/mercury-3: the R4 lesson (judge_independent_rerun_
+    # r11_r4.json) is that mercury-3 passed tiny probes AND compact
+    # calibration (0.933) but failed 14/20 REAL full-length judgments
+    # (JUDGE_TRANSPORT_FAILED); measured dead since 2026-11-12 —
+    # audit-trail entry, never silently removed.
+    ("inception", "mercury-3"),
     ("unorouter", "deepseek-v4-flash:free"),
 ]
 #: R6: the operator-accepted LAST-RESORT judge. When NO independent
