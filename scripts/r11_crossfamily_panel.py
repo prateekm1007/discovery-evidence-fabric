@@ -14,6 +14,7 @@ window, the panel is TYPED_SKIPPED (Art. LXI), never faked.
 Run: python3 scripts/r11_crossfamily_panel.py [limit]
 """
 import json
+import time
 import os
 import sys
 from pathlib import Path
@@ -72,78 +73,126 @@ def _primary_judge() -> tuple:
 
 
 def main() -> int:
-    limit = int(sys.argv[1]) if len(sys.argv) > 1 else 6
+    limit = int(sys.argv[1]) if len(sys.argv) > 1 else 10
     served = _generator_served()
     jp, jm = _primary_judge()
-    cand = None
-    for prov, model in PANEL_CANDIDATES:
-        if (prov, model) in served or (prov, model) == (jp, jm):
-            continue
-        cand = (prov, model)
-        break
-    out = {"record": "crossfamily_panel_r11/1.0.0",
-           "article": ("Amendment 2 §5 P2-8; bias-check input only, "
-                       "the gate stays auditor-judged (Art. XXVI); "
+    # AM3 D5: with only two live families this window (agnes generator,
+    # inception judge), BOTH serve as panel auditors with their bias
+    # position TYPED on every record — the R3 6/6 empty-output failure
+    # was the 300-token cap (measured: mercury-3 reasoning burns it,
+    # finish_reason=length; recovery at >=2000), so the cap is 4000 and
+    # the per-axis agreement vs the committed primary judge is computed.
+    cands = [(prov, model) for prov, model in PANEL_CANDIDATES
+             if (prov, model) != (jp, jm)]
+    out = {"record": "crossfamily_panel_r11/2.0.0",
+           "article": ("Amendment 2 §5 P2-8 + Amendment 3 D5; "
+                       "bias-check input only, the gate stays "
+                       "auditor-judged (Art. XXVI); "
                        "reviewer_provenance: AI_REVIEW (Art. LXVII)"),
            "primary_judge": [jp, jm],
            "generator_rungs_n": len(served)}
-    if not cand:
+    if not cands:
         out["typed_state"] = "TYPED_SKIP_NO_CROSSFAMILY_PROVIDER"
-        print("[panel] TYPED_SKIP: no credentialed provider outside "
-              f"the generator/judge set ({len(served)} rungs, judge "
+        print("[panel] TYPED_SKIP: no panel candidate outside the "
+              f"primary judge ({len(served)} generator rungs, judge "
               f"{jp}/{jm}) (Art. LXI)")
         (REPO / "eval" / "crossfamily_panel_r11.json").write_text(
             json.dumps(out, indent=1, default=str) + "\n",
             encoding="utf-8")
         return 3
-    prov, model = cand
-    out["panel"] = [prov, model]
-    print(f"[panel] cross-family auditor: {prov}/{model} "
-          f"(generator rungs: {len(served)}, primary judge: "
-          f"{jp}/{jm})")
-    rows, n = [], 0
-    for f in sorted(A1_DIR.glob("*.json")):
-        if n >= limit:
-            break
-        pid = f.stem
-        rec = json.loads(f.read_text())
-        a1_ans = str(rec.get("a1_answer") or "")
-        base_ans = ""
-        fr = FRESH / f"{pid}.json"
-        if fr.exists():
-            base_ans = str(json.loads(fr.read_text()).get(
-                "baseline_answer") or "")
-        if not a1_ans.strip() or not base_ans.strip():
-            continue
-        prob = probs[pid]
-        pair = _load_pair(pid)
-        packet = (_unique_packet_list(_packet_by_id_from_run_tree(pair))
-                  if pair else [])
-        prompt = _rubric_prompt(prob, base_ans, a1_ans, packet)
-        jc = _judge_judgment_call(prov, model, prompt, max_tokens=300)
-        n += 1
-        row = {"problem_id": pid,
-               "outcome": jc.get("outcome"),
-               "prefer": ((jc.get("valid") or {}).get("prefer")
-                          if jc.get("outcome") == "JUDGE_VALID"
-                          else None)}
-        rows.append(row)
-        print(f"[panel] {pid[:36]:38s} {row['outcome']:22s} "
-              f"prefer={row['prefer']}")
-    w = sum(1 for r in rows if r.get("prefer") == "B")
-    l = sum(1 for r in rows if r.get("prefer") == "A")
-    t = sum(1 for r in rows if r.get("prefer") == "TIE")
-    out["judgments"] = rows
-    out["summary"] = {"valid": len(rows), "a1_wins": w,
-                      "baseline_wins": l, "ties": t,
-                      "note": "A=baseline-first order in the prompt; "
-                              "the panel verdicts are bias-check "
-                              "input, never gate inputs"}
+    # per-axis agreement vs the committed primary judge (the R3
+    # a1_vs_baseline judgments carry the axis values)
+    committed = {}
+    try:
+        cj = json.loads((REPO / "eval" / "a0plus_compare_r11.json")
+                        .read_text()).get("judgments") or []
+        committed = {j["problem_id"]: j for j in cj
+                     if j.get("pair") == "a1_vs_baseline"
+                     and j.get("outcome") == "JUDGE_VALID"}
+    except Exception:  # noqa: BLE001
+        committed = {}
+    out["panel_auditors"] = []
+    all_panels = {}
+    for prov, model in cands:
+        bias = ("PANEL_IS_GENERATOR_FAMILY (blind rubric; the arms are "
+                "never disclosed to the judge; typed bias caveat — "
+                "Art. XXVII)" if (prov, model) in served
+                else "CROSS_FAMILY_VS_GENERATOR")
+        print(f"[panel] auditor: {prov}/{model} ({bias})")
+        rows, n = [], 0
+        for f in sorted(A1_DIR.glob("*.json")):
+            if n >= limit:
+                break
+            pid = f.stem
+            rec = json.loads(f.read_text())
+            a1_ans = str(rec.get("a1_answer") or "")
+            base_ans = ""
+            fr = FRESH / f"{pid}.json"
+            if fr.exists():
+                base_ans = str(json.loads(fr.read_text()).get(
+                    "baseline_answer") or "")
+            if not a1_ans.strip() or not base_ans.strip():
+                continue
+            prob = probs[pid]
+            pair = _load_pair(pid)
+            packet = (_unique_packet_list(
+                _packet_by_id_from_run_tree(pair)) if pair else [])
+            prompt = _rubric_prompt(prob, base_ans, a1_ans, packet)
+            jc = _judge_judgment_call(prov, model, prompt,
+                                      max_tokens=4000)
+            time.sleep(5)
+            n += 1
+            v = jc.get("valid") or {}
+            row = {"problem_id": pid,
+                   "outcome": jc.get("outcome"),
+                   "prefer": v.get("prefer"),
+                   "axes": {k: v[k] for k in
+                            ("A1", "A2", "A3", "A4", "A6",
+                             "B1", "B2", "B3", "B4", "B6") if k in v}}
+            rows.append(row)
+            print(f"[panel] {pid[:36]:38s} {row['outcome']:22s} "
+                  f"prefer={row['prefer']}")
+        w = sum(1 for r in rows if r.get("prefer") == "B")
+        l = sum(1 for r in rows if r.get("prefer") == "A")
+        tt = sum(1 for r in rows if r.get("prefer") == "TIE")
+        # per-axis agreement with the committed primary judge
+        axis_agree, axis_n = {}, {}
+        for r in rows:
+            c = committed.get(r["problem_id"])
+            if not c or not r.get("axes"):
+                continue
+            ca = c.get("axes") or {}
+            for k, v in r["axes"].items():
+                if k in ca:
+                    axis_n[k] = axis_n.get(k, 0) + 1
+                    axis_agree[k] = axis_agree.get(k, 0) + int(
+                        v == ca[k])
+        out["panel_auditors"].append({
+            "panel": [prov, model], "bias_position": bias,
+            "judgments": rows,
+            "summary": {"valid": len(rows),
+                        "non_empty": sum(1 for r in rows
+                                         if r["outcome"] == "JUDGE_VALID"),
+                        "a1_wins": w, "baseline_wins": l, "ties": tt,
+                        "per_axis_agreement": {
+                            k: {"agreed": axis_agree.get(k, 0),
+                                "n": axis_n.get(k, 0)}
+                            for k in sorted(axis_n)}},
+            "note": ("A=baseline-first order in the prompt; the panel "
+                     "verdicts are bias-check input, never gate "
+                     "inputs")})
+        all_panels[(prov, model)] = rows
+    out["d5_acceptance"] = {
+        "threshold": ">= 10/10 non-empty judgments per panel auditor",
+        "auditors": [{"panel": pa["panel"],
+                      "non_empty": pa["summary"]["non_empty"],
+                      "PASS": pa["summary"]["non_empty"] >= 10}
+                     for pa in out["panel_auditors"]]}
     (REPO / "eval" / "crossfamily_panel_r11.json").write_text(
         json.dumps(out, indent=1, default=str) + "\n",
         encoding="utf-8")
     print(f"[panel] -> eval/crossfamily_panel_r11.json "
-          f"(a1={w} base={l} tie={t} of {len(rows)})")
+          f"(auditors: {[(p['panel'], p['summary']['non_empty']) for p in out['panel_auditors']]})")
     return 0
 
 

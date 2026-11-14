@@ -166,6 +166,14 @@ CRITERIA = {
 # an official-provider free-tier key is added only when the owner
 # supplies one. No further judge-routing work this round.
 JUDGE_CANDIDATES = [
+    # AM3 D4 (2026-11-14): the R3 generator served EXACTLY ONE rung
+    # (agnes/agnes-3.0-flash, 17 calls, per_call_timeline) — the judge
+    # must differ in provider AND model. inception/mercury-3 is
+    # measured live (direct 200-OK 'OK', probe_capability ok) and is
+    # the diffusion-LM family (a genuinely different family from the
+    # agnes autoregressive rung). xkiro is 403-dead this window, kept
+    # in the list with its typed record for the audit trail.
+    ("inception", "mercury-3"),
     ("xkiro", "mistralai/ministral-14b"),
     ("xkiro", "mistralai/ministral-8b"),
     ("unorouter", "deepseek-v4-flash:free"),
@@ -1632,20 +1640,25 @@ def _parse_rubric(raw: str) -> Dict[str, Any]:
 
 
 def _judge_judgment_call(provider: str, model: str, prompt: str,
-                         max_tokens: int = 300,
+                         max_tokens: int = 2000,
                          clar: bool = False):
     """R11 owner item 5: ONE judge call with ONE parse retry and the
-    RAW OUTPUT LOGGED. First attempt uses the structured-output
+    RAW OUTPUT LOGGED. Default max_tokens 2000->4000 for reasoning rungs (AM3 D5 measured
+    2026-11-14: inception/mercury-3 returned empty content with
+    finish_reason=length at 300 — the reasoning budget consumed the
+    cap; the SAME full-length prompt answers with the JSON contract at
+    2000. The R3 panel's 6/6 JUDGE_EMPTY_OUTPUT (F15) was this cap,
+    not prompt length). First attempt uses the structured-output
     prompt; when the response fails the rubric contract, ONE retry
     re-asks with the parse failure and the raw excerpt. Returns
     {outcome, parsed, valid, raw, attempts, latencies, errors} - the
     outcome is typed (JUDGE_VALID / JUDGE_TRANSPORT_FAILED /
     JUDGE_EMPTY_OUTPUT / JUDGE_PARSE_FAILED), never converted."""
+    system_call = ("You are a strict blind rubric judge. "
+                   "English only. Respond with ONLY the JSON object.")
     t0 = time.time()
     res = _transport_call(provider, model, prompt,
-                          "You are a strict blind rubric judge. "
-                          "English only. Respond with ONLY the JSON "
-                          "object.", max_tokens=max_tokens)
+                          system_call, max_tokens=max_tokens)
     lat1 = round(time.time() - t0, 1)
     rec: Dict[str, Any] = {"attempts": [], "parsed": None,
                            "valid": None, "raw": ""}
@@ -1668,13 +1681,35 @@ def _judge_judgment_call(provider: str, model: str, prompt: str,
         rec["parsed"], rec["valid"] = parsed, valid
         return rec
     if not content1.strip():
+        # AM3 D5 (measured): mercury-3's reasoning budget scales with
+        # the task; 4000 still starves the LONGEST pair prompts
+        # (finish_reason=length). ONE typed cap escalation (x2), then
+        # the outcome stands — the starvation is never silently
+        # converted into a verdict.
+        res1b = _transport_call(provider, model, prompt, system_call,
+                                max_tokens=max_tokens * 2)
+        rec["latencies"].append(round(time.time() - t0, 1))
+        rec["attempts"].append({"n": "1b_cap_escalated",
+                                "max_tokens": max_tokens * 2,
+                                "chars_out":
+                                    len(str(res1b.get("content") or ""))})
+        if res1b.get("status") == "OK" and str(res1b.get("content") or "").strip():
+            parsed1b = _parse_rubric(str(res1b.get("content")))
+            valid1b = _validate_rubric_pass(parsed1b, clar) \
+                if parsed1b else None
+            if valid1b is not None:
+                rec["outcome"] = JUDGE_VALID
+                rec["parsed"], rec["valid"] = parsed1b, valid1b
+                rec["cap_escalated"] = True
+                return rec
         rec["outcome"] = JUDGE_EMPTY_OUTPUT
         return rec
     # ---- ONE parse retry (owner item 5): re-ask with the failure
     retry_prompt = (prompt + "\n\nIMPORTANT: your previous response "
                     "was not a parseable rubric judgment. Respond "
                     "AGAIN with ONLY the JSON object with the integer "
-                    "keys A1-A6, B1-B6 (1-5) and 'prefer' "
+                    "keys A1-A6, B1-B6 (A1-A3/B1-B3 are 0-or-1 gates, "
+                    "A4-A6/B4-B6 are 1-5) and 'prefer' "
                     "(one of A, B, TIE). No other text.")
     t1 = time.time()
     res2 = _transport_call(provider, model, retry_prompt,
@@ -1758,7 +1793,7 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
         # - a pair that never parses counts as WRONG, Art. XXV).
         _jc = _judge_judgment_call(judge_route["provider"],
                                    judge_route["model"], prompt,
-                                   max_tokens=300,
+                                   max_tokens=4000,  # AM3 D5: reasoning rungs starve smaller caps (measured: 12/30 still finish_reason=length at 2000; 4000 covers the budget)
                                    clar=bool(
                                        problem.get(
                                            "clarification_answer")))
