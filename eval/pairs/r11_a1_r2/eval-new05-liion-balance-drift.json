@@ -1,0 +1,465 @@
+{
+ "a1_version": "r11_a1/1.1.0",
+ "problem_id": "eval-new05-liion-balance-drift",
+ "baseline_sha_source": "{'pipeline_answer_sha256': '2b00644f033513277b35a47fbfae5da8ff4f336725bc70032691d05b7d2e2a1c', 'baseline_answer_sha256': '8b27dae1c659dd238e6eb6240c8a23cd379c9e1ceeb603d257bf39f6f113d8de', 'evidence_sha256': '15060ab53da795f43de79ed5dcc9eb97db5ea878d144455589bc4474cb091d8b', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 28,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "ideate": {
+  "wall_s": 14.6,
+  "transport_ok": true,
+  "json_parsed": true,
+  "salvage_note": null,
+  "n_candidates": 6,
+  "candidates": [
+   {
+    "lever": "materials",
+    "name": "Gradient-Tolerant NMC-811 with Li-Ion Conductive Additive",
+    "mechanism": "Embedding Li-ion conductive polymer (e.g., PEO-LiTFSI) in cathode to homogenize lithium diffusion across temperature gradients.",
+    "failure_link": "Mitigates self-discharge spread by reducing lithium plating/stripping asymmetry in hot/cold cells (thermal gradient-induced capacity drift).",
+    "cost_to_test": "$5K (10 cells, 3 months: lab-scale slurry coating + cycling at 15\u00b0C gradient).",
+    "standard_solution": "Standard NMC-811 with no additives; relies solely on passive balancing.",
+    "departure": "Active lithium-ion transport coupling to thermal gradients via conductive polymer network."
+   },
+   {
+    "lever": "process",
+    "name": "Thermal Gradient-Aware Cell Formation",
+    "mechanism": "Pre-cycle cells at 15\u00b0C gradient to equilibrate initial SOC and impedance across the module.",
+    "failure_link": "Prevents capacity spread by forcing uniform lithium distribution before imbalance can grow (calendar life drift).",
+    "cost_to_test": "$3K (1 module, 2 weeks: custom formation profile + impedance spectroscopy).",
+    "standard_solution": "Uniform formation at single temperature; no gradient compensation.",
+    "departure": "Gradient-matched formation to initialize cells with matched SOC/impedance profiles."
+   },
+   {
+    "lever": "design",
+    "name": "Modular Busbar with Adaptive Thermal Coupling",
+    "mechanism": "Segmented busbars with thermally conductive yet electrically insulated links to equalize cell temperatures via heat pipes.",
+    "failure_link": "Reduces thermal gradient by 50% (from 15\u00b0C to ~7.5\u00b0C), slowing capacity/self-discharge divergence.",
+    "cost_to_test": "$8K (1 module, 1 month: thermal mockup + IR imaging validation).",
+    "standard_solution": "Monolithic busbar with no thermal management; gradient persists.",
+    "departure": "Active thermal homogenization via conductive pathways without increasing footprint."
+   },
+   {
+    "lever": "controls",
+    "name": "Dynamic Balancing Pulse Modulation",
+    "mechanism": "Vary balancer pulse width (1A current) based on real-time cell temperature gradients to prioritize hot/cold cells.",
+    "failure_link": "Compensates for self-discharge asymmetry by aggressively balancing cells with higher thermal drift rates.",
+    "cost_to_test": "$2K (1 module, 1 week: BMS firmware tweak + lab cycling).",
+    "standard_solution": "Fixed-time balancing pulses; no temperature awareness.",
+    "departure": "Temperature-gradient-aware balancing algorithm using existing 1A hardware."
+   },
+   {
+    "lever": "operations",
+    "name": "Gradient-Reversing Charge/Discharge Cycles",
+    "mechanism": "Alternate charge/discharge directions to periodically reverse thermal gradients and redistribute lithium.",
+    "failure_link": "Resets capacity/impedance spread by mechanically mixing cell states (calendar life drift).",
+    "cost_to_test": "$1K (1 module, 3 days: BMS cycle pattern validation).",
+    "standard_solution": "Unidirectional cycling; gradient-induced drift accumulates.",
+    "departure": "Operational cycling strategy to counteract thermal stratification."
+   },
+   {
+    "lever": "measurement",
+    "name": "Distributed Impedance-Sensing Balancer",
+    "mechanism": "Embed low-power impedance sensors (e.g., broadband dielectric spectroscopy) in each cell to trigger balancing at 35 mV *before* voltage spread occurs.",
+    "failure_link": "Predicts and prevents voltage spread by detecting impedance divergence (self-discharge/capacity drift) early.",
+    "cost_to_test": "$12K (13 cells, 2 months: sensor integration + validation).",
+    "standard_solution": "Voltage-only balancing; reacts to spread after it forms.",
+    "departure": "Proactive balancing triggered by impedance heterogeneity, not voltage."
+   }
+  ],
+  "finish_reason": "stop",
+  "raw_sha256": "db171a8b251b466e",
+  "raw_excerpt": "```json\n{\n  \"candidates\": [\n    {\n      \"lever\": \"materials\",\n      \"name\": \"Gradient-Tolerant NMC-811 with Li-Ion Conductive Additive\",\n      \"mechanism\": \"Embedding Li-ion conductive polymer (e.g., PEO-LiTFSI) in cathode to homogenize lithium diffusion across temperature gradients.\",\n      \"failure_link\": \"Mitigates self-discharge spread by reducing lithium plating/stripping asymmetry in hot/cold cells (thermal gradient-induced capacity drift).\",\n      \"cost_to_test\": \"$5K (10 cells, 3 months: lab-scale slurry coating + cycling at 15\u00b0C gradient).\",\n      \"standard_solution\": \"Standard NMC-81",
+  "raw_tail": "g Balancer\",\n      \"mechanism\": \"Embed low-power impedance sensors (e.g., broadband dielectric spectroscopy) in each cell to trigger balancing at 35 mV *before* voltage spread occurs.\",\n      \"failure_link\": \"Predicts and prevents voltage spread by detecting impedance divergence (self-discharge/capacity drift) early.\",\n      \"cost_to_test\": \"$12K (13 cells, 2 months: sensor integration + validation).\",\n      \"standard_solution\": \"Voltage-only balancing; reacts to spread after it forms.\",\n      \"departure\": \"Proactive balancing triggered by impedance heterogeneity, not voltage.\"\n    }\n  ]\n}\n```"
+ },
+ "critic": {
+  "version": "plausibility_critic/1.0.0",
+  "article": "owner audit 2026-11-14 step 1; anchors Art. L calibration corpus, provenance Art. XXVII",
+  "allowed_signals": null,
+  "allowed_clause": null,
+  "prior_killed_classes": [],
+  "per_candidate": [
+   {
+    "verdict": "VETOED",
+    "kills": [
+     {
+      "anchor": "SCOPE_CELL_VS_MODULE",
+      "verdict": "SCOPE_VIOLATION",
+      "finding": "cell-internal chemistry/electrolyte change proposed against a module-level thermal-gradient phenomenon \u2014 the change is below the scope the user can act on for this failure",
+      "provenance_class": "BUYER_DEFINED",
+      "provenance": "owner audit 2026-11-14 (new05)"
+     }
+    ],
+    "flags": [
+     {
+      "flag": "SCOPE_AUDIT",
+      "finding": "the candidate changes cell-internal chemistry while the stated failure phenomenon is stated at module/pack level \u2014 the LLM critic must adjudicate whether a cell-level mechanism can act on the stated system-level phenomenon",
+      "provenance_class": "BUYER_DEFINED",
+      "provenance": "owner audit 2026-11-14 (new05: 'wrong scope \u2014 PEO-LiTFSI into the cathode to fix a module-level thermal gradient')"
+     }
+    ],
+    "basis": [
+     "SCOPE_CELL_VS_MODULE: cell-chemistry change for a module-level phenomenon"
+    ],
+    "index": 0,
+    "lever": "materials",
+    "name": "Gradient-Tolerant NMC-811 with Li-Ion Conductive Additive",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 1,
+    "lever": "process",
+    "name": "Thermal Gradient-Aware Cell Formation",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 2,
+    "lever": "design",
+    "name": "Modular Busbar with Adaptive Thermal Coupling",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 3,
+    "lever": "controls",
+    "name": "Dynamic Balancing Pulse Modulation",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 4,
+    "lever": "operations",
+    "name": "Gradient-Reversing Charge/Discharge Cycles",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 5,
+    "lever": "measurement",
+    "name": "Distributed Impedance-Sensing Balancer",
+    "disconfirming_query": null
+   }
+  ],
+  "vetoed_indexes": [
+   0
+  ],
+  "flagged_indexes": []
+ },
+ "critique": {
+  "wall_s": 16.1,
+  "transport_ok": true,
+  "json_parsed": true,
+  "n_critiques": 5,
+  "top3": [
+   "Dynamic Balancing Pulse Modulation",
+   "Gradient-Reversing Charge/Discharge Cycles",
+   "Thermal Gradient-Aware Cell Formation"
+  ],
+  "standard_solution": "Passive cell balancing with fixed 1A current, no thermal or impedance compensation",
+  "raw_sha256": "b0aeed34802ee7ff",
+  "raw_excerpt": "```json\n{\n  \"critiques\": [\n    {\n      \"lever\": \"Thermal Gradient-Aware Cell Formation\",\n      \"environment_compatibility\": \"ok; survives 15\u00b0C gradient, NMC-811 stable in this range\",\n      \"magnitude_audit\": \"ok; 15\u00b0C gradient matches requirement exactly\",\n      \"scope_audit\": \"ok; acts on module-level formation, not cell chemistry\",\n      \"premise_audit\": \"none; uses existing formation equipment\",\n      \"signal_compliance\": \"none; no new signals needed\",\n      \"plausibility\": \"ok; proven in lithium-ion formation literature\",\n      \"constraint_audit\": {\n        \"voltage_spread\": \"ok; reduces ",
+  "selection_note": "rank_walk_first_survivor (vetoed=[0])"
+ },
+ "chosen": {
+  "lever": "controls",
+  "name": "Dynamic Balancing Pulse Modulation",
+  "mechanism": "Vary balancer pulse width (1A current) based on real-time cell temperature gradients to prioritize hot/cold cells.",
+  "failure_link": "Compensates for self-discharge asymmetry by aggressively balancing cells with higher thermal drift rates."
+ },
+ "compose": {
+  "wall_s": 15.8,
+  "transport_ok": true,
+  "answer_sha256": "dfbd5a8fdd9ad936"
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "n_user_constraint_relabels": 0,
+  "relabels": [],
+  "n_label_hygiene_relabels": 1,
+  "n_invalid_citations_dropped": 0
+ },
+ "first_pass": {
+  "consistency_state": "CONSISTENCY_PASS",
+  "contract_valid": true,
+  "n_contract_violations": 0
+ },
+ "repair_call": {
+  "applied": false,
+  "mode": null,
+  "budget_guard_s": 26.1
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "intervention-proposal",
+   "bindings": {
+    "evidence_bound": 14,
+    "assumption": 1,
+    "unbound_numbers": 3,
+    "all_numbers": 18,
+    "claims": [
+     {
+      "parameter": "PARAMETER: **thermal time constant (\u03c4)** = 30 minutes (rationale: NMC-811\u2019s thermal diffusion in a 15 \u00b0C gradient aligns with empirical \u03c4 \u2248 30 min for 10 Ah cells [doi:10.4271/2017-01-1217]).\nASSUMPTI",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "aligns",
+       "cells",
+       "constant",
+       "diffusion",
+       "empirical",
+       "gradient",
+       "minutes",
+       "rationale",
+       "thermal",
+       "time"
+      ],
+      "pairs": [
+       {
+        "value": "15",
+        "unit": "\u00b0c"
+       }
+      ],
+      "conversion_recorded": true
+     },
+     {
+      "parameter": "PARAMETER: **modulation frequency (f)** = 1/\u03c4 = 0.033 Hz (rationale: ensures pulses align with thermal drift rate; higher f risks overbalancing, lower f delays correction).\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "align",
+       "correction",
+       "delays",
+       "drift",
+       "ensures",
+       "frequency",
+       "higher",
+       "lower",
+       "modulation",
+       "overbalancing",
+       "pulses",
+       "rate",
+       "rationale",
+       "risks",
+       "thermal"
+      ],
+      "pairs": [
+       {
+        "value": "0.033",
+        "unit": "hz"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: **pulse width range** = 10\u2013100 ms (rationale: 1 A current at 10 ms = 10 mAh/cell, sufficient to offset self-discharge asymmetry without exceeding cell C-rate limits).\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "asymmetry",
+       "cell",
+       "current",
+       "discharge",
+       "exceeding",
+       "limits",
+       "offset",
+       "pulse",
+       "range",
+       "rate",
+       "rationale",
+       "self",
+       "sufficient",
+       "width"
+      ],
+      "pairs": [
+       {
+        "value": "1",
+        "unit": "a"
+       },
+       {
+        "value": "10",
+        "unit": "ms"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: **self-discharge activation energy (Ea)** = 0.5 eV [doi:10.1021/jacs.5c15171] (rationale: quantifies temperature sensitivity of NMC-811).\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "activation",
+       "discharge",
+       "energy",
+       "jacs",
+       "quantifies",
+       "rationale",
+       "self",
+       "sensitivity",
+       "temperature"
+      ],
+      "pairs": [],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: **temperature measurement error** = \u00b10.5 \u00b0C (rationale: typical RTD accuracy; error propagates linearly to voltage spread via Ea).\n\nFALSIFICATION TEST:\nn = 10 modules, cycled for 10,000 hou",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "accuracy",
+       "after",
+       "balancing",
+       "bottom",
+       "cell",
+       "circuit",
+       "criterion",
+       "cycled",
+       "cycles",
+       "error",
+       "every",
+       "falsification",
+       "gradient",
+       "hours",
+       "linearly",
+       "logged",
+       "measured",
+       "measurement",
+       "minute",
+       "minutes",
+       "modules",
+       "open",
+       "pass",
+       "propagates",
+       "rationale",
+       "relaxation",
+       "rest",
+       "spread",
+       "temperature",
+       "temperatures",
+       "test",
+       "typical",
+       "voltage"
+      ],
+      "pairs": [
+       {
+        "value": "0.5",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "15",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "35",
+        "unit": "mv"
+       },
+       {
+        "value": "90",
+        "unit": "%"
+       }
+      ],
+      "conversion_recorded": false
+     }
+    ]
+   }
+  }
+ },
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "INCOMPLETE_CONTRACT",
+  "a0plus_answer_sha256": "920e4cad3354876ce5c3512869d73eb702f3b24040fd64b8c15c162ebd317c2b",
+  "note": "the A1 invention arm pairs against the A0+ default path for the same problem (owner R11 item 3)"
+ },
+ "a1_answer": "PROPOSED DESIGN INTERVENTION:\nInject a **gradient-aware balancing pulse train** into the 1 A balancer, where pulse width is modulated in real-time by cell temperature measurements. Hotter cells receive shorter, more frequent pulses to counteract self-discharge asymmetry, while colder cells are balanced less aggressively. The modulation frequency is synchronized to the thermal time constant of NMC-811 (\u224830 min) to avoid overcorrecting. This leverages the existing balancer hardware without additional current or footprint.\n\nMECHANISM:\nSelf-discharge in NMC-811 scales exponentially with temperature (Arrhenius dependence, *Ea* \u2248 0.5 eV [doi:10.1021/jacs.5c15171]). By dynamically adjusting pulse width, the balancer compensates for the **thermal drift rate asymmetry** across the 15 \u00b0C gradient, preventing cumulative voltage spread from exceeding the 35 mV trip threshold. The modulation exploits the fact that hot cells discharge faster; aggressive balancing of these cells equalizes the string before cold cells can lag further.\n\nDEPARTURE FROM STANDARD:\nStandard: fixed-duty-cycle passive balancing (e.g., periodic equalization pulses).\nDifference: **closed-loop thermal gradient compensation** using real-time cell temperature inputs to weight pulse allocation, not just time-based triggers.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: **thermal time constant (\u03c4)** = 30 minutes (rationale: NMC-811\u2019s thermal diffusion in a 15 \u00b0C gradient aligns with empirical \u03c4 \u2248 30 min for 10 Ah cells [doi:10.4271/2017-01-1217]).\nASSUMPTION PARAMETER: **modulation frequency (f)** = 1/\u03c4 = 0.033 Hz (rationale: ensures pulses align with thermal drift rate; higher f risks overbalancing, lower f delays correction).\nASSUMPTION PARAMETER: **pulse width range** = 10\u2013100 ms (rationale: 1 A current at 10 ms = 10 mAh/cell, sufficient to offset self-discharge asymmetry without exceeding cell C-rate limits).\nASSUMPTION PARAMETER: **self-discharge activation energy (Ea)** = 0.5 eV [doi:10.1021/jacs.5c15171] (rationale: quantifies temperature sensitivity of NMC-811).\nASSUMPTION PARAMETER: **temperature measurement error** = \u00b10.5 \u00b0C (rationale: typical RTD accuracy; error propagates linearly to voltage spread via Ea).\n\nFALSIFICATION TEST:\nn = 10 modules, cycled for 10,000 hours at 15 \u00b0C top-to-bottom gradient, with cell temperatures logged every 30 minutes.\n**Pass criterion:** \u226435 mV cell-to-cell voltage spread at rest in \u226590% of cycles, measured via 10-minute open-circuit relaxation after balancing.",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_ideate",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 11206,
+   "ttfb_ms": 11206,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_critique",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 12813,
+   "ttfb_ms": 12813,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_compose",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 12340,
+   "ttfb_ms": 12340,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  }
+ ],
+ "n_llm_calls": 3,
+ "e2e_wall_s": 46.6,
+ "infra_time_s": {
+  "queue_wait": null,
+  "gateway_setup": null,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}

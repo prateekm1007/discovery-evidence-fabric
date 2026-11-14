@@ -1,0 +1,287 @@
+{
+ "a1_version": "r11_a1/1.1.0",
+ "problem_id": "eval-new02-slipring-predictor",
+ "baseline_sha_source": "{'pipeline_answer_sha256': 'f1e86b347a55ab9ce3b55d277df1175b3c7ac6985c3001fd2f98ce8ec241ea7d', 'baseline_answer_sha256': 'e9186400d448e73479a31d8ecfffcb644d67093ec41bda216f22e3e7bd24adc5', 'evidence_sha256': 'b3508c00c3ccfd9fac092b730a9be3edc2546ce4e71d32392b7a51e65656bc48', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 30,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "ideate": {
+  "wall_s": 12.2,
+  "transport_ok": true,
+  "json_parsed": true,
+  "salvage_note": null,
+  "n_candidates": 6,
+  "candidates": [
+   {
+    "lever": "materials",
+    "name": "Graphite-Nanotube Composite Brushes",
+    "mechanism": "Embedded carbon nanotubes in brush material enhance electrical conductivity and reduce friction via self-lubrication.",
+    "failure_link": "Mitigates contact wear by reducing arcing via lower resistance and heat dissipation at micro-asperities.",
+    "cost_to_test": "$5K (10 brush samples, 1 week lab testing at 1800 rpm with 1-minute current/voltage logging).",
+    "standard_solution": "Standard silver-graphite brushes with fixed composition.",
+    "departure": "Nanotube reinforcement (5-10% by weight) for dynamic conductivity adaptation under wear."
+   },
+   {
+    "lever": "process",
+    "name": "Dynamic Brush Pressure Modulation",
+    "mechanism": "Adjust brush pressure in real-time via piezoelectric actuators to compensate for wear-induced gap changes.",
+    "failure_link": "Prevents arcing by maintaining optimal contact force as brush height degrades over time.",
+    "cost_to_test": "$3K (retrofit 1 brush assembly, 2-week field trial with historian data validation).",
+    "standard_solution": "Static mechanical spring-loaded brush pressure.",
+    "departure": "Closed-loop pressure control using slip-ring current ripple as feedback proxy."
+   },
+   {
+    "lever": "design",
+    "name": "Segmented Slip-Ring with Redundant Paths",
+    "mechanism": "Divide slip-ring into electrically isolated segments with parallel brush contacts to distribute wear.",
+    "failure_link": "Delays open-circuit transients by maintaining excitation current via redundant paths until full failure.",
+    "cost_to_test": "$12K (1 slip-ring rebuild, 1-month validation with historian current/voltage trends).",
+    "standard_solution": "Single continuous slip-ring with uniform brush contact.",
+    "departure": "Modular segments with brush rotation logic to balance wear across paths."
+   },
+   {
+    "lever": "controls",
+    "name": "Brush Wear-Predictive Excitation Current Ramping",
+    "mechanism": "Gradually increase excitation current to preemptively compensate for rising contact resistance from wear.",
+    "failure_link": "Masking wear effects by proactively adjusting current to maintain voltage stability before arcing occurs.",
+    "cost_to_test": "$0 (software-only, 1-week historian data backtest for threshold tuning).",
+    "standard_solution": "Fixed excitation current profile regardless of brush condition.",
+    "departure": "Adaptive current ramp based on historian-derived contact resistance trends (1-minute \u0394V/I)."
+   },
+   {
+    "lever": "operations",
+    "name": "Brush Rotation Schedule Optimization",
+    "mechanism": "Shift brush position periodically to redistribute wear based on historian-identified hotspots.",
+    "failure_link": "Prevents localized arcing by rotating brushes away from high-wear zones before critical failure.",
+    "cost_to_test": "$2K (1-week manual rotation trials with historian current variance analysis).",
+    "standard_solution": "Static brush positioning for entire lifespan.",
+    "departure": "Data-driven rotation intervals (e.g., every 300 hours) using historian current fluctuation patterns."
+   },
+   {
+    "lever": "measurement",
+    "name": "High-Frequency Current Ripple Spectral Analysis",
+    "mechanism": "Analyze 1-minute historian current ripple spectra to detect early brush wear via increasing high-frequency noise.",
+    "failure_link": "Links micro-arcing and contact degradation to spectral shifts in excitation current before visible wear.",
+    "cost_to_test": "$0 (historian data reprocessing with FFT on existing 1-minute samples).",
+    "standard_solution": "Threshold-based voltage/current alarms without spectral analysis.",
+    "departure": "Machine learning classifier trained on ripple spectra to predict wear 2+ weeks ahead."
+   }
+  ],
+  "finish_reason": "stop",
+  "raw_sha256": "6fd66233e8bed20a",
+  "raw_excerpt": "```json\n{\n  \"candidates\": [\n    {\n      \"lever\": \"materials\",\n      \"name\": \"Graphite-Nanotube Composite Brushes\",\n      \"mechanism\": \"Embedded carbon nanotubes in brush material enhance electrical conductivity and reduce friction via self-lubrication.\",\n      \"failure_link\": \"Mitigates contact wear by reducing arcing via lower resistance and heat dissipation at micro-asperities.\",\n      \"cost_to_test\": \"$5K (10 brush samples, 1 week lab testing at 1800 rpm with 1-minute current/voltage logging).\",\n      \"standard_solution\": \"Standard silver-graphite brushes with fixed composition.\",\n      \"de",
+  "raw_tail": "pectral Analysis\",\n      \"mechanism\": \"Analyze 1-minute historian current ripple spectra to detect early brush wear via increasing high-frequency noise.\",\n      \"failure_link\": \"Links micro-arcing and contact degradation to spectral shifts in excitation current before visible wear.\",\n      \"cost_to_test\": \"$0 (historian data reprocessing with FFT on existing 1-minute samples).\",\n      \"standard_solution\": \"Threshold-based voltage/current alarms without spectral analysis.\",\n      \"departure\": \"Machine learning classifier trained on ripple spectra to predict wear 2+ weeks ahead.\"\n    }\n  ]\n}\n```"
+ },
+ "critic": {
+  "version": "plausibility_critic/1.0.0",
+  "article": "owner audit 2026-11-14 step 1; anchors Art. L calibration corpus, provenance Art. XXVII",
+  "allowed_signals": null,
+  "allowed_clause": null,
+  "prior_killed_classes": [],
+  "per_candidate": [
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 0,
+    "lever": "materials",
+    "name": "Graphite-Nanotube Composite Brushes",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 1,
+    "lever": "process",
+    "name": "Dynamic Brush Pressure Modulation",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 2,
+    "lever": "design",
+    "name": "Segmented Slip-Ring with Redundant Paths",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 3,
+    "lever": "controls",
+    "name": "Brush Wear-Predictive Excitation Current Ramping",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 4,
+    "lever": "operations",
+    "name": "Brush Rotation Schedule Optimization",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 5,
+    "lever": "measurement",
+    "name": "High-Frequency Current Ripple Spectral Analysis",
+    "disconfirming_query": null
+   }
+  ],
+  "vetoed_indexes": [],
+  "flagged_indexes": []
+ },
+ "critique": {
+  "wall_s": 22.1,
+  "transport_ok": true,
+  "json_parsed": true,
+  "n_critiques": 6,
+  "top3": [
+   "High-Frequency Current Ripple Spectral Analysis",
+   "Graphite-Nanotube Composite Brushes",
+   "Segmented Slip-Ring with Redundant Paths"
+  ],
+  "standard_solution": "Replace brushes/slip-ring on fixed schedule (e.g., 6-12 months) with no predictive warning; fails when arcing causes excitation transients.",
+  "raw_sha256": "2840e398c89f9264",
+  "raw_excerpt": "```json\n{\n  \"critiques\": [\n    {\n      \"lever\": \"Graphite-Nanotube Composite Brushes\",\n      \"environment_compatibility\": \"ok; survives 1800 rpm, 100\u00b0C+ and acidic slip-ring environments (carbon nanotube oxidation threshold ~250\u00b0C)\",\n      \"magnitude_audit\": \"ok; conductivity improvement ~20-30% (sufficient for 1.5 MW excitation current stability)\",\n      \"scope_audit\": \"ok; brush material is user-changeable\",\n      \"premise_audit\": \"none; no unauthorized assumptions\",\n      \"signal_compliance\": \"none; no new signals required\",\n      \"plausibility\": \"ok; self-lubrication reduces micro-arcing v",
+  "selection_note": "rank_walk_first_survivor (vetoed=[])"
+ },
+ "chosen": {
+  "lever": "measurement",
+  "name": "High-Frequency Current Ripple Spectral Analysis",
+  "mechanism": "Analyze 1-minute historian current ripple spectra to detect early brush wear via increasing high-frequency noise.",
+  "failure_link": "Links micro-arcing and contact degradation to spectral shifts in excitation current before visible wear."
+ },
+ "compose": {
+  "wall_s": 12.1,
+  "transport_ok": true,
+  "answer_sha256": "f9f9f0ec964fa43c"
+ },
+ "strict_relabel": {
+  "n_relabels": 1,
+  "n_user_constraint_relabels": 1,
+  "relabels": [
+   {
+    "parameter": "",
+    "value": "**Brush material noise signature** = carbon-graphite (standard for 1.5 MW genera",
+    "new_label": "ASSUMPTION (User Constraint)",
+    "cited_record": "doi:10.1109/holm.2017.8088083",
+    "why": "value not found in the cited record; the value is the user's own stated constraint"
+   }
+  ],
+  "n_label_hygiene_relabels": 0,
+  "n_invalid_citations_dropped": 0
+ },
+ "first_pass": {
+  "consistency_state": "CONSISTENCY_PASS",
+  "contract_valid": true,
+  "n_contract_violations": 0
+ },
+ "repair_call": {
+  "applied": false,
+  "mode": null,
+  "budget_guard_s": 32.1
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "predictor-design",
+   "bindings": {
+    "evidence_bound": 17,
+    "assumption": 1,
+    "unbound_numbers": 0,
+    "all_numbers": 18,
+    "claims": [],
+    "threshold_basis": "assumption"
+   }
+  }
+ },
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "COMPLETE",
+  "a0plus_answer_sha256": "b55c99b01ace9d3e6f05389a0cedb86990b9129f00e9295fcedcf97ef923710b",
+  "note": "the A1 invention arm pairs against the A0+ default path for the same problem (owner R11 item 3)"
+ },
+ "a1_answer": "PROPOSED INDICATOR AND THRESHOLD: Monitor the **high-frequency current ripple spectral power** in the excitation current (1\u201310 kHz band) at 1-minute intervals. A threshold of **+20% increase in spectral power density** over a 7-day rolling baseline, sustained for 3 consecutive days, predicts brush wear progression to arcing with \u226514 days warning. This leverages the fact that micro-arcing and contact degradation introduce broadband noise before visible wear or excitation transients.\n\nMECHANISM: Brush wear initiates micro-arcing at asperity contacts, generating stochastic high-frequency current ripples (1\u201310 kHz) due to intermittent plasma formation. These ripples propagate through the excitation circuit as broadband noise, detectable in the current spectrum long before macro-scale wear triggers open-circuit transients or vibration alarms. The spectral power density in this band correlates with contact resistance fluctuations, which precede visible wear by weeks.\n\nDEPARTURE FROM STANDARD: Standard solutions rely on vibration or temperature alarms (reactive) or require new sensors (e.g., piezoelectric actuators). This method uses **existing historian current data** and a spectral analysis of **pre-existing high-frequency noise**, requiring no hardware changes.\n\nLABELED PARAMETERS:\n ASSUMPTION PARAMETER: **Frequency band** = 1\u201310 kHz (rationale: arcing noise in carbon brush-slip ring systems peaks in this range per [doi:10.31274/rtd-180813-15199], with 10 kHz capturing micro-arcing while excluding switching harmonics)\n ASSUMPTION PARAMETER: **Threshold increase** = +20% over 7-day baseline (rationale: empirical calibration in [doi:10.1109/holm.2018.8611774] shows 15\u201325% spectral power growth precedes visible wear by \u226514 days; 20% balances sensitivity and false alarms)\n ASSUMPTION PARAMETER: **Detection window** = 3 consecutive days (rationale: filters transient noise while ensuring \u226514 days warning per user constraint)\n ASSUMPTION PARAMETER: **Brush material noise signature** = carbon-graphite (standard for 1.5 MW generators) \u2014 user's own stated value, not evidence\n ASSUMPTION PARAMETER: **Sampling rate** = 1-minute historian interval (rationale: matches user constraint; spectral resolution sufficient for 1\u201310 kHz analysis via Welch\u2019s method with 50% overlap)\n\nINDICATOR: High-frequency current ripple spectral power density in the 1\u201310 kHz band (dB/Hz relative to 1 A\u00b2/Hz baseline).\n\nTHRESHOLD: +20% increase in spectral power density over a 7-day rolling baseline, sustained for 3 consecutive days (ASSUMPTION: calibrated to precede arcing by \u226514 days based on [doi:10.1109/holm.2018.8611774]).\n\nVALIDATION PROTOCOL: temperature = 20\u2013100\u00b0C, duration = 6 months, sample size = n = 10 independent 1.5 MW generator slip-ring assemblies. Monitor **high-frequency current ripple spectral power density in the 1\u201310 kHz band** over 1-minute intervals; validate using time-to-failure data from brush replacement logs. Detection criterion: \u22653 consecutive days of +20% spectral power increase triggers alert. False alarm rate audited via 1-year deployment in 5 machines.",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_ideate",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 8737,
+   "ttfb_ms": 8737,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_critique",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 18725,
+   "ttfb_ms": 18725,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_compose",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 8835,
+   "ttfb_ms": 8835,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  }
+ ],
+ "n_llm_calls": 3,
+ "e2e_wall_s": 46.5,
+ "infra_time_s": {
+  "queue_wait": null,
+  "gateway_setup": null,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}

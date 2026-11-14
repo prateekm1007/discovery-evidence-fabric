@@ -69,7 +69,7 @@ sys.path.insert(0, str(REPO / "scripts"))
 
 PAIRS_A1 = REPO / "eval" / "pairs" / "r11_a1"
 
-A1_VERSION = "r11_a1/1.0.0"
+A1_VERSION = "r11_a1/1.1.0"  # 1.1.0: the plausibility critic in the loop
 
 # the cheap-path hard bounds (owner item 3): 40 s per attempt, NO
 # retries, 60 s TOTAL per problem — the typed budget state covers a
@@ -216,8 +216,25 @@ def run_a1(pid: str) -> int:
     os.environ["ENGINE_LLM_TIMEOUT_S"] = str(HARD_TIMEOUT_S)
     os.environ["ENGINE_LLM_RETRY_SLEEP_S"] = "0"
     t0 = time.time()
-    PAIRS_A1.mkdir(parents=True, exist_ok=True)
-    out_f = PAIRS_A1 / f"{pid}.json"
+    # R11 P1-4 (owner audit step 4): the output dir is a NEW versioned
+    # location via A1_OUT_DIR, or the committed r11_a1 dir — which the
+    # pair guard now protects: writing committed pair bytes needs the
+    # explicit FABRIC_PAIR_WRITE_UNLOCK=1 (the measured near-miss the
+    # guard closes: a flag-less default path overwrote 5 committed
+    # delivery records before git checkout restored them). The refusal
+    # is typed BEFORE any call is served (no budget spent on a run
+    # whose bytes cannot land).
+    out_dir = Path(os.environ.get("A1_OUT_DIR", "").strip() or PAIRS_A1)
+    if out_dir != PAIRS_A1:
+        out_dir = Path(out_dir)
+    out_f = out_dir / f"{pid}.json"
+    try:
+        from discovery_fabric.pair_guard import require_pair_write
+        require_pair_write(out_f)
+    except Exception as e:  # noqa: BLE001 — typed refusal, zero calls
+        print(f"[a1] {pid}: PAIR_WRITE_REFUSED — {e}")
+        return 6
+    out_dir.mkdir(parents=True, exist_ok=True)
     pair = _load_pair(pid)
     baseline_sha = _baseline_identity(pair)
     prob = _problem_record(pid)
@@ -273,6 +290,16 @@ def run_a1(pid: str) -> int:
     def _bounded(prompt: str, **kw):
         kw.setdefault("timeout", HARD_TIMEOUT_S)
         kw.setdefault("max_retries", MAX_RETRIES)
+        # R11 measured (2026-11-14, the r2 re-run): the ledger rotated
+        # xkiro to the front after ~40 served calls and both xkiro
+        # rungs refused runtime admission (PROBE_FAILED) — the walk
+        # reported the refusal instead of reaching the eligible agnes
+        # rungs behind them. The operator pin is the recorded override
+        # (typed in the route meta, same class as the ENGINE_*_PROVIDER
+        # pins, Art. XXVII): A1_PIN_PROVIDER=agnes rides the record.
+        _pin = os.environ.get("A1_PIN_PROVIDER", "").strip()
+        if _pin:
+            kw.setdefault("hard_pin_provider", _pin)
         return llm_generate(prompt, **kw)
 
     qtype = str(prob.get("question_type")
@@ -280,6 +307,40 @@ def run_a1(pid: str) -> int:
     ask = ("design the intervention" if qtype != "predictor-design"
            else "propose the leading indicator and its threshold")
     user_txt = _user_constraint_text(prob)
+
+    # ---------------- (a0) CRITIC PREPARE — deterministic, no LLM -----
+    # R11 P1 (owner audit step 1): the plausibility critic. The
+    # allowed-signal set is extracted from the user's OWN constraint
+    # text (BUYER_DEFINED provenance); the killed-class prior (Art. LI)
+    # comes from the prior run's record when one exists — negative
+    # knowledge that changes future search, not an archive.
+    from discovery_fabric.engine.plausibility_critic import (
+        CRITIC_VERSION, allowed_signals_from_constraint, check_candidate,
+        disconfirming_hits, killed_classes)
+    allowed_sigs, allowed_clause = allowed_signals_from_constraint(user_txt)
+    prior_killed: list = []
+    _prior_dir = Path(os.environ.get("A1_PRIOR_RECORDS_DIR", "").strip()
+                      or PAIRS_A1)
+    try:
+        _prior = json.loads((_prior_dir / f"{pid}.json").read_text(
+            encoding="utf-8"))
+        prior_killed = killed_classes(
+            (_prior.get("critic") or {}).get("per_candidate") or [])
+    except Exception:  # noqa: BLE001 — no prior record is not a failure
+        prior_killed = []
+
+    prior_line = ""
+    if prior_killed:
+        prior_line = (
+            "\n\nPRIOR KILLED MECHANISM CLASSES (an auditor/critic "
+            "killed these CLASSES in a previous run on this problem — "
+            "do NOT re-propose them or a cosmetic variant):\n- "
+            + "\n- ".join(prior_killed[:6]) + "\n")
+        rec["learning_feed"] = {
+            "article": "Art. LI — negative knowledge changes future "
+                       "search",
+            "prior_record": str(_prior_dir / f"{pid}.json"),
+            "killed_classes": prior_killed}
 
     # ---------------- (a) IDEATE — 6 candidates, one per lever -------
     ideate_prompt = (
@@ -309,7 +370,7 @@ def run_a1(pid: str) -> int:
         "(not six parameter settings of one idea). BE TERSE: every "
         "field under 22 words, the whole output must fit in 2400 "
         "tokens. Output ONLY a JSON object: {\"candidates\": [ ... "
-        "six objects ... ]}")
+        "six objects ... ]}" + prior_line)
     t_ide = time.time()
     res_i = _bounded(ideate_prompt, max_tokens=2600,
                      purpose="a1_ideate")
@@ -349,6 +410,41 @@ def run_a1(pid: str) -> int:
                       "candidate set (raw logged, hash recorded) — "
                       "no invention delivered (Art. XXV)")
 
+    # ---------------- (a1) CRITIC GATE — deterministic, no LLM -------
+    # every candidate runs the plausibility gate (environment/magnitude/
+    # scope/premise/signals) BEFORE the critique call; VETOED candidates
+    # are marked so the critique call argues about the survivors, and
+    # the deterministic selection override after the call can never
+    # pick one. Disconfirming-evidence hits are retrieved here too (no
+    # LLM) and fed INTO the critique prompt.
+    _device_txt = str(prob.get("device") or "")
+    _fail_txt = str(prob.get("failure") or "")
+    per_cand = []
+    disconf_by_idx = {}
+    for _i, _c in enumerate(cands_preview := ide_obj["candidates"][:6]):
+        _chk = check_candidate(_c, user_txt, device_txt=_device_txt,
+                               failure_txt=_fail_txt,
+                               allowed_signals=allowed_sigs)
+        _chk["index"] = _i
+        _chk["lever"] = _c.get("lever")
+        _chk["name"] = _c.get("name")
+        _chk["disconfirming_query"] = None
+        per_cand.append(_chk)
+        _hits = disconfirming_hits(_c, packet_list, _fail_txt)
+        disconf_by_idx[_i] = _hits
+    _vetoed = [pc["index"] for pc in per_cand if pc["verdict"] == "VETOED"]
+    _flagged = [pc["index"] for pc in per_cand if pc["verdict"] == "FLAGGED"]
+    rec["critic"] = {
+        "version": CRITIC_VERSION,
+        "article": ("owner audit 2026-11-14 step 1; anchors Art. L "
+                    "calibration corpus, provenance Art. XXVII"),
+        "allowed_signals": allowed_sigs,
+        "allowed_clause": allowed_clause,
+        "prior_killed_classes": prior_killed,
+        "per_candidate": per_cand,
+        "vetoed_indexes": _vetoed,
+        "flagged_indexes": _flagged}
+
     # ---------------- (b) CRITIQUE — select, quoted audit ------------
     cands = ide_obj["candidates"][:6]
     cand_txt = "\n\n".join(
@@ -357,6 +453,16 @@ def run_a1(pid: str) -> int:
         f"{c.get('failure_link')} | cost_to_test="
         f"{c.get('cost_to_test')}"
         for i, c in enumerate(cands))
+    _critic_block = (
+        "DETERMINISTIC CRITIC RESULTS (the plausibility gate ran "
+        "BEFORE you — a candidate marked VETOED is dead: a "
+        "deterministic anchor with recorded provenance killed it; "
+        "do NOT rank a VETOED candidate; your job on a VETOED one "
+        "is to CONFIRM or REFUTE the anchor with named physics, "
+        "never to develop it):\n"
+        + json.dumps([{k: pc[k] for k in ("index", "lever", "name",
+                                          "verdict", "kills", "flags")}
+                      for pc in per_cand], default=str)[:2000] + "\n\n")
     crit_prompt = (
         "You are the critique-and-select stage of an engineering "
         "invention pipeline. DEVICE: " + str(prob.get("device") or "")
@@ -364,7 +470,32 @@ def run_a1(pid: str) -> int:
         "USER'S OWN STATED CONSTRAINTS (verbatim):\n"
         + user_txt[:1400] + "\n\n"
         "SIX CANDIDATES:\n" + cand_txt[:4000] + "\n\n"
-        "For EACH candidate judge:\n"
+        + _critic_block
+        + "DISCONFIRMING-EVIDENCE HITS (retrieved from the evidence "
+        "corpus per candidate — argue against them or explain why "
+        "they do not apply):\n"
+        + json.dumps({str(i): h for i, h in disconf_by_idx.items()},
+                     default=str)[:1200] + "\n\n"
+        "For EACH candidate judge, EXPLICITLY:\n"
+        "  environment_compatibility: does the mechanism survive THIS "
+        "operating environment — electrochemical potential, acidity/pH, "
+        "temperature? name the reaction or physics that kills it if not\n"
+        "  magnitude_audit: every stated property magnitude vs the "
+        "requirement — an order-of-magnitude miss (e.g. a 'comparable "
+        "conductivity to X' claim when the classes are >=2 orders "
+        "apart) kills the candidate\n"
+        "  scope_audit: does the change act ONLY on what the user can "
+        "change? a cell-internal chemistry move for a module-level "
+        "phenomenon is out of scope\n"
+        "  premise_audit: does the mechanism ASSUME a component, "
+        "sensor, fluid or capability the stated device does not have "
+        "and the user did not authorize adding? name the assumption\n"
+        "  signal_compliance: the mechanism may consume ONLY signals "
+        "in the user's allowed set"
+        + (f" {allowed_sigs} (from: {allowed_clause})"
+           if allowed_sigs else " (the user stated no explicit signal "
+           "restriction — say so if none)")
+        + "\n"
         "  plausibility: does the mechanism hold in this domain? "
         "name the physics that kills it if not\n"
         "  constraint_audit: check it against EVERY user constraint "
@@ -372,17 +503,18 @@ def run_a1(pid: str) -> int:
         "constraint is violated (or 'ok' when it complies)\n"
         "  difference_from_standard: the standard solution for this "
         "failure, and what is genuinely different here\n"
-        "Then RANK the three strongest candidates (rank 1 = the one "
-        "to develop; the STANDARD solution itself is the reference, "
-        "rank nothing above a candidate unless it truly beats the "
-        "standard on mechanism, feasibility AND cost-to-test).\n"
-        "Keep every field under 25 words. Output ONLY a JSON "
+        "Then RANK the three strongest NON-VETOED candidates (rank 1 = "
+        "the one to develop; the STANDARD solution itself is the "
+        "reference, rank nothing above a candidate unless it truly "
+        "beats the standard on mechanism, feasibility AND cost-to-test).\n"
+        "Keep every field under 18 words (the JSON must be COMPLETE — truncation is a parse failure). Output ONLY a JSON "
         "object: {\"critiques\": [ ...six objects "
-        "with lever, plausibility, constraint_audit, "
+        "with lever, environment_compatibility, magnitude_audit, "
+        "scope_audit, premise_audit, plausibility, constraint_audit, "
         "difference_from_standard... ], \"standard_solution\": \"...\", "
         "\"top3\": [lever or name, ...] }")
     t_cr = time.time()
-    res_c = _bounded(crit_prompt, max_tokens=1600,
+    res_c = _bounded(crit_prompt, max_tokens=2600,
                      purpose="a1_critique")
     timeline += _timeline_from_result(res_c, "a1_critique")
     cr_raw = (res_c.get("content") or "") if res_c.get("ok") else ""
@@ -421,7 +553,11 @@ def run_a1(pid: str) -> int:
 
     # pick rank-1: the top3 entry matched by lever or name (typed
     # match; a non-matching top3 entry falls back to candidate 1 and
-    # the fallback is disclosed)
+    # the fallback is disclosed). R11 P1 override (owner audit step 1):
+    # the DETERMINISTIC veto outranks the LLM's ranking — a VETOED
+    # candidate can never be developed, whatever the critique call
+    # ranked; the selection walks top3 to the first survivor, then the
+    # best surviving candidate by index, and the override is typed.
     def _match(entry: str):
         e = str(entry or "").lower()
         for c in cands:
@@ -430,9 +566,51 @@ def run_a1(pid: str) -> int:
                       or str(c.get("lever") or "").lower() in e):
                 return c
         return None
-    chosen = _match(top3[0]) or cands[0]
+
+    def _cand_index(c):
+        for i, cc in enumerate(cands):
+            if cc is c:
+                return i
+        return None
+    _veto_set = set(_vetoed)
+    chosen = None
+    _sel_note = "rank1"
+    for _e in top3[:3]:
+        _c = _match(_e)
+        if _c is not None and _cand_index(_c) not in _veto_set:
+            chosen = _c
+            _sel_note = ("rank_walk_first_survivor (vetoed="
+                         f"{sorted(_veto_set)})")
+            break
+    if chosen is None:
+        chosen = next((cands[i] for i in range(len(cands))
+                       if i not in _veto_set), None)
+        if chosen is not None:
+            _sel_note = ("top3_all_vetoed_or_unmatched -> best "
+                         f"surviving candidate (vetoed="
+                         f"{sorted(_veto_set)})")
+    if chosen is None:
+        # every candidate died at the deterministic gate: no invention
+        # is delivered (Art. LXXXIV: a starved run reports starvation,
+        # never an attack result on nothing)
+        rec["result"] = "INCOMPLETE_ALL_CANDIDATES_VETOED"
+        rec["typed_note"] = (
+            "every candidate was killed by the deterministic "
+            "plausibility gate (anchors with recorded provenance, "
+            "Art. XXVII) — no candidate survives to compose; the "
+            "killed classes ride the record for the next run's "
+            "learning feed (Art. LI)")
+        rec["per_call_timeline"] = timeline
+        rec["e2e_wall_s"] = round(time.time() - t0, 1)
+        rec["infra_time_s"] = infra
+        out_f.write_text(json.dumps(rec, indent=1, default=str) + "\n",
+                         encoding="utf-8")
+        print(f"[a1] {pid}: INCOMPLETE_ALL_CANDIDATES_VETOED "
+              f"(critic killed all {len(cands)})")
+        return EXIT_INCOMPLETE
     if _match(top3[0]) is None:
         rec["critique"]["top1_match"] = "FELL_BACK_TO_CANDIDATE_1"
+    rec["critique"]["selection_note"] = _sel_note
     rec["chosen"] = {"lever": chosen.get("lever"),
                      "name": chosen.get("name"),
                      "mechanism": chosen.get("mechanism"),
@@ -673,6 +851,7 @@ def run_a1(pid: str) -> int:
 
 def main() -> int:
     args = [a for a in sys.argv[1:] if not a.startswith("-")]
+    _out_dir = Path(os.environ.get("A1_OUT_DIR", "").strip() or PAIRS_A1)
     if not args:
         d = json.loads((REPO / "eval" / "problems_dev12.json")
                        .read_text(encoding="utf-8"))
@@ -680,7 +859,7 @@ def main() -> int:
         ids = sorted(str(p.get("problem_id") or p.get("id"))
                      for p in plist)
         for pid in ids:
-            f = PAIRS_A1 / f"{pid}.json"
+            f = _out_dir / f"{pid}.json"
             if f.exists():
                 continue
             args = [pid]
@@ -695,8 +874,15 @@ def main() -> int:
         # record (never exit-1 with no record — Art. XXV: the unknown
         # stays typed and dated; the battery can then retry it).
         import traceback as _tb
-        PAIRS_A1.mkdir(parents=True, exist_ok=True)
-        (PAIRS_A1 / f"{args[0]}.json").write_text(json.dumps({
+        try:
+            from discovery_fabric.pair_guard import require_pair_write
+            require_pair_write(_out_dir / f"{args[0]}.json")
+            _crash_ok = True
+        except Exception as g:  # noqa: BLE001 — the guard refuses
+            print(f"[a1] {args[0]}: crash-record PAIR_WRITE_REFUSED — {g}")
+            return 6
+        _out_dir.mkdir(parents=True, exist_ok=True)
+        (_out_dir / f"{args[0]}.json").write_text(json.dumps({
             "a1_version": A1_VERSION,
             "problem_id": args[0],
             "result": "INCOMPLETE_STAGE_CRASH",

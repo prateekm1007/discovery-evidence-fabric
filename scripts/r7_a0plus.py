@@ -469,12 +469,28 @@ def run_a0plus(pid: str) -> int:
     if os.environ.get("FABRIC_A0P_SKIP_REPAIR") == "1":
         _abl.append("minus_repair")
     ablation_variant = ("full" if not _abl else "+".join(_abl))
+    # R11 P1-4 (owner audit step 4): committed pair dirs are GUARDED —
+    # an override dir (A0P_OUT_DIR) or the ablation dirs are untracked
+    # and writable; the committed r11_a0plus delivery needs the
+    # explicit FABRIC_PAIR_WRITE_UNLOCK=1 (typed refusal otherwise,
+    # BEFORE any call is served). This closes the measured near-miss
+    # where a flag-less default path overwrote 5 committed delivery
+    # records (restored in eff419506; Art. XXXIX).
     out_dir = PAIRS_A0
     if _abl:
         out_dir = PAIRS_A0.parent / "r11_ablation" / ablation_variant
+    _ovr = os.environ.get("A0P_OUT_DIR", "").strip()
+    if _ovr:
+        out_dir = Path(_ovr)
+    out_f = out_dir / f"{pid}.json"
+    try:
+        from discovery_fabric.pair_guard import require_pair_write
+        require_pair_write(out_f)
+    except Exception as e:  # noqa: BLE001 — typed refusal, zero calls
+        print(f"[a0plus] {pid}: PAIR_WRITE_REFUSED — {e}")
+        return 6
     run_t0 = time.time()
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_f = out_dir / f"{pid}.json"
     pair = _load_pair(pid)
     baseline_sha = _baseline_identity(pid, pair)
     if out_f.exists():

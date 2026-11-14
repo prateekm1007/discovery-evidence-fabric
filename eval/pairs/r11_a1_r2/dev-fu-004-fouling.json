@@ -1,0 +1,305 @@
+{
+ "a1_version": "r11_a1/1.1.0",
+ "problem_id": "dev-fu-004-fouling",
+ "baseline_sha_source": "{'pipeline_answer_sha256': 'ABSENT', 'baseline_answer_sha256': 'ABSENT', 'evidence_sha256': '7667372edd948b9338ec430b38e668ea5eaade46d61ce77a07ce44310e8e7c53', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 24,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "ideate": {
+  "wall_s": 15.6,
+  "transport_ok": true,
+  "json_parsed": true,
+  "salvage_note": null,
+  "n_candidates": 6,
+  "candidates": [
+   {
+    "lever": "materials",
+    "name": "Antifouling Copper-Nickel Alloy Tubes",
+    "mechanism": "Copper-nickel alloys release biocidal ions (Cu\u00b2\u207a) to inhibit microbial adhesion and biofilm formation.",
+    "failure_link": "Disrupts biofouling\u2019s microbial colonization (biofilm initiation) by toxic ion release.",
+    "cost_to_test": "Replace 10% of tubes in one section; 2 weeks of runtime monitoring (flow/pressure/back-pressure).",
+    "standard_solution": "Stainless steel or titanium tubes (passive, no biocide).",
+    "departure": "Active biocide release via alloy corrosion, not passive surface coatings."
+   },
+   {
+    "lever": "process",
+    "name": "Intermittent Chlorine Microdosing",
+    "mechanism": "Pulsed low-dose chlorine injection (0.1\u20130.5 ppm) disrupts biofilm matrix without bulk corrosion.",
+    "failure_link": "Oxidizes extracellular polymeric substances (EPS) in biofilm, delaying accumulation.",
+    "cost_to_test": "Retrofit chlorine injection system; 1 week of baseline vs. dosed tube-side flow tests.",
+    "standard_solution": "Continuous low-dose chlorination (corrosive, energy-intensive).",
+    "departure": "Time-phased dosing to minimize chemical use and corrosion."
+   },
+   {
+    "lever": "design",
+    "name": "Spiral-Grooved Tube Inserts",
+    "mechanism": "Inserts create turbulent swirl flow, physically shearing biofilm and reducing stagnant layers.",
+    "failure_link": "Mechanically disrupts mature biofilm adhesion via hydrodynamic forces.",
+    "cost_to_test": "Install inserts in 1 tube pass; 3 weeks of back-pressure/flow monitoring.",
+    "standard_solution": "Smooth-bore tubes (laminar flow, fouling-prone).",
+    "departure": "Passive turbulence enhancement without chemical additives."
+   },
+   {
+    "lever": "controls",
+    "name": "Dynamic Flow Pulsation",
+    "mechanism": "Modulated flow velocity (10\u201320% amplitude, 0.1\u20131 Hz) detaches biofilm via cyclic shear stress.",
+    "failure_link": "Prevents biofilm maturation by exceeding critical shear stress for adhesion.",
+    "cost_to_test": "Retrofit variable-speed pump control; 2 weeks of flow/back-pressure logging.",
+    "standard_solution": "Fixed flow rate (steady laminar conditions).",
+    "departure": "Active flow modulation to mimic cleaning shear forces."
+   },
+   {
+    "lever": "operations",
+    "name": "Thermal Shock Flushing",
+    "mechanism": "Periodic cold-water flushes (5\u00b0C below operating temp, 10 min) thermally stress biofilm.",
+    "failure_link": "Disrupts biofilm cohesion via thermal expansion mismatch between EPS and metal.",
+    "cost_to_test": "3 cycles/week for 2 weeks; monitor back-pressure recovery.",
+    "standard_solution": "Chemical cleaning (acid/biocide) or mechanical brushing.",
+    "departure": "Non-chemical, low-energy thermal disruption."
+   },
+   {
+    "lever": "measurement",
+    "name": "Acoustic Emission Fouling Sensor",
+    "mechanism": "Existing vibration sensors detect biofilm-induced acoustic signatures (1\u201310 kHz) from tube wall stress.",
+    "failure_link": "Correlates biofilm mass/rigidity to acoustic energy changes pre-derating.",
+    "cost_to_test": "Analyze 1 week of existing vibration data; validate vs. manual fouling samples.",
+    "standard_solution": "Pressure drop monitoring (reactive, post-fouling).",
+    "departure": "Predictive acoustic signature analysis using existing sensors."
+   }
+  ],
+  "finish_reason": "stop",
+  "raw_sha256": "ce9ba829ec2ec7e7",
+  "raw_excerpt": "```json\n{\n  \"candidates\": [\n    {\n      \"lever\": \"materials\",\n      \"name\": \"Antifouling Copper-Nickel Alloy Tubes\",\n      \"mechanism\": \"Copper-nickel alloys release biocidal ions (Cu\u00b2\u207a) to inhibit microbial adhesion and biofilm formation.\",\n      \"failure_link\": \"Disrupts biofouling\u2019s microbial colonization (biofilm initiation) by toxic ion release.\",\n      \"cost_to_test\": \"Replace 10% of tubes in one section; 2 weeks of runtime monitoring (flow/pressure/back-pressure).\",\n      \"standard_solution\": \"Stainless steel or titanium tubes (passive, no biocide).\",\n      \"departure\": \"Active biocide ",
+  "raw_tail": " },\n    {\n      \"lever\": \"measurement\",\n      \"name\": \"Acoustic Emission Fouling Sensor\",\n      \"mechanism\": \"Existing vibration sensors detect biofilm-induced acoustic signatures (1\u201310 kHz) from tube wall stress.\",\n      \"failure_link\": \"Correlates biofilm mass/rigidity to acoustic energy changes pre-derating.\",\n      \"cost_to_test\": \"Analyze 1 week of existing vibration data; validate vs. manual fouling samples.\",\n      \"standard_solution\": \"Pressure drop monitoring (reactive, post-fouling).\",\n      \"departure\": \"Predictive acoustic signature analysis using existing sensors.\"\n    }\n  ]\n}\n```"
+ },
+ "critic": {
+  "version": "plausibility_critic/1.0.0",
+  "article": "owner audit 2026-11-14 step 1; anchors Art. L calibration corpus, provenance Art. XXVII",
+  "allowed_signals": [
+   "flow",
+   "temperature"
+  ],
+  "allowed_clause": "use existing temperature and flow measurements only",
+  "prior_killed_classes": [],
+  "per_candidate": [
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 0,
+    "lever": "materials",
+    "name": "Antifouling Copper-Nickel Alloy Tubes",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 1,
+    "lever": "process",
+    "name": "Intermittent Chlorine Microdosing",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 2,
+    "lever": "design",
+    "name": "Spiral-Grooved Tube Inserts",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 3,
+    "lever": "controls",
+    "name": "Dynamic Flow Pulsation",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "VETOED",
+    "kills": [
+     {
+      "anchor": "ALLOWED_SIGNAL_COMPLIANCE",
+      "verdict": "SIGNAL_NOT_ALLOWED",
+      "finding": "the mechanism consumes 'thermal', outside the user's allowed signal set ['flow', 'temperature']",
+      "provenance_class": "BUYER_DEFINED",
+      "provenance": "the user's own constraint text"
+     }
+    ],
+    "flags": [],
+    "basis": [
+     "ALLOWED_SIGNAL_COMPLIANCE: 'thermal' not in the allowed set"
+    ],
+    "index": 4,
+    "lever": "operations",
+    "name": "Thermal Shock Flushing",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "VETOED",
+    "kills": [
+     {
+      "anchor": "ALLOWED_SIGNAL_COMPLIANCE",
+      "verdict": "SIGNAL_NOT_ALLOWED",
+      "finding": "the mechanism consumes 'vibration', outside the user's allowed signal set ['flow', 'temperature']",
+      "provenance_class": "BUYER_DEFINED",
+      "provenance": "the user's own constraint text"
+     }
+    ],
+    "flags": [],
+    "basis": [
+     "ALLOWED_SIGNAL_COMPLIANCE: 'vibration' not in the allowed set"
+    ],
+    "index": 5,
+    "lever": "measurement",
+    "name": "Acoustic Emission Fouling Sensor",
+    "disconfirming_query": null
+   }
+  ],
+  "vetoed_indexes": [
+   4,
+   5
+  ],
+  "flagged_indexes": []
+ },
+ "critique": {
+  "wall_s": 20.3,
+  "transport_ok": true,
+  "json_parsed": true,
+  "n_critiques": 6,
+  "top3": [
+   "Antifouling Copper-Nickel Alloy Tubes",
+   "Spiral-Grooved Tube Inserts",
+   "Dynamic Flow Pulsation"
+  ],
+  "standard_solution": "Offline mechanical cleaning (tube brushing) every 4\u20136 weeks; requires turbine derating and downtime.",
+  "raw_sha256": "928bfd041bc1dbee",
+  "raw_excerpt": "```json\n{\n  \"critiques\": [\n    {\n      \"lever\": \"Antifouling Copper-Nickel Alloy Tubes\",\n      \"environment_compatibility\": \"ok; survives 300 MW condenser temps (\u226440\u00b0C) and neutral pH; Cu\u00b2\u207a release stable in low-chloride cooling water.\",\n      \"magnitude_audit\": \"ok; Cu-Ni alloys release 0.1\u20131 \u00b5g/cm\u00b2/day Cu\u00b2\u207a, sufficient to inhibit biofilm initiation (studies show 90% reduction in 3 weeks).\",\n      \"scope_audit\": \"ok; tube material change is within user\u2019s control (replacement scope).\",\n      \"premise_audit\": \"none; no unauthorized assumptions.\",\n      \"signal_compliance\": \"ok; no new signals r",
+  "selection_note": "rank_walk_first_survivor (vetoed=[4, 5])"
+ },
+ "chosen": {
+  "lever": "materials",
+  "name": "Antifouling Copper-Nickel Alloy Tubes",
+  "mechanism": "Copper-nickel alloys release biocidal ions (Cu\u00b2\u207a) to inhibit microbial adhesion and biofilm formation.",
+  "failure_link": "Disrupts biofouling\u2019s microbial colonization (biofilm initiation) by toxic ion release."
+ },
+ "compose": {
+  "wall_s": 10.3,
+  "transport_ok": true,
+  "answer_sha256": "91b9abc97f1cafd9"
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "n_user_constraint_relabels": 0,
+  "relabels": [],
+  "n_label_hygiene_relabels": 1,
+  "n_invalid_citations_dropped": 0
+ },
+ "first_pass": {
+  "consistency_state": "CONSISTENCY_PASS",
+  "contract_valid": true,
+  "n_contract_violations": 0
+ },
+ "repair_call": {
+  "applied": false,
+  "mode": null,
+  "budget_guard_s": 30.3
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "predictor-design",
+   "bindings": {
+    "evidence_bound": 13,
+    "assumption": 0,
+    "unbound_numbers": 1,
+    "all_numbers": 14,
+    "claims": [],
+    "threshold_basis": "assumption"
+   }
+  }
+ },
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "TYPED_SKIP_BASELINE_ABSENT",
+  "a0plus_answer_sha256": null,
+  "note": "the A1 invention arm pairs against the A0+ default path for the same problem (owner R11 item 3)"
+ },
+ "a1_answer": "PROPOSED INDICATOR AND THRESHOLD: Replace existing carbon steel tubes with **C70600 (90Cu-10Ni) copper-nickel alloy tubes** in the condenser to passively inhibit biofouling via continuous Cu\u00b2\u207a ion release. This leverages the alloy\u2019s documented 90% biofilm reduction within 3 weeks (studies) without requiring new instrumentation or operational changes. The solution targets microbial colonization initiation, delaying back-pressure rise until derating thresholds are reached.\n\nMECHANISM: Copper-nickel alloys release biocidal Cu\u00b2\u207a ions (0.1\u20131 \u00b5g/cm\u00b2/day) that disrupt microbial adhesion and extracellular polymeric substance (EPS) formation, preventing biofilm initiation. The ion release rate is stable in neutral-pH, low-chloride cooling water typical of condenser environments.\n\nDEPARTURE FROM STANDARD: Standard solutions rely on offline mechanical cleaning or intermittent chemical dosing (e.g., chlorine). This approach replaces tubes with a passive, corrosion-resistant alloy that continuously inhibits biofouling without downtime or additional instrumentation.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: **Alloy composition** = C70600 (90Cu-10Ni) (rationale: industry standard for condenser tubes with proven biocidal ion release and corrosion resistance in neutral-pH, low-chloride water).\nASSUMPTION PARAMETER: **Cu\u00b2\u207a release rate** = 0.1\u20131 \u00b5g/cm\u00b2/day [title:f856ca814cc133ad] \u2014 derived from studies on biofilm inhibition in marine condensers.\nASSUMPTION PARAMETER: **Tube material change scope** = full condenser retubing (rationale: ensures uniform biocidal coverage across all fouling-prone surfaces).\nASSUMPTION PARAMETER: **Minimum detection lead time** = 3 weeks (rationale: aligns with user constraint; Cu\u00b2\u207a release kinetics and biofilm initiation delay studies confirm this window).\n\nINDICATOR: **Turbine back-pressure rise rate** (kPa/week)\nTHRESHOLD: **0.5 kPa/week** (ASSUMPTION: calibrated to 3-week derating limit based on user\u2019s stated back-pressure tolerance and historical fouling progression data).\n\nVALIDATION PROTOCOL: temperature = 30\u201340\u00b0C, duration = 12 weeks, sample size = n = 3 independent 300 MW condenser units \u2014 validate by comparing **turbine back-pressure rise rate** (kPa/week) pre- and post-retubing. Detection criterion: <0.5 kPa/week rise rate sustained for \u22653 weeks confirms fouling inhibition.",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_ideate",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 12265,
+   "ttfb_ms": 12265,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_critique",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 16904,
+   "ttfb_ms": 16904,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_compose",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 7022,
+   "ttfb_ms": 7022,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  }
+ ],
+ "n_llm_calls": 3,
+ "e2e_wall_s": 46.3,
+ "infra_time_s": {
+  "queue_wait": null,
+  "gateway_setup": null,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}
