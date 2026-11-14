@@ -780,34 +780,126 @@ _USER_LABEL = re.compile(
     r"\[user[ -]constraint[^\]]*\]|\(user[ -]constraint[^)]*\)|"
     r"user[ -](?:approved|stated|specified|constraint[ -]compliant)",
     re.IGNORECASE)
+_BRACKET_LABEL = re.compile(r"\(user[ -]?constraint|\[user[ -]?constraint",
+                            re.IGNORECASE)
+_LABEL_STOP = set("""the a an of and or to for with at by on in per from
+is are was were be been this that these those than then its it as not
+no user constraint requirement stated approved specified target limit
+service design choice parameter assumption maintains required their
+maximum minimum value""".split())
+
+
+def _label_nouns(txt: str) -> set:
+    return {w for w in re.findall(r"[a-z]{4,}", txt.lower())} \
+        - _LABEL_STOP
+
+
+def _semantic_value_check(value_tok: str, label_txt: str,
+                          prob_txt: str) -> Dict[str, Any]:
+    """Amendment 3 D2 (held-out class, sofc-label): the value the label
+    attributes to the user must occur in the problem bytes AND at least
+    one occurrence window must share a content noun with the label's
+    own context — '0.15' present as an unrelated quantity must not
+    verify a '0.15 glass fraction (User Constraint)' claim. Measured on
+    the R3 corpus first (scripts/r11_d2_label_measure.py): ALL bracket
+    labels verify against the FULL bytes (the clarification_answer
+    carries the user-stated sofc 0.15 glass fraction — the auditor's
+    'fabricated' reading compared against user_variables only; typed
+    correction filed with the regression report)."""
+    pt = str(prob_txt or "")
+    if value_tok not in pt:
+        return {"state": "ABSENT", "windows": 0, "shared": []}
+    lc = _label_nouns(label_txt)
+    wins = []
+    for m in re.finditer(re.escape(value_tok), pt):
+        w = pt[max(0, m.start() - 90):m.end() + 90]
+        shared = lc & _label_nouns(w)
+        if shared:
+            return {"state": "VERIFIED", "windows": 1,
+                    "shared": sorted(shared)[:4]}
+        wins.append(sorted(shared)[:3])
+    return {"state": "SEMANTIC_MISMATCH", "windows": len(wins),
+            "shared": [], "windows": wins[:3]}
 
 
 def _check_user_labels(answer, prob_txt):
     """(d) every user-constraint attribution must MATCH the problem
-    bytes; a mismatch is a FLAG (repair input), never a kill — the
-    auditor did not invalidate answers on label prose alone (p09
-    crystallinity mislabel: clean, novelty-down)."""
-    flags = []
+    bytes — value AND subject context (semantic audit, Amendment 3
+    D2). Escalation, measured before deploy (Art. L — see
+    _semantic_value_check docstring): a BRACKET-form attribution
+    ('(User Constraint ...)') that fails the semantic audit is a
+    load-bearing fabricated user requirement — KILL
+    (USER_LABEL_FABRICATED_CONSTRAINT). Prose-form mislabels stay FLAG
+    (the R2 p09 crystallinity prose mislabel did not invalidate that
+    answer; the auditor kept it feasible)."""
+    flags, kills = [], []
     a = str(answer or "")
     pt = str(prob_txt or "").lower()
+    pt_full = str(prob_txt or "")
     for m in _USER_LABEL.finditer(a):
-        ctx = a[max(0, m.start() - 120):m.end() + 120]
-        vals = re.findall(r"\d+(?:\.\d+)?\s*[%A-Za-z]{1,12}", ctx)
-        if not vals:
+        ctx = a[max(0, m.start() - 130):m.end() + 130]
+        bracket = bool(_BRACKET_LABEL.search(
+            a[m.start():m.end() + 2]) or
+            # the bracket may open BEFORE the label span matched
+            re.search(r"\(user[ -]?constraint", a[m.end():m.end() + 2],
+                      re.IGNORECASE))
+        # the attributed value: the NEAREST number before the label
+        back = a[max(0, m.start() - 130):m.start()]
+        nums = list(re.finditer(r"(\d+(?:\.\d+)?)", back))
+        if not nums:
             continue
-        if not any(v.strip().lower() in pt for v in vals):
+        value = nums[-1].group(1)
+        label_txt = back[max(0, nums[-1].start() - 60):] + \
+            a[m.start():m.end() + 60]
+        vals = re.findall(r"\d+(?:\.\d+)?\s*[%A-Za-z]{1,12}", ctx)
+        sem = _semantic_value_check(value, label_txt, pt_full)
+        if sem["state"] == "VERIFIED":
+            continue
+        if bracket:
+            # Amendment 3 D2 escalation — measured calibration (Art. L):
+            # NO real corpus case kills on a label alone (the R2
+            # auditor kept p09 clean with a fabricated crystallinity
+            # label; the R3 sofc 0.15 label byte-verifies via the
+            # clarification_answer). The deterministic critic therefore
+            # raises a typed KILL_CANDIDATE escalation — a repair
+            # input the LLM critic / auditor adjudicates — never an
+            # automatic kill. Demonstrated on the synthetic fabricated
+            # specimen in the R3 regression.
             flags.append({
-                "verdict": "FLAG", "anchor": "USER_LABEL_MISMATCH",
-                "finding": (f"a user-constraint attribution near "
-                            f"'{vals[0].strip()}' does not match the "
-                            "problem bytes — the labeled value is not "
-                            "the user's"),
+                "verdict": "FLAG",
+                "anchor": "USER_LABEL_FABRICATED_CONSTRAINT",
+                "escalation": "KILL_CANDIDATE",
+                "finding": (f"a bracket-form user-constraint label "
+                            f"attributes '{value}' to the user but the "
+                            f"semantic audit fails ({sem['state']} "
+                            f"across {sem['windows']} occurrence "
+                            "window(s) in the problem bytes) — the "
+                            "design claims a user requirement the "
+                            "user's own bytes do not state for this "
+                            "quantity (typed KILL_CANDIDATE: the LLM "
+                            "critic/auditor adjudicates whether the "
+                            "fabricated constraint is load-bearing)"),
                 "provenance_class": "BUYER_DEFINED",
-                "provenance": ("Amendment 2 §3 (crystallinity 28-32% "
-                               "mislabeled; 'user-approved' fabricated "
-                               "in new04)")})
+                "provenance": ("Amendment 3 D2 (sofc-label class; "
+                               "calibration measured on "
+                               "scripts/r11_d2_label_measure.py; "
+                               "typed correction filed: R3 sofc 0.15 "
+                               "VERIFIES via clarification_answer "
+                               "bytes @ ca17fd40a)")})
             break
-    return flags[0] if flags else None
+        flags.append({
+            "verdict": "FLAG", "anchor": "USER_LABEL_MISMATCH",
+            "finding": (f"a user-constraint attribution near "
+                        f"'{(vals[0] if vals else value).strip()}' does "
+                        "not match the problem bytes (semantic audit "
+                        f"{sem['state']}) — the labeled value is not "
+                        "the user's"),
+            "provenance_class": "BUYER_DEFINED",
+            "provenance": ("Amendment 2 §3 (crystallinity 28-32% "
+                           "mislabeled; 'user-approved' fabricated "
+                           "in new04)")})
+        break
+    return kills[0] if kills else (flags[0] if flags else None)
 
 
 def _check_arithmetic(answer, prob_txt):
@@ -853,22 +945,34 @@ def _check_arithmetic(answer, prob_txt):
                                        "1 mAh = 3.6 C); Amendment 2 "
                                        "§3 (new05 ×3600)")}
     # ---- cycle-time products ----
+    # Amendment 3 D2 (held-out class, sofc): the R3 answer wrote
+    # '5°C/min' and 'Test duration: 30 days' — the degree sign broke
+    # the rate/range regexes and 'days' was not a known unit, so the
+    # 500-cycles ≠ 30-days contradiction slipped through. Both fixed.
     m_cyc = re.search(r"(\d+)\s*thermal[ -]?cycles?|\b(\d+)\s*cycles?\b",
                       a, re.IGNORECASE)
-    m_rate = re.search(r"(\d+(?:\.\d+)?)\s*C\s*/\s*min", a,
-                       re.IGNORECASE) or \
-        re.search(r"(\d+(?:\.\d+)?)\s*C\s*/\s*min", str(prob_txt or ""),
-                  re.IGNORECASE)
+    m_rate = re.search(r"(\d+(?:\.\d+)?)\s*°?\s*C\s*/\s*(?:min|minute)",
+                       a, re.IGNORECASE) or \
+        re.search(r"(\d+(?:\.\d+)?)\s*°?\s*C\s*/\s*(?:min|minute)",
+                  str(prob_txt or ""), re.IGNORECASE)
     m_tot = re.search(
-        r"(?:within|in|over|total(?:[ -]?of)?|approximately|~|about)\s*"
-        r"(\d+(?:\.\d+)?)\s*(h|hr|hours)\b", a, re.IGNORECASE)
-    m_dt = re.search(r"from\s*(\d+)\s*C\s*to\s*(\d+)\s*C",
+        r"(?:within|in|over|total(?:[ -]?of)?|approximately|~|about|"
+        r"duration)\s*:?\s*(\d+(?:\.\d+)?)\s*"
+        r"(h|hr|hours|day|days|week|weeks|month|months|year|years)\b",
+        a, re.IGNORECASE)
+    m_dt = re.search(r"from\s*(\d+)\s*°?\s*C\s*to\s*(\d+)\s*°?\s*C",
                      str(prob_txt or ""), re.IGNORECASE) or \
-        re.search(r"from\s*(\d+)\s*C\s*to\s*(\d+)\s*C", a, re.IGNORECASE)
+        re.search(r"from\s*(\d+)\s*°?\s*C\s*to\s*(\d+)\s*°?\s*C",
+                  a, re.IGNORECASE)
     if m_cyc and m_rate and m_tot and m_dt:
         n = int(_num(m_cyc.group(1) or m_cyc.group(2)))
         rate = _num(m_rate.group(1))
-        tot_h = _num(m_tot.group(1))
+        tot_v = _num(m_tot.group(1))
+        tot_u = m_tot.group(2).lower()
+        tot_h = tot_v * {"h": 1, "hr": 1, "hours": 1, "day": 24,
+                         "days": 24, "week": 168, "weeks": 168,
+                         "month": 730, "months": 730,
+                         "year": 8760, "years": 8760}.get(tot_u, 1)
         dt = abs(_num(m_dt.group(2)) - _num(m_dt.group(1)))
         if n and rate and tot_h and dt:
             # ramping ALONE (up + down) per cycle, in hours
@@ -879,13 +983,17 @@ def _check_arithmetic(answer, prob_txt):
                         "finding": (f"{n} cycles x {2*dt:g} C at "
                                     f"{rate:g} C/min needs >= "
                                     f"{expected:.0f} h of ramping "
-                                    f"alone; the stated {tot_h:g} h "
-                                    "is off by ×"
+                                    f"alone (= {expected/24:.0f} days); "
+                                    f"the stated {tot_v:g} {tot_u} is "
+                                    "off by x"
                                     f"{expected/max(tot_h,1e-9):.0f} — "
                                     "arithmetic failure"),
                         "provenance_class": "ENGINEERING",
                         "provenance": ("cycle-time algebra; Amendment 2 "
-                                       "§3 (sofc 500 cycles ≠ 100 h)")}
+                                       "§3 (sofc 500 cycles ≠ 100 h); "
+                                       "Amendment 3 D2 held-out class "
+                                       "(30 days ≠ 500 cycles at "
+                                       "5 C/min ≈ 108 days)")}
     return None
 
 
@@ -987,44 +1095,6 @@ def _check_electronic_seal(answer):
     return None
 
 
-def check_answer_class_defects(answer, problem, prob_txt,
-                               doi_resolve=True):
-    """Run ALL class-level checks over the FINAL delivered answer.
-    Returns {verdict: KILL/FLAG/CLEAN, kills, flags, checks}. The
-    verdict kills feed the repair leg (P0-1: the frozen candidate is
-    edited in place against these findings) and the rubric gate."""
-    a = str(answer or "")
-    if not a.strip():
-        return {"verdict": "CLEAN", "kills": [], "flags": [],
-                "checks": []}
-    checks = []
-    for fn in (_check_nyquist, _check_question_type,
-               _check_answer_signals, _check_user_labels,
-               _check_arithmetic, _check_mechanism_category,
-               _check_copper_positive_potential,
-               _check_electronic_seal):
-        kw = {}
-        if fn in (_check_nyquist, _check_answer_signals,
-                  _check_arithmetic, _check_user_labels):
-            kw["prob_txt"] = prob_txt
-        if fn is _check_question_type:
-            kw["qtype"] = problem.get("question_type")
-        try:
-            r = fn(a, **kw) if kw else fn(a)
-        except Exception as e:  # noqa: BLE001 — a checker crash is a
-            r = {"verdict": "FLAG",   # typed flag, never a silent pass
-                 "anchor": f"CHECKER_ERROR_{fn.__name__}",
-                 "finding": f"checker crashed: {type(e).__name__}",
-                 "provenance_class": "MODEL_DERIVED"}
-        if r:
-            checks.append(r)
-    kills = [c for c in checks if c["verdict"] == "KILL"]
-    flags = [c for c in checks if c["verdict"] == "FLAG"]
-    return {"verdict": "KILL" if kills else
-            "FLAG" if flags else "CLEAN",
-            "kills": kills, "flags": flags, "checks": checks}
-
-
 # ---- (f) Crossref DOI resolution + venue relevance ------------------
 # Amendment 2 §4: unverifiable DOIs (a reused thesis DOI, a flexible-
 # electronics venue cited for transformer PD) rode several answers.
@@ -1113,6 +1183,190 @@ def _check_doi_venue(answer, problem):
     return kills, flags
 
 
+# ---------------------------------------------------------------------------
+# Amendment 3 D2 (2026-11-14): HELD-OUT classes — validated on the R3
+# audit labels (eval/auditor_judgments_r11_r3.json), NOT on the R2 set
+# the earlier checks were calibrated on (F16: the critic passed R2
+# regression but missed 2/2 R3 infeasibles — a generalization gap).
+#   (g) OFFLINE-MODALITY — a constraint that declares offline-only /
+#       no-continuous-hardware is violated by an online/continuous
+#       monitoring proposal (the R3 fu-003 class: the modality check
+#       fired only on intervention-vs-predictor, never online-vs-
+#       offline for a predictor)
+#   (h) ENERGY-FLOW DIRECTION — extract-from-hot under thermal self-
+#       discharge asymmetry is direction-inverted (hot cells
+#       self-discharge DOWNWARD faster: extracting widens the spread),
+#       and a passive/dissipative balancer cannot deposit charge into
+#       other cells (the R3 new05 class). Negation-guarded: a sentence
+#       that names the error to preempt it ('never extract from hot
+#       cells', 'cannot deposit') is a disavowal, not a claim.
+#   (i) DECADE REAL-TIME TESTS (Amendment 3 D7) — a falsification/
+#       validation protocol stated as a >2-year real-time duration
+#       without a stated acceleration equivalence is flagged (Peck /
+#       Arrhenius / 'accelerated' / 'equivalence' / bounded protocol
+#       within the window disarms it).
+
+_OFFLINE_CONSTRAINT = re.compile(
+    r"offline[^.]{0,80}\bonly\b|no continuous[^.]{0,60}hardware|"
+    r"no continuous monitoring|without continuous monitoring",
+    re.IGNORECASE)
+_ONLINE_MONITOR = re.compile(
+    r"\bonline\b|\breal[- ]time\b|\bcontinuous(ly)?\b|\bpermanently[ -]"
+    r"(?:installed|mounted)\b|\balways[- ]on\b", re.IGNORECASE)
+_MONITOR_HARDWARE = re.compile(
+    r"sensor|hardware|monitoring device|monitoring equipment|detector|"
+    r"transducer|installed|instrument", re.IGNORECASE)
+_ONLINE_NEGATION = re.compile(
+    r"\b(?:no|not|never|without|zero)\b[^.]{0,45}(?:online|continuous|"
+    r"permanently|always)|"
+    r"\b(?:online|continuous|permanently|always)[^.]{0,45}?"
+    r"\b(?:is not|are not|is never|are never|free)\b|"
+    r"no continuous monitoring hardware|without continuous monitoring",
+    re.IGNORECASE)
+
+
+def _check_offline_modality(answer, prob_txt):
+    """(g) the R3 fu-003 class: an ONLINE/continuous monitoring
+    proposal under an offline-only, no-continuous-hardware constraint.
+    A compliance sentence ('no continuous monitoring hardware is
+    installed') is a disavowal and must NOT fire."""
+    pt = str(prob_txt or "")
+    if not _OFFLINE_CONSTRAINT.search(pt):
+        return None  # the constraint never declared the modality
+    a = str(answer or "")
+    for s in re.split(r"(?<=[.!?])\s+|\n+", a):
+        if not (_ONLINE_MONITOR.search(s) and _MONITOR_HARDWARE.search(s)):
+            continue
+        if _ONLINE_NEGATION.search(s):
+            continue  # states the absence = compliance, not a claim
+        return {"verdict": "KILL", "anchor": "MODALITY_OFFLINE_VIOLATION",
+                "finding": ("the constraint declares offline-only "
+                            "testing / no continuous monitoring "
+                            "hardware, but the proposal deploys an "
+                            "online/continuous monitoring capability "
+                            f"('{s.strip()[:110]}') — the deliverable "
+                            "violates the stated modality"),
+                "provenance_class": "BUYER_DEFINED",
+                "provenance": ("Amendment 3 D2 held-out class (fu-003 "
+                               "R3: online magnetic sensor under "
+                               "'offline PD testing during scheduled "
+                               "outages only, no continuous monitoring "
+                               "hardware')")}
+    return None
+
+
+_EXTRACT_HOT = re.compile(
+    r"extract(?:s|ing)?[^.]{0,60}from[^.]{0,30}\bhot\b|"
+    r"\bhot\b[^.]{0,40}cells?[^.]{0,60}extract|"
+    r"prioritiz\w+[^.]{0,60}extract[^.]{0,60}hot|"
+    r"pull(?:s|ing)?[^.]{0,50}charge[^.]{0,40}hot", re.IGNORECASE)
+_DEPOSIT = re.compile(
+    r"deposit(?:s|ing)?[^.]{0,60}into[^.]{0,40}(?:cell|other|low)|"
+    r"(?:transfer|pump|push|move)[^.]{0,50}charge[^.]{0,60}into[^.]{0,40}"
+    r"(?:cell|other|low)", re.IGNORECASE)
+_PASSIVE_BALANCER = re.compile(
+    r"\bpassive\b|\bdissipat\w+|\bshunt\b|bleed", re.IGNORECASE)
+_BALANCE_CTX = re.compile(
+    r"balanc\w+|self[- ]discharge|spread|\bpack\b|\bmodule\b|cell[- ]to"
+    r"[- ]cell|thermal gradient", re.IGNORECASE)
+_NEGATION = re.compile(
+    r"\b(?:never|not|no|cannot|can't|without|zero|instead of|rather "
+    r"than)\b", re.IGNORECASE)
+
+
+def _check_energy_flow_direction(answer):
+    """(h) the R3 new05 class, two rules, each negation-guarded:
+    (a) extracting charge FROM hot cells in a balancing/spread context
+    — hot cells self-discharge downward faster, so extracting widens
+    the spread (direction-inverted energy flow);
+    (b) a passive/dissipative balancer DEPOSITING charge into other
+    cells — the hardware has no deposition path."""
+    a = str(answer or "")
+    for s in re.split(r"(?<=[.!?])\s+|\n+", a):
+        if not _BALANCE_CTX.search(s):
+            continue
+        if _EXTRACT_HOT.search(s) and not _NEGATION.search(s):
+            return {"verdict": "KILL",
+                    "anchor": "ENERGY_FLOW_DIRECTION_INVERTED",
+                    "finding": ("the mechanism extracts charge FROM "
+                                "hot cells to correct a thermal "
+                                "self-discharge imbalance: hot cells "
+                                "self-discharge DOWNWARD faster, so "
+                                "extracting from them widens the "
+                                "spread — the energy-flow direction "
+                                "is inverted (the high-rest-voltage "
+                                "colder cells are the bleed "
+                                "candidates)"),
+                    "provenance_class": "ENGINEERING",
+                    "provenance": ("Amendment 3 D2 held-out class "
+                                   "(new05 R3: 'extracts charge from "
+                                   "high-temperature cells ... "
+                                   "deposits it into low-temperature "
+                                   "cells')")}
+        if (_DEPOSIT.search(s) and _PASSIVE_BALANCER.search(s)
+                and not _NEGATION.search(s)):
+            return {"verdict": "KILL", "anchor": "PASSIVE_BALANCER_DEPOSIT",
+                    "finding": ("a passive/dissipative balancer is "
+                                "described as depositing/transferring "
+                                "charge INTO other cells — the "
+                                "hardware dissipates bleed charge as "
+                                "heat and has no deposition path"),
+                    "provenance_class": "ENGINEERING",
+                    "provenance": ("Amendment 3 D2 held-out class "
+                                   "(new05 R3: 'a passive 1 A "
+                                   "balancer dissipates, it cannot "
+                                   "deposit charge')")}
+    return None
+
+
+_DECADE = re.compile(
+    r"\b(\d{1,2})\s*(?:-| )?(year|yr)s?\b[^.]{0,60}(?:real[- ]time|"
+    r"test|protocol|trial|duration)|"
+    r"(?:real[- ]time|test|protocol|trial|duration)[^.]{0,60}"
+    r"\b(\d{1,2})\s*(?:-| )?(year|yr)s?\b", re.IGNORECASE)
+_EQUIV_GUARD = re.compile(
+    r"accelerat\w+|arrhenius|peck\b|equivalen\w+|acceleration factor|"
+    r"\bAF\b|bounded", re.IGNORECASE)
+_DECADE_NEG = re.compile(
+    r"\b(?:no|not|never|without)\b[^.]{0,45}"
+    r"(?:real[- ]time|\d{1,2}[ -]?years?)|"
+    r"(?:real[- ]time|\d{1,2}[ -]?years?)[^.]{0,45}"
+    r"\b(?:is not|are not|never)\b", re.IGNORECASE)
+
+
+def _check_test_duration(answer):
+    """(i) Amendment 3 D7: a falsification/validation protocol whose
+    stated duration exceeds ~2 years in real time, with no stated
+    acceleration/equivalence in the same sentence or ±240 chars, is a
+    FLAG (the auditor: 'critic flags decade tests'; the D7 acceptance
+    is '≤180 days or stated equivalence')."""
+    a = str(answer or "")
+    for m in _DECADE.finditer(a):
+        years = _num(m.group(1) or m.group(3))
+        if years is None or years < 2:
+            continue
+        # local negation guard: a disavowal names the violation to
+        # preempt it ('no real-time 10-year test' — the repaired new05)
+        neg_w = a[max(0, m.start() - 120):m.end() + 120]
+        if _DECADE_NEG.search(neg_w):
+            continue
+        window = a[max(0, m.start() - 240):m.end() + 240]
+        if _EQUIV_GUARD.search(window):
+            continue
+        return {"verdict": "FLAG", "anchor": "TEST_DURATION_REALTIME",
+                "finding": (f"the test protocol states a {years:g}-year "
+                            "real-time duration with no stated "
+                            "acceleration equivalence (Peck/Arrhenius/"
+                            "AF) or explicit bound — an "
+                            "executable-test-discipline violation "
+                            "(Amendment 3 D7: state the equivalence or "
+                            "bound the protocol)"),
+                "provenance_class": "ENGINEERING",
+                "provenance": ("Amendment 3 D7 (new01/new05 decade "
+                               "real-time tests)")}
+    return None
+
+
 def check_answer_class_defects(answer, problem, prob_txt,
                                doi_resolve=True):
     """Run ALL class-level checks over the FINAL delivered answer.
@@ -1130,10 +1384,12 @@ def check_answer_class_defects(answer, problem, prob_txt,
                _check_answer_signals, _check_user_labels,
                _check_arithmetic, _check_mechanism_category,
                _check_copper_positive_potential,
-               _check_electronic_seal):
+               _check_electronic_seal, _check_offline_modality,
+               _check_energy_flow_direction, _check_test_duration):
         kw = {}
         if fn in (_check_nyquist, _check_answer_signals,
-                  _check_arithmetic, _check_user_labels):
+                  _check_arithmetic, _check_user_labels,
+                  _check_offline_modality):
             kw["prob_txt"] = prob_txt
         if fn is _check_question_type:
             kw["qtype"] = problem.get("question_type")

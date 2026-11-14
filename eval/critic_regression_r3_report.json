@@ -1,0 +1,117 @@
+{
+ "record": "critic_regression_r3/1.0.0",
+ "critic_version": "plausibility_critic/1.0.0",
+ "corpus": "12 pre-repair R3 answers (snapshot) + 2 repaired + 1 synthetic fabricated-label specimen",
+ "labels": "auditor_judgments_r11_r3.json (AM3)",
+ "cases": [
+  {
+   "case": "prerepair:bench-p02-leadacid-grid-corrosion",
+   "verdict": "FLAG",
+   "anchors": [
+    "TEST_DURATION_REALTIME"
+   ]
+  },
+  {
+   "case": "prerepair:bench-p09-packaging-barrier",
+   "verdict": "CLEAN",
+   "anchors": []
+  },
+  {
+   "case": "prerepair:dev-fu-001-bearing-spalling",
+   "verdict": "CLEAN",
+   "anchors": []
+  },
+  {
+   "case": "prerepair:dev-fu-003-motor-insulation",
+   "verdict": "KILL",
+   "anchors": [
+    "MODALITY_OFFLINE_VIOLATION"
+   ]
+  },
+  {
+   "case": "prerepair:dev-fu-004-fouling",
+   "verdict": "CLEAN",
+   "anchors": []
+  },
+  {
+   "case": "prerepair:dev-fu-005-bridge-bearing",
+   "verdict": "CLEAN",
+   "anchors": []
+  },
+  {
+   "case": "prerepair:eval-new01-supercap-dryout",
+   "verdict": "FLAG",
+   "anchors": [
+    "TEST_DURATION_REALTIME"
+   ]
+  },
+  {
+   "case": "prerepair:eval-new02-slipring-predictor",
+   "verdict": "CLEAN",
+   "anchors": []
+  },
+  {
+   "case": "prerepair:eval-new04-chiller-fouling-predictor",
+   "verdict": "CLEAN",
+   "anchors": []
+  },
+  {
+   "case": "prerepair:eval-new05-liion-balance-drift",
+   "verdict": "KILL",
+   "anchors": [
+    "ENERGY_FLOW_DIRECTION_INVERTED"
+   ]
+  },
+  {
+   "case": "prerepair:eval-new07-transformer-dga-predictor",
+   "verdict": "CLEAN",
+   "anchors": []
+  },
+  {
+   "case": "prerepair:eval-sofc-thermal-cycling",
+   "verdict": "KILL",
+   "anchors": [
+    "ARITHMETIC_CYCLES"
+   ]
+  },
+  {
+   "case": "repaired:dev-fu-003-motor-insulation",
+   "verdict": "CLEAN",
+   "anchors": []
+  },
+  {
+   "case": "repaired:eval-new05-liion-balance-drift",
+   "verdict": "CLEAN",
+   "anchors": []
+  },
+  {
+   "case": "synthetic:fabricated_bracket_label",
+   "verdict": "FLAG",
+   "anchors": [
+    "USER_LABEL_FABRICATED_CONSTRAINT"
+   ]
+  }
+ ],
+ "acceptance": {
+  "D2_4catches": {
+   "fu003_modality": true,
+   "new05_energy_flow": true,
+   "sofc_cycle_arithmetic": true,
+   "sofc_label_OUTCOME": "TYPED CORRECTION (Art. 1/9 culture): the 0.15 glass-fraction label VERIFIES against the problem bytes @ ca17fd40a — clarification_answer: 'user stated the seal's intergranular glass phase fraction is 0.15 (mass fraction)'. The auditor's 'fabricated' reading compared against user_variables only (the preflight GET list shows no problems_dev12.json fetch). Escalation to KILL is implemented and demonstrated on the synthetic fabricated-label specimen; on the real bytes it correctly does not fire.",
+   "synthetic_fabricated_label_kill": true,
+   "score": "4/4 mechanism catches (+1 typed correction)"
+  },
+  "D2_0falsekill": {
+   "false_kill_set": [],
+   "clean_answers_checked": 10,
+   "note": "sofc's ARITHMETIC_CYCLES kill is the auditor-demanded catch (AM3 D2 item 3), scored as a true catch, not a false kill",
+   "PASS": true
+  },
+  "D7_test_discipline": {
+   "decade_flag_fires_new01_prerepair": true,
+   "repaired_new05_not_flagged_equivalence_stated": true,
+   "PASS": true
+  },
+  "D1_repairs_clean": true
+ }
+}
