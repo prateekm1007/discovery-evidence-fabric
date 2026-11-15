@@ -435,6 +435,10 @@ def main() -> int:
             1 for p in FRESH_V5
             if json.loads((OUT_DIR / f"{p}.json").read_text(
                 encoding="utf-8"))["meta"]["residual_findings"])
+        audit_blocks = sum(
+            1 for p in FRESH_V5
+            if json.loads((OUT_DIR / f"{p}.json").read_text(
+                encoding="utf-8"))["meta"]["audit_block"])
         record = {
             "record": "BATTERY_INT_FREPAIR_R22/1.0.0 — the AM22 D1 "
                       "direct-feasibility measurement (V5 repair leg vs "
@@ -502,10 +506,7 @@ def main() -> int:
                 for p in FRESH_V5],
             "repair_leg_summary": {"repairs_total": repairs_total,
                                    "pairs_with_residual_findings": residual,
-                                   "pairs_with_audit_block": sum(
-                                       1 for g in record.get(
-                                           "generation_record", [])
-                                       if g.get("audit_block"))},
+                                   "pairs_with_audit_block": audit_blocks},
             "ladder_stats": ladder_stats,
             "results": results,
             "summary_type_credited": s_tc,
