@@ -172,9 +172,26 @@ def main():
               f"measurement", flush=True)
         return 2
 
+    # Resume: committed rows from a prior run ride verbatim from the
+    # partial record (the judged bytes are the record — a rerun must not
+    # re-roll them); only missing pids are judged (typed in the row).
+    prior = {}
+    if PARTIAL.exists():
+        try:
+            for r in json.loads(PARTIAL.read_text(encoding="utf-8")):
+                prior[r["problem_id"]] = r
+        except Exception:  # noqa: BLE001
+            prior = {}
+    resumed = [pid for pid in (pr["problem_id"] for pr in pairs)
+               if pid in prior]
     results = []
     t0 = time.time()
     for i, pr in enumerate(pairs):
+        if pr["problem_id"] in prior:
+            results.append(prior[pr["problem_id"]])
+            print(f"  [{i+1}/{len(pairs)}] {pr['problem_id'][:34]:<36} "
+                  f"resumed (committed row rides)", flush=True)
+            continue
         pid = pr["problem_id"]
         prompt = _rubric_prompt(pr["prob"], pr["a1"], pr["base"],
                                 None) + AXIS_SUFFIX
