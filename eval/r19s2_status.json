@@ -1,0 +1,70 @@
+{
+ "record": "R19_SESSION2_STATUS/1.0.0",
+ "at": "2026-11-15T14:02:13.084948Z",
+ "am19_receipt": "AM19 read in full (R11/audit/AUDITOR_VERDICT_R11_AMENDMENT_19_2026-11-15.md + preflight). Race disclosed: the auditor snapshot was taken @8c1013fae (the parent of this session's F32-fix push a8c037f81) — the verdict's 'F32 STILL OPEN' describes pre-fix bytes; the fix landed one commit earlier in the same hour. F25-class timing race, benign: the reconciliation record itself is unaffected (no builder bytes touched by the verdict's reconciliation reading).",
+ "gate_headline_overall": {
+  "novelty_delta_mean": 2.133,
+  "novelty_ci95": [
+   1.426,
+   2.841
+  ],
+  "feasibility_abs_gap_mean": 1.367,
+  "feasibility_ci95": [
+   0.931,
+   1.802
+  ],
+  "n_pairs": 30,
+  "verdict": "NOT_MET (feasibility clause fails; improving)",
+  "subset_note": "intervention subset 2.556/1.5 (n=18), predictor parity 1.167 (n=12) — subsets never headline"
+ },
+ "D1_F32_evidence": {
+  "status": "FIXED WITH RECEIPTS (AM19's snapshot predates the fix commit)",
+  "check_run_receipts": "eval/queue_ci_evidence_r19.json (token-free, from the GitHub API): a8c037f81 surface=SUCCESS (run 43719664849, all 11 steps green incl. 'Install test deps' and 'Constitution v3.0.0 enforcement (Arts. 19/21/22/23/25/26/28 on committed bytes)'); 8c1013fae (AM19's audited commit) surface=FAILURE — the auditor's red reading is byte-true for that ref; d1cf5a129 surface=FAILURE (historical). The failure-vs-success delta across the fix boundary IS the sensitivity proof: a broken queue CI fails the branch, the fixed one passes.",
+  "root_cause": "r11_queue_surface.yml had no pip install step (setup-python 3.12 toolcache python lacks pytest); fixed by an explicit install step + the enforcement suite wired on every queue/* push; cert workflow mirrors all seven suites",
+  "acceptance_reading": "'queue-push CI green AND runs Art. 19/21/26' — evidenced by the receipts; 'a new violation fails the queue CI' — structurally enforced (pytest -q under set -e) and demonstrated by the pre-fix failure runs"
+ },
+ "D3_enforcement": {
+  "queue_gated": [
+   "6",
+   "19",
+   "21",
+   "22 (half: committed-bytes + fixture labeling; fresh-held-out flagged)",
+   "23",
+   "25 (half: physics/premise grounding; disconfirming-search flagged)",
+   "26",
+   "28"
+  ],
+  "flagged_live": [
+   "20 (no ablation-registry artifact exists)",
+   "22 held-out half (awaits holdout v2)",
+   "25 disconfirming-search record (artifact queued)"
+  ],
+  "flags_ci_pinned": "tests assert the flags exist so gaps cannot silently disappear (eval/enforcement_flags.json)"
+ },
+ "D2_F30_pilot": {
+  "pre_registration": "committed BEFORE measurement (3d3421d40): SYS_A1_INT_V4 contract + hard-7 subset + k=3 + canonical metric",
+  "byte_type": "residual gap concentrates on novelty-carrying pairs whose bills concede development programs (bench-p06: 'would need to be developed', fgap=4 nd=4); V3 asked disclosure+engineering-out, the generator disclosed and kept — the rule must bind the MECHANISM CHOICE",
+  "v4_rule": "PROCUREMENT RULE (every bill line: stated-present / procurable standard catalog item / parameter-duty-procedure-config change) + NO-DEVELOPMENT RULE (mechanism needing a non-procurable component is out of scope); both failure modes named forbidden",
+  "measured": {
+   "pairs": 7,
+   "r11_fgap_mean": 3.0,
+   "v4_fgap_mean": 1.857,
+   "r11_nd_mean": 2.857,
+   "v4_nd_mean": 2.857,
+   "improved": 5,
+   "worsened": 0,
+   "nd_below_0.5": 0,
+   "prefer_A": "7/7 (bench-p06 and eval-new05 FLIPPED to A; eval-new05 nd -1 -> +1)",
+   "generation": "7/7 critic CLEAN, V4 dev-scan CLEAN on first drafts, 1 repair total (bench-p03), type gates all MATCH"
+  },
+  "typing": "MECHANICS_PILOT — direction probe, NOT the gate battery (>=30 pairs, OVERALL <=0.25); estimate (labeled estimate, arithmetic on measured numbers): hard-7 delta -1.143 x 7/30 ~= -0.267 overall -> projected overall fgap ~= 1.1 — direction is right, the strict clause needs the predictor arm extended with the same procurement rule + a full battery; queued next round",
+  "art16": "one canonical metric throughout: eval/run._rubric_prompt + _f28_axis_suffix_v2 + crowllm/qwen t=0 k=3 + eval/battery_metrics strict plurality; pilot judged with the IDENTICAL metric — no parallel metric created; r11 gate numbers byte-unchanged"
+ },
+ "art27_capability_budget": {
+  "engine_diff": "V4 contract (new arm variant, ISOLATED to the intervention arm; predictor arm untouched) + pilot driver + 4 enforcement test files + queue/cert workflow rebuilds + 2 registers (prior commit a8c037f81) — battery r11 gate numbers byte-unchanged",
+  "primary_metric_delta": "battery r11 gate numbers UNCHANGED (2.133 / 1.367); pilot measures the V4 mechanism's direction only",
+  "deletions": "none (Art. 16 accounting: nothing removed this round)"
+ },
+ "art28": "owner_action_register.json 1.1.0: F25 ESCALATED (6 instances, root cause unnamed key supply; interim: records cite hashes, never labels) + holdout v2 ESCALATED (both per AM19); offline work list carried; Art. 28 CI test green",
+ "next": "D2: extend the procurement rule to the predictor arm's instrument bills (predictor pairs carry fgap 2-3 on 4+ pairs) then the FULL 30-pair battery (the strict-clause measurement); Art. 20 challenge-ledger artifact; D1 residual: confirm the next queue-push run green (this push re-fires it)"
+}
