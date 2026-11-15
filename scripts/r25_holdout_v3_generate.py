@@ -59,7 +59,8 @@ OUT_DIR = REPO / "eval" / "holdout_v3_generation"
 PACE_S = float(os.environ.get("R12_PACE_S", "13.0"))
 REPAIR_BUDGET = 2
 GEN_ATTEMPTS = 3  # transport-level only (Art. 15); never re-draws content
-GW_PORT = 8793
+GW_PORT = 8787  # _gen (r13_a1t_generate) posts to the 127.0.0.1:8787
+# gateway — the shared transport endpoint (infra, not contract)
 
 from r7_queue_runner import _load_key_vault  # noqa: E402
 _load_key_vault()
