@@ -74,11 +74,38 @@ def hermetic(monkeypatch, tmp_path):
         lambda provider_id, force=False: {
             "provider": provider_id, "status": "UNDISCOVERED",
             "fetched_at_epoch": 0.0, "models": [],
-            "catalog_size": 0, "eligible_count": 0})
+            "eligible_count": 0})
     mr.clear_probe_cache()
     monkeypatch.setattr(ph, "HEALTH", ph.ProviderHealthBook(
         health_dir=tmp / "ph"))
+    # F27 (R11 2026-11-15): LOCAL rung availability is now REACHABILITY
+    # (a sub-second TCP connect probe), not key-presence — the tests
+    # that wire localqwen need a LISTENING endpoint, exactly like the
+    # production wrapper (r451_local_qwen.py) owns its llama-server.
+    # One tiny socket server on an ephemeral port, LOCAL_QWEN_BASE_URL
+    # pointed at it; the transport layer itself stays mocked per-test.
+    import socket as _socket
+    import threading as _threading
+    _srv = _socket.socket(_socket.AF_INET, _socket.SOCK_STREAM)
+    _srv.setsockopt(_socket.SOL_SOCKET, _socket.SO_REUSEADDR, 1)
+    _srv.bind(("127.0.0.1", 0))
+    _srv.listen(8)
+    _port = _srv.getsockname()[1]
+
+    def _accept_loop():
+        while True:
+            try:
+                conn, _ = _srv.accept()
+                conn.close()
+            except OSError:
+                return
+
+    _th = _threading.Thread(target=_accept_loop, daemon=True)
+    _th.start()
+    monkeypatch.setenv("LOCAL_QWEN_BASE_URL",
+                       f"http://127.0.0.1:{_port}/v1/chat/completions")
     yield monkeypatch, tmp
+    _srv.close()
     mr.clear_probe_cache()
 
 
@@ -213,8 +240,6 @@ class TestLocalProviderRegistry:
             self, hermetic, monkeypatch):
         monkeypatch, _ = hermetic
         _no_keys(monkeypatch)
-        monkeypatch.setenv("LOCAL_QWEN_BASE_URL",
-                           "http://127.0.0.1:8790/v1/chat/completions")
         matrix = reg.availability_matrix()
         row = {m["provider_id"]: m for m in matrix}["localqwen"]
         assert row["available"] is True
@@ -285,8 +310,6 @@ class TestFailClosed:
         and the cost provenance names it."""
         monkeypatch, tmp = hermetic
         _no_keys(monkeypatch)
-        monkeypatch.setenv("LOCAL_QWEN_BASE_URL",
-                           "http://127.0.0.1:8790/v1/chat/completions")
         monkeypatch.setenv("OPENAI_API_KEY", "sk-paid-present")
         monkeypatch.setattr(
             reg, "_call_openai_flavor",
@@ -309,8 +332,6 @@ class TestFailClosed:
         INTO a paid route)."""
         monkeypatch, tmp = hermetic
         _no_keys(monkeypatch)
-        monkeypatch.setenv("LOCAL_QWEN_BASE_URL",
-                           "http://127.0.0.1:8790/v1/chat/completions")
         monkeypatch.setenv("OPENAI_API_KEY", "sk-paid")  # paid AND live
         monkeypatch.setattr(
             reg, "_call_openai_flavor",
@@ -656,8 +677,6 @@ class TestRoutingObservability:
         the production record reconstructs the exact route."""
         monkeypatch, _ = hermetic
         _no_keys(monkeypatch)
-        monkeypatch.setenv("LOCAL_QWEN_BASE_URL",
-                           "http://127.0.0.1:8790/v1/chat/completions")
         monkeypatch.setattr(
             reg, "_call_openai_flavor",
             lambda spec, messages, timeout, max_tokens,
@@ -684,8 +703,6 @@ class TestRoutingObservability:
         _no_keys(monkeypatch)
         monkeypatch.setenv("ENGINE_MODEL_COST_POLICY", "UNRESTRICTED")
         monkeypatch.setenv("OPENAI_API_KEY", "k")
-        monkeypatch.setenv("LOCAL_QWEN_BASE_URL",
-                           "http://127.0.0.1:8790/v1/chat/completions")
         monkeypatch.setattr(mr, "PINNED_DEFAULT_MODELS", {
             "openai": [
                 {"model": "gpt-4o",
@@ -742,8 +759,6 @@ class TestRoutingObservability:
         _no_keys(monkeypatch)
         monkeypatch.setenv("ENGINE_MODEL_COST_POLICY", "UNRESTRICTED")
         monkeypatch.setenv("OPENAI_API_KEY", "k")
-        monkeypatch.setenv("LOCAL_QWEN_BASE_URL",
-                           "http://127.0.0.1:8790/v1/chat/completions")
         monkeypatch.setattr(mr, "PINNED_DEFAULT_MODELS", {
             "openai": [
                 {"model": "gpt-4o",

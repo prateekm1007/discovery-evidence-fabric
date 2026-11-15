@@ -954,6 +954,42 @@ def reconcile_runtime_classifications() -> Dict[str, Any]:
             "changed": changed, "url_host": host or None}
 
 
+def _local_rung_reachable(spec: "ProviderSpec") -> Dict[str, Any]:
+    """F27 (R11 2026-11-15): LOCAL rungs carry no credential, so
+    key-presence says nothing about their availability. This derives
+    the endpoint host:port from the spec's base_url and does ONE
+    sub-second TCP connect probe (no HTTP, no tokens). Remote rungs
+    are not probed here (their transport layer + circuit breaker own
+    that domain — this gate is strictly the LOCAL-sandbox case)."""
+    import socket
+    from urllib.parse import urlsplit
+    if spec.locality != "LOCAL" or not spec.url:
+        return {"reachable": True, "endpoint": None,
+                "note": "not a LOCAL rung — not probed here"}
+    # url_for_call honors the marker/override contract (R453-LEAN-CORE:
+    # the env-var marker carries the URL when it has one — the probe
+    # must test the endpoint a CALL would actually use, not the spec
+    # default)
+    try:
+        u = urlsplit(spec.url_for_call())
+        host = u.hostname or "127.0.0.1"
+        port = u.port or (443 if u.scheme == "https" else 80)
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(0.5)
+        try:
+            rc = s.connect_ex((host, port))
+        finally:
+            s.close()
+        return {"reachable": rc == 0, "endpoint": f"{host}:{port}",
+                "note": None if rc == 0 else
+                        f"connect_ex rc={rc} (PROVIDER_UNAVAILABLE)"}
+    except Exception as e:  # noqa: BLE001 — probe failure is a typed
+        # fact about reachability, never a crash in availability
+        return {"reachable": False, "endpoint": spec.url,
+                "note": f"probe error {type(e).__name__} "
+                        f"(PROVIDER_UNAVAILABLE)"}
+
+
 def availability_matrix() -> List[Dict[str, Any]]:
     """Key presence per provider, evaluated at call time.
 
@@ -1005,13 +1041,31 @@ def availability_matrix() -> List[Dict[str, Any]]:
                     if os.environ.get(_n, "").strip()]
         key = (os.environ.get(_ring[_present[0]], "")
                if _present else os.environ.get(p.env_var, ""))
+        # F27 (R11 2026-11-15, measured: the 00:49Z battery burned 44
+        # calls to localqwen — no llama-server binary, no weights, port
+        # refused — because a LOCAL rung's availability is key-presence
+        # and localqwen has NO credential to check): a LOCAL rung is
+        # available only when its endpoint is REACHABLE (a TCP connect
+        # probe, sub-second, zero tokens). The reachability result is
+        # typed on the row (local_reachable: true/false + the endpoint
+        # host:port) — never silently dropped (Art. XXV: an unreachable
+        # local rung is PROVIDER_UNAVAILABLE, a typed state, not
+        # absence). build_ladder reads availability_matrix's
+        # "available" and the rung simply never enters the ladder while
+        # its server is down; when llama-server comes back the row
+        # flips available without any code change. This is the cascade
+        # availability awareness the auditor's F27 asks for — no
+        # hard-pin needed.
+        _local_reach = _local_rung_reachable(p)
+        _avail = bool(_present) and (
+            p.locality != "LOCAL" or _local_reach["reachable"])
         eligible, elig_note = _cost_policy.provider_eligibility(p, policy)
         cap = _ra.capability_state(p.provider_id, p.model_for_call(),
                                    policy=policy)
         out.append({
             "provider_id": p.provider_id,
             "env_var": p.env_var,
-            "available": bool(_present),
+            "available": _avail,
             "key_ring_env_vars": _ring,
             "key_slots_present": _present,
             "key_slot_active": active_key_slot(p),
@@ -1029,6 +1083,9 @@ def availability_matrix() -> List[Dict[str, Any]]:
             "cost_policy_eligible": eligible,
             "cost_policy_note": elig_note,
             "capability_state": cap["state"],
+            # F27: the LOCAL reachability evidence rides the row
+            "local_reachable": _local_reach["reachable"],
+            "local_endpoint": _local_reach["endpoint"],
             "policy_note": p.policy_note,
         })
     return out
