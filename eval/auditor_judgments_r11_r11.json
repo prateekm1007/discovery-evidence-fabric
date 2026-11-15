@@ -1,0 +1,64 @@
+{
+ "record": "auditor_judgments_r11_r11/1.0.0",
+ "audited_commit": "575c7ee5786302603118bc9baf20ecf3018a29cc",
+ "at": "2026-11-15T00:00:00Z",
+ "auditor": "session auditor (Claude)",
+ "scope": "R11 (AM10 round + parallel measured D1/D2/D4): F29 30 A1 bytes verified; F28 recalibration k=3 assessed; a1f grounded battery (n=30) re-judged; eval-new01 value-weighting adjudicated; two self-caught incidents verified corrected",
+ "a1f_battery_assessment": {
+  "methodology": "SOUNDEST yet \u2014 judge crowllm/qwen-3.8-max independent of zai/GLM generator (provider AND family); recalibrated v2 axis suffix (novelty judges mechanism not writing); k=3 majority vote + per-axis median; curated baselines; n=30 30/30 valid; committed answer bytes (r11_a1f_r1)",
+  "result": {
+   "novelty_delta_mean": 0.967,
+   "novelty_ci": [
+    0.172,
+    1.761
+   ],
+   "novelty_clause": "UNRESOLVED (CI crosses 0.5)",
+   "feasibility_gap_mean": 1.333,
+   "feasibility_ci": [
+    0.978,
+    1.689
+   ],
+   "feasibility_clause": "RESOLVED-FAIL (CI > 0.25)",
+   "prefer": {
+    "a1f": 14,
+    "baseline": 14
+   }
+  },
+  "F30_tradeoff": "grounding reduced novelty 2.467->0.967 and preference 18/12->14/14 while improving feasibility 2.0->1.333 (still failing); the machine trades novelty for feasibility rather than achieving both"
+ },
+ "F28_recalibration": {
+  "kappa": 0.556,
+  "prev": 0.4,
+  "novelty_sign_agreement": 0.9,
+  "bench_p02_direction": "CORRECT (fixed)",
+  "accepted": false,
+  "reason": "kappa<0.6",
+  "residual": "eval-new01 systematic value-weighting (judge baseline/operational-familiarity 3/3 unanimous vs auditor a1/novelty)"
+ },
+ "eval_new01_adjudication": "Auditor adjudicates (Art. XXVI): the disagreement is axis-weighting, not factual error. A1 IL-polymer electrolyte is a genuine novelty departure (counts for the novelty clause); the baseline SPE is more operationally familiar (a feasibility consideration, already reflected in the feasibility gap). The gate scores novelty and feasibility separately; operational familiarity is not a separate gate axis. Auditor a1 preference stands on novelty; the judge's baseline preference reflects feasibility weighting. Neither is a calibration error.",
+ "gate": {
+  "state": "NOT_MET",
+  "feasibility_clause": "RESOLVED-FAIL (gap 1.333, CI[0.978,1.689] > 0.25) \u2014 binding",
+  "novelty_clause": "UNRESOLVED (0.967, CI[0.172,1.761])",
+  "note": "a1f battery is independent + recalibrated + n=30; feasibility failure robust; judge kappa 0.556 not fully accepted but feasibility direction clear"
+ },
+ "holdout_precondition": {
+  "state": "MET",
+  "clean": 12
+ },
+ "substance_tally": {
+  "a1": 7,
+  "baseline": 2,
+  "tie": 1,
+  "rater": "single, provisional"
+ },
+ "F29": "CLOSED \u2014 30 A1 full bytes committed (GLM generator), re-judgeable",
+ "verified_other": {
+  "D1": "14 incremental commits since R9, per-stage durable",
+  "self_caught_incidents": "2 report-vs-bytes (| tail masked exit code; status read partial logs) both corrected with exit-code checks",
+  "F25_recurring": "parallel session duplicate A1 sets r11_a1_r5/r11_a1f_r1/r11_a1_fresh_r10 \u2014 consolidation needed"
+ },
+ "gold_set_self_check": {
+  "result": "10/10; bench-p02 direction now CORRECT after recalibration"
+ }
+}
