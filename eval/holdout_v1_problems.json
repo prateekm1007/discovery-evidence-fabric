@@ -1,0 +1,509 @@
+{
+ "eval_version": "holdout-v1",
+ "authored_at": "2026-11-10",
+ "author": "independent auditor (neither the builder nor the pipeline)",
+ "provenance": "SEALED HOLDOUT: one-shot scoring set. Do not tune, inspect or iterate on it. Burned (becomes DEV) after the scored run.",
+ "n_problems": 24,
+ "selection_sha256": "57be8218d1fa681c972ff80d084f55666a53a640b3aa4aeb6c02be5ce9c6b107",
+ "selection_hash_basis": "sha256 over canonical tuples of FRESH problems (contamination_tag is None), sorted by problem_id, identical to eval/validate_problems.py",
+ "problems": [
+  {
+   "problem_id": "HO-01-wind-gearbox-wec",
+   "device": "high-speed-shaft cylindrical roller bearing in a 3 MW onshore wind-turbine gearbox",
+   "failure": "white etching cracks and axial cracking start below the surface of the inner ring or rollers and cause bearing failure within 2 to 7 years, far short of the design life",
+   "failure_mode": "white-etching-crack-bearing-failure",
+   "constraint": "retrofit only, no change to gearbox architecture or bearing envelope, target at least 15 years with at most one planned bearing replacement, no more than 2 days of added inspection downtime per year",
+   "domain": "rotating-machinery",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "retrofit only, no change to gearbox architecture or bearing envelope, target at least 15 years with at most one planned bearing replacement, no more than 2 days of added inspection downtime per year",
+    "device of record: high-speed-shaft cylindrical roller bearing in a 3 MW onshore wind-turbine gearbox",
+    "failure to address: white-etching-crack-bearing-failure"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-02-liion-lithium-plating",
+   "device": "400 V automotive pack of 75 Ah NMC811/graphite pouch cells",
+   "failure": "lithium plating on the graphite anode during fast charging at low temperature causes irreversible capacity loss and raises internal-short risk",
+   "failure_mode": "lithium-plating",
+   "constraint": "10 to 80 percent state of charge in 25 minutes or less at 25 C, and at 0 C ambient lose no more than 10 percent capacity over 500 fast-charge cycles, with at most 3 percent added pack mass and cost",
+   "domain": "energy-storage",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "10 to 80 percent state of charge in 25 minutes or less at 25 C, and at 0 C ambient lose no more than 10 percent capacity over 500 fast-charge cycles, with at most 3 percent added pack mass and cost",
+    "device of record: 400 V automotive pack of 75 Ah NMC811/graphite pouch cells",
+    "failure to address: lithium-plating"
+   ],
+   "clarification_answer": null,
+   "followup_finding": "Post-mortem of 12 degraded cells shows plating concentrated near the anode edges and in perimeter cells of the pack, where start-of-charge temperatures were 6 to 8 C lower than at the pack centre.",
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-03-gas-turbine-tbc-spallation",
+   "device": "first-stage industrial gas-turbine blade with a yttria-stabilized zirconia thermal barrier coating on an MCrAlY bond coat",
+   "failure": "the ceramic top coat spalls at the bond-coat interface after thermal cycling and exposes the substrate to hot gas",
+   "failure_mode": "tbc-spallation",
+   "constraint": "coating surface temperature 1150 C, 24000 operating hours and 600 start-stop cycles, no change to the single-crystal substrate alloy, total coating thickness at most 400 micrometres",
+   "domain": "turbomachinery-coatings",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "coating surface temperature 1150 C, 24000 operating hours and 600 start-stop cycles, no change to the single-crystal substrate alloy, total coating thickness at most 400 micrometres",
+    "device of record: first-stage industrial gas-turbine blade with a yttria-stabilized zirconia thermal barrier coating on an MCrAlY bond coat",
+    "failure to address: tbc-spallation"
+   ],
+   "clarification_answer": {
+    "critical failure variable": "thermally grown oxide thickness at end of life",
+    "note": "user wants the answer framed around limiting thermally grown oxide (TGO) thickness at 24000 hours"
+   },
+   "followup_finding": "Cross-sections of failed blades show cracking along the TGO/bond-coat interface with a 9 micrometre TGO and aluminium depletion in the bond coat; the top coat itself shows little sintering damage.",
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-04-hydraulic-cylinder-rod-seal",
+   "device": "rod seal package on a 350 bar hydraulic excavator boom cylinder (160 mm bore, 90 mm rod)",
+   "failure": "rod seals weep at start-up and show stick-slip after cold starts at minus 25 C, and leakage persists after warm-up",
+   "failure_mode": "seal-leakage-cold-start",
+   "constraint": "fit within the existing gland groove dimensions, keep ISO VG 46 hydraulic fluid, at most 1 drop of leakage per 25 strokes after 2000 hours, no change to the hard-chrome rod",
+   "domain": "fluid-power",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "fit within the existing gland groove dimensions, keep ISO VG 46 hydraulic fluid, at most 1 drop of leakage per 25 strokes after 2000 hours, no change to the hard-chrome rod",
+    "device of record: rod seal package on a 350 bar hydraulic excavator boom cylinder (160 mm bore, 90 mm rod)",
+    "failure to address: seal-leakage-cold-start"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-05-bridge-deck-chloride-corrosion",
+   "device": "reinforced-concrete highway bridge deck with black-steel top mat and 40 mm cover in a de-icing-salt climate",
+   "failure": "chloride penetration depassivates the reinforcement and corrosion cracks and delaminates the deck within about 15 years",
+   "failure_mode": "chloride-induced-rebar-corrosion",
+   "constraint": "deck replacement allowed but girders and abutments retained, 75-year service-life target, whole-life cost at most 25 percent above conventional replacement, traffic closure of at most 6 weeks",
+   "domain": "civil-infrastructure",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "deck replacement allowed but girders and abutments retained, 75-year service-life target, whole-life cost at most 25 percent above conventional replacement, traffic closure of at most 6 weeks",
+    "device of record: reinforced-concrete highway bridge deck with black-steel top mat and 40 mm cover in a de-icing-salt climate",
+    "failure to address: chloride-induced-rebar-corrosion"
+   ],
+   "clarification_answer": null,
+   "followup_finding": "Cores from the existing deck show 1.1 percent chloride by cement mass at the 40 mm rebar depth and a water-to-cement ratio near 0.5.",
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-06-aircraft-lap-joint-fatigue",
+   "device": "2024-T3 aluminium fuselage lap joint with three rows of 4.8 mm protruding-head rivets",
+   "failure": "multi-site fatigue cracks initiate at the rivet hole edges of the upper row",
+   "failure_mode": "fastener-hole-fatigue-cracking",
+   "constraint": "double the inspection interval from 8000 to 16000 flight cycles without replacing skin panels, added structural mass below 0.5 percent of the joint, no change to the outer mould line",
+   "domain": "aerospace-structures",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "double the inspection interval from 8000 to 16000 flight cycles without replacing skin panels, added structural mass below 0.5 percent of the joint, no change to the outer mould line",
+    "device of record: 2024-T3 aluminium fuselage lap joint with three rows of 4.8 mm protruding-head rivets",
+    "failure to address: fastener-hole-fatigue-cracking"
+   ],
+   "clarification_answer": {
+    "crack origin": "hole edge at the faying surface of the upper rivet row",
+    "note": "user states fractography places the crack origins at the faying-surface hole edge of the upper rivet row"
+   },
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-07-igbt-power-cycling",
+   "device": "1200 V 400 A IGBT module in an electric-bus traction inverter with aluminium wire bonds and SnAg solder die attach",
+   "failure": "wire-bond lift-off and die-attach solder fatigue under power cycling raise on-state voltage and thermal resistance until the module fails",
+   "failure_mode": "power-cycling-fatigue",
+   "constraint": "survive 300000 power cycles at a junction-temperature swing of 80 K, same footprint and cooler interface, module cost increase under 15 percent",
+   "domain": "power-electronics",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "survive 300000 power cycles at a junction-temperature swing of 80 K, same footprint and cooler interface, module cost increase under 15 percent",
+    "device of record: 1200 V 400 A IGBT module in an electric-bus traction inverter with aluminium wire bonds and SnAg solder die attach",
+    "failure to address: power-cycling-fatigue"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-08-uhmwpe-hip-liner",
+   "device": "UHMWPE acetabular liner in a total hip replacement paired with a 32 mm cobalt-chrome head",
+   "failure": "oxidative embrittlement and wear debris drive osteolysis and revision at 10 to 15 years",
+   "failure_mode": "polyethylene-oxidation-wear",
+   "constraint": "volumetric wear below 10 cubic millimetres per million cycles on a hip simulator, fatigue-crack-propagation resistance reduced by at most 20 percent versus a conventional liner, same liner geometry, sterilization method validated",
+   "domain": "orthopedic-implants",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "volumetric wear below 10 cubic millimetres per million cycles on a hip simulator, fatigue-crack-propagation resistance reduced by at most 20 percent versus a conventional liner, same liner geometry, sterilization method validated",
+    "device of record: UHMWPE acetabular liner in a total hip replacement paired with a 32 mm cobalt-chrome head",
+    "failure to address: polyethylene-oxidation-wear"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-09-hpdc-motor-housing-porosity",
+   "device": "high-pressure die-cast AlSi10MgMn motor housing with an integrated coolant jacket",
+   "failure": "gas and shrinkage porosity beneath the jacket wall cause helium leak-test rejections",
+   "failure_mode": "casting-porosity-leak",
+   "constraint": "scrap below 3 percent, keep cold-chamber high-pressure die casting on the existing 2800 t press, cycle-time increase under 10 percent",
+   "domain": "manufacturing-casting",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "scrap below 3 percent, keep cold-chamber high-pressure die casting on the existing 2800 t press, cycle-time increase under 10 percent",
+    "device of record: high-pressure die-cast AlSi10MgMn motor housing with an integrated coolant jacket",
+    "failure to address: casting-porosity-leak"
+   ],
+   "clarification_answer": {
+    "leak location": "sub-surface shrinkage porosity near the thick bosses next to the coolant jacket",
+    "note": "user states leaks trace to shrinkage porosity near the thick bosses beside the coolant jacket"
+   },
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-10-s690-weld-hydrogen-cracking",
+   "device": "40 mm thick S690QL high-strength steel structural weld made on site with gas-metal arc welding",
+   "failure": "hydrogen-assisted cold cracking at the weld toe and in the heat-affected zone appears 12 to 48 hours after welding",
+   "failure_mode": "hydrogen-assisted-cold-cracking",
+   "constraint": "ambient 5 C, no furnace post-weld heat treatment possible, high joint restraint, weld-metal yield strength at least 690 MPa, at most 5 percent productivity loss",
+   "domain": "welding-metallurgy",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "ambient 5 C, no furnace post-weld heat treatment possible, high joint restraint, weld-metal yield strength at least 690 MPa, at most 5 percent productivity loss",
+    "device of record: 40 mm thick S690QL high-strength steel structural weld made on site with gas-metal arc welding",
+    "failure to address: hydrogen-assisted-cold-cracking"
+   ],
+   "clarification_answer": null,
+   "followup_finding": "Hardness traverses show the heat-affected zone at 410 HV10, and diffusible hydrogen in deposited metal was measured at 8 mL per 100 g.",
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-11-pex-chlorine-embrittlement",
+   "device": "cross-linked polyethylene (PEX-a) 20 mm hot-water pipe in an apartment building",
+   "failure": "oxidative embrittlement from chlorinated mains water at 70 C produces brittle longitudinal cracks on the pipe inner wall within 5 to 8 years",
+   "failure_mode": "chlorine-induced-oxidation",
+   "constraint": "50-year service at 70 C and 6 bar, existing press-fitting dimensions, chlorine dioxide dosing up to 0.5 mg/L, cost increase under 20 percent",
+   "domain": "polymer-piping",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "50-year service at 70 C and 6 bar, existing press-fitting dimensions, chlorine dioxide dosing up to 0.5 mg/L, cost increase under 20 percent",
+    "device of record: cross-linked polyethylene (PEX-a) 20 mm hot-water pipe in an apartment building",
+    "failure to address: chlorine-induced-oxidation"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-12-vanadium-flow-battery-fade",
+   "device": "20 kW vanadium redox flow battery stack with Nafion 212 membranes",
+   "failure": "capacity fades about 15 percent over 2000 cycles from vanadium crossover and electrolyte imbalance",
+   "failure_mode": "crossover-capacity-fade",
+   "constraint": "energy efficiency stays above 75 percent, membrane area-specific resistance rises by less than 20 percent, no electrolyte replacement",
+   "domain": "energy-storage-flow",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "energy efficiency stays above 75 percent, membrane area-specific resistance rises by less than 20 percent, no electrolyte replacement",
+    "device of record: 20 kW vanadium redox flow battery stack with Nafion 212 membranes",
+    "failure to address: crossover-capacity-fade"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-13-liquid-cooling-galvanic-corrosion",
+   "device": "direct-to-chip liquid cooling loop with copper cold plates, aluminium manifolds and 25 percent propylene glycol coolant",
+   "failure": "galvanic corrosion and particle build-up raise pressure drop 30 percent and thermal resistance 8 percent within 18 months",
+   "failure_mode": "galvanic-corrosion-fouling",
+   "constraint": "no replacement of the manifold alloy, thermal-resistance drift below 3 percent over 5 years, maintenance interval no shorter than 12 months, wetted materials stay compatible with existing pumps",
+   "domain": "thermal-management",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "no replacement of the manifold alloy, thermal-resistance drift below 3 percent over 5 years, maintenance interval no shorter than 12 months, wetted materials stay compatible with existing pumps",
+    "device of record: direct-to-chip liquid cooling loop with copper cold plates, aluminium manifolds and 25 percent propylene glycol coolant",
+    "failure to address: galvanic-corrosion-fouling"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-14-water-main-surge",
+   "device": "8 km buried DN600 ductile-iron water pumping main with three 450 kW pumps and swing check valves",
+   "failure": "a sudden pump trip causes a pressure surge to about 2.2 times static head and has ruptured two joints",
+   "failure_mode": "pump-trip-water-hammer",
+   "constraint": "maximum transient pressure below 20 bar on PN16 pipe, no column separation at the high point, no new pump station, protection-vessel footprint below 30 square metres",
+   "domain": "fluid-transients",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "maximum transient pressure below 20 bar on PN16 pipe, no column separation at the high point, no new pump station, protection-vessel footprint below 30 square metres",
+    "device of record: 8 km buried DN600 ductile-iron water pumping main with three 450 kW pumps and swing check valves",
+    "failure to address: pump-trip-water-hammer"
+   ],
+   "clarification_answer": null,
+   "followup_finding": "The pump-trip log shows pressure at the high point falling to near vapour pressure about 4 seconds after the trip, before the surge peak.",
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-15-railway-point-machine",
+   "device": "electromechanical railway turnout point machine with a 230 V AC motor and a 2 s swing",
+   "failure": "the switch intermittently fails to lock or detect, blocking the line, and failures are discovered only at the first blocked movement",
+   "failure_mode": "point-machine-intermittent-failure",
+   "constraint": "use only the existing motor current and voltage log at 10 Hz per movement, warn at least 7 days before the first service-affecting failure, at most 1 false alarm per 100 machines per month",
+   "domain": "railway-infrastructure",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only the existing motor current and voltage log at 10 Hz per movement, warn at least 7 days before the first service-affecting failure, at most 1 false alarm per 100 machines per month",
+    "device of record: electromechanical railway turnout point machine with a 230 V AC motor and a 2 s swing",
+    "failure to address: point-machine-intermittent-failure"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-16-wind-gearbox-oil-debris",
+   "device": "wind-turbine main gearbox planetary stage with an inductive online oil-debris sensor",
+   "failure": "gear and bearing surface damage progresses between 6-month borescope inspections and is found only after secondary damage",
+   "failure_mode": "gearbox-surface-damage-progression",
+   "constraint": "use only the existing inductive debris sensor (particles above 100 micrometres) and 1 Hz vibration RMS, warn at least 30 days before secondary damage, at most 1 false alarm per turbine per year",
+   "domain": "condition-monitoring",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only the existing inductive debris sensor (particles above 100 micrometres) and 1 Hz vibration RMS, warn at least 30 days before secondary damage, at most 1 false alarm per turbine per year",
+    "device of record: wind-turbine main gearbox planetary stage with an inductive online oil-debris sensor",
+    "failure to address: gearbox-surface-damage-progression"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-17-liion-internal-short",
+   "device": "48 V 14S lithium-ion pack of cylindrical NMC cells in an electric scooter",
+   "failure": "a slowly developing internal short in one cell raises its self-discharge and heat until thermal runaway weeks later",
+   "failure_mode": "incipient-internal-short",
+   "constraint": "use only the existing cell voltage (1 mV resolution), pack current and one thermistor per 7 cells, warn at least 48 hours before the cell exceeds 60 C, at most 2 false alarms per 1000 packs per year",
+   "domain": "energy-storage-safety",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only the existing cell voltage (1 mV resolution), pack current and one thermistor per 7 cells, warn at least 48 hours before the cell exceeds 60 C, at most 2 false alarms per 1000 packs per year",
+    "device of record: 48 V 14S lithium-ion pack of cylindrical NMC cells in an electric scooter",
+    "failure to address: incipient-internal-short"
+   ],
+   "clarification_answer": {
+    "available rest period": "packs rest unloaded for at least 6 hours after every ride",
+    "note": "user states the pack rests unloaded for at least 6 hours after every ride"
+   },
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-18-dc-link-capacitor-wearout",
+   "device": "aluminium electrolytic DC-link capacitor bank in a 90 kW industrial drive",
+   "failure": "electrolyte evaporation raises ESR and ripple heating until the capacitor vents, usually between years 6 and 9",
+   "failure_mode": "electrolytic-capacitor-wear-out",
+   "constraint": "use only drive-internal DC-link voltage, an estimated ripple current and heatsink temperature, warn at least 6 months before venting, at most 1 false alarm per 200 drives per year",
+   "domain": "power-electronics-reliability",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only drive-internal DC-link voltage, an estimated ripple current and heatsink temperature, warn at least 6 months before venting, at most 1 false alarm per 200 drives per year",
+    "device of record: aluminium electrolytic DC-link capacitor bank in a 90 kW industrial drive",
+    "failure to address: electrolytic-capacitor-wear-out"
+   ],
+   "clarification_answer": null,
+   "followup_finding": "Teardown of three vented units shows dried-out electrolyte, and the units nearest the heatsink had the highest ESR.",
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-19-corrosion-under-insulation",
+   "device": "insulated carbon-steel process piping in a refinery, 6 to 12 inch lines under mineral-wool insulation with aluminium jacketing",
+   "failure": "external corrosion under insulation thins pipe walls unseen until leaks occur",
+   "failure_mode": "corrosion-under-insulation",
+   "constraint": "screen 5000 insulated line segments without stripping insulation, miss at most 10 percent of segments with wall loss above 30 percent, inspection budget at most 20 percent of full strip-and-inspect",
+   "domain": "process-asset-integrity",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "screen 5000 insulated line segments without stripping insulation, miss at most 10 percent of segments with wall loss above 30 percent, inspection budget at most 20 percent of full strip-and-inspect",
+    "device of record: insulated carbon-steel process piping in a refinery, 6 to 12 inch lines under mineral-wool insulation with aluminium jacketing",
+    "failure to address: corrosion-under-insulation"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-20-pem-electrolyser-membrane-thinning",
+   "device": "PEM water electrolyser stack with 50 micrometre perfluorosulfonic-acid membranes at 1.8 A per square centimetre and 80 C",
+   "failure": "chemical and mechanical thinning of the membrane eventually causes gas crossover and shorts",
+   "failure_mode": "membrane-thinning",
+   "constraint": "measurable online without stack disassembly, warn at least 500 hours before hydrogen-in-oxygen exceeds 2 percent, stack operates 8000 hours per year",
+   "domain": "electrolysis",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "measurable online without stack disassembly, warn at least 500 hours before hydrogen-in-oxygen exceeds 2 percent, stack operates 8000 hours per year",
+    "device of record: PEM water electrolyser stack with 50 micrometre perfluorosulfonic-acid membranes at 1.8 A per square centimetre and 80 C",
+    "failure to address: membrane-thinning"
+   ],
+   "clarification_answer": {
+    "degradation of interest": "membrane thinning rather than catalyst loss",
+    "note": "user states the concern is membrane thinning, not catalyst loss"
+   },
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-21-double-mechanical-seal",
+   "device": "double mechanical seal with pressurised barrier fluid on a 75 kW light-hydrocarbon transfer pump",
+   "failure": "seal-face wear and thermal damage cause leakage and an unplanned shutdown at 8 to 14 months",
+   "failure_mode": "mechanical-seal-face-failure",
+   "constraint": "use only existing barrier-fluid pressure, reservoir level and temperature and pump vibration, warn at least 10 days before leakage reaches the vapour-recovery limit, at most 2 false alarms per pump per year",
+   "domain": "rotating-equipment",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only existing barrier-fluid pressure, reservoir level and temperature and pump vibration, warn at least 10 days before leakage reaches the vapour-recovery limit, at most 2 false alarms per pump per year",
+    "device of record: double mechanical seal with pressurised barrier fluid on a 75 kW light-hydrocarbon transfer pump",
+    "failure to address: mechanical-seal-face-failure"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-22-dialyser-clotting",
+   "device": "hemodialysis machine with a high-flux hollow-fibre dialyser at 300 mL/min blood flow",
+   "failure": "progressive clotting of the fibre bundle during 4-hour sessions cuts clearance and forces circuit replacement",
+   "failure_mode": "dialyser-clotting",
+   "constraint": "use only the machine's existing venous pressure, arterial pressure, transmembrane pressure and dialysate flow signals, warn at least 30 minutes before clearance drops 15 percent, at most 1 false alarm per 50 sessions",
+   "domain": "biomedical-extracorporeal",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only the machine's existing venous pressure, arterial pressure, transmembrane pressure and dialysate flow signals, warn at least 30 minutes before clearance drops 15 percent, at most 1 false alarm per 50 sessions",
+    "device of record: hemodialysis machine with a high-flux hollow-fibre dialyser at 300 mL/min blood flow",
+    "failure to address: dialyser-clotting"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-23-titanium-end-mill-wear",
+   "device": "6 mm solid-carbide end mill machining Ti-6Al-4V at 60 m/min on a 3-axis CNC mill",
+   "failure": "flank wear grows from 0.1 to 0.3 mm within minutes and then the tool breaks, scrapping the part",
+   "failure_mode": "tool-wear-breakage",
+   "constraint": "use only spindle power and the existing 2 kHz spindle accelerometer, warn at least 5 minutes before flank wear VB reaches 0.3 mm, at most 1 false alarm per 500 tool lives",
+   "domain": "machining",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only spindle power and the existing 2 kHz spindle accelerometer, warn at least 5 minutes before flank wear VB reaches 0.3 mm, at most 1 false alarm per 500 tool lives",
+    "device of record: 6 mm solid-carbide end mill machining Ti-6Al-4V at 60 m/min on a 3-axis CNC mill",
+    "failure to address: tool-wear-breakage"
+   ],
+   "clarification_answer": {
+    "material lot variation": "workpiece hardness varies between 330 and 380 HV across lots",
+    "note": "user states workpiece hardness varies between 330 and 380 HV across material lots"
+   },
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO-24-superheater-tube-creep",
+   "device": "T22 (2.25Cr-1Mo) superheater tubes in a coal-fired boiler after 12 years at about 540 C steam temperature",
+   "failure": "long-term creep damage ends in tube rupture and forced outage",
+   "failure_mode": "superheater-tube-creep-rupture",
+   "constraint": "assess during a 6-day outage without removing tubes, remaining-life estimate within plus or minus 30 percent, replacement decisions needed for 400 tube circuits",
+   "domain": "power-generation-asset-life",
+   "source": "auditor_holdout_v1",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "assess during a 6-day outage without removing tubes, remaining-life estimate within plus or minus 30 percent, replacement decisions needed for 400 tube circuits",
+    "device of record: T22 (2.25Cr-1Mo) superheater tubes in a coal-fired boiler after 12 years at about 540 C steam temperature",
+    "failure to address: superheater-tube-creep-rupture"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  }
+ ]
+}
