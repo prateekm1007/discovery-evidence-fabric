@@ -1,0 +1,65 @@
+{
+ "record": "auditor_judgments_r11_r13/1.0.0",
+ "audited_commit": "4be956439adc535341881d028acad0a5df65f90e",
+ "at": "2026-11-15T00:00:00Z",
+ "auditor": "session auditor (Claude)",
+ "scope": "R13: F30 battery r8 measured (orthogonal v2); OA1 sealed holdout v1 placed by owner \u2014 pre-registered, selection_sha256 verified, Art. 7 activated; F28/D4 verified; self-caught incidents",
+ "F30_measurement": {
+  "battery": "r8 (r11_a1f_r2 orthogonal v2), n=30 30/30 valid, independent crowllm/qwen judge k=3 vs GLM generator",
+  "novelty_delta_mean": 1.567,
+  "novelty_ci": [
+   0.601,
+   2.533
+  ],
+  "novelty_clause": "RESOLVED-PASS (lower 0.601>0.5) \u2014 FIRST resolved novelty pass",
+  "feasibility_gap_mean": 1.667,
+  "feasibility_ci": [
+   1.243,
+   2.09
+  ],
+  "feasibility_clause": "RESOLVED-FAIL (worsened from grounded 1.333)",
+  "prefer": {
+   "a1f": 14,
+   "baseline": 16
+  },
+  "gap0_existence_proofs": [
+   "bench-p01-pemfc-dehydration",
+   "eval-new04-chiller-fouling-predictor",
+   "eval-new10-solar-inverter-predictor",
+   "eval-new11-conveyor-belt-predictor"
+  ],
+  "three_generations": {
+   "raw": "2.467/2.0",
+   "grounded": "0.967/1.333",
+   "orthogonal_v2": "1.567/1.667"
+  },
+  "finding": "orthogonality contract MOVED the trade not broke it \u2014 bought novelty at feasibility expense; fresh-18 improved (4 gap=0 proofs that novel+parity-feasible IS producible), dev12 went novelty-negative (over-correction). Frontier: feasibility parity generalizable to all problems",
+  "parity_bar_question": "coder raises (Art. XIX): judge reads curated standard practice at F_B=5 ceiling \u2014 is the parity bar fair or judge over-rating? Auditor to calibrate feasibility axis on a sample; the 4 gap=0 proofs show parity is achievable, so the bar is not inherently impossible"
+ },
+ "OA1_sealed_holdout": {
+  "status": "RESOLVED \u2014 owner placed holdout v1 (24 problems + PRIVATE rubric)",
+  "selection_sha256": "57be8218d1fa681c972ff80d084f55666a53a640b3aa4aeb6c02be5ce9c6b107",
+  "verified": "REPRODUCED EXACTLY by auditor from canonical tuples per validate_problems.py",
+  "art7": "ACTIVATED",
+  "custody": "audit/holdout_v1/ (auditor+owner; rubric PRIVATE, never to builder/pipeline/judge)",
+  "seal_intact": "builder branch has no holdout bytes (verified)",
+  "one_shot_protocol": "owner authorizes -> builder generates on 24 problems once (no rubric) -> auditor scores with private rubric (0-4, K coverage / D quality, red-flag penalties) -> burn (becomes DEV)",
+  "purpose": "clean generalization test (Art. LXXIX + Art. 6) \u2014 breaks dev-set iteration cycle; the decisive next measurement"
+ },
+ "gate": {
+  "state": "NOT_MET",
+  "novelty_clause": "RESOLVED-PASS (machine invents novel things)",
+  "feasibility_clause": "RESOLVED-FAIL (novel things less feasible than standard practice) \u2014 binding",
+  "note": "sealed holdout will test generalization to unseen problems"
+ },
+ "F28": "judge accepted (AM12): kappa 0.556 reproduced, sensitivity 0.743 pre-registered, sign 0.9, bench-p02 correct",
+ "D4_F25": "consolidation verified (r5/fresh_r10 deleted, sha256 accounted, r11_a1f_r1 authoritative)",
+ "self_caught_incidents": [
+  "wrong-set r8 run (component-wise path defeated sed) \u2014 kept as determinism record (reproduces r7 exactly), real r8 re-run",
+  "double mapping bug in kappa aggregation \u2014 recomputed from recorded draws"
+ ],
+ "paid_shelf_census": "kimi-k3 degenerate (all-1s+TIE), typhoon format-incomplete (drops axis keys), deepseek 429 \u2014 generation-class only; judge stays qwen",
+ "gold_set_self_check": {
+  "result": "10/10; bench-p02 correct"
+ }
+}
