@@ -5,7 +5,7 @@
 
 **Read order before EVERY audit:** (1) `EPISTEMIC_CONSTITUTION.md` (the builder's, at the audited SHA), (2) this file, (3) `AUDIT_LEDGER.json` (open/closed findings, past verdicts, corrections). Record the read in a preflight (`audit/AUDIT_PREFLIGHT_TEMPLATE.md`): what you read, exact git SHAs, commands run. **No preflight, no verdict.**
 
-**Size law.** <= 2 pages, 10–12 articles. Add an article only when it has caught a real defect (log the catch in the ledger). Delete any article with zero catches across 5 consecutive audits (pruning counters live in the ledger). Standards change only by dated amendment with a reason (Art. 8).
+**Size law.** <= 2 pages, 10–14 articles (expanded 12->14 by owner directive 2026-11-15 for Arts. 13–14). Add an article only when it has caught a real defect (log the catch in the ledger). Delete any article with zero catches across 5 consecutive audits (pruning counters live in the ledger). Standards change only by dated amendment with a reason (Art. 8).
 
 ## Art. 1 — Bytes over claims
 **Rule:** every number in a verdict is recomputed from committed remote bytes at a named SHA; otherwise mark it UNVERIFIED. Unpushed, gitignored, or dirty-tree evidence does not count.
@@ -66,3 +66,17 @@
 **Rule:** never request or store secrets in the repo; PAT via env/header only, redacted in every record; if the same owner action stays open 3 rounds, escalate it as the top item.
 **Test:** token-pattern grep of pushed files = 0; ledger `rounds_open` counter; escalation at 3.
 **Caught:** none yet — seeded by owner directive; retire after 5 audits with zero catches.
+
+
+## Art. 13 — Independent tally recompute (owner-added 2026-11-15)
+**Rule:** every reported tally (wins/ties/losses, gate counts, agreement) is recomputed by an INDEPENDENT script from the raw judgments, never trusted from the producing driver's own summary. The recompute is committed beside the verdict.
+**Test:** a standalone recompute script reproduces each tally from raw judgment bytes; a diff > 0 is a finding before the verdict is issued.
+**Caught:** the decoder bug that turned ties into wins (4W/6T/0L reported as 8W/2T/0L) — an independent recompute from raw judgments would have caught it at R11 1.0.0.
+
+## Art. 14 — Pre-registered sample size & power (owner-added 2026-11-15)
+**Rule:** before any gate clause is decided, pre-register the sample size needed for adequate power (given the observed effect size and variance); a clause is "resolved" only when the pre-registered n is met and the CI excludes the threshold. n below the pre-registered target is reported UNRESOLVED, never passed on a point estimate.
+**Test:** each gate record carries a pre-registered n + power basis; resolved clauses meet it; under-powered clauses typed UNRESOLVED.
+**Caught:** n=10 left both gate clauses unresolved across R7–R16; pre-registering ~30 pairs for power would have set the decisive sample up front.
+
+## AMENDMENT — auditor v1.1.0 (owner-directed, 2026-11-15)
+Owner added Arts. 13 (independent tally recompute) and 14 (pre-registered sample size/power); size law expanded 12->14. **Art. 7 (sealed instruments) RETAINED** — the owner deployed holdout v1 (scored + burned R14); Art. 7 is in active use. **Prune rule unchanged:** an article with zero catches across 5 consecutive audits is deleted (never-deployed instruments exempt until first deployment + 5 audits).
