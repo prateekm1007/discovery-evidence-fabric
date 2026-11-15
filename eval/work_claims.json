@@ -1,7 +1,7 @@
 {
  "schema": "work-claims/v1",
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
- "at": "2026-11-15T15:21:34Z (Art. 29 adoption commit; base 4389800a0f52)",
+ "at": "2026-11-15T16:05:00Z (F34 bootstrap claim + AM21 D2 battery claim filed; base 60170ecf31f1)",
  "sessions": {
   "builder-r20s2": {
    "registered_at": "2026-11-15T15:21:34Z",
@@ -9,5 +9,43 @@
    "note": "R20 session-2 lineage (F32 independent verification + D2 predictor-half lane; reconciliation commit 5cfabd5b2; preservation bundle /home/z/r20_race_evidence_session2/). Registered at the Art. 29 adoption commit per Art. 29(a)."
   }
  },
- "claims": []
+ "claims": [
+  {
+   "claim_id": "c-0001",
+   "work_id": "art29-coordination-adoption",
+   "session_id": "builder-r20s2",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "4389800a0f52",
+   "claimed_at": "2026-11-15T15:21:34Z",
+   "lease_expiry": "2026-11-15T21:21:34Z",
+   "status": "DONE",
+   "takes_over": null,
+   "artifact_paths": [
+    "EPISTEMIC_CONSTITUTION.md",
+    "eval/coordination_protocol.md",
+    "tests/test_article29_parallel_coordination.py",
+    "eval/enforcement_flags.json",
+    ".github/workflows/r11_queue_surface.yml"
+   ],
+   "notes": "F34 bootstrap claim (filed post-execution, disclosed per Art. 5: the adoption commit 3dc373e70 predates the registry's claim mechanism — this claim makes trailer and registry agree). Execution = commit 3dc373e70: Article 29 enacted verbatim, registry + protocol + test + map + queue wiring; queue CI SUCCESS at 60170ecf3 (check-run 132859615967). VERIFIER: the peer session verified from bytes per AM21 sec.1 (constitution v3.1.0, trailers, registry, test, workflow, CI) — its typed VERIFIER claim rides its own registration push per Art. 29(a) identity-on-first-push."
+  },
+  {
+   "claim_id": "c-0002",
+   "work_id": "r21-v4-battery-n30",
+   "session_id": "builder-r20s2",
+   "role": "EXECUTOR",
+   "kind": "measurement",
+   "base_sha": "60170ecf31f1",
+   "claimed_at": "2026-11-15T16:05:00Z",
+   "lease_expiry": "2026-11-15T22:05:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/battery_v4_n30_r21.json",
+    "eval/battery_v4_n30_r21.partial.json"
+   ],
+   "notes": "AM21 D2 — the gate-decisive 30-pair V4 battery under claim-before-work. Filed BEFORE any judge call (Art. 29(b)); pre-registration = scripts/r21_battery_v4_n30.py committed in the same push (zero generation — the 30 committed AM20 D1 A-side bytes re-judged sha-verified; transport ladder typed; CANONICAL metric core unchanged, Art. 16/19; judge crowllm/Qwen != generator zai/GLM). VERIFIER: the peer session is invited — recompute from committed bytes (Art. 13), NEVER re-run, file a typed VERIFIER claim; this claim flips to DONE only when the verifier record exists (Art. 29(c) + T4)."
+  }
+ ]
 }
