@@ -16,8 +16,15 @@ _load_key_vault()
 from r11_d6_battery30 import judge_call  # noqa: E402
 
 jp = judge_call("xkiro", "mistralai/ministral-14b",
-                'Judge preflight: reply with ONLY the JSON object '
-                '{"prefer":"tie"} and nothing else.')
+                # R11 2026-11-15 fix (same as the queue + D6 preflight):
+                # request a complete VALID minimal rubric object — the
+                # old bare {"prefer":"tie"} probe PARSE_FAILED against
+                # _validate_rubric_pass's required key set and mis-typed
+                # a LIVE window as dead.
+                'Judge preflight: reply with ONLY this exact JSON '
+                'object and nothing else: {"A1":0,"A2":0,"A3":0,'
+                '"A4":1,"B1":0,"B2":0,"B3":0,"B4":1,"A6":1,"B6":1,'
+                '"prefer":"TIE"}')
 rec = {
     "record": "XKIRO_PREFLIGHT_PROBE/1.0.0",
     "at": datetime.datetime.now(datetime.UTC).isoformat(),

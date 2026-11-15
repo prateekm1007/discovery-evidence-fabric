@@ -40,8 +40,8 @@ os.environ.setdefault("ENGINE_MODEL_COST_POLICY", "UNRESTRICTED")
 os.environ.setdefault("ENGINE_LLM_TIMEOUT_S", "90")
 os.environ.setdefault("ENGINE_LLM_RETRY_SLEEP_S", "0")
 
-OUT = REPO / "eval" / "battery30_r11_r4.json"
-PARTIAL = REPO / "eval" / "battery30_r11_r4.partial.json"
+OUT = REPO / "eval" / "battery30_r11_r5.json"
+PARTIAL = REPO / "eval" / "battery30_r11_r5.partial.json"
 LEDGER = []          # typed call ledger
 STATE = {"conc": 1, "max_conc": 4, "streak": 0, "aimd_events": []}
 _lock = __import__("threading").Lock()
@@ -80,12 +80,26 @@ def _aimd_on_success():
 
 def gen_call(prompt, system, max_tokens=900):
     """One generation call through the registry cascade (agnes workhorse
-    + whatever rungs the ladder admits); typed outcome."""
+    + whatever rungs the ladder admits); typed outcome.
+
+    R11 2026-11-15 fix (measured, battery30_r11_r4.json): the 00:49Z
+    run lost 44 calls to localqwen — the local llama.cpp rung is
+    UNREACHABLE in this sandbox (no llama-server binary, no GGUF
+    weights, port 8790 refused — verified; processes do not survive
+    sandbox recycling), and after xkiro's first 429s demoted it, the
+    cost-policy chain extension walked localqwen repeatedly (0/44).
+    D6_GEN_PROVIDER pins the generator ring (R491 hard pin: the walk
+    is restricted to that provider's rungs, a failing pinned call is
+    CALL_FAILED — never a silent cascade into an unreachable local
+    rung). Default: xkiro (the measured serving rung this window).
+    """
     from discovery_fabric.engine import llm_registry as LR
     t0 = time.time()
     try:
+        _pin = os.environ.get("D6_GEN_PROVIDER") or "xkiro"
         res = LR.generate(prompt, system=system, timeout=90,
-                          max_retries=0, max_tokens=max_tokens)
+                          max_retries=0, max_tokens=max_tokens,
+                          hard_pin_provider=_pin)
         lat = round(time.time() - t0, 1)
         if res.status == "OK" and str(res.content or "").strip():
             _ledger_call(res.provider_id, res.model, "OK", lat)
@@ -210,11 +224,21 @@ def main() -> int:
                os.environ.get("D6_JUDGE_MODEL",
                               "mistralai/ministral-14b"))
     _jp = judge_call(JUDGE_P[0], JUDGE_P[1],
-                     'Judge preflight: reply with ONLY the JSON object '
-                     '{"prefer":"tie"} and nothing else.')
+                     # R11 2026-11-15 fix (measured, zero-spend local
+                     # repro): the old probe asked for a bare
+                     # {"prefer":"tie"} — _validate_rubric_pass requires
+                     # the full key set (A4/B4/A6/B6 in 1-5), so an
+                     # obedient model PARSE_FAILED and a LIVE window
+                     # typed as dead. The probe now requests a complete
+                     # VALID minimal rubric object (same probe
+                     # semantics: one tiny call, window liveness).
+                     'Judge preflight: reply with ONLY this exact JSON '
+                     'object and nothing else: {"A1":0,"A2":0,"A3":0,'
+                     '"A4":1,"B1":0,"B2":0,"B3":0,"B4":1,"A6":1,"B6":1,'
+                     '"prefer":"TIE"}')
     if _jp.get("outcome") != "JUDGE_VALID":
         out = {
-            "record": "battery30_r11_r4/1.0.0-PREFLIGHT_BLOCKED",
+            "record": "battery30_r11_r5/1.0.0-PREFLIGHT_BLOCKED",
             "at": __import__("datetime").datetime.utcnow().isoformat()
                  + "Z",
             "judge": list(JUDGE_P),
@@ -275,7 +299,7 @@ def main() -> int:
         from discovery_fabric.engine.r11_stats import wilson_ci
         ci = wilson_ci(a1_wins, n_valid)
     out = {
-        "record": "battery30_r11_r4/1.0.0", "at": __import__(
+        "record": "battery30_r11_r5/1.0.0", "at": __import__(
             "datetime").datetime.utcnow().isoformat() + "Z",
         "pool": {"n": len(pair_ids), "fresh": len(fresh_ids),
                  "dev12": len(dev12)},

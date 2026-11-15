@@ -35,13 +35,24 @@ export A0P_QUEUE_WAIT_S="${A0P_QUEUE_WAIT_S:-0}"
 stage() { echo "[$(date -u +%FT%TZ)] STAGE $1 -> $2" | tee -a "$LOG"; }
 
 stage PREFLIGHT "one tiny judge call (typed; refuses pools while window dead)"
+# R11 2026-11-15 fix (measured, zero-spend local repro): the old probe
+# asked for ONLY {"prefer":"tie"} — but _validate_rubric_pass requires
+# the full rubric key set (A1-A4/B1-B4/A6/B6, with A4/B4/A6/B6 in
+# 1-5), so a correctly-obeying model PARSE_FAILED and the queue
+# mis-typed a LIVE window as dead (exit 3 at 00:46Z with the window
+# serving: first reply was exactly the requested bare object; the
+# model's own retry padded zeros — A4:0 outside 1-5 — still invalid).
+# The probe now asks for a complete VALID minimal rubric object; the
+# probe semantics are unchanged (one tiny call, window liveness).
 python3 - <<'PY' >>"$LOG" 2>&1
 import sys
 sys.path.insert(0, "scripts")
 from r11_d6_battery30 import judge_call  # noqa: E402
 jp = judge_call("xkiro", "mistralai/ministral-14b",
-                'Judge preflight: reply with ONLY the JSON object '
-                '{"prefer":"tie"} and nothing else.')
+                'Judge preflight: reply with ONLY this exact JSON '
+                'object and nothing else: {"A1":0,"A2":0,"A3":0,'
+                '"A4":1,"B1":0,"B2":0,"B3":0,"B4":1,"A6":1,"B6":1,'
+                '"prefer":"TIE"}')
 print("PREFLIGHT_OUTCOME:", jp.get("outcome"))
 sys.exit(0 if jp.get("outcome") == "JUDGE_VALID" else 3)
 PY

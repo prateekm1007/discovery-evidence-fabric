@@ -50,7 +50,7 @@ def blind_order(pid: str, pair_kind: str):
     h = hashlib.sha256(f"{pid}::{pair_kind}".encode()).hexdigest()
     return ("a0plus_first" if int(h, 16) % 2 == 0 else "other_first")
 
-OUT = REPO / "eval" / "judge_independent_rerun_r11_r4.json"
+OUT = REPO / "eval" / "judge_independent_rerun_r11_r5.json"
 GEN_TIMELINE_DIR = REPO / "eval" / "pairs" / "r11_a1_r3"
 A0_DIR = REPO / "eval" / "pairs" / "r11_a0plus"
 BASE_DIR = REPO / "eval" / "pairs" / "dev12_fresh"
@@ -88,7 +88,7 @@ def main() -> int:
     if not (jp and jm and independent):
         print("[d4] VERDICT: NO_INDEPENDENT_JUDGE (typed)")
         OUT.write_text(json.dumps({
-            "record": "judge_independent_rerun_r11_r4/1.0.0",
+            "record": "judge_independent_rerun_r11_r5/1.0.0",
             "at": utc_now(), "served_rungs": sorted(served),
             "route": {k: route.get(k) for k in
                       ("provider", "model", "state", "selection")},
@@ -211,7 +211,7 @@ def main() -> int:
               f" sw={jc2.get('outcome')[:12]:<14} d1={d1} d2={d2}")
         # incremental durability (Art. XXV): the served judgments stay
         # on disk, never lost with the process
-        (REPO / "eval" / "judge_independent_rerun_r11_r4.partial.json") \
+        (REPO / "eval" / "judge_independent_rerun_r11_r5.partial.json") \
             .write_text(json.dumps(results, indent=1, default=str) + "\n",
                         encoding="utf-8")
 
@@ -283,7 +283,7 @@ def main() -> int:
                                     == r["decoded_swap"])
         print(f"  recovery {pid[:34]:<36} {kind:<16} "
               f"d1={r.get('decoded_pass1')} d2={r.get('decoded_swap')}")
-        (REPO / "eval" / "judge_independent_rerun_r11_r4.partial.json") \
+        (REPO / "eval" / "judge_independent_rerun_r11_r5.partial.json") \
             .write_text(json.dumps(results, indent=1, default=str) + "\n",
                         encoding="utf-8")
 
@@ -312,7 +312,7 @@ def main() -> int:
             "PASS": n_decoded > 0 and swap_cons >= 0.8,
         },
     }
-    out = {"record": "judge_independent_rerun_r11_r4/1.0.0",
+    out = {"record": "judge_independent_rerun_r11_r5/1.0.0",
            "at": utc_now(), "served_rungs": sorted(served),
            "judge": {"provider": jp, "model": jm,
                      "route": route.get("selection"),
