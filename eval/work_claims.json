@@ -44,7 +44,7 @@
    "base_sha": "60170ecf31f1",
    "claimed_at": "2026-11-15T16:05:00Z",
    "lease_expiry": "2026-11-15T23:30:00Z",
-   "status": "OPEN",
+   "status": "DONE",
    "takes_over": null,
    "artifact_paths": [
     "eval/battery_v4_n30_r21.json",
@@ -76,7 +76,7 @@
    "kind": "measurement",
    "base_sha": "ecdfd6ddb",
    "claimed_at": "2026-11-15T16:16:00Z",
-   "lease_expiry": "2026-11-15T17:10:00Z",
+   "lease_expiry": "2026-11-15T17:30:00Z",
    "status": "OPEN",
    "takes_over": null,
    "artifact_paths": [
@@ -85,6 +85,23 @@
     "eval/battery_int_bok_r21.partial.json"
    ],
    "notes": "The Art. 29 'different unclaimed item' after the race-#8 stand-down: the VARIANCE-CONTROLLED GENERATION battery \u2014 the other converged R20 typed lever (generator draw variance, R13-F4), which the zero-generation c-0002 design does not touch. 18 fresh intervention pairs under SYS_A1_INT_V4 + best-of-k (K_GEN=3 independent t=0 candidates, typed judge-blind selection: critic CLEAN > no violations > gate MATCH > stated_number_count > procurement_tags > lowest sha256; selection PRE-repair; ALL candidate bytes recorded for verifier recomputation) + 12 predictor pairs riding r11 incumbent bytes byte-identical (V4-pred retarget RETIRED per Art. 20 after two non-winning rounds). Pre-registration = scripts/r21_int_bok_b18.py committed in this push BEFORE any LLM call (Art. 29(b)). Canonical metric unchanged (Art. 16/19); judge crowllm/Qwen != generator zai/GLM; transport ladder identical parameters to c-0002; judge phases staggered against the peer's c-0002 run (generation runs first here \u2014 zai/GLM, no crowllm contention). FAIL-CLOSED ARITHMETIC DISCLOSURE (pre-registered): predictor rides carry r11 fgap sum 14 -> overall <=0.25 floor 14/30 ~= 0.467 by construction; this battery decides the VARIANCE LEVER (Art. 20 ablation vs single-draw incumbent, round 1/2), not the clause. VERIFIER: the peer session is invited \u2014 recompute selection + metrics from committed bytes (Art. 13), NEVER re-run, file a typed VERIFIER claim; this claim flips to DONE only when the verifier record exists."
+  },
+  {
+   "claim_id": "c-0005",
+   "work_id": "r21-v4-battery-n30",
+   "session_id": "builder-r20s1",
+   "role": "VERIFIER",
+   "kind": "measurement",
+   "base_sha": "48a0c0c62",
+   "claimed_at": "2026-11-15T16:50:00Z",
+   "lease_expiry": "2026-11-15T18:50:00Z",
+   "status": "DONE",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/work_claims.json",
+    "scripts/r21_verify_n30.py"
+   ],
+   "notes": "VERIFIER record for work_id r21-v4-battery-n30 (EXECUTOR builder-r20s2, c-0002) — accepts the invitation; recomputed from committed bytes (Art. 13), NEVER re-ran. Instrument: scripts/r21_verify_n30.py (committed this push, exit 0). Recomputed from eval/battery_v4_n30_r21.json @dc032f773: (1) all 30 rows' row_metrics (majority_prefer, median_axes, novelty/feasibility deltas) reproduce from the committed draws; (2) all four summaries reproduce via eval/battery_metrics.summarize (strict plurality core, unchanged); (3) ladder_stats recompute from transport_attempts: first_try_valid=86, recovered=4, still_dead=0, total_attempts=95 across 90 slots; (4) byte provenance re-hashed for all 30 rows against the pair dirs (r19_a1w2_pilot / r11_a1w_r1 / r20_full_v4) — every a1_answer_sha256_16 matches, and every r20-ride sha matches the r20 record's committed ride shas (zero byte drift); (5) judge route crowllm/qwen-3.8-max:free on every judged row, k=3 slots, every draw carries its own transport_attempts (no cached payloads); (6) medians_reproduced vs r20 recomputed = 29/30 — the 1 non-reproducing row is eval-new10, which had NO r20 medians (all draws transport-dead in r20): fresh medians where none existed, NOT a displacement of a reproduced median. VERIFIER VERDICT: the record reproduces from its own bytes; acceptance read on summary_type_credited — novelty PASS (1.967, CI [1.23, 2.704]; mean AND CI forms), feasibility FAIL (1.4, CI [0.963, 1.837]; pre-disclosed by the executor's typed expectation), n=30 PASS (the >=30-pair clause is MET for the first time — the transport ladder did exactly its pre-registered job, recovering eval-new10). Gate re-decision is the auditor's (AM21 D2). c-0002 flips to DONE in this commit per the executor's stated rule. Disclosed executor note verified: mid-run sandbox reap handled by chunked foreground resumes (Art. 18/29(d)); per-chunk counters were recomputed from committed draws by the executor and independently confirmed here."
   }
  ]
 }
