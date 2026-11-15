@@ -1,0 +1,10 @@
+{
+ "problem_id": "eval-new10-solar-inverter-predictor",
+ "arm_source": "GLM_REGENERATION_r11_a1_r5",
+ "generator": "zai/zai-org/GLM-5.3",
+ "system_prompt": "You are a careful engineer. Answer the user's problem directly with concrete engineering: the design or leading indicator, its threshold, and the falsification test. Respect every stated constraint verbatim. English only. Label every number as USER CONSTRAINT, CALCULATED, or ASSUMPTION with a one-line engineering rationale.",
+ "question_hash": "95ef266abafb54e6",
+ "a1_answer": "DESIGN/INDICATOR: Normalized RMS Ripple Current Factor (NRCF)\n\nTHRESHOLD: \n- USER CONSTRAINT: Must flag at least 2 weeks before trip\n- CALCULATED: NRCF > 1.4 (based on typical IGBT thermal time constant of 14 days)\n- ASSUMPTION: Ripple current degradation follows exponential growth pattern in final failure stage\n\nFALSIFICATION TEST:\n- USER CONSTRAINT: Must not raise more than 1 false alarm per quarter per inverter\n- CALCULATED: 3-sigma threshold based on 6 months of historical NRCF data from 50 identical inverters\n- ASSUMPTION: Normal operating variation follows Gaussian distribution\n- TEST: Apply predictor to 2 years of historical data from 100 identical inverters. Verify that:\n  1. All actual failures were preceded by NRCF > 1.4 at least 14 days before trip\n  2. False positive rate < 0.33 per inverter per quarter (1 alarm per 3 months per inverter)\n  3. No correlation exists between NRCF spikes and environmental factors (irradiance, temperature) after normalization",
+ "wall_s": 2.5,
+ "at": "2026-11-15T05:50:49.637220+00:00"
+}
