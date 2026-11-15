@@ -1,0 +1,156 @@
+{
+ "problem_id": "eval-new09-hvac-filter-predictor",
+ "a1_source": "SYS_A1F_V5/r24_a1w_v61_contract",
+ "question_type": "predictor-design",
+ "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a MONITORING/INDICATION scheme using a fixed 90-day replacement schedule (time-based intervention). Our same-class mechanism departs by inferring filter loading from fan power dynamics under occupancy-driven airflow modulation, capturing actual dust accumulation physics. This works because filter loading increases resistance, raising fan power draw to maintain airflow—especially detectable during scheduled airflow changes.\n\nPHYSICS CHECK — Governing relation: ΔP_filter = k * (dust_volume * filter_area), where fan power ∝ (ΔP_system * airflow). For a MERV-13 filter, typical clean ΔP is 50 Pa; at 80% loading, ΔP may reach 250 Pa (5x increase). At 2.5 kW supply fan, power increase from 50 Pa to 250 ΔP is ~1.2 kW (20–30% measurable change) per ASHRAE 90.1 fan laws. Magnitude is detectable above BMS noise (±0.1 kW).\n\nIMPLEMENTATION BILL —  \n- **Input streams** (ALREADY-RECORDED):  \n  - Supply fan power (BMS log, \"supply fan power\")  \n  - Return fan power (BMS log, \"return fan power\")  \n  - Outdoor air flow (BMS log, \"outdoor air flow\")  \n  - Occupancy schedule (BMS log, \"occupancy schedule\")  \n- **Reference/thresholds** (DERIVED):  \n  - Baseline clean power: CALCULATED from stated spec (MERV-13 clean ΔP = 50 Pa) and fan curve at design airflow (stated physics).  \n  - Loading threshold: CALCULATED from 20% power increase above baseline (stated constraint: 20% reduction in unnecessary replacements).  \n- **Instruments**: Existing BMS data logger (no new hardware).  \n- **Procedure**: Compute 24-hr moving average of (supply power / outdoor airflow) during occupied hours; flag if >120% of baseline for ≥7 days.  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —  \n- **Installability**: Same (uses existing BMS points).  \n- **Operability**: Same (automated alert, no manual intervention).  \n- **Maintenance**: Same (no new calibration; thresholds derived from specs).  \n- **Cost**: Same class (no new sensors; computation only).  \n- **Advantage**: Cuts early replacements by targeting actual loading, not time.  \n\nEXECUTABLE TEST —  \n- **Protocol**: Log supply power, outdoor airflow, and occupancy for 90 days post-replacement. Compute daily (supply power / outdoor airflow) during occupied hours.  \n- **Pass/fail**: Predictor flags replacement when signal exceeds 120% baseline for 7 consecutive days. Compare to actual filter ΔP (if available) or 90-day replacement baseline.  \n- **Threshold**: 20% reduction in false alerts vs. 90-day schedule (stated constraint).  \n- **Duration**: 90 days (covers 1 filter life).  \n- **Kill criterion**: If signal fails to correlate with ΔP (r² < 0.7) or doesn’t reduce replacements by 20%.  \n\nCONSTRAINT BIND — Primary indicator is supply fan power (stated in constraint as \"supply/return fan power\"), as it directly reflects filter loading resistance. Outdoor airflow normalizes for demand changes.",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 2,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- **Input streams** (ALREADY-RECORDED):",
+    "- Supply fan power (BMS log, \"supply fan power\")",
+    "- Return fan power (BMS log, \"return fan power\")",
+    "- Outdoor air flow (BMS log, \"outdoor air flow\")",
+    "- Occupancy schedule (BMS log, \"occupancy schedule\")",
+    "- **Reference/thresholds** (DERIVED):",
+    "- Baseline clean power: CALCULATED from stated spec (MERV-13 clean ΔP = 50 Pa) and fan cur",
+    "- Loading threshold: CALCULATED from 20% power increase above baseline (stated constraint:",
+    "- **Instruments**: Existing BMS data logger (no new hardware).",
+    "- **Procedure**: Compute 24-hr moving average of (supply power / outdoor airflow) during o",
+    "- **Installability**: Same (uses existing BMS points).",
+    "- **Operability**: Same (automated alert, no manual intervention).",
+    "- **Maintenance**: Same (no new calibration; thresholds derived from specs).",
+    "- **Cost**: Same class (no new sensors; computation only).",
+    "- **Advantage**: Cuts early replacements by targeting actual loading, not time.",
+    "- **Protocol**: Log supply power, outdoor airflow, and occupancy for 90 days post-replacem",
+    "- **Pass/fail**: Predictor flags replacement when signal exceeds 120% baseline for 7 conse",
+    "- **Threshold**: 20% reduction in false alerts vs. 90-day schedule (stated constraint).",
+    "- **Duration**: 90 days (covers 1 filter life).",
+    "- **Kill criterion**: If signal fails to correlate with ΔP (r² < 0.7) or doesn’t reduce re"
+   ]
+  }
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 2733,
+   "latency_s": 9.1,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- **Input streams** (ALREADY-RECORDED):",
+     "- Supply fan power (BMS log, \"supply fan power\")",
+     "- Return fan power (BMS log, \"return fan power\")",
+     "- Outdoor airflow (BMS log, \"outdoor air flow\")",
+     "- Occupancy schedule (BMS log, \"occupancy schedule\")",
+     "- **Reference/threshold** (DERIVED):",
+     "- Baseline power: Average of first 7 days post-replacement (stated physics: clean filter b",
+     "- Threshold: 15% sustained rise above baseline (CALCULATED: 20% pressure rise → 32% power ",
+     "- **Components**: BMS trend analysis software (existing), no new hardware.",
+     "- **Installability**: Same as BMS (no new sensors), software update only.",
+     "- **Operability**: Automated alerts, no manual checks.",
+     "- **Maintenance**: None beyond BMS upkeep.",
+     "- **Cost class**: Same as time-based (no new hardware), software development offset by 20%",
+     "- **Parity**: Same burden, different mechanism (physics vs. time)."
+    ]
+   },
+   "sha256_16": "ff901f9ce5bfa62d"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 3168,
+   "latency_s": 9.7,
+   "transport_tries": 2,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- **Input streams** (ALREADY-RECORDED):",
+     "- Supply fan power (BMS log, \"supply fan power\")",
+     "- Return fan power (BMS log, \"return fan power\")",
+     "- Outdoor airflow (BMS log, \"outdoor air flow\")",
+     "- Occupancy schedule (BMS log, \"occupancy schedule\")",
+     "- **Derived reference/thresholds**:",
+     "- Baseline pressure drop (CALCULATED: from initial 30-day power data and stated fan curve ",
+     "- Acceleration threshold (CALCULATED: 3× the average daily power increase rate over baseli",
+     "- **Components**:",
+     "- BMS data historian (existing).",
+     "- Edge computing device (for real-time derivative calculation).",
+     "- Alerting system (integrated with BMS).",
+     "- **Installability**: Same as standard practice (uses existing BMS points; no new hardware",
+     "- **Operability**: Minimal training (derivative calculation is automated).",
+     "- **Maintenance**: Same as standard practice (no added calibration; thresholds derived fro",
+     "- **Cost class**: Same as standard practice (no new instrumentation; software-only change)",
+     "- **Protocol**:",
+     "1. Collect 6 months of BMS data (supply/return fan power, outdoor airflow, occupancy).",
+     "2. Calculate baseline pressure drop and acceleration threshold.",
+     "3. Monitor daily power increase rate; trigger alert if threshold exceeded.",
+     "- **Pass/fail threshold**:",
+     "- Pass: ≥20% reduction in unnecessary replacements vs. fixed schedule (measured over 3 fil",
+     "- Fail: <20% reduction or false-positive rate >10%.",
+     "- **Duration**: 9 months (covers 3 filter replacement cycles).",
+     "- **Kill criterion**: Acceleration threshold not crossed when filter is overloaded (per pr",
+     "- Primary stated indicator: Pressure drop (USER CONSTRAINT: \"filter loading is estimated f",
+     "- Supplementation: Fan power dynamics provide a leading indicator for pressure drop accele"
+    ]
+   },
+   "sha256_16": "ba1f1b757bfe86e4",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - **Input streams** (ALREADY-RECORDED):; - Supply fan power (BMS log, \"supply fan power\"); - Return fan power "
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 2896,
+   "latency_s": 7.4,
+   "transport_tries": 3,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- **Input streams** (ALREADY-RECORDED):",
+     "- Supply fan power (BMS log, \"supply fan power\")",
+     "- Return fan power (BMS log, \"return fan power\")",
+     "- Outdoor air flow (BMS log, \"outdoor air flow\")",
+     "- Occupancy schedule (BMS log, \"occupancy schedule\")",
+     "- **Reference/thresholds** (DERIVED):",
+     "- Baseline clean power: CALCULATED from stated spec (MERV-13 clean ΔP = 50 Pa) and fan cur",
+     "- Loading threshold: CALCULATED from 20% power increase above baseline (stated constraint:",
+     "- **Instruments**: Existing BMS data logger (no new hardware).",
+     "- **Procedure**: Compute 24-hr moving average of (supply power / outdoor airflow) during o",
+     "- **Installability**: Same (uses existing BMS points).",
+     "- **Operability**: Same (automated alert, no manual intervention).",
+     "- **Maintenance**: Same (no new calibration; thresholds derived from specs).",
+     "- **Cost**: Same class (no new sensors; computation only).",
+     "- **Advantage**: Cuts early replacements by targeting actual loading, not time.",
+     "- **Protocol**: Log supply power, outdoor airflow, and occupancy for 90 days post-replacem",
+     "- **Pass/fail**: Predictor flags replacement when signal exceeds 120% baseline for 7 conse",
+     "- **Threshold**: 20% reduction in false alerts vs. 90-day schedule (stated constraint).",
+     "- **Duration**: 90 days (covers 1 filter life).",
+     "- **Kill criterion**: If signal fails to correlate with ΔP (r² < 0.7) or doesn’t reduce re"
+    ]
+   },
+   "sha256_16": "a104117366d7f02a",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - **Input streams** (ALREADY-RECORDED):; - Supply fan power (BMS log, \"supply fan power\"); - Return fan power "
+   ]
+  }
+ ],
+ "generated_at": "2026-11-15T21:53:34.424865Z"
+}

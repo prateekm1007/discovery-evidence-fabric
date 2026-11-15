@@ -86,6 +86,7 @@ R11 = REPO / "eval" / "battery_a1w_r11.json"
 R20_REC = REPO / "eval" / "battery_a1w2_full_r20.json"
 R24_REC = REPO / "eval" / "battery_feas_bind_v61_r24.json"
 PILOT_OUT = REPO / "eval" / "battery_v7_catalog_r26_pilot.json"
+PILOT_PARTIAL = REPO / "eval" / "battery_v7_catalog_r26_pilot.partial.json"
 FULL_OUT = REPO / "eval" / "battery_v7_catalog_r26.json"
 FULL_PARTIAL = REPO / "eval" / "battery_v7_catalog_r26.partial.json"
 JUDGE = (os.environ.get("R12_JUDGE_PROVIDER", "crowllm"),
@@ -263,6 +264,24 @@ def valid_draws(row):
     return sum(1 for d in row["draws"] if d["outcome"] == "JUDGE_VALID")
 
 
+def judge_transport_ready():
+    """Typed infra preflight (Art. LXI/LXXIV — the post_reset_queue
+    precedent): the judge route must hold a live credential BEFORE any
+    judging. A dead window refuses typed (pools unspent, rows
+    committed, never silently wasted). Returns (ok, detail)."""
+    from discovery_fabric.engine import llm_registry as lr
+    spec = next((s for s in lr.PROVIDER_SPECS
+                 if s.provider_id == JUDGE[0]), None)
+    if spec is None:
+        return False, f"NO_SPEC for judge provider {JUDGE[0]}"
+    if not lr.active_key_value(spec).strip():
+        return False, (f"judge provider {JUDGE[0]} holds NO credential "
+                       f"(env {spec.env_var} empty — the fresh sandbox "
+                       "wiped the gitignored vault; Art. 17: keys are "
+                       "operator-supplied, the loop cannot mint them)")
+    return True, "key present (names only, never the value)"
+
+
 def _row_from_record(pid, rec, prob):
     """Judge one pair (K draws) and build the battery row."""
     a1 = str(rec["a1_answer"])
@@ -282,9 +301,19 @@ def _row_from_record(pid, rec, prob):
     arm = ("SYS_A1_INT_V7_CATALOG_COMPOSITION"
            if str(prob.get("question_type", "")).startswith("intervention")
            else "SYS_A1F_V5_PRIMARY_INDICATOR")
+    # attempts[0] is the DRAFT's type gate; records written by the
+    # interrupted first background run carry the FINAL gate in meta
+    # only (typed disclosure on the row — the bytes are never re-drawn)
+    atts0 = rec.get("attempts") or [{}]
+    tg0 = atts0[0].get("type_gate") or rec.get("meta", {}).get(
+        "type_gate") or {}
     row = {"problem_id": pid, "a1_arm": arm,
            "question_type": prob.get("question_type"),
-           "question_type_gate": rec["meta"]["attempts"][0]["type_gate"],
+           "question_type_gate": tg0,
+           "question_type_gate_source": (
+               "attempts[0]" if atts0[0].get("type_gate")
+               else "meta (interrupted-run record, attempts ledger "
+                    "absent — disclosed)"),
            "baseline_source": b_src,
            "byte_provenance": {
                "byte_source": f"eval/pairs/r26_v7_catalog/{pid}.json",
@@ -311,7 +340,7 @@ def _generate_one(pid, prob, gw_key):
         print(f"  [gen] {pid[:36]:<38} exists", flush=True)
         return
     t0 = time.time()
-    ans, meta = machine_generate(prob, gw_key)
+    ans, _attempts, meta = machine_generate(prob, gw_key)
     dst.write_text(
         json.dumps({"problem_id": pid,
                     "a1_source": ("SYS_A1_INT_V7/r26_a1w_v7_contract"
@@ -320,6 +349,7 @@ def _generate_one(pid, prob, gw_key):
                                   else "SYS_A1F_V5/r24_a1w_v61_contract"),
                     "question_type": prob.get("question_type"),
                     "a1_answer": ans, "meta": meta,
+                    "attempts": _attempts,
                     "generated_at": _now()},
                    indent=1, ensure_ascii=False) + "\n",
         encoding="utf-8")
@@ -362,25 +392,127 @@ def _judge_set(probs, pids, results, prior):
               f"prefer={row.get('majority_prefer')}", flush=True)
 
 
+def gen_only(probs) -> int:
+    """GENERATION-ONLY mode (typed infra window): commit the machine's
+    30 byte records without judging. The judged battery, pilot gate and
+    acceptance read execute in a judge-transport window via the normal
+    path (resume: generation files are never re-drawn, Art. 29(c)).
+    NO judge calls are made here; the pilot gate stays UNDECIDABLE and
+    no gate-affecting feedback reaches the generator (the repair loop
+    is judge-blind — disclosed quota-economy deviation, typed in the
+    record)."""
+    gw, gw_key = start_gateway()
+    rec = {
+        "record": "BATTERY_V7_CATALOG_R26_GENERATION_ONLY/1.0.0",
+        "at": _now(),
+        "work_id": "r26-v7-catalog-battery", "claim": "c-0020",
+        "mode": "GENERATION_ONLY (judge transport absent — typed in "
+                "eval/r26_judge_blocked.json; the judged battery "
+                "resumes from these bytes)",
+        "byte_map": {"fresh_v7_intervention": FRESH_V7_INT,
+                     "fresh_v5_predictor": FRESH_V5_PRED,
+                     "pilot_8": PILOT_8},
+        "machine": "contract_for_v7 (V7 catalog-composition on "
+                   "interventions / SYS_A1F_V5 on predictors) + critic "
+                   "+ type gate + typed scans (base + constraint-fit + "
+                   "catalog v2 on interventions + predictor "
+                   "violations) + NEUTRAL repairs budget 2; K_GEN=1; "
+                   "judge-blind (no outcome feedback)",
+        "generator": {"model": "zai-org/GLM-5.3", "temperature": 0.0},
+        "generation_record": [],
+        "results": [],
+    }
+    print("[gen-only] generating all 30 rows (judge-blind, "
+          "never re-drawn)", flush=True)
+    try:
+        for pid in ALL:
+            prob = probs[pid]
+            _generate_one(pid, prob, gw_key)
+            rec_path = OUT_DIR / f"{pid}.json"
+            meta = json.loads(rec_path.read_text(
+                encoding="utf-8"))["meta"]
+            rec["generation_record"].append(
+                {"problem_id": pid, "repairs": meta["repairs"],
+                 "residual_findings": meta["residual_findings"] or "CLEAN"})
+            (REPO / "eval" / "r26_generation_only.json").write_text(
+                json.dumps(rec, indent=1, ensure_ascii=False) + "\n",
+                encoding="utf-8")
+        n = len(rec["generation_record"])
+        print(f"[gen-only] {n}/30 generation records complete", flush=True)
+        return 0 if n == 30 else 1
+    finally:
+        gw.terminate()
+
+
 def main() -> int:
     global gw_key
     probs = _prob_map()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
+    if "--gen-only" in sys.argv:
+        return gen_only(probs)
     gw, gw_key = start_gateway()
     print(f"[gateway] up (pid {gw.pid}) | judge {JUDGE[0]}/{JUDGE[1]} "
           f"K={K} pace {PACE_S}s", flush=True)
     try:
         # ---------------- phase 0: the PILOT (direction probe) ----------
+        jt_ok, jt_detail = judge_transport_ready()
+        if not jt_ok:
+            # typed BLOCKED record — the generation bytes already
+            # committed stay canonical; judging resumes in the
+            # pre-registered order (pilot gate first) when a judge
+            # transport exists
+            blocked = {
+                "record": "BATTERY_V7_CATALOG_R26_JUDGE_BLOCKED/1.0.0",
+                "at": _now(),
+                "status": "BLOCKED_ON_JUDGE_TRANSPORT",
+                "detail": jt_detail,
+                "typed_rule": "Art. LXI: infrastructure absence is "
+                              "typed, never silently wasted; Art. 15: "
+                              "infra failure is never scientific "
+                              "rejection; Art. 10/26: the only "
+                              "reachable transport here is the "
+                              "generator's own gateway route — self-"
+                              "judging is forbidden, so the judge "
+                              "phase WAITS instead of self-judging",
+                "resume": "rerun scripts/r26_battery_v7.py in a window "
+                          "where the vault holds the judge key; the "
+                          "pre-registered byte map, pilot gate and "
+                          "acceptance stand UNCHANGED; generation "
+                          "bytes are never re-drawn",
+            }
+            (REPO / "eval" / "r26_judge_blocked.json").write_text(
+                json.dumps(blocked, indent=1) + "\n", encoding="utf-8")
+            print("[r26v7] BLOCKED_ON_JUDGE_TRANSPORT — " + jt_detail,
+                  flush=True)
+            print("[r26v7] typed record -> eval/r26_judge_blocked.json; "
+                  "generation-only mode: rerun with --gen-only to "
+                  "commit the machine's bytes without judging",
+                  flush=True)
+            return 4
         pilot_done = PILOT_OUT.exists()
         if not pilot_done:
+            pilot_prior = {}
+            if PILOT_PARTIAL.exists():
+                for r in json.loads(PILOT_PARTIAL.read_text(
+                        encoding="utf-8")):
+                    pilot_prior[r["problem_id"]] = r
             pilot_rows = []
             for pid in PILOT_8:
+                if pid in pilot_prior and \
+                        valid_draws(pilot_prior[pid]) >= 2:
+                    pilot_rows.append(pilot_prior[pid])
+                    print(f"  [pilot {pid[:30]:<32}] resumed",
+                          flush=True)
+                    continue
                 prob = probs[pid]
                 _generate_one(pid, prob, gw_key)
                 rec = json.loads((OUT_DIR / f"{pid}.json").read_text(
                     encoding="utf-8"))
                 row = _row_from_record(pid, rec, prob)
                 pilot_rows.append(row)
+                PILOT_PARTIAL.write_text(
+                    json.dumps(pilot_rows, indent=1, ensure_ascii=False)
+                    + "\n", encoding="utf-8")
                 time.sleep(PACE_S)
                 print(f"  [pilot {pid[:30]:<32}] nd="
                       f"{row.get('novelty_delta')} fgap="
@@ -453,7 +585,7 @@ def main() -> int:
                       json.loads(PILOT_OUT.read_text(
                           encoding="utf-8"))["rows"]}
         for pid in ALL:
-            if pid in done:
+            if pid in done and valid_draws(prior[pid]) >= 2:
                 results.append(prior[pid])
                 print(f"  [{pid[:32]:<34}] resumed", flush=True)
             elif pid in PILOT_8 and pid in pilot_rows \
