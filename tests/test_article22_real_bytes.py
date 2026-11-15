@@ -59,8 +59,16 @@ def test_article22_fixtures_declare_mechanics_only():
 
 
 def test_article22_heldout_half_flagged_not_silent():
+    """The fresh-held-out half of Art. 22 must stay FLAGGED, not
+    silent. The enforcement map 2.0.0 moved the legacy flags into
+    enforcement_flags.json's legacy_flags sub-dict (R20) — read both
+    locations; the gap must exist and stay FLAGGED in whichever form
+    carries it."""
     flags = json.loads(FLAGS.read_text())
-    assert "article22_fresh_heldout" in flags, (
+    legacy = flags.get("legacy_flags", {})
+    flags_all = {**flags, **legacy}
+    assert "article22_fresh_heldout" in flags_all, (
         "Art. 22 held-out gap is no longer flagged — acceptance must "
         "never claim held-out coverage it does not have")
-    assert str(flags["article22_fresh_heldout"]).startswith("FLAGGED")
+    assert str(flags_all["article22_fresh_heldout"]).startswith(
+        "FLAGGED")

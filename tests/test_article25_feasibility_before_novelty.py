@@ -61,10 +61,28 @@ def test_article25_physics_scope_premise_on_delivered_ideas():
 
 def test_article25_disconfirming_search_flag_is_live():
     """The un-wired half of Art. 25 (targeted disconfirming-evidence
-    search record) must stay FLAGGED, not silent."""
+    search record) must never be SILENT: either the FLAGGED legacy
+    flag, or (R20 wiring) the per-idea record check wired in CI with
+    the remaining lever (live adversarial web search) typed in the
+    enforcement map's legacy_flags. If BOTH disappear, this fails."""
     flags = json.loads(FLAGS.read_text())
-    assert "article25_disconfirming_search" in flags, (
-        "Art. 25 disconfirming-search gap is no longer flagged — "
-        "either wire the check or restore the flag")
-    assert str(flags["article25_disconfirming_search"]).startswith(
-        "FLAGGED")
+    legacy = flags.get("legacy_flags", {})
+    flags_all = {**flags, **legacy}
+    wired_record_test = (REPO / "tests"
+                         / "test_article25_disconfirming_record.py")
+    if "article25_disconfirming_search" in flags_all and str(
+            flags_all["article25_disconfirming_search"]).startswith(
+            "FLAGGED"):
+        return  # legacy form: gap flagged
+    # wired form (map 2.0.0): the record check must exist AND the map
+    # must carry the gap note (the live-search lever stays typed)
+    assert wired_record_test.exists(), (
+        "Art. 25 disconfirming-search gap is silent — neither the "
+        "FLAGGED legacy flag nor the wired record check exists")
+    assert "article25_disconfirming_search" in legacy, (
+        "Art. 25 disconfirming-search wired but the map carries no "
+        "legacy note for the remaining live-search lever")
+    assert "PARTIAL-RESOLVED" in str(
+        legacy["article25_disconfirming_search"]), (
+        "Art. 25 legacy note must type the remaining lever "
+        "(PARTIAL-RESOLVED, live adversarial web search NOT_RUN)")
