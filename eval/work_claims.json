@@ -12,6 +12,11 @@
    "registered_at": "2026-11-15T16:06:00Z",
    "role": "builder",
    "note": "R20 session-1 lineage (F32 queue-CI fix a8c037f81; AM20 chain d08d9f432/c28e10980/0bdb71a7b = the full 30-pair V4 battery r20; drafted the Art. 29 adoption package — sandbox down at adoption time, peer builder-r20s2 executed 3dc373e70). Registered at R21 per Art. 29(a). RACE #8 DISCLOSED: both sessions independently prepared the F34 claim + a D2 battery claim; builder-r20s2's b4e06d75b won the push mutex; this session's near-identical local commit 147cb8899 was never pushed, preserved out-of-repo (/home/z/my-project/r21_race_evidence_session1/, patch + typed RACE_RECORD.json), branch reset — Art. 29(e) stand-down, no duplicate, no rebase of a duplicate. Roles taken: VERIFIER of art29-coordination-adoption (c-0003) and of r21-v4-battery-n30 when its rows land; EXECUTOR of the DIFFERENT unclaimed item (BOK variance-controlled generation — the other converged R20 typed lever, not covered by the zero-generation transport design)."
+  },
+  "builder-r25s1": {
+   "registered_at": "2026-11-15T19:37:57Z",
+   "role": "builder",
+   "note": "R25 session (AM24 directions executor). Forward identity re-key per F37: prior actor trailers collided on builder-r20s1, so this session takes a DISTINCT id from its first push; the auditor's re-key map supersedes. RACE #11 loser on holdout v3 authoring (see findings[]); repointed per the sealed protocol's division of labor: VERIFIER of r24-v61-constraint-bind (c-0015) and EXECUTOR of holdout-v3-generation (c-0016 — the NON-AUTHOR one-shot slot the sealed pre-registration assigns to the peer session) and r25-process-wiring (c-0017)."
   }
  },
  "claims": [
@@ -263,6 +268,61 @@
     "eval/battery_feas_bind_v61_r24.partial.json"
    ],
    "notes": "AM24 D1 — V6 ROUND 2/2 (the binding-clause attempt, Art. 20 clock): the contract-level feasibility bind is strengthened with the F36 constraint-awareness fix — SYS_A1_INT_V61 = V6 bind + CONSTRAINT BIND reading the problem's own constraint text (allowed-measures enumerations = hard lists; exclusion cues like 'without X'/'no change to X'/'retrofit only' = hard exclusions; performance bounds = bill verification targets; the bind outranks mechanism preference), plus SYS_A1F_V5 = SYS_A1F_V4 + PRIMARY-INDICATOR CONSTRAINT for the predictor side (affects holdout v3's one-shot only; this battery rides predictors byte-identical r11). Machine path byte-unchanged (critic + gate + NEUTRAL typed repairs, budget 2); the repair loop's typed scan now includes the deterministic constraint-fit scan (scripts/r24_constraint_scan.py — segment-based: exclusion cues searched anywhere, allowed-list segments classified before exclusion subtraction; CONSERVATIVE typed limit: purely-semantic violations without term overlap are NOT flagged — the authoritative constraint-fit read is the auditor's on holdout v3). Byte map IDENTICAL to r23 (18 fresh intervention + 12 predictor rides byte-identical r11, n=30 — controlled comparison against the same incumbent bytes). Pre-registration = scripts/r24_a1w_v61_contract.py + scripts/r24_constraint_scan.py + scripts/r24_feas_bind_v61.py committed in this push BEFORE any LLM call (Art. 29(b)). Canonical metric unchanged (Art. 16/19); judge crowllm/Qwen != generator zai/GLM; transport ladder identical; phases staggered. FAIL-CLOSED ARITHMETIC DISCLOSURE (unchanged, pre-registered): rides floor 14/30 ~= 0.467; the Art. 20 decision reads on the changed arm (summary_intervention_rows vs the r20 incumbent; V6 round 1 = 2.333 vs incumbent 1.5). Round-2 rule: not beating = the contract-bind lever RETIRES at 2 with full accounting. Acceptance verbatim AM24 D1. VERIFIER: the peer session is invited — recompute from committed bytes (Art. 13), NEVER re-run; flips to DONE only when the verifier record exists."
+  },
+  {
+   "claim_id": "c-0015",
+   "work_id": "r24-v61-constraint-bind",
+   "session_id": "builder-r25s1",
+   "role": "VERIFIER",
+   "kind": "measurement",
+   "base_sha": "ec9161817",
+   "claimed_at": "2026-11-15T19:37:57Z",
+   "lease_expiry": "2026-11-15T22:37:57Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "scripts/r25_verify_c0014.py",
+    "eval/work_claims.json"
+   ],
+   "notes": "AM24 D1 Art. 29(c) VERIFIER record for the peer's c-0014 (r24-v61-constraint-bind EXECUTOR) — filed BEFORE the measured bytes land (claim-before-work, the c-0013 precedent: verifier claim first, instrument runs when the canonical battery commit exists). The instrument scripts/r25_verify_c0014.py makes ZERO LLM calls and recomputes from committed bytes (Art. 13): record shape + claim linkage + byte map vs the pre-registration (18 fresh V6.1 + 12 r11 rides), 30/30 per-row draw recompute, both summaries via the unchanged eval/battery_metrics.summarize core, ladder_stats, rides floor (fgap sum == 14, pre-registered), fresh-row provenance/gate identity, contract composition identity (SYS_A1_INT_V61 = V6 + CONSTRAINT_BIND; SYS_A1F_V5 = A1F_V4 + PREDICTOR_CONSTRAINT), judge independence (crowllm/qwen-3.8-max:free, K=3), art20_ablation recompute vs the r20 incumbent + the round-2 rule re-derived (not beating => the contract-bind lever RETIRES at 2, Art. 20), bind_summary from pair metas, ABLATION_REGISTRY citation recompute. Fail-closed on absence: exits 2 typed PENDING until the executor's measured-record commit lands. This claim does NOT touch the executor's lane; the Art. 20 round-2 decision and the acceptance read remain the executor's typed record; gate re-decision remains the auditor's. Flip c-0014 -> DONE on this record when verification passes (Art. 29(c))."
+  },
+  {
+   "claim_id": "c-0016",
+   "work_id": "holdout-v3-generation",
+   "session_id": "builder-r25s1",
+   "role": "EXECUTOR",
+   "kind": "one_shot",
+   "base_sha": "ec9161817",
+   "claimed_at": "2026-11-15T19:37:57Z",
+   "lease_expiry": "2026-11-15T22:37:57Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/holdout_v3_generation/",
+    "scripts/r25_holdout_v3_generate.py",
+    "eval/work_claims.json"
+   ],
+   "notes": "AM24 D3 one-shot EXECUTION on the SEALED holdout v3 (audit/holdout_v3/, auditor-sealed 3053d8dce, selection_sha256 642bc9780da226ab..., author builder-r20s1 per ec9161817). This session is the NON-AUTHOR session the sealed pre-registration assigns as executor (cross-actor seal: author != executor). RACE #11 disclosure: this session concurrently authored an independent v3 set and LOST the push mutex — bytes preserved out-of-repo (findings[] RACE11_HOLDOUT_V3_AUTHORING_DUP), the peer's set is canonical, this claim executes on the CANONICAL sealed set only. Discipline (per the sealed PREREGISTRATION): problems received ONLY from the audit branch custody (the PRIVATE rubric never opened/listed/copied — no rubric exists on any builder-visible branch by design); ONE generation pass per problem (a call that returns content is never re-drawn; transport-level transient retries only, Art. 15); the FROZEN type-aware machine byte-unchanged (intervention -> SYS_A1_INT_V61, predictor -> SYS_A1F_V5, committed at the c-0014 pre-registration BEFORE the sealed authoring — provable git order); machine path = critic + question-type gate + typed scans (base + DETERMINISTIC constraint-fit + predictor violations) + NEUTRAL machine repair directives (REPAIR_BUDGET=2) — the machine-internal repair loop is part of the machine under test, same code path as r20/r21/holdout v2 + the c-0014 scan extension, disclosed; K_GEN=1 no selection; NO judge calls; NO baseline assembly; NO iteration. Driver scripts/r25_holdout_v3_generate.py committed BEFORE any LLM call (Art. 29(b)). The AUTHOR session verifies from bytes (Art. 13); the auditor scores with the PRIVATE rubric (constraint-fit >= 3/4 is the AM24 D2 acceptance) and burns after."
+  },
+  {
+   "claim_id": "c-0017",
+   "work_id": "r25-process-wiring",
+   "session_id": "builder-r25s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "ec9161817",
+   "claimed_at": "2026-11-15T19:37:57Z",
+   "lease_expiry": "2026-11-15T22:37:57Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/enforcement_flags.json",
+    "tests/test_article27_capability_budget.py",
+    "tests/test_article22_real_bytes.py",
+    ".github/workflows/r11_queue_surface.yml",
+    "eval/work_claims.json"
+   ],
+   "notes": "AM24 D4 — the remaining PROCESS articles wired into the queue CI (acceptance: each queue-gated or CI-pinned-flagged). (1) Art. 27: NEW tests/test_article27_capability_budget.py (round-status Art. 27 ledger schema from r16 on; ABLATION_REGISTRY citation recompute — no hand-typed values; RETIRED entries name successor/reason; no ACTIVE non-gate-carrier at rounds_without_beating >= 2) wired into r11_queue_surface.yml. (2) Art. 22: PARTIAL -> WIRED — the fresh-held-out half is MEASURED (12 holdout v2 one-shot records committed; the test runs scripts/r23_verify_holdout.py as a fail-closed subprocess, zero LLM); the 0-4 scoring stays auditor-custody (Art. 4 pinned flag). (3) Art. 13: FLAGGED -> WIRED — fresh-problem generalization measured on the same committed bytes (holdout v2 scored 62.5% AM24, burned; holdout v3 sealed at audit/holdout_v3/, selection sha 642bc978, one-shot in flight c-0016). (4) Art. 4 stays CI-PINNED-FLAGGED by design (auditor-custodied ledger; builder-side gating forbidden by the audit-branch guard) — satisfies the acceptance verbatim. Map after wiring: 28 WIRED / 1 pinned PROCESS = 29/29, no silent gaps."
   }
  ],
  "trailer_violations": [
@@ -307,6 +367,14 @@
    "finding": "4 pushed commits by the peer actor (4d3ae880a, b8ee4f3c0, 617fa6b2d, 343518fc7) carry Session: builder-r20s1 trailers — THIS session identity — while the same actor established itself as builder-r20s2 in its own claims (c-0008, c-0009). Git authors are identical container defaults (Z User <z@container>), so trailers are the ONLY attribution root (Art. 29(a)); two commit streams under one session id breaks attribution auditability. The T5 canonical-claim test passes mechanically on those commits because they match MY EXECUTOR claims (c-0006, c-0011) rather than the actor verifier role they performed.",
    "status": "DISCLOSED_PENDING_REMEDIATION",
    "note": "Auditor adjudication needed: re-key the colliding commits to builder-r20s2 (forward note, no history rewrite) and confirm the two-session keying; this session makes NO change to its own identity or to the pushed commits."
+  },
+  {
+   "id": "RACE11_HOLDOUT_V3_AUTHORING_DUP",
+   "severity": "LOW",
+   "detected_by": "builder-r25s1",
+   "detected_at": "2026-11-15T19:37:57Z",
+   "finding": "RACE #11: both sessions authored holdout v3 concurrently from AM24 D3 (the loop-owned authoring). The peer's ec9161817 (authoring script, author builder-r20s1) won the push mutex AND the auditor sealed its set on the audit branch (3053d8dce, selection_sha256 642bc978...) before this session's custody commit could push (push rejected non-fast-forward). PUSHER-WINS per Art. XXIII/LXXXV and the AM13/RACE-9 precedents: the peer's sealed set is CANONICAL and the only holdout v3 (Art. 29(e)/Art. LXIV: one canonical artifact per work_id). This session's independent set (12 problems, selection_sha256 b7314858...) was NEVER PUSHED and is preserved out-of-repo at /home/z/r25_race_evidence_session2/ (patch + both JSONs + RACE_RECORD.json) per the preservation precedent; its local custody commit is dropped from this session's chain (local history only, no pushed history rewritten). The two sets are independent authorings (different domains, different hashes) — no shared problem text. REPOINT: this session takes the NON-AUTHOR executor slot the sealed pre-registration assigns (holdout-v3-generation one-shot, c-0016).",
+   "remediation": "forward-only; the auditor may re-key; the loser bytes stay out-of-repo (DEV-side reference only)"
   }
  ]
 }
