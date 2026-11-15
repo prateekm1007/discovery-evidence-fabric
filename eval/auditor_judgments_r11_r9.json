@@ -1,0 +1,78 @@
+{
+ "record": "auditor_judgments_r11_r9/1.0.0",
+ "audited_commit": "9570c4bc11a9cd2eaed686d5c237f7de0e240f82",
+ "at": "2026-11-15T00:00:00Z",
+ "auditor": "session auditor (Claude)",
+ "scope": "R9: battery r6 (F26 fix) audited from bytes \u2014 judge independence, curated baselines, per-axis n=30; bench-p02 auditor re-judgment vs qwen judge; fresh-pair generator/reproducibility check; F27 + crowllm re-qual + D5 verified",
+ "battery_r6_assessment": {
+  "F26_fixed": {
+   "judge": "crowllm/qwen-3.8-max:free (independent of xkiro mistral + zai GLM generators)",
+   "baselines": "CURATED 12 committed + 18 builder STANDARD_REFERENCE (legitimate standard practice, well-authored)",
+   "per_axis": "4-axis novelty/feasibility/testability/constraint",
+   "n": "30/30 valid",
+   "spread": "family independence"
+  },
+  "measurement": {
+   "novelty_delta_mean": 2.467,
+   "novelty_ci": [
+    1.797,
+    3.136
+   ],
+   "novelty_resolved_pass_under_qwen": true,
+   "feasibility_gap_mean": 2.0,
+   "feasibility_ci": [
+    1.549,
+    2.451
+   ],
+   "feasibility_resolved_fail_under_qwen": true,
+   "prefer": {
+    "a1": 18,
+    "baseline": 12
+   }
+  },
+  "F28_judge_miscalibration": "bench-p02 qwen rates standard Pb-Ca-Si baseline novelty 3 > pure-Sn plating A1 2 (REVERSED \u2014 plating is the departure); feasibility_a1=1 vs auditor 3 (harsh); kappa 0.40 (<0.6). Feasibility gap magnitude partly bias; direction (gap>0.25) agrees with auditor",
+  "F29_generator_confound": "18 fresh A1 = raw mistral-14b generations (not curated GLM delivery); weaker generator inflates feasibility gap; fresh A1 answers NOT committed as bytes (axes+prompt_hash only) -> auditor cannot fully re-judge fresh pairs",
+  "dev12_subset_battery": "novelty mean 1.38, feasibility mean 1.69 (qwen) vs auditor 0.8/0.5 \u2014 judge divergence on SAME curated answers"
+ },
+ "auditor_authoritative_gate": {
+  "n_pairs": 10,
+  "basis": "auditor per-axis on curated delivery vs curated standard baseline (R7, unchanged)",
+  "novelty_delta_mean": 0.8,
+  "novelty_ci95_t": [
+   0.14,
+   1.46
+  ],
+  "feasibility_gap_mean": 0.5,
+  "feasibility_ci95_t": [
+   0.12,
+   0.88
+  ],
+  "state": "NOT_MET (unresolved at n=10)"
+ },
+ "gate_decision": {
+  "state": "NOT_MET",
+  "feasibility_clause": "FAILS \u2014 A1 less feasible than standard practice; robust across auditor n=10 (gap 0.5>0.25) AND battery n=30 (gap 2.0, CI>0.25). The binding capability constraint: novel ideas are insufficiently feasible-competitive",
+  "novelty_clause": "direction positive (A1 more novel, both measurements); battery resolves-pass at n=30 under qwen but NOT authoritatively adopted pending F28 judge recalibration + F29 committed fresh answers + auditor re-judgment",
+  "note": "battery r6 is valid measurement infrastructure (F26 closed) but its gate computation is conditional on a miscalibrated judge + confounded fresh generator; the feasibility failure direction is robust"
+ },
+ "holdout_precondition": {
+  "infeasible_or_invalid_count": 0,
+  "clean_count": 12,
+  "state": "MET"
+ },
+ "substance_tally": {
+  "a1": 7,
+  "baseline": 2,
+  "tie": 1,
+  "rater": "single, provisional"
+ },
+ "verified_other": {
+  "F27": "LOCAL rung TCP reachability gating, 37/37 tests",
+  "crowllm_requal": "qwen-3.8-max:free 30/30 calibration 1.0 (deepseek-v4-flash 503 dead); rung change pending adoption",
+  "D5": "gemini-3-flash 10/10 cross-family, A1 5:2 bias input",
+  "baselines": "18+2 STANDARD_REFERENCE legitimate"
+ },
+ "gold_set_self_check": {
+  "result": "10/10 consistent (delivery); bench-p02 qwen novelty reversal flagged F28"
+ }
+}
