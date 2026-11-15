@@ -690,13 +690,24 @@ def _check_nyquist(answer, prob_txt):
 #: an explicit declaration that the spectral computation runs AT the
 #: sensor, on the high-rate stream, BEFORE the historian — the only
 #: way a band above the logged Nyquist is measurable (AM5 F23 repair
-#: shape: 'computed at the sensor edge on the existing 1 kHz waveform')
+#: shape: 'computed at the sensor edge on the existing 1 kHz waveform').
+#: R10 broadening (measured false-kill, typed): natural phrasings the
+#: narrow regex missed — 'The system continuously computes the 0-500 Hz
+#: kurtosis from the 1 kHz accelerometer stream and logs the single
+#: value to SCADA every second' (eval-new06 repair leg) — the added
+#: patterns require a computation VERB + the kHz stream as the data
+#: source; 'edge device' alone is NOT sufficient (it names hardware,
+#: not the data path).
 _EDGE_COMPUTE = re.compile(
     r"at the sensor|sensor[- ]side|sensor edge|at[- ]source|"
     r"edge (?:compute|computing|computation|dsp|processing|node)|"
     r"on[- ]board (?:dsp|compute|processing|fft)|"
     r"before the historian|"
     r"on the (?:existing )?\d+\s?khz (?:stream|waveform|signal|channel)|"
+    r"comput(?:e|ed|es|ing) [^.]{0,80}from the \d+\s?khz"
+    r"[^.]{0,60}(?:stream|waveform|signal|channel)|"
+    r"comput(?:e|ed|es|ing) [^.]{0,60}on the \d+\s?khz"
+    r"[^.]{0,40}(?:stream|waveform|signal|channel)|"
     r"comput(?:e|ed|ing) (?:at|on|from) the (?:sensor|existing "
     r"\d+\s?khz|high[- ]rate)", re.IGNORECASE)
 
