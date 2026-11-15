@@ -1,0 +1,332 @@
+{
+ "eval_version": "holdout-v1-rubric",
+ "PRIVATE": "auditor and owner only; never given to the builder, the pipeline, or the automated judge",
+ "problems_selection_sha256": "57be8218d1fa681c972ff80d084f55666a53a640b3aa4aeb6c02be5ce9c6b107",
+ "tiers": {
+  "K": "known-answer: documented failure with established mitigation; score key_elements coverage",
+  "D": "debated/open: score feasibility, constraint fit, specificity and non-obviousness; no single right answer"
+ },
+ "scoring": "per problem 0-4 on: question answered, key_elements covered (K) or quality checks met (D), commits to numbers with labelled assumptions, falsifier is testable; plus red-flag penalties",
+ "rubrics": [
+  {
+   "problem_id": "HO-01-wind-gearbox-wec",
+   "tier": "D",
+   "key_elements": [
+    "acknowledges multi-factor causation (transient torque or slip, hydrogen from lubricant breakdown, stray electrical current) rather than one cause",
+    "names at least two retrofit-compatible measures: coated rollers or rings (black oxide or DLC), bearing steel or heat-treatment change, lubricant or additive change, electrical insulation or grounding, control limits on torque reversals",
+    "falsification test is a rig or field comparison under transient loading with treated vs untreated bearings and a defined life or crack-count criterion"
+   ],
+   "red_flags": [
+    "asserts one definitive root cause",
+    "requires a new bearing envelope or gearbox redesign (violates the constraint)"
+   ]
+  },
+  {
+   "problem_id": "HO-02-liion-lithium-plating",
+   "tier": "K",
+   "key_elements": [
+    "temperature- and state-of-charge-dependent charge-current derating instead of one fixed rate",
+    "heating before or during cold charge (internal self-heating or thermal system), and handling of the pack temperature gradient",
+    "anode-potential-aware charge control (model-based or reference-estimated) keeping anode potential above 0 V vs Li/Li+, or electrolyte/anode design levers",
+    "falsification via 0 C cycling with plating detection (voltage plateau/dV/dQ, post-mortem) against a capacity-loss criterion"
+   ],
+   "red_flags": [
+    "just charge slower everywhere (ignores the 25-minute requirement at 25 C)",
+    "ignores thermal gradients across the pack after the follow-up finding"
+   ]
+  },
+  {
+   "problem_id": "HO-03-gas-turbine-tbc-spallation",
+   "tier": "K",
+   "key_elements": [
+    "identifies TGO (alumina) growth and its stresses at the bond-coat interface as the driver, and frames limits around TGO thickness",
+    "bond-coat measures: aluminium reservoir (aluminide or Al-rich MCrAlY), reactive elements (Y, Hf), pre-oxidation to form slow-growing alpha-alumina",
+    "strain-tolerant top-coat microstructure (columnar EB-PVD or segmented/dense vertically cracked)",
+    "falsification via furnace thermal-cycling to spallation with TGO thickness measured by SEM against the 600-cycle target; after the follow-up, moves toward bond-coat Al depletion"
+   ],
+   "red_flags": [
+    "changes the substrate alloy or exceeds 400 micrometres",
+    "ignores the stated TGO variable"
+   ]
+  },
+  {
+   "problem_id": "HO-04-hydraulic-cylinder-rod-seal",
+   "tier": "D",
+   "key_elements": [
+    "seal material and geometry appropriate to minus 25 C (low-temperature elastomer grade or PTFE-based capped seal with energizer, tandem or buffer arrangement, wiper)",
+    "explains persistence after warm-up (permanent set, hardening, or damaged sealing lip) rather than only cold stiffness",
+    "stays inside the gland dimensions and fluid constraint",
+    "falsification via cold-chamber stroke test measuring friction and leakage per stroke"
+   ],
+   "red_flags": [
+    "changes the fluid grade or rod coating",
+    "requires a new gland"
+   ]
+  },
+  {
+   "problem_id": "HO-05-bridge-deck-chloride-corrosion",
+   "tier": "K",
+   "key_elements": [
+    "lower-permeability concrete (supplementary cementitious materials, low water-to-cement ratio) and greater cover",
+    "corrosion-resistant reinforcement (stainless, GFRP, or equivalent) and/or inhibitors, sealers or membranes; notes epoxy-coated rebar has a mixed field record",
+    "service-life reasoning via chloride diffusion modelling or testing, not only material lists",
+    "falsification via chloride-profile/diffusion tests plus half-cell or corrosion-rate monitoring against a 75-year projection"
+   ],
+   "red_flags": [
+    "only says use better concrete without addressing chloride transport",
+    "ignores the whole-life cost or closure constraint"
+   ]
+  },
+  {
+   "problem_id": "HO-06-aircraft-lap-joint-fatigue",
+   "tier": "K",
+   "key_elements": [
+    "treatments that retard crack initiation at hole edges: cold expansion or interference-fit fasteners, peening, improved hole quality",
+    "addresses fretting and secondary bending at the faying surface (sealant or coating, bonded strap or doubler within the mass limit)",
+    "does not replace skin panels or change the outer mould line",
+    "falsification via constant- and variable-amplitude coupon fatigue tests with a 2x life or initiation-life criterion"
+   ],
+   "red_flags": [
+    "panel replacement",
+    "ignores the stated faying-surface origin"
+   ]
+  },
+  {
+   "problem_id": "HO-07-igbt-power-cycling",
+   "tier": "K",
+   "key_elements": [
+    "interconnect upgrade: copper wire bonds, ribbons or clips, and/or sintered-silver die attach",
+    "reduces thermal-expansion mismatch (matched substrate or baseplate) or reduces the junction-temperature swing by control or cooling",
+    "falsification via accelerated power-cycling with on-state voltage and thermal-resistance end-of-life criteria"
+   ],
+   "red_flags": [
+    "improves cooling only without addressing the swing or interconnect failure mechanisms"
+   ]
+  },
+  {
+   "problem_id": "HO-08-uhmwpe-hip-liner",
+   "tier": "K",
+   "key_elements": [
+    "highly crosslinked UHMWPE with elimination of residual free radicals (remelting or annealing) or antioxidant stabilization (vitamin E)",
+    "recognizes the crosslinking versus fatigue-strength trade-off and how stabilization manages it",
+    "sterilization route that avoids creating oxidizable radicals (inert-atmosphere irradiation, ethylene oxide, or gas plasma)",
+    "falsification via hip-simulator wear, accelerated oxidative ageing and fatigue-crack-propagation tests"
+   ],
+   "red_flags": [
+    "ignores the fatigue-strength trade-off",
+    "changes liner geometry"
+   ]
+  },
+  {
+   "problem_id": "HO-09-hpdc-motor-housing-porosity",
+   "tier": "K",
+   "key_elements": [
+    "targets shrinkage at the bosses: local cooling or spot cooling, squeeze or intensification, gating or overflow redesign",
+    "also addresses gas porosity: vacuum assistance, venting, shot profile, melt degassing, die-lubricant gas",
+    "treats impregnation as a secondary measure, not the main fix",
+    "falsification via CT or X-ray porosity mapping and leak-rate statistics in a designed experiment against the scrap target"
+   ],
+   "red_flags": [
+    "impregnation only",
+    "ignores the stated boss shrinkage location"
+   ]
+  },
+  {
+   "problem_id": "HO-10-s690-weld-hydrogen-cracking",
+   "tier": "K",
+   "key_elements": [
+    "reduces diffusible hydrogen (low-hydrogen consumables, dry shielding and joint cleanliness) toward below about 5 mL per 100 g",
+    "preheat and controlled interpass temperature and heat input to slow cooling and let hydrogen escape; post-heat hydrogen release instead of full post-weld heat treatment",
+    "uses the follow-up numbers (410 HV10 HAZ, 8 mL per 100 g hydrogen) to justify the changes",
+    "falsification via implant, Tekken or controlled-thermal-severity cracking tests and delayed NDT after 48 hours"
+   ],
+   "red_flags": [
+    "post-weld furnace heat treatment",
+    "ignores restraint and hydrogen measurement"
+   ]
+  },
+  {
+   "problem_id": "HO-11-pex-chlorine-embrittlement",
+   "tier": "K",
+   "key_elements": [
+    "antioxidant or stabilizer package suited to chlorine/chlorine-dioxide exposure, or a protective inner or barrier layer",
+    "considers material alternatives or temperature and dose limits without breaking the fitting dimension constraint",
+    "falsification via accelerated pressurized chlorinated-water tests at elevated temperature with life extrapolation to 50 years"
+   ],
+   "red_flags": [
+    "raises wall thickness only",
+    "ignores the dosing level"
+   ]
+  },
+  {
+   "problem_id": "HO-12-vanadium-flow-battery-fade",
+   "tier": "D",
+   "key_elements": [
+    "separates crossover-driven imbalance from side-reaction drift and proposes a rebalancing (remixing) strategy compatible with no replacement",
+    "membrane option with lower vanadium permeability weighed against resistance and efficiency limits",
+    "operating-window measures (state-of-charge limits, temperature, pressure balance)",
+    "falsification via permeation measurement and capacity-retention cycling against the efficiency floor"
+   ],
+   "red_flags": [
+    "replaces the electrolyte",
+    "ignores the efficiency floor"
+   ]
+  },
+  {
+   "problem_id": "HO-13-liquid-cooling-galvanic-corrosion",
+   "tier": "D",
+   "key_elements": [
+    "breaks or manages the copper-aluminium galvanic couple (isolation, coating, or inhibitor package suited to both metals)",
+    "coolant chemistry control and monitoring (inhibitor level, pH, conductivity) and filtration",
+    "respects the no-manifold-change and pump-compatibility constraints",
+    "falsification via coupon immersion and accelerated loop ageing tracking pressure drop and thermal resistance"
+   ],
+   "red_flags": [
+    "replaces the manifold alloy"
+   ]
+  },
+  {
+   "problem_id": "HO-14-water-main-surge",
+   "tier": "K",
+   "key_elements": [
+    "surge protection sized by transient analysis: air vessel or surge tank, one-way tank, air and vacuum valves, or controlled non-slam check valves",
+    "addresses the down-surge and column separation at the high point as the follow-up shows, not only the up-surge",
+    "pump-side measures (flywheel inertia, controlled ramp-down) as options",
+    "falsification via method-of-characteristics transient simulation and a staged pump-trip field test with pressure loggers"
+   ],
+   "red_flags": [
+    "ignores column separation",
+    "relies only on thicker pipe"
+   ]
+  },
+  {
+   "problem_id": "HO-15-railway-point-machine",
+   "tier": "D",
+   "key_elements": [
+    "features from the per-movement current profile (energy or area, peak and inrush, duration, plateau level) trended against each machine's own baseline",
+    "a persistence rule and relative threshold, not one fixed absolute value for all machines",
+    "retrospective validation on logs with labelled failures, reporting lead time and false alarms per machine-month"
+   ],
+   "red_flags": [
+    "requires new sensors",
+    "fixed fleet-wide absolute threshold"
+   ]
+  },
+  {
+   "problem_id": "HO-16-wind-gearbox-oil-debris",
+   "tier": "K",
+   "key_elements": [
+    "cumulative debris count or mass and its rate of rise against each turbine's own post-run-in baseline",
+    "confirmation with a vibration feature to cut false alarms",
+    "persistence-based threshold expressed as a multiple of baseline rate",
+    "retrospective validation against teardown-confirmed damage"
+   ],
+   "red_flags": [
+    "single fixed absolute count across all turbines"
+   ]
+  },
+  {
+   "problem_id": "HO-17-liion-internal-short",
+   "tier": "D",
+   "key_elements": [
+    "uses rest-period voltage decay or self-discharge rate of each cell relative to its siblings after balancing",
+    "robust statistical threshold on the cell-to-pack distribution, plus a persistence rule",
+    "exploits the stated 6-hour rest window",
+    "validation with seeded or emulated shorts plus a fleet false-alarm estimate"
+   ],
+   "red_flags": [
+    "needs sensors that are not available",
+    "ignores the rest-period variable"
+   ]
+  },
+  {
+   "problem_id": "HO-18-dc-link-capacitor-wearout",
+   "tier": "K",
+   "key_elements": [
+    "ESR (or ripple-voltage-to-ripple-current ratio) trended over time as the primary indicator",
+    "temperature compensation of the indicator (life roughly halves per 10 C rise)",
+    "threshold relative to initial ESR (an end-of-life criterion around 2 times initial) with margin for 6 months of warning",
+    "validation by accelerated life test at upper category temperature; after the follow-up accounts for heatsink-proximity temperature differences"
+   ],
+   "red_flags": [
+    "fixed absolute ESR value regardless of unit or temperature"
+   ]
+  },
+  {
+   "problem_id": "HO-19-corrosion-under-insulation",
+   "tier": "K",
+   "key_elements": [
+    "risk indicator combining operating-temperature window (roughly minus 4 to 175 C, highest near cycling or intermittent service), insulation and jacket condition or age, and geometry",
+    "screening measurement such as moisture detection or pulsed eddy current to rank segments",
+    "validation by strip-and-inspect of a statistical sample with hit-rate and miss-rate against the 10 percent miss limit"
+   ],
+   "red_flags": [
+    "proposes stripping all insulation"
+   ]
+  },
+  {
+   "problem_id": "HO-20-pem-electrolyser-membrane-thinning",
+   "tier": "K",
+   "key_elements": [
+    "fluoride emission rate in the effluent water as the primary chemical-degradation indicator, trended against baseline",
+    "complementary online signals: hydrogen-in-oxygen crossover and high-frequency resistance trend",
+    "threshold as a sustained multiple of baseline emission rate",
+    "validation by accelerated stress testing with post-mortem membrane thickness measurement"
+   ],
+   "red_flags": [
+    "focuses on catalyst loss",
+    "requires disassembly"
+   ]
+  },
+  {
+   "problem_id": "HO-21-double-mechanical-seal",
+   "tier": "D",
+   "key_elements": [
+    "barrier-fluid consumption rate and temperature-rise rate normalized by operating condition",
+    "barrier-pressure decay as a second indicator",
+    "relative-to-baseline threshold with persistence, validated retrospectively on seal-failure history"
+   ],
+   "red_flags": [
+    "requires new sensors"
+   ]
+  },
+  {
+   "problem_id": "HO-22-dialyser-clotting",
+   "tier": "D",
+   "key_elements": [
+    "transmembrane-pressure rise slope at constant ultrafiltration rate and blood flow, relative to the patient's own prior sessions",
+    "supporting pre-dialyser pressure trend",
+    "validation against measured clearance and clot scoring; avoids prescribing anticoagulant changes as the predictor itself"
+   ],
+   "red_flags": [
+    "needs a new sensor",
+    "fixed absolute pressure limit for all patients"
+   ]
+  },
+  {
+   "problem_id": "HO-23-titanium-end-mill-wear",
+   "tier": "K",
+   "key_elements": [
+    "spindle-power trend and a high-frequency vibration band feature, calibrated to flank wear VB by interrupted wear tests",
+    "normalizes against each tool's own early baseline and the lot hardness variation instead of one fixed absolute threshold",
+    "persistence-based relative threshold giving at least 5 minutes of lead",
+    "validation by interrupted wear runs measuring VB under a microscope"
+   ],
+   "red_flags": [
+    "fixed absolute power threshold ignoring lot variation"
+   ]
+  },
+  {
+   "problem_id": "HO-24-superheater-tube-creep",
+   "tier": "K",
+   "key_elements": [
+    "steam-side oxide scale thickness measurement as the indicator of accumulated metal temperature exposure",
+    "converts scale thickness and wall measurements into temperature and stress, then into remaining life via a Larson-Miller type creep-rupture relation",
+    "calibration or validation against a few sacrificial tube samples or creep tests, with a stated uncertainty"
+   ],
+   "red_flags": [
+    "requires removing tubes for all 400 circuits"
+   ]
+  }
+ ]
+}
