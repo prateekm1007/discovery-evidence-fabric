@@ -1,0 +1,23 @@
+{
+ "problem_id": "eval-new12-axle-bearing-predictor",
+ "a1_source": "SYS_A1F_V4/r20_full_battery",
+ "question_type": "predictor-design",
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme using acoustic signature analysis to detect spall-induced impacts; departure is using the timing correlation between impact events and wheel-rail contact forces to detect early-stage subsurface crack formation before spall debris generation. This works because crack initiation alters the local stiffness, causing a measurable phase shift in the impact timing relative to the wheel's position.\n\nPHYSICS CHECK\nThe governing physical relation is the phase shift δt = (ΔL)/(v), where ΔL is the crack-induced length change in the bearing raceway and v is the wheel velocity. For a 0.1 mm crack in a 300 mm diameter bearing at 100 km/h wheel speed, δt ≈ 3.3 μs, which is detectable with cross-correlation techniques on microphone arrays with sampling rates >100 kHz.\n\nIMPLEMENTATION BILL\n1. Wayside acoustic microphone array (ALREADY-RECORDED) - captures bearing impact sounds\n2. Wheel-impact-load-detector (ALREADY-RECORDDED) - provides wheel position and load timing reference\n3. Signal processing system (new) - performs cross-correlation between impact events and wheel position signals\n4. Timing analysis software (new) - calculates phase shifts between impact events and wheel-rail contact points\n5. Threshold calculator (new) - computes baseline timing from healthy bearings\n\nReference threshold: DERIVED from stated physics - Δt_critical = (0.05 mm)/(v_wheel), where v_wheel is the wheel velocity (stated operational parameter). At 100 km/h (27.8 m/s), Δt_critical = 1.8 μs.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME - uses existing wayside infrastructure, no new trackside hardware\n- Operability: SAME - automated processing, no additional operator intervention required\n- Maintenance: SAME - no additional maintenance beyond standard wayside equipment upkeep\n- Cost class: SAME - software upgrade to existing systems, no additional hardware required\n- Burden difference: None - achieves same burden class with different mechanism\n\nEXECUTABLE TEST\nProtocol: Record acoustic data from wayside station while collecting simultaneous wheel-impact-load-detector data for 30 days on a fleet of 100 freight wagons. Analyze for timing correlations between bearing impacts and wheel-rail contact points.\n\nInstruments: Existing wayside acoustic microphone array, existing wheel-impact-load-detector, standard data processing system.\n\nPass/fail threshold: Detection of timing phase shift >1.8 μs (CALCULATED threshold) in at least 90% of bearings that subsequently develop spalls within 60 days.\n\nDuration: 30 days of continuous monitoring.\n\nKill criterion: If fewer than 90% of bearings that develop spalls within 60 days show the timing phase shift above threshold, the predictor is falsified.",
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 5.8,
+   "chars": 2787
+  }
+ ],
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "violations": {},
+  "repairs": 0
+ },
+ "generated_at": "2026-11-15T14:28:15.710814Z"
+}

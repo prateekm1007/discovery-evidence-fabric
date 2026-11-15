@@ -1,7 +1,151 @@
 {
- "record": "ENFORCEMENT_FLAGS/1.0.0 (v3.0.0: an article without a passing CI check is not enforced and must be flagged)",
- "at": "2026-11-15",
- "article20_incumbent_challenge": "FLAGGED: no stage/incumbent ablation-registry artifact exists to check (the release registry is ship-manifest only); the challenge ledger (new stage vs cheapest working arm, 2-round auto-retire) must be created before the check can be wired",
- "article25_disconfirming_search": "FLAGGED: delivered answers carry PHYSICS CHECK (checked, Art. 25 test 1) but no targeted disconfirming-evidence-search record artifact; contract hardening queued for the next generation round",
- "article22_fresh_heldout": "FLAGGED: acceptance rides committed real bytes (checked, Art. 22 test 1) but the fresh-held-out half awaits holdout v2 owner authorization (owner_action_register.json, rounds_pending tracked)"
+ "record": "ENFORCEMENT_MAP/2.0.0 (v3.0.0: every article is queue-gated by a passing CI check, or CI-pinned-flagged with the gap typed — no silent gaps)",
+ "at": "2026-11-15 (R20, AM20 D2)",
+ "article_map": {
+  "1": {
+   "article": "Evidence & provenance",
+   "status": "PROCESS",
+   "mechanism": "auditor-enforced on every round (provenance fields in every record; Art. 13 recompute discipline)"
+  },
+  "2": {
+   "article": "Verifier independence & self-attack",
+   "status": "WIRED",
+   "mechanism": "tests/test_adversarial_infra_separation.py + adversarial answer-contract suites"
+  },
+  "3": {
+   "article": "Fail closed",
+   "status": "WIRED",
+   "mechanism": "typed refusals asserted in tests/test_adversarial_infra_separation.py; drivers fail closed on incomplete pools (battery drivers' assert gates)"
+  },
+  "4": {
+   "article": "History & corrections",
+   "status": "PROCESS",
+   "mechanism": "auditor ledger + amendments; corrections recorded per round (M9/M10 stand)"
+  },
+  "5": {
+   "article": "Disclosure",
+   "status": "PROCESS",
+   "mechanism": "disclosure sections in every round record + status files; races/estimates typed"
+  },
+  "6": {
+   "article": "Anti-gaming",
+   "status": "WIRED",
+   "mechanism": "tests/test_attack_ab_qualifier.py + tests/test_answer_contract_adversarial.py"
+  },
+  "7": {
+   "article": "Viewport, repo & artifact",
+   "status": "WIRED",
+   "mechanism": "tests/test_audit_branch_guard.py + cemetery preservation suites"
+  },
+  "8": {
+   "article": "Unknown & commercial honesty",
+   "status": "PROCESS",
+   "mechanism": "ASSUMPTION/CALCULATED/USER-CONSTRAINT labeling enforced in the answer contracts and the critic; commercial claims scoped in records"
+  },
+  "9": {
+   "article": "Thresholds",
+   "status": "PROCESS",
+   "mechanism": "AM14 D5 thresholds verbatim in the shared summarize() (owner-defined, class BUYER_DEFINED)"
+  },
+  "10": {
+   "article": "Generator/verifier separation",
+   "status": "WIRED",
+   "mechanism": "judge != generator asserted in every battery record (crowllm/Qwen vs zai/GLM) + test_adversarial_infra_separation.py"
+  },
+  "11": {
+   "article": "Independence tracked",
+   "status": "PROCESS",
+   "mechanism": "provider+family provenance fields in every judged row"
+  },
+  "12": {
+   "article": "Stage calibration, falsification & learning",
+   "status": "WIRED",
+   "mechanism": "tests/test_r377_invention_quality_cycle.py + critic regression surfaces (zero-LLM)"
+  },
+  "13": {
+   "article": "Fresh-problem generalization",
+   "status": "FLAGGED",
+   "reason": "sealed holdout score requires holdout v2 (auditor-authored, owner-custodied) — owner_action_register ESCALATED; batteries cannot prove generalization"
+  },
+  "14": {
+   "article": "The Invention Gate",
+   "status": "WIRED",
+   "mechanism": "AM14_D5_point_estimate + r7_comparable_CI computed in the shared metric core (eval/battery_metrics.summarize) on every battery"
+  },
+  "15": {
+   "article": "Infra failure & reproducibility",
+   "status": "WIRED",
+   "mechanism": "partial-record resume discipline in every battery driver + AM19 sec.2 determinism finding recorded"
+  },
+  "16": {
+   "article": "Retirement",
+   "status": "PROCESS",
+   "mechanism": "deletion accounting per round (Art. 16 sections in status records; one canonical metric)"
+  },
+  "17": {
+   "article": "Secrets & credential custody",
+   "status": "WIRED",
+   "mechanism": "vault-only custody (.env.keys, names-only echo); F33 recorded; remote moved off embedded-token URL this round"
+  },
+  "18": {
+   "article": "Durable execution & push",
+   "status": "PROCESS",
+   "mechanism": "push discipline per round; durable artifacts committed (scripts + records); queue CI verifies on push"
+  },
+  "19": {
+   "article": "Metric unit tests",
+   "status": "WIRED",
+   "mechanism": "tests/test_article19_metric_unit_tests.py"
+  },
+  "20": {
+   "article": "Incumbent challenge",
+   "status": "WIRED",
+   "mechanism": "eval/ABLATION_REGISTRY.json + tests/test_article20_ablation_registry.py (built R20; numbers recomputed from cited records)"
+  },
+  "21": {
+   "article": "Label integrity",
+   "status": "WIRED",
+   "mechanism": "tests/test_article21_label_integrity.py"
+  },
+  "22": {
+   "article": "Real-bytes acceptance",
+   "status": "PARTIAL",
+   "mechanism": "tests/test_article22_real_bytes.py (committed-bytes half); fresh-held-out half FLAGGED pending holdout v2; fixtures labeled mechanics-only"
+  },
+  "23": {
+   "article": "Clean delivery",
+   "status": "WIRED",
+   "mechanism": "tests/test_article23_clean_delivery.py"
+  },
+  "24": {
+   "article": "Lead preservation",
+   "status": "PROCESS",
+   "mechanism": "ACTIVE_PATH.md maintained per round; cemetery chain suites preserve dead leads"
+  },
+  "25": {
+   "article": "Feasibility before novelty",
+   "status": "WIRED",
+   "mechanism": "tests/test_article25_feasibility_before_novelty.py + tests/test_article25_disconfirming_record.py (record built R20; live adversarial search flagged in-record)"
+  },
+  "26": {
+   "article": "Provider spread",
+   "status": "WIRED",
+   "mechanism": "tests/test_article26_provider_spread.py"
+  },
+  "27": {
+   "article": "Capability budget",
+   "status": "PARTIAL",
+   "mechanism": "engine-diff accounting in every round status record (Art. 27 sections); no standalone CI test asserts the ledger schema yet — flagged, wiring queued"
+  },
+  "28": {
+   "article": "Owner-dependency timeout & escalation",
+   "status": "WIRED",
+   "mechanism": "tests/test_article28_owner_dependency.py + eval/owner_action_register.json"
+  }
+ },
+ "legacy_flags": {
+  "article20_incumbent_challenge": "RESOLVED R20: registry artifact built + CI-wired (numbers recomputed from cited battery records; PENDING_MEASUREMENT entry for the running full battery is typed, not invented)",
+  "article25_disconfirming_search": "PARTIAL-RESOLVED R20: per-idea record compiled from committed bytes + CI-wired; live adversarial web search remains the flagged lever (in-record, NOT_RUN)",
+  "article22_fresh_heldout": "FLAGGED (unchanged): awaits holdout v2 owner authorization"
+ }
 }

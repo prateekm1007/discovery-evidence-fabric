@@ -1,0 +1,23 @@
+{
+ "problem_id": "eval-sofc-redox",
+ "a1_source": "SYS_A1_INT_V4/r20_full_battery",
+ "question_type": "intervention-proposal",
+ "a1_answer": "# NOVELTY STATEMENT (INTERVENTION)\nThe intervention proposes introducing a secondary, redox-inactive phase with controlled porosity into the Ni-YSZ anode structure to act as a mechanical buffer during redox cycling. Standard practice uses pure Ni-YSZ composites without buffering phases, which directly experience volume changes during redox cycling. Our mitigation departs by adding a sacrificial, compliant phase that accommodates strain without transferring stress to the anode-electrolyte interface. The closest existing practice is the addition of pore formers to increase porosity, but our approach differs by using a mechanically compliant redox-inactive phase that specifically buffers strain rather than merely creating void space. This intervention attacks the failure mechanism by providing a deformable matrix that absorbs the volumetric expansion of nickel re-oxidation, preventing the buildup of tensile stress at the critical anode-electrolyte interface.\n\n# PHYSICS CHECK\nThe governing physical relation is the strain accommodation capacity: Δε_buffer = σ_max / E_composite, where σ_max is the maximum tolerable stress before delamination (≈50 MPa for YSZ) and E_composite is the elastic modulus of the buffered anode. By introducing a 10 vol% compliant phase (e.g., spinel, E≈150 GPa) into the Ni-YSZ anode (E≈200 GPa), we reduce the composite elastic modulus by approximately 15%, increasing the allowable strain by 15% before reaching the critical stress. This directly reduces the stress transferred to the anode-electrolyte interface during re-oxidation, where the volume change ΔV/V = 17% for Ni→NiO is the primary driver of failure.\n\n# IMPLEMENTATION BILL\nStandard practice components (baseline):\n- NiO-YSZ anode support (60 vol% NiO, 40 vol% YSZ)\n- YSZ electrolyte\n- LSCF-YSZ cathode\n\nIntervention components:\n1. 5 vol% spinel (MgAl2O4) powder added to NiO-YSZ anode support mixture (b) - procurable standard ceramic powder\n2. Anode support fabrication process modified to include 5 vol% sacrificial pore former (e.g., graphite flakes) (c) - parameter change to existing process\n3. Sintering profile adjusted to create controlled porosity around spinel particles (c) - parameter change to existing process\n4. Standard NiO reduction procedure maintained (a) - existing procedure\n\n# BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Material addition: 5 vol% spinel powder - minor cost increase, same processing class (b)\n- Process modification: Porosity control adjustment - no new equipment, existing sintering furnace (c)\n- Quality control: Added microscopy to verify spinel distribution - within existing analytical capabilities (a)\n- Burden class: Same as standard practice - no new hardware classes, no exotic materials, only minor formulation and parameter changes to existing processes\n\n# EXECUTABLE TEST\nProtocol: Subject cells to 200 redox cycles (30 min reduction in H2 at 750°C, 30 min oxidation in air at 750°C) with measurement of:\n1. Anode-electrolyte interface delamination area via acoustic emission monitoring\n2. Power density degradation at 0.7 V\n3. Post-test microstructural analysis of anode for nickel agglomeration and spinel distribution\n\nPass/fail criteria:\n- Pass: <5% delamination area after 200 cycles AND power density ≥0.35 W/cm² at 0.7 V after 200 cycles AND no agglomeration >5 μm in anode microstructure\n- Fail: >10% delamination area OR power density <0.30 W/cm² at 0.7 V after 200 cycles OR agglomeration >10 μm\n\nDuration: Test duration approximately 300 hours (including conditioning)\nKill criterion: Immediate termination if cell voltage drops below 0.6 V during any cycle or if visual inspection reveals cracks >100 μm",
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 10.5,
+   "chars": 3670
+  }
+ ],
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "violations": {},
+  "repairs": 0
+ },
+ "generated_at": "2026-11-15T14:28:15.710814Z"
+}

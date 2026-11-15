@@ -1,0 +1,31 @@
+{
+ "problem_id": "bench-p12-mbr-fouling",
+ "a1_source": "SYS_A1_INT_V4/r20_full_battery",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nTo prevent soluble microbial product and extracellular polymeric substance fouling in submerged hollow-fiber membrane bioreactors, I propose implementing a pulsed backwash with air scour and periodic relaxation cycles that creates shear forces at the membrane surface while minimizing biofilm consolidation. Standard practice uses continuous air scour and regular backwashing with constant flow rates, which creates steady-state conditions that allow SMP/EPS to accumulate and form consolidated layers. My mitigation introduces time-varying hydrodynamic forces that disrupt the early stages of biofilm formation before consolidation occurs. The closest existing practice is periodic backwashing in membrane systems, but my approach differs by precisely timing relaxation cycles with air scour pulses to maximize shear stress at the membrane surface during critical fouling formation periods, rather than using continuous or randomly timed backwash cycles.\n\nPHYSICS CHECK\nThe governing physical relation is the shear stress at the membrane surface: τ = μ(du/dy), where μ is dynamic viscosity and du/dy is the velocity gradient. By introducing pulsed backwash with air scour, we create transient high-velocity gradients (du/dy) that exceed the critical shear stress required to detach nascent SMP/EPS deposits (τ_critical ≈ 0.5-2 Pa for biofilms). The magnitude verification shows that pulsed air scour can generate shear stresses of 3-5 Pa during peaks, which is 3-10 times higher than continuous air scour (0.3-0.5 Pa), sufficient to disrupt early-stage fouling before consolidation occurs.\n\nIMPLEMENTATION BILL\nStandard Practice Components:\n- Continuous air scour system (existing)\n- Regular backwash pump (existing)\n- Chemical cleaning system (existing)\n\nProposed Intervention Components:\n1. Programmable logic controller (PLC) with timing module (b) - to control pulsed operation\n2. Air scour solenoid valve with adjustable timing (b) - to create pulsed air flow\n3. Backflow pump with variable frequency drive (VFD) (b) - to generate pulsed backwash flow\n4. Relaxation cycle timer program (c) - implemented in existing PLC\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Standard practice: Continuous air scour (24/7 operation) + regular backwash (every 30-60 minutes)\n- Proposed intervention: \n  * Air scour: 2 minutes on/8 minutes off cycle (reduces air compressor runtime by ~75%)\n  * Backwash: 1 minute pulse every 30 minutes (same flow rate but shorter duration)\n  * Adds PLC programming and solenoid valve (both standard catalog items)\n  * No additional operators required\n  * Energy consumption decreases due to reduced air compressor operation\n  * Chemical cleaning intervals extended from standard 1-3 months to >6 months\nConclusion: Same burden class - no additional equipment operators required, energy consumption decreases, and maintenance requirements remain comparable (standard PLC programming and solenoid valve replacement).\n\nEXECUTABLE TEST\nProtocol: Install intervention on one of three identical membrane bioreactors operating in parallel. Maintain identical operating conditions (MLSS 8 g/L, flux 18 LMH) for 180 days. Measure transmembrane pressure (TMP) every 4 hours. When TMP reaches 40 kPa (standard cleaning threshold), record time since last cleaning and perform cleaning. Repeat for all three reactors, with only the test reactor having the pulsed backwash system.\n\nInstruments: Pressure transducers (±0.1 kPa accuracy), flow meters (±2% accuracy), data logging system.\n\nPass/Fail Threshold: Test reactor must achieve chemical cleaning intervals >6 months while maintaining TMP <40 kPa. Control reactors (standard operation) will likely require cleaning every 1-3 months.\n\nDuration: 180 days minimum, with option to extend to 365 days if no cleaning required by day 180.\n\nKill Criterion: If test reactor requires chemical cleaning before 6 months, intervention fails. If test reactor maintains TMP <40 kPa for 6+ months without chemical cleaning, intervention passes. Statistical significance requires testing across at least three independent cycles.",
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 9.4,
+   "chars": 4313
+  },
+  {
+   "kind": "repair_1",
+   "latency_s": 9.9,
+   "chars": 4113,
+   "findings_disclosed": [
+    "NYQUIST_UNSAMPLED"
+   ]
+  }
+ ],
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "violations": {},
+  "repairs": 1
+ },
+ "generated_at": "2026-11-15T14:28:15.710814Z"
+}
