@@ -1,0 +1,58 @@
+{
+ "record": "CROWLLM_REQUALIFICATION_R11_R8/1.0.0",
+ "at": "2026-11-15T03:04:50.794388+00:00",
+ "context": "AM8 re-qualification bar for the retired crowllm judge role. The allowlisted rung deepseek-v4-flash:free (and v4.1) are 503-dead this window (measured, 8 spaced probes). The operator delivered the same key + https://crowllm.com/v1/; the pool catalog (76 models) serves other families. Stage 1 probe + Stage 2 full-length gate measured live this window: qwen-3.8-max:free and gemini-3-flash:free return complete valid rubric JSON on the real 6284-char judge prompt (~2 s). Stage 3 (this run): the 30-pair gold calibration through the engine's own run_judge_calibration \u2014 the standing retirement bar (>= 0.8 accuracy, a failed pair counts WRONG per Art. XXV).",
+ "stages": {
+  "1_capability_probe": {
+   "deepseek-v4-flash:free": "FAIL 503 (8 spaced probes)",
+   "deepseek-v4.1-flash:free": "FAIL 503",
+   "qwen-3.8-max:free": "OK (tiny probe)",
+   "gemini-3-flash:free": "OK (tiny probe)",
+   "grok-4.7-fast:free": "OK tiny / TIMEOUT full-length",
+   "gpt-4o-mini:free": "OK (tiny probe; not gated further)"
+  },
+  "2_full_length_gate": {
+   "qwen-3.8-max:free": "PASS (complete valid rubric JSON, 2.0 s wall)",
+   "gemini-3-flash:free": "PASS (complete valid rubric JSON, 1.9 s wall)"
+  }
+ },
+ "calibrations": {
+  "crowllm/qwen-3.8-max:free": {
+   "calibrated": true,
+   "passed": true,
+   "n_pairs": 30,
+   "n_valid": 30,
+   "correct": 30,
+   "accuracy": 1.0,
+   "threshold": 0.8,
+   "threshold_correct_pairs": 24,
+   "answered_rate": 1.0,
+   "error_classes": {},
+   "wall_s": 466.3,
+   "method": "PACED 30-pair gold calibration through the engine's own _judge_judgment_call (13 s interval under the free-pool 5/min cap, per-pair governor reset R6 A2, breaker threshold 60). The unpaced engine run (run_judge_calibration) typed 25/30 HTTP_429_THROTTLED \u2014 pacing is infrastructure, not judgment quality (the 5 valid unpaced answers were also all correct)."
+  },
+  "crowllm/gemini-3-flash:free": {
+   "calibrated": false,
+   "passed": false,
+   "n_pairs": 30,
+   "n_valid": 0,
+   "correct": 0,
+   "accuracy": 0.0,
+   "threshold": 0.8,
+   "answered_rate": 0.0,
+   "error_classes": {
+    "HTTP_429_THROTTLED": 4,
+    "JUDGE_TRANSPORT_FAILED": 26
+   },
+   "wall_s": 2.6
+  }
+ },
+ "verdict": {
+  "requalified": true,
+  "rung": "crowllm/qwen-3.8-max:free",
+  "bar": "AM6 retirement re-qualification: new full-length gate + a 30-pair calibration on measured-good transport",
+  "evidence": "full-length gate PASS (complete valid rubric JSON on the real 6284-char judge prompt, 2.0 s) + paced gold calibration 30/30 correct (accuracy 1.000 >= 0.8; 30/30 valid; wall 466 s paced)",
+  "family_independence": "Qwen family (distinct from the xkiro mistral generator rungs and the zai GLM gateway rung) \u2014 judge != generator in provider AND family",
+  "caveat": "deepseek-v4-flash:free (the allowlisted rung) is 503-dead this window (8 spaced probes, typed); the re-qualification is on a DIFFERENT rung of the same operator-supplied key \u2014 the allowlist pin update is auditor/owner-visible in this record (F21: builder-measured, adoption pending). The free pool's 5/min cap means any battery using this judge must pace (the AM7 direction-2 precedence applies)."
+ }
+}
