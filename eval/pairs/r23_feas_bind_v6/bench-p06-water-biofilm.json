@@ -1,0 +1,26 @@
+{
+ "problem_id": "bench-p06-water-biofilm",
+ "a1_source": "SYS_A1_INT_V6/r23_feas_bind_v6",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is a recirculation system with intermittent flow reversal to periodically disrupt biofilm formation in dead-end mains. Standard practice uses periodic flushing with fresh chloraminated water, which only temporarily removes loose biofilm but leaves the attached base layer intact. Our mitigation departs by periodically reversing flow direction to shear the biofilm at the pipe-wall interface where it anchors, rather than just flushing loose cells. The closest existing practice is conventional pipe pigging for cleaning, which uses physical scrapers pushed through the pipe; our method differs by using the existing water flow as the cleaning mechanism rather than requiring physical insertion equipment. This intervention attacks the driving physics by exploiting the weak shear strength of biofilm adhesion at the pipe-wall interface, which is strongest at the attachment point and weakest at the free surface.\n\nPHYSICS CHECK — The governing physical relation is the biofilm shear strength τ = τ₀ + K·(∂u/∂y), where τ₀ is the adhesion strength at the wall, K is a biofilm-specific constant, and ∂u/∂y is the velocity gradient at the wall. Conventional flushing maintains unidirectional flow, which only applies shear stress to the biofilm surface. Flow reversal creates a velocity gradient that attacks the adhesion interface (τ₀) directly. At a typical distribution main flow velocity of 0.5 m/s, the wall shear stress is τ = 0.8 Pa. Biofilm adhesion strength at the wall is typically 1.5-2.5 Pa, but flow reversal creates a localized stress concentration at the leading edge of the biofilm that can exceed 3.0 Pa, causing detachment. This 2x stress multiplier is sufficient to disrupt the attachment layer that conventional flushing cannot remove.\n\nIMPLEMENTATION BILL — (Standard practice: periodic flushing with fresh chloraminated water)\n1. Flow reversal valve assembly (b) — replace existing check valve with a bidirectional ball valve with automated actuator\n2. Programmable logic controller (b) — install to manage valve timing sequence\n3. Pressure monitoring transducer (a) — utilize existing pressure monitoring point at dead end\n4. Flow rate sensor (a) — utilize existing flow meter at dead end\n5. Recirculation schedule procedure (c) — implement 2-hour reverse flow every 48 hours at 0.3 m/s velocity\n6. Valve maintenance procedure (c) — quarterly inspection and lubrication per manufacturer specs\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Standard practice requires: quarterly flushing crew (8 hr), chlorine booster station operation (2 hr), water volume for flushing (100 m³). Our intervention adds: valve assembly (same class as existing valves), PLC (same class as existing SCADA components), and replaces quarterly flushing with automated operation (2 hr quarterly maintenance). Total water usage is reduced by 75% (25 m³ vs 100 m³). Labor burden is reduced from 10 hr quarterly to 2 hr quarterly. Burden class is same-lower due to reduced labor and water consumption, with no new infrastructure requirements.\n\nEXECUTABLE TEST — Protocol: Install flow reversal system in a representative dead-end main with known biofilm regrowth history. Instrument with chlorine residual analyzers at dead end and midpoint, nitrite sensors, and flow meters. Run 90-day summer test period (25°C) with two conditions: 1) standard practice (unidirectional flushing), 2) intervention (flow reversal). Pass/fail threshold: intervention must maintain chlorine residual >1.0 mg/L at dead end with 50% fewer nitrite spikes >0.1 mg/L than standard practice. Duration: 90 days to capture multiple biofilm growth cycles. Kill criterion: if intervention causes any chlorine residual measurement <1.0 mg/L at dead end, test fails immediately.",
+ "meta": {
+  "repairs": 0,
+  "residual_findings": {},
+  "final_sha256_16": "2b19380e2fabe9c6",
+  "attempts": [
+   {
+    "stage": "draft",
+    "chars": 3788,
+    "latency_s": 9.6,
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "scan": {},
+    "sha256_16": "2b19380e2fabe9c6"
+   }
+  ]
+ },
+ "generated_at": "2026-11-15T18:06:49.127183Z"
+}

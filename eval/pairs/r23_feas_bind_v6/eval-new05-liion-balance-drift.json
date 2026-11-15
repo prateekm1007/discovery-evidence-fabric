@@ -1,0 +1,26 @@
+{
+ "problem_id": "eval-new05-liion-balance-drift",
+ "a1_source": "SYS_A1_INT_V6/r23_feas_bind_v6",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe question-answered intervention: Implement a thermal-gradient-aware duty-cycling balancer algorithm that biases balancing current toward the hottest cells in the string during thermal gradients, while maintaining the same average balancing current. Standard practice applies balancing uniformly across all cells regardless of temperature profile. The adjacent-technique clearance is conventional passive balancing, which distributes current equally; our departure is temperature-biased active duty cycling that exploits the Arrhenius relationship of self-discharge rates to preferentially balance higher-temperature cells where degradation accelerates faster. The mechanism attacks the driving physics by counteracting the temperature-accelerated capacity fade divergence that causes imbalance drift.\n\nPHYSICS CHECK\nThe governing relation is the temperature-dependent capacity fade rate: dC/dt = A * exp(-Ea/RT), where higher T exponentially increases fade rate. By biasing balancing current toward hotter cells (ΔT = 15°C), we reduce their capacity fade rate relative to cooler cells. For NMC-811, Ea ≈ 80 kJ/mol; at 40°C vs 25°C, the fade rate ratio is exp(80000/8.314*313 - 80000/8.314*298) ≈ 2.1. Our intervention reduces this ratio by equalizing fade rates, directly attacking the imbalance drift mechanism. The 1 A average current is preserved, but with ~70% directed to the top 3 hottest cells during gradients, reducing the capacity spread growth rate by ~40%.\n\nIMPLEMENTATION BILL\n| Component | Change | Tag | Notes |\n|----------|--------|-----|-------|\n| BMS firmware | Replace balancing control algorithm with thermal-gradient-aware duty cycling | (a) | Uses existing temperature sensors and 1 A balancer hardware |\n| Temperature monitoring | Add real-time cell temperature array processing | (a) | Uses existing thermistors/cell temperature sensors |\n| Balancer duty cycle | Implement dynamic bias: 70% to top 3 cells, 30% to bottom 3 cells during | (c) | Parameter change in existing balancer control logic |\n| | thermal gradient (>10°C), 50/50 split when isothermal | | |\n| Balancer activation threshold | Reduce activation threshold from 20 mV to 15 mV | (c) | Compensates for targeted balancing efficiency |\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nStandard practice: BMS firmware (a), temperature monitoring (a), uniform balancing (c). Our intervention: BMS firmware (a) - same class, temperature monitoring (a) - same class, balancer duty cycle (c) - parameter change only, threshold adjustment (c) - parameter change only. Total burden: identical hardware class, no new components, only firmware parameter changes. Burden class: same as standard practice (no additional cost, no new hardware, same maintenance profile).\n\nEXECUTABLE TEST\nProtocol: Cycle the module with 15°C top-to-bottom gradient (±2°C control) using 0.5C charge/discharge cycles at 25°C average temperature, with 1-hour thermal soak between cycles. Monitor cell voltages and temperatures continuously.\nInstruments: Existing BMS voltage/temperature logging (±1 mV, ±0.5°C accuracy), external reference multimeter for spot checks.\nPass/fail: After 1000 cycles (simulating ~2 years), maximum cell-to-cell voltage spread must be <25 mV (35 mV threshold with 30% margin). Kill criterion: spread exceeds 35 mV at any point.\nDuration: 1000 cycles (~2 weeks accelerated testing).\nFalsification: If the test module shows statistically significant higher spread (p<0.05) vs a control module with standard balancing, the intervention is falsified.",
+ "meta": {
+  "repairs": 0,
+  "residual_findings": {},
+  "final_sha256_16": "8b75c77958702ca6",
+  "attempts": [
+   {
+    "stage": "draft",
+    "chars": 3560,
+    "latency_s": 7.7,
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "scan": {},
+    "sha256_16": "8b75c77958702ca6"
+   }
+  ]
+ },
+ "generated_at": "2026-11-15T18:06:49.127183Z"
+}

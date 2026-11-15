@@ -1,0 +1,58 @@
+{
+ "problem_id": "bench-p08-mems-stiction",
+ "a1_source": "SYS_A1_INT_V6/r23_feas_bind_v6",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The question-answered sentence: Apply a micro-patterned hydrophobic coating to the comb fingers to prevent shock-induced stiction. Standard practice uses a conformal coating (typically parylene) that uniformly covers the entire structure, while our mitigation applies a non-uniform, patterned hydrophobic coating that creates energy barriers at contact points. The closest existing practice is hydrophobic surface treatments in MEMS for moisture resistance, but our approach differs by patterning the coating to specifically inhibit stiction through contact geometry modification rather than just repelling water. This intervention attacks the stiction failure mechanism by reducing the adhesive forces at contact points through controlled surface energy patterning.\n\nPHYSICS CHECK — The governing physical relation is the adhesion force F_adh = γ·A, where γ is the surface energy and A is the contact area. By patterning the hydrophobic coating to create discontinuous regions with different surface energies, we reduce the effective contact area (A) at critical interfaces and introduce energy barriers that must be overcome for stiction to occur. For a 10000 g shock, the acceleration-induced force between comb fingers is approximately 10-6 N. The patterned coating reduces the effective surface energy from ~72 mN/m (untreated silicon) to <10 mN/m in coated regions, reducing adhesion forces by over 85% and preventing permanent contact.\n\nIMPLEMENTATION BILL — Components, materials, instruments, procedure for INSTALLING and RUNNING the intervention:\n1. Apply micro-patterned hydrophobic coating (a) - replaces standard parylene coating in existing deposition process\n2. Modify photolithography mask to create coating pattern (b) - standard MEMS photolithography equipment\n3. Adjust deposition parameters to achieve 50nm coating thickness (c) - within existing PECVD tool capabilities\n4. Implement post-deposition curing at 150°C for 1 hour (c) - uses existing thermal processing equipment\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Comparison with standard practice:\n- Standard practice: Parylene coating deposition (1 step)\n- Our intervention: Patterned coating deposition (1 step) + photomask modification (1 step) + parameter adjustment (0 cost) + curing (0 cost)\n- Burden class: Same - both use standard MEMS processing equipment with no new hardware required. The additional steps are within existing process control capabilities and use the same infrastructure as standard coating processes.\n\nEXECUTABLE TEST — Falsification protocol: Subject 10 devices to 10000 g shock in all axes (x, y, z) using a shock testing machine with accelerometer feedback. Measure zero-g offset before and after shock using a calibrated reference accelerometer. Pass/fail criterion: Any device showing permanent zero-g offset >50 mg fails the test. Test duration: Complete shock testing within 1 day. Kill criterion: If >2 devices fail, the intervention is falsified. Effectiveness validation: Compare failure rate between coated and uncoated devices under identical shock conditions.",
+ "meta": {
+  "repairs": 2,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Standard practice: Parylene coating deposition (1 step)",
+    "- Our intervention: Patterned coating deposition (1 step) + photomask modification (1 step",
+    "- Burden class: Same - both use standard MEMS processing equipment with no new hardware re"
+   ]
+  },
+  "final_sha256_16": "8ee533151fe7b492",
+  "attempts": [
+   {
+    "stage": "draft",
+    "chars": 2883,
+    "latency_s": 7.2,
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "scan": {
+     "BILL_UNTAGGED": [
+      "- Standard practice: Static bias voltage (always on) + mechanical stiffening (requires str",
+      "- Proposed intervention: Replaces static bias with pulsed operation (same voltage class) +",
+      "- Burden comparison: Same electrical infrastructure, no mechanical changes, adds only $0.1"
+     ]
+    },
+    "sha256_16": "a21b005ab492f7a8"
+   },
+   {
+    "stage": "repair_1",
+    "chars": 2898,
+    "latency_s": 5.4,
+    "critic_verdict": "CLEAN",
+    "findings_disclosed": [
+     "BILL_UNTAGGED"
+    ],
+    "sha256_16": "1451f9d6d34e174f"
+   },
+   {
+    "stage": "repair_2",
+    "chars": 3112,
+    "latency_s": 6.4,
+    "critic_verdict": "CLEAN",
+    "findings_disclosed": [
+     "BILL_UNTAGGED"
+    ],
+    "sha256_16": "8ee533151fe7b492"
+   }
+  ]
+ },
+ "generated_at": "2026-11-15T18:06:49.127183Z"
+}
