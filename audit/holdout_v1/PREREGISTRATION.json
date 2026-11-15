@@ -1,0 +1,27 @@
+{
+ "record": "HOLDOUT_V1_PREREGISTRATION/1.0.0",
+ "registered_at": "2026-11-15",
+ "registered_by": "auditor (Claude session), owner-supplied",
+ "article": "Art. 7 (sealed instruments) \u2014 ACTIVATED; OA1 resolved (was escalated rounds 1-10)",
+ "selection_sha256": "57be8218d1fa681c972ff80d084f55666a53a640b3aa4aeb6c02be5ce9c6b107",
+ "selection_hash_verified": "REPRODUCED EXACTLY by the auditor from canonical (id,device,failure,question,question_type,user_variables) tuples of the 24 FRESH problems sorted by problem_id, json.dumps(sort_keys=True,ensure_ascii=False,separators=(',',':')), per eval/validate_problems.py \u2014 MATCH",
+ "problems_file_sha256": "36a1e3a3572539427f0be8bccfbc93aabb050b3da0abdadc99095d2b0fff39a1",
+ "rubric_file_sha256": "d187295b1345885dbfba03da7290852b40a169980edad3249dc3614a74d0c943",
+ "n_problems": 24,
+ "tiers": {
+  "K": 16,
+  "D": 8
+ },
+ "custody": "AUDITOR + OWNER ONLY. Stored on the audit branch (audit/holdout_v1/). The PRIVATE rubric is NEVER given to the builder, the pipeline, or the automated judge. The problems file is released to the builder ONE-SHOT only for the scored generation run (no tuning, no inspection, no iteration).",
+ "seal_intact_verified": "builder branch queue/dev12_r7 @4be956439 contains NO holdout_v1 / HO-* bytes (tree grep empty) \u2014 the builder has not seen the holdout",
+ "one_shot_protocol": [
+  "1. Owner authorizes the scored run.",
+  "2. Builder receives holdout_v1_problems.json ONE-SHOT (problems only, NEVER the rubric); generates A1 answers on all 24 problems once, commits them; no iteration/tuning on the holdout.",
+  "3. Auditor scores the answers against the PRIVATE rubric (0-4 per problem: question answered, key_elements/quality, numbers+labelled assumptions, testable falsifier; red-flag penalties). K-tier=key_elements coverage; D-tier=feasibility/constraint-fit/specificity/non-obviousness.",
+  "4. Auditor reports the scored result (per-problem + aggregate, K vs D).",
+  "5. BURN: after the scored run the holdout becomes DEV (no longer sealed); a fresh holdout must be authored for the next sealed test."
+ ],
+ "purpose": "clean generalization test (Art. LXXIX fresh-problem + Art. 6 held-out acceptance) \u2014 breaks the dev-set iteration cycle; measures whether the machine invents novel AND feasible solutions on UNSEEN problems",
+ "burn_after_use": true,
+ "status": "SEALED \u2014 awaiting owner authorization for the one-shot scored run"
+}
