@@ -1,0 +1,57 @@
+{
+ "record": "auditor_judgments_r11_r20/1.0.0",
+ "audited_commit": "e5dbdd01a7943834b8c07d37f4e36a5d7f33c851",
+ "at": "2026-11-15T00:00:00Z",
+ "auditor": "session auditor (Claude)",
+ "scope": "R20: F32 fix verified with receipts + race-timing adjudication; V4 hard-7 pilot independently recomputed (Art.13); security event recorded; enforcement map",
+ "F32_closed": {
+  "queue_ci": "SUCCESS on a8c037f81, e43cd91e1, e5dbdd01a (3 consecutive) vs FAILURE on 8c1013fae/d1cf5a129",
+  "root_cause": "queue workflow had no pip install; setup-python toolcache python lacks pytest \u2014 every queue run failed at first pytest invocation",
+  "fix": "pip install step + enforcement suite (Arts.19/21/22/23/25/26/28) wired into r11_queue_surface.yml; verified in workflow bytes",
+  "sensitivity_proof": "failure->success delta across the fix boundary is exactly the acceptance demanded",
+  "race_adjudication": "AM19 audit commits 13:32:52-13:34:25Z; fix a8c037f81 landed 13:33:56Z MID-AUDIT. R19 preflight read 8c1013fae (tip at audit start) \u2014 snapshot accurate at read time; verdict raced the push by one commit. Genuine F25-class timing race (7th instance, benign); no auditor error; F32 now CLOSED on current bytes"
+ },
+ "V4_pilot_verified": {
+  "type": "MECHANICS_PILOT (hard-7 direction probe, NOT the gate battery)",
+  "pre_registration": "3d3421d40 13:52:28Z (contract SYS_A1_INT_V4 + subset from committed bytes) BEFORE measurement e43cd91e1 14:02:13Z",
+  "auditor_art13_recompute": {
+   "fgap_mean": 1.857,
+   "r11_fgap_mean": 3.0,
+   "novelty_mean": 2.857,
+   "r11_nd_mean": 2.857,
+   "prefer_v4": "7/7",
+   "improved": 5,
+   "worsened": 0
+  },
+  "per_pair": {
+   "bench-p03": "4->3 nd4->4",
+   "bench-p05": "3->1 nd4->3",
+   "bench-p06": "4->3 nd4->4",
+   "bench-p09": "3->2 nd2->1",
+   "bench-p11": "3->3 nd4->4",
+   "eval-new05": "2->1 nd-1->+1",
+   "eval-sofc": "2->0 nd3->3"
+  },
+  "novelty_note": "mean held exactly but internal redistribution: p05 -1, p09 -1, new05 +2; no pair collapsed below 0.5",
+  "mechanism": "procurement rule (every bill line: stated-present / procurable catalog / parameter-duty-procedure change) + no-development rule; targets measured root cause \u2014 bench-p06 ledger note 'would need to be developed' at fgap=4 (development-need hiding in ledger rows)",
+  "projection": "overall ~1.1 LABELED ESTIMATE, not a measurement; strict <=0.25 needs predictor-arm procurement rule + full 30-pair battery"
+ },
+ "gate": {
+  "state": "NOT_MET (unchanged)",
+  "basis": "r11 overall type-credited: novelty 2.133 CI[1.426,2.841] PASS / feasibility 1.367 CI[0.931,1.802] FAIL",
+  "note": "V4 pilot is a direction probe; the gate battery has not been re-run"
+ },
+ "F33_security_event": {
+  "event": "builder probe echoed the git remote's URL-embedded GitHub PAT into the session transcript",
+  "committed_bytes": "auditor secret-scan of all 4 new round files = 0 leaks",
+  "disposition": "builder self-disclosed + recommended rotation; OWNER DECIDES; recorded once per owner instruction (no pestering); practice note: move remote off embedded-token URL to credential-helper/vault form (Art.17)"
+ },
+ "enforcement_map": {
+  "queue_gated": "7/28 (6/19/21/22-half/23/25-half/26/28)",
+  "flagged": "Art.20 (no ablation-registry artifact exists)",
+  "note": "flags CI-pinned so gaps cannot silently disappear"
+ },
+ "gold_set_self_check": {
+  "result": "10/10; V4 pilot recomputed exact"
+ }
+}
