@@ -179,8 +179,8 @@ intervention), not a correlation."""
 # from data that ALREADY EXISTS, not from a program that must run first.
 # ---------------------------------------------------------------------------
 BASELINE_PROGRAM_MARKERS = re.compile(
-    r"record (?:healthy|baseline|reference) (?:signatures?|data|"
-    r"readings?|profiles?)|collect(?:ing|ion of)? (?:a )?baseline"
+    r"record (?:healthy|baseline|reference)[^.]{0,30}?(?:signatures?|"
+    r"data|readings?|profiles?)|collect(?:ing|ion of)? (?:a )?baseline"
     r"|baseline (?:database|dataset|data[- ]collection|library)"
     r"|gather (?:historical|failure|baseline) (?:data|records?)"
     r"|historical failure (?:data|records?)\s+(?:to|for|over|spanning)"
