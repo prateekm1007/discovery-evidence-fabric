@@ -77,33 +77,13 @@ EVAL_NEW01_ADJUDICATION = {
 NEW07 = "eval-new07-transformer-dga-predictor"
 
 
-def parse_axes(jc):
-    if jc.get("outcome") != "JUDGE_VALID":
-        return None
-    import re
-    raw = str(jc.get("raw") or "")
-    for chunk in reversed(re.findall(r"\{[^{}]*\}", raw, re.S)):
-        try:
-            obj = json.loads(chunk)
-        except json.JSONDecodeError:
-            continue
-        vals, ok = {}, True
-        for arm in ("A", "B"):
-            for ax in ("N", "F", "T", "C"):
-                try:
-                    iv = int(str(obj.get(f"{ax}_{arm}")).strip())
-                except (TypeError, ValueError):
-                    ok = False
-                    break
-                if not (1 <= iv <= 5):
-                    ok = False
-                    break
-                vals[f"{ax}_{arm}"] = iv
-            if not ok:
-                break
-        if ok:
-            return vals
-    return None
+# Art. 19 (v3.0.0): the metric core lives in eval/battery_metrics.py,
+# shared with the CI unit tests (baseline-clone / slot-swap / all-ties
+# / independent recompute). The driver's inline parse_axes copy and its
+# max()-based majority (arbitrary winner on split ties — verified zero
+# impact on the committed records) are replaced by the shared,
+# fixed strict-plurality implementation.
+from eval.battery_metrics import parse_axes, row_metrics  # noqa: E402
 
 
 def _r10_reference() -> dict:
@@ -204,15 +184,10 @@ def main():
                           "axes": parse_axes(jc),
                           "prefer": (jc.get("valid") or {}).get("prefer")})
             time.sleep(PACE_S)
-        prefs = [d["prefer"] for d in draws if d.get("prefer")]
-        pref_counts = {p: prefs.count(p) for p in set(prefs)}
-        maj = max(pref_counts, key=pref_counts.get) if prefs else None
-        axis_draws = [d["axes"] for d in draws if d.get("axes")]
-        med = {}
-        if axis_draws:
-            for key in axis_draws[0]:
-                vals = sorted(a[key] for a in axis_draws)
-                med[key] = vals[len(vals)//2]
+        _dec = row_metrics(draws)
+        maj = _dec["majority_prefer"]
+        med = _dec["median_axes"]
+        pref_counts = _dec["pref_counts"]
         row = {"problem_id": pid,
                "a1_arm": pr["arm"],
                "question_type": pr["prob"].get("question_type"),
