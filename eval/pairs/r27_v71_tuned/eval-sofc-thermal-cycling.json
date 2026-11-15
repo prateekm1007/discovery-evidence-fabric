@@ -1,0 +1,107 @@
+{
+ "problem_id": "eval-sofc-thermal-cycling",
+ "a1_source": "SYS_A1_INT_V71/r27_a1w_v71_contract",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)  \nThe intervention is to apply a graded intergranular glass phase in the seal to reduce differential stress during thermal cycling. Standard practice uses a uniform glass-ceramic seal (15% glass phase), which develops high stress at sharp interfaces due to mismatched CTE. The mitigation replaces this with a bilayer seal: a 5% glass-phase layer adjacent to the anode (lower CTE match) and a 25% glass-phase layer adjacent to the cathode (higher CTE match), creating a smooth CTE transition. This departs from adjacent techniques like graded seals in nuclear reactors, which use continuous gradients (requiring custom fabrication), whereas ours uses a discrete bilayer of procurable stock materials. The bilayer reduces peak stress by distributing strain across the interface, mitigating microcrack initiation.\n\nPHYSICS CHECK  \nThe governing relation is thermal stress σ ≈ E·α·ΔT / (1–ν), where E is Young’s modulus, α is CTE, ΔT is temperature change, and ν is Poisson’s ratio. For ΔT = 775 K (25°C to 800°C), a uniform seal (α ≈ 9 ppm/K) with an anode (α ≈ 12 ppm/K) induces σ ≈ 150 MPa. The bilayer reduces the effective α mismatch: the 5% layer (α ≈ 10.5 ppm/K) matches the anode better, while the 25% layer (α ≈ 8.5 ppm/K) matches the cathode (α ≈ 10 ppm/K). This lowers the peak Δα to 1.5 ppm/K, reducing σ by ~50% to 75 MPa—below the fracture strength (~100 MPa for glass-ceramics).\n\nIMPLEMENTATION BILL  \n| Component | Class | Description |  \n|----------|-------|-------------|  \n| Glass-ceramic powder, 5% glass phase | (b) | Commercial glass-ceramic powder (e.g., G18 composition, 5% intergranular phase), applied as a 50-µm layer adjacent to the anode |  \n| Glass-ceramic powder, 25% glass phase | (b) | Commercial glass-ceramic powder (e.g., G18 composition, 25% intergranular phase), applied as a 50-µm layer adjacent to the cathode |  \n| Standard lamination press | (a) | Existing stack-press equipment, used at standard 800°C/5 MPa conditions for both layers |  \n| Standard sintering profile | (c) | Heat to 850°C at 5°C/min, hold 1 hour, cool at 3°C/min (unchanged from standard practice) |  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n| Standard Practice | Proposed Intervention | Burden |  \n|-------------------|----------------------|--------|  \n| Uniform 15% glass-ceramic seal | Bilayer seal (5% + 25% layers) | Same: two layers applied identically to standard lamination |  \n| Single sintering step | Single sintering step (same profile) | Same: no new equipment or process steps |  \n| No mass change | Bilayer adds negligible mass (<0.5%) | Same: within 2% constraint |  \n\nEXECUTABLE TEST  \nProtocol: Cycle 5 test stacks (3 with bilayer, 2 control) between 25°C and 800°C at 5°C/min, holding 1 hour at each extreme. Measure open-circuit voltage (OCV) and seal leakage (via helium tracer) every 50 cycles.  \nPass/Fail: OCV > 1.0 V and leakage < 1% fuel flow after 500 cycles. Failure if any stack drops below OCV 1.0 V or exceeds leakage.  \nKill Criterion: Stop if 2/3 bilayer stacks fail or if leakage increases by >50% vs. control.  \nDuration: 500 cycles (≈2 weeks at 10 cycles/day).",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 2,
+  "residual_findings": {
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'mas' in: this lowers the peak δα to 1.5 ppm/k, reducing σ by ~50% to 75 mpa—below the fracture strength (~100 mpa for g",
+    "excluded stem 'mass' in: this lowers the peak δα to 1.5 ppm/k, reducing σ by ~50% to 75 mpa—below the fracture strength (~100 mpa for g",
+    "excluded stem 'stack' in: this lowers the peak δα to 1.5 ppm/k, reducing σ by ~50% to 75 mpa—below the fracture strength (~100 mpa for g",
+    "excluded stem 'stack' in: kill criterion: stop if 2/3 bilayer stacks fail or if leakage increases by >50% vs"
+   ],
+   "STANDARD_BILL": [
+    "CUSTOM_MATERIAL: intergranular-phase formulation: | Glass-ceramic powder, 5% glass phase | (b) | Commercial glass-ceramic powder (e.g., G18 composition, 5% intergranular phase), applied as a 50-µm layer adjacen",
+    "CUSTOM_MATERIAL: intergranular-phase formulation: | Glass-ceramic powder, 25% glass phase | (b) | Commercial glass-ceramic powder (e.g., G18 composition, 25% intergranular phase), applied as a 50-µm layer adjac"
+   ]
+  }
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 3133,
+   "latency_s": 7.5,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'mas' in: implementation bill  \n| item | class | description |  \n|------|-------|-------------|  \n| (a) existing electro",
+     "excluded stem 'mass' in: implementation bill  \n| item | class | description |  \n|------|-------|-------------|  \n| (a) existing electro",
+     "excluded stem 'stack' in: novelty statement (intervention)  \nto prevent thermal cycling fatigue in the anode-supported sofc stack, we in"
+    ]
+   },
+   "sha256_16": "05525ef9cf414f54"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 4060,
+   "latency_s": 10.7,
+   "transport_tries": 2,
+   "critic_verdict": "KILL",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'mas' in: for δt = 775 k, this reduces σ by ~50%, from 150 mpa to 75 mpa, below the fracture strength of the glass-ceram",
+     "excluded stem 'mass' in: for δt = 775 k, this reduces σ by ~50%, from 150 mpa to 75 mpa, below the fracture strength of the glass-ceram",
+     "excluded stem 'stack' in: for δt = 775 k, this reduces σ by ~50%, from 150 mpa to 75 mpa, below the fracture strength of the glass-ceram",
+     "excluded stem 'stack' in: glass phase) |  \n| no new equipment | dual-nozzle dispenser (existing infrastructure) | same: uses existing di"
+    ],
+    "STANDARD_BILL": [
+     "CUSTOM_MATERIAL: intergranular-phase formulation: | 3 | (b) | Commercial glass-ceramic powder (e.g., G18 composition) with intergranular glass phase fraction 0.25 |",
+     "CUSTOM_MATERIAL: intergranular-phase formulation: | 4 | (b) | Commercial glass-ceramic powder (e.g., G18 composition) with intergranular glass phase fraction 0.05 |",
+     "CUSTOM_MATERIAL: intergranular-phase formulation: | 5 | (c) | Procedure: Apply sealant as a bilayer with graded intergranular glass phase fraction using a dual-nozzle dispenser, setting the interface at the mid"
+    ]
+   },
+   "sha256_16": "6a44344dfb258bdc",
+   "findings_disclosed": [
+    "ARITHMETIC_CYCLES",
+    "ELECTRONIC_CONDUCTOR_SEAL",
+    "CONSTRAINT_EXCLUSION: excluded stem 'mas' in: for δt = 775 k, this reduces σ by ~50%, from 150 mpa to 75 mpa, below the fracture str",
+    "STANDARD_BILL: CUSTOM_MATERIAL: intergranular-phase formulation: | 3 | (b) | Commercial glass-ceramic powder (e.g., G18 compo"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 3141,
+   "latency_s": 8.4,
+   "transport_tries": 3,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'mas' in: this lowers the peak δα to 1.5 ppm/k, reducing σ by ~50% to 75 mpa—below the fracture strength (~100 mpa for g",
+     "excluded stem 'mass' in: this lowers the peak δα to 1.5 ppm/k, reducing σ by ~50% to 75 mpa—below the fracture strength (~100 mpa for g",
+     "excluded stem 'stack' in: this lowers the peak δα to 1.5 ppm/k, reducing σ by ~50% to 75 mpa—below the fracture strength (~100 mpa for g",
+     "excluded stem 'stack' in: kill criterion: stop if 2/3 bilayer stacks fail or if leakage increases by >50% vs"
+    ],
+    "STANDARD_BILL": [
+     "CUSTOM_MATERIAL: intergranular-phase formulation: | Glass-ceramic powder, 5% glass phase | (b) | Commercial glass-ceramic powder (e.g., G18 composition, 5% intergranular phase), applied as a 50-µm layer adjacen",
+     "CUSTOM_MATERIAL: intergranular-phase formulation: | Glass-ceramic powder, 25% glass phase | (b) | Commercial glass-ceramic powder (e.g., G18 composition, 25% intergranular phase), applied as a 50-µm layer adjac"
+    ]
+   },
+   "sha256_16": "a4357c7ff510b56c",
+   "findings_disclosed": [
+    "CONSTRAINT_EXCLUSION: excluded stem 'mas' in: this lowers the peak δα to 1.5 ppm/k, reducing σ by ~50% to 75 mpa—below the fracture ",
+    "STANDARD_BILL: CUSTOM_MATERIAL: intergranular-phase formulation: | Glass-ceramic powder, 5% glass phase | (b) | Commercial gl"
+   ]
+  }
+ ],
+ "generated_at": "2026-11-15T22:43:41.417155Z"
+}

@@ -1,0 +1,98 @@
+{
+ "problem_id": "bench-p08-mems-stiction",
+ "a1_source": "SYS_A1_INT_V71/r27_a1w_v71_contract",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The proposed intervention is to apply a micro-dimple texture to the comb fingers to prevent shock-induced stiction by locally reducing contact area and increasing the capillary force breakaway threshold. Standard practice applies a hydrophobic coating to minimize surface energy, but this mitigation departs by introducing a deterministic topography that physically limits contact points. The closest existing practice is laser surface texturing for tribological applications, but this differs by targeting capillary-dominated microscale adhesion rather than macro-scale wear. The mechanism exploits the fact that stiction in MEMS is primarily driven by capillary forces during shock-induced contact; dimples reduce the real contact area and create air pockets that lower the effective capillary adhesion.\n\nPHYSICS CHECK — The governing relation for capillary adhesion force is F_cap = 4πγR, where γ is surface energy and R is the effective meniscus radius. By introducing dimples with radius r_dimple and spacing s_dimple, the maximum contact area is reduced by a factor of (πr_dimple²)/(s_dimple²), directly scaling the adhesion force. For a dimple pattern with r_dimple = 0.5 μm and s_dimple = 2 μm (achievable via standard deep reactive ion etching), the contact area reduction is ~0.1, lowering F_cap by an order of magnitude. This reduces the force required to separate fingers during shock, preventing permanent adhesion.\n\nIMPLEMENTATION BILL — \n1. (a) Existing MEMS comb fingers (no change to structure)\n2. (b) Standard commercial DRIE process (e.g., Bosch process) with stock parameters (SF6/C4F8 chemistry, 15 μm total etch depth)\n3. (c) Parameter change: etch dimples with 0.5 μm radius, 2 μm pitch, 1 μm depth using standard photoresist mask\n4. (c) Standard cleaning process (piranha etch, IPA rinse, N2 dry) post-texturing\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- Standard practice: DRIE etch (smooth surface) + hydrophobic coating (e.g., C4F6 deposition)\n- Proposed: DRIE etch (textured surface) + same cleaning process\n- Burden comparison: Same etch process (same tooling, same time), same cleaning process, no additional equipment. Eliminates coating deposition step, reducing process steps. Same burden class (standard MEMS fab process).\n\nEXECUTABLE TEST — \nProtocol: Subject 100 devices to 10000 g shock in X, Y, and Z axes (using shock table with accelerometer feedback). Measure zero-g offset before and after shock using electrostatic self-test. \nInstruments: Shock table (±10000 g capability), precision capacitance bridge (0.1 mg resolution), environmental chamber (controlled humidity 40% RH).\nPass/fail: Permanent zero-g offset ≤ 50 mg in all axes. \nDuration: 1 week (including 100 shocks and measurements). \nKill criterion: >20% of devices exceed offset threshold.",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 2,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Standard practice: DRIE etch (smooth surface) + hydrophobic coating (e.g., C4F6 depositi",
+    "- Proposed: DRIE etch (textured surface) + same cleaning process",
+    "- Burden comparison: Same etch process (same tooling, same time), same cleaning process, n"
+   ],
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'permanent' in: this reduces the force required to separate fingers during shock, preventing permanent adhesion.\n\nimplementati"
+   ]
+  }
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 2214,
+   "latency_s": 4.8,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'offset' in: pass/fail: coated units must show <50 mg permanent offset; uncoated units may fail",
+     "excluded stem 'offset' in: kill criterion: any coated unit exceeding 50 mg offset fails the test.",
+     "excluded stem 'permanent' in: pass/fail: coated units must show <50 mg permanent offset; uncoated units may fail"
+    ]
+   },
+   "sha256_16": "0ff12bd79ad40c7e"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 3223,
+   "latency_s": 7.1,
+   "transport_tries": 2,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'offset' in: (c) parameter change: set shock sensor threshold to 5000 g (adjustable per calibration)  \n\nburden ledger (stan",
+     "excluded stem 'offset' in: *pass/fail:*  \n- intervention units must show <50 mg permanent offset (coated units may fail)",
+     "excluded stem 'permanent' in: *pass/fail:*  \n- intervention units must show <50 mg permanent offset (coated units may fail)"
+    ],
+    "NAMED_VARIANT": [
+     "model/brand-marker: STHV200 | 2. (b) Commercial high-voltage MOSFET switch (e.g., STMicroelectronics STHV200, "
+    ]
+   },
+   "sha256_16": "0c4a5f8b9e5c5a7b",
+   "findings_disclosed": [
+    "CONSTRAINT_EXCLUSION: excluded stem 'offset' in: (c) parameter change: set shock sensor threshold to 5000 g (adjustable per calibrat",
+    "NAMED_VARIANT: model/brand-marker: STHV200 | 2. (b) Commercial high-voltage MOSFET switch (e.g., STMicroelectronics STHV200, "
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 2831,
+   "latency_s": 6.4,
+   "transport_tries": 3,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Standard practice: DRIE etch (smooth surface) + hydrophobic coating (e.g., C4F6 depositi",
+     "- Proposed: DRIE etch (textured surface) + same cleaning process",
+     "- Burden comparison: Same etch process (same tooling, same time), same cleaning process, n"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'permanent' in: this reduces the force required to separate fingers during shock, preventing permanent adhesion.\n\nimplementati"
+    ]
+   },
+   "sha256_16": "b6f26657ac3dfb22",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Standard practice: DRIE etch (smooth surface) + hydrophobic coating (e.g., C4F6 depositi; - Proposed: DRIE e",
+    "CONSTRAINT_EXCLUSION: excluded stem 'permanent' in: this reduces the force required to separate fingers during shock, preventing per"
+   ]
+  }
+ ],
+ "generated_at": "2026-11-15T22:42:11.169001Z"
+}
