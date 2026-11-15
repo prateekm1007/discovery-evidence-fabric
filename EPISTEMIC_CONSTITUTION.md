@@ -1,7 +1,7 @@
-# Epistemic Constitution — Research & Coding (v3.0.0, owner-directed enforcement refactor)
+# Epistemic Constitution — Research & Coding (v3.1.0, owner-directed enforcement refactor)
 
 **Ratified:** 2026-11-15 by OWNER directive (proposal enacted verbatim; recorded below).
-**Supersedes:** v2.12.0 (85 articles, 2,565 lines; full text preserved in git history). **Target met:** 28 articles, each tied to a CI check.
+**Supersedes:** v2.12.0 (85 articles, 2,565 lines; full text preserved in git history). **Target met:** 29 articles, each tied to a CI check (28 from the v3.0.0 refactor + the owner-added Art. 29 in v3.1.0).
 **Headline finding (owner):** the recurring failures were NOT missing articles. XIX, XXX, XLV, LVIII, LIX, LXVII, LXXXV already forbade tuning the metric, self-judging, benchmark gaming, unpushed work and assumed independence — and the builder still did all of them. They were enforced only by being read. **This refactor is mostly ENFORCEMENT (CI checks) and DELETION, plus new articles for uncovered failure modes.** Prose-only articles are deleted; every surviving article names a CI check.
 
 ## The Discovery Imperative (preamble, kept)
@@ -141,6 +141,29 @@ An instrument that waits on an owner action for 3 or more rounds is retired or r
 **Trigger:** the seeded specimens were open 6+ rounds.
 **CI:** owner-action round counter; auto-retire/replace at 3; offline-work list present.
 
+### Article 29 — Parallel builders: claim, execute, verify (owner-added 2026-11-15)
+Two builder sessions run concurrently by OWNER DECISION (they catch each other's errors).
+Parallelism is kept; duplication is forbidden.
+(a) Identity: register a stable session_id in eval/work_claims.json on first push; every
+    commit carries Session: and Work-Id: trailers.
+(b) Claim-before-work: push a claim {work_id, session_id, role:EXECUTOR, base_sha,
+    lease_expiry} before starting. The push is the lock; the other session becomes
+    VERIFIER for that item and executes a different unclaimed item.
+(c) One executor per work item; one generation for one-shot/sealed work; one run per
+    quota-consuming measurement. VERIFIER never re-runs; it recomputes from committed
+    bytes (Art. 13) and files a typed verification record.
+(d) Lease & takeover: stage pushes are heartbeats; an expired OPEN claim may be taken
+    over referencing the dead lease, resuming from committed PARTIAL rows.
+(e) Canonical-path ownership: write only claimed paths; one canonical artifact per
+    work_id (Art. 16). Same-work_id non-fast-forward => stand down to verifier, never
+    rebase a duplicate; rebase only disjoint work; diff-against-remote before push.
+CI: tests/test_article29_parallel_coordination.py — canonical measurement commits have
+a matching claim+trailers; no two EXECUTOR claims per work_id; one-shot work has exactly
+one generation; each DONE measurement has a verifier record; registry schema valid.
+Trigger: F25's seven instances (duplicate r11 run, duplicate Art.19 wiring, duplicate
+holdout generation, duplicate crowllm integration, census mis-type, rebase clobber,
+audit-snapshot race).
+
 ---
 ## AMENDMENT RECORD — v3.0.0 (owner-directed, 2026-11-15)
 **Authority:** OWNER directive (the owner read v2.12.0 in full — 85 articles, 2,565 lines — and proposed this refactor verbatim; this document enacts it). **Ratified by:** owner. **Enforcement philosophy:** every article ties to a CI check; prose-only articles deleted; the recurring failures were unenforced rules, not missing rules.
@@ -173,3 +196,8 @@ An instrument that waits on an owner action for 3 or more rounds is retired or r
 - **NEW (owner):** Arts. 19-28
 
 **Builder acknowledgment required:** the builder reads v3.0.0 on next fetch and wires each CI check; an article without a passing CI check is not enforced and must be flagged.
+
+---
+## AMENDMENT RECORD — v3.1.0 (owner-added, 2026-11-15)
+**Authority:** OWNER decision on F25 (seven measured duplicate-run instances): both builder sessions run CONCURRENTLY — they catch each other's errors — and no duplicate entries. The claim/execute/verify mechanism (push-as-mutex) makes a duplicate entry structurally impossible rather than merely discouraged; Article 29 was supplied VERBATIM by the owner and is enacted above unchanged.
+**Builder wiring (adoption commit):** eval/work_claims.json (registry, schema work-claims/v1, sessions{}, claims[] — committed EMPTY of claims, the lawful adoption state; session identity registered) + eval/coordination_protocol.md + tests/test_article29_parallel_coordination.py (six checks, incl. empty-registry-passes and claim-before-work enforced against each commit's own registry snapshot) wired into the queue surface; enforcement map 29/29 (Art. 29 WIRED). The auditor-constitution clause (Art. 8 append, auditor v1.2.0) rides the auditor's own push per the directive checklist. Adoption is immediate: the next battery/holdout run files its claim BEFORE execution and runs with exactly one EXECUTOR and one VERIFIER record.

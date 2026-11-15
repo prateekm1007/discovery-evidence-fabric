@@ -43,12 +43,13 @@ jobs:
           python3 -B scripts/r11_decoder_retally.py
           python3 -B scripts/r11_critic_regression.py || true
           python3 -B scripts/r11_critic_regression_r2.py
-      # Constitution v3.0.0 enforcement articles — wired into the QUEUE
+      # Constitution v3.1.0 enforcement articles — wired into the QUEUE
       # surface (F32 fix, R18 audit AM18; R20 AM20 D2 adds Arts. 20 +
-      # the Art. 25 record + the 28-article map + the adversarial
-      # suites): these checks gate every queue/* push, not main-only.
-      # A new violation fails the queue CI (Art. 27).
-      - name: Constitution v3.0.0 enforcement (Arts. 19/20/21/22/23/25/26/28 on committed bytes)
+      # the Art. 25 record + the article map + the adversarial suites;
+      # R20 Art. 29 adoption adds the parallel-coordination checks on
+      # eval/work_claims.json): these checks gate every queue/* push,
+      # not main-only. A new violation fails the queue CI (Art. 27).
+      - name: Constitution v3.1.0 enforcement (Arts. 19/20/21/22/23/25/26/28/29 on committed bytes)
         run: |
           set -e
           python3 -m pytest tests/test_article19_metric_unit_tests.py \
@@ -60,6 +61,7 @@ jobs:
             tests/test_article25_disconfirming_record.py \
             tests/test_article26_provider_spread.py \
             tests/test_article28_owner_dependency.py \
+            tests/test_article29_parallel_coordination.py \
             tests/test_article_map_completeness.py \
             -q -p no:warnings
       # Anti-gaming / independence / infra-separation suites (the Art.
