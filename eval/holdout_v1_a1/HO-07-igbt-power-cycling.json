@@ -1,0 +1,29 @@
+{
+ "problem_id": "HO-07-igbt-power-cycling",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 5.3,
+   "chars": 2323
+  },
+  {
+   "kind": "repair_1",
+   "latency_s": 5.5,
+   "chars": 2750,
+   "findings_disclosed": [
+    "NYQUIST_UNSAMPLED"
+   ]
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "663c3f521022c252",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVELTY STATEMENT — Standard practice tracks the on-state voltage (Vce(on)) and thermal resistance (Rth(j-c)) as direct indicators of degradation. My observable is the second derivative of the on-state voltage with respect to temperature (d²Vce(on)/dT²), which captures the non-linear degradation mechanisms in wire bonds and solder joints that standard linear monitoring misses. This connects to failure physics because as wire bonds lift off and solder fatigues, the temperature coefficient of Vce(on) changes non-linearly due to altered current paths and material interfaces.\n\nPHYSICS CHECK — The governing relation is Vce(on) = Vce0 + α·T + β·T², where α is the linear temperature coefficient and β is the non-linear term. For a healthy IGBT, β is typically small (10-6 V/K² range). As degradation occurs, β increases due to changing current crowding and contact resistance. A calculated β > 5×10-5 V/K² indicates significant degradation, as this represents a 5× increase from typical values, correlating with observed failure modes in accelerated testing.\n\nIMPLEMENTATION BILL — Components: 1) Existing voltage and temperature sensors already installed in the IGBT module, 2) Standard data acquisition system sampling at 10 kHz (ASSUMPTION: Existing inverter controller has this capability), 3) Off-the-shelf digital signal processor for real-time calculation (e.g., TI C2000 series). Materials: None required beyond existing wiring. Procedure: Sample Vce(on) and T simultaneously at power switching events, compute first derivative (dVce(on)/dT) using central difference method, then compute second derivative from these values. Processing runs in real-time during normal operation.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Installability: Same as standard practice (uses existing sensors). Operability: Minimal impact - adds only computational load during normal operation (ASSUMPTION: <5% CPU utilization). Maintenance: No additional maintenance required - same as standard monitoring. Cost: <5% module cost increase (computation only, no hardware changes). This achieves same deployment burden as standard Vce(on) monitoring while providing earlier detection of non-linear degradation.\n\nEXECUTABLE TEST — Protocol: Subject 20 modules to accelerated power cycling (80 K swing, 50 Hz frequency) while monitoring d²Vce(on)/dT² continuously. Instruments: Data acquisition system with 10 kHz sampling, thermal chamber, power cycling equipment. Pass/fail threshold: Module fails if d²Vce(on)/dT² exceeds 5×10-5 V/K² before 300,000 cycles. Duration: Test until all modules either reach threshold or complete 300,000 cycles. Kill criterion: Immediate test halt if module shows visible damage or catastrophic failure (short circuit, open circuit)."
+}

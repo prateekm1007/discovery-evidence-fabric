@@ -1,0 +1,21 @@
+{
+ "problem_id": "HO-12-vanadium-flow-battery-fade",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 5.0,
+   "chars": 2191
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "f5fc03cc0f6d351d",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVELTY STATEMENT — Standard practice tracks voltage efficiency and capacity fade directly. My observable is the vanadium crossover rate inferred from the differential pressure between half-cells, which directly measures the driving force for vanadium crossover before it manifests as capacity fade. This connects to failure physics via the pressure-driven transport of vanadium ions across the membrane, which precedes electrolyte imbalance.\n\nPHYSICS CHECK — The governing relation is Fick's law of diffusion with pressure contribution: J = -D(ΔC/Δx) + (C·K·ΔP)/(η·Δx), where J is crossover flux, D is diffusion coefficient, C is concentration, K is membrane permeability, η is viscosity, and ΔP is pressure differential. For a Nafion 212 membrane at 1.5M vanadium concentration, a pressure differential of 5 kPa would cause a crossover rate of approximately 0.02 mA/cm², which would lead to the observed 15% capacity fade over 2000 cycles.\n\nIMPLEMENTATION BILL — Components: Existing pressure sensors (±0.1 kPa accuracy) in half-cell headers, existing data acquisition system, existing electrolyte flow rate meters. Procedure: Calculate average pressure differential (ΔP) between half-cells during charge/discharge cycles. Compute vanadium crossover rate using membrane permeability constant for Nafion 212 (K = 1.2×10⁻¹² m²/Pa·s). No new hardware required; only software modification to existing monitoring system.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Installability: Same (uses existing sensors). Operability: Same (no additional operator actions required). Maintenance: Same (pressure sensors already maintained). Cost class: Same (no additional hardware). Expected conclusion: Same deployment burden, different observable that provides earlier warning of capacity fade.\n\nEXECUTABLE TEST — Protocol: Monitor pressure differential between half-cells during cycling. Instruments: Existing pressure sensors and data acquisition system. Pass threshold: ΔP < 3 kPa average over 100 cycles. Fail threshold: ΔP > 5 kPa sustained for 50 consecutive cycles. Duration: 500 cycles. Kill criterion: If ΔP exceeds 5 kPa for 50 consecutive cycles, the test fails and the approach is falsified."
+}

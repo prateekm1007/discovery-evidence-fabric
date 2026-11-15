@@ -1,0 +1,21 @@
+{
+ "problem_id": "HO-10-s690-weld-hydrogen-cracking",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 6.4,
+   "chars": 2671
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "dbf1cf1de379b549",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVELTY STATEMENT — Standard practice tracks weld cooling rate and hydrogen content in the weld metal as separate indicators. The novel observable is the weld thermal gradient asymmetry index (WTGAI), which quantifies the non-uniform heat dissipation pattern that drives hydrogen accumulation at critical locations. This departs from standard practice by combining thermal history and hydrogen diffusion effects into a single predictive metric that correlates with the stress state at the weld toe.\n\nPHYSICS CHECK — The governing physical relation is Fick's second law of diffusion coupled with thermal stress analysis: ∂C/∂t = D∇²C, where C is hydrogen concentration, D is diffusion coefficient, and thermal gradients create stress fields that trap hydrogen. For S690QL steel at 5°C, D ≈ 1.2×10⁻⁸ m²/s. A WTGAI > 0.15 (dimensionless) indicates sufficient thermal asymmetry to create hydrogen concentration gradients > 0.3 ppm/mm, which exceeds the critical threshold for cold cracking in high-strength steels.\n\nIMPLEMENTATION BILL — Components: 1) Existing thermocouples (type K) at weld toe and HAZ, 2) Data logger with 1 Hz sampling capability (standard equipment), 3) Embedded hydrogen sensors (if available) or inferred from thermal history. Materials: Standard welding consumables with controlled hydrogen pickup. Procedure: Install thermocouples at 10 mm intervals perpendicular to weld centerline. Record temperature every second for 2 hours post-weld. Calculate WTGAI as |dT/dx|max / |dT/dt|avg using finite difference method. No new sensors required; calculation uses existing logged data.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Installability: Same as standard practice (thermocouples already used for cooling rate monitoring). Operability: No additional operator training required (standard data logging). Maintenance: Same as standard practice (thermocouple replacement schedule). Cost class: Same as standard practice (no additional hardware). The approach maintains the same deployment burden while providing superior predictive capability by capturing the thermal-hydrogen interaction that standard practice misses.\n\nEXECUTABLE TEST — Protocol: Weld three test coupons with identical parameters under 5°C ambient conditions. Measure WTGAI for each. Pass/fail threshold: WTGAI ≤ 0.15 for all coupons. Duration: 72 hours post-weld (covering the 12-48 hour failure window). Kill criterion: Any crack > 0.5 mm detected via ultrasonic testing at 24 and 48 hours. Falsification occurs if any coupon with WTGAI ≤ 0.15 exhibits cracking, or if WTGAI > 0.15 in all coupons without cracking. Test repeated with five coupons to establish statistical confidence."
+}

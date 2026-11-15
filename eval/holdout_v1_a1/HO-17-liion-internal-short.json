@@ -1,0 +1,21 @@
+{
+ "problem_id": "HO-17-liion-internal-short",
+ "question_type": "predictor-design",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 6.9,
+   "chars": 3266
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "1e73c5da6a671d4b",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVEL-AND-FEASIBLE IDEATION:\n\nSTEP 1 — INVENT THE OBSERVABLE:\nStandard practice tracks individual cell voltages and pack temperature for sudden changes.\nMy observable is the differential thermal decay rate between cell groups, calculated from the thermistor data, which captures the subtle heat signature of increased self-discharge before voltage changes are detectable.\n\nSTEP 2 — MAKE THE IMPLEMENTATION BORING:\nThe observable is computed using existing thermistor readings (one per 7 cells) and standard finite difference methods applied to temperature logs, requiring no new hardware or complex computation.\n\nNOVELTY STATEMENT:\nStandard practice tracks absolute cell voltages and temperatures for threshold violations. My observable tracks the differential thermal decay rate between cell groups, which directly connects to the failure physics as internal shorts increase self-discharge, causing localized heating that appears as an accelerating temperature difference between cell groups before voltage changes are detectable at 1 mV resolution.\n\nPHYSICS CHECK:\nThe governing physical relation is Q = I²Rt, where internal resistance increases due to the developing short. The thermal decay rate is calculated as ΔT/Δt between thermistor groups. Magnitude verification: a 0.05°C/hour differential thermal decay rate between cell groups corresponds to approximately 0.1W additional heat generation in a 7-cell group, consistent with early-stage internal short development.\n\nIMPLEMENTATION BILL:\nComponents: Existing thermistors (one per 7 cells), existing voltage monitoring system (1 mV resolution), existing current monitoring\nMaterials: Standard data logging system capable of timestamped temperature readings\nInstruments: Standard finite difference calculation implementation\nProcedure: \n1. Log thermistor readings every 60 seconds\n2. Group thermistors by position (7-cell groups)\n3. Calculate thermal decay rate (°C/hour) for each group using finite difference\n4. Calculate maximum differential thermal decay rate between any two 7-cell groups\n5. Compare against threshold\nNo new hardware or specialized software required; implementation uses standard data processing techniques.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY):\n- Installability: SAME - uses existing sensors\n- Operability: SAME - same logging frequency, same data volume\n- Maintenance: SAME - no additional maintenance points\n- Cost class: SAME - no additional hardware costs\nThe approach has identical deployment burden to standard voltage monitoring while providing earlier detection of developing shorts through thermal signature analysis.\n\nEXECUTABLE TEST:\nProtocol: \n1. Select 100 test packs with known healthy cells\n2. Install monitoring system with existing sensors\n3. Monitor continuously for 90 days\n4. Record all thermal decay rate calculations\n5. Simulate internal short in 5 packs at day 60 by introducing known resistance\nInstruments: Existing voltage monitoring, thermistors, data logging system\nPass/Fail threshold: Maximum of 2 false alarms in 100 packs over 90 days; must detect all simulated shorts at least 48 hours before cell exceeds 60°C\nDuration: 90 days\nKill criterion: More than 2 false alarms OR failure to detect simulated shorts at least 48 hours before 60°C threshold"
+}

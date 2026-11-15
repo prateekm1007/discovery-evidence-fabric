@@ -1,0 +1,21 @@
+{
+ "problem_id": "HO-06-aircraft-lap-joint-fatigue",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 7.3,
+   "chars": 3008
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "c1be12b85d11fcff",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVELTY STATEMENT — Standard practice tracks crack length and rivet hole stress concentrations directly via NDI methods. My observable tracks the dynamic strain energy dissipation rate (SED rate) at the rivet row interface, which is a departure because it captures the cumulative fatigue damage accumulation before cracks become visible, rather than measuring only crack presence or static stress.\n\nPHYSICS CHECK — The governing physical relation is the Palmgren-Miner linear damage accumulation law: D = Σ(n_i/N_i), where D is the accumulated damage, n_i is cycles at stress range Δσ_i, and N_i is cycles to failure at that stress range. The SED rate is calculated as U = (π/4) * Δσ² * E⁻¹ * f, where Δσ is the stress range, E is Young's modulus (73 GPa for 2024-T3), and f is the sampling frequency. For a typical flight cycle with Δσ = 50 MPa and f = 1 kHz, U = (π/4) * (50×10⁶)² * (73×10⁹)⁻¹ * 1000 ≈ 0.67 J/m³/cycle, which is physically reasonable for fatigue damage accumulation.\n\nIMPLEMENTATION BILL — Components: 1) Existing strain gauges already installed on the joint structure; 2) Data acquisition system with current sampling rate (minimum 1 kHz); 3) Signal processing software (standard FFT algorithm for stress range calculation); 4) Edge computing unit for real-time SED calculation. Materials: None required beyond existing infrastructure. Procedure: 1) Collect strain data at the rivet row interface; 2) Calculate stress range using existing strain gauge calibration; 3) Compute SED rate using the above formula; 4) Compare against threshold. All components are off-the-shelf and require no new infrastructure.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Installability: Same as standard practice, using existing strain gauges. Operability: Requires additional signal processing but no change to operational procedures. Maintenance: Same maintenance requirements as existing strain gauges. Cost class: Same as standard practice (Class II - minor modification). The approach adds no structural mass and maintains the outer mould line, satisfying constraints. The only additional burden is software development for SED calculation, which is negligible compared to inspection labor savings from doubling the interval.\n\nEXECUTABLE TEST — Protocol: Install SED monitoring system on three test specimens and three control specimens; subject to accelerated fatigue testing (equivalent to 32,000 flight cycles) with spectrum loading matching operational conditions. Instruments: Existing strain gauges, data acquisition system, SED calculation software. Pass/fail threshold: SED rate must not exceed 1.0 J/m³/cycle (ASSUMPTION: based on historical failure data where this rate corresponds to crack initiation). Duration: 32,000 equivalent flight cycles. Kill criterion: If any test specimen shows visible cracks or SED rate exceeds threshold before 32,000 cycles, the approach is falsified. Pass criterion: All test specimens complete 32,000 cycles without exceeding SED threshold or showing cracks."
+}

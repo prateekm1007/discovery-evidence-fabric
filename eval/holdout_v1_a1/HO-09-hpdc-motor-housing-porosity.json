@@ -1,0 +1,21 @@
+{
+ "problem_id": "HO-09-hpdc-motor-housing-porosity",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 6.1,
+   "chars": 2386
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "65972ad495b94e04",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVELTY STATEMENT:\nStandard practice tracks pressure, temperature, and fill time during casting. This observable is the departure: the thermal gradient magnitude and direction across the die wall thickness during solidification, specifically the difference in cooling rate between the jacket side and the outer wall. This gradient drives differential solidification shrinkage, creating the porosity that causes leaks.\n\nPHYSICS CHECK:\nThe governing physical relation is Fourier's law of heat conduction: q = -k∇T, where thermal stress σ = E·α·ΔT/(1-ν) with E=70 GPa (Al), α=23×10⁻⁶/K, ν=0.33. A 50°C/mm gradient across 10mm wall would generate σ=70e9×23e-6×50×0.5/(1-0.33)=30 MPa, approaching the material's yield strength and creating sufficient stress for porosity formation. This magnitude is physically plausible.\n\nIMPLEMENTATION BILL:\n- Standard thermocouples (already installed for temperature monitoring)\n- Data acquisition system (existing)\n- Custom software to calculate thermal gradients from thermocouple pairs\n- Procedure: Install thermocouples at 5mm intervals through die wall thickness (jacket side and outer wall). Record temperature data during solidification. Calculate dT/dx between adjacent thermocouples.\n- All components are off-the-shelf; only custom software development is required.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY):\n- Installability: Same - thermocouples already installed for standard monitoring\n- Operability: Same - uses existing data acquisition system\n- Maintenance: Same - thermocouples already maintained\n- Cost class: Same - only software development cost, no hardware changes\n- Cycle time: Same - no impact on casting cycle\n- Compliance: Meets scrap rate <3% constraint\n- Conclusion: Same deployment burden, different observable\n\nEXECUTABLE TEST:\nFalsification test protocol:\n1. Install thermocouples at 5mm intervals through die wall thickness (3 pairs minimum)\n2. Run 50 casting cycles with standard parameters\n3. Record temperature data during solidification\n4. Calculate thermal gradient magnitude and direction\n5. Pass/fail threshold: If average thermal gradient exceeds 30°C/mm, test fails\n6. Duration: 50 cycles (approximately 2-3 days)\n7. Kill criterion: If helium leak test rejection rate exceeds 3% during test, approach is falsified\n8. Verification: Compare gradient data with porosity locations via X-ray analysis of rejected parts"
+}

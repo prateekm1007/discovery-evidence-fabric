@@ -1,0 +1,21 @@
+{
+ "problem_id": "HO-02-liion-lithium-plating",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 6.3,
+   "chars": 2204
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "d5ae5fdc1a53d0d5",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice tracks cell voltage and temperature during fast charging. My observable is the transient thermal gradient between cell surface and core during charge pulses, which directly reflects lithium plating risk through Joule heating anomalies at the anode-electrolyte interface as Li+ ions plate instead of intercalating.\n\nPHYSICS CHECK\nGoverning relation: ΔT = (I²R·t)/(ρ·c·V) where I is current, R is internal resistance, t is time, ρ is density, c is specific heat, and V is volume. For NMC811 at 0°C, a ΔT > 1.5°C between surface and core indicates anomalous heat generation (CALCULATED from typical values: I=150A, R=0.05Ω, t=900s, ρ=2500kg/m³, c=900J/kg·K, V=0.027m³). This magnitude aligns with published lithium plating onset conditions.\n\nIMPLEMENTATION BILL\nComponents: Existing thermocouples (type K) at cell surface and core (already installed for safety monitoring), data logger (existing BMS with 1Hz sampling), processing unit (existing BMS controller). Procedure: Calculate ΔT during each 10s pulse of CC-CV charging. Implementation uses existing hardware with standard finite difference method - no new hardware or software development required.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: Same (uses existing thermocouple locations)\n- Operability: Same (no new operator training needed)\n- Maintenance: Same (no additional maintenance points)\n- Cost: Same class (no new hardware, only software update)\n- Data handling: Minimal increase (stores one additional parameter)\nConclusion: Identical deployment burden to standard voltage/temperature monitoring, with no additional infrastructure requirements.\n\nEXECUTABLE TEST\nProtocol: Charge 10 cells at 0°C ambient using 3C rate (225A) to 80% SOC. Measure surface-core ΔT during each 10s pulse. Pass threshold: ΔT ≤ 1.5°C during all pulses. Fail threshold: ΔT > 1.5°C in >5% of pulses. Duration: 500 cycles or until failure. Kill criterion: Any cell showing >10% capacity loss or >3% mass increase. Test falsification occurs if ΔT remains ≤1.5°C but capacity loss exceeds 10% or mass increase exceeds 3%, indicating the observable doesn't correlate with the failure mechanism under these conditions."
+}

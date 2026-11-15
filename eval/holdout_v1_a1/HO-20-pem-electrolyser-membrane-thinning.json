@@ -1,0 +1,41 @@
+{
+ "problem_id": "HO-20-pem-electrolyser-membrane-thinning",
+ "question_type": "predictor-design",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "error": "HTTPError"
+  },
+  {
+   "kind": "completion_generation_1",
+   "error": "HTTPError",
+   "at": "2026-11-15T09:59:38.732815Z"
+  },
+  {
+   "kind": "completion_generation_2",
+   "latency_s": 12.2,
+   "chars": 4922,
+   "at": "2026-11-15T09:59:38.732815Z"
+  },
+  {
+   "kind": "repair_1",
+   "latency_s": 9.6,
+   "chars": 2677,
+   "findings_disclosed": [
+    "NYQUIST_UNSAMPLED"
+   ]
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "256a6cc9413c10f3",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVELTY STATEMENT:\nStandard practice tracks voltage efficiency degradation and gas crossover rates directly. My observable is the incremental change in the high-frequency resistance (HFR) slope, which reflects the progressive thinning of the membrane through changes in the proton conductivity gradient across the membrane thickness. This is a genuine departure because it measures the rate of membrane property change rather than the absolute property or its consequence.\n\nPHYSICS CHECK:\nThe governing physical relation is the Nernst equation and proton conductivity in perfluorosulfonic acid membranes: σ = A × exp(-Ea/RT), where σ is conductivity, A is a constant, Ea is activation energy, R is gas constant, and T is temperature. The HFR is inversely proportional to membrane conductivity and thickness. As the membrane thins, the conductivity gradient changes, altering the HFR slope. Magnitude verification: A 5% increase in HFR slope corresponds to approximately 10 micrometers of membrane thinning, which is detectable before reaching the failure threshold.\n\nIMPLEMENTATION BILL:\n- Components: Existing stack voltage and current sensors (USER CONSTRAINT)\n- Instruments: Digital signal processor for HFR calculation (ASSUMPTION: standard PEM control systems include this capability)\n- Materials: Standard data logging software (ASSUMPTION: already part of plant control system)\n- Procedure: Calculate HFR at 1 kHz excitation frequency every 10 minutes using the high-frequency voltage perturbation method. Compute the derivative of HFR with respect to time (slope) using a 24-hour moving window.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY):\n- Installability: SAME - uses existing sensors and processing capability\n- Operability: SAME - identical logging frequency and data handling\n- Maintenance: SAME - no additional maintenance requirements\n- Cost class: SAME - no additional hardware or software costs\n- Comparison: This approach requires no additional deployment burden beyond standard practice while providing an earlier warning of impending failure.\n\nEXECUTABLE TEST:\nProtocol: Operate a test stack with accelerated membrane degradation (e.g., through temperature cycling) while continuously monitoring HFR slope. Instruments: Stack voltage/current sensors, data acquisition system, gas chromatograph for crossover measurement. Pass threshold: HFR slope increase of 0.5%/hour must be detected at least 500 hours before H2-in-O2 reaches 2%. Duration: 2000 hours of operation. Kill criterion: If the HFR slope fails to increase by at least 0.5%/hour before reaching the 2% crossover threshold, or if the warning time is less than 500 hours, the predictor is falsified.",
+ "completion_pass": "standing initial-call budget (2 attempts) applied after gateway transport death; original GEN_FAILED trail kept below",
+ "prior_generation_state": "GEN_FAILED"
+}
