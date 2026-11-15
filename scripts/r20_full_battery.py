@@ -67,7 +67,7 @@ from eval.battery_metrics import parse_axes, row_metrics, summarize  # noqa: E40
 
 OUT_DIR = REPO / "eval" / "pairs" / "r20_full_v4"
 R11 = REPO / "eval" / "battery_a1w_r11.json"
-PILOT = REPO / "eval" / "battery_a1w2_pilot_r19.json"
+PILOT = REPO / "eval" / "battery_a1w2_pilot_r19.partial.json"
 PILOT_DIR = REPO / "eval" / "pairs" / "r19_a1w2_pilot"
 R11_DIR = REPO / "eval" / "pairs" / "r11_a1w_r1"
 FULL_OUT = REPO / "eval" / "battery_a1w2_full_r20.json"
@@ -106,7 +106,7 @@ FRESH_PRED = ["eval-new06-bearing-vibration-predictor",
 r11rows = {r["problem_id"]: r for r in
            json.loads(R11.read_text(encoding="utf-8"))["results"]}
 pilotrows = {r["problem_id"]: r for r in
-             json.loads(PILOT.read_text(encoding="utf-8"))["results"]}
+             json.loads(PILOT.read_text(encoding="utf-8"))}
 ALL = RIDE_PILOT + RIDE_R11_PRED + FRESH_INT + FRESH_PRED
 assert len(ALL) == 30 and len(set(ALL)) == 30, "byte map malformed"
 assert set(ALL) == set(r11rows), "byte map != r11 pool"
