@@ -131,6 +131,15 @@ def _sha(s):
     return hashlib.sha256(s.encode("utf-8")).hexdigest()[:16]
 
 
+def _atomic_write(path, text):
+    """Chunked-execution discipline (Art. 18/29(d)): the run is resumed
+    across foreground chunks, so the partial record is written
+    atomically — a kill mid-write can never corrupt resume state."""
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    tmp.replace(path)
+
+
 def a_bytes_for(pid):
     """The committed A-side answer bytes, resolved by byte map, sha'd,
     and cross-checked against the ride sha the r20 record committed."""
@@ -260,9 +269,9 @@ def main() -> int:
             row["standing_adjudication_note"] = r20row.get(
                 "standing_adjudication_note")
         results.append(row)
-        PARTIAL.write_text(
-            json.dumps(results, indent=1, ensure_ascii=False) + "\n",
-            encoding="utf-8")
+        _atomic_write(PARTIAL,
+                      json.dumps(results, indent=1, ensure_ascii=False)
+                      + "\n")
         print(f"  [{pid[:32]:<34}] judged nd="
               f"{row.get('novelty_delta')} fgap="
               f"{row.get('feasibility_abs_gap')} "
@@ -348,8 +357,7 @@ def main() -> int:
                       "(primary); the >= 30-pair clause reads n_valid "
                       "there; the gate re-decision is the auditor's"),
     }
-    OUT.write_text(json.dumps(record, indent=1, default=str) + "\n",
-                   encoding="utf-8")
+    _atomic_write(OUT, json.dumps(record, indent=1, default=str) + "\n")
     for lbl, s in (("TYPE-CREDITED (PRIMARY)", record[
             "summary_type_credited"]),
                    ("ALL-VALID", record["summary_all_valid"])):
