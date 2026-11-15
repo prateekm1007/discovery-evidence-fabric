@@ -1312,16 +1312,23 @@ def _classify_transport_fail(res: Dict[str, Any]) -> str:
     return JUDGE_TRANSPORT_FAILED
 
 
+def _required_rubric_keys(clar: bool) -> list:
+    """The exact key set _validate_rubric_pass requires (single source:
+    both read this list; the missing-keys retry names them)."""
+    keys = [f"{s}{j}" for s in "AB" for j in range(1, 5)]
+    keys += ["A6", "B6"]
+    if clar:
+        keys += ["A5", "B5"]
+    return keys
+
+
 def _validate_rubric_pass(parsed: Dict[str, Any], clar: bool) -> Optional[Dict[str, Any]]:
     """Hard gate for one judge pass: all required rubric fields must be
     present and integer 1-5, and PREFER must be one of A|B|TIE.
     Truncated/malformed/empty output is a failed judgment — never a tie."""
     if not parsed:
         return None
-    required = [f"{s}{j}" for s in "AB" for j in range(1, 5)]
-    required += ["A6", "B6"]
-    if clar:
-        required += ["A5", "B5"]
+    required = _required_rubric_keys(clar)
     out: Dict[str, Any] = {}
     legacy_normalized = 0
     gate_keys = {f"{s}{j}" for s in "AB" for j in (1, 2, 3)}
@@ -1738,8 +1745,24 @@ def _judge_judgment_call(provider: str, model: str, prompt: str,
         rec["outcome"] = JUDGE_EMPTY_OUTPUT
         return rec
     # ---- ONE parse retry (owner item 5): re-ask with the failure
+    # R11 2026-11-15 (measured live, xkiro mistral rungs): when the
+    # first attempt parses but FAILS VALIDATION, the most common shape
+    # is OMITTED KEYS (the model writes the contract's key order and
+    # skips one — e.g. B1,B2,B3 then jumps to A6, dropping B4; it
+    # reproduces even when the retry restates the generic contract and
+    # the example shape). NAMING the missing keys in the retry fixes
+    # it (measured: both mistral-14b and mistral-8b return complete
+    # valid JSON when the retry says 'missing the key "B4"'). Still a
+    # re-ask — nothing is guessed or repaired client-side (Art. XXV);
+    # a still-incomplete retry types JUDGE_PARSE_FAILED exactly as
+    # before.
+    _missing = [k for k in _required_rubric_keys(clar)
+                if k not in (parsed or {})]
     retry_prompt = (prompt + "\n\nIMPORTANT: your previous response "
-                    "was not a parseable rubric judgment. Respond "
+                    "was not a parseable rubric judgment."
+                    + (f' It was missing the key(s) {", ".join(_missing)}.'
+                       if _missing else "")
+                    + " Respond "
                     "AGAIN with ONLY the JSON object with the integer "
                     "keys A1-A6, B1-B6 (A1-A3/B1-B3 are 0-or-1 gates, "
                     "A4-A6/B4-B6 are 1-5) and 'prefer' "
