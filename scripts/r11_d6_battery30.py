@@ -196,6 +196,15 @@ def main() -> int:
         prob = dev12.get(pid) or next(
             p for p in plist
             if str(p.get("problem_id") or p.get("id")) == pid)
+        # R11 2026-11-15 fix (measured, battery30_d6_0056Z + the 01:11Z
+        # rerun): the per-problem retry GOVERNOR is process-wide when
+        # the scope is never reset — 6 healthy calls then every later
+        # gen_call dies RETRY_CAP_EXCEEDED (scope=None), which is
+        # exactly the "6 ok / 48 failed per rung" ledger signature.
+        # Same pattern run_judge_calibration already applies per pair
+        # (R6 A2): each pair is its own governor scope.
+        from discovery_fabric.engine import llm_economy as _econ
+        _econ.reset_governor(f"d6:{pid}")
         q = (f"DEVICE: {prob.get('device')}\nFAILURE: {prob.get('failure')}"
              f"\nCONSTRAINT: {prob.get('constraint')}\nQUESTION: "
              f"{prob.get('question')}\nAnswer with the design/indicator, "
