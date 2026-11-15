@@ -114,7 +114,7 @@ def baseline_for(pid):
     return "", ""
 
 
-def _retry_call(f, *args, tries=3, backoff=(10.0, 30.0)):
+def _retry_call(f, *args, tries=5, backoff=(10.0, 30.0, 60.0, 120.0)):
     last = None
     for t in range(tries):
         try:
