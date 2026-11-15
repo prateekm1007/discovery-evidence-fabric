@@ -1,0 +1,55 @@
+{
+ "record": "auditor_judgments_r11_r22/1.0.0",
+ "audited_commit": "ae4a0ab9998bbf385a4a8ba6511ca77384508878",
+ "at": "2026-11-15T00:00:00Z",
+ "auditor": "session auditor (Claude)",
+ "scope": "R22: n=30 gate-decisive battery (battery_v4_n30_r21) + Art.29 live-fire race + BOK generation lever + F34 closure; Art.13 independent recompute",
+ "n30_battery_verified": {
+  "file": "eval/battery_v4_n30_r21.json",
+  "n_valid": 30,
+  "novelty_delta": 1.967,
+  "novelty_ci": [
+   1.23,
+   2.704
+  ],
+  "novelty_clause": "RESOLVED-PASS (lower 1.23>0.5)",
+  "feasibility_gap": 1.4,
+  "feasibility_ci": [
+   0.963,
+   1.837
+  ],
+  "feasibility_clause": "RESOLVED-FAIL (entirely >0.25)",
+  "prefer": "23/5/2",
+  "auditor_art13_recompute": "n=30 novelty 1.967 feas 1.4 EXACT",
+  "ladder": "90 slots, 86 first-try, 4 recovered, 0 dead (new10 rescued); recomputed from committed draws",
+  "note": "first time n>=30; novelty now resolved-PASS (Art.14 power satisfied for novelty); feasibility resolved-FAIL"
+ },
+ "art29_live_fire": {
+  "race": "peer pushed 3 commits mid-execution; push rejected; stood down, diffed-against-remote, confirmed disjoint, rebased only disjoint, unioned registry",
+  "registry": "5 claims / 2 sessions (c-0001 bootstrap EXECUTOR DONE, c-0002 battery EXECUTOR DONE, c-0003 adoption VERIFIER DONE, c-0004 BOK EXECUTOR, c-0005 battery VERIFIER DONE)",
+  "result": "zero duplicates, zero clobber; trailers compliant; full claim/execute/verify cycle completed"
+ },
+ "F34": "CLOSED (bootstrap claim c-0001 disclosed post-execution + peer VERIFIER c-0003; both sessions registered; T2/T5 green)",
+ "art20": "WIRED (eval/ABLATION_REGISTRY.json present; D3 verified already-satisfied, no duplicate wiring)",
+ "BOK_generation_lever": {
+  "file": "eval/battery_int_bok_r21.json",
+  "feasibility": 1.667,
+  "feasibility_ci": [
+   1.175,
+   2.158
+  ],
+  "novelty": 1.967,
+  "prefer": "20/7/3",
+  "result": "NEGATIVE \u2014 best-of-k generation did NOT improve feasibility (1.667 > V4 1.4); generation-side variance lever is not the feasibility answer",
+  "F35_question": "BOK novelty mean identical to V4 (1.967) despite different A-side composition; verifier must confirm BOK A-side regenerated+scored from raw draws (not a novelty-column copy); feasibility differs so answers differ"
+ },
+ "gate": {
+  "state": "NOT_MET",
+  "novelty_clause": "RESOLVED-PASS at n=30",
+  "feasibility_clause": "RESOLVED-FAIL at n=30 (binding)",
+  "note": "the machine invents novel things (novelty resolved-pass) but they are not feasible-competitive (feasibility resolved-fail); the frontier is feasibility; BOK generation lever failed; need a direct feasibility lever"
+ },
+ "gold_set_self_check": {
+  "result": "10/10; n=30 recomputed exact"
+ }
+}
