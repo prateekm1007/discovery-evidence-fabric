@@ -43,10 +43,10 @@ v6["beats_incumbent"] = beats
 v6["rounds_without_beating"] = 0 if beats else 2
 v6["gate_pass"] = False
 v6["metric_citation"] = ("eval/battery_feas_bind_v61_r24.json:"
-                         "summary_intervention_rows (round 2/2 — the "
-                         "cited record recomputes the variant numbers; "
-                         "round 1's citation was "
-                         "eval/battery_feas_bind_v6_r23.json)")
+                         "summary_intervention_rows")
+# idempotence: strip any previous round-2 suffix before re-appending
+if " ROUND 2 MEASURED" in v6["notes"]:
+    v6["notes"] = v6["notes"].split(" ROUND 2 MEASURED")[0]
 if beats:
     v6["status"] = "ACTIVE"
     v6["notes"] += (" ROUND 2 RESULT (c-0014): POSITIVE — the "
