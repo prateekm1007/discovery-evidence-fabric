@@ -102,23 +102,42 @@ def build_registry():
                                    "stages, not to the arm whose "
                                    "battery series decides the gate "
                                    "(typed disclosure, AM20 D1/D2)"})
+    full = overall("eval/battery_a1w2_full_r20.json",
+                   "summary_type_credited")
     entries.append({
         "stage": "generator_arm",
-        "variant": "SYS_A1_INT_V4 + SYS_A1F_V4 (r20 full battery)",
-        "incumbent": "battery_a1w_r11.json",
-        "variant_numbers": None,
+        "variant": "SYS_A1_INT_V4 + SYS_A1F_V4 (r20 full battery, n=29 "
+                   "valid + 1 transport-dead)",
+        "incumbent": "eval/battery_a1w_r11.json",
+        "incumbent_numbers": overall("eval/battery_a1w_r11.json",
+                                     "summary_all_valid"),
+        "variant_numbers": full,
         "metric_citation": "eval/battery_a1w2_full_r20.json"
-                           ":summary_type_credited (PENDING — written "
-                           "when the pre-registered full battery "
-                           "lands)",
-        "beats_incumbent": None,
-        "rounds_without_beating": None,
-        "gate_pass": None,
-        "status": "PENDING_MEASUREMENT",
+                           ":summary_type_credited",
+        "beats_incumbent": beats(full, overall(
+            "eval/battery_a1w_r11.json", "summary_all_valid")),
+        "rounds_without_beating": 2,
+        "gate_pass": (full["novelty_delta_mean"] >= 0.5
+                      and full["feasibility_abs_gap_mean"] <= 0.25
+                      and full["n_valid"] >= 30),
+        "gate_pass_note": "gate NOT_MET: feasibility 1.379 > 0.25 AND "
+                          "n=29 < 30 (eval-new10 transport-dead twice); "
+                          "novelty clause passes (1.931, CI lower bound "
+                          "1.172 >= 0.5)",
+        "status": "ACTIVE",
         "gate_carrier": True,
-        "gate_carrier_reason": "the AM20 D1 gate-decisive measurement "
-                               "is running; the registry entry is "
-                               "completed from its committed record"})
+        "gate_carrier_reason": "the core generator arm carries the "
+                               "Art. 14 gate; Art. 20's 2-round "
+                               "auto-retire applies to ADDED stages, "
+                               "not to the arm whose battery series "
+                               "decides the gate. The measured finding "
+                               "is typed honestly: the V4 contract's "
+                               "hard-7 pilot improvement does NOT "
+                               "generalize through fresh re-generation "
+                               "(fresh-draw variance, R13-F4, swamped "
+                               "the contract gains); the next F30 lever "
+                               "must attack generator draw variance, "
+                               "not contract text alone"})
     entries.append({
         "stage": "critic",
         "variant": "plausibility critic (physics/scope/premise + repair)",

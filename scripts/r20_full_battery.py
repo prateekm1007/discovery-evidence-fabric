@@ -121,6 +121,20 @@ def _sha(s):
     return hashlib.sha256(s.encode("utf-8")).hexdigest()[:16]
 
 
+def _backfill_tc(row):
+    """The shared summarize() reads T/C per-axis deltas; rows built
+    before R20 carried only N/F — derive them from the stored medians
+    (pure arithmetic on committed bytes, typed in the row)."""
+    med = row.get("median_axes")
+    if med and "testability_delta" not in row:
+        if "T_A" in med and "T_B" in med:
+            row["testability_delta"] = med["T_A"] - med["T_B"]
+        if "C_A" in med and "C_B" in med:
+            row["constraint_delta"] = med["C_A"] - med["C_B"]
+        row["tc_backfilled_from"] = "median_axes (committed bytes)"
+    return row
+
+
 def baseline_for(pid):
     d12 = REPO / "eval" / "pairs" / "dev12_fresh" / f"{pid}.json"
     if d12.exists():
@@ -251,7 +265,7 @@ def main() -> int:
                       flush=True)
                 continue
             if pid in RIDE_PILOT:
-                row = dict(pilotrows[pid])
+                row = _backfill_tc(dict(pilotrows[pid]))
                 rec = json.loads((PILOT_DIR / f"{pid}.json").read_text(
                     encoding="utf-8"))
                 row["question_type_gate"] = rec["meta"]["type_gate"]
@@ -269,7 +283,7 @@ def main() -> int:
                 print(f"  [{pid[:32]:<34}] ride pilot row", flush=True)
                 continue
             if pid in RIDE_R11_PRED:
-                row = dict(r11rows[pid])
+                row = _backfill_tc(dict(r11rows[pid]))
                 row["ride"] = {"row_source": "battery_a1w_r11.json",
                                "byte_source": f"eval/pairs/r11_a1w_r1/"
                                               f"{pid}.json",
@@ -316,6 +330,8 @@ def main() -> int:
                 row["novelty_delta"] = med["N_A"] - med["N_B"]
                 row["feasibility_abs_gap"] = abs(med["F_A"] - med["F_B"])
                 row["feasibility_signed_gap"] = med["F_A"] - med["F_B"]
+                row["testability_delta"] = med["T_A"] - med["T_B"]
+                row["constraint_delta"] = med["C_A"] - med["C_B"]
             if pid == "eval-new01-supercap-dryout":
                 row["standing_adjudication_note"] = (
                     "AM11 sec.3 / AM12 par.1 holding concerns the R11 "
