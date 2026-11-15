@@ -209,6 +209,24 @@
     "eval/work_claims.json"
    ],
    "notes": "AM23 D3 (F33 mitigation, loop-owned per the Art. 28 addendum) — remote URL moved off the embedded token to credential-helper/vault form. DISCLOSED (c-0001 precedent): filed DONE at the same commit that completes it. Evidence: (1) remote origin is now the token-less https://github.com/pr837/discovery-evidence-fabric.git form (no userinfo component); (2) credential.helper = scripts/git_cred_helper_vault.sh (repo-local git config), which supplies GH_PAT at call time from the gitignored vault (.env.keys, vault-only storage) — the token never reaches a log, artifact, or git history; (3) the credential path is FETCH-TESTED on the token-less URL (succeeded); (4) secret-grep: helper 0 hits; .env.keys carries the vault values and is UNTRACKED (gitignored — vault-only storage, the mitigation state); committed-tree pattern scan finds only secret-SCANNER regex definitions (epistemic_lightweight.yml / HF_SECURITY_SCAN.json / r386_release_chain.py), zero real tokens. Rotation remains the owner account-level prerogative, NOT re-asked (AM23 sec.2)."
+  },
+  {
+   "claim_id": "c-0012",
+   "work_id": "r23-feas-bind-v6",
+   "session_id": "builder-r20s1",
+   "role": "EXECUTOR",
+   "kind": "measurement",
+   "base_sha": "91870128d",
+   "claimed_at": "2026-11-15T18:58:00Z",
+   "lease_expiry": "2026-11-15T21:10:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/pairs/r23_feas_bind_v6/",
+    "eval/battery_feas_bind_v6_r23.json",
+    "eval/battery_feas_bind_v6_r23.partial.json"
+   ],
+   "notes": "AM23 D2 round-2 — the feasibility lever moves INTO the draft contract: SYS_A1_INT_V6 = V4 + FEASIBILITY BIND at MECHANISM CHOICE (procurable classes only; bill format mandated at draft — the V5 lesson; MINIMAL bill; novelty lives in the CHANGE; the bind outranks mechanism preference — choose a different mechanism if the first cannot meet it). Machine path byte-unchanged (critic + gate + NEUTRAL typed machine repairs, budget 2, findings disclosed — the r20/r21/holdout code path); repair pass is neutral so the arm under test is the CONTRACT BIND. Byte map: 18 fresh intervention (K_GEN=1, no selection) + 12 predictor rides byte-identical r11 (n=30). Pre-registration = scripts/r23_a1w_v6_contract.py + scripts/r23_feas_bind_v6.py committed in this push BEFORE any LLM call (Art. 29(b)). Canonical metric unchanged (Art. 16/19); judge crowllm/Qwen != generator zai/GLM; transport ladder identical; phases staggered. FAIL-CLOSED ARITHMETIC DISCLOSURE (pre-registered): predictor rides carry r11 fgap sum 14 -> overall <=0.25 floor 14/30 ~= 0.467 by construction; this battery decides the LEVER (Art. 20 ablation vs the single-draw incumbent; V5 retired at round 1 with this successor shipping in the same change, Art. 16). VERIFIER: the peer session is invited — recompute from committed bytes (Art. 13), NEVER re-run; flips to DONE only when the verifier record exists."
   }
  ],
  "trailer_violations": [
