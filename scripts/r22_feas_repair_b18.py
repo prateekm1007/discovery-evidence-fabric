@@ -160,15 +160,34 @@ def baseline_for(pid):
     return "", ""
 
 
+def _retry_call(f, *args, tries=3, backoff=(10.0, 30.0)):
+    """Transient-failure retry (typed, Art. 15: infra failure is never
+    scientific rejection): generation/critic calls get 3 attempts with
+    backoff on any transport exception; the r21 run lost a whole driver
+    pass to a single HTTP 500 — never again."""
+    last = None
+    for t in range(tries):
+        try:
+            return f(*args)
+        except Exception as e:  # noqa: BLE001 — typed infra retry
+            last = e
+            if t < tries - 1:
+                time.sleep(backoff[min(t, len(backoff) - 1)])
+                print(f"    [retry {t+1}] {type(e).__name__}: {str(e)[:90]}",
+                      flush=True)
+    raise last
+
+
 def draft_and_repair(pid, prob, gw_key):
     """V5 leg: one draft under the UNCHANGED V4 contract, typed scan,
     repair pass (budget 2) with the typed rework directive, re-scan.
-    All drafts/repairs + scans recorded for verifier recomputation."""
+    All drafts/repairs + scans recorded for verifier recomputation.
+    Generation/critic calls are transient-retry hardened (Art. 15)."""
     qt = (prob.get("question_type") or "").lower()
     q = _prob_q(prob)
     attempts = []
-    draft, lat = _gen(q, SYS_A1_INT_V4, gw_key)
-    cr = critic(draft, prob)
+    draft, lat = _retry_call(_gen, q, SYS_A1_INT_V4, gw_key)
+    cr = _retry_call(critic, draft, prob)
     tg = gate_question_type(draft, prob)
     vio0 = scan(draft)
     attempts.append({"stage": "draft", "chars": len(draft),
@@ -184,8 +203,9 @@ def draft_and_repair(pid, prob, gw_key):
         if not vio:
             break
         directive = repair_directive(vio)
-        final, rlat = _gen(q + "\n\n" + directive, SYS_A1_INT_V4, gw_key)
-        cr_r = critic(final, prob)
+        final, rlat = _retry_call(_gen, q + "\n\n" + directive,
+                                  SYS_A1_INT_V4, gw_key)
+        cr_r = _retry_call(critic, final, prob)
         vio = scan(final, repaired=True)
         attempts.append({"stage": f"repair_{rep}", "chars": len(final),
                          "latency_s": round(rlat, 1),

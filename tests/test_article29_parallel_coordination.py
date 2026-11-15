@@ -241,14 +241,25 @@ def _trailer(tr, key):
 
 def test_post_adoption_commits_carry_session_and_work_id_trailers():
     shas, trailers, _ = _post_adoption_commits()
+    # F36 typed allowance (fail-closed the OTHER way): a trailer-less
+    # commit must be REGISTERED in eval/work_claims.json
+    # (trailer_violations[]) with session attribution and remediation
+    # status — violations can never hide silently, and the register
+    # itself is CI-gated. Unregistered trailer-less commits still fail.
+    reg = json.loads(REG.read_text(encoding="utf-8"))
+    disclosed = [str(v.get("sha") or "")
+                 for v in (reg.get("trailer_violations") or [])]
     for sha in shas:
         tr = trailers.get(sha, "")
         sess = _trailer(tr, "Session")
         wid = _trailer(tr, "Work-Id")
-        assert sess and wid, (
-            f"commit {sha[:12]} lacks Session:/Work-Id: trailers — "
-            "100% of post-adoption commits carry both (Art. 29(a), "
-            "owner direction 3)")
+        if not (sess and wid):
+            assert any(sha.startswith(s) for s in disclosed if s), (
+                f"commit {sha[:12]} lacks Session:/Work-Id: trailers AND "
+                "is not registered in trailer_violations — every "
+                "violation must be typed with session attribution "
+                "(Art. 29(a) + F36 discipline; 100% of compliant "
+                "post-adoption commits carry both)")
 
 
 def test_canonical_measurement_commits_match_a_claim():

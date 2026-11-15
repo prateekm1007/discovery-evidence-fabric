@@ -1,11 +1,14 @@
 {
  "record": "ENFORCEMENT_MAP/2.0.0 (v3.1.0: every article is queue-gated by a passing CI check, or CI-pinned-flagged with the gap typed — no silent gaps; 29/29 articles after the owner-added Art. 29)",
- "at": "2026-11-15 (R20, AM20 D2 + Art. 29 adoption)",
+ "at": "AM22 D3 wiring (builder-r20s1): 8 PROCESS -> WIRED via tests/test_article_process_wiring.py; Art. 4 CI-pinned-flagged; map 26 WIRED / 2 PARTIAL / 1 FLAGGED / 1 pinned PROCESS = 29/29",
  "article_map": {
   "1": {
    "article": "Evidence & provenance",
-   "status": "PROCESS",
-   "mechanism": "auditor-enforced on every round (provenance fields in every record; Art. 13 recompute discipline)"
+   "status": "WIRED",
+   "mechanism": "every row of every pre-registered battery record carries provenance of its A-side bytes (byte_provenance | ride | a1_arm) — queue-gated [tests/test_article_process_wiring.py]",
+   "tests": [
+    "tests/test_article_process_wiring.py"
+   ]
   },
   "2": {
    "article": "Verifier independence & self-attack",
@@ -20,12 +23,15 @@
   "4": {
    "article": "History & corrections",
    "status": "PROCESS",
-   "mechanism": "auditor ledger + amendments; corrections recorded per round (M9/M10 stand)"
+   "mechanism": "CI-PINNED-FLAG (AM22 D3): tests/test_article_process_wiring.py::test_art4_history_corrections_ci_pinned_flag asserts the auditor-custody gap stays typed and visible — the ledger and amendments live on the auditor-custodied audit branch; builder-side gating is forbidden by the audit-branch guard, so the flag is pinned in CI rather than wired"
   },
   "5": {
    "article": "Disclosure",
-   "status": "PROCESS",
-   "mechanism": "disclosure sections in every round record + status files; races/estimates typed"
+   "status": "WIRED",
+   "mechanism": "every round status record carries typed disclosure content (race / typed_finding / arithmetic disclosures) — queue-gated [tests/test_article_process_wiring.py]",
+   "tests": [
+    "tests/test_article_process_wiring.py"
+   ]
   },
   "6": {
    "article": "Anti-gaming",
@@ -39,13 +45,19 @@
   },
   "8": {
    "article": "Unknown & commercial honesty",
-   "status": "PROCESS",
-   "mechanism": "ASSUMPTION/CALCULATED/USER-CONSTRAINT labeling enforced in the answer contracts and the critic; commercial claims scoped in records"
+   "status": "WIRED",
+   "mechanism": "the label taxonomy (USER CONSTRAINT / CALCULATED / ASSUMPTION) exists in the contract family the critic enforces, with the no-development rule kept in the V-contract line — queue-gated [tests/test_article_process_wiring.py]",
+   "tests": [
+    "tests/test_article_process_wiring.py"
+   ]
   },
   "9": {
    "article": "Thresholds",
-   "status": "PROCESS",
-   "mechanism": "AM14 D5 thresholds verbatim in the shared summarize() (owner-defined, class BUYER_DEFINED)"
+   "status": "WIRED",
+   "mechanism": "the shared metric core computes the AM14 D5 clause point-estimates verbatim (0.5 / 0.25, class BUYER_DEFINED) — queue-gated [tests/test_article_process_wiring.py]",
+   "tests": [
+    "tests/test_article_process_wiring.py"
+   ]
   },
   "10": {
    "article": "Generator/verifier separation",
@@ -54,8 +66,11 @@
   },
   "11": {
    "article": "Independence tracked",
-   "status": "PROCESS",
-   "mechanism": "provider+family provenance fields in every judged row"
+   "status": "WIRED",
+   "mechanism": "every judged row of the current records names the judge route and the records declare provider-AND-family independence — queue-gated [tests/test_article_process_wiring.py]",
+   "tests": [
+    "tests/test_article_process_wiring.py"
+   ]
   },
   "12": {
    "article": "Stage calibration, falsification & learning",
@@ -79,8 +94,11 @@
   },
   "16": {
    "article": "Retirement",
-   "status": "PROCESS",
-   "mechanism": "deletion accounting per round (Art. 16 sections in status records; one canonical metric)"
+   "status": "WIRED",
+   "mechanism": "ABLATION_REGISTRY retire rule + every RETIRED entry names successor and typed reason — queue-gated [tests/test_article_process_wiring.py]",
+   "tests": [
+    "tests/test_article_process_wiring.py"
+   ]
   },
   "17": {
    "article": "Secrets & credential custody",
@@ -89,8 +107,11 @@
   },
   "18": {
    "article": "Durable execution & push",
-   "status": "PROCESS",
-   "mechanism": "push discipline per round; durable artifacts committed (scripts + records); queue CI verifies on push"
+   "status": "WIRED",
+   "mechanism": "the queue workflow triggers on every queue/** push with full checkout and runs the enforcement surface — queue-gated [tests/test_article_process_wiring.py]",
+   "tests": [
+    "tests/test_article_process_wiring.py"
+   ]
   },
   "19": {
    "article": "Metric unit tests",
@@ -119,8 +140,11 @@
   },
   "24": {
    "article": "Lead preservation",
-   "status": "PROCESS",
-   "mechanism": "ACTIVE_PATH.md maintained per round; cemetery chain suites preserve dead leads"
+   "status": "WIRED",
+   "mechanism": "ACTIVE_PATH.md + the cemetery chain suites + the dead-lead accounting in ABLATION_REGISTRY — queue-gated [tests/test_article_process_wiring.py]",
+   "tests": [
+    "tests/test_article_process_wiring.py"
+   ]
   },
   "25": {
    "article": "Feasibility before novelty",

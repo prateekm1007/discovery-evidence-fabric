@@ -1,0 +1,54 @@
+{
+ "problem_id": "bench-p01-pemfc-dehydration",
+ "a1_source": "SYS_A1_INT_V4+V5-repair-leg/r22_feas_repair_b18",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nTo prevent membrane dehydration in proton exchange membrane fuel cell stacks under high current density operation, we propose an internal water management system that recycles product water from the cathode exhaust to humidify the anode inlet gas. Standard practice uses external humidification systems that consume parasitic energy to add moisture to both anode and cathode streams. Our intervention is a genuine departure because it leverages the water produced as a byproduct of the electrochemical reaction itself, creating a closed-loop water management system without external energy input for humidification. The adjacent-technique clearance is the use of membrane humidifiers in fuel cell systems, which transfer water from the cathode to anode streams but require a pressure differential and don't create a complete closed loop. Our intervention attacks the failure's driving physics by directly addressing the water deficit in the anode side through product water recycling, maintaining membrane hydration without additional energy consumption.\n\nPHYSICS CHECK\nThe governing physical relation is the water balance equation in PEMFCs: Water production rate = Water consumption rate + Water transport through membrane + Water in exhaust streams. Under high current density (1.5 A/cm²), water production increases but membrane transport decreases due to reduced back-diffusion from cathode to anode. By recycling cathode exhaust water to the anode inlet, we increase the anode inlet relative humidity, enhancing water back-diffusion through the membrane to maintain hydration. A 10% increase in anode relative humidity can reduce membrane resistance by approximately 15-20%, based on empirical data from Nafion membrane conductivity studies.\n\nIMPLEMENTATION BILL\nStandard Practice Bill:\n- External humidification system for cathode inlet gas (b)\n- External humidification system for anode inlet gas (b)\n- Additional gas heating for humidified streams (b)\n- Control system for humidification (a)\n\nIntervention Bill:\n- Water separator unit in cathode exhaust line (b)\n- Anode inlet gas humidification unit using recovered water (b)\n- Control system for water recovery and distribution (a)\n- Modification to anode inlet gas mixing chamber (c)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- External humidification system for cathode inlet gas (b) → Replaced by water separator unit (b): Same class component, comparable cost and complexity\n- External humidification system for anode inlet gas (b) → Replaced by anode inlet gas humidification unit using recovered water (b): Same class component, comparable cost and complexity\n- Additional gas heating for humidified streams (b) → Eliminated: No longer needed as recovered water is at stack temperature\n- Control system for humidification (a) → Modified control system for water recovery and distribution (a): Uses existing infrastructure with software updates\n- Additional modification to anode inlet gas mixing chamber (c): Parameter change to existing equipment, no new hardware cost\nTotal burden: Same class as standard practice with no additional major components required.\n\nEXECUTABLE TEST\nProtocol: Operate fuel cell stack at 1.5 A/cm² current density and 80°C stack temperature for 100 hours while monitoring membrane resistance and temperature distribution. Compare performance with and without the water recycling system.\nInstruments: Electrochemical impedance spectrometer for membrane resistance, infrared thermal camera for hot spot detection, humidity sensors at anode/cathode inlets and outlets, flow meters.\nPass/Fail Threshold: System passes if membrane resistance remains within 10% of initial value throughout the test and no temperature hotspots (>5°C above average) develop. Fail criterion is any 20% increase in membrane resistance or development of hotspots.\nDuration: 100 hours continuous operation at specified conditions.\nKill Criterion: Immediate shutdown if membrane resistance increases by 20% or any temperature hotspot develops.\n\nFEASIBILITY AUDIT (V5)\n- Water separator unit in cathode exhaust line - (b) - Procurable fuel cell condenser unit\n- Anode inlet gas humidification unit using recovered water - (b) - Standard fuel cell humidifier component\n- Control system for water recovery and distribution - (a) - Existing stack control system with software update\n- Modification to anode inlet gas mixing chamber - (c) - Existing anode gas manifold with procedural change",
+ "meta": {
+  "repairs": 2,
+  "residual_findings": {},
+  "audit_block": true,
+  "final_sha256_16": "0549383599bcc3a8",
+  "attempts": [
+   {
+    "stage": "draft",
+    "chars": 4449,
+    "latency_s": 11.2,
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "scan": {
+     "BILL_UNTAGGED": [
+      "- Cathode humidification system with humidifier and control valve",
+      "- Stack coolant temperature control system",
+      "- Anode gas supply with standard dry hydrogen"
+     ]
+    },
+    "sha256_16": "db6cb2ba8be37768"
+   },
+   {
+    "stage": "repair_1",
+    "chars": 4716,
+    "latency_s": 11.9,
+    "critic_verdict": "CLEAN",
+    "scan": {
+     "BILL_UNTAGGED": [
+      "- Standard practice burden: External humidifier + control system + additional gas heating",
+      "- Our intervention burden: Water separator (replaces part of existing exhaust treatment) +"
+     ]
+    },
+    "sha256_16": "93fa9734cfe40379"
+   },
+   {
+    "stage": "repair_2",
+    "chars": 4485,
+    "latency_s": 10.6,
+    "critic_verdict": "CLEAN",
+    "scan": {},
+    "sha256_16": "0549383599bcc3a8"
+   }
+  ]
+ },
+ "generated_at": "2026-11-15T17:09:57.908777Z"
+}
