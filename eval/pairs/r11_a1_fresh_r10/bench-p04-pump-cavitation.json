@@ -1,0 +1,14 @@
+{
+ "problem_id": "bench-p04-pump-cavitation",
+ "a1_source": "GLM_CURATED_R10_REGEN",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "system_contract": "SYS_A1_GROUNDED (battery SYS_A1 + AM10 D4 feasibility-grounding contract)",
+ "generation_state": "GENERATED",
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "latency_s": 6.4,
+ "prompt_hash": "a89ffcb98afe9f44",
+ "superseded_f29_gen": "BATTERY_R5_FRESH_GEN_mistral14b_SYS_A1 (axes+prompt_hash only, eval/battery30_r11_r5.json)",
+ "at": "2026-11-15T06:51:12.771750Z",
+ "a1_answer": "**Engineering Solution:**\n**Design/Indicator:** Redistribute vane loading by modifying the vane inlet angle and thickness distribution to reduce local pressure gradients.\n\n**Threshold:** \n- USER CONSTRAINT: 85% of best-efficiency flow (rationale: fixed operating point requirement)\n- CALCULATED: Maximum local pressure gradient reduction of 25% at vane leading edge (rationale: based on cavitation inception threshold where vapor pressure is reached)\n- ASSUMPTION: Original pressure gradient at 85% flow is 15 kPa/mm (rationale: typical value for centrifugal pump impellers at off-design conditions)\n\n**Falsification Test:**\n1. Protocol: \n   - Install instrumented impeller with pressure transducers at vane leading edges (±0.5 mm accuracy)\n   - Test pump at 85% best-efficiency flow with 1.5 m NPSH margin\n   - Measure pressure gradients and head delivery continuously for 1,000 hours\n   - Perform visual inspection of vanes after test\n\n2. Measured Quantities:\n   - Local pressure gradients (kPa/mm)\n   - Head delivery (m)\n   - Vane erosion depth (mm)\n\n3. Explicit Thresholds:\n   - Pressure gradient must remain ≤ 11.25 kPa/mm (15 kPa/mm × 0.75)\n   - Head degradation must not exceed 2% from initial value\n   - Erosion depth must not exceed 0.1 mm\n\n4. Pass/Fail Criteria:\n   - PASS: All thresholds maintained throughout test\n   - FAIL: Any threshold exceeded at any measurement point\n\n5. Kill Criterion:\n   - Immediate test termination if pressure gradient exceeds 15 kPa/mm or erosion exceeds 0.1 mm at any point\n\n**Standard Practice Comparison:**\nStandard practice typically uses hardened materials (e.g., stainless steel) or surface coatings to resist cavitation erosion. The proposed approach maintains the same order-of-magnitude cost (material modification vs. coating) with similar hardware requirements (pressure instrumentation for both validation approaches). Integration effort is comparable as both require precise manufacturing of the impeller vanes. The novelty lies in proactive pressure gradient reduction rather than passive material resistance, but the feasibility footprint remains equivalent."
+}
