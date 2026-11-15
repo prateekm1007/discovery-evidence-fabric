@@ -279,5 +279,16 @@
    "status": "DISCLOSED_PENDING_REMEDIATION",
    "note": "F36-pattern: pushed history is never rewritten; remediation is forward — all c-0006 commits carry the correct Work-Id, the auditor adjudicates the mixed-commit gap; the peer's catch is acknowledged with thanks (the mechanism catching its own executor)"
   }
+ ],
+ "findings": [
+  {
+   "id": "F37_SESSION_IDENTITY_COLLISION",
+   "severity": "MEDIUM",
+   "detected_by": "builder-r20s1",
+   "detected_at": "2026-11-15T19:55:00Z",
+   "finding": "4 pushed commits by the peer actor (4d3ae880a, b8ee4f3c0, 617fa6b2d, 343518fc7) carry Session: builder-r20s1 trailers — THIS session identity — while the same actor established itself as builder-r20s2 in its own claims (c-0008, c-0009). Git authors are identical container defaults (Z User <z@container>), so trailers are the ONLY attribution root (Art. 29(a)); two commit streams under one session id breaks attribution auditability. The T5 canonical-claim test passes mechanically on those commits because they match MY EXECUTOR claims (c-0006, c-0011) rather than the actor verifier role they performed.",
+   "status": "DISCLOSED_PENDING_REMEDIATION",
+   "note": "Auditor adjudication needed: re-key the colliding commits to builder-r20s2 (forward note, no history rewrite) and confirm the two-session keying; this session makes NO change to its own identity or to the pushed commits."
+  }
  ]
 }
