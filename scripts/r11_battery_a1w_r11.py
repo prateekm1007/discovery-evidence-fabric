@@ -106,7 +106,7 @@ def parse_axes(jc):
     return None
 
 
-def _r9_reference() -> dict:
+def _r10_reference() -> dict:
     """Per-pair battery r10 medians (the type-aware arms) so the
     r10->r11 movement reads from this record without a join."""
     if not R8_RECORD.exists():
