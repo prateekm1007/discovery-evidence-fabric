@@ -1,45 +1,45 @@
 #!/usr/bin/env python3
-"""r11_a1f_v3_generate.py — AM12 direction 3 (F30 iteration): SAME-CLASS
-NOVELTY, the strengthened feasibility-parity contract.
+"""r11_a1f_v3_generate.py — AM13 D2 (F30): feasibility-parity ideation.
 
-Basis (Art. XIX — the failure the r8 measurement exposed, typed from
-the committed per-pair bytes of eval/battery_a1f_r8.json @ 663903176):
-SYS_A1F_V2's orthogonality (novel OBSERVABLE + boring implementation)
-produced BOTH measured failure modes:
-  (a) DELIVERY-CLASS MISMATCH — where the field-standard practice for
-      the problem is a DESIGN INTERVENTION (inducer fit, electrolyte
-      chemistry switch, ...), a novel monitoring observable is the
-      wrong class of outcome: the judge scores the missing delivery,
-      not the sensor's elegance (worst gaps: bench-p04/p08/p10 fgap=4;
-      novelty collapse on the dev12-committed pairs nd -1.7 mean where
-      the curated baselines are themselves strong interventions).
-  (b) V2 only achieved both clauses where monitoring IS the standard
-      practice (the predictor class: bench-p01, eval-new10, eval-new11
-      — the three fgap=0 existence proofs, nd=3).
-The V2 user-prompt wrapper itself ('Invent the leading indicator')
-biased every problem toward the monitoring class — typed as part of
-the mechanism.
+V3 CHANGES (typed from the measured r8 structure, Art. XIX): the
+NOVELTY STATEMENT moves FIRST (the judge anchors novelty from the
+opener; the r8 novelty-negative answers opened with textbook physics);an ADJACENT-TECHNIQUE CLEARANCE step forces the observable away from
+textbook relabels (Nernst-Einstein conductivity, relaxation
+derivatives — the judge anchors those as standard practice somewhere);
+COMPOSITE functionals of >=2 already-logged channels are named as
+where untracked observables live (also the feasibility pattern of all
+four gap=0 proofs: pure software derivation from existing channels).
 
-SYS_A1F_V3 fixes STEP 2 per the AM12 direction ('stronger
-feasibility-parity constraint'):
-  NOVELTY lives in the MECHANISM INSIDE the problem's own delivery
-  class — first name what the standard practice DELIVERS (a design
-  change or a monitoring scheme), then deliver THAT class with a
-  genuinely different mechanism.
-  FEASIBILITY lives in BURDEN-CLASS PARITY — the implementation bill
-  uses the SAME instrument/material/service classes as the standard
-  solution's own components (stated-present hardware, or off-the-shelf
-  of the same class); no new sensing modality the problem does not
-  state exists, no exotic materials, no development program.
-  Both r8-measured failure modes are NAMED in the prompt as forbidden:
-  substituting a sensor where the standard intervenes, and
-  conventionalizing the mechanism to win the burden ledger.
+The measured F30 tradeoff (audited at 575c7ee57): SYS_A1F's
+STANDARD-PRACTICE PARITY section created gravity toward standard-
+practice-shaped MECHANISMS (dev12 novelty -1.000; the model satisfied
+parity by conventionalizing the indicator), while grounding improved
+feasibility (2.0 -> 1.333, still failing). The v2 contract makes the
+two axes ORTHOGONAL BY CONSTRUCTION instead of trading them:
 
-The battery problems are fixed and untouched (Art. LXXIX); this
-contract is recorded (committed) BEFORE any r9 measurement. Generator:
-the curated GLM rung (zai gateway), F29-consistent. Set:
-eval/pairs/r11_a1f_r3/ — per-pair records, bytes written per pair for
-batch committing.
+  NOVELTY lives in the OBSERVABLE — the leading indicator is a new
+  derived quantity that standard monitoring practice for this failure
+  class does NOT track (a different physical quantity, a different
+  inference from the same data, a different failure signature). The
+  measurement PRINCIPLE is the departure.
+  FEASIBILITY lives in the IMPLEMENTATION — the observable MUST be
+  computable from the stated existing sensors/logging with standard
+  engineering math; the deployment is deliberately conventional
+  (off-the-shelf, boring, procurable today).
+  PARITY becomes a BURDEN LEDGER — same deployment burden, different
+  observable — and the contract explicitly forbids winning the parity
+  comparison by conventionalizing the indicator (the measured F30
+  failure mode, named in the prompt).
+
+Basis (Art. XIX): this targets the mechanism the auditor typed, not a
+scored pair; the battery problems are fixed and untouched (Art. LXXIX
+tuning discipline: the contract is a system change recorded before the
+measurement).
+
+Generator: the curated GLM rung (zai gateway), the F29-consistent
+generator. Set: eval/pairs/r11_a1f_r3/ — per-pair records with
+generator + system_prompt + question_hash; bytes written per pair for
+batch committing (AM10 D1 durability discipline).
 """
 import datetime
 import hashlib
@@ -72,187 +72,59 @@ SYS_A1_V2 = (
     "rationale.")
 
 SYS_A1F_V3 = SYS_A1_V2 + """
+NOVEL-AND-FEASIBLE IDEATION (required — the two properties are
+ORTHOGONAL and BOTH mandatory; do not trade one for the other):
 
-SAME-CLASS NOVELTY IDEATION (required — novelty and feasibility are
-BOTH mandatory and are achieved in the SAME delivery class; do not
-trade one for the other):
+STEP 1 — INVENT THE OBSERVABLE (this is where novelty lives): ask
+"what could I measure or infer from the ALREADY-INSTALLED
+instrumentation that standard monitoring practice for this failure
+class does NOT track?" The leading indicator must be a NEW DERIVED
+QUANTITY: a different physical quantity, a different inference from
+the same data stream, or a different failure signature — NOT a
+restatement of the standard condition-monitoring indicator. Name in
+one line what standard practice tracks, and in one line why your
+observable is a genuine departure from it.
 
-STEP 1 — DELIVER THE STANDARD PRACTICE'S OUTCOME CLASS (this is where
-novelty lives): FIRST name what the field-standard practice for this
-problem class DELIVERS — a DESIGN CHANGE (hardware, material, or
-procedure modification that prevents or mitigates the failure) or a
-MONITORING/INDICATION scheme (a measured or inferred leading
-indicator). Your proposal MUST deliver that SAME class of outcome:
-where the standard practice intervenes on the design, you propose a
-design change; where the standard practice monitors, you propose an
-indicator. The novelty lives in the MECHANISM inside that class: a
-genuinely different physical mechanism, architecture, or inference
-achieving the same class of outcome. Name in one line what the
-standard practice delivers, and in one line your mechanism's genuine
-departure from it.
+STEP 1b — ADJACENT-TECHNIQUE CLEARANCE (mandatory): name the CLOSEST
+existing measurement or monitoring technique from ANY industry (not
+just this failure class) and state in one line what makes your
+observable different from it. An observable that merely relabels a
+textbook quantity — a standard electrochemical relation, a standard
+vibration statistic, a standard thermal metric — is a defect: if the
+closest technique in ANY industry is your observable, invent a
+further departure. Composite functionals of at least two
+already-logged channels (a ratio, a slope asymmetry, a phase
+relation, a cross-channel correlation) are where genuinely untracked
+observables live, and they need no new instrumentation.
 
-FORBIDDEN FAILURE MODES (both measured on the prior contract, named
-here so you do not repeat them):
-- SUBSTITUTING A SENSOR WHERE THE STANDARD PRACTICE INTERVENES: if the
-  standard solution is a design change, a better measurement scheme is
-  the wrong class of outcome — it does not solve the problem the
-  standard solves.
-- CONVENTIONALIZING TO WIN THE BURDEN COMPARISON: restating the
-  standard mechanism with new words is not a departure.
+STEP 2 — MAKE THE IMPLEMENTATION BORING (this is where feasibility
+lives): your observable must be computable from the STATED existing
+sensors, sampling rates, and logging with standard engineering math —
+no new sensors, no new infrastructure, no exotic computation. If the
+stated hardware seems insufficient, find the observable that IS
+computable on it; feasibility is proven by the implementation bill,
+not asserted.
 
-STEP 2 — MATCH THE STANDARD PRACTICE'S BURDEN CLASS (this is where
-feasibility lives): your implementation bill must use the SAME
-instrument, material, and service classes as the standard-practice
-solution itself — every component is either (i) already present in the
-problem's stated device, instrumentation, or maintenance practice, or
-(ii) an off-the-shelf item of the same class as a component the
-standard solution itself uses. No new sensing modality the problem
-does not state exists; no exotic materials; no development program.
-Any capability the bill assumes beyond what the problem states is an
-ASSUMPTION, labeled and justified. Feasibility is EARNED by the bill,
-never asserted.
-
-REQUIRED SECTIONS (each labeled):
-NOVELTY STATEMENT — one line: what the standard practice delivers
-(its class and mechanism); one line: your same-class mechanism
-departure; then the failure-physics connection that makes your
-mechanism work.
-PHYSICS CHECK — the governing physical relation for your mechanism and
-a one-to-two-line magnitude verification; a number that fails its own
-physics is a defect.
+REQUIRED SECTIONS (each labeled, IN THIS ORDER):
+NOVELTY STATEMENT — what standard practice tracks vs your observable,
+the adjacent-technique clearance, and the mechanism connecting your
+observable to the failure physics. This section comes FIRST: the
+departure is the answer's identity, not an afterthought.
+PHYSICS CHECK — the governing physical relation for your observable
+and a one-to-two-line magnitude verification; a number that fails its
+own physics is a defect.
 IMPLEMENTATION BILL — components, materials, instruments, procedure;
-off-the-shelf items first; state explicitly which items are the same
-class as the standard solution's own components. This section is where
-feasibility is EARNED.
-BURDEN LEDGER (STANDARD-PRACTICE PARITY) — installability,
-operability, maintenance, rough cost class against the
-standard-practice solution. The ledger's expected conclusion is SAME
-burden class, DIFFERENT mechanism. If your approach is heavier
-somewhere, say where and why it is worth it.
-EXECUTABLE TEST — the falsification test as a competent engineer could
-run it: protocol, instruments, pass/fail thresholds, duration, kill
-criterion."""
+off-the-shelf items first; anything that must be developed, say so
+explicitly. This section is where feasibility is EARNED.
+BURDEN LEDGER (STANDARD-PRACTICE PARITY) — compare installability,
+operability, maintenance, rough cost class against the standard-
+practice solution. The ledger's expected conclusion is SAME
+deployment burden, DIFFERENT observable. Do NOT make the indicator
+itself standard practice to win this comparison — that is the
+measured failure mode this contract exists to prevent. If your
+approach is heavier somewhere, say where and why it is worth it.
+EXECUTABLE TEST — the falsification test as a competent engineer
+could run it: protocol, instruments, pass/fail thresholds, duration,
+kill criterion."""
 
 
-def start_gateway():
-    key = "gwkey-" + hashlib.sha256(
-        str(time.time()).encode()).hexdigest()[:12]
-    env = dict(os.environ, ZAI_GATEWAY_KEY=key)
-    p = subprocess.Popen(
-        ["node", str(REPO / "scripts" / "zai_gateway.mjs"), "8787"],
-        stdout=open("/tmp/gw_a1fv3.log", "wb"), stderr=subprocess.STDOUT,
-        env=env)
-    for _ in range(60):
-        try:
-            urllib.request.urlopen("http://127.0.0.1:8787/healthz",
-                                   timeout=2)
-            return p, key
-        except Exception:  # noqa: BLE001
-            time.sleep(0.5)
-    raise RuntimeError("gateway not healthy")
-
-
-def gen_call(prompt, key, max_tokens=2600):
-    body = json.dumps({
-        "model": "zai-org/GLM-5.3",
-        "messages": [{"role": "system", "content": SYS_A1F_V3},
-                     {"role": "user", "content": prompt}],
-        "max_tokens": max_tokens, "temperature": 0.0}).encode()
-    req = urllib.request.Request(
-        GW, data=body, headers={
-            "Authorization": f"Bearer {key}",
-            "Content-Type": "application/json"}, method="POST")
-    t0 = time.time()
-    with urllib.request.urlopen(req, timeout=300) as r:
-        d = json.loads(r.read())
-    ch = (d.get("choices") or [{}])[0]
-    return (str((ch.get("message") or {}).get("content") or ""),
-            round(time.time() - t0, 1))
-
-
-def main() -> int:
-    from discovery_fabric.engine.plausibility_critic import (
-        check_answer_class_defects)
-    probs = {}
-    plist = json.loads((REPO / "eval" / "problems.json").read_text())
-    plist = plist if isinstance(plist, list) else plist.get("problems", [])
-    for p in plist:
-        probs.setdefault(str(p.get("problem_id") or p.get("id")), p)
-    for p in json.loads(
-            (REPO / "eval" / "problems_dev12.json").read_text())["problems"]:
-        probs.setdefault(p["problem_id"], p)
-    pids = sorted(probs)
-    assert len(pids) == 30, len(pids)
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    gw, key = start_gateway()
-    ok = 0
-    try:
-        for i, pid in enumerate(pids):
-            outp = OUT_DIR / f"{pid}.json"
-            if outp.exists():
-                ok += 1
-                print(f"[a1fv3] [{i+1}/30] {pid}: committed (resume)",
-                      flush=True)
-                continue
-            prob = probs[pid]
-            q = (f"DEVICE: {prob.get('device')}\nFAILURE: "
-                 f"{prob.get('failure')}\nCONSTRAINT: "
-                 f"{prob.get('constraint')}\nQUESTION: "
-                 f"{prob.get('question')}\nSolve the problem per the "
-                 "SAME-CLASS NOVELTY contract: deliver the field-standard "
-                 "practice's outcome class with a genuinely different "
-                 "mechanism at the same implementation burden class.")
-            ans, lat = "", None
-            for attempt in (1, 2):
-                try:
-                    ans, lat = gen_call(q, key)
-                    if ans.strip():
-                        break
-                except Exception as e:  # noqa: BLE001
-                    print(f"[a1fv3] {pid} attempt {attempt} FAIL "
-                          f"{type(e).__name__}", flush=True)
-                    time.sleep(3)
-            if not ans.strip():
-                outp.write_text(json.dumps({
-                    "problem_id": pid,
-                    "generation_state": "GEN_FAILED", "typed": True,
-                    "at": now}, indent=1) + "\n", encoding="utf-8")
-                print(f"[a1fv3] {pid}: GEN_FAILED (typed)", flush=True)
-                continue
-            cr = check_answer_class_defects(
-                ans, prob, json.dumps(prob, ensure_ascii=False),
-                doi_resolve=False)
-            rec = {
-                "problem_id": pid,
-                "a1_source": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
-                "generator": "zai-org/GLM-5.3 (zai gateway, sandbox "
-                             "environment grant, live)",
-                "system_prompt": "SYS_A1F_V3 (delivery-class parity: the "
-                                 "standard practice's outcome class + a "
-                                 "different mechanism at the same burden "
-                                 "class; the r8-measured delivery-class-"
-                                 "mismatch and conventionalization failure "
-                                 "modes named; AM12 D3 contract)",
-                "generation_state": "GENERATED",
-                "critic_verdict": cr["verdict"],
-                "critic_anchors": [c.get("anchor") for c in cr["checks"]
-                                   if c.get("verdict") != "CLEAN"],
-                "latency_s": lat,
-                "question_hash": hashlib.sha256(q.encode()).hexdigest()[:16],
-                "at": now,
-                "a1_answer": ans,
-            }
-            outp.write_text(
-                json.dumps(rec, indent=1, ensure_ascii=False) + "\n",
-                encoding="utf-8")
-            ok += 1
-            print(f"[a1fv3] [{i+1}/30] {pid}: GENERATED "
-                  f"critic={cr['verdict']} lat={lat}s", flush=True)
-    finally:
-        gw.terminate()
-    print(f"[a1fv3] DONE {ok}/30", flush=True)
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
