@@ -11,10 +11,13 @@ Wireable offline half:
   2. every fixture used by the enforcement tests declares its class:
      MECHANICS_ONLY or BYTE_RECORD_PIN — an unlabeled fixture cannot
      back an acceptance claim;
-  3. the fresh-held-out half is FLAGGED (holdout v2 awaits owner
-     authorization; the owner-action register tracks it) — CI asserts
-     the flag exists so acceptance can never silently claim held-out
-     coverage it does not have.
+  3. the fresh-held-out half is MEASURED (AM24 D4 wiring): the holdout
+     v2 one-shot generation (12 records + generation record) is
+     committed on this branch and the verifier instrument recomputes
+     generation integrity from those bytes in-CI (zero LLM); the 0-4
+     SCORING stays auditor-custody (Art. 4 CI-pinned flag), and the
+     legacy held-out flag key stays visible carrying the MEASURED state
+     (history is evidence, never silently deleted).
 """
 import json
 import sys
@@ -58,17 +61,52 @@ def test_article22_fixtures_declare_mechanics_only():
             f"an acceptance claim")
 
 
-def test_article22_heldout_half_flagged_not_silent():
-    """The fresh-held-out half of Art. 22 must stay FLAGGED, not
-    silent. The enforcement map 2.0.0 moved the legacy flags into
-    enforcement_flags.json's legacy_flags sub-dict (R20) — read both
-    locations; the gap must exist and stay FLAGGED in whichever form
-    carries it."""
+def test_article22_fresh_heldout_half_measured():
+    """AM24 D4 wiring: the fresh-held-out half of Art. 22 is MEASURED.
+    The holdout v2 one-shot generation is committed on this branch as
+    12 per-problem records + the generation record (custody sha,
+    selection sha, one-shot discipline, no-rubric access all on the
+    record), and the verifier instrument recomputes generation
+    integrity from those bytes with ZERO LLM calls — this test runs it
+    as a subprocess and fails closed on any non-zero exit. The 0-4
+    SCORING of the sealed set remains auditor-custody (Art. 4
+    CI-pinned flag on the audit branch); the builder-side gate is the
+    committed generation bytes + verifier recompute. The legacy flag
+    key must STAY present in enforcement_flags.json carrying the
+    MEASURED state text (history visible, never silently deleted)."""
+    gen_dir = REPO / "eval" / "holdout_v2_generation"
+    pairs = sorted(gen_dir.glob("HO2-*.json"))
+    assert len(pairs) == 12, (
+        f"fresh-held-out half expects the 12 holdout v2 one-shot "
+        f"records committed, found {len(pairs)}")
+    rec = json.loads((gen_dir / "holdout_v2_generation_record.json")
+                     .read_text(encoding="utf-8"))
+    custody = rec.get("custody") or {}
+    assert custody.get("private_rubric_accessed") is False, (
+        "the generation record must carry the no-rubric-access custody "
+        "assertion (rubric PRIVATE)")
+    assert custody.get("problems_sha256_16"), (
+        "generation record must carry the received-problems sha (the "
+        "custody basis of the fresh-held-out half)")
+    assert rec.get("work_id") == "holdout-v2-generation"
+    # the verifier instrument recomputes from bytes, zero LLM (Art. 13)
+    import subprocess
+    r = subprocess.run(
+        [sys.executable, "-B", str(REPO / "scripts" /
+                                   "r23_verify_holdout.py")],
+        capture_output=True, text=True, timeout=300)
+    assert r.returncode == 0, (
+        "holdout v2 generation integrity does NOT recompute from "
+        f"committed bytes (exit {r.returncode}): "
+        f"{(r.stdout + r.stderr).strip()[-400:]}")
+    # the legacy flag stays present with the MEASURED state text
     flags = json.loads(FLAGS.read_text())
     legacy = flags.get("legacy_flags", {})
     flags_all = {**flags, **legacy}
     assert "article22_fresh_heldout" in flags_all, (
-        "Art. 22 held-out gap is no longer flagged — acceptance must "
-        "never claim held-out coverage it does not have")
+        "the Art. 22 held-out flag history was deleted — corrections "
+        "stay visible (Art. XI: history is evidence too)")
     assert str(flags_all["article22_fresh_heldout"]).startswith(
-        "FLAGGED")
+        "MEASURED"), (
+        "the held-out flag text must carry the MEASURED state (the "
+        "half is measured; keep the history, update the state)")

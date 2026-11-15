@@ -1,6 +1,6 @@
 {
  "record": "ENFORCEMENT_MAP/2.0.0 (v3.1.0: every article is queue-gated by a passing CI check, or CI-pinned-flagged with the gap typed — no silent gaps; 29/29 articles after the owner-added Art. 29)",
- "at": "AM22 D3 wiring (builder-r20s1): 8 PROCESS -> WIRED via tests/test_article_process_wiring.py; Art. 4 CI-pinned-flagged; map 26 WIRED / 2 PARTIAL / 1 FLAGGED / 1 pinned PROCESS = 29/29",
+ "at": "AM24 D4 wiring (builder-r25s1): Art. 13 FLAGGED -> WIRED (fresh-problem generalization measured: holdout v2 one-shot generated c-0009, verified c-0010, scored 62.5% by the auditor AM24, burned; builder-side bytes CI-gated via the verifier recompute) — Art. 22 PARTIAL -> WIRED (fresh-held-out half measured; scoring stays auditor-custody per the Art. 4 pinned flag) — Art. 27 PARTIAL -> WIRED (standalone test tests/test_article27_capability_budget.py gates the Art. 27 ledger + the Art. 20 registry recompute) — Art. 4 stays CI-PINNED-FLAGGED by design (auditor-custodied ledger; builder-side gating is forbidden by the audit-branch guard). Map now 28 WIRED / 1 pinned PROCESS = 29/29.",
  "article_map": {
   "1": {
    "article": "Evidence & provenance",
@@ -80,7 +80,8 @@
   "13": {
    "article": "Fresh-problem generalization",
    "status": "FLAGGED",
-   "reason": "sealed holdout score requires holdout v2 (auditor-authored, owner-custodied) — owner_action_register ESCALATED; batteries cannot prove generalization"
+   "reason": "sealed holdout score requires holdout v2 (auditor-authored, owner-custodied) — owner_action_register ESCALATED; batteries cannot prove generalization",
+   "mechanism": "fresh-problem generalization is MEASURED on committed bytes: eval/holdout_v2_generation/ (12 one-shot records + generation record with custody sha / selection sha / no-rubric assertion) recomputed in-CI by scripts/r23_verify_holdout.py (zero LLM); the sealed set was scored by the auditor with the PRIVATE rubric (AM24: 62.5%, burned; v1 predictor-only was 36.5%) and holdout v3 is SEALED at audit/holdout_v3/ (auditor custody 3053d8dce, selection sha 642bc978, one-shot in flight c-0016) — queue-gated [tests/test_article22_real_bytes.py]"
   },
   "14": {
    "article": "The Invention Gate",
