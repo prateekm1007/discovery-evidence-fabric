@@ -167,13 +167,31 @@
    "base_sha": "03b7371ff",
    "claimed_at": "2026-11-15T17:16:00Z",
    "lease_expiry": "2026-11-15T21:30:00Z",
-   "status": "OPEN",
+   "status": "DONE",
    "takes_over": null,
    "artifact_paths": [
     "eval/holdout_v2_generation/",
     "scripts/r22_holdout_v2_generate.py"
    ],
-   "notes": "AM23 holdout v2 ONE-SHOT generation — the unclaimed builder item (auditor authored/authorized/custodies per the Art. 28 addendum + PREREGISTRATION.json @6235108c3). Claim-before-work BEFORE any generation call (Art. 29(b)/(c): one generation for one-shot/sealed work). Protocol: builder receives problems ONLY (audit/holdout_v2/holdout_v2_problems.json, read from the audit branch; the PRIVATE rubric is NEVER read by builder/pipeline/judge); A1 answers generated ONCE with the type-aware contract (intervention -> SYS_A1_INT_V4, predictor -> SYS_A1F_V4, both byte-unchanged; contract_for(qt)); K_GEN=1, no best-of-k, no iteration, no rubric feedback, no re-draws; NO judge calls from this claim (the holdout is builder-unjudged by design; auditor scores with the private rubric). Generation phases staggered against the peer's live c-0006 run. Peer session is VERIFIER (recomputes generation integrity from bytes); status flips to DONE only on their record (Art. 29(c)); BURN after per the pre-registration. Outputs land in eval/holdout_v2_generation/ (canonical, Art. 29(e)). selection_sha256 67671fd6 is the auditor's pre-registered selection basis, not re-derivable by the builder."
+   "notes": "AM23 holdout v2 ONE-SHOT generation — the unclaimed builder item (auditor authored/authorized/custodies per the Art. 28 addendum + PREREGISTRATION.json @6235108c3). Claim-before-work BEFORE any generation call (Art. 29(b)/(c): one generation for one-shot/sealed work). Protocol: builder receives problems ONLY (audit/holdout_v2/holdout_v2_problems.json, read from the audit branch; the PRIVATE rubric is NEVER read by builder/pipeline/judge); A1 answers generated ONCE with the type-aware contract (intervention -> SYS_A1_INT_V4, predictor -> SYS_A1F_V4, both byte-unchanged; contract_for(qt)); K_GEN=1, no best-of-k, no iteration, no rubric feedback, no re-draws; NO judge calls from this claim (the holdout is builder-unjudged by design; auditor scores with the private rubric). Generation phases staggered against the peer's live c-0006 run. Peer session is VERIFIER (recomputes generation integrity from bytes); status flips to DONE only on their record (Art. 29(c)); BURN after per the pre-registration. Outputs land in eval/holdout_v2_generation/ (canonical, Art. 29(e)). selection_sha256 67671fd6 is the auditor's pre-registered selection basis, not re-derivable by the builder. VERIFIED (2026-11-15T18:40Z): peer VERIFIER record c-0010 (builder-r20s1) — 10/10 integrity checks PASS from committed bytes (Art. 13, never re-run): problem-set identity 12/12 vs the audit-branch problems file (sha 79db7868a0e7483d matches the custody record), selection_sha256 matches the auditor pre-registration, custody read at the sealed tip 6235108c3, type-aware contract mapping correct on all 12 from the AUDIT problems file, one-shot discipline (1 generation attempt/problem + machine-internal repairs <=2 with findings disclosed — the disclosed repair loop typed for the auditor ruling; no outcome-based iteration), builder-unjudged (no axes/draws/judge routes anywhere), no rubric content in the queue tree + no driver code path to the rubric, all answers substantive with the bill section. Scoring and burn-after are the auditor's."
+  },
+  {
+   "claim_id": "c-0010",
+   "work_id": "holdout-v2-generation",
+   "session_id": "builder-r20s1",
+   "role": "VERIFIER",
+   "kind": "task",
+   "base_sha": "10dd0a661",
+   "claimed_at": "2026-11-15T18:40:00Z",
+   "lease_expiry": "2026-11-15T20:40:00Z",
+   "status": "DONE",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/holdout_v2_generation/",
+    "scripts/r23_verify_holdout.py",
+    "eval/work_claims.json"
+   ],
+   "notes": "AM23 D1 VERIFIER record for c-0009 (the peer relative to the executor). Recomputed from committed bytes (Art. 13, never re-run) — instrument scripts/r23_verify_holdout.py exit 0, 10/10 checks PASS: (1) problem-set identity 12/12 (audit problems == pair files); (2) problems-file sha256_16 79db7868a0e7483d matches the executor custody record; (3) selection_sha256 == the auditor pre-registration 67671fd6...; (4) custody read at the sealed tip 6235108c3; (5) type-aware contract mapping verified from the AUDIT problems file (authoritative), all 12 correct; (6) one-shot: exactly one generation attempt per problem, transport tries recorded, machine-internal repairs <= REPAIR_BUDGET=2 each disclosing typed findings (NYQUIST_UNSAMPLED / TEST_DURATION_REALTIME) — the executor disclosed this loop as part of the machine under test (same code path as r20/r21); typed for the auditor ruling: NO outcome-based (rubric/judge) iteration exists in the bytes; (7) builder-unjudged: judged=False everywhere, no axes/draws/prefer/judge-route fields; (8) no rubric content in the queue tree and no code path to the rubric file (problems-only custody proven at the code level); (9) all answers substantive (>1500 chars) with the IMPLEMENTATION BILL section on interventions. The PRIVATE rubric was never opened, listed, or copied by this session (names-only listing of the audit dir). c-0009 flips DONE on this record; the auditor scores with the private rubric and burns after."
   }
  ],
  "trailer_violations": [
