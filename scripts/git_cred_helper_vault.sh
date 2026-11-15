@@ -13,6 +13,10 @@ case "$input" in
 esac
 vault="$(cd "$(dirname "$0")/.." && pwd)/.env.keys"
 [ -f "$vault" ] || exit 1
-pat=$(grep -E '^GH_PAT=' "$vault" | head -1 | cut -d= -f2-)
+# R23 remediation (typed): the vault key is GITHUB_PAT; the original grep
+# matched only GH_PAT and failed closed forever (the fetch-only test
+# could not catch it — fetch on a public repo needs no credentials).
+# Accept either name, GITHUB_PAT first.
+pat=$(grep -E '^(GITHUB_PAT|GH_PAT)=' "$vault" | head -1 | cut -d= -f2-)
 [ -n "$pat" ] || exit 1
 printf 'username=x-access-token\npassword=%s\n' "$pat"
