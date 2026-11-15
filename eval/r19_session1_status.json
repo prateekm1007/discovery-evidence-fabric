@@ -1,0 +1,79 @@
+{
+ "record": "R19_SESSION1_STATUS/1.0.0",
+ "at": "2026-11-15T13:33:37.518556Z",
+ "gate_verdict_carry": "AM18 accepted: gate NOT_MET — feasibility RESOLVED-FAIL (1.367), improving; novelty RESOLVED-PASS (2.133). Overall numbers are the headline everywhere in this record; subsets labeled.",
+ "gate_numbers_overall": {
+  "novelty_delta_mean": 2.133,
+  "novelty_ci95": [
+   1.426,
+   2.841
+  ],
+  "feasibility_abs_gap_mean": 1.367,
+  "feasibility_ci95": [
+   0.931,
+   1.802
+  ],
+  "n_pairs": 30,
+  "verdict": "NOT_MET (feasibility clause fails; improving from 1.9)",
+  "subset_note": "the 2.556/1.5 figures are the INTERVENTION SUBSET (n=18); the 1.167 is the PREDICTOR SUBSET (n=12); gate rides the OVERALL 2.133/1.367"
+ },
+ "D1_F32_queue_ci": {
+  "finding_accepted": "F32 valid: my R16s2 claim 'wired + green on commit' OVERSTATED — the Art. 19/21/26 tests were only in epistemic_certification.yml (main-triggered) and the queue CI was red. Corrective disclosure per Art. 5.",
+  "root_cause_of_red": "r11_queue_surface.yml had NO pip install step: after actions/setup-python@v5 the PATH-preferred 3.12 toolcache python lacks pytest (the runner's preinstalled pytest belongs to the system python), so the first pytest invocation failed every queue run — including on d1cf5a129 and fc8d6788a. The two named test files themselves PASS locally (49 tests) — the failure was environmental, now fixed by an explicit 'python3 -m pip install --quiet pytest py pygments' step (transitive deps verified: py, pygments are the only third-party imports beyond pytest).",
+  "wired_into_queue": "r11_queue_surface.yml now runs: deps install + deterministic surfaces (answer_contract, r377, retally, critic regressions) + test_audit_branch_guard + pair guard + Constitution v3.0.0 enforcement suite (Arts. 19/21/22/23/25/26/28 — 17 tests) on EVERY queue/* push. A new violation fails the queue CI (Art. 27). epistemic_certification.yml mirrors all seven suites for main.",
+  "honest_state": "every workflow step now passes LOCALLY end to end (90 tests + retally + critic_r2 + pair guard); REMOTE-green on the next queue push is the acceptance signal — if the runner still fails, the check-run log is the next input, not an assumption"
+ },
+ "D4_enforcement_articles": {
+  "wired_this_round": [
+   "22 (real-bytes: acceptance rests on 30 committed judged rows; fixtures declare MECHANICS_ONLY/BYTE_RECORD_PIN; held-out half flagged)",
+   "23 (clean delivery: non-empty, no contract-invalid banner, <=1 caveat, on 60 committed records)",
+   "25 (physics/premise grounding as content on every delivered idea — header or inline; disconfirming-search half flagged)",
+   "28 (owner-action register: escalation bound enforced — no PENDING at 3 rounds without escalation; offline-work list required)"
+  ],
+  "checker_fixes_disclosed": "two over-strict proxies fixed after triage on real bytes: (a) Art. 23 dropped the section-header requirement (the corpus is mixed-form; Art. 23 demands a plain answer, not a layout); (b) Art. 25 accepts PHYSICS CHECK sections with '—' separators and inline grounding (the header format varies across contract eras; the dev-fu-001 answer carries a full governing-relation statement that a colon-only regex missed). No violation was reclassified to pass: every change was verified against the article text.",
+  "flagged": "Art. 20 (incumbent challenge): NO ablation-registry artifact exists to check — eval/enforcement_flags.json carries the typed flag; the challenge ledger must be created before the check can be wired. Art. 25's disconfirming-search record and Art. 22's fresh-held-out half also flagged live (CI asserts the flags exist so they cannot silently disappear)."
+ },
+ "enforcement_map_now": {
+  "CI_tied_queue_gated": [
+   "6",
+   "19",
+   "21",
+   "22 (half)",
+   "23",
+   "25 (half)",
+   "26",
+   "28"
+  ],
+  "flagged_live": [
+   "20",
+   "22 held-out half",
+   "25 disconfirming-search half"
+  ],
+  "not_yet_individually_tied": [
+   "1",
+   "2",
+   "3",
+   "4",
+   "5",
+   "8",
+   "9",
+   "11",
+   "12",
+   "13",
+   "14",
+   "15",
+   "16",
+   "17",
+   "18",
+   "24",
+   "27-report-side"
+  ]
+ },
+ "art27_capability_budget": {
+  "engine_diff": "r11_queue_surface.yml + epistemic_certification.yml rebuilt (F32); 4 new enforcement test files; 2 registers (enforcement_flags, owner_action_register); Art. 21 fixture class field; NO engine behavior change — no generation/judging code touched",
+  "primary_metric_delta": "NONE — NO CAPABILITY CHANGE (CI enforcement round; battery r11 numbers byte-unchanged and unchanged)",
+  "headline": "overall gate 2.133 novelty PASS / 1.367 feasibility FAIL-improving; NOT_MET stands"
+ },
+ "art28_counter": "owner-action register created: holdout v2 rounds_pending 2/3; F25 session-naming rounds_pending 1/3. CI enforces the escalation bound.",
+ "next": "D2 weight-bound strict-feasibility contract design (offline work, Art. 28 list); Art. 20 challenge-ledger artifact; remote-green confirmation on this push; remaining articles (1-5/8/9/11-14/18/24) queue-CI wiring"
+}

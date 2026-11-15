@@ -26,6 +26,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      # F32 fix (R19): the workflow previously had NO pip install step —
+      # the setup-python 3.12 toolcache python does not carry pytest
+      # (the preinstalled pytest belongs to the system python), so every
+      # queue-push run failed at the first pytest invocation. Explicit
+      # install: pytest + the transitive deps the suites import.
+      - name: Install test deps
+        run: |
+          set -e
+          python3 -m pip install --quiet pytest py pygments
       - name: Deterministic regression surfaces (zero LLM)
         run: |
           set -e
@@ -34,6 +43,23 @@ jobs:
           python3 -B scripts/r11_decoder_retally.py
           python3 -B scripts/r11_critic_regression.py || true
           python3 -B scripts/r11_critic_regression_r2.py
+      # Constitution v3.0.0 enforcement articles — wired into the QUEUE
+      # surface (F32 fix, R18 audit AM18): these checks gate every
+      # queue/* push, not main-only. Arts. 19/21/26 (R16s2) + 22/23/25/28
+      # (R19). A new violation fails the queue CI (Art. 27); Art. 20 is
+      # flagged (eval/enforcement_flags.json: no ablation-registry
+      # artifact exists to check).
+      - name: Constitution v3.0.0 enforcement (Arts. 19/21/22/23/25/26/28 on committed bytes)
+        run: |
+          set -e
+          python3 -m pytest tests/test_article19_metric_unit_tests.py \
+            tests/test_article21_label_integrity.py \
+            tests/test_article22_real_bytes.py \
+            tests/test_article23_clean_delivery.py \
+            tests/test_article25_feasibility_before_novelty.py \
+            tests/test_article26_provider_spread.py \
+            tests/test_article28_owner_dependency.py \
+            -q -p no:warnings
       - name: F21 integrity guard (audit-branch / auditor-namespace refusal)
         run: |
           set -e
