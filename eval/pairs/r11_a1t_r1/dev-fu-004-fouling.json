@@ -1,0 +1,23 @@
+{
+ "problem_id": "dev-fu-004-fouling",
+ "question_type": "predictor-design",
+ "a1_source": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V3 verbatim (session-2 audited predictor contract)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "observable/indicator design present"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 5.9,
+   "chars": 3171
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:09:02.254885Z",
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme using temperature and pressure measurements to detect back-pressure rise.\nOur departure is a fouling accumulation rate indicator calculated from existing temperature and flow measurements using the heat transfer coefficient degradation trend.\nThis works because biofouling follows an asymptotic growth curve, with the initial growth rate being the most reliable early predictor of eventual heat transfer degradation.\n\nPHYSICS CHECK\nGoverning relation: Heat transfer rate Q = U × A × ΔT_lm (where U is overall heat transfer coefficient, A is area, ΔT_lm is log mean temperature difference). \nUSER CONSTRAINT: Existing temperature and flow measurements only.\nCALCULATED: Fouling accumulation rate = (U_0 - U_t)/U_0 per week, where U_0 is initial clean heat transfer coefficient and U_t is current heat transfer coefficient.\nASSUMPTION: Biofouling growth follows a modified logistic model with initial linear growth phase (justified by empirical studies of microbial fouling in heat exchangers).\n\nIMPLEMENTATION BILL\n1. Existing steam flow meter (turbine exhaust) - same class as standard monitoring equipment\n2. Existing cooling water flow meter - same class as standard monitoring equipment\n3. Existing steam temperature measurement (condenser inlet) - same class as standard monitoring equipment\n4. Existing cooling water temperature measurement (inlet and outlet) - same class as standard monitoring equipment\n5. Existing condensate temperature measurement - same class as standard monitoring equipment\n6. Control system software module (off-the-shelf SCADA enhancement) - calculates heat transfer coefficient and fouling rate from existing measurements\n7. Trend analysis algorithm (standard process control implementation) - tracks fouling accumulation rate over 4-week window\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: SAME - uses existing instrumentation, only software addition\nOperability: SAME - integrates with existing control room displays, no new operator training required\nMaintenance: SAME - software maintenance only, no additional field equipment\nCost class: SAME - software implementation only, no capital expenditure for new hardware\nThe burden is identical to standard monitoring practices, with the only difference being the calculation algorithm rather than direct measurement.\n\nEXECUTABLE TEST\nProtocol: \n1. Establish baseline heat transfer coefficient during clean tube operation\n2. Monitor fouling accumulation rate calculation weekly\n3. Record fouling rate when back-pressure reaches 90% of derating limit\n4. Compare fouling rate at 90% back-pressure with earlier measurements\n\nInstruments: Existing plant DCS/SCADA system with trend recording capability\n\nThreshold: Falsification occurs if fouling rate at 90% back-pressure is less than 30% of the maximum observed rate in the preceding 4-week period.\n\nDuration: 4 weeks of continuous monitoring during normal operation\n\nKill criterion: If the fouling rate at 90% back-pressure is consistently below 30% of the maximum observed rate in any 4-week period, the predictor is falsified and should be rejected."
+}

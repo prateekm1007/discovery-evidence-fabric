@@ -1,0 +1,23 @@
+{
+ "problem_id": "eval-new10-solar-inverter-predictor",
+ "question_type": "predictor-design",
+ "a1_source": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V3 verbatim (session-2 audited predictor contract)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "observable/indicator design present"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 6.4,
+   "chars": 3149
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:09:02.254885Z",
+ "a1_answer": "NOVELTY STATEMENT — The standard practice delivers a monitoring/indication scheme using aggregate fault codes after tripping. Our same-class mechanism departs by using thermal-electrical coupling physics on existing telemetry to detect pre-fault degradation signatures through the relationship between switching losses and junction temperature rise. The failure-physics connection is that IGBT degradation increases switching losses, which raise junction temperature and ripple current, creating detectable anomalies in the thermal-electrical balance before catastrophic failure.\n\nPHYSICS CHECK — The governing physical relation is P_loss = V_ce(sat) × I_c × f_sw for IGBT conduction and switching losses. As IGBTs degrade, V_ce(sat) increases, leading to higher power losses and temperature rise. For a typical 100A IGBT with 0.5V V_ce(sat) increase and 10kHz switching frequency, additional power loss = 0.5V × 100A × 10kHz = 500W, causing a temperature rise of approximately 5-10°C (based on thermal resistance of ~0.1-0.2°C/W). This magnitude is detectable in 5-minute resolution telemetry.\n\nIMPLEMENTATION BILL:\n1. Data processing unit: Existing inverter controller or edge computing device (same class as standard inverter control system)\n2. Algorithm implementation: Software module processing existing telemetry (same class as standard inverter monitoring software)\n3. Telemetry inputs: DC voltage/current, AC power, heatsink temperature, fault log (all already exported at 5-minute resolution per constraint)\n4. Processing parameters:\n   - CALCULATED: Normalized temperature coefficient (heatsink temp / AC power ratio) = 0.05°C/kW (based on typical inverter thermal design)\n   - CALCULATED: Ripple current factor (RMS current / average current) = 1.15 (typical for healthy inverter)\n   - CALCULATED: Degradation threshold = 15% deviation from baseline (conservative threshold for early detection)\n   - ASSUMPTION: Baseline established during commissioning (justification: standard industry practice for system normalization)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY):\n- Installability: SAME - uses existing telemetry and processing infrastructure\n- Operability: SAME - integrates with existing monitoring systems\n- Maintenance: SAME - software-only solution, no additional hardware maintenance\n- Cost class: SAME - only requires software development and deployment on existing hardware\n- Expected conclusion: SAME burden class, different mechanism (physics-based prediction vs. post-fault indication)\n\nEXECUTABLE TEST:\nProtocol: Deploy algorithm on 10 inverters in the field for 6 months, comparing predictions against actual failures. Monitor for false positives and detection lead time.\nInstruments: Existing inverter telemetry system, external temperature monitoring for validation\nPass/Fail thresholds: \n- Must detect all actual failures at least 2 weeks before trip\n- Must not exceed 1 false alarm per quarter per inverter\n- Must achieve >90% prediction accuracy\nDuration: 6 months continuous operation\nKill criterion: If any inverter fails without prior detection, or false alarm rate exceeds threshold, the predictor is invalidated."
+}

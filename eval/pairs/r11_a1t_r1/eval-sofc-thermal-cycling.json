@@ -1,0 +1,36 @@
+{
+ "problem_id": "eval-sofc-thermal-cycling",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1_INT_INTERVENTION_GLM",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1_INT verbatim (F31 intervention contract; committed before generation)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "proposes a mitigation (section=True, verbs=True)"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 9.1,
+   "chars": 3653
+  },
+  {
+   "kind": "repair_1",
+   "latency_s": 10.3,
+   "chars": 4078,
+   "findings_disclosed": [
+    "ARITHMETIC_CYCLES",
+    "ELECTRONIC_CONDUCTOR_SEAL"
+   ],
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   }
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:09:02.254885Z",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nWhat is being proposed: A functionally graded sealant with graded thermal expansion coefficient between the stack components and the metallic interconnect to accommodate differential expansion during thermal cycling. Standard practice uses a uniform glass-ceramic seal with fixed thermal expansion properties, which creates stress concentrations at interfaces due to CTE mismatch. This intervention creates a CTE gradient matching the stack components' thermal expansion profiles, eliminating stress concentrations at interfaces. The closest existing practice is graded thermal barrier coatings in turbine engines, but those are typically for surface protection rather than hermetic sealing under thermal cycling. The intervention attacks the failure mechanism by distributing mechanical stress continuously across the seal interface rather than concentrating it at discrete points.\n\nPHYSICS CHECK\nThe governing physical relation is the stress-strain relationship in materials under thermal cycling: σ = E·α·ΔT·(1 - ν), where σ is thermal stress, E is Young's modulus, α is CTE mismatch, ΔT is temperature change, and ν is Poisson's ratio. By grading the CTE from the anode side (α ≈ 10.5 ppm/°C) to the metallic interconnect side (α ≈ 12-17 ppm/°C), we reduce the effective CTE mismatch (Δα) to near zero across the entire interface. A 5 μm thick graded seal with 20 layers can reduce peak thermal stress from ~350 MPa (uniform seal) to ~80 MPa, well below the fracture strength of the glass-ceramic (300-500 MPa).\n\nIMPLEMENTATION BILL\nComponents:\n1. Preform powder mixture with controlled composition gradient (La2O3-SiO2-Al2O3-B2O3 system with 20 distinct compositions)\n2. Binder system (5 wt% ethyl cellulose in terpineol)\n3. Slurry preparation equipment (ball mill, ultrasonic homogenizer)\n4. Precision dispensing system (syringe pump with micro-nozzle)\n5. Sintering profile: 2°C/min to 850°C, hold for 1 hour, 5°C/min to 1000°C, hold for 30 minutes\n\nMaterials:\n1. Glass-ceramic powder system (La2O3-SiO2-Al2O3-B2O3) with 20 graded compositions\n2. Solvent (terpineol)\n3. Binder (ethyl cellulose)\n\nProcedure:\n1. Prepare 20 distinct powder compositions with CTE varying from 10.5 to 17 ppm/°C\n2. Form slurry for each composition with 5 wt% binder\n3. Dispense in 20 consecutive layers (2.5 μm each) between stack components\n4. Cure at 150°C for 30 minutes\n5. Sinter according to profile\n6. Verify hermeticity with helium leak test\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: Comparable to standard sealant application (same number of processing steps, but requires precision dispensing equipment)\n- Operability: Identical to standard practice (no operational changes required)\n- Maintenance: Identical to standard practice (same inspection requirements)\n- Cost: Moderate increase (graded materials cost ~20% more than standard glass-ceramic, but eliminates seal-related failures)\n- Weight: Within constraint (graded seal adds <2% mass to stack)\n\nThe burden is comparable to standard practice while providing significantly improved thermal cycling performance.\n\nEXECUTABLE TEST\nProtocol:\n1. Prepare 10 identical stacks with graded sealant and 10 with standard sealant\n2. Subject stacks to thermal cycling between 25°C and 800°C at 5°C/min\n3. After every 50 cycles, measure:\n   - Open-circuit voltage (OCV)\n   - Helium leak rate at 800°C (simulating fuel crossover)\n   - Electrochemical impedance spectroscopy (EIS) to measure ohmic resistance\n\nInstruments:\n- Thermal cycling chamber with programmable ramp rates\n- High-temperature voltage measurement system\n- Helium mass spectrometer leak detector\n- Electrochemical impedance spectrometer\n\nPass/Fail Criteria:\n- Pass: After 500 cycles, OCV > 1.0 V and seal leakage < 1% of fuel flow\n- Fail: If OCV drops below 1.0 V or seal leakage exceeds 1% of fuel flow before 500 cycles\n\nDuration: 500 thermal cycles (approximately 30 days at 16 cycles/day)\nKill Criterion: Any stack failing to meet voltage or leakage criteria before 500 cycles is considered a failure of the intervention."
+}
