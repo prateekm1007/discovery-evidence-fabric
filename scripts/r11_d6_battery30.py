@@ -233,6 +233,15 @@ def main() -> int:
             from r7_a0plus import (_load_pair,
                                    _packet_by_id_from_run_tree,
                                    _unique_packet_list)
+            # R11 2026-11-15 fix (measured, the 01:15Z run): the judge
+            # call shares the pair's governor scope — after 2 gen calls
+            # (plus any rung-walk retries) the 6-retry cap exhausts
+            # MID-JUDGE and the judge's parse-retry dies
+            # RETRY_CAP_EXCEEDED (typed as JUDGE_TRANSPORT_FAILED /
+            # empty, 6/8 pairs in the 01:15Z partial). The judge gets
+            # its OWN scope — the exact run_judge_calibration pattern
+            # (scope 'judge:<pid>:<idx>').
+            _econ.reset_governor(f"d6-judge:{pid}")
             pair = _load_pair(pid)
             packet = (_unique_packet_list(
                 _packet_by_id_from_run_tree(pair)) if pair else None)
