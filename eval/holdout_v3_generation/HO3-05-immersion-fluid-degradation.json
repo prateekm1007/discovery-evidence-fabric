@@ -1,0 +1,64 @@
+{
+ "problem_id": "HO3-05-immersion-fluid-degradation",
+ "question_type": "intervention-proposal",
+ "a1_source": "SYS_A1_INT_V61",
+ "contract_for_qt": true,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe proposed intervention is to replace one standard activated-alumina cartridge in the side-loop filtration system with a chelating resin cartridge to preferentially bind copper ions while maintaining oxidation control. Standard practice uses activated-alumina cartridges solely for oxidation byproduct removal; this intervention introduces a second capture mechanism that selectively targets dissolved copper ions without requiring additional hardware, a departure from single-function filtration. Adjacent-technique clearance: The closest existing practice is using mixed-bed resins in power plant condensate systems, but those are designed for broad ion removal and require complete system redesign, whereas this intervention uses a targeted chelation mechanism in existing cartridge form factors. The mechanism exploits the preferential affinity of iminodiacetate functional groups for copper ions (Cu²⁺ > H⁺), reducing dissolved copper concentration while the alumina continues to handle acidic oxidation byproducts.\n\nPHYSICS CHECK\nThe governing relation is the Nernst distribution law for chelation: K_d = [Cu²⁺]_resin / [Cu²⁺]_fluid, where iminodiacetate resins exhibit K_d > 10⁴ for copper at 55°C. For a 38-server system with 1.2 m³ fluid volume and 50 ppm copper contamination, a 10\" chelating resin cartridge (≈2.5 L resin, capacity ≈1.2 eq/L) can reduce [Cu²⁺] by >90% (from 50 ppm to <5 ppm) before saturation, directly addressing the copper dissolution failure mechanism while maintaining the existing alumina's oxidation control function.\n\nIMPLEMENTATION BILL\n- Replace one existing activated-alumina cartridge with a standard iminodiacetate chelating resin cartridge (b) [net hardware: 0; uses existing cartridge housing]\n- Adjust side-loop flow rate to 15% of total loop flow (c) [parameter change; no new hardware]\n- Extend cartridge replacement interval to 6 months (c) [procedure change; leverages existing maintenance schedule]\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nStandard practice: 2 activated-alumina cartridges replaced quarterly (8/year) + 6 hours downtime/year\nProposed intervention: 1 alumina + 1 chelating resin cartridge replaced biannually (4 cartridges/year) + 6 hours downtime/year\nBurden class: Same (identical downtime, fewer cartridge changes, no new hardware, no new skills required)\n\nEXECUTABLE TEST\nProtocol: Install test loop with identical copper coupon and fluid sample; monitor copper concentration via ICP-MS and fluid colorimetry weekly for 90 days.\nInstruments: ICP-MS for copper quantification, spectrophotometer for colorimetry, flowmeter.\nPass/fail: Copper reduction >80% vs control (untreated fluid) and fluid color improvement (ΔE < 2.0) within 30 days.\nDuration: 90 days (covers 2 cartridge service intervals).\nKill criterion: If copper reduction <50% or fluid darkening continues at >80% of original rate after 30 days, falsify the intervention.",
+ "a1_answer_sha256_16": "83c1a3f90da82c82",
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 4273,
+   "latency_s": 9.4,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Replaces one activated-alumina cartridge with chelating resin (no net hardware addition)",
+     "- Uses existing infrastructure (side-loop, housing, downtime budget)",
+     "- Adds only a procedural flow adjustment during service",
+     "1. Install chelating resin cartridge in parallel with existing activated-alumina cartridge",
+     "2. Monitor fluid monthly for:",
+     "- Dissolved copper (ICP-MS, pass threshold: <0.1 ppm)",
+     "- Acid number (ASTM D974, pass threshold: rise <0.02 mgKOH/g/month)",
+     "- Dielectric strength (ASTM D877, pass threshold: >50 kV)",
+     "3. Compare to baseline (no resin) for 6 months."
+    ]
+   },
+   "sha256_16": "09c0b4012dfffa1f"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 2937,
+   "latency_s": 7.1,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {},
+   "sha256_16": "83c1a3f90da82c82",
+   "findings_disclosed": []
+  }
+ ],
+ "machine_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 1,
+  "residual_findings": {}
+ },
+ "problems_sha256_16": "38884e58524a3ffb",
+ "audit_tip_at_read": "3053d8dce",
+ "generated_at": "2026-11-15T19:53:32Z",
+ "one_shot": true,
+ "judged": false,
+ "judge": "NONE — auditor scores with the PRIVATE rubric"
+}

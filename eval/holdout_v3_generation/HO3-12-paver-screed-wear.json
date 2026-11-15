@@ -1,0 +1,139 @@
+{
+ "problem_id": "HO3-12-paver-screed-wear",
+ "question_type": "predictor-design",
+ "a1_source": "SYS_A1F_V5",
+ "contract_for_qt": true,
+ "a1_answer": "NOVELTY STATEMENT  \nStandard practice delivers a MONITORING/INDICATION scheme using mat thickness deviation as the primary indicator. Our mechanism departs by inferring screed edge wear from the nonlinear damping of screed vibration amplitude at constant frequency and extension-plate position. This works because edge thinning reduces screed mass stiffness, increasing vibration amplitude decay rate under constant force.  \n\nPHYSICS CHECK  \nGoverning relation: Damping ratio ζ ∝ (vibration amplitude decay rate) / (2π × frequency). For a 4 mm wear (5% mass loss), ζ increases by ~2.5% (CALCULATED: ζ = c/(2√(mk)), m↓5% → ζ↑2.5%). Detectable as amplitude decay rate change >1.5% (ASSUMPTION: sensor resolution ±0.5 Hz/amplitude).  \n\nIMPLEMENTATION BILL  \n- Inputs:  \n  - ALREADY-RECORDED: \"screed vibration frequency\" (Hz) per shift log (source: paver logs)  \n  - ALREADY-RECORDED: \"screed vibration amplitude\" (mm) per shift log (source: paver logs)  \n  - ALREADY-RECORDED: \"extension-plate position\" (mm) per shift log (source: paver logs)  \n  - ALREADY-RECORDDED: \"mat thickness deviation\" (mm) per meter (source: grade control logs)  \n- Reference threshold: DERIVED from stated physics: vibration amplitude decay rate threshold = 1.5% (CALCULATED: ζ increase from 5% mass loss).  \n- Procedure: Compute amplitude decay rate over 10-second windows at constant frequency/extension; trigger if rate exceeds threshold.  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n- Installability: Same (uses existing logs)  \n- Operability: Same (no new training; automated flag)  \n- Maintenance: Same (no new hardware)  \n- Cost class: SAME (no added instruments or labor)  \n- Burden difference: None (reuses existing data streams).  \n\nEXECUTABLE TEST  \n- Protocol: Analyze 3 months of historical log data (200 km paving) with known wear events.  \n- Instruments: Existing log data (no new hardware).  \n- Pass/fail: Must detect wear events with <10% false alarms and >90% lead time (150 m).  \n- Duration: 1 day (historical data analysis).  \n- Kill criterion: If false alarms >1 per 10 km or lead time <150 m, mechanism fails.  \n\nCONSTRAINT BIND  \nPrimary indicator: Mat thickness deviation (stated as failure-defining quantity). Our mechanism supplements it by inferring wear cause from vibration data, but threshold is still based on 4 mm mat drift.",
+ "a1_answer_sha256_16": "251d88fceeb85a7e",
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 2418,
+   "latency_s": 5.5,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Inputs:",
+     "- ALREADY-RECORDED: \"screed vibration frequency\" (Hz) per shift log",
+     "- ALREADY-RECORDED: \"screed amplitude\" (mm) per shift log",
+     "- ALREADY-RECORDED: \"extension-plate position\" (mm) per shift log",
+     "- ALREADY-RECORDED: \"mat thickness sensor deviation\" (mm) per meter log",
+     "- Calculation:",
+     "- DERIVED: Baseline vibration frequency (f₀) = mean of first 3 shift logs at new plate ins",
+     "- DERIVED: Threshold Δf = -0.15 Hz (CALCULATED from steel density and 1 mm wear geometry)",
+     "- Output: Leading indicator = (f₀ - current f) / f₀",
+     "- Installability: SAME (uses existing vibration sensor)",
+     "- Operability: SAME (no new training; logs already reviewed)",
+     "- Maintenance: SAME (no additional hardware)",
+     "- Cost: SAME (no new instrumentation; only signal processing)",
+     "- Advantage: Prevents 200 m rework by catching wear earlier than mat thickness drift"
+    ]
+   },
+   "sha256_16": "3fff6af64bb128e6"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 2307,
+   "latency_s": 5.1,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Inputs:",
+     "- ALREADY-RECORDED: \"screed vibration frequency\" (Hz) per shift log (source: paver logs)",
+     "- ALREADY-RECORDED: \"screed vibration amplitude\" (mm) per shift log (source: paver logs)",
+     "- Processing:",
+     "- Compute frequency harmonic ratio (2nd/1st harmonic amplitude) from FFT of vibration sign",
+     "- DERIVED reference threshold: harmonic_ratio > 0.15 (source: stated physics: Δf/f₀ = 0.02",
+     "- Output:",
+     "- Alert when harmonic_ratio > threshold AND amplitude is constant (±5% of mean)",
+     "- Installability: Same as existing vibration logging (no new hardware)",
+     "- Operability: Uses existing logs (no new training)",
+     "- Maintenance: Zero added maintenance (software-only)",
+     "- Cost: Same class as standard monitoring (no physical sensors)",
+     "- Parity: Identical burden class, different mechanism",
+     "- Protocol: Analyze 10 weeks of historical log data covering 2 known wear events",
+     "- Instruments: Existing vibration log files",
+     "- Pass/fail: Alert ≥150 m before each 4 mm drift event with ≤1 false alarm per 10 km",
+     "- Duration: Single analysis run",
+     "- Kill criterion: If alerts occur <150 m before drift or false alarms >1 per 10 km, predic",
+     "- Validation: Against ALREADY-RECORDED mat thickness deviations (source: grade control log"
+    ]
+   },
+   "sha256_16": "c8d26801b723c31a",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Inputs:; - ALREADY-RECORDED: \"screed vibration frequency\" (Hz) per shift log (source: paver logs); - ALREADY"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 2333,
+   "latency_s": 5.6,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Inputs:",
+     "- ALREADY-RECORDED: \"screed vibration frequency\" (Hz) per shift log (source: paver logs)",
+     "- ALREADY-RECORDED: \"screed vibration amplitude\" (mm) per shift log (source: paver logs)",
+     "- ALREADY-RECORDED: \"extension-plate position\" (mm) per shift log (source: paver logs)",
+     "- ALREADY-RECORDDED: \"mat thickness deviation\" (mm) per meter (source: grade control logs)",
+     "- Reference threshold: DERIVED from stated physics: vibration amplitude decay rate thresho",
+     "- Procedure: Compute amplitude decay rate over 10-second windows at constant frequency/ext",
+     "- Installability: Same (uses existing logs)",
+     "- Operability: Same (no new training; automated flag)",
+     "- Maintenance: Same (no new hardware)",
+     "- Cost class: SAME (no added instruments or labor)",
+     "- Burden difference: None (reuses existing data streams)."
+    ]
+   },
+   "sha256_16": "251d88fceeb85a7e",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Inputs:; - ALREADY-RECORDED: \"screed vibration frequency\" (Hz) per shift log (source: paver logs); - ALREADY"
+   ]
+  }
+ ],
+ "machine_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 2,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Inputs:",
+    "- ALREADY-RECORDED: \"screed vibration frequency\" (Hz) per shift log (source: paver logs)",
+    "- ALREADY-RECORDED: \"screed vibration amplitude\" (mm) per shift log (source: paver logs)",
+    "- ALREADY-RECORDED: \"extension-plate position\" (mm) per shift log (source: paver logs)",
+    "- ALREADY-RECORDDED: \"mat thickness deviation\" (mm) per meter (source: grade control logs)",
+    "- Reference threshold: DERIVED from stated physics: vibration amplitude decay rate thresho",
+    "- Procedure: Compute amplitude decay rate over 10-second windows at constant frequency/ext",
+    "- Installability: Same (uses existing logs)",
+    "- Operability: Same (no new training; automated flag)",
+    "- Maintenance: Same (no new hardware)",
+    "- Cost class: SAME (no added instruments or labor)",
+    "- Burden difference: None (reuses existing data streams)."
+   ]
+  }
+ },
+ "problems_sha256_16": "38884e58524a3ffb",
+ "audit_tip_at_read": "3053d8dce",
+ "generated_at": "2026-11-15T19:57:31Z",
+ "one_shot": true,
+ "judged": false,
+ "judge": "NONE — auditor scores with the PRIVATE rubric"
+}

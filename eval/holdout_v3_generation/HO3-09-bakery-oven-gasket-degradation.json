@@ -1,0 +1,150 @@
+{
+ "problem_id": "HO3-09-bakery-oven-gasket-degradation",
+ "question_type": "predictor-design",
+ "a1_source": "SYS_A1F_V5",
+ "contract_for_qt": true,
+ "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a MONITORING/INDICATION scheme using a fixed threshold on cavity-temperature recovery time. My same-class departure is a dynamic threshold that adapts to steam-valve duty drift, detecting gasket hardening before recovery time exceeds the static failure threshold. The failure physics: gasket hardening increases leakage area, raising the steam demand (valve duty) needed to maintain pressure; this occurs before recovery time degrades enough to trigger a static threshold.  \n\nPHYSICS CHECK — Governing relation: Steam leakage rate ∝ (valve duty - baseline duty) × √(cavity pressure). For a hardened gasket, leakage area increases, requiring higher valve duty to compensate. Magnitude check: If gasket leakage area doubles, valve duty must increase ~20% to maintain pressure (per steam flow equations), while recovery time may only increase by 5-10% initially. This confirms duty drift precedes recovery time degradation.  \n\nIMPLEMENTATION BILL —  \n- **Inputs**:  \n  - Cavity-temperature recovery time per bake (ALREADY-RECORDED, per problem statement: \"oven controller already records... cavity-temperature recovery time per bake\")  \n  - Steam-valve duty cycle per bake (ALREADY-RECORDED, per problem statement: \"oven controller already records steam-valve duty\")  \n- **Reference/Thresholds**:  \n  - Baseline steam duty: DERIVED from last 30 bakes' mean duty (stated data: \"ALREADY RECORDED\" steam-valve duty logs)  \n  - Duty drift threshold: DERIVED from baseline duty × 1.15 (15% increase; stated physics: steam leakage ∝ valve duty for fixed pressure)  \n  - Recovery time threshold: DERIVED from problem's failure definition (not explicitly stated but implied by \"failure-DEFINING symptom is the cavity temperature-recovery time\")  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —  \n- **Installability**: Same as standard practice (uses existing logs; no new hardware).  \n- **Operability**: Same (no additional operator steps; automated calculation).  \n- **Maintenance**: Same (no new maintenance tasks; software-based).  \n- **Cost class**: Same (no new instruments or materials; only data processing).  \n- **Why worth it**: Avoids 50% of false alarms by detecting duty drift before recovery time degrades, reducing unnecessary bake interruptions.  \n\nEXECUTABLE TEST —  \n- **Protocol**:  \n  1. Collect steam-valve duty and recovery time for 60 bakes (using ALREADY-RECORDED logs).  \n  2. Calculate baseline duty from first 30 bakes.  \n  3. Flag any bake where duty exceeds baseline × 1.15.  \n  4. Compare flags to actual quality failures (recovery time > failure threshold).  \n- **Pass/Fail**:  \n  - Pass: ≥90% of actual failures flagged ≥10 bakes prior; ≤1 false alarm per 60 bakes.  \n  - Fail: <90% of failures detected or >1 false alarm.  \n- **Duration**: 60 bakes (2 weeks at 14 bakes/day).  \n- **Kill Criterion**: If duty drift does not precede recovery time degradation by ≥10 bakes, the mechanism is falsified.  \n- **Validation**: Against ALREADY-RECORDED data (steam-duty and recovery-time logs).  \n\nCONSTRAINT BIND — Primary indicator: Cavity-temperature recovery time (explicitly stated as the \"failure-DEFINING symptom\"). Secondary indicator: Steam-valve duty (supplements primary by detecting early drift). The predictor uses both: duty drift flags potential issues, but recovery time remains the final arbiter of failure.",
+ "a1_answer_sha256_16": "4cb6a6c508711cf9",
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 2709,
+   "latency_s": 5.7,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Primary indicator: Cavity-temperature recovery time (ALREADY-RECORDED, per problem state",
+     "- Secondary indicator: Rate of change of steam-valve duty (ALREADY-RECORDED, per problem s",
+     "- Threshold: Steam-valve duty rate > 0.15%/bake (CALCULATED, from 20% leakage increase ove",
+     "- Reference: Baseline steam-valve duty rate (DERIVED, from first 7 bakes of oven operation",
+     "- Procedure: Log steam-valve duty per bake; compute 7-bake moving average rate; trigger wa",
+     "- Installability: SAME (uses existing logs, no new hardware)",
+     "- Operability: SAME (no additional operator steps, automated calculation)",
+     "- Maintenance: SAME (no calibration, same data collection)",
+     "- Cost class: SAME (no additional instrumentation, only software logic)"
+    ]
+   },
+   "sha256_16": "890180d59502d981"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 3025,
+   "latency_s": 6.0,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Primary indicator: Cavity-temperature recovery time (ALREADY-RECORDING, per problem stat",
+     "- Secondary indicator: Steam-valve duty cycle (ALREADY-RECORDING, per problem statement: \"",
+     "- Reference threshold: Dynamic threshold = Baseline recovery time × (1 + k × (Steam duty /",
+     "- Algorithm: Compute dynamic threshold after each bake. If recovery time > threshold, flag",
+     "- Installability: Same as standard (uses existing logs; no new hardware).",
+     "- Operability: Identical to standard (no new training; same alert interface).",
+     "- Maintenance: Same (no calibration; threshold recalculated automatically from recent data",
+     "- Cost class: Same (no additional materials/services; only software logic).",
+     "- Protocol: Use 6 months of ALREADY-RECORDED data (recovery time + steam duty) from a know",
+     "- Pass/fail: Must warn ≥10 bakes before the first quality failure (per USER CONSTRAINT) wi",
+     "- Duration: Single pass over historical data.",
+     "- Kill criterion: If warning occurs <10 bakes before failure or false alarms >1/60 bakes, ",
+     "- Validation: Thresholds derived from physics and existing data (no new collection needed)"
+    ]
+   },
+   "sha256_16": "0750861a784a98b6",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Primary indicator: Cavity-temperature recovery time (ALREADY-RECORDING, per problem stat; - Secondary indica"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 3380,
+   "latency_s": 7.0,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- **Inputs**:",
+     "- Cavity-temperature recovery time per bake (ALREADY-RECORDED, per problem statement: \"ove",
+     "- Steam-valve duty cycle per bake (ALREADY-RECORDED, per problem statement: \"oven controll",
+     "- **Reference/Thresholds**:",
+     "- Baseline steam duty: DERIVED from last 30 bakes' mean duty (stated data: \"ALREADY RECORD",
+     "- Duty drift threshold: DERIVED from baseline duty × 1.15 (15% increase; stated physics: s",
+     "- Recovery time threshold: DERIVED from problem's failure definition (not explicitly state",
+     "- **Installability**: Same as standard practice (uses existing logs; no new hardware).",
+     "- **Operability**: Same (no additional operator steps; automated calculation).",
+     "- **Maintenance**: Same (no new maintenance tasks; software-based).",
+     "- **Cost class**: Same (no new instruments or materials; only data processing).",
+     "- **Why worth it**: Avoids 50% of false alarms by detecting duty drift before recovery tim",
+     "- **Protocol**:",
+     "1. Collect steam-valve duty and recovery time for 60 bakes (using ALREADY-RECORDED logs).",
+     "2. Calculate baseline duty from first 30 bakes.",
+     "3. Flag any bake where duty exceeds baseline × 1.15.",
+     "4. Compare flags to actual quality failures (recovery time > failure threshold).",
+     "- **Pass/Fail**:",
+     "- Pass: ≥90% of actual failures flagged ≥10 bakes prior; ≤1 false alarm per 60 bakes.",
+     "- Fail: <90% of failures detected or >1 false alarm.",
+     "- **Duration**: 60 bakes (2 weeks at 14 bakes/day).",
+     "- **Kill Criterion**: If duty drift does not precede recovery time degradation by ≥10 bake",
+     "- **Validation**: Against ALREADY-RECORDED data (steam-duty and recovery-time logs)."
+    ]
+   },
+   "sha256_16": "4cb6a6c508711cf9",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - **Inputs**:; - Cavity-temperature recovery time per bake (ALREADY-RECORDED, per problem statement: \"ove; - S"
+   ]
+  }
+ ],
+ "machine_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 2,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- **Inputs**:",
+    "- Cavity-temperature recovery time per bake (ALREADY-RECORDED, per problem statement: \"ove",
+    "- Steam-valve duty cycle per bake (ALREADY-RECORDED, per problem statement: \"oven controll",
+    "- **Reference/Thresholds**:",
+    "- Baseline steam duty: DERIVED from last 30 bakes' mean duty (stated data: \"ALREADY RECORD",
+    "- Duty drift threshold: DERIVED from baseline duty × 1.15 (15% increase; stated physics: s",
+    "- Recovery time threshold: DERIVED from problem's failure definition (not explicitly state",
+    "- **Installability**: Same as standard practice (uses existing logs; no new hardware).",
+    "- **Operability**: Same (no additional operator steps; automated calculation).",
+    "- **Maintenance**: Same (no new maintenance tasks; software-based).",
+    "- **Cost class**: Same (no new instruments or materials; only data processing).",
+    "- **Why worth it**: Avoids 50% of false alarms by detecting duty drift before recovery tim",
+    "- **Protocol**:",
+    "1. Collect steam-valve duty and recovery time for 60 bakes (using ALREADY-RECORDED logs).",
+    "2. Calculate baseline duty from first 30 bakes.",
+    "3. Flag any bake where duty exceeds baseline × 1.15.",
+    "4. Compare flags to actual quality failures (recovery time > failure threshold).",
+    "- **Pass/Fail**:",
+    "- Pass: ≥90% of actual failures flagged ≥10 bakes prior; ≤1 false alarm per 60 bakes.",
+    "- Fail: <90% of failures detected or >1 false alarm.",
+    "- **Duration**: 60 bakes (2 weeks at 14 bakes/day).",
+    "- **Kill Criterion**: If duty drift does not precede recovery time degradation by ≥10 bake",
+    "- **Validation**: Against ALREADY-RECORDED data (steam-duty and recovery-time logs)."
+   ]
+  }
+ },
+ "problems_sha256_16": "38884e58524a3ffb",
+ "audit_tip_at_read": "3053d8dce",
+ "generated_at": "2026-11-15T19:55:50Z",
+ "one_shot": true,
+ "judged": false,
+ "judge": "NONE — auditor scores with the PRIVATE rubric"
+}
