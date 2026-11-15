@@ -1,7 +1,7 @@
 {
  "schema": "work-claims/v1",
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
- "at": "2026-11-15 (union after the live Art. 29(e) non-fast-forward: builder-r20s2 c-0002 execution heartbeat rebased onto builder-r20s1 disjoint c-0003 verifier record + c-0004 BOK generation claim; one canonical registry, claims unioned)",
+ "at": "2026-11-15T17:33:00Z",
  "sessions": {
   "builder-r20s2": {
    "registered_at": "2026-11-15T15:21:34Z",
@@ -140,6 +140,40 @@
     "eval/queue_ci_evidence_r22.json"
    ],
    "notes": "AM22 D2 + D3 task lane (no LLM calls, no canonical measurement paths): (D2/F35) executor-side recompute instrument scripts/r22_verify_bok.py — recomputes the c-0004 BOK battery novelty from RAW DRAWS (row_metrics on every row, summarize on the gate-MATCH subset), proves REGENERATION byte-level (every fresh A-side sha differs from its immediately-prior committed bytes in r19/r20 pair dirs), and shows per-row novelty diverges from the r20 reference (no column copy); typed note: this is EXECUTOR-side diligence — the Art. 29(c) VERIFIER record for c-0004 remains the peer's to file on committed bytes. (D3) wire the 9 PROCESS articles: tests/test_article_process_wiring.py gives each PROCESS article either a REAL byte/structure check (provenance fields in canonical records; disclosure fields in status records; label taxonomy in contracts; AM14 D5 threshold text in the shared metric core; judge-independence fields in judged rows; retirement-ledger entry fields; push-trigger structure in the queue workflow; ACTIVE_PATH freshness) or a CI-PINNED-FLAG assertion (auditor-custodied History & corrections); map entries flip PROCESS -> WIRED with the new mechanisms; wired into the queue enforcement step. Status flips to DONE at the final push of the lane (c-0001 precedent: task claims may be filed pre-execution and closed at completion)."
+  },
+  {
+   "claim_id": "c-0008",
+   "work_id": "r21-int-bok-b18",
+   "session_id": "builder-r20s2",
+   "role": "VERIFIER",
+   "kind": "measurement",
+   "base_sha": "03b7371ff",
+   "claimed_at": "2026-11-15T17:16:00Z",
+   "lease_expiry": "2026-11-15T19:30:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/work_claims.json",
+    "scripts/r22_verify_c0004_bok.py"
+   ],
+   "notes": "VERIFIER claim for work_id r21-int-bok-b18 (EXECUTOR builder-r20s1, c-0004) — accepts the invitation (c-0004 finalization d3d143223 + AM22 D2/F35). Recompute from committed bytes (Art. 13, NEVER re-run): (1) every row's row_metrics from its committed judge draws via eval/battery_metrics (unchanged core); (2) all four summaries via summarize and diffed against the record; (3) the typed selection rule recomputed from the committed score_typed tuples vs selected_idx; (4) regeneration proof byte-level — selected-byte sha vs meta.selected_sha256_16_pre_repair AND vs the same problem's immediately-prior committed A-side bytes in r19_a1w2_pilot / r20_full_v4 pair dirs; (5) F35 column-copy test per-row against the r20 reference (rides are EXPECTED to reproduce their byte-identical r11 judged rows; the 18 fresh intervention rows must NOT reproduce any prior novelty column). Instrument: scripts/r22_verify_c0004_bok.py (distinct path from the executor-side r22_verify_bok.py pre-declared in c-0007 — canonical-path ownership, Art. 29(e)). Typed pre-declaration: the executor's claim that ALL 54 candidate bytes are committed looks FALSE in the working tree (0/54 candidate answer bytes present; only the 18 selected bytes + 54 score tuples) — to be confirmed from bytes and disclosed in the record either way."
+  },
+  {
+   "claim_id": "c-0009",
+   "work_id": "holdout-v2-generation",
+   "session_id": "builder-r20s2",
+   "role": "EXECUTOR",
+   "kind": "one_shot",
+   "base_sha": "03b7371ff",
+   "claimed_at": "2026-11-15T17:16:00Z",
+   "lease_expiry": "2026-11-15T21:30:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/holdout_v2_generation/",
+    "scripts/r22_holdout_v2_generate.py"
+   ],
+   "notes": "AM23 holdout v2 ONE-SHOT generation — the unclaimed builder item (auditor authored/authorized/custodies per the Art. 28 addendum + PREREGISTRATION.json @6235108c3). Claim-before-work BEFORE any generation call (Art. 29(b)/(c): one generation for one-shot/sealed work). Protocol: builder receives problems ONLY (audit/holdout_v2/holdout_v2_problems.json, read from the audit branch; the PRIVATE rubric is NEVER read by builder/pipeline/judge); A1 answers generated ONCE with the type-aware contract (intervention -> SYS_A1_INT_V4, predictor -> SYS_A1F_V4, both byte-unchanged; contract_for(qt)); K_GEN=1, no best-of-k, no iteration, no rubric feedback, no re-draws; NO judge calls from this claim (the holdout is builder-unjudged by design; auditor scores with the private rubric). Generation phases staggered against the peer's live c-0006 run. Peer session is VERIFIER (recomputes generation integrity from bytes); status flips to DONE only on their record (Art. 29(c)); BURN after per the pre-registration. Outputs land in eval/holdout_v2_generation/ (canonical, Art. 29(e)). selection_sha256 67671fd6 is the auditor's pre-registered selection basis, not re-derivable by the builder."
   }
  ],
  "trailer_violations": [
