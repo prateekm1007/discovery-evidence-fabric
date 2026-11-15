@@ -163,3 +163,164 @@ could run it: protocol, instruments, pass/fail thresholds, duration,
 kill criterion. For an intervention the falsifier validates
 EFFECTIVENESS (the failure rate or magnitude DROPS with the
 intervention), not a correlation."""
+
+
+# ---------------------------------------------------------------------------
+# V4-predictor marker scans (byte-typed from the r11 predictor rows):
+# the 4 retargeted pairs (eval-new06/07/10/12) carry fgap 2-3 WITHOUT any
+# development-need marker — their bills are already "existing /
+# off-the-shelf" everywhere. The residual burden the judge scores is the
+# SCHEME-TRUST BUILDING: baseline-data collection programs (eval-new12:
+# "Baseline resonance database (implementation: record healthy bearing
+# signatures during manufacturing)") and calibration/validation campaigns
+# ("calibrate during commissioning", "validate over a trial period").
+# The predictor analog of a development program is a data or validation
+# program: V4 forbids it the same way — the scheme's trust must come
+# from data that ALREADY EXISTS, not from a program that must run first.
+# ---------------------------------------------------------------------------
+BASELINE_PROGRAM_MARKERS = re.compile(
+    r"record (?:healthy|baseline|reference) (?:signatures?|data|"
+    r"readings?|profiles?)|collect(?:ing|ion of)? (?:a )?baseline"
+    r"|baseline (?:database|dataset|data[- ]collection|library)"
+    r"|gather (?:historical|failure|baseline) (?:data|records?)"
+    r"|historical failure (?:data|records?)\s+(?:to|for|over|spanning)"
+    r"|(?:build|establish|compile) (?:a |an )?(?:reference|signature|"
+    r"healthy|failure) (?:library|database|baseline|history)"
+    r"|training (?:period|phase|data)\s+(?:of|over|collection|spanning)",
+    re.I)
+
+COMMISSIONING_PROGRAM_MARKERS = re.compile(
+    r"calibrat\w+ (?:during|over|in|at) (?:commissioning|operation|a "
+    r"trial|service|installation)|commissioning (?:period|phase|study|"
+    r"campaign|program)|trial (?:period|run|campaign)\s+(?:to|before|"
+    r"over|spanning)|tun(?:e|ing) (?:the )?thresholds? (?:in|during|"
+    r"over|after|once) (?:operation|service|deployment|the field)"
+    r"|field (?:trial|validation) (?:period|campaign|study)"
+    r"|validat\w+ (?:the )?(?:predictor|model|algorithm|thresholds?|"
+    r"scheme) (?:over|during|across) (?:a |an |the )?(?:trial|week|"
+    r"month|season|campaign|period)", re.I)
+
+
+def predictor_violations(ans):
+    """V4-predictor typed violations (matched text snippets only, never
+    hidden; the repair directive quotes them back to the generator)."""
+    hits = {}
+    b = sorted({m.group(0).lower() for m in
+                BASELINE_PROGRAM_MARKERS.finditer(ans)})
+    c = sorted({m.group(0).lower() for m in
+                COMMISSIONING_PROGRAM_MARKERS.finditer(ans)})
+    d = sorted({m.group(0).lower() for m in
+                DEV_NEED_MARKERS.finditer(ans)})
+    if b:
+        hits["BASELINE_PROGRAM"] = b
+    if c:
+        hits["COMMISSIONING_PROGRAM"] = c
+    if d:
+        hits["DEV_NEED"] = d
+    return hits
+
+
+# Verbatim from r11_a1f_v3_generate.SYS_A1_V2 (the shared base contract;
+# duplicated literally so this module stays import-side-effect-free).
+SYS_A1_V2 = (
+    "You are a careful engineer. Answer the user's problem directly "
+    "with concrete engineering: the design or leading indicator, its "
+    "threshold, and the falsification test. Respect every stated "
+    "constraint verbatim. English only. Label every number as USER "
+    "CONSTRAINT, CALCULATED, or ASSUMPTION with a one-line engineering "
+    "rationale.")
+
+SYS_A1F_V4 = SYS_A1_V2 + """
+
+SAME-CLASS NOVELTY IDEATION V4 (required — novelty and feasibility are
+BOTH mandatory and are achieved in the SAME delivery class; do not
+trade one for the other):
+
+STEP 1 — DELIVER THE STANDARD PRACTICE'S OUTCOME CLASS (this is where
+novelty lives): FIRST name what the field-standard practice for this
+problem class DELIVERS — a DESIGN CHANGE (hardware, material, or
+procedure modification that prevents or mitigates the failure) or a
+MONITORING/INDICATION scheme (a measured or inferred leading
+indicator). Your proposal MUST deliver that SAME class of outcome.
+The novelty lives in the MECHANISM inside that class: a genuinely
+different physical mechanism, architecture, or inference achieving
+the same class of outcome. Name in one line what the standard
+practice delivers, and in one line your mechanism's genuine
+departure from it.
+
+FORBIDDEN FAILURE MODES (all measured on prior contracts, named here
+so you do not repeat them):
+- SUBSTITUTING A SENSOR WHERE THE STANDARD PRACTICE INTERVENES.
+- CONVENTIONALIZING TO WIN THE BURDEN COMPARISON: restating the
+  standard mechanism with new words is not a departure.
+- HIDING A DATA OR VALIDATION PROGRAM IN THE BILL ROWS: a predictor
+  whose trust must be BUILT by a program (record healthy baselines,
+  collect a reference dataset, calibrate during commissioning,
+  validate over a trial period) carries that program as burden — the
+  judge scores it. The scheme's trust must come from data that
+  ALREADY EXISTS per the problem's own statements.
+
+STEP 2 — MATCH THE STANDARD PRACTICE'S BURDEN CLASS (this is where
+feasibility lives): your implementation bill must use the SAME
+instrument, material, and service classes as the standard-practice
+solution itself.
+
+STEP 2B — THE DATA-SOURCE RULE (V4, BINDS HARD):
+  (i) EVERY input stream must be data the problem states ALREADY
+      EXISTS and is ALREADY RECORDED or exported (a stated sensor,
+      stated log, stated telemetry feed, stated inspection record).
+      A predictor that requires NEW instrumentation to be deployed,
+      commissioned, or connected is OUT OF SCOPE.
+  (ii) EVERY reference, baseline, or threshold must be DERIVABLE NOW
+      from data the problem states exists, from stated
+      specs/nameplate/geometry, or from a stated physical relation —
+      show the derivation and label it CALCULATED. "Record healthy
+      signatures", "collect a baseline dataset", "gather historical
+      failures" are typed defects (BASELINE_PROGRAM): go back to
+      STEP 1 and choose a mechanism whose reference comes from
+      already-recorded data, stated specs, or physics.
+  (iii) NO COMMISSIONING OR VALIDATION PROGRAM (COMMISSIONING_PROGRAM
+      defect): no calibrate-during-commissioning, no validate-over-a-
+      trial-period, no tune-in-operation. If the mechanism needs a
+      tuning campaign to become trustworthy, choose a mechanism whose
+      decision rule is a stated-physics relation or an
+      already-exported data comparison.
+  TWO failure modes remain forbidden together: conventionalizing the
+  mechanism to satisfy (i)-(iii), and hiding the program inside a
+  bill row or an ASSUMPTION. The resolution is the same as V4's:
+  keep the NEW MECHANISM (novelty in the computed observable and its
+  inference), deliver its trust ENTIRELY from stated-existing data,
+  stated specs, and stated physics.
+
+REQUIRED SECTIONS (each labeled):
+NOVELTY STATEMENT — one line: what the standard practice delivers
+(its class and mechanism); one line: your same-class mechanism
+departure; then the failure-physics connection that makes your
+mechanism work.
+PHYSICS CHECK — the governing physical relation for your mechanism and
+a one-to-two-line magnitude verification; a number that fails its own
+physics is a defect.
+IMPLEMENTATION BILL — components, materials, instruments, procedure;
+every input stream tagged ALREADY-RECORDED (with the problem's own
+wording for it), every reference/threshold tagged DERIVED (with its
+derivation source: stated data / stated spec / stated physics). This
+section is where feasibility is EARNED.
+BURDEN LEDGER (STANDARD-PRACTICE PARITY) — installability,
+operability, maintenance, rough cost class against the
+standard-practice solution. The ledger's expected conclusion is SAME
+burden class, DIFFERENT mechanism. If your approach is heavier
+somewhere, say where and why it is worth it.
+EXECUTABLE TEST — the falsification test as a competent engineer
+could run it: protocol, instruments, pass/fail thresholds, duration,
+kill criterion; validated against ALREADY-RECORDED data or a stated
+physical relation, never against a to-be-collected campaign."""
+
+
+def contract_for(question_type):
+    """V4 arm selection: interventions keep SYS_A1_INT_V4; predictors
+    move to SYS_A1F_V4 (this module). The change is isolated to the
+    retargeted predictor pairs; the other 8 predictor pairs ride r11
+    byte-identical rows per the pre-registered byte map."""
+    qt = (question_type or "").lower()
+    return SYS_A1_INT_V4 if qt.startswith("intervention") else SYS_A1F_V4
+
