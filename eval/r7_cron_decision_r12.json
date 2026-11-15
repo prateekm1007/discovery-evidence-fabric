@@ -1,0 +1,24 @@
+{
+ "record": "r7_cron_decision_r12/1.0.0",
+ "at": "2026-11-15T09:20:00Z",
+ "written_by": "builder session (AM12 round) — the owner delegated the R7 scheduling call in AM12 owner-decisions: 'Your call: resume daily 16:00 IST, or keep post-reset session turns'",
+ "decision": "KEEP POST-RESET SESSION TURNS — the unattended daily 16:00 IST cron is NOT re-wired",
+ "measured_basis": {
+  "queue_has_no_executable_work": "eval/runs/r7_queue_state.json (the artifact, Art. XXIV): 14 DONE + 2 EXHAUSTED = 16/16 terminal, updated_at 2026-11-13T17:41:50Z. The AM12 verdict's 'idle 14/23' figure counts a superseded plan generation; the state-file artifact says 14/16 DONE + 2 EXHAUSTED with typed reasons. A daily cron with an empty plan would burn a session turn re-verifying emptiness",
+  "cron_measured_dead_across_resets": "both sandbox resets killed the schedule (the R7 cron died 2026-11-13 with its sandbox; idle since). This session IS a reset continuation — the expected life of a re-wired cron is shorter than the measured reset interval, so it would misreport 'scheduled' while actually dead (Art. XXII: the schedule entry is not the schedule)",
+  "F25_race_stands": "no cross-session state lock exists; the AM11 round had two live builder sessions racing on the same artifacts (the disclosed duplicate-run race). A cron tick landing during a live session is the same hazard with no human in the loop",
+  "session_turns_measured_effective": "every R11 capability leg (D1 generation, D2 calibration, D4 consolidation) landed through session turns; the queue's own DONE 14 items all predate the resets and none are load-bearing for the current AM12 directions"
+ },
+ "exhausted_items_retirement": {
+  "items": [
+   "a0plus::dev-fu-004-fouling",
+   "a0plus::eval-sofc-thermal-cycling"
+  ],
+  "state": "EXHAUSTED (attempts 1, VERIFY_FAIL typed skip: 'no committed baseline bytes', exit 2) — terminal in the runner's own semantics since 2026-11-13T17:41:50Z",
+  "why_unfulfillable_and_moot": "the items' dependency (committed A0+ baseline bytes for these two problems) was never produced, and the A0+ role is HISTORICAL since Article LXXXVI (2026-11-14): the clone-passable wins+ties gate the A0+ arm demonstrated is RETIRED — the A0+ compare records (eval/a0plus_compare_r10.json, r11.json) stand as the evidence that motivated the retirement and are kept as history (Art. XI)",
+  "art_LXIV_accounting": "KEPT_BECAUSE the queue state file is a run record (Art. LXIV-4: run records are retired by superseding version, never edited in place); the ITEMS are closed-moot by this record, the PLAN SURFACE is retired by this decision record, and the runner script scripts/r7_queue_runner.py stays live infrastructure (its seeded-sweep planning gate and typed state machine remain the standing instrument; no code deleted)",
+  "note_on_verdict_figures": "the AM12 '14/23' and this record's '14/16' are reconciled by Art. XXIV: the state-file artifact (14/16 DONE + 2 EXHAUSTED) governs; no claim here depends on either figure being the other"
+ },
+ "what_replaces_the_cron": "the AM12 work queue is credential- and auditor-gated, not schedule-gated: battery r8 fires on the CROWLLM key re-supply (driver staged), the auditor re-judgment fires on the auditor's own session (manifest committed), OA1 fires on the same key (contract pre-registered). Post-reset session turns resume exactly these",
+ "owner_override": "one word ('resume cron') re-wires the daily 16:00 IST schedule against a re-planned queue; the decision record above is the default, not a lock"
+}
