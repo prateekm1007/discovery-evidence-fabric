@@ -1,0 +1,168 @@
+{
+ "eval_version": "holdout-v2-rubric",
+ "PRIVATE": "auditor and owner only; never given to the builder, the pipeline, or the automated judge",
+ "problems_selection_sha256": "67671fd6542fbdb21d861880cd7f2e391e174da4b3ecdc20e12794d55bc4b4e2",
+ "tiers": {
+  "K": "known-answer: documented failure with established mitigation; score key_elements coverage",
+  "D": "debated/open: score feasibility, constraint fit, specificity, non-obviousness"
+ },
+ "scoring": "per problem 0-4 on: question answered, key_elements covered (K) or quality checks met (D), commits to numbers with labelled assumptions, falsifier testable; plus red-flag penalties",
+ "rubrics": [
+  {
+   "problem_id": "HO2-01-sofc-interconnect-cr-poisoning",
+   "tier": "K",
+   "key_elements": [
+    "identifies Cr vapor transport to cathode TPB as the driver",
+    "names a conductive Cr-barrier spinel coating (Mn-Co spinel) or aluminizing/protective scale on the interconnect, or cathode-side Cr-getter",
+    "falsification via 10000 h stack test with post-test SEM/EDS of cathode Cr and polarization-resistance trend against the 5% target"
+   ],
+   "red_flags": [
+    "changes the interconnect alloy or cell footprint",
+    "ignores coating conductivity/adhesion under cycling"
+   ]
+  },
+  {
+   "problem_id": "HO2-02-perovskite-module-degradation",
+   "tier": "K",
+   "key_elements": [
+    "identifies moisture ingress at edges and UV-driven decomposition as co-drivers",
+    "names a low-WVTR edge seal (butyl/polyisobutylene) + UV-blocking encapsulant or front-sheet UV filter, and ion-blocking barrier to halt halide migration",
+    "falsification via IEC 61215 damp-heat + UV sequence with electroluminescence and output tracking against the 2% retention"
+   ],
+   "red_flags": [
+    "changes the cell architecture",
+    "ignores UV or edge ingress separately"
+   ]
+  },
+  {
+   "problem_id": "HO2-03-lead-service-line-release",
+   "tier": "K",
+   "key_elements": [
+    "identifies low pH/alkalinity and lack of corrosion inhibitor as the driver of lead solubility",
+    "names orthophosphate dosing to form insoluble lead-phosphate scale plus pH/alkalinity raise to reduce solubility, with a ramp to avoid scale destabilization",
+    "falsification via 12-month tap sampling (90th percentile <5 ppb) and pipe-loop scale characterization (XRD for lead-phosphate)"
+   ],
+   "red_flags": [
+    "proposes line replacement (violates constraint)",
+    "ignores pH/alkalinity or inhibitor ramp"
+   ]
+  },
+  {
+   "problem_id": "HO2-04-gt-compressor-fouling",
+   "tier": "K",
+   "key_elements": [
+    "identifies salt/hydrocarbon aerosol deposition as the driver",
+    "names upgraded inlet coalescer/filtration (HEPA/electrostatic) plus optimized online water-wash cadence and detergent chemistry",
+    "falsification via heat-rate and compressor-efficiency trend before/after with borescope deposit scoring against the 3% recovery"
+   ],
+   "red_flags": [
+    "redesigns blades or coating",
+    "ignores wash-induced erosion/corrosion"
+   ]
+  },
+  {
+   "problem_id": "HO2-05-ev-busbar-fretting",
+   "tier": "K",
+   "key_elements": [
+    "identifies micro-slip fretting + oxidation at the contact interface as the driver",
+    "names interface treatment (tin/silver plating or contact lubricant) plus preload retention (Belleville/spring washer or prevailing-torque feature) to stop micro-slip",
+    "falsification via 1000 h vibration with 4-wire contact-resistance trend and post-test interface microscopy against the 10% drift"
+   ],
+   "red_flags": [
+    "redesigns harness or cells",
+    "ignores preload retention"
+   ]
+  },
+  {
+   "problem_id": "HO2-06-sewer-crown-corrosion",
+   "tier": "K",
+   "key_elements": [
+    "identifies biogenic sulfuric acid (Thiobacillus) on the crown as the driver, not the wastewater itself",
+    "names H2S control (ventilation, oxidant/iron-salt dosing, or antimicrobial) plus acid-resistant surface treatment or calcareous sacrificial aggregate",
+    "falsification via crown-loss coupons and H2S/acid-rate monitoring over 12 months against the 1 mm/yr limit"
+   ],
+   "red_flags": [
+    "proposes relining/replacement",
+    "treats wastewater-side only, ignoring crown headspace"
+   ]
+  },
+  {
+   "problem_id": "HO2-09-oltc-contact-erosion",
+   "tier": "K",
+   "key_elements": [
+    "features from per-operation motor-current and vibro-acoustic signature (arc duration, contact-bounce, transition time) trended vs each unit's own baseline",
+    "persistence rule + relative threshold, not one fixed absolute value",
+    "retrospective validation against maintenance/teardown-confirmed contact erosion with lead-time and false-alarm reporting"
+   ],
+   "red_flags": [
+    "requires new sensors",
+    "fixed fleet-wide absolute threshold"
+   ]
+  },
+  {
+   "problem_id": "HO2-10-pump-cavitation-erosion",
+   "tier": "K",
+   "key_elements": [
+    "cavitation-sensitive feature from existing signals (high-frequency vibration band / pressure pulsation / current signature) normalized to operating point (speed/flow)",
+    "persistence + relative-to-baseline threshold",
+    "validation against NPSH-margin tests and teardown erosion with lead-time/false-alarm reporting"
+   ],
+   "red_flags": [
+    "requires new sensors",
+    "ignores operating-point normalization"
+   ]
+  },
+  {
+   "problem_id": "HO2-11-blade-leading-edge-erosion",
+   "tier": "K",
+   "key_elements": [
+    "power-curve residual (measured vs expected at same wind speed/air density) trended as the erosion proxy, plus acoustic/vibration confirmation",
+    "persistence + relative threshold vs each turbine's clean baseline",
+    "validation against drone/rope-access leading-edge inspection with lead-time/false-alarm reporting"
+   ],
+   "red_flags": [
+    "requires new sensors",
+    "ignores air-density/wind-speed normalization"
+   ]
+  },
+  {
+   "problem_id": "HO2-12-crude-preheat-fouling",
+   "tier": "K",
+   "key_elements": [
+    "overall heat-transfer coefficient U (or fouling resistance Rf) from existing T/P/flow, normalized to flow/viscosity, trended vs clean baseline",
+    "persistence + relative threshold",
+    "validation against cleaning records and duty trend with lead-time/false-alarm reporting"
+   ],
+   "red_flags": [
+    "requires new sensors",
+    "ignores flow/viscosity normalization"
+   ]
+  },
+  {
+   "problem_id": "HO2-13-rail-wheel-rcf",
+   "tier": "K",
+   "key_elements": [
+    "wheel-impact/load-detector trend and vibration feature per wheel, normalized to load/curvature, vs each wheel's baseline",
+    "persistence + relative threshold",
+    "validation against ultrasonic/visual tread inspection with lead-time/false-alarm reporting"
+   ],
+   "red_flags": [
+    "requires new sensors",
+    "fixed fleet-wide absolute threshold"
+   ]
+  },
+  {
+   "problem_id": "HO2-15-robot-gearbox-wear",
+   "tier": "K",
+   "key_elements": [
+    "torque-ripple / current-signature and encoder transmission-error feature per joint, normalized to load/speed, vs each joint's baseline",
+    "persistence + relative threshold",
+    "validation against backlash measurement and teardown with lead-time/false-alarm reporting"
+   ],
+   "red_flags": [
+    "requires new sensors",
+    "ignores load/speed normalization"
+   ]
+  }
+ ]
+}
