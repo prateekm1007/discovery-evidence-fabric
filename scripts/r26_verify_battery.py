@@ -55,7 +55,76 @@ def sha16(s):
     return hashlib.sha256(s.encode("utf-8")).hexdigest()[:16]
 
 
+def verify_generation_only() -> int:
+    """Zero-LLM stage verification for the GENERATION-ONLY window."""
+    gen = json.loads((REPO / "eval" / "r26_generation_only.json")
+                     .read_text(encoding="utf-8"))
+    blocked = json.loads((REPO / "eval" / "r26_judge_blocked.json")
+                         .read_text(encoding="utf-8"))
+    print("[r26-verify] GENERATION-ONLY window — verifying the machine "
+          "bytes, byte map and claim linkage")
+    check("byte map: 30 generation records",
+          len(gen["generation_record"]) == 30,
+          f"n={len(gen['generation_record'])}")
+    ok, detail = True, []
+    for p in (gen["byte_map"]["fresh_v7_intervention"]
+              + gen["byte_map"]["fresh_v5_predictor"]):
+        f = PAIRS / f"{p}.json"
+        if not f.exists():
+            ok = False
+            detail.append(f"missing {p}")
+            continue
+        d = json.loads(f.read_text(encoding="utf-8"))
+        if d.get("problem_id") != p or not str(d.get("a1_answer") or "").strip():
+            ok = False
+            detail.append(f"bad record {p}")
+        g = gen["contract_for"] if "contract_for" in gen else None
+    check("30/30 pair records exist with non-empty answers", ok,
+          "; ".join(detail[:3]))
+    check("pilot-8 subset is inside the fresh intervention map",
+          set(gen["byte_map"]["pilot_8"])
+          <= set(gen["byte_map"]["fresh_v7_intervention"]))
+    # machine-meta integrity: repairs/residual disclosed on every row
+    ok, detail = True, []
+    for g in gen["generation_record"]:
+        d = json.loads((PAIRS / f"{g['problem_id']}.json").read_text(
+            encoding="utf-8"))
+        m = d.get("meta") or {}
+        if "repairs" not in m or "residual_findings" not in m:
+            ok = False
+            detail.append(g["problem_id"])
+        elif (m["residual_findings"] or "CLEAN") != \
+                (g["residual_findings"] or "CLEAN"):
+            ok = False
+            detail.append(f"{g['problem_id']}: residual mismatch")
+    check("machine-meta integrity 30/30 (repairs + residuals match)",
+          ok, "; ".join(detail[:3]))
+    check("judge-blocked record typed", 
+          blocked.get("status") == "BLOCKED_ON_JUDGE_TRANSPORT")
+    check("no judge draws exist anywhere (judge-blind window)",
+          not list(REPO.glob("eval/battery_v7_catalog_r26*.json"))
+          or not any("partial" not in f.name and "pilot" not in f.name
+                     and "generation" not in f.name
+                     for f in REPO.glob("eval/battery_v7_catalog_r26*")))
+    claims = json.loads(CLAIMS.read_text(encoding="utf-8"))
+    c20 = [c for c in claims["claims"] if c["claim_id"] == "c-0020"]
+    check("claim c-0020 EXECUTOR on r26-v7-catalog-battery",
+          bool(c20) and c20[0]["role"] == "EXECUTOR")
+    print("[r26-verify] " + ("ALL PASS — generation stage reproduces "
+          "from committed bytes (zero LLM calls); the judged-battery "
+          "checks are PENDING-JUDGE-WINDOW, not findings"
+          if not FAILS else f"{len(FAILS)} FINDINGS"))
+    for f in FAILS:
+        print(f"  FINDING: {f}")
+    return 0 if not FAILS else 1
+
+
 def main() -> int:
+    if not R26.exists():
+        # the GENERATION-ONLY window (judge transport absent): verify the
+        # committed machine bytes + byte map + claim linkage; the judged
+        # battery checks type PENDING-JUDGE-WINDOW (not findings)
+        return verify_generation_only()
     rec = json.loads(R26.read_text(encoding="utf-8"))
     results = rec["results"]
     print(f"[r26-verify] record {rec['record'][:60]}...")
@@ -214,9 +283,10 @@ def main() -> int:
           bool(c20) and c20[0]["role"] == "EXECUTOR"
           and c20[0]["work_id"] == "r26-v7-catalog-battery")
 
-    print(f"[r26-verify] {'ALL PASS — the record reproduces from its own "
-          'bytes (zero LLM calls)' if not FAILS else str(len(FAILS))
-          + " FINDINGS"}")
+    print("[r26-verify] "
+          + ("ALL PASS — the record reproduces from its own bytes "
+             "(zero LLM calls)" if not FAILS
+             else f"{len(FAILS)} FINDINGS"))
     for f in FAILS:
         print(f"  FINDING: {f}")
     return 0 if not FAILS else 1
