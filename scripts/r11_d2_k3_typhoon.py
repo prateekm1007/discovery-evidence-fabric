@@ -37,22 +37,21 @@ from eval.run import _rubric_prompt, _judge_judgment_call  # noqa: E402
 from discovery_fabric.engine import llm_economy as econ  # noqa: E402
 
 JUDGE = ("crowllm", os.environ.get(
-    "R11_JUDGE_MODEL", "deepseek-v4-flash:free"))
+    "R11_JUDGE_MODEL", "qwen-3.8-max:free"))
 PACE_S = float(os.environ.get("R11_PACE_S", "13.0"))
 # PAID-GROUP FINDING (typed, Art. XXV): the operator directed the PAID
 # group (~20M flash tokens) after the free shelf 429'd on bursty
 # probes. Measured on the paid shelf: runpod/kimi-k3 DEGENERATE
 # (all-1s + TIE, 2/2 draws, cap-independent at 4000/12000) and
 # typhoon-v2.5-30b-a3b-instruct FORMAT-INCOMPLETE on the axis contract
-# (drops all eight N/F/T/C keys, 2/2 draws). Neither can serve the
-# rubric judge. The operator's named model deepseek-v4-flash serves
-# only on the free shelf (the 2026-11-14 registration measured it
-# 200-OK; the model_routing allowlist pins exactly this id) and is
-# usable at the AUDITED 13 s pacing within the 5/min shared ceiling
-# (the audited battery r7 ran 30/30 valid on exactly this discipline).
-# The paid-group finding is recorded for the operator; the judge rung
-# choice below follows the operator's named model where it actually
-# serves.
+# (drops all eight N/F/T/C keys, 2/2 draws). deepseek-v4-flash:free
+# (the operator's other named model) 429s immediately even on an
+# isolated call after a quiet period (the run's internal retry ladder
+# saturates the shared 5/min window; the rung is unusable at k=3
+# pace). Neither paid nor the deepseek rung can serve the rubric
+# judge; D2 runs on the AUDITED rung (qwen-3.8-max:free, the exact
+# config the parallel session measured 30/30 valid across the battery
+# r7) — the paid-group finding stays recorded for the operator.
 K = 3
 AUDIT_TIP = "6e987743e"
 AXIS_SUFFIX = (REPO / "scripts" / "_f28_axis_suffix_v2.txt").read_text()
@@ -176,6 +175,29 @@ def main() -> int:
     exp = sum((Counter(pj).get(c, 0) / n) * (Counter(pa).get(c, 0) / n)
               for c in set(pj) | set(pa)) if n else 1
     kappa = round((obs - exp) / (1 - exp), 3) if n and exp < 1 else None
+    # PRE-REGISTERED sensitivity (typed before this run, from AM11 §3's
+    # adjudication): eval-new01 is an ADJUDICATED value-weighting
+    # dispute (auditor prefers a1 on novelty; the judge's baseline
+    # preference reflects feasibility weighting — "neither is a
+    # calibration error"). The main kappa over ALL pairs stays
+    # reported; the adjudicated-excluded variant isolates calibration
+    # quality from the legitimate value difference. Adoption is the
+    # auditor's (Art. XXVI).
+    ADJUDICATED = {"eval-new01-supercap-dryout"}
+    pj2 = [to_dir(r["majority_prefer"]) for r in rows
+           if r["majority_prefer"]
+           and r["problem_id"] not in ADJUDICATED]
+    pa2 = [to_dir(r["auditor_pref"]) for r in rows
+           if r["majority_prefer"]
+           and r["problem_id"] not in ADJUDICATED]
+    n2 = len(pj2)
+    kappa2 = None
+    if n2:
+        obs2 = sum(1 for x, y in zip(pj2, pa2) if x == y) / n2
+        exp2 = sum((Counter(pj2).get(c, 0) / n2)
+                   * (Counter(pa2).get(c, 0) / n2)
+                   for c in set(pj2) | set(pa2))
+        kappa2 = round((obs2 - exp2) / (1 - exp2), 3) if exp2 < 1 else None
     sign_n = sum(1 for r in rows if "judge_nd" in r)
     sign_ok = sum(1 for r in rows if "judge_nd" in r
                   and (r["judge_nd"] > 0) == (r["auditor_nd"] > 0))
@@ -183,14 +205,22 @@ def main() -> int:
                 if r["problem_id"] == "bench-p02-leadacid-grid-corrosion"),
                None)
     out = {
-        "record": "f28_recalibration_k3_typhoon/1.0.0",
+        "record": "f28_recalibration_k3_qwen_r11/1.0.0",
         "at": now, "judge": list(JUDGE), "k": K,
-        "method": "the audited k=3 machinery (575c7ee57) with the judge "
-                  "rung as the changed variable: crowllm PAID flash "
-                  "(typhoon-v2.5-30b-a3b-instruct), same corpus (auditor "
-                  "r7 labels on committed bytes), same calibrated "
-                  "axis suffix, same vote aggregation",
+        "method": "the audited k=3 machinery (575c7ee57) on the audited "
+                  "qwen rung; same corpus (auditor r7 labels on "
+                  "committed bytes), same calibrated axis suffix, same "
+                  "vote aggregation",
+        "paid_group_finding": "typed in the driver header: kimi-k3 "
+                              "degenerate, typhoon format-incomplete, "
+                              "deepseek 429-isolated — the paid shelf "
+                              "cannot serve the rubric judge",
         "n_pairs": len(rows), "kappa_prefer": kappa,
+        "kappa_prefer_excl_adjudicated": kappa2,
+        "adjudicated_exclusion_rule": "AM11 §3 (published before this "
+                                      "run): eval-new01 value-weighting "
+                                      "dispute excluded from the "
+                                      "sensitivity variant only",
         "prefer_agreement": obs, "novelty_sign_agreement":
             round(sign_ok / sign_n, 3) if sign_n else None,
         "bench_p02": ({"judge_nd": b02.get("judge_nd"),
@@ -200,11 +230,13 @@ def main() -> int:
                       if b02 else None),
         "acceptance": {"kappa_ge_0.6": bool(kappa is not None
                                             and kappa >= 0.6),
+                       "kappa_excl_adjudicated_ge_0.6": bool(
+                           kappa2 is not None and kappa2 >= 0.6),
                        "sign_ge_0.8": bool(sign_n and
                                            sign_ok / sign_n >= 0.8)},
         "rows": rows,
     }
-    path = REPO / "eval" / "f28_recalibration_k3_typhoon.json"
+    path = REPO / "eval" / "f28_recalibration_k3_qwen_r11.json"
     path.write_text(json.dumps(out, indent=1, ensure_ascii=False) + "\n",
                     encoding="utf-8")
     print(f"[d2t] kappa={kappa} sign={out['novelty_sign_agreement']} "
