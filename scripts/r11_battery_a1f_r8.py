@@ -45,7 +45,7 @@ PACE_S = 13.0
 K = 3
 AXIS_SUFFIX = (REPO / "scripts" / "_f28_axis_suffix_v2.txt").read_text()
 
-A1F_DIR = REPO / "eval" / "pairs" / "r11_a1f_r1"
+A1F_DIR = REPO / "eval" / "pairs" / "r11_a1f_r2"
 
 
 def parse_axes(jc):
