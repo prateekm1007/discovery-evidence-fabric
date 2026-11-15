@@ -1,7 +1,7 @@
 {
  "schema": "work-claims/v1",
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
- "at": "2026-11-15T17:33:00Z",
+ "at": "2026-11-15T17:52:00Z",
  "sessions": {
   "builder-r20s2": {
    "registered_at": "2026-11-15T15:21:34Z",
@@ -77,7 +77,7 @@
    "base_sha": "ecdfd6ddb",
    "claimed_at": "2026-11-15T16:16:00Z",
    "lease_expiry": "2026-11-15T17:55:00Z",
-   "status": "OPEN",
+   "status": "DONE",
    "takes_over": null,
    "artifact_paths": [
     "eval/pairs/r21_bok_int_v4/",
@@ -150,13 +150,13 @@
    "base_sha": "03b7371ff",
    "claimed_at": "2026-11-15T17:16:00Z",
    "lease_expiry": "2026-11-15T19:30:00Z",
-   "status": "OPEN",
+   "status": "DONE",
    "takes_over": null,
    "artifact_paths": [
     "eval/work_claims.json",
     "scripts/r22_verify_c0004_bok.py"
    ],
-   "notes": "VERIFIER claim for work_id r21-int-bok-b18 (EXECUTOR builder-r20s1, c-0004) — accepts the invitation (c-0004 finalization d3d143223 + AM22 D2/F35). Recompute from committed bytes (Art. 13, NEVER re-run): (1) every row's row_metrics from its committed judge draws via eval/battery_metrics (unchanged core); (2) all four summaries via summarize and diffed against the record; (3) the typed selection rule recomputed from the committed score_typed tuples vs selected_idx; (4) regeneration proof byte-level — selected-byte sha vs meta.selected_sha256_16_pre_repair AND vs the same problem's immediately-prior committed A-side bytes in r19_a1w2_pilot / r20_full_v4 pair dirs; (5) F35 column-copy test per-row against the r20 reference (rides are EXPECTED to reproduce their byte-identical r11 judged rows; the 18 fresh intervention rows must NOT reproduce any prior novelty column). Instrument: scripts/r22_verify_c0004_bok.py (distinct path from the executor-side r22_verify_bok.py pre-declared in c-0007 — canonical-path ownership, Art. 29(e)). Typed pre-declaration: the executor's claim that ALL 54 candidate bytes are committed looks FALSE in the working tree (0/54 candidate answer bytes present; only the 18 selected bytes + 54 score tuples) — to be confirmed from bytes and disclosed in the record either way."
+   "notes": "VERIFIER record for work_id r21-int-bok-b18 (EXECUTOR builder-r20s1, c-0004) — recomputed from committed bytes (Art. 13, NEVER re-ran). Instrument: scripts/r22_verify_c0004_bok.py (committed this push, exit 0; distinct path from the executor-side scripts/r22_verify_bok.py per Art. 29(e)). RESULTS: (1) all 30 rows' row_metrics (majority_prefer, median_axes, novelty/feasibility/testability/constraint deltas) reproduce EXACTLY from their committed draws via the unchanged eval/battery_metrics core; (2) all four summaries (type_credited / intervention / predictor / all_valid) reproduce byte-for-byte via summarize; (3) typed selection rule recomputes: argmax lexicographic(score_typed) == selected_idx for 18/18 pair files, and sha256(committed a1_answer)[:16] == post_repair_sha256_16 == selected_sha256_16_pre_repair for 18/18 (repairs=0 throughout); (4) REGENERATION PROVEN byte-level: 0/18 fresh A-side shas byte-match any immediately-prior committed bytes (r20_full_v4 + r19_a1w2_pilot cover 18/18 problems); (5) F35 CLOSED from the verifier side — NOT a novelty-column copy: 12/18 fresh rows' novelty DIFFERS from the r20 column (a copy would match 18/18), 12/12 ride rows reproduce their byte-identical r11 judged rows (expected determinism, not copying), and the executor's coincidence decomposition CONFIRMS exactly from bytes: 8 rows byte-shared with the V4 n30 record (nd sum 7 == 7), 22 non-shared rows sum 52.0 (BOK) vs 52.0 (V4) — identical 1.967 means over DIFFERENT compositions; (6) the executor's 3/18 median-tuple finding reproduces exactly (bench-p03/bench-p04/eval-new03 full median tuples byte-equal r20 on DIFFERENT A-side bytes — judge near-determinism at t=0 + rubric quantization, disclosed in the executor's record and independently confirmed here); (7) transport: all 18 fresh rows 3/3 JUDGE_VALID with per-draw transport_attempts — '0 rows transport-dead' holds for the fresh arm. TYPED DISCLOSURES (for the auditor): (a) candidate ANSWER bytes committed = 0/54 — the executor heartbeat f123879fd and c-0004 notes claim 'ALL candidate bytes + scores recorded' which is FALSE for bytes (only the 18 selected bytes + 54 typed score tuples are committed); selection is recomputable from scores + sha-consistency, not from raw candidate bytes — disclosure-precision finding, does not affect any summary; (b) 4 ride rows (eval-new02/new06/new08/new09) carry their r11 judged draws VERBATIM including 5 historical transport-failed draws (byte-identical ride rule, AM19 sec.2) — per-draw transport bookkeeping exists only on the 54 fresh draws; typed fact, no gate impact. VERIFIER VERDICT: the c-0004 record reproduces from its own bytes; acceptance read on summary_type_credited: novelty PASS (1.967, CI [1.23, 2.704]), feasibility FAIL (1.667, CI [1.175, 2.158]) — the VARIANCE LEVER is falsified (BOK 1.667 vs single-draw incumbent 1.4: the generation-side variance lever did NOT help feasibility; intervention subset 2.278/2.0 vs incumbent 2.333/1.5, beats_incumbent=False), consistent with the executor's typed lesson and the Art. 20 round-1 loss + RETIREMENT already shipped by the peer in 931c1eb6a. Gate re-decision is the auditor's. c-0004 flips to DONE in this commit per the executor's stated rule (DONE only when a VERIFIER record exists — it now does)."
   },
   {
    "claim_id": "c-0009",
