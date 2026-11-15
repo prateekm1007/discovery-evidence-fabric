@@ -1,0 +1,23 @@
+{
+ "problem_id": "eval-new04-chiller-fouling-predictor",
+ "question_type": "predictor-design",
+ "a1_source": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V3 verbatim (session-2 audited predictor contract)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "observable/indicator design present"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 8.1,
+   "chars": 3272
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:09:02.254885Z",
+ "a1_answer": "NOVELTY STATEMENT\nUSER CONSTRAINT: Standard practice delivers a MONITORING/INDICATION scheme with fixed monthly cleaning cadence.\nCALCULATED: My mechanism departs by using a physics-based fouling coefficient derived from existing BMS points that triggers cleaning when condenser heat transfer efficiency degrades beyond a threshold.\nASSUMPTION: The existing BMS points capture the necessary thermal and hydraulic data to calculate real-time heat transfer performance.\nPHYSICS CHECK\nGOVERNING RELATION: Heat transfer rate Q = U × A × LMTD, where U is the overall heat transfer coefficient, A is the heat transfer area, and LMTD is the log mean temperature difference.\nCALCULATED: Fouling reduces U by creating an additional thermal resistance. The fouling coefficient Rf = 1/Ufouled - 1/Uclean. With typical condenser U values of 800-1200 W/m²K, a 3% energy savings corresponds to Rf ≈ 0.00024-0.00036 m²K/W.\nIMPLEMENTATION BILL\n1. Existing BMS points:\n   - Chilled water supply/return temperature (CHWS, CHWR)\n   - Condenser water supply/return temperature (CWS, CWR)\n   - Compressor power (COMP_PWR)\n   - Pump speed (PUMP_SPD)\n   - Outdoor wet-bulb (WB)\n   (All same class as standard practice monitoring)\n\n2. Calculated parameters:\n   - Condenser load (Qcond) = COMP_PWR / COP (COP calculated from CHWS, CWS, WB)\n   - LMTD = ((CWS - CHWR) - (CWR - CHWS)) / ln((CWS - CHWR)/(CWR - CHWS))\n   - Overall heat transfer coefficient (U) = Qcond / (A × LMTD)\n   - Fouling coefficient (Rf) = 1/Ufouled - 1/Ubaseline\n\n3. Baseline establishment:\n   - Calculate initial Rf when system is clean (first 3 days of operation)\n   - Update baseline weekly to account for seasonal variations\n\n4. Trigger mechanism:\n   - When Rf exceeds threshold (0.0003 m²K/W), generate cleaning alert\n   - Reset baseline after cleaning\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- INSTALLABILITY: Uses existing BMS infrastructure, no additional hardware required (SAME burden class)\n- OPERABILITY: Same monitoring interface, just additional calculated parameter display (SAME burden class)\n- MAINTENANCE: No additional maintenance beyond standard BMS (SAME burden class)\n- COST: Software implementation only, no additional hardware costs (SAME burden class, lower than standard)\n\nEXECUTABLE TEST\nPROTOCOL:\n1. Install calculation module in existing BMS system\n2. Establish baseline Rf during clean condition at full load\n3. Monitor Rf continuously at full load conditions\n4. Introduce controlled fouling (reduce flow rate by 20% for 72 hours)\n5. Measure time from fouling introduction to Rf exceeding threshold\n6. Compare energy consumption between triggered cleaning and fixed monthly cadence over 30 days\n\nINSTRUMENTS:\n- Existing BMS data logging\n- Power meter for compressor energy measurement\n- Temperature sensors for verification\n\nPASS/FAIL CRITERIA:\nPASS: Rf exceeds threshold within 3 days of fouling introduction AND triggered cleaning reduces total compressor energy by ≥3% versus fixed monthly cadence over 30-day test period\nFAIL: Rf does not exceed threshold within 3 days OR energy savings <3%\n\nDURATION: 30-day test period with controlled fouling event\nKILL CRITERION: If the predictor fails to detect fouling within 3 days or fails to achieve 3% energy savings, the approach is invalidated."
+}

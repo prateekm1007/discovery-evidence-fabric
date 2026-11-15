@@ -1,0 +1,23 @@
+{
+ "problem_id": "eval-new01-supercap-dryout",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1_INT_WB_WEIGHT_BOUND_GLM",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1_INT_WB verbatim (AM16 D1 weight-bound contract; committed before generation)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "proposes a mitigation (section=True, verbs=True)"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 8.8,
+   "chars": 3833
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:57:18.978931Z",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe proposed intervention is to replace the conventional liquid electrolyte with a solid-state polymer electrolyte composite that incorporates thermally stable ionic liquid crystals. Standard practice uses liquid organic solvents with additives to suppress evaporation; this mitigation departs by fundamentally changing the electrolyte's physical state to eliminate free solvent molecules while maintaining ion transport through anhydrous ionic liquid crystal pathways. The closest existing practice is the use of gel polymer electrolytes in consumer electronics, which still contain significant liquid components; this intervention is different because it employs a fully solid matrix with embedded ionic liquid crystals that undergo reversible phase transitions to maintain ion mobility without liquid solvent.\n\nPHYSICS CHECK\nThe governing physical relation is Fick's law of diffusion: J = -D(dC/dx), where evaporation rate J is proportional to diffusion coefficient D. By eliminating free solvent molecules and using ionic liquid crystals with vapor pressures <10^-6 torr, D is reduced by >4 orders of magnitude compared to conventional electrolytes (D_liquid ≈ 10^-9 m²/s vs D_liquid_crystal ≈ 10^-13 m²/s). This reduces solvent loss rate from ~0.1%/1000h at 65°C to <0.001%/1000h, extending electrolyte life beyond 10 years while maintaining conductivity >10 mS/cm through liquid crystal reorientation.\n\nIMPLEMENTATION BILL\nStandard practice components:\n- Liquid organic electrolyte (EC:DMC 1:1 by weight)\n- Polyolefin separator\n- Aluminum foil current collectors\n- Plastic module housing with rubber seals\n\nProposed intervention components:\n- Solid-state polymer electrolyte composite (replaces liquid electrolyte):\n  * Base polymer: Poly(vinylidene fluoride-co-hexafluoropropylene) (PVDF-HFP) - procurable\n  * Ionic liquid crystals: 1-ethyl-3-methylimidazolium tetrafluoroborate (EMIM-BF4) - procurable\n  * Ceramic filler: 5% wt. Al2O3 nanoparticles (procurable)\n- Modified separator (same polyolefin, plasma-treated for better polymer adhesion)\n- Same aluminum current collectors\n- Same plastic module housing with rubber seals (no change)\n- Manufacturing process: Roll-to-roll coating of polymer-ionic liquid composite onto electrodes (existing equipment in battery manufacturing)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n| Component/Process | Standard Practice | Proposed Intervention | Burden Impact |\n|-------------------|-------------------|----------------------|---------------|\n| Electrolyte | Liquid organic solvent | Solid polymer-ionic liquid composite | Same cost (PVDF-HFP and ionic liquids are commodity chemicals) |\n| Separator | Standard polyolefin | Plasma-treated polyolefin | +5% cost (plasma treatment is standard in battery manufacturing) |\n| Current collectors | Standard aluminum foil | Standard aluminum foil | No change |\n| Housing | Standard plastic with rubber seals | Standard plastic with rubber seals | No change |\n| Manufacturing | Liquid filling process | Roll-to-roll coating process | Same equipment class (existing battery manufacturing equipment) |\n| Module height | Standard | +0.5 mm (due to slightly thicker composite) | Within 1 mm constraint |\n| Total Burden | | | Same burden class |\n\nEXECUTABLE TEST\nProtocol: Subject 10 modules to 85°C/85% RH accelerated aging (per IEC 62660-2) while cycling at 1C charge/discharge between 1.5V-2.7V. Monitor ESR weekly and capacitance monthly. Test duration: 2000 hours (~83 days). Pass/fail criterion: ESR increase <20% and capacitance retention >90% at end of test. Kill criterion: ESR increase >50% or capacitance drop >15% at any checkpoint. Falsification: If any module fails to meet pass criterion, the intervention is invalidated as it demonstrates insufficient electrolyte stability under thermal stress."
+}

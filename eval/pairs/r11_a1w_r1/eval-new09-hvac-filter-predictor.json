@@ -1,0 +1,23 @@
+{
+ "problem_id": "eval-new09-hvac-filter-predictor",
+ "question_type": "predictor-design",
+ "a1_source": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V3 verbatim (session-2 audited predictor contract)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "observable/indicator design present"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 7.0,
+   "chars": 2945
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:09:02.254885Z",
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme based on fixed time replacement (90-day schedule).\nMy departure is a same-class monitoring scheme using a normalized pressure drop rate indicator that captures filter loading physics.\nThe connection: filter loading follows an exponential curve, so the rate of pressure drop increase accelerates as dirt accumulates, allowing early detection before performance limits are breached.\n\nPHYSICS CHECK\nGoverning relation: ΔP = k × v^m × c, where ΔP is pressure drop, v is velocity, c is contaminant concentration, and k/m are constants.\nMagnitude verification: For a MERV-13 filter, pressure drop typically increases from 0.5\" wg (clean) to 1.5\" wg (dirty) over 90 days. The normalized rate (ΔP/day / current ΔP) will increase from ~0.005 to ~0.015 as loading progresses, providing a detectable signal well before failure.\n\nIMPLEMENTATION BILL\n1. BMS data points (already logged):\n   - Supply fan power (USER CONSTRAINT: already present)\n   - Filter pressure drop (USER CONSTRAINT: if available; if not, calculated from fan power curve)\n   - Outdoor airflow (USER CONSTRAINT: already logged)\n   - Occupancy schedule (USER CONSTRAINT: already logged)\n2. Calculation algorithm (standard BMS programming):\n   - Calculate daily pressure drop change (ΔP_day)\n   - Calculate normalized rate: R = ΔP_day / current ΔP\n   - Apply occupancy-weighted smoothing (using occupancy schedule)\n3. Threshold determination (historical data analysis):\n   - Establish baseline R during clean filter operation\n   - Set alert threshold at 3× baseline R\n   - Set replacement threshold at 5× baseline R\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME - uses existing BMS points, no new hardware required\n- Operability: SAME - runs automatically in background, no additional operator training needed\n- Maintenance: SAME - standard BMS programming maintenance, no specialized upkeep\n- Cost class: SAME - no capital cost, minimal computational overhead (standard BMS processing)\n- Burden difference: Slightly increased programming complexity, but offset by reduced filter costs\n\nEXECUTABLE TEST\nProtocol: \n1. Install the normalized rate indicator algorithm in BMS\n2. Monitor on 10 identical AHUs with varying occupancy and loading conditions\n3. Track actual filter replacement needs against algorithm recommendations\n4. Compare against current 90-day schedule\n\nInstruments: Standard BMS data logging, filter pressure gauges, airflow measurement devices\n\nThreshold: Success requires ≥20% reduction in unnecessary replacements while maintaining indoor air quality standards (no increase in particulate matter beyond baseline)\n\nDuration: 12 months (covers all seasonal loading variations)\n\nKill criterion: If the algorithm fails to achieve ≥20% reduction in unnecessary replacements OR if any unit experiences filter failure before replacement recommendation, the predictor is invalidated."
+}

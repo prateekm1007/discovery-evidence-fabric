@@ -1,0 +1,23 @@
+{
+ "problem_id": "eval-sofc-redox",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1_INT_WB_WEIGHT_BOUND_GLM",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1_INT_WB verbatim (AM16 D1 weight-bound contract; committed before generation)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "proposes a mitigation (section=True, verbs=True)"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 8.0,
+   "chars": 3231
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:57:18.978931Z",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe proposed intervention is a graded anode structure with controlled porosity gradients that mechanically accommodates nickel re-oxidation volume changes. Standard practice uses a homogeneous Ni-YSZ anode with uniform porosity, which builds internal stress during redox cycling. This intervention introduces a radial porosity gradient (higher porosity at the anode-electrolyte interface) that provides compliance space for nickel expansion during re-oxidation, preventing stress buildup. The closest existing practice is functionally graded materials in thermal barrier coatings, but those are designed for thermal stress gradients, not redox volume change accommodation, and typically use ceramic-metal systems rather than electrochemically active phases.\n\nPHYSICS CHECK\nThe governing relation is the strain accommodation capacity: ΔV/V = (1 - φ) × Δε, where φ is the local porosity and Δε is the nickel expansion strain (~25% during full oxidation). By increasing φ from 30% (bulk) to 50% at the interface, strain accommodation capacity increases by 67%, reducing interfacial stress by a proportional amount. This keeps stress below the fracture threshold of YSZ (~300 MPa) even with 25% Ni volume change.\n\nIMPLEMENTATION BILL\nStandard practice components:\n- NiO-YSZ anode support (40 vol% NiO, 60 vol% YSZ, 30% porosity)\n- YSZ electrolyte (20 μm)\n- Standard cell fabrication: tape casting, lamination, co-firing\n\nIntervention components:\n- Modified anode support with graded porosity (same materials, different processing)\n- Porosity gradient tooling (procurable: custom ceramic mold with controlled sintering profile)\n- Modified sintering profile (procedural change: temperature ramp rate control)\n- No new materials, no new equipment class (uses existing furnace with programmable controls)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n| Component | Standard | Intervention | Burden Change |\n|----------|----------|--------------|---------------|\n| Materials | NiO-YSZ powder | Same NiO-YSZ powder | None |\n| Processing | Uniform sintering | Graded sintering profile | Minimal (program change) |\n| Tooling | Standard mold | Custom mold (one-time cost) | Comparable to mold replacement |\n| Labor | Standard processing | Modified procedure training | Minimal (1-day training) |\n| Quality control | Standard porosity check | Added gradient verification | Comparable to existing checks |\n| Total burden | Standard | Same class | Same burden class |\n\nEXECUTABLE TEST\nProtocol: Fabricate 20 cells (10 standard, 10 graded) subject to 200 redox cycles (750°C, 1h reduction/1h oxidation). Measure:\n1. Initial power density at 0.7V\n2. Power density after every 50 cycles\n3. Interfacial stress via curvature measurement\n4. Post-test microstructure (SEM) for nickel agglomeration\nInstruments: Potentiostat, laser curvature sensor, SEM\nPass/fail: Graded cells maintain >0.35 W/cm² power density after 200 cycles while standard cells degrade below 0.30 W/cm². Kill criterion: >30% power density drop in any cell.\nDuration: 6 months (accelerated testing)\nFalsification: If graded cells show no statistically significant improvement in power retention or interfacial stress reduction compared to standard cells."
+}

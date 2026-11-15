@@ -1,0 +1,23 @@
+{
+ "problem_id": "eval-new08-pipeline-leak-predictor",
+ "question_type": "predictor-design",
+ "a1_source": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V3 verbatim (session-2 audited predictor contract)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "observable/indicator design present"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 4.8,
+   "chars": 2457
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:09:02.254885Z",
+ "a1_answer": "NOVELTY STATEMENT\nUSER CONSTRAINT: Standard practice delivers a monitoring/indication scheme using pressure deviation as the leading indicator.\nCALCULATED: My mechanism departs by using pressure deviation acceleration as the leading indicator, which detects the developing trend of a small leak before it reaches the absolute pressure deviation threshold that would trigger conventional alarms.\nPHYSICS CHECK: The governing physical relation is the rate of pressure change (dP/dt) in a pipeline with constant flow and a small leak. For a leak of 0.5% of nominal flow in a DN 600 pipeline, the pressure deviation acceleration would be approximately 0.02 kPa/min² over 48 hours, detectable above normal operational fluctuations.\nIMPLEMENTATION BILL\n1. Existing SCADA pressure and flow transmitters (same class as standard practice)\n2. Data processing unit (same class as standard practice's monitoring system)\n3. Algorithm to calculate pressure deviation acceleration from 5-minute pressure readings\nASSUMPTION: The existing SCADA system has sufficient computational capacity to run the acceleration calculation without hardware upgrades (justification: modern SCADA systems typically have excess capacity for additional algorithms).\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME - uses existing sensors and SCADA infrastructure\n- Operability: SAME - integrates with existing monitoring dashboard\n- Maintenance: SAME - no additional physical maintenance requirements\n- Cost class: SAME - minimal software development cost, no new hardware\n- Expected conclusion: SAME burden class, different mechanism (pressure acceleration vs. static pressure deviation)\nEXECUTABLE TEST\nProtocol:\n1. Install test section of DN 600 carbon-steel pipeline with controlled leak injection system\n2. Set baseline flow at nominal rate (e.g., 500 m³/h)\n3. Introduce 0.5% leak (2.5 m³/h) at t=0\n4. Record pressure and flow data at 5-minute intervals for 48 hours\n5. Run pressure deviation acceleration algorithm on data\nInstruments:\n- Existing pressure transducers (±0.1% accuracy)\n- Existing flow meters (±0.5% accuracy)\n- Data logging system\nPass/fail threshold:\n- Detection within 48 hours of leak introduction\n- No more than 1 false alarm per month per 10 km of pipe (tested over 30 days with no actual leaks)\nDuration: 48 hours per test, repeated 10 times with different leak locations\nKill criterion: Failure to detect 0.5% leak within 48 hours in any test run"
+}
