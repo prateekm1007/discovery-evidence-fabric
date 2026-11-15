@@ -294,6 +294,144 @@ for e in entries:
 check("ABLATION_REGISTRY V6 round-2 entry recomputes "
       "(no hand-typed numbers)", ok_reg, detail)
 
+# ==== ROUND-1 (c-0012, r23 V6 battery) — full Art. 13 recompute =========
+# the round-2 record cites the round-1 fgap; the same machine's round-1
+# canonical record verifies in the same run so BOTH executor claims
+# (c-0012 + c-0014) flip DONE on this single verifier record (Art. 29(c)).
+R23PAIRS = REPO / "eval" / "pairs" / "r23_feas_bind_v6"
+if R23PAIRS.exists():
+    R23 = R23REC
+    r23rows = R23["results"]
+    check("r23 record shape + claim linkage",
+          str(R23.get("record", "")).startswith("BATTERY_INT_V6BIND_R23")
+          and len(r23rows) == 30
+          and R23.get("claim", {}).get("claim_id") == "c-0012",
+          f"n={len(r23rows)}")
+    r23rides = {r["problem_id"]: r for r in r23rows
+                if str(r.get("question_type", "")).startswith("predictor")}
+    r23fresh = {r["problem_id"]: r for r in r23rows
+                if r["problem_id"] not in r23rides}
+    check("r23 byte map", len(r23rides) == 12 and len(r23fresh) == 18,
+          f"rides={len(r23rides)} fresh={len(r23fresh)}")
+    for pid, row in r23rows and {r["problem_id"]: r for r in r23rows}.items():
+        dec = row_metrics(row["draws"])
+        med = dec["median_axes"]
+        ok = (dec["majority_prefer"] == row.get("majority_prefer")
+              and med == row.get("median_axes"))
+        if med:
+            ok = ok and (
+                row.get("novelty_delta") == med["N_A"] - med["N_B"]
+                and row.get("feasibility_abs_gap")
+                == abs(med["F_A"] - med["F_B"])
+                and row.get("feasibility_signed_gap")
+                == med["F_A"] - med["F_B"])
+        check(f"r23 row recompute {pid[:32]}", ok)
+        if not ok:
+            break
+    for lbl, got, sub in (
+            ("summary_type_credited", R23["summary_type_credited"],
+             [r for r in r23rows
+              if (r.get("question_type_gate") or {}).get("verdict")
+              == "MATCH"]),
+            ("summary_intervention_rows", R23["summary_intervention_rows"],
+             [r for r in r23rows
+              if str(r.get("question_type", "")).startswith(
+                  "intervention")]),
+            ("summary_predictor_rows", R23["summary_predictor_rows"],
+             list(r23rides.values())),
+            ("summary_all_valid", R23["summary_all_valid"], r23rows)):
+        s = summarize(sub, lbl)
+        check(f"r23 summary recompute {lbl}",
+              s.get("n_valid") == got.get("n_valid")
+              and s.get("novelty_delta_mean")
+              == got.get("novelty_delta_mean")
+              and s.get("novelty_ci95") == got.get("novelty_ci95")
+              and s.get("feasibility_abs_gap_mean")
+              == got.get("feasibility_abs_gap_mean")
+              and s.get("feasibility_ci95") == got.get("feasibility_ci95")
+              and s.get("prefer_tally") == got.get("prefer_tally"),
+              f"n={got.get('n_valid')} "
+              f"nd={got.get('novelty_delta_mean')} "
+              f"fgap={got.get('feasibility_abs_gap_mean')}")
+    ls1 = {"first_try_valid": 0, "recovered": 0, "still_dead": 0,
+           "total_attempts": 0}
+    for r in r23rows:
+        for d in r.get("draws") or []:
+            atts = d.get("transport_attempts") or []
+            ls1["total_attempts"] += len(atts)
+            if d.get("outcome") == "JUDGE_VALID":
+                ls1["first_try_valid"] += len(atts) == 1
+                ls1["recovered"] += len(atts) > 1
+            else:
+                ls1["still_dead"] += 1
+    check("r23 ladder_stats recompute", ls1 == R23["ladder_stats"],
+          f"recomputed={ls1}")
+    fs = 0
+    for pid, row in r23rides.items():
+        src = row.get("ride", {}).get("byte_source", "")
+        pair = REPO / src
+        ok = pair.exists()
+        if ok:
+            a1 = json.loads(pair.read_text(encoding="utf-8"))["a1_answer"]
+            ok = row["ride"]["a1_answer_sha256_16"] == _sha(a1)
+        r11 = _backfill_tc(dict(R11ROWS[pid]))
+        ok = ok and all(
+            row.get(k) == r11.get(k) for k in
+            ("novelty_delta", "feasibility_abs_gap",
+             "feasibility_signed_gap", "majority_prefer", "median_axes"))
+        fs += R11ROWS[pid].get("feasibility_abs_gap") or 0
+        check(f"r23 ride identity {pid[:32]}", ok)
+        if not ok:
+            break
+    check("r23 pre-registered rides floor (fgap sum == 14)", fs == 14,
+          f"sum={fs}")
+    fr_ok = True
+    for pid, row in r23fresh.items():
+        pair = R23PAIRS / f"{pid}.json"
+        rec = json.loads(pair.read_text(encoding="utf-8"))
+        a1 = str(rec["a1_answer"])
+        prov = row.get("byte_provenance") or {}
+        fr_ok = (prov.get("a1_answer_sha256_16") == _sha(a1)
+                 and (rec["meta"]["attempts"][0].get("type_gate")
+                      == row.get("question_type_gate")))
+        check(f"r23 fresh provenance {pid[:32]}", fr_ok)
+        if not fr_ok:
+            break
+    jr_ok = all(tuple(r.get("judge") or ())
+                == ("crowllm", "qwen-3.8-max:free")
+                for r in r23fresh.values())
+    jk_ok = all(len(r.get("draws") or []) == 3 for r in r23fresh.values())
+    jv_ok = all(sum(1 for d in r["draws"]
+                    if d["outcome"] == "JUDGE_VALID") >= 2
+                for r in r23fresh.values())
+    check("r23 judge independence", jr_ok and jk_ok and jv_ok,
+          "route=crowllm/qwen-3.8-max:free k=3 >=2 valid on every fresh row")
+    ab1 = R23["art20_ablation"]
+    check("r23 art20_ablation recomputes",
+          ab1["incumbent_intervention_fgap_r20"] == exp_inc_f
+          and ab1["incumbent_ndelta_r20"] == exp_inc_n
+          and ab1["v6_bind_intervention_fgap_this"]
+          == R23["summary_intervention_rows"]["feasibility_abs_gap_mean"]
+          and ab1["v6_ndelta_this"]
+          == R23["summary_intervention_rows"]["novelty_delta_mean"],
+          f"r23 intervention {R23['summary_intervention_rows']['novelty_delta_mean']}"
+          f"/{R23['summary_intervention_rows']['feasibility_abs_gap_mean']}")
+    bs1 = R23.get("bind_summary", {})
+    rp1 = 0
+    rs1 = 0
+    for pid in r23fresh:
+        meta = json.loads((R23PAIRS / f"{pid}.json").read_text(
+            encoding="utf-8"))["meta"]
+        rp1 += meta["repairs"]
+        rs1 += 1 if meta.get("residual_findings") else 0
+    check("r23 bind_summary recomputes from pair metas",
+          bs1.get("repairs_total") == rp1
+          and bs1.get("pairs_with_residual_findings") == rs1,
+          f"repairs={rp1} residual={rs1}")
+else:
+    check("r23 pairs present", False,
+          "eval/pairs/r23_feas_bind_v6/ missing — fail closed")
+
 print()
 if FAILS:
     print(f"VERDICT: FAIL ({len(FAILS)} failing checks: {FAILS[:4]}...)")
