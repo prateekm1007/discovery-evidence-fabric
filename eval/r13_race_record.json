@@ -1,0 +1,24 @@
+{
+ "record": "R13_ONE_SHOT_RACE_RECORD/1.0.0",
+ "at": "2026-11-15",
+ "what": "the FOURTH F25 parallel-session race (after R12's three instances), and the first on the SEALED holdout: both builder sessions executed the AM13 direction-1 one-shot holdout generation concurrently from the same operator directive",
+ "timeline": [
+  "37687e34e (session-2, previous context): holdout problems RECEIVED once, receipt committed; the one-shot 'begins with the next commit'",
+  "session-2 (this session): constitution+AM13 read, machine-as-measured verification (SYS_A1F_V2 import; wrapper 30/30 byte-identity vs the committed r8 records; problems sha256 fail-closed; rubric-absence asserted), 24/24 generated (uniform wrapper, 24/24 transport attempt 1, first pass 16 CLEAN/7 FLAG/1 KILL; HO-23 KILL NYQUIST_BANDWIDTH repaired CLEAN on re-ask 1 with superseded bytes kept), atomic commit efd4859e3",
+  "session-1 (parallel): same directive executed with scripts/r13_holdout_oneshot_generate.py + a completion pass; pushed 754ec229e (D2 V3-contract rewrite) + a284c0d09 (their 24 answers) DURING session-2's window",
+  "session-2 push rejected (non-fast-forward); pusher-wins applied (Art. XXIII/LXXXV, the AM11 aaea69de3 duplicate-run precedent): session-1's bytes are AUTHORITATIVE; session-2's generation NEVER PUSHED, preserved out-of-repo"
+ ],
+ "resolution": {
+  "rule": "pusher-wins (the standing F25 discipline)",
+  "authoritative_set": "eval/holdout_v1_a1/ @ a284c0d09 (session-1)",
+  "duplicate_run": "NEVER PUSHED; preserved at /home/z/r13_race_evidence_session2/ (24 per-pair bytes + manifest + scripts + full commit patch efd4859e3 + PROVENANCE.json with per-pair sha256); retrievable for auditor/owner order — NOT pushed to avoid competing one-shot bytes in the scored tree",
+  "why_not_both": "the one-shot protocol scores ONE set; two scored sets would contaminate the sealed test"
+ },
+ "duplicate_run_census": "24/24 GENERATED, 0 GEN_FAILED, 24/24 transport attempt 1; first pass 16 CLEAN / 7 FLAG / 1 KILL; final 17 CLEAN / 7 FLAG (4 USER_LABEL_FABRICATED_CONSTRAINT + 3 TEST_DURATION_REALTIME) / 0 KILL after the single HO-23 repair (bafe163d9 pattern: problem-specific disclosed directive, superseded bytes kept in-record)",
+ "byte_proven_divergence": "the two runs differ on wrapper discipline (session-1: question-type-conditional, 14/24 deviating from as-measured — see the run manifest F1; session-2: uniform as-measured 24/24) AND on answers/censuses (F4: the gateway route is non-deterministic at t0 across calls). Both censuses are typed from bytes; neither session's set is asserted superior here — adjudication is the auditor's (Art. XXVI).",
+ "art_lxiv_accounting": {
+  "session_2_scripts": "scripts/r13_holdout_v1_generate.py + scripts/r13_repair_holdout_ho23.py were authored and run by session-2 but are RETIRED-UNPUBLISHED (preserved out-of-repo with the run): the authoritative tree already carries session-1's tooling (r13_holdout_oneshot_generate.py, r13_holdout_completion.py) for the same function — publishing a parallel duplicate would violate Art. LXIV (two live implementations of the same one-shot tooling)",
+  "session_1_contract_rewrite": "754ec229e rewrote scripts/r11_a1f_v3_generate.py (SYS_A1F_V3 SAME-CLASS -> the AM13 structure-fixes contract) with the r3 regeneration 'queued behind the holdout' — until that regeneration lands with Art. LXIV accounting for the R12 V3 bytes (eval/pairs/r11_a1f_r3/, 28 CLEAN/1 FLAG/1 KILL-with-recheck), the tree carries a script/bytes provenance mismatch: the committed r3 bytes were generated under the SUPERSEDED contract. Typed as the open state of session-1's D2 leg (not overridden by session-2 per the race discipline)."
+ },
+ "f25_root_cause_note": "both sessions hold the same operator directive and the same gateway; nothing in the round's coordination surface serialized the one-shot execution. The receipt commit (37687e34e) declared 'the one-shot begins with the next commit' — both sessions read that as their instruction. Suggested fix for the owner/auditor: the one-shot authorization should name the executing session."
+}
