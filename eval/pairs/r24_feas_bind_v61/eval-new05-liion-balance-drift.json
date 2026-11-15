@@ -1,0 +1,76 @@
+{
+ "problem_id": "eval-new05-liion-balance-drift",
+ "a1_source": "SYS_A1_INT_V61/r24_feas_bind_v61",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The proposed intervention is a thermal-gradient-aware balancing algorithm that adjusts balancing current based on cell temperature to mitigate series string imbalance drift. Standard practice applies a fixed balancing current regardless of thermal conditions; this intervention dynamically modulates balancing current in response to real-time temperature measurements to counteract the temperature-dependent self-discharge variation. The closest existing practice is passive cell balancing, which uses fixed resistors to bleed charge; this differs by actively balancing based on thermal state rather than fixed bleeds. The intervention attacks the failure's driving physics by balancing cells more aggressively in hotter regions where self-discharge is higher, preventing the capacity spread from growing beyond the threshold.\n\nPHYSICS CHECK — The governing physical relation is the Arrhenius equation for self-discharge rate: k = A·e^(-Ea/RT), where k is the rate constant, A is the pre-exponential factor, Ea is activation energy, R is the gas constant, and T is temperature in Kelvin. A 15°C temperature difference (e.g., 298K vs 313K) can cause a 2-3x difference in self-discharge rates for NMC-811 chemistry. By increasing balancing current proportionally to cell temperature, we reduce the capacity spread (ΔC) at a rate of ΔC ∝ (k_hot - k_cold)·t, where t is time. This maintains the voltage spread below 35 mV by compensating for the thermal-driven divergence in state-of-charge.\n\nIMPLEMENTATION BILL — \n- (a) Existing BMS controller firmware (modified with new balancing algorithm)\n- (a) Existing temperature sensors (already present in the module)\n- (a) Existing balancing circuits (no hardware changes)\n- (c) New balancing procedure: Temperature-dependent balancing current modulation (0.5-1.5A based on cell temperature, with 1A nominal)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \nStandard practice uses: (a) BMS controller, (a) temperature sensors, (a) balancing circuits, (c) fixed 1A balancing procedure. This intervention adds only a firmware modification (c) and uses existing components. The burden is identical to standard practice—same hardware, same installation effort, same maintenance requirements. No additional cost, weight, or complexity is introduced.\n\nEXECUTABLE TEST — \nProtocol: Cycle the module with 15°C top-to-bottom thermal gradient while monitoring cell voltages and temperatures. Apply the thermal-gradient-aware balancing algorithm for 10,000 cycles (simulating 10 years). Instruments: Voltage monitoring accuracy ±1mV, temperature monitoring accuracy ±0.5°C. Pass/fail threshold: maximum cell-to-cell voltage spread remains below 35 mV at rest after cycling. Duration: 10,000 cycles or equivalent calendar aging. Kill criterion: If voltage spread exceeds 35 mV at any point, the test fails and the intervention is falsified.",
+ "meta": {
+  "repairs": 2,
+  "residual_findings": {
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'increasing' in: by increasing balancing current proportionally to cell temperature, we reduce the capacity spread (δc) at a ra",
+    "excluded stem 'module' in: this maintains the voltage spread below 35 mv by compensating for the thermal-driven divergence in state-of-ch",
+    "excluded stem 'module' in: no additional cost, weight, or complexity is introduced.\n\nexecutable test — \nprotocol: cycle the module with 1"
+   ]
+  },
+  "final_sha256_16": "a25e954a587a379c",
+  "attempts": [
+   {
+    "stage": "draft",
+    "chars": 4047,
+    "latency_s": 11.4,
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "scan": {
+     "BILL_UNTAGGED": [
+      "1. Cycle the module with 15°C gradient (top at 40°C, bottom at 25°C) and 80% DoD for 6 mon",
+      "2. Measure cell voltages weekly at rest; record max ΔV and temperature gradients.",
+      "- Data logger (e.g., NI 9219) for voltage/temperature",
+      "- Environmental chamber for gradient control",
+      "- **Pass:** ΔV remains <35 mV at all times.",
+      "- **Fail:** ΔV exceeds 35 mV for >3 consecutive readings."
+     ],
+     "CONSTRAINT_EXCLUSION": [
+      "excluded stem 'footprint' in: ---\n\n### implementation bill  \n*(standard practice: fixed 1 a balancing, no thermal weighting)*  \n\n| **compone",
+      "excluded stem 'footprint' in: constraint compliance: no footprint increase, 1 a current limit, and 10-year life target are enforced by the t",
+      "excluded stem 'module' in: ### novelty statement (intervention)  \n**what is being proposed:** introduce a thermally-guided balancing algo",
+      "excluded stem 'module' in: ---\n\n### implementation bill  \n*(standard practice: fixed 1 a balancing, no thermal weighting)*  \n\n| **compone"
+     ]
+    },
+    "sha256_16": "4ee88fe1b8ce6850"
+   },
+   {
+    "stage": "repair_1",
+    "chars": 3187,
+    "latency_s": 7.6,
+    "critic_verdict": "CLEAN",
+    "findings_disclosed": {
+     "CONSTRAINT_EXCLUSION": [
+      "excluded stem 'increasing' in: the mechanism exploits the arrhenius relationship by reducing over-balancing of cooler cells (which age slower",
+      "excluded stem 'increasing' in: by increasing balancing duty on warmer cells (reducing their state of charge during rest) and decreasing it on",
+      "excluded stem 'module' in: adjacent-technique clearance: existing thermal management systems in battery modules only focus on cooling; no",
+      "excluded stem 'modules' in: adjacent-technique clearance: existing thermal management systems in battery modules only focus on cooling; no"
+     ]
+    },
+    "sha256_16": "0d7aec174573cf55"
+   },
+   {
+    "stage": "repair_2",
+    "chars": 2900,
+    "latency_s": 7.1,
+    "critic_verdict": "CLEAN",
+    "findings_disclosed": {
+     "CONSTRAINT_EXCLUSION": [
+      "excluded stem 'increasing' in: by increasing balancing current proportionally to cell temperature, we reduce the capacity spread (δc) at a ra",
+      "excluded stem 'module' in: this maintains the voltage spread below 35 mv by compensating for the thermal-driven divergence in state-of-ch",
+      "excluded stem 'module' in: no additional cost, weight, or complexity is introduced.\n\nexecutable test — \nprotocol: cycle the module with 1"
+     ]
+    },
+    "sha256_16": "a25e954a587a379c"
+   }
+  ]
+ },
+ "generated_at": "2026-11-15T19:30:00.449889Z"
+}

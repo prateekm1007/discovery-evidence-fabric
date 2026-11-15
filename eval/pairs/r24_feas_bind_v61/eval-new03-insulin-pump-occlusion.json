@@ -1,0 +1,58 @@
+{
+ "problem_id": "eval-new03-insulin-pump-occlusion",
+ "a1_source": "SYS_A1_INT_V61/r24_feas_bind_v61",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is a dual-channel pressure monitoring system with differential pressure analysis that replaces the single-channel sensor to detect partial occlusions missed by the current fixed-threshold system. Standard practice uses a single-channel absolute pressure sensor with a fixed threshold, while this intervention adds a second pressure sensor upstream of the infusion site and analyzes the pressure difference between channels to detect developing occlusions before they reach the fixed threshold. The closest existing practice is multi-parameter infusion monitoring in hospital pumps, but those use separate flow and pressure sensors, not dual pressure channels for differential analysis. This mechanism attacks the failure's driving physics by detecting pressure gradients indicative of developing blockages rather than absolute pressure alone, catching partial occlusions that generate insufficient absolute pressure to trigger the current system.\n\nPHYSICS CHECK — The governing physical relation is the pressure gradient ΔP = P_upstream - P_downstream proportional to flow resistance (ΔP ∝ Q·R). A partial occlusion increases upstream pressure while downstream pressure remains near zero, creating a detectable ΔP before absolute pressure reaches the fixed threshold. A 20% delivery deficit corresponds to a ~5-10 kPa ΔP (based on typical pump flow rates of 1-2 mL/h and catheter resistance), which is detectable with differential pressure analysis while remaining below the current absolute pressure threshold of ~15-20 kPa.\n\nIMPLEMENTATION BILL — (Standard practice: single absolute pressure sensor, pressure threshold algorithm)\n- Hardware: Dual-channel pressure sensor module (b) - replaces single-channel sensor, same cost class\n- Software: Differential pressure analysis algorithm (c) - parameter change to existing control software\n- Calibration routine (c) - modified procedure for zeroing pressure differential\n- Alarm logic update (c) - reconfiguration of existing alarm thresholds based on ΔP vs absolute P\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Standard practice uses: single pressure sensor, absolute pressure threshold algorithm, periodic calibration. This intervention replaces: single sensor with dual-channel sensor (same cost class), adds differential pressure analysis (software parameter change), modifies calibration (procedure change), and updates alarm logic (configuration change). Total burden: same hardware cost class (sensor replacement), same software development effort (algorithm modification), same calibration frequency (procedure change). No new infrastructure required, same-or-lower burden class.\n\nEXECUTABLE TEST — Protocol: Test pump with dual-channel sensor using simulated partial occlusions (gradual catheter kinking) and complete occlusions. Instruments: Pressure monitoring equipment, glucose simulation system, timer. Pass/fail: Complete occlusion detected within 15 minutes, partial occlusion (>20% deficit) detected within 2 hours, nuisance alarms ≤1 per 14 days of simulated wear. Duration: 14-day continuous test with periodic occlusion inductions. Kill criterion: Any missed occlusion outside time windows or nuisance alarm rate exceeding constraint.",
+ "meta": {
+  "repairs": 1,
+  "residual_findings": {},
+  "final_sha256_16": "18970ce9513fcbd7",
+  "attempts": [
+   {
+    "stage": "draft",
+    "chars": 3757,
+    "latency_s": 6.9,
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "scan": {
+     "BILL_UNTAGGED": [
+      "- Hardware: Dual-channel sensor replaces single-channel sensor (same cost class, no new to",
+      "- Software: Signal processing added to existing firmware (no new hardware, minimal develop",
+      "- Calibration: Added to existing initialization (no additional equipment)",
+      "- Form factor: Ambient port uses existing housing design (no change to wearable form facto",
+      "- Burden class: Same as standard practice (no new hardware classes, no increased cost or c",
+      "1. Test group: 10 pumps with dual-channel system vs. 10 control pumps with single-channel ",
+      "2. Simulate occlusions: Complete occlusion (clamped catheter) and partial occlusion (20% f",
+      "3. Simulate environmental artifacts: Movement, pressure changes, clothing compression",
+      "4. Measure detection times and false alarms over 14 days of simulated wear",
+      "- Pressure sensors (calibrated)",
+      "- Flow meter to verify delivery rates",
+      "- Glucose simulator to track delivery effectiveness",
+      "- Complete occlusion detection: ≤15 minutes (both groups)",
+      "- Partial occlusion detection: ≤2 hours (intervention group only)",
+      "- Nuisance alarms: ≤1 per 14 days (both groups)",
+      "- Glucose deviation: <10% increase from baseline (intervention group only)"
+     ],
+     "CONSTRAINT_EXCLUSION": [
+      "excluded stem 'factor' in: magnitude verification: a 20% delivery deficit corresponds to ~5-10 kpa δp (based on infusion rate and cathete",
+      "excluded stem 'form' in: magnitude verification: a 20% delivery deficit corresponds to ~5-10 kpa δp (based on infusion rate and cathete",
+      "excluded stem 'wearable' in: magnitude verification: a 20% delivery deficit corresponds to ~5-10 kpa δp (based on infusion rate and cathete"
+     ]
+    },
+    "sha256_16": "166c480a30f6f1b7"
+   },
+   {
+    "stage": "repair_1",
+    "chars": 3256,
+    "latency_s": 7.3,
+    "critic_verdict": "CLEAN",
+    "findings_disclosed": {},
+    "sha256_16": "18970ce9513fcbd7"
+   }
+  ]
+ },
+ "generated_at": "2026-11-15T19:19:03.845030Z"
+}

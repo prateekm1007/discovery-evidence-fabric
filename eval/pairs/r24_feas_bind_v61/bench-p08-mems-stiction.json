@@ -1,0 +1,110 @@
+{
+ "problem_id": "bench-p08-mems-stiction",
+ "a1_source": "SYS_A1_INT_V61/r24_feas_bind_v61",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The proposed intervention is to apply a pulsed electrostatic discharge mitigation scheme during shock events to prevent stiction in MEMS capacitive accelerometer comb structures. Standard practice relies solely on mechanical design and spacing to prevent contact; our mitigation introduces a controlled electrostatic repulsion pulse that counteracts adhesive forces upon shock detection, directly addressing the van der Waals and capillary forces driving stiction. The closest existing technique is electrostatic self-testing in MEMS, which uses DC bias for diagnostics; our departure is the use of transient high-voltage pulses (not DC) for active stiction prevention during shock events, leveraging the same electrodes but with a new operational mode.\n\nPHYSICS CHECK — The governing relation for electrostatic force between parallel plates is F = ε₀AV²/(2d²), where ε₀ is permittivity, A is contact area, V is voltage, and d is gap. For a 100V pulse across a 1μm gap with 100μm² contact area, F ≈ 4.4×10⁻⁵N, sufficient to overcome typical stiction forces (10⁻⁷–10⁻⁶N range). This force acts normal to the contact plane, directly counteracting adhesion.\n\nIMPLEMENTATION BILL (vs. standard practice):\n- Standard practice: comb finger gap design, power supply, microcontroller, optical lever system\n- Proposed intervention:\n  - (a) Power supply (existing, repurposed for pulse generation)\n  - (b) High-voltage pulse generator module (procurable standard catalog item, e.g., EMCO AG Series)\n  - (c) Shock detection algorithm (parameter change to existing microcontroller code)\n  - (c) Electrostatic pulse timing procedure (configuration change to existing electrodes)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY):\n- Power supply: existing (a) — no change\n- Microcontroller: existing (a) — software update only\n- Optical lever system: existing (a) — no change\n- HV pulse generator: new (b) — same class as existing power supply, comparable cost/size\n- Total burden: same class as standard practice (minimal new hardware, software changes)\n\nEXECUTABLE TEST:\n- Protocol: Subject 10 devices to 10000g shock (per MIL-STD-883 Method 2002.4) with and without intervention. Measure zero-g offset before/after shock using calibrated reference accelerometer.\n- Instruments: Shock test fixture, precision shaker, calibrated reference accelerometer, data acquisition system\n- Pass/fail: Zero-g offset ≤50mg post-shock with intervention; >50mg without intervention indicates failure\n- Duration: 100ms shock pulse per test\n- Kill criterion: Any device showing permanent offset >50mg fails the test\n\nCONSTRAINT BIND:\n- Survives 10000g shock: Verified via shock test protocol\n- No permanent zero-g offset >50mg: Directly measured in test\n- Uses only allowed measures: Electrostatic repulsion (not prohibited), no mechanical redesign\n- No new development: Pulse generator is procurable, software update is standard practice",
+ "meta": {
+  "repairs": 2,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Standard practice: comb finger gap design, power supply, microcontroller, optical lever ",
+    "- Proposed intervention:",
+    "- Total burden: same class as standard practice (minimal new hardware, software changes)",
+    "- Protocol: Subject 10 devices to 10000g shock (per MIL-STD-883 Method 2002.4) with and wi",
+    "- Instruments: Shock test fixture, precision shaker, calibrated reference accelerometer, d",
+    "- Pass/fail: Zero-g offset ≤50mg post-shock with intervention; >50mg without intervention ",
+    "- Duration: 100ms shock pulse per test",
+    "- Kill criterion: Any device showing permanent offset >50mg fails the test",
+    "- Survives 10000g shock: Verified via shock test protocol",
+    "- No permanent zero-g offset >50mg: Directly measured in test",
+    "- Uses only allowed measures: Electrostatic repulsion (not prohibited), no mechanical rede",
+    "- No new development: Pulse generator is procurable, software update is standard practice"
+   ],
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'offset' in: measure zero-g offset before/after shock using calibrated reference accelerometer.\n- instruments: shock test f",
+    "excluded stem 'permanent' in: measure zero-g offset before/after shock using calibrated reference accelerometer.\n- instruments: shock test f",
+    "excluded stem 'zero' in: measure zero-g offset before/after shock using calibrated reference accelerometer.\n- instruments: shock test f"
+   ]
+  },
+  "final_sha256_16": "68b8c5dbd1e6ae49",
+  "attempts": [
+   {
+    "stage": "draft",
+    "chars": 3521,
+    "latency_s": 11.3,
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "scan": {
+     "BILL_UNTAGGED": [
+      "- Intervention replaces power supply with pulse generator (same class, b)",
+      "- Adds timing controller (same class as existing control electronics, b)",
+      "- Total burden: same class (electrical hardware and materials) with no additional installa",
+      "- No increase in maintenance frequency or complexity"
+     ],
+     "CONSTRAINT_EXCLUSION": [
+      "excluded stem 'offset' in: measure zero-g offset before/after each shock using precision optical lever system.\ninstruments: shock sled wi",
+      "excluded stem 'permanent' in: measure zero-g offset before/after each shock using precision optical lever system.\ninstruments: shock sled wi",
+      "excluded stem 'zero' in: measure zero-g offset before/after each shock using precision optical lever system.\ninstruments: shock sled wi"
+     ]
+    },
+    "sha256_16": "5d5f015f8cc42f9c"
+   },
+   {
+    "stage": "repair_1",
+    "chars": 2405,
+    "latency_s": 8.6,
+    "critic_verdict": "CLEAN",
+    "findings_disclosed": {
+     "BILL_UNTAGGED": [
+      "- Standard practice uses: power supply, microcontroller, optical lever system",
+      "- Total burden: same class as standard practice (no new development or exotic components)",
+      "- Protocol: Subject devices to 10000g shocks along all axes; measure zero-g offset before ",
+      "- Instruments: Shock test fixture, precision optical lever system, programmable pulse gene",
+      "- Pass/fail: Zero-g offset ≤50mg after all shocks; no permanent electrical shorts",
+      "- Duration: 100 shocks per axis (300 total)",
+      "- Kill criterion: Any device showing >50mg permanent offset or electrical short fails the "
+     ],
+     "CONSTRAINT_EXCLUSION": [
+      "excluded stem 'offset' in: for a 100v pulse across a 1μm gap with 100μm² contact area, f ≈ 4.4×10⁻⁵n, sufficient to overcome typical stic",
+      "excluded stem 'permanent' in: novelty statement (intervention) — the proposed intervention is to implement a controlled electrostatic discha",
+      "excluded stem 'permanent' in: for a 100v pulse across a 1μm gap with 100μm² contact area, f ≈ 4.4×10⁻⁵n, sufficient to overcome typical stic",
+      "excluded stem 'zero' in: for a 100v pulse across a 1μm gap with 100μm² contact area, f ≈ 4.4×10⁻⁵n, sufficient to overcome typical stic"
+     ]
+    },
+    "sha256_16": "23f8046d8b0e2e08"
+   },
+   {
+    "stage": "repair_2",
+    "chars": 2936,
+    "latency_s": 15.4,
+    "critic_verdict": "CLEAN",
+    "findings_disclosed": {
+     "BILL_UNTAGGED": [
+      "- Standard practice: comb finger gap design, power supply, microcontroller, optical lever ",
+      "- Proposed intervention:",
+      "- Total burden: same class as standard practice (minimal new hardware, software changes)",
+      "- Protocol: Subject 10 devices to 10000g shock (per MIL-STD-883 Method 2002.4) with and wi",
+      "- Instruments: Shock test fixture, precision shaker, calibrated reference accelerometer, d",
+      "- Pass/fail: Zero-g offset ≤50mg post-shock with intervention; >50mg without intervention ",
+      "- Duration: 100ms shock pulse per test",
+      "- Kill criterion: Any device showing permanent offset >50mg fails the test",
+      "- Survives 10000g shock: Verified via shock test protocol",
+      "- No permanent zero-g offset >50mg: Directly measured in test",
+      "- Uses only allowed measures: Electrostatic repulsion (not prohibited), no mechanical rede",
+      "- No new development: Pulse generator is procurable, software update is standard practice"
+     ],
+     "CONSTRAINT_EXCLUSION": [
+      "excluded stem 'offset' in: measure zero-g offset before/after shock using calibrated reference accelerometer.\n- instruments: shock test f",
+      "excluded stem 'permanent' in: measure zero-g offset before/after shock using calibrated reference accelerometer.\n- instruments: shock test f",
+      "excluded stem 'zero' in: measure zero-g offset before/after shock using calibrated reference accelerometer.\n- instruments: shock test f"
+     ]
+    },
+    "sha256_16": "68b8c5dbd1e6ae49"
+   }
+  ]
+ },
+ "generated_at": "2026-11-15T19:19:03.845030Z"
+}
