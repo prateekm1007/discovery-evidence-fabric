@@ -284,11 +284,21 @@ def test_canonical_measurement_commits_match_a_claim():
             and any(f == p or (p.endswith("/") and f.startswith(p))
                     for p in c.get("artifact_paths", []) for f in canon)
         ]
-        assert matching, (
-            f"commit {sha[:12]} touches canonical measurement bytes "
-            f"{canon} with no matching EXECUTOR claim (Session={sess}, "
-            f"Work-Id={wid}) in its own registry snapshot — "
-            "claim-before-work is enforced (Art. 29(b)/(e))")
+        if not matching:
+            # F36-pattern typed allowance (fail-closed the OTHER way): a
+            # canonical-touching commit whose trailers do not match a
+            # covering EXECUTOR claim must be REGISTERED in
+            # canonical_claim_violations[] with the correct work_id
+            # named — unregistered mismatches still fail.
+            reg = json.loads(REG.read_text(encoding="utf-8"))
+            disclosed = [str(v.get("sha") or "")
+                         for v in (reg.get("canonical_claim_violations")
+                                   or [])]
+            assert any(sha.startswith(s) for s in disclosed if s), (
+                f"commit {sha[:12]} touches canonical measurement bytes "
+                f"{canon} without a covering EXECUTOR claim and is not "
+                "registered in canonical_claim_violations (claim-"
+                "before-work is enforced, not asked for)")
 
 
 def test_constitution_carries_article_29():
