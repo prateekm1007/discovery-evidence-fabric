@@ -1,0 +1,39 @@
+{
+ "problem_id": "HO2-13-rail-wheel-rcf",
+ "question_type": "predictor-design",
+ "a1_source": "SYS_A1F_V4",
+ "contract_for_qt": true,
+ "a1_answer": "NOVELTY STATEMENT\n- Standard practice delivers a MONITORING/INDICATION scheme using wheel impact/load detector data to identify impact severity as a leading indicator for rolling-contact fatigue.\n- My same-class mechanism departure is the use of vehicle vibration resonance frequency shifts as a precursor to tread subsurface crack propagation, detectable through existing wayside vibration sensors.\n- The mechanism works because as microcracks initiate and grow in the tread subsurface, they alter the wheel's local stiffness, shifting its vibration resonance frequency before surface defects become visible or impact loads increase significantly.\n\nPHYSICS CHECK\n- Governing physical relation: Natural frequency shift Δf/f₀ = -ΔE/(2E) where E is Young's modulus, proportional to crack density (Griffith's criterion for fracture mechanics).\n- Magnitude verification: A 5% stiffness reduction (ΔE/E = -0.05) would cause a ~2.5% frequency shift, detectable above typical measurement noise (±0.1%) in wayside vibration sensors.\n\nIMPLEMENTATION BILL\n- Components: Wayside vibration sensors (ALREADY-RECORDED: \"vehicle vibration\" from user constraint), wayside wheel-impact/load detectors (ALREADY-RECORDED: \"wheel-impact/load detectors\" from user constraint)\n- Materials: Signal processing software (FFT analysis)\n- Instruments: Existing wayside monitoring equipment\n- Procedure:\n  1. Record vibration signatures from each wheel passage (ALREADY-RECORDED: \"vehicle vibration\")\n  2. Extract dominant resonance frequency (f₀) from healthy wheels (DERIVED: from stated spec \"railway vehicle wheel tread\" geometry and material properties)\n  3. Calculate frequency shift Δf = f_current - f_healthy (DERIVED: from stated physics \"vibration resonance frequency shift\" relation)\n  4. Compare to threshold: |Δf/f₀| > 0.025 (CALCULATED: from physics check magnitude verification)\n  5. Issue warning when threshold exceeded and confirmed in 3 consecutive wheel passages\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME - uses existing wayside equipment\n- Operability: SAME - integrates with existing monitoring systems\n- Maintenance: SAME - no additional hardware maintenance\n- Cost class: SAME - software modification only, no new sensors\n- Expected conclusion: SAME burden class as standard practice, with different mechanism\n\nEXECUTABLE TEST\n- Protocol: Monitor 100 wheels over 6 months, recording vibration data and comparing to manual tread inspections every 30 days\n- Instruments: Existing wayside vibration sensors and wheel-impact/load detectors\n- Pass threshold: >=30 days warning before grade 3 defect, <=1 false alarm per 100 wheels/yr\n- Duration: 6 months (sufficient to capture multiple defect development cycles)\n- Kill criterion: If predictor fails to meet warning threshold or exceeds false alarm rate\n- Validation: Against ALREADY-RECORDED data from historical wheel failures and stated physical relations for vibration response",
+ "a1_answer_sha256_16": "807fff23d2bcf303",
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 7.8,
+   "chars": 3181,
+   "transport_tries": 1
+  },
+  {
+   "kind": "repair_1",
+   "latency_s": 7.2,
+   "chars": 2946,
+   "findings_disclosed": [
+    "NYQUIST_UNSAMPLED"
+   ]
+  }
+ ],
+ "machine_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "violations": {},
+  "repairs": 1
+ },
+ "problems_sha256_16": "79db7868a0e7483d",
+ "audit_tip_at_read": "6235108c3",
+ "generated_at": "2026-11-15T17:36:33Z",
+ "one_shot": true,
+ "judged": false,
+ "judge": "NONE — auditor scores with the PRIVATE rubric"
+}

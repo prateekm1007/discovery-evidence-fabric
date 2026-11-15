@@ -1,0 +1,50 @@
+{
+ "problem_id": "HO2-11-blade-leading-edge-erosion",
+ "question_type": "predictor-design",
+ "a1_source": "SYS_A1F_V4",
+ "contract_for_qt": true,
+ "a1_answer": "NOVELTY STATEMENT\n- Standard practice delivers a MONITORING/INDICATION scheme using direct inspection or erosion-rate modeling from historical weather data.\n- My same-class mechanism departure: Acoustic signature analysis of rain/sand impact frequency shifts indicating surface roughness changes.\n- This mechanism works because increased surface roughness from erosion alters the acoustic emission characteristics of particle impacts, detectable via nacelle microphones.\n\nPHYSICS CHECK\n- Governing physical relation: Acoustic pressure amplitude (P) ∝ impact energy^(1/2) × surface roughness factor (RF), where RF increases with erosion.\n- Magnitude verification: A 5% surface roughness increase (typical for 2% AEP loss) causes ~3 dB acoustic amplitude increase at impact frequencies (2-8 kHz), detectable above SCADA noise floor (ASSUMPTION: nacelle microphones have sufficient SNR at these frequencies per manufacturer specs).\n\nIMPLEMENTATION BILL\n1. Data processing unit (existing SCADA system capability)\n2. Nacelle acoustic sensors (ALREADY-RECORDED: \"nacelle acoustic/vibration\" per user constraint)\n3. Vibration analysis module (existing nacelle vibration processing)\n4. Impact frequency detection algorithm\n   - Input: ALREADY-RECORDED nacelle acoustic time-series\n   - Reference threshold: CALCULATED from stated turbine specs (impact energy = 0.5 × particle mass × velocity²; velocity = wind speed from SCADA)\n   - Surface roughness indicator: CALCULATED from acoustic amplitude deviation at impact frequencies (2-8 kHz) from baseline healthy state\n5. Alert generation system (existing SCADA alarm capability)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME (uses existing sensors and processing)\n- Operability: SAME (integrated with existing SCADA monitoring)\n- Maintenance: SAME (no additional maintenance beyond standard nacelle sensor checks)\n- Cost class: SAME (no new hardware, only software algorithm implementation)\n- Burden difference: Minimal computational load increase for acoustic analysis, offset by elimination of physical inspection requirements\n\nEXECUTABLE TEST\n- Protocol: Record nacelle acoustic data and SCADA parameters during known erosion events (from historical inspection records). Compare acoustic signature changes at impact frequencies with AEP degradation measurements.\n- Instruments: Existing nacelle microphones and SCADA system\n- Pass threshold: Predictor must show correlation between acoustic amplitude increase at impact frequencies and AEP loss ≥2% with ≥30 days lead time\n- Fail threshold: >1 false alarm per turbine/year or failure to detect 2% AEP loss within 30 days\n- Duration: 6 months of continuous monitoring against historical data\n- Kill criterion: If predictor fails to meet pass threshold or requires new sensor calibration (COMMISSIONING_PROGRAM defect)",
+ "a1_answer_sha256_16": "506773cbd4c837b8",
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 6.7,
+   "chars": 3231,
+   "transport_tries": 1
+  },
+  {
+   "kind": "repair_1",
+   "latency_s": 7.9,
+   "chars": 3190,
+   "findings_disclosed": [
+    "NYQUIST_UNSAMPLED"
+   ]
+  },
+  {
+   "kind": "repair_2",
+   "latency_s": 5.7,
+   "chars": 2829,
+   "findings_disclosed": [
+    "NYQUIST_UNSAMPLED"
+   ]
+  }
+ ],
+ "machine_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "violations": {},
+  "repairs": 2,
+  "residual_findings": [
+   "NYQUIST_UNSAMPLED"
+  ]
+ },
+ "problems_sha256_16": "79db7868a0e7483d",
+ "audit_tip_at_read": "6235108c3",
+ "generated_at": "2026-11-15T17:35:43Z",
+ "one_shot": true,
+ "judged": false,
+ "judge": "NONE — auditor scores with the PRIVATE rubric"
+}

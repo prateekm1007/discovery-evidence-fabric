@@ -1,0 +1,31 @@
+{
+ "problem_id": "HO2-01-sofc-interconnect-cr-poisoning",
+ "question_type": "intervention-proposal",
+ "a1_source": "SYS_A1_INT_V4",
+ "contract_for_qt": true,
+ "a1_answer": "# NOVELTY STATEMENT (INTERVENTION)\nI propose applying a thin, porous, manganese-cobalt spinel (MCO) coating to the cathode-side surface of the ferritic-steel interconnect, which acts as a chromium diffusion barrier while maintaining electrical conductivity. Standard practice applies dense MCO coatings as a complete barrier, but my intervention uses a controlled porosity structure to allow oxygen transport while blocking chromium migration. This differs from existing barrier coatings in other industries (like thermal barrier coatings in gas turbines) which prioritize thermal insulation over selective permeability. The mechanism exploits the preferential oxidation of chromium at the coating surface, forming a Cr2O3 layer that is immobilized within the porous structure, preventing its transport to the cathode.\n\n# PHYSICS CHECK\nThe governing physical relation is Fick's first law of diffusion: J = -D∇C, where J is the flux of chromium species, D is the diffusion coefficient, and ∇C is the concentration gradient. By creating a porous MCO coating with controlled pore size (50-100 nm), we reduce the effective diffusion coefficient for chromium species (CrO2(OH)2) while allowing oxygen transport for cathode operation. The pore size is selected to be smaller than the kinetic diameter of chromium volatilization species (≈0.4 nm) but larger than oxygen molecules (≈0.3 nm), reducing chromium diffusion by >90% while maintaining oxygen permeability. This is verified by comparing the calculated flux reduction (J_new/J_old = D_eff/D_bulk ≈ 0.1) with the required performance target (power decay <5% over 10000 h).\n\n# IMPLEMENTATION BILL\nStandard Practice Bill:\n- Dense MCO coating applied to interconnect (deposition method: PVD or PLD)\n- Post-coating heat treatment for adhesion\n\nIntervention Bill:\n1. Porous MCO precursor slurry preparation (a) - using standard MCO powder mixed with pore-forming polymer spheres (50-100 nm diameter)\n2. Spray application of porous MCO precursor to interconnect cathode-side surface (a) - using existing spray equipment in the production line\n3. Controlled sintering (b) - using standard furnace with modified temperature profile to burn off pore-forming material, creating controlled porosity\n4. Post-sintering passivation treatment (c) - thermal treatment in air to form surface Cr2O3 layer within coating pores\n5. Electrical conductivity verification (a) - using existing conductivity measurement equipment\n\n# BURDEN LEDGER (STANDARD-PRACTICE PARITY)\nStandard Practice Cost Class: Medium (PVD/PLD equipment is capital-intensive)\nIntervention Cost Class: Low-Medium\n\n| Item | Standard Practice | Intervention | Burden Impact |\n|------|-------------------|--------------|---------------|\n| Coating Application | PVD/PLD (high capital cost) | Spray coating (existing equipment) | REDUCED: Uses existing spray equipment |\n| Material | Dense MCO powder | MCO powder + polymer spheres (standard materials) | SAME: Both use standard ceramic powders |\n| Processing | High-vacuum deposition | Modified sintering (existing furnace) | REDUCED: Uses existing furnace with modified profile |\n| Quality Control | Thickness/coverage verification | Thickness/porosity verification | SAME: Similar verification requirements |\n| Total Burden | Medium | Low-Medium | REDUCED overall burden |\n\nThe intervention uses existing spray equipment and furnaces, avoiding the need for specialized PVD/PLD systems. The additional polymer spheres are standard materials, and the modified sintering profile is a parameter change to existing equipment, not new hardware.\n\n# EXECUTABLE TEST\nProtocol: \n1. Prepare two identical SOFC stacks with ferritic-steel interconnects and LSCF cathodes\n2. Apply standard dense MCO coating to Stack A (control)\n3. Apply porous MCO coating to Stack B (intervention)\n4. Subject both stacks to accelerated aging test at 750°C with thermal cycling (20 cycles: 1h at 750°C, 1h at 600°C)\n5. Measure polarization resistance (Rp) and power output every 500h for 10000h total\n6. Monitor coating adhesion via cross-sectional SEM analysis every 2000h\n7. Monitor electrical conductivity via four-point probe measurement every 1000h\n\nPass/Fail Threshold:\n- Intervention passes if Stack B maintains <5% power decay after 10000h\n- Intervention fails if Stack B shows >5% power decay or any coating delamination/conductivity loss\n- Kill criterion: Any measurable increase in Rp >20% before 5000h indicates coating failure\n\nFalsification Test: The intervention is falsified if the porous MCO coating stack shows significantly higher polarization resistance or power decay compared to the standard dense coating stack, or if the coating shows signs of delamination or conductivity loss during testing.",
+ "a1_answer_sha256_16": "85772fb4e87dc779",
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 11.8,
+   "chars": 4734,
+   "transport_tries": 1
+  }
+ ],
+ "machine_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "violations": {},
+  "repairs": 0
+ },
+ "problems_sha256_16": "79db7868a0e7483d",
+ "audit_tip_at_read": "6235108c3",
+ "generated_at": "2026-11-15T17:28:27Z",
+ "one_shot": true,
+ "judged": false,
+ "judge": "NONE — auditor scores with the PRIVATE rubric"
+}

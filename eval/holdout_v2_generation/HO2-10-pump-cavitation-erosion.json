@@ -1,0 +1,31 @@
+{
+ "problem_id": "HO2-10-pump-cavitation-erosion",
+ "question_type": "predictor-design",
+ "a1_source": "SYS_A1F_V4",
+ "contract_for_qt": true,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme using vibration amplitude as the leading indicator for cavitation.\nOur same-class mechanism departure: Instead of vibration amplitude, we use the cross-spectral coherence between discharge pressure fluctuations and motor current harmonics as the leading indicator.\nThe connection to failure physics: Cavitation creates pressure oscillations that couple mechanically to the rotor system, inducing current harmonics detectable in the motor electrical signature before significant erosion occurs.\n\nPHYSICS CHECK\nGoverning physical relation: The coherence function γ²(f) = |S_pc(f)|² / (S_pp(f) · S_cc(f)), where S_pc is the cross-power spectral density between pressure (p) and current (c), and S_pp, S_cc are auto-power spectral densities.\nMagnitude verification: Under incipient cavitation, pressure oscillations at blade-pass frequency (BPF) and its harmonics will show coherence >0.7 with motor current harmonics, as the mechanical coupling through the shaft creates detectable electromagnetic effects (ASSUMPTION: based on established motor-current signature analysis principles for rotating machinery).\n\nIMPLEMENTATION BILL\n- Signal processing unit: Existing PLC or dedicated signal processor (already installed)\n- Inputs:\n  * ALREADY-RECORDED: Discharge pressure transducer signal (problem states \"existing discharge pressure\")\n  * ALREADY-RECORDED: Motor current sensor signal (problem states \"existing motor current\")\n  * ALREADY-RECORDED: Vibration sensor signal (problem states \"existing vibration\")\n- Processing algorithm:\n  * Extract time segments of 1-minute duration from all signals\n  * Compute cross-spectral coherence between pressure and current at BPF and first 3 harmonics\n  * Calculate maximum coherence across these frequencies\n- Reference threshold: DERIVED from stated physics - coherence >0.7 at BPF harmonics indicates cavitation presence (ASSUMPTION: based on empirical observation that cavitation creates strong mechanical-electrical coupling)\n- Warning logic: When maximum coherence exceeds threshold for 3 consecutive days, issue warning (CALCULATED: 14-day warning period requires sustained detection, not instantaneous)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME - uses existing sensors and processing capability, no additional hardware required\n- Operability: SAME - continuous monitoring with existing control systems\n- Maintenance: SAME - no additional maintenance requirements beyond standard sensor calibration\n- Cost class: SAME - utilizes existing infrastructure, only requires software implementation\n- False alarm rate: CALCULATED - <=2 false alarms/yr achieved by requiring sustained coherence above threshold for 3 consecutive days, reducing transient false positives\n\nEXECUTABLE TEST\nProtocol: \n1. Collect 6 months of historical data from pump under normal operation (no cavitation) and during known cavitation events\n2. Process data using the coherence algorithm\n3. Measure time between first coherence >0.7 and 5% head drop\n4. Count false alarms during normal operation period\n\nInstruments: Existing data acquisition system, signal processing software\nPass threshold: Average warning time >=14 days before head drop, false alarms <=2 per year\nDuration: Analysis of 6 months historical data\nKill criterion: If warning time <14 days or false alarms >2 per year, the predictor is invalid\nValidation method: Against ALREADY-RECORDED historical data and stated pump performance curves (CALCULATED head drop from efficiency degradation)",
+ "a1_answer_sha256_16": "273ff09e351b412b",
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 7.4,
+   "chars": 3572,
+   "transport_tries": 1
+  }
+ ],
+ "machine_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "violations": {},
+  "repairs": 0
+ },
+ "problems_sha256_16": "79db7868a0e7483d",
+ "audit_tip_at_read": "6235108c3",
+ "generated_at": "2026-11-15T17:35:10Z",
+ "one_shot": true,
+ "judged": false,
+ "judge": "NONE — auditor scores with the PRIVATE rubric"
+}

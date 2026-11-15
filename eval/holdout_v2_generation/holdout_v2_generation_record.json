@@ -1,0 +1,454 @@
+{
+ "record": "HOLDOUT_V2_GENERATION/1.0.0",
+ "work_id": "holdout-v2-generation",
+ "claim": "c-0009 (EXECUTOR builder-r20s2, one_shot, filed+pushed 55f59facb BEFORE any generation call — Art. 29(b))",
+ "at": "2026-11-15T17:32:25Z",
+ "custody": {
+  "audit_branch": "origin/audit/r11-auditor-verdict-20261114",
+  "audit_tip_at_read": "6235108c3",
+  "problems_file": "audit/holdout_v2/holdout_v2_problems.json",
+  "problems_sha256_16": "79db7868a0e7483d",
+  "selection_sha256_received": "67671fd6542fbdb21d861880cd7f2e391e174da4b3ecdc20e12794d55bc4b4e2",
+  "private_rubric_accessed": false,
+  "note": "builder received PROBLEMS ONLY per the pre-registration; the PRIVATE rubric was never opened, listed, or copied by the builder"
+ },
+ "discipline": {
+  "one_shot": "one generation pass per problem (Art. 29(c)); a call that returns content is never re-drawn; transport-level transient retries only (Art. 15)",
+  "machine": "BYTE-UNCHANGED type-aware machine: contract_for(qt) — SYS_A1_INT_V4 (intervention-proposal) / SYS_A1F_V4 (predictor-design); critic + question-type gate + typed violations + machine repair directives (REPAIR_BUDGET=2) — the machine-internal repair loop is part of the machine under test (same code path as r20/r21, disclosed)",
+  "no_selection": "K_GEN=1 — no best-of-k, no selection (BOK arm RETIRED per ABLATION_REGISTRY @ 931c1eb6a)",
+  "no_judge": "NO judge calls, NO baseline/B-side assembly — the auditor scores with the PRIVATE rubric (never seen by builder/pipeline/judge)",
+  "no_iteration": "no rubric feedback, no problem-set iteration, no tuning — the problems are unseen (split=HOLDOUT)",
+  "stagger": "pace 13.0s between problems, staggered against the peer's live c-0006 run (shared upstream quota)"
+ },
+ "generator": {
+  "model": "zai-org/GLM-5.3",
+  "temperature": 0.0,
+  "max_tokens": 2600,
+  "route": "local zai gateway (infra, not contract)"
+ },
+ "results": [
+  {
+   "problem_id": "HO2-01-sofc-interconnect-cr-poisoning",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V4",
+   "contract_for_qt": true,
+   "a1_answer": "# NOVELTY STATEMENT (INTERVENTION)\nI propose applying a thin, porous, manganese-cobalt spinel (MCO) coating to the cathode-side surface of the ferritic-steel interconnect, which acts as a chromium diffusion barrier while maintaining electrical conductivity. Standard practice applies dense MCO coatings as a complete barrier, but my intervention uses a controlled porosity structure to allow oxygen transport while blocking chromium migration. This differs from existing barrier coatings in other industries (like thermal barrier coatings in gas turbines) which prioritize thermal insulation over selective permeability. The mechanism exploits the preferential oxidation of chromium at the coating surface, forming a Cr2O3 layer that is immobilized within the porous structure, preventing its transport to the cathode.\n\n# PHYSICS CHECK\nThe governing physical relation is Fick's first law of diffusion: J = -D∇C, where J is the flux of chromium species, D is the diffusion coefficient, and ∇C is the concentration gradient. By creating a porous MCO coating with controlled pore size (50-100 nm), we reduce the effective diffusion coefficient for chromium species (CrO2(OH)2) while allowing oxygen transport for cathode operation. The pore size is selected to be smaller than the kinetic diameter of chromium volatilization species (≈0.4 nm) but larger than oxygen molecules (≈0.3 nm), reducing chromium diffusion by >90% while maintaining oxygen permeability. This is verified by comparing the calculated flux reduction (J_new/J_old = D_eff/D_bulk ≈ 0.1) with the required performance target (power decay <5% over 10000 h).\n\n# IMPLEMENTATION BILL\nStandard Practice Bill:\n- Dense MCO coating applied to interconnect (deposition method: PVD or PLD)\n- Post-coating heat treatment for adhesion\n\nIntervention Bill:\n1. Porous MCO precursor slurry preparation (a) - using standard MCO powder mixed with pore-forming polymer spheres (50-100 nm diameter)\n2. Spray application of porous MCO precursor to interconnect cathode-side surface (a) - using existing spray equipment in the production line\n3. Controlled sintering (b) - using standard furnace with modified temperature profile to burn off pore-forming material, creating controlled porosity\n4. Post-sintering passivation treatment (c) - thermal treatment in air to form surface Cr2O3 layer within coating pores\n5. Electrical conductivity verification (a) - using existing conductivity measurement equipment\n\n# BURDEN LEDGER (STANDARD-PRACTICE PARITY)\nStandard Practice Cost Class: Medium (PVD/PLD equipment is capital-intensive)\nIntervention Cost Class: Low-Medium\n\n| Item | Standard Practice | Intervention | Burden Impact |\n|------|-------------------|--------------|---------------|\n| Coating Application | PVD/PLD (high capital cost) | Spray coating (existing equipment) | REDUCED: Uses existing spray equipment |\n| Material | Dense MCO powder | MCO powder + polymer spheres (standard materials) | SAME: Both use standard ceramic powders |\n| Processing | High-vacuum deposition | Modified sintering (existing furnace) | REDUCED: Uses existing furnace with modified profile |\n| Quality Control | Thickness/coverage verification | Thickness/porosity verification | SAME: Similar verification requirements |\n| Total Burden | Medium | Low-Medium | REDUCED overall burden |\n\nThe intervention uses existing spray equipment and furnaces, avoiding the need for specialized PVD/PLD systems. The additional polymer spheres are standard materials, and the modified sintering profile is a parameter change to existing equipment, not new hardware.\n\n# EXECUTABLE TEST\nProtocol: \n1. Prepare two identical SOFC stacks with ferritic-steel interconnects and LSCF cathodes\n2. Apply standard dense MCO coating to Stack A (control)\n3. Apply porous MCO coating to Stack B (intervention)\n4. Subject both stacks to accelerated aging test at 750°C with thermal cycling (20 cycles: 1h at 750°C, 1h at 600°C)\n5. Measure polarization resistance (Rp) and power output every 500h for 10000h total\n6. Monitor coating adhesion via cross-sectional SEM analysis every 2000h\n7. Monitor electrical conductivity via four-point probe measurement every 1000h\n\nPass/Fail Threshold:\n- Intervention passes if Stack B maintains <5% power decay after 10000h\n- Intervention fails if Stack B shows >5% power decay or any coating delamination/conductivity loss\n- Kill criterion: Any measurable increase in Rp >20% before 5000h indicates coating failure\n\nFalsification Test: The intervention is falsified if the porous MCO coating stack shows significantly higher polarization resistance or power decay compared to the standard dense coating stack, or if the coating shows signs of delamination or conductivity loss during testing.",
+   "a1_answer_sha256_16": "85772fb4e87dc779",
+   "attempts": [
+    {
+     "kind": "generation",
+     "latency_s": 11.8,
+     "chars": 4734,
+     "transport_tries": 1
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "violations": {},
+    "repairs": 0
+   },
+   "problems_sha256_16": "79db7868a0e7483d",
+   "audit_tip_at_read": "6235108c3",
+   "generated_at": "2026-11-15T17:28:27Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO2-02-perovskite-module-degradation",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V4",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe intervention proposed is a dual-functional edge-seal design with integrated UV-absorbing and moisture-scavenging additives that prevent perovskite degradation and encapsulant delamination. Standard practice uses inert edge-seal materials and UV-blocking encapsulants that passively resist environmental factors, whereas this intervention actively neutralizes moisture and UV at the module perimeter through chemical reactions. The closest existing practice is the use of desiccant bags in electronic enclosures, but this differs by being a permanent, integrated part of the edge-seal rather than a replaceable component, and by also absorbing UV radiation. This intervention attacks the failure's driving physics by creating a chemical barrier at the module edge where moisture ingress and UV penetration initiate degradation.\n\nPHYSICS CHECK\nThe governing physical relation is the Arrhenius equation for reaction rates: k = A * exp(-Ea/RT), where the reaction rate k of perovskite decomposition is exponentially dependent on activation energy Ea. By incorporating moisture-scavenging additives (e.g., metal-organic frameworks with high affinity for H2O) and UV-absorbing compounds (e.g., benzotriazole derivatives), the effective Ea for degradation reactions increases, reducing k by approximately 60-70% based on similar systems in literature. The UV-absorbing additives reduce photon flux reaching the perovskite by >95% in the 300-400 nm range, while moisture scavengers reduce local relative humidity to <10%, both below the threshold for rapid degradation.\n\nIMPLEMENTATION BILL\nStandard Practice Components:\n- Edge seal: Butyl rubber or EVA-based sealant\n- Encapsulant: UV-blocking EVA or POE with UV absorbers (e.g., benzophenone)\n\nIntervention Components:\n1. Edge seal formulation with 5 wt% hydrophobic metal-organic framework (MOF) moisture scavenger (b) - replaces standard edge seal material\n2. Edge seal formulation with 2 wt% benzotriazole UV absorber (b) - integrated into edge seal material\n3. Edge seal application process with extended curing time (200% of standard) to ensure additive dispersion (c) - procedural change\n4. Quality control protocol for edge seal thickness verification (±5% tolerance) (c) - procedural change\n5. Accelerated aging test protocol for edge seal performance (c) - procedural change\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nStandard Practice Burden: Edge seal material (b), Encapsulant material (b), Application process (c), QC protocol (c)\nIntervention Burden: Edge seal material (b) - same cost class as standard, UV absorber (b) - standard additive cost, Application process (c) - same equipment, longer time but same labor class, QC protocol (c) - same inspection method, same tolerance\nConclusion: Same burden class. The intervention uses existing edge seal manufacturing infrastructure with additive packages that are commercially available. The extended curing time increases process time but uses existing equipment and labor. No new hardware or exotic materials are required.\n\nEXECUTABLE TEST\nProtocol: Subject modules to IEC 61215 damp-heat (85°C/85% RH) for 1000 hours and UV exposure (60 kWh/m2) in sequence, with electrical output measured at 0, 250, 500, 750, and 1000 hours.\nInstruments: Solar simulator (IEC 60904-9 class AAA), environmental chamber with humidity control, UV weatherometer, IV curve tracer.\nPass/Fail Threshold: Module efficiency must remain within 2% of initial value after testing; no visual delamination, bubbles, or yellowing allowed.\nDuration: 1000 hours damp-heat + 60 kWh/m2 UV exposure (approximately 30 days of continuous testing).\nKill Criterion: Any module showing >2% efficiency drop, >5% power loss, or visible degradation (delamination, yellowing, bubbles) fails the test.\nEffectiveness Validation: Compare test results between standard modules and intervention modules; the intervention is validated if it shows statistically significant (p<0.05) reduction in efficiency drop and degradation incidence compared to control modules.",
+   "a1_answer_sha256_16": "9a982cee814db90c",
+   "attempts": [
+    {
+     "kind": "generation",
+     "latency_s": 13.0,
+     "chars": 4061,
+     "transport_tries": 1
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "violations": {},
+    "repairs": 0
+   },
+   "problems_sha256_16": "79db7868a0e7483d",
+   "audit_tip_at_read": "6235108c3",
+   "generated_at": "2026-11-15T17:32:38Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO2-03-lead-service-line-release",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V4",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe intervention is a sacrificial zinc anode collar installed at the service line connection point to the home's plumbing. Standard practice uses orthophosphate dosing and pH/adjacent-technique clearance: the closest existing practice is cathodic protection for large water mains, which requires external power and specialized monitoring equipment. Our mitigation is a departure because it uses a passive, maintenance-free galvanic couple that requires no external power or monitoring, leveraging the existing plumbing as part of the protection circuit. The mechanism attacks the failure's driving physics by creating a preferential corrosion site (zinc) that sacrifices itself to protect the lead service line, reducing the electrochemical potential difference that drives lead corrosion.\n\nPHYSICS CHECK\nThe governing physical relation is the galvanic series: when two metals with different electrochemical potentials are in electrical contact in an electrolyte, the less noble metal (zinc, E° = -0.76 V) corrodes preferentially to protect the more noble metal (lead, E° = -0.13 V). The magnitude verification: zinc's more negative potential creates a cathodic protection potential of approximately -0.9 to -1.1 V on the lead surface, which is below the -0.8 V threshold required to inhibit lead dissolution in water chemistry. This reduces the driving force for lead corrosion by approximately 80-90% based on electrochemical corrosion theory.\n\nIMPLEMENTATION BILL\nStandard practice components:\n- Orthophosphate dosing system\n- pH/alkalinity adjustment system\n- Water quality monitoring equipment\n\nIntervention components:\n1. Zinc anode collar (b): Standard catalog sacrificial zinc anode, modified to fit service line diameter\n2. Insulating bushing (b): Standard electrical insulator, used to isolate the anode from the home's plumbing\n3. Installation tool (a): Existing pipe wrench and torque wrench from maintenance inventory\n4. Installation procedure (c): Modified connection procedure to install anode collar at service line entry point\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nStandard practice burden:\n- Chemical dosing equipment (existing)\n- pH/alkalinity monitoring (existing)\n- Regular water testing (existing)\n\nIntervention burden:\n- Zinc anode collar (b): One-time installation, replaces routine chemical adjustments\n- Insulating bushing (b): One-time installation, no ongoing maintenance\n- Installation tool (a): Already in inventory\n- Installation procedure (c): No new equipment required\n\nConclusion: Same burden class. The intervention eliminates the need for continuous chemical dosing and monitoring, replacing them with a one-time installation using existing tools and standard catalog parts. The ongoing burden is reduced as no regular chemical adjustments or monitoring are required beyond standard water quality checks.\n\nEXECUTABLE TEST\nProtocol:\n1. Install zinc anode collar at 50 randomly selected homes with lead service lines\n2. Maintain control group of 50 homes without intervention\n3. Monitor lead levels at all taps weekly for 12 months\n4. Maintain identical water chemistry in both groups\n\nInstruments:\n- ICP-MS for lead analysis\n- pH and orthophosphate monitoring equipment\n\nPass/fail threshold:\n- Intervention group must show 90th percentile lead levels <5 ppb within 12 months\n- Intervention group must show statistically significant (p<0.05) reduction in lead levels compared to control group\n\nDuration: 12 months\n\nKill criterion: If at any point the 90th percentile lead levels in the intervention group exceed 10 ppb, the intervention is considered ineffective and will be terminated.",
+   "a1_answer_sha256_16": "5c560c20ece71fbe",
+   "attempts": [
+    {
+     "kind": "generation",
+     "latency_s": 8.1,
+     "chars": 3657,
+     "transport_tries": 1
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "violations": {},
+    "repairs": 0
+   },
+   "problems_sha256_16": "79db7868a0e7483d",
+   "audit_tip_at_read": "6235108c3",
+   "generated_at": "2026-11-15T17:32:59Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO2-04-gt-compressor-fouling",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V4",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe intervention is a modified intake air humidity control system that actively modulates humidity to prevent salt and hydrocarbon aerosol deposition on compressor blades. Standard practice relies solely on inlet filtration/coalescer and periodic online water washing to remove deposits after they form. Our intervention is a genuine departure because it prevents deposition by altering the aerosol physics at the point of intake, rather than removing deposits after they accumulate. The closest existing mitigation practice is inlet air filtration in power plants, which physically removes particles but does not alter aerosol deposition physics through humidity modulation. Our intervention attacks the failure's driving mechanism by maintaining optimal humidity levels that prevent salt crystallization and hydrocarbon condensation on blade surfaces.\n\nPHYSICS CHECK\nThe governing physical relation is the Kelvin equation, which describes the relationship between relative humidity (RH) and the equilibrium vapor pressure over a curved surface. For salt aerosols, deposition occurs when RH exceeds the deliquescence relative humidity (DRH), typically ~75% for NaCl. For hydrocarbons, deposition occurs when temperature drops below the dew point. By maintaining intake air RH between 40-60% and temperature above the hydrocarbon dew point, we prevent both salt dissolution and hydrocarbon condensation. A 3% heat rate recovery is achievable by reducing deposition by an estimated 60%, based on empirical data showing each 1% reduction in flow area corresponds to approximately 0.5% heat rate increase.\n\nIMPLEMENTATION BILL\nStandard Practice Bill:\n- Inlet filtration/coalescer system (existing)\n- Online water washing system (existing)\n- Scheduled water wash procedure (existing)\n\nIntervention Bill:\n- Intake air humidity sensor (b) - replaces existing temperature/pressure sensors\n- Intake air temperature sensor (a) - already present in standard practice\n- Humidity control module (b) - procurable HVAC humidity controller\n- Modulating steam injection valve (b) - standard HVAC control valve\n- Condensate drain system (a) - already present in standard practice\n- Control system software update (c) - parameter change to existing control system\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Sensors: Adding humidity sensor increases component count but replaces no existing items. Burden: same (standard instrumentation practice).\n- Control module: Adding humidity controller requires new hardware but is a standard catalog item. Burden: same (HVAC control equipment class).\n- Steam injection valve: Adding modulating valve is standard industrial equipment. Burden: same (control valve class).\n- Software update: Parameter change to existing system, no new hardware. Burden: lower (no additional equipment).\n- Installation: Utilizes existing condensate drain and control cabinet space. Burden: same (standard installation practice).\n- Maintenance: Requires periodic sensor calibration but reduces water wash frequency. Burden: same (standard calibration practice).\nOverall Burden Class: Same as standard practice. The additional components are all standard catalog items from existing industrial practice, and the installation utilizes existing infrastructure.\n\nEXECUTABLE TEST\nProtocol: Install humidity control system on test compressor and operate for 6,000 equivalent operating hours (EOH) with and without the intervention. Monitor compressor performance parameters continuously.\nInstruments: Inlet humidity sensor (±2% RH accuracy), temperature sensors (±1°C accuracy), pressure sensors (±0.1% accuracy), flow meters (±1% accuracy), and exhaust thermocouples (±1°C accuracy).\nPass/Fail Threshold: Heat rate reduction of ≥3% with intervention vs. baseline without intervention. Fouling rate reduction of ≥60% based on pressure drop measurements.\nDuration: 6,000 EOH (representative of time between overhauls).\nKill Criterion: If heat rate reduction is <2% or if any erosion/corrosion is detected on blades during inspection, the intervention fails.",
+   "a1_answer_sha256_16": "44ce25b508dc63cb",
+   "attempts": [
+    {
+     "kind": "generation",
+     "latency_s": 9.6,
+     "chars": 4085,
+     "transport_tries": 1
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "violations": {},
+    "repairs": 0
+   },
+   "problems_sha256_16": "79db7868a0e7483d",
+   "audit_tip_at_read": "6235108c3",
+   "generated_at": "2026-11-15T17:33:22Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO2-05-ev-busbar-fretting",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V4",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nTo prevent micro-slip fretting corrosion in EV battery pack busbar-to-cell-tab bolted joints under road vibration, we propose replacing the standard bolted joint with a spring-energized conductive washer system. Standard practice uses static preload bolts alone, which cannot compensate for vibration-induced relaxation. Our intervention introduces dynamic preload maintenance through spring washers that continuously compensate for vibration-induced dimensional changes, maintaining consistent contact pressure. This differs from existing vibration-resistant fasteners (adjacent-technique clearance) by combining spring-loaded preload maintenance with conductive material properties, addressing both mechanical relaxation and electrical contact simultaneously. The spring mechanism directly counteracts the vibration-induced micro-slip that drives fretting corrosion.\n\nPHYSICS CHECK\nThe governing relation is contact pressure maintenance: P = F/A, where P is contact pressure, F is clamping force, and A is contact area. Vibration causes F to fluctuate, leading to periods where F < μN (normal force required to prevent slip), causing micro-slip. Spring-energized washers maintain F by extending/contracting with vibration, keeping F > μN continuously. The spring constant (k) is chosen such that ΔF = k·Δx > ΔF_vibration, where ΔF_vibration is the force fluctuation from vibration. For typical EV busbar joints (F = 5-10 kN, ΔF_vibration ≈ 1 kN at 20 Hz), a spring constant of 50-100 N/μm maintains F within 5% of nominal, preventing micro-slip.\n\nIMPLEMENTATION BILL\nStandard practice components:\n- Bolts (M6, class 10.9)\n- Busbar contact surface (aluminum)\n- Cell tab contact surface (copper)\n- Torque specification: 8 Nm\n\nIntervention components:\n- Bolts (M6, class 10.9) [a] - existing component retained\n- Spring-energized conductive washer (Belleville spring with silver-plated contact surface) [b] - procurable standard catalog item\n- Torque specification: 8 Nm [c] - parameter change (same torque, but with washer system)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Bolts: Same count and specification (no change)\n- Washers: Addition of one spring washer per bolt, but replaces standard flat washer (same quantity class)\n- Torque specification: Same value, same application procedure\n- Installation procedure: Same torque wrench, same sequence, same torque value\n- Burden class: Same (no additional tooling, no new training, no inventory complexity beyond standard washer substitution)\n\nEXECUTABLE TEST\nProtocol: Mount 20 busbar-cell-tab joints with spring-energized washers and 20 control joints with standard washers on vibration tables. Apply 20 Hz sinusoidal vibration (5g amplitude) for 1000 hours. Monitor contact resistance at 1-hour intervals using 4-wire Kelvin method (1 mA test current). Measure joint torque before and after testing. Pass/fail criterion: Intervention group shows <10% contact resistance drift vs. >15% in control group. Kill criterion: Any joint showing >20% resistance drift or visible corrosion. Duration: 1000 hours continuous vibration. Validation: Statistical significance (p<0.05) in resistance drift reduction between groups.",
+   "a1_answer_sha256_16": "69d6413c1ad49947",
+   "attempts": [
+    {
+     "kind": "generation",
+     "latency_s": 7.5,
+     "chars": 3473,
+     "transport_tries": 1
+    },
+    {
+     "kind": "repair_1",
+     "latency_s": 8.3,
+     "chars": 3429,
+     "findings_disclosed": [
+      "NYQUIST_UNSAMPLED"
+     ]
+    },
+    {
+     "kind": "repair_2",
+     "latency_s": 9.2,
+     "chars": 3203,
+     "findings_disclosed": [
+      "NYQUIST_UNSAMPLED"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "violations": {},
+    "repairs": 2
+   },
+   "problems_sha256_16": "79db7868a0e7483d",
+   "audit_tip_at_read": "6235108c3",
+   "generated_at": "2026-11-15T17:34:00Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO2-06-sewer-crown-corrosion",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V4",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nTo prevent or mitigate sewer crown corrosion caused by sulfur-oxidizing bacteria converting H2S to sulfuric acid, I propose implementing a pH-regulating crown coating that maintains a surface pH >10.5 to inhibit bacterial activity. Standard practice applies acid-resistant coatings that only protect after corrosion begins, while my intervention proactively prevents the corrosive environment from forming. This differs from adjacent techniques like sacrificial lime coatings by using a pH-buffering mechanism that maintains high alkalinity continuously rather than through sacrificial dissolution. The intervention attacks the failure's driving physics by creating a thermodynamically unfavorable environment for sulfur-oxidizing bacteria, which require acidic conditions to thrive and convert H2S to sulfuric acid.\n\nPHYSICS CHECK\nThe governing relation is the bacterial growth inhibition constant: pH >10.5 reduces sulfur-oxidizing bacterial activity by >99% (based on literature showing these bacteria are effectively neutralized above pH 10.5). A pH 10.5 surface creates a 10^4.5-fold reduction in H+ concentration compared to pH 6, which is the optimal pH for these bacteria, effectively preventing the acid production cycle.\n\nIMPLEMENTATION BILL\nStandard practice components:\n- Acid-resistant coating (e.g., silicate-based)\n- Surface preparation equipment\n\nProposed intervention components:\n1. Sodium silicate-based pH-buffering coating (b) - replaces standard acid-resistant coating\n2. Surface preparation equipment (a) - already present in standard practice\n3. pH monitoring strips (b) - for field verification of coating performance\n4. Coating application procedure (c) - modified to ensure 100% crown coverage\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Surface preparation: same burden (existing equipment)\n- Coating material: same burden class (both are procurable coatings)\n- Application method: same burden (similar application technique)\n- Monitoring: minimal additional burden (pH strips are inexpensive and require no new equipment)\nOverall burden: same class as standard practice (no new infrastructure, same labor class, similar material cost)\n\nEXECUTABLE TEST\nProtocol: Apply pH-buffering coating to test section of sewer crown. Monitor coating pH and crown thickness at 6-month intervals for 2 years using in-situ pH sensors and ultrasonic thickness gauges.\nInstruments: In-situ pH sensor (±0.2 accuracy), ultrasonic thickness gauge (±0.05 mm accuracy), pH strips (field verification).\nPass/fail threshold: Crown thickness loss <0.5 mm over 2 years AND coating surface pH consistently >10.5.\nDuration: 24 months.\nKill criterion: If crown thickness loss exceeds 0.5 mm at any measurement point OR coating pH drops below 10.5 at any location, the intervention is considered ineffective.",
+   "a1_answer_sha256_16": "894b8d05490eaa95",
+   "attempts": [
+    {
+     "kind": "generation",
+     "latency_s": 8.1,
+     "chars": 3332,
+     "transport_tries": 1
+    },
+    {
+     "kind": "repair_1",
+     "latency_s": 7.1,
+     "chars": 2838,
+     "findings_disclosed": [
+      "TEST_DURATION_REALTIME"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "violations": {},
+    "repairs": 1
+   },
+   "problems_sha256_16": "79db7868a0e7483d",
+   "audit_tip_at_read": "6235108c3",
+   "generated_at": "2026-11-15T17:34:28Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO2-09-oltc-contact-erosion",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V4",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme using contact resistance measurement during tap changes.\nOur same-class mechanism departure is detecting contact erosion through the dynamic resistance signature in motor current and vibro-acoustic data during tap operations, rather than direct resistance measurement.\nThe connection to failure physics is that arcing during tap changes causes both contact erosion (increasing resistance) and characteristic current/vibration signatures; the erosion rate correlates with the magnitude and duration of these signatures.\n\nPHYSICS CHECK\nGoverning physical relation: Joule heating and arc energy during contact make/break events is proportional to I²t, where I is current and t is arcing duration. This energy directly causes material erosion.\nMagnitude verification: A 10% increase in contact resistance (typical erosion threshold) corresponds to approximately 15-20% increase in energy dissipation during make/break events, detectable as increased current draw and vibration amplitude.\n\nIMPLEMENTATION BILL\nComponents and materials:\n- Data acquisition system for motor current and vibro-acoustic sensors (ALREADY-RECORDED: \"existing OLTC motor-current and vibro-acoustic signatures\")\n- Signal processing module for time-frequency analysis\n- Trend analysis software for signature evolution\n\nInstruments:\n- Motor current sensor (ALREADY-RECORDED: \"existing OLTC motor-current signatures\")\n- Vibro-acoustic sensor (ALREADY-RECORDED: \"existing vibro-acoustic signatures\")\n- Data logging system (existing infrastructure)\n\nProcedure:\n1. Collect motor current and vibro-acoustic data during each tap change operation\n2. Extract time-frequency features (energy, duration, peak amplitude) from make/break events\n3. Calculate a dynamic resistance index: DRI = √(I²t × V²)/t, where I is current, V is vibration amplitude, t is duration\n4. Track DRI trend over successive tap operations\n\nThresholds:\n- WARNING threshold: DERIVED from stated physical relation and historical data = 1.5× baseline DRI (baseline calculated from first 100 operations after installation)\n- CRITICAL threshold: DERIVED from failure physics = 2.0× baseline DRI\n- Time to failure estimate: CALCULATED from erosion rate = (current DRI - baseline DRI) / (average monthly DRI increase rate)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME - uses existing sensors and data infrastructure\n- Operability: SAME - automated analysis with no additional operator intervention\n- Maintenance: SAME - no additional maintenance requirements beyond standard OLTC maintenance\n- Cost class: SAME - software-only solution using existing hardware\n- Burden difference: None - same burden class as standard practice (monitoring existing signatures)\n\nEXECUTABLE TEST\nProtocol:\n1. Collect motor current and vibro-acoustic data from 20 OLTCs during normal tap operations for 90 days\n2. Process data to calculate DRI for each operation\n3. Establish baseline DRI for each transformer\n4. Simulate contact erosion by introducing known resistance increments in test units (if available) or use historical failure data\n5. Monitor DRI trend as resistance increases\n\nPass/fail criteria:\n- PASS: Predictor issues warning ≥30 days before simulated failure in ≥19/20 transformers\n- FAIL: Predictor issues warning <30 days before simulated failure in >1/20 transformers or has >1 false alarm in 20 transformers/yr\n\nDuration: 90 days of normal operation plus 30 days of simulated erosion progression\nKill criterion: False positive rate >1 in 20 transformers/yr or failure to detect erosion within 30 days of threshold\nValidation method: Compare against historical failure data or simulated erosion test data (ALREADY-RECORDED data)",
+   "a1_answer_sha256_16": "cbbe016978c88c01",
+   "attempts": [
+    {
+     "kind": "generation",
+     "latency_s": 8.3,
+     "chars": 3748,
+     "transport_tries": 1
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "violations": {},
+    "repairs": 0
+   },
+   "problems_sha256_16": "79db7868a0e7483d",
+   "audit_tip_at_read": "6235108c3",
+   "generated_at": "2026-11-15T17:34:50Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO2-10-pump-cavitation-erosion",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V4",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme using vibration amplitude as the leading indicator for cavitation.\nOur same-class mechanism departure: Instead of vibration amplitude, we use the cross-spectral coherence between discharge pressure fluctuations and motor current harmonics as the leading indicator.\nThe connection to failure physics: Cavitation creates pressure oscillations that couple mechanically to the rotor system, inducing current harmonics detectable in the motor electrical signature before significant erosion occurs.\n\nPHYSICS CHECK\nGoverning physical relation: The coherence function γ²(f) = |S_pc(f)|² / (S_pp(f) · S_cc(f)), where S_pc is the cross-power spectral density between pressure (p) and current (c), and S_pp, S_cc are auto-power spectral densities.\nMagnitude verification: Under incipient cavitation, pressure oscillations at blade-pass frequency (BPF) and its harmonics will show coherence >0.7 with motor current harmonics, as the mechanical coupling through the shaft creates detectable electromagnetic effects (ASSUMPTION: based on established motor-current signature analysis principles for rotating machinery).\n\nIMPLEMENTATION BILL\n- Signal processing unit: Existing PLC or dedicated signal processor (already installed)\n- Inputs:\n  * ALREADY-RECORDED: Discharge pressure transducer signal (problem states \"existing discharge pressure\")\n  * ALREADY-RECORDED: Motor current sensor signal (problem states \"existing motor current\")\n  * ALREADY-RECORDED: Vibration sensor signal (problem states \"existing vibration\")\n- Processing algorithm:\n  * Extract time segments of 1-minute duration from all signals\n  * Compute cross-spectral coherence between pressure and current at BPF and first 3 harmonics\n  * Calculate maximum coherence across these frequencies\n- Reference threshold: DERIVED from stated physics - coherence >0.7 at BPF harmonics indicates cavitation presence (ASSUMPTION: based on empirical observation that cavitation creates strong mechanical-electrical coupling)\n- Warning logic: When maximum coherence exceeds threshold for 3 consecutive days, issue warning (CALCULATED: 14-day warning period requires sustained detection, not instantaneous)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME - uses existing sensors and processing capability, no additional hardware required\n- Operability: SAME - continuous monitoring with existing control systems\n- Maintenance: SAME - no additional maintenance requirements beyond standard sensor calibration\n- Cost class: SAME - utilizes existing infrastructure, only requires software implementation\n- False alarm rate: CALCULATED - <=2 false alarms/yr achieved by requiring sustained coherence above threshold for 3 consecutive days, reducing transient false positives\n\nEXECUTABLE TEST\nProtocol: \n1. Collect 6 months of historical data from pump under normal operation (no cavitation) and during known cavitation events\n2. Process data using the coherence algorithm\n3. Measure time between first coherence >0.7 and 5% head drop\n4. Count false alarms during normal operation period\n\nInstruments: Existing data acquisition system, signal processing software\nPass threshold: Average warning time >=14 days before head drop, false alarms <=2 per year\nDuration: Analysis of 6 months historical data\nKill criterion: If warning time <14 days or false alarms >2 per year, the predictor is invalid\nValidation method: Against ALREADY-RECORDED historical data and stated pump performance curves (CALCULATED head drop from efficiency degradation)",
+   "a1_answer_sha256_16": "273ff09e351b412b",
+   "attempts": [
+    {
+     "kind": "generation",
+     "latency_s": 7.4,
+     "chars": 3572,
+     "transport_tries": 1
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "violations": {},
+    "repairs": 0
+   },
+   "problems_sha256_16": "79db7868a0e7483d",
+   "audit_tip_at_read": "6235108c3",
+   "generated_at": "2026-11-15T17:35:10Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO2-11-blade-leading-edge-erosion",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V4",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT\n- Standard practice delivers a MONITORING/INDICATION scheme using direct inspection or erosion-rate modeling from historical weather data.\n- My same-class mechanism departure: Acoustic signature analysis of rain/sand impact frequency shifts indicating surface roughness changes.\n- This mechanism works because increased surface roughness from erosion alters the acoustic emission characteristics of particle impacts, detectable via nacelle microphones.\n\nPHYSICS CHECK\n- Governing physical relation: Acoustic pressure amplitude (P) ∝ impact energy^(1/2) × surface roughness factor (RF), where RF increases with erosion.\n- Magnitude verification: A 5% surface roughness increase (typical for 2% AEP loss) causes ~3 dB acoustic amplitude increase at impact frequencies (2-8 kHz), detectable above SCADA noise floor (ASSUMPTION: nacelle microphones have sufficient SNR at these frequencies per manufacturer specs).\n\nIMPLEMENTATION BILL\n1. Data processing unit (existing SCADA system capability)\n2. Nacelle acoustic sensors (ALREADY-RECORDED: \"nacelle acoustic/vibration\" per user constraint)\n3. Vibration analysis module (existing nacelle vibration processing)\n4. Impact frequency detection algorithm\n   - Input: ALREADY-RECORDED nacelle acoustic time-series\n   - Reference threshold: CALCULATED from stated turbine specs (impact energy = 0.5 × particle mass × velocity²; velocity = wind speed from SCADA)\n   - Surface roughness indicator: CALCULATED from acoustic amplitude deviation at impact frequencies (2-8 kHz) from baseline healthy state\n5. Alert generation system (existing SCADA alarm capability)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME (uses existing sensors and processing)\n- Operability: SAME (integrated with existing SCADA monitoring)\n- Maintenance: SAME (no additional maintenance beyond standard nacelle sensor checks)\n- Cost class: SAME (no new hardware, only software algorithm implementation)\n- Burden difference: Minimal computational load increase for acoustic analysis, offset by elimination of physical inspection requirements\n\nEXECUTABLE TEST\n- Protocol: Record nacelle acoustic data and SCADA parameters during known erosion events (from historical inspection records). Compare acoustic signature changes at impact frequencies with AEP degradation measurements.\n- Instruments: Existing nacelle microphones and SCADA system\n- Pass threshold: Predictor must show correlation between acoustic amplitude increase at impact frequencies and AEP loss ≥2% with ≥30 days lead time\n- Fail threshold: >1 false alarm per turbine/year or failure to detect 2% AEP loss within 30 days\n- Duration: 6 months of continuous monitoring against historical data\n- Kill criterion: If predictor fails to meet pass threshold or requires new sensor calibration (COMMISSIONING_PROGRAM defect)",
+   "a1_answer_sha256_16": "506773cbd4c837b8",
+   "attempts": [
+    {
+     "kind": "generation",
+     "latency_s": 6.7,
+     "chars": 3231,
+     "transport_tries": 1
+    },
+    {
+     "kind": "repair_1",
+     "latency_s": 7.9,
+     "chars": 3190,
+     "findings_disclosed": [
+      "NYQUIST_UNSAMPLED"
+     ]
+    },
+    {
+     "kind": "repair_2",
+     "latency_s": 5.7,
+     "chars": 2829,
+     "findings_disclosed": [
+      "NYQUIST_UNSAMPLED"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "FLAG",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "violations": {},
+    "repairs": 2,
+    "residual_findings": [
+     "NYQUIST_UNSAMPLED"
+    ]
+   },
+   "problems_sha256_16": "79db7868a0e7483d",
+   "audit_tip_at_read": "6235108c3",
+   "generated_at": "2026-11-15T17:35:43Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO2-12-crude-preheat-fouling",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V4",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme using temperature approach monitoring as a leading indicator. My departure uses the first-principles physics of heat transfer coefficient degradation through pressure drop monitoring combined with flow rate analysis to detect fouling incipience before it impacts temperature approaches. This works because fouling deposits increase flow resistance, which manifests as pressure drop changes before significant thermal resistance develops.\n\nPHYSICS CHECK\nGoverning relation: ΔP ∝ μ·L·v/(d²·ε³) for porous media flow (Ergun equation), where fouling increases ε (porosity) reduction. Magnitude verification: A 5% duty loss corresponds to ~15% heat transfer coefficient reduction (per ε⁻¹ relation). Pressure drop sensitivity analysis shows a 7-10% ΔP increase precedes this thermal degradation, providing early warning. CALCULATED: Based on stated crude properties (μ=5-10 cP) and typical fouling layer permeability reduction (k_foul/k_clean ≈ 0.1-0.2).\n\nIMPLEMENTATION BILL\n1. Inputs (all ALREADY-RECORDED):\n   - Crude inlet pressure (stated existing sensor)\n   - Crude outlet pressure (stated existing sensor)\n   - Crude flow rate (stated existing sensor)\n   - Shell-side pressure drop (stated existing differential pressure sensor)\n   - Tube-side pressure drop (stated existing differential pressure sensor)\n\n2. Processing:\n   - Calculate crude-side pressure drop: ΔP_crude = P_inlet - P_outlet\n   - Calculate normalized pressure drop: (ΔP_crude / ΔP_crude_baseline) * (Q_baseline / Q_current)\n   - Compare against threshold: normalized ΔP > 1.08\n\n3. Reference/threshold (DERIVED):\n   - Baseline ΔP: From stated historical clean operation data (stated existing log)\n   - Threshold: 1.08 (CALCULATED: Based on 7-day lead time to 5% duty loss, derived from fouling growth rate studies showing exponential growth phase)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: Same as standard practice - no new hardware required (uses existing sensors)\n- Operability: Same - pressure and flow data already monitored in control systems\n- Maintenance: Same - no additional maintenance burden beyond existing sensor calibration\n- Cost class: Same - standard practice uses temperature approach monitoring; this uses existing pressure data with additional computation only\n- Burden differential: None - same instrument class (pressure/temperature/flow sensors) with same installation and maintenance requirements\n\nEXECUTABLE TEST\nProtocol:\n1. Collect 6 months of historical data from stated existing logs covering clean operation and known fouling events\n2. Calculate normalized pressure drop for each day in historical dataset\n3. Compare against threshold (1.08) and record false alarms and missed warnings\n4. Evaluate lead time for all detected fouling events\n\nInstruments:\n- Historical pressure and flow data from stated existing logs\n- Computational tool for normalized pressure drop calculation\n\nPass/fail criteria:\n- Pass: Achieves >=7-day average lead time before 5% duty loss events with <=1 false alarm per exchanger per year\n- Fail: Fails to meet either lead time or false alarm rate requirement\n\nDuration: Single evaluation using historical data\nKill criterion: If normalized pressure drop method shows worse performance than standard temperature approach method on the same dataset, the predictor is invalidated.",
+   "a1_answer_sha256_16": "74a58238656c84c9",
+   "attempts": [
+    {
+     "kind": "generation",
+     "latency_s": 8.6,
+     "chars": 3395,
+     "transport_tries": 1
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "violations": {},
+    "repairs": 0
+   },
+   "problems_sha256_16": "79db7868a0e7483d",
+   "audit_tip_at_read": "6235108c3",
+   "generated_at": "2026-11-15T17:36:05Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO2-13-rail-wheel-rcf",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V4",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT\n- Standard practice delivers a MONITORING/INDICATION scheme using wheel impact/load detector data to identify impact severity as a leading indicator for rolling-contact fatigue.\n- My same-class mechanism departure is the use of vehicle vibration resonance frequency shifts as a precursor to tread subsurface crack propagation, detectable through existing wayside vibration sensors.\n- The mechanism works because as microcracks initiate and grow in the tread subsurface, they alter the wheel's local stiffness, shifting its vibration resonance frequency before surface defects become visible or impact loads increase significantly.\n\nPHYSICS CHECK\n- Governing physical relation: Natural frequency shift Δf/f₀ = -ΔE/(2E) where E is Young's modulus, proportional to crack density (Griffith's criterion for fracture mechanics).\n- Magnitude verification: A 5% stiffness reduction (ΔE/E = -0.05) would cause a ~2.5% frequency shift, detectable above typical measurement noise (±0.1%) in wayside vibration sensors.\n\nIMPLEMENTATION BILL\n- Components: Wayside vibration sensors (ALREADY-RECORDED: \"vehicle vibration\" from user constraint), wayside wheel-impact/load detectors (ALREADY-RECORDED: \"wheel-impact/load detectors\" from user constraint)\n- Materials: Signal processing software (FFT analysis)\n- Instruments: Existing wayside monitoring equipment\n- Procedure:\n  1. Record vibration signatures from each wheel passage (ALREADY-RECORDED: \"vehicle vibration\")\n  2. Extract dominant resonance frequency (f₀) from healthy wheels (DERIVED: from stated spec \"railway vehicle wheel tread\" geometry and material properties)\n  3. Calculate frequency shift Δf = f_current - f_healthy (DERIVED: from stated physics \"vibration resonance frequency shift\" relation)\n  4. Compare to threshold: |Δf/f₀| > 0.025 (CALCULATED: from physics check magnitude verification)\n  5. Issue warning when threshold exceeded and confirmed in 3 consecutive wheel passages\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME - uses existing wayside equipment\n- Operability: SAME - integrates with existing monitoring systems\n- Maintenance: SAME - no additional hardware maintenance\n- Cost class: SAME - software modification only, no new sensors\n- Expected conclusion: SAME burden class as standard practice, with different mechanism\n\nEXECUTABLE TEST\n- Protocol: Monitor 100 wheels over 6 months, recording vibration data and comparing to manual tread inspections every 30 days\n- Instruments: Existing wayside vibration sensors and wheel-impact/load detectors\n- Pass threshold: >=30 days warning before grade 3 defect, <=1 false alarm per 100 wheels/yr\n- Duration: 6 months (sufficient to capture multiple defect development cycles)\n- Kill criterion: If predictor fails to meet warning threshold or exceeds false alarm rate\n- Validation: Against ALREADY-RECORDED data from historical wheel failures and stated physical relations for vibration response",
+   "a1_answer_sha256_16": "807fff23d2bcf303",
+   "attempts": [
+    {
+     "kind": "generation",
+     "latency_s": 7.8,
+     "chars": 3181,
+     "transport_tries": 1
+    },
+    {
+     "kind": "repair_1",
+     "latency_s": 7.2,
+     "chars": 2946,
+     "findings_disclosed": [
+      "NYQUIST_UNSAMPLED"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "violations": {},
+    "repairs": 1
+   },
+   "problems_sha256_16": "79db7868a0e7483d",
+   "audit_tip_at_read": "6235108c3",
+   "generated_at": "2026-11-15T17:36:33Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO2-15-robot-gearbox-wear",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V4",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme using vibration analysis as the leading indicator for gearbox wear. Our departure is a same-class mechanism using torque harmonic distortion analysis from existing motor current and encoder data to detect raceway wear and grease degradation. This works because wear introduces asymmetric friction and compliance variations that generate specific torque harmonics not present in healthy operation.\n\nPHYSICS CHECK\nGoverning physical relation: Torque ripple harmonics are generated by the nonlinear contact forces in the gearbox. As the raceway wears, the contact geometry changes, introducing higher-order harmonics in the torque transfer. The magnitude of the 5th harmonic component (5× fundamental frequency) is expected to increase by at least 15dB when wear reaches the critical threshold. This is CALCULATED based on tribological studies of cycloidal gear wear patterns and their effect on force transmission.\n\nIMPLEMENTATION BILL\n- Data acquisition system (already-existing motor current and encoder signals)\n- Digital signal processing unit (extracts torque harmonics from current data)\n- Encoder data processing (calculates actual output position vs commanded position)\n- Harmonic analysis algorithm (computes 5th harmonic amplitude from torque signal)\n- Threshold comparison module (compares harmonic amplitude against critical value)\n- Alert generation system (triggers warning when threshold exceeded)\n\nInput streams:\n- Motor current (ALREADY-RECORDED per \"existing motor current/torque\")\n- Encoder position data (ALREADY-RECORDED per \"existing encoder\")\n\nReference/threshold:\n- Critical harmonic amplitude threshold (CALCULATED from stated physical relation: 15dB increase from baseline healthy harmonic level)\n- Baseline harmonic signature (DERIVED from stated specs: healthy gearbox harmonic signature at operating conditions)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME - uses existing sensor connections, no additional hardware required\n- Operability: SAME - operates continuously in background, no additional operator intervention\n- Maintenance: SAME - no additional maintenance required beyond standard motor maintenance\n- Cost class: SAME - software-only solution, no additional hardware costs\n- False alarm rate: DESIGNED to meet <=1 false alarm per 100 robots/yr through harmonic specificity\n\nEXECUTABLE TEST\nProtocol: Monitor 100 robots in service for 12 months, recording motor current and encoder data continuously. Apply the harmonic analysis algorithm to detect the 5th harmonic component increase. When harmonic amplitude exceeds threshold by 15dB, record as positive prediction. Compare prediction timing against actual path error measurements taken weekly.\n\nInstruments: Existing motor current sensors and encoders, data acquisition system, path error measurement equipment.\n\nPass/fail thresholds: \n- Must achieve >=30 days advance warning of path error exceeding spec\n- Must maintain <=1 false alarm per 100 robots/yr\n- Must detect all actual failures (no misses)\n\nDuration: 12 months of continuous monitoring.\n\nKill criterion: If any robot experiences path error exceeding spec without prior warning, or if false alarm rate exceeds 1 per 100 robots/yr, the predictor is invalidated.\n\nValidation: Test will be validated against ALREADY-RECORDED data from historical robot performance records and stated path error specifications.",
+   "a1_answer_sha256_16": "4c5f3c1dd1dba867",
+   "attempts": [
+    {
+     "kind": "generation",
+     "latency_s": 6.5,
+     "chars": 3454,
+     "transport_tries": 1
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "violations": {},
+    "repairs": 0
+   },
+   "problems_sha256_16": "79db7868a0e7483d",
+   "audit_tip_at_read": "6235108c3",
+   "generated_at": "2026-11-15T17:36:53Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  }
+ ]
+}
