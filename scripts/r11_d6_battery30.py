@@ -45,6 +45,36 @@ PARTIAL = REPO / "eval" / "battery30_r11_r5.partial.json"
 LEDGER = []          # typed call ledger
 STATE = {"conc": 1, "max_conc": 4, "streak": 0, "aimd_events": []}
 _lock = __import__("threading").Lock()
+# R11 2026-11-15 (measured, battery30_r11_r5.json): the xkiro free tier
+# enforces a REQUESTS-PER-MINUTE cap — the 00:56Z run burned 96 instant
+# failures in 34 s (6 ok then 48 failed PER RUNG, wall 0.0 s per pair)
+# while the same rung serves single paced calls fine seconds later.
+# The AM6 measurement pins the cap at ~5 req/min. A global pacer now
+# gates EVERY provider call the battery makes (gen + judge): min
+# interval D6_PACE_S (default 13 s = just under 5/min), and a 429
+# costs a D6_429_PAUSE_S (default 60 s) cooldown before the next call.
+# Wall target: the auditor's acceptance allows the paced fallback
+# (AM7 direction 2: "its 5/min cap supersedes the wall target").
+_pace_lock = __import__("threading").Lock()
+_pace_last = [0.0]
+_PACE_S = float(__import__("os").environ.get("D6_PACE_S", "13"))
+_PAUSE_429_S = float(__import__("os").environ.get("D6_429_PAUSE_S", "60"))
+
+
+def _pace():
+    """Global courtesy pacer — one provider call at a time, at least
+    _PACE_S apart (Art. LXI: the cap is typed infrastructure, never a
+    verdict; pacing is the honest response, burning the pool is not)."""
+    import time as _t
+    while True:
+        with _pace_lock:
+            now = _t.monotonic()
+            wait = _pace_last[0] + _PACE_S - now
+            if wait <= 0:
+                _pace_last[0] = now
+                return
+        import time as _t2
+        _t2.sleep(min(wait, 5))
 
 
 def _ledger_call(provider, model, outcome_class, latency_s, note=""):
@@ -97,6 +127,7 @@ def gen_call(prompt, system, max_tokens=900):
     t0 = time.time()
     try:
         _pin = os.environ.get("D6_GEN_PROVIDER") or "xkiro"
+        _pace()
         res = LR.generate(prompt, system=system, timeout=90,
                           max_retries=0, max_tokens=max_tokens,
                           hard_pin_provider=_pin)
@@ -109,6 +140,9 @@ def gen_call(prompt, system, max_tokens=900):
         _ledger_call(res.provider_id, res.model, "CALL_FAILED", lat, err)
         if "429" in err or "THROTTL" in err.upper():
             _aimd_on_throttle(res.provider_id)
+            # the measured requests/min cap: pay the cooldown once,
+            # then the pacer resumes (never a tight retry loop)
+            time.sleep(_PAUSE_429_S)
         return None
     except Exception as e:  # noqa: BLE001
         _ledger_call("?", "?", "EXC", round(time.time() - t0, 1),
@@ -118,12 +152,16 @@ def gen_call(prompt, system, max_tokens=900):
 
 def judge_call(provider, model, prompt):
     from eval.run import _judge_judgment_call
+    _pace()                    # the judge shares the same req/min cap
     t0 = time.time()
     jc = _judge_judgment_call(provider, model, prompt, max_tokens=4000)
     lat = round(time.time() - t0, 1)
     _ledger_call(provider, model, jc.get("outcome") or "?", lat)
     if jc.get("outcome") == "JUDGE_TRANSPORT_FAILED":
         _aimd_on_throttle(provider)
+        _err = str((jc.get("errors") or [""])[0])
+        if "429" in _err or "THROTTL" in _err.upper():
+            time.sleep(_PAUSE_429_S)
     else:
         _aimd_on_success()
     return jc
