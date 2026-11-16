@@ -1,0 +1,54 @@
+{
+ "problem_id": "HO5-01-cell-cathode-heave",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe proposed intervention is a **two-stage start-up ramp-rate procedure** that rapidly traverses the 300–600 °C critical sodium-intercalation window (50 °C/h) before reverting to the standard slow ramp (20 °C/h) above 600 °C, thereby cutting the time-integrated sodium exposure that initiates cathode-block swelling.  \nStandard practice uses a single slow linear ramp (≈20 °C/h) throughout start-up to minimize thermal stress, accepting prolonged dwell in the temperature band where sodium diffusion into graphitized carbon is maximal.  \nAdjacent-technique clearance: the closest existing practice is start-up ramp optimization for thermal-stress management (universal in aluminium smelting); the departure is **re-profiling the ramp specifically for sodium-penetration kinetics** — a non-uniform schedule that targets the intercalation window rather than thermal stress alone.  \nMechanism: sodium penetration flux into cathode blocks is governed by the product of sodium surface concentration (set by bath chemistry) and the temperature-dependent diffusion coefficient D_Na(T), which peaks sharply in the 300–600 °C range due to stage-2 graphite intercalation kinetics. By reducing the dwell time in this window by ~60 %, the total sodium dose absorbed during the most vulnerable period is proportionally reduced, delaying the onset of heave that eventually cracks the collector-bar seal.\n\nPHYSICS CHECK\nGoverning relation: sodium penetration depth δ ∝ √(∫ D_Na(T(t)) dt) where D_Na(T) = D₀ exp(-E_a/RT) with E_a ≈ 80 kJ/mol for intercalation-driven diffusion in graphitized carbon; the integral is dominated by the 300–600 °C window where D_Na is 10–100× higher than at 700 °C.  \nMagnitude verification: standard ramp (20 °C/h) spends 15 h in the 300–600 °C window; two-stage ramp (50 °C/h) spends 6 h. The time-integral of D_Na drops by ≈60 %, giving a predicted √0.4 ≈ 0.63× reduction in initial sodium penetration depth — sufficient to shift the heave-initiation threshold beyond the current campaign life.  \nDIRECTION-OF-EFFECT: driving variable = time-integrated sodium exposure in the critical temperature window (∫ c_Na·D_Na dt); the mechanism moves it **down** by **reducing dwell time in the 300–600 °C window from 15 h to 6 h via a faster ramp segment**; this **reduces** the sodium penetration depth that drives cathode heave.\n\nIMPLEMENTATION BILL\n| # | Item / Action | Generic Class / Stated Infrastructure | Attachment Point in Stated Infrastructure | Operating Parameter(s) | Procurement Tag |\n|---|---------------|--------------------------------------|------------------------------------------|------------------------|-----------------|\n| 1 | Revised start-up ramp schedule loaded into cell control system | Standard DCS/PLC procedure change (existing control system) | Cell control system (stated existing infrastructure) | Stage 1: 50 °C/h from 300 °C to 600 °C; Stage 2: 20 °C/h from 600 °C to operating temp (960 °C) | (c) |\n| 2 | Updated start-up procedure document | Standard operating procedure (existing documentation system) | Plant procedure management system | Same ramp parameters as above; thermal-stress hold points unchanged above 600 °C | (c) |\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n| Standard Practice Bill Row | Intervention Bill Row | Burden Comparison |\n|----------------------------|-----------------------|-------------------|\n| Start-up procedure (linear 20 °C/h ramp) — DCS parameter set, operator execution | Revised start-up procedure (two-stage ramp) — same DCS, same operator actions, different setpoints | **Same class**: parameter change on existing control system; no new hardware, no added consumables, no extra labor. |\n| Thermal-stress monitoring (acoustic emission, thermocouples) — existing instrumentation | Unchanged — same instruments, same monitoring | **Same**: no added sensing. |\n| Operational loss during start-up | **Zero** — start-up is non-production time; faster ramp through 300–600 °C actually shortens total start-up by ~9 h, avoiding loss. | **Lower or equal**: no production curtailment. |\n**Conclusion**: same-or-lower burden class in every row. No row introduces development, custom machining, new process steps, or regulatory burden.\n\nEXECUTABLE TEST\n**Protocol**:  \n1. Select two comparable cells (same cathode age, same bath chemistry, same ACD/metal-pad setpoints) entering start-up after anode change.  \n2. Cell A (control): standard linear 20 °C/h ramp. Cell B (test): two-stage ramp (50 °C/h 300→600 °C, then 20 °C/h).  \n3. Instrument both cells with existing cathode thermocouples (stated infrastructure) and acoustic emission sensors (standard practice) to verify thermal-stress equivalence.  \n4. After start-up, operate both cells identically for 6 months.  \n5. At 6 months, measure cathode heave via collector-bar seal displacement (standard laser tracker survey) and extract cathode core samples (standard maintenance practice) at three locations per cell for sodium concentration profiling (EPMA).  \n\n**Instruments**: existing thermocouples, acoustic emission system, laser tracker, EPMA (standard lab).  \n\n**Pass/Fail Thresholds**:  \n- Primary: test cell shows ≥30 % reduction in sodium concentration at 10 mm depth in cathode blocks vs control (p<0.05, t-test).  \n- Secondary: collector-bar seal displacement rate in test cell ≤70 % of control cell rate.  \n\n**Duration**: 6 months operational (one start-up + 6 months).  \n\n**Kill Criterion**: if acoustic emission during Stage 1 ramp exceeds 2× baseline thermal-stress threshold (indicating cathode cracking risk), abort test ramp and revert to standard ramp for that cell.",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 1,
+  "residual_findings": {}
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 6234,
+   "latency_s": 121.6,
+   "transport_tries": 1,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "sustained_primary_outage (HTTP 500 x2, typed)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "sha256_16": "0d6f7fd6cab13f27"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 5650,
+   "latency_s": 123.1,
+   "transport_tries": 2,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "sustained_primary_outage (HTTP 500 x2, typed)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {},
+   "sha256_16": "d584bc43b2209144",
+   "findings_disclosed": []
+  }
+ ],
+ "generated_at": "2026-11-16T11:22:20Z"
+}

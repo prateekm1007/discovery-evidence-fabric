@@ -1,0 +1,170 @@
+{
+ "rows": {
+  "HO5-05-gearbox-oil-foaming": {
+   "repairs": 3,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Installation: Standard practice (breather replacement) = 1 hr labor; This intervention =",
+     "- Commissioning: Standard practice = 0.5 hr; This intervention = 0.5 hr (timer setpoint ad",
+     "- Maintenance: Standard practice = 0.5 hr/yr (breather replacement); This intervention = 0",
+     "- Cost: Standard practice = $150 (breather); This intervention = $200 (valve + timer) — sa",
+     "- Operational loss: Zero (duty cycle occurs during low-speed operation, no production impa"
+    ],
+    "ALLOWED_ROW_OUTSIDE": [
+     "added measure 'Standard solenoid valve' shares no allowed-list stem (no gearbox or oil-system redesign; allowed measures: oil level and sump dwell se...)",
+     "added measure 'Standard mechanical timer' shares no allowed-list stem (no gearbox or oil-system redesign; allowed measures: oil level and sump dwell se...)"
+    ],
+    "ALLOWED_MEASURE_TYPE_OUTSIDE": [
+     "physical measure outside the param-exhaustive permitted set | - (b) Standard solenoid valve, 1/4\" NPT, 120 VAC, 0–100 psi (e.g., ASCO Series 2"
+    ]
+   },
+   "chars": 2972,
+   "routes": [
+    "zai_gateway"
+   ],
+   "models": []
+  },
+  "HO5-06-vacuum-furnace-hotzone-sag": {
+   "repairs": 3,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Total burden: Same as standard practice (no new hardware, only software parameter change"
+    ],
+    "ALLOWED_ROW_OUTSIDE": [
+     "added measure 'Standard programmable logic controller' shares no allowed-list stem (no hot-zone replacement; allowed measures: ramp-rate and soak-temperature setpoi...)"
+    ]
+   },
+   "chars": 2413,
+   "routes": [
+    "zai_gateway"
+   ],
+   "models": []
+  },
+  "HO5-07-dryer-drum-trunnion": {
+   "repairs": 3,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- (a1) Existing drive-motor current sensor (ALREADY-RECORDED: \"drive-motor current\").",
+     "- (a2) Existing drum speed encoder (ALREADY-RECORDDED: \"drum speed encoder\").",
+     "- (b1) Real-time FFT module (catalog signal conditioner) to extract 2× speed harmonic from",
+     "- (b2) Threshold comparator (PLC logic) to flag when harmonic amplitude > 0.3A (CALCULATED",
+     "- (c1) Existing process alarm system (ALREADY-RECORDED: \"standard alarm infrastructure\").",
+     "- Installability: SAME (uses existing sensors, no hardware modifications).",
+     "- Operability: SAME (no additional operator training; alarm integrates with existing HMI).",
+     "- Maintenance: SAME (no new consumables; FFT module is solid-state).",
+     "- Cost class: SAME (PLC logic and signal conditioner are standard industrial components).",
+     "- Protocol: Record motor current and drum speed for 30 days under normal operation. Analyz",
+     "- Pass/fail threshold: Alarm triggers if harmonic exceeds 0.3A for ≥5 consecutive days.",
+     "- Duration: 30 days (matches warning requirement).",
+     "- Kill criterion: >1 false alarm (verified against historical data showing noise floor <0.",
+     "- Validation: Threshold derived from CALCULATED torque ripple (0.5A at 1mm clearance) and "
+    ]
+   },
+   "chars": 2949,
+   "routes": [
+    "zai_gateway"
+   ],
+   "models": []
+  },
+  "HO5-08-accumulator-bladder": {
+   "repairs": 3,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Installability: SAME (uses existing sensors, no hardware changes)",
+     "- Operability: SAME (runs continuously in background, no operator intervention)",
+     "- Maintenance: SAME (no calibration; threshold derived from physics)",
+     "- Cost class: SAME (software-only addition, no new hardware)",
+     "- Operational loss: Zero (UNPRICED_OPERATIONAL_LOSS: no downtime penalty)"
+    ]
+   },
+   "chars": 2684,
+   "routes": [
+    "zai_gateway"
+   ],
+   "models": []
+  },
+  "HO5-09-steam-trap-blowthrough": {
+   "repairs": 3,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Trap inlet temperature (ALREADY-RECORDED: \"trap inlet temperature tag\")",
+     "- Trap outlet temperature (ALREADY-RECORDED: \"trap outlet temperature tag\")",
+     "- Condensate header pressure (ALREADY-RECORDED: \"condensate header pressure\")",
+     "- Calculate inlet pressure transient magnitude (ΔP) from header pressure steps.",
+     "- Measure outlet temperature response time (ΔT_out) to ΔP.",
+     "- Compute τ = Δt / ln(ΔP_initial / ΔP_final) for each transient.",
+     "- Installability: SAME (uses existing tags; no new hardware).",
+     "- Operability: SAME (no operator intervention; auto-calculates from existing data).",
+     "- Maintenance: SAME (no moving parts; algorithm runs on existing PLC).",
+     "- Cost: SAME (no new sensors; minor software update)."
+    ]
+   },
+   "chars": 3111,
+   "routes": [
+    "zai_gateway"
+   ],
+   "models": []
+  },
+  "HO5-10-motor-rotor-bar": {
+   "repairs": 3,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Digital signal processor (DSP) module for real-time three-phase stator current sampling ",
+     "- Speed-to-frequency converter (ALREADY-RECORDED: \"drive speed estimate\").",
+     "- Standard industrial DSP firmware (NAMED_VARIANT: generic \"motor protection relay DSP upg",
+     "- Algorithm: Compute negative-sequence current (I₂) from stator current phasors. Calculate",
+     "- Threshold: Δθ ≥ 0.8° (CALCULATED from 5% crack-induced slip increase per IEEE 112, scale",
+     "- Installability: Same as standard practice (software-only upgrade to existing relay) – SA",
+     "- Operability: No additional operator training required; uses existing HMI.",
+     "- Maintenance: Zero added maintenance; threshold derived from physics, not calibration.",
+     "- Cost class: Software-only; no hardware changes. Parity achieved.",
+     "- Protocol: Record stator current and speed during 10% load transients on healthy and crac",
+     "- Instruments: DSP module, oscilloscope (for validation).",
+     "- Pass/fail threshold: Δθ < 0.8° for healthy motors; Δθ ≥ 0.8° for cracked motors.",
+     "- Duration: 1 week (using historical data).",
+     "- Kill criterion: False positive rate > 0.5% (violates \"1 false alarm per 200 motors/year\"",
+     "- Primary indicator: Slip (per failure definition). Secondary indicator: Δθ supplements sl",
+     "- Rationale: Slip defines failure threshold; Δθ provides early warning via crack-induced a",
+     "- Driving variable: Rotor asymmetry (increases with crack growth).",
+     "- Mechanism: Δθ detection flags asymmetry early.",
+     "- Effect: Reduces undetected crack progression by enabling timely intervention."
+    ]
+   },
+   "chars": 2899,
+   "routes": [
+    "zai_gateway"
+   ],
+   "models": []
+  },
+  "HO5-11-dry-gas-seal": {
+   "repairs": 3,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Installability: Same as standard practice (uses existing telemetry ports).",
+     "- Operability: No change (integrated into existing control system).",
+     "- Maintenance: Same (no moving parts; software update only).",
+     "- Cost class: Same (no new hardware; software development only).",
+     "- Operational loss: Zero (early warning prevents trips)."
+    ]
+   },
+   "chars": 2502,
+   "routes": [
+    "zai_gateway"
+   ],
+   "models": []
+  },
+  "HO5-12-gear-pump-volumetric-wear": {
+   "repairs": 1,
+   "residual_findings": {},
+   "chars": 3004,
+   "routes": [
+    "zai_gateway"
+   ],
+   "models": []
+  }
+ },
+ "packet_sha256": "11b46c6fc4e73082f9e085661032b5a5612046959f52b04e3b3143a8a3adffe2",
+ "claim": "r33-holdout-v5-oneshot (c-0034, pre-registered and PUSHED BEFORE any problem read; one-shot/sealed per Art. 29(c): K_GEN=1, one run, resume from committed rows only)",
+ "machine": "frozen V7.6 (V7.4 path + V76 directive + AM29 class-bind + direction-bind in path; budget 3; K_GEN=1)",
+ "acceptance_bar": "auditor mean >=3.0/4 AND 0 allowed-measures violations AND 0 inverted-direction mechanisms"
+}
