@@ -1,0 +1,29 @@
+{
+ "record": "HOLDOUT_V7_PREREGISTRATION/1.0.0",
+ "registered_at": "2026-11-17",
+ "registered_by": "auditor (Claude), loop-owned per Art. 28",
+ "article": "Art. 7 + Art. 6 + the served-model attestation gate",
+ "selection_sha256": "c7b4473c7a55726147be32a62e5cbda0967465bf4ed616f4a6f0cd3fada9f95b",
+ "n_problems": 12,
+ "intervention": 6,
+ "predictor": 6,
+ "custody": "audit/holdout_v7/ (auditor+owner); PRIVATE rubric never to builder/pipeline/judge",
+ "purpose": "ACCEPTANCE test for V7.7. v6 (VALID, attested) scored 64.6% and failed on duty-cycle monoculture, one inverted mechanism and two unavailable-input rows. v7 is designed to test exactly those binds, WITH negative controls.",
+ "MANDATORY_RUN_ARTIFACTS": [
+  "committed gateway-log slice (requested+served per call) covering the run window",
+  "12/12 served_model == registered glm-4-plus attestation, PRE-SCORING",
+  "durable all-row events ledger",
+  "ONE named executor id, claim before any problem read",
+  "green pushed CI read from the check-run API (r41_remote_ci_read.py)"
+ ],
+ "one_shot_protocol": [
+  "1. Builder claims holdout-v7-generation under its own unique id BEFORE any problem read.",
+  "2. Problems ONLY; one generation with the frozen V7.7 machine; commit rows + slice + ledger; peer VERIFIER recomputes from bytes.",
+  "3. Attestation gate runs pre-scoring; VOID/UNPROVABLE runs are never scored.",
+  "4. Auditor scores with the PRIVATE rubric.",
+  "5. BURN; fresh v8 next."
+ ],
+ "ACCEPTANCE_BAR": "mean >= 3.0/4 AND 0 allowed-measures violations AND 0 inverted-direction AND 0 unavailable-input rows AND run_verdict == VALID",
+ "burn_after_use": true,
+ "status": "SEALED_REGISTERED \u2014 builder may claim the one-shot generation"
+}
