@@ -234,3 +234,35 @@ def test_r35_pins_zero_false_positives_on_other_v5_rows():
             if c.get(fam) or d.get(fam):
                 fp.append((pid, fam))
     assert not fp, fp
+
+
+def test_scan_is_deterministic_across_hash_seeds():
+    """R42 determinism pin: the scanner's verdict must not depend on
+    PYTHONHASHSEED. The pre-fix _content_words returned a SET and
+    _object_stems took 'the first six' of it — the HO4-06 verdict
+    flipped run-to-run (reproduced 4/15 and 6/15). The scan now runs
+    in two seeded subprocesses and the verdicts must be IDENTICAL."""
+    import os
+    import subprocess
+    import sys
+
+    probe = (
+        "import json, sys\n"
+        "sys.path.insert(0, 'scripts'); sys.path.insert(0, '.')\n"
+        "from r30_allowed_class_scan import scan_allowed_measures_class\n"
+        "from tests.test_r30_am29_binds import _probs, _answer\n"
+        "r = scan_allowed_measures_class(\n"
+        "    _probs()['HO4-06-ro-silica-scaling'],\n"
+        "    _answer('HO4-06-ro-silica-scaling'))\n"
+        "print(json.dumps(r, sort_keys=True))\n")
+    outs = []
+    for seed in ("0", "1", "7", "12345"):
+        env = dict(os.environ, PYTHONHASHSEED=seed)
+        p = subprocess.run(
+            [sys.executable, "-I", "-c", probe],
+            capture_output=True, text=True, timeout=60, env=env,
+            cwd=str(REPO))
+        assert p.returncode == 0, p.stderr[-300:]
+        outs.append(p.stdout.strip())
+    assert len(set(outs)) == 1, (
+        f"scanner verdict varies with PYTHONHASHSEED: {outs}")

@@ -1,6 +1,6 @@
 {
  "record": "ENFORCEMENT_MAP/2.0.0 (v3.1.0: every article is queue-gated by a passing CI check, or CI-pinned-flagged with the gap typed — no silent gaps; 29/29 articles after the owner-added Art. 29)",
- "at": "AM24 D4 wiring (builder-r25s1): Art. 13 FLAGGED -> WIRED (fresh-problem generalization measured: holdout v2 one-shot generated c-0009, verified c-0010, scored 62.5% by the auditor AM24, burned; builder-side bytes CI-gated via the verifier recompute) — Art. 22 PARTIAL -> WIRED (fresh-held-out half measured; scoring stays auditor-custody per the Art. 4 pinned flag) — Art. 27 PARTIAL -> WIRED (standalone test tests/test_article27_capability_budget.py gates the Art. 27 ledger + the Art. 20 registry recompute) — Art. 4 stays CI-PINNED-FLAGGED by design (auditor-custodied ledger; builder-side gating is forbidden by the audit-branch guard). Map now 28 WIRED / 1 pinned PROCESS = 29/29.",
+ "at": "AM39 F56 wiring (builder-r20s4, c-0056): the R41 guard suites join the zero-LLM CI block and the map — tests/test_remote_ci_rule.py + tests/test_v77_bind_controls.py cited WIRED (Art. 18/6), test_guard_activation cited (Art. 18), Art. 27 PARTIAL->WIRED (stale text corrected; the standalone test gates in CI); map 29/29",
  "article_map": {
   "1": {
    "article": "Evidence & provenance",
@@ -36,7 +36,10 @@
   "6": {
    "article": "Anti-gaming",
    "status": "WIRED",
-   "mechanism": "tests/test_attack_ab_qualifier.py + tests/test_answer_contract_adversarial.py"
+   "mechanism": "tests/test_attack_ab_qualifier.py + tests/test_answer_contract_adversarial.py + tests/test_v77_bind_controls.py (AM39 F56 wiring, c-0056: the V7 bind negative controls — pricing/diversity/direction — gate every queue push)",
+   "tests": [
+    "tests/test_v77_bind_controls.py"
+   ]
   },
   "7": {
    "article": "Viewport, repo & artifact",
@@ -109,9 +112,11 @@
   "18": {
    "article": "Durable execution & push",
    "status": "WIRED",
-   "mechanism": "the queue workflow triggers on every queue/** push with full checkout and runs the enforcement surface — queue-gated [tests/test_article_process_wiring.py]",
+   "mechanism": "the queue workflow triggers on every queue/** push with full checkout and runs the enforcement surface — queue-gated [tests/test_article_process_wiring.py] + tests/test_remote_ci_rule.py (the D2 remote-green rule: no round claims green without the API-read check-run conclusion) + tests/test_guard_activation.py (AM39 F56 wiring, c-0056)",
    "tests": [
-    "tests/test_article_process_wiring.py"
+    "tests/test_article_process_wiring.py",
+    "tests/test_remote_ci_rule.py",
+    "tests/test_guard_activation.py"
    ]
   },
   "19": {
@@ -159,8 +164,8 @@
   },
   "27": {
    "article": "Capability budget",
-   "status": "PARTIAL",
-   "mechanism": "engine-diff accounting in every round status record (Art. 27 sections); no standalone CI test asserts the ledger schema yet — flagged, wiring queued"
+   "status": "WIRED",
+   "mechanism": "tests/test_article27_capability_budget.py gates the Art. 27 ledger schema on every round record from r16 on + the Art. 20 registry recompute (c-0050 completed the ledger r30..r39; the map text is corrected from the stale PARTIAL note — the standalone test has existed and run in the queue CI since c-0050)"
   },
   "28": {
    "article": "Owner-dependency timeout & escalation",

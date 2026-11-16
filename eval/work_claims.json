@@ -57,6 +57,11 @@
    "registered_at": "2026-11-16T18:38:00Z (sandbox clock)",
    "role": "builder",
    "note": "R41 guard-integrity lane (session 3 of the r20 lineage): the auditor's R40b verdict D1-D5 — the red-CI fix (the r40 record's missing Art. 27 ledger field), the remote-conclusion hard rule, the pricing/diversity negative controls, the driver-class lexicon semantics, the direction-LLM verdict derivation. Identity registered at first push per Art. 29(a)."
+  },
+  "builder-r20s4": {
+   "registered_at": "2026-11-17T10:05:00Z (sandbox clock)",
+   "role": "builder",
+   "note": "R42 lane: F56 CI wiring (c-0056) + the holdout-v7 one-shot generation (c-0057, the auditor's AM39 D2; claim registered BEFORE any v7 problem read; the PRIVATE rubric is never opened by this session). Identity at first push per Art. 29(a)."
   }
  },
  "claims": [
@@ -1111,7 +1116,7 @@
    "claim_id": "c-0055",
    "work_id": "r41-guard-integrity-round",
    "title": "R40b verdict response: red-CI fix (the r40 record's missing Art. 27 ledger field) + the remote-conclusion hard rule + negative controls for the pricing/diversity binds + driver-class lexicon semantics + the direction-LLM verdict/reason derivation",
-   "status": "OPEN",
+   "status": "DONE",
    "registered_at": "2026-11-16T18:31:00Z (sandbox clock)",
    "session": "builder-r20s3",
    "scope": "GUARD-INTEGRITY round (the auditor's R40b verdict D1-D5; D6 honored: NO v7 run — the v7 claim waits for the sealed packet and green CI). (1) D1: the pushed queue CI at 6fab59a41 is FAILURE on test_article27_capability_budget::test_every_round_from_r16_carries_the_art27_ledger — eval/r40_status.json lacks art27_capability_budget (the field became mandatory forward-only when the peer's c-0050 completed the ledger for r30..r39; the R40 record was committed under the old schema and regressed the gate). Fix: the field added to the r40 record with honest BUILD-round values; nothing else in the historical record is touched (Art. 4). (2) D2: the hard rule becomes code — scripts/r41_remote_ci_read.py reads the check-run conclusion for a pushed SHA from the GitHub API (token by NAME from the vault, never a value in a log) and emits the {pushed_sha, remote_ci_conclusion, read_at} block; a new test asserts every round record from r40 on carries pushed_sha + remote_ci_conclusion (a local-only green is a typed defect). The round-closing procedure runs the API read AFTER the final push and BEFORE the report. (3) D3: tests/test_v77_bind_controls.py — negative controls for the pricing bind (>=3 rows: a quantified in-prose cost, an OPERATIONAL COST line, a duty-cycle mention confined to the falsification-test span) and the diversity cap (6 distinct classes; a 2-shared set with a distinct third; a same-class-but-under-cap histogram), 0 false positives, with the positive pins retained (HO6-03 unpriced fires; a synthetic unpriced duty cycle fires; a 3rd row of one class fires; a missing declaration fires). (4) D4: the lexicon leg moves from wordforms to driver-class semantics: 'cyclone' is excluded from the thermal-cycling class (the FCC failure's DEVICE noun is not cycling), the charge-discharge class requires the charge/discharge-cycling PAIRING (a 'charge-sensing threshold' is a measurement, not a cycling action); OR-mapping (lexicon OR typed-LLM) preserved and pinned; HO6-02 stays caught by the LLM leg. (5) D5: the direction-LLM verdict is DERIVED IN CODE from structured sign fields (driver_sign vs ingredient_sign: SAME->INVERTED, OPPOSITE->CORRECT, UNSTATED->UNCLEAR) and the model's own label is advisory — a label/derivation disagreement types DIVERGENT (fail-open, disclosed) with a pin; the reason is assembled from the fields so verdict and reason cannot diverge structurally. Re-validation: the retrospective fire-test re-runs over the committed v6 rows (zero regeneration) and the mapping 4/4 must hold with the wordform firings suppressed. Art. 27: no capability number claimed — guard-integrity only; the next measured delta comes from the v7 run after the auditor seals the packet.",
@@ -1132,7 +1137,53 @@
     "eval/r40_v77_firetest.json",
     "LOG.md",
     "eval/work_claims.json"
-   ]
+   ],
+   "outcome": "EXECUTION-COMPLETE-PENDING-VERIFICATION -> VERIFIED: the auditor's R42 (AM39/V37) verified c-0055 on every deterministic leg — CI SUCCESS API-read at b408b03e4/1cfd42621 with 6fab59a41 FAILURE preserved; D3/D4/D5 recomputed zero-LLM 10/10 control legs; glm-4-plus pinned; r41_status valid JSON + honest remote_ci + art27 ledger (capability NONE); c-0054 first live refusal credited; secret-grep 0; v6 byte-frozen; registry lawful. F56 (the guards were ungated) is this session's to close: c-0056.",
+   "verifier": "eval/r42_verifier_c0055.json — VERIFIED (AM39/V37, auditor-r42s1): all legs pass; gate NOT_MET stands (v6 64.6%); capability change NONE."
+  },
+  {
+   "claim_id": "c-0056",
+   "work_id": "f56-wire-guards-into-ci",
+   "title": "F56 fix: wire tests/test_remote_ci_rule.py + tests/test_v77_bind_controls.py into the queue zero-LLM CI block and cite them WIRED in the enforcement map; refusal path proven in-suite",
+   "status": "OPEN",
+   "registered_at": "2026-11-17T10:05:00Z (sandbox clock)",
+   "session_id": "builder-r20s4",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "b408b03e4",
+   "claimed_at": "2026-11-17T10:05:00Z (sandbox clock)",
+   "lease_expiry": "2026-11-17T18:00:00Z",
+   "artifact_paths": [
+    ".github/workflows/r11_queue_surface.yml",
+    "eval/enforcement_flags.json",
+    "tests/test_remote_ci_rule.py",
+    "eval/work_claims.json",
+    "LOG.md"
+   ],
+   "scope": "AM39 F56 (the 7th exists-but-does-not-gate instance): both R41 guard suites join the zero-LLM pytest block of .github/workflows/r11_queue_surface.yml and are cited WIRED in eval/enforcement_flags.json (Art. 18 / Art. 6); test_guard_activation gains its map citation (same class, already CI-gated by c-0053); the Art. 27 map text is corrected from stale PARTIAL to WIRED (the standalone test has gated since c-0050). Refusal path: _validate_remote_ci is the single validator; four negative tests prove deliberately broken records (no block / fake conclusion / unquoted success / partial success) RED the suite. Acceptance per AM39: both files in workflow + map; test_article_map_completeness green; pushed surface=SUCCESS API-read with check_runs quoted."
+  },
+  {
+   "claim_id": "c-0057",
+   "work_id": "holdout-v7-generation",
+   "title": "the holdout-v7 one-shot: ONE generation of the frozen V7.7 machine over the auditor's 12 sealed problems (seal c7b4473c…), registered BEFORE any problem read",
+   "status": "OPEN",
+   "registered_at": "2026-11-17T10:05:00Z (sandbox clock)",
+   "session_id": "builder-r20s4",
+   "role": "EXECUTOR",
+   "kind": "one_shot",
+   "executor_id": "builder-r20s4@holdout-v7-generation",
+   "base_sha": "b408b03e4",
+   "claimed_at": "2026-11-17T10:05:00Z (sandbox clock)",
+   "lease_expiry": "2026-11-17T22:00:00Z",
+   "artifact_paths": [
+    "eval/v7_run/",
+    "eval/v7_run/v7_run_ledger.json",
+    "eval/v7_run/v7_events_ledger.json",
+    "eval/v7_run/v7_serving_attestation.json",
+    "eval/v7_run/gateway_log_slice.txt"
+   ],
+   "pre_registration_note": "Art. 29(b) + the v7 PREREGISTRATION one_shot_protocol step 1: this claim is committed and pushed BEFORE any v7 problem is read. The problems come ONLY from audit/holdout_v7/holdout_v7_problems.json (seal c7b4473c7a55726147be32a62e5cbda0967465bf4ed616f4a6f0cd3fada9f95b); the PRIVATE rubric is never read by this session; ONE generation, frozen V7.7 (V77_REQUEST_MODEL=glm-4-plus), zero re-generation; the attestation gate runs PRE-SCORING.",
+   "scope": "Per audit/holdout_v7/PREREGISTRATION.json (SEALED_REGISTERED, AM39 D2): generate bills for the 12 sealed problems (6 intervention + 6 predictor) with the frozen V7.7 machine; commit 12 pair rows + the gateway-log slice (requested+served per call over the run window) + the durable all-row events ledger + the run ledger (run_verdict, seal_anchor, serving_evidence_full); attestation gate PRE-SCORING: 12/12 served_model == registered glm-4-plus, seal recompute EXACT, ONE executor id, green pushed CI read from the check-run API. BURN is the post-scoring act (prereg step 5 follows step 4 scoring) — not this session's."
   }
  ],
  "trailer_violations": [

@@ -196,8 +196,13 @@ def _stem(w: str) -> str:
     return w[:6]
 
 
-def _content_words(text: str) -> set:
-    return {w for w in re.findall(r"[a-zA-Z]{4,}", text)}
+def _content_words(text: str) -> list:
+    # ORDERED list (text order), not a set: _object_stems takes "the
+    # first six content words", and a set's iteration order varies
+    # with PYTHONHASHSEED — the scanner's verdict flipped run-to-run
+    # (reproduced 4/15 and 6/15 on HO4-06 before this fix; the
+    # membership-only call sites below are unaffected by the change)
+    return re.findall(r"[a-zA-Z]{4,}", text)
 
 
 def _object_stems(row: str) -> set:
