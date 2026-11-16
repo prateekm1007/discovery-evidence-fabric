@@ -1,0 +1,165 @@
+{
+ "eval_version": "holdout-v6-rubric",
+ "PRIVATE": "auditor and owner only; never given to the builder, the pipeline, or the automated judge",
+ "problems_selection_sha256": "4d60488a581897b9b7452158158049e65656c26ac58ea7e611236047a9aab804",
+ "scoring": "per problem 0-4: question answered; key_elements covered; ALLOWED-MEASURES / existing-sensor constraint fit; numbers with labelled assumptions; testable falsifier; red-flag penalties. DIRECTION correctness is the auditor's read (the machine only enforces presence).",
+ "ACCEPTANCE_BAR": "mean >= 3.0/4 AND 0 allowed-measures violations AND 0 inverted-direction mechanisms AND run_verdict == VALID (12/12 served_model == registered) with a COMMITTED gateway-log slice",
+ "rubrics": [
+  {
+   "problem_id": "HO6-01-membrane-anode-coating",
+   "tier": "K",
+   "key_elements": [
+    "coating dissolution/passivation driven by brine impurities and local acidity as driver",
+    "brine purity/pH retuning, current-density scheduling, or temperature setpoint",
+    "cell-voltage and O2-in-Cl2 trend vs coating-life target"
+   ],
+   "red_flags": [
+    "recoats or replaces the anode",
+    "ignores brine quality"
+   ]
+  },
+  {
+   "problem_id": "HO6-02-caster-mould-taper",
+   "tier": "K",
+   "key_elements": [
+    "face wear changing effective taper and shell support as driver",
+    "taper/oscillation retuning, powder selection, or cooling-water setpoint",
+    "mould profile measurement + breakout/crack rate vs target"
+   ],
+   "red_flags": [
+    "replaces the mould",
+    "ignores effective taper"
+   ]
+  },
+  {
+   "problem_id": "HO6-03-fcc-cyclone-erosion",
+   "tier": "K",
+   "key_elements": [
+    "particle velocity and loading driving erosive wear as driver",
+    "circulation/fines setpoint, atomisation steam, or velocity/pressure-balance retuning",
+    "catalyst loss rate + wall-thickness survey vs run-length target"
+   ],
+   "red_flags": [
+    "replaces cyclones or lining",
+    "ignores particle velocity"
+   ]
+  },
+  {
+   "problem_id": "HO6-04-gis-spacer-charge",
+   "tier": "K",
+   "key_elements": [
+    "charge accumulation at the gas-solid interface under DC stress as driver",
+    "voltage ramp/polarity procedure, gas pressure/moisture setpoint, or conditioning energisation",
+    "surface-charge/flashover withstand testing vs the withstand criterion"
+   ],
+   "red_flags": [
+    "replaces the spacer or changes the gas",
+    "ignores DC charge accumulation"
+   ]
+  },
+  {
+   "problem_id": "HO6-05-stenter-chain-carbonisation",
+   "tier": "K",
+   "key_elements": [
+    "thermal-oxidative carbonisation of the lubricant at pin temperatures as driver",
+    "high-temperature lubricant selection + dose/interval, speed/dwell-temperature setpoint, or cleaning interval",
+    "chain drag/torque trend + pin deposit inspection vs fault rate"
+   ],
+   "red_flags": [
+    "replaces the chain",
+    "ignores pin temperature exposure"
+   ]
+  },
+  {
+   "problem_id": "HO6-06-h2-compressor-valve",
+   "tier": "K",
+   "key_elements": [
+    "cyclic plate impact plus hydrogen-embrittled fatigue as driver",
+    "pressure-ratio/unloader scheduling, gas drying/temperature setpoint, or inspection interval",
+    "valve leakage/temperature trend + teardown crack inspection vs life target"
+   ],
+   "red_flags": [
+    "changes valve material or design",
+    "ignores hydrogen embrittlement"
+   ]
+  },
+  {
+   "problem_id": "HO6-07-yaw-drive-gear",
+   "tier": "K",
+   "key_elements": [
+    "per-slew current signature + encoder backlash/position-error feature vs the turbine's own baseline",
+    "persistence and relative threshold",
+    "retrospective validation vs yaw gear inspection/grease records"
+   ],
+   "red_flags": [
+    "new sensors",
+    "fixed fleet-wide absolute threshold"
+   ]
+  },
+  {
+   "problem_id": "HO6-08-mine-hoist-brake",
+   "tier": "K",
+   "key_elements": [
+    "release-pressure/position-timing feature normalised to load and duty, vs the hoist's own baseline",
+    "persistence and relative threshold",
+    "validation vs statutory brake tests and pad-change records"
+   ],
+   "red_flags": [
+    "new sensors",
+    "ignores load/duty normalisation"
+   ]
+  },
+  {
+   "problem_id": "HO6-09-check-ring-wear",
+   "tier": "K",
+   "key_elements": [
+    "cushion-loss / pressure-transfer feature at the injection-to-hold transition, normalised to shot size and viscosity, per machine baseline",
+    "persistence and relative threshold",
+    "validation vs shot-weight logs and check-ring teardown"
+   ],
+   "red_flags": [
+    "new sensors",
+    "ignores shot-size/viscosity normalisation"
+   ]
+  },
+  {
+   "problem_id": "HO6-10-coldbox-blockage",
+   "tier": "K",
+   "key_elements": [
+    "local temperature-profile pinch plus dP rise normalised to flow, with the pre-purifier analyser as a corroborating signal",
+    "persistence and relative threshold vs the post-defrost clean baseline",
+    "validation vs defrost records and analyser breakthrough logs"
+   ],
+   "red_flags": [
+    "new sensors",
+    "fixed absolute dP limit ignoring flow"
+   ]
+  },
+  {
+   "problem_id": "HO6-11-turbocharger-fouling",
+   "tier": "K",
+   "key_elements": [
+    "load- and ambient-normalised scavenge-pressure/temperature-ratio deviation vs the post-clean baseline",
+    "persistence and relative threshold",
+    "validation vs turbocharger water-wash/teardown records"
+   ],
+   "red_flags": [
+    "new sensors",
+    "ignores load/ambient normalisation"
+   ]
+  },
+  {
+   "problem_id": "HO6-12-dhx-scaling",
+   "tier": "K",
+   "key_elements": [
+    "flow-normalised overall U / effectiveness trend vs the post-clean baseline, with a temperature-ratio cross-check",
+    "persistence and relative threshold",
+    "validation vs chemical-clean records and approach-temperature logs"
+   ],
+   "red_flags": [
+    "new sensors",
+    "ignores flow normalisation"
+   ]
+  }
+ ]
+}
