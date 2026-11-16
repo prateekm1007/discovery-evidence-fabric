@@ -73,7 +73,9 @@ def main() -> int:
     packet_sha = hashlib.sha256(PACKET.read_bytes()).hexdigest()
     packet = json.loads(PACKET.read_text(encoding="utf-8"))
     rows = packet.get("rows") or packet.get("problems") or []
-    probs = {r["problem_id"]: r["problem"] for r in rows}
+    # the v5 packet is FLAT (problem fields at row level); the dev
+    # packet nested them under "problem" — accept both shapes
+    probs = {r["problem_id"]: (r.get("problem") or r) for r in rows}
     print(f"[v5-oneshot] packet sha256_16={packet_sha[:16]} "
           f"problems={len(probs)} (claim: {CLAIM})", flush=True)
 
