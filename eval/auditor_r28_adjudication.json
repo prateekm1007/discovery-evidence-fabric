@@ -1,0 +1,222 @@
+{
+ "record": "AUDITOR_R28_ADJUDICATION/1.0.0",
+ "audited_commit": "d8ee3be062da174d7d2b8265e483e15a3c5a854f",
+ "at": "2026-11-16",
+ "auditor": "session auditor (Claude)",
+ "scope": "AM26 D2 tolerance ruling + auditor re-judgment of all 18 intervention rows of the r27 judge packet (V7 frozen + V7.1 tuned), read from bytes",
+ "machine_crosscheck": {
+  "n": 18,
+  "novelty": 2.389,
+  "novelty_ci": [
+   1.41,
+   3.367
+  ],
+  "feasibility_gap": 1.889,
+  "feasibility_ci": [
+   1.32,
+   2.458
+  ]
+ },
+ "auditor_rejudgment": {
+  "novelty_delta_mean": 2.444,
+  "feasibility_gap_mean": 0.556,
+  "feasibility_ci95": [
+   0.249,
+   0.862
+  ]
+ },
+ "tolerance_ruling": {
+  "verdict": "MACHINE FEASIBILITY READ REJECTED AS UNCALIBRATED; AUDITOR READ GOVERNS WITH SELF-CORRECTIONS",
+  "basis": "machine assigns F_A=1 (infeasible) to pure firmware/procedure changes on existing hardware (bench-p10 inverter duty cycle via catalog timer relay; dev-fu-005 install cycling; eval-new05 BMS schedule; eval-sofc-redox gas sequencing). Procurable by construction; F_A=1 indefensible against the bill bytes.",
+  "rows_diverging_ge2": [
+   "bench-p01-pemfc-dehydration",
+   "bench-p04-pump-cavitation",
+   "bench-p06-water-biofilm",
+   "bench-p10-pv-pid",
+   "bench-p11-spindle-thermal-drift",
+   "dev-fu-005-bridge-bearing",
+   "eval-new05-liion-balance-drift",
+   "eval-sofc-redox"
+  ],
+  "auditor_self_corrections": [
+   "bench-p06: AM26 pilot scored gap 0; dead-end main has no second supply path so flow reversal premise is flawed -> corrected to gap 2. The machine caught what the auditor missed.",
+   "bench-p01: gap 1 upheld after re-read; machine's 4 rejected"
+  ],
+  "machine_credit": "novelty CONFIRMED (machine 2.389 vs auditor 2.444, within 0.06); machine correctly flagged bench-p06",
+  "disposition": "machine judge stays a CROSS-CHECK INPUT (Art. XXVI); its feasibility axis is uncalibrated for procedure-class interventions and must not drive the gate"
+ },
+ "gate_read": {
+  "novelty_clause": "PASS (2.444)",
+  "feasibility_clause": "FAIL (0.556, CI [0.249,0.862] > 0.25)",
+  "state": "NOT_MET",
+  "note": "closest yet on the full 18-row set; residual = 7 rows at gap 1 (surface treatments, bonded interfaces, added sensor channel, graded co-firing) + bench-p06 at gap 2"
+ },
+ "new_findings": [
+  "F38: bench-p10 PV-PID 8h-on/4h-off duty cycle = ~33% daily energy curtailment, unpriced in the burden ledger; novelty real, operational cost hidden (constraint-fit defect)",
+  "F39: machine judge feasibility axis uncalibrated for procedure-class interventions (F_A=1 for firmware/procedure changes on existing hardware)"
+ ],
+ "per_row": [
+  {
+   "problem_id": "bench-p01-pemfc-dehydration",
+   "novelty_delta": 3,
+   "a1_feasibility": 3,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 1,
+   "rationale": "hydrophilic membrane water-recovery: catalog-class membrane humidifier but anode-side integration/water balance unproven",
+   "machine_feasibility_abs_gap": 4
+  },
+  {
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "novelty_delta": 2,
+   "a1_feasibility": 4,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 0,
+   "rationale": "duty-cycle firmware + catalog resistor/relay: procurable procedure change",
+   "machine_feasibility_abs_gap": 1
+  },
+  {
+   "problem_id": "bench-p03-phe-biofouling",
+   "novelty_delta": 2,
+   "a1_feasibility": 4,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 0,
+   "rationale": "3-way valve + PLC + schedule: catalog parts, sound shear mechanism",
+   "machine_feasibility_abs_gap": 1
+  },
+  {
+   "problem_id": "bench-p04-pump-cavitation",
+   "novelty_delta": 3,
+   "a1_feasibility": 3,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 1,
+   "rationale": "micro-roughened leading edge: procurable surface treatment, cavitation-suppression effect unproven",
+   "machine_feasibility_abs_gap": 3
+  },
+  {
+   "problem_id": "bench-p05-bridge-bearing-aging",
+   "novelty_delta": 3,
+   "a1_feasibility": 4,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 0,
+   "rationale": "bilayer NR+EPDM commercial sheets on existing bonding jig; interface durability unproven",
+   "machine_feasibility_abs_gap": 1
+  },
+  {
+   "problem_id": "bench-p06-water-biofilm",
+   "novelty_delta": 1,
+   "a1_feasibility": 2,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 2,
+   "rationale": "PREMISE FLAW: dead-end main has no second supply path, cannot reverse flow; auditor AM26 missed this, machine caught it",
+   "machine_feasibility_abs_gap": 4
+  },
+  {
+   "problem_id": "bench-p07-cgm-biofouling",
+   "novelty_delta": 2,
+   "a1_feasibility": 4,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 0,
+   "rationale": "firmware anodic sweep on existing electrodes + catalog boost converter",
+   "machine_feasibility_abs_gap": 1
+  },
+  {
+   "problem_id": "bench-p08-mems-stiction",
+   "novelty_delta": 3,
+   "a1_feasibility": 3,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 1,
+   "rationale": "micro-dimple texture: laser texturing serviceable but MEMS comb process development",
+   "machine_feasibility_abs_gap": 1
+  },
+  {
+   "problem_id": "bench-p09-packaging-barrier",
+   "novelty_delta": 3,
+   "a1_feasibility": 3,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 1,
+   "rationale": "hydrophilic silica interlayer: catalog silica but food-contact lamination/migration compliance dev",
+   "machine_feasibility_abs_gap": 2
+  },
+  {
+   "problem_id": "bench-p10-pv-pid",
+   "novelty_delta": 2,
+   "a1_feasibility": 4,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 0,
+   "rationale": "existing inverter + catalog timer relay + firmware duty cycle: procurable; BUT 8h-on/4h-off = ~33% daily curtailment unpriced (F38)",
+   "machine_feasibility_abs_gap": 4
+  },
+  {
+   "problem_id": "bench-p11-spindle-thermal-drift",
+   "novelty_delta": 3,
+   "a1_feasibility": 3,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 1,
+   "rationale": "aluminium sleeve bonded to steel shaft: catalog materials, CTE bond risk is design detail",
+   "machine_feasibility_abs_gap": 3
+  },
+  {
+   "problem_id": "bench-p12-mbr-fouling",
+   "novelty_delta": 2,
+   "a1_feasibility": 4,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 0,
+   "rationale": "periodic reverse-flow pulse on existing pumps/valves; backpulse established class",
+   "machine_feasibility_abs_gap": 0
+  },
+  {
+   "problem_id": "dev-fu-005-bridge-bearing",
+   "novelty_delta": 2,
+   "a1_feasibility": 4,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 0,
+   "rationale": "multi-stage stress-relief cycling at install: pure procedure, no parts",
+   "machine_feasibility_abs_gap": 2
+  },
+  {
+   "problem_id": "eval-new01-supercap-dryout",
+   "novelty_delta": 3,
+   "a1_feasibility": 3,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 1,
+   "rationale": "hydrophilic silica packet: catalog desiccant but solvent-selective reabsorption unproven",
+   "machine_feasibility_abs_gap": 1
+  },
+  {
+   "problem_id": "eval-new03-insulin-pump-occlusion",
+   "novelty_delta": 3,
+   "a1_feasibility": 3,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 1,
+   "rationale": "dual-channel differential pressure: adds sensor channel, medical device hardware+regulatory dev",
+   "machine_feasibility_abs_gap": 1
+  },
+  {
+   "problem_id": "eval-new05-liion-balance-drift",
+   "novelty_delta": 2,
+   "a1_feasibility": 4,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 0,
+   "rationale": "thermal-aware balancing schedule: BMS firmware, no hardware",
+   "machine_feasibility_abs_gap": 2
+  },
+  {
+   "problem_id": "eval-sofc-redox",
+   "novelty_delta": 2,
+   "a1_feasibility": 4,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 0,
+   "rationale": "humidified-N2 gas sequencing on existing manifold: procedure change",
+   "machine_feasibility_abs_gap": 2
+  },
+  {
+   "problem_id": "eval-sofc-thermal-cycling",
+   "novelty_delta": 3,
+   "a1_feasibility": 3,
+   "baseline_feasibility": 4,
+   "feasibility_abs_gap": 1,
+   "rationale": "graded/bilayer glass-phase seal: catalog-class compositions, graded co-firing is process dev",
+   "machine_feasibility_abs_gap": 1
+  }
+ ]
+}
