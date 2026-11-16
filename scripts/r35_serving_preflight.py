@@ -7,14 +7,14 @@ exact requested_model the frozen machine uses, then reads SERVED model
 identity from (a) the HTTP response's `model` field and (b) the
 committed-pattern gateway call log (requested_model vs model).
 
-Decision rule (typed into the round record):
-  served == registered (zai-org/GLM-5.3) -> verified window; the v6
-      one-shot MAY burn the seal;
-  served != registered -> STRUCTURAL substitution (the z-ai grant
-      serves its single embedded model regardless of requested id,
-      per the R458-C1 disclosure in zai_gateway.mjs) -> the one-shot
-      would be born-VOID: the seal is NOT burned; typed infra block +
-      registration escalation instead (Art. 15 / Art. 3).
+Decision rule (typed into the round record; R38 D4 pin, see
+compute_verdict):
+  served == registered == log_served -> VERIFIED window; the v6
+      one-shot MAY burn the seal (with the seal-anchor test green);
+  upstream call failed (429/5xx)    -> AVAILABILITY_BLOCK — identity
+      NOT measurable; NOT a substitution;
+  answered with a different model   -> SUBSTITUTION — the one-shot
+      would be born-VOID: the seal is NOT burned (Art. 15 / Art. 3).
 """
 from __future__ import annotations
 
@@ -39,6 +39,26 @@ from r11_a1f_v3_generate import start_gateway  # noqa: E402
 REGISTERED = "glm-4-plus"
 GW = "http://127.0.0.1:8787/v1/chat/completions"
 LOG = Path(os.environ["ZAI_GATEWAY_LOG"])
+
+
+def compute_verdict(served, log_served, registered):
+    """R38 D4 pin: the three-way typed classification, PURE so the
+    test pins it —
+      VERIFIED           served == registered AND log agrees;
+      AVAILABILITY_BLOCK the upstream call failed (429/5xx/timeout):
+                         identity NOT measurable; NOT a substitution;
+      SUBSTITUTION       a call ANSWERED with a different model than
+                         requested (served or log != registered).
+    (The R36 round's conflation of a failed call with substitution is
+    retired; the auditor confirmed the distinction, AM34/35 §4.)"""
+    if served == registered and log_served == registered:
+        return "VERIFIED — served == registered"
+    if served is None:
+        return ("AVAILABILITY_BLOCK — the upstream call failed "
+                "(see transport_error_body); identity not measurable "
+                "this window")
+    return ("SUBSTITUTION — the transport cannot serve the "
+            "registered model")
 
 
 def main() -> int:
@@ -83,15 +103,7 @@ def main() -> int:
                     d.get("status") == "OK":
                 last = d
         log_served = (last or {}).get("model")
-        if served == REGISTERED and log_served == REGISTERED:
-            verdict = "VERIFIED — served == registered"
-        elif served is None:
-            verdict = ("AVAILABILITY_BLOCK — the upstream call failed "
-                       "(see transport_error_body); identity not "
-                       "measurable this window")
-        else:
-            verdict = ("SUBSTITUTION — the transport cannot serve the "
-                       "registered model")
+        verdict = compute_verdict(served, log_served, REGISTERED)
         out = {
             "record": "V6_SERVING_PREFLIGHT/1.0.0",
             "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -108,13 +120,18 @@ def main() -> int:
                                 "verbatim, never rewritten",
             "latency_s": round(latency, 1),
             "verdict": verdict,
-            # R36: the seal ALSO requires the custody anchor to verify
-            # (pre-registration selection_sha256 vs the sealed problems
-            # bytes — see eval/v6_seal_custody_break.json: currently
-            # UNANCHORED). A verified window alone does not burn.
+            # R38 (F50 supersession): the seal anchor is VERIFIED —
+            # selection_sha256 is the canonical-tuple hash, recomputed
+            # EXACTLY by BOTH sides (recipe: eval/
+            # seal_anchor_verification_recipe.json; executable check:
+            # tests/test_seal_anchor.py, run before any burn). The
+            # R36 custody-break record is superseded forward-only.
+            # The burn now requires ONLY: this window VERIFIED + the
+            # seal-anchor test green.
             "seal_decision": (
-                "WINDOW OPEN — the seal burns ONLY when the v6 custody "
-                "anchor verifies (see eval/v6_seal_custody_break.json)"
+                "WINDOW OPEN — burn is gated on the seal-anchor test "
+                "(tests/test_seal_anchor.py) being green; anchor "
+                "VERIFIED per F50"
                 if verdict.startswith("VERIFIED") else
                 "DO NOT BURN — window closed (Art. 3/15)"),
         }

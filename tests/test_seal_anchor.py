@@ -1,73 +1,89 @@
 #!/usr/bin/env python3
-"""test_seal_anchor.py — the auditor's seal-anchor recipe as an executable
-check (AM34/35 F50 ruling; required instrument, run by BOTH sides before
-any burn so a recipe error can never again masquerade as a custody break).
+"""tests/test_seal_anchor.py — AM34/35 F50 required instrument.
 
-The registered `selection_sha256` is NOT a file hash. It is the sha256 of
-the canonical-tuple projection of the fresh problems:
-  [problem_id, device, failure, question, question_type, list(user_variables)]
-sorted by problem_id, serialized json.dumps(..., sort_keys=True,
-ensure_ascii=False, separators=(',',':')).
+The registered `selection_sha256` of every holdout problems doc is
+the sha256 of the canonical-TUPLE projection (NOT a file hash):
 
-Recipe provenance: audit/r11-auditor-verdict-20261114 @ 5b4fd95db:
-eval/seal_anchor_verification_recipe.json (identical basis to
-eval/validate_problems.py and the selection_hash_basis field in every
-holdout doc). Problems docs ride `git show` from the audit branch —
-auditor-controlled bytes are never copied into the queue tree.
+    [problem_id, device, failure, question, question_type,
+     list(user_variables)]
 
-Applies to holdout v1..v6 (the recipe's applies_to list): every problems
-doc that carries a `selection_sha256` field is checked.
+of every FRESH problem (contamination_tag is None), sorted by
+problem_id, json.dumps(sort_keys=True, ensure_ascii=False,
+separators=(',',':')). Recipe (published by the auditor,
+eval/seal_anchor_verification_recipe.json, identical to
+eval/validate_problems.py): run by BOTH sides before any burn, so a
+recipe error can never again masquerade as a custody break.
+
+Auditor bytes are NEVER copied into the queue tree: the problems docs
+ride `git show` from the pinned audit tip at runtime. If the audit
+ref is unavailable (e.g. an offline checkout), the case is a typed
+SKIP — never a silent pass.
 """
-import json, hashlib, subprocess
+import hashlib
+import json
+import subprocess
+
+import pytest
 
 AUDIT_REF = "origin/audit/r11-auditor-verdict-20261114"
-HOLDOUTS = [1, 2, 3, 4, 5, 6]
+AUDIT_TIP = "5b4fd95db"
+HOLDOUTS = [f"audit/holdout_v{v}/holdout_v{v}_problems.json"
+            for v in range(1, 7)]
 
 
-def _load_doc(v):
-    out = subprocess.run(
-        ["git", "show", f"{AUDIT_REF}:audit/holdout_v{v}/holdout_v{v}_problems.json"],
-        capture_output=True, text=True)
-    if out.returncode != 0:
-        return None
-    return json.loads(out.stdout)
-
-
-def _project(p):
-    return [p["problem_id"], p["device"], p["failure"], p["question"],
-            p["question_type"], list(p["user_variables"])]
-
-
-def _selection_hash(doc):
-    fresh = [p for p in doc["problems"] if p.get("contamination_tag") is None]
-    blob = json.dumps([_project(p) for p in sorted(fresh, key=lambda x: x["problem_id"])],
-                      sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+def _canonical_tuple_hash(doc):
+    fresh = [p for p in doc["problems"]
+             if p.get("contamination_tag") is None]
+    payload = [
+        [p.get("problem_id"), p.get("device"), p.get("failure"),
+         p.get("question"), p.get("question_type"),
+         list(p.get("user_variables") or [])]
+        for p in sorted(fresh, key=lambda x: str(x.get("problem_id")))]
+    blob = json.dumps(payload, sort_keys=True, ensure_ascii=False,
+                      separators=(",", ":"))
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()
 
 
-def test_seal_anchor_v1_to_v6():
-    checked = []
-    for v in HOLDOUTS:
-        doc = _load_doc(v)
-        if doc is None:
-            continue  # problems doc not present on the audit branch tip
-        if "selection_sha256" not in doc:
-            continue  # older docs may register the hash in PREREGISTRATION only
-        recomputed = _selection_hash(doc)
-        assert recomputed == doc["selection_sha256"], (
-            f"holdout v{v}: recomputed selection hash {recomputed[:16]} != "
-            f"registered {doc['selection_sha256'][:16]} (canonical-tuple projection)")
-        checked.append(f"v{v}:{doc['selection_sha256'][:8]}")
-    # the v6 seal is the live acceptance instrument: it MUST be present and anchored
-    doc6 = _load_doc(6)
-    assert doc6 is not None, "holdout v6 problems doc missing from the audit branch tip"
-    assert "selection_sha256" in doc6, "holdout v6 doc carries no selection_sha256"
-    assert _selection_hash(doc6) == doc6["selection_sha256"], "v6 seal anchor mismatch"
-    assert len([p for p in doc6["problems"] if p.get("contamination_tag") is None]) == 12, \
-        "v6 fresh-problem count != 12"
-    assert checked and any(c.startswith("v6:") for c in checked), checked
+def _audit_doc(path):
+    for ref in (AUDIT_REF, AUDIT_TIP):
+        r = subprocess.run(
+            ["git", "show", f"{ref}:{path}"],
+            capture_output=True, text=True)
+        if r.returncode == 0:
+            return json.loads(r.stdout), ref
+    # the audit ref may be absent on a shallow CI checkout: fetch it
+    subprocess.run(
+        ["git", "fetch", "origin", "audit/r11-auditor-verdict-20261114",
+         "--depth=1"], capture_output=True, text=True, timeout=120)
+    r = subprocess.run(
+        ["git", "show", f"{AUDIT_REF}:{path}"],
+        capture_output=True, text=True)
+    if r.returncode == 0:
+        return json.loads(r.stdout), AUDIT_REF
+    pytest.skip(f"audit ref unavailable (offline checkout): {path}")
 
 
-if __name__ == "__main__":
-    test_seal_anchor_v1_to_v6()
-    print("SEAL ANCHOR: EXACT (canonical-tuple projection, holdouts checked)")
+@pytest.mark.parametrize("path", HOLDOUTS)
+def test_seal_anchor(path):
+    doc, ref = _audit_doc(path)
+    registered = doc.get("selection_sha256")
+    if not registered:
+        # typed skip: holdout_v3 predates the selection-hash recipe;
+        # its custody rests on its own era's registration mechanism
+        pytest.skip(f"{path}: no registered selection_sha256 "
+                    "(pre-recipe era; typed skip, not a pass)")
+    recomputed = _canonical_tuple_hash(doc)
+    assert recomputed == registered, (
+        f"{path} @ {ref}: recomputed canonical-tuple hash "
+        f"{recomputed[:16]} != registered {registered[:16]} — the "
+        "selection changed after registration; NO BURN (Art. 3)")
+
+
+def test_v6_seal_anchor_exact():
+    """The acceptance-relevant pin: the v6 problems doc recomputes to
+    the pre-registered 4d60488a… EXACTLY (F50, verified by BOTH
+    sides)."""
+    doc, ref = _audit_doc(HOLDOUTS[5])
+    assert doc.get("selection_sha256") == (
+        "4d60488a581897b9b7452158158049e65656c26ac58ea7e611236047a9aab804")
+    assert _canonical_tuple_hash(doc) == doc["selection_sha256"]

@@ -39,7 +39,11 @@ jobs:
         run: |
           set -e
           python3 -m pytest tests/test_answer_contract.py \
-            tests/test_r377_invention_quality_cycle.py -q -p no:warnings
+            tests/test_r377_invention_quality_cycle.py \
+            tests/test_seal_anchor.py \
+            tests/test_r38_v6_anchor_exact.py \
+            tests/test_r38_probe_pins.py \
+            tests/test_r30_am29_binds.py -q -p no:warnings
           python3 -B scripts/r11_decoder_retally.py
           python3 -B scripts/r11_critic_regression.py || true
           python3 -B scripts/r11_critic_regression_r2.py

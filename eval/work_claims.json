@@ -771,7 +771,7 @@
     "one executor id (builder-r20s2, ratified per F49)"
    ],
    "notes": "AM33 D1. GATING PRECONDITION BEFORE THE SEAL BURNS: an infra serving pre-flight (NOT problem-adjacent, no seal exposure) must verify the gateway actually SERVES the registered model for requested zai-org/GLM-5.3 — the gateway log shows 311/311 historical GLM-5.3 requests served glm-4-plus, so without a verified window the one-shot would be born-VOID and will NOT be taken (typed infra block, Art. 15, escalation instead). Rows commit as produced; peer VERIFIER recomputes from bytes; auditor scores with the PRIVATE rubric.",
-   "precondition_state": "TWO typed blockers: (1) serving window AVAILABILITY_BLOCK (z-ai upstream HTTP 429 since 11-16 13:28Z, reproduced across rounds; identity RESOLVED by the registration ruling — machine now requests glm-4-plus); (2) custody anchor UNANCHORED (the pre-registration's selection_sha256 4d60488a… matches no committed bytes; the sealed problems file is cb4e984a…, one commit, byte-stable — eval/v6_seal_custody_break.json). Seal INTACT, problems UNREAD. Fires when BOTH verify; each is a one-command check.",
+   "precondition_state": "ONE typed blocker: the serving window AVAILABILITY_BLOCK (z-ai upstream HTTP 429, reproduced across R36-R38 via the gateway and the direct CLI; re-verify with ONE command: scripts/r35_serving_preflight.py). The custody blocker is CLEARED per F50: selection_sha256 is the canonical-tuple hash, recomputed EXACTLY by both sides (tests/test_seal_anchor.py green). Seal INTACT, problems UNREAD. The run fires the moment the window verifies.",
    "coordination_lesson": "the precondition probe was executed by BOTH sessions under two claims (c-0038 note + c-0040) — shared-precondition work must carry its own work_id (F25 class, zero-loss instance; reconciled in rebase without artifact loss)"
   },
   {
@@ -870,6 +870,26 @@
     "the canonical c-0026 route (crowllm/qwen-3.8-max:free) is NOT touched by this measurement"
    ],
    "notes": "R-JUDGE (AM34/35, auditor act granted): a fresh calibration of the RETIRED deepseek-v4-flash:free rung under the v3 axis suffix — >=0.8 accuracy on the 10-specimen gold corpus (4 GOOD / 6 BAD with per-specimen expect criteria: BAD feasibility-class F_A<=1, BAD constraint-class C_A<=1, GOOD survive + numeric floors) makes it an ELIGIBLE judge rung; below 0.8 it STAYS RETIRED. The canonical c-0026 judge remains crowllm/qwen-3.8-max:free — this measurement does NOT touch it (no route swap; the deepseek rung is evaluated exactly because the auditor granted it). Specimens ride git-show from their source commits (gold bytes never copied); a1 answers judged at position A with the real baseline at B where available and a typed single-answer mode for G03 (no baseline in the record); criteria parsed mechanically from the expect strings. Zero generator calls. Art. 27: NO CAPABILITY CHANGE (an eligibility measurement of a judge rung; no engine or scoring-path change)."
+  },
+  {
+   "claim_id": "c-0044",
+   "work_id": "r38-deepseek-rung-qualification-c0026",
+   "session_id": "builder-r20s2",
+   "role": "EXECUTOR",
+   "kind": "judge-rung eligibility measurement (R-JUDGE auditor act; concurrent INDEPENDENT execution — see race disclosure)",
+   "base_sha": "f85d0dbbf",
+   "claimed_at": "2026-11-16T14:35:00Z",
+   "status": "EXECUTION-COMPLETE-PENDING-VERIFICATION",
+   "takes_over": null,
+   "pre_registration": null,
+   "mandatory_artifacts": [
+    "typed record eval/deepseek_rung_qualification_r38.json (stages 1-3, gold accuracy, answered share, eligibility)",
+    "qualification script scripts/r38_deepseek_qualification.py (transport-aware interpretation: eligibility requires accuracy >=0.8 AND answered share >=0.9)",
+    "the canonical c-0026 route (crowllm/qwen-3.8-max:free) is NOT touched by this measurement"
+   ],
+   "notes": "RACE DISCLOSURE: this claim was filed in-flight as 'c-0043' while the peer's c-0043 (r36-deepseek-rung-gold-calibration, builder-r35s1, OPEN) was being pushed concurrently; the peer's claim landed on the remote FIRST and keeps the id — this entry is renumbered c-0044 on rebase. The execution COMPLETED (record committed) BEFORE the peer's claim was visible in this tree; both measurements stand as independent readings of the same instrument and the auditor rules on any acceptance implication. Protocol note: this run used the engine's own 30-pair gold corpus through run_judge_calibration (the r11 requalification precedent); the peer's c-0043 uses the 10-specimen gold corpus with per-specimen expect criteria — different instruments for the same ruling, both kept. This session takes NO further work on the item either way (mutex honored going forward).",
+   "outcome": "typed INCONCLUSIVE_TRANSPORT: stages 1-2 PASS (tiny OK; JUDGE_VALID on the 11292-char REAL packet prompt under the v3 axis suffix); stage 3 gold accuracy 0.333 with answered share 0.367 (11/30 pairs answered; 19/30 exhausted the 3-try ladder on a sustained 429/503 pool flap and count WRONG per Art. XXV; accuracy-on-answered 0.909 but the sample is too small) — inconclusive, rung eligibility unresolved; disclosed post-run interpretation correction in the record. The c-0026 deepseek drivers (interventions via the UNEDITED r29 harness with OUT/PARTIAL reassigned; predictors via a sibling) are committed and gated on the qualification.",
+   "acceptance": "gold >=0.8 for the rung used; c-0026 on the qualified rung: within +/-1 of the auditor on >=16/18 interventions AND >=10/12 predictors"
   }
  ],
  "trailer_violations": [

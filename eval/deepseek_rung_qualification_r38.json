@@ -1,0 +1,47 @@
+{
+ "record": "DEEPSEEK_RUNG_QUALIFICATION_R38/1.0.0",
+ "at": "2026-11-16T14:42:52.442105+00:00",
+ "claim": "c-0043 (builder-r20s2, base f85d0dbbf)",
+ "authorization": "R-JUDGE (AM34/35 \u00a73): fresh calibration of the RETIRED deepseek-v4-flash:free rung under the v3 axis suffix; >=0.8 gold makes it ELIGIBLE; below 0.8 it stays retired",
+ "route": {
+  "provider": "crowllm",
+  "model": "deepseek-v4-flash:free"
+ },
+ "stages": {
+  "1_capability_probe": {
+   "tiny_status": "OK",
+   "content_chars": 2,
+   "error": "",
+   "latency_s": 3.1
+  },
+  "2_full_length_gate_v3": {
+   "problem_id": "bench-p01-pemfc-dehydration",
+   "prompt_chars": 11292,
+   "axis_suffix": "v3 (calibrated F pins)",
+   "outcome": "JUDGE_VALID",
+   "valid_rubric_json": true,
+   "latency_s": 12.6
+  },
+  "3_gold_calibration_engine": {
+   "calibrated": false,
+   "passed": false,
+   "n_pairs": 30,
+   "n_valid": 11,
+   "correct": 10,
+   "accuracy": 0.333,
+   "threshold": 0.8,
+   "answered_rate": 0.367,
+   "error_classes": {
+    "HTTP_503_UPSTREAM": 17,
+    "HTTP_429_THROTTLED": 1,
+    "HTTP_500_UPSTREAM": 1
+   },
+   "wall_s": 1831.1,
+   "answered_share": 0.367,
+   "accuracy_on_answered": 0.909
+  }
+ },
+ "gate": "INCONCLUSIVE_TRANSPORT",
+ "verdict": "TRANSPORT-DEGRADED gold run: only 11/30 pairs answered (19 pairs transport-failed the full 3-try ladder on a sustained 429/503 pool flap and count WRONG per Art. XXV). INCONCLUSIVE \u2014 NOT a capability retirement: accuracy-on-answered is 0.909 but the sample is too small; the rung's RETIRED status is unchanged and its ELIGIBILITY is unresolved this window. Retry the gold run when the pool stabilizes (the committed script now types this case automatically); the pre-registered qwen route remains the judge for c-0026 (its intervention axis stands 15/18 NOT MET).",
+ "interpretation_note": "POST-RUN CORRECTION (disclosed): the executing process carried the pre-patch verdict logic and typed 'BELOW 0.8 \u2014 STAYS RETIRED'; the committed script (r38_deepseek_qualification.py) now types this exact case INCONCLUSIVE_TRANSPORT; this record's verdict line was corrected to the transport-aware reading with ALL raw numbers preserved (accuracy 0.333, correct 10/30, valid 11/30, wall 1831.1s). The D4 lesson applied: availability must never masquerade as capability."
+}

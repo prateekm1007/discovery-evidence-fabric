@@ -1,0 +1,39 @@
+{
+ "record": "R38_STATUS/1.0.0",
+ "session": "builder-r20s2",
+ "at": "2026-11-16T15:25:00Z (sandbox clock)",
+ "builder_base": "f85d0dbbf",
+ "audited_tip": "audit/r11-auditor-verdict-20261114 @ 5b4fd95db (AM34+AM35 read in full; recipe + predictor anchors read in full)",
+ "f50_custody_withdrawal": "ACCEPTED and executed. The recipe was verified INDEPENDENTLY before wiring: the canonical-tuple projection [problem_id, device, failure, question, question_type, list(user_variables)], sorted by problem_id, recomputes 4d60488a… EXACTLY from the committed sealed bytes (file sha cb4e984a… confirmed byte-identical to the auditor's stated 16,991 bytes). The R36 custody-break record is superseded FORWARD-ONLY (status field added; original bytes preserved verbatim — eval/v6_seal_custody_break.json). The probe script's stale 'UNANCHORED' notes are corrected; c-0038's precondition is now the SINGLE 429 window blocker.",
+ "d1_seal_anchor_instrument": {
+  "wired": "the auditor's recipe as an executable check over ALL SIX holdout docs — implemented INDEPENDENTLY by BOTH sessions in-flight; the PEER's file (tests/test_seal_anchor.py, pushed first) is the committed instrument and stands; this session's variant was resolved onto it on rebase (add/add conflict, theirs kept per first-executor discipline) and its extra value survives as tests/test_r38_v6_anchor_exact.py (the v6 EXACT 4d60488a… pin + the extracted builder-tree copy's byte-identity custody check)",
+  "result": "31 passed + 1 typed skip across the four suites (seal anchor, v6 exact pin, probe pins, AM29 binds); wired into the queue-push CI's zero-LLM block (which had NOT carried the AM29 bind suite; added) — BOTH-SIDES gate: the auditor runs the same recipe on their side before any burn",
+  "no_burn_rule": "the v6 one-shot driver now REFUSES to generate unless the seal-anchor check passes AND a fresh VERIFIED window probe exists"
+ },
+ "d4_probe_pins": {
+  "wired": "the probe's verdict logic extracted into a PURE function (compute_verdict in scripts/r35_serving_preflight.py) and pinned by tests/test_r38_probe_pins.py (6 cases): failed upstream call (429/5xx) => AVAILABILITY_BLOCK, never SUBSTITUTION; answered-with-different-model => SUBSTITUTION; log-disagreement => SUBSTITUTION; stale-log + failed live call => AVAILABILITY_BLOCK",
+  "result": "6/6 green"
+ },
+ "d2_deepseek_rung_qualification": {
+  "claim": "c-0044 (builder-r20s2; RENumbered from the in-flight c-0043 after the peer's c-0043 landed first on the remote — race disclosure in the claim)",
+  "stage_1_capability_probe": "PASS (tiny call OK — the rung IS servable this window, confirming the auditor's 200 observation)",
+  "stage_2_full_length_gate_v3": "PASS on retry (JUDGE_VALID, complete rubric JSON, 11,292-char REAL packet prompt under the v3 axis suffix; first attempt hit a 429->503 flap — the free pool bursts)",
+  "stage_3_gold_calibration": "COMPLETED transport-degraded: 30.5 min wall, accuracy 0.333 (10/30) with only 11/30 pairs answering — 19 pairs transport-failed the full 3-try ladder on the sustained 429/503 pool flap (answered share 0.367; accuracy-on-answered 0.909 but the sample is too small). TYPED INCONCLUSIVE_TRANSPORT — NOT a capability retirement; the rung's RETIRED status is unchanged and its ELIGIBILITY is unresolved this window (disclosed post-run interpretation correction in the record; the script now types this case automatically)",
+  "transport_guard": "a TRANSPORT-degraded gold run is typed INCONCLUSIVE_TRANSPORT — never a capability retirement (the D4 lesson applied: pairs that exhaust the ladder count WRONG, so a flapping pool would tank accuracy for availability reasons); eligibility requires accuracy >=0.8 AND answered share >=0.9",
+  "c0026_on_qualified_rung": "NOT RUN this window — the qualification gate did not land ELIGIBLE (transport-degraded); both drivers are committed and gated on it (interventions via the UNEDITED r29 harness with OUT/PARTIAL reassigned so the committed qwen record is never written; predictors via a sibling importing the harness functions, anchors riding git show 015340a3c). The qwen predictor axis stays the peer's c-0042; the qwen intervention axis stands 15/18 NOT MET — c-0026 acceptance fails this round either way",
+  "acceptance": "gold >=0.8 for the rung used; within +/-1 of the auditor on >=16/18 interventions AND >=10/12 predictors"
+ },
+ "d3_v6_one_shot": {
+  "window": "STILL CLOSED — HTTP 429 reproduced this round (gateway probe + direct CLI); typed AVAILABILITY_BLOCK (the D4 distinction held: the R36-era conflation is retired)",
+  "pre_staged": "the burn is now TWO commands when the window opens: scripts/r38_v6_extract_problems.py (problems ONLY, anchor-checked) then scripts/r38_holdout_v6_oneshot.py (frozen V7.6, K_GEN=1, seal-anchor gate + FRESH-window gate + committed gateway-log slice + durable events ledger + pre-scoring attestation vs glm-4-plus, fail-closed). The extracted packet is committed with its sha256 for custody (v5 precedent, Art. 1) — byte-identical to the sealed bytes",
+  "safety": "the driver refuses to fire on a closed window (a row committed with transport-failed attempts could never be re-drawn — the skip logic would freeze the damage); this closes the last auto-burn hazard",
+  "acceptance": "run_verdict == VALID (12/12 served glm-4-plus) + slice + ledger + one executor; auditor scoring pending"
+ },
+ "art27_verdict": "NO CAPABILITY CHANGE — instrumentation, pins, pre-staging and measurements only; the machine contract is byte-unchanged",
+ "peer_mutex": "MUTEX EVENT typed: the peer's sandbox recovered mid-round and pushed three commits while this session was in flight — c-0042 EXECUTED (the qwen predictor axis measured: 11/12 within +/-1, predictor clause MET in isolation; combined with the 15/18 intervention axis the c-0026 bar stays NOT MET overall), 6f5ded572 wired their seal-anchor test, and c-0043 CLAIMED the deepseek gold calibration (OPEN) — which this session had already executed in flight. Resolution on rebase: the peer keeps the claim id and their seal-anchor file; this session's execution is renumbered c-0044 (EXECUTION-COMPLETE-PENDING-VERIFICATION) with the full race disclosure; no further work on the item either way; the auditor rules on any acceptance implication of the two independent gold instruments",
+ "next_steps": [
+  "owner/infra: the z-ai upstream 429 window is the ONLY blocker on the acceptance run (F45 rotation stays the owner's account-level prerogative)",
+  "auditor: run tests/test_seal_anchor.py on the audit side (the both-sides gate) before the burn",
+  "builder: fire the pre-staged two-command burn on the first VERIFIED window; run the c-0026 deepseek measurement if the gold gate lands ELIGIBLE"
+ ]
+}
