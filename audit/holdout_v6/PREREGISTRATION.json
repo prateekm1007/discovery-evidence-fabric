@@ -1,0 +1,28 @@
+{
+ "record": "HOLDOUT_V6_PREREGISTRATION/1.0.0",
+ "registered_at": "2026-11-17",
+ "registered_by": "auditor (Claude), loop-owned per Art. 28",
+ "article": "Art. 7 sealed instruments + Art. 6 held-out acceptance + the R34 served-model attestation gate",
+ "selection_sha256": "4d60488a581897b9b7452158158049e65656c26ac58ea7e611236047a9aab804",
+ "n_problems": 12,
+ "intervention": 6,
+ "predictor": 6,
+ "custody": "audit/holdout_v6/ (auditor+owner); PRIVATE rubric never to builder/pipeline/judge",
+ "purpose": "ACCEPTANCE test for the frozen V7.6 machine with BOTH AM29 binds AND the R34 served-model attestation gate in the generation path. v5 was VOID (model substitution: 30x glm-4-plus for requested GLM-5.3) AND twice-generated (identity collision).",
+ "MANDATORY_RUN_ARTIFACTS": [
+  "a COMMITTED gateway-log slice covering the run window, carrying requested_model AND served_model per call (the local log is gitignored with zero run-day entries \u2014 that custody gap voids a run)",
+  "per-row served-model attestation: 12/12 served_model == the registered model, else run_verdict=VOID and acceptance_eligible=false",
+  "a durable append-per-fire events ledger covering ALL 12 rows (restart-safe)",
+  "one generation only, by ONE named executor session (Art. 29 identity; the R33 collision came from two sandboxes sharing one id)"
+ ],
+ "one_shot_protocol": [
+  "1. Builder claims holdout-v6-generation (EXECUTOR) under its OWN unique session id BEFORE any problem read.",
+  "2. Receives problems ONLY; generates ONCE with the frozen V7.6 machine; commits rows + gateway-log slice + events ledger; peer VERIFIER recomputes from bytes.",
+  "3. Attestation gate runs PRE-SCORING; VOID runs are never scored for acceptance.",
+  "4. Auditor scores with the PRIVATE rubric.",
+  "5. BURN (becomes DEV); fresh v7 for the next attempt."
+ ],
+ "ACCEPTANCE_BAR": "mean >= 3.0/4 AND 0 allowed-measures violations AND 0 inverted-direction mechanisms AND run_verdict == VALID",
+ "burn_after_use": true,
+ "status": "SEALED_REGISTERED \u2014 builder may claim the one-shot generation"
+}
