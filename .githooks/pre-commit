@@ -23,3 +23,22 @@ if git diff --cached -U0 --no-color |
   echo "pre-commit: CONFLICT MARKERS found in the staged diff — commit refused (F53/AM36 D3; resolve the merge or use --no-verify and disclose it in the commit message)" >&2
   exit 1
 fi
+
+# R40b (c-0054): every STAGED *.json must parse — the R40 round record
+# landed as INVALID JSON (Python-literal style) because the R39b
+# per-commit JSON-validation lesson was session-local discipline and
+# did not bind the other session (the F32/F52/F53 class, 5th
+# instance). Validating the INDEX version (git show :file) so the
+# check reads exactly what would be committed. --no-verify is the
+# typed escape and must be disclosed in the commit message.
+status=0
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  if ! git show ":$f" | python3 -m json.tool >/dev/null 2>&1; then
+    echo "pre-commit: $f is not valid JSON — commit refused (c-0054; fix the record or use --no-verify and disclose it in the commit message)" >&2
+    status=1
+  fi
+done <<EOF
+$(git diff --cached --name-only --diff-filter=ACMR -- '*.json')
+EOF
+[ "$status" -eq 0 ] || exit 1
