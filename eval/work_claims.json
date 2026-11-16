@@ -746,6 +746,39 @@
     "eval/r34_c0035_verification.json"
    ],
    "notes": "VERIFIER of the c-0035 execution (AM32 D1 gate + D3 ledger + D2 burn/v6 records + D5 correction). Determinism: both instruments re-run in a throwaway worktree reproduce BYTE-EQUAL to the committed records (attestation VOID 0/12 canonical + 0/12 duplicate; ledger recompute 12/12 EXACT). Independent recompute of the backfilled ledger vs row files: 12/12 exact. Findings (typed, forward-only): V1 the attestation instrument CRASHES on a fresh clone (FileNotFoundError on the gitignored gateway log — their container happened to hold the file; a fresh clone does not; one-line existence guard proposed, executor-side); V2 the log DOES correlate per-attempt (content_sha256[:16] == attempts[].sha256_16, 39/39) — the v6 committed-slice requirement should name this as the attestation basis; V3 registry schema violations (c-0034/c-0035 statuses, c-0035 kind) remediated in this commit; V4 the gate fires end-of-run (satisfies AM32 pre-scoring; a stop-the-line variant would save quota on substituted runs); V5 custody gap confirmed — the run-day log survives HERE and corroborates the committed tier-2 summary exactly (30x glm-4-plus). Engine bytes untouched (ad0432bbd..HEAD discovery_fabric/ = empty). Zero LLM calls."
+  },
+  {
+   "claim_id": "c-0038",
+   "work_id": "holdout-v6-generation",
+   "session_id": "builder-r20s2",
+   "role": "EXECUTOR",
+   "kind": "sealed-one-shot (Art. 29(c): exactly ONE generation, K_GEN=1)",
+   "base_sha": "3b76866aa",
+   "claimed_at": "2026-11-17T02:20:00Z",
+   "lease_expiry": "2026-11-17T14:00:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "pre_registration": "audit/holdout_v6/PREREGISTRATION.json (selection_sha256 4d60488a581897b9b7452158158049e65656c26ac58ea7e611236047a9aab804); problems-only receipt — the PRIVATE rubric is never read by builder/pipeline/judge",
+   "mandatory_artifacts": [
+    "committed gateway-log slice with requested_model + served_model per call",
+    "12/12 served == zai-org/GLM-5.3 attestation pre-scoring",
+    "durable append-per-fire events ledger, all 12 rows",
+    "one executor id (builder-r20s2, ratified per F49)"
+   ],
+   "notes": "AM33 D1. GATING PRECONDITION BEFORE THE SEAL BURNS: an infra serving pre-flight (NOT problem-adjacent, no seal exposure) must verify the gateway actually SERVES the registered model for requested zai-org/GLM-5.3 — the gateway log shows 311/311 historical GLM-5.3 requests served glm-4-plus, so without a verified window the one-shot would be born-VOID and will NOT be taken (typed infra block, Art. 15, escalation instead). Rows commit as produced; peer VERIFIER recomputes from bytes; auditor scores with the PRIVATE rubric."
+  },
+  {
+   "claim_id": "c-0039",
+   "work_id": "r35-instrument-pins-c0026",
+   "session_id": "builder-r20s2",
+   "role": "EXECUTOR",
+   "kind": "instrument-fix-and-recalibration",
+   "base_sha": "3b76866aa",
+   "claimed_at": "2026-11-17T02:20:00Z",
+   "lease_expiry": "2026-11-17T14:00:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "notes": "AM33 D2+D3+D4. (D2) constraint-fit pin: a machine-side check that fires on the committed HO5-05 solenoid-valve bytes (actuation device dressed as a maintenance procedure) and joins the type gate so v6 cannot pass an actuation-as-procedure measure. (D3) arithmetic direction check: sign/integral test that fires on the committed HO5-06 bytes (holds ADD time-at-temperature while claiming to cut the creep integral); domain-only direction cases stay typed for the auditor. (D4) c-0026 recalibration on the now-live CROWLLM_API_KEY (vault custody confirmed): feasibility within +/-1 of the auditor on >=16/18 interventions; no judge-route swap; failures never cached (Art. 26). Art. 27: instruments only, NO CAPABILITY CHANGE."
   }
  ],
  "trailer_violations": [
