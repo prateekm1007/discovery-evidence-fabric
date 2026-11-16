@@ -40,6 +40,8 @@ import sys
 import time
 from pathlib import Path
 
+import fcntl  # noqa: E402 — cron-safe single-fire lock (R32)
+
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "scripts"))
@@ -153,6 +155,13 @@ def machine_generate_v76(prob: dict, gw_key: str):
         if tg["verdict"] == "MISMATCH":
             problems.append(tg["reason"])
         problems += findings
+        if not (final or "").strip():
+            # typed machine guard (R32): an EMPTY answer must never
+            # complete — the transport fallback chain raises before
+            # this point in the normal path, so reaching here with
+            # empty content is a machine-path defect, not a transport
+            # one; force the repair loop / residual disclosure.
+            problems.append("EMPTY_ANSWER_TRANSPORT")
         att = {"stage": ("draft" if rep == 0 else f"repair_{rep}"),
                "chars": len(final), "latency_s": round(lat, 1),
                "transport_tries": tries,
@@ -198,6 +207,14 @@ def _intervention_ids() -> list:
 
 
 def main() -> int:
+    lock_path = REPO / "eval" / ".r30_v76_battery.lock"
+    lock_fh = open(lock_path, "w")
+    try:
+        fcntl.flock(lock_fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        print("[v76] another fire holds the lease (lock held) — exit 0",
+              flush=True)
+        return 0
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     probs = _prob_map()
     gw, gw_key = start_gateway()
