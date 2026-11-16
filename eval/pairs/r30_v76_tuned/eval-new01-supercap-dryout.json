@@ -1,0 +1,169 @@
+{
+ "problem_id": "eval-new01-supercap-dryout",
+ "a1_source": "SYS_A1_INT_V72+V76/r30_v76_directive",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)  \n**Proposed intervention:** Insert a two-layer thermal interface stack — a thin pyrolytic graphite sheet (25 µm) for in-plane heat spreading followed by a silicone thermal pad (0.5 mm) for compliant contact — between the supercapacitor module base and its existing mounting bracket, using the existing bolt pattern and torque procedure.  \n\n**Standard practice:** Automotive supercapacitor modules typically rely on natural convection and a minimal thermal interface (e.g., thermal grease or a single thin pad) at the mounting surface; no dedicated in-plane spreading layer is used.  \n\n**Our departure:** The novelty is the **arrangement** — adding a high-conductivity graphite sheet *beneath* the module to laterally spread heat across the full bracket footprint before it crosses the compliant pad, thereby reducing the module’s steady-state temperature without active cooling or module redesign.  \n\n**Adjacent-technique clearance:** The closest existing mitigation is a single thermal pad or grease (standard in power electronics). Our mechanism differs by inserting a *spreading layer* that exploits the bracket’s larger area, moving the thermal bottleneck from the module-to-bracket interface to the bracket-to-chassis path (which has lower resistance).  \n\n**Failure physics attack:** Electrolyte dry-out is driven by Arrhenius-rate solvent evaporation and seal permeation; the driving variable is the **module internal temperature**. The graphite-plus-pad stack lowers that temperature by reducing the thermal resistance from cell stack to chassis, directly slowing the evaporation/permeation kinetics.\n\nPHYSICS CHECK  \n**Governing relation:** Evaporation/permeation rate ∝ exp(−Eₐ/RT_module). A reduction ΔT in T_module yields a rate reduction factor ≈ exp[(Eₐ/R)(1/T₁ − 1/T₂)]. For typical Eₐ ≈ 80 kJ/mol, a 10 °C drop from 85 °C to 75 °C (358 K → 348 K) gives factor ≈ exp[80000/8.314 × (1/348 − 1/358)] ≈ 0.5 — i.e., the dry-out rate halves.  \n\n**Magnitude verification:** The graphite sheet (κ_in-plane ≈ 1500 W/m·K, 25 µm) spreads heat over ~10× the module footprint; the silicone pad (κ ≈ 3 W/m·K, 0.5 mm) adds <0.2 K/W contact resistance. Combined stack thermal resistance ≈ 0.3 K/W vs. ~1.5 K/W for grease-only. At 5 W self-heating (typical for stop-start pulses), ΔT ≈ 6 °C lower module temperature. This yields ~2× life extension, sufficient to meet the 10% capacitance loss target at 10 years/65 °C ambient.  \n\n**DIRECTION-OF-EFFECT:** driving variable = module internal temperature; the mechanism moves it **down** by ~6–10 °C via reduced thermal resistance to chassis; this **reduces** the failure driver (Arrhenius evaporation/permeation rate).\n\nIMPLEMENTATION BILL  \n| # | Item (generic class) | Source tag | Where it attaches / parameter set |\n|---|----------------------|------------|-----------------------------------|\n| 1 | Pyrolytic graphite sheet, 25 µm thick, in-plane κ ≥ 1500 W/m·K, commercial grade | (b) | Placed flat on the module’s base plate (entire footprint), oriented with in-plane axes parallel to bracket plane. |\n| 2 | Silicone thermal interface pad, 0.5 mm thick, κ ≥ 3 W/m·K, commercial grade | (b) | Placed on top of graphite sheet, same footprint; compressed by existing mounting bolts. |\n| 3 | Existing mounting bracket and bolts (stated infrastructure) | (a) | Unchanged; bolts torqued to OEM specification (procedure per service manual). |\n| 4 | Installation procedure: clean module base and bracket faces with isopropyl alcohol; lay graphite sheet, then silicone pad; align module; torque bolts in cross pattern to spec. | (c) | Performed during module assembly or service; no new tools. |\n\n*Total added stack height = 0.525 mm ≤ 1 mm budget.*\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n| Aspect | Standard practice (grease or single pad) | This intervention | Burden comparison |\n|--------|------------------------------------------|-------------------|-------------------|\n| Parts procurement | Thermal grease (tube) or one pad (catalog) | Two catalog sheets (graphite + pad) — both off-the-shelf, same vendor class | Same procurement class; slightly higher part count but both are stock line items. |\n| Installation labor | Apply grease (messy, variable) or place one pad | Place two pre-cut sheets (clean, repeatable) | **Lower** labor variability; no curing/wipe step. |\n| Tooling | None | None | Identical. |\n| Added height | ~0.1 mm (grease) or 0.5 mm (pad) | 0.525 mm | Within same 1 mm envelope; no redesign of bracket or module. |\n| Operational loss | None | None (passive, no duty cycle change) | Zero. |\n| Maintenance | Re-grease if serviced | Replace both sheets if module removed (same interval) | Same service class. |\n\n**Conclusion:** Same-or-lower burden class. The only added cost is a second catalog sheet (~$0.50–$1.00 per module), offset by faster, cleaner assembly.\n\nEXECUTABLE TEST  \n**Protocol:** Accelerated life test per ISO 16750-4 (temperature/humidity cycling) with electrical load profile mimicking stop-start.  \n- **Samples:** 10 modules with intervention, 10 control modules (identical, grease-only interface).  \n- **Conditions:** 65 °C ambient, 2.7 V/cell constant voltage, 12 V module; 10 s 300 A pulse every 30 s (cold-crank simulation), 8 h/day, 365 days/year equivalent. Accelerate by raising ambient to 85 °C (Arrhenius factor ~4×) for 2.5 years equivalent = 2190 h.  \n- **Measurements:** Capacitance (1 kHz) and ESR (1 kHz) every 200 h.  \n- **Pass/fail threshold:** At 2190 h (10-year equivalent), **mean capacitance loss ≤ 10%** for intervention group; control group expected >15% loss.  \n- **Kill criterion:** If any intervention module exceeds 10% loss before 1500 h, the mechanism is falsified.  \n- **Instruments:** Standard LCR meter (1 kHz, 1 V rms), thermal chamber, programmable load — all existing in validation lab.  \n- **Duration:** 2190 h continuous (≈ 3 months).  \n\nThis test directly validates the intervention’s effectiveness on the failure metric (capacitance loss) under the stated constraints.",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'adding' in: **our departure:** the novelty is the **arrangement** — adding a high-conductivity graphite sheet *beneath* th",
+    "excluded stem 'height' in: |\n\n*total added stack height = 0.525 mm ≤ 1 mm budget.*\n\nburden ledger (standard-practice parity)  \n| aspect |",
+    "excluded stem 'height' in: |\n| added height | ~0.1 mm (grease) or 0.5 mm (pad) | 0.525 mm | within same 1 mm envelope; no redesign of bra",
+    "excluded stem 'module' in: novelty statement (intervention)  \n**proposed intervention:** insert a two-layer thermal interface stack — a t"
+   ]
+  }
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 4313,
+   "latency_s": 133.0,
+   "transport_tries": 1,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'height' in: magnitude verified by arrhenius extrapolation (ea ≈ 0.7 ev) from accelerated 85 °c data.\n\nimplementation bill ",
+     "excluded stem 'module' in: quad‑rings are standard in hydraulic sealing but have not been adopted in supercapacitor modules; ffkm is used",
+     "excluded stem 'module' in: magnitude verified by arrhenius extrapolation (ea ≈ 0.7 ev) from accelerated 85 °c data.\n\nimplementation bill ",
+     "excluded stem 'modules' in: quad‑rings are standard in hydraulic sealing but have not been adopted in supercapacitor modules; ffkm is used"
+    ],
+    "NAMED_VARIANT": [
+     "model/brand-marker: AS568 | | 1 | Standard FKM O‑ring (AS568‑XXX, 70 Shore A) | (a) — stated existing infras",
+     "model/brand-marker: AS568 | | 2 | FFKM quad‑ring (AS568‑XXX, 75 Shore A, perfluoroelastomer) | (b) — procura"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "sha256_16": "6d443764b6228558"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 4922,
+   "latency_s": 179.2,
+   "transport_tries": 2,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'adding' in: novelty statement (intervention)  \nwe propose adding a passive phase‑change material (pcm) thermal buffer to t",
+     "excluded stem 'module' in: novelty statement (intervention)  \nwe propose adding a passive phase‑change material (pcm) thermal buffer to t",
+     "excluded stem 'module' in: our mitigation installs a commercial paraffin‑based pcm pack (melting point 60 °c) between the module and its ",
+     "excluded stem 'module' in: adjacent‑technique clearance: pcm thermal buffers are standard catalog items in lithium‑ion ev battery packs ("
+    ],
+    "NAMED_VARIANT": [
+     "variant-marker: bespoke | All parts are used as‑sold; no custom machining, custom process recipes, custom‑"
+    ],
+    "STANDARD_BILL": [
+     "CUSTOM_MACHINING: machining/machined work: All parts are used as‑sold; no custom machining, custom process recipes, custom‑compounded materials, or bespoke calibration.",
+     "BESPOKE_COMPONENT: bespoke/custom-made component: All parts are used as‑sold; no custom machining, custom process recipes, custom‑compounded materials, or bespoke calibration.",
+     "CUSTOM_RECIPE: custom recipe/process: All parts are used as‑sold; no custom machining, custom process recipes, custom‑compounded materials, or bespoke calibration."
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "sha256_16": "ad1d39f9a9c7c9a0",
+   "findings_disclosed": [
+    "CONSTRAINT_EXCLUSION: excluded stem 'adding' in: novelty statement (intervention)  \nwe propose adding a passive phase‑change materia",
+    "NAMED_VARIANT: variant-marker: bespoke | All parts are used as‑sold; no custom machining, custom process recipes, custom‑",
+    "STANDARD_BILL: CUSTOM_MACHINING: machining/machined work: All parts are used as‑sold; no custom machining, custom process rec",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 4980,
+   "latency_s": 136.3,
+   "transport_tries": 3,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "DEV_NEED": [
+     "custom-compound"
+    ],
+    "BILL_UNTAGGED": [
+     "- Rows 1–2 (PCM pad + thermal pad): procurable catalog items, same procurement class as th",
+     "- Row 3 (procedure): uses existing bolts, torque tools, and assembly line step; adds ~5 se",
+     "- Height increase: 0.7 mm (within 1 mm constraint).",
+     "- Operational loss: zero — no duty-cycle change, no derate, no curtailment of cranking pul",
+     "- Maintenance: none added; pads are passive and last the module life."
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'height' in: total added stack height = 0.7 mm ≤ 1 mm.\n\nburden ledger (standard-practice parity)  \nrow-by-row comparison (i",
+     "excluded stem 'height' in: - height increase: 0.7 mm (within 1 mm constraint)",
+     "excluded stem 'module' in: novelty statement (intervention)  \nwe propose installing a commercial paraffin-based phase-change material (pc",
+     "excluded stem 'module' in: adjacent-technique clearance: pcm thermal buffering is used in li-ion battery packs for temperature homogeniza"
+    ],
+    "NAMED_VARIANT": [
+     "variant-marker: custom-compounded | All parts used as-sold; no custom machining, custom process recipes, custom-comp"
+    ],
+    "STANDARD_BILL": [
+     "CUSTOM_MACHINING: machining/machined work: All parts used as-sold; no custom machining, custom process recipes, custom-compounded materials, or bespoke calibration. Total added stack height = 0.7 mm ≤ 1 ",
+     "BESPOKE_COMPONENT: bespoke/custom-made component: All parts used as-sold; no custom machining, custom process recipes, custom-compounded materials, or bespoke calibration. Total added stack height = 0.7 mm ≤ 1 ",
+     "CUSTOM_RECIPE: custom recipe/process: All parts used as-sold; no custom machining, custom process recipes, custom-compounded materials, or bespoke calibration. Total added stack height = 0.7 mm ≤ 1 "
+    ]
+   },
+   "sha256_16": "5203be300b9aaad0",
+   "findings_disclosed": [
+    "DEV_NEED: custom-compound",
+    "BILL_UNTAGGED: - Rows 1–2 (PCM pad + thermal pad): procurable catalog items, same procurement class as th; - Row 3 (procedure",
+    "CONSTRAINT_EXCLUSION: excluded stem 'height' in: total added stack height = 0.7 mm ≤ 1 mm.\n\nburden ledger (standard-practice parity)",
+    "NAMED_VARIANT: variant-marker: custom-compounded | All parts used as-sold; no custom machining, custom process recipes, custo",
+    "STANDARD_BILL: CUSTOM_MACHINING: machining/machined work: All parts used as-sold; no custom machining, custom process recipes"
+   ]
+  },
+  {
+   "stage": "repair_3",
+   "chars": 6035,
+   "latency_s": 77.7,
+   "transport_tries": 4,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'adding' in: **our departure:** the novelty is the **arrangement** — adding a high-conductivity graphite sheet *beneath* th",
+     "excluded stem 'height' in: |\n\n*total added stack height = 0.525 mm ≤ 1 mm budget.*\n\nburden ledger (standard-practice parity)  \n| aspect |",
+     "excluded stem 'height' in: |\n| added height | ~0.1 mm (grease) or 0.5 mm (pad) | 0.525 mm | within same 1 mm envelope; no redesign of bra",
+     "excluded stem 'module' in: novelty statement (intervention)  \n**proposed intervention:** insert a two-layer thermal interface stack — a t"
+    ]
+   },
+   "sha256_16": "de39bcec46de99e5",
+   "findings_disclosed": [
+    "CONSTRAINT_EXCLUSION: excluded stem 'adding' in: **our departure:** the novelty is the **arrangement** — adding a high-conductivity "
+   ]
+  }
+ ],
+ "generated_at": "2026-11-16T10:24:51.508217Z"
+}

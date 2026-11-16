@@ -1,0 +1,178 @@
+{
+ "problem_id": "eval-sofc-thermal-cycling",
+ "a1_source": "SYS_A1_INT_V72+V76/r30_v76_directive",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nProposed intervention: add a programmed stress-relief dwell at 800 °C during each thermal cycle to enable viscous relaxation of the intergranular glass phase in the seal, healing microcracks and reducing the strain energy that drives crack propagation.  \nStandard practice: SOFC thermal‑cycling tests and start/stop procedures use continuous heating/cooling at a fixed rate (here 5 °C/min) without an extended high‑temperature hold, relying on the seal’s inherent compliance to accommodate CTE mismatch.  \nOur mitigation: introduces a mandatory 30‑minute dwell at the peak temperature (800 °C) in every cycle, making stress relaxation a repeated, cycle‑integrated step rather than a one‑time seal‑formation soak.  \nAdjacent‑technique clearance: the closest existing practice is a single high‑temperature soak during initial stack assembly to form the seal; our mechanism differs by making the dwell a recurring part of every thermal cycle to continuously heal fatigue damage.  \nMechanism: the dwell allows the intergranular glass phase (15 % mass fraction) to reach a viscosity (~10¹⁰ Pa·s at 800 °C) where the Maxwell relaxation time τ = η/E ≈ 100 s, so a 30‑min hold provides >1000 relaxation times, reducing the residual stress in the seal by orders of magnitude and dropping the strain‑energy release rate below the fracture toughness of the glass‑ceramic.\n\nPHYSICS CHECK\nGoverning relation: stress relaxation in the glass phase follows σ(t) = σ₀ exp(−t/τ) with τ = η/E. For a typical SOFC seal glass, η(800 °C) ≈ 10¹⁰ Pa·s, E ≈ 100 GPa → τ ≈ 100 s. After t = 1800 s (30 min), σ/σ₀ ≈ exp(−18) ≈ 1.5×10⁻⁸. The driving variable for crack growth is the strain‑energy release rate G ∝ σ². The mechanism moves σ **down** by >8 orders of magnitude; this **reduces** G far below the critical value (G_c ≈ 10 J/m² for glass‑ceramics), arresting microcrack propagation.  \nMagnitude verification: without dwell, Δα ≈ 2×10⁻⁶/K, ΔT = 775 K → σ₀ ≈ 200 MPa, G ≈ 10 J/m² (above G_c). With dwell, σ_relaxed ≈ 3 Pa, G_relaxed ≈ 10⁻¹⁵ J/m² ≪ G_c. The seal leakage and OCV degradation are therefore suppressed.\n\nDIRECTION-OF-EFFECT: driving variable = residual stress in the seal (σ); the mechanism moves it **down** by viscous relaxation during the dwell; this **reduces** the strain‑energy release rate that drives microcrack growth.\n\nIMPLEMENTATION BILL\n| # | Component / Operation | Generic Class / Stated Item | Attachment Point in Stated Infrastructure | Operating Parameter(s) | Procurement Tag |\n|---|-----------------------|-----------------------------|-------------------------------------------|------------------------|-----------------|\n| 1 | Existing programmable furnace temperature controller | (a) stated infrastructure — the furnace and controller that already deliver the 5 °C/min ramp | Furnace control cabinet | Reprogram cycle profile: add 30 min hold at 800 °C after heating ramp, before cooling | (c) |\n| 2 | Thermal cycle profile (software parameter) | (c) standard operation on existing controller | Same controller | Heating: 25→800 °C at 5 °C/min; Dwell: 800 °C for 30 min; Cooling: 800→25 °C at existing rate (uncontrolled or controlled) | (c) |\n\nStandard practice’s bill: same furnace, same controller, profile without dwell (continuous ramp). Our bill replaces the profile (row 2) and uses the same hardware (row 1). No new hardware, no added mass.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n| Aspect | Standard Practice | This Intervention | Comparison |\n|--------|-------------------|-------------------|------------|\n| Hardware procurement | Furnace, controller (existing) | Identical — no new parts | Same |\n| Installation / commissioning | Load profile without dwell | Reprogram controller (minutes of engineer time) | Lower (software change only) |\n| Mass added to stack | 0 % | 0 % | Same (well below 2 % limit) |\n| Operational loss per cycle | Heating + cooling time only | +30 min dwell at 800 °C | **Priced loss**: +30 min/cycle → +250 h over 500 cycles; extra energy = furnace power × 250 h. No curtailment of primary output (test is the primary activity), so loss is only extended test duration and energy cost. |\n| Maintenance | Standard furnace upkeep | Unchanged | Same |\n| Cost class | Capital + operating | Capital unchanged; operating cost increases by energy for 250 h | Same burden class (operating cost increase is marginal vs. total test budget) |\n\nConclusion: same-or-lower burden class. The only added burden is a quantified operational loss (extra time/energy) that does not violate any constraint and is typical for a procedural change.\n\nEXECUTABLE TEST\nProtocol:  \n1. Build two identical anode‑supported SOFC stacks (YSZ electrolyte, LSM cathode, glass‑ceramic seal with 15 % glass phase).  \n2. Install both in the same furnace with independent gas supply and voltage monitoring.  \n3. Stack A (control): run 500 thermal cycles 25→800 °C at 5 °C/min, continuous ramp, no dwell.  \n4. Stack B (intervention): run 500 cycles with identical ramps plus a 30 min dwell at 800 °C each cycle.  \n5. Every 50 cycles, cool to room temperature, measure open‑circuit voltage (OCV) and seal leakage (helium leak check or fuel‑flow differential) at 800 °C.  \nInstruments: existing furnace thermocouples, programmable controller, high‑impedance voltmeter (existing), mass flow meters for fuel/air (existing), helium leak detector (standard lab equipment).  \nPass/fail thresholds:  \n- OCV ≥ 1.0 V at 800 °C after 500 cycles.  \n- Seal leakage ≤ 1 % of fuel flow after 500 cycles.  \nKill criterion: if Stack B fails either threshold before 500 cycles, the mechanism is falsified.  \nDuration: ~500 cycles × (155 min heat + 30 min dwell + cooling) ≈ 2800 h total.  \nFalsification: the test validates EFFECTIVENESS — the intervention stack must survive 500 cycles while the control stack is expected to degrade earlier. A correlation (e.g., only monitoring leakage) is not sufficient; the test requires a side‑by‑side comparison with a control.",
+ "meta": {
+  "critic_verdict": "KILL",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'mas' in: mechanism: the dwell allows the intergranular glass phase (15 % mass fraction) to reach a viscosity (~10¹⁰ pa·",
+    "excluded stem 'mas' in: no new hardware, no added mass.\n\nburden ledger (standard-practice parity)\n| aspect | standard practice | this ",
+    "excluded stem 'mass' in: mechanism: the dwell allows the intergranular glass phase (15 % mass fraction) to reach a viscosity (~10¹⁰ pa·",
+    "excluded stem 'mass' in: no new hardware, no added mass.\n\nburden ledger (standard-practice parity)\n| aspect | standard practice | this "
+   ],
+   "DRIVER_AS_REMEDY": [
+    "the mechanism's active ingredient 'cycling' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+   ]
+  }
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 6663,
+   "latency_s": 84.5,
+   "transport_tries": 1,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "KILL",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "DEV_NEED": [
+     "custom formulation"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'mas' in: magnitude verification: the shingle geometry reduces peak tensile stress in the seal bulk from >100 mpa to <10",
+     "excluded stem 'mass' in: magnitude verification: the shingle geometry reduces peak tensile stress in the seal bulk from >100 mpa to <10",
+     "excluded stem 'stack' in: magnitude verification: the shingle geometry reduces peak tensile stress in the seal bulk from >100 mpa to <10",
+     "excluded stem 'stack' in: the only delta is a stencil re-cut or dispense-program edit, which is standard practice for any seal-pattern i"
+    ],
+    "NAMED_VARIANT": [
+     "variant-marker: custom formulation | Conclusion: **same-or-lower burden class** — every row is a catalog-class procur"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "DRIVER_AS_REMEDY": [
+     "the mechanism's active ingredient 'thermal cycling' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+    ]
+   },
+   "sha256_16": "e66d4bd5da6b0213"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 5627,
+   "latency_s": 128.5,
+   "transport_tries": 2,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "KILL",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "DEV_NEED": [
+     "custom formulation"
+    ],
+    "BILL_UNTAGGED": [
+     "- Rows 1–5: identical parts, identical installation, identical commissioning.",
+     "- Row 6: adds Belleville washers — standard catalog items, same installation step (place u",
+     "- Row 7: same torque wrench, different torque value — standard operation class.",
+     "- Operational loss: zero (no curtailment, no duty‑cycle change, no derate of primary outpu",
+     "- Maintenance: no added steps; spring force verified visually during routine stack inspect"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'mas' in: mass increase: ~0.1 kg per bolt × 8 bolts = 0.8 kg on a ~50 kg stack (<2 % mass increase)",
+     "excluded stem 'mass' in: mass increase: ~0.1 kg per bolt × 8 bolts = 0.8 kg on a ~50 kg stack (<2 % mass increase)",
+     "excluded stem 'stack' in: novelty statement (intervention)  \nproposed intervention: replace the rigid bolted clamping of the sofc stack ",
+     "excluded stem 'stack' in: mechanism: by maintaining compressive stress on the seal, the peak tensile stress that drives microcrack openi"
+    ],
+    "NAMED_VARIANT": [
+     "variant-marker: custom formulation | No custom machining, custom formulation, custom process recipes, custom‑compound"
+    ],
+    "STANDARD_BILL": [
+     "CUSTOM_MACHINING: machining/machined work: No custom machining, custom formulation, custom process recipes, custom‑compounded materials, bespoke calibration, added sensing channels, or surface‑treatment ",
+     "BESPOKE_COMPONENT: bespoke/custom-made component: No custom machining, custom formulation, custom process recipes, custom‑compounded materials, bespoke calibration, added sensing channels, or surface‑treatment ",
+     "CUSTOM_RECIPE: custom recipe/process: No custom machining, custom formulation, custom process recipes, custom‑compounded materials, bespoke calibration, added sensing channels, or surface‑treatment "
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "sha256_16": "44080845db6d447c",
+   "findings_disclosed": [
+    "ELECTRONIC_CONDUCTOR_SEAL",
+    "DEV_NEED: custom formulation",
+    "BILL_UNTAGGED: - Rows 1–5: identical parts, identical installation, identical commissioning.; - Row 6: adds Belleville washer",
+    "CONSTRAINT_EXCLUSION: excluded stem 'mas' in: mass increase: ~0.1 kg per bolt × 8 bolts = 0.8 kg on a ~50 kg stack (<2 % mass increa",
+    "NAMED_VARIANT: variant-marker: custom formulation | No custom machining, custom formulation, custom process recipes, custom‑c",
+    "STANDARD_BILL: CUSTOM_MACHINING: machining/machined work: No custom machining, custom formulation, custom process recipes, cu",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 2682,
+   "latency_s": 8.5,
+   "transport_tries": 3,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3.5-bolt-e4b",
+   "fallback_reason": "nvidia/nemotron-3-ultra-550b-a55b empty content (typed)",
+   "critic_verdict": "KILL",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'mas' in: pass/fail thresholds: open-circuit voltage $\\ge 1.0$ v throughout; seal leakage $\\le 1\\%$ of fuel flow; stack ",
+     "excluded stem 'mass' in: pass/fail thresholds: open-circuit voltage $\\ge 1.0$ v throughout; seal leakage $\\le 1\\%$ of fuel flow; stack ",
+     "excluded stem 'stack' in: anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum stro",
+     "excluded stem 'stack' in: procedure change: introduce 30-minute dwell at 450 c during each cycle (c)\n\nburden ledger (standard-practice p"
+    ],
+    "DRIVER_AS_REMEDY": [
+     "the mechanism's active ingredient 'thermal cycling' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+    ]
+   },
+   "sha256_16": "6e54fab164d322a8",
+   "findings_disclosed": [
+    "ELECTRONIC_CONDUCTOR_SEAL",
+    "CONSTRAINT_EXCLUSION: excluded stem 'mas' in: pass/fail thresholds: open-circuit voltage $\\ge 1.0$ v throughout; seal leakage $\\le 1",
+    "DRIVER_AS_REMEDY: the mechanism's active ingredient 'thermal cycling' matches the problem's stated failure driver — a remedy may"
+   ]
+  },
+  {
+   "stage": "repair_3",
+   "chars": 5997,
+   "latency_s": 144.9,
+   "transport_tries": 4,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "KILL",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'mas' in: mechanism: the dwell allows the intergranular glass phase (15 % mass fraction) to reach a viscosity (~10¹⁰ pa·",
+     "excluded stem 'mas' in: no new hardware, no added mass.\n\nburden ledger (standard-practice parity)\n| aspect | standard practice | this ",
+     "excluded stem 'mass' in: mechanism: the dwell allows the intergranular glass phase (15 % mass fraction) to reach a viscosity (~10¹⁰ pa·",
+     "excluded stem 'mass' in: no new hardware, no added mass.\n\nburden ledger (standard-practice parity)\n| aspect | standard practice | this "
+    ],
+    "DRIVER_AS_REMEDY": [
+     "the mechanism's active ingredient 'cycling' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+    ]
+   },
+   "sha256_16": "9162396ea0660fa3",
+   "findings_disclosed": [
+    "ELECTRONIC_CONDUCTOR_SEAL",
+    "CONSTRAINT_EXCLUSION: excluded stem 'mas' in: mechanism: the dwell allows the intergranular glass phase (15 % mass fraction) to reac",
+    "DRIVER_AS_REMEDY: the mechanism's active ingredient 'cycling' matches the problem's stated failure driver — a remedy may not be "
+   ]
+  }
+ ],
+ "generated_at": "2026-11-16T10:50:56.131232Z"
+}

@@ -1,0 +1,76 @@
+{
+ "record": "R32_STATUS/1.0.0",
+ "session": "builder-r20s1",
+ "at": "2026-11-16T17:30:00Z",
+ "base_audited_tip": "ad2eb8d90 (AM30, audit branch)",
+ "builder_base": "8e8e1b635 (AM30-audited builder tip)",
+ "responds_to": "AM30 verdict directions D1-D4",
+ "art27_verdict": "NO CAPABILITY CHANGE this round — the engine (contract_for_v72, V76 directive, both bind scans, critic, type gate, repair budget 3, K_GEN=1) is byte-unchanged; the transport gained a DISCLOSED fallback chain; the completed measurement is DEV-scoped (the fresh-material acceptance test remains the auditor-authored holdout v5 one-shot)",
+ "d1_v5_request": {
+  "status": "FILED (commit 6f1bd6200) — awaiting auditor authoring",
+  "file": "eval/HOLDOUT_V5_REQUEST_2026-11-16.md",
+  "acceptance_numbers_restated": "0 allowed-measure-type violations AND 100% structured DIRECTION-OF-EFFECT statements AND auditor mean >=3.0/4"
+ },
+ "d2_transport_unblock": {
+  "typed_probe": {
+   "file": "eval/r30_transport_probe.json",
+   "glm_5_3_flash": "STILL_REASONING — 9277 reasoning chars in a 100s sample, content=0; a full 8192-token call ended finish=length with content=0 in 416s. DOCUMENTED-UNSERVABLE on machine-path prompts (unservable latency, not a loop)",
+   "nemotron_3_ultra_550b": "CONTENT_FLOWING — 6230 content chars in 77s (streamed)",
+   "bolt_e4b": "CONTENT_FLOWING — 3115 chars, zero reasoning, 8.8s",
+   "endpoint_constraint": "non-streamed long calls 504 at the free endpoint — every fallback call streams"
+  },
+  "amendments": [
+   "AM#2 (d0ba31e77): FALLBACK_CHAIN_AMENDMENT_TYPED — chain = primary z.ai gateway -> nvidia/nemotron-3-ultra-550b-a55b -> nvidia/nemotron-3.5-bolt-e4b; MODEL-FAMILY CHANGE DISCLOSED (fallback leg only); R31 chars=0 rows quarantined (bytes kept); EMPTY_ANSWER_TRANSPORT machine guard added (an empty answer can never complete)",
+   "AM#3 (e222451ff): SUSTAINED_OUTAGE_CLAUSE_TYPED — single transient 500s still retry on the primary (R24 ladder unchanged); >=2 consecutive primary infra failures hand to the chain with a typed sustained_primary_outage disclosure; streak resets on any primary success; the primary is probed every row"
+  ],
+  "defects_caught_forward": [
+   "R31 run: rows with chars=0 produced and accepted CLEAN (empty-content defect) — quarantined + machine guard added",
+   "R32: the outage clause engaged once and crashed on a missing model kwarg (TypeError BEFORE serving any row) — fixed forward, zero rows produced by the broken path"
+  ]
+ },
+ "c0031_dev_battery": {
+  "status": "COMPLETE — 18/18 rows committed (eval/pairs/r30_v76_tuned/ + eval/r30_v76_tuning_generation.json)",
+  "first_complete_run": "the first complete battery since the c-0031 pre-registration (the R31 attempt died on the 401 before producing valid rows)",
+  "route_disclosure": {
+   "primary_only_rows": 13,
+   "nvidia_involved_rows": 5,
+   "models_serving": ["nvidia/nemotron-3-ultra-550b-a55b", "nvidia/nemotron-3.5-bolt-e4b"],
+   "note": "the primary gateway RECOVERED mid-round (401 -> serving for rows 1-13) then re-died (401 again) with 500 flapping; rows 14-18 served by the amended chain; route/route_model/fallback_reason recorded per attempt"
+  },
+  "empty_rows": 0,
+  "resume_discipline": "nothing re-drawn — existing rows skipped at every restart; one mid-outage crash resumed clean from the committed anchors",
+  "claim_1_class_bind": {
+   "claim": "0 rows with ALLOWED_MEASURE_TYPE_OUTSIDE or LIMIT_DIRECTION_VIOLATION",
+   "result": "MET — 0/18 rows",
+   "significance": "the 'learned the list, not the class' defect (F36) did not reproduce on the dev battery with the bind in the path"
+  },
+  "claim_2_direction_bind": {
+   "claim": "100% of re-drawn rows carry the structured DIRECTION-OF-EFFECT statement",
+   "result": "NOT MET — 10/18 rows clean (56%); 8 rows fail (PHYSICS_DIRECTION_UNSTATED on 7, DRIVER_AS_REMEDY overlapping)",
+   "failing_rows": ["bench-p03-phe-biofouling", "bench-p04-pump-cavitation", "bench-p06-water-biofilm", "bench-p10-pv-pid", "bench-p11-spindle-thermal-drift", "dev-fu-005-bridge-bearing", "eval-new05-liion-balance-drift", "eval-sofc-thermal-cycling"],
+   "honest_read": "the direction-bind is IN the machine path and drives the repair loop, but the generator cannot always satisfy it within budget 3 — the F43 instrument works (it fires and drives repairs); the 100% pre-registered machine claim FAILS on the dev set",
+   "note": "a deterministic scan still cannot judge domain-direction correctness — that stays the auditor's read (AM30, typed limit)"
+  },
+  "repair_budget": "all 18 rows exhausted budget 3 (repairs=3) with typed residual findings",
+  "residual_families": ["APPARATUS_ROW", "BILL_UNTAGGED", "CONSTRAINT_EXCLUSION", "CONVERSION", "DRIVER_AS_REMEDY", "NAMED_VARIANT", "PHYSICS_DIRECTION_UNSTATED", "STANDARD_BILL"],
+  "scope_warning": "DEV measurement only (Art. 6) — the gate-MET/NOT-MET numbers here do NOT transfer to acceptance; the acceptance question is answered only on the fresh auditor-authored holdout v5"
+ },
+ "d2_judge_route": {
+  "status": "BLOCKED (typed, twice over)",
+  "history": "crowllm/qwen-3.8-max:free was 503-with-credentials at AM30; the sandbox recycle then WIPED the vault — CROWLLM_API_KEY/CROWLLM_BASE_URL are lost, the route is currently UNPROBEABLE",
+  "no_swap": "the judge was NOT swapped (Art. 26); the NVIDIA catalog has no qwen family (disclosed at R31); the c-0026 recalibration stays probe-gated on the pre-registered route"
+ },
+ "vault_wipe_disclosure": {
+  "event": "the sandbox recycle restored a STALE local checkout (R24-era) and wiped the gitignored vault",
+  "reconciled": "ff-only to the remote tip 8e8e1b635 (no peer commits; Art. 7/29(e))",
+  "lost": ["CROWLLM_API_KEY", "CROWLLM_BASE_URL", "GH_PAT", "GITHUB_TOKEN", "AGNES_API_KEY", "INCEPTION_API_KEY", "OPENROUTER_API_KEY", "XKIRO_API_KEY"],
+  "restorable": ["NVIDIA_API_KEY (re-restored from the operator conversation)"],
+  "owner_actions_needed": [
+   "re-supply GH_PAT (push auth dead — this round's commits push on the next credential window; Art. 17: rotation only on operator supply)",
+   "re-supply crowllm credentials (unblocks the D2/D3 judge route and the c-0026 recalibration probe)",
+   "optional: the other provider keys"
+  ]
+ },
+ "push_state": "BLOCKED (no GH_PAT) — commits 6f1bd6200, d0ba31e77, e222451ff + the fix-forward + this record are local; they push on the next credential window",
+ "verifier": "peer INVITED (Art. 29(c)): recompute the 18-row numbers from the committed bytes; never re-run"
+}
