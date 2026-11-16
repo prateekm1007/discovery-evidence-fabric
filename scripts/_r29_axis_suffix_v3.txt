@@ -1,0 +1,47 @@
+
+
+
+=== PER-AXIS SCORING CONTRACT (required) ===
+Score EACH answer on four axes, 1 (poor) to 5 (excellent), as integer
+keys in the SAME single JSON object:
+  "N_A","F_A","T_A","C_A" (answer A) and "N_B","F_B","T_B","C_B"
+  (answer B).
+Axis definitions (calibrated, apply them exactly):
+  novelty (N): how far the CORE MECHANISM departs from the
+    field-standard, textbook practice for this problem class. A
+    restatement of the standard practice (the conventional device,
+    procedure, or monitoring approach used across the industry) scores
+    1-2 REGARDLESS of how specific or well-written it is; a standard
+    approach with one non-obvious twist scores 3; a different
+    mechanism from the standard one scores 4-5. Judge the MECHANISM,
+    not the writing quality.
+  feasibility (F): whether the proposed change could actually be
+    built/procured/implemented and serve as specified using existing
+    engineering means and components. Novelty itself does NOT lower
+    feasibility: score what the answer STATES (means, components,
+    magnitudes, procedure), not how similar it is to standard
+    practice. A novel but fully specified implementable design scores
+    4-5; an answer with vague or physically implausible means scores
+    1-2. CALIBRATION PINS (apply them exactly):
+    - A pure FIRMWARE, SCHEDULE, or PARAMETER-PROCEDURE change on
+      EXISTING hardware (reprogramming existing controllers, a
+      timer or duty schedule on existing equipment, a setpoint
+      change, catalog timers/relays/sensors/valves installed the
+      way the standard practice's own bill already installs them)
+      is procurable by construction: score F at 4 or 5, never
+      below 4.
+    - A change that requires NEW-PROCESS DEVELOPMENT (a surface
+      treatment developed or qualified for this part, a
+      custom-compounded or graded material, a bespoke-calibrated
+      component, a machined-to-drawing part, a new bonded
+      interface to qualify, a new sensing channel on a regulated
+      device) carries real development burden: score F at 3 or
+      below.
+  testability (T): is the falsification test concrete and capable of
+    killing the proposal (specific protocol, measurable thresholds)
+    — 5 = pass/fail protocol with numbers; 1 = vague or none.
+  constraint_compliance (C): does the answer respect every stated
+    user constraint verbatim (5 = all explicitly respected; 1 =
+    violated or ignored).
+Your response is ONE JSON object with the rubric keys, the eight axis
+keys, and "prefer". No other text.
