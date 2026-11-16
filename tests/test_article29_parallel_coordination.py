@@ -57,7 +57,8 @@ def _git(*args: str) -> str:
     return r.stdout
 
 
-def _validate_registry(reg, where: str, kind_violations=None):
+def _validate_registry(reg, where: str, kind_violations=None,
+                       status_violations=None):
     """Schema validation for work-claims/v1 (Art. 29 CI line: registry
     schema valid). Returns (sessions, claims).
 
@@ -96,6 +97,24 @@ def _validate_registry(reg, where: str, kind_violations=None):
                 f"{where}: kind violation for {v.get('claim_id')} must "
                 "be remediated (forward-only disclosure)")
             registered_kinds[v["claim_id"]] = v
+    registered_statuses = {}
+    if status_violations is not None:
+        assert isinstance(status_violations, list), \
+            f"{where}: claim_status_violations must be an array"
+        for v in status_violations:
+            assert isinstance(v, dict) and v.get("claim_id"), \
+                f"{where}: status violation entries need claim_id"
+            assert v.get("correct_status") in STATUSES, (
+                f"{where}: status violation for {v.get('claim_id')} must "
+                "name the correct_status")
+            assert v.get("wrong_status") and \
+                v.get("wrong_status") not in STATUSES, (
+                f"{where}: status violation for {v.get('claim_id')} must "
+                "name the out-of-enum wrong_status")
+            assert v.get("status") == "remediated", (
+                f"{where}: status violation for {v.get('claim_id')} must "
+                "be remediated (forward-only disclosure)")
+            registered_statuses[v["claim_id"]] = v
     for sid, s in sessions.items():
         assert isinstance(sid, str) and sid.strip(), \
             f"{where}: session id must be a non-empty string"
@@ -118,8 +137,15 @@ def _validate_registry(reg, where: str, kind_violations=None):
                 "must be REGISTERED in claim_kind_violations[] with the "
                 "correct kind named — forward-only disclosure; history "
                 "rewrites are not a remedy, Art. 4)")
-        assert c.get("status") in STATUSES, \
-            f"{cid}: status must be one of {STATUSES}"
+        if c.get("status") not in STATUSES:
+            regd_s = registered_statuses.get(cid)
+            assert regd_s and regd_s.get("wrong_status") == c.get("status"), (
+                f"{cid}: status must be one of {STATUSES} (F42: an "
+                "out-of-enum status in an immutable HISTORICAL snapshot "
+                "must be REGISTERED in claim_status_violations[] with the "
+                "correct status named — forward-only disclosure; the "
+                "current-registry tip is always strict; history rewrites "
+                "are not a remedy, Art. 4)")
         assert isinstance(c.get("session_id"), str) and \
             c["session_id"].strip(), f"{cid}: session_id required"
         assert c["session_id"] in sessions, (
@@ -312,7 +338,8 @@ def test_canonical_measurement_commits_match_a_claim():
         cur = json.loads(REG.read_text(encoding="utf-8"))
         _, claims = _validate_registry(
             snap, f"{sha[:12]}:registry",
-            kind_violations=cur.get("claim_kind_violations"))
+            kind_violations=cur.get("claim_kind_violations"),
+            status_violations=cur.get("claim_status_violations"))
         matching = [
             c for c in claims
             if c["role"] == "EXECUTOR"
