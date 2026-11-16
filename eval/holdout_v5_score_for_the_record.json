@@ -1,0 +1,92 @@
+{
+ "record": "HOLDOUT_V5_SCORE_FOR_THE_RECORD/1.0.0",
+ "scored_at": "2026-11-17",
+ "scored_by": "auditor (Claude) with the PRIVATE v5 rubric",
+ "STATUS_OF_THIS_SCORE": "FOR THE RECORD ONLY \u2014 NO ACCEPTANCE. The v5 run is VOID on two independent grounds: (1) served-model substitution (30x glm-4-plus for requested zai-org/GLM-5.3; 4 rows on the NVIDIA chain), (2) twice-generated under an identity collision (canonical e401bb2ad + quarantined duplicate). The set is BURNED-INVALID.",
+ "per_problem": [
+  {
+   "problem_id": "HO5-01-cell-cathode-heave",
+   "score_0_4": 3,
+   "rationale": "two-stage start-up ramp procedure IS an allowed measure; identifies the sodium-intercalation window; falsifier present"
+  },
+  {
+   "problem_id": "HO5-02-plating-anode-passivation",
+   "score_0_4": 3,
+   "rationale": "current-density duty cycle + chloride setpoint + charge-throughput bag triggers \u2014 all within the allowed set; identifies the black-film driver"
+  },
+  {
+   "problem_id": "HO5-03-kiln-tyre-creep",
+   "score_0_4": 3,
+   "rationale": "thermal-state-indexed procedure suite on the permitted axes only (lubrication timing, shim at matched thermal state, speed/feed ramps, alignment interval)"
+  },
+  {
+   "problem_id": "HO5-04-submersible-cable-water-tree",
+   "score_0_4": 3,
+   "rationale": "VFD dv/dt + switching frequency + gland sealing procedure + duty scheduling; explicitly no new hardware; within the allowed set"
+  },
+  {
+   "problem_id": "HO5-05-gearbox-oil-foaming",
+   "score_0_4": 1,
+   "rationale": "ALLOWED-MEASURES VIOLATION: adds a timer-controlled SOLENOID VALVE on the breather = new hardware; the set permits oil-level/dwell setpoint, antifoam selection, or breather/return-line MAINTENANCE PROCEDURE only. Matches the machine's own class-bind flag."
+  },
+  {
+   "problem_id": "HO5-06-vacuum-furnace-hotzone-sag",
+   "score_0_4": 2,
+   "rationale": "two-stage ramp with holds IS allowed and DIRECTION-OF-EFFECT is stated, but the direction is questionable: 30-min holds at 600/1000 C ADD time-at-temperature, which raises the cumulative creep integral the answer claims to cut; auditor direction-correctness concern"
+  },
+  {
+   "problem_id": "HO5-07-dryer-drum-trunnion",
+   "score_0_4": 3,
+   "rationale": "coupled current+speed inference of trunnion wear on existing sensors; per-unit baseline"
+  },
+  {
+   "problem_id": "HO5-08-accumulator-bladder",
+   "score_0_4": 3,
+   "rationale": "pressure-current hysteresis decay kinetics for gas permeation; existing transducer + current"
+  },
+  {
+   "problem_id": "HO5-09-steam-trap-blowthrough",
+   "score_0_4": 3,
+   "rationale": "thermal-inertia lag between inlet pressure transient and outlet response; existing tags"
+  },
+  {
+   "problem_id": "HO5-10-motor-rotor-bar",
+   "score_0_4": 3,
+   "rationale": "negative-sequence phase-angle deviation under load transients; existing current + speed estimate"
+  },
+  {
+   "problem_id": "HO5-11-dry-gas-seal",
+   "score_0_4": 3,
+   "rationale": "seal-gas dP + buffer-temperature inference of O-ring hang-up before vent-flow degradation; existing sensors"
+  },
+  {
+   "problem_id": "HO5-12-gear-pump-volumetric-wear",
+   "score_0_4": 2,
+   "rationale": "pressure-flow hysteresis area is sound and uses existing sensors, but the novelty statements carry decorative 'USER CONSTRAINT:' prefixes \u2014 the label-integrity defect class recurring"
+  }
+ ],
+ "aggregate": {
+  "n": 12,
+  "total": 32,
+  "mean_0_4": 2.667,
+  "pct": 66.7,
+  "intervention_mean": 2.5,
+  "predictor_mean": 2.833,
+  "allowed_measures_violations": 1,
+  "violating_rows": [
+   "HO5-05-gearbox-oil-foaming"
+  ],
+  "direction_correctness_concerns": [
+   "HO5-06-vacuum-furnace-hotzone-sag"
+  ]
+ },
+ "indicative_trend": {
+  "v4_pct": 62.5,
+  "v4_violations": 2,
+  "v5_pct": 66.7,
+  "v5_violations": 1,
+  "note": "the class-bind IS improving constraint fit on fresh material (2 violations -> 1; 5/6 interventions stayed inside the permitted set). Indicative only \u2014 the run is void, so this earns no acceptance credit."
+ },
+ "bar_would_have_failed_anyway": "mean 2.67 < 3.0 AND 1 allowed-measures violation \u2014 so even a valid run would not have granted acceptance",
+ "burn": "v5 BURNED-INVALID (confirmed); v6 authored and sealed"
+}
