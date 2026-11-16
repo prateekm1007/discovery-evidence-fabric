@@ -1,0 +1,47 @@
+{
+ "record": "DEEPSEEK_RUNG_GOLD_CALIBRATION_R36/1.0.0",
+ "at": "2026-11-16T15:28:00Z",
+ "typed": "R-JUDGE auditor act (>=0.8 gold-corpus recalibration of the RETIRED crowllm/deepseek-v4-flash:free rung) — TYPED INFRA BLOCK: the measurement is UNRESOLVED this window (Art. 15 typed infra skip; never a scoring result)",
+ "claim": {
+  "claim_id": "c-0043",
+  "work_id": "r36-deepseek-rung-gold-calibration",
+  "session": "builder-r35s1",
+  "base_sha": "8cd31d0d7"
+ },
+ "rung": {
+  "provider": "crowllm",
+  "model": "deepseek-v4-flash:free",
+  "previous_calibration": 0.667,
+  "status_before": "RETIRED",
+  "status_after": "RETIRED (unchanged — no evidence to change it)"
+ },
+ "probe_gate": {
+  "at": "2026-11-16T15:03:08Z",
+  "result": "PASS (tiny OK + verdict-shaped JUDGE_VALID) after pacing was typed — the rung CAN serve small/medium calls"
+ },
+ "pass_1_starved": {
+  "pacing_s": 9.0,
+  "result": "0/10 JUDGE_TRANSPORT_FAILED",
+  "cause": "RATE-LIMIT ARTIFACT — each _judge_judgment_call makes 2-3 HTTP calls internally against the crowllm free-tier ceiling of 10 req/60s (failed requests included, typed verbatim from the provider error); this pass is NOT a scoring result and is retained only as the typed cause"
+ },
+ "pass_2_paced": {
+  "pacing_s": 25.0,
+  "result": "4/10 rows observed before the typed block, ALL JUDGE_TRANSPORT_FAILED",
+  "errors": "HTTP 502 Bad Gateway on the 9.6KB specimen prompts (attempt 1 transport-fails; the parse path never runs)"
+ },
+ "direct_diagnosis": {
+  "deepseek_small_call": "HTTP 503 system_cpu_overloaded (current: 100.0%, threshold: 90%) — the R33-typed overload class, crowllm-wide",
+  "deepseek_large_call": "HTTP 502",
+  "qwen_large_call_CANONICAL_ROUTE": "HTTP 502 — the canonical c-0026 route is degraded in the SAME window",
+  "conclusion": "crowllm-wide degradation window (CPU overloaded + 502s on large prompts on BOTH rungs); not a deepseek-rung property; the qwen route served 54 valid draws + 36 predictor draws earlier this round, so the degradation is temporal"
+ },
+ "VERDICT": {
+  "eligibility": "UNRESOLVED — the gold measurement cannot run in this window (failures never cached, Art. 26; no route swap, Art. 26; the builder never declares eligibility without bytes)",
+  "deepseek_rung": "STAYS RETIRED (status unchanged)",
+  "canonical_c0026_route": "TYPED degraded this window — completed c-0026 measurements stand on their committed bytes; any re-run waits for the window",
+  "v6_impact": "NONE — the generator transport (zai gateway, glm-4-plus) is a different path and verified 200 OK at 14:26:14Z; the v6 one-shot's judge is the AUDITOR, not crowllm"
+ },
+ "harness": "scripts/r36_deepseek_rung_calibration.py committed — re-fires in one command when the window lifts (probe gate first, 25s pacing, 2-3 HTTP calls per judgment typed)",
+ "art_27": "NO CAPABILITY CHANGE (typed infra block; no eligibility declared; no route swap)",
+ "secret_grep": "0 findings in staged diff"
+}
