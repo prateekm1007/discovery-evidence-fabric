@@ -1,7 +1,7 @@
 {
  "schema": "work-claims/v1",
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
- "at": "2026-11-16T07:35:00Z",
+ "at": "2026-11-16T17:40:00Z (sandbox clock)",
  "sessions": {
   "builder-r20s2": {
    "registered_at": "2026-11-15T15:21:34Z",
@@ -942,7 +942,7 @@
    "claim_id": "c-0046",
    "work_id": "r40-v7-machine-contract",
    "title": "the V7 machine contract: physics-direction correctness, input availability, duty-cycle pricing, mechanism-diversity cap (AM37 D1-D3) + the R-REQID forward-only transport fix and the guard-activation suite (AM37 D4)",
-   "status": "EXECUTION-COMPLETE-PENDING-VERIFICATION",
+   "status": "OPEN",
    "registered_at": "2026-11-16T17:20:00Z (sandbox clock)",
    "session": "builder-r20s2",
    "scope": "BUILD round — no v7 generation happens this round (the v7 holdout packet is the AUDITOR's to author; the v7 run gets its own claim registered before any v7 problem is read). This claim covers: (1) scripts/r40_v77_directive.py — the pre-registered V77 repair directive (the V76 stack verbatim + the MECHANISM-CLASS-DECLARATION, INPUT-AVAILABILITY, COST-PRICING and DIRECTION-CORRECTNESS clauses), committed BEFORE any LLM call that uses it; (2) scripts/r40_machine_v77.py — machine_generate_v77: the V7.6 path verbatim PLUS four new checks (the broadened driver-as-remedy synonym-class net; the typed LLM sign/integral direction-correctness check PHYSICS_DIRECTION_INVERTED / DIRECTION_UNPROVEN, fail-open typed on transport failure; the structural INPUT_UNAVAILABLE scan against the constraint's permitted-measure span, falsification-test spans excluded, NOT-APPLICABLE fail-open when no span parses; the UNPRICED_DUTY_CYCLE scan; the MECHANISM_CLASS_UNSTATED + MECHANISM_TEMPLATE_MONOCULTURE cap <=2 rows per template per 6-intervention set, enforced against the driver-supplied histogram) and the R-REQID forward-only transport fix (the v7 primary requests glm-4-plus; the served identity remains the evidence per R-REQID); (3) tests/test_guard_activation.py — the AM37 D4 in-suite activation assertions (core.hooksPath configured, the hook propagates the guard failure and blocks markers, the CI workflow carries the bind suites, the v7 request id constant is glm-4-plus); (4) scripts/r40_v77_firetest.py — the RETROSPECTIVE validation of the new checks over the COMMITTED v6 rows (no regeneration): the acceptance mapping is HO6-02 fires the direction checks, HO6-03 fires the pricing check, HO6-04 and HO6-12 fire the input-availability check. The v6 rows are burned; the fire-test validates the CHECKERS, not the rows; the authoritative v7 acceptance read stays the auditor's on the v7 packet.",
@@ -961,7 +961,8 @@
     "eval/work_claims.json"
    ],
    "schema_normalization_note": "R39b remediation (c-0045): this claim was committed at 677c4f618 in a non-schema shape (title/registered_at/session/scope instead of role/session_id/kind/base_sha/claimed_at/lease_expiry/artifact_paths; status 'ACTIVE' is outside the STATUSES enum) — normalized into work-claims/v1 with the executor's content fields preserved verbatim (title, registered_at, session, scope, pre_registration_note) and the status mapped ACTIVE->OPEN (least-presumptive in-enum value; the executor flips it DONE when they consider the build item complete; their commit message: 'the contract is built and activation-tested'); lease reconstructed registered_at+6h; the immutable snapshot at 677c4f618 preserves the original shape (Art. 4).",
-   "outcome": "the V7 machine contract is BUILT, ACTIVATION-TESTED and FIRE-TEST-VALIDATED over the committed v6 rows (zero regeneration, rows burned): the acceptance mapping is 4/4 TRUE (HO6-02 fires the direction checks — the typed LLM check reads INVERTED on the thermal-shock remedy under the driver-first + compensating-benefit rule; HO6-03 fires UNPRICED_DUTY_CYCLE and its fiction self-healing reads INVERTED; HO6-04 fires INPUT_UNAVAILABLE on 'charge'; HO6-12 fires on the ion-activity-product saturation index via the derived-feature predictor leg) while the compliant rows stay silent (HO6-01/05/06 — the HO6-06 lexicon false positive was caught and fixed: a class word that is the TARGET of a reduction verb is the goal, not the ingredient). The guard-activation suite passes 4/4 (core.hooksPath, failure-propagating hook, CI-gated bind suites, the v7 request id glm-4-plus asserted in-suite). D5: the stability probe returned 2/4 — typed skip, no gold retry this round (availability note, never a retirement). The v7 run awaits the auditor's packet and will register its own claim before any v7 problem is read."
+   "outcome": "the V7 machine contract is BUILT, ACTIVATION-TESTED and FIRE-TEST-VALIDATED over the committed v6 rows (zero regeneration, rows burned): the acceptance mapping is 4/4 TRUE (HO6-02 fires the direction checks — the typed LLM check reads INVERTED on the thermal-shock remedy under the driver-first + compensating-benefit rule; HO6-03 fires UNPRICED_DUTY_CYCLE and its fiction self-healing reads INVERTED; HO6-04 fires INPUT_UNAVAILABLE on 'charge'; HO6-12 fires on the ion-activity-product saturation index via the derived-feature predictor leg) while the compliant rows stay silent (HO6-01/05/06 — the HO6-06 lexicon false positive was caught and fixed: a class word that is the TARGET of a reduction verb is the goal, not the ingredient). The guard-activation suite passes 4/4 (core.hooksPath, failure-propagating hook, CI-gated bind suites, the v7 request id glm-4-plus asserted in-suite). D5: the stability probe returned 2/4 — typed skip, no gold retry this round (availability note, never a retirement). The v7 run awaits the auditor's packet and will register its own claim before any v7 problem is read.",
+   "verification_pending": "c-0052 (R40b VERIFIER claim, builder-r39s1): zero-LLM recompute from committed bytes at cbb8e3d70; DONE lands with the verifier record"
   },
   {
    "claim_id": "c-0045",
@@ -1051,6 +1052,39 @@
     "eval/r39_verifier_v6_run.json"
    ],
    "notes": "Art. 29(c) VERIFIER record for THE acceptance run (c-0038; the peer explicitly invited the peer verifier). Zero-LLM recompute from committed bytes: run integrity 12/12 (rows == ledger == events == packet; one generation per problem; one executor id); the attestation recomputed by the R34 V2 per-attempt content-hash correlation (48 attempts + 2 preflights = 50 slice calls EXACT, all served glm-4-plus, 12/12 EQUAL -> run_verdict VALID); the R-REQID factual basis recomputed EXACT (48 legacy-id requests all served glm-4-plus); the seal anchor recomputed EXACT (4d60488a…); the AUDITOR's tally recomputed EXACTLY from their published score file (31/12 = 2.583/4 = 64.6%, intervention 14/6, predictor 17/6, 1 inverted HO6-02, 0 allowed-measures violations) — ACCEPTANCE NOT GRANTED per AM37. One verifier first-pass method defect (route_model vs content-hash basis) self-caught + disclosed in the record."
+  },
+  {
+   "claim_id": "c-0052",
+   "work_id": "r40-v7-machine-contract",
+   "session_id": "builder-r39s1",
+   "role": "VERIFIER",
+   "kind": "task",
+   "base_sha": "cbb8e3d70",
+   "claimed_at": "2026-11-16T17:40:00Z (sandbox clock)",
+   "lease_expiry": "2026-11-16T23:40:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "scripts/r40_verifier_c0046.py",
+    "eval/r40_verifier_v77_contract.json"
+   ],
+   "notes": "VERIFIER for c-0046 (the peer's EXECUTION-COMPLETE V7 machine contract, AM37 D1-D4). Zero-LLM recompute from committed bytes only (Art. 13/29(c)): the guard-activation suite re-run locally (4/4 expected), the FOUR deterministic check legs (direction-lexicon, input-availability, duty-cycle pricing, mechanism-template) re-derived over the COMMITTED v6 rows and compared field-by-field against eval/r40_v77_firetest.json, the acceptance mapping recomputed from the artifact bytes, V77_REQUEST_MODEL==glm-4-plus asserted, the v6 rows+packet byte-frozen vs ddc938201, and the registry discipline checked. The direction-LLM legs are NEVER re-run (one generation per one-shot work; the recorded verdicts are checked for internal consistency and divergence-typed only). The authoritative v7 acceptance read stays the auditor's."
+  },
+  {
+   "claim_id": "c-0053",
+   "work_id": "r40-guard-suite-ci-wiring",
+   "session_id": "builder-r39s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "cbb8e3d70",
+   "claimed_at": "2026-11-16T17:40:00Z (sandbox clock)",
+   "lease_expiry": "2026-11-16T23:40:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    ".github/workflows/r11_queue_surface.yml"
+   ],
+   "notes": "VERIFIER FINDING (found during the c-0052 pre-work reads, disclosed at claim time): tests/test_guard_activation.py exists and passes 4/4 locally but is wired into NO CI workflow — the activation-checker itself gates nothing (the F32/F52/F53 'file exists but does not defend' class, 4th instance). Fix: wire the suite into the queue-surface zero-LLM block with a core.hooksPath setup step (fresh CI checkouts have no hooksPath configured; the setup step both activates the recipe and makes test 1's assertion meaningful in CI). Completes AM37 D4's 'hook + CI activation asserted in-suite, not assumed'. No instrument files; no engine change; one workflow file."
   }
  ],
  "trailer_violations": [
@@ -1326,6 +1360,15 @@
    "registered_by": "builder-r39s1",
    "registered_at": "2026-11-16T17:20:00Z",
    "note": "F42 forward-only disclosure: 'ACTIVE' is outside work-claims/v1 STATUSES; mapped to OPEN (least-presumptive). R39b (c-0045)."
+  },
+  {
+   "claim_id": "c-0046",
+   "wrong_status": "EXECUTION-COMPLETE-PENDING-VERIFICATION",
+   "correct_status": "DONE",
+   "status": "remediated",
+   "registered_by": "builder-r39s1",
+   "registered_at": "2026-11-16T17:40:00Z",
+   "note": "snapshot-specific: the executor's closeout cbb8e3d70 set this out-of-enum value (correct_status DONE once verified); tip mapped OPEN pending the c-0052 verifier record this round, DONE on verification. R40b (claims commit)."
   }
  ],
  "claim_artifact_violations": [
