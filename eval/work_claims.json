@@ -47,6 +47,11 @@
    "registered_at": "2026-11-16T13:35:00Z",
    "role": "builder",
    "note": "R35 sandbox id (F49-precedent re-key, AM32/33 identity ruling applied proactively): this sandbox observed c-0038/c-0039 pushed by a DIFFERENT live session operating id builder-r20s2 (commit f19a182db, not from this sandbox), so reusing builder-r20s2 here would recreate the shared-id collision that voided v5. One unique executor id per sandbox, registered before the claim. Lineage: builder-r20s2 (R33/R34 execution)."
+  },
+  "builder-r39s1": {
+   "registered_at": "2026-11-16T17:10:00Z",
+   "role": "builder",
+   "note": "R39 second-session lineage (re-keyed after the ~15:57Z recycle; this sandbox's prior id builder-r35s1). Environment recovery + credential custody facts typed in eval/r39b_status.json. Registered on the peer's R40 tip 677c4f618 after TWO mutex stand-downs (the peer's ddc938201 acceptance tip and 677c4f618 R40 build landed mid-round; this session's work rebuilt disjoint each time per Art. 29(e))."
   }
  },
  "claims": [
@@ -903,6 +908,95 @@
    "session": "builder-r20s2",
    "scope": "BUILD round — no v7 generation happens this round (the v7 holdout packet is the AUDITOR's to author; the v7 run gets its own claim registered before any v7 problem is read). This claim covers: (1) scripts/r40_v77_directive.py — the pre-registered V77 repair directive (the V76 stack verbatim + the MECHANISM-CLASS-DECLARATION, INPUT-AVAILABILITY, COST-PRICING and DIRECTION-CORRECTNESS clauses), committed BEFORE any LLM call that uses it; (2) scripts/r40_machine_v77.py — machine_generate_v77: the V7.6 path verbatim PLUS four new checks (the broadened driver-as-remedy synonym-class net; the typed LLM sign/integral direction-correctness check PHYSICS_DIRECTION_INVERTED / DIRECTION_UNPROVEN, fail-open typed on transport failure; the structural INPUT_UNAVAILABLE scan against the constraint's permitted-measure span, falsification-test spans excluded, NOT-APPLICABLE fail-open when no span parses; the UNPRICED_DUTY_CYCLE scan; the MECHANISM_CLASS_UNSTATED + MECHANISM_TEMPLATE_MONOCULTURE cap <=2 rows per template per 6-intervention set, enforced against the driver-supplied histogram) and the R-REQID forward-only transport fix (the v7 primary requests glm-4-plus; the served identity remains the evidence per R-REQID); (3) tests/test_guard_activation.py — the AM37 D4 in-suite activation assertions (core.hooksPath configured, the hook propagates the guard failure and blocks markers, the CI workflow carries the bind suites, the v7 request id constant is glm-4-plus); (4) scripts/r40_v77_firetest.py — the RETROSPECTIVE validation of the new checks over the COMMITTED v6 rows (no regeneration): the acceptance mapping is HO6-02 fires the direction checks, HO6-03 fires the pricing check, HO6-04 and HO6-12 fire the input-availability check. The v6 rows are burned; the fire-test validates the CHECKERS, not the rows; the authoritative v7 acceptance read stays the auditor's on the v7 packet.",
    "pre_registration_note": "Art. 29(b): this claim and the directive module are committed and pushed BEFORE the fire-test's LLM calls and before any v7 generation. The V7.6 machine path is BYTE-FROZEN (v6 burned, rows stand); v7 is a NEW contract version."
+  },
+  {
+   "claim_id": "c-0045",
+   "work_id": "r39-registry-schema-remediation",
+   "session_id": "builder-r39s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "677c4f618",
+   "claimed_at": "2026-11-16T17:10:00Z",
+   "lease_expiry": "2026-11-16T19:30:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/work_claims.json",
+    "eval/r39_registry_remediation.json"
+   ],
+   "notes": "CI-UNBLOCK (R34 V3 precedent), third filing (two mutex stand-downs): the queue CI is RED at 677c4f618 and has been red on 7 consecutive pushes — TWO independent red lines: (article29) the R35-R39 registry schema violations (7 out-of-enum kinds c-0038..c-0044; 4 out-of-enum statuses incl. the peer's 'VERIFIED' and 'ACTIVE'; 8 missing artifact_paths incl. the new c-0046; 2 missing lease_expiry; 1 verifier-attribution mismatch; 2 canonical coverage gaps) and (article27) every round record r30..r39 lacks the art27_capability_budget ledger field (red since R30 — found on the full-output re-run after a tail-truncated first inventory hid it; self-caught). Remediation forward-only (Art. 4): tip fields normalized + every change registered in the violation arrays; the Art. 29 test amended per the V3 precedent (registered tolerance for snapshot-baked missing fields, per-claim LIST registrations; tip always strict). ALSO NORMALIZED: the peer's fresh c-0046 (r40-v7-machine-contract) entry committed in a non-schema shape (title/registered_at/session/scope instead of role/session_id/kind/base_sha/claimed_at/lease_expiry/artifact_paths) — brought into schema with their content fields preserved verbatim + disclosed. DISCLOSURE: this sandbox's own prior push de04717b8 is among the red pushes; also this session's first rebase of the rebuilt chain glued the registry merge malformed (the conflict-resolution script failed AFTER writing; the git add ran on an unguarded chain) — self-caught on per-commit JSON validation, the chain was discarded unpushed and rebuilt clean (nothing broken ever pushed)."
+  },
+  {
+   "claim_id": "c-0048",
+   "work_id": "r36-c0026-predictor-half",
+   "session_id": "builder-r39s1",
+   "role": "VERIFIER",
+   "kind": "measurement",
+   "base_sha": "677c4f618",
+   "claimed_at": "2026-11-16T17:10:00Z",
+   "lease_expiry": "2026-11-16T19:30:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/r39_verifier_c0042.json"
+   ],
+   "notes": "Art. 29(c) VERIFIER record for c-0042 (EXECUTION-COMPLETE-PENDING-VERIFICATION -> DONE upon this record): zero-LLM recompute of the 11/12 within-+/-1 predictor tally from eval/judge_feasibility_calibration_r29_predictors.json (medians from the K=3 draws, deltas, within flags — zero row mismatches on recompute); concurs with the AM36 re-adjudication (COMBINED MET 16/18+11/12; auditor governs). DISCLOSURE: c-0042 was executed by this sandbox's PRIOR session (builder-r35s1); the recompute is mechanical and the AUDITOR's re-adjudication is the governing verification."
+  },
+  {
+   "claim_id": "c-0049",
+   "work_id": "r38-deepseek-rung-qualification-c0026",
+   "session_id": "builder-r39s1",
+   "role": "VERIFIER",
+   "kind": "measurement",
+   "base_sha": "677c4f618",
+   "claimed_at": "2026-11-16T17:10:00Z",
+   "lease_expiry": "2026-11-16T19:30:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/r39_verifier_c0044.json"
+   ],
+   "notes": "Art. 29(c) VERIFIER record for the peer's c-0044: both deepseek readings recomputed (original @9f2f632cc: accuracy 0.333, answered 0.367; R39 retry @tip: accuracy 0.8, answered 0.833 — the 0.9 answered bar FAILS) -> INCONCLUSIVE_TRANSPORT both times, not a retirement (R-CAL); concurs with AM36 section 2 + AM37 section 4."
+  },
+  {
+   "claim_id": "c-0050",
+   "work_id": "r39-art27-ledger-completion",
+   "session_id": "builder-r39s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "677c4f618",
+   "claimed_at": "2026-11-16T17:10:00Z",
+   "lease_expiry": "2026-11-16T19:30:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/r30_status.json",
+    "eval/r31_status.json",
+    "eval/r32_status.json",
+    "eval/r33_status.json",
+    "eval/r34_status.json",
+    "eval/r35_status.json",
+    "eval/r36_status.json",
+    "eval/r38_status.json",
+    "eval/r39_status.json"
+   ],
+   "notes": "SECOND red line: every round record r30..r38 AND the peer's fresh r39_status.json lack the art27_capability_budget field (red since R30). Forward-only: the field added at the tip with values sourced ONLY from each round's own statements (art27_verdict / commit Art. 27 lines / the AM30 + AM37 rulings); nothing invented; every value cites its source; snapshots keep the defect (Art. 4)."
+  },
+  {
+   "claim_id": "c-0051",
+   "work_id": "holdout-v6-generation",
+   "session_id": "builder-r39s1",
+   "role": "VERIFIER",
+   "kind": "measurement",
+   "base_sha": "677c4f618",
+   "claimed_at": "2026-11-16T17:10:00Z",
+   "lease_expiry": "2026-11-16T19:30:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/r39_verifier_v6_run.json"
+   ],
+   "notes": "Art. 29(c) VERIFIER record for THE acceptance run (c-0038; the peer explicitly invited the peer verifier). Zero-LLM recompute from committed bytes: run integrity 12/12 (rows == ledger == events == packet; one generation per problem; one executor id); the attestation recomputed by the R34 V2 per-attempt content-hash correlation (48 attempts + 2 preflights = 50 slice calls EXACT, all served glm-4-plus, 12/12 EQUAL -> run_verdict VALID); the R-REQID factual basis recomputed EXACT (48 legacy-id requests all served glm-4-plus); the seal anchor recomputed EXACT (4d60488a…); the AUDITOR's tally recomputed EXACTLY from their published score file (31/12 = 2.583/4 = 64.6%, intervention 14/6, predictor 17/6, 1 inverted HO6-02, 0 allowed-measures violations) — ACCEPTANCE NOT GRANTED per AM37. One verifier first-pass method defect (route_model vs content-hash basis) self-caught + disclosed in the record."
   }
  ],
  "trailer_violations": [
