@@ -55,7 +55,12 @@ REGISTRY_PROVENANCE = ("auditor registration ruling (R36 message, AM34 to "
 
 def load_rows(d: Path) -> dict[str, dict]:
     rows = {}
-    for f in sorted(d.glob("HO5-*.json")):
+    # R39 fix (disclosed): the glob was hardcoded to the v5 row prefix,
+    # which made the v6 attestation measure ZERO rows ("0/0" = a
+    # measurement failure typed as substitution). Both holdout prefixes
+    # load; v5 behavior is byte-identical.
+    files = sorted(d.glob("HO5-*.json")) + sorted(d.glob("HO6-*.json"))
+    for f in files:
         rows[f.stem] = json.loads(f.read_text(encoding="utf-8"))
     return rows
 

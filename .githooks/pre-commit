@@ -8,4 +8,18 @@
 # Discovery: if the guard script itself is missing (deleted, botched
 # checkout), FAIL CLOSED — an absent guard must not silently admit
 # auditor-namespace edits (Art. XVII).
-exec python3 "$(dirname "$0")/../discovery_fabric/audit_branch_guard.py"
+# R39 fix (found by the F53 refusal-path test): `exec` REPLACES the
+# process — everything after it was dead code and the marker check
+# never ran. Run the guard and propagate its failure instead.
+python3 "$(dirname "$0")/../discovery_fabric/audit_branch_guard.py" || exit $?
+
+# F53 (AM36 D3): conflict markers are blocked at COMMIT time, not only
+# caught before push — an added line in the staged diff must never open
+# or close a merge-conflict block. Exact-7 tokens only (audited: no
+# tracked line matches, so false positives are none); --no-verify is
+# the typed escape and must be disclosed in the commit message.
+if git diff --cached -U0 --no-color |
+   grep -qE '^\+(<{7}($|[ ])|={7}$|>{7}($|[ ]))'; then
+  echo "pre-commit: CONFLICT MARKERS found in the staged diff — commit refused (F53/AM36 D3; resolve the merge or use --no-verify and disclose it in the commit message)" >&2
+  exit 1
+fi

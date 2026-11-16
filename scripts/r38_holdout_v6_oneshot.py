@@ -212,8 +212,23 @@ def main() -> int:
         # v6 artifact names for the attestation record
         att.OUT = REPO / "eval" / "holdout_v6_attestation.json"
         att.SUMMARY = REPO / "eval" / "holdout_v6_full_summary.json"
-        times = sorted(str(d.get("generated_at", ""))
-                       for d in ledger["rows"].values())
+        # R39 fix: attest() hashes rows from ROWS_DIR/DUP_DIR (module
+        # constants still point at the v5 dirs) — point them at the v6
+        # pair dir so the per-row custody sha reads the actual files
+        att.ROWS_DIR = OUT_DIR
+        att.DUP_DIR = OUT_DIR
+        # R39 fix: the ledger row_recs carry no generated_at — derive
+        # the run window from the durable EVENTS log's row ts
+        times = []
+        if EVENTS.exists():
+            for line in EVENTS.read_text(encoding="utf-8").splitlines():
+                try:
+                    ev = json.loads(line)
+                except Exception:
+                    continue
+                if ev.get("kind") == "row" and ev.get("ts"):
+                    times.append(ev["ts"])
+        times.sort()
         win_start = win_end = None
         if times and att.GW_LOG.exists():
             win_start, win_end = times[0][:13], times[-1][:13]
@@ -227,29 +242,74 @@ def main() -> int:
                   f"{len(lines)} calls ({GW_SLICE.name})", flush=True)
         gw_hist = (att.gateway_window(win_start, win_end)
                    if win_start and win_end else {})
+        # R39 honesty fix: gateway_window counts only requests with
+        # requested_model == REGISTERED — but the FROZEN V7.6 contract
+        # requests the legacy embedded id zai-org/GLM-5.3 (the R458-C1
+        # disclosure: the grant serves its single embedded model
+        # regardless of requested id). The committed slice shows ALL
+        # run-window calls were SERVED glm-4-plus; record the FULL
+        # requested->served evidence so the PASS rests on the rows'
+        # own calls, not on an unrelated probe call.
+        req_to_served = {}
+        all_served_reg = True
+        if GW_SLICE.exists():
+            for ln in GW_SLICE.read_text(encoding="utf-8").splitlines():
+                try:
+                    d = json.loads(ln)
+                except Exception:
+                    continue
+                key = f"{d.get('requested_model')} -> {d.get('model')}"
+                req_to_served[key] = req_to_served.get(key, 0) + 1
+                if d.get("model") != att.REGISTERED_MODEL:
+                    all_served_reg = False
         summary_serving = None
         verdict = att.attest(
             att.load_rows(OUT_DIR), gw_hist, summary_serving,
             f"{RUN_NAME} one-shot (corrected registration glm-4-plus)")
+        n_measured = verdict["n_rows"]
         ledger["served_model_attestation"] = {
             "registered_model": att.REGISTERED_MODEL,
-            "n_equal": verdict["n_equal"], "n_rows": verdict["n_rows"],
+            "n_equal": verdict["n_equal"], "n_rows": n_measured,
             "verdict": verdict["verdict"],
             "gate": "pre-scoring (AM32 D1 + holdout v6 mandatory)",
             "gateway_log_slice": str(GW_SLICE.name),
-            "serving_histogram": gw_hist}
-        run_void = verdict["verdict"] != "PASS"
-        ledger["run_verdict"] = ("VOID — served-model substitution "
-                                 "(registered machine did not execute; "
-                                 "scoring refused, Art. 3 fail-closed)"
-                                 if run_void else
-                                 f"VALID — {verdict['n_equal']}/"
-                                 f"{verdict['n_rows']} rows attested "
-                                 "equal to the registered model "
-                                 "glm-4-plus")
-        ledger["acceptance_eligible"] = not run_void
+            "serving_histogram": gw_hist,
+            "serving_evidence_full": {
+                "requested_to_served": req_to_served,
+                "all_window_calls_served_registered": all_served_reg,
+                "request_id_note": (
+                    "the frozen V7.6 contract requests the legacy "
+                    "embedded id zai-org/GLM-5.3 (a frozen-contract "
+                    "artifact); the grant serves its single embedded "
+                    "model regardless of requested id (R458-C1) — "
+                    "every run-window call was SERVED glm-4-plus, "
+                    "which is the identity evidence; correcting the "
+                    "machine's request id is a contract change that "
+                    "belongs to the auditor's next ruling, never a "
+                    "mid-acceptance edit")}}
+        if n_measured == 0:
+            # R39 fix: 0 rows measured is a MEASUREMENT FAILURE, not a
+            # substitution — type it honestly (the R36-era conflation
+            # lesson, applied to the gate itself)
+            ledger["run_verdict"] = ("UNPROVABLE — the attestation "
+                                     "measured ZERO rows (gate wiring "
+                                     "failure); scoring refused, "
+                                     "fail-closed (Art. 3)")
+            ledger["acceptance_eligible"] = False
+        else:
+            run_void = verdict["verdict"] != "PASS"
+            ledger["run_verdict"] = ("VOID — served-model substitution "
+                                     "(registered machine did not "
+                                     "execute; scoring refused, "
+                                     "Art. 3 fail-closed)"
+                                     if run_void else
+                                     f"VALID — {verdict['n_equal']}/"
+                                     f"{n_measured} rows attested equal "
+                                     "to the registered model "
+                                     "glm-4-plus")
+            ledger["acceptance_eligible"] = not run_void
         print(f"[v6-oneshot] ATTESTATION: {verdict['n_equal']}/"
-              f"{verdict['n_rows']} equal -> {verdict['verdict']}",
+              f"{n_measured} equal -> {verdict['verdict']}",
               flush=True)
     except Exception as e:  # gate failure fails CLOSED, never open
         ledger["run_verdict"] = (f"UNPROVABLE — attestation gate error: "

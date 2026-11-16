@@ -1,0 +1,158 @@
+{
+ "problem_id": "HO6-10-coldbox-blockage",
+ "question_type": "predictor-design",
+ "a1_answer": "**NOVELTY STATEMENT**  \n- Standard practice delivers: MONITORING/INDICATION scheme using pressure drop as a direct indicator of blockage.  \n- Novel departure: Same-class mechanism but using thermal inertia in the cold-box temperature profile as a leading indicator, detected via cross-correlation with pressure drop and CO2/moisture levels.  \n- Physics connection: CO2/moisture freezing releases latent heat, temporarily warming local channels, increasing thermal inertia before pressure rises detectably.  \n\n**PHYSICS CHECK**  \n- Governing relation: Latent heat release from freezing (Q = m·ΔH_fus) delays temperature drop, increasing thermal time constant (τ = ρ·c_p·V/h·A).  \n- Magnitude verification: For a 1 kg ice deposit (ΔH_fus ≈ 334 kJ/kg), in a 0.1 m³ channel (ρ ≈ 900 kg/m³, c_p ≈ 2000 J/kg·K), ΔT ≈ 1.8 K, measurable over 2–4 hours before pressure drop rises.  \n- DIRECTION-OF-EFFECT: driving variable = thermal inertia (τ); the mechanism increases τ by detecting delayed cooling; this raises the temperature signature, reducing the failure driver (early blockage formation).  \n\n**IMPLEMENTATION BILL**  \n(a) ALREADY-RECORDED: Cold-box temperature profile (stated sensor: \"cold-box temperature profile\").  \n(b) ALREADY-RECORDED: Stream pressure drop (stated sensor: \"stream pressure drop\").  \n(c) ALREADY-RECORDED: Pre-purifier outlet analyser (stated sensor: \"pre-purifier outlet analyser\").  \n(d) CALCULATED: Thermal inertia threshold (τ_threshold) from baseline temperature decay rate (stated physics: exponential cooling in cryogenic systems).  \n(e) CALCULATED: Cross-correlation window (48 hours) from pressure drop rise rate (stated spec: defrost limit pressure drop).  \n(f) DERIVED: CO2/moisture freezing probability (from analyser data and temperature thresholds, stated data: \"pre-purifier outlet analyser\").  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n- Installability: SAME (uses existing sensors; no hardware changes).  \n- Operability: SAME (cloud-hosted analysis; no operator intervention).  \n- Maintenance: SAME (no new components; calibration inherited from existing sensors).  \n- Cost class: SAME (no new hardware; software-only implementation).  \n\n**EXECUTABLE TEST**  \n- Protocol: Compare predicted blockage (from thermal inertia model) against actual pressure drop over 6 months of historical data.  \n- Instruments: Existing temperature, pressure, and analyser logs.  \n- Pass/fail: ≤1 false alarm/year; prediction must precede pressure drop threshold by ≥48 hours.  \n- Kill criterion: If false alarms exceed 1/year or prediction lead time <48 hours, mechanism is invalid.  \n- Validation: Against ALREADY-RECORDED data (historical logs) and stated physical relation (cooling dynamics).",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Installability: SAME (uses existing sensors; no hardware changes).",
+    "- Operability: SAME (cloud-hosted analysis; no operator intervention).",
+    "- Maintenance: SAME (no new components; calibration inherited from existing sensors).",
+    "- Cost class: SAME (no new hardware; software-only implementation).",
+    "- Protocol: Compare predicted blockage (from thermal inertia model) against actual pressur",
+    "- Instruments: Existing temperature, pressure, and analyser logs.",
+    "- Pass/fail: ≤1 false alarm/year; prediction must precede pressure drop threshold by ≥48 h",
+    "- Kill criterion: If false alarms exceed 1/year or prediction lead time <48 hours, mechani",
+    "- Validation: Against ALREADY-RECORDED data (historical logs) and stated physical relation"
+   ]
+  }
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 2782,
+   "latency_s": 7.1,
+   "transport_tries": 1,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Inputs (all ALREADY-RECORDED):",
+     "- Cold-box temperature profile (stated: \"existing cold-box temperature profile\")",
+     "- Stream pressure drop (stated: \"existing stream pressure drop\")",
+     "- Pre-purifier outlet CO2/H2O analyser (stated: \"pre-purifier outlet analyser\")",
+     "- Processing:",
+     "- Thermal inertia model: Compare measured temperature gradient (dT/dx) against expected ad",
+     "- Anomaly threshold: 15% deviation in thermal inertia (CALCULATED from historical freeze e",
+     "- Output: Warning signal when thermal inertia anomaly persists >6 hours (DERIVED from phys",
+     "- Installability: Same as standard (no new sensors; uses existing data streams).",
+     "- Operability: Identical monitoring interface; adds only thermal inertia computation (negl",
+     "- Maintenance: Zero additional hardware; software update only (same burden as standard thr",
+     "- Cost class: SAME as standard (no new equipment; minor software development)."
+    ]
+   },
+   "sha256_16": "30bf981fedfe8ce6"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 2940,
+   "latency_s": 7.8,
+   "transport_tries": 2,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Cold-box temperature profile (stated: \"existing cold-box temperature profile\")",
+     "- Stream pressure drop (stated: \"stream pressure drop\")",
+     "- Pre-purifier outlet CO2 analyzer (stated: \"pre-purifier outlet analyser\")",
+     "- Thermal gradient analyzer software (class: industrial process monitoring systems)",
+     "- CO2 adsorption kinetics model (class: chemical process simulation tools)",
+     "- Thermal gradient threshold: CALCULATED from stated cold-box design ΔT (spec: 30 K across",
+     "- CO2 breakthrough threshold: CALCULATED from analyzer baseline (stated log) + 20% = 0.2 p",
+     "- Installability: SAME (no new hardware; software integrates with existing DCS).",
+     "- Operability: SAME (uses existing operator interfaces; no new training).",
+     "- Maintenance: SAME (software updates via standard IT protocols).",
+     "- Cost class: SAME (software licensing vs. pressure transducer replacement).",
+     "- Operational loss: ZERO (no downtime; early action avoids defrost).",
+     "- Protocol: Log temperature profile, pressure drop, and CO2 analyzer data during 3 normal ",
+     "- Pass/fail: Predict pressure drop rise > 48 hours ahead with < 1 false alarm/year (valida",
+     "- Duration: 1 cycle (8–12 hours).",
+     "- Kill criterion: Prediction error > 6 hours or false alarm during test.",
+     "- Primary indicator: Pressure drop (stated: \"pressure drop ... forces a defrost outage\").",
+     "- Supplement: CO2 analyzer (secondary, confirms breakthrough but not primary for threshold"
+    ]
+   },
+   "sha256_16": "e6c5eb321a66dd8a",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Cold-box temperature profile (stated: \"existing cold-box temperature profile\"); - Stream pressure drop (stat"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 2950,
+   "latency_s": 8.0,
+   "transport_tries": 3,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installability: SAME (uses existing sensors; no hardware changes).",
+     "- Operability: SAME (cloud-hosted analysis; no operator intervention).",
+     "- Maintenance: SAME (sensor calibration per standard practice; algorithm updates via sched",
+     "- Cost class: SAME (software-only solution; no capital expenditure).",
+     "- Operational loss: ZERO (avoids defrost outage costing $50K/instance)."
+    ]
+   },
+   "sha256_16": "2dd9bb6c1ddc86b9",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Installability: SAME (uses existing sensors; no hardware changes).; - Operability: SAME (cloud-hosted analys"
+   ]
+  },
+  {
+   "stage": "repair_3",
+   "chars": 2721,
+   "latency_s": 7.5,
+   "transport_tries": 4,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installability: SAME (uses existing sensors; no hardware changes).",
+     "- Operability: SAME (cloud-hosted analysis; no operator intervention).",
+     "- Maintenance: SAME (no new components; calibration inherited from existing sensors).",
+     "- Cost class: SAME (no new hardware; software-only implementation).",
+     "- Protocol: Compare predicted blockage (from thermal inertia model) against actual pressur",
+     "- Instruments: Existing temperature, pressure, and analyser logs.",
+     "- Pass/fail: ≤1 false alarm/year; prediction must precede pressure drop threshold by ≥48 h",
+     "- Kill criterion: If false alarms exceed 1/year or prediction lead time <48 hours, mechani",
+     "- Validation: Against ALREADY-RECORDED data (historical logs) and stated physical relation"
+    ]
+   },
+   "sha256_16": "03b8ea694c38350f",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Installability: SAME (uses existing sensors; no hardware changes).; - Operability: SAME (cloud-hosted analys"
+   ]
+  }
+ ],
+ "generated_at": "2026-11-16T16:12:59Z"
+}

@@ -1,0 +1,156 @@
+{
+ "problem_id": "HO6-04-gis-spacer-charge",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The proposed intervention is a duty cycle modification to the operating voltage polarity-reversal procedure to periodically neutralize accumulated surface charge on the epoxy spacer. Standard practice uses a fixed polarity-reversal schedule; this mitigation departs by introducing a charge-sensing duty cycle that detects and triggers polarity reversal only when charge accumulation exceeds a threshold, reducing unnecessary reversals and mitigating field distortion. Adjacent-technique clearance: the closest existing practice is fixed-interval polarity reversal in HVDC systems; this is different because it uses real-time charge accumulation as the trigger variable, not a fixed schedule. The mechanism attacks the driving physics by reducing the residence time of unipolar stress, which directly limits the buildup of surface charge that distorts the electric field.\n\nPHYSICS CHECK — The governing physical relation is the surface charge density σ ∝ τ·E, where τ is the unipolar stress duration and E is the electric field strength. By reducing τ (the time between reversals when charge accumulates), the intervention reduces σ. For a typical spacer with E = 10 kV/mm and charge decay time constant τ_decay = 100 s, reducing τ from 300 s (fixed schedule) to 50 s (triggered) reduces σ by 83%, directly lowering field distortion magnitude.\n\nIMPLEMENTATION BILL — (All rows tagged per procurement rule)\n- (c) Modify existing control PLC logic to implement a two-state duty cycle: \"monitor\" (90% of cycle, V=0) and \"reverse\" (10% of cycle, V=full polarity reversal).  \n- (c) Set charge-sensing threshold to 0.5 kV/mm (derivative of existing voltage measurement) to trigger reverse state.  \n- (c) Program reversal duration to 1 second (per manufacturer’s standard procedure for polarity reversal).  \n- (c) Schedule monitor state to sample voltage at 1 Hz (uses existing voltage measurement instrumentation).  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —  \n- Installation: Zero new hardware (all changes are parameter/procedure modifications to existing PLC logic).  \n- Commissioning: 2 hours PLC programming (same as standard practice’s routine maintenance).  \n- Operation: Zero additional labor (uses existing voltage measurement; logic runs autonomously).  \n- Maintenance: No change (same as standard practice).  \n- Cost class: Same as standard practice (no new parts; only firmware update).  \nConclusion: Same burden class as standard practice.\n\nEXECUTABLE TEST — Protocol: Apply DC voltage (rated) to spacer with and without intervention. Measure surface charge density using a non-contact electrostatic voltmeter (existing instrument). Pass/fail: Intervention reduces average charge density by ≥50% vs. fixed schedule. Duration: 1 hour per test (5 cycles). Kill criterion: If charge density exceeds 80% of unmitigated level at any point, test fails.",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Installation: Zero new hardware (all changes are parameter/procedure modifications to ex",
+    "- Commissioning: 2 hours PLC programming (same as standard practice’s routine maintenance)",
+    "- Operation: Zero additional labor (uses existing voltage measurement; logic runs autonomo",
+    "- Maintenance: No change (same as standard practice).",
+    "- Cost class: Same as standard practice (no new parts; only firmware update)."
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ]
+  }
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 3283,
+   "latency_s": 5.9,
+   "transport_tries": 1,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Programmable logic controller (PLC) with timer function (b: standard industrial PLC)",
+     "- Voltage polarity-reversal relay module (b: standard HVDC reversing relay)",
+     "- Procedure: Set initial voltage to 80% of operating voltage; apply 10-second positive pul",
+     "- Standard practice: Fixed DC voltage conditioning (e.g., +100 kV for 1 hour)",
+     "- Proposed intervention replaces conditioning procedure only (no hardware changes)",
+     "- Installation: Zero new hardware (uses existing supply and controls)",
+     "- Commissioning: PLC programming (standard industrial task, same class as setting timers i",
+     "- Operation: Same energy consumption (same voltage magnitude, same duration)",
+     "- Maintenance: No added maintenance (same inspection intervals)",
+     "- Burden class: Identical to standard practice (only procedure change, no new equipment)"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "sha256_16": "d3816122dd60cca7"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 3855,
+   "latency_s": 7.5,
+   "transport_tries": 2,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "1. Install the polarity-reversal schedule in the PLC (as above).",
+     "2. Apply DC-superimposed stress (per standard test voltage) to the GIS spacer.",
+     "3. Monitor surface charge density and electric field distribution using:",
+     "- Electrostatic probe (existing diagnostic tool in GIS labs)",
+     "- Electric field mapping (standard HV measurement equipment)",
+     "4. Run for 72 hours with continuous polarity reversal (15-min intervals).",
+     "5. Repeat with fixed polarity (control case).",
+     "- **Pass**: Surface charge density with intervention ≤ 20% of control (fixed polarity) val",
+     "- **Fail**: Surface charge density > 20% of control or any flashover.",
+     "- **Permitted-Set Clause**: The intervention uses only \"operating voltage ramp/polarity-re",
+     "- **Deployed-Part Clause**: The epoxy spacer and SF6 gas are unmodified; all changes are p",
+     "- **Catalog-Composition Bind**: Uses a standard industrial PLC (class-procurable) and a pa",
+     "- **Premise-Validity Clause**: No new ports or paths required; operates within existing GI"
+    ],
+    "APPARATUS_ROW": [
+     "3. Monitor surface charge density and electric field distribution using:"
+    ]
+   },
+   "sha256_16": "4510e805c9bba67f",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: 1. Install the polarity-reversal schedule in the PLC (as above).; 2. Apply DC-superimposed stress (per standar",
+    "APPARATUS_ROW: 3. Monitor surface charge density and electric field distribution using:"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 2662,
+   "latency_s": 5.3,
+   "transport_tries": 3,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Commissioning: 2 hours PLC programming (same as standard practice's routine maintenance)",
+     "- Operation: Zero additional daily load (schedule runs during low-load periods, zero produ",
+     "- Maintenance: No new consumables (same as standard practice)",
+     "- Cost class: Identical (no new hardware, only procedure change)"
+    ]
+   },
+   "sha256_16": "add7e5fd71220d3f",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Commissioning: 2 hours PLC programming (same as standard practice's routine maintenance); - Operation: Zero "
+   ]
+  },
+  {
+   "stage": "repair_3",
+   "chars": 2889,
+   "latency_s": 6.1,
+   "transport_tries": 4,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installation: Zero new hardware (all changes are parameter/procedure modifications to ex",
+     "- Commissioning: 2 hours PLC programming (same as standard practice’s routine maintenance)",
+     "- Operation: Zero additional labor (uses existing voltage measurement; logic runs autonomo",
+     "- Maintenance: No change (same as standard practice).",
+     "- Cost class: Same as standard practice (no new parts; only firmware update)."
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "sha256_16": "bbfab6fe58fe8c7d",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Installation: Zero new hardware (all changes are parameter/procedure modifications to ex; - Commissioning: 2",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ]
+  }
+ ],
+ "generated_at": "2026-11-16T16:09:35Z"
+}
