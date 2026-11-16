@@ -1,0 +1,35 @@
+{
+ "record": "R33_DUPLICATE_GENERATION_DISCLOSURE/1.0.0",
+ "session": "builder-r20s1",
+ "at": "2026-11-16T21:10:00Z",
+ "severity": "PROTOCOL INCIDENT — duplicate generation of a SEALED one-shot set (Art. 29(c) one-generation discipline broken); disclosed per Art. 5, remediated per Art. 29(e)",
+ "what_happened": [
+  "This session (builder-r20s1) filed claim c-0034 and pushed it at 72cdf4ca8 BEFORE any problem read (Art. 29(b) push-as-mutex), extracted the sealed packet (sha256_16 11b46c6fc4e73082), and ran the 12-problem one-shot locally.",
+  "While that run was mid-flight, the remote branch gained a COMPLETED 12-row one-shot of the SAME sealed set (commit e401bb2ad), committed under the SAME session trailer (Session: builder-r20s1) — an IDENTITY COLLISION: two sandbox sessions ran the sealed one-shot under one registered session id, which made the push-as-mutex blind (the registry saw the same session on both sides of the lease).",
+  "c-0034 was OPEN with a valid lease (expiry 2026-11-17T02:00:00Z) when the second generation executed — no takeover per Art. 29(d) was filed."
+ ],
+ "evidence_generations_differ": [
+  "HO5-01: this session's row sha256_16 5c8fe2933a1d4012 (4624 chars) vs canonical f4cbf34c109f6633 (5650 chars)",
+  "HO5-05: this session's row sha256_16 47ea26a9e6ac732f (6065 chars) vs canonical d2cc2d39ba3bb155 (2972 chars)"
+ ],
+ "stand_down": {
+  "rule": "Art. 29(e): same-work_id non-fast-forward => stand down to verifier, never rebase a duplicate",
+  "action": "this session's 12 rows are QUARANTINED (eval/pairs/holdout_v5_generation_DUPLICATE_builder-r20s1/ + eval/holdout_v5_run_DUPLICATE_builder-r20s1.json — bytes kept, typed NON-CANONICAL, never submitted for scoring) and this session takes the VERIFIER seat on c-0034",
+  "canonical": "the PUSHED run e401bb2ad is the canonical one-shot; the canonical rows live at eval/pairs/holdout_v5_generation/ (untouched)"
+ },
+ "canonical_run_numbers": {
+  "source": "commit e401bb2ad (recomputable from the committed row bytes, Art. 13)",
+  "rows": "12/12, 0 empty, nothing re-drawn",
+  "residuals": "BILL_UNTAGGED=7, ALLOWED_ROW_OUTSIDE=2, ALLOWED_MEASURE_TYPE_OUTSIDE=1 (HO5-05 — typed as an auditor input, instrument not weakened), PHYSICS_DIRECTION_UNSTATED=0/12",
+  "transport": "8 rows served by the recovered primary (typed upstream observation: served model glm-4-plus for requested zai-org/GLM-5.3, disclosed from the gateway call log), 4 rows by the c-0031 amended NVIDIA chain"
+ },
+ "duplicate_run_numbers": {
+  "scope_warning": "NOT an acceptance read — quarantined bytes, disclosed for the incident record only",
+  "rows": "12/12, 0 empty, K_GEN=1 held, no resume needed",
+  "machine_bars": "0/12 ALLOWED_MEASURE_TYPE_OUTSIDE or LIMIT_DIRECTION_VIOLATION; 0/12 PHYSICS_DIRECTION_UNSTATED or DRIVER_AS_REMEDY; 10/12 residual-CLEAN outright; BILL_UNTAGGED=2 (HO5-07, HO5-12)",
+  "transport": "the primary z.ai credential returned HTTP 401 on EVERY probe for the ENTIRE run — all 12 rows served by the c-0031 amended fallback chain (9 nemotron-ultra, 2 bolt first-attempt after one typed ultra empty-content advance, 3 mixed), route/route_model/fallback_reason on every attempt in the quarantined ledger"
+ },
+ "sealed_set_status": "the v5 set has now been GENERATED TWICE (the canonical run + this session's quarantined run) — the burn-after-use condition is engaged either way; whether the auditor scores the canonical run as the one-shot or re-seals a fresh v6 before scoring is the AUDITOR's call (typed here, not decided by the builder)",
+ "identity_collision_remediation": "typed for the auditor to attribute (the F37 re-key precedent applies); this session will adopt a fresh session id on the auditor's direction",
+ "verifier_offer": "this session, standing down to VERIFIER (Art. 29(e)), offers the typed recompute of the canonical rows from committed bytes (never a re-run) on the auditor's or peer's request"
+}

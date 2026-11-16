@@ -1,0 +1,111 @@
+{
+ "problem_id": "HO5-11-dry-gas-seal",
+ "question_type": "predictor-design",
+ "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a MONITORING/INDICATION scheme using a threshold on primary vent flow; your same-class mechanism departure uses the rate of change of seal-gas differential pressure relative to buffer temperature. The failure-physics connection is that O-ring hang-up increases seal leakage, raising differential pressure before significant vent flow increase occurs.\nPHYSICS CHECK — Governing relation is seal leakage rate proportional to differential pressure ($\\dot{Q}_{leak} \\propto \\Delta P_{seal}$); a 10% increase in $\\Delta P_{seal}$ for a constant buffer temperature indicates a measurable degradation rate exceeding the threshold.\nIMPLEMENTATION BILL — Components: Existing DCS/PLC, Existing primary/secondary vent flow, Existing seal-gas differential pressure, Existing buffer temperature; Input Stream 1: \"primary/secondary vent flow\"; Input Stream 2: \"seal-gas differential pressure\"; Input Stream 3: \"buffer temperature\"; Reference/Threshold: DERIVED (stated physics) $\\text{Threshold} = f(\\text{Trip Vent Flow}) - \\text{Safety Margin}$; CALCULATED $\\text{Warning Time} = \\text{Time to reach Trip Vent Flow} - 10 \\text{ days}$.\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Installability: SAME burden class (software deployment on existing DCS/PLC); Operability: SAME burden class (uses existing instrumentation); Maintenance: SAME burden class (no new parts); Rough Cost Class: SAME burden class. Operational Loss: 0 USER CONSTRAINT\nEXECUTABLE TEST — Protocol: Monitor $\\Delta P_{seal}$ and Buffer Temperature; Instruments: Existing DCS/PLC; Pass/Fail Thresholds: Warning issued when $\\text{Rate of Change}(\\Delta P_{seal}) / \\text{Buffer Temperature}$ exceeds $\\text{DERIVED Threshold}$ for 3 consecutive readings; Duration: Continuous monitoring; Kill Criterion: Two false alarms recorded within one year USER CONSTRAINT",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {}
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 5701,
+   "latency_s": 93.2,
+   "transport_tries": 1,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Primary vent flow transmitter (ALREADY-RECORDED per problem: \"existing primary/secondary",
+     "- Secondary vent flow transmitter (ALREADY-RECORDED per problem: \"existing primary/seconda",
+     "- Seal-gas differential pressure transmitter (ALREADY-RECORDED per problem: \"seal-gas diff",
+     "- Buffer temperature transmitter (ALREADY-RECORDED per problem: \"buffer temperature\")",
+     "- No new sensors, no new wiring, no new hardware — computation only.",
+     "- K_seal: DERIVED from stated seal nameplate performance curve (Q vs ΔP at reference T) — ",
+     "- Q_expected(ΔP, T_buf) = K_seal · ΔP · √(T_ref / T_buf) · (P_std/P_ref) — DERIVED from st",
+     "- Model uncertainty σ_model: DERIVED from stated nameplate tolerance (±5% USER CONSTRAINT)",
+     "- Residual R = Q_pri_measured − Q_expected — computed every scan (e.g., 1 Hz).",
+     "- Operating threshold R_thresh: DERIVED from stated constraints (warn ≥10 days before trip",
+     "- FAIL (kill criterion) if: any trip has <10 days residual warning, OR false alarm rate >2"
+    ]
+   },
+   "sha256_16": "37ca2004e18f1a7a"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 5051,
+   "latency_s": 150.4,
+   "transport_tries": 2,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "1. Extract 2 years of continuous 1‑minute resolution data for the four signals (primary ve"
+    ]
+   },
+   "sha256_16": "0fc94c04cde8f2f8",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: 1. Extract 2 years of continuous 1‑minute resolution data for the four signals (primary ve"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 3799,
+   "latency_s": 142.2,
+   "transport_tries": 3,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installability: No new hardware; software deployment on existing DCS/PLC. Standard pract",
+     "- Operability: Operators see a new “Projected Days"
+    ]
+   },
+   "sha256_16": "3688a271576fc996",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Installability: No new hardware; software deployment on existing DCS/PLC. Standard pract; - Operability: Ope"
+   ]
+  },
+  {
+   "stage": "repair_3",
+   "chars": 1865,
+   "latency_s": 5.3,
+   "transport_tries": 4,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3.5-bolt-e4b",
+   "fallback_reason": "nvidia/nemotron-3-ultra-550b-a55b empty content (typed)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {},
+   "sha256_16": "8b76058606c62246",
+   "findings_disclosed": []
+  }
+ ],
+ "generated_at": "2026-11-16T11:57:01Z"
+}

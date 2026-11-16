@@ -1,0 +1,54 @@
+{
+ "problem_id": "HO5-06-vacuum-furnace-hotzone-sag",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe intervention is a coordinated thermal-mechanical duty schedule — a two-stage ramp profile combined with support-proximal load placement and reduced soak temperature — that simultaneously minimizes the creep driving force (stress × time-at-temperature) on molybdenum rails and graphite felt. Standard practice treats ramp rate, soak temperature, load placement, and load mass as independent setpoints; the mitigation departs by co-optimizing them as a single schedule: (1) a slow initial ramp (2°C/min) through 800–1100°C where molybdenum creep initiates but stress relaxation occurs, then standard ramp above; (2) soak temperature reduced by 15°C (1235°C vs 1250°C) with unchanged soak duration; (3) loads placed within 10% of rail span from supports (vs centered) to cut bending moment by ~80%; (4) maximum load mass per rail span reduced by 20%. Adjacent-technique clearance: semiconductor annealing uses multi-stage ramps for stress control, but not coordinated with mechanical load-path optimization on creep-prone supports; vacuum brazing practice holds fixed ramps and centered loading. The mechanism attacks the failure physics by reducing the Larson-Miller parameter (time-temperature integral) and the applied stress simultaneously, where standard practice only limits peak temperature.\n\nPHYSICS CHECK\nGoverning relation: Molybdenum creep strain rate ε̇ = Aσⁿexp(-Q/RT) with n≈3–5, Q≈500–600 kJ/mol. Graphite felt sag follows similar time-temperature-stress dependence. Integrated creep strain Δε ∝ σⁿ × t × exp(-Q/RT).\nDIRECTION-OF-EFFECT: driving variable = creep driving force (σⁿ × t × exp(-Q/RT)); the mechanism moves it DOWN by: (a) reducing σ via support-proximal placement (bending moment ∝ distance from support, ~80% reduction at 10% span) and 20% mass reduction (σ ∝ load); (b) reducing T by 15°C at soak (exp(-Q/R·1500K) → ~35% rate reduction for Q=550 kJ/mol); (c) slow ramp through 800–1100°C allows stress relaxation without accumulating high-temperature creep time. Magnitude verification: combined effect ≈ (0.8)⁴ × 0.35 × (relaxation benefit) ≈ 0.14× baseline creep per cycle — a 7× reduction. This reduces rail deflection and felt sag accumulation per cycle, directly mitigating the failure driver.\n\nIMPLEMENTATION BILL\n| Row | Component / Operation | Class | Tag | Location / Parameter |\n|-----|----------------------|-------|-----|---------------------|\n| 1 | Furnace temperature controller recipe | Existing equipment | (a) | Stated furnace control system |\n| 2 | Ramp profile: 2°C/min from RT to 800°C; 2°C/min from 800°C to 1100°C; standard ramp (e.g., 10°C/min) 1100°C to soak | Parameter change on (1) | (c) | Controller setpoint recipe |\n| 3 | Soak temperature setpoint: 1235°C (vs 1250°C baseline) | Parameter change on (1) | (c) | Controller setpoint recipe |\n| 4 | Soak duration: unchanged from baseline | Parameter change on (1) | (c) | Controller setpoint recipe |\n| 5 | Load placement procedure: parts fixtured within 10% of rail span from nearest support | Procedure change | (c) | Load fixture / operator instruction |\n| 6 | Load mass limit: ≤80% of baseline max mass per rail span | Procedure change | (c) | Load planning / operator instruction |\n| 7 | Support inspection interval: unchanged (detection not prevention) | Existing procedure | (a) | Maintenance schedule |\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n| Dimension | Standard Practice | This Intervention | Delta |\n|-----------|-------------------|-------------------|-------|\n| Hardware install | None (recipe load) | None (recipe load) | 0 |\n| Commissioning | Recipe validation run | Recipe validation run | 0 |\n| Operation per cycle | Baseline cycle time | +15–20 min cycle time (slow ramp segment) | +~3% cycle time |\n| Maintenance | Standard inspection | Standard inspection | 0 |\n| Cost class | Recipe management | Recipe management | Same |\n| Operational loss | Baseline throughput | Throughput loss = 1 cycle per ~30 cycles (3% derate) | Priced: 3% throughput reduction |\n| **Parity conclusion** | — | **Same burden class** (recipe + procedure only; 3% cycle-time increase priced as operational loss) | ✓ |\n\nEXECUTABLE TEST\nProtocol: Run 20 production cycles on the same furnace with the new coordinated schedule (Rows 2–6) vs 20 baseline cycles (historical or concurrent control). Same alloy, same braze specification.\nInstruments: Existing furnace thermocouples (pack uniformity), existing rail deflection gauges or post-cycle CMM on rail positions, existing shield-short detection (hipot or resistance).\nPass/fail thresholds: (1) Rail deflection growth per cycle ≤30% of baseline rate (mm/cycle); (2) Pack temperature uniformity (max ΔT at soak) ≤ baseline +5°C; (3) Zero shield shorts in 20 cycles (baseline: ≥1 short per 10 cycles).\nDuration: 20 cycles per arm (~2–3 weeks).\nKill criterion: If rail deflection growth per cycle >50% of baseline OR any shield short occurs, the intervention fails — revert to baseline and investigate.",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 1,
+  "residual_findings": {}
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 5857,
+   "latency_s": 71.0,
+   "transport_tries": 1,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "sha256_16": "6526a32bf1cd1d1d"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 4987,
+   "latency_s": 43.7,
+   "transport_tries": 2,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {},
+   "sha256_16": "cd7f763e493e3b40",
+   "findings_disclosed": []
+  }
+ ],
+ "generated_at": "2026-11-16T11:26:08Z"
+}

@@ -1,0 +1,33 @@
+{
+ "problem_id": "HO5-09-steam-trap-blowthrough",
+ "question_type": "predictor-design",
+ "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a DESIGN CHANGE (e.g., trap replacement/repair); your same-class mechanism departure is an inference based on thermodynamic imbalance derived from existing temperature and pressure data; the failure-physics connection is that blow-through increases the effective heat transfer rate beyond the design limit for a given condensate return pressure.\nPHYSICS CHECK — Governing relation is the energy balance across the trap: $Q_{in} = Q_{out} + Q_{loss}$, where $Q_{loss}$ is proportional to the blow-through mass flow rate. For a 10 bar saturated steam, the temperature difference between inlet and condensate header pressure dictates the potential for blow-through; a temperature difference exceeding $5^\\circ\\text{C}$ above the expected saturated condensate temperature at header pressure indicates excessive blow-through.\nIMPLEMENTATION BILL — Components: Inverted-bucket steam traps; Materials: Existing trap components; Instruments: existing trap inlet/outlet temperature tags, existing condensate header pressure; Procedure: Data logging and comparison; Input Stream 1: \"existing trap inlet/outlet temperature tags\" ALREADY-RECORDED; Input Stream 2: \"condensate header pressure\" ALREADY-RECORDED; Reference/Threshold: $\\text{T}_{\\text{inlet}} - \\text{T}_{\\text{condensate\\_header}} > 5^\\circ\\text{C}$ DERIVED (stated physics); Warning Time: 21 days DERIVED (USER CONSTRAINT).\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Installability: Low (uses existing tags); Operability: Low (data analysis); Maintenance: Low (software check); Rough Cost Class: Low (software/analysis only) SAME burden class.\nEXECUTABLE TEST — Protocol: Monitor $\\text{T}_{\\text{inlet}} - \\text{T}_{\\text{condensate\\_header}}$ for 21 consecutive days; Instruments: existing trap inlet/outlet temperature tags, existing condensate header pressure; Pass/Fail Thresholds: Warning issued if $\\text{T}_{\\text{inlet}} - \\text{T}_{\\text{condensate\\_header}} > 5^\\circ\\text{C}$ for 21 days; Duration: 21 days; Kill Criterion: Exceeding 1 false alarm per 100 traps per year (USER CONSTRAINT).\nCONSTRAINT BIND (predictor): The primary stated indicator is the energy-loss limit (implied by the 21-day warning requirement); the temperature differential is the leading indicator that predicts exceeding this energy-loss limit because blow-through directly increases heat loss.\nUSER CONSTRAINT: use only existing trap inlet/outlet temperature tags and condensate header pressure USER CONSTRAINT\nUSER CONSTRAINT: warn at least 21 days before blow-through exceeds the energy-loss limit USER CONSTRAINT\nUSER CONSTRAINT: at most 1 false alarm per 100 traps per year USER CONSTRAINT\nUSER CONSTRAINT: no new sensors USER CONSTRAINT\nCALCULATED: $5^\\circ\\text{C}$ magnitude verification ASSUMPTION (This value is derived from the physical relation of 10 bar saturated steam and the need to predict energy loss without explicit energy-loss data, adhering to the physics check requirement).",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 0,
+  "residual_findings": {}
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 2985,
+   "latency_s": 8.2,
+   "transport_tries": 1,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3.5-bolt-e4b",
+   "fallback_reason": "nvidia/nemotron-3-ultra-550b-a55b empty content (typed)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {},
+   "sha256_16": "3da44f0b00cd5aa1"
+  }
+ ],
+ "generated_at": "2026-11-16T11:40:09Z"
+}
