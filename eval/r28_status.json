@@ -1,0 +1,51 @@
+{
+ "record": "R28_STATUS/1.0.0",
+ "session": "builder-r28s1",
+ "at": "2026-11-16T03:55:00Z",
+ "reads": {
+  "constitution": "EPISTEMIC_CONSTITUTION.md v3.1.0 (29 articles + the Art. 28 addendum) — Arts. 10, 14, 15, 17, 26, 29 re-read in full for this round",
+  "amendment_26": "R11/audit/AUDITOR_VERDICT_R11_AMENDMENT_26_2026-11-15.md @ audit tip a6ca19ed7 + eval/v7_pilot_auditor_score.json + AUDIT_LEDGER.json",
+  "verdict": "Gate NOT_MET — feasibility NEAR PARITY (auditor pilot-8 fgap 0.375); novelty RESOLVED-PASS (2.125); V7 novelty-relocation the breakthrough direction; the gate is AUDITOR-judged; the machine judge is an input, not the verdict"
+ },
+ "sandbox_note": "fresh sandbox (the prior session's environment was wiped); the repo recloned at queue tip 4926706b4; the audit tip a6ca19ed7 fetched and read. The operator re-supplied CROWLLM_API_KEY to this session at 2026-11-16T02:5xZ — the D2 vault window opened.",
+ "directions_ledger": {
+  "D2": {
+   "direction": "restore the machine judge as a cross-check when its credential is available (optional, not a gate dependency)",
+   "claim": "c-0022 (EXECUTOR builder-r28s1, work_id r28-machine-judge-crosscheck, claim pushed BEFORE any judge LLM call — commit e6ae08314)",
+   "execution": {
+    "probe": "servability gate on the ACTUAL route through the ACTUAL transport path — first attempt TYPED TRANSIENT (HTTP 521 + the provider's own system_cpu_overloaded 94.7% window measured via curl; python+Chrome-UA verified SERVING against the plain-UA 403/CF-1010 class); re-probe PASS (tiny OK 1.3s; 2/2 full-length verdict-shaped trials complete valid rubric JSONs on qwen-3.8-max:free)",
+    "run": "30/30 rows x K=3 = 90 logical judge draws, ALL VALID (3/3 on every row; 110 judge-slot attempts incl. 20 typed ladder retries on transient congestion); the background process was reaped by the sandbox after row 2 (the r21/r22 SIGKILL precedent) and the run completed via the pre-registered chunked foreground resume from the committed per-row partial records — no row ever re-drawn",
+    "byte_riding": "the r27 judge packet's 30 pre-assembled rubric prompts ridden BYTE-EXACT (per-row sha256_16 pinned; the verifier recomputes)",
+    "record": "eval/battery_v7_1_machine_crosscheck_r28.json — per-pair novelty_delta / a1_feasibility / baseline_feasibility / feasibility_abs_gap (median axes, the unchanged metric core), summaries over 18 interventions / 12 predictors / the pilot-8 subset, the AM26 pilot-8 comparison with anchor provenance (audit tip a6ca19ed7), every judged field typed CROSS-CHECK-ONLY",
+    "verifier": "scripts/r28_verify_crosscheck.py — 16/16 zero-LLM checks PASS (shape, row map, byte-exact prompts, per-row recompute, summaries, pilot-8 comparison vs the pinned anchor, quota recount, claim linkage, route pin, zero generation, 3/3-valid health pin)"
+   },
+   "outcome": "MACHINE CROSS-CHECK COMPLETE, DIVERGENCE TYPED (the D2 acceptance's second arm). Machine means on the 18 intervention rows: novelty_delta 2.389 CI95 [1.41, 3.367] — the novelty clause is MACHINE-CORROBORATED (>=0.5 both point and CI); feasibility_abs_gap 1.889 CI95 [1.32, 2.458] — the near-parity feasibility read is NOT machine-corroborated (auditor pilot-8: 0.375). Pilot-8 same-bytes agreement (5 rows): novelty 2/5 exact, 2/5 within-1; feasibility_gap 0/5 exact, 4/5 within-1; the largest per-pair divergence is bench-p06-water-biofilm (machine F_A=1 vs auditor F_A=4, machine fgap=4 vs auditor 0). The 3 v71-tuned pilot rows (p01/p04/p08) are typed INPUT-DIVERGED (the auditor judged the r26 V7 bytes; the final battery carries the V7.1 tuned bytes — not a judgment divergence). The tolerance ruling is the AUDITOR's (AM26: the gate is auditor-judged; these numbers are an input, never the verdict).",
+   "status": "EXECUTED — claim c-0022 stays OPEN until the peer/auditor VERIFIER record lands (Art. 29(c): the verifier recomputes from committed bytes via scripts/r28_verify_crosscheck.py)"
+  },
+  "D1": "UNCHANGED — c-0021's machine work stands (the final 30-pair V7.1 battery + judge packet, judged fields PENDING-AUDITOR); this cross-check does not touch the battery bytes or its claim lane",
+  "D3": "UNCHANGED — PENDING-ON-AUDITOR (holdout v4 authoring is auditor-owned per the Art. 28 addendum)",
+  "D4": "UNCHANGED — Art. 4 pinned-PROCESS with the typed reason; scan v2 + the standard-bill scan stay enforced in CI"
+ },
+ "art29": {
+  "session": "builder-r28s1 (registered at claim c-0022)",
+  "claims": [
+   "c-0022 r28-machine-judge-crosscheck EXECUTOR (claimed+pushed before any judge call; executed; OPEN awaiting the VERIFIER record)"
+  ],
+  "races": "none — the queue tip was re-fetched and diffed before the claim push (single claimant on this work_id); no other live EXECUTOR claims touched disjoint canonical paths this window",
+  "verifier": "scripts/r28_verify_crosscheck.py (the instrument); the VERIFIER record is the peer's/auditor's to file"
+ },
+ "quota_accounting": {
+  "judge_route_calls": "crowllm free route only: 1 failed tiny probe (521 transient) + 2 urllib transport diagnostics (1 served, 1 CF-403-blocked) + 1 served tiny + 2 verdict-shaped probe trials + 90 logical judge draws (110 slot attempts incl. 20 ladder retries) = 96 completion-class calls, of which 93 served",
+  "generator_calls": "0 (the 30 answer/baseline bytes are never re-drawn — Art. 29(c))",
+  "deviation": "the 521/overload transient typed and cleared via the pre-registered ladder (Art. 15: infra failure is never scientific rejection); the sandbox reaped the background run and the chunked foreground resume completed it (the r21/r22 precedent); no row re-drawn, no prompt re-assembled"
+ },
+ "art27_capability_budget": {
+  "engine_diff": "NONE on the machine path — the cross-check is a MEASUREMENT instrument (scripts/r28_judge_crosscheck.py + scripts/r28_verify_crosscheck.py + the record); the generation contracts, scans, and battery assembly are byte-unchanged",
+  "primary_metric_delta": "NONE (no engine change); the D2 cross-check artifact is eval/battery_v7_1_machine_crosscheck_r28.json — a cross-check input typed as such, not a gate metric",
+  "deletions": "none"
+ },
+ "secret_grep": "0 findings (token patterns ghp_/github_pat_/sk-/Bearer + both vault values grepped over every staged diff; the credentials travel via the gitignored vault and the push helper only)",
+ "disclosures": {
+  "pre_existing_test_failure": "tests/test_judge_strict_contract.py::test_calibration_full_set_gate_requires_24_correct FAILS with an IndexError at tests/test_judge_strict_contract.py:199 — verified PRE-EXISTING on the clean base 4926706b4 (reproduced with this round's changes stashed; not caused by or touched by this round). The stub indexes eval/judge_calibration.json (30 entries) by transport-call counter and the IndexError means the calibration driver now makes more calls than the corpus has entries. Disclosed per Art. 5 for the peer/auditor; NOT fixed under this measurement claim (out of scope — its own claim if the loop takes it). The 13-suite constitution enforcement run + the r26/r27 pin files + both stage verifiers are GREEN this round."
+ }
+}
