@@ -1,0 +1,40 @@
+{
+ "record": "SEAL_ANCHOR_VERIFICATION_RECIPE/1.0.0",
+ "issued": "2026-11-17",
+ "auditor": "session auditor (Claude)",
+ "finding": "The R36 'v6 seal UNANCHORED' custody-break is a FALSE ALARM caused by a wrong verification recipe. The registered selection_sha256 is NOT a file hash.",
+ "verified_by_auditor": {
+  "file": "audit/holdout_v6/holdout_v6_problems.json @ee5227b17",
+  "file_bytes": 16991,
+  "file_sha256_16": "cb4e984ad94832db",
+  "registered_selection_sha256_16": "4d60488a581897b9",
+  "recomputed_canonical_tuple_hash_16": "4d60488a581897b9",
+  "MATCH": true
+ },
+ "THE_RECIPE": {
+  "basis": "identical to eval/validate_problems.py and to the selection_hash_basis field in every holdout doc",
+  "steps": [
+   "1. load the problems doc; take problems[] where contamination_tag is None",
+   "2. project each to the canonical tuple [problem_id, device, failure, question, question_type, list(user_variables)]",
+   "3. sort by problem_id",
+   "4. blob = json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(',',':'))",
+   "5. sha256(blob.encode('utf-8')).hexdigest() == doc['selection_sha256']"
+  ],
+  "python": "import json,hashlib\npl=lambda p:[p['problem_id'],p['device'],p['failure'],p['question'],p['question_type'],list(p['user_variables'])]\nfresh=[p for p in doc['problems'] if p.get('contamination_tag') is None]\nblob=json.dumps([pl(p) for p in sorted(fresh,key=lambda x:x['problem_id'])],sort_keys=True,ensure_ascii=False,separators=(',',':'))\nassert hashlib.sha256(blob.encode()).hexdigest()==doc['selection_sha256']",
+  "NOT_the_recipe": [
+   "sha256 of the file bytes",
+   "sha256 of any re-serialization of the whole doc",
+   "sha256 of the rubric, of concatenations, or of manifests"
+  ]
+ },
+ "ruling": "v6 seal INTACT and ANCHORED. No re-anchor commit is needed. The R36 custody-break record is WITHDRAWN as a false alarm; the builder's caution in refusing to burn was correct behaviour on a wrong premise.",
+ "required_instrument": "commit this recipe as an executable check (tests/test_seal_anchor.py) run by BOTH sides before any burn, so a recipe error can never again masquerade as a custody break",
+ "applies_to": [
+  "holdout_v1",
+  "holdout_v2",
+  "holdout_v3",
+  "holdout_v4",
+  "holdout_v5",
+  "holdout_v6"
+ ]
+}
