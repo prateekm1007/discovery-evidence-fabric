@@ -1,5 +1,11 @@
 {
  "record": "R32_STATUS/1.0.0",
+ "art27_capability_budget": {
+  "_source_note": "R39b forward-only completion (claim c-0050): this round record was committed WITHOUT the art27_capability_budget ledger field the Art. 27 CI test requires (a pre-existing defect since R30 — the queue CI has been red on test_article27 that whole span); the field is added at the tip with values sourced from THIS round's own statements cited below; the historical snapshot is unchanged (Art. 4).",
+  "engine_diff": "none — engine byte-unchanged; the transport gained a DISCLOSED fallback chain [source: this record's art27_verdict]",
+  "primary_metric_delta": "none — no acceptance measurement (the v5 request committed, run not taken; the later v5 canonical run was ruled VOID on served-model substitution, AM32)",
+  "deletions": "none"
+ },
  "session": "builder-r20s1",
  "at": "2026-11-16T17:30:00Z",
  "base_audited_tip": "ad2eb8d90 (AM30, audit branch)",
@@ -34,7 +40,10 @@
   "route_disclosure": {
    "primary_only_rows": 13,
    "nvidia_involved_rows": 5,
-   "models_serving": ["nvidia/nemotron-3-ultra-550b-a55b", "nvidia/nemotron-3.5-bolt-e4b"],
+   "models_serving": [
+    "nvidia/nemotron-3-ultra-550b-a55b",
+    "nvidia/nemotron-3.5-bolt-e4b"
+   ],
    "note": "the primary gateway RECOVERED mid-round (401 -> serving for rows 1-13) then re-died (401 again) with 500 flapping; rows 14-18 served by the amended chain; route/route_model/fallback_reason recorded per attempt"
   },
   "empty_rows": 0,
@@ -47,12 +56,30 @@
   "claim_2_direction_bind": {
    "claim": "100% of re-drawn rows carry the structured DIRECTION-OF-EFFECT statement",
    "result": "NOT MET — 10/18 rows clean (56%); 8 rows fail (PHYSICS_DIRECTION_UNSTATED on 7, DRIVER_AS_REMEDY overlapping)",
-   "failing_rows": ["bench-p03-phe-biofouling", "bench-p04-pump-cavitation", "bench-p06-water-biofilm", "bench-p10-pv-pid", "bench-p11-spindle-thermal-drift", "dev-fu-005-bridge-bearing", "eval-new05-liion-balance-drift", "eval-sofc-thermal-cycling"],
+   "failing_rows": [
+    "bench-p03-phe-biofouling",
+    "bench-p04-pump-cavitation",
+    "bench-p06-water-biofilm",
+    "bench-p10-pv-pid",
+    "bench-p11-spindle-thermal-drift",
+    "dev-fu-005-bridge-bearing",
+    "eval-new05-liion-balance-drift",
+    "eval-sofc-thermal-cycling"
+   ],
    "honest_read": "the direction-bind is IN the machine path and drives the repair loop, but the generator cannot always satisfy it within budget 3 — the F43 instrument works (it fires and drives repairs); the 100% pre-registered machine claim FAILS on the dev set",
    "note": "a deterministic scan still cannot judge domain-direction correctness — that stays the auditor's read (AM30, typed limit)"
   },
   "repair_budget": "all 18 rows exhausted budget 3 (repairs=3) with typed residual findings",
-  "residual_families": ["APPARATUS_ROW", "BILL_UNTAGGED", "CONSTRAINT_EXCLUSION", "CONVERSION", "DRIVER_AS_REMEDY", "NAMED_VARIANT", "PHYSICS_DIRECTION_UNSTATED", "STANDARD_BILL"],
+  "residual_families": [
+   "APPARATUS_ROW",
+   "BILL_UNTAGGED",
+   "CONSTRAINT_EXCLUSION",
+   "CONVERSION",
+   "DRIVER_AS_REMEDY",
+   "NAMED_VARIANT",
+   "PHYSICS_DIRECTION_UNSTATED",
+   "STANDARD_BILL"
+  ],
   "scope_warning": "DEV measurement only (Art. 6) — the gate-MET/NOT-MET numbers here do NOT transfer to acceptance; the acceptance question is answered only on the fresh auditor-authored holdout v5"
  },
  "d2_judge_route": {
@@ -63,8 +90,19 @@
  "vault_wipe_disclosure": {
   "event": "the sandbox recycle restored a STALE local checkout (R24-era) and wiped the gitignored vault",
   "reconciled": "ff-only to the remote tip 8e8e1b635 (no peer commits; Art. 7/29(e))",
-  "lost": ["CROWLLM_API_KEY", "CROWLLM_BASE_URL", "GH_PAT", "GITHUB_TOKEN", "AGNES_API_KEY", "INCEPTION_API_KEY", "OPENROUTER_API_KEY", "XKIRO_API_KEY"],
-  "restorable": ["NVIDIA_API_KEY (re-restored from the operator conversation)"],
+  "lost": [
+   "CROWLLM_API_KEY",
+   "CROWLLM_BASE_URL",
+   "GH_PAT",
+   "GITHUB_TOKEN",
+   "AGNES_API_KEY",
+   "INCEPTION_API_KEY",
+   "OPENROUTER_API_KEY",
+   "XKIRO_API_KEY"
+  ],
+  "restorable": [
+   "NVIDIA_API_KEY (re-restored from the operator conversation)"
+  ],
   "owner_actions_needed": [
    "re-supply GH_PAT (push auth dead — this round's commits push on the next credential window; Art. 17: rotation only on operator supply)",
    "re-supply crowllm credentials (unblocks the D2/D3 judge route and the c-0026 recalibration probe)",
