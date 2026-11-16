@@ -186,10 +186,10 @@ def main() -> int:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     probs = _prob_map()
     gw, gw_key = start_gateway()
+    V76_ROWS = _intervention_ids()
     print(f"[r30-tune-v76] gateway up; {len(V76_ROWS)} rows to "
           f"convert (existing files skipped — never re-drawn)",
           flush=True)
-    V76_ROWS = _intervention_ids()
     ledger = {"rows": {},
               "tuning_set": list(V76_ROWS),
               "claim": "c-0031 (pre-registered, pushed BEFORE any LLM "
