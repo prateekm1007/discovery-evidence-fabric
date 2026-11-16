@@ -38,12 +38,22 @@ jobs:
       - name: Deterministic regression surfaces (zero LLM)
         run: |
           set -e
+          # R40b (c-0053, F53-class 4th instance): the guard-activation
+          # suite existed since the R40 build but was wired into NO
+          # workflow — the activation-checker itself gated nothing. It
+          # now runs here. The hooksPath setup step is part of the fix:
+          # a fresh CI checkout has no core.hooksPath configured (it is
+          # clone-local state), so the step activates the recipe AND
+          # makes the suite's first assertion (hooksPath == .githooks)
+          # meaningful in CI instead of locally-only.
+          git config core.hooksPath .githooks
           python3 -m pytest tests/test_answer_contract.py \
             tests/test_r377_invention_quality_cycle.py \
             tests/test_seal_anchor.py \
             tests/test_r38_v6_anchor_exact.py \
             tests/test_r38_probe_pins.py \
-            tests/test_r30_am29_binds.py -q -p no:warnings
+            tests/test_r30_am29_binds.py \
+            tests/test_guard_activation.py -q -p no:warnings
           python3 -B scripts/r11_decoder_retally.py
           python3 -B scripts/r11_critic_regression.py || true
           python3 -B scripts/r11_critic_regression_r2.py
