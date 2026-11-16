@@ -65,6 +65,16 @@ from r24_constraint_scan import scan_constraint_fit  # noqa: E402
 from r22_a1w_v5_repair import scan as base_scan  # noqa: E402
 from r11_a1f_v3_generate import start_gateway  # noqa: E402
 from r13_a1t_generate import _gen, critic  # noqa: E402
+from r30_nvidia_route import gen_with_fallback  # noqa: E402
+
+
+def _gen_fb(prompt: str, contract: str, gw_key: str):
+    """Typed transport: the primary local z.ai gateway first; on an
+    auth error (the R31 401) fall back to the NVIDIA NIM route
+    serving the same GLM-5.3-flash family. Returns
+    (content, route_meta); the route that served every call is
+    recorded in the row ledger (disclosed, never hidden)."""
+    return gen_with_fallback(prompt, contract, gw_key, primary_gen=_gen)
 from r13_question_type_gate import gate_question_type  # noqa: E402
 
 OUT_DIR = REPO / "eval" / "pairs" / "r30_v76_tuned"
@@ -105,7 +115,8 @@ def machine_generate_v76(prob: dict, gw_key: str):
     q = json.dumps(prob, ensure_ascii=False)
     contract = contract_for_v72(qt)
     attempts = []
-    final, lat = _retry_call(_gen, q, contract, gw_key)
+    final, gen_meta = _retry_call(_gen_fb, q, contract, gw_key)
+    lat = gen_meta["latency_s"]
     tries = 1
     final_meta = {}
     rep = 0
@@ -145,6 +156,9 @@ def machine_generate_v76(prob: dict, gw_key: str):
         att = {"stage": ("draft" if rep == 0 else f"repair_{rep}"),
                "chars": len(final), "latency_s": round(lat, 1),
                "transport_tries": tries,
+               "route": gen_meta.get("route"),
+               "route_model": gen_meta.get("model"),
+               "fallback_reason": gen_meta.get("fallback_reason"),
                "critic_verdict": cr["verdict"], "type_gate": tg,
                "scan": {k: list(v) for k, v in vio.items()},
                "sha256_16": _sha(final)}
@@ -164,8 +178,9 @@ def machine_generate_v76(prob: dict, gw_key: str):
             return final, attempts, final_meta
         directive = V76_REPAIR_DIRECTIVE.format(
             findings="; ".join(p for p in problems if p))
-        final, lat = _retry_call(
-            _gen, q + "\n\n" + directive, contract, gw_key)
+        final, gen_meta = _retry_call(
+            _gen_fb, q + "\n\n" + directive, contract, gw_key)
+        lat = gen_meta["latency_s"]
         tries += 1
         rep += 1
 
