@@ -32,6 +32,11 @@
    "registered_at": "2026-11-16T03:07:53Z",
    "role": "builder",
    "note": "R28 session lineage (fresh sandbox; the repo recloned at queue tip 4926706b4; the audit tip a6ca19ed7 fetched and read). Lane topology unchanged: builders push the queue branch; the audit branch converges via the auditor's merges. This session's timestamps are TRUE UTC (disclosed: prior builder-r27s1 entries carry an IST-offset clock mislabeled Z — disclosed here once, never rewritten). Registered at claim c-0022 per Art. 29(a)."
+  },
+  "builder-r29s1": {
+   "registered_at": "2026-11-16T05:25:00Z",
+   "role": "builder",
+   "note": "R29 session lineage (fresh sandbox; the repo cloned at queue tip d8ee3be06; the audit tip d7540c6fe fetched and read: AM27 + auditor_r28_adjudication.json + AUDIT_LEDGER). Executes the AM27 loop-owned directions D1 (F38 operational-loss pricing + pin), D2 (bench-p06 premise-flaw kill + the gap-1 row conversions -> the V7.2 battery), D3 (F39 judge feasibility-axis calibration), D4 (the disclosed pre-existing test_judge_strict_contract failure). Claims filed BEFORE any LLM call per Art. 29(b). The AM27 D5 holdout v4 is auditor-owned, not claimed here."
   }
  },
  "claims": [
@@ -458,6 +463,93 @@
     "verifier_run": "scripts/r28_verify_crosscheck.py exit 0 (16/16 zero-LLM checks)",
     "outcome": "DIVERGENCE TYPED (the D2 acceptance's second arm): machine interventions nd 2.389 CI[1.41,3.367] (novelty clause machine-corroborated) / fgap 1.889 CI[1.32,2.458] (the auditor's near-parity 0.375 NOT machine-corroborated); pilot-8 same-bytes agreement nd 2/5 exact 2/5 within-1, fgap 0/5 exact 4/5 within-1; largest divergence bench-p06 (machine F_A=1 vs auditor F_A=4); the 3 v71-tuned pilot rows typed INPUT-DIVERGED; the tolerance ruling is the auditor's"
    }
+  },
+  {
+   "claim_id": "c-0023",
+   "work_id": "r29-judge-contract-test-fix",
+   "session_id": "builder-r29s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "d8ee3be062da174d7d2b8265e483e15a3c5a854f",
+   "claimed_at": "2026-11-16T05:25:00Z",
+   "lease_expiry": "2026-11-16T16:00:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "tests/test_judge_strict_contract.py",
+    "eval/work_claims.json",
+    "eval/r29_status.json"
+   ],
+   "notes": "AM27 D4: fix the DISCLOSED pre-existing failure (builder-r28s1, Art. 5 disclosure at d8ee3be06) — tests/test_judge_strict_contract.py::test_calibration_full_set_gate_requires_24_correct IndexError at line 199: the stub indexes the 30-entry eval/judge_calibration.json corpus by TRANSPORT-CALL counter, but the driver's AM3 D5 cap escalation (one empty first response -> ONE retry at max_tokens x2 through the SAME prompt) consumes a second call per empty pair -> 31 calls > 30 entries. Fix = make the stub PAIR-SCOPED (the escalation repeats the same prompt; the parse retry extends it — a repeated/extended prompt is the SAME pair), preserving the test's original semantics exactly: n_empty pairs never answer (empty on both the first attempt and the escalation), the next n_good pairs answer with the good pick, the rest answer valid-but-wrong. The calibration DRIVER is byte-unchanged (the cap escalation is the measured instrument behavior; Art. XIX constitutional test: the defect was in the outdated stub, not the evidence). Acceptance (AM27 verdict): the suite green on a clean base."
+  },
+  {
+   "claim_id": "c-0024",
+   "work_id": "r29-operational-loss-pricing",
+   "session_id": "builder-r29s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "d8ee3be062da174d7d2b8265e483e15a3c5a854f",
+   "claimed_at": "2026-11-16T05:25:00Z",
+   "lease_expiry": "2026-11-16T16:00:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "scripts/r29_operational_loss_scan.py",
+    "tests/test_r29_operational_loss_scan.py",
+    "eval/work_claims.json",
+    "eval/r29_status.json"
+   ],
+   "notes": "AM27 D1 (F38, HIGH): 'Price operational losses in the burden ledger. Any duty-cycle/curtailment/derate intervention must state the energy/output/throughput loss and count it against parity. Accept: 0 rows with unpriced operational loss; add a regression pin on bench-p10.' Deterministic zero-LLM scan (scripts/r29_operational_loss_scan.py): an intervention answer whose implementation bill or burden ledger duty-cycles/curtails/derates output (on/off cycles, reduced duty, derated operation, intermittent windows) must carry an explicit operational-loss PRICING (a stated energy/output/throughput loss number, or an explicit schedule that avoids production hours WITH the avoided loss stated) — an unpriced curtailment fires UNPRICED_OPERATIONAL_LOSS with the row evidence. Regression pins on the REAL violation bytes (bench-p10 r26 V7: the 8h-on/4h-off duty cycle, ~33% daily curtailment, burden ledger counts only PLC wiring hours — MUST fire) and not-firing pins on the other 17 intervention rows + 12 predictor rows + determinism. The matching V7.2 contract clause (OPERATIONAL-LOSS PRICING BIND) rides the c-0025 contract; the scan wires into the c-0025 machine path and the final battery's 0-residual acceptance."
+  },
+  {
+   "claim_id": "c-0025",
+   "work_id": "r29-v72-battery-conversion",
+   "session_id": "builder-r29s1",
+   "role": "EXECUTOR",
+   "kind": "measurement",
+   "base_sha": "d8ee3be062da174d7d2b8265e483e15a3c5a854f",
+   "claimed_at": "2026-11-16T05:25:00Z",
+   "lease_expiry": "2026-11-16T16:00:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "scripts/r29_a1w_v72_contract.py",
+    "scripts/r29_conversion_scan.py",
+    "scripts/r29_tune_battery.py",
+    "scripts/r29_assemble_battery.py",
+    "scripts/r29_verify_battery.py",
+    "tests/test_r29_conversion_scan.py",
+    "eval/pairs/r29_v72_tuned/",
+    "eval/battery_v7_2_catalog_r29.json",
+    "eval/r29_tuning_generation.json",
+    "eval/r29_judge_packet.json",
+    "eval/ABLATION_REGISTRY.json",
+    "eval/work_claims.json",
+    "eval/r29_status.json"
+   ],
+   "notes": "AM27 D2: 'Kill the premise-flawed row and convert the seven gap-1 rows. bench-p06 needs a topology-valid mechanism (no reversal without a second path). The seven gap-1 rows (micro-roughened vane, MEMS dimples, silica interlayer, Al-on-steel sleeve, silica packet, added sensor channel, graded co-firing) must become pure catalog-part or procedure changes. Accept: feasibility |gap| <=0.25 AND novelty delta >=0.5 on >=30 pairs, auditor-judged.' PRE-REGISTERED TUNING SET (the adjudication's gap>=1 set at d7540c6fe:eval/auditor_r28_adjudication.json per_row — 8 rows at gap 1 + bench-p06 at gap 2 — PLUS bench-p10 for the F38 pricing): bench-p01, bench-p04, bench-p06, bench-p08, bench-p09, bench-p10, bench-p11, eval-new01, eval-new03, eval-sofc-thermal-cycling (10 rows; the adjudication names p01 gap-1 'anode-side integration/water balance unproven' in per_row — the verdict prose's 'seven' enumeration plus p01; converting all gap>=1 rows + p10 covers both readings honestly). V7.2 = SYS_A1_INT_V71 + the PREMISE-VALIDITY BIND (any flow-reversal/direction claim must name the physical second path that enables it; a dead-end/single-path topology cannot reverse — the bench-p06 lesson) + the PURE-CATALOG/PROCEDURE CONVERSION BIND (no surface-treatment development on the deployed part, no process steps added beyond the standard practice's own bill or run at other-than-standard parameters, no added sensing channels where detection can ride existing signals, no graded/layered compositions-of-one-material-class — novelty stays on the arrangement axis) + the OPERATIONAL-LOSS PRICING BIND (c-0024). Deterministic legs: scripts/r29_conversion_scan.py (the conversion classes, pinned on the REAL V7.1/V7 gap bytes: p04 micro-blast Ra target, p08 dimple etch, p09 gravure silica coat, p11 added epoxy bond, new03 added pressure channel, sofc-thermal graded intergranular bilayer; not-firing pins on the 8 gap-0 rows + 12 predictors incl. p05's existing-jig bilayer) + the c-0024 operational-loss scan. Machine path BYTE-UNCHANGED in logic (zai-gateway generation + critic + question-type gate + scans [base, constraint-fit, catalog-v2, standard-bill, operational-loss, conversion] + NEUTRAL repair directives, budget 2, K_GEN=1, judge-blind — no outcome feedback, no judged numbers in any prompt). The other 20 rows stay BYTE-FROZEN (never re-drawn, Art. 29(c)). FINAL: the 30-pair V7.2 battery (eval/battery_v7_2_catalog_r29.json) + the auditor judge packet (eval/r29_judge_packet.json, the unchanged _rubric_prompt + AXIS_SUFFIX form) + zero-LLM verifier (scripts/r29_verify_battery.py); judged fields TYPED PENDING-AUDITOR (the gate is auditor-judged, Art. 14/LXXXVI; the builder never scores — Art. 10). Claim stays OPEN until the peer/auditor VERIFIER record lands (Art. 29(c))."
+  },
+  {
+   "claim_id": "c-0026",
+   "work_id": "r29-judge-feasibility-calibration",
+   "session_id": "builder-r29s1",
+   "role": "EXECUTOR",
+   "kind": "measurement",
+   "base_sha": "d8ee3be062da174d7d2b8265e483e15a3c5a854f",
+   "claimed_at": "2026-11-16T05:25:00Z",
+   "lease_expiry": "2026-11-16T16:00:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "scripts/_r29_axis_suffix_v3.txt",
+    "scripts/r29_judge_calibration.py",
+    "scripts/r29_verify_calibration.py",
+    "eval/judge_feasibility_calibration_r29.json",
+    "eval/judge_feasibility_calibration_r29.partial.json",
+    "eval/work_claims.json",
+    "eval/r29_status.json"
+   ],
+   "notes": "AM27 D3 (F39, MEDIUM): 'Calibrate the judge's feasibility axis. Add pins: firmware/procedure change on existing hardware => F_A >= 4; new-process development => F_A <= 3. Accept: judge feasibility within +/-1 of the auditor on >=16/18 rows; until then it is novelty-only cross-check.' The v3 axis suffix (scripts/_r29_axis_suffix_v3.txt) = the v2 suffix (scripts/_f28_axis_suffix_v2.txt) with the F axis extended by the auditor's two anchor pins verbatim-in-spirit; the N/T/C axis text and all non-suffix rubric bytes UNCHANGED. RUN (CROSS-CHECK ONLY — never a gate input on feasibility; the gate is auditor-judged): the calibrated judge over the r27 judge packet's 18 intervention rows — problem/a1/baseline bytes BYTE-EXACT from eval/r27_judge_packet.json; the ONLY prompt delta vs the packet's rubric_prompt is the v2->v3 axis-suffix block (pinned: the pre-suffix prefix must match the packet prompt byte-exactly; the verifier recomputes). Route: crowllm/qwen-3.8-max:free, K=3 draws, the canonical r28 route (pace 13 s, ladder 20/60, max_tokens 4000, one parse retry; provider AND family independent of the zai/GLM generator — Art. 10/26); credential via the gitignored vault (.env.keys, operator-re-supplied; servability-gated by a probe on the ACTUAL route through the ACTUAL transport path before any judging — the R11 catalog-poisoning lesson). COMPARISON: per-row machine a1_feasibility (median of K=3) vs the auditor's 18-row re-judgment, anchor d7540c6fe:eval/auditor_r28_adjudication.json (auditor-controlled content read via git show — never copied into the queue tree); every row's divergence typed. Acceptance recomputed by scripts/r29_verify_calibration.py (zero-LLM). Claim stays OPEN until the peer/auditor VERIFIER record lands (Art. 29(c))."
   }
  ],
  "trailer_violations": [
