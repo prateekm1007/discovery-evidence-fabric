@@ -1,0 +1,97 @@
+{
+ "record": "HOLDOUT_V6_AUDITOR_SCORE/1.0.0",
+ "scored_at": "2026-11-17",
+ "scored_by": "auditor (Claude) with the PRIVATE v6 rubric",
+ "run": "eval/holdout_v6_run.json \u2014 run_verdict VALID, acceptance_eligible true, seal anchor recomputed EXACT, attestation 12/12 served == glm-4-plus, 50-call committed slice, durable events ledger, zero re-generation",
+ "FIRST_ATTESTED_ACCEPTANCE_RUN": true,
+ "per_problem": [
+  {
+   "problem_id": "HO6-01-membrane-anode-coating",
+   "score_0_4": 3,
+   "rationale": "periodic low-current-density hold = current-density scheduling, ALLOWED; direction stated and correct (lower j -> lower coating dissolution)"
+  },
+  {
+   "problem_id": "HO6-02-caster-mould-taper",
+   "score_0_4": 1,
+   "rationale": "INVERTED DIRECTION: deliberate periodic THERMAL SHOCK on a Ni-alloy-coated copper mould induces thermal fatigue / heat-checking \u2014 it accelerates the crack propagation it claims to inhibit. Measure class (cooling-water setpoint) is allowed, physics is backwards."
+  },
+  {
+   "problem_id": "HO6-03-fcc-cyclone-erosion",
+   "score_0_4": 2,
+   "rationale": "circulation-rate duty cycle is ALLOWED and the v^3 erosion direction is right, but 'refractory self-healing / micro-repair' during rest is not a real mechanism; circulation reduction also costs conversion throughput, unpriced"
+  },
+  {
+   "problem_id": "HO6-04-gis-spacer-charge",
+   "score_0_4": 2,
+   "rationale": "polarity-reversal procedure is ALLOWED and the direction is right, but the trigger requires real-time surface-charge sensing that GIS does not have online \u2014 unavailable input, outside a pure procedure retune"
+  },
+  {
+   "problem_id": "HO6-05-stenter-chain-carbonisation",
+   "score_0_4": 3,
+   "rationale": "lubrication pulses timed to the coolest chain segment = dose/interval retuning, ALLOWED; Arrhenius residence-time direction correct"
+  },
+  {
+   "problem_id": "HO6-06-h2-compressor-valve",
+   "score_0_4": 3,
+   "rationale": "pressure-ratio + unloader scheduling ALLOWED; stress-amplitude direction correct; delivery/throughput cost of ratio modulation should be priced"
+  },
+  {
+   "problem_id": "HO6-07-yaw-drive-gear",
+   "score_0_4": 3,
+   "rationale": "current hysteresis width/slope at reversal + position-error history, existing sensors only"
+  },
+  {
+   "problem_id": "HO6-08-mine-hoist-brake",
+   "score_0_4": 3,
+   "rationale": "physics model on existing hydraulic pressure + caliper switch + motor current"
+  },
+  {
+   "problem_id": "HO6-09-check-ring-wear",
+   "score_0_4": 3,
+   "rationale": "screw-position/injection-pressure hysteresis-loop geometry, existing sensors only"
+  },
+  {
+   "problem_id": "HO6-10-coldbox-blockage",
+   "score_0_4": 3,
+   "rationale": "thermal-inertia cross-correlation with dP and the existing analyser"
+  },
+  {
+   "problem_id": "HO6-11-turbocharger-fouling",
+   "score_0_4": 3,
+   "rationale": "d/dt scavenge pressure normalised by TC speed, existing sensors only"
+  },
+  {
+   "problem_id": "HO6-12-dhx-scaling",
+   "score_0_4": 2,
+   "rationale": "saturation-ratio index needs ion activities / water chemistry, which is NOT among the permitted four temperatures + two flow meters \u2014 unavailable input"
+  }
+ ],
+ "aggregate": {
+  "n": 12,
+  "total": 31,
+  "mean_0_4": 2.583,
+  "pct": 64.6,
+  "intervention_mean": 2.333,
+  "predictor_mean": 2.833,
+  "allowed_measures_violations": 0,
+  "inverted_direction_mechanisms": 1,
+  "inverted_rows": [
+   "HO6-02-caster-mould-taper"
+  ],
+  "unavailable_input_rows": [
+   "HO6-04-gis-spacer-charge",
+   "HO6-12-dhx-scaling"
+  ]
+ },
+ "ACCEPTANCE": "NOT GRANTED \u2014 mean 2.583 < 3.0 AND 1 inverted-direction mechanism (HO6-02). BUT allowed-measures violations = 0: the AM29 class-bind HELD on all six interventions.",
+ "sealed_set_trend": {
+  "v1": 36.5,
+  "v2": 62.5,
+  "v3": 68.8,
+  "v4": 62.5,
+  "v5_void": 66.7,
+  "v6_valid": 64.6
+ },
+ "headline_finding": "DUTY-CYCLE MONOCULTURE: 6/6 interventions are the same template \u2014 schedule a duty cycle on a permitted setpoint. The class-bind successfully steered the machine inside the allowed measure CLASS, but it did not require mechanism DIVERSITY or physical soundness; two rows are physically wrong (thermal-shock-to-inhibit-cracking, refractory self-healing) and two propose inputs the constraint does not provide.",
+ "burn": "HOLDOUT v6 BURNED (becomes DEV); fresh v7 required for the next acceptance attempt"
+}
