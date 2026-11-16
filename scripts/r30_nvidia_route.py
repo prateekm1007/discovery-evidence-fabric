@@ -133,22 +133,44 @@ def nvidia_chat(messages, model: str = FALLBACK_CHAIN[0],
     return nvidia_chat_stream(messages, model, max_tokens, temperature)
 
 
+# Sustained-outage clause (R32 amendment #3, filed BEFORE any row used
+# it): after this many consecutive PRIMARY infra failures (500-class,
+# NOT auth — auth always falls through immediately), the amended chain
+# serves and the row's route record discloses
+# "sustained_primary_outage". A single transient 500 still retries on
+# the primary (the R24 behavior is preserved for blips).
+SUSTAINED_OUTAGE_THRESHOLD = 2
+_infra_fail_streak = {"n": 0}
+
+
 def gen_with_fallback(prompt: str, contract: str, gw_key: str,
                       primary_gen):
     """Primary generator first (the local z.ai gateway); on an auth
     error (401/403), a connection failure, or an empty-content result,
-    walk the amended NVIDIA chain. Returns (content, route_meta) where
-    route_meta names the route that actually served the call."""
+    walk the amended NVIDIA chain; on a SUSTAINED primary infra outage
+    (>= SUSTAINED_OUTAGE_THRESHOLD consecutive 500-class failures),
+    the chain serves with a typed sustained_primary_outage disclosure.
+    Returns (content, route_meta) naming the route that served."""
+    global_streak = _infra_fail_streak
     try:
         content, lat = primary_gen(prompt, contract, gw_key)
         if content and content.strip():
+            global_streak["n"] = 0
             return content, {"route": "zai_gateway", "latency_s": lat}
         why = "primary returned empty content"
     except urllib.error.HTTPError as e:
-        if e.code not in (401, 403):
-            raise
-        why = f"primary HTTP {e.code} (typed: credential dead)"
+        if e.code in (401, 403):
+            why = f"primary HTTP {e.code} (typed: credential dead)"
+        elif e.code >= 500:
+            global_streak["n"] += 1
+            if global_streak["n"] < SUSTAINED_OUTAGE_THRESHOLD:
+                raise  # typed infra retry: the ladder handles blips
+            why = (f"sustained_primary_outage "
+                   f"(HTTP 500 x{global_streak['n']}, typed)")
+        else:
+            raise  # 4xx client errors are not transport-fallback scope
     except (urllib.error.URLError, ConnectionError, OSError) as e:
+        global_streak["n"] += 1
         why = f"primary unreachable ({type(e).__name__})"
     last_err = why
     for model in FALLBACK_CHAIN:
@@ -159,6 +181,7 @@ def gen_with_fallback(prompt: str, contract: str, gw_key: str,
                 [{"role": "system", "content": contract},
                  {"role": "user", "content": prompt}])
             meta["fallback_reason"] = last_err
+            _infra_fail_streak["n"] = 0  # served; probe primary next row
             return content, meta
         except NVIDIAEmptyContent as e:
             last_err = f"{model} empty content (typed)"
