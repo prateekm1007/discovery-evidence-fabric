@@ -125,6 +125,17 @@ STANDARDS_TOKEN = re.compile(
     r"\b(?:ASTM|ISO|ASME|IEC|ANSI|API|NACE|DIN|JIS|SAE|UL|CSA|EN)\s*"
     r"[A-Z]?\s*\d+\b")
 
+# F41 (AM28): size/pressure-class designations are ENGINEERING CLASSES,
+# not brand markers — DN (nominal diameter), PN (nominal pressure), and
+# thread/fitting classes. The auditor's false-positive set: a conformant
+# bill row "3-way ball valve, DN80 PN16" flagged as a model marker.
+SIZE_DESIGNATION = re.compile(
+    r"\b(?:DN|PN|NPT|BSP|BSPT|G|M\d{2}|ANSI\s*class|class\s*\d{2,3})"
+    r"\s*[\d.]+\b"
+    # sensor physics classes, not brands: NTC/PTC thermistor resistance
+    # ("NTC 10k"), IEC 60751 platinum RTD classes ("PT100", "PT1000")
+    r"|\b(?:NTC|PTC|PT)\s*[- ]?\d{2,4}(?:k|K)?\b", re.I)
+
 
 def _stems(text, min_len=2):
     """Content stems, singular/plural tolerant, digits dropped. min_len
@@ -311,6 +322,9 @@ def scan_named_variant(answer):
         if not row:
             continue
         cleaned = STANDARDS_TOKEN.sub("", row)
+        # F41: size/pressure classes are engineering designations,
+        # stripped before the brand/model net (a class is not a brand)
+        cleaned = SIZE_DESIGNATION.sub("", cleaned)
         vm = VARIANT_MARKER.search(cleaned)
         mm = MODEL_MARKER.search(cleaned)
         if vm or mm:
