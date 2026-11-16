@@ -1,0 +1,64 @@
+{
+ "record": "R36_PEER_VERIFIER_C0039/1.0.0",
+ "claim": "c-0041",
+ "verified_claim": "c-0039",
+ "session_id": "builder-r35s1",
+ "role": "VERIFIER",
+ "executed_at": "2026-11-16T14:27:30Z",
+ "base_sha": "5b1a9bce8",
+ "independence": "peer session, own recompute script (scripts/r36_peer_verifier_c0039.py), NOT the executor's assembler and NOT r36_verifier_recompute.py; zero-LLM (no network calls in the recompute, no generation, no judge calls)",
+ "sandbox_note": "the executor's R36 self-verification typed the peer sandbox 'down' — this sandbox was recovering from a recycle (ff-only re-clone, Art. 18), never down; the invited independent recompute is hereby delivered",
+ "calibration_recompute": {
+  "checks": "11/11 PASS (scripts/r36_peer_verifier_c0039.py)",
+  "tally": "15/18 within +/-1 — recomputed from RAW draw axes (F_A per draw), NOT from the executor's comparison fields; matches the claimed 15/18 and acceptance.met=false",
+  "draw_integrity": "54/54 JUDGE_VALID draws; machine medians AND values re-derived from draws == reported (18/18)",
+  "quota": "63 slot attempts / 9 retries / 54 valid — exact",
+  "signed_delta_note": "FINDING-TYPE: convention, not defect — the executor's comparison.delta is SIGNED (machine - auditor); peer initially assumed absolute; verified the convention is applied consistently on all 18 rows and within_1 == |delta|<=1 everywhere",
+  "anchor_cross_check": "auditor_r28.a1_feasibility per row == audit-branch anchor bytes (git show d7540c6fe:eval/auditor_r28_adjudication.json), 18/18 exact, 0 mismatches",
+  "f39_pin_rows": "4/4 within-1 and byte-consistent with comparison[]",
+  "zero_generator_calls": "confirmed (generation.calls == 0)"
+ },
+ "coverage_vs_am33_chat_bar": {
+  "bar": "machine feasibility within +/-1 of the auditor on >=16/18 interventions AND >=10/12 predictors",
+  "interventions": "15/18 within-1 measured — BELOW the 16/18 clause: NOT MET (typed by executor, independently confirmed)",
+  "predictors": "UNMEASURED by construction: the calibration packet (eval/r27_judge_packet.json) has 30 rows = 18 intervention + 12 predictor; the executed run judged the 18-row intervention subset only; the auditor anchor (r28 adjudication) per_row covers the 18 intervention rows ONLY (0 predictor rows in the anchor)",
+  "consequence": "the >=10/12 predictor clause cannot be evaluated by ANY builder-side run until the auditor supplies a predictor-row feasibility anchor; extending the audited packet is an auditor act, not a builder act",
+  "disposition": "c-0026 machine judge remains NOVELTY-ONLY CROSS-CHECK; the auditor's feasibility read governs"
+ },
+ "pin_verification": {
+  "suite": "scripts/r35_pin_tests.py re-run from committed bytes: D2 FIRES on HO5-05 solenoid-valve bytes, D3 FIRES on HO5-06 holds bytes, 0 false positives across 12 rows, D2/D3 accept MET — matches the committed eval/r35_pin_tests.json",
+  "pytest": "tests/test_r30_am29_binds.py: 17/17 green"
+ },
+ "seal_custody_independent_check": {
+  "problems_file": "single commit d49694879, 16,991 bytes, sha256 cb4e984ad94832db016c9fd3d4f2508bba6b4fe03dbffd81c35f2cc1105abdb4, byte-stable at the audit tip",
+  "preregistered": "selection_sha256 4d60488a581897b9b7452158158049e65656c26ac58ea7e611236047a9aab804",
+  "peer_canonicalizations": "9 attempted (raw bytes, trimmed text, compact JSON, sorted-key JSON, problems-array compact, inner-pipe join, ids-pipe join, filename-prefixed, filename-suffixed): ZERO matches for the preregistered hash",
+  "verdict": "CUSTODY ANCHOR UNANCHORED — INDEPENDENTLY CONFIRMED; the executor's eval/v6_seal_custody_break.json finding stands. ONE auditor commit re-anchors (selection_sha256 := cb4e984a… with the rubric-matches-these-problems attestation) or re-seals; the seal stays INTACT and problems UNREAD until then"
+ },
+ "availability_probe_r36": {
+  "ts": "2026-11-16T14:26:14.237Z",
+  "http": 200,
+  "requested_model": "glm-4-plus",
+  "served_model": "glm-4-plus",
+  "significance": "FIRST byte-equal identity observation on the loop transport: under the corrected registration the requested id equals the served id equals the registered id — the R35 substitution finding (32/32 zai-org/GLM-5.3 -> glm-4-plus) no longer applies to the corrected machine; the executor's AVAILABILITY_BLOCK (429) has LIFTED",
+  "log_line": {
+   "ts": "2026-11-16T14:26:14.237Z",
+   "requested_model": "glm-4-plus",
+   "served": "glm-4-plus",
+   "status": "OK"
+  }
+ },
+ "v6_precondition_chain": {
+  "registration": "SATISFIED (auditor ruling, executed by the executor in bytes: gen_call + REGISTERED_MODEL + window probe -> glm-4-plus)",
+  "serving_identity": "SATISFIED (peer probe 14:26:14Z: requested == served == glm-4-plus)",
+  "availability": "SATISFIED (429 lifted, HTTP 200)",
+  "seal_anchor": "UNSATISFIED — auditor one-commit re-anchor required (cb4e984a… or re-seal)",
+  "verifier_posture": "c-0038 verification PENDING bytes; the one-shot fires when the anchor verifies; peer verifier stands ready (claim c-0041)"
+ },
+ "registry_actions": [
+  "c-0039 EXECUTION-COMPLETE-PENDING-VERIFICATION -> DONE (peer-verified independent, this record)",
+  "c-0041 OPEN -> DONE (this record is the mandatory artifact)"
+ ],
+ "art_27": "NO CAPABILITY CHANGE (verifier instrument + typed records; zero generation; engine byte-unchanged)",
+ "secret_grep": "0 findings in staged diff"
+}
