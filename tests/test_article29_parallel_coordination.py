@@ -57,9 +57,18 @@ def _git(*args: str) -> str:
     return r.stdout
 
 
-def _validate_registry(reg, where: str):
+def _validate_registry(reg, where: str, kind_violations=None):
     """Schema validation for work-claims/v1 (Art. 29 CI line: registry
-    schema valid). Returns (sessions, claims)."""
+    schema valid). Returns (sessions, claims).
+
+    F42 (AM29) forward-only disclosure path: a claim whose `kind` is
+    outside the enum may exist in an IMMUTABLE HISTORICAL snapshot only
+    if it is REGISTERED in the CURRENT registry's claim_kind_violations[]
+    (claim_id, wrong_kind, correct_kind in KINDS, status="remediated").
+    The CURRENT registry itself is always validated strictly (callers
+    that omit kind_violations) — the tip must be clean; history may
+    carry only disclosed, remediated violations. Fix the instrument,
+    never rewrite history (Art. 4)."""
     assert isinstance(reg, dict), f"{where}: registry must be an object"
     assert reg.get("schema") == "work-claims/v1", \
         f"{where}: schema must be work-claims/v1"
@@ -69,6 +78,24 @@ def _validate_registry(reg, where: str):
         f"{where}: sessions must be an object ({{}} allowed)"
     assert isinstance(claims, list), \
         f"{where}: claims must be an array ([] allowed)"
+    registered_kinds = {}
+    if kind_violations is not None:
+        assert isinstance(kind_violations, list), \
+            f"{where}: claim_kind_violations must be an array"
+        for v in kind_violations:
+            assert isinstance(v, dict) and v.get("claim_id"), \
+                f"{where}: kind violation entries need claim_id"
+            assert v.get("correct_kind") in KINDS, (
+                f"{where}: kind violation for {v.get('claim_id')} must "
+                "name the correct_kind")
+            assert v.get("wrong_kind") and \
+                v.get("wrong_kind") not in KINDS, (
+                f"{where}: kind violation for {v.get('claim_id')} must "
+                "name the out-of-enum wrong_kind")
+            assert v.get("status") == "remediated", (
+                f"{where}: kind violation for {v.get('claim_id')} must "
+                "be remediated (forward-only disclosure)")
+            registered_kinds[v["claim_id"]] = v
     for sid, s in sessions.items():
         assert isinstance(sid, str) and sid.strip(), \
             f"{where}: session id must be a non-empty string"
@@ -83,7 +110,14 @@ def _validate_registry(reg, where: str):
         assert cid not in by_id, f"{where}: duplicate claim_id {cid}"
         by_id[cid] = c
         assert c.get("role") in ROLES, f"{cid}: role must be one of {ROLES}"
-        assert c.get("kind") in KINDS, f"{cid}: kind must be one of {KINDS}"
+        if c.get("kind") not in KINDS:
+            regd = registered_kinds.get(cid)
+            assert regd and regd.get("wrong_kind") == c.get("kind"), (
+                f"{cid}: kind must be one of {KINDS} (F42: an "
+                "out-of-enum kind in an immutable historical snapshot "
+                "must be REGISTERED in claim_kind_violations[] with the "
+                "correct kind named — forward-only disclosure; history "
+                "rewrites are not a remedy, Art. 4)")
         assert c.get("status") in STATUSES, \
             f"{cid}: status must be one of {STATUSES}"
         assert isinstance(c.get("session_id"), str) and \
@@ -275,7 +309,10 @@ def test_canonical_measurement_commits_match_a_claim():
             f"commit {sha[:12]} touches canonical measurement bytes "
             f"{canon} without Session:/Work-Id: trailers (Art. 29(a))")
         snap = json.loads(_git("show", f"{sha}:eval/work_claims.json"))
-        _, claims = _validate_registry(snap, f"{sha[:12]}:registry")
+        cur = json.loads(REG.read_text(encoding="utf-8"))
+        _, claims = _validate_registry(
+            snap, f"{sha[:12]}:registry",
+            kind_violations=cur.get("claim_kind_violations"))
         matching = [
             c for c in claims
             if c["role"] == "EXECUTOR"
@@ -299,6 +336,58 @@ def test_canonical_measurement_commits_match_a_claim():
                 f"{canon} without a covering EXECUTOR claim and is not "
                 "registered in canonical_claim_violations (claim-"
                 "before-work is enforced, not asked for)")
+
+
+def test_kind_enum_errors_have_forward_only_disclosure_path():
+    """F42 (AM29): an out-of-enum kind in an immutable historical
+    snapshot passes ONLY when registered in claim_kind_violations[]
+    (correct kind named, remediated). The current registry is always
+    strict. The remedy for a schema mistake is a forward-only
+    disclosure commit, never a history rewrite (Art. 4)."""
+    base = {"schema": "work-claims/v1",
+            "sessions": {"builder-t": {"role": "EXECUTOR"}},
+            "claims": [{
+                "claim_id": "c-x", "role": "EXECUTOR",
+                "kind": "one-shot-sealed-generation",
+                "status": "DONE", "session_id": "builder-t",
+                "work_id": "w", "base_sha": "abc1234",
+                "claimed_at": "2026-11-16T00:00:00Z",
+                "lease_expiry": "2026-11-16T04:00:00Z",
+                "artifact_paths": ["eval/x/"]}]}
+    regd = dict(base, claim_kind_violations=[{
+        "claim_id": "c-x",
+        "wrong_kind": "one-shot-sealed-generation",
+        "correct_kind": "one_shot", "status": "remediated",
+        "session_id": "builder-t",
+        "note": "self-caught post-push; fixed forward in the next "
+                "commit"}])
+    # (a) registered -> passes (forward-only disclosure)
+    s, c = _validate_registry(regd, "hist", kind_violations=regd[
+        "claim_kind_violations"])
+    assert c[0]["claim_id"] == "c-x"
+    # (b) unregistered -> fails (violations can never hide silently)
+    try:
+        _validate_registry(base, "hist", kind_violations=[])
+        raise SystemExit("unregistered kind violation must fail")
+    except AssertionError:
+        pass
+    # (c) current registry is strict even with a registration present
+    try:
+        _validate_registry(regd, "current")
+        raise SystemExit("the tip registry must always be enum-clean")
+    except AssertionError:
+        pass
+    # (d) a registration naming a wrong_kind that IS in the enum (i.e.
+    # not a real violation) is invalid instrument use
+    bad = dict(base, claim_kind_violations=[{
+        "claim_id": "c-x", "wrong_kind": "task",
+        "correct_kind": "one_shot", "status": "remediated"}])
+    try:
+        _validate_registry(bad, "hist", kind_violations=bad[
+            "claim_kind_violations"])
+        raise SystemExit("registration must name an out-of-enum kind")
+    except AssertionError:
+        pass
 
 
 def test_constitution_carries_article_29():
