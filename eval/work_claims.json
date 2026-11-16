@@ -1,7 +1,7 @@
 {
  "schema": "work-claims/v1",
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
- "at": "2026-11-16T05:35:00Z",
+ "at": "2026-11-16T05:55:00Z",
  "sessions": {
   "builder-r20s2": {
    "registered_at": "2026-11-15T15:21:34Z",
@@ -491,7 +491,7 @@
    "base_sha": "d8ee3be062da174d7d2b8265e483e15a3c5a854f",
    "claimed_at": "2026-11-16T05:25:00Z",
    "lease_expiry": "2026-11-16T16:00:00Z",
-   "status": "OPEN",
+   "status": "DONE",
    "takes_over": null,
    "artifact_paths": [
     "scripts/r29_operational_loss_scan.py",
@@ -499,7 +499,7 @@
     "eval/work_claims.json",
     "eval/r29_status.json"
    ],
-   "notes": "AM27 D1 (F38, HIGH): 'Price operational losses in the burden ledger. Any duty-cycle/curtailment/derate intervention must state the energy/output/throughput loss and count it against parity. Accept: 0 rows with unpriced operational loss; add a regression pin on bench-p10.' Deterministic zero-LLM scan (scripts/r29_operational_loss_scan.py): an intervention answer whose implementation bill or burden ledger duty-cycles/curtails/derates output (on/off cycles, reduced duty, derated operation, intermittent windows) must carry an explicit operational-loss PRICING (a stated energy/output/throughput loss number, or an explicit schedule that avoids production hours WITH the avoided loss stated) — an unpriced curtailment fires UNPRICED_OPERATIONAL_LOSS with the row evidence. Regression pins on the REAL violation bytes (bench-p10 r26 V7: the 8h-on/4h-off duty cycle, ~33% daily curtailment, burden ledger counts only PLC wiring hours — MUST fire) and not-firing pins on the other 17 intervention rows + 12 predictor rows + determinism. The matching V7.2 contract clause (OPERATIONAL-LOSS PRICING BIND) rides the c-0025 contract; the scan wires into the c-0025 machine path and the final battery's 0-residual acceptance."
+   "notes": "AM27 D1 (F38) EXECUTED: scripts/r29_operational_loss_scan.py — the deterministic zero-LLM UNPRICED_OPERATIONAL_LOSS scan, three staged checks: (1) a DUTY MARKER names the on/off/duty-cycle/interrupted regime (bare periodic/cyclic/schedule do NOT fire — the p02/p05/p07/p12/dev-fu-005 bytes); (2) OUTPUT GATING requires the cycled element to be the PRIMARY delivery stage or an explicit output reduction (inverter / system voltage bias / string output / grid export / plant output / production line / throughput / energy yield / curtail / derate — auxiliary charging profiles, sensor resets, cleaning pulses are inert, matching the auditor's gap-0 no-F38 reads on those rows); (3) PRICING accepts a curtailment acknowledgment, an energy/output/production/throughput/yield/operational loss-or-penalty statement, or a zero-loss non-producing-hours schedule — 'power loss' ALONE is excluded (the degradation idiom: bench-p10's own '0.5% annual power loss constraint' is the pass criterion, not a price — byte-pinned as the false-pricing trap). REGRESSION PINS (tests/test_r29_operational_loss_scan.py, 10/10 green): the REAL bench-p10 r26 V7 bytes FIRE (duty cycle on the inverter, 'Operation unchanged' ledger); the false-pricing trap does not mute them; the 17 other r26 intervention rows + 7 r27 tuned rows + 12 predictor rows are clean; synthetic priced / zero-loss-night / unpriced shapes behave; determinism. The scan's full-generation read: exactly 1 flagged row (bench-p10) across the r26+r27 generations. The matching V7.2 contract clause (OPERATIONAL-LOSS PRICING BIND) rides the c-0025 contract; the final-battery 0-residual acceptance is re-checked by the c-0025 verifier. Zero LLM, zero network — the peer/auditor verifies from committed bytes."
   },
   {
    "claim_id": "c-0025",
