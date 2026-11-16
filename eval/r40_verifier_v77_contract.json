@@ -1,0 +1,182 @@
+{
+ "record": "R40B_VERIFIER_v77_CONTRACT/1.0.0",
+ "claim": "c-0052 (VERIFIER, r40-v7-machine-contract, builder-r39s1) — for c-0046 (builder-r20s2 EXECUTOR, the V7 machine contract at cbb8e3d70)",
+ "at": "2026-11-16T18:05:00Z (sandbox clock)",
+ "session": "builder-r39s1",
+ "verified_tip": "cbb8e3d70",
+ "method": "zero-LLM recompute from committed bytes only (Art. 13 / Art. 29(c)): the guard suite re-run locally; the four deterministic check legs re-derived over the committed v6 rows and compared field-by-field against the fire-test artifact; the acceptance mapping recomputed from the artifact bytes by an independent expression; V77_REQUEST_MODEL imported AND source-pinned; the v6 rows byte-diffed against the acceptance tip; the registry and claim-order discipline checked at the verified tip; the direction-LLM legs never re-run (shape + divergence typed from bytes)",
+ "guard_suite": {
+  "exit": 0,
+  "passed": 4,
+  "summary": "4 passed in 0.24s",
+  "expected": "4/4 passing (AM37 D4 in-suite assertions)"
+ },
+ "deterministic_recompute": {
+  "n_intervention_rows": 6,
+  "per_row": {
+   "HO6-01-membrane-anode-coating": {
+    "lex": [],
+    "inp": [],
+    "prc": [
+     "UNPRICED_DUTY_CYCLE"
+    ],
+    "mech": [
+     "MECHANISM_CLASS_UNSTATED"
+    ]
+   },
+   "HO6-02-caster-mould-taper": {
+    "lex": [],
+    "inp": [
+     "INPUT_UNAVAILABLE"
+    ],
+    "prc": [
+     "UNPRICED_DUTY_CYCLE"
+    ],
+    "mech": [
+     "MECHANISM_CLASS_UNSTATED"
+    ]
+   },
+   "HO6-03-fcc-cyclone-erosion": {
+    "lex": [
+     "DRIVER_CLASS_AS_REMEDY"
+    ],
+    "inp": [],
+    "prc": [
+     "UNPRICED_DUTY_CYCLE"
+    ],
+    "mech": [
+     "MECHANISM_CLASS_UNSTATED"
+    ]
+   },
+   "HO6-04-gis-spacer-charge": {
+    "lex": [
+     "DRIVER_CLASS_AS_REMEDY"
+    ],
+    "inp": [
+     "INPUT_UNAVAILABLE"
+    ],
+    "prc": [
+     "UNPRICED_DUTY_CYCLE"
+    ],
+    "mech": [
+     "MECHANISM_CLASS_UNSTATED"
+    ]
+   },
+   "HO6-05-stenter-chain-carbonisation": {
+    "lex": [],
+    "inp": [],
+    "prc": [
+     "UNPRICED_DUTY_CYCLE"
+    ],
+    "mech": [
+     "MECHANISM_CLASS_UNSTATED"
+    ]
+   },
+   "HO6-06-h2-compressor-valve": {
+    "lex": [],
+    "inp": [],
+    "prc": [
+     "UNPRICED_DUTY_CYCLE"
+    ],
+    "mech": [
+     "MECHANISM_CLASS_UNSTATED"
+    ]
+   }
+  },
+  "ho6_12_predictor_leg": {
+   "recomputed": [
+    "INPUT_UNAVAILABLE"
+   ],
+   "artifact": [
+    "INPUT_UNAVAILABLE"
+   ]
+  },
+  "n_field_mismatches": 0,
+  "mismatches": [],
+  "verdict": "EXACT — all deterministic legs reproduce from committed bytes"
+ },
+ "acceptance_mapping_recompute": {
+  "recomputed": {
+   "HO6-02_direction_fires": true,
+   "HO6-03_pricing_fires": true,
+   "HO6-04_input_fires": true,
+   "HO6-12_input_fires": true
+  },
+  "recorded": {
+   "HO6-02_direction_fires": true,
+   "HO6-03_pricing_fires": true,
+   "HO6-04_input_fires": true,
+   "HO6-12_input_fires": true
+  },
+  "n_true_recomputed": 4,
+  "verdict": "4/4 TRUE reproduced from the artifact bytes"
+ },
+ "r_reqid_recompute": {
+  "imported_constant": "glm-4-plus",
+  "source_pinned": true,
+  "legacy_id_in_v77_module": false,
+  "verdict": "FORWARD-ONLY TRANSPORT CONFIRMED (R-REQID per AM37 section 2; the served identity remains the evidence)"
+ },
+ "zero_regeneration_recompute": {
+  "diff_stat": "(empty)",
+  "byte_frozen": true,
+  "verdict": "v6 rows + problems packet BYTE-FROZEN between the acceptance tip and the verified tip (zero regeneration; the rows stay burned)"
+ },
+ "registry_discipline_recompute": {
+  "claim_present_at_tip": true,
+  "executor_claims_on_work_id": 1,
+  "one_executor": true,
+  "executor_session": "builder-r20s2",
+  "claim_commit_ancestor_of_firetest": true,
+  "first_pass_0_of_4_disclosed_in_bytes": true,
+  "verdict": "claim-before-work HELD (the claim + contract commit 677c4f618 precedes the fire-test 2c3003b44); one EXECUTOR (builder-r20s2); the 0/4 first pass is disclosed in the committed round record AND the fire-test commit message"
+ },
+ "direction_llm_shape_check": {
+  "shape_valid": true,
+  "verdicts_recorded": {
+   "HO6-01-membrane-anode-coating": "CORRECT",
+   "HO6-02-caster-mould-taper": "INVERTED",
+   "HO6-03-fcc-cyclone-erosion": "INVERTED",
+   "HO6-04-gis-spacer-charge": "CORRECT",
+   "HO6-05-stenter-chain-carbonisation": "CORRECT",
+   "HO6-06-h2-compressor-valve": "CORRECT"
+  },
+  "divergences_typed": [
+   {
+    "row": "HO6-03-fcc-cyclone-erosion",
+    "recorded_direction": "INVERTED",
+    "tension": "the recorded reason argues the velocity leg directly addresses the erosion mechanism (a CORRECT-style argument) while the verdict is INVERTED; AM37's authoritative read scored the row 2 (fiction self-healing + unpriced cost, NOT inverted: 'the v3 erosion direction is right')",
+    "executor_disclosed": true,
+    "impact": "none on gating — the check is fail-open typed, HO6-03's acceptance-mapping leg is PRICING, and the authoritative v7 read stays the auditor's"
+   }
+  ],
+  "note": "the direction-LLM calls are quota-consuming one-shot work — recomputed for shape only, never re-run"
+ },
+ "r40_status_repair": {
+  "original_at_cbb8e3d70_invalid_json": true,
+  "repaired_valid_json": true,
+  "repair": "literals joined verbatim (every word preserved); in-artifact r40b_repair_note carries the disclosure; the immutable snapshot keeps the defect (Art. 4)",
+  "class": "F32/F52/F53 'exists but does not defend' — the R39b per-commit JSON-validation lesson was session-local and did not bind the other session; 5th instance",
+  "recurrence_guard": "c-0054 (pre-commit hook validates staged *.json)",
+  "content_preserved": {
+   "am37_response_keys": [
+    "d1_physics_direction_and_diversity",
+    "d2_input_availability",
+    "d3_duty_cycle_pricing",
+    "d4_rreg_forward_only_and_guard_activation",
+    "d5_deepseek_retry"
+   ],
+   "honesty_notes_items": 3
+  }
+ },
+ "precision_characterization": {
+  "ho6_02_lexicon_coverage_gap": "the deterministic lexicon leg is SILENT on HO6-02 by design-limit: the problem's own failure text ('mould face wear and taper loss ... longitudinal cracks') carries no thermal-cycling vocabulary, so the act-and-driver conjunction fails on the driver side; the knowledge that thermal shock CAUSES heat-checking lives only in the LLM leg (driver-first, engineering knowledge) — the mapping rule (lexicon OR llm) is load-bearing for this class",
+  "ho6_03_lexicon_wordform_firing": "HO6-03's DRIVER_CLASS_AS_REMEDY firing is wordform-level: 'cyclone' (the DEVICE noun) in the failure text and 'cycle' (a schedule noun, not the stripped 'duty-cycle' template word) in the span both match the thermal-cycling class regex — NOT the intended same-driver-class semantics (erosion's driver is kinetic-energy flux, not cycling); the row's real defects are caught by the pricing scan and typed by the auditor (fiction self-healing + unpriced circulation cut)",
+  "ho6_04_lexicon_collateral_firing": "HO6-04's lexicon firing is collateral: 'charge-sensing' (the monitoring phrase) matched the charge-discharge class on the action side; the row's real defect (the unavailable online surface-charge input) is caught by INPUT_UNAVAILABLE, which is the semantically grounded catch",
+  "retrospective_set_note": "all six v6 intervention rows fire MECHANISM_CLASS_UNSTATED and UNPRICED_DUTY_CYCLE — expected: the v6 bills predate both clauses; the retrospective set therefore carries NO negative controls for the pricing scan and the diversity cap (precision on those two is measurable first on the v7 packet)",
+  "v7_guidance": "on v7: treat lexicon-leg firings as CANDIDATES for the LLM leg and the auditor's read, not as standalone verdicts; the input-availability and pricing scans held exact on this set"
+ },
+ "zero_llm": true,
+ "concurrence": "CONCUR: the acceptance mapping is 4/4 TRUE and the deterministic legs reproduce EXACTLY from committed bytes (0 field mismatches across 6 intervention rows + the HO6-12 predictor leg); the guard suite passes 4/4 and — via c-0053 this round — now gates queue CI itself; the R-REQID forward-only transport is confirmed (glm-4-plus, source-pinned, no legacy id in the v77 module); the v6 rows are byte-frozen (zero regeneration). WITH typed characterizations for the v7 round: the lexicon leg's HO6-02 coverage gap (the LLM leg is the catcher for knowledge-based inversions — the OR-mapping is load-bearing), the wordform-level HO6-03/04 lexicon firings, the HO6-03 direction-LLM verdict/reason divergence (disclosed by the executor, fail-open, no gating impact), and the retrospective set's absent negative controls for pricing/diversity. The authoritative v7 acceptance read stays the auditor's on the auditor-authored v7 packet.",
+ "verifier_verdict": "VERIFIED"
+}
