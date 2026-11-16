@@ -1,0 +1,33 @@
+{
+ "record": "R41_STATUS/1.0.0",
+ "session": "builder-r20s3",
+ "at": "2026-11-16T18:40:00Z (sandbox clock)",
+ "builder_base": "6fab59a41 (AM37 + Amendments 34-37 held as fully-read bytes; the constitution drift check against the queue tip is empty — byte-identical, so the full-read duty is carried by the identical bytes)",
+ "pushed": ["1cfd42621 (the D1-D5 fixes: the Art. 27 ledger field on the r40 record, the remote-conclusion hard rule as code, the pricing/diversity negative controls, the driver-class lexicon semantics, the derived direction verdict; the fire-test re-validated 4/4 with the wordform firings suppressed and 6/6 verdict/reason agreement)",
+            "this record's commit (the closeout)"],
+ "r40b_verdict_response": {
+  "d1_green_pushed_ci_read_from_the_api": "DONE. The failure at 6fab59a41 was test_article27_capability_budget::test_every_round_from_r16_carries_the_art27_ledger — eval/r40_status.json carried no art27_capability_budget field (mandatory forward-only since the peer's c-0050 completed the ledger for r30..r39; the R40 record was written under the old schema). Fixed forward-only: the field added with honest BUILD-round values, history untouched (Art. 4). The pushed fix commit 1cfd42621 was READ FROM THE CHECK-RUN API: surface -> completed -> success (quoted; the remote_ci block below carries the read).",
+  "d2_remote_conclusion_rule": "DONE as executable code: scripts/r41_remote_ci_read.py (the API read; exit 2 UNREADABLE forbids a green claim; exit 3 pending forbids it too) + tests/test_remote_ci_rule.py (every record from r40 on MUST carry pushed_sha + a real check-run conclusion; a quoted success must carry the check-run list — an unquoted success is not evidence). The r40 record's remote_ci carries the honest API-read FAILURE for 6fab59a41.",
+  "d3_negative_controls": "DONE: tests/test_v77_bind_controls.py — pricing N1/N2/N3 silent (OPERATIONAL COST line; quantified in-prose cost; duty-cycle mention confined to the falsification span), positives P1 (the committed HO6-03 bill) + P2 (synthetic unpriced) fire; diversity N4/N5/N6 silent (six distinct classes; 2-shared set + distinct third; a same-class second row under the cap), positives P3 (third row of one class) + P4 (missing declaration) fire. Two REAL defects fell out of the controls and were fixed: the duty detection read the whole bill instead of the mechanism span (a falsification-test protocol could fire the pricing bind), and the _COST_QUANT trailing word-boundary after '%' could never match — quantified percent-costs were invisible to the pricing bind since it shipped.",
+  "d4_lexicon_semantics": "DONE: 'cyclone'/'cyclonic' excluded from the thermal-cycling class (device nouns, not cycling); the charge-discharge class requires the charge/discharge PAIRING ('charge-sensing' is a measurement, not a cycle). OR-mapping preserved: HO6-02 is still caught — by the typed LLM leg reading INVERTED.",
+  "d5_verdict_reason_resolution": "DONE by construction: the direction-LLM returns the structured sign comparison and _derive_direction computes the verdict (SAME->INVERTED, OPPOSITE->CORRECT, UNSTATED->UNCLEAR) with the reason assembled from the fields — verdict and reason cannot diverge structurally; a label disagreement types DIVERGENT (fail-open, disclosed). Re-validation: 6/6 retrospective rows show zero divergence; HO6-03 reads CORRECT by derivation, matching AM37's own 'the erosion direction is right'.",
+  "d6_no_v7": "HONORED: zero v7 generation, zero new v7-adjacent claims; the v7 claim will be filed only after the packet exists on the audit branch and the pushed CI is green — this round's CI is green (API-read) and the packet is the auditor's pending act."
+ },
+ "art27_capability_budget": {
+  "engine_diff": "guard-integrity only: scripts/r41_remote_ci_read.py ADDED (the D2 hard rule as code); tests/test_remote_ci_rule.py and tests/test_v77_bind_controls.py ADDED (the remote-conclusion schema gate; the pricing/diversity negative controls); scripts/r40_machine_v77.py EDITED (D4 lexicon semantics — cyclone exclusion + charge/discharge pairing; the duty detection moved to the mechanism span; the _COST_QUANT trailing-boundary fix; D5 _derive_direction + the structured-sign contract; _derive_direction exported); eval/r40_status.json EDITED forward-only (the missing art27 field + the honest remote_ci FAILURE block); eval/work_claims.json EDITED (session builder-r20s3 registered; c-0055 schema-complete). The frozen V7.6 path and the v6 rows are BYTE-UNCHANGED; zero LLM generation (the 6 direction-check re-validation calls read the committed bills as fixtures).",
+  "primary_metric_delta": "none — no acceptance run (D6: v7 waits for the auditor's sealed packet); the re-validated checker mapping (4/4 with the wordform firings suppressed, 6/6 verdict/reason agreement) is a guard-quality measurement, not a capability score; no number is claimed.",
+  "deletions": "none — nothing removed; the V76 stack stays in force under the V77 directive import; the r40 record's history is preserved (the new fields are forward-only additions per Art. 4)."
+ },
+ "remote_ci": {
+  "pushed_sha": "1cfd42621",
+  "remote_ci_conclusion": "success",
+  "check_runs": [{"name": "surface", "status": "completed", "conclusion": "success"}],
+  "read_at": "2026-11-16T18:35:35Z (sandbox clock; check-run API via authenticated read — the green is the remote's, not a local pytest run)"
+ },
+ "json_guard_note": "the FIRST closeout attempt of this record was REFUSED BY THE c-0054 PRE-COMMIT JSON GUARD (Python-literal parenthesized continuations in the values — the same defect class the peer's r40 record shipped with, caught this time AT COMMIT TIME instead of at verifier time). Rewritten as proper JSON; the refused attempt is disclosed here; the guard's live refusal is the proof the F32/F52/F53 family countermeasure works.",
+ "honesty_notes": [
+  "the round opened by REPRODUCING the red gate locally before fixing it (the auditor's byte-level finding confirmed: surface = failure, exit 1, enforcement block) — the fix is the missing ledger field, not a test weakening",
+  "the negative controls found two real checker defects (the whole-bill duty read; the never-matching percent quantifier) — both are the kind of false-positive/false-negative that only a clean-row control exposes, which is exactly the auditor's point",
+  "the CI quota reality is disclosed: the unauthenticated API is rate-limited from this sandbox; the reads use the vault credential BY NAME (the value never reaches a log, an artifact, or git)"
+ ]
+}
